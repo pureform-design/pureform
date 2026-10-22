@@ -1,6 +1,7 @@
 import { testIds } from "@pureform/anatomy";
 import { createSignal, createStore, flush } from "solid-js";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import { userEvent } from "vitest/browser";
 
 import { ListItem } from ".";
 import { PureformProvider, useIconStyle } from "..";
@@ -301,5 +302,116 @@ describe("List", () => {
         setItems([{ value: "drafts", headline: "Drafts" }, inbox]);
         await settle();
         expect(reads).toBe(before);
+    });
+});
+
+describe("a swipeable ListItem", () => {
+    const pointer = (
+        element: Element,
+        type: "pointerdown" | "pointermove" | "pointerup",
+        clientX: number,
+    ) =>
+        element.dispatchEvent(
+            new PointerEvent(type, {
+                bubbles: true,
+                pointerId: 1,
+                pointerType: "touch",
+                isPrimary: true,
+                clientX,
+            }),
+        );
+
+    it("renders its action as the last part, out of reach until revealed", async () => {
+        withRegistry(() => (
+            <ListItem
+                headline="Message"
+                swipeAction={<button type="button">Delete</button>}
+            />
+        ));
+        await settle();
+        const root = byTestId(ids.root);
+        expect(root.className).toContain("list-item--swipeable-true");
+        expect(root.style.touchAction).toBe("pan-y");
+        expect(root.tabIndex).toBe(0);
+        const action = byTestId(ids.action);
+        expect(root.lastElementChild).toBe(action);
+        expect(action.hasAttribute("inert")).toBe(true);
+        expect(action.textContent).toBe("Delete");
+    });
+
+    it("reveals the action when dragged toward the start past half, and closes when dragged back", async () => {
+        const onRevealedChange = vi.fn();
+        withRegistry(() => (
+            <ListItem
+                headline="Message"
+                swipeAction={<button type="button">Delete</button>}
+                onRevealedChange={onRevealedChange}
+            />
+        ));
+        await settle();
+        const root = byTestId(ids.root);
+        pointer(root, "pointerdown", 200);
+        pointer(root, "pointermove", 180);
+        pointer(root, "pointermove", 140);
+        pointer(root, "pointerup", 140);
+        await settle();
+        expect(onRevealedChange).toHaveBeenLastCalledWith({ revealed: true });
+        expect(byTestId(ids.action).hasAttribute("inert")).toBe(false);
+        pointer(root, "pointerdown", 140);
+        pointer(root, "pointermove", 160);
+        pointer(root, "pointermove", 200);
+        pointer(root, "pointerup", 200);
+        await settle();
+        expect(onRevealedChange).toHaveBeenLastCalledWith({ revealed: false });
+        expect(byTestId(ids.action).hasAttribute("inert")).toBe(true);
+    });
+
+    it("stays closed when the drag falls short of half", async () => {
+        const onRevealedChange = vi.fn();
+        withRegistry(() => (
+            <ListItem
+                headline="Message"
+                swipeAction={<button type="button">Delete</button>}
+                onRevealedChange={onRevealedChange}
+            />
+        ));
+        await settle();
+        const root = byTestId(ids.root);
+        pointer(root, "pointerdown", 200);
+        pointer(root, "pointermove", 190);
+        pointer(root, "pointermove", 180);
+        pointer(root, "pointerup", 180);
+        await settle();
+        expect(onRevealedChange).not.toHaveBeenCalled();
+    });
+
+    it("takes the arrow keys and Escape on the focused row", async () => {
+        const onRevealedChange = vi.fn();
+        withRegistry(() => (
+            <ListItem
+                headline="Message"
+                swipeAction={<button type="button">Delete</button>}
+                onRevealedChange={onRevealedChange}
+            />
+        ));
+        await settle();
+        const root = byTestId(ids.root);
+        root.focus();
+        await userEvent.keyboard("{ArrowLeft}");
+        expect(onRevealedChange).toHaveBeenLastCalledWith({ revealed: true });
+        await userEvent.keyboard("{Escape}");
+        expect(onRevealedChange).toHaveBeenLastCalledWith({ revealed: false });
+    });
+
+    it("can be started revealed, with its action in reach", async () => {
+        withRegistry(() => (
+            <ListItem
+                headline="Message"
+                defaultRevealed
+                swipeAction={<button type="button">Delete</button>}
+            />
+        ));
+        await settle();
+        expect(byTestId(ids.action).hasAttribute("inert")).toBe(false);
     });
 });

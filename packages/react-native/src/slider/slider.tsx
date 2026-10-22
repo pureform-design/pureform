@@ -8,6 +8,7 @@
 import { sliderAnatomy } from "@pureform/anatomy";
 import type { TestIdOverride } from "@pureform/anatomy";
 import {
+    isPresent,
     sliderMarkerTokens,
     sliderSelection,
     sliderStopActive,
@@ -28,6 +29,7 @@ import type { ReactNode } from "react";
 import type { GestureResponderEvent } from "react-native";
 import { Text } from "react-native";
 
+import { IconSlot, iconSlot } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
 import { useDirection } from "../provider";
@@ -55,6 +57,8 @@ export interface SliderProps<V extends SliderValue = SliderValue>
     readonly stops?: boolean | readonly number[] | undefined;
     /** Shows the value beside the handle while it's dragged. */
     readonly valueIndicator?: boolean | undefined;
+    /** An icon inside the active track, at its start; drawn at sizes `medium` and up. */
+    readonly insetIcon?: ReactNode;
     readonly disabled?: boolean | undefined;
     /** What the slider sets, for assistive technology. */
     readonly "aria-label"?: string | undefined;
@@ -127,7 +131,10 @@ function Thumb(props: {
         "slider",
         {
             ...selection,
-            tokens: { ...selection.tokens, ...sliderThumbTokens(props.percent) },
+            tokens: {
+                ...selection.tokens,
+                ...sliderThumbTokens(props.percent),
+            },
         },
         props.state,
     );
@@ -212,7 +219,9 @@ function SliderImpl(props: SliderProps): ReactNode {
     const track = useRef<Track>(undefined);
     const root = useRef<Measurable>(null);
     const percentOf = (v: number) =>
-        max > min ? ((Math.min(Math.max(v, min), max) - min) / (max - min)) * 100 : 0;
+        max > min
+            ? ((Math.min(Math.max(v, min), max) - min) / (max - min)) * 100
+            : 0;
     const percents = values.map(percentOf);
     const indication = useSurfaceIndication(INDICATION!, {
         indication: props.indication,
@@ -226,14 +235,17 @@ function SliderImpl(props: SliderProps): ReactNode {
         dragged: indication.state.dragged,
         ...(props.disabled ? { disabled: true } : {}),
     };
-    const { styles: s, views: v } = useComponentSlots<SliderPart>(
-        "slider",
-        selection,
-        state,
-    );
+    const {
+        styles: s,
+        selected,
+        views: v,
+    } = useComponentSlots<SliderPart>("slider", selection, state);
     const rtl = useDirection() === "rtl";
     const snap = (raw: number) =>
-        Math.min(max, Math.max(min, min + Math.round((raw - min) / step) * step));
+        Math.min(
+            max,
+            Math.max(min, min + Math.round((raw - min) / step) * step),
+        );
     // A thumb moved to `next`, kept between its neighbours.
     const moveThumb = (index: number, next: number) => {
         const low = values[index - 1] ?? min;
@@ -309,13 +321,18 @@ function SliderImpl(props: SliderProps): ReactNode {
                 const { pageX, pageY } = event.nativeEvent;
                 const start = (from: number, length: number) => {
                     track.current = { start: from, length };
-                    const at = { nativeEvent: { pageX, pageY } } as GestureResponderEvent;
+                    const at = {
+                        nativeEvent: { pageX, pageY },
+                    } as GestureResponderEvent;
                     const point = pointValue(at);
                     if (point === undefined) return;
                     // The thumb nearest the point moves.
                     let nearest = 0;
                     values.forEach((thumb, index) => {
-                        if (Math.abs(thumb - point) <= Math.abs(values[nearest]! - point))
+                        if (
+                            Math.abs(thumb - point) <=
+                            Math.abs(values[nearest]! - point)
+                        )
                             nearest = index;
                     });
                     setActive(nearest);
@@ -354,6 +371,20 @@ function SliderImpl(props: SliderProps): ReactNode {
                 style={s.activeTrack}
                 testID={id("activeTrack")}
             />
+            {isPresent(props.insetIcon) && (
+                <v.insetIcon.View
+                    pointerEvents="none"
+                    style={s.insetIcon}
+                    testID={id("insetIcon")}
+                >
+                    <IconSlot
+                        {...iconSlot(selected, "insetIcon")}
+                        motion={s.insetIcon}
+                    >
+                        {props.insetIcon}
+                    </IconSlot>
+                </v.insetIcon.View>
+            )}
             {stops.length > 0 && (
                 <v.markerGroup.View
                     pointerEvents="none"

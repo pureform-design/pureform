@@ -12,7 +12,7 @@ describe("componentClasses", () => {
 });
 
 describe("classesFor", () => {
-    const { button, card, avatar } = classesFor(pureform(), {
+    const { button, card, badge } = classesFor(pureform(), {
         classPrefix: "pf",
     });
 
@@ -38,8 +38,8 @@ describe("classesFor", () => {
                 string
             >
         >();
-        expectTypeOf(avatar()).toEqualTypeOf<string>();
+        expectTypeOf(badge()).toEqualTypeOf<string>();
         // @ts-expect-error a value the variant doesn't have
-        avatar({ size: "huge" });
+        badge({ size: "huge" });
     });
 });

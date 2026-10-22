@@ -146,4 +146,36 @@ describe("Slider", () => {
         expect(indicator.textContent).toBe("2");
         expect(indicator.hidden).toBe(true);
     });
+
+    it("draws an inset icon inside the active track, before the handle, hidden from assistive technology", async () => {
+        withRegistry(() => (
+            <Slider
+                aria-label="Volume"
+                size="large"
+                defaultValue={40}
+                insetIcon="♪"
+            />
+        ));
+        await settle();
+        const root = byTestId(ids.root);
+        expect(parts(root)).toEqual([
+            "start-track",
+            "track",
+            "active-track",
+            "inset-icon",
+            "handle",
+            "input",
+        ]);
+        const icon = byTestId(ids.insetIcon);
+        expect(icon.textContent).toBe("♪");
+        expect(icon.getAttribute("aria-hidden")).toBe("true");
+    });
+
+    it("has no inset icon part without one", async () => {
+        withRegistry(() => <Slider aria-label="Volume" defaultValue={40} />);
+        await settle();
+        expect(
+            document.querySelector(`[data-testid="${ids.insetIcon}"]`),
+        ).toBeNull();
+    });
 });

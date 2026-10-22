@@ -2,11 +2,26 @@
 // group's container, at one of three sizes. It can take a shape. An avatar isn't interactive,
 // so it takes the clip itself; put it inside a button to make it one.
 //
-//   <img class={avatar()} src="…" alt="Ada Lovelace" />
-//   <span class={avatar({ shape: "cookie9Sided" })} role="img" aria-label="Ada Lovelace">AL</span>
+// The root holds the picture (`image`) and what stands in for it (`fallback`: initials or an
+// icon). Zag's avatar machine shows the picture once it has loaded, and the fallback until then
+// and when it fails; a root holding only a fallback is the initials or icon avatar.
+//
+//   <span class={root} role="img" aria-label="Ada Lovelace">
+//     <img class={image} src="/ada.png" alt="" />
+//     <span class={fallback}>AL</span>
+//   </span>
 
 import { typed } from "@pureform/core";
-import { center, cover, inlineFlex, px, unitless } from "@pureform/core/ast";
+import {
+    center,
+    cover,
+    hidden,
+    inlineFlex,
+    pct,
+    px,
+    relative,
+    unitless,
+} from "@pureform/core/ast";
 import type { StyleMap } from "@pureform/core/ast";
 import { radius, textStyle } from "@pureform/theme";
 
@@ -35,11 +50,21 @@ const { tokens, ref } = componentTokens("avatar", {
 const sized = (
     token: "sizeSmall" | "sizeMedium" | "sizeLarge",
     style: string,
-): StyleMap => ({
-    width: ref(token),
-    height: ref(token),
-    textStyle: textStyle(style),
+) => ({
+    root: {
+        width: ref(token),
+        height: ref(token),
+        textStyle: textStyle(style),
+    } satisfies StyleMap,
 });
+
+const onRoot = (variants: Record<string, StyleMap>) =>
+    Object.fromEntries(
+        Object.entries(variants).map(([name, style]) => [
+            name,
+            { root: style },
+        ]),
+    );
 
 const pf = typed();
 
@@ -50,13 +75,15 @@ export const createAvatar = <const G extends string = ColorGroup>(
     shapes: Shapes = DEFAULT_SHAPES,
 ) =>
     variantsOf<{ color: G | typeof DEFAULT_GROUP }>()(
-        pf.component({
+        pf.slotComponent({
             name: "avatar",
             $meta: {
                 description:
-                    "Avatar: a picture (style the img itself), initials, or an icon, in a color group's container. Give it alt text or an aria-label. shape clips it to one of the theme's shapes.",
+                    "Avatar: a picture with initials or an icon as its fallback, in a color group's container. Give it alt text or an aria-label. shape clips it to one of the theme's shapes.",
             },
             tokens,
+            slots: ["root", "image", "fallback"],
+            structure: { root: ["image", "fallback"] },
             variants: {
                 size: ["small", "medium", "large"],
                 color: groups as ColorGroups,
@@ -64,14 +91,27 @@ export const createAvatar = <const G extends string = ColorGroup>(
             },
             recipe: () => ({
                 base: {
-                    display: inlineFlex,
-                    alignItems: center,
-                    justifyContent: center,
-                    flexShrink: unitless(0),
-                    borderRadius: ref("radius"),
-                    backgroundColor: ref("container"),
-                    color: ref("content"),
-                    objectFit: cover,
+                    root: {
+                        position: relative,
+                        display: inlineFlex,
+                        alignItems: center,
+                        justifyContent: center,
+                        flexShrink: unitless(0),
+                        overflow: hidden,
+                        borderRadius: ref("radius"),
+                        backgroundColor: ref("container"),
+                        color: ref("content"),
+                    },
+                    // Neither sets `display`, so the machine's `hidden` hides them.
+                    image: {
+                        width: pct(100),
+                        height: pct(100),
+                        objectFit: cover,
+                    },
+                    fallback: {
+                        alignItems: center,
+                        justifyContent: center,
+                    },
                 },
                 variants: {
                     size: {
@@ -80,10 +120,12 @@ export const createAvatar = <const G extends string = ColorGroup>(
                         large: sized("sizeLarge", "titleLarge"),
                     },
                     color: colorVariant(groups, (g) => ({
-                        backgroundColor: g.container,
-                        color: g.onContainer,
+                        root: {
+                            backgroundColor: g.container,
+                            color: g.onContainer,
+                        },
                     })),
-                    shape: clipVariant(shapes, ref("radius")),
+                    shape: onRoot(clipVariant(shapes, ref("radius"))),
                 },
                 defaultVariants: {
                     size: "medium",

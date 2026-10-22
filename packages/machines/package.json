@@ -194,6 +194,13 @@
                 "default": "./dist/accordion.mjs"
             }
         },
+        "./avatar": {
+            "types": "./dist/avatar/index.d.ts",
+            "import": {
+                "development": "./src/avatar/index.ts",
+                "default": "./dist/avatar.mjs"
+            }
+        },
         "./tree-view": {
             "types": "./dist/tree-view/index.d.ts",
             "import": {
@@ -229,6 +236,7 @@
         "@pureform/js-effects": "workspace:^",
         "@zag-js/accordion": "catalog:",
         "@zag-js/anatomy": "catalog:",
+        "@zag-js/avatar": "catalog:",
         "@zag-js/carousel": "catalog:",
         "@zag-js/checkbox": "catalog:",
         "@zag-js/collection": "catalog:",

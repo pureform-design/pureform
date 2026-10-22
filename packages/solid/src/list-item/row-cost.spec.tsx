@@ -101,8 +101,9 @@ describe("ListItem, setup cost", () => {
         // content, headline, supporting and trailing text), the Shows for the text that can come
         // and go, the classes, the source's handlers, and the contexts. It was 144 before the
         // parts shared their slot props, dropped their extra memos, and built the leading content
-        // once. Lower it when it drops.
-        expect(nodes).toBeLessThanOrEqual(68);
+        // once. The leading avatar is now a root, with the loaded signal its fallback hides for
+        // (c7c: it was one part), which is the 7 over the earlier 68. Lower it when it drops.
+        expect(nodes).toBeLessThanOrEqual(75);
         expect(nodes).toBeGreaterThan(40);
     });
 });

@@ -24,6 +24,7 @@ const ICON_SLOTS: Record<string, string[]> = {
     appBar: ["leading", "trailing"],
     searchBar: ["leading", "trailing"],
     select: ["leadingIcon", "trailingIcon"],
+    slider: ["insetIcon"],
     autocomplete: ["leadingIcon", "trailingIcon"],
     datePicker: ["modeToggle", "prev", "next"],
     dockedDatePicker: ["leadingIcon", "trailingIcon", "prev", "next"],

@@ -45,6 +45,13 @@ export const listItem: ComponentCase = {
         compact: { density: "compact", supportingText: "3 new messages" },
         link: { as: undefined, href: "#inbox", selected: true },
         "not interactive": { as: undefined, supportingText: "Read only" },
+        swipeable: { as: undefined, leading: "✉", swipeAction: "Delete" },
+        "swipeable, revealed": {
+            as: undefined,
+            leading: "✉",
+            swipeAction: "Delete",
+            defaultRevealed: true,
+        },
         disabled: { disabled: true, leading: "✉" },
     },
     keyboard: {

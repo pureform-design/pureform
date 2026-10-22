@@ -26,6 +26,7 @@ import type {
     ColorValue,
     StyleMap,
     ValueNode,
+    ValueType,
 } from "@pureform/core/ast";
 import { size as sizeToken, spacing, textStyle } from "@pureform/theme";
 
@@ -60,7 +61,13 @@ export type RowToken = keyof typeof ROW_TOKENS;
 export const rowTokens = <K extends string = never>(
     name: string,
     extra: Record<K, ValueNode> = {} as Record<K, ValueNode>,
-) => componentTokens<RowToken | K>(name, { ...ROW_TOKENS, ...extra });
+    valueTypes: Partial<Record<RowToken | K, ValueType>> = {},
+) =>
+    componentTokens<RowToken | K>(
+        name,
+        { ...ROW_TOKENS, ...extra },
+        valueTypes,
+    );
 
 /** The colors a selected row takes: its tokens by default, or a color group's container. */
 export interface RowSelected {

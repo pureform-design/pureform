@@ -30,12 +30,16 @@ import { useComponent, useSlotProps } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { combinePartProps, omitProps } from "../props";
 import type { PartProps } from "../props";
+import { useSwipe } from "./swipe";
+import type { Swipe } from "./swipe";
 
 type Anatomy = typeof listItemAnatomy;
 
 /** What Root shares with its parts. */
 interface ListItemContextValue {
     readonly scope: ComponentScope<Anatomy>;
+    /** A swipeable item's state; `undefined` for any other. */
+    readonly swipe: Swipe | undefined;
 }
 
 const context = createPartContext<ListItemContextValue>("ListItem");
@@ -81,8 +85,18 @@ function Root(props: ListItemRootProps): ReactNode {
         source,
         !interactive || !!props.disabled,
     );
+    const variants = listItemVariants(list, props);
+    const swipe = useSwipe(props, !!variants.swipeable);
     const scope = useComponent(listItemAnatomy, {
-        selection: listItemSelection(listItemVariants(list, props), element),
+        selection: listItemSelection(
+            swipe
+                ? {
+                      ...variants,
+                      tokens: { ...variants.tokens, ...swipe.tokens },
+                  }
+                : variants,
+            element,
+        ),
         testId: props.testId,
         unstyled: props.unstyled,
         indication: props.indication,
@@ -91,15 +105,18 @@ function Root(props: ListItemRootProps): ReactNode {
     });
     const { as: _as, ...rest } = omitProps(props, LIST_ITEM_ROOT_PROPS);
     return (
-        <context.Provider value={{ scope }}>
+        <context.Provider value={{ scope, swipe }}>
             {scope.render("root", {
                 element,
-                machine: interactive
-                    ? combinePartProps([
-                          listItemRootProps(props, element),
-                          handlers,
-                      ])
-                    : listItemRootProps(props, element),
+                machine:
+                    interactive || swipe
+                        ? combinePartProps([
+                              listItemRootProps(props, element),
+                              interactive ? handlers : undefined,
+                              swipe?.rootProps(interactive),
+                          ])
+                        : listItemRootProps(props, element),
+                ...(swipe ? { states: { pressed: swipe.dragging } } : {}),
                 props: rest,
             })}
         </context.Provider>
@@ -153,6 +170,18 @@ const Trailing = iconPart("trailing", "Trailing");
 /** Text after the text, such as a count. */
 const TrailingText = textPart("trailingText", "TrailingText", "span");
 
+/** The action a swipeable row uncovers as it slides: put a button in it. It is out of reach of
+ *  assistive technology and the keyboard until it's revealed. */
+function Action({ unstyled, ...props }: ListItemPartProps): ReactNode {
+    const { scope, swipe } = context.use("Action");
+    return scope.render("action", {
+        element: "div",
+        machine: { inert: swipe ? !swipe.revealed : true },
+        unstyled,
+        props,
+    });
+}
+
 /** The ready-made list item's props: Root's, with `className`, `style`, and `slotProps` keyed by
  *  part, and its content. `lines` follows the content unless given. */
 export interface ListItemProps
@@ -173,6 +202,7 @@ function ReadyMade(props: ListItemProps): ReactNode {
         leading,
         trailing,
         trailingText,
+        swipeAction,
         mirrorLeading,
         mirrorTrailing,
         ...rootProps
@@ -182,6 +212,7 @@ function ReadyMade(props: ListItemProps): ReactNode {
         <Root
             {...rootProps}
             lines={props.lines ?? listItemLines(props)}
+            swipeable={props.swipeable ?? (isPresent(swipeAction) || undefined)}
             {...(slot("root") as object)}
         >
             {isPresent(leading) ? (
@@ -210,6 +241,9 @@ function ReadyMade(props: ListItemProps): ReactNode {
                     {trailingText}
                 </TrailingText>
             ) : null}
+            {isPresent(swipeAction) ? (
+                <Action {...slot("action")}>{swipeAction}</Action>
+            ) : null}
         </Root>
     );
 }
@@ -227,4 +261,5 @@ export const ListItem = Object.assign(ReadyMade, {
     SupportingText,
     Trailing,
     TrailingText,
+    Action,
 });

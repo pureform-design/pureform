@@ -5,23 +5,33 @@ import { listItemAnatomy } from "@pureform/anatomy";
 import type { TestIdOverride } from "@pureform/anatomy";
 import {
     isPresent,
+    LIST_ITEM_SWIPE_SLOP,
+    LIST_ITEM_SWIPE_WIDTH,
     listItemLines,
     listItemSelection,
     listItemVariants,
+    swipeKeyAction,
+    swipeOffsetOf,
+    swipeRestOffset,
+    swipeSettlesOpen,
+    swipeTokens,
 } from "@pureform/binding-core";
 import type {
     InteractiveProps,
     ListItemContentProps,
+    ListItemSwipeProps,
     ListItemPart,
     ListItemVariantProps,
     ListVariantProps,
 } from "@pureform/binding-core";
-import { createContext, use } from "react";
+import { createContext, use, useRef, useState } from "react";
 import type { ReactNode } from "react";
+import { PanResponder } from "react-native";
 
 import { IconSlot, iconSlot } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, unselectable, withEngine } from "../parts";
+import { useDirection } from "../provider";
 import { useComponentSlots } from "../styles";
 
 const [INDICATION] = listItemAnatomy.indication!;
@@ -30,11 +40,13 @@ export interface ListItemProps
     extends
         ListItemVariantProps,
         ListItemContentProps<ReactNode>,
+        ListItemSwipeProps,
         InteractiveProps {
     /** The current item, such as the page a navigation list is on. */
     readonly selected?: boolean | undefined;
     readonly disabled?: boolean | undefined;
-    /** Makes the item act. */
+    /** Makes the item act. A swipeable item (one with a `swipeAction`) takes the drag instead, so
+     *  it can't also be pressed: put the press on its content. */
     readonly onPress?: (() => void) | undefined;
     readonly testId?: TestIdOverride<ListItemPart> | undefined;
 }
@@ -44,7 +56,55 @@ export const ListDefaults = createContext<ListVariantProps | null>(null);
 
 function ListItemImpl(props: ListItemProps): ReactNode {
     const list = use(ListDefaults);
-    const interactive = props.onPress !== undefined;
+    const swipeable = props.swipeable ?? isPresent(props.swipeAction);
+    const interactive = props.onPress !== undefined && !swipeable;
+    const rtl = useDirection() === "rtl";
+    const width = props.swipeWidth ?? LIST_ITEM_SWIPE_WIDTH;
+    const [own, setOwn] = useState(props.defaultRevealed ?? false);
+    const revealed = props.revealed ?? own;
+    // Where a drag has the row, as its slid offset; `undefined` when it isn't held.
+    const [drag, setDrag] = useState<number | undefined>(undefined);
+    const offset = drag ?? swipeRestOffset(revealed, width);
+    const setRevealed = (next: boolean) => {
+        if (next === revealed) return;
+        if (props.revealed === undefined) setOwn(next);
+        props.onRevealedChange?.({ revealed: next });
+    };
+    // The responder is made once; it reads the latest render's values from here.
+    const latest = useRef({ offset, width, rtl, setRevealed });
+    latest.current = { offset, width, rtl, setRevealed };
+    const start = useRef(0);
+    const pan = useRef(
+        PanResponder.create({
+            onMoveShouldSetPanResponder: (_event, gesture) =>
+                Math.abs(gesture.dx) > LIST_ITEM_SWIPE_SLOP &&
+                Math.abs(gesture.dx) > Math.abs(gesture.dy),
+            onPanResponderGrant: () => {
+                start.current = latest.current.offset;
+            },
+            onPanResponderMove: (_event, gesture) =>
+                setDrag(
+                    swipeOffsetOf(
+                        start.current,
+                        0,
+                        gesture.dx,
+                        latest.current.width,
+                        latest.current.rtl,
+                    ),
+                ),
+            onPanResponderRelease: (_event, gesture) => {
+                const { width, rtl, setRevealed } = latest.current;
+                setRevealed(
+                    swipeSettlesOpen(
+                        swipeOffsetOf(start.current, 0, gesture.dx, width, rtl),
+                        width,
+                    ),
+                );
+                setDrag(undefined);
+            },
+            onPanResponderTerminate: () => setDrag(undefined),
+        }),
+    ).current;
     const indication = useSurfaceIndication(INDICATION!, {
         indication: props.indication,
         interactionSource: props.interactionSource,
@@ -61,7 +121,16 @@ function ListItemImpl(props: ListItemProps): ReactNode {
             listItemSelection(
                 {
                     ...listItemVariants(list, props),
+                    swipeable,
                     lines: props.lines ?? listItemLines(props),
+                    ...(swipeable
+                        ? {
+                              tokens: {
+                                  ...props.tokens,
+                                  ...swipeTokens(offset, width),
+                              },
+                          }
+                        : {}),
                 },
                 interactive ? "button" : "div",
             ),
@@ -74,7 +143,9 @@ function ListItemImpl(props: ListItemProps): ReactNode {
                       ? { mirrored: true }
                       : {}),
               })
-            : {},
+            : swipeable && drag !== undefined
+              ? { pressed: true }
+              : {},
     );
     const id = (part: ListItemPart) =>
         testIdOf(listItemAnatomy, part, props.testId);
@@ -96,6 +167,54 @@ function ListItemImpl(props: ListItemProps): ReactNode {
             </Slot.View>
         ) : null;
     };
+    const action = isPresent(props.swipeAction) ? (
+        <v.action.View
+            aria-hidden={revealed ? undefined : true}
+            importantForAccessibility={
+                revealed ? "auto" : "no-hide-descendants"
+            }
+            pointerEvents={revealed ? "auto" : "none"}
+            style={s.action}
+            testID={id("action")}
+        >
+            {props.swipeAction}
+        </v.action.View>
+    ) : null;
+    const content = (
+        <>
+            {icon("leading", props.leading)}
+            <v.content.View style={s.content} testID={id("content")}>
+                {line("overline", props.overline)}
+                {line("headline", props.headline)}
+                {line("supportingText", props.supportingText)}
+            </v.content.View>
+            {icon("trailing", props.trailing)}
+            {line("trailingText", props.trailingText)}
+        </>
+    );
+    // A swipeable row takes the drag itself rather than the press.
+    if (swipeable)
+        return (
+            <v.root.View
+                {...pan.panHandlers}
+                {...({
+                    onKeyDown: (event: { nativeEvent: { key?: string } }) => {
+                        const next = swipeKeyAction(
+                            event.nativeEvent.key ?? "",
+                            rtl,
+                        );
+                        if (next) setRevealed(next === "reveal");
+                    },
+                } as object)}
+                focusable
+                role="listitem"
+                style={{ ...s.root, ...unselectable }}
+                testID={id("root")}
+            >
+                {content}
+                {action}
+            </v.root.View>
+        );
     return (
         <v.root.Pressable
             {...(interactive ? indication.handlers : {})}
@@ -106,14 +225,7 @@ function ListItemImpl(props: ListItemProps): ReactNode {
             style={{ ...s.root, ...unselectable }}
             testID={id("root")}
         >
-            {icon("leading", props.leading)}
-            <v.content.View style={s.content} testID={id("content")}>
-                {line("overline", props.overline)}
-                {line("headline", props.headline)}
-                {line("supportingText", props.supportingText)}
-            </v.content.View>
-            {icon("trailing", props.trailing)}
-            {line("trailingText", props.trailingText)}
+            {content}
             {indication.layer(selected)}
         </v.root.Pressable>
     );

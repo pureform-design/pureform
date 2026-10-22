@@ -245,6 +245,17 @@ export {
     listItemRootProps,
     listItemSelection,
 } from "./components/list-item";
+export {
+    LIST_ITEM_SWIPE_PROPS,
+    LIST_ITEM_SWIPE_SLOP,
+    LIST_ITEM_SWIPE_WIDTH,
+    swipeKeyAction,
+    swipeOffsetOf,
+    swipeRestOffset,
+    swipeSettlesOpen,
+    swipeTokens,
+} from "./components/list-item-swipe";
+export type { ListItemSwipeProps } from "./components/list-item-swipe";
 export type {
     ListItemContentProps,
     ListItemPart,
@@ -831,13 +842,15 @@ export type {
 } from "./components/badge";
 export {
     AVATAR_ROOT_PROPS,
-    avatarElement,
+    avatarMachineProps,
     avatarRootProps,
     avatarSelection,
 } from "./components/avatar";
 export type {
+    AvatarContentProps,
     AvatarPart,
     AvatarRootOwnProps,
+    AvatarStatus,
     AvatarVariantProps,
 } from "./components/avatar";
 export {

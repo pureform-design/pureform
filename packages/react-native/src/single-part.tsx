@@ -25,6 +25,7 @@ import {
     textSelection,
 } from "@pureform/binding-core";
 import type {
+    AvatarPart,
     AvatarVariantProps,
     BadgeVariantProps,
     IconVariantProps,
@@ -36,6 +37,7 @@ import type {
 } from "@pureform/binding-core";
 import type { Selected, Style } from "@pureform/rn-adapter/factory";
 import { useTokens } from "@pureform/rn-adapter/react";
+import { useState } from "react";
 import type { ReactNode } from "react";
 import { Image, Text as NativeText, View } from "react-native";
 import type { ImageStyle, StyleProp, TextStyle, ViewStyle } from "react-native";
@@ -82,16 +84,40 @@ export function Text(props: TextProps): ReactNode {
 export interface AvatarProps extends AvatarVariantProps {
     /** Who it stands for, for assistive technology. */
     readonly label?: string | undefined;
-    /** Initials, or anything else to show. */
+    /** The picture. It shows once it has loaded; until then, and if it fails, the children do. */
+    readonly src?: string | undefined;
+    /** Called when the picture loads or fails. */
+    readonly onStatusChange?:
+        | ((details: { readonly status: "loaded" | "error" }) => void)
+        | undefined;
+    /** Initials, or anything else to show: the fallback. */
     readonly children?: ReactNode;
-    readonly testId?: TestIdOverride<Root> | undefined;
+    readonly testId?: TestIdOverride<AvatarPart> | undefined;
 }
+
+// An image that hasn't loaded still has to, so it stays mounted but takes no room.
+const HIDDEN = {
+    position: "absolute",
+    width: 0,
+    height: 0,
+    opacity: 0,
+} as const;
 
 function AvatarImpl(props: AvatarProps): ReactNode {
     const engine = useEngine();
     const selected = useSelectedStyles("avatar", avatarSelection(props));
     const style = rootOf(selected);
     const Drawing = engine.Drawing;
+    // The picture's load, per `src`: a new one starts over.
+    const [status, setStatus] = useState<{
+        src: string | undefined;
+        loaded: boolean;
+    }>({ src: props.src, loaded: false });
+    const loaded = status.src === props.src && status.loaded;
+    const settle = (next: "loaded" | "error") => {
+        setStatus({ src: props.src, loaded: next === "loaded" });
+        props.onStatusChange?.({ status: next });
+    };
     return (
         <View
             role="img"
@@ -102,9 +128,28 @@ function AvatarImpl(props: AvatarProps): ReactNode {
             testID={testIdOf(avatarAnatomy, "root", props.testId)}
         >
             {Drawing ? <Drawing drawing={rootDrawing(selected)} /> : null}
-            <NativeText style={ownText(style) as TextStyle}>
-                {props.children}
-            </NativeText>
+            {props.src !== undefined && (
+                <Image
+                    accessibilityElementsHidden
+                    alt=""
+                    onError={() => settle("error")}
+                    onLoad={() => settle("loaded")}
+                    source={{ uri: props.src }}
+                    style={[
+                        selected.styles.image as ImageStyle,
+                        loaded ? null : HIDDEN,
+                    ]}
+                    testID={testIdOf(avatarAnatomy, "image", props.testId)}
+                />
+            )}
+            {loaded ? null : (
+                <NativeText
+                    style={ownText(style) as TextStyle}
+                    testID={testIdOf(avatarAnatomy, "fallback", props.testId)}
+                >
+                    {props.children}
+                </NativeText>
+            )}
         </View>
     );
 }

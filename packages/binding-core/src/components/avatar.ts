@@ -1,6 +1,7 @@
 // The avatar's contract, shared by every binding: the props Root takes for itself, how they map
-// onto the selection, and Root's element props. An avatar is a picture (`src`, an `<img>`), or
-// initials or an icon (its children, in a `<span>`), named by `label`.
+// onto the selection and the avatar machine (Zag's), and Root's element props. An avatar is a
+// picture (`src`, the `image` part) with initials or an icon (the `fallback` part, its children)
+// that show until the picture has loaded and when it fails, named by `label`.
 
 import type {
     avatarAnatomy,
@@ -12,7 +13,7 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 import type { Unstyled } from "../parts";
 import type { VariantProp } from "./variants";
 
-/** The avatar's parts: `"root"`. */
+/** The avatar's parts: `"root" | "image" | "fallback"`. */
 export type AvatarPart = PartName<typeof avatarAnatomy>;
 
 /** The avatar's variant groups and instance tokens. */
@@ -23,16 +24,23 @@ export interface AvatarVariantProps {
     readonly tokens?: InstanceTokens<"avatar"> | undefined;
 }
 
+/** How the picture's load stands once it has settled. */
+export type AvatarStatus = "loaded" | "error";
+
 /** Everything Root takes for itself, besides the element's own props and `as`. */
 export interface AvatarRootOwnProps extends AvatarVariantProps {
-    /** The picture: Root renders an `<img>`. */
-    readonly src?: string | undefined;
-    /** Who or what it shows: the picture's `alt`, or the initials' accessible name. Left out,
-     *  the avatar is decorative and hidden from assistive technology. */
+    /** Who or what it shows: the avatar's accessible name. Left out, the avatar is decorative
+     *  and hidden from assistive technology. */
     readonly label?: string | undefined;
+    /** Called when the picture loads or fails. */
+    readonly onStatusChange?:
+        | ((details: { readonly status: AvatarStatus }) => void)
+        | undefined;
+    /** Root's id, also the machine's. */
+    readonly id?: string | undefined;
     /** A test id for Root, or ids by part. */
     readonly testId?: TestIdOverride<AvatarPart> | undefined;
-    /** Without the registry's styles. */
+    /** Every part, or some, without the registry's styles. */
     readonly unstyled?: Unstyled<AvatarPart> | undefined;
 }
 
@@ -42,18 +50,21 @@ export const AVATAR_ROOT_PROPS = [
     "color",
     "shape",
     "tokens",
-    "src",
     "label",
+    "onStatusChange",
+    "id",
     "testId",
     "unstyled",
 ] as const satisfies readonly (keyof AvatarRootOwnProps)[];
 
-/** The element Root renders: `as`, else an `<img>` with a `src`, else a `<span>`. */
-export const avatarElement = <E>(props: {
+/** What the ready-made avatar renders inside Root, in the framework's node type. */
+export interface AvatarContentProps<Node> {
+    /** The picture. It shows once it has loaded; until then, and if it fails, the children
+     *  (the fallback) do. */
     readonly src?: string | undefined;
-    readonly as?: E | undefined;
-}): E | "img" | "span" =>
-    props.as ?? (props.src !== undefined ? "img" : "span");
+    /** Initials, or an icon: the fallback. */
+    readonly children?: Node;
+}
 
 /** The registry selection from Root's props. */
 export const avatarSelection = (
@@ -65,14 +76,14 @@ export const avatarSelection = (
     tokens: props.tokens,
 });
 
-/** Root's element props: a picture's `src` and `alt` (empty when decorative); anything else is
- *  `role="img"` named by `label`, or hidden from assistive technology without one. */
-export const avatarRootProps = (
-    props: Pick<AvatarRootOwnProps, "src" | "label">,
-    element: unknown,
-) =>
-    element === "img"
-        ? { src: props.src, alt: props.label ?? "" }
-        : props.label === undefined
-          ? { "aria-hidden": "true" as const }
-          : { role: "img" as const, "aria-label": props.label };
+/** The machine's props from Root's. */
+export const avatarMachineProps = (
+    props: Pick<AvatarRootOwnProps, "id" | "onStatusChange">,
+) => ({ id: props.id, onStatusChange: props.onStatusChange });
+
+/** Root's element props: `role="img"` named by `label`, or hidden from assistive technology
+ *  without one. The picture inside is decorative, since the root names it. */
+export const avatarRootProps = (props: Pick<AvatarRootOwnProps, "label">) =>
+    props.label === undefined
+        ? { "aria-hidden": "true" as const }
+        : { role: "img" as const, "aria-label": props.label };

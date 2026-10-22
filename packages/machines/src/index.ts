@@ -2,6 +2,7 @@
 // `anatomy`, `props`, and its types), also importable from its own subpath.
 
 export * as accordion from "./accordion";
+export * as avatar from "./avatar";
 export * as button from "./button";
 export * as buttonGroup from "./button-group";
 export * as carousel from "./carousel";

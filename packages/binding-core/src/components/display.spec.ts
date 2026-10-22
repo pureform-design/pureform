@@ -8,7 +8,7 @@ import type {
 } from "@pureform/anatomy";
 import { describe, expect, expectTypeOf, it, vi } from "vitest";
 
-import { avatarElement, avatarRootProps } from "./avatar";
+import { avatarMachineProps, avatarRootProps } from "./avatar";
 import { badgeRootProps, badgeSelection } from "./badge";
 import {
     CARD_ROOT_PROPS,
@@ -310,18 +310,17 @@ describe("card", () => {
 });
 
 describe("static components", () => {
-    it("draws an avatar as a picture or a named image", () => {
-        expect(avatarElement({ src: "/ada.png" })).toBe("img");
-        expect(avatarElement({})).toBe("span");
-        expect(avatarRootProps({ src: "/ada.png" }, "img")).toEqual({
-            src: "/ada.png",
-            alt: "",
-        });
-        expect(avatarRootProps({ label: "Ada" }, "span")).toEqual({
+    it("names an avatar by its label and hides it without one", () => {
+        expect(avatarRootProps({ label: "Ada" })).toEqual({
             role: "img",
             "aria-label": "Ada",
         });
-        expect(avatarRootProps({}, "span")).toEqual({ "aria-hidden": "true" });
+        expect(avatarRootProps({})).toEqual({ "aria-hidden": "true" });
+        const onStatusChange = () => {};
+        expect(avatarMachineProps({ id: "a", onStatusChange })).toEqual({
+            id: "a",
+            onStatusChange,
+        });
     });
 
     it("names a badge by its label and hides a dot without one", () => {

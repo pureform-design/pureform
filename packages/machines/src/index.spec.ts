@@ -1,4 +1,5 @@
 import * as zagAccordion from "@zag-js/accordion";
+import * as zagAvatar from "@zag-js/avatar";
 import * as zagCarousel from "@zag-js/carousel";
 import * as zagCheckbox from "@zag-js/checkbox";
 import * as zagCombobox from "@zag-js/combobox";
@@ -24,6 +25,16 @@ describe("@pureform/machines", () => {
         expect(machines.dialog.connect).toBe(zagDialog.connect);
         expect(machines.tooltip.machine).toBe(zagTooltip.machine);
         expect(machines.tooltip.connect).toBe(zagTooltip.connect);
+    });
+
+    it("re-exports Zag's avatar unchanged, with the parts the preset draws", () => {
+        expect(machines.avatar.machine).toBe(zagAvatar.machine);
+        expect(machines.avatar.connect).toBe(zagAvatar.connect);
+        expect(machines.avatar.anatomy.keys()).toEqual([
+            "root",
+            "image",
+            "fallback",
+        ]);
     });
 
     it("re-exports Zag's date picker and date input unchanged", () => {

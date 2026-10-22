@@ -3,6 +3,7 @@
 import {
     accordionAnatomy,
     autocompleteAnatomy,
+    avatarAnatomy,
     buttonAnatomy,
     buttonGroupAnatomy,
     calendarCellAnatomy,
@@ -30,6 +31,7 @@ import {
 import { describe, expect, it } from "vitest";
 
 import { anatomy as accordion } from "./accordion/accordion.anatomy";
+import { anatomy as avatar } from "./avatar/avatar.anatomy";
 import { anatomy as buttonGroup } from "./button-group";
 import { anatomy as button } from "./button/button.anatomy";
 import { anatomy as carousel } from "./carousel/carousel.anatomy";
@@ -69,6 +71,7 @@ interface Pair {
 const pairs: Record<string, Pair> = {
     accordion: { machine: accordion, preset: accordionAnatomy },
     autocomplete: { machine: autocomplete, preset: autocompleteAnatomy },
+    avatar: { machine: avatar, preset: avatarAnatomy },
     button: { machine: button, preset: buttonAnatomy },
     buttonGroup: { machine: buttonGroup, preset: buttonGroupAnatomy },
     calendarCell: { machine: calendarCell, preset: calendarCellAnatomy },

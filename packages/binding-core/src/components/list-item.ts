@@ -13,6 +13,8 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 import type { Unstyled } from "../parts";
 import { isPresent } from "./content";
 import type { InteractiveProps } from "./indication";
+import type { ListItemSwipeProps } from "./list-item-swipe";
+import { LIST_ITEM_SWIPE_PROPS } from "./list-item-swipe";
 import type { VariantProp } from "./variants";
 
 /** The list item's parts: `"root" | "leading" | "content" | "overline" | "headline" |
@@ -30,6 +32,9 @@ export interface ListItemVariantProps {
     /** Its place among a segmented list's tiles, which rounds its corners. A segmented `List`
      *  sets it. @default "none" */
     readonly position?: VariantProp<"listItem", "position">;
+    /** The row slides to uncover an action (`swipeAction` on the ready-made item). Set by the
+     *  ready-made item when it has one. @default false */
+    readonly swipeable?: boolean | undefined;
     readonly density?: VariantProp<"listItem", "density">;
     readonly color?: VariantProp<"listItem", "color">;
     readonly tokens?: InstanceTokens<"listItem"> | undefined;
@@ -45,7 +50,11 @@ export interface ListItemStateProps {
 
 /** Everything Root takes for itself, besides the element's own props and `as`. */
 export interface ListItemRootOwnProps
-    extends ListItemVariantProps, ListItemStateProps, InteractiveProps {
+    extends
+        ListItemVariantProps,
+        ListItemStateProps,
+        ListItemSwipeProps,
+        InteractiveProps {
     /** A prefix for every part's test id (`inbox` → `inbox-headline`), or ids by part. */
     readonly testId?: TestIdOverride<ListItemPart> | undefined;
     /** Every part, or some, without the registry's styles. */
@@ -58,9 +67,11 @@ export const LIST_ITEM_ROOT_PROPS = [
     "interactive",
     "leadingType",
     "position",
+    "swipeable",
     "density",
     "color",
     "tokens",
+    ...LIST_ITEM_SWIPE_PROPS,
     "selected",
     "disabled",
     "testId",
@@ -82,6 +93,9 @@ export interface ListItemContentProps<Node> {
     readonly trailing?: Node;
     /** Text after the text, such as a count. */
     readonly trailingText?: Node;
+    /** The action the row slides to uncover: a button. Makes the item swipeable. Don't put it in
+     *  a link or button item; the action is a button of its own. */
+    readonly swipeAction?: Node;
     /** Flip the leading or trailing icon under `rtl`, for an icon that points. */
     readonly mirrorLeading?: boolean | undefined;
     readonly mirrorTrailing?: boolean | undefined;
@@ -95,6 +109,7 @@ export const LIST_ITEM_CONTENT_PROPS = [
     "leading",
     "trailing",
     "trailingText",
+    "swipeAction",
     "mirrorLeading",
     "mirrorTrailing",
 ] as const satisfies readonly (keyof ListItemContentProps<unknown>)[];
@@ -126,6 +141,7 @@ export const listItemSelection = (
     interactive: isInteractiveListItem(props, element),
     leadingType: props.leadingType,
     position: props.position,
+    swipeable: props.swipeable,
     density: props.density,
     color: props.color,
     tokens: props.tokens,

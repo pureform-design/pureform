@@ -1659,19 +1659,21 @@ export function Page() {
                     >
                         {([size, shape, color]) => (
                             <span
-                                class={avatar({ size, shape, color })}
+                                class={avatar({ size, shape, color }).root}
                                 role="img"
                                 aria-label="Ada Lovelace"
                             >
-                                AL
+                                <span class={avatar().fallback}>AL</span>
                             </span>
                         )}
                     </For>
-                    <img
-                        class={avatar({ size: "large", shape: "sunny" })}
-                        src={PORTRAIT}
-                        alt="A landscape, cropped to fill the avatar"
-                    />
+                    <span
+                        class={avatar({ size: "large", shape: "sunny" }).root}
+                        role="img"
+                        aria-label="A landscape, cropped to fill the avatar"
+                    >
+                        <img class={avatar().image} src={PORTRAIT} alt="" />
+                    </span>
                 </div>
                 <div style={{ ...row, "align-items": "flex-start" }}>
                     <For
@@ -2742,6 +2744,19 @@ export function Page() {
                                             [40],
                                             [],
                                         ],
+                                        // The inset icon (c7c): a large slider.
+                                        [
+                                            { size: "large" },
+                                            {
+                                                value: 60,
+                                                activeStart: 0,
+                                                activeEnd: 60,
+                                                startGap: 0,
+                                                endGap: 1,
+                                            },
+                                            [60],
+                                            [],
+                                        ],
                                     ] as const
                                 ).map(
                                     (
@@ -2778,6 +2793,11 @@ export function Page() {
                                                 <span class={s.startTrack} />
                                                 <span class={s.track} />
                                                 <span class={s.activeTrack} />
+                                                {"size" in variants && (
+                                                    <span class={s.insetIcon}>
+                                                        ♪
+                                                    </span>
+                                                )}
                                                 <div class={s.markerGroup}>
                                                     {stops.map((stop) => (
                                                         <span

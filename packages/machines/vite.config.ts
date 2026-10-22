@@ -33,6 +33,7 @@ export default createConfig({
                     toast: "src/toast/index.ts",
                     carousel: "src/carousel/index.ts",
                     accordion: "src/accordion/index.ts",
+                    avatar: "src/avatar/index.ts",
                     "tree-view": "src/tree-view/index.ts",
                     paginator: "src/paginator/index.ts",
                     combobox: "src/combobox/index.ts",

@@ -16,6 +16,8 @@ export const avatar: ComponentCase = {
     component: "Avatar",
     props: { label: "Ada Lovelace", children: "AL" },
     root: testIds.avatar.root,
+    // A picture that loads after hydrating swaps itself in for its fallback.
+    measured: true,
     examples: {
         initials: {},
         small: { size: "small" },
@@ -23,6 +25,8 @@ export const avatar: ComponentCase = {
         "secondary color": { color: "secondary" },
         shaped: { shape: "cookie9Sided" },
         picture: { src: PICTURE, children: undefined },
+        "picture with a fallback": { src: PICTURE },
+        "failed picture": { src: "/no-such-avatar.png" },
         decorative: { label: undefined },
     },
 };

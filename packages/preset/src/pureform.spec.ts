@@ -113,6 +113,7 @@ describe("pureform", () => {
             "fab",
             "fabMenu",
             "splitButton",
+            "avatar",
             "chip",
             "inputChip",
             "textField",
