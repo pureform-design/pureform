@@ -184,7 +184,9 @@ field, collapsible → accordion and expandable list items).
 
 ### No M3 component, ranked by usefulness
 
-Built with the Material guidelines and the existing parts, tokens and anatomy, if wanted:
+Built with the Material guidelines and the existing parts, tokens and anatomy. Ranks 1 to 7 are
+planned in [c9](phases/c9-beyond-m3.md) as NumberField, FileUpload, CodeField, Popover,
+ColorPicker, CopyButton and Rating; the rest aren't planned.
 
 | #   | Zag             | Why                                                                           | Built from                                     |
 | --- | --------------- | ----------------------------------------------------------------------------- | ---------------------------------------------- |

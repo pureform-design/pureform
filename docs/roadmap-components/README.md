@@ -48,6 +48,7 @@ flowchart LR
     r6 --> m2[m2 spring components]
     m1 --> m2
     m2 --> c8[c8 Material gaps from Zag]
+    c8 --> c9[c9 components beyond M3]
 ```
 
 A phase depends on the one before it unless its file says it needs only a specific earlier
@@ -76,6 +77,7 @@ contexts exist.
 | [x]  | [m1 Springs foundation](phases/m1-springs-foundation.md) ([m1](context/m1.md))                                                                                                                                     | m1                                                                                                                    | Spring and `linear()` motion plumbing; M3 springs; emphasized path |                  |
 | [ ]  | [m2 Spring components](phases/m2-spring-components.md)                                                                                                                                                             | TBD                                                                                                                   | Components moved to springs                                        |                  |
 | [ ]  | [c8 Material gaps from Zag](phases/c8-zag-gaps.md)                                                                                                                                                                 | c8a bottom sheet partly open, c8b context menu trigger, c8c resizable panes                                           | M3 behaviours a Zag machine can back                               |                  |
+| [ ]  | [c9 Components beyond M3](phases/c9-beyond-m3.md)                                                                                                                                                                  | c9a NumberField and CodeField, c9b FileUpload, c9c Popover, c9d ColorPicker, c9e CopyButton and Rating                | Useful components M3 doesn't specify                               |                  |
 
 ## Rules that apply to every phase
 
