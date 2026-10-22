@@ -29,12 +29,16 @@ import type {
 } from "@pureform/binding-core";
 import { useState } from "react";
 import type { ReactNode, Ref } from "react";
-import { Pressable } from "react-native";
+import { Platform, Pressable } from "react-native";
 import type { TextInputProps } from "react-native";
 
 import { IconSlot, iconSlot } from "./icon-style";
 import { useControllable, withEngine } from "./parts";
 import { useComponentSlots } from "./styles";
+
+/** React Native Web draws a field that isn't editable as `readonly`; a disabled one is
+ *  `disabled` there instead, as the web bindings draw it (React Native Web forwards it). */
+const WEB_DISABLED = Platform.OS === "web";
 
 /** What every text input takes. */
 export interface FieldProps extends TextFieldContentProps<ReactNode> {
@@ -181,8 +185,13 @@ function FieldImpl(props: FieldOptions): ReactNode {
                         props.inputProps?.onBlur?.(event as never);
                     }}
                     editable={
-                        !props.disabled && !props.readOnly && !props.display
+                        !(props.disabled && !WEB_DISABLED) &&
+                        !props.readOnly &&
+                        !props.display
                     }
+                    {...(WEB_DISABLED && props.disabled
+                        ? ({ disabled: true } as object)
+                        : {})}
                     {...(typeof props.label === "string"
                         ? { "aria-label": props.label }
                         : {})}
