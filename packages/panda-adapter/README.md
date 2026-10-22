@@ -99,8 +99,10 @@ ClassFactory<"<name>">`. It imports the component's recipe from its own file
 `generate` adds the header, `index.ts` (the registry), and `registry.d.ts` (the types). The
 codegen returns `themeAttribute: "data-panda-theme"` (`THEME_ATTRIBUTE`), the attribute Panda
 scopes themes by, so `registry.themeAttributes("teal")` is `{ "data-panda-theme": "teal" }`, and
-`vars: { prefix, tokenPrefix }` from its options. Set `tokenPrefix` to Panda's own `prefix` when
-the app's Panda config sets one: providers name token overrides and runtime theme vars with it.
+`vars: { prefix, tokenPrefix }` from its options. Pass the app's Panda `prefix` as `pandaPrefix`
+when its Panda config sets one: `tokenPrefix` defaults to it, so the providers' token overrides,
+runtime theme vars and a spring role's instance vars (`--<prefix>-springs-<role>-…`) match
+Panda's. Set `tokenPrefix` only to name the token vars otherwise.
 
 ## States
 
@@ -142,8 +144,8 @@ and then their `styled-system/` from this preset (their `prepare` tasks). The br
   recipe, so the rule needs neither. The factory modules don't change.
 - Pass the same `prefix` to `compilePreset` and to the codegen: the factories name instance
   tokens' vars with it.
-- `prefix` (Panda's own class prefix, `pandaPrefix` here) doesn't change the recipe functions,
-  so the codegen doesn't need it.
+- `prefix` (Panda's own class prefix, `pandaPrefix` here) doesn't change the recipe functions;
+  the codegen takes it only to name the token vars (its `tokenPrefix` default).
 - The generated modules import `@pureform/styling`, and `panda.ts` imports a type from
   `@pandacss/dev`; the app needs both.
 - Slot conditions select slots by class, so pass your Panda `prefix` as `pandaPrefix`.

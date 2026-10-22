@@ -24,10 +24,17 @@ export interface PandaCodegenOptions {
     /** The var prefix the preset was compiled with (`compilePreset`'s `prefix`), which names
      *  the instance tokens' CSS vars. Default none. */
     prefix?: VarPrefix;
-    /** Panda's own `prefix`, when the app's Panda config sets one: it names the token vars,
-     *  which providers write for token overrides and runtime themes. Default none. */
+    /** The `prefix` in the app's Panda config, if any (`compilePreset`'s `pandaPrefix`). Panda
+     *  names its token vars with it, so it is `tokenPrefix`'s default. Default none. */
+    pandaPrefix?: string;
+    /** The prefix of the token vars, which providers write for token overrides and runtime
+     *  themes and a spring role's instance vars read. Default `pandaPrefix`. */
     tokenPrefix?: string;
 }
+
+// The token vars' prefix: the app's own, else Panda's.
+const tokenPrefixOf = (options: PandaCodegenOptions): string | undefined =>
+    options.tokenPrefix ?? options.pandaPrefix;
 
 /** The file `panda.config.ts` imports `staticCss` from, relative to `.pureform/`. */
 export const STATIC_CSS_FILE = "panda.ts";
@@ -55,6 +62,7 @@ export const codegen = defineCodegen<PandaCodegenOptions>({
     platform: "web",
     codegen: (context) => {
         const outdir = context.options.outdir ?? "styled-system";
+        const tokenPrefix = tokenPrefixOf(context.options);
         const components = context.components.map((name) => {
             const spec = context.config.components[name]!;
             const path = `web/${name}.ts`;
@@ -72,7 +80,7 @@ export const codegen = defineCodegen<PandaCodegenOptions>({
                     vars: tokenVars(name, spec, context.options.prefix),
                     springs: instanceSpringVars(
                         context.shape(name).springs,
-                        context.options.tokenPrefix,
+                        tokenPrefix,
                     ),
                 }),
             };
@@ -92,7 +100,7 @@ export const codegen = defineCodegen<PandaCodegenOptions>({
             themeAttribute: THEME_ATTRIBUTE,
             vars: {
                 prefix: context.options.prefix,
-                tokenPrefix: context.options.tokenPrefix,
+                tokenPrefix,
             },
         };
     },

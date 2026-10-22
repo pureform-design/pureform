@@ -52,6 +52,19 @@ const config = (): CoreConfig =>
                 name: "divider",
                 recipe: { base: {} },
             },
+            slide: {
+                kind: "component",
+                name: "slide",
+                tokens: {
+                    move: {
+                        $value: {
+                            type: "alias",
+                            path: ["springs", "spatialFast"],
+                        },
+                    },
+                },
+                recipe: { base: {} },
+            },
         },
     }) as unknown as CoreConfig;
 
@@ -143,6 +156,21 @@ describe("the Panda codegen", () => {
     it("gives the registry the var prefixes", async () => {
         const { output } = await run({ prefix: "pf", tokenPrefix: "x" });
         expect(output.vars).toEqual({ prefix: "pf", tokenPrefix: "x" });
+    });
+
+    it("names token vars with Panda's prefix when no tokenPrefix is set", async () => {
+        const { output, files } = await run({ pandaPrefix: "app" }, ["slide"]);
+        expect(output.vars).toEqual({ prefix: undefined, tokenPrefix: "app" });
+        expect(files["web/slide.ts"]).toContain('move: "--app-springs"');
+    });
+
+    it("takes an explicit tokenPrefix over Panda's prefix", async () => {
+        const { output, files } = await run(
+            { pandaPrefix: "app", tokenPrefix: "x" },
+            ["slide"],
+        );
+        expect(output.vars).toEqual({ prefix: undefined, tokenPrefix: "x" });
+        expect(files["web/slide.ts"]).toContain('move: "--x-springs"');
     });
 
     it("writes the modules it's given, from Panda's outdir", async () => {
