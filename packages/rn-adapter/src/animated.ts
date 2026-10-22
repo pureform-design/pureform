@@ -16,6 +16,7 @@ export {
     slideAt,
     slideOffset,
     slowSpring,
+    springProgress,
 } from "./motion";
 export type {
     SlideMotion,

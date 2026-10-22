@@ -1,4 +1,4 @@
-// An active indicator sliding into its place through Animated: a progress from 0 to 1 per slide,
+// An active indicator sliding into its place through Animated: a progress from 0 to 1 per slide, on a spring (`settle`) or a curve,
 // the view's transform interpolating from the slide's offset to none. Transforms run on the
 // native thread on a device.
 
@@ -7,6 +7,7 @@ import { Animated } from "react-native";
 
 import type { SlideMotion } from "../motion";
 import { NATIVE_DRIVER, curve } from "./curve";
+import { settle } from "./settle";
 
 /** The style that slides a view into its place, for each new `motion`; `undefined` without one.
  *  The view is drawn at the slide's start from its first render, and the slide starts once that
@@ -20,6 +21,23 @@ export const useAnimatedSlide = (
     );
     useLayoutEffect(() => {
         if (!motion || !progress) return;
+        if (motion.spring) {
+            // A real spring, carrying on the speed an interrupted slide had.
+            const { spring, velocity = 0, delay } = motion;
+            let stop = () => {};
+            const start = () => {
+                stop = settle(progress, velocity / 1000, spring, 1);
+            };
+            if (delay > 0) {
+                const timer = setTimeout(start, delay);
+                return () => {
+                    clearTimeout(timer);
+                    stop();
+                };
+            }
+            start();
+            return () => stop();
+        }
         const animation = Animated.timing(progress, {
             toValue: 1,
             duration: motion.duration,
