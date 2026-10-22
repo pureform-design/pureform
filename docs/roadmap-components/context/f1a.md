@@ -147,6 +147,7 @@ tailwind targets.
 
 - **Tab order of a revealed action:** it comes before the row, because the DOM order puts the
   row on top. A theme z-index for "above a sibling" would allow `[root, action]` instead.
+  _Settled at the merge ([f1](f1.md)): `[root, action]`, the swipeable row at `z-index: 1`._
 - **Focus ring inside a swipeable row:** the frame clips, so a swipeable row's ring is inset
   (`focusIndicatorOuterOffset` = minus the thickness), unlike other list items.
 - **React Native:** a swipeable item that doesn't expand still can't take `onPress`. It could

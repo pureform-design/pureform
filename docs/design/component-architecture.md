@@ -243,7 +243,7 @@ slot-state table the preset mostly uses):
 | `indeterminate` | `:indeterminate`                           | `aria-checked=mixed`                            |                    | Drop `data-indeterminate`                                                                 |
 | `selected`      |                                            | `aria-selected`, `aria-pressed`, `aria-current` |                    | Drop `data-selected`                                                                      |
 | `expanded`      |                                            | `aria-expanded`                                 |                    | Drop `data-expanded`                                                                      |
-| `descending`    |                                            | `aria-sort=descending`                          |                    | New (f1d): the machine's `data-direction` isn't matched                                    |
+| `descending`    |                                            | `aria-sort=descending`                          |                    | New (f1d): the machine's `data-direction` isn't matched                                   |
 | `invalid`       | `:invalid` (condition only; not on fields) | `aria-invalid=true`                             |                    | Drop `data-invalid`                                                                       |
 | `disabled`      | `:disabled`                                | `aria-disabled=true`                            |                    | Drop `data-disabled` and `[disabled]`; the slot state gains `aria-disabled`               |
 | `readOnly`      | `:read-only`                               | `aria-readonly=true`                            |                    | Drop `data-read-only`                                                                     |
@@ -1077,8 +1077,8 @@ var(--springs-spatial-default-duration))` and the easing alike, and a theme's or
   step gives way to its fade alone, and the settle is instant.
 - **Containers (m2c).** Every chevron that turns (the expand indicator of the list item,
   accordion and tree, the select's arrow) turns on `spatialFast` (`chevronTransition`), its color
-  on its tween; the field label floats on `spatialFast` (Compose's `FastSpatial` in
-  `TextFieldImpl.kt`), its colors on their tween. A swipeable list item's `swipeOffset` follows
+  on its tween; the field label floats on `effectsDefault` (f1b; m2c had Compose's
+  `FastSpatial`, which overshoots under expressive), its colors on their tween. A swipeable list item's `swipeOffset` follows
   the drag at once and settles on `spatialFast` after release; on React Native the spring starts
   at the release velocity (`useComponentSlots`' `velocities`, `Animated.spring`'s `velocity`).
 - **Table sort arrow (f1d).** The arrow is always ↑ and turns over on `spatialFast` while its
