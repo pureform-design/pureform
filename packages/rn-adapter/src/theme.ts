@@ -33,6 +33,7 @@ type Flat = Record<string, Token<ValueNode>> | undefined;
 const tokenNodes = (
     config: CoreConfig,
     override: ThemeOverride | undefined,
+    target: string,
 ) => {
     const nodes = new Map<string, ValueNode>();
     const tiered = (
@@ -77,7 +78,7 @@ const tokenNodes = (
             const key = `components.${component}.${token}`;
             const node = tokenValue(entry) as ValueNode;
             // A spring is its five values, each a key of its own.
-            const fields = springFieldNodes(node);
+            const fields = springFieldNodes(node, { config, target });
             if (fields) {
                 for (const [field, value] of Object.entries(fields)) {
                     nodes.set(`${key}.${field}`, value);
@@ -102,7 +103,7 @@ export const resolveTheme = (
     const override = options.theme ? config.themes?.[options.theme] : undefined;
     if (options.theme && !override)
         throw new Error(`unknown theme "${options.theme}"`);
-    const nodes = tokenNodes(config, override);
+    const nodes = tokenNodes(config, override, options.target ?? "rn");
     const values: ThemeValues = {};
     const pending = new Set<string>();
     const get = (key: string): Concrete | undefined => {
