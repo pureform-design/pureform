@@ -1,5 +1,44 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`chipSet > compiles to a stable Panda slot recipe 1`] = `
+{
+  "base": {
+    "root": {
+      "alignItems": "center",
+      "display": "flex",
+      "flexDirection": "row",
+      "gap": "var(--components-chipSet-gap, token(spacing.2))",
+    },
+  },
+  "className": "chipSet",
+  "compoundVariants": [],
+  "defaultVariants": {
+    "singleLine": false,
+  },
+  "jsx": [
+    "ChipSet",
+  ],
+  "slots": [
+    "root",
+  ],
+  "variants": {
+    "singleLine": {
+      "false": {
+        "root": {
+          "flexWrap": "wrap",
+        },
+      },
+      "true": {
+        "root": {
+          "flexWrap": "nowrap",
+          "overflow": "auto",
+        },
+      },
+    },
+  },
+}
+`;
+
 exports[`circularProgress > compiles to a stable Panda slot recipe 1`] = `
 {
   "base": {
@@ -3690,12 +3729,9 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
       "color": "var(--components-tabs-content, token(colors.onSurfaceVariant))",
       "cursor": "pointer",
       "display": "inline-flex",
-      "flexBasis": "0px",
       "flexDirection": "row",
-      "flexGrow": "1",
       "height": "var(--components-tabs-height, 48px)",
       "justifyContent": "center",
-      "minWidth": "0px",
       "outlineColor": "var(--components-tabs-focusIndicatorColor, token(colors.secondary))",
       "outlineOffset": "var(--components-tabs-focusIndicatorOuterOffset, token(sizes.focusIndicatorOuterOffset))",
       "outlineStyle": {
@@ -3739,6 +3775,7 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
     "color": "primary",
     "icon": false,
     "inlineIcon": false,
+    "scrollable": false,
     "variant": "primary",
   },
   "jsx": [
@@ -3799,6 +3836,27 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
     "inlineIcon": {
       "false": {},
       "true": {},
+    },
+    "scrollable": {
+      "false": {
+        "tab": {
+          "flexBasis": "0px",
+          "flexGrow": "1",
+          "minWidth": "0px",
+        },
+      },
+      "true": {
+        "root": {
+          "overflow": "auto",
+          "paddingInlineEnd": "var(--components-tabs-edgePadding, 52px)",
+          "paddingInlineStart": "var(--components-tabs-edgePadding, 52px)",
+        },
+        "tab": {
+          "flexGrow": "0",
+          "flexShrink": "0",
+          "minWidth": "var(--components-tabs-scrollableMinWidth, 90px)",
+        },
+      },
     },
     "variant": {
       "primary": {},

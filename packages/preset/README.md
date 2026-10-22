@@ -655,6 +655,11 @@ with `aria-checked="true"`).
   `innerRadius` (`pressedInnerRadius` while pressed, round once a toggle is on), per size from
   `GROUP_INNER_RADII`. `groupCorners` builds those corners along the inline axis. The connected
   group replaces the deprecated segmented button. No compound variants are added.
+- `chipSet` (`chip.ts`): a row of chips 8px apart (`gap`) that wraps, or with `singleLine`
+  stays on one line and scrolls (React Native wraps it in a horizontal scroll view). Its
+  selection is the binding's: a selectable set's chips are toggle chips (`aria-pressed`).
+- `tabs` `scrollable`: tabs size to their content (at least `scrollableMinWidth`, 90px) rather
+  than share the list's width, and the list scrolls with `edgePadding` (52px) at its edges.
 - `color` (both): a group's container fills the selected row. With no color, a selected row
   keeps Material's secondary container.
 

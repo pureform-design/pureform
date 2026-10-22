@@ -10,6 +10,7 @@ export const RN_COMPONENTS = [
     "stepper",
     "gridList",
     "chip",
+    "chipSet",
     "inputChip",
     "checkbox",
     "switchControl",

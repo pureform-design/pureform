@@ -4,6 +4,7 @@ import { commands } from "vitest/browser";
 import {
     observeIconStyle,
     radioInputs,
+    revealInRow,
     readIconStyle,
     setRadioDefaults,
     stackPositioner,
@@ -208,5 +209,32 @@ describe("radio groups", () => {
         expect(
             radioInputs(element).map((input) => input.defaultChecked),
         ).toEqual([false, false]);
+    });
+});
+
+describe("revealInRow", () => {
+    it("scrolls only the item's scrolling row, by as little as it takes", () => {
+        const row = document.createElement("div");
+        row.style.cssText =
+            "display: flex; width: 200px; overflow: auto; padding-inline: 20px";
+        const items = Array.from({ length: 5 }, () => {
+            const item = document.createElement("div");
+            item.style.cssText = "flex: 0 0 100px; height: 10px";
+            row.append(item);
+            return item;
+        });
+        document.body.append(row);
+        revealInRow(items[3]);
+        const view = row.getBoundingClientRect();
+        expect(items[3]!.getBoundingClientRect().right).toBeCloseTo(
+            view.right - 20,
+            0,
+        );
+        revealInRow(items[0]);
+        expect(items[0]!.getBoundingClientRect().left).toBeCloseTo(
+            view.left + 20,
+            0,
+        );
+        expect(window.scrollX).toBe(0);
     });
 });

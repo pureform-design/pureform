@@ -68,6 +68,20 @@
                 "default": "./dist/button-group.mjs"
             }
         },
+        "./chip-set": {
+            "types": "./dist/chip-set/index.d.ts",
+            "import": {
+                "development": "./src/chip-set/index.ts",
+                "default": "./dist/chip-set.mjs"
+            }
+        },
+        "./selection-list": {
+            "types": "./dist/selection-list/index.d.ts",
+            "import": {
+                "development": "./src/selection-list/index.ts",
+                "default": "./dist/selection-list.mjs"
+            }
+        },
         "./paginator": {
             "types": "./dist/paginator/index.d.ts",
             "import": {

@@ -22,6 +22,8 @@ export const COMPONENT_NAMES = [
     "Tree",
     "Checkbox",
     "Chip",
+    "ChipSet",
+    "SelectionList",
     "CircularProgress",
     "LoadingIndicator",
     "Dialog",

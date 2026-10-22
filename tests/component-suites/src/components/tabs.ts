@@ -72,6 +72,7 @@ export const tabsCase: ComponentCase = {
         "first selected": {},
         "second selected": { defaultValue: "hotels" },
         secondary: { variant: "secondary", defaultValue: "cars" },
+        scrollable: { scrollable: true, defaultValue: "hotels" },
         "secondary color": { color: "secondary" },
         "with icons": {
             items: ITEMS.map((item, index) => ({

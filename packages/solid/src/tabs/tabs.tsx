@@ -1,7 +1,8 @@
 // The tabs: Root on Zag's tabs machine, an unstyled element around the tab list and the panels; the
 // tab list and its tabs (each a button around its content: an icon, a label, and the active
 // indicator), as the preset draws them; a panel per tab; and the ready-made Tabs over them. When
-// the selected tab changes, its indicator slides in from the one selected before.
+// the selected tab changes, its indicator slides in from the one selected before, and a scrollable
+// list scrolls it into view.
 
 import { tabsCompositeAnatomy } from "@pureform/anatomy";
 import {
@@ -23,7 +24,7 @@ import type {
     TabsItem,
     TabsRootOwnProps,
 } from "@pureform/binding-core";
-import { slideIndicator } from "@pureform/binding-core/dom";
+import { revealInRow, slideIndicator } from "@pureform/binding-core/dom";
 import * as tabs from "@pureform/machines/tabs";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {
@@ -143,9 +144,13 @@ function Root(props: TabsRootProps): JSX.Element {
             const previous = shown;
             shown = value;
             if (previous == null || value == null || previous === value) return;
-            untrack(() =>
-                slideIndicator(indicatorOf(previous), indicatorOf(value)),
-            );
+            untrack(() => {
+                slideIndicator(indicatorOf(previous), indicatorOf(value));
+                // A scrollable list scrolls the newly selected tab into view.
+                if (props.scrollable) {
+                    revealInRow(indicatorOf(value)?.closest('[role="tab"]'));
+                }
+            });
         },
     );
     return (

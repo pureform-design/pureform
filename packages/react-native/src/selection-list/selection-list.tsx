@@ -1,0 +1,110 @@
+// The selection list: a list whose rows are options, each an interactive list item marked with
+// `aria-selected`, which its selected colors read. A press selects one: any number in a
+// `multiple` list (the default), one in a `single` list.
+
+import { listAnatomy } from "@pureform/anatomy";
+import {
+    listItemPosition,
+    listSelection,
+    selectionListMachineProps,
+} from "@pureform/binding-core";
+import type {
+    ListPart,
+    SelectionListContentProps,
+    SelectionListRootOwnProps,
+} from "@pureform/binding-core";
+import { useMemo } from "react";
+import type { ReactNode } from "react";
+
+import { ListDefaults, ListItem } from "../list-item/list-item";
+import type { ListItemProps } from "../list-item/list-item";
+import { testIdOf, useControllable, withEngine } from "../parts";
+import { useComponentSlots } from "../styles";
+
+export interface SelectionListProps
+    extends SelectionListRootOwnProps, SelectionListContentProps<ReactNode> {
+    readonly "aria-label"?: string | undefined;
+}
+
+function SelectionListImpl(props: SelectionListProps): ReactNode {
+    const { styles: s, views: v } = useComponentSlots<ListPart>(
+        "list",
+        listSelection(props),
+    );
+    const { density, color, tokens, leadingType } = props;
+    const defaults = useMemo(
+        () => ({ density, color, tokens, leadingType }),
+        [density, color, tokens, leadingType],
+    );
+    const [value, setValue] = useControllable(
+        "SelectionList",
+        "value",
+        props.value,
+        props.defaultValue,
+        props.onValueChange,
+        [] as string[],
+    );
+    const { selectionMode, deselectable } = selectionListMachineProps(props);
+    const press = (key: string) => {
+        const on = value.includes(key);
+        if (selectionMode === "multiple")
+            setValue(on ? value.filter((v) => v !== key) : [...value, key]);
+        else if (!on) setValue([key]);
+        else if (deselectable) setValue([]);
+    };
+    const items = props.items ?? [];
+    const segmented = props.variant === "segmented";
+    const id = (part: ListPart) => testIdOf(listAnatomy, part, props.testId);
+    return (
+        <ListDefaults value={defaults}>
+            <v.root.View
+                role="listbox"
+                aria-multiselectable={selectionMode === "multiple"}
+                {...(props["aria-label"] === undefined
+                    ? {}
+                    : { "aria-label": props["aria-label"] })}
+                style={s.root}
+                testID={id("root")}
+            >
+                {items.map(
+                    (
+                        {
+                            value: key,
+                            textValue: _textValue,
+                            disabled,
+                            ...item
+                        },
+                        index,
+                    ) => (
+                        <v.item.View
+                            key={key}
+                            style={s.item}
+                            testID={id("item")}
+                        >
+                            <ListItem
+                                {...(item as ListItemProps)}
+                                role="option"
+                                selected={value.includes(key)}
+                                disabled={disabled || props.disabled}
+                                onPress={() => press(key)}
+                                position={
+                                    item.position ??
+                                    listItemPosition(
+                                        index,
+                                        items.length,
+                                        segmented,
+                                    )
+                                }
+                            />
+                        </v.item.View>
+                    ),
+                )}
+            </v.root.View>
+        </ListDefaults>
+    );
+}
+
+/** A list of options to select, one or many (`selectionMode`, `multiple` by default), as
+ *  Angular's selection list: `<SelectionList aria-label="Folders" items={[{ value: "inbox",
+ *  headline: "Inbox" }]} />`. */
+export const SelectionList = withEngine(SelectionListImpl, "SelectionList");

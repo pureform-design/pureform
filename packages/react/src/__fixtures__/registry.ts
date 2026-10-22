@@ -697,3 +697,16 @@ export const paginatorRegistry = () =>
             "itemLabel",
         ]),
     });
+
+/** The chip set's fake factories: the set, and the chips in it. */
+export const chipSetRegistry = () =>
+    createRegistry({
+        chipSet: named("chip-set", ["root"]),
+        chip: named("chip", [
+            "root",
+            "icon",
+            "label",
+            "trailingIcon",
+            "touchTarget",
+        ]),
+    });

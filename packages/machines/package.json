@@ -82,6 +82,13 @@
                 "default": "./dist/tabs.mjs"
             }
         },
+        "./selection-list": {
+            "types": "./dist/selection-list.d.ts",
+            "import": {
+                "development": "./src/selection-list.ts",
+                "default": "./dist/selection-list.mjs"
+            }
+        },
         "./button-group": {
             "types": "./dist/button-group.d.ts",
             "import": {
@@ -238,6 +245,7 @@
         "@zag-js/date-picker": "catalog:",
         "@zag-js/dialog": "catalog:",
         "@zag-js/dom-query": "catalog:",
+        "@zag-js/listbox": "catalog:",
         "@zag-js/menu": "catalog:",
         "@zag-js/pagination": "catalog:",
         "@zag-js/presence": "catalog:",

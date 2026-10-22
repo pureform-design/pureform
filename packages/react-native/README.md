@@ -444,6 +444,17 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
   `density`, each with its `position` (`single`, or its place in the run when `connected`).
   `selectable` (`single` or `multiple`) makes them toggles, with `value`, `defaultValue` and
   `onValueChange`; `Button` takes a controlled `selected` for it. There are no compound parts.
+- **Chip sets:** `ChipSet` renders a `Chip` per entry of `items`, with the set's `variant`,
+  `corner`, `color`, `density` and `tokens`. `selectable` (`single` or `multiple`, `deselectable`
+  by default) makes them filter chips, with `value`, `defaultValue` and `onValueChange`.
+  `singleLine` puts the row in a horizontal `ScrollView`, since `overflow: auto` is dropped.
+- **Selection lists:** `SelectionList` is a `List` (`role="listbox"`) whose `items` are options:
+  interactive `ListItem`s with `role="option"` and `aria-selected`. `selectionMode` is `multiple`
+  by default, or `single` (`deselectable` lets its option go off). There's no keyboard highlight
+  or typeahead, as there's no Zag machine on React Native.
+- **Scrollable tabs:** `Tabs scrollable` sizes its tabs to their content and puts the row in a
+  horizontal `ScrollView`, which scrolls the selected tab into view (centered where it can be)
+  when the selection changes.
 - **Menu items** take `supportingText`, a line under the label, and a `type` (`checkbox` or
   `radio`) with `checked` and `onCheckedChange`: a toggleable item fills while checked. `groups`
   render after `items`, each in an `itemGroup` with its optional label, and draw the menu as tiles

@@ -19,6 +19,7 @@ import { Card } from "@pureform/solid/card";
 import { Carousel } from "@pureform/solid/carousel";
 import { Checkbox } from "@pureform/solid/checkbox";
 import { Chip } from "@pureform/solid/chip";
+import { ChipSet } from "@pureform/solid/chip-set";
 import { CircularProgress } from "@pureform/solid/circular-progress";
 import { DateInput } from "@pureform/solid/date-input";
 import { DatePicker } from "@pureform/solid/date-picker";
@@ -47,6 +48,7 @@ import { Scrim } from "@pureform/solid/scrim";
 import { SearchBar } from "@pureform/solid/search-bar";
 import { SearchView } from "@pureform/solid/search-view";
 import { Select } from "@pureform/solid/select";
+import { SelectionList } from "@pureform/solid/selection-list";
 import { Separator } from "@pureform/solid/separator";
 import { SideSheet } from "@pureform/solid/side-sheet";
 import { Slider } from "@pureform/solid/slider";
@@ -55,13 +57,13 @@ import { SplitButton } from "@pureform/solid/split-button";
 import { Stepper } from "@pureform/solid/stepper";
 import { SupportingText } from "@pureform/solid/supporting-text";
 import { Switch } from "@pureform/solid/switch";
+import { Table } from "@pureform/solid/table";
 import { Tabs } from "@pureform/solid/tabs";
 import { TagsInput } from "@pureform/solid/tags-input";
 import { Text } from "@pureform/solid/text";
 import { TextArea } from "@pureform/solid/text-area";
 import { TextField } from "@pureform/solid/text-field";
 import { TimeInput } from "@pureform/solid/time-input";
-import { Table } from "@pureform/solid/table";
 import { TimePicker } from "@pureform/solid/time-picker";
 import { createToaster, Toaster } from "@pureform/solid/toast";
 import type { ToastData } from "@pureform/solid/toast";
@@ -157,6 +159,8 @@ export const components: Record<ComponentName, ValidComponent> = {
     Tree,
     Checkbox,
     Chip,
+    ChipSet,
+    SelectionList,
     CircularProgress,
     LoadingIndicator,
     Dialog,

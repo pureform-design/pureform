@@ -451,6 +451,24 @@ export const chipAnatomy = {
     ],
 } as const satisfies ComponentAnatomy;
 
+export const chipSetAnatomy = {
+    name: "chipSet",
+    scope: "chip-set",
+    root: "root",
+    partNames: ["root"],
+    parts: {
+        root: {
+            name: "root",
+            attribute: "root",
+            testId: "pf-chip-set-root",
+            parent: null,
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+    },
+} as const satisfies ComponentAnatomy;
+
 export const inputChipAnatomy = {
     name: "inputChip",
     scope: "input-chip",
@@ -4798,6 +4816,7 @@ export const anatomy = {
     badge: badgeAnatomy,
     media: mediaAnatomy,
     chip: chipAnatomy,
+    chipSet: chipSetAnatomy,
     inputChip: inputChipAnatomy,
     textField: textFieldAnatomy,
     textArea: textAreaAnatomy,
@@ -4901,6 +4920,7 @@ export const testIds = {
         trailingIcon: "pf-chip-trailing-icon",
         touchTarget: "pf-chip-touch-target",
     },
+    chipSet: { root: "pf-chip-set-root" },
     inputChip: {
         root: "pf-input-chip-root",
         avatar: "pf-input-chip-avatar",

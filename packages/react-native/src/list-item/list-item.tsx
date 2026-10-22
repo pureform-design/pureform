@@ -36,6 +36,9 @@ export interface ListItemProps
     readonly disabled?: boolean | undefined;
     /** Makes the item act. */
     readonly onPress?: (() => void) | undefined;
+    /** An interactive item's role in place of `button`: a selection list's options are `option`s,
+     *  marked with `aria-selected`. */
+    readonly role?: "option" | undefined;
     readonly testId?: TestIdOverride<ListItemPart> | undefined;
 }
 
@@ -99,7 +102,10 @@ function ListItemImpl(props: ListItemProps): ReactNode {
     return (
         <v.root.Pressable
             {...(interactive ? indication.handlers : {})}
-            role={interactive ? "button" : "listitem"}
+            role={interactive ? (props.role ?? "button") : "listitem"}
+            {...(interactive && props.role === "option"
+                ? { "aria-selected": props.selected ?? false }
+                : {})}
             {...(interactive
                 ? { onPress: props.onPress, disabled: props.disabled }
                 : { disabled: true })}

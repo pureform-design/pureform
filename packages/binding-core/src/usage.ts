@@ -99,6 +99,15 @@ export const COMPONENT_USAGE = {
             ripple: {},
         },
     },
+    // `singleLine` is set only when on; the chips take the set's variants under their own, and
+    // `toggle` follows the selection.
+    "chip-set": {
+        entries: {
+            chipSet: same("singleLine"),
+            chip: same("variant", "color", "density", "corner"),
+            ripple: {},
+        },
+    },
     // `indeterminate` follows the value.
     "circular-progress": {
         entries: { circularProgress: same("color", "shape") },
@@ -150,6 +159,14 @@ export const COMPONENT_USAGE = {
     // A `ul` around list items; the ready-made renders a list item per entry, in the list's
     // density, color, and leading type. A segmented list sets each item's position.
     list: {
+        entries: {
+            list: same("variant"),
+            listItem: same("density", "color", "leadingType"),
+            ripple: {},
+        },
+    },
+    // A list of options: the rows are list items in the list's density, color, and leading type.
+    "selection-list": {
         entries: {
             list: same("variant"),
             listItem: same("density", "color", "leadingType"),
@@ -283,7 +300,10 @@ export const COMPONENT_USAGE = {
     switch: { entries: { switchControl: same("color"), ripple: {} } },
     // `icon` follows the tabs' icons.
     tabs: {
-        entries: { tabs: same("variant", "inlineIcon", "color"), ripple: {} },
+        entries: {
+            tabs: same("variant", "inlineIcon", "scrollable", "color"),
+            ripple: {},
+        },
     },
     // The icons follow their content, and the chips' groups come in one `chip` prop.
     "tags-input": {

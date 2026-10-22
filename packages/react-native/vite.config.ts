@@ -41,6 +41,8 @@ export default createConfig({
                     "icon-button": "src/icon-button/index.ts",
                     "linear-progress": "src/linear-progress/index.ts",
                     "button-group": "src/button-group/index.ts",
+                    "chip-set": "src/chip-set/index.ts",
+                    "selection-list": "src/selection-list/index.ts",
                     paginator: "src/paginator/index.ts",
                     list: "src/list/index.ts",
                     "list-item": "src/list-item/index.ts",

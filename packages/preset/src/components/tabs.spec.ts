@@ -95,3 +95,30 @@ describe("tabs", () => {
         expect(recipe()?.defaultVariants).toMatchObject({ inlineIcon: false });
     });
 });
+
+describe("scrollable tabs", () => {
+    it("share the list's width when fixed, and size to their content and scroll when scrollable", () => {
+        const css = recipe();
+        expect(css?.base?.tab).not.toHaveProperty("flexGrow");
+        expect(css?.variants?.scrollable?.false?.tab).toEqual({
+            flexBasis: "0px",
+            flexGrow: "1",
+            minWidth: "0px",
+        });
+        expect(css?.variants?.scrollable?.true).toEqual({
+            root: {
+                overflow: "auto",
+                paddingInlineStart: "var(--components-tabs-edgePadding, 52px)",
+                paddingInlineEnd: "var(--components-tabs-edgePadding, 52px)",
+            },
+            tab: {
+                flexGrow: "0",
+                flexShrink: "0",
+                minWidth: "var(--components-tabs-scrollableMinWidth, 90px)",
+            },
+        });
+        expect(tabs.recipe.defaultVariants).toMatchObject({
+            scrollable: "false",
+        });
+    });
+});

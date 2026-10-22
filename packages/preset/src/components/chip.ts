@@ -12,13 +12,19 @@
 
 import { typed } from "@pureform/core";
 import {
+    auto,
+    center,
+    flex,
+    nowrap,
     px,
+    row,
     solid,
     transparent,
     slot,
     when,
     add,
     unitless,
+    wrap,
 } from "@pureform/core/ast";
 import type { ColorValue, NumericValue, StyleMap } from "@pureform/core/ast";
 import { radius, size as sizeToken, spacing, textStyle } from "@pureform/theme";
@@ -263,3 +269,41 @@ export const createChip = <
     );
 
 export const chip = createChip();
+
+const set = componentTokens("chipSet", {
+    // Material's 8dp between chips, across and down.
+    gap: spacing("2"),
+});
+
+/** A set of chips: a row that wraps them, or with `singleLine` keeps them on one line and
+ *  scrolls sideways (Android's `ChipGroup`). Its behaviour (a filter set's single or multiple
+ *  selection, with toggle chips) comes from the binding; the set only lays them out. */
+export const chipSet = pf.slotComponent({
+    name: "chipSet",
+    $meta: {
+        description:
+            "A set of Material chips: a row that wraps them, or keeps them on one line and scrolls with singleLine. A selectable filter set's chips are toggle chips with aria-pressed.",
+    },
+    tokens: set.tokens,
+    slots: ["root"],
+    variants: { singleLine: ["false", "true"] },
+    recipe: () => ({
+        base: {
+            root: {
+                display: flex,
+                flexDirection: row,
+                alignItems: center,
+                gap: set.ref("gap"),
+            },
+        },
+        variants: {
+            singleLine: {
+                false: { root: { flexWrap: wrap } },
+                // React Native has no scrolling overflow: its binding wraps the set in a
+                // horizontal scroll view.
+                true: { root: { flexWrap: nowrap, overflow: auto } },
+            },
+        },
+        defaultVariants: { singleLine: "false" },
+    }),
+});

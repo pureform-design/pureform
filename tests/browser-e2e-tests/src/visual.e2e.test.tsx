@@ -46,6 +46,7 @@ const SECTIONS = [
     "input-chips",
     "lists",
     "tabs",
+    "chip-sets-and-scrollable-tabs",
     "row-colors",
     "toasts",
     "search-and-feedback",
@@ -259,4 +260,24 @@ it("a grid list shares the row between its columns around the gutter, at the asp
         getComputedStyle(medium!.querySelector("[data-part=content]")!)
             .borderStartStartRadius,
     ).toBe("12px");
+});
+
+it("a chip set wraps 8px apart, a single-line one scrolls, and scrollable tabs size to their content", () => {
+    const [wrapping, single, scrolling] = [
+        ...section("chip-sets-and-scrollable-tabs").children,
+    ] as HTMLElement[];
+    expect(getComputedStyle(wrapping!).flexWrap).toBe("wrap");
+    expect(getComputedStyle(wrapping!).columnGap).toBe("8px");
+    expect(getComputedStyle(single!).flexWrap).toBe("nowrap");
+    expect(single!.scrollWidth).toBeGreaterThan(single!.clientWidth);
+    const style = getComputedStyle(scrolling!);
+    expect([style.paddingInlineStart, style.overflowX]).toEqual([
+        "52px",
+        "auto",
+    ]);
+    const tabs = [...scrolling!.children] as HTMLElement[];
+    expect(scrolling!.scrollWidth).toBeGreaterThan(scrolling!.clientWidth);
+    for (const tab of tabs) {
+        expect(tab.getBoundingClientRect().width).toBeGreaterThanOrEqual(90);
+    }
 });

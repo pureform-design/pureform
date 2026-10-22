@@ -28,10 +28,10 @@ import type {
 import type { Indication } from "@pureform/binding-core/indication";
 import type { SlideMotion } from "@pureform/rn-adapter/animated";
 import type { Selection } from "@pureform/styling";
-import { memo } from "react";
+import { memo, useEffect, useRef } from "react";
 import type { ReactNode } from "react";
-import { Modal, Pressable, StyleSheet, View } from "react-native";
-import type { LayoutChangeEvent } from "react-native";
+import { Modal, Pressable, ScrollView, StyleSheet, View } from "react-native";
+import type { LayoutChangeEvent, ScrollViewInstance } from "react-native";
 
 import { IconSlot, iconSlot } from "./icon-style";
 import { useSurfaceIndication } from "./indication";
@@ -200,7 +200,31 @@ function TabsImpl(props: TabsProps): ReactNode {
             (transition) => transition.property === "transform",
         ),
     );
-    return (
+    // Scrollable tabs scroll in a horizontal view (the adapter drops `overflow: auto`), which
+    // brings the selected tab into view, centered where it can be.
+    const scroller = useRef<ScrollViewInstance>(null);
+    const viewport = useRef(0);
+    const spans = useRef(new Map<string, { x: number; width: number }>());
+    const scrollable = props.scrollable === true;
+    const reveal = useStableCallback((animated: boolean) => {
+        const span = spans.current.get(value);
+        if (!scrollable || !span) return;
+        scroller.current?.scrollTo({
+            x: Math.max(0, span.x - (viewport.current - span.width) / 2),
+            animated,
+        });
+    });
+    const onLayout: IndicatorSlides["onLayout"] = useStableCallback(
+        (...args: Parameters<IndicatorSlides["onLayout"]>) => {
+            const [key, part, span] = args;
+            slides.onLayout(key, part, span);
+            if (part !== "tab") return;
+            spans.current.set(key, span);
+            if (key === value) reveal(false);
+        },
+    );
+    useEffect(() => reveal(true), [value, reveal]);
+    const list = (
         <v.root.View
             role="tablist"
             {...(props["aria-label"] === undefined
@@ -219,12 +243,33 @@ function TabsImpl(props: TabsProps): ReactNode {
                     selected={value === item.value}
                     onPick={pick}
                     slide={slides.motionOf(item.value)}
-                    onLayout={slides.onLayout}
+                    onLayout={scrollable ? onLayout : slides.onLayout}
                 />
             ))}
         </v.root.View>
     );
+    return scrollable ? (
+        <ScrollView
+            ref={scroller}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={scrollStyles.content}
+            onLayout={(event: LayoutChangeEvent) => {
+                viewport.current = event.nativeEvent.layout.width;
+                reveal(false);
+            }}
+            testID={testIdOf(tabsAnatomy, "root", props.testId) + "-scroll"}
+        >
+            {list}
+        </ScrollView>
+    ) : (
+        list
+    );
 }
+
+const scrollStyles = StyleSheet.create({
+    content: { flexGrow: 1 },
+});
 
 /** Material's tabs: `<Tabs items={[{ value: "mail", label: "Mail" }]} defaultValue="mail" />`.
  *  Panels are the app's: render the one for the value. */
