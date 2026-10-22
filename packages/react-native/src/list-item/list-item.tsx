@@ -27,7 +27,7 @@ import type {
     ListItemVariantProps,
     ListVariantProps,
 } from "@pureform/binding-core";
-import { createContext, use, useRef, useState } from "react";
+import { createContext, use, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { PanResponder } from "react-native";
 
@@ -84,6 +84,12 @@ function ListItemImpl(props: ListItemProps): ReactNode {
     const revealed = props.revealed ?? own;
     // Where a drag has the row, as its slid offset; `undefined` when it isn't held.
     const [drag, setDrag] = useState<number | undefined>(undefined);
+    // How fast a released drag had the row sliding, in pixels per second, which the snap-back's
+    // spring carries on from; for the render after the release only.
+    const [fling, setFling] = useState<number | undefined>(undefined);
+    useEffect(() => {
+        if (fling !== undefined) setFling(undefined);
+    }, [fling]);
     const offset = drag ?? swipeRestOffset(revealed, width);
     const setRevealed = (next: boolean) => {
         if (next === revealed) return;
@@ -114,6 +120,9 @@ function ListItemImpl(props: ListItemProps): ReactNode {
                 ),
             onPanResponderRelease: (_event, gesture) => {
                 const { width, rtl, setRevealed } = latest.current;
+                // `vx` is in pixels per millisecond, along the screen; the offset grows toward
+                // the inline start.
+                setFling(gesture.vx * 1000 * (rtl ? 1 : -1));
                 setRevealed(
                     swipeSettlesOpen(
                         swipeOffsetOf(start.current, 0, gesture.dx, width, rtl),
@@ -163,6 +172,7 @@ function ListItemImpl(props: ListItemProps): ReactNode {
             : swipeable && drag !== undefined
               ? { pressed: true }
               : {},
+        fling === undefined ? undefined : { swipeOffset: fling },
     );
     const { styles: s, selected, views: v } = slots;
     const id = (part: ListItemPart) =>

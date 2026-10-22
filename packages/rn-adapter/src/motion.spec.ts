@@ -14,6 +14,7 @@ import {
     slideAt,
     slideFrames,
     slideOffset,
+    startVelocity,
     stops,
 } from "./motion";
 
@@ -220,6 +221,13 @@ describe("token tweens", () => {
             word: "none",
             still: 2,
         });
+    });
+
+    it("start a moving token's clock at its velocity over the distance it moves", () => {
+        const moving = movingTokens(from, to, transitions);
+        expect(startVelocity(from, to, moving, undefined)).toBe(0);
+        expect(startVelocity(from, to, moving, { n: -500 })).toBe(-50);
+        expect(startVelocity(from, to, moving, { color: 3 })).toBe(0);
     });
 });
 

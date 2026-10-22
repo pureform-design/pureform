@@ -17,6 +17,7 @@ import type {
     SlideMotion,
 } from "@pureform/rn-adapter/animated";
 import type { Drawing, State, ThemeValues } from "@pureform/rn-adapter/factory";
+import type { TokenVelocities } from "@pureform/rn-adapter/react";
 import type { SvgDrawingProps } from "@pureform/rn-adapter/svg";
 import { createElement } from "react";
 import type { ComponentType, ReactNode } from "react";
@@ -41,12 +42,14 @@ export interface MotionEngine {
     /** Whether it draws shapes and gradients with SVG; selection returns drawings only then. */
     readonly svg: boolean;
     /** A component's styles per slot, transitions and keyframe animations running, for
-     *  `variants`, `state`, and the instance's `tokens` by theme key. */
+     *  `variants`, `state`, and the instance's `tokens` by theme key, moving tokens starting at
+     *  `velocities` (by theme key, in their units per second). */
     useStyles(
         name: string,
         variants: Record<string, string | boolean | undefined>,
         state: State,
         tokens: ThemeValues | undefined,
+        velocities?: TokenVelocities,
     ): MotionStyles;
     /** Press ripples for a surface. */
     useRipple(options: InkOptions): Ripples;

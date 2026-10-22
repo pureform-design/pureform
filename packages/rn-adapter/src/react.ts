@@ -17,7 +17,16 @@ import type { StyleProp, ViewProps, ViewStyle } from "react-native";
 import { animate } from "./animate/curve";
 import { componentFactory } from "./factory";
 import type { Environment, NativeFactory } from "./factory";
-import { movingTokens, slowSpring, tokenTransitions, tokensAt } from "./motion";
+import {
+    movingTokens,
+    slowSpring,
+    startVelocity,
+    tokenTransitions,
+    tokensAt,
+} from "./motion";
+import type { TokenVelocities } from "./motion";
+
+export type { TokenVelocities } from "./motion";
 import { overridesFor, themeKey, withDerived } from "./resolve";
 import type { Overrides, Styles } from "./resolve";
 import type { Selected, State, Style } from "./select";
@@ -343,6 +352,7 @@ const useSelected = (
 const useMovingTokens = (
     tokens: ThemeValues | undefined,
     transitions: Map<string, Transition>,
+    velocities: TokenVelocities | undefined,
 ): ThemeValues | undefined => {
     const [now, setNow] = useState<ThemeValues>();
     const shown = useRef<ThemeValues | undefined>(tokens);
@@ -369,7 +379,12 @@ const useMovingTokens = (
             shown.current = next;
             setNow(next);
         });
-        animate(progress, timing, false).start(({ finished }) => {
+        animate(
+            progress,
+            timing,
+            false,
+            startVelocity(from!, tokens, moving, velocities),
+        ).start(({ finished }) => {
             if (!finished) return;
             shown.current = tokens;
             setNow(undefined);
@@ -386,17 +401,20 @@ const useMovingTokens = (
  *  `tokens` gives this one instance its own token values, as the web sets a CSS variable on
  *  one element: `{ "components.linearProgress.value": 40 }`. A token whose own value
  *  transitions moves to each new value, a number, color, length, angle, percentage or time,
- *  and the styles reading it with it. */
+ *  and the styles reading it with it. `velocities` gives a token the speed it starts moving at
+ *  (in its units per second), such as a released drag's, where its transition is a spring. */
 export const useComponentState = (
     name: string,
     variants: Record<string, string | boolean | undefined> = {},
     state: State = {},
     tokens?: ThemeValues,
+    velocities?: TokenVelocities,
 ): Selected => {
     const target = useSelected(name, variants, state, tokens);
     const moving = useMovingTokens(
         tokens,
         tokenTransitions(target.transitions, useReducedMotion()),
+        velocities,
     );
     const now = useSelected(name, variants, state, moving);
     return moving === tokens ? target : now;

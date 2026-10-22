@@ -2,6 +2,7 @@
 // value, and each keyframe animation runs, through React Native's Animated, which React
 // Native Web runs too. Pass the slots' styles to `Animated.View` and `Animated.Text`.
 
+import type { TokenVelocities } from "../motion";
 import { useComponentState } from "../react";
 import type { State } from "../select";
 import type { ThemeValues } from "../values";
@@ -15,12 +16,14 @@ export const useAnimatedComponentStyles = (
     variants: Record<string, string | boolean | undefined> = {},
     state: State = {},
     tokens?: ThemeValues,
+    velocities?: TokenVelocities,
 ): Record<string, Record<string, unknown>> => {
     const { styles, transitions, animations, parents } = useComponentState(
         name,
         variants,
         state,
         tokens,
+        velocities,
     );
     const transition = useTransitions();
     const keyframes = useKeyframes();
