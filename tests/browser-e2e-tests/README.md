@@ -48,6 +48,14 @@ config (`~/.config/fontconfig`) and turns hinting and subpixel rendering off, an
 do the same in Chromium (`--font-render-hinting=none`, `--disable-lcd-text`,
 `--disable-font-subpixel-positioning`), plus `--force-color-profile=srgb` and `--disable-gpu`.
 
+The symbols the fixture uses as icons (▤ ◉ ★ ⌕ ⋮ and the rest) are bundled too: `src/symbols.css`
+adds Noto Sans Symbols 2, Noto Sans Symbols, and Noto Sans Math (`@fontsource`) as extra faces of
+the theme's `Roboto`, limited by `unicode-range` to those characters, so Chromium composes them
+into Roboto text and no glyph comes from a system font (whose symbols differ by machine).
+`visual.e2e.test.tsx` loads them up front. A new symbol in the fixture must be added to
+`symbols.css` and to `SYMBOLS` in the test, from a face that has it (check the font's cmap).
+Without that the screenshot would fall back to the machine's fonts again.
+
 ## Worth knowing
 
 - The browser context emulates reduced motion for every suite. Color fades still run under

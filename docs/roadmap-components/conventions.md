@@ -13,15 +13,11 @@ compaction). Where this file differs, it wins for the component roadmap. Context
    `component-architecture.md` it points to (at least §5.5 tokens and §9.8 indication).
 3. Read the output contexts of every phase you depend on, **including their refactoring
    hints**, then `git log --oneline -20`.
-4. In a fresh worktree, run `bun install`, `omni run build`, then `bun install` again. The
-   second install links the workspace's own bins (`pureform`) that only exist after the build;
-   without it, `bun x pureform generate` fetches an unrelated package from the registry and
-   the demos' `generate` fails. If the first build failed partway (timeouts under load), the
-   bin may still be missing: check `node_modules/.bin/pureform` exists before the second
-   install, and rerun the build with `-f failed` first if it doesn't.
-5. `omni run build -p` on a test package (`@pureform/component-suites`,
-   `@pureform/browser-e2e-tests`) runs its whole e2e suite. Run those files through Vitest
-   instead, as the targeted checks say.
+4. In a fresh worktree, run `bun install`, then `omni run build`. The demos' `generate` runs
+   the CLI's build directly with Node, so no bin link is needed.
+5. `build` doesn't run tests (only `publish` waits for them). Tests run through `omni run test`
+   or `build test`; a test package's own `test` runs its whole e2e suite, so run those files
+   through Vitest instead, as the targeted checks say.
 
 Other agents run omni in their own worktrees at the same time. Never stop processes by
 pattern (`pkill -f "omni run"`); stop only the ones you started, by PID.
