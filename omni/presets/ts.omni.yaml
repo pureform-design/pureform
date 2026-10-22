@@ -31,7 +31,6 @@ tasks:
   build:
     exec: bun run build
     dependencies:
-      - test
       - ^build
     cache:
       output:
