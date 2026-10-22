@@ -50,6 +50,7 @@ import { presetRegistry } from "./testing/registry";
 import type { TestRegistry } from "./testing/registry";
 import {
     byTestId,
+    drag,
     computed,
     interact,
     mount,
@@ -1084,23 +1085,11 @@ describe("nested rows", () => {
         expect(computed("tap-frame").isolation).toBe("isolate");
         await interact(() => userEvent.click(root));
         expect(onPress).toHaveBeenCalledTimes(1);
-        const at = (dx: number) => {
-            const box = root.getBoundingClientRect();
-            return {
-                bubbles: true,
-                button: 0,
-                buttons: 1,
-                clientX: box.left + box.width / 2 + dx,
-                clientY: box.top + box.height / 2,
-            };
-        };
-        await interact(async () => {
-            root.dispatchEvent(new MouseEvent("mousedown", at(0)));
-            for (const dx of [-10, -40, -80, -120]) {
-                root.dispatchEvent(new MouseEvent("mousemove", at(dx)));
-            }
-            document.dispatchEvent(new MouseEvent("mouseup", at(-120)));
-        });
+        const release = await drag(
+            root,
+            [-10, -40, -80, -120].map((dx) => [dx, 0] as const),
+        );
+        await release();
         expect(onRevealedChange).toHaveBeenCalledWith({ revealed: true });
         expect(onPress).toHaveBeenCalledTimes(1);
     });

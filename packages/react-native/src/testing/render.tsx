@@ -77,6 +77,40 @@ export const interact = async (
     await settle();
 };
 
+/** Drags `element` with the mouse: presses at `from` (from its top left; its center by default),
+ *  moves by each `[dx, dy]` in a task of its own, as a pointer's moves arrive, so React Native
+ *  Web's responder and the drag see each one, and returns what releases it at the last. */
+export const drag = async (
+    element: HTMLElement,
+    moves: readonly (readonly [dx: number, dy: number])[],
+    from?: { readonly x: number; readonly y: number },
+): Promise<() => Promise<void>> => {
+    const box = element.getBoundingClientRect();
+    const x = box.left + (from?.x ?? box.width / 2);
+    const y = box.top + (from?.y ?? box.height / 2);
+    const at = ([dx, dy]: readonly [number, number]) => ({
+        bubbles: true,
+        button: 0,
+        buttons: 1,
+        clientX: x + dx,
+        clientY: y + dy,
+    });
+    await interact(() => {
+        element.dispatchEvent(new MouseEvent("mousedown", at([0, 0])));
+    });
+    for (const move of moves) {
+        await interact(() => {
+            element.dispatchEvent(new MouseEvent("mousemove", at(move)));
+        });
+    }
+    return () =>
+        interact(() => {
+            element.dispatchEvent(
+                new MouseEvent("mouseup", at(moves.at(-1) ?? [0, 0])),
+            );
+        });
+};
+
 /** A value the test sets from outside the view: `<value.Holder>{(v) => …}</value.Holder>`,
  *  then `await value.set(next)`. */
 export const outside = <T,>(initial: T) => {

@@ -22,6 +22,7 @@ import type { TestRegistry } from "./testing/registry";
 import {
     byTestId,
     interact,
+    drag,
     laidOut,
     mount,
     outside,
@@ -795,31 +796,13 @@ describe("the sheets", () => {
     // Drags the handle down by each of `moves` in turn, from where it rests now. Each move is
     // its own task: the pan responder takes a move's distance over the time since the last, so
     // moves dispatched within one tick (one timestamp) would be dropped.
-    const dragDown = async (handle: HTMLElement, moves: readonly number[]) => {
-        const left = handle.getBoundingClientRect().left + 4;
-        const top = handle.getBoundingClientRect().top + 4;
-        const at = (dy: number) => ({
-            bubbles: true,
-            button: 0,
-            buttons: 1,
-            clientX: left,
-            clientY: top + dy,
-        });
-        await interact(async () => {
-            handle.dispatchEvent(new MouseEvent("mousedown", at(0)));
-        });
-        for (const dy of moves) {
-            await interact(async () => {
-                handle.dispatchEvent(new MouseEvent("mousemove", at(dy)));
-            });
-        }
-        return () =>
-            interact(async () => {
-                handle.dispatchEvent(
-                    new MouseEvent("mouseup", at(moves.at(-1) ?? 0)),
-                );
-            });
-    };
+    // Down by each of `moves`, from near the handle's top left.
+    const dragDown = (handle: HTMLElement, moves: readonly number[]) =>
+        drag(
+            handle,
+            moves.map((dy) => [0, dy] as const),
+            { x: 4, y: 4 },
+        );
     const sheet = (scope: string) =>
         document.querySelector<HTMLElement>(`[data-testid="pf-${scope}-root"]`);
     const press = (name: string) =>
