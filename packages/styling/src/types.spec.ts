@@ -88,6 +88,7 @@ describe("registered components", () => {
             | "filled"
             | "expanded"
             | "mirrored"
+            | "overflowing"
             | "indeterminate"
             | "rtl"
             | "reducedMotion"

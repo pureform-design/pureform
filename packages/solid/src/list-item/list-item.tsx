@@ -19,7 +19,6 @@ import {
     listItemRootProps,
     listItemSelection,
     isInteractiveListItem,
-    isPresent,
     listItemVariants,
 } from "@pureform/binding-core";
 import type {

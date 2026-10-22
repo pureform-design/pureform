@@ -22,7 +22,8 @@ import { aliasTarget } from "./css";
 // pseudo-class first, then an ARIA attribute, and only where neither covers it a `data-pf-*`
 // attribute the bindings set. A behavior library's own attributes (`data-state`, `data-hover`)
 // are never matched, so swapping it can't change styling.
-const { hover, pressed, dragged, filled, mirrored } = STATE_ATTRIBUTES;
+const { hover, pressed, dragged, filled, mirrored, overflowing } =
+    STATE_ATTRIBUTES;
 
 // A text input holding a value, or an element containing one. CSS sees a value through
 // `:placeholder-shown`, so the input needs a placeholder (a single space works when none
@@ -55,6 +56,8 @@ const CONDITION_SELECTOR: Record<string, string> = {
     expanded: "&[aria-expanded=true]",
     // An element that flips under rtl, such as an icon that points; only pureform marks it.
     mirrored: `&[${mirrored}]`,
+    // A part that doesn't fit where it usually sits; only pureform marks it.
+    overflowing: `&[${overflowing}]`,
     ltr: ":where([dir=ltr], :dir(ltr)) &",
     rtl: ":where([dir=rtl], :dir(rtl)) &",
 };

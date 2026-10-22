@@ -137,6 +137,7 @@ const STATES = [
     "filled",
     "expanded",
     "mirrored",
+    "overflowing",
     "rtl",
     "reducedMotion",
 ];

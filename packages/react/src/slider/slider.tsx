@@ -9,6 +9,7 @@ import {
     SLIDER_INPUT_LABEL_PROPS,
     SLIDER_ROOT_PROPS,
     sliderControllableProps,
+    sliderInsetIconOverflows,
     sliderMachineProps,
     sliderMarkerTokens,
     sliderNativeDefault,
@@ -148,7 +149,7 @@ function Root(props: SliderRootProps): ReactNode {
 }
 
 const drawn = (
-    part: "startTrack" | "track" | "activeTrack" | "markerGroup" | "insetIcon",
+    part: "startTrack" | "track" | "activeTrack" | "markerGroup",
     name: string,
     machine: (api: slider.Api<PropTypes>) => object,
 ) =>
@@ -173,10 +174,44 @@ const ActiveTrack = drawn("activeTrack", "ActiveTrack", (api) =>
     api.getActiveTrackProps(),
 );
 /** An icon inside the active track, at its start (medium sliders and up): put the icon in its
- *  children. */
-const InsetIcon = drawn("insetIcon", "InsetIcon", (api) =>
-    api.getInsetIconProps(),
-);
+ *  children. Where the active track is too short for it, it's marked `overflowing` and sits at
+ *  the start of the inactive track. */
+function InsetIcon({ unstyled, ...props }: SliderPartProps): ReactNode {
+    const { scope, api, props: root } = context.use("InsetIcon");
+    const vertical = root.orientation === "vertical";
+    // The root's length along the axis, kept by an observer on the icon's parent (the root).
+    const [length, setLength] = useState(0);
+    const observer = useRef<ResizeObserver | undefined>(undefined);
+    const measure = useCallback(
+        (element: HTMLElement | null) => {
+            observer.current?.disconnect();
+            const parent = element?.parentElement;
+            if (!parent) return;
+            const read = () => {
+                const rect = parent.getBoundingClientRect();
+                setLength(vertical ? rect.height : rect.width);
+            };
+            read();
+            observer.current = new ResizeObserver(read);
+            observer.current.observe(parent);
+        },
+        [vertical],
+    );
+    return scope.render("insetIcon", {
+        element: "span",
+        ref: measure,
+        machine: api.getInsetIconProps(),
+        states: {
+            overflowing: sliderInsetIconOverflows(
+                length,
+                api.percents,
+                root.centered,
+            ),
+        },
+        unstyled,
+        props,
+    });
+}
 /** Holds the stops (`Marker`). */
 const MarkerGroup = drawn("markerGroup", "MarkerGroup", (api) =>
     api.getMarkerGroupProps(),

@@ -3179,6 +3179,39 @@ exports[`slider > compiles to a stable Panda slot recipe 1`] = `
     "input": {
       "display": "none",
     },
+    "insetIcon": {
+      "&[data-pf-overflowing]": {
+        "color": {
+          ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+          "base": "var(--components-slider-insetIconOutsideColor, token(colors.onSecondaryContainer))",
+        },
+        "insetBlockStart": "calc(50% - calc(var(--components-slider-insetIconSize, 20px) * 0.5))",
+        "insetInlineStart": "calc(calc(calc(var(--components-slider-activeEnd, 0) * 1%) + calc(calc(var(--components-slider-bar, 1) * calc(calc(var(--components-slider-barHandleWidth, 4px) * 0.5) + var(--components-slider-handleGap, 6px))) * var(--components-slider-endGap, 1))) + var(--components-slider-insetIconPadding, 10px))",
+      },
+      "_rtl": {
+        "&[data-pf-mirror]": {
+          "transform": "scaleX(-1)",
+        },
+      },
+      "alignItems": "center",
+      "color": {
+        ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+        "base": "var(--components-slider-insetIconColor, token(colors.onPrimary))",
+      },
+      "display": "inline-flex",
+      "fontSize": "var(--components-slider-insetIconSize, 20px)",
+      "fontVariationSettings": ""FILL" var(--components-slider-iconFill, 0)",
+      "height": "var(--components-slider-insetIconSize, 20px)",
+      "insetBlockStart": "calc(50% - calc(var(--components-slider-insetIconSize, 20px) * 0.5))",
+      "insetInlineStart": "calc(calc(var(--components-slider-activeStart, 0) * 1%) + var(--components-slider-insetIconPadding, 10px))",
+      "justifyContent": "center",
+      "lineHeight": "1",
+      "minWidth": "var(--components-slider-insetIconSize, 20px)",
+      "opacity": "calc(var(--components-slider-insetIconShown, 0) * var(--components-slider-bar, 1))",
+      "pointerEvents": "none",
+      "position": "absolute",
+      "width": "var(--components-slider-insetIconSize, 20px)",
+    },
     "marker": {
       "backgroundColor": {
         ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
@@ -3309,6 +3342,7 @@ exports[`slider > compiles to a stable Panda slot recipe 1`] = `
     "markerGroup",
     "marker",
     "stateLayer",
+    "insetIcon",
     "handle",
     "valueIndicator",
     "input",
@@ -3326,6 +3360,18 @@ exports[`slider > compiles to a stable Panda slot recipe 1`] = `
           "backgroundColor": {
             ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             "base": "token(colors.error)",
+          },
+        },
+        "insetIcon": {
+          "&[data-pf-overflowing]": {
+            "color": {
+              ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+              "base": "var(--components-slider-insetIconOutsideColor, token(colors.onSecondaryContainer))",
+            },
+          },
+          "color": {
+            ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "base": "token(colors.onError)",
           },
         },
         "marker": {
@@ -3355,6 +3401,18 @@ exports[`slider > compiles to a stable Panda slot recipe 1`] = `
           "backgroundColor": {
             ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             "base": "token(colors.info)",
+          },
+        },
+        "insetIcon": {
+          "&[data-pf-overflowing]": {
+            "color": {
+              ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+              "base": "var(--components-slider-insetIconOutsideColor, token(colors.onSecondaryContainer))",
+            },
+          },
+          "color": {
+            ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "base": "token(colors.onInfo)",
           },
         },
         "marker": {
@@ -3387,6 +3445,18 @@ exports[`slider > compiles to a stable Panda slot recipe 1`] = `
             "base": "token(colors.secondary)",
           },
         },
+        "insetIcon": {
+          "&[data-pf-overflowing]": {
+            "color": {
+              ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+              "base": "var(--components-slider-insetIconOutsideColor, token(colors.onSecondaryContainer))",
+            },
+          },
+          "color": {
+            ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "base": "token(colors.onSecondary)",
+          },
+        },
         "marker": {
           "backgroundColor": {
             ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
@@ -3414,6 +3484,18 @@ exports[`slider > compiles to a stable Panda slot recipe 1`] = `
           "backgroundColor": {
             ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             "base": "token(colors.success)",
+          },
+        },
+        "insetIcon": {
+          "&[data-pf-overflowing]": {
+            "color": {
+              ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+              "base": "var(--components-slider-insetIconOutsideColor, token(colors.onSecondaryContainer))",
+            },
+          },
+          "color": {
+            ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "base": "token(colors.onSuccess)",
           },
         },
         "marker": {
@@ -3445,6 +3527,18 @@ exports[`slider > compiles to a stable Panda slot recipe 1`] = `
             "base": "token(colors.tertiary)",
           },
         },
+        "insetIcon": {
+          "&[data-pf-overflowing]": {
+            "color": {
+              ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+              "base": "var(--components-slider-insetIconOutsideColor, token(colors.onSecondaryContainer))",
+            },
+          },
+          "color": {
+            ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "base": "token(colors.onTertiary)",
+          },
+        },
         "marker": {
           "backgroundColor": {
             ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
@@ -3472,6 +3566,18 @@ exports[`slider > compiles to a stable Panda slot recipe 1`] = `
           "backgroundColor": {
             ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             "base": "token(colors.warning)",
+          },
+        },
+        "insetIcon": {
+          "&[data-pf-overflowing]": {
+            "color": {
+              ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+              "base": "var(--components-slider-insetIconOutsideColor, token(colors.onSecondaryContainer))",
+            },
+          },
+          "color": {
+            ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "base": "token(colors.onWarning)",
           },
         },
         "marker": {
@@ -3534,6 +3640,14 @@ exports[`slider > compiles to a stable Panda slot recipe 1`] = `
           },
           "width": "calc(var(--components-slider-handleSize, 20px) + calc(calc(var(--components-slider-barHandleHeight, 44px) - var(--components-slider-handleSize, 20px)) * var(--components-slider-bar, 1)))",
         },
+        "insetIcon": {
+          "&[data-pf-overflowing]": {
+            "insetBlockEnd": "calc(calc(calc(var(--components-slider-activeEnd, 0) * 1%) + calc(calc(var(--components-slider-bar, 1) * calc(calc(var(--components-slider-barHandleWidth, 4px) * 0.5) + var(--components-slider-handleGap, 6px))) * var(--components-slider-endGap, 1))) + var(--components-slider-insetIconPadding, 10px))",
+            "insetInlineStart": "calc(50% - calc(var(--components-slider-insetIconSize, 20px) * 0.5))",
+          },
+          "insetBlockEnd": "calc(calc(var(--components-slider-activeStart, 0) * 1%) + var(--components-slider-insetIconPadding, 10px))",
+          "insetInlineStart": "calc(50% - calc(var(--components-slider-insetIconSize, 20px) * 0.5))",
+        },
         "marker": {
           "height": "var(--components-slider-stopSize, 4px)",
           "insetBlockStart": "calc(calc(100% - calc(var(--components-slider-value, 0) * 1%)) - calc(var(--components-slider-stopSize, 4px) * 0.5))",
@@ -3582,6 +3696,7 @@ exports[`slider > compiles to a stable Panda slot recipe 1`] = `
           "--components-slider-barHandleHeight": "68px",
           "--components-slider-barRadius": "token(radii.large)",
           "--components-slider-barTrackHeight": "56px",
+          "--components-slider-insetIconShown": "1",
         },
       },
       "medium": {
@@ -3589,6 +3704,7 @@ exports[`slider > compiles to a stable Panda slot recipe 1`] = `
           "--components-slider-barHandleHeight": "52px",
           "--components-slider-barRadius": "token(radii.medium)",
           "--components-slider-barTrackHeight": "40px",
+          "--components-slider-insetIconShown": "1",
         },
       },
       "small": {
@@ -3596,6 +3712,7 @@ exports[`slider > compiles to a stable Panda slot recipe 1`] = `
           "--components-slider-barHandleHeight": "44px",
           "--components-slider-barRadius": "token(radii.small)",
           "--components-slider-barTrackHeight": "24px",
+          "--components-slider-insetIconShown": "0",
         },
       },
       "xlarge": {
@@ -3603,6 +3720,7 @@ exports[`slider > compiles to a stable Panda slot recipe 1`] = `
           "--components-slider-barHandleHeight": "108px",
           "--components-slider-barRadius": "token(radii.extraLarge)",
           "--components-slider-barTrackHeight": "96px",
+          "--components-slider-insetIconShown": "1",
         },
       },
       "xsmall": {
@@ -3610,6 +3728,7 @@ exports[`slider > compiles to a stable Panda slot recipe 1`] = `
           "--components-slider-barHandleHeight": "44px",
           "--components-slider-barRadius": "token(radii.small)",
           "--components-slider-barTrackHeight": "16px",
+          "--components-slider-insetIconShown": "0",
         },
       },
     },

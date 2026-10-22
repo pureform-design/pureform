@@ -41,6 +41,7 @@ import {
     sliderSelection,
     sliderStopActive,
     sliderStops,
+    sliderInsetIconOverflows,
     sliderTrackTokens,
 } from "./slider";
 import type { SliderPart } from "./slider";
@@ -235,6 +236,22 @@ describe("slider", () => {
         expect(sliderNativeDefault([20, 60], 0)).toBe("20,60");
         expect(sliderNativeDefault(undefined, 10)).toBe("10");
         expect(sliderNativeDefault(undefined, undefined)).toBe("0");
+    });
+});
+
+describe("slider inset icon", () => {
+    it("fits in the active track while it's at least the icon, its padding and the handle's gap", () => {
+        // 400px long: 20% is 80px, less the 8px clearance, past 40.
+        expect(sliderInsetIconOverflows(400, [20])).toBe(false);
+        // 10% is 40px, less the clearance: too short.
+        expect(sliderInsetIconOverflows(400, [10])).toBe(true);
+        expect(sliderInsetIconOverflows(400, [0])).toBe(true);
+    });
+
+    it("counts both gaps of a range, and fits when unmeasured", () => {
+        expect(sliderInsetIconOverflows(400, [40, 52])).toBe(true);
+        expect(sliderInsetIconOverflows(400, [40, 60])).toBe(false);
+        expect(sliderInsetIconOverflows(0, [0])).toBe(false);
     });
 });
 

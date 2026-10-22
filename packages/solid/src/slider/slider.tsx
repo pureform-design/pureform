@@ -9,6 +9,7 @@ import {
     SLIDER_INPUT_LABEL_PROPS,
     SLIDER_ROOT_PROPS,
     sliderControllableProps,
+    sliderInsetIconOverflows,
     sliderMachineProps,
     sliderMarkerTokens,
     sliderNativeDefault,
@@ -28,6 +29,7 @@ import {
     createUniqueId,
     For,
     omit,
+    onCleanup,
     Show,
 } from "solid-js";
 
@@ -146,7 +148,7 @@ function Root(props: SliderRootProps): JSX.Element {
 }
 
 const drawn = (
-    part: "startTrack" | "track" | "activeTrack" | "markerGroup" | "insetIcon",
+    part: "startTrack" | "track" | "activeTrack" | "markerGroup",
     name: string,
     machine: (api: slider.Api<PropTypes>) => object,
 ) =>
@@ -171,10 +173,47 @@ const ActiveTrack = drawn("activeTrack", "ActiveTrack", (api) =>
     api.getActiveTrackProps(),
 );
 /** An icon inside the active track, at its start (medium sliders and up): put the icon in its
- *  children. */
-const InsetIcon = drawn("insetIcon", "InsetIcon", (api) =>
-    api.getInsetIconProps(),
-);
+ *  children. Where the active track is too short for it, it's marked `overflowing` and sits at
+ *  the start of the inactive track. */
+function InsetIcon(props: SliderPartProps): JSX.Element {
+    const { scope, api, props: root } = context.use("InsetIcon");
+    // The root's length along the axis, kept by an observer on the icon's parent (the root).
+    const [length, setLength] = createSignal(0);
+    let observer: ResizeObserver | undefined;
+    onCleanup(() => observer?.disconnect());
+    return scope.render("insetIcon", {
+        element: "span",
+        ref: (element: HTMLElement) => {
+            observer?.disconnect();
+            // The ref runs before the element is placed; its parent is there a turn later.
+            queueMicrotask(() => {
+                const parent = element.parentElement;
+                if (!parent) return;
+                const read = () => {
+                    const rect = parent.getBoundingClientRect();
+                    setLength(
+                        root.orientation === "vertical"
+                            ? rect.height
+                            : rect.width,
+                    );
+                };
+                read();
+                observer = new ResizeObserver(read);
+                observer.observe(parent);
+            });
+        },
+        machine: () => api().getInsetIconProps(),
+        states: () => ({
+            overflowing: sliderInsetIconOverflows(
+                length(),
+                api().percents,
+                root.centered,
+            ),
+        }),
+        unstyled: () => props.unstyled,
+        props: omit(props, "unstyled"),
+    });
+}
 /** Holds the stops (`Marker`). */
 const MarkerGroup = drawn("markerGroup", "MarkerGroup", (api) =>
     api.getMarkerGroupProps(),

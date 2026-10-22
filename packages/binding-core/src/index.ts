@@ -1048,8 +1048,10 @@ export type {
 } from "./components/separator";
 export {
     SLIDER_INPUT_LABEL_PROPS,
+    SLIDER_INSET_ICON,
     SLIDER_ROOT_PROPS,
     sliderControllableProps,
+    sliderInsetIconOverflows,
     sliderMachineProps,
     sliderMarkerTokens,
     sliderNativeDefault,

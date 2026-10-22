@@ -1136,10 +1136,27 @@ describe("c7c: avatar picture, swipe, inset icon, search bar width", () => {
                     insetIcon={<Glyph glyph="♪" />}
                     testId="vol"
                 />
+                <Slider
+                    aria-label="Bass"
+                    size="large"
+                    defaultValue={2}
+                    insetIcon={<Glyph glyph="♪" />}
+                    testId="low"
+                />
                 <SearchBar testId="wide" />
             </View>,
         );
         expect(byTestId("vol-inset-icon").textContent).toBe("♪");
+        // Too short an active track: the icon moves past the handle, in the inactive track's
+        // content colour, never across the boundary.
+        await until(() =>
+            expect(computed("low-inset-icon").color).not.toBe(
+                computed("vol-inset-icon").color,
+            ),
+        );
+        const low = byTestId("low-inset-icon").getBoundingClientRect();
+        const active = byTestId("low-active-track").getBoundingClientRect();
+        expect(low.left).toBeGreaterThanOrEqual(active.right);
         await until(() => expect(computed("wide-root").maxWidth).toBe("720px"));
         // Flat: Compose's search bar has no shadow (level 0).
         expect(computed("wide-root").boxShadow).toBe("none");

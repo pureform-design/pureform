@@ -89,9 +89,14 @@ const { tokens, ref } = componentTokens("slider", {
     valueIndicatorWidth: px(48),
     valueIndicatorHeight: px(44),
     valueIndicatorGap: px(4),
-    // An icon inside the active track, at its start (medium and larger sliders).
-    insetIconSize: sizeToken("iconMedium"),
-    insetIconPadding: px(8),
+    // An icon inside the active track, at its start (medium and larger sliders), as Compose's
+    // SliderWithTrackIconsSample: 20px, 10px in from the track's end. Where the active track is
+    // too short for it (the binding marks it `overflowing`), it sits at the start of the inactive
+    // track instead, after the handle's gap, in the inactive track's content colour.
+    insetIconSize: px(20),
+    insetIconPadding: px(10),
+    insetIconColor: on("primary"),
+    insetIconOutsideColor: on("secondaryContainer"),
     iconFill: unitless(0),
     // Set by `size` (1 from medium up), and shown only on the bar handle's thick track.
     insetIconShown: unitless(0),
@@ -265,6 +270,13 @@ const handleBox = (at: typeof horizontalAt): StyleMap => {
 // it when vertical. Where its far edge sits.
 const BESIDE = sub(sub(pct(50), half(HANDLE_ACROSS)), ref("valueIndicatorGap"));
 
+// Where an overflowing inset icon starts: past the active track's end and the handle's gap, in by
+// the padding.
+const INACTIVE_START = add(
+    add(percent("activeEnd"), mul(CLEARANCE, ref("endGap"))),
+    ref("insetIconPadding"),
+);
+
 const geometry = (vertical: boolean) => {
     const segment = vertical ? verticalSegment : horizontalSegment;
     const at = vertical ? verticalAt : horizontalAt;
@@ -286,6 +298,15 @@ const geometry = (vertical: boolean) => {
                       ref("insetIconPadding"),
                   ),
                   insetInlineStart: sub(pct(50), half(ref("insetIconSize"))),
+                  states: {
+                      overflowing: {
+                          insetBlockEnd: INACTIVE_START,
+                          insetInlineStart: sub(
+                              pct(50),
+                              half(ref("insetIconSize")),
+                          ),
+                      },
+                  },
               }
             : {
                   insetInlineStart: add(
@@ -293,6 +314,15 @@ const geometry = (vertical: boolean) => {
                       ref("insetIconPadding"),
                   ),
                   insetBlockStart: sub(pct(50), half(ref("insetIconSize"))),
+                  states: {
+                      overflowing: {
+                          insetInlineStart: INACTIVE_START,
+                          insetBlockStart: sub(
+                              pct(50),
+                              half(ref("insetIconSize")),
+                          ),
+                      },
+                  },
               },
         handle: handleBox(at),
         valueIndicator: vertical
@@ -356,13 +386,25 @@ const unlessDisabled = (
 });
 
 // Every property that depends on the color group.
-const colored = (active: ColorValue, onActive: ColorValue) => ({
+const colored = (
+    active: ColorValue,
+    onActive: ColorValue,
+    icon: ColorValue = onActive,
+) => ({
     activeTrack: unlessDisabled(active, "disabledContent"),
     handle: unlessDisabled(active, "disabledContent"),
     insetIcon: {
         color: when()
             .on(DISABLED, disabledColor("disabledContainer"))
-            .else(onActive),
+            .else(icon),
+        // Off the active track, it takes the inactive track's content colour.
+        states: {
+            overflowing: {
+                color: when()
+                    .on(DISABLED, disabledColor("disabledContainer"))
+                    .else(ref("insetIconOutsideColor")),
+            },
+        },
     },
     marker: unlessDisabled(
         colorMix(ref("stopColor"), onActive, mul(ref("stopActive"), pct(100))),
@@ -437,6 +479,14 @@ export const createSlider = <const G extends string = ColorGroup>(
             },
             recipe: () => {
                 const horizontal = geometry(false);
+                const baseColors = colored(
+                    ref("activeColor"),
+                    ref("stopActiveColor"),
+                    ref("insetIconColor"),
+                );
+                const icon = iconBox(ref("insetIconSize"), {
+                    fill: iconFill(ref("iconFill")),
+                });
                 const piece = (moves: StyleMap): StyleMap => ({
                     position: absolute,
                     pointerEvents: none,
@@ -479,9 +529,7 @@ export const createSlider = <const G extends string = ColorGroup>(
                             // An icon inside the active track, at its start, over the track
                             // and under the handle; only medium and larger sliders show it.
                             insetIcon: {
-                                ...iconBox(ref("insetIconSize"), {
-                                    fill: iconFill(ref("iconFill")),
-                                }),
+                                ...icon,
                                 ...piece(horizontal.insetIcon),
                                 opacity: mul(ref("insetIconShown"), ref("bar")),
                             },
@@ -528,7 +576,23 @@ export const createSlider = <const G extends string = ColorGroup>(
                             },
                             input: { display: none },
                         },
-                        colored(ref("activeColor"), ref("stopActiveColor")),
+                        {
+                            ...baseColors,
+                            // Its states join the icon's and the placement's.
+                            insetIcon: {
+                                ...baseColors.insetIcon,
+                                states: {
+                                    ...icon.states,
+                                    ...horizontal.insetIcon.states,
+                                    overflowing: {
+                                        ...horizontal.insetIcon.states
+                                            .overflowing,
+                                        ...baseColors.insetIcon.states
+                                            .overflowing,
+                                    },
+                                },
+                            },
+                        },
                     ),
                     variants: {
                         color: colorVariant(groups, (g) =>

@@ -1,5 +1,5 @@
 import { testIds } from "@pureform/anatomy";
-import { createSignal } from "solid-js";
+import { createSignal, flush } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
@@ -169,6 +169,31 @@ describe("Slider", () => {
         const icon = byTestId(ids.insetIcon);
         expect(icon.textContent).toBe("♪");
         expect(icon.getAttribute("aria-hidden")).toBe("true");
+    });
+
+    it("marks the inset icon overflowing while the active track is too short for it", async () => {
+        const [value, setValue] = createSignal(40);
+        withRegistry(() => (
+            <div style={{ width: "400px" }}>
+                <Slider
+                    aria-label="Volume"
+                    size="large"
+                    value={value()}
+                    insetIcon="♪"
+                />
+            </div>
+        ));
+        await settle();
+        const icon = byTestId(ids.insetIcon);
+        await expect
+            .poll(() => icon.hasAttribute("data-pf-overflowing"))
+            .toBe(false);
+        setValue(5);
+        flush();
+        await settle();
+        await expect
+            .poll(() => icon.hasAttribute("data-pf-overflowing"))
+            .toBe(true);
     });
 
     it("has no inset icon part without one", async () => {

@@ -17,6 +17,9 @@ export const STATE_ATTRIBUTES = {
     /** An element that flips under `rtl`, such as an icon that points; the bindings set it from
      *  the icon's `mirror` prop. */
     mirrored: "data-pf-mirror",
+    /** A part that doesn't fit where it usually sits, so it moves, such as a slider's inset icon
+     *  on an active track too short for it; the binding measures it. */
+    overflowing: "data-pf-overflowing",
 } as const;
 
 /** A state the bindings mark with a `data-pf-*` attribute. */

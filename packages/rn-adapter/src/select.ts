@@ -47,6 +47,8 @@ export interface State {
     expanded?: boolean;
     /** An icon that points, which flips under `rtl`. */
     mirrored?: boolean;
+    /** A part that doesn't fit where it usually sits (a slider's inset icon on a short track). */
+    overflowing?: boolean;
     reducedMotion?: boolean;
     rtl?: boolean;
     /** The color scheme, for styles that switch on it rather than through tokens. */

@@ -414,8 +414,10 @@ export type DirectionCondition = "ltr" | "rtl";
 
 /** An element marked to flip with the writing direction, such as an icon that points (a back
  *  arrow, a chevron). The web matches the `data-pf-mirror` attribute the bindings set; a native
- *  binding reports it as the `mirrored` state. */
-export type MarkCondition = "mirrored";
+ *  binding reports it as the `mirrored` state. `overflowing` marks a part that doesn't fit where
+ *  it usually sits, so it moves (a slider's inset icon on a short active track): the web matches
+ *  `data-pf-overflowing`, a native binding reports the state. */
+export type MarkCondition = "mirrored" | "overflowing";
 
 /** Portable non-size media features (color scheme is its own axis above). */
 export type MediaCondition =

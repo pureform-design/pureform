@@ -10,6 +10,7 @@ import type { TestIdOverride } from "@pureform/anatomy";
 import {
     isPresent,
     sliderMarkerTokens,
+    sliderInsetIconOverflows,
     sliderSelection,
     sliderStopActive,
     sliderStops,
@@ -26,7 +27,7 @@ import type {
 } from "@pureform/binding-core";
 import { useRef, useState } from "react";
 import type { ReactNode } from "react";
-import type { GestureResponderEvent } from "react-native";
+import type { GestureResponderEvent, LayoutChangeEvent } from "react-native";
 import { Text } from "react-native";
 
 import { IconSlot, iconSlot } from "../icon-style";
@@ -230,8 +231,14 @@ function SliderImpl(props: SliderProps): ReactNode {
     });
     const { interaction } = indication;
     const selection = indication.select(sliderSelection(props, percents));
+    // The root's length along the axis, for whether the inset icon fits in the active track.
+    const [length, setLength] = useState(0);
     const state = {
         ...indication.states(),
+        ...(isPresent(props.insetIcon) &&
+        sliderInsetIconOverflows(length, percents, props.centered)
+            ? { overflowing: true }
+            : {}),
         dragged: indication.state.dragged,
         ...(props.disabled ? { disabled: true } : {}),
     };
@@ -353,6 +360,14 @@ function SliderImpl(props: SliderProps): ReactNode {
             onResponderMove={(event: GestureResponderEvent) => move(event)}
             onResponderRelease={() => end(false)}
             onResponderTerminate={() => end(true)}
+            {...(isPresent(props.insetIcon)
+                ? {
+                      onLayout: (event: LayoutChangeEvent) => {
+                          const { width, height } = event.nativeEvent.layout;
+                          setLength(vertical ? height : width);
+                      },
+                  }
+                : {})}
             style={{ ...s.root, ...unselectable }}
             testID={id("root")}
         >

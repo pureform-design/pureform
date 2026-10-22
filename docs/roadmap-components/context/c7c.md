@@ -170,3 +170,16 @@ variant (c3c/c4b): the bar already rests at elevation 3 and the app bar's scroll
   `surfaceContainerHigh`, and `scrolled` still takes `surfaceContainerHighest`: that colour change
   is the whole lift on scroll. Specs: preset `expressive.spec.ts`, the browser suite's
   `visual.e2e.test.tsx` (no box shadow) and React Native's `components.spec.tsx`.
+- **Inset icon clipping (resolved):** as Compose's `SliderWithTrackIconsSample`, the icon (now
+  20px, `insetIconPadding` 10px) sits at the start of the active track in `insetIconColor`
+  (`onPrimary`, the group's on-colour under `color`) while the active track is at least the icon
+  and its padding either side; otherwise at the start of the inactive track, after the handle's
+  gap, in `insetIconOutsideColor` (`onSecondaryContainer`). It's never clipped or drawn across
+  the boundary. Placement is a state, not a variant: a new mark condition `overflowing` (core
+  `MarkCondition`, `data-pf-overflowing` in `STATE_ATTRIBUTES`, css-lowering's selector, the
+  rn-adapter state), set by the bindings from binding-core's `sliderInsetIconOverflows` (the
+  root's measured length: a `ResizeObserver` on the web, `onLayout` on React Native) with the
+  icon's measures in `SLIDER_INSET_ICON`. A theme that changes `insetIconSize` or
+  `insetIconPadding` should change those too. Specs: binding-core `display.spec.ts`, Solid and
+  React `slider.spec.tsx`, React Native `components.spec.tsx`, preset `expressive.spec.ts`;
+  `variant-overlap.spec.ts` still passes.

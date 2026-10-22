@@ -1,4 +1,5 @@
 import { testIds } from "@pureform/anatomy";
+import { act, useState } from "react";
 import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
@@ -141,6 +142,35 @@ describe("Slider", () => {
         const icon = byTestId(ids.insetIcon);
         expect(icon.textContent).toBe("♪");
         expect(icon.getAttribute("aria-hidden")).toBe("true");
+    });
+
+    it("marks the inset icon overflowing while the active track is too short for it", async () => {
+        let set!: (value: number) => void;
+        function Wrapper() {
+            const [value, setValue] = useState(40);
+            set = setValue;
+            return (
+                <div style={{ width: "400px" }}>
+                    <Slider
+                        aria-label="Volume"
+                        size="large"
+                        value={value}
+                        insetIcon="♪"
+                    />
+                </div>
+            );
+        }
+        withRegistry(<Wrapper />);
+        await settle();
+        const icon = byTestId(ids.insetIcon);
+        await expect
+            .poll(() => icon.hasAttribute("data-pf-overflowing"))
+            .toBe(false);
+        await act(async () => set(5));
+        await settle();
+        await expect
+            .poll(() => icon.hasAttribute("data-pf-overflowing"))
+            .toBe(true);
     });
 
     it("has no inset icon part without one", async () => {

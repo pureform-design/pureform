@@ -104,6 +104,21 @@ describe("M3 Expressive", () => {
         expect(icons?.none?.icon).toMatchObject({ display: { value: "none" } });
     });
 
+    it("moves an overflowing inset icon past the handle, in the inactive track's content colour", () => {
+        const icon = slider.recipe.base.insetIcon as {
+            states?: { overflowing?: object; rtl?: object };
+        };
+        expect(icon.states?.overflowing).toHaveProperty("insetInlineStart");
+        expect(icon.states?.overflowing).toHaveProperty("color");
+        // The icon box's mirroring stays.
+        expect(icon.states).toHaveProperty("rtl");
+        expect(slider.tokens).toMatchObject({
+            insetIconPadding: expect.anything(),
+            insetIconColor: expect.anything(),
+            insetIconOutsideColor: expect.anything(),
+        });
+    });
+
     it("draws the bar slider by default and keeps the round one", () => {
         expect(slider.recipe.defaultVariants).toMatchObject({
             handleShape: "bar",
