@@ -289,7 +289,8 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
       first (Escape, the back button, the scrim, a press on the handle, a dismissing drag), all
       through binding-core's `closeAsker`: `true` closes, `false` keeps it open (a dragged sheet
       springs back), and a promise keeps it open (a dragged sheet holding where it was let go)
-      until it settles. The drag moves a view around the surface that
+      until it settles. Closing it through a controlled `open` doesn't ask: by design (as in
+      Radix and MUI), the app already decided. The drag moves a view around the surface that
       takes the surface's place in its parent (size, margins, position, layer).
       The side sheet's header takes a back button when given `onBack`, and an `actions` row
       under the content. With `modal={false}` (and, for the side sheet, `coplanar`) each is its

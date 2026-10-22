@@ -385,7 +385,7 @@ import { RichTooltip } from "@pureform/solid/rich-tooltip";
   down past a quarter of its height or a flick. Root's `onClose` is asked before any close of its own:
   Escape, the scrim, a press on the handle, or a drag. `true` closes, `false` keeps it open (a
   dragged sheet settles back), and a promise keeps it open (a dragged sheet holding where it was
-  let go) until it settles (resolved `true` leaves). The side sheet's ready-made draws a back icon
+  let go) until it settles (resolved `true` leaves). Closing it through a controlled `open` (the app's own `setOpen(false)`) doesn't ask: by design, as in Radix and MUI, the app already decided. The side sheet's ready-made draws a back icon
   button when given `onBack`, and always a close icon button. Import them from
   `@pureform/solid/bottom-sheet` and `@pureform/solid/side-sheet`; the drag handle alone from
   `@pureform/solid/drag-handle`.

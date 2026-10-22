@@ -381,7 +381,7 @@ import { RichTooltip } from "@pureform/react/rich-tooltip";
   past a quarter of its height. Root's `onClose` is asked before any close of its own: Escape, the
   scrim, a press on the handle, or a drag. `true` closes, `false` keeps it open (a dragged sheet
   settles back), and a promise keeps it open (a dragged sheet holding where it was let go) until
-  it settles (resolved `true` leaves). The ready-made takes `trigger`, `dragHandle`, `dragHandleLabel`
+  it settles (resolved `true` leaves). Closing it through a controlled `open` (the app's own `setOpen(false)`) doesn't ask: by design, as in Radix and MUI, the app already decided. The ready-made takes `trigger`, `dragHandle`, `dragHandleLabel`
   and `body`. Import it from `@pureform/react/bottom-sheet`.
 - **The side sheet** sits against the end edge of the viewport (`coplanar` puts a standard sheet
   in the page's layout). Its `Header` holds a `BackButton`, the `Headline` and the

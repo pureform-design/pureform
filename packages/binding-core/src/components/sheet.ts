@@ -65,7 +65,8 @@ export interface BottomSheetCloseProps {
      *  the scrim, a press on the drag handle, or a drag down on it. `true` closes it, `false`
      *  keeps it open. Given a promise, it stays open until the promise settles, a dragged sheet
      *  holding where the drag let go of it, then leaves (resolved `true`) or springs back.
-     *  Without, each of these closes it. Closing it through `open` doesn't ask. */
+     *  Without, each of these closes it. Closing it through a controlled `open` doesn't ask, by
+     *  design (as in Radix and MUI): the app has already decided. */
     readonly onClose?: CloseQuestion | undefined;
 }
 

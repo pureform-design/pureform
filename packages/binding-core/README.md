@@ -282,7 +282,7 @@ fullscreenDialogPositionerLayout(present); // hidden once gone; fixed over the v
 // Sheets: the dialog's Zag machine; bottomSheetOverlayAnatomy, sideSheetOverlayAnatomy
 type BottomSheetPart; type SideSheetPart  // the overlays' parts, and "backdrop"
 interface BottomSheetRootOwnProps        // modal, tokens, onClose, the dialog's behavior props (no role), testId, unstyled
-interface BottomSheetCloseProps          // onClose: asked before any close of its own (Escape, scrim, handle press, drag): a boolean, or a promise
+interface BottomSheetCloseProps          // onClose: asked before any close of its own (Escape, scrim, handle press, drag): a boolean, or a promise; a controlled `open` closing it doesn't ask, by design
 closeAsker();                            // asks an overlay's onClose for every way it closes; a later question makes an earlier answer moot
 askingDismissProps(onClose, props, asker, close); // Zag dialog props: Escape and a press outside ask onClose first
 interface SideSheetRootOwnProps          // modal, coplanar, tokens, and the same
