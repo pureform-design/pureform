@@ -54,6 +54,7 @@ callback reports user actions only, with a details object.
 | `carousel/`                                               | Zag's carousel with `mask` and `content` parts: items size themselves and each snap, the arrow keys move focus by direction, and `reducedMotion` scrolls at once.                                                                     |
 | `accordion/`, `tree-view/`                                | Zag's accordion and tree view: each header or row emits to its item's interaction source; a branch's control also carries `aria-expanded`, `aria-current` and `aria-disabled` for the row's styles                                    |
 | `stepper/`                                                | Zag's steps with `label` and `caption` parts: a row is a tab list (only the current header is a tab stop) and a column a list of disclosure buttons; the arrow keys, Home and End move focus between the headers, by direction; `invalid` and `disabled` headers; a done step's indicator is `aria-checked`. |
+| `avatar/`                                                 | Zag's avatar, re-exported: `Image` shows once the picture has loaded, `Fallback` until then and when it fails.                                                                                                                       |
 | `tooltip.ts`                                              | Zag's tooltip, re-exported unchanged.                                                                                                                                                                                                 |
 | `button-group.ts`                                         | Zag's toggle group behind a selectable button group: the root is a `group` and every item a toggle button with `aria-pressed`.                                                                                                        |
 | `presence.ts`                                             | Zag's presence, re-exported; keeps an overlay mounted until its exit animation ends, and only the exit's own animations end it.                                                                                                       |
@@ -87,6 +88,7 @@ callback reports user actions only, with a details object.
 | `@pureform/machines/snackbar`     | `snackbar`'s members                                                                                                                                                                                                                    |
 | `@pureform/machines/toast`        | `@zag-js/toast` (`toast` at the root: `createStore`, `group`, `machine`), with an `icon` part in `anatomy` and `getIconProps` in `connect`                                                                                              |
 | `@pureform/machines/carousel`     | `@zag-js/carousel`, with `getMaskProps`/`getContentProps`, a `reducedMotion` prop, and no style reads as it starts                                                                                                                      |
+| `@pureform/machines/avatar`       | `@zag-js/avatar` (`avatar` at the root)                                                                                                                                                                                                 |
 | `@pureform/machines/accordion`    | `@zag-js/accordion`, each item's header emitting to its interaction source                                                                                                                                                              |
 | `@pureform/machines/tree-view`    | `@zag-js/tree-view`, each row emitting to its source, a branch's control marked as its treeitem                                                                                                                                         |
 | `@pureform/machines/stepper`      | `@zag-js/steps`, with `getLabelProps`/`getCaptionProps`, `getTriggerProps({ index, invalid, disabled })` and the headers' keys                                                                                                          |
@@ -285,7 +287,8 @@ Zag's `@zag-js/slider` (all its props: `value: number[]`, `min`, `max`, `step`, 
 - The API has the preset's parts: `getRootProps`, `getStartTrackProps`, `getTrackProps`,
   `getActiveTrackProps` (Zag's range), `getMarkerGroupProps`, `getMarkerProps({ value })`, and per
   thumb `getHandleProps(i)` (role `slider`, focus and keys), `getStateLayerProps(i)`,
-  `getValueIndicatorProps(i)` (Zag's dragging indicator), `getInputProps(i)` (the hidden input,
+  `getValueIndicatorProps(i)` (Zag's dragging indicator), `getInsetIconProps()` (the icon inside the
+  active track; drawn only, `aria-hidden`), `getInputProps(i)` (the hidden input,
   `disabled` while the slider is, so it doesn't submit). Zag's inline styles are left off; the
   preset places every part. Also `percents`, `percentOf(value)`, `disabled`, `focusedIndex`.
 - The up and down arrows step a horizontal slider too, as a range input does (Zag ignores them).

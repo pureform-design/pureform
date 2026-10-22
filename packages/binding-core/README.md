@@ -487,8 +487,10 @@ type RipplePart; interface RippleRootOwnProps // tokens, disabled, effect, cente
 RIPPLE_ROOT_PROPS; rippleSelection(props); rippleMachineProps(props); // effect → the machine's variant
 
 // Single-part components: Root is the component
-AVATAR_ROOT_PROPS; avatarSelection; avatarElement({ src, as }); // img with a src, else span
-avatarRootProps(props, element);         // src and alt; else role img named by label, or hidden
+AVATAR_ROOT_PROPS; avatarSelection; avatarMachineProps(props); // id, onStatusChange (Zag's avatar)
+avatarRootProps(props);                  // role img named by label, or hidden; AvatarContentProps: src, children
+// List item swipe (components/list-item-swipe.ts): swipeOffsetOf, swipeSettlesOpen, swipeRestOffset,
+// swipeKeyAction, swipeTokens, ListItemSwipeProps (revealed, defaultRevealed, onRevealedChange, swipeWidth)
 BADGE_ROOT_PROPS; badgeSelection;      // size, placement
 badgeRootProps(props);                   // role img named by label; a dot without one is hidden
 MEDIA_ROOT_PROPS; mediaSelection;        // aspect, shape

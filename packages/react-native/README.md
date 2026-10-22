@@ -438,7 +438,11 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
   them its `density`, `color`, `tokens`, and `leadingType` (`icon`, `avatar`, `thumbnail`,
   `video`) unless an item sets its own. `variant="segmented"` sets the items apart as tiles, each
   item rounded by its `position` (`first`, `middle`, `last`, `single`), which a `ListItem` outside
-  a `List` can take too. An item's `href` isn't followed; give it `onPress`.
+  a `List` can take too. An item's `href` isn't followed; give it `onPress`. A `swipeAction`
+  makes the item swipeable (`revealed`, `defaultRevealed`, `onRevealedChange`, `swipeWidth`): the
+  row takes the drag (a `PanResponder`), so it isn't also pressable; the action is hidden from
+  assistive technology until revealed. `Avatar` takes a `src` that shows once loaded
+  (`onStatusChange`), its children the fallback.
 - **Button groups:** `ButtonGroup` renders a `Button` per labelled entry of `items` and an
   `IconButton` per icon-only one, in its `size` and the buttons' `color`, `variant`, `corner` and
   `density`, each with its `position` (`single`, or its place in the run when `connected`).
@@ -520,7 +524,8 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
 - **The slider takes focus** and steps with the arrow keys (sideways by direction), Home, and End,
   and the `increment` and `decrement` accessibility actions. A range (`defaultValue={[20, 60]}`)
   moves the thumb nearest the press, and the keys move the last one dragged; `centered`, `stops`,
-  `valueIndicator` and `orientation: "vertical"` match the web. Each thumb and stop resolves its
+  `valueIndicator` and `orientation: "vertical"` match the web; `insetIcon` draws an icon in the
+  active track (size `medium` up). Each thumb and stop resolves its
   own styles with its own `value` token.
 - **The time picker and time input** keep the time in state and step it with the web machine's
   arithmetic (`@pureform/machines/time-picker`), so 12/24-hour, periods and the dial's geometry
