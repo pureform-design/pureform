@@ -43,12 +43,18 @@ Subphases of one phase don't depend on each other and run at the same time.
   `tests/component-suites` and `tests/browser-e2e-tests` lists, and
   `packages/anatomy/src/generated.ts` (generated: never merge by hand, rerun `generate`).
   Edit them with small additive changes (one line per component) so merges are a union.
-- **Targeted checks only in a subphase.** Build and test just what the subphase affects:
-  `omni run build test -p <project>` for the packages you touched, or
-  `omni run build test -b <phase start commit> -w` for everything changed since the phase began
-  and its dependents, plus the type check in each touched package and the specific suites
-  (component suites, browser screenshots) for your components. Don't run the whole suite
-  (`-f all` on every project); it is slow, and the orchestrator runs it once per phase.
+- **Targeted checks only in a subphase.** Check just what the subphase changed:
+    - Build and unit-test the packages you touched with `omni run build test -p <project>`
+      (repeat `-p`). Don't use `-b <commit> -w` for a subphase: it pulls in every dependent,
+      including the full e2e suites.
+    - Run the type check in each touched package.
+    - Run only the e2e test files your change can affect, straight through Vitest after the
+      build, narrowed by file, project and test name, for example from `tests/component-suites`:
+      `bunx vitest run -c vitest.config.e2e.ts src/overlays.e2e.test.ts --project "solid/css" -t Menu`.
+      Pick one project per binding unless the change is target-specific; widen only when a
+      narrow run fails in a way the others could share.
+    - Never run the whole suite, a whole e2e project, or `-f all` across projects; it takes
+      30+ minutes under load, and the orchestrator runs it once per phase.
 - **Merging:** the orchestrator merges the subphase branches one at a time in the order the
   phase lists, reruns `generate`, rebuilds, and runs the whole suite once, after the last
   merge. If anything fails, it spawns **one** subagent to fix all the failures (with the
