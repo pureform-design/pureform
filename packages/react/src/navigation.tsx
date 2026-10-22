@@ -21,11 +21,13 @@ import {
     navigationModalContentLayout,
     navigationModalMachineProps,
     navigationModalPositionerLayout,
+    navigationSections,
     navigationSelection,
 } from "@pureform/binding-core";
 import type {
     NavigationComponent,
     NavigationContentProps,
+    NavigationItem,
     NavigationItemOwnProps,
     NavigationRootOwnProps,
 } from "@pureform/binding-core";
@@ -355,6 +357,26 @@ export function createNavigation<C extends NavigationComponent>(config: {
             ...rootProps
         } = props;
         const slot = useSlotProps(props);
+        const destination = (item: NavigationItem<ReactNode>) => (
+            <Item
+                key={item.value}
+                value={item.value}
+                href={item.href}
+                disabled={item.disabled}
+                interactionSource={item.interactionSource}
+                {...slot("item")}
+            >
+                <Indicator {...slot("indicator")}>
+                    <ActiveIndicator {...slot("activeIndicator")} />
+                    {isPresent(item.icon) ? (
+                        <Icon mirror={item.mirrorIcon} {...slot("icon")}>
+                            {item.icon}
+                        </Icon>
+                    ) : null}
+                </Indicator>
+                <Label {...slot("label")}>{item.label}</Label>
+            </Item>
+        );
         return (
             <Root
                 {...(rootProps as NavigationRootProps<C>)}
@@ -365,37 +387,21 @@ export function createNavigation<C extends NavigationComponent>(config: {
                         {header}
                     </Header>
                 ) : null}
-                {items.map((item) => (
-                    <Fragment key={item.value}>
-                        {hasHeader && isPresent(item.sectionLabel) ? (
+                {(hasHeader
+                    ? navigationSections(items)
+                    : [{ group: undefined, items }]
+                ).map((section, index) => (
+                    <Fragment key={section.group ?? `#${index}`}>
+                        {section.group === undefined ? null : (
                             <SectionLabel
                                 {...(slot as (part: string) => PartProps)(
                                     "sectionLabel",
                                 )}
                             >
-                                {item.sectionLabel}
+                                {section.group}
                             </SectionLabel>
-                        ) : null}
-                        <Item
-                            value={item.value}
-                            href={item.href}
-                            disabled={item.disabled}
-                            interactionSource={item.interactionSource}
-                            {...slot("item")}
-                        >
-                            <Indicator {...slot("indicator")}>
-                                <ActiveIndicator {...slot("activeIndicator")} />
-                                {isPresent(item.icon) ? (
-                                    <Icon
-                                        mirror={item.mirrorIcon}
-                                        {...slot("icon")}
-                                    >
-                                        {item.icon}
-                                    </Icon>
-                                ) : null}
-                            </Indicator>
-                            <Label {...slot("label")}>{item.label}</Label>
-                        </Item>
+                        )}
+                        {section.items.map(destination)}
                     </Fragment>
                 ))}
             </Root>

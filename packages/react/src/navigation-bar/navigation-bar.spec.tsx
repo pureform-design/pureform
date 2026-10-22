@@ -160,10 +160,11 @@ describe("NavigationRail", () => {
         expect(header.textContent).toBe("Menu");
     });
 
-    it("draws a destination's section label before it, the rail's only", async () => {
+    it("draws one heading over each section's destinations, the rail's only", async () => {
         const items = [
-            { ...ITEMS[0]!, sectionLabel: "Mail" },
-            ...ITEMS.slice(1),
+            { ...ITEMS[0]!, section: "Mail" },
+            ITEMS[1]!,
+            { ...ITEMS[2]!, section: "Mail" },
         ];
         withRegistry(
             <>
@@ -177,8 +178,25 @@ describe("NavigationRail", () => {
         );
         expect(labels).toHaveLength(1);
         expect(labels[0]!.textContent).toBe("Mail");
-        expect(labels[0]!.nextElementSibling!.getAttribute("data-part")).toBe(
-            "item",
+        // The section's destinations sit together under it; the bar keeps its order.
+        const values = (root: string) =>
+            [
+                ...byTestId(root).querySelectorAll<HTMLElement>(
+                    '[data-part="item"]',
+                ),
+            ].map((item) => item.dataset["value"]);
+        expect(values(testIds.navigationRail.root)).toEqual([
+            "home",
+            "settings",
+            "search",
+        ]);
+        expect(values(testIds.navigationBar.root)).toEqual([
+            "home",
+            "search",
+            "settings",
+        ]);
+        expect(labels[0]!.nextElementSibling!.getAttribute("data-value")).toBe(
+            "home",
         );
     });
 

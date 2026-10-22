@@ -334,6 +334,7 @@ export {
     navigationModalContentLayout,
     navigationModalMachineProps,
     navigationModalPositionerLayout,
+    navigationSections,
     navigationSelection,
 } from "./components/navigation";
 export type {

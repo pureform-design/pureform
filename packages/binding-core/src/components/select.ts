@@ -64,31 +64,35 @@ export interface SelectItem extends InteractionSourceProps {
 }
 
 /** A run of options under one group label (`undefined` for options outside any group). */
-export interface SelectItemGroup {
+export interface SelectItemGroup<Item = SelectItem> {
     readonly group: string | undefined;
-    readonly items: readonly SelectItem[];
+    readonly items: readonly Item[];
 }
 
 /** The options by group, in the order each group first appears; options outside any group form
  *  their own runs. The list shows them in this order, so give it the items in it too (see
- *  `selectGroupedItems`), or the arrow keys move in a different order than the eye. */
-export const selectItemGroups = (
-    items: readonly SelectItem[],
-): SelectItemGroup[] => {
-    const groups: { group: string | undefined; items: SelectItem[] }[] = [];
-    const byName = new Map<string, SelectItem[]>();
+ *  `selectGroupedItems`), or the arrow keys move in a different order than the eye. `groupOf`
+ *  reads another tag than `group`: the rail's `section`, say. */
+export const selectItemGroups = <Item = SelectItem>(
+    items: readonly Item[],
+    groupOf: (item: Item) => string | undefined = (item) =>
+        (item as SelectItem).group,
+): SelectItemGroup<Item>[] => {
+    const groups: { group: string | undefined; items: Item[] }[] = [];
+    const byName = new Map<string, Item[]>();
     for (const item of items) {
-        if (item.group === undefined) {
+        const group = groupOf(item);
+        if (group === undefined) {
             const last = groups.at(-1);
             if (last && last.group === undefined) last.items.push(item);
             else groups.push({ group: undefined, items: [item] });
             continue;
         }
-        let run = byName.get(item.group);
+        let run = byName.get(group);
         if (!run) {
             run = [];
-            byName.set(item.group, run);
-            groups.push({ group: item.group, items: run });
+            byName.set(group, run);
+            groups.push({ group, items: run });
         }
         run.push(item);
     }

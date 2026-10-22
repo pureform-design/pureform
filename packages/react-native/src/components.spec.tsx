@@ -1033,13 +1033,13 @@ describe("nested rows", () => {
         expect(labels()).toEqual(["Cut", "Share›"]);
     });
 
-    it("shows an expanded rail's section labels", async () => {
+    it("shows an expanded rail's section headings", async () => {
         await render(
             <NavigationRail
-                items={[
-                    { ...DESTINATIONS[0]!, sectionLabel: "Mail" },
-                    ...DESTINATIONS.slice(1),
-                ]}
+                items={DESTINATIONS.map((item) => ({
+                    ...item,
+                    section: "Mail",
+                }))}
                 expanded
                 testId="s"
             />,

@@ -11,6 +11,7 @@ import {
 import type { PartName, TestIdOverride } from "@pureform/anatomy";
 import {
     isPresent,
+    navigationSections,
     navigationSelection,
     tabsHaveIcons,
     tabsSelection,
@@ -424,10 +425,12 @@ function NavigationImpl<C extends NavigationComponent>(
                     {props.header}
                 </v.header.View>
             ) : null}
-            {props.items.map((item) => (
-                <Fragment key={item.value}>
-                    {props.name === "navigationRail" &&
-                    isPresent(item.sectionLabel) ? (
+            {(props.name === "navigationRail"
+                ? navigationSections(props.items)
+                : [{ group: undefined, items: props.items }]
+            ).map((section, index) => (
+                <Fragment key={section.group ?? `#${index}`}>
+                    {section.group === undefined ? null : (
                         <v.sectionLabel.Text
                             selectable={false}
                             style={s.sectionLabel}
@@ -437,19 +440,24 @@ function NavigationImpl<C extends NavigationComponent>(
                                 props.testId as TestIdOverride<RailPart>,
                             )}
                         >
-                            {item.sectionLabel}
+                            {section.group}
                         </v.sectionLabel.Text>
-                    ) : null}
-                    <Destination
-                        name={props.name}
-                        item={item}
-                        selection={selection}
-                        indication={props.indication}
-                        testId={props.testId as TestIdOverride<NavigationPart>}
-                        disabled={props.disabled === true}
-                        selected={value === item.value}
-                        onPick={pick}
-                    />
+                    )}
+                    {section.items.map((item) => (
+                        <Destination
+                            key={item.value}
+                            name={props.name}
+                            item={item}
+                            selection={selection}
+                            indication={props.indication}
+                            testId={
+                                props.testId as TestIdOverride<NavigationPart>
+                            }
+                            disabled={props.disabled === true}
+                            selected={value === item.value}
+                            onPick={pick}
+                        />
+                    ))}
                 </Fragment>
             ))}
         </v.root.View>

@@ -16,6 +16,7 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 import type { Controllable } from "../controllable";
 import type { Unstyled } from "../parts";
 import type { IndicationProps, InteractionSourceProps } from "./indication";
+import { selectItemGroups, type SelectItemGroup } from "./select";
 import type { VariantProp } from "./variants";
 
 /** The navigation components: Material's bar and rail, which share their parts and behavior. */
@@ -135,10 +136,19 @@ export interface NavigationItem<Node = unknown> extends NavigationItemOwnProps {
     readonly icon?: Node;
     /** Flip the icon under `rtl`, for an icon that points. */
     readonly mirrorIcon?: boolean | undefined;
-    /** A section label over this destination, starting a run of them: the rail's, shown while
-     *  it's expanded. The bar ignores it. */
-    readonly sectionLabel?: Node;
+    /** The rail's section this destination belongs to. Destinations of one section sit
+     *  together under one heading with this text, shown while the rail is expanded, in the order
+     *  the sections first appear (like Select's `group`). The bar ignores it. */
+    readonly section?: string | undefined;
 }
+
+/** The rail's destinations by `section`, through `selectItemGroups`: each run under one
+ *  heading, `undefined` for destinations outside any section. */
+export const navigationSections = <
+    Item extends { readonly section?: string | undefined },
+>(
+    items: readonly Item[],
+): SelectItemGroup<Item>[] => selectItemGroups(items, (item) => item.section);
 
 /** What the ready-made components render inside Root, in the framework's node type. */
 export interface NavigationContentProps<Node> {

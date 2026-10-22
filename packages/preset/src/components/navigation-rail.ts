@@ -13,8 +13,8 @@
 //   </nav>
 //
 // `expanded` widens it, M3 Expressive's replacement for the navigation drawer: each label sits
-// beside its icon, inside the pill, and a `sectionLabel` heads a run of destinations. A
-// collapsed rail hides its section labels. `modal` draws it as a surface over the page; the bindings
+// beside its icon, inside the pill, and destinations sharing a `section` sit under one
+// `sectionLabel` heading. A collapsed rail hides its section labels. `modal` draws it as a surface over the page; the bindings
 // put it in a dialog over a scrim.
 
 import { typed } from "@pureform/core";

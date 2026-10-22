@@ -23,6 +23,7 @@ import {
     navigationModalContentLayout,
     navigationModalMachineProps,
     navigationModalPositionerLayout,
+    navigationSections,
     navigationSelection,
 } from "@pureform/binding-core";
 import type {
@@ -365,18 +366,6 @@ export function createNavigation<C extends NavigationComponent>(config: {
     ] as const;
 
     /** A ready-made destination's section label, when it has one: the rail's only. */
-    const ItemSectionLabel = hasHeader
-        ? (
-              props: NavigationPartProps & { readonly label: JSX.Element },
-          ): JSX.Element => (
-              <Show when={isPresent(props.label)}>
-                  <SectionLabel {...omit(props, "label")}>
-                      {props.label}
-                  </SectionLabel>
-              </Show>
-          )
-        : (): JSX.Element => undefined;
-
     /** The ready-made component: a destination per item, each with every part in the preset's
      *  structure, the icon only when given. */
     function ReadyMade(props: NavigationProps<C>): JSX.Element {
@@ -393,41 +382,60 @@ export function createNavigation<C extends NavigationComponent>(config: {
         const sectionLabel = (slots as (part: string) => object)(
             "sectionLabel",
         );
+        // The bar ignores `section`: its destinations stay in one run, in order.
+        const sections = createMemo(() =>
+            hasHeader
+                ? navigationSections(props.items ?? [])
+                : [{ group: undefined, items: props.items ?? [] }],
+        );
         return (
             <Root {...own} {...root}>
                 <Show when={hasHeader && isPresent(props.header)}>
                     <Header {...header}>{props.header}</Header>
                 </Show>
-                <For
-                    each={props.items ?? []}
-                    keyed={(item: NavigationItem<JSX.Element>) => item.value}
-                >
-                    {(item) => (
+                <For each={sections()} keyed={false}>
+                    {(section) => (
                         <>
-                            <ItemSectionLabel
-                                label={item().sectionLabel}
-                                {...sectionLabel}
-                            />
-                            <Item
-                                value={item().value}
-                                href={item().href}
-                                disabled={item().disabled}
-                                interactionSource={item().interactionSource}
-                                {...itemSlot}
+                            <Show when={section().group}>
+                                {(name) => (
+                                    <SectionLabel {...sectionLabel}>
+                                        {name()}
+                                    </SectionLabel>
+                                )}
+                            </Show>
+                            <For
+                                each={section().items}
+                                keyed={(item: NavigationItem<JSX.Element>) =>
+                                    item.value
+                                }
                             >
-                                <Indicator {...indicator}>
-                                    <ActiveIndicator {...activeIndicator} />
-                                    <Show when={isPresent(item().icon)}>
-                                        <Icon
-                                            mirror={item().mirrorIcon}
-                                            {...icon}
-                                        >
-                                            {item().icon}
-                                        </Icon>
-                                    </Show>
-                                </Indicator>
-                                <Label {...label}>{item().label}</Label>
-                            </Item>
+                                {(item) => (
+                                    <Item
+                                        value={item().value}
+                                        href={item().href}
+                                        disabled={item().disabled}
+                                        interactionSource={
+                                            item().interactionSource
+                                        }
+                                        {...itemSlot}
+                                    >
+                                        <Indicator {...indicator}>
+                                            <ActiveIndicator
+                                                {...activeIndicator}
+                                            />
+                                            <Show when={isPresent(item().icon)}>
+                                                <Icon
+                                                    mirror={item().mirrorIcon}
+                                                    {...icon}
+                                                >
+                                                    {item().icon}
+                                                </Icon>
+                                            </Show>
+                                        </Indicator>
+                                        <Label {...label}>{item().label}</Label>
+                                    </Item>
+                                )}
+                            </For>
                         </>
                     )}
                 </For>
