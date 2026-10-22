@@ -17,6 +17,9 @@ export interface RendererConfig {
      *  bindings' native elements, ARIA and data attributes): its stories run without the
      *  generated play tests. The a11y checks still run. */
     readonly casePlays?: boolean;
+    /** `false` leaves the renderer out of the story tests (`vitest.config.storybook.ts`); its
+     *  stories still draw in Storybook. */
+    readonly tests?: boolean;
 }
 
 /** Overrides for one component; everything else comes from its anatomy and its case. */
@@ -26,11 +29,15 @@ export interface ComponentConfig {
     readonly args?: Args;
     /** Arg types over the ones from the anatomy's variants. */
     readonly argTypes?: Partial<ArgTypes>;
-    /** Anatomy variants that aren't props (derived by the binding): no control for them. */
-    readonly controls?: { readonly exclude?: readonly string[] };
     /** Scheme-pinned copies of `Default` (`Light`, `Dark`) with the state's play: they set the
-     *  story's `globals.scheme`, which overrides (and locks) the toolbar's. */
+     *  story's `globals.scheme`, which overrides (and locks) the toolbar's. Over the config's
+     *  `schemes`. */
     readonly schemes?: readonly ("light" | "dark")[];
+    /** The canvas's minimum height in pixels, over `overlayHeight` (which only overlays get). */
+    readonly height?: number;
+    /** Parameters for every story of the component (the meta's), plain data:
+     *  `{ a11y: { test: "todo" } }`. */
+    readonly parameters?: Readonly<Record<string, unknown>>;
     /** Pins every story of the component to a scheme (the meta's `globals`). */
     readonly scheme?: "light" | "dark";
     /** Story fields by export name, merged into the generated story (plain data):
@@ -46,8 +53,13 @@ export interface StoriesConfig {
     readonly renderers: Readonly<Record<string, RendererConfig>>;
     /** The components to draw, by export name; left out: every one with an anatomy and a case. */
     readonly include?: readonly string[];
-    /** Components to leave out. */
-    readonly skip?: readonly string[];
+    /** Components to leave out, each with the reason it can't be drawn from its case. */
+    readonly skip?: Readonly<Record<string, string>>;
+    /** Scheme-pinned copies every component gets, unless its own `schemes` says otherwise. */
+    readonly schemes?: readonly ("light" | "dark")[];
+    /** The canvas's minimum height, in pixels, for a component whose case opens an overlay
+     *  (it has `overlay` or `opened`), so a floating or modal surface has room. */
+    readonly overlayHeight?: number;
     /** Overrides by component. */
     readonly components?: Readonly<Record<string, ComponentConfig>>;
     /** Shared hook modules, relative to the app: they apply to every renderer, first. */

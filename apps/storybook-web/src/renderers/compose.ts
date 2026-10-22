@@ -25,6 +25,10 @@ export interface ComposeInput {
     readonly argTypes: Partial<ArgTypes>;
     /** Pins every story of the component to a scheme. */
     readonly scheme?: "light" | "dark" | undefined;
+    /** The canvas's minimum height in pixels (an overlay's room), `parameters.pureform.height`. */
+    readonly height?: number | undefined;
+    /** The component's parameters from `stories.config.ts`. */
+    readonly parameters?: Readonly<Record<string, unknown>> | undefined;
 }
 
 export const composeStories = (input: ComposeInput) => {
@@ -35,7 +39,13 @@ export const composeStories = (input: ComposeInput) => {
         {},
         c.props,
         c.keyboard?.keys.some((key) => key.does === "click")
-            ? { onClick: fn() }
+            ? {
+                  // A link's click would navigate the story's frame away (a list's
+                  // `href="#inbox"`), so the spy keeps it in place.
+                  onClick: fn((event?: { preventDefault?: () => void }) =>
+                      event?.preventDefault?.(),
+                  ),
+              }
             : {},
         ...input.hooks.map((h) => h.args),
         input.args,
@@ -59,9 +69,9 @@ export const composeStories = (input: ComposeInput) => {
         const key =
             typeof play === "object" ? c.keyboard?.keys[play.key] : undefined;
         const reads = c.state && key?.does !== "click";
-        return {
-            ...base,
-            args: {
+        // A `null` the key's props give means "left out" (Storybook drops null args).
+        const args = Object.fromEntries(
+            Object.entries({
                 ...(reads
                     ? {
                           ...c.state!.props,
@@ -70,7 +80,11 @@ export const composeStories = (input: ComposeInput) => {
                     : {}),
                 ...key?.props,
                 ...base.args,
-            },
+            }).filter(([, value]) => value !== null),
+        );
+        return {
+            ...base,
+            args,
             play: skipping(key ? keyPlay(c, key) : statePlay(c)),
         };
     };
@@ -88,6 +102,10 @@ export const composeStories = (input: ComposeInput) => {
             args: { ...shared, ...component },
             argTypes: input.argTypes,
             decorators,
+            parameters: {
+                ...input.parameters,
+                ...(input.height ? { pureform: { height: input.height } } : {}),
+            },
             ...(input.scheme ? { globals: { scheme: input.scheme } } : {}),
         },
         /** A story; `base.globals.scheme` pins its scheme over the toolbar's, and `play` gives

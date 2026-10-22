@@ -8,9 +8,17 @@ import { storybookTest } from "@storybook/addon-vitest/vitest-plugin";
 import { playwright } from "@vitest/browser-playwright";
 import { defineConfig } from "vitest/config";
 
+import config from "./stories.config";
+
 const executablePath = process.env["CHROMIUM_PATH"];
 
-const RENDERERS = ["solid", "react", "native"];
+// The renderers in `stories.config.ts` but those with `tests: false` (React Native, for now:
+// skipped until the cases get renderer-neutral readers). `SB_RENDERERS=native` runs one anyway.
+const RENDERERS = process.env["SB_RENDERERS"]
+    ? process.env["SB_RENDERERS"].split(",")
+    : Object.entries(config.renderers)
+          .filter(([, renderer]) => renderer.tests !== false)
+          .map(([name]) => name);
 
 export default defineConfig({
     test: {
@@ -33,7 +41,14 @@ export default defineConfig({
                     provider: playwright({
                         launchOptions: executablePath ? { executablePath } : {},
                     }),
-                    instances: [{ browser: "chromium" }],
+                    // The component suites' viewport, so components that measure the page (the
+                    // carousel) lay out as they do there.
+                    instances: [
+                        {
+                            browser: "chromium",
+                            viewport: { width: 1280, height: 900 },
+                        },
+                    ],
                 },
             },
         })),

@@ -81,17 +81,33 @@ const controlFor = (values: readonly string[]) =>
         ? { control: "boolean" }
         : { control: "select", options: values };
 
-/** Every component with a case, from the anatomy: the case whose root test id is the
- *  anatomy's root part's. */
+/** Every component with a case and an anatomy (the one whose root part's test id is the case's
+ *  root). A component with several cases (the card's, its action area's) is one entry: its
+ *  first case gives the plays, the others (`more`) their examples over their own props. */
 const componentsFromAnatomy = (
     anatomy: Readonly<Record<string, ComponentAnatomy>>,
     cases: readonly ComponentCase[],
-) =>
-    Object.values(anatomy).flatMap((a) => {
-        const root = (a.parts as ComponentAnatomy["parts"])[a.root]!.testId;
-        const c = cases.find((x) => x.root === root);
-        return c ? [{ anatomy: a, case: c }] : [];
-    });
+) => {
+    const anatomies = Object.values(anatomy);
+    const byRoot = (root: string) =>
+        anatomies.find(
+            (a) =>
+                (a.parts as ComponentAnatomy["parts"])[a.root]!.testId === root,
+        );
+    const out: {
+        anatomy: ComponentAnatomy;
+        case: ComponentCase;
+        more: ComponentCase[];
+    }[] = [];
+    for (const c of cases) {
+        const a = byRoot(c.root);
+        if (!a) continue;
+        const same = out.find((x) => x.case.component === c.component);
+        if (same) same.more.push(c);
+        else out.push({ anatomy: a, case: c, more: [] });
+    }
+    return out;
+};
 
 const load = async <T>(path: string) =>
     (await runnerImport<T>(path, { root: APP, configFile: false })).module;
@@ -106,15 +122,32 @@ const generate = async () => {
             load<{ transformSource?: TransformSource }>(join(APP, path)),
         ),
     );
-    const { anatomy } = await load<{
-        anatomy: Record<string, ComponentAnatomy>;
-    }>("@pureform/anatomy");
+    const anatomyModule = await load<
+        { anatomy: Record<string, ComponentAnatomy> } & Record<string, unknown>
+    >("@pureform/anatomy");
+    // The preset components' anatomies, then the hand-written composites' (`radioGroupAnatomy`),
+    // which have no variants, for a case whose root is a composite's.
+    const anatomy: Record<string, ComponentAnatomy> = {
+        ...anatomyModule.anatomy,
+        ...Object.fromEntries(
+            Object.entries(anatomyModule)
+                .filter(([key]) => key.endsWith("Anatomy"))
+                .map(([, value]) => value as ComponentAnatomy)
+                .filter(
+                    (a) =>
+                        typeof a?.name === "string" &&
+                        !(a.name in anatomyModule.anatomy),
+                )
+                .map((a) => [a.name, a]),
+        ),
+    };
     const { COMPONENTS } = await load<{
         COMPONENTS: readonly ComponentCase[];
     }>("@pureform/component-cases");
     const include = config.include && new Set(config.include);
-    const skip = new Set(config.skip ?? []);
-    const found = componentsFromAnatomy(anatomy, COMPONENTS).filter(
+    const skip = new Set(Object.keys(config.skip ?? {}));
+    const paired = componentsFromAnatomy(anatomy, COMPONENTS);
+    const found = paired.filter(
         ({ case: c }) =>
             (!include || include.has(c.component)) && !skip.has(c.component),
     );
@@ -123,7 +156,7 @@ const generate = async () => {
     mkdirSync(OUT, { recursive: true });
 
     const written: string[] = [];
-    for (const { anatomy: a, case: c } of found) {
+    for (const { anatomy: a, case: c, more } of found) {
         const component = c.component;
         const options = config.components?.[component] ?? {};
         if (taken.has(component)) continue;
@@ -161,11 +194,12 @@ const generate = async () => {
             imports.push(`import * as hooks${i} from "${fromOut(path)}";`),
         );
 
-        const exclude = new Set(options.controls?.exclude ?? []);
+        // Variants the binding sets itself (the anatomy's `bindingVariants`) get no control.
+        const bindingVariants = new Set(a.bindingVariants ?? []);
         const argTypes = {
             ...Object.fromEntries(
                 Object.entries(a.variants ?? {})
-                    .filter(([variant]) => !exclude.has(variant))
+                    .filter(([variant]) => !bindingVariants.has(variant))
                     .map(([variant, values]) => [variant, controlFor(values)]),
             ),
             ...options.argTypes,
@@ -173,20 +207,38 @@ const generate = async () => {
         const args = options.args ?? {};
         const used = new Set<string>();
         const unique = (name: string) => {
-            let id = exportName(name);
-            while (used.has(id)) id += "_";
+            // Numbered, not `_`-suffixed: Storybook's story ids drop the `_`, so they'd clash.
+            const base = exportName(name);
+            let id = base;
+            for (let n = 2; used.has(id); n++) id = `${base}${n}`;
             used.add(id);
             return id;
         };
-        const story = (name: string, base: object, play?: string) => {
+        const names = new Map<string, number>();
+        /** A story's display name, numbered from its second use (`Key: Space 2`). */
+        const shown = (name: string) => {
+            const n = (names.get(name) ?? 0) + 1;
+            names.set(name, n);
+            return n === 1 ? name : `${name} ${n}`;
+        };
+        const story = (
+            name: string,
+            base: { name?: string } & Record<string, unknown>,
+            play?: string,
+        ) => {
             const id = unique(name);
+            if (base.name) base = { ...base, name: shown(base.name) };
             base = { ...base, ...options.stories?.[id] };
-            return `export const ${id} = {\n    ...stories.story(${JSON.stringify(id)}, ${JSON.stringify(base)}${play ? `, ${play}` : ""}),\n} satisfies StoryObj;`;
+            // Tags written out: Storybook's indexer reads them from the file, not at run time.
+            const tags = Array.isArray(base["tags"])
+                ? `\n    tags: ${JSON.stringify(base["tags"])},`
+                : "";
+            return `export const ${id} = {\n    ...stories.story(${JSON.stringify(id)}, ${JSON.stringify(base)}${play ? `, ${play}` : ""}),${tags}\n} satisfies StoryObj;`;
         };
         const stories = [
             // The case's `props`, and the same pinned to each scheme, with the state's play.
             story("Default", {}),
-            ...(options.schemes ?? []).map((scheme) =>
+            ...(options.schemes ?? config.schemes ?? []).map((scheme) =>
                 story(
                     scheme,
                     { globals: { scheme } },
@@ -196,6 +248,20 @@ const generate = async () => {
             // One story per example.
             ...Object.entries(c.examples).map(([name, example]) =>
                 story(name, { name, args: example }),
+            ),
+            // The component's other cases' examples, over their props.
+            ...more.flatMap((m) =>
+                Object.entries({ ...m.examples, ...m.opened }).map(
+                    ([name, example]) =>
+                        story(name, { name, args: { ...m.props, ...example } }),
+                ),
+            ),
+            // One story per opened rendering (an overlay shown), named `Opened: …`.
+            ...Object.entries(c.opened ?? {}).map(([name, example]) =>
+                story(`Opened ${name}`, {
+                    name: `Opened: ${name}`,
+                    args: example,
+                }),
             ),
             // One story per key, with its play.
             ...(c.keyboard?.keys ?? []).map((key, index) =>
@@ -207,6 +273,10 @@ const generate = async () => {
             ),
         ];
 
+        // Room for an overlay to open into: the canvas's minimum height (`src/hooks.ts`).
+        const height =
+            options.height ??
+            (c.overlay || c.opened ? config.overlayHeight : undefined);
         let source = [
             ...imports,
             "",
@@ -221,6 +291,10 @@ const generate = async () => {
             `    argTypes: ${JSON.stringify(argTypes)},`,
             ...(options.scheme
                 ? [`    scheme: ${JSON.stringify(options.scheme)},`]
+                : []),
+            ...(height ? [`    height: ${height},`] : []),
+            ...(options.parameters
+                ? [`    parameters: ${JSON.stringify(options.parameters)},`]
                 : []),
             "});",
             "",
@@ -244,8 +318,11 @@ const generate = async () => {
     const skipped = found
         .map(({ case: c }) => c.component)
         .filter((c) => taken.has(c));
+    const unpaired = COMPONENTS.filter(
+        (c) => !paired.some((f) => f.case === c || f.more.includes(c)),
+    ).map((c) => c.component);
     console.log(
-        `generate-stories: ${written.join(", ") || "none"}${skipped.length ? `; hand-written: ${skipped.join(", ")}` : ""}`,
+        `generate-stories: ${written.length} generated (${written.join(", ") || "none"})${skipped.length ? `; hand-written: ${skipped.join(", ")}` : ""}${skip.size ? `; skipped: ${[...skip].join(", ")}` : ""}${unpaired.length ? `; cases without an anatomy: ${unpaired.join(", ")}` : ""}`,
     );
 };
 

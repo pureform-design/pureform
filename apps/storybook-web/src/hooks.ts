@@ -18,7 +18,22 @@ const withScheme: Decorator = (story, context) => {
     return story();
 };
 
-export const decorators = [withScheme];
+/** Room for an overlay: `parameters.pureform.height` (set by the codegen for a component whose
+ *  case opens one) gives the canvas a minimum height, so a menu or a dialog opens inside it. */
+const withHeight: Decorator = (story, context) => {
+    const height = (
+        context.parameters["pureform"] as { height?: number } | undefined
+    )?.height;
+    const el = story() as HTMLElement;
+    if (!height) return el;
+    const frame = document.createElement("div");
+    frame.dataset["pfCanvas"] = "";
+    frame.style.minHeight = `${height}px`;
+    frame.append(el);
+    return frame;
+};
+
+export const decorators = [withScheme, withHeight];
 
 export const args = { disabled: false };
 
