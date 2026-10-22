@@ -14,6 +14,8 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 import type { Controllable } from "../controllable";
 import type { Unstyled } from "../parts";
 import { isPresent, withoutControls } from "./content";
+import { PAGE_TRANSITION_PROPS } from "./horizontal-shared-axis";
+import type { PageTransitionProps } from "./horizontal-shared-axis";
 import type { IndicationProps, InteractionSourceProps } from "./indication";
 import type { VariantProp } from "./variants";
 
@@ -118,7 +120,7 @@ export interface TabsItem<Node = unknown> extends InteractionSourceProps {
 }
 
 /** What the ready-made tabs render inside Root, in the framework's node type. */
-export interface TabsContentProps<Node> {
+export interface TabsContentProps<Node> extends PageTransitionProps {
     /** The tabs, in order. */
     readonly items?: readonly TabsItem<Node>[] | undefined;
 }
@@ -126,6 +128,7 @@ export interface TabsContentProps<Node> {
 /** The keys of `TabsContentProps`. */
 export const TABS_CONTENT_PROPS = [
     "items",
+    ...PAGE_TRANSITION_PROPS,
 ] as const satisfies readonly (keyof TabsContentProps<unknown>)[];
 
 /** The tabs' registry selection from Root's props. */

@@ -14,6 +14,8 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 import type { Controllable } from "../controllable";
 import type { Unstyled } from "../parts";
 import { withoutControls } from "./content";
+import { PAGE_TRANSITION_PROPS } from "./horizontal-shared-axis";
+import type { PageTransitionProps } from "./horizontal-shared-axis";
 import type { IndicationProps, InteractionSourceProps } from "./indication";
 import type { VariantProp } from "./variants";
 
@@ -126,7 +128,7 @@ export interface StepperItem<Node = unknown> extends InteractionSourceProps {
 }
 
 /** What the ready-made stepper renders inside Root, in the framework's node type. */
-export interface StepperContentProps<Node> {
+export interface StepperContentProps<Node> extends PageTransitionProps {
     /** The steps, in order. */
     readonly items?: readonly StepperItem<Node>[] | undefined;
 }
@@ -134,6 +136,7 @@ export interface StepperContentProps<Node> {
 /** The keys of `StepperContentProps`. */
 export const STEPPER_CONTENT_PROPS = [
     "items",
+    ...PAGE_TRANSITION_PROPS,
 ] as const satisfies readonly (keyof StepperContentProps<unknown>)[];
 
 /** The stepper's registry selection from Root's props. */
