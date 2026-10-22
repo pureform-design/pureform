@@ -22,8 +22,8 @@
 // Zag moves each toast with `--x`, `--y`, `--scale`, `--opacity`, `--z-index` and `--height` on
 // its root; the bindings apply them as a transform, and the root transitions the transform and
 // height on the fast spatial spring, as Compose's snackbar host scales its snackbar in
-// (`SnackbarHost.kt`, `FastSpatial`), and the opacity on its tween (the movement drops out
-// under reduced motion).
+// (`SnackbarHost.kt`, `FastSpatial`), and the opacity on the fast effects spring (`FastEffects`;
+// the movement drops out under reduced motion).
 
 import { typed } from "@pureform/core";
 import {
@@ -41,8 +41,6 @@ import {
     unitless,
 } from "@pureform/core/ast";
 import {
-    duration,
-    easing,
     radius,
     size as sizeToken,
     spacing,
@@ -98,9 +96,10 @@ const pf = typed();
 // set tokens, and the group holds toasts of every type.)
 const accent = (group: string) => ({ icon: { color: sys(group) } });
 
-// A toast moves into its place in the stack and resizes on a spring; it fades on a tween.
+// A toast moves into its place in the stack and resizes on a spatial spring; it fades on an
+// effects spring.
 const MOVE = { spring: spring("spatialFast") };
-const FADE = { duration: duration("short3"), easing: easing("standard") };
+const FADE = { spring: spring("effectsFast") };
 
 // The icon's room at the start: the padding, the icon and a gap.
 const iconRoom = add(ref("paddingInline"), ref("iconSize"), spacing("3"));

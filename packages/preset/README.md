@@ -112,22 +112,25 @@ They animate on Zag's `data-state` (`components/overlay.ts`): the enter's keyfra
 `open`, the exit's once it's `closed`, holding the last frame until the binding hides the
 overlay once the exit ends (Zag's presence). Every duration and curve is a motion token:
 
-The movement runs on one of the theme's springs, as Compose's does, and the fade alongside it
-keeps its duration and curve: two animations per step (`fade` on an `OverlayMotionStep`).
+The movement runs on one of the theme's spatial springs and the fade alongside it on an effects
+spring, as Compose's do: two animations per step (`fade` on an `OverlayMotionStep`).
 
-| Overlay                    | Enters                                                                                               | Leaves                                                                        |
-| -------------------------- | ---------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| menu, select list, tooltip | grows from 80% on `spatialFast` from the side it opens on; fades in, `short3`, emphasized decelerate | fades out, `short2`, emphasized accelerate                                    |
-| snackbar                   | grows from 80% on `spatialFast` from its center; fades in, `short3`                                  | fades out, `short2`                                                           |
-| dialog                     | comes down 48px on `spatialDefault`; fades in, `long2`, emphasized decelerate                        | goes back up on `effectsFast`; fades out, `short3`, emphasized accelerate     |
-| bottom and side sheet      | slides in from its edge on `spatialDefault`; fades in, `long2`, emphasized decelerate                | slides back out on `effectsFast`; fades out, `medium1`, emphasized accelerate |
-| scrim                      | fades in, `long2`, linear                                                                            | fades out, `short3`, linear                                                   |
+| Overlay                    | Enters                                                                               | Leaves                                                           |
+| -------------------------- | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------- |
+| menu, select list, tooltip | grows from 80% on `spatialFast` from the side it opens on; fades in on `effectsFast` | shrinks back to 80% on `spatialFast`; fades out on `effectsFast` |
+| snackbar                   | grows from 80% on `spatialFast` from its center; fades in on `effectsFast`           | shrinks back to 80% on `spatialFast`; fades out on `effectsFast` |
+| dialog                     | comes down 48px on `spatialDefault`; fades in on `effectsFast`                       | goes back up on `effectsFast`; fades out on `effectsFast`        |
+| bottom and side sheet      | slides in from its edge on `spatialDefault`; fades in on `effectsFast`               | slides back out on `effectsFast`; fades out on `effectsFast`     |
+| scrim                      | fades in on `effectsDefault`                                                         | fades out on `effectsDefault`                                    |
 
-The springs are Compose's: its menu, tooltip and snackbar host scale on `FastSpatial`; its
-sheets and drawers show on `DefaultSpatial` and hide on `FastEffects` (the dialog, which has no
-motion of its own in Compose, follows them). A bottom sheet let go of after a drag settles back on
-`spatialDefault` (`SHEET_SETTLE`, a transition of the `translate` the drag sets). A toast moves and
-resizes in its stack on `spatialFast` and fades on its tween.
+The springs are Compose's: its menu, tooltip and snackbar host scale between 80% and full size on
+`FastSpatial` and fade on `FastEffects`, both ways (`Menu.kt`, `Tooltip.kt`, `SnackbarHost.kt`);
+its sheets and drawers show on `DefaultSpatial` and hide on `FastEffects`, and its modal bottom
+sheet fades the scrim on `DefaultEffects` (the dialog, which has no motion of its own in Compose,
+follows the sheets). A bottom sheet let go of after a drag settles back on `spatialDefault`
+(`SHEET_SETTLE`, a transition of the `translate` the drag sets). A toast moves and resizes in its
+stack on `spatialFast` and fades on `effectsFast`. Under reduced motion only the fades run, on
+their springs.
 
 The menu follows Compose's `DropdownMenu` (scale and fade) rather than material-web's height
 reveal: a transform and opacity need no layout, and reduced motion keeps the fade alone. Under

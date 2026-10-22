@@ -3,16 +3,10 @@
 // comes in from the end edge, so its keyframes run the other way under right to left (translation
 // is physical). The slide springs, as Compose's sheets and drawers do (`BottomSheet.kt`,
 // `NavigationDrawer.kt`: shown on `DefaultSpatial`, hidden on `FastEffects`), and a fade runs
-// alongside on its own tween. Under reduced motion only the fade runs. A target without
+// alongside on the fast effects spring. Under reduced motion only the fade runs. A target without
 // `data-state` (React Native) draws no motion.
 
-import {
-    pct,
-    px,
-    transform,
-    translateX,
-    translateY,
-} from "@pureform/core/ast";
+import { pct, px, transform, translateX, translateY } from "@pureform/core/ast";
 import type { StyleMap } from "@pureform/core/ast";
 import { spring } from "@pureform/theme";
 
@@ -81,19 +75,18 @@ export const SHEET_KEYFRAMES: Record<string, Record<string, StyleMap>> = {
 };
 
 /** A bottom sheet's motion (`overlayMotion`, on the element Zag marks with `data-state`): it
- *  rises from the bottom on the default spatial spring while `open`, fading in over `long2` on
- *  the emphasized decelerating curve, and goes back down on the fast effects spring once
- *  `closed`, fading out over `medium1` on the emphasized accelerating one. */
+ *  rises from the bottom on the default spatial spring while `open`, and goes back down on the
+ *  fast effects spring once `closed`, fading in and out on the fast effects spring. */
 export const BOTTOM_SHEET_MOTION = {
     enter: {
         keyframes: "bottomSheetIn",
         spring: "spatialDefault",
-        fade: { duration: "long2", easing: "emphasizedDecelerate" },
+        fade: { spring: "effectsFast" },
     },
     exit: {
         keyframes: "bottomSheetOut",
         spring: "effectsFast",
-        fade: { duration: "medium1", easing: "emphasizedAccelerate" },
+        fade: { spring: "effectsFast" },
     },
 } as const satisfies OverlayMotion;
 
@@ -104,12 +97,12 @@ export const SIDE_SHEET_MOTION = {
         keyframes: "sideSheetIn",
         rtl: "sideSheetInRtl",
         spring: "spatialDefault",
-        fade: { duration: "long2", easing: "emphasizedDecelerate" },
+        fade: { spring: "effectsFast" },
     },
     exit: {
         keyframes: "sideSheetOut",
         rtl: "sideSheetOutRtl",
         spring: "effectsFast",
-        fade: { duration: "medium1", easing: "emphasizedAccelerate" },
+        fade: { spring: "effectsFast" },
     },
 } as const satisfies OverlayMotion;

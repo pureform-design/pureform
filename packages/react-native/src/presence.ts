@@ -1,8 +1,8 @@
 // Overlays' enter and exit, as the preset's keyframes run them on the web: a menu, select list,
-// tooltip, or snackbar grows from 80% as it fades in and fades out faster; a dialog comes down
-// 48px as it fades in and goes back up as it fades out; a scrim fades. A step that moves runs
-// its movement on the theme's spring and its fade alongside on the fade's own duration and
-// curve. Each is the theme's motion token, so a theme that changes them changes these too.
+// tooltip, or snackbar grows from 80% as it fades in and shrinks back to 80% as it fades out; a
+// dialog comes down 48px as it fades in and goes back up as it fades out; a scrim fades. A step
+// that moves runs its movement on the theme's spatial spring and its fade alongside on its own
+// (an effects spring). Each is the theme's motion token, so a theme that changes them changes these too.
 // Under reduced motion each moving step gives way to its fade, as the web's rule does.
 //
 // `usePresence(open)` keeps an overlay present until its exit has run to its end, which the
@@ -42,6 +42,10 @@ export const OVERLAY_KEYFRAMES = {
     overlayGrowIn: {
         from: { scale: 0.8 },
         to: { scale: 1 },
+    },
+    overlayShrinkOut: {
+        from: { scale: 1 },
+        to: { scale: 0.8 },
     },
     dialogSlideIn: {
         from: { translateY: { token: "spacing.12", times: -1 } },
@@ -86,38 +90,30 @@ export const OVERLAY_MOTIONS = {
         enter: {
             keyframes: "overlayGrowIn",
             spring: "spatialFast",
-            fade: { duration: "short3", easing: "emphasizedDecelerate" },
+            fade: { spring: "effectsFast" },
         },
         exit: {
-            keyframes: "overlayFadeOut",
-            duration: "short2",
-            easing: "emphasizedAccelerate",
+            keyframes: "overlayShrinkOut",
+            spring: "spatialFast",
+            fade: { spring: "effectsFast" },
         },
     },
     dialog: {
         enter: {
             keyframes: "dialogSlideIn",
             spring: "spatialDefault",
-            fade: { duration: "long2", easing: "emphasizedDecelerate" },
+            fade: { spring: "effectsFast" },
         },
         exit: {
             keyframes: "dialogSlideOut",
             spring: "effectsFast",
-            fade: { duration: "short3", easing: "emphasizedAccelerate" },
+            fade: { spring: "effectsFast" },
         },
     },
     /** The scrim behind a dialog. */
     scrim: {
-        enter: {
-            keyframes: "overlayFadeIn",
-            duration: "long2",
-            easing: "linear",
-        },
-        exit: {
-            keyframes: "overlayFadeOut",
-            duration: "short3",
-            easing: "linear",
-        },
+        enter: { keyframes: "overlayFadeIn", spring: "effectsDefault" },
+        exit: { keyframes: "overlayFadeOut", spring: "effectsDefault" },
     },
 } as const satisfies Record<
     string,
@@ -135,6 +131,7 @@ const FADES = {
 
 const MOVES = new Set<KeyframesName>([
     "overlayGrowIn",
+    "overlayShrinkOut",
     "dialogSlideIn",
     "dialogSlideOut",
 ]);

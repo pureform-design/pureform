@@ -26,10 +26,14 @@ const rootOf = (component: (typeof OVERLAYS)[number][1]) =>
         ?.base?.root as Record<string, unknown>;
 
 const OPEN = "&[data-state=open]";
-// The growth on the fast spatial spring, and the fade alongside on its tween.
-const GROW =
-    "token(springs.spatialFast.duration) token(springs.spatialFast.easing) overlayGrowIn, " +
-    "token(durations.short3) token(easings.emphasizedDecelerate) overlayFadeIn";
+// The growth on the fast spatial spring, and the fade alongside on the fast effects spring.
+const FAST_EFFECTS =
+    "token(springs.effectsFast.duration) token(springs.effectsFast.easing)";
+const FADE_IN = `${FAST_EFFECTS} overlayFadeIn`;
+const FADE_OUT = `${FAST_EFFECTS} forwards overlayFadeOut`;
+const GROW = `token(springs.spatialFast.duration) token(springs.spatialFast.easing) overlayGrowIn, ${FADE_IN}`;
+// Shrinking back to 80% as it fades out, as Compose's menu, tooltip and snackbar do.
+const SHRINK = `token(springs.spatialFast.duration) token(springs.spatialFast.easing) forwards overlayShrinkOut, ${FADE_OUT}`;
 const CLOSED = "&[data-state=closed]";
 
 describe("overlays", () => {
@@ -51,32 +55,30 @@ describe("overlays", () => {
         expect(z("tooltip")).toBeGreaterThan(z("snackbar"));
     });
 
-    it("grows a menu and a tooltip in from the side they open on, and fades them out", () => {
+    it("grows a menu and a tooltip in from the side they open on, and shrinks them as they fade out", () => {
         for (const component of [menu, tooltip, richTooltip]) {
             const root = rootOf(component);
             expect(root[OPEN]).toEqual({
                 animation: {
                     base: GROW,
-                    _motionReduce:
-                        "token(durations.short3) token(easings.emphasizedDecelerate) overlayFadeIn",
+                    _motionReduce: FADE_IN,
                 },
                 transformOrigin: "var(--transform-origin)",
             });
-            expect(root[CLOSED]).toMatchObject({
-                animation:
-                    "token(durations.short2) token(easings.emphasizedAccelerate) forwards overlayFadeOut",
+            expect(root[CLOSED]).toEqual({
+                animation: { base: SHRINK, _motionReduce: FADE_OUT },
+                transformOrigin: "var(--transform-origin)",
             });
         }
     });
 
-    it("grows a snackbar in from its center", () => {
+    it("grows a snackbar in from its center, and shrinks it as it fades out", () => {
         const root = rootOf(snackbar);
         expect(root[OPEN]).toEqual({
-            animation: {
-                base: GROW,
-                _motionReduce:
-                    "token(durations.short3) token(easings.emphasizedDecelerate) overlayFadeIn",
-            },
+            animation: { base: GROW, _motionReduce: FADE_IN },
+        });
+        expect(root[CLOSED]).toEqual({
+            animation: { base: SHRINK, _motionReduce: FADE_OUT },
         });
     });
 
@@ -86,31 +88,29 @@ describe("overlays", () => {
             animation: {
                 base:
                     "token(springs.spatialDefault.duration) token(springs.spatialDefault.easing) dialogSlideIn, " +
-                    "token(durations.long2) token(easings.emphasizedDecelerate) overlayFadeIn",
-                _motionReduce:
-                    "token(durations.long2) token(easings.emphasizedDecelerate) overlayFadeIn",
+                    FADE_IN,
+                _motionReduce: FADE_IN,
             },
         });
         expect(root[CLOSED]).toEqual({
             animation: {
                 base:
                     "token(springs.effectsFast.duration) token(springs.effectsFast.easing) forwards dialogSlideOut, " +
-                    "token(durations.short3) token(easings.emphasizedAccelerate) forwards overlayFadeOut",
-                _motionReduce:
-                    "token(durations.short3) token(easings.emphasizedAccelerate) forwards overlayFadeOut",
+                    FADE_OUT,
+                _motionReduce: FADE_OUT,
             },
         });
     });
 
-    it("fades the scrim, which moves nothing, the same under reduced motion", () => {
+    it("fades the scrim on the default effects spring, the same under reduced motion", () => {
         const root = rootOf(scrim);
         expect(root[OPEN]).toEqual({
             animation:
-                "token(durations.long2) token(easings.linear) overlayFadeIn",
+                "token(springs.effectsDefault.duration) token(springs.effectsDefault.easing) overlayFadeIn",
         });
         expect(root[CLOSED]).toEqual({
             animation:
-                "token(durations.short3) token(easings.linear) forwards overlayFadeOut",
+                "token(springs.effectsDefault.duration) token(springs.effectsDefault.easing) forwards overlayFadeOut",
         });
     });
 
@@ -124,7 +124,12 @@ describe("overlays", () => {
                 expect(Object.keys(stop)).toEqual(["opacity"]);
             }
         }
-        for (const name of ["overlayGrowIn", "dialogSlideIn", "dialogSlideOut"]) {
+        for (const name of [
+            "overlayGrowIn",
+            "overlayShrinkOut",
+            "dialogSlideIn",
+            "dialogSlideOut",
+        ]) {
             for (const stop of Object.values(OVERLAY_KEYFRAMES[name]!)) {
                 expect(Object.keys(stop)).toEqual(["transform"]);
             }

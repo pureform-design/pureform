@@ -917,7 +917,8 @@ The design makes one setting, followed by everything that moves, on every target
       going on.
     - Zag's enter and exit animations need no change: Zag's presence logic finishes at
       once when no animation runs.
-    - Built (overlay motion): the preset animates each overlay with keyframes on Zag's
+    - Built (overlay motion; m2 moved its timings to springs and added the popups' shrink on
+      exit, see §5.8.1): the preset animates each overlay with keyframes on Zag's
       `data-state` (`overlayMotion` in `components/overlay.ts`, `OVERLAY_KEYFRAMES` added by
       `pureform()`), every duration and curve a motion token. The menu, select list, tooltip, and
       snackbar grow from 80% and fade in (`short3`, emphasized decelerate; from the positioner's
@@ -1051,15 +1052,18 @@ damping, mass? })` builds one; `spring({ duration, bounce })` converts a percept
   (`overlayGrowIn`, `dialogSlideIn`/`Out`, the sheets') set only `transform`. Roles follow
   Compose: the menu, select list, tooltip and snackbar grow on `spatialFast` (`Menu.kt`,
   `Tooltip.kt`, `SnackbarHost.kt`, `FastSpatial`); the sheets slide in on `spatialDefault` and out
-  on `effectsFast` (`BottomSheet.kt`, `NavigationDrawer.kt`), and the dialog follows them; the
-  scrim and every fade stay on their tweens. Zag's presence (ours, `@pureform/machines/presence`)
+  on `effectsFast` (`BottomSheet.kt`, `NavigationDrawer.kt`), and the dialog follows them. Decided
+  at the m2 merge: every fade runs on an effects spring, as Compose's do (`effectsFast`; the scrim
+  `effectsDefault`, `ModalBottomSheet.kt`), and the menu, tooltip and snackbar shrink back to 80%
+  on `spatialFast` as they fade out (`overlayShrinkOut`; Compose's `ClosedScaleTarget = 0.8f` in
+  `Menu.kt`, `Tooltip.kt`, `SnackbarHost.kt`). Zag's presence (ours, `@pureform/machines/presence`)
   lets an exit go once the last of its animations ends. A bottom sheet let go of after a drag
   settles back on `spatialDefault` (`SHEET_SETTLE`, a transition of the `translate` the drag
   sets); on React Native the sheet follows the drag and settles with `Animated.spring` from the
   release's velocity (`settle` in `@pureform/rn-adapter/animated`). React Native's presence
   steps carry the fade's own timing (`PresenceStep.fade`): Animated runs the two in parallel,
   Reanimated as two CSS animations, ending the step when both have. The toast moves and resizes
-  in its stack on `spatialFast` and fades on its tween. Reduced motion is unchanged: each moving
+  in its stack on `spatialFast` and fades on `effectsFast`. Reduced motion is unchanged: each moving
   step gives way to its fade alone, and the settle is instant.
 - **Containers (m2c).** Every chevron that turns (the expand indicator of the list item,
   accordion and tree, the select's arrow) turns on `spatialFast` (`chevronTransition`), its color

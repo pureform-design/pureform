@@ -6,10 +6,10 @@
 //     <div class={menu().root} data-state="closed">                (leaves, then hides)
 //
 // Each motion follows Material 3 in Compose: a menu, select list, tooltip, or snackbar grows
-// from 80% and fades in, then fades out faster; a dialog slides down and fades in, as
-// material-web's does, and slides back up as it fades out; the scrim fades. The movement and
-// the fade are two animations: the movement runs on a spring, as Compose's do, and the fade
-// keeps its duration and curve. Under reduced motion only the fade runs. A target without
+// from 80% as it fades in, and shrinks back to 80% as it fades out; a dialog slides down and
+// fades in, as material-web's does, and slides back up as it fades out; the scrim fades. The
+// movement and the fade are two animations: the movement runs on a spatial spring and the fade
+// on an effects spring, as Compose's do. Under reduced motion only the fade runs. A target without
 // `data-state` (React Native) draws no motion.
 
 import {
@@ -45,6 +45,11 @@ export const OVERLAY_KEYFRAMES: Record<string, Record<string, StyleMap>> = {
     overlayGrowIn: {
         from: { transform: transform(scale(unitless(0.8))) },
         to: { transform: transform(scale(unitless(1))) },
+    },
+    // ...and shrinks back to it as it leaves (fading out alongside).
+    overlayShrinkOut: {
+        from: { transform: transform(scale(unitless(1))) },
+        to: { transform: transform(scale(unitless(0.8))) },
     },
     // A dialog comes down into place, and goes back up.
     dialogSlideIn: {
@@ -83,7 +88,7 @@ export type OverlayMotionStep = {
      *  physical): a side sheet's slide. */
     readonly rtl?: string;
     /** For keyframes that only move: the fade that runs alongside them, on its own timing (the
-     *  overlay fade in or out), so the movement can spring while the fade keeps its tween.
+     *  overlay fade in or out), so the movement and the fade can each take their own spring.
      *  Under reduced motion it runs alone. */
     readonly fade?: MotionTiming;
 } & MotionTiming;
@@ -136,7 +141,8 @@ const step = (
         const moving = timedAnimation(name, timing, fillMode);
         return fadeTiming ? animations(moving, fading) : moving;
     };
-    if (FADES.has(keyframes)) return timedAnimation(keyframes, timing, fillMode);
+    if (FADES.has(keyframes))
+        return timedAnimation(keyframes, timing, fillMode);
     if (rtl) {
         return when()
             .on("rtl", run(rtl))
@@ -169,42 +175,43 @@ export const overlayMotion = (motion: OverlayMotion): StyleMap => ({
 });
 
 /** A menu, select list, tooltip, or snackbar: grows to full size from 80% on the fast spatial
- *  spring as it fades in over `short3` on the emphasized decelerating curve, and fades out over
- *  `short2` on the emphasized accelerating one. Compose's menu, tooltip, and snackbar host
- *  scale on `FastSpatial` (`Menu.kt`, `Tooltip.kt`, `SnackbarHost.kt`). */
+ *  spring as it fades in on the fast effects spring, and shrinks back to 80% as it fades out on
+ *  the same two. Compose's menu, tooltip, and snackbar host scale between 0.8 and 1 on
+ *  `FastSpatial` and fade on `FastEffects` both ways (`Menu.kt` `DropdownMenuContent`,
+ *  `ClosedScaleTarget = 0.8f`; `Tooltip.kt`; `SnackbarHost.kt` `FadeInFadeOutWithScale`). */
 export const POPUP_MOTION = {
     enter: {
         keyframes: "overlayGrowIn",
         spring: "spatialFast",
-        fade: { duration: "short3", easing: "emphasizedDecelerate" },
+        fade: { spring: "effectsFast" },
     },
     exit: {
-        keyframes: FADE_OUT,
-        duration: "short2",
-        easing: "emphasizedAccelerate",
+        keyframes: "overlayShrinkOut",
+        spring: "spatialFast",
+        fade: { spring: "effectsFast" },
     },
 } as const satisfies OverlayMotion;
 
-/** A dialog: comes down into place on the default spatial spring as it fades in over `long2`
- *  on the emphasized decelerating curve, and goes back up on the fast effects spring as it
- *  fades out over `short3` on the emphasized accelerating one, as material-web's dialog moves.
- *  Compose's dialog has no motion of its own; the springs are its sheets' and drawers' (shown
- *  on `DefaultSpatial`, hidden on `FastEffects`). */
+/** A dialog: comes down into place on the default spatial spring, and goes back up on the fast
+ *  effects spring, as material-web's dialog moves; it fades in and out on the fast effects
+ *  spring. Compose's dialog has no motion of its own; the springs are its sheets' and drawers'
+ *  (shown on `DefaultSpatial`, hidden on `FastEffects`). */
 export const DIALOG_MOTION = {
     enter: {
         keyframes: "dialogSlideIn",
         spring: "spatialDefault",
-        fade: { duration: "long2", easing: "emphasizedDecelerate" },
+        fade: { spring: "effectsFast" },
     },
     exit: {
         keyframes: "dialogSlideOut",
         spring: "effectsFast",
-        fade: { duration: "short3", easing: "emphasizedAccelerate" },
+        fade: { spring: "effectsFast" },
     },
 } as const satisfies OverlayMotion;
 
-/** The scrim behind a dialog: fades in and out with it, on the linear curve. */
+/** The scrim behind a dialog: fades in and out with it on the default effects spring, as
+ *  Compose's modal bottom sheet fades its scrim (`ModalBottomSheet.kt`, `DefaultEffects`). */
 export const SCRIM_MOTION = {
-    enter: { keyframes: FADE_IN, duration: "long2", easing: "linear" },
-    exit: { keyframes: FADE_OUT, duration: "short3", easing: "linear" },
+    enter: { keyframes: FADE_IN, spring: "effectsDefault" },
+    exit: { keyframes: FADE_OUT, spring: "effectsDefault" },
 } as const satisfies OverlayMotion;

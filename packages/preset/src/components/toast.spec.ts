@@ -44,13 +44,14 @@ describe("toast", () => {
         );
     });
 
-    it("moves and resizes in the stack on a spring, and fades on a tween", () => {
+    it("moves and resizes in the stack on a spatial spring, and fades on an effects spring", () => {
         expect(recipe().base.root!.transition).toEqual({
             base:
                 "transform token(springs.spatialFast.duration) token(springs.spatialFast.easing), " +
                 "height token(springs.spatialFast.duration) token(springs.spatialFast.easing), " +
-                "opacity token(durations.short3) token(easings.standard)",
-            _motionReduce: "opacity token(durations.short3) token(easings.standard)",
+                "opacity token(springs.effectsFast.duration) token(springs.effectsFast.easing)",
+            _motionReduce:
+                "opacity token(springs.effectsFast.duration) token(springs.effectsFast.easing)",
         });
     });
 

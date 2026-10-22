@@ -330,11 +330,12 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
 - **Overlays move as on the web:** the preset's enter and exit keyframes are raw CSS on Zag's
   `data-state`, which React Native drops, so `presence.ts` holds the same motions (checked against
   the preset's in `presence.spec.tsx`) and runs them through the engine: a menu, select list,
-  tooltip, or snackbar grows from 80% as it fades in (`short3`, emphasized decelerate) and fades
-  out (`short2`, emphasized accelerate); a dialog comes down 48px as it fades in (`long2`) and
-  goes back up as it fades out (`short3`); a scrim fades (linear). Every duration and curve is the
-  theme's token, times the provider's `timeScale`. Under reduced motion each step that moves is a
-  fade of the same timing, as the web's rule. The select's menu grows from its top left, as the
+  tooltip, or snackbar grows from 80% as it fades in and shrinks back to 80% as it fades out
+  (`spatialFast`, fading on `effectsFast`); a dialog comes down 48px as it fades in
+  (`spatialDefault`) and goes back up as it fades out (`effectsFast`, fading on `effectsFast`); a
+  scrim fades (`effectsDefault`). Every spring, duration and curve is the theme's token, slowed by
+  the provider's `timeScale`. Under reduced motion each step that moves is its fade alone, as the
+  web's rule. The select's menu grows from its top left, as the
   web's grows from its positioner's origin, and its `Modal` closes once the menu has faded out
   (closing, it takes no presses). The menu, dialog, snackbar, tooltip, and scrim take `open`:
   with it they enter and leave and render nothing once gone; without it they're shown and still,

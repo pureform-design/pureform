@@ -139,14 +139,12 @@ describe("sheet motion", () => {
         expect(Object.keys(SHEET_KEYFRAMES)).not.toContain("sheetFadeIn");
     });
 
-    it("slides on springs, fades on tweens, and settles after a drag on a spring", () => {
+    it("slides on spatial springs, fades on the fast effects spring, and settles after a drag on a spring", () => {
         for (const motion of [BOTTOM_SHEET_MOTION, SIDE_SHEET_MOTION]) {
             expect(motion.enter.spring).toBe("spatialDefault");
             expect(motion.exit.spring).toBe("effectsFast");
-            expect(motion.enter.fade).toEqual({
-                duration: "long2",
-                easing: "emphasizedDecelerate",
-            });
+            expect(motion.enter.fade).toEqual({ spring: "effectsFast" });
+            expect(motion.exit.fade).toEqual({ spring: "effectsFast" });
         }
         for (const stops of Object.values(SHEET_KEYFRAMES)) {
             for (const stop of Object.values(stops)) {

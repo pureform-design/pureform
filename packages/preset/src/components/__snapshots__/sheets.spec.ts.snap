@@ -20,14 +20,14 @@ exports[`bottomSheet > compiles to a stable Panda slot recipe 1`] = `
     "root": {
       "&[data-state=closed]": {
         "animation": {
-          "_motionReduce": "token(durations.medium1) token(easings.emphasizedAccelerate) forwards overlayFadeOut",
-          "base": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) forwards bottomSheetOut, token(durations.medium1) token(easings.emphasizedAccelerate) forwards overlayFadeOut",
+          "_motionReduce": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) forwards overlayFadeOut",
+          "base": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) forwards bottomSheetOut, token(springs.effectsFast.duration) token(springs.effectsFast.easing) forwards overlayFadeOut",
         },
       },
       "&[data-state=open]": {
         "animation": {
-          "_motionReduce": "token(durations.long2) token(easings.emphasizedDecelerate) overlayFadeIn",
-          "base": "token(springs.spatialDefault.duration) token(springs.spatialDefault.easing) bottomSheetIn, token(durations.long2) token(easings.emphasizedDecelerate) overlayFadeIn",
+          "_motionReduce": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) overlayFadeIn",
+          "base": "token(springs.spatialDefault.duration) token(springs.spatialDefault.easing) bottomSheetIn, token(springs.effectsFast.duration) token(springs.effectsFast.easing) overlayFadeIn",
         },
       },
       "backgroundColor": "var(--components-bottomSheet-container, token(colors.surfaceContainerLow))",
@@ -196,16 +196,16 @@ exports[`sideSheet > compiles to a stable Panda slot recipe 1`] = `
     "root": {
       "&[data-state=closed]": {
         "animation": {
-          "_motionReduce": "token(durations.medium1) token(easings.emphasizedAccelerate) forwards overlayFadeOut",
-          "_rtl": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) forwards sideSheetOutRtl, token(durations.medium1) token(easings.emphasizedAccelerate) forwards overlayFadeOut",
-          "base": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) forwards sideSheetOut, token(durations.medium1) token(easings.emphasizedAccelerate) forwards overlayFadeOut",
+          "_motionReduce": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) forwards overlayFadeOut",
+          "_rtl": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) forwards sideSheetOutRtl, token(springs.effectsFast.duration) token(springs.effectsFast.easing) forwards overlayFadeOut",
+          "base": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) forwards sideSheetOut, token(springs.effectsFast.duration) token(springs.effectsFast.easing) forwards overlayFadeOut",
         },
       },
       "&[data-state=open]": {
         "animation": {
-          "_motionReduce": "token(durations.long2) token(easings.emphasizedDecelerate) overlayFadeIn",
-          "_rtl": "token(springs.spatialDefault.duration) token(springs.spatialDefault.easing) sideSheetInRtl, token(durations.long2) token(easings.emphasizedDecelerate) overlayFadeIn",
-          "base": "token(springs.spatialDefault.duration) token(springs.spatialDefault.easing) sideSheetIn, token(durations.long2) token(easings.emphasizedDecelerate) overlayFadeIn",
+          "_motionReduce": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) overlayFadeIn",
+          "_rtl": "token(springs.spatialDefault.duration) token(springs.spatialDefault.easing) sideSheetInRtl, token(springs.effectsFast.duration) token(springs.effectsFast.easing) overlayFadeIn",
+          "base": "token(springs.spatialDefault.duration) token(springs.spatialDefault.easing) sideSheetIn, token(springs.effectsFast.duration) token(springs.effectsFast.easing) overlayFadeIn",
         },
       },
       "backgroundColor": "var(--components-sideSheet-container, token(colors.surface))",

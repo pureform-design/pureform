@@ -144,7 +144,7 @@ describe("the overlay motions", () => {
             </PureformProvider>,
         );
         const popup = overlayMotion("popup", tokens, false);
-        // The growth on the fast spatial spring, its fade alongside on the fade's tween.
+        // The growth on the fast spatial spring, its fade alongside on the fast effects spring.
         expect(popup.enter).toMatchObject({
             from: { opacity: 0, scale: 0.8 },
             to: { opacity: 1, scale: 1 },
@@ -155,15 +155,18 @@ describe("the overlay motions", () => {
                 stiffness: Number(tokens["springs.spatialFast.stiffness"]),
             },
             fade: {
-                duration: 150,
-                easing: tokens["easings.emphasizedDecelerate"],
+                duration: Number(tokens["springs.effectsFast.duration"]),
+                spring: {
+                    stiffness: Number(tokens["springs.effectsFast.stiffness"]),
+                },
             },
         });
-        expect(popup.exit).toEqual({
-            from: { opacity: 1 },
-            to: { opacity: 0 },
-            duration: 100,
-            easing: tokens["easings.emphasizedAccelerate"],
+        // It shrinks back to 80% as it fades out, as Compose's menu does.
+        expect(popup.exit).toMatchObject({
+            from: { opacity: 1, scale: 1 },
+            to: { opacity: 0, scale: 0.8 },
+            duration: Number(tokens["springs.spatialFast.duration"]),
+            fade: { duration: Number(tokens["springs.effectsFast.duration"]) },
         });
         const dialog = overlayMotion("dialog", tokens, false, 2);
         expect(dialog.enter).toMatchObject({
@@ -174,26 +177,34 @@ describe("the overlay motions", () => {
                 stiffness:
                     Number(tokens["springs.spatialDefault.stiffness"]) / 4,
             },
-            fade: { duration: 1000 },
+            fade: {
+                duration: Number(tokens["springs.effectsFast.duration"]) * 2,
+            },
         });
         expect(dialog.exit).toMatchObject({
             from: { opacity: 1, translateY: 0 },
             to: { opacity: 0, translateY: -48 },
             duration: Number(tokens["springs.effectsFast.duration"]) * 2,
-            fade: { duration: 300 },
+            fade: {
+                duration: Number(tokens["springs.effectsFast.duration"]) * 2,
+            },
         });
         const reduced = overlayMotion("dialog", tokens, true);
-        expect(reduced.enter.spring).toBeUndefined();
+        expect(reduced.enter.spring).toMatchObject({
+            stiffness: Number(tokens["springs.effectsFast.stiffness"]),
+        });
         expect(reduced.enter.fade).toBeUndefined();
         expect(reduced.enter).toMatchObject({
             from: { opacity: 0 },
             to: { opacity: 1 },
-            duration: 500,
+            duration: Number(tokens["springs.effectsFast.duration"]),
         });
+        // The fades keep their effects spring under reduced motion.
+        expect(reduced.enter.easing).toBe(tokens["springs.effectsFast.easing"]);
         expect(reduced.exit).toMatchObject({
             from: { opacity: 1 },
             to: { opacity: 0 },
-            duration: 150,
+            duration: Number(tokens["springs.effectsFast.duration"]),
         });
     });
 });
@@ -231,7 +242,8 @@ describe.each(ENGINES)("with $name", (engine) => {
         leaving.stop();
         const fading = leaving.partway();
         expect(fading).toBeDefined();
-        expect(fading!.scale).toBe(1);
+        expect(fading!.scale).toBeGreaterThanOrEqual(0.8);
+        expect(fading!.scale).toBeLessThan(1);
     });
 
     it("only fades under reduced motion, as the web's rule does", async () => {
@@ -340,7 +352,7 @@ describe.each(ENGINES)("with $name", (engine) => {
             expect(document.querySelector('[role="tooltip"]')).toBeNull();
         });
         leaving.stop();
-        expect(leaving.partway()).toBeDefined();
+        expect(leaving.partway()?.scale).toBeLessThan(1);
     });
 
     it("leaves a surface without `open` shown and still", async () => {
