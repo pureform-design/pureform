@@ -44,6 +44,7 @@ path = "."
 changelog_path = "CHANGELOG.md"
 include = [
     "packages/anatomy/**",
+    "packages/component-cases/**",
     "packages/core/**",
     "packages/css-adapter/**",
     "packages/css-lowering/**",
