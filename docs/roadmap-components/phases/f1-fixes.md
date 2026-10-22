@@ -31,6 +31,8 @@ tailwind targets. Remove an option outright when its replacement covers it.
 - **React Native sheets:** slide in from their edge instead of the dialog's motion; a refused
   close after a drag springs back to rest; check that the drag's extra `Animated.View` doesn't
   change a standalone sheet's layout (m2b).
+- **Web sheet drag-to-dismiss:** the sheet springs back toward rest while it slides out; it
+  should leave from where the drag released it (m2 merge).
 - **Submenus** inside grouped menus aren't clipped.
 
 ## f1d: Table sort arrow
