@@ -14,7 +14,7 @@ describe("scanConfigImports", () => {
                 'import type { Options } from "some-types";',
                 'import { type Other } from "other-types";',
                 'import { themes } from "./themes";',
-                'import tokens from "./data/tokens.json";',
+                'import tokens from "./data/tokens.json" with { type: "json" };',
                 "const read = () => process.env.LATER;",
                 "export default defineConfig({ themes, tokens });",
             ].join("\n"),
