@@ -51,16 +51,20 @@ Native Web doesn't draw.
           file; a mapped type's property, such as `Controllable`'s `selected`, counts its
           mapped type's): DOM, React and Solid attributes, `as` and `children` get none;
         - the **resolved type** picks the control: a string-literal union is a select,
-          `boolean` a boolean, `string` text, `number` a number; functions, nodes, objects,
-          arrays and mixed unions get none (`control: false` when the story has the arg, so
-          Storybook doesn't infer one; left out otherwise);
+          `boolean` a boolean, `string` text, `number` a number; a union of literals with a
+          non-boolean member (`boolean | "indeterminate"`, `12 | 24`) is a select of the
+          stringified values, with `mapping` back to the real ones (`true`, `12`); functions,
+          nodes, objects, arrays and unions with a non-literal member get none (`control:
+false` when the story has the arg, so Storybook doesn't infer one; left out
+          otherwise);
         - a prop typed **`VariantProp<C, "group">`** (directly or through
           `XVariantProps["group"]`) is read before the alias resolves, and takes its group's
           values from the anatomy, in the recipe's order: the text's `textStyle` is its
           `style`, a `true`/`false` group a boolean;
         - a **`@control none | select | boolean | text | number`** JSDoc tag on the prop in
-          binding-core overrides the type (`@control none` on ids, form names and submit
-          values).
+          binding-core overrides the type (`@control none` on ids, form names, submit values
+          and every `default*` prop; `Controllable`'s mapped `default*` props take the tag
+          from the mapped type's JSDoc).
 
         Any other arg (a shared hook's `disabled` on a component without one, `aria-label` from
         the binding) gets `control: false`. `scripts/prop-controls.spec.ts` (`omni run test:unit

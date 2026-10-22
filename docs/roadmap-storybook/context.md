@@ -413,3 +413,71 @@ object.
   compiler upgrade could move it (the spec's `selected` fixture would catch it).
 - `aria-label`/`aria-labelledby` keep text controls where binding-core declares them
   (IconButton, Menu, dialogs, sheets): they're required labels, arguably content.
+
+## Round 4 (branch `storybook-web-4`)
+
+From `main` (`a94bbe0b`). Not pushed.
+
+### What changed
+
+- **`default*` props have no control.** Every `default*` prop in `binding-core` is
+  `@control none`: the ones `Controllable` maps (`defaultSelected`, `defaultOpen`,
+  `defaultValue`, `defaultChecked`, `defaultPage`, `defaultExpanded`, …) through one tag in
+  `controllable.ts`, and the declared ones (`defaultSort`, `defaultSelection` in the table;
+  `defaultValue`, `defaultView` in the time picker) on their own JSDoc. The compiler attaches no
+  JSDoc to a mapped type node, so `tagOf` reads the `@control` kind from the text just inside
+  the mapped type's brace (`mappedTag`; the spec's `defaultSelected` fixture covers it).
+  `aria-label` keeps its text control.
+- **Literal unions are selects with a mapping** (`controlOfType`): string, number and boolean
+  literals, at least one non-boolean, become `select` with the stringified values as options (`true`,
+  `false` first, then the rest in the checker's order) and `mapping` for the non-strings
+  (`{ true: true, false: false }`; numbers `{ "12": 12 }`). `argTypeFor` passes `mapping` through
+  (not for a variant prop, whose values the anatomy gives). Plain `true | false` stays boolean;
+  a union with a non-literal member (`boolean | string`, `boolean | {…}`) stays none. Spec: 12
+  tests (fixtures `mixed`, `count`, `flag`, `loose`, `tricky`, and the mapped `default*` tag).
+- **The ready-made DateInput takes `leadingIcon`, `trailingIcon`, `prefixText` and `suffixText`
+  as content** (Solid, React, React Native), like TextField: `DateInputContentProps` gains the
+  four nodes (and their keys), the ready-made's props `Omit` the flags from Root's, and Root
+  gets the flags from `isPresent(content)`. Composed parts keep the flags. React and Solid draw
+  them in the container in the text field's order (leading icon, prefix, segments, suffix, label,
+  trailing icon); React Native draws them like its text field. **Breaking:** `<DateInput
+leadingIcon />` (a flag) is now a node, so nothing is drawn for `true`.
+- **DockedDatePicker already did this** (Solid, React and React Native take the icons and
+  affixes as content and omit the flags; its trailing icon is always on), so it needed no change.
+- **Deprecated options:** none of these components has any.
+
+### Controls that changed
+
+- **New:** Checkbox `checked` (`true`, `false`, `indeterminate`), TimePicker and TimeInput
+  `hourCycle` (`12`, `24`). Every other union that was none stayed none.
+- **Removed:** DateInput's `leadingIcon`, `trailingIcon`, `prefixText`, `suffixText` booleans
+  (now nodes, so no control); `defaultSelected`, `defaultOpen`, `defaultValue`, `defaultChecked`,
+  `defaultPage`, … on every component (`control: false` when the story passes them, so the
+  panel doesn't infer one from the args).
+
+### Checks run
+
+- `bunx tsc --noEmit` in binding-core, react, solid, react-native and the app (both
+  tsconfigs); `omni run build test -p` those four (one `rows.spec.tsx` render-count failure in
+  the first run, passing on `-f failed`: a flake under load); the app's unit spec (12 passed).
+- Date input and docked date picker specs per package (React 24, Solid 28, React Native 20 with
+  the date pickers').
+- Component suites after `omni run generate prepare -p @pureform/panda-fixture`, narrowed with
+  `-t "DateInput|DockedDatePicker"`, `solid/panda` and `react/css`: controllable 6, accessibility
+  30, overlays 3, keyboard 18, themes 18 each, all passing (forms ran nothing for them).
+- `omni run build -p @pureform/storybook-web`; story tests for fields and selection (19
+  components: Checkbox, Switch, RadioGroup, Slider, ChipSet, ButtonGroup, SelectionList,
+  TextField, TextArea, Select, Autocomplete, TagsInput, SearchBar, SearchView, DateInput,
+  DatePicker, DockedDatePicker, TimeInput, TimePicker): **267 per renderer, Solid and React,
+  all passing** (they cover Checkbox, TimePicker and TimeInput, the newly controlled).
+
+### Open questions (round 4)
+
+- **Selects of stringified values** show `true`/`false` as text options; a radio or
+  inline-radio control would suit `checked` better.
+- **`checked` as a controlled prop** freezes the checkbox's own state, like the other
+  controlled props; now that `default*` has no control, that is the only way to set it.
+- A string literal `"true"` mixed with the boolean `true` in one union would collide in the
+  mapping; none exists.
+- The date input's icons render `children` only; no `mirror` content props (the text field has
+  `mirrorLeadingIcon`/`mirrorTrailingIcon`).
