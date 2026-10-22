@@ -177,32 +177,76 @@ export const sliderTrackTokens = (
     };
 };
 
-/** The inset icon's measures, as the preset's `insetIconSize` and `insetIconPadding`, and the
- *  bar handle's clearance (half its width and the gap beside it). */
+/** The inset icon's measures, as the preset's default `insetIconSize` and `insetIconPadding`
+ *  (what a binding uses until it has read the theme's), and the bar handle's clearance (half its
+ *  width and the gap beside it). */
 export const SLIDER_INSET_ICON = {
     size: 20,
     padding: 10,
     clearance: 8,
 } as const;
 
+/** The inset icon's size and padding as the theme resolves them. */
+export interface SliderInsetIconMeasures {
+    readonly size: number;
+    readonly padding: number;
+}
+
 /** Whether the inset icon doesn't fit in the active track, `length` pixels long along the axis
  *  (0 when unmeasured: it fits), so it moves to the start of the inactive track: Compose's track
- *  icons sit in the active track while it's at least the icon and its padding either side. */
+ *  icons sit in the active track while it's at least the icon and its padding either side.
+ *  `icon` is the theme's `insetIconSize` and `insetIconPadding`, as the binding read them; the
+ *  preset's defaults until it has. */
 export const sliderInsetIconOverflows = (
     length: number,
     percents: readonly number[],
     centered = false,
+    icon: Partial<SliderInsetIconMeasures> | undefined = undefined,
 ): boolean => {
     if (length <= 0) return false;
     const { activeStart, activeEnd, startGap, endGap } = sliderTrackTokens(
         percents,
         centered,
     );
-    const { size, padding, clearance } = SLIDER_INSET_ICON;
+    const { clearance } = SLIDER_INSET_ICON;
+    const size = icon?.size ?? SLIDER_INSET_ICON.size;
+    const padding = icon?.padding ?? SLIDER_INSET_ICON.padding;
     const active =
         (length * (activeEnd - activeStart)) / 100 -
         clearance * (startGap + endGap);
     return active < size + 2 * padding;
+};
+
+/** The inset icon's measures from its resolved style on React Native, where the preset's
+ *  `insetIconSize` is the icon's width (its height, vertically) and `insetIconPadding` is the
+ *  margin that sits on its inset (selection moves a percentage's pixels there); an overflowing
+ *  icon's margin also holds the handle's clearance. `undefined` when the style has none. */
+export const sliderInsetIconMeasuresOfStyle = (
+    style: Readonly<Record<string, unknown>> | undefined,
+    {
+        vertical,
+        overflowing,
+        percents,
+        centered = false,
+    }: {
+        vertical: boolean;
+        overflowing: boolean;
+        percents: readonly number[];
+        centered?: boolean | undefined;
+    },
+): SliderInsetIconMeasures | undefined => {
+    if (!style) return undefined;
+    const number = (value: unknown) =>
+        typeof value === "number" ? value : undefined;
+    const size = number(vertical ? style.height : style.width);
+    const margin = vertical
+        ? number(style.marginBottom ?? style.marginTop)
+        : number(style.marginStart ?? style.marginLeft ?? style.marginEnd);
+    if (size === undefined || size <= 0 || margin === undefined)
+        return undefined;
+    const { endGap } = sliderTrackTokens(percents, centered);
+    const clearance = overflowing ? SLIDER_INSET_ICON.clearance * endGap : 0;
+    return { size, padding: Math.max(0, margin - clearance) };
 };
 
 /** The tokens one thumb's parts (its handle, state layer, and value indicator) set for

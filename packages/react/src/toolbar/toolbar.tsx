@@ -5,6 +5,7 @@
 import { toolbarAnatomy } from "@pureform/anatomy";
 import {
     isPresent,
+    isUnstyled,
     TOOLBAR_OVERFLOW_LABEL,
     TOOLBAR_ROOT_PROPS,
     toolbarMenuItems,
@@ -13,11 +14,14 @@ import {
     toolbarOverflowTestId,
     toolbarRootProps,
     toolbarSelection,
+    unstyledToolbarProvidedTokens,
 } from "@pureform/binding-core";
 import type {
     ToolbarContentProps,
     ToolbarItem,
+    ToolbarPart,
     ToolbarRootOwnProps,
+    Unstyled,
 } from "@pureform/binding-core";
 import { moveToolbarFocus, watchOverflow } from "@pureform/binding-core/dom";
 import type {
@@ -36,6 +40,7 @@ import { Menu } from "../menu";
 import { useComponent } from "../parts";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
+import { ProvidedTokens } from "../provided-tokens";
 import { useDirection } from "../provider";
 
 /** Root's props: the variants and tokens, `overflow`, `testId`, `as`, and the element's own
@@ -44,6 +49,9 @@ export interface ToolbarRootProps
     extends Omit<PartProps, keyof ToolbarRootOwnProps>, ToolbarRootOwnProps {
     /** Another element or component to render instead of `<div>`. */
     readonly as?: ElementType | undefined;
+    /** Opts the root out of the registry's styles. An unstyled `vibrant` toolbar still gives its
+     *  icon buttons the accent that follows its content color. */
+    readonly unstyled?: Unstyled<ToolbarPart> | undefined;
 }
 
 const HIDDEN: CSSProperties = { display: "none" };
@@ -55,8 +63,15 @@ function Root(props: ToolbarRootProps): ReactNode {
     const scope = useComponent(toolbarAnatomy, {
         selection: toolbarSelection(props),
         testId: props.testId,
+        unstyled: props.unstyled,
     });
-    const { as, ...rest } = omitProps(props, TOOLBAR_ROOT_PROPS);
+    const { as, unstyled: _unstyled, ...rest } = omitProps(
+        props,
+        TOOLBAR_ROOT_PROPS,
+    );
+    const provided = isUnstyled(props.unstyled, "root")
+        ? unstyledToolbarProvidedTokens(props.color)
+        : undefined;
     return scope.render("root", {
         element: "div",
         as,
@@ -72,7 +87,16 @@ function Root(props: ToolbarRootProps): ReactNode {
                 if (moved) event.preventDefault();
             },
         },
-        props: rest,
+        props: provided
+            ? {
+                  ...rest,
+                  children: (
+                      <ProvidedTokens tokens={provided}>
+                          {rest.children}
+                      </ProvidedTokens>
+                  ),
+              }
+            : rest,
     });
 }
 

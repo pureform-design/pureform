@@ -41,6 +41,7 @@ import {
     sliderSelection,
     sliderStopActive,
     sliderStops,
+    sliderInsetIconMeasuresOfStyle,
     sliderInsetIconOverflows,
     sliderTrackTokens,
 } from "./slider";
@@ -252,6 +253,42 @@ describe("slider inset icon", () => {
         expect(sliderInsetIconOverflows(400, [40, 52])).toBe(true);
         expect(sliderInsetIconOverflows(400, [40, 60])).toBe(false);
         expect(sliderInsetIconOverflows(0, [0])).toBe(false);
+    });
+
+    it("follows the theme's icon size and padding when given", () => {
+        // 20% of 400px is 80px, less 8: 72. A 24px icon with 24px padding needs 72.
+        expect(sliderInsetIconOverflows(400, [20], false, {})).toBe(false);
+        expect(
+            sliderInsetIconOverflows(400, [20], false, { size: 24, padding: 24 }),
+        ).toBe(false);
+        expect(
+            sliderInsetIconOverflows(400, [20], false, { size: 24, padding: 25 }),
+        ).toBe(true);
+        expect(
+            sliderInsetIconOverflows(400, [20], false, { size: 12, padding: 6 }),
+        ).toBe(false);
+    });
+
+    it("reads the measures from React Native's resolved style", () => {
+        const at = { vertical: false, overflowing: false, percents: [20] };
+        expect(
+            sliderInsetIconMeasuresOfStyle({ width: 24, marginStart: 12 }, at),
+        ).toEqual({ size: 24, padding: 12 });
+        // Overflowing, the margin also holds the handle's clearance (8 × the end gap, 1).
+        expect(
+            sliderInsetIconMeasuresOfStyle(
+                { width: 24, marginStart: 20 },
+                { ...at, overflowing: true },
+            ),
+        ).toEqual({ size: 24, padding: 12 });
+        expect(
+            sliderInsetIconMeasuresOfStyle(
+                { height: 24, marginBottom: 12 },
+                { ...at, vertical: true },
+            ),
+        ).toEqual({ size: 24, padding: 12 });
+        expect(sliderInsetIconMeasuresOfStyle({ width: "1x" }, at)).toBeUndefined();
+        expect(sliderInsetIconMeasuresOfStyle(undefined, at)).toBeUndefined();
     });
 });
 

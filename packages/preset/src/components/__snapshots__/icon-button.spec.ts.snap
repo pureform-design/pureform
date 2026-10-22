@@ -782,7 +782,7 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
             "borderStyle": "solid",
             "borderWidth": {
               "@supports (clip-path: shape(from 0 0, line to 0 0))": "calc(var(--components-iconButton-outlineWidth, 1px) + calc(calc(0px - var(--components-iconButton-outlineWidth, 1px)) * var(--components-iconButton-shaped, 0)))",
-              "base": "calc(var(--components-iconButton-outlineWidth, 1px) + calc(calc(1px - var(--components-iconButton-outlineWidth, 1px)) * var(--components-iconButton-shaped, 0)))",
+              "base": "var(--components-iconButton-outlineWidth, 1px)",
             },
             "display": "flex",
           },

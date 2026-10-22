@@ -11,6 +11,7 @@ import {
     isPresent,
     sliderMarkerTokens,
     sliderInsetIconOverflows,
+    sliderInsetIconMeasuresOfStyle,
     sliderSelection,
     sliderStopActive,
     sliderStops,
@@ -21,11 +22,12 @@ import {
 import type {
     ChangeDetails,
     InteractiveProps,
+    SliderInsetIconMeasures,
     SliderPart,
     SliderValue,
     SliderVariantProps,
 } from "@pureform/binding-core";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import type { GestureResponderEvent, LayoutChangeEvent } from "react-native";
 import { Text } from "react-native";
@@ -233,12 +235,14 @@ function SliderImpl(props: SliderProps): ReactNode {
     const selection = indication.select(sliderSelection(props, percents));
     // The root's length along the axis, for whether the inset icon fits in the active track.
     const [length, setLength] = useState(0);
+    // The theme's `insetIconSize` and `insetIconPadding`, read from the icon's resolved style.
+    const [measures, setMeasures] = useState<SliderInsetIconMeasures>();
+    const overflowing =
+        isPresent(props.insetIcon) &&
+        sliderInsetIconOverflows(length, percents, props.centered, measures);
     const state = {
         ...indication.states(),
-        ...(isPresent(props.insetIcon) &&
-        sliderInsetIconOverflows(length, percents, props.centered)
-            ? { overflowing: true }
-            : {}),
+        ...(overflowing ? { overflowing: true } : {}),
         dragged: indication.state.dragged,
         ...(props.disabled ? { disabled: true } : {}),
     };
@@ -247,6 +251,22 @@ function SliderImpl(props: SliderProps): ReactNode {
         selected,
         views: v,
     } = useComponentSlots<SliderPart>("slider", selection, state);
+    const measured = sliderInsetIconMeasuresOfStyle(
+        s.insetIcon as Record<string, unknown> | undefined,
+        {
+            vertical: props.orientation === "vertical",
+            overflowing,
+            percents,
+            centered: props.centered,
+        },
+    );
+    useEffect(() => {
+        setMeasures((last) =>
+            measured?.size === last?.size && measured?.padding === last?.padding
+                ? last
+                : measured,
+        );
+    }, [measured?.size, measured?.padding]);
     const rtl = useDirection() === "rtl";
     const snap = (raw: number) =>
         Math.min(

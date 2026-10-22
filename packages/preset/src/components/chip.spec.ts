@@ -59,7 +59,7 @@ describe("chip color", () => {
 });
 
 describe("chip corners and trailing icon", () => {
-    it("rests in the small radius and morphs from tokens, with no compound", () => {
+    it("rests in the medium radius and morphs from tokens, with no compound", () => {
         const recipe = compiled();
         const radius = JSON.stringify(recipe?.base?.root?.borderRadius);
         expect(radius).toContain("components-chip-square");
