@@ -19,7 +19,7 @@ phase named.
   `HorizontalSharedAxis` (§1 #5). Predictive back stays here for later.
 - **Before m2:** pre-bundle the dependencies of the component-suites and rn-web-demo e2e runs,
   so a Vite config change doesn't re-optimize mid-run (Solid hydration mismatches, blank page).
-- **Alongside m2:** a fresh-build `tsc` check on main, and formatting the unformatted files.
+- **Alongside m2:** a fresh-build `tsc` check on main.
 - **Gate:** the fixing agent reruns with `-f failed` only ([conventions](conventions.md)).
 - **Small fix phase after m2:**
     - Selection list: single selection by default; multiple stays an option.
@@ -85,9 +85,6 @@ the code's (`doc-counts.spec.ts`).
 - **Glyph naming:** the stepper's check and warning use `ToastIcon`/`TOAST_GLYPHS`; named
   `check`/`warning` glyphs in `GLYPH_PATHS` would decouple them from the toast (no behaviour
   change).
-- **Formatting drift on main:** a few files (`binding-core` `slider.ts`, React Native
-  `autocomplete.tsx`, `docked-date-picker.tsx`, `overlay.tsx`) aren't `oxfmt`-clean; a
-  `style:` commit would fix them.
 
 ## 3. Open questions from the contexts
 
