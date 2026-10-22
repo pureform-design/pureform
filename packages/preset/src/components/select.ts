@@ -43,10 +43,10 @@ import {
     defaultDensities,
     defaultGroups,
     densitySteps,
-    tweens,
     variantsOf,
 } from "./shared";
 import type { ColorGroup, ColorGroups, Densities } from "./shared";
+import { chevronTransition } from "./spring-motion";
 
 const EXPANDED = slot("container", "expanded");
 
@@ -108,7 +108,7 @@ export const selectField = <
                                 ),
                             )
                             .else(transform(translateY(pct(-50)))),
-                        transition: tweens("transform", "color"),
+                        transition: chevronTransition,
                     },
                 },
                 variants: {

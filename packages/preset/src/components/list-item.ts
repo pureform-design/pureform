@@ -66,6 +66,7 @@ import {
     variantsOf,
 } from "./shared";
 import type { ColorGroup, ColorGroups, Densities } from "./shared";
+import { springTweens } from "./spring-motion";
 import type { Position } from "./tiles";
 import { positionCorners, POSITIONS, TILE_RADII } from "./tiles";
 
@@ -143,7 +144,7 @@ const slides: StyleMap = {
     ),
     transition: when()
         .on(slot("root", "pressed"), tweens())
-        .else(tweens(own("swipeOffset"))),
+        .else(springTweens("spatialFast", [own("swipeOffset")])),
 };
 
 const lines = (height: LineHeight) => ({

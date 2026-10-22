@@ -43,8 +43,8 @@ import {
     iconFill,
     stateTransition,
     sys,
-    tweens,
 } from "./shared";
+import { chevronTransition } from "./spring-motion";
 
 /** The tokens every row has. */
 export const ROW_TOKENS = {
@@ -170,7 +170,7 @@ export const rowParts = (
 };
 
 /** An expand indicator: a row's trailing icon that turns over while `expanded` holds, through a
- *  moving tween that reduced motion drops. The accordion's, the tree's and an expandable list item's. */
+ *  fast spatial spring that reduced motion drops. The accordion's, the tree's and an expandable list item's. */
 export const expandIndicator = (
     trailing: StyleMap,
     expanded: Condition,
@@ -179,7 +179,7 @@ export const expandIndicator = (
     transform: when()
         .on(expanded, transform(rotate(numeric(180, "deg"))))
         .else(transform(rotate(numeric(0, "deg")))),
-    transition: tweens("transform", "color"),
+    transition: chevronTransition,
 });
 
 /** A row's colors in a color group: the selected container and content, on the row and its

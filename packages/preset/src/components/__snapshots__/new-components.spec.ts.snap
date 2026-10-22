@@ -766,7 +766,7 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
       },
       "transition": {
         "_motionReduce": "color token(durations.short3) token(easings.standard)",
-        "base": "transform token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard)",
+        "base": "transform token(springs.spatialFast.duration) token(springs.spatialFast.easing), color token(durations.short3) token(easings.standard)",
       },
       "width": "var(--components-listItem-iconSize, token(sizes.iconMedium))",
     },
@@ -1106,7 +1106,7 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
             ".listItem__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "",
             "base": {
               "_motionReduce": "none",
-              "base": "--components-listItem-swipeOffset token(durations.short3) token(easings.standard)",
+              "base": "--components-listItem-swipeOffset token(springs.spatialFast.duration) token(springs.spatialFast.easing)",
             },
           },
         },
@@ -1119,7 +1119,7 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
             ".listItem__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "",
             "base": {
               "_motionReduce": "none",
-              "base": "--components-listItem-swipeOffset token(durations.short3) token(easings.standard)",
+              "base": "--components-listItem-swipeOffset token(springs.spatialFast.duration) token(springs.spatialFast.easing)",
             },
           },
         },
@@ -1135,7 +1135,7 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
             ".listItem__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "",
             "base": {
               "_motionReduce": "none",
-              "base": "--components-listItem-swipeOffset token(durations.short3) token(easings.standard)",
+              "base": "--components-listItem-swipeOffset token(springs.spatialFast.duration) token(springs.spatialFast.easing)",
             },
           },
         },
@@ -1148,7 +1148,7 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
             ".listItem__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "",
             "base": {
               "_motionReduce": "none",
-              "base": "--components-listItem-swipeOffset token(durations.short3) token(easings.standard)",
+              "base": "--components-listItem-swipeOffset token(springs.spatialFast.duration) token(springs.spatialFast.easing)",
             },
           },
         },
@@ -2749,7 +2749,7 @@ exports[`select > compiles to a stable Panda slot recipe 1`] = `
       "textStyle": "bodyLarge",
       "transition": {
         "_motionReduce": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard)",
-        "base": "top token(durations.short3) token(easings.standard), inset-inline-start token(durations.short3) token(easings.standard), padding-inline-start token(durations.short3) token(easings.standard), padding-inline-end token(durations.short3) token(easings.standard), margin-inline-start token(durations.short3) token(easings.standard), background-color token(durations.short3) token(easings.standard), transform token(durations.short3) token(easings.standard), font-size token(durations.short3) token(easings.standard), line-height token(durations.short3) token(easings.standard), letter-spacing token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard)",
+        "base": "top token(springs.spatialFast.duration) token(springs.spatialFast.easing), inset-inline-start token(springs.spatialFast.duration) token(springs.spatialFast.easing), padding-inline-start token(springs.spatialFast.duration) token(springs.spatialFast.easing), padding-inline-end token(springs.spatialFast.duration) token(springs.spatialFast.easing), margin-inline-start token(springs.spatialFast.duration) token(springs.spatialFast.easing), transform token(springs.spatialFast.duration) token(springs.spatialFast.easing), font-size token(springs.spatialFast.duration) token(springs.spatialFast.easing), line-height token(springs.spatialFast.duration) token(springs.spatialFast.easing), letter-spacing token(springs.spatialFast.duration) token(springs.spatialFast.easing), background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard)",
       },
     },
     "leadingIcon": {
@@ -2859,7 +2859,7 @@ exports[`select > compiles to a stable Panda slot recipe 1`] = `
       },
       "transition": {
         "_motionReduce": "color token(durations.short3) token(easings.standard)",
-        "base": "transform token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard)",
+        "base": "transform token(springs.spatialFast.duration) token(springs.spatialFast.easing), color token(durations.short3) token(easings.standard)",
       },
       "width": "var(--components-select-iconSize, token(sizes.iconMedium))",
     },
