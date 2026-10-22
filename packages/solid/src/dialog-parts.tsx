@@ -246,6 +246,25 @@ export function dialogParts<
         api.getTriggerProps(),
     );
 
+    /** A close trigger: it asks `onClose` before it closes, if the overlay has one. */
+    const closeTrigger =
+        (key: string, display: string) =>
+        (props: DialogChromeTriggerProps): JSX.Element => {
+            const { scope, api, requestClose, onClose } = context.use(display);
+            return scope.render(name(key), {
+                element: "button",
+                as: () => props.as,
+                machine: () => {
+                    const close = api().getCloseTriggerProps();
+                    return onClose()
+                        ? { ...close, onClick: requestClose }
+                        : close;
+                },
+                unstyled: () => props.unstyled,
+                props: omit(props, "unstyled", "as"),
+            });
+        };
+
     function Backdrop(props: DialogChromePartProps): JSX.Element {
         const {
             backdrop,
@@ -321,5 +340,6 @@ export function dialogParts<
         Content,
         part,
         trigger,
+        closeTrigger,
     };
 }

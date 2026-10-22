@@ -63,6 +63,7 @@ const chrome = dialogParts({
         fullscreenDialogSelection(props),
     machineProps: dialogMachineProps,
     positionerLayout: (present) => fullscreenDialogPositionerLayout(present),
+    onClose: (props) => props.onClose,
 });
 
 /** The full-screen dialog's root, a `<div>` around the trigger and the dialog. The registry
@@ -91,9 +92,7 @@ const Header: (props: FullscreenDialogPartProps) => ReactNode = chrome.part(
 /** A button that closes the dialog: `as={IconButton}` draws it as one. Name it with
  *  `aria-label`. */
 const CloseTrigger: (props: FullscreenDialogTriggerProps) => ReactNode =
-    chrome.trigger("closeTrigger", "CloseTrigger", (api) =>
-        api.getCloseTriggerProps(),
-    );
+    chrome.closeTrigger("closeTrigger", "CloseTrigger");
 
 /** The title, an `<h2>`, which names the dialog. */
 const Headline: (props: FullscreenDialogPartProps) => ReactNode = chrome.part(

@@ -77,6 +77,7 @@ const chrome = dialogParts({
             sideSheetSelection(props).coplanar === true,
         ),
     contentLayout: sheetContentLayout,
+    onClose: (props) => props.onClose,
 });
 
 /** The sheet's root, a `<div>` around the trigger and the sheet. The registry doesn't style
@@ -123,9 +124,7 @@ const Headline: (props: SideSheetPartProps) => ReactNode = chrome.part(
 /** A button at the end of the header that closes the sheet: `as={IconButton}` draws it as one.
  *  Name it with `aria-label`. */
 const CloseTrigger: (props: SideSheetTriggerProps) => ReactNode =
-    chrome.trigger("closeTrigger", "CloseTrigger", (api) =>
-        api.getCloseTriggerProps(),
-    );
+    chrome.closeTrigger("closeTrigger", "CloseTrigger");
 
 /** The content, which describes the sheet. It scrolls when it's taller than the sheet. */
 const Body: (props: SideSheetPartProps) => ReactNode = chrome.part(
