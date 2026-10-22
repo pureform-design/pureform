@@ -219,3 +219,10 @@ variant (c3c/c4b): the bar already rests at elevation 3 and the app bar's scroll
 - Indication fixtures were re-recorded (additions only vs main: 38 lines each); screenshots
   re-recorded: `progress` (the inset icon slider), `app-bars`, `search-and-feedback` and
   `search-and-autocomplete` (the flat search bar).
+- **Gate flakes:** Solid's unit suite failed twice with "iframe did not become ready" (tabs, then
+  toolbar). The cause was Vite discovering `@zag-js/*` dependencies mid-run (c7 added `avatar`
+  and `listbox`) and reloading; Solid's `optimizeDeps.include` named machine dependencies by bare
+  name, which it can't resolve. Both bindings now pre-bundle every machine dependency
+  (`@pureform/machines > @zag-js/…`), and cold-cache runs no longer reload. The component suites'
+  indication "Failed to fetch dynamically imported module" (known flake) happened once and passed
+  on the next run.
