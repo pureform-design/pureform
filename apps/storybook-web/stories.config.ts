@@ -4,10 +4,9 @@
 
 import { defineStories } from "./src/renderers/config";
 
-/** The fields' affixes: content in the ready-made components, flags in their variant props. */
-const AFFIXES = ["leadingIcon", "trailingIcon", "prefixText", "suffixText"];
-
 export default defineStories({
+    // The controls come from React's exports' props (Solid's agree; see the README).
+    controls: "react",
     renderers: {
         solid: {
             package: "@pureform/solid",
@@ -48,26 +47,7 @@ export default defineStories({
     // Floating and modal overlays open into the canvas; this keeps room for them.
     overlayHeight: 480,
     components: {
-        // Components whose variant props interface isn't `<Component>VariantProps`.
-        CircularProgress: { variantProps: "ProgressVariantProps" },
-        LinearProgress: { variantProps: "ProgressVariantProps" },
-        NavigationBar: { variantProps: "NavigationVariantProps" },
-        NavigationRail: { variantProps: "NavigationVariantProps" },
-        SelectionList: { variantProps: "ListVariantProps" },
-        // `ListVariantProps` is the items' defaults; the list's own `variant` is here.
-        List: { variantProps: "ListOwnVariantProps" },
-        // The ready-made fields take these as content (`leadingIcon: "@"`), which the variant
-        // props declare as the root's flags: a boolean control would draw "true".
-        TextArea: { controls: { exclude: AFFIXES } },
-        TagsInput: { controls: { exclude: AFFIXES } },
-        Select: { controls: { exclude: AFFIXES } },
-        Autocomplete: { controls: { exclude: AFFIXES } },
-        DateInput: { controls: { exclude: AFFIXES } },
-        DockedDatePicker: { controls: { exclude: AFFIXES } },
-        // The ready-made dialog's `icon` is the icon itself, not the variant's flag.
-        Dialog: { controls: { exclude: ["icon"] } },
         TextField: {
-            controls: { exclude: AFFIXES },
             // React Native Web: the disabled field's input is `disabled` now (not `readonly`)
             // and passes, but its label is a plain text element, not the input's `<label>`, so
             // axe holds its disabled color to the contrast ratio (React Native only; parameters
