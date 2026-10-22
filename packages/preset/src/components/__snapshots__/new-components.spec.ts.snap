@@ -4262,9 +4262,9 @@ exports[`toast > compiles to a stable Panda slot recipe 1`] = `
     },
     "root": {
       "&[data-state=closed]": {
-        "scale": {
-          "_motionReduce": "1",
-          "base": "0.8",
+        "animation": {
+          "_motionReduce": "none",
+          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) forwards overlayShrinkOut",
         },
       },
       "alignItems": "start",
@@ -4284,7 +4284,7 @@ exports[`toast > compiles to a stable Panda slot recipe 1`] = `
       "shadowElevation": "level3",
       "transition": {
         "_motionReduce": "opacity token(springs.effectsFast.duration) token(springs.effectsFast.easing)",
-        "base": "transform token(springs.spatialFast.duration) token(springs.spatialFast.easing), scale token(springs.spatialFast.duration) token(springs.spatialFast.easing), height token(springs.spatialFast.duration) token(springs.spatialFast.easing), opacity token(springs.effectsFast.duration) token(springs.effectsFast.easing)",
+        "base": "transform token(springs.spatialFast.duration) token(springs.spatialFast.easing), height token(springs.spatialFast.duration) token(springs.spatialFast.easing), opacity token(springs.effectsFast.duration) token(springs.effectsFast.easing)",
       },
       "width": "var(--components-toast-width, 356px)",
     },

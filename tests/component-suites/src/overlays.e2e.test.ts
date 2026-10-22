@@ -155,22 +155,20 @@ describe("Toast", () => {
         expect(root.dataset.state).toBe("closed");
         return root;
     };
-    const transitioned = (element: HTMLElement) =>
+    const animationNames = (element: HTMLElement) =>
         element
             .getAnimations()
-            .map(
-                (animation) => (animation as CSSTransition).transitionProperty,
-            );
+            .map((animation) => (animation as CSSAnimation).animationName);
 
-    it("shrinks to 80% as it fades out", async () => {
+    it("shrinks to 80% as it fades out, with the popups' overlayShrinkOut", async () => {
         const root = await leave("full");
-        expect(transitioned(root)).toContain("scale");
+        expect(animationNames(root)).toContain("overlayShrinkOut");
         expect(getComputedStyle(root).scale).not.toBe("1");
     });
 
     it("only fades under reduced motion", async () => {
         const root = await leave("reduce");
-        expect(transitioned(root)).not.toContain("scale");
+        expect(animationNames(root)).not.toContain("overlayShrinkOut");
         expect(["1", "none"]).toContain(getComputedStyle(root).scale);
     });
 });

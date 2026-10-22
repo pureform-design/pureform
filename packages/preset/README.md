@@ -131,9 +131,10 @@ follows the sheets). A bottom sheet let go of after a drag settles back on `spat
 (`SHEET_SETTLE`, a transition of the `translate` the drag sets); a drag that closes it holds its
 `translate`, so the exit slides out from where it was let go, and a close the app refuses settles
 it back. A toast moves and resizes in its stack on `spatialFast` and fades on `effectsFast`;
-leaving, it shrinks to 80% on `spatialFast` as it fades, like the snackbar (its `scale`, apart from
-the transform Zag stacks it with). Under reduced motion only the fades run, on
-their springs.
+leaving, it shrinks to 80% on `spatialFast` as it fades, with the popups' `overlayShrinkOut`.
+`overlayGrowIn` and `overlayShrinkOut` animate the CSS `scale` property, not `transform`, so they
+compose with a transform of the overlay's own (the one Zag stacks a toast with). Under reduced
+motion only the fades run, on their springs.
 
 The menu follows Compose's `DropdownMenu` (scale and fade) rather than material-web's height
 reveal: a transform and opacity need no layout, and reduced motion keeps the fade alone. Under

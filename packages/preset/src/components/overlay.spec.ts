@@ -124,12 +124,14 @@ describe("overlays", () => {
                 expect(Object.keys(stop)).toEqual(["opacity"]);
             }
         }
-        for (const name of [
-            "overlayGrowIn",
-            "overlayShrinkOut",
-            "dialogSlideIn",
-            "dialogSlideOut",
-        ]) {
+        // The popups scale with the `scale` property, which composes with an overlay's own
+        // transform (a toast's stacking).
+        for (const name of ["overlayGrowIn", "overlayShrinkOut"]) {
+            for (const stop of Object.values(OVERLAY_KEYFRAMES[name]!)) {
+                expect(Object.keys(stop)).toEqual(["scale"]);
+            }
+        }
+        for (const name of ["dialogSlideIn", "dialogSlideOut"]) {
             for (const stop of Object.values(OVERLAY_KEYFRAMES[name]!)) {
                 expect(Object.keys(stop)).toEqual(["transform"]);
             }
