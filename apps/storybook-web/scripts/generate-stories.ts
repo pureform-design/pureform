@@ -118,7 +118,10 @@ const generate = async () => {
     const shared = config.hooks ?? [];
     const sharedModules = await Promise.all(
         shared.map((path) =>
-            load<{ transformSource?: TransformSource }>(join(APP, path)),
+            load<{
+                transformSource?: TransformSource;
+                args?: Record<string, unknown>;
+            }>(join(APP, path)),
         ),
     );
     const anatomyModule = await load<
@@ -232,6 +235,7 @@ const generate = async () => {
                     ...Object.values(m.opened ?? {}),
                 ]),
                 options.args ?? {},
+                ...sharedModules.map((m) => m.args ?? {}),
             ].flatMap((x) => Object.keys(x ?? {})),
         );
         const argTypes = {
