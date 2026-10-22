@@ -67,6 +67,8 @@ import {
     pressableRoot,
     sys,
     variantsOf,
+    isolated,
+    stackAbove,
 } from "./shared";
 import type { ColorGroup, ColorGroups } from "./shared";
 
@@ -162,7 +164,7 @@ export const createTabs = <const G extends string = ColorGroup>(
                         ...INDICATION_ROOT,
                         // A stacking context of its own, so the indicator's layer stays in it.
                         position: relative,
-                        zIndex: unitless(0),
+                        ...isolated,
                         display: flex,
                         flexDirection: row,
                         backgroundColor: ref("container"),
@@ -218,7 +220,7 @@ export const createTabs = <const G extends string = ColorGroup>(
                             .on(SELECTED, unitless(1))
                             .else(unitless(0)),
                         // Over every tab, so it draws over the tabs it slides across.
-                        zIndex: unitless(1),
+                        ...stackAbove(),
                         transition: motionTransition(
                             tween("transform", {
                                 spring: ref("indicatorSpring"),

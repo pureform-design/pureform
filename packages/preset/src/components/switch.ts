@@ -57,6 +57,8 @@ import {
     stateTransition,
     sys,
     variantsOf,
+    isolated,
+    stackAbove,
 } from "./shared";
 import type { ColorGroup, ColorGroups } from "./shared";
 
@@ -187,6 +189,8 @@ export const createSwitch = <const G extends string = ColorGroup>(
                             ...focusRing(ref, CONTROL_FOCUS),
                             borderRadius: radius("full"),
                             position: relative,
+                            // So the input stacks only against the track.
+                            ...isolated,
                             display: inlineFlex,
                             cursor: pointer,
                             width: ref("trackWidth"),
@@ -194,7 +198,7 @@ export const createSwitch = <const G extends string = ColorGroup>(
                         },
                         touchTarget: controlTouchTarget,
                         // Above the track, so it takes every click.
-                        input: { ...controlInput, zIndex: unitless(1) },
+                        input: { ...controlInput, ...stackAbove() },
                         track: {
                             transition: stateTransition,
                             position: relative,

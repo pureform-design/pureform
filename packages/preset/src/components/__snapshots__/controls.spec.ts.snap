@@ -832,6 +832,7 @@ exports[`switchControl > compiles to a stable Panda slot recipe 1`] = `
       "cursor": "pointer",
       "display": "inline-flex",
       "height": "var(--components-switchControl-trackHeight, 32px)",
+      "isolation": "isolate",
       "outlineColor": "var(--components-switchControl-focusIndicatorColor, token(colors.secondary))",
       "outlineOffset": "var(--components-switchControl-focusIndicatorOuterOffset, token(sizes.focusIndicatorOuterOffset))",
       "outlineStyle": {

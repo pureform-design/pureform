@@ -46,7 +46,6 @@ import {
     column,
     flex,
     hidden,
-    isolate,
     mul,
     pct,
     relative,
@@ -80,6 +79,8 @@ import {
     stateTransition,
     sys,
     variantsOf,
+    isolated,
+    stackAbove,
 } from "./shared";
 import type { ColorGroup, ColorGroups, Densities } from "./shared";
 import type { Position } from "./tiles";
@@ -270,11 +271,11 @@ export const createListItem = <
                     // Its display is left to the `hidden` attribute that collapses it.
                     region: { paddingInlineStart: ref("regionIndent") },
                     // A swipeable item's frame: the action and the row, clipped to it. It
-                    // isolates them, so the row's `zIndex` stacks only against its action.
+                    // isolates them, so the row stacks only against its action.
                     frame: {
                         position: relative,
                         overflow: hidden,
-                        isolation: isolate,
+                        ...isolated,
                     },
                     // The revealed action, pinned to the frame's end under the row and
                     // uncovered as the row slides away.
@@ -350,7 +351,7 @@ export const createListItem = <
                             root: {
                                 ...slides,
                                 // Over the action, which follows it in the frame.
-                                zIndex: unitless(1),
+                                ...stackAbove(),
                                 tokens: {
                                     focusIndicatorOuterOffset: mul(
                                         ref("focusIndicatorThickness"),

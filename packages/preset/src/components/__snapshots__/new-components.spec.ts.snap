@@ -3962,8 +3962,8 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
       "backgroundColor": "var(--components-tabs-container, token(colors.surface))",
       "display": "flex",
       "flexDirection": "row",
+      "isolation": "isolate",
       "position": "relative",
-      "zIndex": "0",
     },
     "tab": {
       "&:is(:disabled, [aria-disabled=true])": {

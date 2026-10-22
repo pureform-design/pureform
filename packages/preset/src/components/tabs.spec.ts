@@ -20,7 +20,7 @@ describe("tabs", () => {
         expect(recipe()?.base?.indicator).toMatchObject({ zIndex: "1" });
         expect(recipe()?.base?.root).toMatchObject({
             position: "relative",
-            zIndex: "0",
+            isolation: "isolate",
         });
     });
 

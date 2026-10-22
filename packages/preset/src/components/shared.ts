@@ -12,6 +12,7 @@ import {
     row,
     center,
     inlineFlex,
+    isolate,
     unitless,
     alias,
     colorMix,
@@ -397,6 +398,14 @@ export const turnedOver = (turned: Condition) =>
     when()
         .on(turned, transform(rotate(numeric(180, "deg"))))
         .else(transform(rotate(numeric(0, "deg"))));
+
+/** A stacking context of its own: a part inside that `stackAbove()`s its siblings stacks only
+ *  against them, never against the page. Spread it on the container. */
+export const isolated: StyleMap = { isolation: isolate };
+
+/** Draws over its siblings in an `isolated` container (the list item's row over its action,
+ *  the tabs' indicator over the tabs, the switch's input over its track). */
+export const stackAbove = (): StyleMap => ({ zIndex: unitless(1) });
 
 /** Material's focus indicator: a ring of the focus indicator's thickness and color, its outer
  *  offset outside the element (by default the theme's 3px, secondary, and 2px), shown while
