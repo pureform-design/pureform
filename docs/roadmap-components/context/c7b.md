@@ -190,3 +190,12 @@ Branch `c7b-submenu-expandable`, from main `07eaa67c`. Commits: `git log 07eaa67
 - React Native drills into submenus. Should it cascade with a second `Anchored` popup instead?
 - Should the ready-made rail take `sections` (groups of destinations) rather than a
   destination's `sectionLabel`?
+
+## Merge resolution (c7-merge)
+
+- Merged after c7a; conflicts in the gap analysis' "Later" row (union, later replaced by "None"),
+  React Native `list-item.tsx` (c7a's `role="option"` and c7b's `aria-expanded` both kept) and
+  React Native `navigation.tsx` (imports unioned). `list-item.ts` with c7c: see c7c's merge
+  resolution.
+- `nested.spec.ts` now lists c7c's `swipeable` and `actionColor` groups beside c7b's (neither is
+  the expandable item's).

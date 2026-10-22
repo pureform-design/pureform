@@ -191,3 +191,31 @@ variant (c3c/c4b): the bar already rests at elevation 3 and the app bar's scroll
   it through `swipeTokens`). Specs: preset `expressive.spec.ts`, binding-core
   `list-item-swipe.spec.ts`, Solid and React `list-item.spec.tsx`, React Native
   `components.spec.tsx`.
+
+## Merge resolution (c7-merge)
+
+- **`list-item.ts` (preset):** union of both sides. Tokens: c7c's action and swipe tokens plus
+  c7b's `regionIndent`. `slots`: `…, indicator, region, action`; `structure.root` ends
+  `indicator, action` (action last, as asked). Parts: c7b's `indicator`/`region` and c7c's
+  `action`. The description names both.
+- **Expandable and swipeable together:** the API allows both props, but an expandable item's
+  root is a button and the swipe action is a button inside the root, so the pair would nest a
+  button in a button. Resolved as: **an item with a `region` doesn't swipe** (its `swipeAction`
+  is ignored; `swipeable` is forced false). Solid and React `Root` skip the swipe state inside
+  an `Expandable`; the ready-made rows render no `Action`; React Native's `swipeable` excludes
+  `expandable`. Specs: "a ListItem with both a region and a swipe action" (Solid, React) and "keeps
+  an item with both a region and a swipe action expandable, without the action" (React Native).
+  Making both work would need the action outside the button root (a restructure for r6).
+- **Bindings:** React/Solid `Root` combine the accordion trigger props, the interaction handlers
+  (not for an expandable header) and the swipe root props; React Native's swipe branch and the
+  expandable row (indicator, region) both kept. Solid's duplicated `isPresent` import fixed.
+- **m1 overlap:** none of the c7 branches touched m1's motion files (springs, emphasized
+  `linear()`, tween and overlay types); `slider.ts` differed only by m1's formatting, kept.
+- **Row-cost budget:** accepted at 75 for Solid (the avatar root's loaded signal and `Show`); the
+  budget spec passes after the merge.
+- **Found in the gate:** the swipe action's `width` read the unitless token directly (CSS
+  `width: 80` is invalid, so the web action was 0px wide; rn-parity caught it); it's now
+  `actionWidth × 1px`.
+- Indication fixtures were re-recorded (additions only vs main: 38 lines each); screenshots
+  re-recorded: `progress` (the inset icon slider), `app-bars`, `search-and-feedback` and
+  `search-and-autocomplete` (the flat search bar).
