@@ -8,6 +8,8 @@ import {
     numeric,
     px,
     spring,
+    transition,
+    tween,
     when,
 } from "@pureform/core/ast";
 import { buttonConfig } from "@pureform/core/fixtures/button";
@@ -344,5 +346,58 @@ describe("compilePreset (springs)", () => {
         expect(stiff.tokens.springs.spatialFast.duration.value).toMatch(
             /^\d+ms$/,
         );
+    });
+});
+
+describe("compilePreset (spring component tokens)", () => {
+    const box = defineComponent({
+        name: "box",
+        tokens: {
+            move: dynamic(
+                ["components", "box", "move"],
+                alias("springs", "spatialDefault"),
+            ),
+        },
+        recipe: {
+            base: {
+                transition: transition(
+                    tween("transform", {
+                        spring: alias("components", "box", "move"),
+                    }),
+                ),
+            },
+        },
+    });
+    const preset = compilePreset({
+        ...buttonConfig,
+        springs: {
+            spatialDefault: spring({ stiffness: 380, damping: 0.8 }),
+            spatialSlow: spring({ stiffness: 200, damping: 0.8 }),
+        },
+        components: { ...buttonConfig.components, box },
+        themes: {
+            slow: {
+                components: {
+                    box: {
+                        tokens: { move: alias("springs", "spatialSlow") },
+                    },
+                },
+            },
+        },
+    });
+
+    it("reads the token's two vars, falling back to the role's", () => {
+        const recipe = obj(obj(obj(preset.theme).recipes).box);
+        expect(obj(recipe.base).transition).toBe(
+            "transform var(--components-box-move-duration, token(springs.spatialDefault.duration)) var(--components-box-move-easing, token(springs.spatialDefault.easing))",
+        );
+    });
+
+    it("writes a theme's override of the token as the role's two vars", () => {
+        expect(obj(preset.globalCss)["[data-panda-theme=slow]"]).toEqual({
+            "--components-box-move-duration":
+                "token(springs.spatialSlow.duration)",
+            "--components-box-move-easing": "token(springs.spatialSlow.easing)",
+        });
     });
 });

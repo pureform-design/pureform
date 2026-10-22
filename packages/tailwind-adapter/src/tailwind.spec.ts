@@ -1,4 +1,4 @@
-import { px } from "@pureform/core/ast";
+import { alias, px } from "@pureform/core/ast";
 import { materialColor } from "@pureform/material";
 import { pureform } from "@pureform/preset";
 import { compile } from "@tailwindcss/node";
@@ -195,5 +195,35 @@ describe("compileTailwind", () => {
         ]);
         expect(out).not.toContain(".bg-red-500");
         expect(out).toContain(".bg-primary");
+    });
+});
+
+describe("compileTailwind (spring component tokens)", () => {
+    const css = compileTailwind({
+        ...config,
+        themes: {
+            ...config.themes,
+            slow: {
+                components: {
+                    tabs: {
+                        tokens: {
+                            indicatorSpring: alias("springs", "spatialSlow"),
+                        },
+                    },
+                },
+            },
+        },
+    });
+
+    it("times the tabs' indicator by its spring token, falling back to the role's vars", () => {
+        expect(css).toContain(
+            "transition: transform var(--components-tabs-indicatorSpring-duration, var(--springs-spatial-default-duration)) var(--components-tabs-indicatorSpring-easing, var(--springs-spatial-default-easing))",
+        );
+    });
+
+    it("writes a theme's override of the token as the role's two vars", () => {
+        expect(css).toMatch(
+            /\[data-theme="slow"\] \{[^}]*--components-tabs-indicatorSpring-duration: var\(--springs-spatial-slow-duration\);\s*--components-tabs-indicatorSpring-easing: var\(--springs-spatial-slow-easing\);/,
+        );
     });
 });
