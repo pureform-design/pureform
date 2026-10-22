@@ -259,13 +259,22 @@ describe("slider inset icon", () => {
         // 20% of 400px is 80px, less 8: 72. A 24px icon with 24px padding needs 72.
         expect(sliderInsetIconOverflows(400, [20], false, {})).toBe(false);
         expect(
-            sliderInsetIconOverflows(400, [20], false, { size: 24, padding: 24 }),
+            sliderInsetIconOverflows(400, [20], false, {
+                size: 24,
+                padding: 24,
+            }),
         ).toBe(false);
         expect(
-            sliderInsetIconOverflows(400, [20], false, { size: 24, padding: 25 }),
+            sliderInsetIconOverflows(400, [20], false, {
+                size: 24,
+                padding: 25,
+            }),
         ).toBe(true);
         expect(
-            sliderInsetIconOverflows(400, [20], false, { size: 12, padding: 6 }),
+            sliderInsetIconOverflows(400, [20], false, {
+                size: 12,
+                padding: 6,
+            }),
         ).toBe(false);
     });
 
@@ -287,7 +296,9 @@ describe("slider inset icon", () => {
                 { ...at, vertical: true },
             ),
         ).toEqual({ size: 24, padding: 12 });
-        expect(sliderInsetIconMeasuresOfStyle({ width: "1x" }, at)).toBeUndefined();
+        expect(
+            sliderInsetIconMeasuresOfStyle({ width: "1x" }, at),
+        ).toBeUndefined();
         expect(sliderInsetIconMeasuresOfStyle(undefined, at)).toBeUndefined();
     });
 });

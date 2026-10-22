@@ -6,7 +6,7 @@
   `spatialDefault` spring instead of the sampled curve (`useAnimatedSlide`,
   `packages/rn-adapter/src/animate/slide.ts`). `SlideMotion` gained `spring` and `velocity`.
 - `springProgress(spring, velocity, seconds)` (`rn-adapter/src/motion.ts`) gives a spring's
-  progress and speed in closed form, with a start speed, for the damping *coefficient* the
+  progress and speed in closed form, with a start speed, for the damping _coefficient_ the
   adapter's `Spring` holds.
 - `useIndicatorSlides` (`react-native/src/tab-indicator.ts`) finds where an interrupted slide
   has got to and how fast it moves (spring or curve), and starts the next slide at that speed

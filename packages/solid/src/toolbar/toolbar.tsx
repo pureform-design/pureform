@@ -35,8 +35,8 @@ import type { IconButtonProps } from "../icon-button";
 import { Menu } from "../menu";
 import { MENU_TRIGGER_ATTRIBUTES } from "../menu/menu";
 import { useComponent } from "../parts";
-import { ProvidedTokens } from "../provided-tokens";
 import type { PartProps } from "../props";
+import { ProvidedTokens } from "../provided-tokens";
 import { useDirection } from "../provider";
 
 /** Root's props: the variants and tokens, `overflow`, `testId`, `as`, and the element's own

@@ -49,7 +49,7 @@ Branch `f1b-controls`, from main `aee1db3c`. Commits: `git log aee1db3c..f1b-con
   timeouts under load in omni; `factory.spec` passes alone with `--testTimeout=600000`.
 - `bunx tsc --noEmit -p tsconfig.json` clean in binding-core, preset, react, solid, react-native.
 - e2e (Vitest, narrowed): component-suites `direction` and `themes` with `-t "Slider|TextField|Text
-  field|Chip"` on react/css, solid/panda, react/tailwind: 264 passed. browser-e2e-tests
+field|Chip"` on react/css, solid/panda, react/tailwind: 264 passed. browser-e2e-tests
   `reduced-motion` and `provided-tokens` narrowed to the text field and toolbar: passed.
 
 ## Refactoring hints

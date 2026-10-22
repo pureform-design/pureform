@@ -4,10 +4,7 @@
 // DOM readers in the browser, after mount; the root entry stays free of DOM use and of CSS
 // lowering for React Native.
 
-import {
-    SLIDER_INSET_ICON,
-    sliderTrackTokens,
-} from "./components/slider";
+import { SLIDER_INSET_ICON, sliderTrackTokens } from "./components/slider";
 import type { SliderInsetIconMeasures } from "./components/slider";
 import { DEFAULT_ICON_STYLE, sameIconStyle } from "./icon-style";
 import type { IconStyle } from "./icon-style";

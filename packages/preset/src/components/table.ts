@@ -161,7 +161,10 @@ const arrowOpacity = when()
 
 // The arrow turns over while its column is sorted descending.
 const arrowTurn = when()
-    .on(slot("headerCell", "descending"), transform(rotate(numeric(180, "deg"))))
+    .on(
+        slot("headerCell", "descending"),
+        transform(rotate(numeric(180, "deg"))),
+    )
     .else(transform(rotate(numeric(0, "deg"))));
 
 /** Build the table with a `density` step per entry of `densities`. */

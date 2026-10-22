@@ -65,10 +65,11 @@ function Root(props: ToolbarRootProps): ReactNode {
         testId: props.testId,
         unstyled: props.unstyled,
     });
-    const { as, unstyled: _unstyled, ...rest } = omitProps(
-        props,
-        TOOLBAR_ROOT_PROPS,
-    );
+    const {
+        as,
+        unstyled: _unstyled,
+        ...rest
+    } = omitProps(props, TOOLBAR_ROOT_PROPS);
     const provided = isUnstyled(props.unstyled, "root")
         ? unstyledToolbarProvidedTokens(props.color)
         : undefined;
