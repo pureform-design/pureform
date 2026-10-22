@@ -17,6 +17,7 @@ import {
 import type {
     ChangeDetails,
     SideSheetVariantProps,
+    SideSheetCloseProps,
 } from "@pureform/binding-core";
 import type { ReactNode } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
@@ -39,7 +40,8 @@ export interface SideSheetTriggerProps {
     readonly "aria-haspopup": "dialog";
 }
 
-export interface SideSheetProps extends SideSheetVariantProps {
+export interface SideSheetProps
+    extends SideSheetVariantProps, SideSheetCloseProps {
     /** The title, which names the sheet. */
     readonly headline?: ReactNode;
     /** The content, in the scrolling body. */
@@ -170,6 +172,7 @@ function ModalSideSheet(props: SideSheetProps): ReactNode {
         defaultOpen: _defaultOpen,
         onOpenChange: _onOpenChange,
         closeOnEscape: _closeOnEscape,
+        onClose: _onClose,
         ...surface
     } = props;
     const { open, presence, close, show } = useModalOverlay(

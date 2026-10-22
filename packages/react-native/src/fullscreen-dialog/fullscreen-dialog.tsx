@@ -13,6 +13,7 @@ import { fullscreenDialogSelection, isPresent } from "@pureform/binding-core";
 import type {
     ChangeDetails,
     FullscreenDialogVariantProps,
+    DialogCloseProps,
 } from "@pureform/binding-core";
 import type { ReactNode } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
@@ -41,7 +42,8 @@ export interface FullscreenDialogTriggerProps {
     readonly "aria-haspopup": "dialog";
 }
 
-export interface FullscreenDialogProps extends FullscreenDialogVariantProps {
+export interface FullscreenDialogProps
+    extends FullscreenDialogVariantProps, DialogCloseProps {
     readonly headline?: ReactNode;
     /** The content, in the scrolling body. */
     readonly children?: ReactNode;
@@ -162,6 +164,7 @@ function ModalFullscreenDialog(props: FullscreenDialogProps): ReactNode {
         defaultOpen: _defaultOpen,
         onOpenChange: _onOpenChange,
         closeOnEscape: _closeOnEscape,
+        onClose: _onClose,
         ...surface
     } = props;
     const engine = useEngine();

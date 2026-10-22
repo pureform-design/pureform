@@ -9,7 +9,11 @@
 import { dialogAnatomy } from "@pureform/anatomy";
 import type { PartName, TestIdOverride } from "@pureform/anatomy";
 import { dialogSelection, isPresent } from "@pureform/binding-core";
-import type { ChangeDetails, DialogVariantProps } from "@pureform/binding-core";
+import type {
+    ChangeDetails,
+    DialogVariantProps,
+    DialogCloseProps,
+} from "@pureform/binding-core";
 import type { ReactNode } from "react";
 import { StyleSheet } from "react-native";
 
@@ -39,7 +43,8 @@ export interface DialogTriggerProps {
 
 const NO_ACTIONS: DialogActions = { close: () => {} };
 
-export interface DialogProps extends Omit<DialogVariantProps, "icon"> {
+export interface DialogProps
+    extends Omit<DialogVariantProps, "icon">, DialogCloseProps {
     /** An icon over the headline, which centers it. */
     readonly icon?: ReactNode;
     readonly mirrorIcon?: boolean | undefined;
@@ -141,6 +146,7 @@ function ModalDialog(props: DialogProps): ReactNode {
         onOpenChange: _onOpenChange,
         closeOnInteractOutside,
         closeOnEscape: _closeOnEscape,
+        onClose: _onClose,
         actions,
         ...surface
     } = props;
