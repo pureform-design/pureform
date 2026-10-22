@@ -27,6 +27,7 @@ export const COMPONENT_NAMES = [
     "Dialog",
     "DragHandle",
     "Fab",
+    "FadeThrough",
     "FullscreenDialog",
     "GridList",
     "FabMenu",
