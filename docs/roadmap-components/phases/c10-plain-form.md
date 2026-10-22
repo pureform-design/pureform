@@ -28,6 +28,9 @@ targets. Record in each context where the design is pureform's own.
 
 - A styled native `<select>` (with `<optgroup>`), the same box as Input, and a chevron in the
   theme's colour. The platform draws the list. Works inside Field.
-- React Native: the platform's own picker (Android dialog, iOS action sheet or menu); record
-  the choice and any dependency.
+- React Native: the trigger is a pressable drawn like Input (the selected label and the
+  chevron); the list is the platform's native menu through `@react-native-menu/menu` (UIMenu
+  with a check on iOS, the popup menu on Android), an optional peer dependency. Without it
+  installed, fall back to the Material Menu and warn in development. On the web, React Native
+  renders a real `<select>`.
 - Own files: `native-select.ts`, bindings.
