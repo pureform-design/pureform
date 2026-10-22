@@ -8,6 +8,7 @@ import {
     sub,
     pointer,
     relative,
+    rotate,
     row,
     center,
     inlineFlex,
@@ -17,6 +18,7 @@ import {
     dynamic,
     fontVariations,
     none,
+    numeric,
     pct,
     px,
     scaleX,
@@ -387,6 +389,14 @@ export const chevronTransition = springTweens(
     ["transform"],
     ["color"],
 );
+
+/** A turning icon's transform: turned over (180°) while `turned` holds, else upright. The
+ *  expand indicators', the split button's chevron and the table's sort arrow; give it
+ *  `chevronTransition`, or `springTweens("spatialFast", ["transform"], fades)` for other fades. */
+export const turnedOver = (turned: Condition) =>
+    when()
+        .on(turned, transform(rotate(numeric(180, "deg"))))
+        .else(transform(rotate(numeric(0, "deg"))));
 
 /** Material's focus indicator: a ring of the focus indicator's thickness and color, its outer
  *  offset outside the element (by default the theme's 3px, secondary, and 2px), shown while
