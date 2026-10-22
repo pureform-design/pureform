@@ -167,3 +167,46 @@ values (c7b), swipe action colour and width (c7c), scrollable tabs' 52/90 (c7a).
 - `@pureform/anatomy#generate` can't load the root `oxfmt.config.ts` (r5).
 - omni can replay a stale build after files change back; `-f all` remains the workaround (gap
   analysis §5.7).
+
+## 4. Zag components we haven't ported (checked 2026-10-22)
+
+From [zagjs.com/llms.txt](https://zagjs.com/llms.txt) (Zag 1.46). Everything else there already
+has a pureform equivalent (listbox → selection list, combobox → autocomplete, toggle group and
+segmented control → button group, hover card and popover → rich tooltip, password input → text
+field, collapsible → accordion and expandable list items).
+
+### M3 gaps Zag can back
+
+- **Bottom sheet partly-open state** (Zag's drawer, snap points): M3's sheet rests half-open.
+- **Context trigger on Menu** (Zag's context menu): open the existing menu on right-click or
+  long-press.
+- **Resizable panes** (Zag's splitter): `DragHandle` is only the grip; nothing resizes panes.
+
+### No M3 component, ranked by usefulness
+
+Built with the Material guidelines and the existing parts, tokens and anatomy, if wanted:
+
+| #   | Zag             | Why                                                                           | Built from                                     |
+| --- | --------------- | ----------------------------------------------------------------------------- | ---------------------------------------------- |
+| 1   | Number input    | Forms everywhere; quantity, price                                             | Text field, icon buttons, the stepper's logic  |
+| 2   | File upload     | Common in forms; drop zone and file list                                      | Button, list items, progress, input chips      |
+| 3   | Pin input       | Sign-in and verification codes                                                | Text field cells                               |
+| 4   | Popover         | A general anchored panel (filters, small forms); rich tooltip is text         | Rich tooltip's surface, menu's positioning     |
+| 5   | Color picker    | Fits pureform's seed-based theming; theme editors                             | Slider, text field, `@pureform/material` color |
+| 6   | Clipboard       | Copy button with feedback; tiny                                               | Icon button, tooltip or snackbar               |
+| 7   | Rating          | Reviews                                                                       | Icon buttons, radio group's keyboard           |
+| 8   | Editable        | Inline edit in tables and list rows                                           | Text field, table cell, list item              |
+| 9   | Tour            | Onboarding                                                                    | Rich tooltip, scrim                            |
+| 10  | Timer           | Countdown or stopwatch; mostly logic                                          | Text, progress                                 |
+| 11  | Cascade select  | Picks a path through nested data; separate selects or autocomplete usually do | Select's field, menu's submenus                |
+| 12  | Navigation menu | Website mega-menus; M3 apps use bars and rails                                | Menu, navigation                               |
+| 13  | Angle slider    | Niche; the time picker's dial covers time                                     | Time picker dial                               |
+| 14  | Floating panel  | Desktop window-like panels; niche                                             | Dialog surface                                 |
+| 15  | Image cropper   | Niche and large                                                               | -                                              |
+| 16  | Signature pad   | Niche                                                                         | -                                              |
+| 17  | QR code         | A utility, not a control                                                      | -                                              |
+| 18  | Marquee         | Constant motion; accessibility cost                                           | -                                              |
+
+Not to port: **scroll area** (custom scrollbars that set the scroll position break the
+[native scrolling](conventions.md#native-scrolling) rule). The utilities (focus trap, hotkeys,
+async list) aren't components; dialogs already trap focus.
