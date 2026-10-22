@@ -32,6 +32,32 @@ export type StartVelocity = number;
 // the distance, which is 0 to 1 here.
 const REST = 0.001;
 
+/** `Animated.spring` of `value` to `toValue` on a spring's stiffness, damping coefficient, and
+ *  mass, starting at `velocity` per second and stopping within `rest` of it (in the value's
+ *  units, for both its distance and its speed). */
+export const springTo = (
+    value: Animated.Value,
+    spring: Spring,
+    options: {
+        toValue: number;
+        velocity: number;
+        rest: number;
+        delay?: number;
+        useNativeDriver: boolean;
+    },
+): Animated.CompositeAnimation =>
+    Animated.spring(value, {
+        toValue: options.toValue,
+        stiffness: spring.stiffness,
+        damping: spring.damping,
+        mass: spring.mass,
+        velocity: options.velocity,
+        ...(options.delay === undefined ? {} : { delay: options.delay }),
+        restDisplacementThreshold: options.rest,
+        restSpeedThreshold: options.rest,
+        useNativeDriver: options.useNativeDriver,
+    });
+
 /** Animate `progress` to 1 on a timing: `Animated.spring` with the spring's stiffness, damping
  *  coefficient, and mass (starting at `velocity`, in progress per second), or `Animated.timing` with its duration and curve. */
 export const animate = (
@@ -41,15 +67,11 @@ export const animate = (
     velocity: StartVelocity = 0,
 ): Animated.CompositeAnimation =>
     timing.spring
-        ? Animated.spring(progress, {
+        ? springTo(progress, timing.spring, {
               toValue: 1,
-              stiffness: timing.spring.stiffness,
-              damping: timing.spring.damping,
-              mass: timing.spring.mass,
               velocity,
               delay: timing.delay ?? 0,
-              restDisplacementThreshold: REST,
-              restSpeedThreshold: REST,
+              rest: REST,
               useNativeDriver,
           })
         : Animated.timing(progress, {
