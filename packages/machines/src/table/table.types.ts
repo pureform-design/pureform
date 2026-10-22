@@ -111,6 +111,9 @@ export interface TableApi<T extends PropTypes = PropTypes> {
     /** Sorts by `column` as a press on its header does. */
     toggleSort: (column: string) => void;
     ariaSort: (column: string) => AriaSort;
+    /** The way `column`'s sort arrow points: its direction when sorted, else the one a press
+     *  would sort it in (`sortStart`). */
+    arrowDirection: (column: string) => SortDirection;
     setSelection: (selection: string[]) => void;
     isSelected: (row: string) => boolean;
     toggleRow: (row: string) => void;

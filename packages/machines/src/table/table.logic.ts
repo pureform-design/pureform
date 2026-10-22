@@ -42,6 +42,14 @@ export const nextSort = (
 export const ariaSort = (sort: Sort | null, column: string): AriaSort =>
     sort?.column === column ? sort.direction : "none";
 
+/** The direction a column's sort arrow points: the sorted direction, or while the column isn't
+ *  sorted, the one a press would sort it in (`start`). */
+export const arrowDirection = (
+    sort: Sort | null,
+    column: string,
+    start: SortDirection = "ascending",
+): SortDirection => (sort?.column === column ? sort.direction : start);
+
 /** Compares two cells' values: numbers and dates by value, anything else as text in the
  *  locale's order, numbers inside text by value. Empty values sort last. */
 export const compareValues = (

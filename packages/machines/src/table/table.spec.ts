@@ -11,6 +11,7 @@ afterEach(() => {
 
 const {
     ariaSort,
+    arrowDirection,
     compareValues,
     nextSort,
     selectAllState,
@@ -46,6 +47,13 @@ describe("sort arithmetic", () => {
         expect(ariaSort(sort, "name")).toBe("descending");
         expect(ariaSort(sort, "weight")).toBe("none");
         expect(ariaSort(null, "name")).toBe("none");
+    });
+
+    it("points a column's arrow the way it's sorted, or the way a press would sort it", () => {
+        const sort = { column: "name", direction: "ascending" } as const;
+        expect(arrowDirection(sort, "name", "descending")).toBe("ascending");
+        expect(arrowDirection(sort, "weight", "descending")).toBe("descending");
+        expect(arrowDirection(null, "name")).toBe("ascending");
     });
 
     it("compares numbers by value, text in order with numbers inside, and empties last", () => {

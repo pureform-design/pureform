@@ -2,7 +2,7 @@ import type { Service } from "@zag-js/core";
 import { dataAttr } from "@zag-js/dom-query";
 import type { NormalizeProps, PropTypes } from "@zag-js/types";
 
-import { ariaSort, nextSort } from "./table.logic";
+import { ariaSort, arrowDirection, nextSort } from "./table.logic";
 import type { Sort } from "./table.logic";
 import type { TableApi, TableSchema } from "./table.types";
 
@@ -36,6 +36,8 @@ export function connect<T extends PropTypes>(
         setSort,
         toggleSort,
         ariaSort: (column) => ariaSort(sort, column),
+        arrowDirection: (column) =>
+            arrowDirection(sort, column, prop("sortStart")),
         setSelection(next) {
             send({ type: "SELECTION.SET", selection: next });
         },
@@ -116,12 +118,13 @@ export function connect<T extends PropTypes>(
             return normalize.element({});
         },
         getSortIndicatorProps({ column }) {
-            const sorted = sort?.column === column;
             return normalize.element({
                 "aria-hidden": true,
-                "data-direction": sorted
-                    ? sort.direction
-                    : (prop("sortStart") ?? "ascending"),
+                "data-direction": arrowDirection(
+                    sort,
+                    column,
+                    prop("sortStart"),
+                ),
             });
         },
     };
