@@ -93,11 +93,16 @@ describe.each(overlays)("$component", (component) => {
         await frames(2);
         const surface = overlay.surface(scene.host);
         expect(shows(scene.host)).toBe(true);
-        // The movement (on a spring) and the fade (on its tween) are two animations.
+        // The movement (on a spring) and the fade (on its tween) are two animations. A popup
+        // grows on the `scale` property (composing with its own transform), a sheet or dialog
+        // moves on `transform`.
         const entering = animated(surface);
         expect(entering).toHaveLength(2);
         expect(entering).toEqual(
-            expect.arrayContaining([["transform"], ["opacity"]]),
+            expect.arrayContaining([
+                [expect.stringMatching(/^(transform|scale)$/)],
+                ["opacity"],
+            ]),
         );
         await animationsDone();
         await scene.update({ open: false });

@@ -36,6 +36,7 @@ interface PresetRecipe {
 interface DynamicNode {
     type: "dynamic";
     path: string[];
+    default?: { type: string; path?: string[] };
 }
 
 const NAMES = Object.keys(pureformConfig.components);
@@ -258,8 +259,25 @@ describe.each(NAMES)("the %s factory", (name) => {
         const tokens = (pureformConfig.components[name]!.tokens ??
             {}) as unknown as Record<string, DynamicNode>;
         for (const [token, node] of Object.entries(tokens)) {
-            const slots = factory({ tokens: { [token]: "1px" } });
             const variable = varName(node.path, PREFIX);
+            const fallback = node.default;
+            if (
+                fallback?.type === "spring" ||
+                (fallback?.type === "alias" && fallback.path?.[0] === "springs")
+            ) {
+                // A spring token takes a role's name, as the role's two vars.
+                expect(
+                    factory({ tokens: { [token]: "spatialSlow" } }).root.style,
+                    token,
+                ).toEqual({
+                    [`${variable}-duration`]:
+                        "var(--springs-spatial-slow-duration)",
+                    [`${variable}-easing`]:
+                        "var(--springs-spatial-slow-easing)",
+                });
+                continue;
+            }
+            const slots = factory({ tokens: { [token]: "1px" } });
             expect(slots.root.style, token).toEqual({ [variable]: "1px" });
             expect(slots.root.class).toBe(factory({}).root.class);
         }

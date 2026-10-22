@@ -27,7 +27,7 @@ const mount = async (value: number, provider?: SceneProvider) => {
     mountCase(
         slider,
         { defaultValue: value, size: "large", insetIcon: "♪" },
-        { host, provider },
+        provider ? { host, provider } : { host },
     );
     await settlePlaced();
     // The binding reads the theme's measures after the first draw, which can move the icon.
