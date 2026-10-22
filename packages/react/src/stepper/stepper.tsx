@@ -23,7 +23,6 @@ import * as stepper from "@pureform/machines/stepper";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";
 import {
-    createElement,
     type ElementType,
     type MouseEvent,
     type ReactNode,
@@ -38,6 +37,7 @@ import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import { plainParts, useComponent, useSlotProps } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
+import { pickerAction } from "../picker-actions";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
@@ -251,24 +251,19 @@ function Content({
 
 // A button that goes to the next or the previous step unless the app's `onClick` prevents it,
 // disabled where there is none.
-const stepAction =
-    (display: string, direction: "next" | "previous") =>
-    ({ as, onClick, ...props }: StepperStepActionProps): ReactNode => {
-        const { api } = context.use(display);
-        const available =
-            direction === "next" ? api.hasNextStep : api.hasPrevStep;
-        return createElement(as ?? "button", {
-            type: "button",
-            disabled: !available,
-            ...props,
-            onClick: (event: MouseEvent<HTMLElement>) => {
-                onClick?.(event);
-                if (event.defaultPrevented) return;
-                if (direction === "next") api.goToNextStep();
-                else api.goToPrevStep();
-            },
-        });
-    };
+const stepAction = (display: string, direction: "next" | "previous") =>
+    pickerAction(
+        display,
+        (name) => {
+            const { api } = context.use(name);
+            return () =>
+                direction === "next" ? api.goToNextStep() : api.goToPrevStep();
+        },
+        (name) => {
+            const { api } = context.use(name);
+            return !(direction === "next" ? api.hasNextStep : api.hasPrevStep);
+        },
+    ) as (props: StepperStepActionProps) => ReactNode;
 
 /** A button that goes to the next step, which finishes the stepper from the last. Disabled once
  *  every step is done. Render a component with `as`. */

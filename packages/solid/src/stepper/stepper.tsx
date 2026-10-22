@@ -22,7 +22,6 @@ import type {
     StepperRootOwnProps,
 } from "@pureform/binding-core";
 import * as stepper from "@pureform/machines/stepper";
-import { Dynamic } from "@solidjs/web";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {
     type Accessor,
@@ -43,6 +42,7 @@ import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
 import { createSlotProps, plainParts, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
+import { pickerAction } from "../picker-actions";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 
@@ -260,28 +260,21 @@ const stepAction = (
     display: string,
     direction: "next" | "previous",
 ): ((props: StepperStepActionProps) => JSX.Element) =>
-    function StepAction(props) {
-        const { api } = context.use(display);
-        const available = () =>
-            direction === "next" ? api().hasNextStep : api().hasPrevStep;
-        const onClick = (event: MouseEvent) => {
-            (props["onClick"] as ((event: MouseEvent) => void) | undefined)?.(
-                event,
-            );
-            if (event.defaultPrevented) return;
-            if (direction === "next") api().goToNextStep();
-            else api().goToPrevStep();
-        };
-        return (
-            <Dynamic
-                component={props.as ?? "button"}
-                type="button"
-                disabled={!available()}
-                {...omit(props, "as", "onClick")}
-                onClick={onClick}
-            />
-        );
-    };
+    pickerAction(
+        display,
+        (name) => {
+            const { api } = context.use(name);
+            return () =>
+                direction === "next"
+                    ? api().goToNextStep()
+                    : api().goToPrevStep();
+        },
+        (name) => {
+            const { api } = context.use(name);
+            return () =>
+                !(direction === "next" ? api().hasNextStep : api().hasPrevStep);
+        },
+    );
 
 /** A button that goes to the next step, which finishes the stepper from the last. Disabled once
  *  every step is done. Render a component with `as`. */

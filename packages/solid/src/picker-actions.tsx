@@ -1,6 +1,6 @@
-// A dialog-like picker's actions (the modal date picker's and the date input's Cancel and OK): a
-// `<button>`, or `as` (`as={Button}`), that runs the picker's action on a click the app's own
-// `onClick` doesn't prevent.
+// A composed component's actions (the modal date picker's and the date input's Cancel and OK, the
+// stepper's Next and Previous): a `<button>`, or `as` (`as={Button}`), that runs the action on a
+// click the app's own `onClick` doesn't prevent.
 
 import { Dynamic } from "@solidjs/web";
 import type { JSX, ValidComponent } from "@solidjs/web";
@@ -12,11 +12,17 @@ export interface PickerActionProps {
     readonly [prop: string]: unknown;
 }
 
-/** An action that reads `run` from Root's context, naming the part. */
+/** An action that reads `run` from Root's context, naming the part, and with `disabled`, whether
+ *  it can't run now (the app's `disabled` wins). */
 export const pickerAction =
-    (display: string, use: (name: string) => () => void) =>
+    (
+        display: string,
+        use: (name: string) => () => void,
+        disabled?: (name: string) => () => boolean,
+    ) =>
     (props: PickerActionProps): JSX.Element => {
         const run = use(display);
+        const off = disabled?.(display);
         const onClick = (event: MouseEvent) => {
             (props["onClick"] as ((event: MouseEvent) => void) | undefined)?.(
                 event,
@@ -27,6 +33,7 @@ export const pickerAction =
             <Dynamic
                 component={props.as ?? "button"}
                 type="button"
+                disabled={off?.()}
                 {...omit(props, "as", "onClick")}
                 onClick={onClick}
             />
