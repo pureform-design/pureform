@@ -204,20 +204,20 @@ function InsetIcon(props: SliderPartProps): JSX.Element {
                 icon(),
                 length(),
                 overflowing(),
-                api().percents.join(","),
+                api().percents,
                 vertical(),
                 root.centered,
+                measures(),
             ] as const,
-        ([element, , over, , isVertical, centered]) => {
+        ([element, , over, percents, isVertical, centered, last]) => {
             const parent = element?.parentElement;
             if (!element || !parent) return;
             const read = readSliderInsetIcon(element, parent, {
                 vertical: isVertical,
                 overflowing: over,
-                percents: api().percents,
+                percents,
                 centered,
             });
-            const last = measures();
             if (read?.size !== last?.size || read?.padding !== last?.padding)
                 setMeasures(read);
         },
