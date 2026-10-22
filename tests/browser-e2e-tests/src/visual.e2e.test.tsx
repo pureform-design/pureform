@@ -201,6 +201,14 @@ it("a floating toolbar is a 64px pill hugging its buttons, a docked one fills it
     expect(dockedStyle.boxShadow).toBe("none");
 });
 
+it("a search bar is flat (Compose's level 0), on the high container colour", () => {
+    const bar = section("search-and-feedback").querySelector<HTMLElement>(
+        "label",
+    )!;
+    expect(getComputedStyle(bar).boxShadow).toBe("none");
+    expect(getComputedStyle(bar).backgroundColor).not.toBe("rgba(0, 0, 0, 0)");
+});
+
 it("a paginator is a 56px row ending at the inline end, holding a compact select", () => {
     const [full, compact] = [
         ...section("paginators").querySelectorAll<HTMLElement>("[role=group]"),

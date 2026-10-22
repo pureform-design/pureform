@@ -161,3 +161,12 @@ variant (c3c/c4b): the bar already rests at elevation 3 and the app bar's scroll
 - **Search bar lift on scroll** is read as the existing colour change; if M3 means a higher
   elevation at rest-to-scrolled, `scrolled` could also set a shadow level.
 - The avatar machine runs in `Image` in Solid and in Root in React (cost versus symmetry).
+
+## Resolved after the merge (c7-merge)
+
+- **Search bar lift on scroll (resolved):** the bar is flat. Compose's `SearchBarDefaults`
+  `ShadowElevation` and `TonalElevation` are `ElevationTokens.Level0` (androidx-main
+  `SearchBar.kt`), so the root's `surface(…, "level3")` is now `level0`. The container stays
+  `surfaceContainerHigh`, and `scrolled` still takes `surfaceContainerHighest`: that colour change
+  is the whole lift on scroll. Specs: preset `expressive.spec.ts`, the browser suite's
+  `visual.e2e.test.tsx` (no box shadow) and React Native's `components.spec.tsx`.

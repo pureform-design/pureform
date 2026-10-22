@@ -156,6 +156,12 @@ describe("M3 Expressive", () => {
         expect(searchBar.recipe.base.root).toHaveProperty("maxWidth");
     });
 
+    it("draws the search bar flat: Compose's shadow and tonal elevation are level 0", () => {
+        expect(searchBar.recipe.base.root).toMatchObject({
+            apply: { shadowElevation: "level0" },
+        });
+    });
+
     it("thickens both progress indicators", () => {
         expect(linearProgress.recipe.variants?.thickness?.thick).toHaveProperty(
             "root.tokens",

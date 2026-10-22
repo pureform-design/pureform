@@ -1141,5 +1141,7 @@ describe("c7c: avatar picture, swipe, inset icon, search bar width", () => {
         );
         expect(byTestId("vol-inset-icon").textContent).toBe("♪");
         await until(() => expect(computed("wide-root").maxWidth).toBe("720px"));
+        // Flat: Compose's search bar has no shadow (level 0).
+        expect(computed("wide-root").boxShadow).toBe("none");
     });
 });

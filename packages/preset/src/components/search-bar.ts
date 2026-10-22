@@ -71,7 +71,7 @@ export const searchBar = pf.slotComponent({
         base: {
             root: {
                 ...INDICATION_ROOT,
-                ...surface(ref("container"), ref("inputColor"), "level3"),
+                ...surface(ref("container"), ref("inputColor"), "level0"),
                 ...focusRing(ref, slot("root", "focusVisibleWithin")),
                 transition: stateTransition,
                 position: relative,
