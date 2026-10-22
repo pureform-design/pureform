@@ -193,6 +193,7 @@ export const createHorizontalSharedAxis = (
         },
         tokens,
         slots: ["root", "page", "scrim"],
+        structure: { root: ["page", "scrim"] },
         recipe: () => ({
             base: {
                 root: {
