@@ -31,6 +31,7 @@ import {
     type WithProps,
 } from "../interaction";
 import { pressableItemProps } from "../interaction/pressable";
+import { rovingIndex } from "../interaction/roving";
 
 export * from "@zag-js/steps";
 import { parts } from "./stepper.anatomy";
@@ -65,24 +66,6 @@ export interface Api<T extends PropTypes = PropTypes> extends Omit<
 }
 
 const TRIGGER = '[data-part="trigger"]';
-
-// The header to focus for a key from the one at `index` among `count`, or `undefined` for other
-// keys: the orientation's forward and back keys (a row's flip under `rtl`), Home and End.
-const keyTarget = (
-    key: string,
-    index: number,
-    count: number,
-    vertical: boolean,
-    rtl: boolean,
-): number | undefined => {
-    const forward = vertical ? "ArrowDown" : rtl ? "ArrowLeft" : "ArrowRight";
-    const back = vertical ? "ArrowUp" : rtl ? "ArrowRight" : "ArrowLeft";
-    if (key === forward) return (index + 1) % count;
-    if (key === back) return (index - 1 + count) % count;
-    if (key === "Home") return 0;
-    if (key === "End") return count - 1;
-    return undefined;
-};
 
 /** Zag's steps machine, keeping an interaction emitter per header. */
 export const machine: Machine = withInteraction(zagMachine);
@@ -137,13 +120,11 @@ export function connect<T extends PropTypes>(
                         ...(list?.querySelectorAll<HTMLElement>(TRIGGER) ?? []),
                     ];
                     const from = triggers.indexOf(event.currentTarget);
-                    const to = keyTarget(
-                        event.key,
-                        from,
-                        triggers.length,
+                    const to = rovingIndex(event.key, from, triggers.length, {
                         vertical,
                         rtl,
-                    );
+                        loop: true,
+                    });
                     if (to === undefined || from < 0) return;
                     event.preventDefault();
                     // Skip the headers that can't be pressed.

@@ -6,6 +6,8 @@ export {
     pointerKind,
 } from "./emitter";
 export { pressableItemProps } from "./pressable";
+export { rovingIndex } from "./roving";
+export type { RovingOptions } from "./roving";
 export {
     chainProps,
     emittersOf,

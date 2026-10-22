@@ -27,6 +27,7 @@ import {
     type WithProps,
 } from "../interaction";
 import { pressableItemProps } from "../interaction/pressable";
+import { rovingIndex } from "../interaction/roving";
 
 export * from "@zag-js/carousel";
 import { parts } from "./carousel.anatomy";
@@ -64,22 +65,6 @@ export interface Api<T extends PropTypes = PropTypes> extends CarouselApi<T> {
 const ITEM = '[data-part="item"]';
 const MASK = '[data-part="mask"]';
 
-// The item index a key moves focus to, from the focused one; `undefined` for other keys.
-const keyTarget = (
-    key: string,
-    index: number,
-    count: number,
-    rtl: boolean,
-): number | undefined => {
-    const forward = rtl ? "ArrowLeft" : "ArrowRight";
-    const back = rtl ? "ArrowRight" : "ArrowLeft";
-    if (key === forward) return Math.min(index + 1, count - 1);
-    if (key === back) return Math.max(index - 1, 0);
-    if (key === "Home") return 0;
-    if (key === "End") return count - 1;
-    return undefined;
-};
-
 type ZagParams = Params<SchemaOf<ZagMachine> & { props: CarouselOwnProps }>;
 
 // Replaces Zag's keys on the window, which page by `ArrowRight`/`ArrowLeft` whatever the direction
@@ -94,11 +79,11 @@ function trackKeyboardScroll({ scope, send, prop }: ZagParams) {
         const item = (event.target as Element | null)?.closest(ITEM);
         if (!item || !group.contains(item)) return;
         const items = [...group.querySelectorAll<HTMLElement>(ITEM)];
-        const index = keyTarget(
+        const index = rovingIndex(
             event.key,
             items.indexOf(item as HTMLElement),
             items.length,
-            prop("dir") === "rtl",
+            { rtl: prop("dir") === "rtl" },
         );
         if (index === undefined) return;
         event.preventDefault();
