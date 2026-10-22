@@ -1,6 +1,6 @@
 # m3: Material transitions
 
-**Depends on:** f2, r7, f1 and m2. **Subphases:** m3a to m3c, parallel.
+**Depends on:** r8, f2, r7, f1 and m2. **Subphases:** m3a to m3c, parallel.
 **Source:** [next.md §1 #5](../next.md#1-spec-recheck-2026-10-22).
 
 Compose's `MaterialTransitions` (androidx-main 62637abaa5, 9b25d27e14): motion between pages and
