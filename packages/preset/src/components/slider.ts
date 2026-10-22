@@ -74,6 +74,7 @@ import {
     tweens,
     variantsOf,
 } from "./shared";
+import { spatialTweens } from "./shaped";
 import type { ColorGroup, ColorGroups } from "./shared";
 
 const { tokens, ref } = componentTokens("slider", {
@@ -134,12 +135,14 @@ const INSETS = [
     "insetBlockEnd",
 ] as const;
 
-// Movement eases for keyboard steps, but follows the pointer directly while it is down, so a
+// Movement settles on the `spatialFast` spring for keyboard steps, but follows the pointer directly while it is down, so a
 // drag doesn't trail behind it. Colors ease either way.
 const follows = (...also: ("width" | "height")[]) =>
     when()
-        .on(PRESSED, tweens(...also, "backgroundColor"))
-        .else(tweens(...INSETS, ...also, "backgroundColor"));
+        .on(PRESSED, spatialTweens("spatialFast", ...also, "backgroundColor"))
+        .else(
+            spatialTweens("spatialFast", ...INSETS, ...also, "backgroundColor"),
+        );
 
 const percent = (token: Parameters<typeof ref>[0]) => mul(ref(token), pct(1));
 const half = (length: NumericValue) => mul(length, unitless(0.5));

@@ -237,7 +237,7 @@ exports[`timePicker > compiles to a stable Panda slot recipe 1`] = `
       "position": "absolute",
       "transition": {
         "_motionReduce": "none",
-        "base": "transform var(--components-timePicker-handDuration, token(durations.medium2)) var(--components-timePicker-handEasing, token(easings.emphasized))",
+        "base": "transform token(springs.spatialDefault.duration) token(springs.spatialDefault.easing)",
       },
       "width": "var(--components-timePicker-trackWidth, 2px)",
     },

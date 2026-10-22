@@ -55,9 +55,9 @@ import {
     sizeTokenName,
     sizeTokens,
     sys,
-    tweens,
     variantsOf,
 } from "./shared";
+import { spatialTweens } from "./shaped";
 import type { ColorGroup, ColorGroups, Densities, Fill } from "./shared";
 import { runCorners } from "./tiles";
 
@@ -244,7 +244,7 @@ export const createSplitButton = <
                                 transform(rotate(numeric(180, "deg"))),
                             )
                             .else(transform(rotate(numeric(0, "deg")))),
-                        transition: tweens("transform"),
+                        transition: spatialTweens("spatialFast", "transform"),
                     },
                 },
                 variants: {

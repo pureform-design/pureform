@@ -53,6 +53,7 @@ import {
     radius,
     size,
     spacing,
+    spring,
     textStyle,
 } from "@pureform/theme";
 
@@ -740,11 +741,13 @@ export const cornerMorphVariants = (rest: RestingCorner) => ({
     },
 });
 
-/** Corner changes ease on the emphasized curve, with the state colors; under reduced motion the
- *  corners change at once and the colors still fade. */
+/** Corner changes settle on the `effectsDefault` spring, with the state colors, as Compose's
+ *  buttons, icon buttons and split buttons morph their shape (an effects spring on purpose, so
+ *  the corners never bounce); under reduced motion the corners change at once and the colors
+ *  still fade. */
 export const cornerTransition = motionTransition(
     ...STATE_TWEENS,
-    tween("borderRadius", duration("medium1"), easing("emphasized")),
+    tween("borderRadius", { spring: spring("effectsDefault") }),
 );
 
 /** A component token per size for one of its measures, named `<prefix><Size>`

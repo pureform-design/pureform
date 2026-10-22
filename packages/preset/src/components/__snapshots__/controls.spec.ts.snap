@@ -785,7 +785,7 @@ exports[`switchControl > compiles to a stable Panda slot recipe 1`] = `
       },
       "transition": {
         "_motionReduce": "background-color token(durations.short3) token(easings.standard)",
-        "base": "inset-inline-start token(durations.short3) token(easings.standard), width token(durations.short3) token(easings.standard), height token(durations.short3) token(easings.standard), background-color token(durations.short3) token(easings.standard)",
+        "base": "inset-inline-start token(springs.spatialFast.duration) token(springs.spatialFast.easing), width token(springs.spatialFast.duration) token(springs.spatialFast.easing), height token(springs.spatialFast.duration) token(springs.spatialFast.easing), background-color token(durations.short3) token(easings.standard)",
       },
       "width": {
         ".switchControl__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "var(--components-switchControl-handleSizePressed, 28px)",
@@ -868,7 +868,7 @@ exports[`switchControl > compiles to a stable Panda slot recipe 1`] = `
       },
       "transition": {
         "_motionReduce": "background-color token(durations.short3) token(easings.standard)",
-        "base": "inset-inline-start token(durations.short3) token(easings.standard), background-color token(durations.short3) token(easings.standard)",
+        "base": "inset-inline-start token(springs.spatialFast.duration) token(springs.spatialFast.easing), background-color token(durations.short3) token(easings.standard)",
       },
       "width": "var(--components-switchControl-stateLayerSize, token(sizes.controlMedium))",
     },

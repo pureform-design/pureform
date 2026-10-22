@@ -39,6 +39,7 @@ import {
     radius,
     size as sizeToken,
     spacing,
+    spring,
     textStyle,
 } from "@pureform/theme";
 
@@ -162,11 +163,13 @@ export const navLabelTokens = (group: {
 // grows the same way in either writing direction.
 const grow = when().on(CURRENT, px(0)).else(pct(50));
 
+// It grows on the `spatialDefault` spring and fades in on `effectsDefault`, as Compose's
+// navigation items animate their indicator (`DefaultSpatial`; their colors `DefaultEffects`).
 // Under reduced motion it appears at its full size, fading in.
 const growTransition = motionTransition(
-    tween("insetInlineStart", duration("medium2"), easing("emphasized")),
-    tween("insetInlineEnd", duration("medium2"), easing("emphasized")),
-    tween("opacity", duration("medium2"), easing("emphasized")),
+    tween("insetInlineStart", { spring: spring("spatialDefault") }),
+    tween("insetInlineEnd", { spring: spring("spatialDefault") }),
+    tween("opacity", { spring: spring("effectsDefault") }),
     tween("backgroundColor", duration("short3"), easing("standard")),
 );
 

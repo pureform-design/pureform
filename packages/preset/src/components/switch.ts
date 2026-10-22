@@ -55,9 +55,9 @@ import {
     mergeSlots,
     stateTransition,
     sys,
-    tweens,
     variantsOf,
 } from "./shared";
+import { spatialTweens } from "./shaped";
 import type { ColorGroup, ColorGroups } from "./shared";
 
 const pf = typed();
@@ -214,7 +214,8 @@ export const createSwitch = <const G extends string = ColorGroup>(
                             height: ref("stateLayerSize"),
                             borderRadius: radius("full"),
                             pointerEvents: none,
-                            transition: tweens(
+                            transition: spatialTweens(
+                                "spatialFast",
                                 "insetInlineStart",
                                 "backgroundColor",
                             ),
@@ -237,7 +238,8 @@ export const createSwitch = <const G extends string = ColorGroup>(
                                 .on(CONTROL_CHECKED, ref("handleSizeChecked"))
                                 .on(CONTROL_PRESSED, ref("handleSizePressed"))
                                 .else(ref("handleSize")),
-                            transition: tweens(
+                            transition: spatialTweens(
+                                "spatialFast",
                                 "insetInlineStart",
                                 "width",
                                 "height",

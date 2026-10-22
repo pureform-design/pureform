@@ -38,7 +38,6 @@ import {
     cornerMorphTokens,
     cornerMorphVariants,
     cornerRadius,
-    cornerTransition,
     componentTokens,
     defaultDensities,
     defaultGroups,
@@ -54,6 +53,7 @@ import {
     touchTarget,
     variantsOf,
 } from "./shared";
+import { spatialCornerTransition } from "./shaped";
 import type { ColorGroup, ColorGroups, Densities } from "./shared";
 
 const { tokens, ref } = componentTokens("chip", {
@@ -172,7 +172,7 @@ export const chipShape = (
     height: dense(ref("height")),
     paddingInlineStart: ref("padding"),
     paddingInlineEnd: ref("padding"),
-    transition: cornerTransition,
+    transition: spatialCornerTransition,
     borderRadius: cornerRadius(ref),
 });
 

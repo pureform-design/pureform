@@ -45,7 +45,6 @@ import {
     DEFAULT_GROUP,
     colorTokenVariants,
     componentTokens,
-    cornerTransition,
     defaultGroups,
     entriesOf,
     groupTokens,
@@ -59,6 +58,7 @@ import {
     slotStateLayer,
     variantsOf,
 } from "./shared";
+import { spatialCornerTransition } from "./shaped";
 import type { ColorGroup, ColorGroups } from "./shared";
 
 /** The FAB sizes the menu's FAB takes: Expressive's, without the deprecated small one. */
@@ -159,7 +159,7 @@ export const createFabMenu = <const G extends string = ColorGroup>(
                     },
                     closeTrigger: {
                         ...pressableRoot(ref),
-                        transition: cornerTransition,
+                        transition: spatialCornerTransition,
                         fontSize: ref("closeIconSize"),
                         backgroundColor: slotStateLayer(
                             ref,
