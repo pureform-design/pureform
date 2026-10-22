@@ -4,7 +4,11 @@
 // `overflow: auto`).
 
 import { chipSetAnatomy } from "@pureform/anatomy";
-import { chipSetChipVariants, chipSetSelection } from "@pureform/binding-core";
+import {
+    chipSetChipVariants,
+    chipSetSelection,
+    toggleSelection,
+} from "@pureform/binding-core";
 import type {
     ChipSetContentProps,
     ChipSetPart,
@@ -21,19 +25,6 @@ export interface ChipSetProps
     extends ChipSetRootOwnProps, ChipSetContentProps<ReactNode> {
     readonly "aria-label"?: string | undefined;
 }
-
-/** The value after pressing `value`, as a button group's. */
-const pressed = (
-    current: readonly string[],
-    value: string,
-    multiple: boolean,
-    deselectable: boolean,
-): string[] => {
-    const on = current.includes(value);
-    if (multiple)
-        return on ? current.filter((v) => v !== value) : [...current, value];
-    return on ? (deselectable ? [] : [...current]) : [value];
-};
 
 function ChipSetImpl(props: ChipSetProps): ReactNode {
     const { styles: s, views: v } = useComponentSlots<ChipSetPart>(
@@ -74,7 +65,7 @@ function ChipSetImpl(props: ChipSetProps): ReactNode {
                         onPress={() => {
                             if (selectable)
                                 setValue(
-                                    pressed(
+                                    toggleSelection(
                                         value,
                                         key,
                                         props.selectable === "multiple",

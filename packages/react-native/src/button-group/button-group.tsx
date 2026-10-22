@@ -8,6 +8,7 @@ import {
     buttonGroupPosition,
     buttonGroupSelection,
     groupedButtonVariants,
+    toggleSelection,
 } from "@pureform/binding-core";
 import type {
     ButtonGroupContentProps,
@@ -27,20 +28,6 @@ export interface ButtonGroupProps
     extends ButtonGroupRootOwnProps, ButtonGroupContentProps<ReactNode> {
     readonly "aria-label"?: string | undefined;
 }
-
-/** The value after pressing `value`: on or off in a multiple-select group; alone, or off when
- *  deselectable, in a single-select one. */
-const pressed = (
-    current: readonly string[],
-    value: string,
-    multiple: boolean,
-    deselectable: boolean,
-): string[] => {
-    const on = current.includes(value);
-    if (multiple)
-        return on ? current.filter((v) => v !== value) : [...current, value];
-    return on ? (deselectable ? [] : [...current]) : [value];
-};
 
 function ButtonGroupImpl(props: ButtonGroupProps): ReactNode {
     const { styles: s, views: v } = useComponentSlots<ButtonGroupPart>(
@@ -79,7 +66,7 @@ function ButtonGroupImpl(props: ButtonGroupProps): ReactNode {
                 const onPress = () => {
                     if (selectable)
                         setValue(
-                            pressed(
+                            toggleSelection(
                                 value,
                                 key,
                                 props.selectable === "multiple",

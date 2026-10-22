@@ -172,6 +172,20 @@ export const buttonGroupItemProps = <P extends object>(
     return rest;
 };
 
+/** A toggle group's value after pressing `value`, where no machine keeps it (React Native): on
+ *  or off in a multiple-select group; alone, or off when deselectable, in a single-select one. */
+export const toggleSelection = (
+    current: readonly string[],
+    value: string,
+    multiple: boolean,
+    deselectable: boolean,
+): string[] => {
+    const on = current.includes(value);
+    if (multiple)
+        return on ? current.filter((v) => v !== value) : [...current, value];
+    return on ? (deselectable ? [] : [...current]) : [value];
+};
+
 /** What an item of a selectable group (a grouped button, a set's chip) takes from Zag's toggle
  *  group: its item props (`buttonGroupItemProps`), its `id` and `disabled`, and `selected` as
  *  its pressed state, which the group changes, not the item. */

@@ -23,6 +23,7 @@ export {
     BUTTON_GROUP_ROOT_PROPS,
     buttonGroupItemProps,
     toggleGroupItemProps,
+    toggleSelection,
     buttonGroupMachineProps,
     buttonGroupPosition,
     buttonGroupRootProps,
