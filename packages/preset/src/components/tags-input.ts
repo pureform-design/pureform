@@ -133,7 +133,6 @@ export const createTagsInput = <
     }>()(
         pf.slotComponent({
             name: "tagsInput",
-            bindingVariants: ["leadingIcon", "trailingIcon", "density"],
             $meta: {
                 description:
                     "Material text field whose values are input chips, filled or outlined. Render an inputChip per value in the container before the input; give the input a placeholder (a space works) and put the label after it. Mark the container filled while it holds a chip. Turn on leadingIcon or trailingIcon when you render one.",

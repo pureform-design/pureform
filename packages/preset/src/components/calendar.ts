@@ -323,7 +323,6 @@ const pf = typed();
 
 export const calendarCell = pf.slotComponent({
     name: "calendarCell",
-    bindingVariants: ["view", "selection", "today", "outside"],
     $meta: {
         description:
             "A day, month or year of a date picker's calendar: the cell (which draws a chosen range's band) and the circle or pill inside it. view sets the size; selection, today and outside are per cell.",

@@ -110,7 +110,6 @@ export const createTextArea = <
     }>()(
         pf.slotComponent({
             name: "textArea",
-            bindingVariants: ["leadingIcon", "trailingIcon", "density"],
             $meta: {
                 description:
                     "Material text area, filled or outlined. Give the textarea a placeholder (a space works) and rows, and put the label after it; mark errors with aria-invalid. autoGrow grows it with the text. Turn on leadingIcon or trailingIcon when you render one. A counter sits after the supporting text, on its line.",

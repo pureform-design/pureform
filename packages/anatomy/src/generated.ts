@@ -76,7 +76,6 @@ export const buttonAnatomy = {
         position: ["none", "first", "middle", "last", "single"],
         density: ["0", "inherit", "-1", "-2", "-3"],
     },
-    bindingVariants: ["toggle", "position", "density"],
 } as const satisfies ComponentAnatomy;
 
 export const iconButtonAnatomy = {
@@ -195,7 +194,6 @@ export const iconButtonAnatomy = {
         position: ["none", "first", "middle", "last", "single"],
         density: ["0", "inherit", "-1", "-2", "-3"],
     },
-    bindingVariants: ["toggle", "position", "density"],
 } as const satisfies ComponentAnatomy;
 
 export const buttonGroupAnatomy = {
@@ -496,7 +494,6 @@ export const splitButtonAnatomy = {
         size: ["xsmall", "small", "medium", "large", "xlarge"],
         density: ["0", "inherit", "-1", "-2", "-3"],
     },
-    bindingVariants: ["density"],
 } as const satisfies ComponentAnatomy;
 
 export const avatarAnatomy = {
@@ -733,7 +730,6 @@ export const chipAnatomy = {
         ],
         density: ["0", "inherit", "-1", "-2", "-3"],
     },
-    bindingVariants: ["toggle", "density"],
 } as const satisfies ComponentAnatomy;
 
 export const chipSetAnatomy = {
@@ -839,7 +835,6 @@ export const inputChipAnatomy = {
         ],
         density: ["0", "inherit", "-1", "-2", "-3"],
     },
-    bindingVariants: ["toggle", "density"],
 } as const satisfies ComponentAnatomy;
 
 export const textFieldAnatomy = {
@@ -975,13 +970,6 @@ export const textFieldAnatomy = {
         secure: ["true", "false"],
         density: ["0", "inherit", "-1", "-2", "-3"],
     },
-    bindingVariants: [
-        "leadingIcon",
-        "trailingIcon",
-        "prefixText",
-        "suffixText",
-        "density",
-    ],
 } as const satisfies ComponentAnatomy;
 
 export const textAreaAnatomy = {
@@ -1088,7 +1076,6 @@ export const textAreaAnatomy = {
         variant: ["filled", "outlined"],
         density: ["0", "inherit", "-1", "-2", "-3"],
     },
-    bindingVariants: ["leadingIcon", "trailingIcon", "density"],
 } as const satisfies ComponentAnatomy;
 
 export const tagsInputAnatomy = {
@@ -1184,7 +1171,6 @@ export const tagsInputAnatomy = {
         trailingIcon: ["true", "false"],
         density: ["0", "inherit", "-1", "-2", "-3"],
     },
-    bindingVariants: ["leadingIcon", "trailingIcon", "density"],
 } as const satisfies ComponentAnatomy;
 
 export const searchBarAnatomy = {
@@ -1446,13 +1432,6 @@ export const selectAnatomy = {
         suffixText: ["true", "false"],
         density: ["0", "inherit", "-1", "-2", "-3"],
     },
-    bindingVariants: [
-        "leadingIcon",
-        "trailingIcon",
-        "prefixText",
-        "suffixText",
-        "density",
-    ],
 } as const satisfies ComponentAnatomy;
 
 export const autocompleteAnatomy = {
@@ -1577,13 +1556,6 @@ export const autocompleteAnatomy = {
         suffixText: ["true", "false"],
         density: ["0", "inherit", "-1", "-2", "-3"],
     },
-    bindingVariants: [
-        "leadingIcon",
-        "trailingIcon",
-        "prefixText",
-        "suffixText",
-        "density",
-    ],
 } as const satisfies ComponentAnatomy;
 
 export const calendarCellAnatomy = {
@@ -1631,7 +1603,6 @@ export const calendarCellAnatomy = {
         today: ["true", "false"],
         outside: ["true", "false"],
     },
-    bindingVariants: ["view", "selection", "today", "outside"],
 } as const satisfies ComponentAnatomy;
 
 export const datePickerAnatomy = {
@@ -2072,13 +2043,6 @@ export const dockedDatePickerAnatomy = {
         suffixText: ["true", "false"],
         density: ["0", "inherit", "-1", "-2", "-3"],
     },
-    bindingVariants: [
-        "leadingIcon",
-        "trailingIcon",
-        "prefixText",
-        "suffixText",
-        "density",
-    ],
 } as const satisfies ComponentAnatomy;
 
 export const dateInputAnatomy = {
@@ -2283,13 +2247,6 @@ export const dateInputAnatomy = {
         suffixText: ["true", "false"],
         density: ["0", "inherit", "-1", "-2", "-3"],
     },
-    bindingVariants: [
-        "leadingIcon",
-        "trailingIcon",
-        "prefixText",
-        "suffixText",
-        "density",
-    ],
 } as const satisfies ComponentAnatomy;
 
 export const supportingTextAnatomy = {
@@ -2405,7 +2362,6 @@ export const checkboxAnatomy = {
             "info",
         ],
     },
-    bindingVariants: ["density"],
 } as const satisfies ComponentAnatomy;
 
 export const radioAnatomy = {
@@ -2475,7 +2431,6 @@ export const radioAnatomy = {
             "info",
         ],
     },
-    bindingVariants: ["density"],
 } as const satisfies ComponentAnatomy;
 
 export const switchControlAnatomy = {
@@ -3165,7 +3120,6 @@ export const listItemAnatomy = {
             "info",
         ],
     },
-    bindingVariants: ["position", "swipeable", "density"],
 } as const satisfies ComponentAnatomy;
 
 export const menuAnatomy = {
@@ -3298,7 +3252,6 @@ export const menuAnatomy = {
         vibrant: ["true", "false"],
         grouped: ["true", "false"],
     },
-    bindingVariants: ["grouped", "density"],
 } as const satisfies ComponentAnatomy;
 
 export const tabsAnatomy = {
@@ -3380,7 +3333,6 @@ export const tabsAnatomy = {
             "info",
         ],
     },
-    bindingVariants: ["icon"],
 } as const satisfies ComponentAnatomy;
 
 export const navigationBarAnatomy = {
@@ -3659,7 +3611,6 @@ export const appBarAnatomy = {
         scrolled: ["false", "true"],
         collapsed: ["false", "true"],
     },
-    bindingVariants: ["search"],
 } as const satisfies ComponentAnatomy;
 
 export const timePickerAnatomy = {
@@ -4035,7 +3986,6 @@ export const dialogAnatomy = {
         },
     },
     variants: { icon: ["true", "false"] },
-    bindingVariants: ["icon"],
 } as const satisfies ComponentAnatomy;
 
 export const fullscreenDialogAnatomy = {
@@ -4418,7 +4368,6 @@ export const toastAnatomy = {
         },
     ],
     variants: { type: ["info", "success", "warning", "error", "loading"] },
-    bindingVariants: ["type"],
 } as const satisfies ComponentAnatomy;
 
 export const toolbarAnatomy = {
@@ -4651,7 +4600,6 @@ export const paginatorAnatomy = {
         },
     },
     variants: { density: ["0", "inherit", "-1", "-2", "-3"] },
-    bindingVariants: ["density"],
 } as const satisfies ComponentAnatomy;
 
 export const cardAnatomy = {
@@ -5001,7 +4949,6 @@ export const accordionAnatomy = {
         },
     ],
     variants: { density: ["0", "inherit", "-1", "-2", "-3"] },
-    bindingVariants: ["density"],
 } as const satisfies ComponentAnatomy;
 
 export const treeAnatomy = {
@@ -5117,7 +5064,6 @@ export const treeAnatomy = {
             "info",
         ],
     },
-    bindingVariants: ["density"],
 } as const satisfies ComponentAnatomy;
 
 export const stepperAnatomy = {
@@ -5230,7 +5176,6 @@ export const stepperAnatomy = {
         orientation: ["horizontal", "vertical"],
         density: ["0", "inherit", "-1", "-2", "-3"],
     },
-    bindingVariants: ["density"],
 } as const satisfies ComponentAnatomy;
 
 export const dataTableAnatomy = {
@@ -5403,7 +5348,6 @@ export const dataTableAnatomy = {
         stickyHeader: ["true", "false"],
         density: ["0", "inherit", "-1", "-2", "-3"],
     },
-    bindingVariants: ["density"],
 } as const satisfies ComponentAnatomy;
 
 export const gridListAnatomy = {

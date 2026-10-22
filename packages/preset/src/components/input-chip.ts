@@ -137,7 +137,6 @@ export const createInputChip = <
     variantsOf<{ color: G | typeof DEFAULT_GROUP; density: "inherit" | D }>()(
         pf.slotComponent({
             name: "inputChip",
-            bindingVariants: ["toggle", "density"],
             $meta: {
                 description:
                     "Material input chip, as the tags input renders it: an optional avatar or icon, the label, and a remove button. Mark it selected with aria-selected. Render the avatar or the icon only when there is one.",

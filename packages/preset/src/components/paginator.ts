@@ -70,7 +70,6 @@ export const createPaginator = <D extends string = MaterialDensity>(
     variantsOf<{ density: "inherit" | D }>()(
         pf.slotComponent({
             name: "paginator",
-            bindingVariants: ["density"],
             $meta: {
                 description:
                     "Paginator (Angular Material parity, not in M3): the page-size select, the range label, and first, previous, next and last icon buttons. The triggers are icon buttons; the page-size select is the select.",

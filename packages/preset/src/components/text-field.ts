@@ -90,13 +90,6 @@ export const createTextField = <
     }>()(
         pf.slotComponent({
             name: "textField",
-            bindingVariants: [
-                "leadingIcon",
-                "trailingIcon",
-                "prefixText",
-                "suffixText",
-                "density",
-            ],
             $meta: {
                 description:
                     "Material text field, filled or outlined. Give the input a placeholder (a space works) and put the label after it; mark errors with aria-invalid. Turn on leadingIcon, trailingIcon, prefixText or suffixText when you render one. A counter sits after the supporting text, on its line. secure makes the trailing icon a show/hide button for a password.",

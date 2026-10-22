@@ -108,7 +108,6 @@ const iconRoom = add(ref("paddingInline"), ref("iconSize"), spacing("3"));
 
 export const toast = pf.slotComponent({
     name: "toast",
-    bindingVariants: ["type"],
     $meta: {
         description:
             "A notification outside Material 3, skinned with its tokens: stacked toasts with a type (info, success, warning, error, loading) that tints the icon. Material's single message is the snackbar.",

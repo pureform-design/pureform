@@ -130,7 +130,6 @@ export const createTabs = <const G extends string = ColorGroup>(
     variantsOf<{ color: G | typeof DEFAULT_GROUP }>()(
         pf.slotComponent({
             name: "tabs",
-            bindingVariants: ["icon"],
             $meta: {
                 description:
                     "Material tabs, primary or secondary. Mark the current tab with aria-selected; turn on icon when the tabs have icons, inlineIcon to set a primary tab's icon beside its label, and scrollable for tabs that size to their content and scroll.",

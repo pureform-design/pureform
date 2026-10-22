@@ -111,14 +111,6 @@ export const deriveAnatomy = (
         };
     };
     const partNames = [...slots, ...extras.map((extra) => extra.name)];
-    const bindingVariants = spec.bindingVariants ?? [];
-    for (const variant of bindingVariants) {
-        if (!(variant in (spec.recipe.variants ?? {}))) {
-            throw new Error(
-                `${name}: sets "${variant}" as a binding variant, which is not a variant`,
-            );
-        }
-    }
     const indication = spec.indication?.map(
         ({ trigger, surface, centered, focus, layer }): IndicationAnatomy => {
             for (const named of [trigger, surface, focus, layer]) {
@@ -158,7 +150,6 @@ export const deriveAnatomy = (
                 ([variant, values]) => [variant, Object.keys(values)],
             ),
         ),
-        ...(bindingVariants.length ? { bindingVariants } : {}),
     };
 };
 

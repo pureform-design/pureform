@@ -101,7 +101,6 @@ export const createRadio = <
     variantsOf<{ color: G | typeof DEFAULT_GROUP; density: "inherit" | D }>()(
         pf.slotComponent({
             name: "radio",
-            bindingVariants: ["density"],
             $meta: {
                 description:
                     "Material radio button over a native input. Group radios with a shared name.",

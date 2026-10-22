@@ -129,13 +129,6 @@ export const createDateInput = <
     }>()(
         pf.slotComponent({
             name: "dateInput",
-            bindingVariants: [
-                "leadingIcon",
-                "trailingIcon",
-                "prefixText",
-                "suffixText",
-                "density",
-            ],
             $meta: {
                 description:
                     "Material modal date input: a surface with a header (headline, the date so far, mode toggle), a text field whose input is a group of date segments, and the actions.",

@@ -155,7 +155,6 @@ export const createSplitButton = <
     variantsOf<{ color: G | typeof DEFAULT_GROUP; density: "inherit" | D }>()(
         pf.slotComponent({
             name: "splitButton",
-            bindingVariants: ["density"],
             $meta: {
                 description:
                     "M3 Expressive split button: a leading button for the main action and a trailing button that opens a menu (mark it aria-expanded while open; its trailingIcon turns over). Both share the fill, color, size and density.",

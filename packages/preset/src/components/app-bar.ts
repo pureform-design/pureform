@@ -135,7 +135,6 @@ const contentInset = blend(
 
 export const appBar = pf.slotComponent({
     name: "appBar",
-    bindingVariants: ["search"],
     $meta: {
         description:
             "Material app bar: the strip at the top of a screen with a leading navigation button, the headline and subtitle (or a search bar), and trailing actions. size small, mediumFlexible or largeFlexible (the flexible ones put the headline on a line of its own, larger); centered centers the headline; search makes room for a search bar; scrolled takes the scrolled container color; collapsed draws a flexible bar as the small one.",

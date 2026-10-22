@@ -84,10 +84,6 @@ interface BaseComponentSpec {
     /** Where it shows indication, one entry per interactive surface. Left out for a component
      *  that isn't interactive. */
     indication?: IndicationDeclaration[];
-    /** Variant groups the binding sets itself, from other props or its context (a toggle from
-     *  `selected`, a group's `position`, the provider's `density`), rather than taking them as
-     *  props of the same name. Tools that offer a control per variant leave these out. */
-    bindingVariants?: string[];
 }
 
 /** Styles applied only when several variant selections combine (lowering to Panda

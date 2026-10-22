@@ -123,7 +123,6 @@ export const createStepper = <D extends string = MaterialDensity>(
     variantsOf<{ density: "inherit" | D }>()(
         pf.slotComponent({
             name: "stepper",
-            bindingVariants: ["density"],
             $meta: {
                 description:
                     "Stepper: a header per step (an indicator, a label and an optional caption) joined by a connector, with the current step's content. orientation horizontal or vertical. Mark the current step's header aria-selected, a completed indicator aria-checked and an error header aria-invalid.",

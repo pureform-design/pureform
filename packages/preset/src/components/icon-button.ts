@@ -285,7 +285,6 @@ export const createIconButton = <
     variantsOf<{ color: G | typeof DEFAULT_GROUP; density: "inherit" | D }>()(
         pf.slotComponent({
             name: "iconButton",
-            bindingVariants: ["toggle", "position", "density"],
             $meta: {
                 description:
                     'Material icon button holding a single icon. Put the icon in the container; render the outline slot for the outlined variant. shape clips the container to one of the theme\'s shapes. A toggle sets toggle to "true" and marks itself selected with aria-pressed="true".',
