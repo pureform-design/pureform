@@ -113,7 +113,9 @@ const { tokens, ref } = componentTokens("slider", {
     barRadius: radius("small"),
     // Half the theme's extra-small corner (2px in Material), so a shape theme rounds it too.
     barInnerRadius: mul(radius("extraSmall"), unitless(0.5)),
-    handleGap: px(6),
+    // From a bar handle's centre to the far edge of the gap cut either side of it: half its
+    // 4px width and Compose's 6px gap. Bindings read it back to place the overflowing icon.
+    handleClearance: px(8),
     // Set by `handleShape`: 1 for the bar handle, 0 for the round one.
     bar: unitless(1),
     value: unitless(0),
@@ -156,10 +158,7 @@ const byShape = (round: NumericValue, bar: NumericValue) =>
     blend(round, bar, ref("bar"));
 const THICKNESS = byShape(ref("trackHeight"), ref("barTrackHeight"));
 // From a handle's centre to the edge of the gap around it; none for the round handle.
-const CLEARANCE = mul(
-    ref("bar"),
-    add(half(ref("barHandleWidth")), ref("handleGap")),
-);
+const CLEARANCE = mul(ref("bar"), ref("handleClearance"));
 const OUTER = byShape(radius("full"), ref("barRadius"));
 const INNER = byShape(radius("full"), ref("barInnerRadius"));
 // A track end's corner: the inner one where a handle's gap cuts it.

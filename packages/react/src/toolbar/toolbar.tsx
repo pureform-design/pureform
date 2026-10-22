@@ -41,7 +41,7 @@ import { useComponent } from "../parts";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
 import { ProvidedTokens } from "../provided-tokens";
-import { useDirection } from "../provider";
+import { useComponentState, useDirection } from "../provider";
 
 /** Root's props: the variants and tokens, `overflow`, `testId`, `as`, and the element's own
  *  props. Name the toolbar with `aria-label` or `aria-labelledby`. */
@@ -60,6 +60,7 @@ const HIDDEN: CSSProperties = { display: "none" };
  *  and End move focus among its elements. */
 function Root(props: ToolbarRootProps): ReactNode {
     const dir = useDirection();
+    const { defaults } = useComponentState();
     const scope = useComponent(toolbarAnatomy, {
         selection: toolbarSelection(props),
         testId: props.testId,
@@ -71,7 +72,7 @@ function Root(props: ToolbarRootProps): ReactNode {
         ...rest
     } = omitProps(props, TOOLBAR_ROOT_PROPS);
     const provided = isUnstyled(props.unstyled, "root")
-        ? unstyledToolbarProvidedTokens(props.color)
+        ? unstyledToolbarProvidedTokens(props, defaults)
         : undefined;
     return scope.render("root", {
         element: "div",

@@ -1060,6 +1060,8 @@ export {
     sliderControllableProps,
     sliderInsetIconOverflows,
     sliderInsetIconMeasuresOfStyle,
+    sliderClearanceOf,
+    sameSliderInsetIcon,
     sliderMachineProps,
     sliderMarkerTokens,
     sliderNativeDefault,

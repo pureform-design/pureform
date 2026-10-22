@@ -41,6 +41,7 @@ import {
     sliderSelection,
     sliderStopActive,
     sliderStops,
+    sliderClearanceOf,
     sliderInsetIconMeasuresOfStyle,
     sliderInsetIconOverflows,
     sliderTrackTokens,
@@ -278,28 +279,66 @@ describe("slider inset icon", () => {
         ).toBe(false);
     });
 
-    it("reads the measures from React Native's resolved style", () => {
+    it("reads the measures from React Native's resolved styles", () => {
         const at = { vertical: false, overflowing: false, percents: [20] };
+        const icon = (insetIcon: Record<string, unknown> | undefined) => ({
+            insetIcon,
+        });
         expect(
-            sliderInsetIconMeasuresOfStyle({ width: 24, marginStart: 12 }, at),
-        ).toEqual({ size: 24, padding: 12 });
+            sliderInsetIconMeasuresOfStyle(
+                icon({ width: 24, marginStart: 12 }),
+                at,
+            ),
+        ).toEqual({ size: 24, padding: 12, clearance: 8 });
         // Overflowing, the margin also holds the handle's clearance (8 × the end gap, 1).
         expect(
             sliderInsetIconMeasuresOfStyle(
-                { width: 24, marginStart: 20 },
-                { ...at, overflowing: true },
+                icon({ width: 24, marginStart: 20 }),
+                {
+                    ...at,
+                    overflowing: true,
+                },
             ),
-        ).toEqual({ size: 24, padding: 12 });
+        ).toEqual({ size: 24, padding: 12, clearance: 8 });
         expect(
             sliderInsetIconMeasuresOfStyle(
-                { height: 24, marginBottom: 12 },
-                { ...at, vertical: true },
+                icon({ height: 24, marginBottom: 12 }),
+                {
+                    ...at,
+                    vertical: true,
+                },
             ),
-        ).toEqual({ size: 24, padding: 12 });
+        ).toEqual({ size: 24, padding: 12, clearance: 8 });
         expect(
-            sliderInsetIconMeasuresOfStyle({ width: "1x" }, at),
+            sliderInsetIconMeasuresOfStyle(icon({ width: "1x" }), at),
         ).toBeUndefined();
-        expect(sliderInsetIconMeasuresOfStyle(undefined, at)).toBeUndefined();
+        expect(
+            sliderInsetIconMeasuresOfStyle(icon(undefined), at),
+        ).toBeUndefined();
+    });
+
+    it("reads the theme's handle clearance from the inactive track's margin", () => {
+        const at = { vertical: false, overflowing: true, percents: [20] };
+        expect(
+            sliderInsetIconMeasuresOfStyle(
+                {
+                    insetIcon: { width: 24, marginStart: 26 },
+                    track: { marginStart: 14 },
+                },
+                at,
+            ),
+        ).toEqual({ size: 24, padding: 12, clearance: 14 });
+        // A theme's 14px clearance leaves 80 - 14 = 66px: short of 24 + 2 × 24.
+        expect(
+            sliderInsetIconOverflows(400, [20], false, {
+                size: 24,
+                padding: 24,
+                clearance: 14,
+            }),
+        ).toBe(true);
+        // No end gap tells nothing.
+        expect(sliderClearanceOf(14, 0)).toBeUndefined();
+        expect(sliderClearanceOf(undefined, 1)).toBeUndefined();
     });
 });
 
@@ -354,7 +393,10 @@ describe("card", () => {
         });
         expect(
             cardLayout({ headline: "Pro", actions: "Buy" }, "a"),
-        ).toMatchObject({ actionArea: true, headerOutside: false });
+        ).toMatchObject({
+            actionArea: true,
+            headerOutside: false,
+        });
         expect(
             cardLayout({ headline: "Pro", headerAction: "⋮" }, "button"),
         ).toMatchObject({ actionArea: true, headerOutside: true });

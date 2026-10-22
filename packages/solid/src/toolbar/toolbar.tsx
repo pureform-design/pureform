@@ -37,7 +37,7 @@ import { MENU_TRIGGER_ATTRIBUTES } from "../menu/menu";
 import { useComponent } from "../parts";
 import type { PartProps } from "../props";
 import { ProvidedTokens } from "../provided-tokens";
-import { useDirection } from "../provider";
+import { useDirection, usePureform } from "../provider";
 
 /** Root's props: the variants and tokens, `overflow`, `testId`, `as`, and the element's own
  *  props. Name the toolbar with `aria-label` or `aria-labelledby`. */
@@ -56,6 +56,7 @@ const HIDDEN: JSX.CSSProperties = { display: "none" };
  *  and End move focus among its elements. */
 function Root(props: ToolbarRootProps): JSX.Element {
     const dir = useDirection();
+    const state = usePureform();
     const scope = useComponent(toolbarAnatomy, {
         selection: () => toolbarSelection(props),
         testId: () => props.testId,
@@ -63,7 +64,7 @@ function Root(props: ToolbarRootProps): JSX.Element {
     });
     const provided = () =>
         isUnstyled(props.unstyled, "root")
-            ? unstyledToolbarProvidedTokens(props.color)
+            ? unstyledToolbarProvidedTokens(props, state().defaults)
             : undefined;
     return scope.render("root", {
         element: "div",

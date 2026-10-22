@@ -160,6 +160,28 @@ describe("Toolbar, unstyled", () => {
         );
     });
 
+    it("is vibrant by the provider's default color too", async () => {
+        withRegistry(() => (
+            <PureformProvider defaults={{ toolbar: { color: "vibrant" } }}>
+                <Toolbar
+                    aria-label="Edit"
+                    unstyled
+                    items={[{ value: "a", label: "A", icon: "A", testId: "a" }]}
+                />
+                <Toolbar
+                    aria-label="Standard"
+                    color="standard"
+                    unstyled
+                    items={[{ value: "b", label: "B", icon: "B", testId: "b" }]}
+                />
+            </PureformProvider>
+        ));
+        expect(accent("a")).toBe(
+            "var(--components-toolbar-content, currentColor)",
+        );
+        expect(accent("b")).toBe("");
+    });
+
     it("leaves a styled or standard toolbar's icon buttons to the cascade", async () => {
         withRegistry(() => (
             <>

@@ -208,11 +208,10 @@ const textValue = (
 
 // The label floats with its color. Its inset moves too where a leading icon pushes it in, and
 // the outlined label's notch (padding, margin, background) grows with it.
-// Compose floats it on `FastSpatial` (`TextFieldImpl.kt`), which overshoots the label's turn
-// and size under expressive, so it floats on `effectsDefault` here (critically damped); the
-// colors stay on their tween.
+// It floats on `spatialFast`, as Compose's `FastSpatial` (`TextFieldImpl.kt`), overshooting
+// under expressive; the colors stay on their tween.
 const labelTransition = springTweens(
-    "effectsDefault",
+    "spatialFast",
     [
         "top",
         "insetInlineStart",

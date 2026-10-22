@@ -9,6 +9,7 @@ import {
     SLIDER_INPUT_LABEL_PROPS,
     SLIDER_ROOT_PROPS,
     sliderControllableProps,
+    sameSliderInsetIcon,
     sliderInsetIconOverflows,
     sliderMachineProps,
     sliderMarkerTokens,
@@ -187,7 +188,8 @@ function InsetIcon(props: SliderPartProps): JSX.Element {
     const [length, setLength] = createSignal(0);
     let observer: ResizeObserver | undefined;
     onCleanup(() => observer?.disconnect());
-    // The theme's `insetIconSize` and `insetIconPadding`, read from the layout once it's drawn.
+    // The theme's `insetIconSize`, `insetIconPadding` and `handleClearance`, read from the
+    // layout once it's drawn.
     const [measures, setMeasures] = createSignal<SliderInsetIconMeasures>();
     const [icon, setIcon] = createSignal<HTMLElement>();
     const vertical = () => root.orientation === "vertical";
@@ -217,9 +219,9 @@ function InsetIcon(props: SliderPartProps): JSX.Element {
                 overflowing: over,
                 percents,
                 centered,
+                last,
             });
-            if (read?.size !== last?.size || read?.padding !== last?.padding)
-                setMeasures(read);
+            if (!sameSliderInsetIcon(read, last)) setMeasures(read);
         },
     );
     return scope.render("insetIcon", {

@@ -9,6 +9,7 @@ import {
     SLIDER_INPUT_LABEL_PROPS,
     SLIDER_ROOT_PROPS,
     sliderControllableProps,
+    sameSliderInsetIcon,
     sliderInsetIconOverflows,
     sliderMachineProps,
     sliderMarkerTokens,
@@ -189,7 +190,8 @@ function InsetIcon({ unstyled, ...props }: SliderPartProps): ReactNode {
     const [length, setLength] = useState(0);
     const observer = useRef<ResizeObserver | undefined>(undefined);
     const icon = useRef<HTMLElement | null>(null);
-    // The theme's `insetIconSize` and `insetIconPadding`, read from the layout once it's drawn.
+    // The theme's `insetIconSize`, `insetIconPadding` and `handleClearance`, read from the
+    // layout once it's drawn.
     const [measures, setMeasures] = useState<SliderInsetIconMeasures>();
     const measure = useCallback(
         (element: HTMLElement | null) => {
@@ -223,13 +225,10 @@ function InsetIcon({ unstyled, ...props }: SliderPartProps): ReactNode {
             overflowing,
             percents: api.percents,
             centered: root.centered,
+            last: measures,
         });
-        setMeasures((last) =>
-            read?.size === last?.size && read?.padding === last?.padding
-                ? last
-                : read,
-        );
-    }, [length, overflowing, percentsKey, vertical, root.centered]);
+        setMeasures((last) => (sameSliderInsetIcon(read, last) ? last : read));
+    }, [length, overflowing, percentsKey, vertical, root.centered, measures]);
     return scope.render("insetIcon", {
         element: "span",
         ref: measure,

@@ -10,6 +10,7 @@ import type { TestIdOverride } from "@pureform/anatomy";
 import {
     isPresent,
     sliderMarkerTokens,
+    sameSliderInsetIcon,
     sliderInsetIconOverflows,
     sliderInsetIconMeasuresOfStyle,
     sliderSelection,
@@ -235,7 +236,8 @@ function SliderImpl(props: SliderProps): ReactNode {
     const selection = indication.select(sliderSelection(props, percents));
     // The root's length along the axis, for whether the inset icon fits in the active track.
     const [length, setLength] = useState(0);
-    // The theme's `insetIconSize` and `insetIconPadding`, read from the icon's resolved style.
+    // The theme's `insetIconSize`, `insetIconPadding` and `handleClearance`, read from the
+    // icon's and the inactive track's resolved styles.
     const [measures, setMeasures] = useState<SliderInsetIconMeasures>();
     const overflowing =
         isPresent(props.insetIcon) &&
@@ -252,7 +254,10 @@ function SliderImpl(props: SliderProps): ReactNode {
         views: v,
     } = useComponentSlots<SliderPart>("slider", selection, state);
     const measured = sliderInsetIconMeasuresOfStyle(
-        s.insetIcon as Record<string, unknown> | undefined,
+        {
+            insetIcon: s.insetIcon as Record<string, unknown> | undefined,
+            track: s.track as Record<string, unknown> | undefined,
+        },
         {
             vertical: props.orientation === "vertical",
             overflowing,
@@ -262,11 +267,9 @@ function SliderImpl(props: SliderProps): ReactNode {
     );
     useEffect(() => {
         setMeasures((last) =>
-            measured?.size === last?.size && measured?.padding === last?.padding
-                ? last
-                : measured,
+            sameSliderInsetIcon(measured, last) ? last : measured,
         );
-    }, [measured?.size, measured?.padding]);
+    }, [measured?.size, measured?.padding, measured?.clearance]);
     const rtl = useDirection() === "rtl";
     const snap = (raw: number) =>
         Math.min(

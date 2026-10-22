@@ -1231,4 +1231,38 @@ describe("c7c: avatar picture, swipe, inset icon, search bar width", () => {
         // Flat: Compose's search bar has no shadow (level 0).
         expect(computed("wide-root").boxShadow).toBe("none");
     });
+
+    it("cuts a slider's inset icon off by the theme's handle clearance", async () => {
+        // 13% of 400px is 52px: less the default 8px clearance the icon fits (44 ≥ 40), less a
+        // theme's 14px it doesn't (38).
+        const slider = (testId: string) => (
+            <View style={{ width: 400 }}>
+                <Slider
+                    aria-label="Volume"
+                    size="large"
+                    defaultValue={13}
+                    insetIcon={<Glyph glyph="♪" />}
+                    testId={testId}
+                />
+            </View>
+        );
+        await render(
+            <>
+                {slider("default")}
+                <PureformProvider
+                    overrides={{ "components.slider.handleClearance": 14 }}
+                >
+                    {slider("themed")}
+                </PureformProvider>
+            </>,
+        );
+        const from = (testId: string, part: string) =>
+            byTestId(`${testId}-${part}`).getBoundingClientRect().left -
+            byTestId(`${testId}-root`).getBoundingClientRect().left;
+        await until(() => {
+            expect(from("themed", "track")).toBeCloseTo(52 + 14, 0);
+            expect(from("themed", "inset-icon")).toBeCloseTo(52 + 14 + 10, 0);
+        });
+        expect(from("default", "inset-icon")).toBeCloseTo(10, 0);
+    });
 });
