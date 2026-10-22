@@ -36,8 +36,9 @@ cache:
         - ".storybook/**/*"
 
 tasks:
+  # The codegen's specs (scripts/**/*.spec.ts).
   test:unit:
-    enabled: false
+    enabled: true
 
   test:integration:
     enabled: false
