@@ -87,6 +87,7 @@ describe("registered components", () => {
             | "readOnly"
             | "filled"
             | "expanded"
+            | "descending"
             | "mirrored"
             | "overflowing"
             | "indeterminate"

@@ -136,6 +136,7 @@ const STATES = [
     "readOnly",
     "filled",
     "expanded",
+    "descending",
     "mirrored",
     "overflowing",
     "rtl",
