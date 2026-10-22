@@ -354,3 +354,65 @@ export const validateConfig = (config: CoreConfig): void => {
     );
     validateSlotConditions(config);
 };
+
+/** The value node of the token at `path` (unwrapping `meta(...)`), or `undefined` when the path
+ *  names nothing: `getByPath` for a caller that only asks. */
+export const tokenAt = (
+    config: CoreConfig,
+    path: string[],
+): ValueNode | undefined => {
+    try {
+        return unwrap(getByPath(config, path)) as ValueNode;
+    } catch (error) {
+        if (error instanceof ConfigPathError) return undefined;
+        throw error;
+    }
+};
+
+/** Where `isSpringToken` looks: the config, to follow an alias to another token, and the
+ *  target a platform's choice is made for. */
+export interface SpringTokenOptions {
+    readonly config?: CoreConfig | undefined;
+    readonly target?: string | undefined;
+}
+
+/** Whether a token's value is a spring: a literal one, an alias to a spring role, or (with the
+ *  config) an alias to another token holding one, also through a `dynamic` default or a
+ *  platform's choice. With a `target`, the choice is that target's value (else the default);
+ *  without, every choice has to be one. */
+export const isSpringToken = (
+    node: ValueNode | undefined,
+    options: SpringTokenOptions = {},
+    seen: ReadonlySet<string> = new Set(),
+): boolean => {
+    if (!node) return false;
+    switch (node.type) {
+        case "spring":
+            return true;
+        case "alias": {
+            if (node.path[0] === "springs") return true;
+            const key = node.path.join(".");
+            if (!options.config || seen.has(key)) return false;
+            return isSpringToken(
+                tokenAt(options.config, node.path),
+                options,
+                new Set([...seen, key]),
+            );
+        }
+        case "dynamic":
+            return isSpringToken(node.default, options, seen);
+        case "platform":
+            return options.target !== undefined
+                ? isSpringToken(
+                      node.values[options.target] ?? node.default,
+                      options,
+                      seen,
+                  )
+                : isSpringToken(node.default, options, seen) &&
+                      Object.values(node.values).every((value) =>
+                          isSpringToken(value, options, seen),
+                      );
+        default:
+            return false;
+    }
+};

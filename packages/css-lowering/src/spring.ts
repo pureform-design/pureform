@@ -6,6 +6,7 @@
 import {
     formatLinearEasing,
     getByPath,
+    isSpringToken,
     sampleSpring,
     tokenValue,
 } from "@pureform/core";
@@ -118,39 +119,11 @@ export const springVarNames = (
 };
 
 // The value at an alias's path, or `undefined` where there's none (compiling it reports that).
-const tokenAt = (
-    config: LowerCtx["config"],
-    path: string[],
-): ValueNode | undefined => {
-    try {
-        return tokenValue(getByPath(config, path)) as ValueNode;
-    } catch {
-        return undefined;
-    }
-};
-
-/** Whether a token's value is a spring: a literal one, an alias to a spring role, or a
- *  component token holding one (or an alias to it, such as another component's), also through
- *  a platform's choice. */
-export const isSpringValue = (node: ValueNode, ctx: LowerCtx): boolean => {
-    switch (node.type) {
-        case "spring":
-            return true;
-        case "alias": {
-            if (node.path[0] === "springs") return true;
-            const target = tokenAt(ctx.config, node.path);
-            return target !== undefined && isSpringValue(target, ctx);
-        }
-        case "dynamic":
-            return (
-                node.default !== undefined && isSpringValue(node.default, ctx)
-            );
-        case "platform":
-            return isSpringValue(node.values[ctx.target] ?? node.default, ctx);
-        default:
-            return false;
-    }
-};
+/** Whether a token's value is a spring for the context's target: a literal one, an alias to a
+ *  spring role, or a component token holding one (or an alias to it, such as another
+ *  component's), also through a platform's choice (core's `isSpringToken`). */
+export const isSpringValue = (node: ValueNode, ctx: LowerCtx): boolean =>
+    isSpringToken(node, { config: ctx.config, target: ctx.target });
 
 /** A token set to a spring, as its two vars: each of the spring's, so an alias to a spring role
  *  still follows a theme's change of that role. */

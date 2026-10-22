@@ -1,12 +1,14 @@
 import { describe, expect, it } from "vitest";
 
-import { alias, hex, px } from "./ast";
+import { alias, dynamic, hex, platform, px, spring } from "./ast";
 import { defineComponent } from "./define";
 import {
     AliasCycleError,
     ConfigPathError,
     getByPath,
+    isSpringToken,
     resolveAlias,
+    tokenAt,
     validateConfig,
 } from "./path";
 import type { CoreConfig } from "./types";
@@ -103,5 +105,58 @@ describe("validateConfig", () => {
             b: alias("semanticTokens", "colors", "a"),
         };
         expect(() => validateConfig(config)).toThrow(AliasCycleError);
+    });
+});
+
+describe("tokenAt", () => {
+    it("gives the token's value node, or undefined where nothing is", () => {
+        const config = {
+            tokens: { sizes: { a: { $value: px(4) } } },
+        } as unknown as CoreConfig;
+        expect(tokenAt(config, ["tokens", "sizes", "a"])).toEqual(px(4));
+        expect(tokenAt(config, ["tokens", "sizes", "b"])).toBeUndefined();
+        expect(tokenAt(config, ["components", "x", "y"])).toBeUndefined();
+    });
+});
+
+describe("isSpringToken", () => {
+    const slow = spring({ stiffness: 200, damping: 0.9 });
+    const config = {
+        components: {
+            tabs: { tokens: { move: alias("springs", "spatialFast") } },
+            loop: {
+                tokens: {
+                    a: alias("components", "loop", "b"),
+                    b: alias("components", "loop", "a"),
+                },
+            },
+        },
+    } as unknown as CoreConfig;
+
+    it("takes a literal spring, a role, and a dynamic default", () => {
+        expect(isSpringToken(slow)).toBe(true);
+        expect(isSpringToken(alias("springs", "spatialFast"))).toBe(true);
+        expect(isSpringToken(dynamic(["x"], slow))).toBe(true);
+        expect(isSpringToken(dynamic(["x"]))).toBe(false);
+        expect(isSpringToken(px(1))).toBe(false);
+    });
+
+    it("follows an alias to another token only with the config, and stops on a cycle", () => {
+        const other = alias("components", "tabs", "move");
+        expect(isSpringToken(other)).toBe(false);
+        expect(isSpringToken(other, { config })).toBe(true);
+        expect(
+            isSpringToken(alias("components", "loop", "a"), { config }),
+        ).toBe(false);
+        expect(
+            isSpringToken(alias("components", "none", "a"), { config }),
+        ).toBe(false);
+    });
+
+    it("needs every platform choice to be one, or the target's", () => {
+        const mixed = platform({ rn: px(1) }, slow);
+        expect(isSpringToken(mixed)).toBe(false);
+        expect(isSpringToken(mixed, { target: "css" })).toBe(true);
+        expect(isSpringToken(mixed, { target: "rn" })).toBe(false);
     });
 });

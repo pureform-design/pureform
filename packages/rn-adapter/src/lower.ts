@@ -12,6 +12,7 @@ import {
     getByPath,
     inlineStyles,
     sampleSpring,
+    tokenAt,
     tokenValue,
 } from "@pureform/core";
 import type {
@@ -380,15 +381,8 @@ export const springFieldNodes = (
     if (!ctx) return undefined;
     switch (value.type) {
         case "alias": {
-            let target: ValueNode;
-            try {
-                target = tokenValue(
-                    getByPath(ctx.config, value.path),
-                ) as ValueNode;
-            } catch {
-                return undefined;
-            }
-            return springFieldNodes(target, ctx);
+            const target = tokenAt(ctx.config, value.path);
+            return target && springFieldNodes(target, ctx);
         }
         case "dynamic": {
             // Without a default, nothing says the token is a spring.
