@@ -34,6 +34,7 @@ import type { MaterialDensity } from "@pureform/theme";
 
 import { INDICATION_TOKENS } from "../state-layer";
 import { BUTTON_SIZES } from "./button";
+import { spatialTweens } from "./shaped";
 import {
     DEFAULT_GROUP,
     colorTokenVariants,
@@ -57,7 +58,6 @@ import {
     sys,
     variantsOf,
 } from "./shared";
-import { spatialTweens } from "./shaped";
 import type { ColorGroup, ColorGroups, Densities, Fill } from "./shared";
 import { runCorners } from "./tiles";
 

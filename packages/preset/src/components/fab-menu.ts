@@ -41,6 +41,7 @@ import {
 import { INDICATION_TOKENS } from "../state-layer";
 import { FAB_SIZES } from "./fab";
 import { overlayMotion, POPUP_MOTION } from "./overlay";
+import { spatialCornerTransition } from "./shaped";
 import {
     DEFAULT_GROUP,
     colorTokenVariants,
@@ -58,7 +59,6 @@ import {
     slotStateLayer,
     variantsOf,
 } from "./shared";
-import { spatialCornerTransition } from "./shaped";
 import type { ColorGroup, ColorGroups } from "./shared";
 
 /** The FAB sizes the menu's FAB takes: Expressive's, without the deprecated small one. */

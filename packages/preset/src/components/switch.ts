@@ -44,6 +44,7 @@ import {
     controlTouchTarget,
     CONTROL_FOCUS,
 } from "./control";
+import { spatialTweens } from "./shaped";
 import {
     DEFAULT_GROUP,
     colorVariant,
@@ -57,7 +58,6 @@ import {
     sys,
     variantsOf,
 } from "./shared";
-import { spatialTweens } from "./shaped";
 import type { ColorGroup, ColorGroups } from "./shared";
 
 const pf = typed();

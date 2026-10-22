@@ -54,6 +54,7 @@ import type { ColorValue, NumericValue, StyleMap } from "@pureform/core/ast";
 import { radius, size as sizeToken, textStyle } from "@pureform/theme";
 
 import { INDICATION_TOKENS } from "../state-layer";
+import { spatialTweens } from "./shaped";
 import {
     DEFAULT_GROUP,
     blend,
@@ -74,7 +75,6 @@ import {
     tweens,
     variantsOf,
 } from "./shared";
-import { spatialTweens } from "./shaped";
 import type { ColorGroup, ColorGroups } from "./shared";
 
 const { tokens, ref } = componentTokens("slider", {

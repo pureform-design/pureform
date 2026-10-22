@@ -32,6 +32,7 @@ import type { MaterialDensity } from "@pureform/theme";
 
 import { INDICATION_TOKENS, stateLayer } from "../state-layer";
 import type { IndicationRef } from "../state-layer";
+import { spatialCornerTransition } from "./shaped";
 import {
     DEFAULT_GROUP,
     colorVariant,
@@ -53,7 +54,6 @@ import {
     touchTarget,
     variantsOf,
 } from "./shared";
-import { spatialCornerTransition } from "./shaped";
 import type { ColorGroup, ColorGroups, Densities } from "./shared";
 
 const { tokens, ref } = componentTokens("chip", {

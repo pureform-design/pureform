@@ -231,7 +231,9 @@ export const timePicker = pf.slotComponent({
                     transition: motionTransition(
                         // It turns on the `spatialDefault` spring, as Compose's clock dial
                         // does (`ClockDialModifier`, `DefaultSpatial`).
-                        tween("transform", { spring: spring("spatialDefault") }),
+                        tween("transform", {
+                            spring: spring("spatialDefault"),
+                        }),
                     ),
                 },
                 dialHandle: {
