@@ -56,6 +56,10 @@ describe("deriveAnatomy", () => {
         });
     });
 
+    it("lists each variant's values, in the recipe's order", () => {
+        expect(deriveAnatomy(card).variants).toEqual({ tone: ["loud"] });
+    });
+
     it("marks a part mirror only when one of its styles reads mirrored", () => {
         const anatomy = deriveAnatomy(card);
         expect(
@@ -157,6 +161,7 @@ describe("deriveAnatomy", () => {
                     mirror: true,
                 },
             },
+            variants: {},
         });
     });
 

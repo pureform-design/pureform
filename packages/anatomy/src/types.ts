@@ -59,6 +59,10 @@ export interface ComponentAnatomy<
     /** Where it shows indication, one entry per interactive surface; left out when it isn't
      *  interactive. */
     readonly indication?: readonly IndicationAnatomy<P>[];
+    /** Its variants and their values, in the recipe's order (`variant: ["filled", …]`; a boolean
+     *  one is `["true", "false"]` as the recipe keys it): what a story's controls offer. Every
+     *  generated anatomy has it (`{}` for none); a composite's, written by hand, leaves it out. */
+    readonly variants?: { readonly [variant: string]: readonly string[] };
 }
 
 /** A component anatomy's part names. */

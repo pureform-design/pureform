@@ -58,6 +58,24 @@ export const buttonAnatomy = {
     indication: [
         { trigger: "root", surface: "root", centered: false, focus: "root" },
     ],
+    variants: {
+        color: [
+            "primary",
+            "secondary",
+            "tertiary",
+            "success",
+            "warning",
+            "error",
+            "info",
+        ],
+        variant: ["filled", "tonal", "outlined", "text", "elevated"],
+        size: ["xsmall", "small", "medium", "large", "xlarge", "compact"],
+        corner: ["round", "square"],
+        toggle: ["false", "true"],
+        secondaryIconPosition: ["end", "start"],
+        position: ["none", "first", "middle", "last", "single"],
+        density: ["0", "inherit", "-1", "-2", "-3"],
+    },
 } as const satisfies ComponentAnatomy;
 
 export const iconButtonAnatomy = {
@@ -120,6 +138,62 @@ export const iconButtonAnatomy = {
             focus: "root",
         },
     ],
+    variants: {
+        color: [
+            "primary",
+            "secondary",
+            "tertiary",
+            "success",
+            "warning",
+            "error",
+            "info",
+        ],
+        variant: ["filled", "tonal", "outlined", "standard", "elevated"],
+        shape: [
+            "none",
+            "circle",
+            "square",
+            "slanted",
+            "arch",
+            "fan",
+            "arrow",
+            "semiCircle",
+            "oval",
+            "pill",
+            "triangle",
+            "diamond",
+            "clamShell",
+            "pentagon",
+            "gem",
+            "sunny",
+            "verySunny",
+            "cookie4Sided",
+            "cookie6Sided",
+            "cookie7Sided",
+            "cookie9Sided",
+            "cookie12Sided",
+            "ghostish",
+            "clover4Leaf",
+            "clover8Leaf",
+            "burst",
+            "softBurst",
+            "boom",
+            "softBoom",
+            "flower",
+            "puffy",
+            "puffyDiamond",
+            "pixelCircle",
+            "pixelTriangle",
+            "bun",
+            "heart",
+        ],
+        size: ["xsmall", "small", "medium", "large", "xlarge", "compact"],
+        width: ["narrow", "default", "wide"],
+        corner: ["round", "square"],
+        toggle: ["false", "true"],
+        position: ["none", "first", "middle", "last", "single"],
+        density: ["0", "inherit", "-1", "-2", "-3"],
+    },
 } as const satisfies ComponentAnatomy;
 
 export const buttonGroupAnatomy = {
@@ -137,6 +211,10 @@ export const buttonGroupAnatomy = {
             styled: true,
             mirror: false,
         },
+    },
+    variants: {
+        size: ["xsmall", "small", "medium", "large", "xlarge"],
+        connected: ["false", "true"],
     },
 } as const satisfies ComponentAnatomy;
 
@@ -200,6 +278,58 @@ export const fabAnatomy = {
             focus: "root",
         },
     ],
+    variants: {
+        color: [
+            "primary",
+            "secondary",
+            "tertiary",
+            "success",
+            "warning",
+            "error",
+            "info",
+        ],
+        variant: ["tonal", "filled", "surface"],
+        size: ["small", "default", "medium", "large"],
+        extended: ["true", "false"],
+        shape: [
+            "none",
+            "circle",
+            "square",
+            "slanted",
+            "arch",
+            "fan",
+            "arrow",
+            "semiCircle",
+            "oval",
+            "pill",
+            "triangle",
+            "diamond",
+            "clamShell",
+            "pentagon",
+            "gem",
+            "sunny",
+            "verySunny",
+            "cookie4Sided",
+            "cookie6Sided",
+            "cookie7Sided",
+            "cookie9Sided",
+            "cookie12Sided",
+            "ghostish",
+            "clover4Leaf",
+            "clover8Leaf",
+            "burst",
+            "softBurst",
+            "boom",
+            "softBoom",
+            "flower",
+            "puffy",
+            "puffyDiamond",
+            "pixelCircle",
+            "pixelTriangle",
+            "bun",
+            "heart",
+        ],
+    },
 } as const satisfies ComponentAnatomy;
 
 export const fabMenuAnatomy = {
@@ -279,6 +409,18 @@ export const fabMenuAnatomy = {
         },
         { trigger: "item", surface: "item", centered: false, focus: "item" },
     ],
+    variants: {
+        color: [
+            "primary",
+            "secondary",
+            "tertiary",
+            "success",
+            "warning",
+            "error",
+            "info",
+        ],
+        size: ["default", "medium", "large"],
+    },
 } as const satisfies ComponentAnatomy;
 
 export const splitButtonAnatomy = {
@@ -338,6 +480,20 @@ export const splitButtonAnatomy = {
             focus: "trailingButton",
         },
     ],
+    variants: {
+        color: [
+            "primary",
+            "secondary",
+            "tertiary",
+            "success",
+            "warning",
+            "error",
+            "info",
+        ],
+        variant: ["filled", "tonal", "outlined", "elevated"],
+        size: ["xsmall", "small", "medium", "large", "xlarge"],
+        density: ["0", "inherit", "-1", "-2", "-3"],
+    },
 } as const satisfies ComponentAnatomy;
 
 export const avatarAnatomy = {
@@ -374,6 +530,56 @@ export const avatarAnatomy = {
             mirror: false,
         },
     },
+    variants: {
+        size: ["small", "medium", "large"],
+        color: [
+            "primary",
+            "secondary",
+            "tertiary",
+            "success",
+            "warning",
+            "error",
+            "info",
+        ],
+        shape: [
+            "none",
+            "circle",
+            "square",
+            "slanted",
+            "arch",
+            "fan",
+            "arrow",
+            "semiCircle",
+            "oval",
+            "pill",
+            "triangle",
+            "diamond",
+            "clamShell",
+            "pentagon",
+            "gem",
+            "sunny",
+            "verySunny",
+            "cookie4Sided",
+            "cookie6Sided",
+            "cookie7Sided",
+            "cookie9Sided",
+            "cookie12Sided",
+            "ghostish",
+            "clover4Leaf",
+            "clover8Leaf",
+            "burst",
+            "softBurst",
+            "boom",
+            "softBoom",
+            "flower",
+            "puffy",
+            "puffyDiamond",
+            "pixelCircle",
+            "pixelTriangle",
+            "bun",
+            "heart",
+        ],
+    },
 } as const satisfies ComponentAnatomy;
 
 export const badgeAnatomy = {
@@ -392,6 +598,7 @@ export const badgeAnatomy = {
             mirror: false,
         },
     },
+    variants: { size: ["small", "large"], placement: ["flow", "anchored"] },
 } as const satisfies ComponentAnatomy;
 
 export const mediaAnatomy = {
@@ -409,6 +616,47 @@ export const mediaAnatomy = {
             styled: true,
             mirror: false,
         },
+    },
+    variants: {
+        aspect: ["square", "landscape", "portrait", "auto"],
+        shape: [
+            "none",
+            "circle",
+            "square",
+            "slanted",
+            "arch",
+            "fan",
+            "arrow",
+            "semiCircle",
+            "oval",
+            "pill",
+            "triangle",
+            "diamond",
+            "clamShell",
+            "pentagon",
+            "gem",
+            "sunny",
+            "verySunny",
+            "cookie4Sided",
+            "cookie6Sided",
+            "cookie7Sided",
+            "cookie9Sided",
+            "cookie12Sided",
+            "ghostish",
+            "clover4Leaf",
+            "clover8Leaf",
+            "burst",
+            "softBurst",
+            "boom",
+            "softBoom",
+            "flower",
+            "puffy",
+            "puffyDiamond",
+            "pixelCircle",
+            "pixelTriangle",
+            "bun",
+            "heart",
+        ],
     },
 } as const satisfies ComponentAnatomy;
 
@@ -467,6 +715,21 @@ export const chipAnatomy = {
     indication: [
         { trigger: "root", surface: "root", centered: false, focus: "root" },
     ],
+    variants: {
+        variant: ["outlined", "elevated"],
+        corner: ["round", "square"],
+        toggle: ["false", "true"],
+        color: [
+            "primary",
+            "secondary",
+            "tertiary",
+            "success",
+            "warning",
+            "error",
+            "info",
+        ],
+        density: ["0", "inherit", "-1", "-2", "-3"],
+    },
 } as const satisfies ComponentAnatomy;
 
 export const chipSetAnatomy = {
@@ -485,6 +748,7 @@ export const chipSetAnatomy = {
             mirror: false,
         },
     },
+    variants: { singleLine: ["false", "true"] },
 } as const satisfies ComponentAnatomy;
 
 export const inputChipAnatomy = {
@@ -557,6 +821,20 @@ export const inputChipAnatomy = {
             focus: "remove",
         },
     ],
+    variants: {
+        corner: ["round", "square"],
+        toggle: ["false", "true"],
+        color: [
+            "primary",
+            "secondary",
+            "tertiary",
+            "success",
+            "warning",
+            "error",
+            "info",
+        ],
+        density: ["0", "inherit", "-1", "-2", "-3"],
+    },
 } as const satisfies ComponentAnatomy;
 
 export const textFieldAnatomy = {
@@ -674,6 +952,24 @@ export const textFieldAnatomy = {
             mirror: false,
         },
     },
+    variants: {
+        variant: ["filled", "outlined"],
+        color: [
+            "primary",
+            "secondary",
+            "tertiary",
+            "success",
+            "warning",
+            "error",
+            "info",
+        ],
+        leadingIcon: ["true", "false"],
+        trailingIcon: ["true", "false"],
+        prefixText: ["true", "false"],
+        suffixText: ["true", "false"],
+        secure: ["true", "false"],
+        density: ["0", "inherit", "-1", "-2", "-3"],
+    },
 } as const satisfies ComponentAnatomy;
 
 export const textAreaAnatomy = {
@@ -764,6 +1060,22 @@ export const textAreaAnatomy = {
             mirror: false,
         },
     },
+    variants: {
+        color: [
+            "primary",
+            "secondary",
+            "tertiary",
+            "success",
+            "warning",
+            "error",
+            "info",
+        ],
+        leadingIcon: ["true", "false"],
+        trailingIcon: ["true", "false"],
+        autoGrow: ["true", "false"],
+        variant: ["filled", "outlined"],
+        density: ["0", "inherit", "-1", "-2", "-3"],
+    },
 } as const satisfies ComponentAnatomy;
 
 export const tagsInputAnatomy = {
@@ -844,6 +1156,21 @@ export const tagsInputAnatomy = {
             mirror: false,
         },
     },
+    variants: {
+        variant: ["filled", "outlined"],
+        color: [
+            "primary",
+            "secondary",
+            "tertiary",
+            "success",
+            "warning",
+            "error",
+            "info",
+        ],
+        leadingIcon: ["true", "false"],
+        trailingIcon: ["true", "false"],
+        density: ["0", "inherit", "-1", "-2", "-3"],
+    },
 } as const satisfies ComponentAnatomy;
 
 export const searchBarAnatomy = {
@@ -889,6 +1216,7 @@ export const searchBarAnatomy = {
             mirror: true,
         },
     },
+    variants: { centered: ["false", "true"], scrolled: ["false", "true"] },
 } as const satisfies ComponentAnatomy;
 
 export const searchViewAnatomy = {
@@ -969,6 +1297,7 @@ export const searchViewAnatomy = {
             mirror: false,
         },
     },
+    variants: { variant: ["fullScreen", "docked", "contained"] },
 } as const satisfies ComponentAnatomy;
 
 export const selectAnatomy = {
@@ -1086,6 +1415,23 @@ export const selectAnatomy = {
             mirror: false,
         },
     },
+    variants: {
+        variant: ["filled", "outlined"],
+        color: [
+            "primary",
+            "secondary",
+            "tertiary",
+            "success",
+            "warning",
+            "error",
+            "info",
+        ],
+        leadingIcon: ["true", "false"],
+        trailingIcon: ["true", "false"],
+        prefixText: ["true", "false"],
+        suffixText: ["true", "false"],
+        density: ["0", "inherit", "-1", "-2", "-3"],
+    },
 } as const satisfies ComponentAnatomy;
 
 export const autocompleteAnatomy = {
@@ -1193,6 +1539,23 @@ export const autocompleteAnatomy = {
             mirror: false,
         },
     },
+    variants: {
+        variant: ["filled", "outlined"],
+        color: [
+            "primary",
+            "secondary",
+            "tertiary",
+            "success",
+            "warning",
+            "error",
+            "info",
+        ],
+        leadingIcon: ["true", "false"],
+        trailingIcon: ["true", "false"],
+        prefixText: ["true", "false"],
+        suffixText: ["true", "false"],
+        density: ["0", "inherit", "-1", "-2", "-3"],
+    },
 } as const satisfies ComponentAnatomy;
 
 export const calendarCellAnatomy = {
@@ -1228,6 +1591,18 @@ export const calendarCellAnatomy = {
             focus: "trigger",
         },
     ],
+    variants: {
+        view: ["day", "month", "year"],
+        selection: [
+            "none",
+            "selected",
+            "rangeStart",
+            "rangeMiddle",
+            "rangeEnd",
+        ],
+        today: ["true", "false"],
+        outside: ["true", "false"],
+    },
 } as const satisfies ComponentAnatomy;
 
 export const datePickerAnatomy = {
@@ -1406,6 +1781,7 @@ export const datePickerAnatomy = {
             mirror: false,
         },
     },
+    variants: {},
 } as const satisfies ComponentAnatomy;
 
 export const dockedDatePickerAnatomy = {
@@ -1650,6 +2026,23 @@ export const dockedDatePickerAnatomy = {
             mirror: false,
         },
     },
+    variants: {
+        variant: ["filled", "outlined"],
+        color: [
+            "primary",
+            "secondary",
+            "tertiary",
+            "success",
+            "warning",
+            "error",
+            "info",
+        ],
+        leadingIcon: ["true", "false"],
+        trailingIcon: ["true", "false"],
+        prefixText: ["true", "false"],
+        suffixText: ["true", "false"],
+        density: ["0", "inherit", "-1", "-2", "-3"],
+    },
 } as const satisfies ComponentAnatomy;
 
 export const dateInputAnatomy = {
@@ -1837,6 +2230,23 @@ export const dateInputAnatomy = {
             mirror: false,
         },
     },
+    variants: {
+        variant: ["filled", "outlined"],
+        color: [
+            "primary",
+            "secondary",
+            "tertiary",
+            "success",
+            "warning",
+            "error",
+            "info",
+        ],
+        leadingIcon: ["true", "false"],
+        trailingIcon: ["true", "false"],
+        prefixText: ["true", "false"],
+        suffixText: ["true", "false"],
+        density: ["0", "inherit", "-1", "-2", "-3"],
+    },
 } as const satisfies ComponentAnatomy;
 
 export const supportingTextAnatomy = {
@@ -1854,6 +2264,18 @@ export const supportingTextAnatomy = {
             styled: true,
             mirror: false,
         },
+    },
+    variants: {
+        tone: [
+            "neutral",
+            "error",
+            "primary",
+            "secondary",
+            "tertiary",
+            "success",
+            "warning",
+            "info",
+        ],
     },
 } as const satisfies ComponentAnatomy;
 
@@ -1928,6 +2350,18 @@ export const checkboxAnatomy = {
     indication: [
         { trigger: "input", surface: "root", centered: true, focus: "root" },
     ],
+    variants: {
+        density: ["0", "inherit", "-1", "-2", "-3"],
+        color: [
+            "primary",
+            "secondary",
+            "tertiary",
+            "success",
+            "warning",
+            "error",
+            "info",
+        ],
+    },
 } as const satisfies ComponentAnatomy;
 
 export const radioAnatomy = {
@@ -1985,6 +2419,18 @@ export const radioAnatomy = {
     indication: [
         { trigger: "input", surface: "root", centered: true, focus: "root" },
     ],
+    variants: {
+        density: ["0", "inherit", "-1", "-2", "-3"],
+        color: [
+            "primary",
+            "secondary",
+            "tertiary",
+            "success",
+            "warning",
+            "error",
+            "info",
+        ],
+    },
 } as const satisfies ComponentAnatomy;
 
 export const switchControlAnatomy = {
@@ -2073,6 +2519,18 @@ export const switchControlAnatomy = {
             focus: "root",
         },
     ],
+    variants: {
+        color: [
+            "primary",
+            "secondary",
+            "tertiary",
+            "success",
+            "warning",
+            "error",
+            "info",
+        ],
+        icons: ["selected", "both", "none"],
+    },
 } as const satisfies ComponentAnatomy;
 
 export const sliderAnatomy = {
@@ -2210,6 +2668,20 @@ export const sliderAnatomy = {
             focus: "handle",
         },
     ],
+    variants: {
+        color: [
+            "primary",
+            "secondary",
+            "tertiary",
+            "success",
+            "warning",
+            "error",
+            "info",
+        ],
+        handleShape: ["bar", "round"],
+        size: ["xsmall", "small", "medium", "large", "xlarge"],
+        orientation: ["horizontal", "vertical"],
+    },
 } as const satisfies ComponentAnatomy;
 
 export const linearProgressAnatomy = {
@@ -2254,6 +2726,20 @@ export const linearProgressAnatomy = {
             styled: true,
             mirror: false,
         },
+    },
+    variants: {
+        indeterminate: ["true", "false"],
+        thickness: ["default", "thick"],
+        shape: ["flat", "wavy"],
+        color: [
+            "primary",
+            "secondary",
+            "tertiary",
+            "success",
+            "warning",
+            "error",
+            "info",
+        ],
     },
 } as const satisfies ComponentAnatomy;
 
@@ -2365,6 +2851,20 @@ export const circularProgressAnatomy = {
             mirror: false,
         },
     },
+    variants: {
+        indeterminate: ["true", "false"],
+        thickness: ["default", "thick"],
+        shape: ["flat", "wavy"],
+        color: [
+            "primary",
+            "secondary",
+            "tertiary",
+            "success",
+            "warning",
+            "error",
+            "info",
+        ],
+    },
 } as const satisfies ComponentAnatomy;
 
 export const loadingIndicatorAnatomy = {
@@ -2401,6 +2901,18 @@ export const loadingIndicatorAnatomy = {
             mirror: false,
         },
     },
+    variants: {
+        variant: ["uncontained", "contained"],
+        color: [
+            "primary",
+            "secondary",
+            "tertiary",
+            "success",
+            "warning",
+            "error",
+            "info",
+        ],
+    },
 } as const satisfies ComponentAnatomy;
 
 export const separatorAnatomy = {
@@ -2418,6 +2930,10 @@ export const separatorAnatomy = {
             styled: true,
             mirror: false,
         },
+    },
+    variants: {
+        inset: ["none", "start", "middle"],
+        orientation: ["horizontal", "vertical"],
     },
 } as const satisfies ComponentAnatomy;
 
@@ -2446,6 +2962,7 @@ export const listAnatomy = {
             mirror: false,
         },
     },
+    variants: { variant: ["standard", "segmented"] },
 } as const satisfies ComponentAnatomy;
 
 export const listItemAnatomy = {
@@ -2585,6 +3102,24 @@ export const listItemAnatomy = {
     indication: [
         { trigger: "root", surface: "root", centered: false, focus: "root" },
     ],
+    variants: {
+        lines: ["one", "two", "three"],
+        interactive: ["true", "false"],
+        leadingType: ["icon", "avatar", "thumbnail", "video"],
+        position: ["none", "first", "middle", "last", "single"],
+        swipeable: ["false", "true"],
+        actionColor: ["secondary", "error"],
+        density: ["0", "inherit", "-1", "-2", "-3"],
+        color: [
+            "primary",
+            "secondary",
+            "tertiary",
+            "success",
+            "warning",
+            "error",
+            "info",
+        ],
+    },
 } as const satisfies ComponentAnatomy;
 
 export const menuAnatomy = {
@@ -2703,6 +3238,20 @@ export const menuAnatomy = {
     indication: [
         { trigger: "item", surface: "item", centered: false, focus: "item" },
     ],
+    variants: {
+        density: ["0", "inherit", "-1", "-2", "-3"],
+        color: [
+            "primary",
+            "secondary",
+            "tertiary",
+            "success",
+            "warning",
+            "error",
+            "info",
+        ],
+        vibrant: ["true", "false"],
+        grouped: ["true", "false"],
+    },
 } as const satisfies ComponentAnatomy;
 
 export const tabsAnatomy = {
@@ -2769,6 +3318,21 @@ export const tabsAnatomy = {
     indication: [
         { trigger: "tab", surface: "tab", centered: false, focus: "tab" },
     ],
+    variants: {
+        variant: ["primary", "secondary"],
+        icon: ["true", "false"],
+        inlineIcon: ["true", "false"],
+        scrollable: ["false", "true"],
+        color: [
+            "primary",
+            "secondary",
+            "tertiary",
+            "success",
+            "warning",
+            "error",
+            "info",
+        ],
+    },
 } as const satisfies ComponentAnatomy;
 
 export const navigationBarAnatomy = {
@@ -2847,6 +3411,18 @@ export const navigationBarAnatomy = {
             focus: "item",
         },
     ],
+    variants: {
+        color: [
+            "primary",
+            "secondary",
+            "tertiary",
+            "success",
+            "warning",
+            "error",
+            "info",
+        ],
+        itemLayout: ["vertical", "horizontal"],
+    },
 } as const satisfies ComponentAnatomy;
 
 export const navigationRailAnatomy = {
@@ -2945,6 +3521,19 @@ export const navigationRailAnatomy = {
             focus: "item",
         },
     ],
+    variants: {
+        color: [
+            "primary",
+            "secondary",
+            "tertiary",
+            "success",
+            "warning",
+            "error",
+            "info",
+        ],
+        expanded: ["false", "true"],
+        modal: ["false", "true"],
+    },
 } as const satisfies ComponentAnatomy;
 
 export const appBarAnatomy = {
@@ -3014,6 +3603,13 @@ export const appBarAnatomy = {
             styled: true,
             mirror: true,
         },
+    },
+    variants: {
+        size: ["small", "mediumFlexible", "largeFlexible"],
+        centered: ["false", "true"],
+        search: ["false", "true"],
+        scrolled: ["false", "true"],
+        collapsed: ["false", "true"],
     },
 } as const satisfies ComponentAnatomy;
 
@@ -3200,6 +3796,7 @@ export const timePickerAnatomy = {
             focus: "period",
         },
     ],
+    variants: { mode: ["dial", "scroll"], color: ["standard", "vibrant"] },
 } as const satisfies ComponentAnatomy;
 
 export const timeInputAnatomy = {
@@ -3333,6 +3930,7 @@ export const timeInputAnatomy = {
             focus: "period",
         },
     ],
+    variants: {},
 } as const satisfies ComponentAnatomy;
 
 export const dialogAnatomy = {
@@ -3387,6 +3985,7 @@ export const dialogAnatomy = {
             mirror: false,
         },
     },
+    variants: { icon: ["true", "false"] },
 } as const satisfies ComponentAnatomy;
 
 export const fullscreenDialogAnatomy = {
@@ -3457,6 +4056,7 @@ export const fullscreenDialogAnatomy = {
             mirror: false,
         },
     },
+    variants: {},
 } as const satisfies ComponentAnatomy;
 
 export const bottomSheetAnatomy = {
@@ -3493,6 +4093,7 @@ export const bottomSheetAnatomy = {
             mirror: false,
         },
     },
+    variants: { modal: ["true", "false"] },
 } as const satisfies ComponentAnatomy;
 
 export const sideSheetAnatomy = {
@@ -3573,6 +4174,7 @@ export const sideSheetAnatomy = {
             mirror: false,
         },
     },
+    variants: { modal: ["true", "false"], coplanar: ["true", "false"] },
 } as const satisfies ComponentAnatomy;
 
 export const dragHandleAnatomy = {
@@ -3600,6 +4202,7 @@ export const dragHandleAnatomy = {
             mirror: false,
         },
     },
+    variants: { orientation: ["horizontal", "vertical"] },
 } as const satisfies ComponentAnatomy;
 
 export const snackbarAnatomy = {
@@ -3663,6 +4266,7 @@ export const snackbarAnatomy = {
         },
         { trigger: "close", surface: "close", centered: false, focus: "close" },
     ],
+    variants: { layout: ["oneLine", "twoLine", "longAction"] },
 } as const satisfies ComponentAnatomy;
 
 export const toastAnatomy = {
@@ -3763,6 +4367,7 @@ export const toastAnatomy = {
             focus: "closeTrigger",
         },
     ],
+    variants: { type: ["info", "success", "warning", "error", "loading"] },
 } as const satisfies ComponentAnatomy;
 
 export const toolbarAnatomy = {
@@ -3780,6 +4385,12 @@ export const toolbarAnatomy = {
             styled: true,
             mirror: false,
         },
+    },
+    variants: {
+        placement: ["floating", "docked"],
+        orientation: ["horizontal", "vertical"],
+        color: ["standard", "vibrant"],
+        overflow: ["false", "true"],
     },
 } as const satisfies ComponentAnatomy;
 
@@ -3817,6 +4428,7 @@ export const tooltipAnatomy = {
             mirror: false,
         },
     },
+    variants: {},
 } as const satisfies ComponentAnatomy;
 
 export const richTooltipAnatomy = {
@@ -3871,6 +4483,7 @@ export const richTooltipAnatomy = {
             mirror: false,
         },
     },
+    variants: {},
 } as const satisfies ComponentAnatomy;
 
 export const paginatorAnatomy = {
@@ -3986,6 +4599,7 @@ export const paginatorAnatomy = {
             mirror: false,
         },
     },
+    variants: { density: ["0", "inherit", "-1", "-2", "-3"] },
 } as const satisfies ComponentAnatomy;
 
 export const cardAnatomy = {
@@ -4154,6 +4768,12 @@ export const cardAnatomy = {
             layer: "actionArea",
         },
     ],
+    variants: {
+        variant: ["elevated", "filled", "outlined"],
+        interactive: ["true", "false"],
+        padded: ["true", "false"],
+        actionsAlign: ["end", "start"],
+    },
 } as const satisfies ComponentAnatomy;
 
 export const carouselAnatomy = {
@@ -4211,6 +4831,15 @@ export const carouselAnatomy = {
     indication: [
         { trigger: "mask", surface: "mask", centered: false, focus: "mask" },
     ],
+    variants: {
+        layout: [
+            "multiBrowse",
+            "hero",
+            "uncontained",
+            "multiAspect",
+            "fullScreen",
+        ],
+    },
 } as const satisfies ComponentAnatomy;
 
 export const accordionAnatomy = {
@@ -4319,6 +4948,7 @@ export const accordionAnatomy = {
             focus: "trigger",
         },
     ],
+    variants: { density: ["0", "inherit", "-1", "-2", "-3"] },
 } as const satisfies ComponentAnatomy;
 
 export const treeAnatomy = {
@@ -4422,6 +5052,18 @@ export const treeAnatomy = {
     indication: [
         { trigger: "node", surface: "node", centered: false, focus: "node" },
     ],
+    variants: {
+        density: ["0", "inherit", "-1", "-2", "-3"],
+        color: [
+            "primary",
+            "secondary",
+            "tertiary",
+            "success",
+            "warning",
+            "error",
+            "info",
+        ],
+    },
 } as const satisfies ComponentAnatomy;
 
 export const stepperAnatomy = {
@@ -4530,6 +5172,10 @@ export const stepperAnatomy = {
             focus: "trigger",
         },
     ],
+    variants: {
+        orientation: ["horizontal", "vertical"],
+        density: ["0", "inherit", "-1", "-2", "-3"],
+    },
 } as const satisfies ComponentAnatomy;
 
 export const dataTableAnatomy = {
@@ -4698,6 +5344,10 @@ export const dataTableAnatomy = {
             focus: "sortHeader",
         },
     ],
+    variants: {
+        stickyHeader: ["true", "false"],
+        density: ["0", "inherit", "-1", "-2", "-3"],
+    },
 } as const satisfies ComponentAnatomy;
 
 export const gridListAnatomy = {
@@ -4788,6 +5438,11 @@ export const gridListAnatomy = {
             mirror: false,
         },
     },
+    variants: {
+        columns: ["1", "2", "3", "4", "5", "6"],
+        gutter: ["none", "small", "medium", "large"],
+        aspect: ["square", "landscape", "portrait", "wide"],
+    },
 } as const satisfies ComponentAnatomy;
 
 export const scrimAnatomy = {
@@ -4806,6 +5461,7 @@ export const scrimAnatomy = {
             mirror: false,
         },
     },
+    variants: {},
 } as const satisfies ComponentAnatomy;
 
 export const rippleAnatomy = {
@@ -4833,6 +5489,7 @@ export const rippleAnatomy = {
             mirror: false,
         },
     },
+    variants: {},
 } as const satisfies ComponentAnatomy;
 
 export const iconAnatomy = {
@@ -4850,6 +5507,20 @@ export const iconAnatomy = {
             styled: true,
             mirror: true,
         },
+    },
+    variants: {
+        size: ["small", "medium", "large"],
+        color: [
+            "current",
+            "primary",
+            "secondary",
+            "tertiary",
+            "success",
+            "warning",
+            "error",
+            "info",
+        ],
+        filled: ["inherit", "false", "true"],
     },
 } as const satisfies ComponentAnatomy;
 
@@ -4869,6 +5540,7 @@ export const touchTargetAnatomy = {
             mirror: false,
         },
     },
+    variants: {},
 } as const satisfies ComponentAnatomy;
 
 export const textAnatomy = {
@@ -4886,6 +5558,25 @@ export const textAnatomy = {
             styled: true,
             mirror: false,
         },
+    },
+    variants: {
+        style: [
+            "displayLarge",
+            "displayMedium",
+            "displaySmall",
+            "headlineLarge",
+            "headlineMedium",
+            "headlineSmall",
+            "titleLarge",
+            "titleMedium",
+            "titleSmall",
+            "bodyLarge",
+            "bodyMedium",
+            "bodySmall",
+            "labelLarge",
+            "labelMedium",
+            "labelSmall",
+        ],
     },
 } as const satisfies ComponentAnatomy;
 
