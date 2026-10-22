@@ -931,6 +931,53 @@ describe("the sheets", () => {
         expect(box(root).top).toBe(start);
     });
 
+    it("holds a dragged bottom sheet until onClose answers, then springs back or leaves", async () => {
+        const asked: boolean[] = [];
+        let answer: (yes: boolean) => void = () => {};
+        await render(
+            <BottomSheet
+                modal={false}
+                open
+                onOpenChange={(details) => asked.push(details.open)}
+                onClose={() =>
+                    new Promise<boolean>((resolve) => {
+                        answer = resolve;
+                    })
+                }
+            >
+                Share to
+            </BottomSheet>,
+        );
+        const root = sheet("bottom-sheet")!;
+        const handle = document.querySelector<HTMLElement>(
+            '[data-testid="pf-bottom-sheet-drag-handle"]',
+        )!;
+        await laidOut(root);
+        const start = box(root).top;
+        const drag = async () =>
+            (await dragDown(handle, [20, 100, 200, 300]))();
+
+        // It holds where it was let go while the app thinks, then springs back on false.
+        await drag();
+        const held = box(root).top;
+        expect(held).toBeGreaterThan(start + 100);
+        await settle(100);
+        expect(box(root).top).toBe(held);
+        expect(asked).toEqual([]);
+        await interact(async () => answer(false));
+        await until(() => box(root).top === start);
+        expect(box(root).top).toBe(start);
+        expect(asked).toEqual([]);
+
+        // On true, it asks to close (and, kept open here, settles back).
+        await drag();
+        expect(box(root).top).toBeGreaterThan(start + 100);
+        await interact(async () => answer(true));
+        expect(asked).toEqual([false]);
+        await until(() => box(root).top === start);
+        expect(box(root).top).toBe(start);
+    });
+
     it("closes a modal side sheet from its close button, and its back button calls onBack", async () => {
         const backs: number[] = [];
         await render(

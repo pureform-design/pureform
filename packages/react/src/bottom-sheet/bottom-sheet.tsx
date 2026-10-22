@@ -30,7 +30,7 @@ import type {
 } from "@pureform/binding-core";
 import { dragToDismiss } from "@pureform/binding-core/dom";
 import { mergeProps, normalizeProps } from "@zag-js/react";
-import { type ElementType, type ReactNode, useCallback } from "react";
+import { type ElementType, type ReactNode, useCallback, useRef } from "react";
 
 import { Button } from "../button";
 import { dialogParts } from "../dialog-parts";
@@ -113,7 +113,15 @@ function DragHandle({
     as,
     ...props
 }: BottomSheetTriggerProps): ReactNode {
-    const { scope, api, latestApi, surface } = context.use("DragHandle");
+    const {
+        scope,
+        api,
+        latestApi,
+        surface,
+        props: root,
+    } = context.use("DragHandle");
+    const latestRoot = useRef(root);
+    latestRoot.current = root;
     const ref = useCallback(
         (element: HTMLElement | null) =>
             element
@@ -121,6 +129,7 @@ function DragHandle({
                       element,
                       () => surface.current,
                       () => latestApi.current.setOpen(false),
+                      () => latestRoot.current.onClose?.() ?? true,
                   )
                 : undefined,
         [surface, latestApi],

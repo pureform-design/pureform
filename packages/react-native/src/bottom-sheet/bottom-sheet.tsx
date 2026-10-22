@@ -5,21 +5,24 @@
 // drag handle, Escape, or the back button closes it, and so does a drag down on the handle past a
 // quarter of the sheet's height. The sheet follows the drag down; a shorter drag lets it settle
 // back on the theme's default spatial spring, carrying the release's velocity (at once under
-// reduced motion), as Compose's sheets do. Its `Modal` holds a portal host of its own, so menus, tooltips,
-// and selects opened inside draw over it.
+// reduced motion), as Compose's sheets do. Given `onClose`, a dismissing drag asks it first and
+// holds where it was let go until the answer, then leaves or settles back. Its `Modal` holds a
+// portal host of its own, so menus, tooltips, and selects opened inside draw over it.
 
 import { bottomSheetAnatomy } from "@pureform/anatomy";
 import type { PartName, TestIdOverride } from "@pureform/anatomy";
 import { bottomSheetSelection, sheetModal } from "@pureform/binding-core";
 import type {
+    BottomSheetCloseProps,
     BottomSheetVariantProps,
     ChangeDetails,
 } from "@pureform/binding-core";
 import { settle } from "@pureform/rn-adapter/animated";
 import { useReducedMotion, useTokens } from "@pureform/rn-adapter/react";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Animated, PanResponder, ScrollView, StyleSheet } from "react-native";
+import type { LayoutChangeEvent } from "react-native";
 
 import { Button } from "../button/button";
 import { DragHandle } from "../drag-handle/drag-handle";
@@ -39,7 +42,8 @@ export interface BottomSheetTriggerProps {
     readonly "aria-haspopup": "dialog";
 }
 
-export interface BottomSheetProps extends BottomSheetVariantProps {
+export interface BottomSheetProps
+    extends BottomSheetVariantProps, BottomSheetCloseProps {
     /** The content, scrolling under the drag handle. */
     readonly children?: ReactNode;
     /** Whether it shows the drag handle at its top edge. @default true */
@@ -115,11 +119,42 @@ function BottomSheetImpl(
     useEffect(() => {
         if (shown.current) drag.setValue(0);
     }, [props.shown, props.open, drag]);
-    const checking = useRef(0);
+    // After a drag asked it to close: once that render has committed, a sheet that stays (one
+    // the app keeps open, or one that can't close) settles back.
+    const [left, setLeft] = useState<{ readonly velocity: number }>();
+    useEffect(() => {
+        if (left && shown.current) latestSettle(left.velocity);
+    }, [left, latestSettle]);
+    const latestLeave = useStableCallback((velocity: number) => {
+        latestClose();
+        setLeft({ velocity });
+    });
+    // Counts the questions `onClose` was asked, so an answer after another drag is moot.
+    const asking = useRef(0);
+    // A dismissing drag asks `onClose` first; it holds where it was let go until the answer.
+    const latestDismiss = useStableCallback((velocity: number) => {
+        const answer = props.onClose?.() ?? true;
+        if (typeof answer === "boolean") {
+            if (answer) latestLeave(velocity);
+            else latestSettle(velocity);
+            return;
+        }
+        const asked = ++asking.current;
+        answer.then(
+            (yes) => {
+                if (asked !== asking.current) return;
+                if (yes) latestLeave(0);
+                else latestSettle(0);
+            },
+            () => {
+                if (asked === asking.current) latestSettle(0);
+            },
+        );
+    });
     useEffect(
         () => () => {
             stopSettle.current();
-            cancelAnimationFrame(checking.current);
+            asking.current++;
         },
         [],
     );
@@ -131,25 +166,21 @@ function BottomSheetImpl(
                 onMoveShouldSetPanResponder: (_, gesture) =>
                     gesture.dy > 4 &&
                     Math.abs(gesture.dy) > Math.abs(gesture.dx),
-                onPanResponderGrant: () => stopSettle.current(),
+                onPanResponderGrant: () => {
+                    asking.current++;
+                    stopSettle.current();
+                },
                 onPanResponderMove: (_, gesture) =>
                     drag.setValue(Math.max(0, gesture.dy)),
                 onPanResponderRelease: (_, gesture) => {
-                    if (height.current > 0 && gesture.dy > height.current / 4) {
-                        latestClose();
-                        // A sheet that stays (one the app keeps open, or one that can't
-                        // close) settles back once the close has had its render.
-                        checking.current = requestAnimationFrame(() => {
-                            if (shown.current) latestSettle(gesture.vy);
-                        });
-                        return;
-                    }
-                    latestSettle(gesture.vy);
+                    if (height.current > 0 && gesture.dy > height.current / 4)
+                        latestDismiss(gesture.vy);
+                    else latestSettle(gesture.vy);
                 },
                 onPanResponderTerminate: (_, gesture) =>
                     latestSettle(gesture.vy),
             }),
-        [latestClose, latestSettle, drag],
+        [latestDismiss, latestSettle, drag],
     );
     const id = (part: Part) => testIdOf(bottomSheetAnatomy, part, props.testId);
     if (!presence.present) return null;
@@ -166,10 +197,13 @@ function BottomSheetImpl(
                 {...(props["aria-label"] === undefined
                     ? {}
                     : { "aria-label": props["aria-label"] })}
-                onLayout={(event: {
-                    nativeEvent: { layout: { height: number } };
-                }) => {
+                onLayout={(event: LayoutChangeEvent) => {
                     height.current = event.nativeEvent.layout.height;
+                    (
+                        presence.props.onLayout as
+                            | ((event: LayoutChangeEvent) => void)
+                            | undefined
+                    )?.(event);
                 }}
                 style={{ ...own, ...presence.style }}
                 testID={id("root")}

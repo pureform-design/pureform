@@ -154,6 +154,7 @@ export {
     sideSheetSelection,
 } from "./components/sheet";
 export type {
+    BottomSheetCloseProps,
     BottomSheetContentProps,
     BottomSheetPart,
     BottomSheetRootOwnProps,

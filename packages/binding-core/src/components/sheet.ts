@@ -55,10 +55,18 @@ export interface SideSheetVariantProps {
     readonly tokens?: InstanceTokens<"sideSheet"> | undefined;
 }
 
+/** What a bottom sheet asks before a drag closes it. */
+export interface BottomSheetCloseProps {
+    /** Asked when a drag on the drag handle would close the sheet: `true` closes it, `false`
+     *  keeps it open. Given a promise, the sheet holds where the drag let go of it until it
+     *  settles, then leaves (resolved `true`) or springs back. Without, a drag closes it. */
+    readonly onClose?: (() => boolean | Promise<boolean>) | undefined;
+}
+
 /** Everything the bottom sheet's Root takes for itself, besides the element's own props and
  *  `as`. */
 export interface BottomSheetRootOwnProps
-    extends BottomSheetVariantProps, SheetBehaviorProps {
+    extends BottomSheetVariantProps, SheetBehaviorProps, BottomSheetCloseProps {
     /** A prefix for every part's test id (`share` → `share-trigger`, `share-content`), or ids by
      *  part. */
     readonly testId?: TestIdOverride<BottomSheetPart> | undefined;
@@ -81,6 +89,7 @@ export interface SideSheetRootOwnProps
 export const BOTTOM_SHEET_ROOT_PROPS = [
     "modal",
     "tokens",
+    "onClose",
     ...DIALOG_BEHAVIOR_PROPS,
 ] as const satisfies readonly (keyof BottomSheetRootOwnProps)[];
 

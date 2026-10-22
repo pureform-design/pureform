@@ -285,7 +285,9 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
       the bottom sheet's drag handle (`dragHandleLabel`, "Close sheet"), on a press or a drag
       down past a quarter of its height, and the side sheet's close icon button (`closeLabel`).
       A drag that closes it lets it leave from where it was let go; a close the app refuses
-      (it keeps `open`) springs it back to rest. The drag moves a view around the surface that
+      (it keeps `open`) springs it back to rest. Given `onClose`, a dismissing drag asks it
+      first: `true` closes, `false` springs back, and a promise holds the sheet where it was let
+      go until it settles. The drag moves a view around the surface that
       takes the surface's place in its parent (size, margins, position, layer).
       The side sheet's header takes a back button when given `onBack`, and an `actions` row
       under the content. With `modal={false}` (and, for the side sheet, `coplanar`) each is its
