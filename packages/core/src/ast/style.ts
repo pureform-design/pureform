@@ -171,6 +171,9 @@ export interface StyleMap {
     backgroundImage?: Gradient;
     boxShadow?: Shadow;
     transform?: Transform;
+    /** A scale apart from `transform`, which it composes with: a part whose transform is set at
+     *  runtime (a toast Zag stacks) can still shrink. Web only. */
+    scale?: Dimension;
     /** The point a transform scales and turns around: `center`, `top left`, or a reference to
      *  one set at runtime, such as a positioner's `--transform-origin`. */
     transformOrigin?: Keyword;

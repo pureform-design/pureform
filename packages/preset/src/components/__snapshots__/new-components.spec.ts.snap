@@ -4264,6 +4264,12 @@ exports[`toast > compiles to a stable Panda slot recipe 1`] = `
       "width": "var(--components-toast-iconSize, token(sizes.iconMedium))",
     },
     "root": {
+      "&[data-state=closed]": {
+        "scale": {
+          "_motionReduce": "1",
+          "base": "0.8",
+        },
+      },
       "alignItems": "start",
       "backgroundColor": "var(--components-toast-container, token(colors.surfaceContainerHigh))",
       "borderRadius": "var(--components-toast-radius, token(radii.medium))",
@@ -4281,7 +4287,7 @@ exports[`toast > compiles to a stable Panda slot recipe 1`] = `
       "shadowElevation": "level3",
       "transition": {
         "_motionReduce": "opacity token(springs.effectsFast.duration) token(springs.effectsFast.easing)",
-        "base": "transform token(springs.spatialFast.duration) token(springs.spatialFast.easing), height token(springs.spatialFast.duration) token(springs.spatialFast.easing), opacity token(springs.effectsFast.duration) token(springs.effectsFast.easing)",
+        "base": "transform token(springs.spatialFast.duration) token(springs.spatialFast.easing), scale token(springs.spatialFast.duration) token(springs.spatialFast.easing), height token(springs.spatialFast.duration) token(springs.spatialFast.easing), opacity token(springs.effectsFast.duration) token(springs.effectsFast.easing)",
       },
       "width": "var(--components-toast-width, 356px)",
     },

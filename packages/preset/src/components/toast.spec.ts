@@ -48,10 +48,17 @@ describe("toast", () => {
         expect(recipe().base.root!.transition).toEqual({
             base:
                 "transform token(springs.spatialFast.duration) token(springs.spatialFast.easing), " +
+                "scale token(springs.spatialFast.duration) token(springs.spatialFast.easing), " +
                 "height token(springs.spatialFast.duration) token(springs.spatialFast.easing), " +
                 "opacity token(springs.effectsFast.duration) token(springs.effectsFast.easing)",
             _motionReduce:
                 "opacity token(springs.effectsFast.duration) token(springs.effectsFast.easing)",
+        });
+    });
+
+    it("shrinks to 80% as it fades out, like the snackbar, and only fades under reduced motion", () => {
+        expect(recipe().base.root!["&[data-state=closed]"]).toEqual({
+            scale: { base: "0.8", _motionReduce: "1" },
         });
     });
 
