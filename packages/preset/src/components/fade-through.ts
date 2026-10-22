@@ -23,17 +23,19 @@ import { overlayMotion } from "./overlay";
 import type { OverlayMotion } from "./overlay";
 
 /** The keyframes the fade through grows its pages with; `pureform()` adds them to the config. */
-export const FADE_THROUGH_KEYFRAMES: Record<string, Record<string, StyleMap>> =
-    {
-        fadeThroughGrowIn: {
-            from: { scale: unitless(0.8) },
-            to: { scale: unitless(1) },
-        },
-        fadeThroughGrowOut: {
-            from: { scale: unitless(1) },
-            to: { scale: unitless(1.05) },
-        },
-    };
+export const FADE_THROUGH_KEYFRAMES: Record<
+    string,
+    Record<string, StyleMap>
+> = {
+    fadeThroughGrowIn: {
+        from: { scale: unitless(0.8) },
+        to: { scale: unitless(1) },
+    },
+    fadeThroughGrowOut: {
+        from: { scale: unitless(1) },
+        to: { scale: unitless(1.05) },
+    },
+};
 
 /** The incoming page grows from 80% on the default spatial spring as it fades in, after the
  *  outgoing page has faded out; the outgoing page grows to 105% as it fades out. */

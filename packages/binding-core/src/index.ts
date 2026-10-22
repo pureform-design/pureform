@@ -987,6 +987,20 @@ export type {
     ScrimVariantProps,
 } from "./components/scrim";
 export {
+    dropPage,
+    FADE_THROUGH_ROOT_PROPS,
+    fadeThroughSelection,
+    pageStateProps,
+    showPage,
+} from "./components/fade-through";
+export type {
+    FadeThroughPage,
+    FadeThroughPart,
+    FadeThroughRootOwnProps,
+    FadeThroughState,
+    FadeThroughValue,
+} from "./components/fade-through";
+export {
     APP_BAR_AT_REST,
     APP_BAR_COLLAPSE_OFFSET,
     APP_BAR_CONTENT_PROPS,

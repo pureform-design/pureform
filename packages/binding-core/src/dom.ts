@@ -184,6 +184,30 @@ const stackNow = (positioner: HTMLElement, surface: HTMLElement): void => {
     stacked.set(positioner, positioner.style.zIndex);
 };
 
+/** Calls `done` once every animation running on `element` now has ended, at once when none runs
+ *  (an unstyled element, or styles not loaded). An animation cancelled instead of ending (the
+ *  element restyled or removed) counts as ended. Returns what stops waiting. */
+export const whenAnimationsEnd = (
+    element: Element,
+    done: () => void,
+): (() => void) => {
+    let waiting = true;
+    const end = () => {
+        if (!waiting) return;
+        waiting = false;
+        done();
+    };
+    const running = element.getAnimations?.() ?? [];
+    if (running.length === 0) {
+        end();
+        return () => {};
+    }
+    void Promise.allSettled(running.map((motion) => motion.finished)).then(end);
+    return () => {
+        waiting = false;
+    };
+};
+
 export {
     carouselRowPadding,
     measureCarouselRow,

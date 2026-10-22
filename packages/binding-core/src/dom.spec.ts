@@ -13,6 +13,7 @@ import {
     syncRadioInputs,
     syncTextInput,
     systemReducedMotion,
+    whenAnimationsEnd,
 } from "./dom";
 import type { IconStyle } from "./icon-style";
 
@@ -236,5 +237,38 @@ describe("revealInRow", () => {
             0,
         );
         expect(window.scrollX).toBe(0);
+    });
+});
+
+describe("whenAnimationsEnd", () => {
+    it("ends at once on an element with no animation", () => {
+        const element = document.body.appendChild(
+            document.createElement("div"),
+        );
+        let ended = 0;
+        whenAnimationsEnd(element, () => (ended += 1));
+        expect(ended).toBe(1);
+    });
+
+    it("waits for every running animation, and not once stopped", async () => {
+        const element = document.body.appendChild(
+            document.createElement("div"),
+        );
+        element.animate({ opacity: [1, 0] }, 30);
+        element.animate({ scale: [1, 1.05] }, 60);
+        let ended = false;
+        whenAnimationsEnd(element, () => (ended = true));
+        expect(ended).toBe(false);
+        await Promise.all(element.getAnimations().map((a) => a.finished));
+        await Promise.resolve();
+        expect(ended).toBe(true);
+
+        const other = document.body.appendChild(document.createElement("div"));
+        const motion = other.animate({ opacity: [1, 0] }, 20);
+        let heard = false;
+        whenAnimationsEnd(other, () => (heard = true))();
+        await motion.finished;
+        await Promise.resolve();
+        expect(heard).toBe(false);
     });
 });
