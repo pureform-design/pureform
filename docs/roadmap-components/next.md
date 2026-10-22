@@ -15,13 +15,14 @@ phase named.
   the list's and select's chevrons), plus the
   extras in [m2](phases/m2-spring-components.md) (swipe snap-back, sheet drag release,
   snackbar enter and stacking, split button chevron).
-- **A transitions phase** after the small fix phase: Compose's `FadeThrough` and
+- **[m3](phases/m3-transitions.md)**, a transitions phase after the fix phase: Compose's `FadeThrough` and
   `HorizontalSharedAxis` (§1 #5). Predictive back stays here for later.
 - **Before m2:** pre-bundle the dependencies of the component-suites and rn-web-demo e2e runs,
   so a Vite config change doesn't re-optimize mid-run (Solid hydration mismatches, blank page).
 - **Alongside m2:** a fresh-build `tsc` check on main.
 - **Gate:** the fixing agent reruns with `-f failed` only ([conventions](conventions.md)).
-- **Small fix phase after m2:**
+- **[f1](phases/f1-fixes.md)**, a fix phase after m2 (also the table sort arrow's descending
+  state from m2c):
     - React Native sheets: slide in from their edge instead of the dialog's motion; a refused
       close after a drag springs back to rest; check the extra drag `Animated.View` doesn't
       change a standalone sheet's layout (m2b).
@@ -164,3 +165,48 @@ values (c7b), swipe action colour and width (c7c), scrollable tabs' 52/90 (c7a).
 - `@pureform/anatomy#generate` can't load the root `oxfmt.config.ts` (r5).
 - omni can replay a stale build after files change back; `-f all` remains the workaround (gap
   analysis §5.7).
+
+## 4. Zag components we haven't ported (checked 2026-10-22)
+
+From [zagjs.com/llms.txt](https://zagjs.com/llms.txt) (Zag 1.46). Everything else there already
+has a pureform equivalent (listbox → selection list, combobox → autocomplete, toggle group and
+segmented control → button group, hover card and popover → rich tooltip, password input → text
+field, collapsible → accordion and expandable list items).
+
+### M3 gaps Zag can back
+
+- **Bottom sheet partly-open state** (Zag's drawer, snap points): M3's sheet rests half-open.
+- **Context trigger on Menu** (Zag's context menu): open the existing menu on right-click or
+  long-press.
+- **Resizable panes** (Zag's splitter): `DragHandle` is only the grip; nothing resizes panes.
+
+### No M3 component, ranked by usefulness
+
+Built with the Material guidelines and the existing parts, tokens and anatomy. Ranks 1 to 7 are
+planned in [c9](phases/c9-beyond-m3.md) as NumberField, FileUpload, CodeField, Popover,
+ColorPicker, CopyButton and Rating; the rest aren't planned.
+
+| #   | Zag             | Why                                                                           | Built from                                     |
+| --- | --------------- | ----------------------------------------------------------------------------- | ---------------------------------------------- |
+| 1   | Number input    | Forms everywhere; quantity, price                                             | Text field, icon buttons, the stepper's logic  |
+| 2   | File upload     | Common in forms; drop zone and file list                                      | Button, list items, progress, input chips      |
+| 3   | Pin input       | Sign-in and verification codes                                                | Text field cells                               |
+| 4   | Popover         | A general anchored panel (filters, small forms); rich tooltip is text         | Rich tooltip's surface, menu's positioning     |
+| 5   | Color picker    | Fits pureform's seed-based theming; theme editors                             | Slider, text field, `@pureform/material` color |
+| 6   | Clipboard       | Copy button with feedback; tiny                                               | Icon button, tooltip or snackbar               |
+| 7   | Rating          | Reviews                                                                       | Icon buttons, radio group's keyboard           |
+| 8   | Editable        | Inline edit in tables and list rows                                           | Text field, table cell, list item              |
+| 9   | Tour            | Onboarding                                                                    | Rich tooltip, scrim                            |
+| 10  | Timer           | Countdown or stopwatch; mostly logic                                          | Text, progress                                 |
+| 11  | Cascade select  | Picks a path through nested data; separate selects or autocomplete usually do | Select's field, menu's submenus                |
+| 12  | Navigation menu | Website mega-menus; M3 apps use bars and rails                                | Menu, navigation                               |
+| 13  | Angle slider    | Niche; the time picker's dial covers time                                     | Time picker dial                               |
+| 14  | Floating panel  | Desktop window-like panels; niche                                             | Dialog surface                                 |
+| 15  | Image cropper   | Niche and large                                                               | -                                              |
+| 16  | Signature pad   | Niche                                                                         | -                                              |
+| 17  | QR code         | A utility, not a control                                                      | -                                              |
+| 18  | Marquee         | Constant motion; accessibility cost                                           | -                                              |
+
+Not to port: **scroll area** (custom scrollbars that set the scroll position break the
+[native scrolling](conventions.md#native-scrolling) rule). The utilities (focus trap, hotkeys,
+async list) aren't components; dialogs already trap focus.
