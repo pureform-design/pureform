@@ -23,13 +23,14 @@ import type {
 import type { ThemeValues } from "@pureform/rn-adapter/factory";
 import { useReducedMotion, useTokens } from "@pureform/rn-adapter/react";
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
+import type { LayoutChangeEvent } from "react-native";
 import { useWindowDimensions } from "react-native";
 
 import { useDirection, useEngine, usePureform } from "./provider";
 
 /** A move as the theme gives it: pixels, a token's length times a factor, or a share of the
- *  window's size along the move (`{ share: 1 }` for the web's `100%` of a sheet against that
- *  edge: out of sight past it, whatever the sheet's own size). */
+ *  overlay's own size along the move (`{ share: 1 }` for the web's `100%`: a sheet against that
+ *  edge goes just out of sight past it). */
 export type OverlayMove =
     | number
     | { readonly token: string; readonly times: number }
@@ -210,7 +211,7 @@ const numberOf = (value: unknown, fallback: number): number => {
     return Number.isFinite(n) ? n : fallback;
 };
 
-/** The window's size, which a move by a share of it reads. */
+/** The overlay's size, which a move by a share of it reads. */
 export interface OverlaySize {
     readonly width: number;
     readonly height: number;
@@ -288,7 +289,7 @@ const timingOf = (
     };
 };
 
-/** An overlay's motion in a theme: its frames (a move by a share of the window's `size`, and
+/** An overlay's motion in a theme: its frames (a move by a share of its own `size`, and
  *  under `rtl` its right-to-left keyframes), its durations (`timeScale` times as long), curves
  *  and springs from the theme's tokens, and under `reducedMotion` its fade alone in place of
  *  each step that moves. */
@@ -336,11 +337,33 @@ export interface Presence {
     readonly present: boolean;
     /** The moving view's style: its opacity and transform, animated by the engine. */
     readonly style: Record<string, unknown>;
-    /** Props for the moving view, which must be the engine's view (`useEngine().View`). */
+    /** Props for the moving view, which must be the engine's view (`useEngine().View`). For a
+     *  motion that moves by the overlay's own size, they include the `onLayout` measuring it:
+     *  call it from the view's own `onLayout`, if it has one. */
     readonly props: Record<string, unknown>;
 }
 
 const STILL = Object.freeze({});
+const UNSEEN = Object.freeze({ opacity: 0 });
+
+// The motions that move by a share of the overlay's own size, which they measure.
+const SIZED = new Set<OverlayMotionName>(
+    (Object.keys(OVERLAY_MOTIONS) as OverlayMotionName[]).filter((name) =>
+        Object.values(OVERLAY_MOTIONS[name]).some((step: OverlayMotionStep) =>
+            [step.keyframes, step.rtl].some(
+                (keyframes) =>
+                    keyframes !== undefined &&
+                    Object.values(OVERLAY_KEYFRAMES[keyframes]).some(
+                        (frame: OverlayFrame) =>
+                            [frame.translateX, frame.translateY].some(
+                                (move) =>
+                                    typeof move === "object" && "share" in move,
+                            ),
+                    ),
+            ),
+        ),
+    ),
+);
 
 /** An overlay's enter and exit through the provider's engine: it enters when `open` turns
  *  true (or mounts open), and stays present when it turns false until the exit ends, so the
@@ -363,7 +386,9 @@ export function usePresence(
 }
 
 /** As `usePresence`, for a surface whose `open` is optional: without it, the surface is always
- *  present and still. */
+ *  present and still. A sheet slides by its own size, measured by the moving view's layout: its
+ *  enter waits for the first measure, and each step keeps the size it started with, so a sheet
+ *  that grows while it moves doesn't start the step over. */
 export function useOverlayPresence(
     open: boolean | undefined,
     motion: OverlayMotionName,
@@ -374,14 +399,33 @@ export function useOverlayPresence(
     const { timeScale } = usePureform();
     const window = useWindowDimensions();
     const rtl = useDirection() === "rtl";
+    const sized = SIZED.has(motion);
+    const [measured, setMeasured] = useState<OverlaySize>();
+    const shownNow = open ?? true;
+    const phase: PresencePhase = shownNow ? "enter" : "exit";
+    // The size a step moves by: measured when it started, or once it's first measured.
+    const held = useRef<{ phase: PresencePhase; size: OverlaySize }>(undefined);
+    if (
+        measured &&
+        (held.current === undefined || held.current.phase !== phase)
+    )
+        held.current = { phase, size: measured };
     const computed = overlayMotion(
         motion,
         tokens,
         reducedMotion,
         timeScale,
-        window,
+        held.current?.size ?? window,
         rtl,
     );
+    const onLayout = useCallback((event: LayoutChangeEvent) => {
+        const { width, height } = event.nativeEvent.layout;
+        setMeasured((last) =>
+            last?.width === width && last.height === height
+                ? last
+                : { width, height },
+        );
+    }, []);
     // Kept while it's the same, so a render doesn't start a step over.
     const resolved = useMemo(() => computed, [JSON.stringify(computed)]);
     const moves = open !== undefined;
@@ -389,11 +433,9 @@ export function useOverlayPresence(
         () => (moves ? engine.presence?.() : undefined),
         [engine, moves],
     );
-    const shownNow = open ?? true;
     const [present, setPresent] = useState(shownNow);
     if (shownNow && !present) setPresent(true);
     const shown = shownNow || present;
-    const phase: PresencePhase = shownNow ? "enter" : "exit";
     const latest = useRef(phase);
     useLayoutEffect(() => {
         latest.current = phase;
@@ -401,8 +443,11 @@ export function useOverlayPresence(
     const done = useCallback((ended: PresencePhase) => {
         if (ended === "exit" && latest.current === "exit") setPresent(false);
     }, []);
+    // A sized motion's enter waits for its first measure, unseen meanwhile; then the engine's
+    // view takes over from its first frame.
+    const measuring = sized && phase === "enter" && held.current === undefined;
     useLayoutEffect(() => {
-        if (!shown) return;
+        if (!shown || measuring) return;
         if (!driver) {
             done(phase);
             return;
@@ -412,8 +457,14 @@ export function useOverlayPresence(
         const step = resolved[phase];
         if (Math.max(step.duration, step.fade?.duration ?? 0) <= 0) done(phase);
         return stop;
-    }, [driver, resolved, phase, shown]);
+    }, [driver, resolved, phase, shown, measuring]);
     if (!driver) return { present: shownNow, style: STILL, props: STILL };
+    if (measuring)
+        return { present: shown, style: UNSEEN, props: { onLayout } };
     const view = driver.view(phase, resolved, done);
-    return { present: shown, style: view.style, props: view.props };
+    return {
+        present: shown,
+        style: view.style,
+        props: sized ? { ...view.props, onLayout } : view.props,
+    };
 }

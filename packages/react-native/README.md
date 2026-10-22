@@ -143,8 +143,8 @@ import { registry } from "./.pureform";
   turns false until the exit has run to its end, so render the overlay (or a `Modal`'s
   `visible`) from `present`, and give `style` and `props` to the engine's view that moves.
   `overlayMotion(name, tokens, reducedMotion, timeScale, size, rtl)` gives the frames and
-  timings; a sheet's slide is the window's `size` along its edge (the web's `100%` of the sheet:
-  out of sight either way), and the side sheet's runs from the left under `rtl`.
+  timings; a sheet slides by its own measured size along its edge (the web's `100%`), its enter
+  waiting, unseen, for its first layout, and the side sheet's runs from the left under `rtl`.
 - **Portals:** `Portal` renders its children at the nearest `PortalHost`, in a layer over the
   page, sorted by the theme's z-index for its `layer` and then by the order each opened (a portal
   inside another sorts over it), keeping the provider it was declared under. The root
