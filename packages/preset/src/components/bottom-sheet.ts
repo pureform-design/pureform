@@ -18,7 +18,7 @@ import { radius, spacing, textStyle, zIndex } from "@pureform/theme";
 
 import { overlayMotion } from "./overlay";
 import { componentTokens, surface, sys } from "./shared";
-import { BOTTOM_SHEET_MOTION } from "./sheet";
+import { BOTTOM_SHEET_MOTION, SHEET_SETTLE } from "./sheet";
 import { runCorners } from "./tiles";
 
 const { tokens, ref } = componentTokens("bottomSheet", {
@@ -47,6 +47,8 @@ export const bottomSheet = pf.slotComponent({
             root: {
                 ...surface(ref("container"), ref("content"), "level1"),
                 ...overlayMotion(BOTTOM_SHEET_MOTION),
+                // Settles back on a spring after a drag the binding lets go of.
+                transition: SHEET_SETTLE,
                 ...runCorners(ref("radius"), px(0)),
                 display: flex,
                 flexDirection: column,

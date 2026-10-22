@@ -110,3 +110,10 @@ export const animation = (opts: AnimationRun & Timing): AnimationNode => ({
     type: "animation",
     ...opts,
 });
+/** Keyframe animations that run together, each on its own timing (CSS's comma-separated
+ *  `animation` list): `animations(animation({ name: "scaleIn", spring }), animation({ name:
+ *  "fadeIn", duration, easing }))`. One alone is itself. */
+export const animations = (
+    first: AnimationNode,
+    ...rest: AnimationNode[]
+): AnimationNode => (rest.length > 0 ? { ...first, alongside: rest } : first);

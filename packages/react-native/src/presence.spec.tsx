@@ -143,32 +143,48 @@ describe("the overlay motions", () => {
                 <Read />
             </PureformProvider>,
         );
-        expect(overlayMotion("popup", tokens, false)).toEqual({
-            enter: {
-                from: { opacity: 0, scale: 0.8 },
-                to: { opacity: 1, scale: 1 },
+        const popup = overlayMotion("popup", tokens, false);
+        // The growth on the fast spatial spring, its fade alongside on the fade's tween.
+        expect(popup.enter).toMatchObject({
+            from: { opacity: 0, scale: 0.8 },
+            to: { opacity: 1, scale: 1 },
+            duration: Number(tokens["springs.spatialFast.duration"]),
+            easing: tokens["springs.spatialFast.easing"],
+            spring: {
+                type: "spring",
+                stiffness: Number(tokens["springs.spatialFast.stiffness"]),
+            },
+            fade: {
                 duration: 150,
                 easing: tokens["easings.emphasizedDecelerate"],
             },
-            exit: {
-                from: { opacity: 1 },
-                to: { opacity: 0 },
-                duration: 100,
-                easing: tokens["easings.emphasizedAccelerate"],
-            },
+        });
+        expect(popup.exit).toEqual({
+            from: { opacity: 1 },
+            to: { opacity: 0 },
+            duration: 100,
+            easing: tokens["easings.emphasizedAccelerate"],
         });
         const dialog = overlayMotion("dialog", tokens, false, 2);
         expect(dialog.enter).toMatchObject({
             from: { opacity: 0, translateY: -48 },
             to: { opacity: 1, translateY: 0 },
-            duration: 1000,
+            duration: Number(tokens["springs.spatialDefault.duration"]) * 2,
+            spring: {
+                stiffness:
+                    Number(tokens["springs.spatialDefault.stiffness"]) / 4,
+            },
+            fade: { duration: 1000 },
         });
         expect(dialog.exit).toMatchObject({
             from: { opacity: 1, translateY: 0 },
             to: { opacity: 0, translateY: -48 },
-            duration: 300,
+            duration: Number(tokens["springs.effectsFast.duration"]) * 2,
+            fade: { duration: 300 },
         });
         const reduced = overlayMotion("dialog", tokens, true);
+        expect(reduced.enter.spring).toBeUndefined();
+        expect(reduced.enter.fade).toBeUndefined();
         expect(reduced.enter).toMatchObject({
             from: { opacity: 0 },
             to: { opacity: 1 },

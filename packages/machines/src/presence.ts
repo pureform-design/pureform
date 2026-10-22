@@ -44,12 +44,21 @@ export const machine: Machine = {
                         );
                     }
                 };
+                // An exit of several animations (a movement and a fade, each on its own timing)
+                // ends with the last of them.
+                const ended = new Set<string>();
                 const onEnd = (event: AnimationEvent) => {
                     if (
-                        exiting(event) &&
-                        animationName(refs.get("styles")) ===
+                        !exiting(event) ||
+                        animationName(refs.get("styles")) !==
                             context.get("unmountAnimationName")
-                    ) {
+                    )
+                        return;
+                    ended.add(event.animationName);
+                    const names = (context.get("unmountAnimationName") ?? "")
+                        .split(",")
+                        .map((name) => name.trim());
+                    if (names.every((name) => ended.has(name))) {
                         send({ type: "UNMOUNT", src: "animationend" });
                     }
                 };

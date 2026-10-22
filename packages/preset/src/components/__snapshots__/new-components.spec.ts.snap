@@ -338,13 +338,13 @@ exports[`dialog > compiles to a stable Panda slot recipe 1`] = `
       "&[data-state=closed]": {
         "animation": {
           "_motionReduce": "token(durations.short3) token(easings.emphasizedAccelerate) forwards overlayFadeOut",
-          "base": "token(durations.short3) token(easings.emphasizedAccelerate) forwards dialogSlideOut",
+          "base": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) forwards dialogSlideOut, token(durations.short3) token(easings.emphasizedAccelerate) forwards overlayFadeOut",
         },
       },
       "&[data-state=open]": {
         "animation": {
           "_motionReduce": "token(durations.long2) token(easings.emphasizedDecelerate) overlayFadeIn",
-          "base": "token(durations.long2) token(easings.emphasizedDecelerate) dialogSlideIn",
+          "base": "token(springs.spatialDefault.duration) token(springs.spatialDefault.easing) dialogSlideIn, token(durations.long2) token(easings.emphasizedDecelerate) overlayFadeIn",
         },
       },
       "backgroundColor": "var(--components-dialog-container, token(colors.surfaceContainerHigh))",
@@ -436,13 +436,13 @@ exports[`fullscreenDialog > compiles to a stable Panda slot recipe 1`] = `
       "&[data-state=closed]": {
         "animation": {
           "_motionReduce": "token(durations.short3) token(easings.emphasizedAccelerate) forwards overlayFadeOut",
-          "base": "token(durations.short3) token(easings.emphasizedAccelerate) forwards dialogSlideOut",
+          "base": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) forwards dialogSlideOut, token(durations.short3) token(easings.emphasizedAccelerate) forwards overlayFadeOut",
         },
       },
       "&[data-state=open]": {
         "animation": {
           "_motionReduce": "token(durations.long2) token(easings.emphasizedDecelerate) overlayFadeIn",
-          "base": "token(durations.long2) token(easings.emphasizedDecelerate) dialogSlideIn",
+          "base": "token(springs.spatialDefault.duration) token(springs.spatialDefault.easing) dialogSlideIn, token(durations.long2) token(easings.emphasizedDecelerate) overlayFadeIn",
         },
       },
       "backgroundColor": "var(--components-fullscreenDialog-container, token(colors.surface))",
@@ -1422,7 +1422,7 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
       "&[data-state=open]": {
         "animation": {
           "_motionReduce": "token(durations.short3) token(easings.emphasizedDecelerate) overlayFadeIn",
-          "base": "token(durations.short3) token(easings.emphasizedDecelerate) overlayGrowIn",
+          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) overlayGrowIn, token(durations.short3) token(easings.emphasizedDecelerate) overlayFadeIn",
         },
         "transformOrigin": "var(--transform-origin)",
       },
@@ -2526,7 +2526,7 @@ exports[`richTooltip > compiles to a stable Panda slot recipe 1`] = `
       "&[data-state=open]": {
         "animation": {
           "_motionReduce": "token(durations.short3) token(easings.emphasizedDecelerate) overlayFadeIn",
-          "base": "token(durations.short3) token(easings.emphasizedDecelerate) overlayGrowIn",
+          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) overlayGrowIn, token(durations.short3) token(easings.emphasizedDecelerate) overlayFadeIn",
         },
         "transformOrigin": "var(--transform-origin)",
       },
@@ -3829,7 +3829,7 @@ exports[`snackbar > compiles to a stable Panda slot recipe 1`] = `
       "&[data-state=open]": {
         "animation": {
           "_motionReduce": "token(durations.short3) token(easings.emphasizedDecelerate) overlayFadeIn",
-          "base": "token(durations.short3) token(easings.emphasizedDecelerate) overlayGrowIn",
+          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) overlayGrowIn, token(durations.short3) token(easings.emphasizedDecelerate) overlayFadeIn",
         },
       },
       "--components-snackbar-focusIndicatorColor": "token(colors.secondary)",
@@ -4272,7 +4272,7 @@ exports[`toast > compiles to a stable Panda slot recipe 1`] = `
       "shadowElevation": "level3",
       "transition": {
         "_motionReduce": "opacity token(durations.short3) token(easings.standard)",
-        "base": "transform token(durations.short3) token(easings.standard), opacity token(durations.short3) token(easings.standard), height token(durations.short3) token(easings.standard)",
+        "base": "transform token(springs.spatialFast.duration) token(springs.spatialFast.easing), height token(springs.spatialFast.duration) token(springs.spatialFast.easing), opacity token(durations.short3) token(easings.standard)",
       },
       "width": "var(--components-toast-width, 356px)",
     },
@@ -4340,7 +4340,7 @@ exports[`tooltip > compiles to a stable Panda slot recipe 1`] = `
       "&[data-state=open]": {
         "animation": {
           "_motionReduce": "token(durations.short3) token(easings.emphasizedDecelerate) overlayFadeIn",
-          "base": "token(durations.short3) token(easings.emphasizedDecelerate) overlayGrowIn",
+          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) overlayGrowIn, token(durations.short3) token(easings.emphasizedDecelerate) overlayFadeIn",
         },
         "transformOrigin": "var(--transform-origin)",
       },

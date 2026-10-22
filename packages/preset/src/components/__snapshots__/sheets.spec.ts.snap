@@ -21,13 +21,13 @@ exports[`bottomSheet > compiles to a stable Panda slot recipe 1`] = `
       "&[data-state=closed]": {
         "animation": {
           "_motionReduce": "token(durations.medium1) token(easings.emphasizedAccelerate) forwards overlayFadeOut",
-          "base": "token(durations.medium1) token(easings.emphasizedAccelerate) forwards bottomSheetOut",
+          "base": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) forwards bottomSheetOut, token(durations.medium1) token(easings.emphasizedAccelerate) forwards overlayFadeOut",
         },
       },
       "&[data-state=open]": {
         "animation": {
           "_motionReduce": "token(durations.long2) token(easings.emphasizedDecelerate) overlayFadeIn",
-          "base": "token(durations.long2) token(easings.emphasizedDecelerate) bottomSheetIn",
+          "base": "token(springs.spatialDefault.duration) token(springs.spatialDefault.easing) bottomSheetIn, token(durations.long2) token(easings.emphasizedDecelerate) overlayFadeIn",
         },
       },
       "backgroundColor": "var(--components-bottomSheet-container, token(colors.surfaceContainerLow))",
@@ -45,6 +45,10 @@ exports[`bottomSheet > compiles to a stable Panda slot recipe 1`] = `
       "maxWidth": "var(--components-bottomSheet-maxWidth, 640px)",
       "minHeight": "0px",
       "shadowElevation": "level1",
+      "transition": {
+        "_motionReduce": "none",
+        "base": "translate token(springs.spatialDefault.duration) token(springs.spatialDefault.easing)",
+      },
       "width": "100%",
     },
   },
@@ -193,15 +197,15 @@ exports[`sideSheet > compiles to a stable Panda slot recipe 1`] = `
       "&[data-state=closed]": {
         "animation": {
           "_motionReduce": "token(durations.medium1) token(easings.emphasizedAccelerate) forwards overlayFadeOut",
-          "_rtl": "token(durations.medium1) token(easings.emphasizedAccelerate) forwards sideSheetOutRtl",
-          "base": "token(durations.medium1) token(easings.emphasizedAccelerate) forwards sideSheetOut",
+          "_rtl": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) forwards sideSheetOutRtl, token(durations.medium1) token(easings.emphasizedAccelerate) forwards overlayFadeOut",
+          "base": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) forwards sideSheetOut, token(durations.medium1) token(easings.emphasizedAccelerate) forwards overlayFadeOut",
         },
       },
       "&[data-state=open]": {
         "animation": {
           "_motionReduce": "token(durations.long2) token(easings.emphasizedDecelerate) overlayFadeIn",
-          "_rtl": "token(durations.long2) token(easings.emphasizedDecelerate) sideSheetInRtl",
-          "base": "token(durations.long2) token(easings.emphasizedDecelerate) sideSheetIn",
+          "_rtl": "token(springs.spatialDefault.duration) token(springs.spatialDefault.easing) sideSheetInRtl, token(durations.long2) token(easings.emphasizedDecelerate) overlayFadeIn",
+          "base": "token(springs.spatialDefault.duration) token(springs.spatialDefault.easing) sideSheetIn, token(durations.long2) token(easings.emphasizedDecelerate) overlayFadeIn",
         },
       },
       "backgroundColor": "var(--components-sideSheet-container, token(colors.surface))",

@@ -112,19 +112,29 @@ They animate on Zag's `data-state` (`components/overlay.ts`): the enter's keyfra
 `open`, the exit's once it's `closed`, holding the last frame until the binding hides the
 overlay once the exit ends (Zag's presence). Every duration and curve is a motion token:
 
-| Overlay                    | Enters                                                                                 | Leaves                                                      |
-| -------------------------- | -------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| menu, select list, tooltip | grows from 80% and fades in from the side it opens on, `short3`, emphasized decelerate | fades out, `short2`, emphasized accelerate                  |
-| snackbar                   | grows from 80% and fades in, from its center                                           | fades out, `short2`                                         |
-| dialog                     | comes down 48px and fades in, `long2`, emphasized decelerate                           | goes back up and fades out, `short3`, emphasized accelerate |
-| scrim                      | fades in, `long2`, linear                                                              | fades out, `short3`, linear                                 |
+The movement runs on one of the theme's springs, as Compose's does, and the fade alongside it
+keeps its duration and curve: two animations per step (`fade` on an `OverlayMotionStep`).
+
+| Overlay                    | Enters                                                                                               | Leaves                                                                        |
+| -------------------------- | ---------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| menu, select list, tooltip | grows from 80% on `spatialFast` from the side it opens on; fades in, `short3`, emphasized decelerate | fades out, `short2`, emphasized accelerate                                    |
+| snackbar                   | grows from 80% on `spatialFast` from its center; fades in, `short3`                                  | fades out, `short2`                                                           |
+| dialog                     | comes down 48px on `spatialDefault`; fades in, `long2`, emphasized decelerate                        | goes back up on `effectsFast`; fades out, `short3`, emphasized accelerate     |
+| bottom and side sheet      | slides in from its edge on `spatialDefault`; fades in, `long2`, emphasized decelerate                | slides back out on `effectsFast`; fades out, `medium1`, emphasized accelerate |
+| scrim                      | fades in, `long2`, linear                                                                            | fades out, `short3`, linear                                                   |
+
+The springs are Compose's: its menu, tooltip and snackbar host scale on `FastSpatial`; its
+sheets and drawers show on `DefaultSpatial` and hide on `FastEffects` (the dialog, which has no
+motion of its own in Compose, follows them). A bottom sheet let go of after a drag settles back on
+`spatialDefault` (`SHEET_SETTLE`, a transition of the `translate` the drag sets). A toast moves and
+resizes in its stack on `spatialFast` and fades on its tween.
 
 The menu follows Compose's `DropdownMenu` (scale and fade) rather than material-web's height
 reveal: a transform and opacity need no layout, and reduced motion keeps the fade alone. Under
-reduced motion every moving keyframe gives way to a fade (`overlayFadeIn`, `overlayFadeOut`) of
-the same timing. The keyframes are `OVERLAY_KEYFRAMES`, which `pureform()` adds to the config;
-`overlayMotion` and the `*_MOTION` steps build a surface's styles. React Native draws no overlay
-motion: the rules are web-only (`rawRules.css`).
+reduced motion every moving step gives way to its fade (`overlayFadeIn`, `overlayFadeOut`) alone.
+The keyframes are `OVERLAY_KEYFRAMES` and `SHEET_KEYFRAMES`, which `pureform()` adds to the
+config; `overlayMotion` and the `*_MOTION` steps build a surface's styles. The rules are web-only
+(`rawRules.css`); `@pureform/react-native` runs the same motions through its engine.
 
 ## Direction
 

@@ -26,6 +26,10 @@ const rootOf = (component: (typeof OVERLAYS)[number][1]) =>
         ?.base?.root as Record<string, unknown>;
 
 const OPEN = "&[data-state=open]";
+// The growth on the fast spatial spring, and the fade alongside on its tween.
+const GROW =
+    "token(springs.spatialFast.duration) token(springs.spatialFast.easing) overlayGrowIn, " +
+    "token(durations.short3) token(easings.emphasizedDecelerate) overlayFadeIn";
 const CLOSED = "&[data-state=closed]";
 
 describe("overlays", () => {
@@ -52,7 +56,7 @@ describe("overlays", () => {
             const root = rootOf(component);
             expect(root[OPEN]).toEqual({
                 animation: {
-                    base: "token(durations.short3) token(easings.emphasizedDecelerate) overlayGrowIn",
+                    base: GROW,
                     _motionReduce:
                         "token(durations.short3) token(easings.emphasizedDecelerate) overlayFadeIn",
                 },
@@ -69,25 +73,29 @@ describe("overlays", () => {
         const root = rootOf(snackbar);
         expect(root[OPEN]).toEqual({
             animation: {
-                base: "token(durations.short3) token(easings.emphasizedDecelerate) overlayGrowIn",
+                base: GROW,
                 _motionReduce:
                     "token(durations.short3) token(easings.emphasizedDecelerate) overlayFadeIn",
             },
         });
     });
 
-    it("slides a dialog in and out, and only fades it under reduced motion", () => {
+    it("slides a dialog in and out on springs, and only fades it under reduced motion", () => {
         const root = rootOf(dialog);
         expect(root[OPEN]).toEqual({
             animation: {
-                base: "token(durations.long2) token(easings.emphasizedDecelerate) dialogSlideIn",
+                base:
+                    "token(springs.spatialDefault.duration) token(springs.spatialDefault.easing) dialogSlideIn, " +
+                    "token(durations.long2) token(easings.emphasizedDecelerate) overlayFadeIn",
                 _motionReduce:
                     "token(durations.long2) token(easings.emphasizedDecelerate) overlayFadeIn",
             },
         });
         expect(root[CLOSED]).toEqual({
             animation: {
-                base: "token(durations.short3) token(easings.emphasizedAccelerate) forwards dialogSlideOut",
+                base:
+                    "token(springs.effectsFast.duration) token(springs.effectsFast.easing) forwards dialogSlideOut, " +
+                    "token(durations.short3) token(easings.emphasizedAccelerate) forwards overlayFadeOut",
                 _motionReduce:
                     "token(durations.short3) token(easings.emphasizedAccelerate) forwards overlayFadeOut",
             },
@@ -106,7 +114,7 @@ describe("overlays", () => {
         });
     });
 
-    it("adds the keyframes to the pureform config, and fades only opacity", () => {
+    it("adds the keyframes to the pureform config; the fades only fade and the rest only move", () => {
         const keyframes = pureform().keyframes ?? {};
         for (const name of Object.keys(OVERLAY_KEYFRAMES)) {
             expect(keyframes[name]).toBe(OVERLAY_KEYFRAMES[name]);
@@ -114,6 +122,11 @@ describe("overlays", () => {
         for (const name of ["overlayFadeIn", "overlayFadeOut"]) {
             for (const stop of Object.values(OVERLAY_KEYFRAMES[name]!)) {
                 expect(Object.keys(stop)).toEqual(["opacity"]);
+            }
+        }
+        for (const name of ["overlayGrowIn", "dialogSlideIn", "dialogSlideOut"]) {
+            for (const stop of Object.values(OVERLAY_KEYFRAMES[name]!)) {
+                expect(Object.keys(stop)).toEqual(["transform"]);
             }
         }
     });

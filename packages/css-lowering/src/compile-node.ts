@@ -156,14 +156,19 @@ export const compileNodeToCSS = (node: ValueNode, ctx: LowerCtx): string => {
                 .join(", ");
         case "animation":
             return [
-                ...compileTiming(node, ctx),
-                node.iterations != null ? String(node.iterations) : null,
-                node.direction ?? null,
-                node.fillMode ?? null,
-                node.name,
-            ]
-                .filter(Boolean)
-                .join(" ");
+                [
+                    ...compileTiming(node, ctx),
+                    node.iterations != null ? String(node.iterations) : null,
+                    node.direction ?? null,
+                    node.fillMode ?? null,
+                    node.name,
+                ]
+                    .filter(Boolean)
+                    .join(" "),
+                ...(node.alongside ?? []).map((run) =>
+                    compileNodeToCSS(run, ctx),
+                ),
+            ].join(", ");
         case "easing":
             return node.kind === "cubicBezier"
                 ? `cubic-bezier(${node.points.join(", ")})`

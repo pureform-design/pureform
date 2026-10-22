@@ -783,8 +783,11 @@ export interface AnimationRun {
 
 /** A keyframe-animation instance (lowering to CSS `animation`). `name` references a
  *  `CoreConfig.keyframes` entry; its `Timing` is a duration and easing or a spring. Leaf-kind
- *  "animation". */
-export type AnimationNode = { type: "animation" } & AnimationRun & Timing;
+ *  "animation". `alongside` runs more animations at the same time, each on its own timing
+ *  (CSS's comma-separated list), so a movement can spring while a fade keeps its tween; React
+ *  Native's keyframe engine runs only the first. */
+export type AnimationNode = { type: "animation" } & AnimationRun &
+    Timing & { alongside?: AnimationNode[] };
 
 /* Math. */
 

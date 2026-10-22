@@ -5,6 +5,8 @@
 export { useAnimatedComponentStyles } from "./animate/styles";
 export { curve } from "./animate/curve";
 export { animatedPresence } from "./animate/presence";
+export { settle } from "./animate/settle";
+export type { Spring } from "./values";
 export { useRipple } from "./animate/ripple";
 export { useAnimatedSlide } from "./animate/slide";
 export type { RippleOptions, Ripples } from "./animate/ripple";
@@ -24,6 +26,7 @@ export type {
     PresenceMotion,
     PresencePhase,
     PresenceStep,
+    PresenceTiming,
     PresenceView,
 } from "./motion";
 export type { State, Style } from "./select";

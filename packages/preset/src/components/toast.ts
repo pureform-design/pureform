@@ -20,8 +20,10 @@
 // icon and the close button sit in the inline padding, so the text runs between them.
 //
 // Zag moves each toast with `--x`, `--y`, `--scale`, `--opacity`, `--z-index` and `--height` on
-// its root; the bindings apply them as a transform, and the root transitions the transform,
-// opacity and height (the movement drops out under reduced motion).
+// its root; the bindings apply them as a transform, and the root transitions the transform and
+// height on the fast spatial spring, as Compose's snackbar host scales its snackbar in
+// (`SnackbarHost.kt`, `FastSpatial`), and the opacity on its tween (the movement drops out
+// under reduced motion).
 
 import { typed } from "@pureform/core";
 import {
@@ -35,12 +37,16 @@ import {
     relative,
     start,
     transparent,
+    tween,
     unitless,
 } from "@pureform/core/ast";
 import {
+    duration,
+    easing,
     radius,
     size as sizeToken,
     spacing,
+    spring,
     textStyle,
     zIndex,
 } from "@pureform/theme";
@@ -50,11 +56,11 @@ import {
     componentTokens,
     INDICATION_ROOT,
     interactiveColors,
+    motionTransition,
     notificationAction,
     pressableRoot,
     surface,
     sys,
-    tweens,
 } from "./shared";
 
 /** The toast's `type` values, each a theme color group but `loading`. */
@@ -91,6 +97,10 @@ const pf = typed();
 // A type's icon color: one of the theme's color groups. (Only the group, the outermost slot, can
 // set tokens, and the group holds toasts of every type.)
 const accent = (group: string) => ({ icon: { color: sys(group) } });
+
+// A toast moves into its place in the stack and resizes on a spring; it fades on a tween.
+const MOVE = { spring: spring("spatialFast") };
+const FADE = { duration: duration("short3"), easing: easing("standard") };
 
 // The icon's room at the start: the padding, the icon and a gap.
 const iconRoom = add(ref("paddingInline"), ref("iconSize"), spacing("3"));
@@ -153,7 +163,11 @@ export const toast = pf.slotComponent({
                 paddingInlineEnd: ref("closeSize"),
                 borderRadius: ref("radius"),
                 overflow: hidden,
-                transition: tweens("transform", "opacity", "height"),
+                transition: motionTransition(
+                    tween("transform", MOVE),
+                    tween("height", MOVE),
+                    tween("opacity", FADE),
+                ),
             },
             icon: {
                 position: absolute,

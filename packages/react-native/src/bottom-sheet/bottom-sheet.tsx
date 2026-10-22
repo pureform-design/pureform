@@ -3,7 +3,9 @@
 // `modal={false}`, showing it is the app's, and given `open`, it enters and leaves in place. A
 // modal sheet opens in a `Modal` over a scrim, against the bottom edge: a press on the scrim, the
 // drag handle, Escape, or the back button closes it, and so does a drag down on the handle past a
-// quarter of the sheet's height. Its `Modal` holds a portal host of its own, so menus, tooltips,
+// quarter of the sheet's height. The sheet follows the drag down; a shorter drag lets it settle
+// back on the theme's default spatial spring, carrying the release's velocity (at once under
+// reduced motion), as Compose's sheets do. Its `Modal` holds a portal host of its own, so menus, tooltips,
 // and selects opened inside draw over it.
 
 import { bottomSheetAnatomy } from "@pureform/anatomy";
@@ -13,16 +15,18 @@ import type {
     BottomSheetVariantProps,
     ChangeDetails,
 } from "@pureform/binding-core";
-import { useMemo, useRef } from "react";
+import { settle } from "@pureform/rn-adapter/animated";
+import { useReducedMotion, useTokens } from "@pureform/rn-adapter/react";
+import { useEffect, useMemo, useRef } from "react";
 import type { ReactNode } from "react";
-import { PanResponder, ScrollView, StyleSheet } from "react-native";
+import { Animated, PanResponder, ScrollView, StyleSheet } from "react-native";
 
 import { Button } from "../button/button";
 import { DragHandle } from "../drag-handle/drag-handle";
 import { ModalScrimLayer, ModalWindow, useModalOverlay } from "../modal";
 import { testIdOf, useStableCallback, withEngine } from "../parts";
-import { useOverlayPresence } from "../presence";
-import { useEngine } from "../provider";
+import { themeSpring, useOverlayPresence } from "../presence";
+import { useEngine, usePureform } from "../provider";
 import { useComponentSlots } from "../styles";
 
 /** The sheet's parts this binding renders. */
@@ -85,60 +89,101 @@ function BottomSheetImpl(
             ? NEEDS_CLOSE
             : () => props.onOpenChange?.({ open: false }));
     const latestClose = useStableCallback(() => close());
-    // A drag down on the handle past a quarter of the sheet's height closes it.
+    // How far down the drag has moved the sheet, apart from its enter and exit.
+    const drag = useMemo(() => new Animated.Value(0), []);
+    const tokens = useTokens();
+    const reducedMotion = useReducedMotion();
+    const { timeScale } = usePureform();
+    const stopSettle = useRef<() => void>(() => {});
+    const latestSettle = useStableCallback((velocity: number) => {
+        stopSettle.current = settle(
+            drag,
+            velocity,
+            reducedMotion
+                ? undefined
+                : themeSpring("spatialDefault", tokens, timeScale),
+        );
+    });
+    // Each time it opens, it starts where it rests.
+    useEffect(() => {
+        if (props.open !== false) drag.setValue(0);
+    }, [props.open, drag]);
+    useEffect(() => () => stopSettle.current(), []);
+    // A drag down on the handle past a quarter of the sheet's height closes it; it leaves from
+    // where the drag left it.
     const pan = useMemo(
         () =>
             PanResponder.create({
                 onMoveShouldSetPanResponder: (_, gesture) =>
                     gesture.dy > 4 &&
                     Math.abs(gesture.dy) > Math.abs(gesture.dx),
+                onPanResponderGrant: () => stopSettle.current(),
+                onPanResponderMove: (_, gesture) =>
+                    drag.setValue(Math.max(0, gesture.dy)),
                 onPanResponderRelease: (_, gesture) => {
-                    if (height.current > 0 && gesture.dy > height.current / 4)
+                    if (height.current > 0 && gesture.dy > height.current / 4) {
                         latestClose();
+                        // A sheet that stays (one the app keeps open) settles back.
+                        if (
+                            props.close === undefined &&
+                            props.onOpenChange === undefined
+                        )
+                            latestSettle(gesture.vy);
+                        return;
+                    }
+                    latestSettle(gesture.vy);
                 },
+                onPanResponderTerminate: (_, gesture) =>
+                    latestSettle(gesture.vy),
             }),
-        [latestClose],
+        [latestClose, latestSettle, drag],
     );
     const id = (part: Part) => testIdOf(bottomSheetAnatomy, part, props.testId);
     if (!presence.present) return null;
     const Root = props.open === undefined ? v.root : engine;
+    // The drag moves a plain Animated view around the surface, apart from the engine's enter
+    // and exit on the surface itself.
     return (
-        <Root.View
-            {...presence.props}
-            role="dialog"
-            {...(props["aria-label"] === undefined
-                ? {}
-                : { "aria-label": props["aria-label"] })}
-            onLayout={(event: {
-                nativeEvent: { layout: { height: number } };
-            }) => {
-                height.current = event.nativeEvent.layout.height;
-            }}
-            style={{ ...s.root, ...presence.style }}
-            testID={id("root")}
+        <Animated.View
+            style={[styles.dragged, { transform: [{ translateY: drag }] }]}
         >
-            {props.dragHandle === false ? null : (
-                <v.dragHandle.View
-                    {...pan.panHandlers}
-                    style={s.dragHandle}
-                    testID={id("dragHandle")}
-                >
-                    <DragHandle
-                        aria-label={props.dragHandleLabel ?? "Close sheet"}
-                        onPress={close}
-                    />
-                </v.dragHandle.View>
-            )}
-            {typeof props.children === "string" ? (
-                <v.content.Text style={s.content} testID={id("content")}>
-                    {props.children}
-                </v.content.Text>
-            ) : (
-                <v.content.View style={s.content} testID={id("content")}>
-                    <ScrollView>{props.children}</ScrollView>
-                </v.content.View>
-            )}
-        </Root.View>
+            <Root.View
+                {...presence.props}
+                role="dialog"
+                {...(props["aria-label"] === undefined
+                    ? {}
+                    : { "aria-label": props["aria-label"] })}
+                onLayout={(event: {
+                    nativeEvent: { layout: { height: number } };
+                }) => {
+                    height.current = event.nativeEvent.layout.height;
+                }}
+                style={{ ...s.root, ...presence.style }}
+                testID={id("root")}
+            >
+                {props.dragHandle === false ? null : (
+                    <v.dragHandle.View
+                        {...pan.panHandlers}
+                        style={s.dragHandle}
+                        testID={id("dragHandle")}
+                    >
+                        <DragHandle
+                            aria-label={props.dragHandleLabel ?? "Close sheet"}
+                            onPress={close}
+                        />
+                    </v.dragHandle.View>
+                )}
+                {typeof props.children === "string" ? (
+                    <v.content.Text style={s.content} testID={id("content")}>
+                        {props.children}
+                    </v.content.Text>
+                ) : (
+                    <v.content.View style={s.content} testID={id("content")}>
+                        <ScrollView>{props.children}</ScrollView>
+                    </v.content.View>
+                )}
+            </Root.View>
+        </Animated.View>
     );
 }
 
@@ -185,6 +230,13 @@ function ModalBottomSheet(props: BottomSheetProps): ReactNode {
 // Against the bottom edge, leaving room at the top, as the web's positioner does
 // (`bottomSheetPositionerLayout`).
 const styles = StyleSheet.create({
+    // Passes the surface's layout through: as wide as where it's placed, and no taller.
+    dragged: {
+        alignSelf: "stretch",
+        flexShrink: 1,
+        maxHeight: "100%",
+        minHeight: 0,
+    },
     positioner: {
         position: "absolute",
         top: 0,

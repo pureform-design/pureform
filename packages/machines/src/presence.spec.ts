@@ -8,8 +8,10 @@ import { run, settle } from "./testing/vanilla";
 const MOTION = `
 @keyframes test-in { from { opacity: 0 } to { opacity: 1 } }
 @keyframes test-out { from { opacity: 1 } to { opacity: 0 } }
+@keyframes test-move { from { transform: none } to { transform: translateY(10px) } }
 .surface[data-state=open] { animation: test-in 60s }
 .surface[data-state=closed] { animation: test-out 60s }
+.surface.both[data-state=closed] { animation: test-move 60s, test-out 60s }
 `;
 
 afterEach(() => {
@@ -24,12 +26,12 @@ const frame = () => new Promise((resolve) => requestAnimationFrame(resolve));
 const animations = (element: Element) =>
     element.getAnimations().map((a) => (a as CSSAnimation).animationName);
 
-const mount = () => {
+const mount = (className = "surface") => {
     const style = document.head.appendChild(document.createElement("style"));
     style.dataset.test = "";
     style.textContent = MOTION;
     const surface = document.body.appendChild(document.createElement("div"));
-    surface.className = "surface";
+    surface.className = className;
     surface.dataset.state = "open";
     const control = run(
         presence.machine,
@@ -62,6 +64,20 @@ describe("presence", () => {
         expect(control.api().present).toBe(true);
         expect(animations(surface)).toEqual(["test-out"]);
         surface.getAnimations()[0]!.finish();
+        await expect.poll(() => control.api().present).toBe(false);
+    });
+
+    it("stays until the last of an exit's animations ends", async () => {
+        const { surface, control, entering, close } = mount("surface both");
+        await entering();
+        await close();
+        expect(animations(surface)).toEqual(["test-move", "test-out"]);
+        const [move, fade] = surface.getAnimations();
+        fade!.finish();
+        await settle();
+        await frame();
+        expect(control.api().present).toBe(true);
+        move!.finish();
         await expect.poll(() => control.api().present).toBe(false);
     });
 

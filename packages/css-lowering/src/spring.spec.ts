@@ -2,6 +2,7 @@ import { sampleSpring } from "@pureform/core";
 import {
     alias,
     animation,
+    animations,
     linearEasing,
     numeric,
     spring,
@@ -82,6 +83,22 @@ describe("springs on the web", () => {
             ),
         ).toBe(
             "var(--springs-spatial-fast-duration) var(--springs-spatial-fast-easing) forwards grow",
+        );
+        // A movement on a spring alongside a fade on its tween.
+        expect(
+            compileNodeToCSS(
+                animations(
+                    animation({ name: "grow", spring: spatial }),
+                    animation({
+                        name: "fade",
+                        duration: alias("durations", "short2"),
+                    }),
+                ),
+                ctx,
+            ),
+        ).toBe(
+            "var(--springs-spatial-fast-duration) var(--springs-spatial-fast-easing) grow, " +
+                "var(--durations-short2) fade",
         );
     });
 

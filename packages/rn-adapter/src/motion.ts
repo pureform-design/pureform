@@ -264,16 +264,22 @@ export interface PresenceFrame {
     readonly translateY?: number;
 }
 
-/** One way in or out: from one frame to another, over milliseconds, on a curve as
- *  transitions take it (`cubic-bezier(...)`, `linear(...)`, or `linear`). A spring step also
- *  carries its physics, which an engine with springs runs in place of the sampled duration and
- *  curve. */
-export interface PresenceStep {
-    readonly from: PresenceFrame;
-    readonly to: PresenceFrame;
+/** How long a step takes: milliseconds, on a curve as transitions take it (`cubic-bezier(...)`,
+ *  `linear(...)`, or `linear`). A spring also carries its physics, which an engine with springs
+ *  runs in place of the sampled duration and curve. */
+export interface PresenceTiming {
     readonly duration: number;
     readonly easing: string;
     readonly spring?: Spring | undefined;
+}
+
+/** One way in or out: from one frame to another on a timing. With `fade`, the opacity runs on
+ *  that timing instead, alongside the movement (a movement on a spring, its fade on a tween),
+ *  and the step ends when both have. */
+export interface PresenceStep extends PresenceTiming {
+    readonly from: PresenceFrame;
+    readonly to: PresenceFrame;
+    readonly fade?: PresenceTiming | undefined;
 }
 
 /** A spring `by` times as slow: its stiffness over by², its damping coefficient over by. At

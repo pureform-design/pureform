@@ -1,6 +1,6 @@
 // The overlays: each draws over a positioned element that follows it in the page, at its layer of
 // the theme's stacking scale; it animates in as it opens, and as it closes it stays until its exit
-// animation ends, then hides; under reduced motion it fades without moving (design doc §5.8).
+// animations end, then hides; under reduced motion it fades without moving (design doc §5.8).
 
 import { describe, expect, it } from "vitest";
 
@@ -90,18 +90,18 @@ describe.each(overlays)("$component", (component) => {
         await frames(2);
         const surface = overlay.surface(scene.host);
         expect(shows(scene.host)).toBe(true);
+        // The movement (on a spring) and the fade (on its tween) are two animations.
         const entering = animated(surface);
-        expect(entering).toHaveLength(1);
-        expect(entering[0]).toEqual(
-            expect.arrayContaining(["opacity", "transform"]),
+        expect(entering).toHaveLength(2);
+        expect(entering).toEqual(
+            expect.arrayContaining([["transform"], ["opacity"]]),
         );
         await animationsDone();
         await scene.update({ open: false });
         await frames(2);
         expect(surface.dataset.state).toBe("closed");
         expect(shows(scene.host)).toBe(true);
-        expect(animated(surface)).toHaveLength(1);
-        expect(animated(surface)[0]).toContain("opacity");
+        expect(animated(surface).flat()).toContain("opacity");
         await animationsDone();
         await frames(3);
         expect(shows(scene.host)).toBe(false);
