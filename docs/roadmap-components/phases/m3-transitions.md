@@ -29,3 +29,10 @@ movement and keeps a short fade.
 
 - Compose's `FloatingActionButtonMenu` staggers its items: each scales and fades in from the
   button in turn, and they leave in reverse. Ours moves the list as one popup (m2 merge).
+
+## m3d: `onClose` on the other sheets
+
+The dialog, full-screen dialog and side sheet take `onClose` like the bottom sheet (f2c, r8):
+Escape, the scrim and their close buttons ask it through binding-core's `closeAsker`, on web and
+React Native, and the app can refuse. Closing through a controlled `open` doesn't ask. Test each
+way of closing, refused and allowed; document it in the binding READMEs.
