@@ -81,6 +81,7 @@ export default createConfig({
                     "supporting-text": "src/supporting-text/index.ts",
                     text: "src/text/index.ts",
                     "touch-target": "src/touch-target/index.ts",
+                    storybook: "src/storybook/index.ts",
                 },
                 formats: ["es"],
                 fileName: (format, entryName) =>

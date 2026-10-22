@@ -459,6 +459,13 @@
                 "development": "./src/rich-tooltip/index.ts",
                 "default": "./dist/rich-tooltip.mjs"
             }
+        },
+        "./storybook": {
+            "types": "./dist/storybook/index.d.ts",
+            "import": {
+                "development": "./src/storybook/index.ts",
+                "default": "./dist/storybook.mjs"
+            }
         }
     },
     "publishConfig": {

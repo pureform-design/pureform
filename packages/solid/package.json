@@ -719,6 +719,17 @@
                 "development": "./src/touch-target/index.ts",
                 "default": "./dist/touch-target.jsx"
             }
+        },
+        "./storybook": {
+            "types": "./dist/storybook/index.d.ts",
+            "solid": {
+                "development": "./src/storybook/index.ts",
+                "default": "./dist/storybook.jsx"
+            },
+            "import": {
+                "development": "./src/storybook/index.ts",
+                "default": "./dist/storybook.jsx"
+            }
         }
     },
     "publishConfig": {
