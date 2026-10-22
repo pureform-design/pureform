@@ -667,7 +667,8 @@ with `aria-checked="true"`).
 - `menu`: items are always interactive. Put items in `itemGroup`s with an optional
   `itemGroupLabel` (a select's option groups use the same parts), or separate them with the
   `separator` component. `grouped` draws each group as its own tile, 2px apart; on the web the
-  first and last groups round the run's outside corners to its `large` radius, so the menu
+  first and last groups (marked `data-first`/`data-last` by the machine) round the run's outside
+  corners to its `large` radius, so the menu
   doesn't clip and a submenu inside it shows whole (React Native, whose submenus drill in, clips
   them at the menu). `vibrant`
   swaps the menu to the tertiary container's colors, and a chosen item to the tertiary's. The

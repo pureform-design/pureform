@@ -119,9 +119,12 @@ export interface MenuIconProps extends MenuPartProps {
  *  item its `type`, `checked`, and `onCheckedChange`, and a part's. */
 export interface MenuItemProps extends MenuPartProps, MenuItemBehaviorProps {}
 
-/** A group's props: its `id` among the groups, and a part's. */
+/** A group's props: its `id` among the groups, whether it's the menu's `first` or `last` group
+ *  (a grouped menu rounds their outside corners), and a part's. */
 export interface MenuItemGroupProps extends MenuPartProps {
     readonly id: string;
+    readonly first?: boolean | undefined;
+    readonly last?: boolean | undefined;
 }
 
 /** A group label's props: the `id` of the group it names, and a part's. */
@@ -285,9 +288,14 @@ function ItemGroup(props: MenuItemGroupProps): JSX.Element {
     const { scope, api } = context.use("ItemGroup");
     return scope.render("itemGroup", {
         element: "div",
-        machine: () => api().getItemGroupProps({ id: props.id }),
+        machine: () =>
+            api().getItemGroupProps({
+                id: props.id,
+                first: props.first,
+                last: props.last,
+            }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "id"),
+        props: omit(props, "unstyled", "id", "first", "last"),
     });
 }
 
@@ -576,8 +584,13 @@ function ReadyMade(props: MenuProps): JSX.Element {
                         each={groups()}
                         keyed={(group: MenuGroup<JSX.Element>) => group.id}
                     >
-                        {(group) => (
-                            <ItemGroup {...itemGroup} id={group().id}>
+                        {(group, index) => (
+                            <ItemGroup
+                                {...itemGroup}
+                                id={group().id}
+                                first={index() === 0}
+                                last={index() === groups().length - 1}
+                            >
                                 <Show when={isPresent(group().label)}>
                                     <ItemGroupLabel
                                         htmlFor={group().id}

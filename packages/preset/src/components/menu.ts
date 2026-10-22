@@ -232,9 +232,10 @@ export const createMenu = <
                         false: {},
                     },
                     // Each group a tile of the surface, apart from the next, the run's outside
-                    // corners round. On the web the first and last groups round them, so the
-                    // menu doesn't clip, and a submenu drawn inside it shows whole; React Native
-                    // (whose submenus drill in) clips them.
+                    // corners round. On the web the first and last groups (the machine marks
+                    // them `data-first`/`data-last`) round them, so the menu doesn't clip, and a
+                    // submenu drawn inside it shows whole; React Native (whose submenus drill in)
+                    // clips them.
                     grouped: {
                         true: {
                             root: {
@@ -252,13 +253,13 @@ export const createMenu = <
                                 paddingBlockEnd: ref("paddingBlock"),
                                 rawRules: {
                                     css: {
-                                        "&:first-child": {
+                                        "&[data-first]": {
                                             borderStartStartRadius:
                                                 ref("outerRadius"),
                                             borderStartEndRadius:
                                                 ref("outerRadius"),
                                         },
-                                        "&:last-child": {
+                                        "&[data-last]": {
                                             borderEndStartRadius:
                                                 ref("outerRadius"),
                                             borderEndEndRadius:

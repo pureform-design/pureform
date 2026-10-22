@@ -32,12 +32,7 @@ import type {
 import * as menu from "@pureform/machines/menu";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";
-import {
-    type ElementType,
-    type ReactNode,
-    useEffect,
-    useId,
-} from "react";
+import { type ElementType, type ReactNode, useEffect, useId } from "react";
 
 import { Button } from "../button";
 import { useControllable } from "../controllable";
@@ -117,9 +112,12 @@ export interface MenuItemProps
         Omit<MenuPartProps, keyof MenuItemBehaviorProps>,
         MenuItemBehaviorProps {}
 
-/** A group's props: its `id`, which its label points at, and a part's. */
+/** A group's props: its `id`, which its label points at, whether it's the menu's `first` or
+ *  `last` group (a grouped menu rounds their outside corners), and a part's. */
 export interface MenuItemGroupProps extends MenuPartProps {
     readonly id: string;
+    readonly first?: boolean | undefined;
+    readonly last?: boolean | undefined;
 }
 
 /** A group label's props: the `id` of its group, and a part's. */
@@ -257,11 +255,17 @@ function Content({ unstyled, ...props }: MenuPartProps): ReactNode {
 }
 
 /** A group of items, labelled by the ItemGroupLabel with its `id` as `group`. */
-function ItemGroup({ unstyled, id, ...props }: MenuItemGroupProps): ReactNode {
+function ItemGroup({
+    unstyled,
+    id,
+    first,
+    last,
+    ...props
+}: MenuItemGroupProps): ReactNode {
     const { scope, api } = context.use("ItemGroup");
     return scope.render("itemGroup", {
         element: "div",
-        machine: api.getItemGroupProps({ id }),
+        machine: api.getItemGroupProps({ id, first, last }),
         unstyled,
         props,
     });
@@ -532,11 +536,13 @@ function ReadyMade(props: MenuProps): ReactNode {
                     {items.map((item) => (
                         <ItemEntry key={item.value} item={item} slot={slot} />
                     ))}
-                    {groups.map((group) => (
+                    {groups.map((group, index) => (
                         <ItemGroup
                             key={group.id}
                             {...slot("itemGroup")}
                             id={group.id}
+                            first={index === 0}
+                            last={index === groups.length - 1}
                         >
                             {isPresent(group.label) ? (
                                 <ItemGroupLabel

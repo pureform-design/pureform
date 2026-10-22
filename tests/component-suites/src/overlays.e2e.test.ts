@@ -237,10 +237,15 @@ describe("Menu", () => {
         ) {
             expect(getComputedStyle(element).overflow).toBe("visible");
         }
-        // The group still rounds the run's outside corners.
+        // The group still rounds the run's outside corners, marked as the first and last.
         const group = parent!.querySelector<HTMLElement>('[role="group"]')!;
+        expect(group.hasAttribute("data-first")).toBe(true);
+        expect(group.hasAttribute("data-last")).toBe(true);
         expect(getComputedStyle(group).borderTopLeftRadius).toBe(
             getComputedStyle(parent!).borderTopLeftRadius,
+        );
+        expect(getComputedStyle(group).borderBottomRightRadius).toBe(
+            getComputedStyle(parent!).borderBottomRightRadius,
         );
     });
 });
