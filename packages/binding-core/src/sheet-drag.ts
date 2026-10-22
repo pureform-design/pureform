@@ -1,6 +1,7 @@
 // Dragging a bottom sheet down by its drag handle: the sheet follows the pointer down (never up
-// past where it rests), and a drag past a quarter of its height, or a quick flick, closes it.
-// Shorter drags put it back. The press that ends a real drag doesn't also count as a click on the
+// past where it rests), and a drag past a quarter of its height, or a quick flick, closes it,
+// leaving from where the drag let go of it. Shorter drags, and a close the app refuses, put it
+// back. The press that ends a real drag doesn't also count as a click on the
 // handle, so a handle that closes on a press closes only once.
 
 /** How far down, as a share of the sheet's height, a drag closes it. */
@@ -31,14 +32,52 @@ export const dragToDismiss = (
             surface.style.transition = "none";
         }
     };
+    let watching: MutationObserver | undefined;
+    let checking = 0;
+    const stopWatching = () => {
+        watching?.disconnect();
+        watching = undefined;
+        cancelAnimationFrame(checking);
+    };
+    // Back to rest, settling on the sheet's own transition.
     const release = () => {
+        stopWatching();
         const surface = sheet();
         surface?.style.removeProperty("translate");
         surface?.style.removeProperty("transition");
     };
+    // Back to rest at once, before it next opens, so it opens from its edge.
+    const reset = (surface: HTMLElement) => {
+        stopWatching();
+        surface.style.removeProperty("translate");
+        void getComputedStyle(surface).translate;
+        surface.style.removeProperty("transition");
+    };
+    // Closing: it holds where the drag let go of it, and its exit runs from there. If it's still
+    // open a frame later, the app refused the close, so it settles back; otherwise it goes back
+    // to rest once it opens again.
+    const leave = (surface: HTMLElement | null | undefined) => {
+        dismiss();
+        if (!surface) return;
+        checking = requestAnimationFrame(() => {
+            if (surface.getAttribute("data-state") !== "closed") {
+                release();
+                return;
+            }
+            watching = new MutationObserver(() => {
+                if (surface.getAttribute("data-state") !== "closed")
+                    reset(surface);
+            });
+            watching.observe(surface, {
+                attributes: true,
+                attributeFilter: ["data-state"],
+            });
+        });
+    };
 
     const onDown = (event: PointerEvent) => {
         if (event.button !== 0) return;
+        stopWatching();
         start = {
             y: event.clientY,
             time: event.timeStamp,
@@ -53,15 +92,17 @@ export const dragToDismiss = (
     };
     const onUp = (event: PointerEvent) => {
         if (start?.id !== event.pointerId) return;
-        const height = sheet()?.getBoundingClientRect().height ?? 0;
+        const surface = sheet();
+        const height = surface?.getBoundingClientRect().height ?? 0;
         const speed = offset / Math.max(1, event.timeStamp - start.time);
         start = undefined;
-        release();
         if (
             dragged &&
             (offset > height * SHEET_DISMISS_SHARE || speed > SHEET_FLICK_SPEED)
         ) {
-            dismiss();
+            leave(surface);
+        } else {
+            release();
         }
     };
     const onCancel = () => {

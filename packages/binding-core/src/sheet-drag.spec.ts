@@ -62,6 +62,42 @@ describe("dragToDismiss", () => {
         document.removeEventListener("click", click);
     });
 
+    const frame = () =>
+        new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+    const nextChange = () =>
+        new Promise<void>((resolve) => queueMicrotask(resolve));
+
+    it("leaves from where the drag let it go, and is back at rest when it opens again", async () => {
+        const { sheet, handle, dismiss } = setup();
+        sheet.setAttribute("data-state", "open");
+        dismiss.mockImplementation(() =>
+            sheet.setAttribute("data-state", "closed"),
+        );
+        handle.dispatchEvent(pointer("pointerdown", 100, 0));
+        handle.dispatchEvent(pointer("pointermove", 250, 1000));
+        handle.dispatchEvent(pointer("pointerup", 250, 2000));
+        expect(dismiss).toHaveBeenCalledTimes(1);
+        expect(sheet.style.translate).toBe("0px 150px");
+        await frame();
+        expect(sheet.style.translate).toBe("0px 150px");
+        sheet.setAttribute("data-state", "open");
+        await nextChange();
+        expect(sheet.style.translate).toBe("");
+        expect(sheet.style.transition).toBe("");
+    });
+
+    it("settles back when the app keeps it open", async () => {
+        const { sheet, handle, dismiss } = setup();
+        sheet.setAttribute("data-state", "open");
+        handle.dispatchEvent(pointer("pointerdown", 100, 0));
+        handle.dispatchEvent(pointer("pointermove", 250, 1000));
+        handle.dispatchEvent(pointer("pointerup", 250, 2000));
+        expect(dismiss).toHaveBeenCalledTimes(1);
+        await frame();
+        expect(sheet.style.translate).toBe("");
+        expect(sheet.style.transition).toBe("");
+    });
+
     it("closes on a quick flick however short", () => {
         const { handle, dismiss } = setup();
         handle.dispatchEvent(pointer("pointerdown", 100, 0));
