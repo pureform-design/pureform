@@ -17,6 +17,8 @@ export interface ComposeInput {
     /** The component's args and arg types from `stories.config.ts`. */
     readonly args: Args;
     readonly argTypes: Partial<ArgTypes>;
+    /** Pins every story of the component to a scheme. */
+    readonly scheme?: "light" | "dark" | undefined;
 }
 
 export const composeStories = (input: ComposeInput) => {
@@ -40,8 +42,22 @@ export const composeStories = (input: ComposeInput) => {
             args: { ...shared, ...component },
             argTypes: input.argTypes,
             decorators,
+            ...(input.scheme ? { globals: { scheme: input.scheme } } : {}),
         },
-        story: (story: string, base: StoryObj = {}): StoryObj =>
-            extend({ component: input.component, story }, base),
+        /** A story; `base.globals.scheme` pins its scheme over the toolbar's. */
+        story: (story: string, base: StoryObj = {}): StoryObj => {
+            const scheme = base.globals?.["scheme"];
+            return extend(
+                {
+                    component: input.component,
+                    story,
+                    scheme:
+                        scheme === "light" || scheme === "dark"
+                            ? scheme
+                            : undefined,
+                },
+                base,
+            );
+        },
     };
 };

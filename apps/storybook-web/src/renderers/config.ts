@@ -21,6 +21,11 @@ export interface ComponentConfig {
     readonly argTypes?: Partial<ArgTypes>;
     /** The `variant` prop's values: a control, and one story each besides `Default`. */
     readonly variants?: readonly string[];
+    /** Scheme-pinned stories next to `Default` (`Light`, `Dark`): they set the story's
+     *  `globals.scheme`, which overrides (and locks) the toolbar's, and run the shared tests. */
+    readonly schemes?: readonly ("light" | "dark")[];
+    /** Pins every story of the component to a scheme (the meta's `globals`). */
+    readonly scheme?: "light" | "dark";
     /** The component's hook modules, relative to the app, after the renderers'. */
     readonly hooks?: readonly string[];
 }

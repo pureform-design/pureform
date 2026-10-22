@@ -123,6 +123,10 @@ const generate = async () => {
         };
         const stories = [
             `export const Default = { ...stories.story("Default") } satisfies StoryObj;`,
+            ...(options.schemes ?? []).map(
+                (scheme) =>
+                    `export const ${storyName(scheme)} = {\n    ...stories.story("${storyName(scheme)}", { globals: { scheme: ${JSON.stringify(scheme)} } }),\n} satisfies StoryObj;`,
+            ),
             ...variants.map(
                 (variant) =>
                     `export const ${storyName(variant)} = {\n    ...stories.story("${storyName(variant)}", { args: { variant: ${JSON.stringify(variant)} } }),\n} satisfies StoryObj;`,
@@ -141,6 +145,9 @@ const generate = async () => {
             `    hooks: [${hooks.map((_, i) => `hooks${i}`).join(", ")}],`,
             `    args: ${JSON.stringify(args)},`,
             `    argTypes: ${JSON.stringify(argTypes)},`,
+            ...(options.scheme
+                ? [`    scheme: ${JSON.stringify(options.scheme)},`]
+                : []),
             "});",
             "",
             `export default { title: ${JSON.stringify(component)}, ...stories.meta } satisfies Meta;`,

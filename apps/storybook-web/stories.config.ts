@@ -28,15 +28,18 @@ export default defineStories({
         Button: {
             args: { label: "Save", disabled: false },
             variants: ["filled", "tonal", "elevated", "outlined", "text"],
+            schemes: ["light", "dark"],
             hooks: ["./src/components/button.ts"],
         },
         Switch: {
             args: { "aria-label": "Wi-Fi", disabled: false },
+            schemes: ["light", "dark"],
             hooks: ["./src/components/switch.ts"],
         },
         TextField: {
             args: { label: "Name", disabled: false },
             variants: ["filled", "outlined"],
+            schemes: ["light", "dark"],
             hooks: ["./src/components/text-field.ts"],
         },
     },

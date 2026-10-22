@@ -42,6 +42,13 @@ bunx vitest run -c vitest.config.storybook.ts --project storybook/native -t Butt
   and React Native's provider, given no `scheme`, follows `useColorScheme()` (React Native Web
   reads the same media query). **Light** and **Dark** set the root's class (the shared hook,
   `src/hooks.ts`) or React Native's `scheme` prop (its binding hook); System removes them.
+- **Pinning a scheme:** a story or a component's meta can set Storybook's story-level
+  `globals: { scheme: "light" | "dark" }`, which overrides the toolbar for that story (Storybook
+  locks the Scheme item while it's pinned). Without a pin, the toolbar decides. In
+  `stories.config.ts`, `schemes: ["light", "dark"]` generates `Light` and `Dark` stories next to
+  `Default`, and `scheme: "dark"` pins every story of the component; a hook's `extendStory` can
+  set `globals` as well. The shared `play` tests (`isBaseStory`: `Default` and the pinned
+  copies) and the a11y checks run on them, so contrast is checked in both schemes.
 - **Theme** goes to each provider's `theme` prop.
 - The canvas paints the theme's surface (`src/index.css`), in the current scheme.
 - Storybook's UI follows the system too: `.storybook/manager.ts` switches the manager live when
@@ -77,12 +84,12 @@ component's.
 ## Adding a component
 
 1. Add it to `stories.config.ts`'s `components`, by its export name (`TextField` comes from each
-   binding's `./text-field` export): its `args`, `variants` (a control and one story each) and
-   `argTypes`.
+   binding's `./text-field` export): its `args`, `variants` (a control and one story each),
+   `schemes` (pinned `Light`/`Dark` stories) and `argTypes`.
 2. Add its anatomy name (and any sub-component's, such as `supportingText`) to `COMPONENTS` in
    `pureform.codegen.ts`.
 3. Give it a hook, `src/components/<component>.ts`, whose `extendStory` adds the `play` test to
-   `Default`. Query by role and accessible name, so it holds in every renderer.
+   the stories `isBaseStory` picks (`Default` and the scheme-pinned ones). Query by role and accessible name, so it holds in every renderer.
 4. Run `omni run test:e2e -p @pureform/storybook-web`.
 
 For a story the generator can't express, write `src/stories/<Component>.stories.ts` with the

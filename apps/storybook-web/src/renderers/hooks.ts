@@ -11,7 +11,13 @@ import type { Args, RendererDecorator } from "./types";
 export interface StoryName {
     readonly component: string;
     readonly story: string;
+    /** The scheme the story pins (its `globals.scheme`), if any. */
+    readonly scheme?: "light" | "dark" | undefined;
 }
+
+/** The story a component's shared tests run on: `Default`, and its scheme-pinned copies. */
+export const isBaseStory = (name: StoryName): boolean =>
+    name.story === "Default" || name.scheme !== undefined;
 
 /** A story-level hook: the shared one, or a component's. */
 export interface StoryHooks {

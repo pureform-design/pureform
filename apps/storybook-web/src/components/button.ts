@@ -3,12 +3,12 @@
 import type { StoryObj } from "@storybook/html-vite";
 import { expect, fn, userEvent, within } from "storybook/test";
 
-import type { StoryName } from "../renderers/hooks";
+import { isBaseStory, type StoryName } from "../renderers/hooks";
 
 export const args = { onClick: fn() };
 
 export const extendStory = (name: StoryName, story: StoryObj): StoryObj =>
-    name.story !== "Default"
+    !isBaseStory(name)
         ? story
         : {
               ...story,
