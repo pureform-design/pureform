@@ -34,8 +34,7 @@ phase named.
     - Expandable plus swipeable list items: move the swipe action outside the row (§2).
     - Icon button: the fallback outline width follows the size.
     - Vibrant toolbar: an unstyled one recolours its icon buttons.
-    - Submenus clipped in grouped menus, the slider cut-off following the theme (§2), and
-      chips' expressive corners (§1 #2).
+    - Submenus clipped in grouped menus, and chips' expressive corners (§1 #2).
 
 - **Never drive native scrolling** with springs or our own scroll code, on any platform (the
   carousel's snapping stays the browser's and `ScrollView`'s).
@@ -80,12 +79,6 @@ the code's (`doc-counts.spec.ts`).
   root becomes a wrapper holding the header button and the action as siblings, which changes
   the DOM of every expandable item (screenshots, indication fixtures) in all three bindings and
   the preset's `structure`. Not contained enough for r6.
-- **Slider inset icon cutoff following the theme.** `sliderInsetIconOverflows` (binding-core)
-  uses `SLIDER_INSET_ICON` (20/10/8) rather than the theme's `insetIconSize`/`insetIconPadding`.
-  Following a retuned theme needs the resolved component tokens at runtime: on the web a reader
-  for the component's token variables across the Panda, Tailwind and CSS adapters, on React
-  Native the component's own tokens (`useTokens` gives only system tokens). Design that reader
-  first.
 - **Glyph naming:** the stepper's check and warning use `ToastIcon`/`TOAST_GLYPHS`; named
   `check`/`warning` glyphs in `GLYPH_PATHS` would decouple them from the toast (no behaviour
   change).
