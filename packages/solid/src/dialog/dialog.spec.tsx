@@ -1,4 +1,5 @@
 import { compositeTestIds } from "@pureform/anatomy";
+import { createSignal } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
@@ -117,5 +118,60 @@ describe("Dialog, compound", () => {
         await frames();
         expect(onOpenChange).toHaveBeenCalledExactlyOnceWith({ open: false });
         expect(byTestId(ids.positioner).hidden).toBe(true);
+    });
+});
+
+describe("Dialog, onClose", () => {
+    it("asks onClose before Escape, the scrim or its close trigger closes it, refused and then allowed", async () => {
+        const onOpenChange = vi.fn();
+        let answer = false;
+        const onClose = vi.fn(() => answer);
+        withRegistry(() => (
+            <Dialog
+                trigger="Discard"
+                defaultOpen
+                aria-label="Discard"
+                headline="Discard draft?"
+                actions={<Dialog.CloseTrigger>Cancel</Dialog.CloseTrigger>}
+                onOpenChange={onOpenChange}
+                onClose={onClose}
+            />
+        ));
+        await frames();
+        await userEvent.keyboard("{Escape}");
+        await userEvent.click(byTestId(ids.positioner), {
+            position: { x: 5, y: 5 },
+            force: true,
+        });
+        await userEvent.click(byTestId(ids.closeTrigger));
+        await frames();
+        expect(onClose).toHaveBeenCalledTimes(3);
+        expect(onOpenChange).not.toHaveBeenCalled();
+        expect(byTestId(ids.positioner).hidden).toBe(false);
+        answer = true;
+        await userEvent.click(byTestId(ids.closeTrigger));
+        await frames();
+        expect(onClose).toHaveBeenCalledTimes(4);
+        expect(onOpenChange).toHaveBeenLastCalledWith({ open: false });
+    });
+
+    it("doesn't ask onClose when a controlled open closes it", async () => {
+        const onClose = vi.fn(() => false);
+        const [open, setOpen] = createSignal(true);
+        withRegistry(() => (
+            <Dialog
+                trigger="Discard"
+                aria-label="Discard"
+                headline="Discard draft?"
+                actions={<Dialog.CloseTrigger>Cancel</Dialog.CloseTrigger>}
+                open={open()}
+                onClose={onClose}
+            />
+        ));
+        await frames();
+        setOpen(false);
+        await frames();
+        expect(byTestId(ids.positioner).hidden).toBe(true);
+        expect(onClose).not.toHaveBeenCalled();
     });
 });

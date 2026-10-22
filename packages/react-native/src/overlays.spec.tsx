@@ -1067,3 +1067,111 @@ it("stacks open overlays by their layers: a menu, then a snackbar, then a toolti
     ].map((element) => element.getAttribute("role"));
     expect(order).toEqual(["menu", "status", "tooltip"]);
 });
+
+describe("onClose on the dialog, the full-screen dialog and the side sheet", () => {
+    const byRole = (name: string) =>
+        [...document.querySelectorAll<HTMLElement>('[role="button"]')].find(
+            (button) =>
+                button.textContent === name ||
+                button.getAttribute("aria-label") === name,
+        )!;
+    const press = (name: string) =>
+        interact(() => userEvent.click(byRole(name)));
+    const surface = (testId: string) =>
+        document.querySelector<HTMLElement>(`[data-testid="${testId}"]`);
+
+    const cases = [
+        {
+            name: "dialog",
+            testId: "pf-dialog-root",
+            scrim: true,
+            closer: "Cancel",
+            view: (props: {
+                onClose: () => boolean;
+                onOpenChange: (details: { open: boolean }) => void;
+            }) => (
+                <Dialog
+                    trigger="Open"
+                    headline="Discard draft?"
+                    {...props}
+                    actions={({ close }) => (
+                        <Button variant="text" label="Cancel" onPress={close} />
+                    )}
+                >
+                    Your changes won't be saved.
+                </Dialog>
+            ),
+        },
+        {
+            name: "full-screen dialog",
+            testId: "pf-fullscreen-dialog-root",
+            scrim: false,
+            closer: "Close",
+            view: (props: {
+                onClose: () => boolean;
+                onOpenChange: (details: { open: boolean }) => void;
+            }) => (
+                <FullscreenDialog
+                    trigger="Open"
+                    headline="New event"
+                    {...props}
+                >
+                    Fill in the details.
+                </FullscreenDialog>
+            ),
+        },
+        {
+            name: "side sheet",
+            testId: "pf-side-sheet-root",
+            scrim: true,
+            closer: "Close",
+            view: (props: {
+                onClose: () => boolean;
+                onOpenChange: (details: { open: boolean }) => void;
+            }) => (
+                <SideSheet trigger="Open" headline="Filters" {...props}>
+                    Narrow it down.
+                </SideSheet>
+            ),
+        },
+    ];
+
+    it.each(cases)(
+        "asks onClose before Escape, the scrim or the close control closes the $name, refused and allowed",
+        async ({ testId, scrim, closer, view }) => {
+            const asked: boolean[] = [];
+            let answer = false;
+            let questions = 0;
+            await render(
+                view({
+                    onClose: () => {
+                        questions++;
+                        return answer;
+                    },
+                    onOpenChange: (details) => asked.push(details.open),
+                }),
+            );
+            await press("Open");
+            await settle(600);
+            expect(surface(testId)).not.toBeNull();
+            await interact(() => userEvent.keyboard("{Escape}"));
+            if (scrim) {
+                const beside = document.elementFromPoint(4, 4) as HTMLElement;
+                expect(surface(testId)!.contains(beside)).toBe(false);
+                await interact(() =>
+                    userEvent.click(beside, { position: { x: 4, y: 4 } }),
+                );
+            }
+            await press(closer);
+            await settle(100);
+            expect(questions).toBe(scrim ? 3 : 2);
+            expect(asked).toEqual([true]);
+            expect(surface(testId)).not.toBeNull();
+            answer = true;
+            await press(closer);
+            await until(() => surface(testId) === null);
+            expect(questions).toBe(scrim ? 4 : 3);
+            expect(asked).toEqual([true, false]);
+        },
+    );
+});
