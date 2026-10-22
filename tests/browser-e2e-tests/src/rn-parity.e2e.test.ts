@@ -277,6 +277,11 @@ const WAVE_BOX = (name: string, slot: string, property: string) =>
     slot === "indicator" &&
     (property === "height" || property === "top");
 
+// A grouped menu clips its groups in React Native; on the web it doesn't (so submenus aren't
+// cut off) and the first and last group round the run's outside corners themselves.
+const GROUP_CORNER = (name: string, slot: string, property: string) =>
+    name === "menu" && slot === "itemGroup" && property.endsWith("radius");
+
 // A shaped outline is a filled ring on the web and a border in React Native.
 const RING = (property: string) =>
     property === "background-color" || /^border-.*-width$/.test(property);
@@ -368,6 +373,7 @@ describe("the React Native adapter matches the CSS adapter", () => {
                     slot,
                 )) {
                     if (shaped && WAVE_BOX(name, slot, property)) continue;
+                    if (GROUP_CORNER(name, slot, property)) continue;
                     compared++;
                     const [x, y] = [
                         a.getPropertyValue(property),
