@@ -1,13 +1,22 @@
-// Screenshots every component's Default story in every renderer, against a running Storybook:
-// `node scripts/screenshots.mjs <url> [dir] [scheme] [theme]` writes `<dir>/sb-web-<component>-<renderer>.png`
-// and prints what each canvas holds, with the page's errors.
+// Screenshots a sample of stories in every renderer, against a running Storybook:
+// `node scripts/screenshots.mjs <url> [dir] [scheme] [theme]` writes one overview per renderer,
+// `<dir>/sb-web2-<renderer>[-<scheme>][-<theme>].png` (each story's canvas in a grid), and prints
+// what each canvas holds, with the page's errors.
 import { chromium } from "playwright";
 
 const base = process.argv[2] ?? "http://localhost:6006";
 const dir = process.argv[3] ?? "/tmp/opencode";
 const scheme = process.argv[4] ?? "light";
 const theme = process.argv[5] ?? "default";
-const components = ["button", "switch", "textfield"];
+/** Story ids: a sample across the groups, an overlay opened among them. */
+const stories = [
+    "button--default",
+    "switch--default",
+    "textfield--default",
+    "slider--default",
+    "tabs--default",
+    "menu--opened-plain",
+];
 const renderers = ["solid", "react", "native"];
 
 const browser = await chromium.launch(
@@ -15,7 +24,7 @@ const browser = await chromium.launch(
         ? { executablePath: process.env.CHROMIUM_PATH }
         : {},
 );
-const page = await browser.newPage({ viewport: { width: 1100, height: 560 } });
+const page = await browser.newPage({ viewport: { width: 900, height: 700 } });
 /** @type {string[]} */
 const errors = [];
 page.on("pageerror", (e) => errors.push(`page: ${e.message}`));
@@ -23,26 +32,38 @@ page.on("console", (m) => {
     if (m.type() === "error") errors.push(`console: ${m.text()}`);
 });
 
-for (const component of components) {
-    for (const renderer of renderers) {
+const suffix = `${scheme === "light" ? "" : `-${scheme}`}${theme === "default" ? "" : `-${theme}`}`;
+for (const renderer of renderers) {
+    /** @type {{ story: string, png: string }[]} */
+    const shots = [];
+    for (const story of stories) {
+        // The canvas alone (`iframe.html`), so the shot is the story's.
         await page.goto(
-            `${base}/?path=/story/${component}--default&globals=renderer:${renderer};scheme:${scheme};theme:${theme}`,
+            `${base}/iframe.html?id=${story}&viewMode=story&globals=renderer:${renderer};scheme:${scheme};theme:${theme}`,
         );
-        const frame = page.frameLocator("#storybook-preview-iframe");
-        await frame
-            .locator(`[data-renderer=${renderer}] :is(button, input, [role])`)
+        const root = page.locator(`[data-renderer=${renderer}]`);
+        await root
+            .locator(":is(button, input, [role])")
             .first()
             .waitFor({ timeout: 60_000 });
-        await page.waitForTimeout(500);
-        const html = await frame
-            .locator(`[data-renderer=${renderer}]`)
-            .evaluate((el) => el.textContent ?? "");
-        const suffix = `${scheme === "light" ? "" : `-${scheme}`}${theme === "default" ? "" : `-${theme}`}`;
-        await page.screenshot({
-            path: `${dir}/sb-web-${component}-${renderer}${suffix}.png`,
-        });
-        console.log(component, renderer, JSON.stringify(html.slice(0, 60)));
+        await page.waitForTimeout(800);
+        const text = await root.evaluate((el) => el.textContent ?? "");
+        const png = await page.screenshot({ fullPage: false });
+        shots.push({ story, png: png.toString("base64") });
+        console.log(renderer, story, JSON.stringify(text.slice(0, 60)));
     }
+    await page.setContent(
+        `<body style="margin:0;font:14px sans-serif;background:#ddd"><h2 style="margin:8px">${renderer}</h2><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:8px">${shots
+            .map(
+                (s) =>
+                    `<figure style="margin:0;background:#fff"><figcaption style="padding:4px">${s.story}</figcaption><img style="width:100%" src="data:image/png;base64,${s.png}"></figure>`,
+            )
+            .join("")}</div></body>`,
+    );
+    await page.screenshot({
+        path: `${dir}/sb-web2-${renderer}${suffix}.png`,
+        fullPage: true,
+    });
 }
 console.log("errors", JSON.stringify(errors, null, 1));
 await browser.close();

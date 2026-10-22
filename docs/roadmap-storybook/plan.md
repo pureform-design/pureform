@@ -124,19 +124,25 @@ the demos):
       values (`variants`, plain data generated next to the parts from the recipe's variants;
       `generated.ts` is regenerated, never edited, and the drift spec covers it). The controls
       (`argTypes`, a select or a boolean per variant) come from it, so no preset runs in the
-      browser.
+      browser. `bindingVariants` (from the preset spec's field of the same name) marks the
+      variants the binding sets itself (a button's `toggle`/`position`/`density`), which get no
+      control. Composite anatomies (the radio group's) pair too, without controls.
     - **`@pureform/component-cases`** (the framework-neutral cases moved out of
       `tests/component-suites`, which now imports them) gives each component's stories and play
-      tests: `props` is `Default`'s args, each of `examples` is a story, `state` gives a play
+      tests: `props` is `Default`'s args, each of `examples` and `opened` is a story, `state` gives a play
       (read gives `from`, one `act`, read gives `to`), and each `keyboard` key a story with its
       play. Cases take `userEvent` as a parameter (`createCases(userEvent)`), so Storybook passes
       `storybook/test`'s and the suites Vitest's. A component is drawn when an anatomy and a case
       share its root test id.
-    - **`stories.config.ts` holds overrides only:** the renderers, `include` (this slice: Button,
-      Switch, TextField) and `skip`, and per component extra `args`/`argTypes`, controls to
-      leave out (variants the binding derives), `schemes`, hooks, and story fields by export
-      name. A renderer whose DOM the cases can't read sets `casePlays: false` (React Native Web,
-      for now).
+    - **`stories.config.ts` holds overrides only:** the renderers, `skip` (with reasons),
+      `schemes` and `overlayHeight` for every component, and per component extra
+      `args`/`argTypes`/`parameters`, `schemes`, `height`, hooks, and story fields by export
+      name. A renderer whose DOM the cases can't read sets `casePlays: false`, and `tests: false`
+      leaves it out of the story tests (React Native Web, for now: **skipped until the cases get
+      renderer-neutral readers**).
+    - **Overlays** get room rather than hand-written stories: their `opened` renderings are
+      stories, and a component whose case has `overlay` or `opened` gets a canvas at least
+      `overlayHeight` (480px) tall from the shared hook.
 2. **Output:** `src/stories/generated/<Component>.stories.ts` (ignored by git), one per
    component, importing each renderer's implementation and calling `multiRender`. A renderer
    without that component shows "not implemented" in the canvas.
@@ -183,7 +189,11 @@ codegen hooks (`transformSource`) run in the script.
 
 ## Decisions
 
-- **Components:** Button, Switch, TextField.
+- **Components:** every one with an anatomy and a case (round 2; the first slice was Button,
+  Switch and TextField). Toast and GridList are skipped: their cases need a scene (a toaster,
+  tiles as children) that props can't give.
+- **React Native:** skipped for now in the story tests and plays; needs renderer-neutral
+  readers.
 - **Host:** `@storybook/html-vite`, renderer-neutral; each renderer mounts through its adapter.
 - **Per-renderer hooks** live in the binding packages, as a `storybook` export
   (`@pureform/solid/storybook`, `@pureform/react/storybook`, `@pureform/react-native/storybook`).

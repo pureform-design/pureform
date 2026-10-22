@@ -10,9 +10,19 @@ and `play` tests are shared, so one interaction test runs against every renderer
 omni run dev -p @pureform/storybook-web     # http://localhost:6006
 omni run build -p @pureform/storybook-web   # storybook-static/
 omni run test:e2e -p @pureform/storybook-web
-# one renderer, one component:
-bunx vitest run -c vitest.config.storybook.ts --project storybook/native -t Button
+# one renderer, some components (by their generated files):
+bunx vitest run -c vitest.config.storybook.ts --project storybook/solid \
+    src/stories/generated/Button.stories.ts src/stories/generated/Menu.stories.ts
+# React Native's tests are off (below); run them anyway:
+SB_RENDERERS=native bunx vitest run -c vitest.config.storybook.ts --project storybook/native \
+    src/stories/generated/TextField.stories.ts
 ```
+
+**React Native skipped for now; needs renderer-neutral readers.** Its stories still draw (the
+toolbar's React Native), but without the generated plays (`casePlays: false`) and outside the
+story tests (`tests: false` in `stories.config.ts`): the cases read the web bindings' DOM (a
+button's `aria-pressed`, the switch's native input, the field's `data-pf-filled`), which React
+Native Web doesn't draw.
 
 ## How it fits together
 
@@ -25,26 +35,39 @@ bunx vitest run -c vitest.config.storybook.ts --project storybook/native -t Butt
   `src/solid/**` and every package that ships Solid JSX (the `SOLID` list); React's takes the
   rest. Solid and React draw with the Panda registry in `.pureform/`, React Native with
   rn-adapter's runtime styles from `virtual:pureform-rn`. `pureform.codegen.ts`'s
-  `COMPONENTS` lists the components (by anatomy name) for both.
+  `COMPONENTS` is every anatomy in `@pureform/anatomy`, for both.
 - **Stories are generated** by `scripts/generate-stories.ts` (the omni `generate:stories`
   task, before `dev`, `build` and the tests) into `src/stories/generated/<Component>.stories.ts`
   (ignored by git), from data the components already have:
-    - **`@pureform/anatomy`**: the component list, and each variant's values, which become the
-      controls (a select, or a boolean for `true`/`false`).
+    - **`@pureform/anatomy`**: the component list (the preset's anatomies, then the
+      hand-written composites', such as the radio group's), and each variant's values, which
+      become the controls (a select, or a boolean for `true`/`false`). Variants in the
+      anatomy's `bindingVariants` (set by the binding itself: a button's `toggle`, a group's
+      `position`, the provider's `density`, a field's `leadingIcon`) get no control; they come
+      from the preset spec's `bindingVariants`, and `generated.ts` is regenerated, never edited.
     - **`@pureform/component-cases`**: `props` gives `Default`, each of `examples` a story, the
       `state` a play test (read gives `from`, one `act`, read gives `to`) on the pinned `Light`
-      and `Dark` copies, and each `keyboard` key a `Key: …` story with its play. The cases act
+      and `Dark` copies, each of `opened` an `Opened: …` story (an overlay shown), and each
+      `keyboard` key a `Key: …` story with its play. A component with several cases (the card
+      and its action area) gets the others' examples too. A component whose case has `overlay`
+      or `opened` gets a canvas at least `overlayHeight` tall (`parameters.pureform.height`,
+      drawn by the shared hook), so a menu, a sheet or a dialog opens inside it. The cases act
       through `storybook/test`'s `userEvent` (`createCases(userEvent)`, `src/renderers/plays.ts`).
-    - **`stories.config.ts`**, overrides only: renderers, `include`/`skip`, and per component
-      `args`, `argTypes`, `controls.exclude` (variants the binding derives, which aren't props),
-      `schemes`, `scheme`, `hooks`, and `stories` (fields by export name).
+    - **`stories.config.ts`**, overrides only: renderers (`casePlays`, `tests`), `include`,
+      `skip` (by component, with the reason), `schemes` for every component, `overlayHeight`,
+      and per component `args`, `argTypes`, `parameters`, `schemes`, `scheme`, `height`,
+      `hooks`, and `stories` (fields by export name; `tags` are written into the file, where
+      Storybook's indexer reads them, so `tags: ["!test"]` keeps a story out of the tests).
 
     A hand-written `src/stories/*.stories.ts` with the same `title` replaces the generated file;
     the script never writes outside `generated/`.
 
 - **Tests:** `@storybook/addon-vitest` runs every story in Chromium (Vitest browser mode), one
   project per renderer (`storybook/solid`, `storybook/react`, `storybook/native`, set by the
-  `renderer` global). `@storybook/addon-a11y` checks each story; a violation fails it.
+  `renderer` global), in the component suites' 1280×900 viewport. `@storybook/addon-a11y`
+  checks each story; a violation fails it. The cases act through Vitest's `userEvent` there
+  (real Playwright input; `.storybook/main.ts` aliases `#user-event` under `VITEST`) and
+  through `storybook/test`'s in Storybook, which the Interactions panel records.
 
 ## Scheme and theme
 
@@ -98,12 +121,12 @@ component's.
 1. Give it an anatomy (the preset's component, `@pureform/anatomy`'s `generate`) and a case in
    `@pureform/component-cases` (`packages/component-cases/src/cases/<name>.ts`); the generator
    pairs them by the root's test id.
-2. Add it to `include` in `stories.config.ts` (or drop `include` to draw every component with
-   both), and its anatomy name (and any sub-component's, such as `supportingText`) to
-   `COMPONENTS` in `pureform.codegen.ts`.
-3. Override what the data gets wrong in its `components` entry: `controls.exclude` for
-   variants that aren't props, `args`, `schemes: ["light", "dark"]` for pinned copies.
-4. Run `omni run test:e2e -p @pureform/storybook-web`.
+   Every such component is drawn; a variant the binding sets itself goes in the preset spec's
+   `bindingVariants`, not here.
+2. Override what the data gets wrong in its `components` entry (`args`, `parameters`,
+   `stories`), or `skip` it with the reason when its case can't be drawn from props alone.
+3. Run its story tests: `bunx vitest run -c vitest.config.storybook.ts --project
+storybook/solid src/stories/generated/<Component>.stories.ts` (and `storybook/react`).
 
 For a story the generator can't express, write `src/stories/<Component>.stories.ts` with the
 same `title`; it replaces the generated one.
@@ -123,9 +146,9 @@ context)` renders the component under `context.decorators` (each called with the
 2. Give the binding a `storybook` export (`package.json` export and its build's entry) with
    at least the provider decorator, mapping the theme to its provider's props.
 3. Add it to `stories.config.ts`'s `renderers` (`package`, `adapter`, `export`, `hooks`, and
-   `casePlays: false` if the cases can't read its DOM), to
-   the `renderer` toolbar items in `.storybook/preview.ts`, and to `RENDERERS` in
-   `vitest.config.storybook.ts`.
+   `casePlays: false` if the cases can't read its DOM, `tests: false` to keep it out of the
+   story tests; the Vitest projects come from this list), and to the `renderer` toolbar items
+   in `.storybook/preview.ts`.
 4. Its compiler in `.storybook/main.ts`: Svelte's and Vue's plugins claim their own extensions;
    another JSX renderer gets a path list like `SOLID`, excluded from React's plugin.
 5. Add the binding to `package.json` and `project.omni.yaml`'s dependencies.
@@ -133,6 +156,7 @@ context)` renders the component under `context.decorators` (each called with the
 ## Scripts
 
 - `scripts/generate-stories.ts`: the codegen above.
-- `scripts/screenshots.mjs <url> [dir] [scheme] [theme]`: screenshots each component's
-  `Default` in each renderer against a running Storybook, and prints the page's errors.
+- `scripts/screenshots.mjs <url> [dir] [scheme] [theme]`: one overview per renderer
+  (`sb-web2-<renderer>.png`) of a sample of stories (Button, Switch, TextField, Slider, Tabs,
+  Menu opened) against a running Storybook, and prints the page's errors.
 - `scripts/system-scheme.mjs <url> [dir]`: the System scheme check above; exits 1 on a failure.
