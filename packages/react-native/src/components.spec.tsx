@@ -1066,6 +1066,44 @@ describe("nested rows", () => {
         expect(root.getAttribute("aria-expanded")).toBe("true");
         expect(byTestId("both-region")).toBeTruthy();
     });
+
+    it("presses a swipeable item on a tap, not a drag, and isolates its frame", async () => {
+        const onPress = vi.fn();
+        const onRevealedChange = vi.fn();
+        await render(
+            <ListItem
+                headline="Message"
+                swipeAction={<Glyph glyph="🗑" />}
+                onPress={onPress}
+                onRevealedChange={onRevealedChange}
+                testId="tap"
+            />,
+        );
+        const root = byTestId("tap-root");
+        expect(root.getAttribute("role")).toBe("button");
+        expect(computed("tap-frame").isolation).toBe("isolate");
+        await interact(() => userEvent.click(root));
+        expect(onPress).toHaveBeenCalledTimes(1);
+        const at = (dx: number) => {
+            const box = root.getBoundingClientRect();
+            return {
+                bubbles: true,
+                button: 0,
+                buttons: 1,
+                clientX: box.left + box.width / 2 + dx,
+                clientY: box.top + box.height / 2,
+            };
+        };
+        await interact(async () => {
+            root.dispatchEvent(new MouseEvent("mousedown", at(0)));
+            for (const dx of [-10, -40, -80, -120]) {
+                root.dispatchEvent(new MouseEvent("mousemove", at(dx)));
+            }
+            document.dispatchEvent(new MouseEvent("mouseup", at(-120)));
+        });
+        expect(onRevealedChange).toHaveBeenCalledWith({ revealed: true });
+        expect(onPress).toHaveBeenCalledTimes(1);
+    });
 });
 
 describe("c7c: avatar picture, swipe, inset icon, search bar width", () => {

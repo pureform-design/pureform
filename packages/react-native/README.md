@@ -422,10 +422,10 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
   `region` is expandable: a button whose `⌄` indicator turns over, showing the region under it
   while `expanded` (`defaultExpanded`, `onExpandedChange`), React state rather than Zag's
   accordion. A `swipeAction`
-  makes the item swipeable (`revealed`, `defaultRevealed`, `onRevealedChange`, `swipeWidth`; `actionColor="error"` for a destructive action): the
+  makes the item swipeable, and only it: there's no `swipeable` prop (`revealed`, `defaultRevealed`, `onRevealedChange`, `swipeWidth`; `actionColor="error"` for a destructive action): the
   item sits in a `frame` with the action under the row (after it in the accessibility order), and the frame takes the drag (a
-  `PanResponder`), so the row isn't also pressable, but for an expandable one (with a `region`),
-  which swipes and expands; the action is hidden from assistive technology until revealed. `Avatar` takes a `src` that shows once loaded
+  `PanResponder`): a drag past the slop takes the touch from the row, so its `onPress` (or an
+  expandable item's expanding) fires on a tap only; the action is hidden from assistive technology until revealed. `Avatar` takes a `src` that shows once loaded
   (`onStatusChange`), its children the fallback.
 - **Button groups:** `ButtonGroup` renders a `Button` per labelled entry of `items` and an
   `IconButton` per icon-only one, in its `size` and the buttons' `color`, `variant`, `corner` and

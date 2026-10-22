@@ -42,7 +42,7 @@ const [INDICATION] = listItemAnatomy.indication!;
 
 export interface ListItemProps
     extends
-        ListItemVariantProps,
+        Omit<ListItemVariantProps, "swipeable">,
         ListItemContentProps<ReactNode>,
         ListItemExpandProps,
         ListItemSwipeProps,
@@ -50,9 +50,8 @@ export interface ListItemProps
     /** The current item, such as the page a navigation list is on. */
     readonly selected?: boolean | undefined;
     readonly disabled?: boolean | undefined;
-    /** Makes the item act. An expandable item (given a `region`) acts as well: it expands. A
-     *  swipeable item (one with a `swipeAction`) takes the drag instead, so it can't also be
-     *  pressed, but for an expandable one: put the press on its content. */
+    /** Makes the item act. An expandable item (given a `region`) acts as well: it expands. On a
+     *  swipeable item (one with a `swipeAction`), a tap fires it and a drag doesn't. */
     readonly onPress?: (() => void) | undefined;
     /** An interactive item's role in place of `button`: a selection list's options are `option`s,
      *  marked with `aria-selected`. */
@@ -74,9 +73,8 @@ function ListItemImpl(props: ListItemProps): ReactNode {
         props.onExpandedChange,
         false,
     );
-    const swipeable = props.swipeable ?? isPresent(props.swipeAction);
-    const interactive =
-        expandable || (props.onPress !== undefined && !swipeable);
+    const swipeable = isPresent(props.swipeAction);
+    const interactive = expandable || props.onPress !== undefined;
     const rtl = useDirection() === "rtl";
     const width = props.swipeWidth ?? LIST_ITEM_SWIPE_WIDTH;
     const [own, setOwn] = useState(props.defaultRevealed ?? false);
@@ -236,8 +234,9 @@ function ListItemImpl(props: ListItemProps): ReactNode {
         ) : (
             row
         );
-    // A swipeable row takes the drag rather than the press, unless it expands.
-    if (swipeable && !expandable)
+    // A swipeable row that doesn't act only takes the drag. One that does takes the press too:
+    // a drag past the slop takes the touch from it, so only a tap presses it.
+    if (swipeable && !interactive)
         return framed(
             <v.root.View
                 {...keys}
@@ -275,7 +274,7 @@ function ListItemImpl(props: ListItemProps): ReactNode {
             {indication.layer(selected)}
         </v.root.Pressable>
     );
-    if (!expandable) return row;
+    if (!expandable) return framed(row);
     return (
         <>
             {framed(row)}
