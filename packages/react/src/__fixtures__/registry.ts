@@ -317,6 +317,11 @@ export const navigationRegistry = () =>
         ]),
         list: named("list", ["root", "item"]),
         scrim: named("scrim", ["root"]),
+        horizontalSharedAxis: named("horizontal-shared-axis", [
+            "root",
+            "page",
+            "scrim",
+        ]),
         listItem: named("list-item", [
             "root",
             "leading",
@@ -416,6 +421,11 @@ export const displayRegistry = () =>
             "text",
             "indicator",
             "group",
+        ]),
+        horizontalSharedAxis: named("horizontal-shared-axis", [
+            "root",
+            "page",
+            "scrim",
         ]),
         stepper: named("stepper", [
             "root",

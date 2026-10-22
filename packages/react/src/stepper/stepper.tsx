@@ -31,6 +31,10 @@ import {
 
 import { useControllable } from "../controllable";
 import { ToastIcon } from "../glyphs";
+import {
+    HorizontalSharedAxis,
+    useSharedAxisPage,
+} from "../horizontal-shared-axis/horizontal-shared-axis";
 import { useItemInteractionSources } from "../interaction";
 import type { ItemInteractionSources } from "../interaction";
 import { useMachine } from "../machine";
@@ -241,9 +245,13 @@ function Content({
 }: StepperContentPartProps): ReactNode {
     const { scope, api } = context.use("Content");
     const at = index ?? itemContext.use("Content").index;
+    // A step's content leaving in a shared axis stays drawn while it goes.
+    const leaving = useSharedAxisPage() === "leaving";
     return scope.render("content", {
         element: "div",
-        machine: api.getContentProps({ index: at }),
+        machine: leaving
+            ? { ...api.getContentProps({ index: at }), hidden: false }
+            : api.getContentProps({ index: at }),
         unstyled,
         props,
     });
@@ -326,6 +334,8 @@ function ReadyMade(props: StepperProps): ReactNode {
         items = [],
         "aria-label": label,
         "aria-labelledby": labelledBy,
+        transition,
+        transitionScrim,
         ...rootProps
     } = props;
     const slot = useSlotProps(props);
@@ -379,8 +389,36 @@ function ReadyMade(props: StepperProps): ReactNode {
                     </Item>
                 ))}
             </List>
-            {vertical ? null : items.map(content)}
+            {vertical ? null : transition === "sharedAxis" ? (
+                <SharedAxisSteps
+                    items={items}
+                    scrim={transitionScrim}
+                    content={content}
+                />
+            ) : (
+                items.map(content)
+            )}
         </Root>
+    );
+}
+
+// A row's current step's content in a horizontal shared axis, which slides between the steps in
+// their order.
+function SharedAxisSteps(props: {
+    readonly items: readonly StepperItem<ReactNode>[];
+    readonly scrim: boolean | undefined;
+    readonly content: (
+        item: StepperItem<ReactNode>,
+        index: number,
+    ) => ReactNode;
+}): ReactNode {
+    const { api } = context.use("Content");
+    const index = api.value;
+    const item = props.items[index];
+    return (
+        <HorizontalSharedAxis index={index} scrim={props.scrim}>
+            {item ? props.content(item, index) : null}
+        </HorizontalSharedAxis>
     );
 }
 
