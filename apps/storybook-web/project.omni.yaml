@@ -39,8 +39,22 @@ tasks:
   test:integration:
     enabled: false
 
+  # Every story's play test and a11y checks in Chromium, once per renderer (see
+  # vitest.config.storybook.ts).
   test:e2e:
-    enabled: false
+    enabled: true
+    exec: bun run vitest --config ./vitest.config.storybook.ts run
+    dependencies:
+      append:
+        - generate:stories
+        - prepare
+    cache:
+      key:
+        files:
+          append:
+            - "./vitest.config.storybook.ts"
+            - stories.config.ts
+            - ".storybook/**/*"
 
   dev:
     exec: bun x storybook dev -p 6006 --no-open

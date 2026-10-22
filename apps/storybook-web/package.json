@@ -7,7 +7,8 @@
     "scripts": {
         "dev": "storybook dev -p 6006 --no-open",
         "build": "storybook build",
-        "generate": "node scripts/generate-stories.ts"
+        "generate": "node scripts/generate-stories.ts",
+        "test": "vitest --config ./vitest.config.storybook.ts run"
     },
     "dependencies": {
         "@pureform/binding-core": "workspace:^",

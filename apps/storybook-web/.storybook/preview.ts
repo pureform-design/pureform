@@ -38,4 +38,6 @@ export default {
         },
     },
     initialGlobals: { renderer: "solid", theme: "light" },
+    // The a11y addon's violations fail the story's test (in Vitest and in the panel's runs).
+    parameters: { a11y: { test: "error" } },
 } satisfies Preview;

@@ -8,6 +8,6 @@
         "paths": { "$*": ["./styled-system/*"] }
     },
     // The Solid folder has its own config (Solid's JSX); `.pureform/` holds the registry.
-    "include": ["src", ".storybook", "scripts/**/*.ts", "stories.config.ts", ".pureform/**/*.*"],
+    "include": ["src", ".storybook", "scripts/**/*.ts", "stories.config.ts", "vitest.config.storybook.ts", ".pureform/**/*.*"],
     "exclude": ["src/solid"]
 }
