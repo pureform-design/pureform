@@ -11,21 +11,50 @@ import type {
 
 /** Where a spring released from rest at 0 is after `t` seconds, heading for 1: the closed-form
  *  solution of `m·x'' + c·x' + k·x = 0` with `c = 2ζ√(k·m)`, as 1 minus the displacement. */
-export const springAt = (spring: SpringNode, t: number): number => {
+export const springAt = (spring: SpringNode, t: number): number =>
+    springState(spring, 0, t).progress;
+
+/** Where a spring heading for 1 is after `t` seconds, and how fast (per second), from 0 at
+ *  `velocity` per second: `springAt`'s motion with a starting speed, as an interrupted motion
+ *  carries on. */
+export const springState = (
+    spring: SpringNode,
+    velocity: number,
+    t: number,
+): { progress: number; velocity: number } => {
     const { stiffness: k, damping: zeta, mass: m } = spring;
-    const w0 = Math.sqrt(k / m);
+    const w = Math.sqrt(k / m);
+    const x0 = -1;
     if (zeta < 1) {
-        const wd = w0 * Math.sqrt(1 - zeta * zeta);
-        const x =
-            Math.exp(-zeta * w0 * t) *
-            (Math.cos(wd * t) + ((zeta * w0) / wd) * Math.sin(wd * t));
-        return 1 - x;
+        const wd = w * Math.sqrt(1 - zeta * zeta);
+        const a = zeta * w;
+        const b = (velocity + a * x0) / wd;
+        const decay = Math.exp(-a * t);
+        const [cos, sin] = [Math.cos(wd * t), Math.sin(wd * t)];
+        return {
+            progress: 1 + decay * (x0 * cos + b * sin),
+            velocity:
+                decay *
+                (-a * (x0 * cos + b * sin) + wd * (-x0 * sin + b * cos)),
+        };
     }
-    if (zeta === 1) return 1 - Math.exp(-w0 * t) * (1 + w0 * t);
+    if (zeta === 1) {
+        const b = velocity + w * x0;
+        const decay = Math.exp(-w * t);
+        return {
+            progress: 1 + decay * (x0 + b * t),
+            velocity: decay * (b - w * (x0 + b * t)),
+        };
+    }
     const root = Math.sqrt(zeta * zeta - 1);
-    const r1 = -w0 * (zeta - root);
-    const r2 = -w0 * (zeta + root);
-    return 1 - (r2 * Math.exp(r1 * t) - r1 * Math.exp(r2 * t)) / (r2 - r1);
+    const [r1, r2] = [-w * (zeta - root), -w * (zeta + root)];
+    const c2 = (velocity - r1 * x0) / (r2 - r1);
+    const c1 = x0 - c2;
+    const [e1, e2] = [Math.exp(r1 * t), Math.exp(r2 * t)];
+    return {
+        progress: 1 + c1 * e1 + c2 * e2,
+        velocity: c1 * r1 * e1 + c2 * r2 * e2,
+    };
 };
 
 /** The damping coefficient `c = 2ζ√(k·m)` a native spring takes, from the damping ratio. */
