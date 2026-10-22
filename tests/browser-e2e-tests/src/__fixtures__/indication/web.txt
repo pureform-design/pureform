@@ -1994,6 +1994,22 @@ listItem[position=single].trailing: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0
     hovered-selected: color oklch(0.4005 0.034 298.613)
 listItem[position=single].indicator: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
     hovered-selected: color oklch(0.4005 0.034 298.613)
+listItem[actionColor=error].root: bg oklch(0.9844 0.0084 325.895) | color oklch(0.2245 0.0059 301.135) | outline none
+    hovered-selected: bg oklch(0.9163 0.0365 303.153) | color oklch(0.4005 0.034 298.613)
+listItem[actionColor=error].leading: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.4005 0.034 298.613)
+listItem[actionColor=error].content: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline none
+    hovered-selected: color oklch(0.4005 0.034 298.613)
+listItem[actionColor=error].overline: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.4005 0.034 298.613)
+listItem[actionColor=error].headline: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline none
+    hovered-selected: color oklch(0.4005 0.034 298.613)
+listItem[actionColor=error].supportingText: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.4005 0.034 298.613)
+listItem[actionColor=error].trailing: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.4005 0.034 298.613)
+listItem[actionColor=error].indicator: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.4005 0.034 298.613)
 listItem[color=tertiary].root: bg oklch(0.9844 0.0084 325.895) | color oklch(0.2245 0.0059 301.135) | outline none
     hovered-selected: bg oklch(0.9199 0.0441 0.3843) | color oklch(0.4044 0.0591 359.127)
 listItem[color=tertiary].leading: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none

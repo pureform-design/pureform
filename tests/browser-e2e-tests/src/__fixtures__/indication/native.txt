@@ -1671,6 +1671,22 @@ listItem[position=single].trailing: bg none | color rgba(73, 69, 78, 1) | outlin
     hovered-selected: color rgba(74, 68, 88, 1)
 listItem[position=single].indicator: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(74, 68, 88, 1)
+listItem[actionColor=error].root: bg rgba(253, 248, 253, 1) | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: bg rgba(232, 222, 248, 1) | color rgba(74, 68, 88, 1)
+listItem[actionColor=error].leading: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem[actionColor=error].content: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem[actionColor=error].overline: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem[actionColor=error].headline: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem[actionColor=error].supportingText: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem[actionColor=error].trailing: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem[actionColor=error].indicator: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
 listItem[color=tertiary].root: bg rgba(253, 248, 253, 1) | color rgba(28, 27, 30, 1) | outline none
     hovered-selected: bg rgba(255, 217, 227, 1) | color rgba(99, 59, 72, 1)
 listItem[color=tertiary].leading: bg none | color rgba(73, 69, 78, 1) | outline none
