@@ -46,16 +46,21 @@ export interface ButtonElementIds {
 export interface ButtonBehaviorProps extends Controllable<"selected", boolean> {
     /** A disabled fieldset around the button disables it too. */
     readonly disabled?: boolean | undefined;
-    /** The native button type. @default "button" */
+    /** The native button type. @default "button"
+     *  @control none */
     readonly type?: "button" | "submit" | "reset" | undefined;
+    /** @control none */
     readonly name?: string | undefined;
+    /** @control none */
     readonly value?: string | undefined;
-    /** The id of the form the button belongs to, for a button outside it. */
+    /** The id of the form the button belongs to, for a button outside it.
+     *  @control none */
     readonly form?: string | undefined;
     /** Whether a press toggles `selected`, which `aria-pressed` reports.
      *  @default true when `selected` or `defaultSelected` is given */
     readonly toggle?: boolean | undefined;
-    /** The root element's id; the machine finds the element by it. */
+    /** The root element's id; the machine finds the element by it.
+     *  @control none */
     readonly id?: string | undefined;
     readonly ids?: ButtonElementIds | undefined;
 }

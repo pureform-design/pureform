@@ -27,13 +27,10 @@ export interface ComponentConfig {
     /** Args for every story of the component, over the case's props and the shared and
      *  renderer hooks'. */
     readonly args?: Args;
-    /** Anatomy variants to give no control, besides those that aren't props (see
-     *  `variantProps`). */
+    /** Props to give no control, besides those the derivation drops
+     *  (`scripts/prop-controls.ts`). */
     readonly controls?: { readonly exclude?: readonly string[] };
-    /** The binding-core interface whose properties are the component's variant props, when it
-     *  isn't `<Component>VariantProps` (`ProgressVariantProps` for both progress indicators). */
-    readonly variantProps?: string;
-    /** Arg types over the ones from the anatomy's variants. */
+    /** Arg types over the derived ones. */
     readonly argTypes?: Partial<ArgTypes>;
     /** Scheme-pinned copies of `Default` (`Light`, `Dark`) with the state's play: they set the
      *  story's `globals.scheme`, which overrides (and locks) the toolbar's. Over the config's
@@ -57,6 +54,9 @@ export interface ComponentConfig {
 
 export interface StoriesConfig {
     readonly renderers: Readonly<Record<string, RendererConfig>>;
+    /** The renderer whose component exports give the controls (their resolved props); the
+     *  first renderer when left out. */
+    readonly controls?: string;
     /** The components to draw, by export name; left out: every one with an anatomy and a case. */
     readonly include?: readonly string[];
     /** Components to leave out, each with the reason it can't be drawn from its case. */

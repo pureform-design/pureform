@@ -69,7 +69,8 @@ export interface TableBehaviorProps extends IndicationProps {
               readonly selectRow?: string | undefined;
           }
         | undefined;
-    /** The root's id. */
+    /** The root's id.
+     *  @control none */
     readonly id?: string | undefined;
 }
 

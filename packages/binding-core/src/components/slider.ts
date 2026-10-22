@@ -67,11 +67,14 @@ export interface SliderBehaviorProps<
     /** Shows the value but takes no change. */
     readonly readOnly?: boolean | undefined;
     readonly invalid?: boolean | undefined;
-    /** The name each thumb's input submits its value under (`name[]` for a range). */
+    /** The name each thumb's input submits its value under (`name[]` for a range).
+     *  @control none */
     readonly name?: string | undefined;
-    /** The id of the form the inputs belong to, for a slider outside it. */
+    /** The id of the form the inputs belong to, for a slider outside it.
+     *  @control none */
     readonly form?: string | undefined;
-    /** Root's id, also the machine's. */
+    /** Root's id, also the machine's.
+     *  @control none */
     readonly id?: string | undefined;
     readonly ids?: SliderElementIds | undefined;
 }

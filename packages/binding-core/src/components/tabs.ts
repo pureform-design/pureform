@@ -58,7 +58,8 @@ export interface TabsBehaviorProps extends Controllable<
     readonly loopFocus?: boolean | undefined;
     /** Disables every tab. */
     readonly disabled?: boolean | undefined;
-    /** Root's id; the machine builds the other ids from it. */
+    /** Root's id; the machine builds the other ids from it.
+     *  @control none */
     readonly id?: string | undefined;
     readonly ids?: TabsElementIds | undefined;
 }

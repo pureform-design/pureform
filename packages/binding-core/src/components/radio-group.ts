@@ -53,13 +53,16 @@ export interface RadioGroupBehaviorProps extends Controllable<
     readonly required?: boolean | undefined;
     /** Ignores the user's changes. */
     readonly readOnly?: boolean | undefined;
-    /** The name every radio submits under. @default the group's id */
+    /** The name every radio submits under. @default the group's id
+     *  @control none */
     readonly name?: string | undefined;
-    /** The id of the form the radios belong to, for a group outside it. */
+    /** The id of the form the radios belong to, for a group outside it.
+     *  @control none */
     readonly form?: string | undefined;
     /** How the radios are laid out, for `aria-orientation`. @default "vertical" */
     readonly orientation?: "horizontal" | "vertical" | undefined;
-    /** The group element's id; the machine finds the element by it. */
+    /** The group element's id; the machine finds the element by it.
+     *  @control none */
     readonly id?: string | undefined;
     readonly ids?: RadioGroupElementIds | undefined;
 }

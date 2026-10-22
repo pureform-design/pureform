@@ -22,7 +22,8 @@ export interface SelectionListBehaviorProps extends Controllable<
     readonly loopFocus?: boolean | undefined;
     /** Disables every option. */
     readonly disabled?: boolean | undefined;
-    /** The list's id; the machine builds the options' ids from it. */
+    /** The list's id; the machine builds the options' ids from it.
+     *  @control none */
     readonly id?: string | undefined;
 }
 

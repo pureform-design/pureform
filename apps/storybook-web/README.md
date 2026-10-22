@@ -40,16 +40,32 @@ Native Web doesn't draw.
   task, before `dev`, `build` and the tests) into `src/stories/generated/<Component>.stories.ts`
   (ignored by git), from data the components already have:
     - **`@pureform/anatomy`**: the component list (the preset's anatomies, then the
-      hand-written composites', such as the radio group's), and each variant's values, which
-      become the controls (a select, or a boolean for `true`/`false`).
-    - **`@pureform/binding-core`'s declarations**: which variants are props. At generate time
-      `scripts/variant-props.ts` loads its built `dist/index.d.ts` with the TypeScript compiler
-      API (`@typescript/typescript6`; TypeScript 7 has no JS API yet) and reads the property
-      names of `<Component>VariantProps` (the checker resolves `extends`). A recipe variant
-      that isn't one is set by the binding itself (a button's `toggle`) and gets no control;
-      `density` and `position` are props, so they keep theirs. A component whose interface is
-      missing fails the codegen, listing every such component; `variantProps` in its config
-      names another interface (`ProgressVariantProps`).
+      hand-written composites', such as the radio group's), and each variant group's values,
+      which a variant prop's control lists.
+    - **The components' resolved props** (`scripts/prop-controls.ts`): at generate time the
+      TypeScript checker (`@typescript/typescript6`; TypeScript 7 has no JS API yet) reads the
+      export each story renders, from the binding's built declarations (the `controls`
+      renderer, React; Solid's props agree, all 61), with the app's `.pureform/registry.d.ts`,
+      and resolves its props type (the call signature's first parameter). Then:
+        - only properties **declared in `@pureform/binding-core`** are kept (the declaration's
+          file; a mapped type's property, such as `Controllable`'s `selected`, counts its
+          mapped type's): DOM, React and Solid attributes, `as` and `children` get none;
+        - the **resolved type** picks the control: a string-literal union is a select,
+          `boolean` a boolean, `string` text, `number` a number; functions, nodes, objects,
+          arrays and mixed unions get none (`control: false` when the story has the arg, so
+          Storybook doesn't infer one; left out otherwise);
+        - a prop typed **`VariantProp<C, "group">`** (directly or through
+          `XVariantProps["group"]`) is read before the alias resolves, and takes its group's
+          values from the anatomy, in the recipe's order: the text's `textStyle` is its
+          `style`, a `true`/`false` group a boolean;
+        - a **`@control none | select | boolean | text | number`** JSDoc tag on the prop in
+          binding-core overrides the type (`@control none` on ids, form names and submit
+          values).
+
+        Any other arg (a shared hook's `disabled` on a component without one, `aria-label` from
+        the binding) gets `control: false`. `scripts/prop-controls.spec.ts` (`omni run test:unit
+-p @pureform/storybook-web`) has a fixture per rule.
+
     - **`@pureform/component-cases`**: `props` gives `Default`, each of `examples` a story, the
       `state` a play test (read gives `from`, one `act`, read gives `to`) on the pinned `Light`
       and `Dark` copies, each of `opened` an `Opened: …` story (an overlay shown), and each
@@ -60,9 +76,9 @@ Native Web doesn't draw.
       through `storybook/test`'s `userEvent` (`createCases(userEvent)`, `src/renderers/plays.ts`).
     - **`stories.config.ts`**, overrides only: renderers (`casePlays`, `tests`), `include`,
       `skip` (by component, with the reason), `schemes` for every component, `overlayHeight`,
-      and per component `args`, `argTypes`, `controls.exclude` (variants that are props but
-      shouldn't get a control, such as the fields' affixes, which the ready-made components
-      take as content), `variantProps`, `parameters`, `schemes`, `scheme`, `height`,
+      and `controls` (the renderer whose exports give the props), and per component `args`,
+      `argTypes`, `controls.exclude` (props to give no control, over the rules above; none
+      needed today), `parameters`, `schemes`, `scheme`, `height`,
       `hooks`, and `stories` (fields by export name; `tags` are written into the file, where
       Storybook's indexer reads them, so `tags: ["!test"]` keeps a story out of the tests).
 
@@ -128,9 +144,8 @@ component's.
 1. Give it an anatomy (the preset's component, `@pureform/anatomy`'s `generate`) and a case in
    `@pureform/component-cases` (`packages/component-cases/src/cases/<name>.ts`); the generator
    pairs them by the root's test id.
-   Every such component is drawn. Its controls are the variants its binding-core
-   `<Component>VariantProps` declares; name another interface with `variantProps` if its own
-   is named differently.
+   Every such component is drawn. Its controls come from its export's props (above); tag a
+   binding-core prop `@control none` (or another kind) when its type gives the wrong one.
 2. Override what the data gets wrong in its `components` entry (`args`, `controls.exclude`, `parameters`,
    `stories`), or `skip` it with the reason when its case can't be drawn from props alone.
 3. Run its story tests: `bunx vitest run -c vitest.config.storybook.ts --project

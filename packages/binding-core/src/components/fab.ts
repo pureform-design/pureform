@@ -29,13 +29,18 @@ export interface FabVariantProps {
 export interface FabBehaviorProps {
     /** A disabled fieldset around the FAB disables it too. */
     readonly disabled?: boolean | undefined;
-    /** The native button type. @default "button" */
+    /** The native button type. @default "button"
+     *  @control none */
     readonly type?: "button" | "submit" | "reset" | undefined;
+    /** @control none */
     readonly name?: string | undefined;
+    /** @control none */
     readonly value?: string | undefined;
-    /** The id of the form the button belongs to, for a FAB outside it. */
+    /** The id of the form the button belongs to, for a FAB outside it.
+     *  @control none */
     readonly form?: string | undefined;
-    /** The root element's id; the machine finds the element by it. */
+    /** The root element's id; the machine finds the element by it.
+     *  @control none */
     readonly id?: string | undefined;
     readonly ids?: ButtonElementIds | undefined;
 }

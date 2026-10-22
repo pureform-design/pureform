@@ -49,9 +49,11 @@ export interface TagsInputBehaviorProps extends Controllable<
     /** The input's placeholder, shown while there's no chip. The label floats while it shows,
      *  so the default is a single space. */
     readonly placeholder?: string | undefined;
-    /** The name the values submit under, joined by ", " (Zag's). */
+    /** The name the values submit under, joined by ", " (Zag's).
+     *  @control none */
     readonly name?: string | undefined;
-    /** The id of the form the values belong to, for a field outside it. */
+    /** The id of the form the values belong to, for a field outside it.
+     *  @control none */
     readonly form?: string | undefined;
     /** The most values it takes. */
     readonly max?: number | undefined;
@@ -71,7 +73,8 @@ export interface TagsInputBehaviorProps extends Controllable<
         | undefined;
     /** A remove button's accessible name, from its chip's value. @default `Delete tag ${value}` */
     readonly removeLabel?: ((value: string) => string) | undefined;
-    /** The root element's id; the machine builds the other ids from it. */
+    /** The root element's id; the machine builds the other ids from it.
+     *  @control none */
     readonly id?: string | undefined;
 }
 

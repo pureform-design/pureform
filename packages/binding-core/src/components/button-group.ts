@@ -59,7 +59,8 @@ export interface ButtonGroupBehaviorProps extends Controllable<
     readonly deselectable?: boolean | undefined;
     /** Disables every button. */
     readonly disabled?: boolean | undefined;
-    /** The group element's id; the machine finds the element by it. */
+    /** The group element's id; the machine finds the element by it.
+     *  @control none */
     readonly id?: string | undefined;
 }
 

@@ -36,7 +36,8 @@ export interface AvatarRootOwnProps extends AvatarVariantProps {
     readonly onStatusChange?:
         | ((details: { readonly status: AvatarStatus }) => void)
         | undefined;
-    /** Root's id, also the machine's. */
+    /** Root's id, also the machine's.
+     *  @control none */
     readonly id?: string | undefined;
     /** A test id for Root, or ids by part. */
     readonly testId?: TestIdOverride<AvatarPart> | undefined;

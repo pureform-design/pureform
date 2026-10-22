@@ -24,7 +24,11 @@ import { runnerImport } from "vite";
 
 import type { StoriesConfig } from "../src/renderers/config.ts";
 import type { TransformSource } from "../src/renderers/hooks.ts";
-import { variantProps } from "./variant-props.ts";
+import {
+    argTypeFor,
+    bindingControls,
+    type PropControl,
+} from "./prop-controls.ts";
 
 const APP = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const STORIES = join(APP, "src/stories");
@@ -76,12 +80,6 @@ const keyName = (key: string) =>
         ? "Space"
         : key.replace(/[{}]/g, "").replace(/^./, (c) => c.toUpperCase());
 
-/** A control per variant from the anatomy: a boolean for `["true", "false"]`, else a select. */
-const controlFor = (values: readonly string[]) =>
-    values.length === 2 && values.includes("true") && values.includes("false")
-        ? { control: "boolean" }
-        : { control: "select", options: values };
-
 /** Every component with a case and an anatomy (the one whose root part's test id is the case's
  *  root). A component with several cases (the card's, its action area's) is one entry: its
  *  first case gives the plays, the others (`more`) their examples over their own props. */
@@ -120,7 +118,10 @@ const generate = async () => {
     const shared = config.hooks ?? [];
     const sharedModules = await Promise.all(
         shared.map((path) =>
-            load<{ transformSource?: TransformSource }>(join(APP, path)),
+            load<{
+                transformSource?: TransformSource;
+                args?: Record<string, unknown>;
+            }>(join(APP, path)),
         ),
     );
     const anatomyModule = await load<
@@ -153,7 +154,19 @@ const generate = async () => {
             (!include || include.has(c.component)) && !skip.has(c.component),
     );
     const taken = handWritten();
-    const propsOf = variantProps(APP, "@pureform/binding-core");
+    // The renderer whose exports give the props (the first, unless `controls` names one).
+    const propsRenderer = config.controls ?? Object.keys(config.renderers)[0]!;
+    const propsPackage = config.renderers[propsRenderer]!.package;
+    const withProps = found
+        .map(({ case: c }) => c.component)
+        .filter((c) => exportsComponent(propsPackage, c));
+    const registry = join(APP, ".pureform/registry.d.ts");
+    const controlsOf = bindingControls(
+        APP,
+        propsPackage,
+        withProps.map((c) => `./${kebab(c)}`),
+        existsSync(registry) ? [registry] : [],
+    );
     const missing: string[] = [];
     rmSync(OUT, { recursive: true, force: true });
     mkdirSync(OUT, { recursive: true });
@@ -197,32 +210,55 @@ const generate = async () => {
             imports.push(`import * as hooks${i} from "${fromOut(path)}";`),
         );
 
-        // A recipe variant that isn't a prop (binding-core's `<Component>VariantProps`) is set
-        // by the binding itself: no control. `controls.exclude` drops more.
-        const variants = Object.entries(a.variants ?? {});
-        // Each variant that's a prop, to the prop's name (the text's `style` is `textStyle`).
-        let props: ReadonlyMap<string, string>;
+        // The controls from the props the export takes (`scripts/prop-controls.ts`); a prop
+        // `controls.exclude` names, and every other arg (DOM attributes, `children`), gets none.
+        let props: PropControl[];
         try {
-            props = variants.length
-                ? propsOf(options.variantProps ?? `${component}VariantProps`)
-                : new Map();
+            props = withProps.includes(component)
+                ? controlsOf(component, `./${kebab(component)}`)
+                : [];
         } catch (error) {
             missing.push(`${component}: ${(error as Error).message}`);
             continue;
         }
         const exclude = new Set(options.controls?.exclude ?? []);
+        const variants = a.variants ?? {};
+        const own = new Set(props.map((p) => p.name));
+        const argNames = new Set(
+            [
+                c.props,
+                ...Object.values(c.examples),
+                ...Object.values(c.opened ?? {}),
+                ...more.flatMap((m) => [
+                    m.props,
+                    ...Object.values(m.examples),
+                    ...Object.values(m.opened ?? {}),
+                ]),
+                options.args ?? {},
+                ...sharedModules.map((m) => m.args ?? {}),
+            ].flatMap((x) => Object.keys(x ?? {})),
+        );
         const argTypes = {
-            ...Object.fromEntries(
-                variants
-                    .filter(
-                        ([variant]) =>
-                            props.has(variant) && !exclude.has(variant),
+            ...Object.fromEntries([
+                ...props
+                    .map(
+                        (p) =>
+                            [
+                                p.name,
+                                exclude.has(p.name)
+                                    ? { control: false }
+                                    : argTypeFor(p, variants),
+                            ] as const,
                     )
-                    .map(([variant, values]) => [
-                        props.get(variant)!,
-                        controlFor(values),
-                    ]),
-            ),
+                    // No control and no arg: left out, so the panel doesn't list it.
+                    .filter(
+                        ([name, t]) =>
+                            t.control !== false || argNames.has(name),
+                    ),
+                ...[...argNames]
+                    .filter((name) => !own.has(name))
+                    .map((name) => [name, { control: false }]),
+            ]),
             ...options.argTypes,
         };
         const args = options.args ?? {};
@@ -338,7 +374,7 @@ const generate = async () => {
     }
     if (missing.length) {
         throw new Error(
-            `generate-stories: no variant props for ${missing.length} component(s):\n${missing.join("\n")}`,
+            `generate-stories: no props for ${missing.length} component(s):\n${missing.join("\n")}`,
         );
     }
     const skipped = found

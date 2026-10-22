@@ -46,13 +46,17 @@ export interface CheckboxBehaviorProps extends Controllable<
     readonly required?: boolean | undefined;
     /** Ignores the user's changes and sets `aria-readonly`. */
     readonly readOnly?: boolean | undefined;
-    /** The name the input submits under. */
+    /** The name the input submits under.
+     *  @control none */
     readonly name?: string | undefined;
-    /** The id of the form the input belongs to, for a checkbox outside it. */
+    /** The id of the form the input belongs to, for a checkbox outside it.
+     *  @control none */
     readonly form?: string | undefined;
-    /** The value the input submits when checked. @default "on" */
+    /** The value the input submits when checked. @default "on"
+     *  @control none */
     readonly value?: string | undefined;
-    /** The root element's id; the machine finds the element by it. */
+    /** The root element's id; the machine finds the element by it.
+     *  @control none */
     readonly id?: string | undefined;
     readonly ids?: CheckboxElementIds | undefined;
 }

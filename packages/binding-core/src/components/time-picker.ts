@@ -59,10 +59,13 @@ export interface TimeBehaviorProps extends IndicationProps {
         | undefined;
     readonly disabled?: boolean | undefined;
     readonly readOnly?: boolean | undefined;
-    /** The name the time submits under, as `HH:mm`. */
+    /** The name the time submits under, as `HH:mm`.
+     *  @control none */
     readonly name?: string | undefined;
+    /** @control none */
     readonly form?: string | undefined;
-    /** The root's id. */
+    /** The root's id.
+     *  @control none */
     readonly id?: string | undefined;
 }
 

@@ -52,7 +52,8 @@ export interface TreeBehaviorProps
     readonly selectionMode?: "single" | "multiple" | undefined;
     /** Whether a click on a branch's row expands it, besides selecting it. @default true */
     readonly expandOnClick?: boolean | undefined;
-    /** Root's id; the machine builds the other ids from it. */
+    /** Root's id; the machine builds the other ids from it.
+     *  @control none */
     readonly id?: string | undefined;
 }
 

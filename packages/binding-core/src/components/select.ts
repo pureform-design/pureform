@@ -145,14 +145,17 @@ export interface SelectBehaviorProps
     readonly required?: boolean | undefined;
     /** Shows the value but doesn't open. */
     readonly readOnly?: boolean | undefined;
-    /** The name the hidden select submits under. */
+    /** The name the hidden select submits under.
+     *  @control none */
     readonly name?: string | undefined;
-    /** The id of the form the hidden select belongs to, for a select outside it. */
+    /** The id of the form the hidden select belongs to, for a select outside it.
+     *  @control none */
     readonly form?: string | undefined;
     /** The hidden select's `autocomplete`, for autofill. */
     readonly autoComplete?: string | undefined;
     readonly positioning?: SelectPositioning | undefined;
-    /** The root element's id; the machine builds the other ids from it. */
+    /** The root element's id; the machine builds the other ids from it.
+     *  @control none */
     readonly id?: string | undefined;
     readonly ids?: SelectElementIds | undefined;
 }

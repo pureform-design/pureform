@@ -59,7 +59,8 @@ export interface SnackbarBehaviorProps extends Controllable<
     readonly duration?: number | null | undefined;
     /** Called when the user chooses the action, before the snackbar asks to close. */
     readonly onAction?: (() => void) | undefined;
-    /** The root element's id; the machine builds the other ids from it. */
+    /** The root element's id; the machine builds the other ids from it.
+     *  @control none */
     readonly id?: string | undefined;
     readonly ids?: SnackbarElementIds | undefined;
 }
