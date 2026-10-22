@@ -6,7 +6,11 @@
 import type { listAnatomy, PartName, TestIdOverride } from "@pureform/anatomy";
 import type { InstanceTokens, Selection } from "@pureform/styling";
 
-import type { ListItemContentProps, ListItemPart } from "./list-item";
+import type {
+    ListItemContentProps,
+    ListItemExpandProps,
+    ListItemPart,
+} from "./list-item";
 import type { ListItemVariantProps } from "./list-item";
 
 /** The list's own parts: `"root" | "item"` (the `<li>` around each list item). */
@@ -45,7 +49,10 @@ export const LIST_ROOT_PROPS = [
 
 /** One item of the ready-made list, as data: a list item's content, variants, and props. */
 export interface ListItemData<Node = unknown>
-    extends ListItemContentProps<Node>, ListItemVariantProps {
+    extends
+        ListItemContentProps<Node>,
+        ListItemVariantProps,
+        ListItemExpandProps {
     /** Its key among the items. @default its index */
     readonly value?: string | undefined;
     /** Where it leads: the item renders as a link. */

@@ -971,3 +971,79 @@ describe("app bar", () => {
         );
     });
 });
+
+describe("nested rows", () => {
+    it("expands a list item with a region, its indicator turning over", async () => {
+        const seen: boolean[] = [];
+        await render(
+            <ListItem
+                headline="Folders"
+                region={<ListItem headline="Work" testId="work" />}
+                onExpandedChange={({ expanded }) => seen.push(expanded)}
+                testId="folders"
+            />,
+        );
+        const root = byTestId("folders-root");
+        expect(root.getAttribute("role")).toBe("button");
+        expect(root.getAttribute("aria-expanded")).toBe("false");
+        expect(byTestId("folders-indicator").textContent).toBe("⌄");
+        expect(document.querySelector('[data-testid="folders-region"]')).toBe(
+            null,
+        );
+        await interact(() => userEvent.click(root));
+        expect(root.getAttribute("aria-expanded")).toBe("true");
+        expect(byTestId("folders-region").contains(byTestId("work-root"))).toBe(
+            true,
+        );
+        expect(byTestId("work-root").getAttribute("role")).toBe("listitem");
+        expect(seen).toEqual([true]);
+    });
+
+    it("drills into a menu item's submenu, and back out", async () => {
+        const onSelect = vi.fn();
+        await render(
+            <Menu
+                items={[
+                    { value: "cut", label: "Cut" },
+                    {
+                        value: "share",
+                        label: "Share",
+                        items: [{ value: "mail", label: "Mail" }],
+                    },
+                ]}
+                onSelect={onSelect}
+            />,
+        );
+        const labels = () =>
+            [...document.querySelectorAll('[role="menuitem"]')].map(
+                (item) => item.textContent,
+            );
+        expect(labels()).toEqual(["Cut", "Share›"]);
+        const share =
+            document.querySelectorAll<HTMLElement>('[role="menuitem"]')[1]!;
+        await interact(() => userEvent.click(share));
+        expect(labels()).toEqual(["‹Share", "Mail"]);
+        expect(onSelect).not.toHaveBeenCalled();
+        const [back, mail] =
+            document.querySelectorAll<HTMLElement>('[role="menuitem"]');
+        await interact(() => userEvent.click(mail!));
+        expect(onSelect).toHaveBeenCalledExactlyOnceWith({ value: "mail" });
+        await interact(() => userEvent.click(back!));
+        expect(labels()).toEqual(["Cut", "Share›"]);
+    });
+
+    it("shows an expanded rail's section labels", async () => {
+        await render(
+            <NavigationRail
+                items={[
+                    { ...DESTINATIONS[0]!, sectionLabel: "Mail" },
+                    ...DESTINATIONS.slice(1),
+                ]}
+                expanded
+                testId="s"
+            />,
+        );
+        expect(byTestId("s-section-label").textContent).toBe("Mail");
+        expect(computed("s-section-label").display).toBe("flex");
+    });
+});

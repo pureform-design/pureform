@@ -3,12 +3,13 @@ import { useState } from "react";
 import type { ReactNode } from "react";
 import { act } from "react";
 import { describe, expect, it } from "vitest";
+import { userEvent } from "vitest/browser";
 
 import { ListItem } from ".";
 import { PureformProvider } from "..";
 import { navigationRegistry } from "../__fixtures__/registry";
 import { List } from "../list";
-import { mount, settle } from "../testing/render";
+import { interact, mount, settle } from "../testing/render";
 
 /** The first element with a test id. */
 const byTestId = <E extends HTMLElement = HTMLElement>(id: string): E => {
@@ -181,6 +182,112 @@ describe("List", () => {
         await settle();
         expect(byTestId("a-root").className).toContain(
             "list-item--position-none",
+        );
+    });
+});
+
+describe("ListItem, expandable", () => {
+    it("draws a button with an indicator, and its region after it, hidden while collapsed", async () => {
+        withRegistry(
+            <ListItem headline="Folders" region={<span>Work</span>} />,
+        );
+        await settle();
+        const root = byTestId(ids.root);
+        const region = byTestId(ids.region);
+        expect(root.tagName).toBe("BUTTON");
+        expect(root.className).toContain("list-item--interactive-true");
+        expect(root.getAttribute("aria-expanded")).toBe("false");
+        expect(root.getAttribute("aria-controls")).toBe(region.id);
+        expect(root.lastElementChild).toBe(byTestId(ids.indicator));
+        expect(byTestId(ids.indicator).getAttribute("aria-hidden")).toBe(
+            "true",
+        );
+        expect(byTestId(ids.indicator).querySelector("svg")).not.toBeNull();
+        expect(root.nextElementSibling).toBe(region);
+        expect(region.className).toBe("list-item__region");
+        expect(region.getAttribute("role")).toBe("region");
+        expect(region.getAttribute("aria-labelledby")).toBe(root.id);
+        expect(region.hidden).toBe(true);
+        expect(region.textContent).toBe("Work");
+    });
+
+    it("expands and collapses with a click or Enter, and reports it", async () => {
+        const seen: boolean[] = [];
+        withRegistry(
+            <ListItem
+                headline="Folders"
+                region="Work"
+                onExpandedChange={({ expanded }) => seen.push(expanded)}
+            />,
+        );
+        await settle();
+        const root = byTestId(ids.root);
+        await interact(() => userEvent.click(root));
+        expect(root.getAttribute("aria-expanded")).toBe("true");
+        expect(byTestId(ids.region).hidden).toBe(false);
+        await interact(() => userEvent.keyboard("{Enter}"));
+        expect(root.getAttribute("aria-expanded")).toBe("false");
+        expect(byTestId(ids.region).hidden).toBe(true);
+        expect(seen).toEqual([true, false]);
+    });
+
+    it("follows a controlled expanded", async () => {
+        let set!: (value: boolean) => void;
+        function Controlled() {
+            const [expanded, setExpanded] = useState(true);
+            set = setExpanded;
+            return (
+                <ListItem
+                    headline="Folders"
+                    region="Work"
+                    expanded={expanded}
+                />
+            );
+        }
+        withRegistry(<Controlled />);
+        await settle();
+        expect(byTestId(ids.region).hidden).toBe(false);
+        await act(async () => set(false));
+        await settle();
+        expect(byTestId(ids.root).getAttribute("aria-expanded")).toBe("false");
+    });
+
+    it("composes Expandable around Root and Region, and nests in a List's item", async () => {
+        withRegistry(
+            <List.Root>
+                <List.Item>
+                    <ListItem.Expandable defaultExpanded>
+                        <ListItem.Root>
+                            <ListItem.Content>
+                                <ListItem.Headline>Folders</ListItem.Headline>
+                            </ListItem.Content>
+                            <ListItem.Indicator />
+                        </ListItem.Root>
+                        <ListItem.Region>
+                            <ListItem headline="Work" />
+                        </ListItem.Region>
+                    </ListItem.Expandable>
+                </List.Item>
+            </List.Root>,
+        );
+        await settle();
+        const [row, nested] = document.querySelectorAll<HTMLElement>(
+            `[data-testid="${ids.root}"]`,
+        );
+        expect(row!.tagName).toBe("BUTTON");
+        expect(row!.getAttribute("aria-expanded")).toBe("true");
+        expect(row!.parentElement!.tagName).toBe("LI");
+        expect(byTestId(ids.region).contains(nested!)).toBe(true);
+        expect(nested!.tagName).toBe("DIV");
+        expect(nested!.hasAttribute("aria-expanded")).toBe(false);
+    });
+
+    it("keeps an item without a region as it was", async () => {
+        withRegistry(<ListItem headline="Inbox" />);
+        await settle();
+        expect(byTestId(ids.root).tagName).toBe("DIV");
+        expect(document.querySelector(`[data-testid="${ids.indicator}"]`)).toBe(
+            null,
         );
     });
 });

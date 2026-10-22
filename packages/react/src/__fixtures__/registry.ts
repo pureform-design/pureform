@@ -310,7 +310,11 @@ export const navigationRegistry = () =>
             "indicator",
         ]),
         navigationBar: named("navigation-bar", NAV_SLOTS),
-        navigationRail: named("navigation-rail", [...NAV_SLOTS, "header"]),
+        navigationRail: named("navigation-rail", [
+            ...NAV_SLOTS,
+            "header",
+            "sectionLabel",
+        ]),
         list: named("list", ["root", "item"]),
         scrim: named("scrim", ["root"]),
         listItem: named("list-item", [
@@ -322,6 +326,8 @@ export const navigationRegistry = () =>
             "supportingText",
             "trailing",
             "trailingText",
+            "indicator",
+            "region",
         ]),
     });
 

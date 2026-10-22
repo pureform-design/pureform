@@ -30,6 +30,7 @@ const SECTIONS = [
     "media",
     "grid-lists",
     "carousels",
+    "nested-rows",
     "expandables",
     "steppers",
     "controls",

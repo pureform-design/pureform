@@ -1583,6 +1583,8 @@ listItem.supportingText: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(74, 68, 88, 1)
 listItem.trailing: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(74, 68, 88, 1)
+listItem.indicator: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
 listItem[interactive=true].root: bg rgba(253, 248, 253, 1) | color rgba(28, 27, 30, 1) | outline none
     hovered: bg rgba(235, 230, 235, 1)
     focused: bg rgba(231, 226, 231, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
@@ -1603,6 +1605,8 @@ listItem[interactive=true].supportingText: bg none | color rgba(73, 69, 78, 1) |
     hovered-selected: color rgba(74, 68, 88, 1)
 listItem[interactive=true].trailing: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(74, 68, 88, 1)
+listItem[interactive=true].indicator: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
 listItem[position=first].root: bg rgba(242, 236, 241, 1) | color rgba(28, 27, 30, 1) | outline none
     hovered-selected: bg rgba(232, 222, 248, 1) | color rgba(74, 68, 88, 1)
 listItem[position=first].leading: bg none | color rgba(73, 69, 78, 1) | outline none
@@ -1616,6 +1620,8 @@ listItem[position=first].headline: bg none | color rgba(28, 27, 30, 1) | outline
 listItem[position=first].supportingText: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(74, 68, 88, 1)
 listItem[position=first].trailing: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem[position=first].indicator: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(74, 68, 88, 1)
 listItem[position=middle].root: bg rgba(242, 236, 241, 1) | color rgba(28, 27, 30, 1) | outline none
     hovered-selected: bg rgba(232, 222, 248, 1) | color rgba(74, 68, 88, 1)
@@ -1631,6 +1637,8 @@ listItem[position=middle].supportingText: bg none | color rgba(73, 69, 78, 1) | 
     hovered-selected: color rgba(74, 68, 88, 1)
 listItem[position=middle].trailing: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(74, 68, 88, 1)
+listItem[position=middle].indicator: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
 listItem[position=last].root: bg rgba(242, 236, 241, 1) | color rgba(28, 27, 30, 1) | outline none
     hovered-selected: bg rgba(232, 222, 248, 1) | color rgba(74, 68, 88, 1)
 listItem[position=last].leading: bg none | color rgba(73, 69, 78, 1) | outline none
@@ -1644,6 +1652,8 @@ listItem[position=last].headline: bg none | color rgba(28, 27, 30, 1) | outline 
 listItem[position=last].supportingText: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(74, 68, 88, 1)
 listItem[position=last].trailing: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem[position=last].indicator: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(74, 68, 88, 1)
 listItem[position=single].root: bg rgba(242, 236, 241, 1) | color rgba(28, 27, 30, 1) | outline none
     hovered-selected: bg rgba(232, 222, 248, 1) | color rgba(74, 68, 88, 1)
@@ -1659,6 +1669,8 @@ listItem[position=single].supportingText: bg none | color rgba(73, 69, 78, 1) | 
     hovered-selected: color rgba(74, 68, 88, 1)
 listItem[position=single].trailing: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(74, 68, 88, 1)
+listItem[position=single].indicator: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
 listItem[color=tertiary].root: bg rgba(253, 248, 253, 1) | color rgba(28, 27, 30, 1) | outline none
     hovered-selected: bg rgba(255, 217, 227, 1) | color rgba(99, 59, 72, 1)
 listItem[color=tertiary].leading: bg none | color rgba(73, 69, 78, 1) | outline none
@@ -1672,6 +1684,8 @@ listItem[color=tertiary].headline: bg none | color rgba(28, 27, 30, 1) | outline
 listItem[color=tertiary].supportingText: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(99, 59, 72, 1)
 listItem[color=tertiary].trailing: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(99, 59, 72, 1)
+listItem[color=tertiary].indicator: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(99, 59, 72, 1)
 listItem[color=success].root: bg rgba(253, 248, 253, 1) | color rgba(28, 27, 30, 1) | outline none
     hovered-selected: bg rgba(116, 254, 128, 1) | color rgba(0, 83, 23, 1)
@@ -1687,6 +1701,8 @@ listItem[color=success].supportingText: bg none | color rgba(73, 69, 78, 1) | ou
     hovered-selected: color rgba(0, 83, 23, 1)
 listItem[color=success].trailing: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(0, 83, 23, 1)
+listItem[color=success].indicator: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(0, 83, 23, 1)
 listItem[color=warning].root: bg rgba(253, 248, 253, 1) | color rgba(28, 27, 30, 1) | outline none
     hovered-selected: bg rgba(255, 224, 138, 1) | color rgba(87, 68, 0, 1)
 listItem[color=warning].leading: bg none | color rgba(73, 69, 78, 1) | outline none
@@ -1700,6 +1716,8 @@ listItem[color=warning].headline: bg none | color rgba(28, 27, 30, 1) | outline 
 listItem[color=warning].supportingText: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(87, 68, 0, 1)
 listItem[color=warning].trailing: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(87, 68, 0, 1)
+listItem[color=warning].indicator: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(87, 68, 0, 1)
 listItem[color=error].root: bg rgba(253, 248, 253, 1) | color rgba(28, 27, 30, 1) | outline none
     hovered-selected: bg rgba(255, 218, 214, 1) | color rgba(147, 0, 10, 1)
@@ -1715,6 +1733,8 @@ listItem[color=error].supportingText: bg none | color rgba(73, 69, 78, 1) | outl
     hovered-selected: color rgba(147, 0, 10, 1)
 listItem[color=error].trailing: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(147, 0, 10, 1)
+listItem[color=error].indicator: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(147, 0, 10, 1)
 listItem[color=info].root: bg rgba(253, 248, 253, 1) | color rgba(28, 27, 30, 1) | outline none
     hovered-selected: bg rgba(176, 236, 255, 1) | color rgba(0, 78, 94, 1)
 listItem[color=info].leading: bg none | color rgba(73, 69, 78, 1) | outline none
@@ -1728,6 +1748,8 @@ listItem[color=info].headline: bg none | color rgba(28, 27, 30, 1) | outline non
 listItem[color=info].supportingText: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(0, 78, 94, 1)
 listItem[color=info].trailing: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(0, 78, 94, 1)
+listItem[color=info].indicator: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(0, 78, 94, 1)
 radio.root: bg transparent | color none | outline none
     hovered: bg rgba(28, 27, 30, 0.08)

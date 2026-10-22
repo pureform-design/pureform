@@ -267,15 +267,19 @@ export type {
 } from "./components/list";
 export {
     LIST_ITEM_CONTENT_PROPS,
+    LIST_ITEM_EXPAND_PROPS,
+    LIST_ITEM_EXPAND_VALUE,
     isInteractiveListItem,
     LIST_ITEM_ROOT_PROPS,
     listItemElement,
+    listItemExpandMachineProps,
     listItemLines,
     listItemRootProps,
     listItemSelection,
 } from "./components/list-item";
 export type {
     ListItemContentProps,
+    ListItemExpandProps,
     ListItemPart,
     ListItemRootOwnProps,
     ListItemStateProps,
@@ -285,11 +289,13 @@ export {
     MENU_CONTENT_PROPS,
     MENU_ITEM_PROPS,
     MENU_ROOT_PROPS,
+    hasSubmenu,
     menuGrouped,
     menuItemMachineProps,
     menuItemProps,
     menuMachineProps,
     menuSelection,
+    submenuPositioning,
 } from "./components/menu";
 export type {
     MenuBehaviorProps,

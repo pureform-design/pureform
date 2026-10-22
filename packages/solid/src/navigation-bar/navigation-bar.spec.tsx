@@ -198,6 +198,48 @@ describe("NavigationRail", () => {
         expect(header.textContent).toBe("Menu");
     });
 
+    it("composes a section label over a run of destinations", async () => {
+        withRegistry(() => (
+            <NavigationRail.Root aria-label="Main" expanded>
+                <NavigationRail.SectionLabel>Mail</NavigationRail.SectionLabel>
+                <NavigationRail.Item value="inbox">
+                    <NavigationRail.Label>Inbox</NavigationRail.Label>
+                </NavigationRail.Item>
+            </NavigationRail.Root>
+        ));
+        await settle();
+        const root = byTestId(testIds.navigationRail.root);
+        const label = root.firstElementChild!;
+        expect(label.getAttribute("data-testid")).toBe(
+            testIds.navigationRail.sectionLabel,
+        );
+        expect(label.getAttribute("data-part")).toBe("section-label");
+        expect(label.className).toBe("navigation-rail__sectionLabel");
+        expect(label.textContent).toBe("Mail");
+    });
+
+    it("draws a destination's section label before it, the rail's only", async () => {
+        const items = [
+            { ...ITEMS[0]!, sectionLabel: "Mail" },
+            ...ITEMS.slice(1),
+        ];
+        withRegistry(() => (
+            <>
+                <NavigationRail aria-label="Main" items={items} expanded />
+                <NavigationBar aria-label="Bar" items={items} />
+            </>
+        ));
+        await settle();
+        const labels = document.querySelectorAll<HTMLElement>(
+            '[data-part="section-label"]',
+        );
+        expect(labels).toHaveLength(1);
+        expect(labels[0]!.textContent).toBe("Mail");
+        expect(labels[0]!.nextElementSibling!.getAttribute("data-part")).toBe(
+            "item",
+        );
+    });
+
     it("selects expanded, and a modal rail is expanded too", async () => {
         withRegistry(() => (
             <NavigationRail aria-label="Main" items={ITEMS} expanded />

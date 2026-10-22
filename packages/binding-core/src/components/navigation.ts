@@ -135,6 +135,9 @@ export interface NavigationItem<Node = unknown> extends NavigationItemOwnProps {
     readonly icon?: Node;
     /** Flip the icon under `rtl`, for an icon that points. */
     readonly mirrorIcon?: boolean | undefined;
+    /** A section label over this destination, starting a run of them: the rail's, shown while
+     *  it's expanded. The bar ignores it. */
+    readonly sectionLabel?: Node;
 }
 
 /** What the ready-made components render inside Root, in the framework's node type. */

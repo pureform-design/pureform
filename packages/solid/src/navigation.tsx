@@ -290,6 +290,19 @@ export function createNavigation<C extends NavigationComponent>(config: {
         });
     }
 
+    /** The rail's section label, over a run of destinations: shown while the rail is expanded. */
+    function SectionLabel(props: NavigationPartProps): JSX.Element {
+        const { scope, api } = context.use("SectionLabel");
+        return (
+            scope as unknown as ComponentScope<typeof navigationRailAnatomy>
+        ).render("sectionLabel", {
+            element: "div",
+            machine: () => api().getSectionLabelProps(),
+            unstyled: () => props.unstyled,
+            props: omit(props, "unstyled"),
+        });
+    }
+
     /** The pill behind the icon, which takes the state layer. */
     function Indicator(props: NavigationPartProps): JSX.Element {
         const { scope } = context.use("Indicator");
@@ -351,6 +364,20 @@ export function createNavigation<C extends NavigationComponent>(config: {
         ...NAVIGATION_CONTENT_PROPS,
     ] as const;
 
+    /** A ready-made destination's section label, when it has one: the rail's only. */
+    const ItemSectionLabel = hasHeader
+        ? (
+              props: NavigationPartProps & { readonly label: JSX.Element },
+          ): JSX.Element => (
+              <Show when={isPresent(props.label)}>
+                  <SectionLabel {...omit(props, "label")}>
+                      {props.label}
+                  </SectionLabel>
+              </Show>
+          )
+        : (_: NavigationPartProps & { readonly label: JSX.Element }) =>
+              undefined;
+
     /** The ready-made component: a destination per item, each with every part in the preset's
      *  structure, the icon only when given. */
     function ReadyMade(props: NavigationProps<C>): JSX.Element {
@@ -364,6 +391,9 @@ export function createNavigation<C extends NavigationComponent>(config: {
         const icon = slots("icon");
         const label = slots("label");
         const header = (slots as (part: string) => object)("header");
+        const sectionLabel = (slots as (part: string) => object)(
+            "sectionLabel",
+        );
         return (
             <Root {...own} {...root}>
                 <Show when={hasHeader && isPresent(props.header)}>
@@ -374,23 +404,32 @@ export function createNavigation<C extends NavigationComponent>(config: {
                     keyed={(item: NavigationItem<JSX.Element>) => item.value}
                 >
                     {(item) => (
-                        <Item
-                            value={item().value}
-                            href={item().href}
-                            disabled={item().disabled}
-                            interactionSource={item().interactionSource}
-                            {...itemSlot}
-                        >
-                            <Indicator {...indicator}>
-                                <ActiveIndicator {...activeIndicator} />
-                                <Show when={isPresent(item().icon)}>
-                                    <Icon mirror={item().mirrorIcon} {...icon}>
-                                        {item().icon}
-                                    </Icon>
-                                </Show>
-                            </Indicator>
-                            <Label {...label}>{item().label}</Label>
-                        </Item>
+                        <>
+                            <ItemSectionLabel
+                                label={item().sectionLabel}
+                                {...sectionLabel}
+                            />
+                            <Item
+                                value={item().value}
+                                href={item().href}
+                                disabled={item().disabled}
+                                interactionSource={item().interactionSource}
+                                {...itemSlot}
+                            >
+                                <Indicator {...indicator}>
+                                    <ActiveIndicator {...activeIndicator} />
+                                    <Show when={isPresent(item().icon)}>
+                                        <Icon
+                                            mirror={item().mirrorIcon}
+                                            {...icon}
+                                        >
+                                            {item().icon}
+                                        </Icon>
+                                    </Show>
+                                </Indicator>
+                                <Label {...label}>{item().label}</Label>
+                            </Item>
+                        </>
                     )}
                 </For>
             </Root>
@@ -399,6 +438,15 @@ export function createNavigation<C extends NavigationComponent>(config: {
 
     return {
         ReadyMade,
-        parts: { Root, Header, Item, Indicator, ActiveIndicator, Icon, Label },
+        parts: {
+            Root,
+            Header,
+            SectionLabel,
+            Item,
+            Indicator,
+            ActiveIndicator,
+            Icon,
+            Label,
+        },
     };
 }

@@ -1,12 +1,19 @@
 // The list item: Root, a row that's a `<div>`, a link (`href`), or a button (`as="button"`), with
 // its leading part, text (overline, headline, supporting text), and trailing parts as the preset
 // draws them; and the ready-made ListItem over them. It has no machine: the app marks it selected
-// or disabled. Inside a List, it takes the list's variants as its defaults.
+// or disabled. Inside a List, it takes the list's variants as its defaults. An expandable item sits
+// in `Expandable`, Zag's accordion with one item: Root is its header (a button, with an
+// `Indicator`), and `Region`, after Root, its content.
 
 import { listItemAnatomy } from "@pureform/anatomy";
+import type { PartName, TestIdOverride } from "@pureform/anatomy";
 import {
+    isPresent,
     LIST_ITEM_CONTENT_PROPS,
+    LIST_ITEM_EXPAND_PROPS,
+    LIST_ITEM_EXPAND_VALUE,
     LIST_ITEM_ROOT_PROPS,
+    listItemExpandMachineProps,
     listItemElement,
     listItemLines,
     listItemRootProps,
@@ -16,22 +23,33 @@ import {
 } from "@pureform/binding-core";
 import type {
     ListItemContentProps,
+    ListItemExpandProps,
+    ListItemPart,
     ListItemRootOwnProps,
     ListVariantProps,
 } from "@pureform/binding-core";
+import type { MutableInteractionSource } from "@pureform/binding-core/interaction";
+import * as accordion from "@pureform/machines/accordion";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {
     type Accessor,
     createContext,
     createMemo,
+    createUniqueId,
+    merge,
     omit,
+    untrack,
     useContext,
 } from "solid-js";
 
+import { useControllable } from "../controllable";
+import { ExpandIcon } from "../glyphs";
 import {
     useInteractionHandlers,
     useOwnInteractionSource,
 } from "../interaction";
+import { normalizeProps, useMachine } from "../internal/zag";
+import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
 import {
     createSlotProps,
@@ -43,6 +61,7 @@ import {
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { combinePartProps } from "../props";
 import type { PartProps } from "../props";
+import { useDirection } from "../provider";
 
 type Anatomy = typeof listItemAnatomy;
 
@@ -52,6 +71,23 @@ interface ListItemContextValue {
 }
 
 const context = createPartContext<ListItemContextValue>("ListItem");
+
+/** What `Expandable` shares with Root and Region. Root gives it its interaction source, which the
+ *  machine's header emits to, as an accordion header's. */
+interface ExpandContextValue {
+    readonly scope: ComponentScope<Anatomy>;
+    readonly api: Accessor<accordion.Api<PropTypes>>;
+    readonly root: { source?: Accessor<MutableInteractionSource | undefined> };
+}
+
+const expandContext = createPartContext<ExpandContextValue>(
+    "ListItem",
+    "Expandable",
+);
+const expandItem = (disabled: boolean | undefined) => ({
+    value: LIST_ITEM_EXPAND_VALUE,
+    disabled,
+});
 
 /** The variants of the list around a list item: its defaults. Internal to the list. */
 export const ListDefaults = createContext<Accessor<ListVariantProps> | null>(
@@ -83,18 +119,38 @@ export interface ListItemIconProps extends ListItemPartProps {
  *  the focus ring. */
 function Root(props: ListItemRootProps): JSX.Element {
     const list = useContext(ListDefaults);
+    const expand = useContext(expandContext.Provider);
+    // An expandable item's header is a button, unless told otherwise.
     const element = createMemo(() =>
-        listItemElement<ValidComponent>({ href: props.href, as: props.as }),
+        listItemElement<ValidComponent>({
+            href: props.href,
+            as: props.as ?? (expand ? "button" : undefined),
+        }),
     );
+    // An expandable item's header: the accordion machine's, emitting to Root's source.
+    const own = () =>
+        expand
+            ? combinePartProps([
+                  listItemRootProps(props, element()),
+                  expand
+                      .api()
+                      .getItemTriggerProps(
+                          expandItem(props.disabled),
+                      ) as Record<string, unknown>,
+              ])
+            : listItemRootProps(props, element());
     // A memo: the handlers, the classes, and the indication each read it.
     const interactive = createMemo(() =>
         isInteractiveListItem(listItemVariants(list?.(), props), element()),
     );
     const source = useOwnInteractionSource(() => props.interactionSource);
-    const handlers = useInteractionHandlers(
-        source,
-        () => !interactive() || !!props.disabled,
-    );
+    if (expand) expand.root.source = source;
+    const handlers = expand
+        ? undefined
+        : useInteractionHandlers(
+              source,
+              () => !interactive() || !!props.disabled,
+          );
     const scope = useComponent(listItemAnatomy, {
         selection: () =>
             listItemSelection(listItemVariants(list?.(), props), element()),
@@ -110,12 +166,9 @@ function Root(props: ListItemRootProps): JSX.Element {
                 element: "div",
                 as: () => (element() === "div" ? undefined : element()),
                 machine: () =>
-                    interactive()
-                        ? combinePartProps([
-                              listItemRootProps(props, element()),
-                              handlers(),
-                          ])
-                        : listItemRootProps(props, element()),
+                    interactive() && handlers
+                        ? combinePartProps([own(), handlers()])
+                        : own(),
                 props: omit(props, "as", ...LIST_ITEM_ROOT_PROPS),
             })}
         </context.Provider>
@@ -177,24 +230,128 @@ const OptionalOverline = whenPresent(Overline);
 const OptionalSupportingText = whenPresent(SupportingText);
 const OptionalTrailingText = whenPresent(TrailingText);
 
+/** An expandable item's indicator, after the text: a chevron (or its children) that turns over
+ *  while the item is expanded, hidden from assistive technology. */
+function Indicator(props: ListItemPartProps): JSX.Element {
+    const { scope } = context.use("Indicator");
+    return scope.render("indicator", {
+        element: "span",
+        machine: () => ({ "aria-hidden": "true" }),
+        unstyled: () => props.unstyled,
+        props: merge(omit(props, "unstyled"), {
+            get children() {
+                return props.children ?? <ExpandIcon />;
+            },
+        }),
+    });
+}
+
+/** `Expandable`'s props: whether the item is expanded (controllable), the region's and the
+ *  indicator's test ids, and Root and Region as children. */
+export interface ListItemExpandableProps extends ListItemExpandProps {
+    /** A prefix for its parts' test ids, or ids by part (Region's). */
+    readonly testId?: TestIdOverride<ListItemPart> | undefined;
+    readonly children?: JSX.Element;
+}
+
+/** An expandable item: Zag's accordion with one item, around the item's Root (its header) and
+ *  its Region. */
+function Expandable(props: ListItemExpandableProps): JSX.Element {
+    const id = createUniqueId();
+    const dir = useDirection();
+    const list = useContext(ListDefaults);
+    const root: ExpandContextValue["root"] = {};
+    const controllable = useControllable<"expanded", boolean>(
+        "ListItem",
+        "expanded",
+        props,
+    );
+    const service = useMachine(accordion.machine, () => ({
+        id,
+        dir: dir(),
+        itemInteractionSource: () =>
+            untrack(() => root.source?.()) as MutableInteractionSource,
+        ...listItemExpandMachineProps(controllable.machineProps()),
+    }));
+    const api = createMemo(() => accordion.connect(service, normalizeProps));
+    const scope = useComponent(listItemAnatomy, {
+        selection: () =>
+            listItemSelection(listItemVariants(list?.(), {}), "button"),
+        testId: () => props.testId,
+    });
+    return (
+        <expandContext.Provider value={{ scope, api, root }}>
+            {props.children}
+        </expandContext.Provider>
+    );
+}
+
+/** What an expandable item shows while expanded, after its Root: nested list items, say. Hidden
+ *  while collapsed, named by Root. */
+function Region(props: ListItemPartProps): JSX.Element {
+    const expand = expandContext.use("Region");
+    return expand.scope.render("region", {
+        element: "div",
+        machine: () => expand.api().getItemContentProps(expandItem(undefined)),
+        unstyled: () => props.unstyled,
+        // The items inside are its content, not more headers.
+        props: merge(omit(props, "unstyled", "children"), {
+            get children() {
+                return (
+                    <expandContext.Provider value={null}>
+                        {props.children}
+                    </expandContext.Provider>
+                );
+            },
+        }),
+    });
+}
+
 /** The ready-made list item's props: Root's, with `class`, `style`, and `slotProps` keyed by part,
  *  and its content. `lines` follows the content unless given. */
 export interface ListItemProps
     extends
         Omit<ListItemRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
         SlotKeyedProps<Anatomy>,
-        ListItemContentProps<JSX.Element> {}
+        ListItemContentProps<JSX.Element>,
+        ListItemExpandProps {}
 
 const READY_MADE_PROPS = [
     "class",
     "style",
     "slotProps",
     ...LIST_ITEM_CONTENT_PROPS,
+    ...LIST_ITEM_EXPAND_PROPS,
 ] as const;
 
-/** The ready-made list item: every part in the preset's structure that has content. */
+/** The ready-made list item: every part in the preset's structure that has content; given a
+ *  `region` when it's created, an expandable item showing it under the row. */
 function ReadyMade(props: ListItemProps): JSX.Element {
     const slots = createSlotProps(props);
+    if (!untrack(() => isPresent(props.region)))
+        return row(props, slots, false);
+    const region = slots("region");
+    return (
+        <Expandable
+            expanded={props.expanded}
+            defaultExpanded={props.defaultExpanded}
+            onExpandedChange={props.onExpandedChange}
+            testId={props.testId}
+        >
+            {row(props, slots, true)}
+            <Region {...region}>{props.region}</Region>
+        </Expandable>
+    );
+}
+
+const NoPart = (_: ListItemPartProps): JSX.Element => undefined;
+
+/** The ready-made item's row: Root and its parts, the indicator last when expandable. */
+function row(
+    props: ListItemProps,
+    slots: (part: PartName<Anatomy>) => PartProps,
+    expandable: boolean,
+): JSX.Element {
     const own = omit(props, ...READY_MADE_PROPS) as ListItemRootProps;
     const root = slots("root") as object;
     const leading = slots("leading");
@@ -204,6 +361,9 @@ function ReadyMade(props: ListItemProps): JSX.Element {
     const supportingText = slots("supportingText");
     const trailing = slots("trailing");
     const trailingText = slots("trailingText");
+    // Picked here, so a row that can't expand makes no node for it.
+    const IndicatorPart = expandable ? Indicator : NoPart;
+    const indicator = expandable ? slots("indicator") : {};
     const LeadingPart = optionalPart(
         props,
         "leading",
@@ -252,6 +412,7 @@ function ReadyMade(props: ListItemProps): JSX.Element {
             <TrailingTextPart {...trailingText}>
                 {props.trailingText}
             </TrailingTextPart>
+            <IndicatorPart {...indicator} />
         </Root>
     );
 }
@@ -259,9 +420,14 @@ function ReadyMade(props: ListItemProps): JSX.Element {
 /** Material's list item. Use it ready-made, `<ListItem headline="Inbox" supportingText="3 new"
  *  href="/inbox" />`, or compose its parts under `ListItem.Root`: `Leading`, `Content` holding
  *  `Overline`, `Headline`, and `SupportingText`, then `Trailing` and `TrailingText`. Put it in a
- *  `List`, or give it the element a list item needs (`as="li"`). */
+ *  `List`, or give it the element a list item needs (`as="li"`). An expandable item takes a
+ *  `region` (ready-made), or composes `Expandable` around `Root` (holding an `Indicator` last) and
+ *  `Region`. */
 export const ListItem = Object.assign(ReadyMade, {
     Root,
+    Expandable,
+    Region,
+    Indicator,
     Leading,
     Content,
     Overline,

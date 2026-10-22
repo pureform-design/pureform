@@ -1,7 +1,9 @@
 // The list item's contract, shared by every binding: the props Root takes for itself, how they map
 // onto the selection, the content the ready-made list item takes, and Root's element props. A list
 // item has no machine: it's a row, a link (`href`), or a button (`as="button"`), and an app marks
-// it selected or disabled.
+// it selected or disabled. An expandable item (given a `region`) is a button that shows or hides
+// the region after it, its expand indicator turning over: the accordion's header and content, for
+// one item.
 
 import type {
     listItemAnatomy,
@@ -10,13 +12,15 @@ import type {
 } from "@pureform/anatomy";
 import type { InstanceTokens, Selection } from "@pureform/styling";
 
+import type { Controllable } from "../controllable";
 import type { Unstyled } from "../parts";
 import { isPresent } from "./content";
 import type { InteractiveProps } from "./indication";
 import type { VariantProp } from "./variants";
 
 /** The list item's parts: `"root" | "leading" | "content" | "overline" | "headline" |
- *  "supportingText" | "trailing" | "trailingText"`. */
+ *  "supportingText" | "trailing" | "trailingText" | "indicator"` (an expandable item's) `|
+ *  "region"` (what it expands, after the row). */
 export type ListItemPart = PartName<typeof listItemAnatomy>;
 
 /** The list item's variant groups and instance tokens. `interactive` gives it the state layer and
@@ -42,6 +46,10 @@ export interface ListItemStateProps {
     /** Dims it; a button is disabled, anything else `aria-disabled`. */
     readonly disabled?: boolean | undefined;
 }
+
+/** Whether an expandable item shows its region. Only an item in an `Expandable` (or a
+ *  ready-made one given a `region`) takes them. */
+export type ListItemExpandProps = Controllable<"expanded", boolean>;
 
 /** Everything Root takes for itself, besides the element's own props and `as`. */
 export interface ListItemRootOwnProps
@@ -85,6 +93,9 @@ export interface ListItemContentProps<Node> {
     /** Flip the leading or trailing icon under `rtl`, for an icon that points. */
     readonly mirrorLeading?: boolean | undefined;
     readonly mirrorTrailing?: boolean | undefined;
+    /** What the item expands to show, under it (nested list items): the item becomes a button
+     *  with an expand indicator. */
+    readonly region?: Node;
 }
 
 /** The keys of `ListItemContentProps`. */
@@ -97,6 +108,7 @@ export const LIST_ITEM_CONTENT_PROPS = [
     "trailingText",
     "mirrorLeading",
     "mirrorTrailing",
+    "region",
 ] as const satisfies readonly (keyof ListItemContentProps<unknown>)[];
 
 /** The element Root renders: a link with an `href`, else `as`, else a `<div>`. */
@@ -161,3 +173,31 @@ export const listItemLines = (
         Number(isPresent(content.supportingText));
     return extra === 0 ? "one" : extra === 1 ? "two" : "three";
 };
+
+/** The keys of `ListItemExpandProps`. */
+export const LIST_ITEM_EXPAND_PROPS = [
+    "expanded",
+    "defaultExpanded",
+    "onExpandedChange",
+] as const satisfies readonly (keyof ListItemExpandProps)[];
+
+/** The value of an expandable item's single accordion item, on the web bindings. */
+export const LIST_ITEM_EXPAND_VALUE = "item";
+
+/** Zag's accordion props for an expandable item, one item that opens and closes, from the item's
+ *  `expanded`, `defaultExpanded` and `onExpandedChange`. */
+export const listItemExpandMachineProps = (props: ListItemExpandProps) => ({
+    collapsible: true,
+    multiple: false,
+    value:
+        props.expanded === undefined
+            ? undefined
+            : props.expanded
+              ? [LIST_ITEM_EXPAND_VALUE]
+              : [],
+    defaultValue: props.defaultExpanded ? [LIST_ITEM_EXPAND_VALUE] : [],
+    onValueChange: (details: { value: string[] }) =>
+        props.onExpandedChange?.({
+            expanded: details.value.includes(LIST_ITEM_EXPAND_VALUE),
+        }),
+});

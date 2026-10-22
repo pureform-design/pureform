@@ -1,5 +1,7 @@
 // The list item: its leading icon, its lines (overline, headline, supporting text), and its
 // trailing icon or text. With `onPress` it's interactive: it takes the state layer and ripples.
+// Given a `region`, it's expandable: a button whose indicator turns over, showing the region under
+// it while expanded (React state, as the accordion's; there's no Zag here).
 
 import { listItemAnatomy } from "@pureform/anatomy";
 import type { TestIdOverride } from "@pureform/anatomy";
@@ -12,6 +14,7 @@ import {
 import type {
     InteractiveProps,
     ListItemContentProps,
+    ListItemExpandProps,
     ListItemPart,
     ListItemVariantProps,
     ListVariantProps,
@@ -21,7 +24,7 @@ import type { ReactNode } from "react";
 
 import { IconSlot, iconSlot } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
-import { testIdOf, unselectable, withEngine } from "../parts";
+import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
 import { useComponentSlots } from "../styles";
 
 const [INDICATION] = listItemAnatomy.indication!;
@@ -30,11 +33,12 @@ export interface ListItemProps
     extends
         ListItemVariantProps,
         ListItemContentProps<ReactNode>,
+        ListItemExpandProps,
         InteractiveProps {
     /** The current item, such as the page a navigation list is on. */
     readonly selected?: boolean | undefined;
     readonly disabled?: boolean | undefined;
-    /** Makes the item act. */
+    /** Makes the item act. An expandable item (given a `region`) acts as well: it expands. */
     readonly onPress?: (() => void) | undefined;
     /** An interactive item's role in place of `button`: a selection list's options are `option`s,
      *  marked with `aria-selected`. */
@@ -47,7 +51,16 @@ export const ListDefaults = createContext<ListVariantProps | null>(null);
 
 function ListItemImpl(props: ListItemProps): ReactNode {
     const list = use(ListDefaults);
-    const interactive = props.onPress !== undefined;
+    const expandable = isPresent(props.region);
+    const [expanded, setExpanded] = useControllable<"expanded", boolean>(
+        "ListItem",
+        "expanded",
+        props.expanded,
+        props.defaultExpanded,
+        props.onExpandedChange,
+        false,
+    );
+    const interactive = expandable || props.onPress !== undefined;
     const indication = useSurfaceIndication(INDICATION!, {
         indication: props.indication,
         interactionSource: props.interactionSource,
@@ -72,6 +85,7 @@ function ListItemImpl(props: ListItemProps): ReactNode {
         interactive
             ? indication.states({
                   selected: props.selected ?? false,
+                  ...(expandable ? { expanded } : {}),
                   ...(props.disabled ? { disabled: true } : {}),
                   ...(props.mirrorLeading || props.mirrorTrailing
                       ? { mirrored: true }
@@ -89,7 +103,10 @@ function ListItemImpl(props: ListItemProps): ReactNode {
             </Slot.Text>
         ) : null;
     };
-    const icon = (part: "leading" | "trailing", value: ReactNode) => {
+    const icon = (
+        part: "leading" | "trailing" | "indicator",
+        value: ReactNode,
+    ) => {
         const Slot = v[part];
         return isPresent(value) ? (
             <Slot.View style={s[part]} testID={id(part)}>
@@ -99,15 +116,22 @@ function ListItemImpl(props: ListItemProps): ReactNode {
             </Slot.View>
         ) : null;
     };
-    return (
+    const onPress = expandable
+        ? () => {
+              setExpanded(!expanded);
+              props.onPress?.();
+          }
+        : props.onPress;
+    const row = (
         <v.root.Pressable
             {...(interactive ? indication.handlers : {})}
             role={interactive ? (props.role ?? "button") : "listitem"}
             {...(interactive && props.role === "option"
                 ? { "aria-selected": props.selected ?? false }
                 : {})}
+            {...(expandable ? { "aria-expanded": expanded } : {})}
             {...(interactive
-                ? { onPress: props.onPress, disabled: props.disabled }
+                ? { onPress, disabled: props.disabled }
                 : { disabled: true })}
             style={{ ...s.root, ...unselectable }}
             testID={id("root")}
@@ -120,8 +144,20 @@ function ListItemImpl(props: ListItemProps): ReactNode {
             </v.content.View>
             {icon("trailing", props.trailing)}
             {line("trailingText", props.trailingText)}
+            {expandable ? icon("indicator", "⌄") : null}
             {indication.layer(selected)}
         </v.root.Pressable>
+    );
+    if (!expandable) return row;
+    return (
+        <>
+            {row}
+            {expanded ? (
+                <v.region.View style={s.region} testID={id("region")}>
+                    {props.region}
+                </v.region.View>
+            ) : null}
+        </>
     );
 }
 

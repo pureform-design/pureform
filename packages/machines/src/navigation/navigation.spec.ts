@@ -55,6 +55,16 @@ describe("navigation machine", () => {
         stop();
     });
 
+    it("names the rail's section label part", () => {
+        const { api, stop } = nav({ dir: "rtl" });
+        expect(api().getSectionLabelProps()).toMatchObject({
+            "data-scope": "navigation",
+            "data-part": "section-label",
+            dir: "rtl",
+        });
+        stop();
+    });
+
     it("marks the current destination with aria-current", () => {
         const { item, stop } = nav({ defaultValue: "search" });
         expect(item("search").getAttribute("aria-current")).toBe("page");

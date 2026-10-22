@@ -19,7 +19,7 @@ import { fabMenu, fabMenuItems } from "./fab-menu";
 import { fullscreenDialog } from "./fullscreen-dialog";
 import { gridList } from "./grid-list";
 import { iconButton } from "./icon-button";
-import { list, listItem } from "./list";
+import { expandableListItem, list, listItem } from "./list";
 import { loadingIndicator } from "./loading-indicator";
 import { menu } from "./menu";
 import { navigationBar, navigationRail } from "./navigation";
@@ -49,11 +49,11 @@ import {
 } from "./static";
 import { stepper } from "./stepper";
 import { switchControl } from "./switch";
+import { table } from "./table";
 import { tabsCase } from "./tabs";
 import { tagsInput } from "./tags-input";
 import { textArea } from "./text-area";
 import { textField } from "./text-field";
-import { table } from "./table";
 import { timeInput, timePicker } from "./time-picker";
 import { toastCase } from "./toast";
 import { toolbar } from "./toolbar";
@@ -88,6 +88,7 @@ export const COMPONENTS: readonly ComponentCase[] = [
     linearProgress,
     list,
     listItem,
+    expandableListItem,
     media,
     menu,
     navigationBar,

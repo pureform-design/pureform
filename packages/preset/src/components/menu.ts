@@ -21,7 +21,8 @@
 //   </div>
 //
 // Mark the chosen item with `aria-selected` (or `aria-checked` for a toggleable one), and an
-// unavailable one with `disabled` or `aria-disabled`. It stacks at the theme's `menu` layer, and grows in from the
+// unavailable one with `disabled` or `aria-disabled`. An item that opens a submenu holds an arrow
+// in `itemTrailing` (mirrored under `rtl`), and the submenu is another menu. It stacks at the theme's `menu` layer, and grows in from the
 // side it opens on while Zag's `data-state` is `open`.
 
 import { typed } from "@pureform/core";

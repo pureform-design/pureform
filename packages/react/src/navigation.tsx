@@ -35,7 +35,7 @@ import * as navigation from "@pureform/machines/navigation";
 import type { Selection } from "@pureform/styling";
 import { mergeProps, normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";
-import { type ElementType, type ReactNode, useId } from "react";
+import { type ElementType, Fragment, type ReactNode, useId } from "react";
 
 import { useControllable } from "./controllable";
 import { useItemInteractionSources } from "./interaction";
@@ -310,6 +310,22 @@ export function createNavigation<C extends NavigationComponent>(config: {
         });
     }
 
+    /** The rail's section label, over a run of destinations: shown while the rail is expanded. */
+    function SectionLabel({
+        unstyled,
+        ...props
+    }: NavigationPartProps): ReactNode {
+        const { scope, api } = context.use("SectionLabel");
+        return (
+            scope as unknown as ComponentScope<typeof navigationRailAnatomy>
+        ).render("sectionLabel", {
+            element: "div",
+            machine: api.getSectionLabelProps(),
+            unstyled,
+            props,
+        });
+    }
+
     // Only the rail has a header.
     const hasHeader = (config.anatomy.partNames as readonly string[]).includes(
         "header",
@@ -350,27 +366,37 @@ export function createNavigation<C extends NavigationComponent>(config: {
                     </Header>
                 ) : null}
                 {items.map((item) => (
-                    <Item
-                        key={item.value}
-                        value={item.value}
-                        href={item.href}
-                        disabled={item.disabled}
-                        interactionSource={item.interactionSource}
-                        {...slot("item")}
-                    >
-                        <Indicator {...slot("indicator")}>
-                            <ActiveIndicator {...slot("activeIndicator")} />
-                            {isPresent(item.icon) ? (
-                                <Icon
-                                    mirror={item.mirrorIcon}
-                                    {...slot("icon")}
-                                >
-                                    {item.icon}
-                                </Icon>
-                            ) : null}
-                        </Indicator>
-                        <Label {...slot("label")}>{item.label}</Label>
-                    </Item>
+                    <Fragment key={item.value}>
+                        {hasHeader && isPresent(item.sectionLabel) ? (
+                            <SectionLabel
+                                {...(slot as (part: string) => PartProps)(
+                                    "sectionLabel",
+                                )}
+                            >
+                                {item.sectionLabel}
+                            </SectionLabel>
+                        ) : null}
+                        <Item
+                            value={item.value}
+                            href={item.href}
+                            disabled={item.disabled}
+                            interactionSource={item.interactionSource}
+                            {...slot("item")}
+                        >
+                            <Indicator {...slot("indicator")}>
+                                <ActiveIndicator {...slot("activeIndicator")} />
+                                {isPresent(item.icon) ? (
+                                    <Icon
+                                        mirror={item.mirrorIcon}
+                                        {...slot("icon")}
+                                    >
+                                        {item.icon}
+                                    </Icon>
+                                ) : null}
+                            </Indicator>
+                            <Label {...slot("label")}>{item.label}</Label>
+                        </Item>
+                    </Fragment>
                 ))}
             </Root>
         );
@@ -378,6 +404,15 @@ export function createNavigation<C extends NavigationComponent>(config: {
 
     return {
         ReadyMade,
-        parts: { Root, Header, Item, Indicator, ActiveIndicator, Icon, Label },
+        parts: {
+            Root,
+            Header,
+            SectionLabel,
+            Item,
+            Indicator,
+            ActiveIndicator,
+            Icon,
+            Label,
+        },
     };
 }

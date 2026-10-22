@@ -3,11 +3,18 @@
 // Without a trigger it's the surface, placed by the app (as the select does in a `Modal`), and
 // given `open` it grows in and fades out. With one, it renders the trigger in place and opens the
 // surface under it, over the page through the portal host: placed against the trigger, closed by
-// a press outside, the back button or Escape, or picking an item.
+// a press outside, the back button or Escape, or picking an item. An item with `items` opens a
+// submenu in its place, drilling in rather than cascading beside it (React Native has no nested
+// popup here): the submenu's items under a row that goes back, headed by the item's label.
 
 import { menuAnatomy } from "@pureform/anatomy";
 import type { PartName, TestIdOverride } from "@pureform/anatomy";
-import { isPresent, menuGrouped, menuSelection } from "@pureform/binding-core";
+import {
+    hasSubmenu,
+    isPresent,
+    menuGrouped,
+    menuSelection,
+} from "@pureform/binding-core";
 import type {
     ChangeDetails,
     IndicationProps,
@@ -20,7 +27,7 @@ import type {
 import type { Indication } from "@pureform/binding-core/indication";
 import type { MutableInteractionSource } from "@pureform/binding-core/interaction";
 import type { Selection } from "@pureform/styling";
-import { memo, useEffect, useRef } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import type { ComponentRef, ReactNode } from "react";
 import { Platform, View } from "react-native";
 
@@ -127,7 +134,9 @@ function MenuItemImpl(props: ItemProps): ReactNode {
                 ? {}
                 : { checked: item.checked ?? false }),
             disabled: item.disabled ?? false,
-            ...(item.mirrorLeadingIcon || item.mirrorTrailingIcon
+            ...(item.mirrorLeadingIcon ||
+            item.mirrorTrailingIcon ||
+            hasSubmenu(item)
                 ? { mirrored: true }
                 : {}),
         }),
@@ -147,6 +156,7 @@ function MenuItemImpl(props: ItemProps): ReactNode {
         <v.item.Pressable
             {...indication.handlers}
             role={item.type === undefined ? "menuitem" : `menuitem${item.type}`}
+            {...(hasSubmenu(item) ? { "aria-haspopup": "menu" as const } : {})}
             {...(item.type === undefined
                 ? {}
                 : { "aria-checked": item.checked ?? false })}
@@ -183,7 +193,12 @@ function MenuItemImpl(props: ItemProps): ReactNode {
                     </v.itemSupportingText.Text>
                 ) : null}
             </v.itemContent.View>
-            {icon("itemTrailing", item.trailingIcon)}
+            {icon(
+                "itemTrailing",
+                hasSubmenu(item) && !isPresent(item.trailingIcon)
+                    ? "›"
+                    : item.trailingIcon,
+            )}
             {isPresent(item.trailingText) ? (
                 <v.itemTrailingText.Text
                     selectable={false}
@@ -200,14 +215,51 @@ function MenuItemImpl(props: ItemProps): ReactNode {
 
 const Item = memo(withEngine(MenuItemImpl, "MenuItem"));
 
+/** The value of the row that goes back out of a submenu. */
+const BACK = "\u0000back";
+
+/** The submenus drilled into, outermost first, from `path` (their items' values). */
+const submenusOf = (
+    items: readonly MenuItem<ReactNode>[],
+    path: readonly string[],
+): MenuItem<ReactNode>[] => {
+    const found: MenuItem<ReactNode>[] = [];
+    let level = items;
+    for (const value of path) {
+        const next = level.find((entry) => entry.value === value);
+        if (!next?.items) break;
+        found.push(next);
+        level = next.items;
+    }
+    return found;
+};
+
 function MenuImpl(props: MenuProps): ReactNode {
     const engine = useEngine();
+    const [path, setPath] = useState<readonly string[]>([]);
+    const all = [
+        ...(props.items ?? []),
+        ...(props.groups ?? []).flatMap((group) => group.items),
+    ];
+    const submenus = submenusOf(all, path);
+    const submenu = submenus.at(-1);
     const selection = useStableSelection(
-        menuSelection({ ...props, grouped: menuGrouped(props) }),
+        menuSelection({
+            ...props,
+            grouped: submenu ? false : menuGrouped(props),
+        }),
     );
-    const select = useStableCallback((value: string) =>
-        props.onSelect?.({ value }),
-    );
+    const select = useStableCallback((value: string) => {
+        if (value === BACK) return setPath(path.slice(0, -1));
+        const level = submenu?.items ?? all;
+        const chosen = level.find((entry) => entry.value === value);
+        if (chosen && hasSubmenu(chosen)) return setPath([...path, value]);
+        props.onSelect?.({ value });
+    });
+    // Out of any submenu once it closes.
+    useEffect(() => {
+        if (props.open === false) setPath([]);
+    }, [props.open]);
     const { styles: s, views: v } = useComponentSlots<Part>("menu", selection);
     const presence = useOverlayPresence(props.open, "popup");
     if (!presence.present) return null;
@@ -235,8 +287,20 @@ function MenuImpl(props: MenuProps): ReactNode {
             style={{ ...s.root, ...presence.style }}
             testID={id("root")}
         >
-            {(props.items ?? []).map(item)}
-            {(props.groups ?? []).map((group) => (
+            {submenu ? (
+                <>
+                    {item({
+                        value: BACK,
+                        label: submenu.label,
+                        leadingIcon: "‹",
+                        mirrorLeadingIcon: true,
+                        closeOnSelect: false,
+                    })}
+                    {(submenu.items ?? []).map(item)}
+                </>
+            ) : null}
+            {submenu ? null : (props.items ?? []).map(item)}
+            {(submenu ? [] : (props.groups ?? [])).map((group) => (
                 <v.itemGroup.View
                     key={group.id}
                     role="group"
