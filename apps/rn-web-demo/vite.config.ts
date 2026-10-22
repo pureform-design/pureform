@@ -11,7 +11,7 @@ import { createConfig } from "@pureform/vite-config/app";
 import react from "@vitejs/plugin-react";
 import type { Plugin } from "vite";
 
-import packageJson from "./package.json";
+import packageJson from "./package.json" with { type: "json" };
 import { codegen } from "./pureform.codegen";
 import config, { BRAND_TOKENS, BRANDS, COMPONENTS } from "./pureform.config";
 

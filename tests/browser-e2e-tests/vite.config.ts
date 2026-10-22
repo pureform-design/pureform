@@ -7,7 +7,7 @@ import { pandacss } from "@pandacss/vite";
 import { createConfig } from "@pureform/vite-config/test";
 import solid from "@solidjs/vite-plugin";
 
-import packageJson from "./package.json";
+import packageJson from "./package.json" with { type: "json" };
 
 const fixture = fileURLToPath(new URL("../panda-fixture/", import.meta.url));
 

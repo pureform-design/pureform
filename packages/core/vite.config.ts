@@ -2,7 +2,7 @@ import { readdirSync } from "node:fs";
 
 import { createConfig } from "@pureform/vite-config/library";
 
-import packageJson from "./package.json";
+import packageJson from "./package.json" with { type: "json" };
 
 // Emit one bundle per public entry. The `./ast/helpers/*` subpath export is a wildcard, so
 // every helper module (including the `keyword` submodule) needs its own dist file for the

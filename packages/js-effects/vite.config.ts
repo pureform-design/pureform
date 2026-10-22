@@ -1,6 +1,6 @@
 import { createConfig } from "@pureform/vite-config/library";
 
-import packageJson from "./package.json";
+import packageJson from "./package.json" with { type: "json" };
 
 export default createConfig({
     package: packageJson,

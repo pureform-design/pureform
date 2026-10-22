@@ -2,7 +2,7 @@ import pureform from "@pureform/bundler/vite";
 import { createConfig } from "@pureform/vite-config/app";
 import solid from "@solidjs/vite-plugin";
 
-import packageJson from "./package.json";
+import packageJson from "./package.json" with { type: "json" };
 import { codegen } from "./pureform.codegen";
 
 export default createConfig({
