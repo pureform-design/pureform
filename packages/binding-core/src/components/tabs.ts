@@ -13,7 +13,7 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Controllable } from "../controllable";
 import type { Unstyled } from "../parts";
-import { isPresent } from "./content";
+import { isPresent, withoutControls } from "./content";
 import type { IndicationProps, InteractionSourceProps } from "./indication";
 import type { VariantProp } from "./variants";
 
@@ -158,11 +158,7 @@ export const tabsTriggerProps = <P extends object>(
     { controls }: { readonly controls: boolean },
 ): Omit<P, "data-ssr"> => {
     const { "data-ssr": _ssr, ...rest } = props as P & { "data-ssr"?: unknown };
-    if (controls) return rest;
-    const { "aria-controls": _controls, ...named } = rest as typeof rest & {
-        "aria-controls"?: unknown;
-    };
-    return named as unknown as Omit<P, "data-ssr">;
+    return withoutControls(rest, controls);
 };
 
 /** Zag's item props for one tab, from the tab's props and the tabs' `disabled`. */

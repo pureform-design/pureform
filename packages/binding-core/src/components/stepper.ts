@@ -13,6 +13,7 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Controllable } from "../controllable";
 import type { Unstyled } from "../parts";
+import { withoutControls } from "./content";
 import type { IndicationProps, InteractionSourceProps } from "./indication";
 import type { VariantProp } from "./variants";
 
@@ -172,13 +173,7 @@ export const stepperMachineProps = (
 export const stepperTriggerProps = <P extends object>(
     props: P,
     { controls }: { readonly controls: boolean },
-): P => {
-    if (controls) return props;
-    const { "aria-controls": _controls, ...named } = props as P & {
-        "aria-controls"?: unknown;
-    };
-    return named as unknown as P;
-};
+): P => withoutControls(props, controls);
 
 /** Whether a header can't be pressed: it's the step's own `disabled`, or the step is done and not
  *  `editable`. */

@@ -105,6 +105,7 @@ export {
     hasAccessibleName,
     isPresent,
     missingNameMessage,
+    withoutControls,
 } from "./components/content";
 export type { IconOnlyName } from "./components/content";
 export {

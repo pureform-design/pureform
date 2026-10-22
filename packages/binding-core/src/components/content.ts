@@ -29,3 +29,16 @@ export const hasAccessibleName = (props: object): boolean => {
     };
     return Boolean(named["aria-label"] || named["aria-labelledby"]);
 };
+
+/** A machine's trigger props without `aria-controls` unless `controls` holds: a header (a tab,
+ *  a step) with no content to point at. */
+export const withoutControls = <P extends object>(
+    props: P,
+    controls: boolean,
+): P => {
+    if (controls) return props;
+    const { "aria-controls": _controls, ...named } = props as P & {
+        "aria-controls"?: unknown;
+    };
+    return named as unknown as P;
+};
