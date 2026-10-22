@@ -7,6 +7,7 @@ import {
     dateFormatHint,
     dateInputSelection,
     formatDateText,
+    isPresent,
     isSelectableDate,
     parseDateText,
     pickerLocale,
@@ -22,6 +23,7 @@ import type { ReactNode } from "react";
 
 import { Button } from "../button/button";
 import { IconButton } from "../icon-button/icon-button";
+import { IconSlot, iconSlot } from "../icon-style";
 import { useControllable, withEngine } from "../parts";
 import { useComponentSlots } from "../styles";
 import { partId } from "../text-input";
@@ -55,9 +57,19 @@ function DateInputImpl(props: DateInputProps): ReactNode {
     );
     const [focused, setFocused] = useState(false);
     const invalid = props.error !== undefined || !!props.invalid;
-    const { styles: s, views: v } = useComponentSlots<DateInputPart>(
+    const {
+        styles: s,
+        selected,
+        views: v,
+    } = useComponentSlots<DateInputPart>(
         "dateInput",
-        dateInputSelection(props),
+        dateInputSelection({
+            ...props,
+            leadingIcon: isPresent(props.leadingIcon),
+            trailingIcon: isPresent(props.trailingIcon),
+            prefixText: isPresent(props.prefixText),
+            suffixText: isPresent(props.suffixText),
+        }),
         {
             focus: focused,
             focusVisible: focused,
@@ -76,6 +88,30 @@ function DateInputImpl(props: DateInputProps): ReactNode {
         if (parsed[0] !== value[0]) setValue(parsed);
     };
     const hint = dateFormatHint(locale);
+    const icon = (part: "leadingIcon" | "trailingIcon", node: ReactNode) => {
+        if (!isPresent(node)) return null;
+        const Slot = v[part];
+        return (
+            <Slot.View
+                {...(part === "trailingIcon" ? { pointerEvents: "none" } : {})}
+                style={s[part]}
+                testID={id(part)}
+            >
+                <IconSlot {...iconSlot(selected, part)} motion={s[part]}>
+                    {node}
+                </IconSlot>
+            </Slot.View>
+        );
+    };
+    const affix = (part: "prefixText" | "suffixText", node: ReactNode) => {
+        if (!isPresent(node)) return null;
+        const Slot = v[part];
+        return (
+            <Slot.Text selectable={false} style={s[part]} testID={id(part)}>
+                {node}
+            </Slot.Text>
+        );
+    };
     return (
         <v.root.View role="dialog" style={s.root} testID={id("root")}>
             <v.header.View style={s.header} testID={id("header")}>
@@ -108,6 +144,8 @@ function DateInputImpl(props: DateInputProps): ReactNode {
             <v.divider.View style={s.divider} testID={id("divider")} />
             <v.field.View style={s.field} testID={id("field")}>
                 <v.container.View style={s.container} testID={id("container")}>
+                    {icon("leadingIcon", props.leadingIcon)}
+                    {affix("prefixText", props.prefixText)}
                     <v.input.TextInput
                         value={text}
                         onChangeText={onText}
@@ -125,6 +163,7 @@ function DateInputImpl(props: DateInputProps): ReactNode {
                         style={s.input}
                         testID={id("input")}
                     />
+                    {affix("suffixText", props.suffixText)}
                     <v.label.Text
                         selectable={false}
                         pointerEvents="none"
@@ -133,6 +172,7 @@ function DateInputImpl(props: DateInputProps): ReactNode {
                     >
                         {props.label ?? "Date"}
                     </v.label.Text>
+                    {icon("trailingIcon", props.trailingIcon)}
                 </v.container.View>
                 <v.supportingText.Text
                     style={s.supportingText}

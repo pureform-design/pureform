@@ -632,6 +632,14 @@ export interface DateInputContentProps<Node> extends PickerContentProps<Node> {
     readonly label?: Node;
     /** Helper text under the field; an `error` replaces it. @default the date's format */
     readonly supportingText?: Node;
+    /** An icon at the start of the field; renders only when given. */
+    readonly leadingIcon?: Node;
+    /** An icon at the end of the field; renders only when given. */
+    readonly trailingIcon?: Node;
+    /** Text before the segments; renders only when given. */
+    readonly prefixText?: Node;
+    /** Text after the segments; renders only when given. */
+    readonly suffixText?: Node;
 }
 
 /** The keys of `DateInputContentProps`. */
@@ -639,6 +647,10 @@ export const DATE_INPUT_CONTENT_PROPS = [
     ...PICKER_CONTENT_PROPS,
     "label",
     "supportingText",
+    "leadingIcon",
+    "trailingIcon",
+    "prefixText",
+    "suffixText",
 ] as const satisfies readonly (keyof DateInputContentProps<unknown>)[];
 
 /** The date's format as a locale writes it, for the supporting text: "mm/dd/yyyy" in `en-US`,

@@ -52,6 +52,38 @@ describe("DateInput, ready-made", () => {
         ).toBe(null);
     });
 
+    it("draws the icons and affixes only when given, as content", async () => {
+        withRegistry(
+            <DateInput
+                locale="en-US"
+                leadingIcon="L"
+                trailingIcon="T"
+                prefixText="$"
+                suffixText="USD"
+            />,
+        );
+        await settle();
+        expect(byTestId(ids.leadingIcon).textContent).toBe("L");
+        expect(byTestId(ids.trailingIcon).textContent).toBe("T");
+        expect(byTestId(ids.prefixText).textContent).toBe("$");
+        expect(byTestId(ids.suffixText).textContent).toBe("USD");
+    });
+
+    it("draws none of them without content", async () => {
+        withRegistry(<DateInput locale="en-US" />);
+        await settle();
+        for (const part of [
+            ids.leadingIcon,
+            ids.trailingIcon,
+            ids.prefixText,
+            ids.suffixText,
+        ]) {
+            expect(document.querySelector(`[data-testid="${part}"]`)).toBe(
+                null,
+            );
+        }
+    });
+
     it("takes typed digits as the ISO value, and confirms it", async () => {
         const onValueChange = vi.fn();
         const onConfirm = vi.fn();

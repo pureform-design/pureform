@@ -286,10 +286,19 @@ const CancelTrigger: (props: PickerActionProps) => ReactNode = pickerAction(
 );
 
 /** The ready-made date input's props: Root's, with `className`, `style`, and `slotProps` keyed
- *  by part, and the headline, label, supporting text and actions' labels as content. */
+ *  by part, and the headline, label, supporting text, icons and affixes (each renders only when
+ *  given) and actions' labels as content. */
 export interface DateInputProps
     extends
-        Omit<DateInputRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
+        Omit<
+            DateInputRootProps,
+            | keyof SlotKeyedProps<Anatomy>
+            | "children"
+            | "leadingIcon"
+            | "trailingIcon"
+            | "prefixText"
+            | "suffixText"
+        >,
         SlotKeyedProps<Anatomy>,
         DateInputContentProps<ReactNode> {}
 
@@ -321,8 +330,28 @@ function ReadyMadeContent({ own }: { readonly own: DateInputProps }) {
             <Divider {...slot("divider")} />
             <Field {...slot("field")}>
                 <Container {...slot("container")}>
+                    {isPresent(own.leadingIcon) ? (
+                        <LeadingIcon {...slot("leadingIcon")}>
+                            {own.leadingIcon}
+                        </LeadingIcon>
+                    ) : null}
+                    {isPresent(own.prefixText) ? (
+                        <PrefixText {...slot("prefixText")}>
+                            {own.prefixText}
+                        </PrefixText>
+                    ) : null}
                     <Input {...slot("input")} />
+                    {isPresent(own.suffixText) ? (
+                        <SuffixText {...slot("suffixText")}>
+                            {own.suffixText}
+                        </SuffixText>
+                    ) : null}
                     <Label {...slot("label")}>{own.label ?? "Date"}</Label>
+                    {isPresent(own.trailingIcon) ? (
+                        <TrailingIcon {...slot("trailingIcon")}>
+                            {own.trailingIcon}
+                        </TrailingIcon>
+                    ) : null}
                 </Container>
                 <SupportingText {...slot("supportingText")}>
                     {isPresent(own.supportingText)
@@ -358,7 +387,14 @@ function ReadyMade(props: DateInputProps): ReactNode {
     } = props;
     const rootProps = omitProps(rest, DATE_INPUT_CONTENT_PROPS);
     return (
-        <Root {...rootProps} {...(slot("root") as object)}>
+        <Root
+            {...rootProps}
+            leadingIcon={isPresent(props.leadingIcon) || undefined}
+            trailingIcon={isPresent(props.trailingIcon) || undefined}
+            prefixText={isPresent(props.prefixText) || undefined}
+            suffixText={isPresent(props.suffixText) || undefined}
+            {...(slot("root") as object)}
+        >
             <ReadyMadeContent own={props} />
         </Root>
     );

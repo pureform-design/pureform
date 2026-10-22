@@ -296,11 +296,19 @@ const CancelTrigger: (props: PickerActionProps) => JSX.Element = pickerAction(
 );
 
 /** The ready-made date input's props: Root's, with `class`, `style`, and `slotProps` keyed by
- *  part, and the headline, placeholder, label, supporting text, actions' labels, and the mode
- *  toggle as content. `aria-describedby` goes on the segments. */
+ *  part, and the headline, placeholder, label, supporting text, icons and affixes (each renders
+ *  only when given), actions' labels, and the mode toggle as content. `aria-describedby` goes on the segments. */
 export interface DateInputProps
     extends
-        Omit<DateInputRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
+        Omit<
+            DateInputRootProps,
+            | keyof SlotKeyedProps<Anatomy>
+            | "children"
+            | "leadingIcon"
+            | "trailingIcon"
+            | "prefixText"
+            | "suffixText"
+        >,
         SlotKeyedProps<Anatomy>,
         DateInputContentProps<JSX.Element> {}
 
@@ -346,6 +354,16 @@ function ReadyMadeContent(props: {
             <Divider {...slots("divider")} />
             <Field {...slots("field")}>
                 <Container {...slots("container")}>
+                    <Show when={isPresent(own.leadingIcon)}>
+                        <LeadingIcon {...slots("leadingIcon")}>
+                            {own.leadingIcon}
+                        </LeadingIcon>
+                    </Show>
+                    <Show when={isPresent(own.prefixText)}>
+                        <PrefixText {...slots("prefixText")}>
+                            {own.prefixText}
+                        </PrefixText>
+                    </Show>
                     <For each={indexes()} keyed={false}>
                         {(index) => (
                             <Input
@@ -371,9 +389,19 @@ function ReadyMadeContent(props: {
                             </Input>
                         )}
                     </For>
+                    <Show when={isPresent(own.suffixText)}>
+                        <SuffixText {...slots("suffixText")}>
+                            {own.suffixText}
+                        </SuffixText>
+                    </Show>
                     <Label {...slots("label")}>
                         {isPresent(own.label) ? own.label : "Date"}
                     </Label>
+                    <Show when={isPresent(own.trailingIcon)}>
+                        <TrailingIcon {...slots("trailingIcon")}>
+                            {own.trailingIcon}
+                        </TrailingIcon>
+                    </Show>
                 </Container>
                 <SupportingText {...slots("supportingText")}>
                     {isPresent(own.supportingText)
@@ -407,7 +435,14 @@ function ReadyMade(props: DateInputProps): JSX.Element {
     const slots = createSlotProps(props);
     const own = omit(props, ...READY_MADE_PROPS) as DateInputRootProps;
     return (
-        <Root {...own} {...(slots("root") as object)}>
+        <Root
+            {...own}
+            leadingIcon={isPresent(props.leadingIcon) || undefined}
+            trailingIcon={isPresent(props.trailingIcon) || undefined}
+            prefixText={isPresent(props.prefixText) || undefined}
+            suffixText={isPresent(props.suffixText) || undefined}
+            {...(slots("root") as object)}
+        >
             <ReadyMadeContent own={props} slots={slots} />
         </Root>
     );

@@ -228,6 +228,25 @@ describe("DockedDatePicker", () => {
 });
 
 describe("DateInput", () => {
+    it("draws the icons and affixes only when given", async () => {
+        await render(
+            <DateInput
+                locale="en-US"
+                leadingIcon="L"
+                prefixText="$"
+                suffixText="USD"
+            />,
+        );
+        expect(byTestId("pf-date-input-leading-icon").textContent).toBe("L");
+        expect(byTestId("pf-date-input-prefix-text").textContent).toBe("$");
+        expect(byTestId("pf-date-input-suffix-text").textContent).toBe("USD");
+        expect(
+            document.querySelector(
+                '[data-testid="pf-date-input-trailing-icon"]',
+            ),
+        ).toBeNull();
+    });
+
     it("confirms the typed date", async () => {
         const onConfirm = vi.fn();
         const onCancel = vi.fn();
