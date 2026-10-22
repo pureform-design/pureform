@@ -41,7 +41,7 @@ import {
 import { INDICATION_TOKENS } from "../state-layer";
 import { FAB_SIZES } from "./fab";
 import { overlayMotion, POPUP_MOTION } from "./overlay";
-import { spatialCornerTransition } from "./shaped";
+import { spatialCornerTransition } from "./shared";
 import {
     DEFAULT_GROUP,
     colorTokenVariants,

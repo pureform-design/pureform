@@ -46,7 +46,7 @@ import {
     variantsOf,
 } from "./shared";
 import type { ColorGroup, ColorGroups, Densities } from "./shared";
-import { chevronTransition } from "./spring-motion";
+import { chevronTransition } from "./shared";
 
 const EXPANDED = slot("container", "expanded");
 

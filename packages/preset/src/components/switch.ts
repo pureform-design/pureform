@@ -44,7 +44,7 @@ import {
     controlTouchTarget,
     CONTROL_FOCUS,
 } from "./control";
-import { spatialTweens } from "./shaped";
+import { springTweens } from "./shared";
 import {
     DEFAULT_GROUP,
     colorVariant,
@@ -214,10 +214,10 @@ export const createSwitch = <const G extends string = ColorGroup>(
                             height: ref("stateLayerSize"),
                             borderRadius: radius("full"),
                             pointerEvents: none,
-                            transition: spatialTweens(
+                            transition: springTweens(
                                 "spatialFast",
-                                "insetInlineStart",
-                                "backgroundColor",
+                                ["insetInlineStart"],
+                                ["backgroundColor"],
                             ),
                         },
                         handle: {
@@ -238,12 +238,10 @@ export const createSwitch = <const G extends string = ColorGroup>(
                                 .on(CONTROL_CHECKED, ref("handleSizeChecked"))
                                 .on(CONTROL_PRESSED, ref("handleSizePressed"))
                                 .else(ref("handleSize")),
-                            transition: spatialTweens(
+                            transition: springTweens(
                                 "spatialFast",
-                                "insetInlineStart",
-                                "width",
-                                "height",
-                                "backgroundColor",
+                                ["insetInlineStart", "width", "height"],
+                                ["backgroundColor"],
                             ),
                         },
                         icon: {

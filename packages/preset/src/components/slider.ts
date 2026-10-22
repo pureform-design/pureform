@@ -54,7 +54,7 @@ import type { ColorValue, NumericValue, StyleMap } from "@pureform/core/ast";
 import { radius, size as sizeToken, textStyle } from "@pureform/theme";
 
 import { INDICATION_TOKENS } from "../state-layer";
-import { spatialTweens } from "./shaped";
+import { springTweens } from "./shared";
 import {
     DEFAULT_GROUP,
     blend,
@@ -139,9 +139,13 @@ const INSETS = [
 // drag doesn't trail behind it. Colors ease either way.
 const follows = (...also: ("width" | "height")[]) =>
     when()
-        .on(PRESSED, spatialTweens("spatialFast", ...also, "backgroundColor"))
+        .on(PRESSED, springTweens("spatialFast", also, ["backgroundColor"]))
         .else(
-            spatialTweens("spatialFast", ...INSETS, ...also, "backgroundColor"),
+            springTweens(
+                "spatialFast",
+                [...INSETS, ...also],
+                ["backgroundColor"],
+            ),
         );
 
 const percent = (token: Parameters<typeof ref>[0]) => mul(ref(token), pct(1));

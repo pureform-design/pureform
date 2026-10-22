@@ -992,11 +992,11 @@ the components.
 - **Components (m2a).** Each takes the role Compose Material 3's `MotionSchemeKeyTokens` gives it:
   `effectsDefault` for the corner and clip-path morphs of buttons, icon buttons, FABs and split
   buttons (`cornerTransition`, Compose picks an effects spring so they never bounce);
-  `spatialFast` for chips' and the FAB menu toggle's corners (`spatialCornerTransition`), the
-  button group's corners, padding and width, the switch handle, the slider's handle and track
+  `spatialFast` for chips' and the FAB menu toggle's corners (`spatialCornerTransition`, beside
+  `cornerTransition` in `components/shared.ts`), the button group's corners, padding and width, the switch handle, the slider's handle and track
   on keyboard steps, and the split button's chevron turn; `spatialDefault` for the navigation
   indicator's growth (its fade on `effectsDefault`), the tabs' indicator slide and the time
-  picker's hand. Colors stay on their `short3` tweens (`spatialTweens` in `shaped.ts`).
+  picker's hand. Colors stay on their `short3` tweens (`springTweens` in `components/shared.ts`).
 
 - **The node.** `SpringNode { type: "spring", stiffness, damping, mass }` in `@pureform/core`:
   damping is the ratio ζ (1 critical, below bounces), mass defaults to 1. `spring({ stiffness,

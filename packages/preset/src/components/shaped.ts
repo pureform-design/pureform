@@ -14,7 +14,6 @@
 //     <span class={outline} />   (outlined styles only)
 //   </button>
 
-import { transitionMoves } from "@pureform/core";
 import {
     absolute,
     center,
@@ -41,10 +40,8 @@ import type {
     ShapeGeometry,
     ShapeMorph,
     StyleMap,
-    TransitionPart,
 } from "@pureform/core/ast";
 import { duration, easing, elevationTint, spring } from "@pureform/theme";
-import type { SpringRole } from "@pureform/theme";
 
 import { MATERIAL_SHAPES } from "../shapes";
 import type { IndicationRef } from "../state-layer";
@@ -72,31 +69,6 @@ const morphTransition = motionTransition(
     ...STATE_TWEENS,
     tween("clipPath", { spring: spring("effectsDefault") }),
 );
-
-/** Corner changes that settle on the `spatialFast` spring, with the state colors: Compose's
- *  chips (`shapeByInteraction` with `FastSpatial`) and the FAB menu's toggle
- *  (`ToggleFloatingActionButton`, `FastSpatial`). Under reduced motion the corners change at
- *  once and the colors still fade. */
-export const spatialCornerTransition = motionTransition(
-    ...STATE_TWEENS,
-    tween("borderRadius", { spring: spring("spatialFast") }),
-);
-
-/** A transition of the given properties where the ones that move, resize or turn settle on the
- *  `role` spring and the rest (colors, opacity) keep the `short3` standard tween, as Compose
- *  springs movement and leaves colors to their own spec. Under reduced motion the moving ones
- *  change at once and the fades still run. */
-export const spatialTweens = (
-    role: SpringRole,
-    ...properties: TransitionPart["property"][]
-): NonNullable<StyleMap["transition"]> =>
-    motionTransition(
-        ...properties.map((property) =>
-            transitionMoves(property)
-                ? tween(property, { spring: spring(role) })
-                : tween(property, duration("short3"), easing("standard")),
-        ),
-    );
 
 export const DEFAULT_SHAPES: Shapes = MATERIAL_SHAPES;
 

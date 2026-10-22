@@ -66,7 +66,7 @@ import {
     variantsOf,
 } from "./shared";
 import type { ColorGroup, ColorGroups, Densities } from "./shared";
-import { springTweens } from "./spring-motion";
+import { springTweens } from "./shared";
 import type { Position } from "./tiles";
 import { positionCorners, POSITIONS, TILE_RADII } from "./tiles";
 

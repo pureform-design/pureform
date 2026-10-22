@@ -64,7 +64,7 @@ import {
     tweens,
 } from "./shared";
 import type { ColorGroups, Densities } from "./shared";
-import { springTweens } from "./spring-motion";
+import { springTweens } from "./shared";
 import { supportingTextStyle } from "./supporting-text";
 
 /** The tokens every text input has. */

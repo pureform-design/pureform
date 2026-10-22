@@ -44,7 +44,7 @@ import {
     stateTransition,
     sys,
 } from "./shared";
-import { chevronTransition } from "./spring-motion";
+import { chevronTransition } from "./shared";
 
 /** The tokens every row has. */
 export const ROW_TOKENS = {

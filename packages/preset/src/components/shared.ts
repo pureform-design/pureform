@@ -56,6 +56,7 @@ import {
     spring,
     textStyle,
 } from "@pureform/theme";
+import type { SpringRole } from "@pureform/theme";
 
 import {
     INDICATION_TOKENS,
@@ -357,6 +358,35 @@ export function tweens(
         ...properties.map((property) => tween(property, timing)),
     );
 }
+
+/** A transition moving `moving` on the spring `role` and fading `fades` on `tweens`' timing
+ *  (`short3`, standard), as Compose splits a component's motion: a spring for what moves
+ *  (position, size, shape, rotation) and the colors on their own timing. Under reduced motion
+ *  the moving ones change at once and the fades still run. */
+export const springTweens = (
+    role: SpringRole,
+    moving: readonly TransitionPart["property"][],
+    fades: readonly TransitionPart["property"][] = [],
+): NonNullable<StyleMap["transition"]> =>
+    motionTransition(
+        ...moving.map((property) => tween(property, { spring: spring(role) })),
+        ...fades.map((property) =>
+            tween(property, {
+                duration: duration("short3"),
+                easing: easing("standard"),
+            }),
+        ),
+    );
+
+/** How a chevron turns over: on the fast spatial spring, its color on its tween. Every chevron
+ *  that turns (the list's, accordion's and tree's expand indicator, the select's arrow) uses it,
+ *  so they turn alike. Compose rotates its dropdown arrow at once (`ExposedDropdownMenuDefaults
+ *  .TrailingIcon`); a small part's movement takes `FastSpatial` in its motion scheme. */
+export const chevronTransition = springTweens(
+    "spatialFast",
+    ["transform"],
+    ["color"],
+);
 
 /** Material's focus indicator: a ring of the focus indicator's thickness and color, its outer
  *  offset outside the element (by default the theme's 3px, secondary, and 2px), shown while
@@ -741,14 +771,21 @@ export const cornerMorphVariants = (rest: RestingCorner) => ({
     },
 });
 
-/** Corner changes settle on the `effectsDefault` spring, with the state colors, as Compose's
- *  buttons, icon buttons and split buttons morph their shape (an effects spring on purpose, so
- *  the corners never bounce); under reduced motion the corners change at once and the colors
- *  still fade. */
-export const cornerTransition = motionTransition(
-    ...STATE_TWEENS,
-    tween("borderRadius", { spring: spring("effectsDefault") }),
-);
+// Corner changes that settle on the `role` spring, with the state colors; under reduced motion
+// the corners change at once and the colors still fade.
+const cornersOn = (role: SpringRole) =>
+    motionTransition(
+        ...STATE_TWEENS,
+        tween("borderRadius", { spring: spring(role) }),
+    );
+
+/** Corner changes on the `effectsDefault` spring, as Compose's buttons, icon buttons and split
+ *  buttons morph their shape (an effects spring on purpose, so the corners never bounce). */
+export const cornerTransition = cornersOn("effectsDefault");
+
+/** Corner changes on the `spatialFast` spring: Compose's chips (`shapeByInteraction` with
+ *  `FastSpatial`) and the FAB menu's toggle (`ToggleFloatingActionButton`, `FastSpatial`). */
+export const spatialCornerTransition = cornersOn("spatialFast");
 
 /** A component token per size for one of its measures, named `<prefix><Size>`
  *  (`heightSmall`), so a theme can retune each size. */

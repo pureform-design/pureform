@@ -32,7 +32,7 @@ import type { MaterialDensity } from "@pureform/theme";
 
 import { INDICATION_TOKENS, stateLayer } from "../state-layer";
 import type { IndicationRef } from "../state-layer";
-import { spatialCornerTransition } from "./shaped";
+import { spatialCornerTransition } from "./shared";
 import {
     DEFAULT_GROUP,
     colorVariant,
