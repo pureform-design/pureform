@@ -8,9 +8,10 @@ import { createComponent } from "solid-js";
 
 import { PureformProvider } from "../provider";
 
-/** The story's theme from the toolbar: the scheme, and a named theme from the config. */
+/** The story's theme from the toolbar: the scheme (`undefined` follows the system), and a named
+ *  theme from the config. */
 export interface StoryTheme {
-    readonly scheme: "light" | "dark";
+    readonly scheme?: "light" | "dark" | undefined;
     readonly name?: string | undefined;
 }
 
@@ -28,7 +29,7 @@ export type Decorator = (
 ) => JSX.Element;
 
 /** The provider with the story's registry and named theme. The scheme is the page's class,
- *  which the Panda target's dark condition reads. */
+ *  which the Panda target's dark condition reads (no class follows the system). */
 const withProvider: Decorator = (story, context) =>
     createComponent(PureformProvider, {
         get registry() {

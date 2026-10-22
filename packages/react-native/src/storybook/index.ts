@@ -8,9 +8,10 @@ import type { ReactNode } from "react";
 
 import { PureformProvider } from "../provider";
 
-/** The story's theme from the toolbar: the scheme, and a named theme from the config. */
+/** The story's theme from the toolbar: the scheme (`undefined` follows the system), and a named
+ *  theme from the config. */
 export interface StoryTheme {
-    readonly scheme: "light" | "dark";
+    readonly scheme?: "light" | "dark" | undefined;
     readonly name?: string | undefined;
 }
 
@@ -26,13 +27,14 @@ export type Decorator = (
     context: StoryContext,
 ) => ReactNode;
 
-/** The provider with the story's registry, its scheme, and its named theme. */
+/** The provider with the story's registry, its scheme, and its named theme. Without a scheme the
+ *  provider follows `useColorScheme()`, which React Native Web reads from the system. */
 const withProvider: Decorator = (story, context) =>
     createElement(
         PureformProvider,
         {
             registry: context.registry,
-            scheme: context.theme.scheme,
+            ...(context.theme.scheme ? { scheme: context.theme.scheme } : {}),
             theme: context.theme.name,
         },
         story(),
