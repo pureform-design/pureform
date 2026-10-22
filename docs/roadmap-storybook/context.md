@@ -18,10 +18,14 @@ from `main` (`da4f3d08`). Not pushed.
   without a remount), `src/react/adapter.ts` (`reactDomAdapter`, shared with
   `src/native/adapter.ts` over the runtime-styles registry). All JSX-free. The adapter applies
   the renderer hook's decorators.
-- **Globals:** `renderer` (Solid, React, React Native) and `theme` (light, dark, teal,
-  squircle, sharp, compact). Dark on the web is the page's `.dark`/`.light` class (the shared
-  hook's decorator), which the Panda target's dark condition reads; named themes go to the
-  provider's `theme`; React Native gets `scheme` and `theme`.
+- **Globals:** `renderer` (Solid, React, React Native), `scheme` (System by default, Light,
+  Dark) and `theme` (default, teal, squircle, sharp, compact). System sets nothing, so the web's
+  `prefers-color-scheme` CSS and React Native's `useColorScheme()` follow the OS live; Light and
+  Dark set the page's `.light`/`.dark` class (the shared hook's decorator) or React Native's
+  `scheme` prop. Named themes go to the provider's `theme`.
+- **System UI:** `.storybook/manager.ts` follows `prefers-color-scheme` and switches live; docs
+  pages read it at load (`parameters.docs.theme`). The canvas (`.sb-show-main`, `.docs-story`)
+  paints `--colors-canvas`, the theme's surface; the backgrounds addon is off.
 - **Hooks:** `src/renderers/hooks.ts` (types, `extendWith`, `rendererArgs`),
   `src/renderers/compose.ts` (`composeStories`), shared `src/hooks.ts` (scheme decorator,
   `args`, `transformSource` adding the generated-file header), component hooks
@@ -58,6 +62,9 @@ from `main` (`da4f3d08`). Not pushed.
 
 ## Problems
 
+- Importing `storybook/theming` in the preview made Vite optimize it mid-run and reload the
+  Vitest page ("Vitest failed to find the current suite"); `optimizeDeps.include` in
+  `vitest.config.storybook.ts` fixes it.
 - `CSF: expected non-factory story` for `export const X = fn()` (fixed as above).
 - `require.resolve("<pkg>/package.json")` fails: bindings don't export `./package.json`; the
   script reads it from `node_modules` directly.
@@ -73,6 +80,10 @@ from `main` (`da4f3d08`). Not pushed.
   bindings' storybook modules are checked by their builds (declarations).
 - A throwaway story confirmed a11y violations fail a test, and that the `native` project
   renders with `renderer: native`.
+- `scripts/system-scheme.mjs` against the static build: for each renderer, the OS scheme
+  flipped with `emulateMedia` changes the button and the canvas without a reload, the manager's
+  sidebar too; Light holds under a dark OS, Dark under a light one, and System follows again
+  (`/tmp/opencode/sb-web-system-<renderer>-{light,dark}.png`).
 - `scripts/screenshots.mjs` against `storybook build` served statically: every component in
   every renderer, light, dark and teal, no page or console errors
   (`/tmp/opencode/sb-web-<component>-<renderer>[-dark|-teal].png`).
@@ -83,8 +94,13 @@ from `main` (`da4f3d08`). Not pushed.
   and React show an icon only when given. A binding difference, not a storybook one.
 - **The a11y panel shows a count for React Native** (Button 1, Switch 2) while the tests pass
   with `test: "error"`: likely "incomplete" results, not violations. Worth a look.
-- **Theme toolbar:** named themes are in light only, and the list is hand-written in
-  `preview.ts`; it could come from `pureform.config.ts`'s `themes` and offer scheme × theme.
+- **Theme toolbar:** the named-theme list is hand-written in `preview.ts`; it could come from
+  `pureform.config.ts`'s `themes`.
+- **Canvas under a named theme:** the canvas paints the base theme's surface, since the named
+  theme's vars are scoped to the provider's element (`display: contents`), which can't paint.
+- **Docs theme** follows the system at load only; there are no docs pages yet (no autodocs).
+- Web components animate between schemes, so a color read right after a change can be mid
+  transition; the check waits for colors to settle.
 - **Component list from `@pureform/anatomy`** (the plan's idea) isn't done; `COMPONENTS` and
   `stories.config.ts` both list them.
 - **No root README** exists to link from (plan step 7); the app's README stands alone.

@@ -90,9 +90,21 @@ no composition fallback.
   (`virtual:pureform-rn`, rn-web-demo's `pureformRn()`), not a second generated registry: the
   bundler plugin writes one `.pureform/`, the Panda one. The component list
   (`pureform.codegen.ts`'s `COMPONENTS`) serves both.
-- One `theme` toolbar global (light, dark, and the named themes), mapped to each renderer's
-  provider prop: Solid and React take `theme` (and dark is the `.dark` class Panda reads),
-  React Native takes `scheme` and `theme`.
+- **The scheme follows the system by default.** A `scheme` global (System, the default; Light;
+  Dark) and a `theme` global (Default and the named themes), mapped to each renderer's provider:
+    - **System forces nothing.** The web targets (Panda, css, tailwind) already write dark under
+      `@media (prefers-color-scheme: dark)`, which `.light`/`.dark` on the root only override,
+      so no class is set; React Native's provider defaults `scheme` to `useColorScheme()`, which
+      React Native Web reads from `prefers-color-scheme`, so no `scheme` prop is passed.
+    - **Light/Dark** set the root's class (web) or the provider's `scheme` (React Native);
+      switching back to System removes them.
+    - Changing the OS scheme updates every renderer live, without a reload (checked with
+      Playwright's `emulateMedia({ colorScheme })` for all three).
+    - Named themes go to the provider's `theme` in every renderer.
+- **Storybook's own UI follows the system:** `.storybook/manager.ts` picks `themes.dark` or
+  `themes.light` from `matchMedia("(prefers-color-scheme: dark)")` and switches live on a
+  change; docs pages read it once when they load.
+- **The canvas is the theme's surface** (`canvas`, in the current scheme), not Storybook's white.
 
 ## Codegen
 
