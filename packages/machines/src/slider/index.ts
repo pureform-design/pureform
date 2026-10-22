@@ -54,8 +54,7 @@ export type Machine = AnyMachine<Schema>;
 export type Service = AnyService<Schema>;
 
 const rootId = (scope: { id?: string | undefined; ids?: unknown }) =>
-    (scope.ids as { root?: string } | undefined)?.root ??
-    `slider:${scope.id}`;
+    (scope.ids as { root?: string } | undefined)?.root ?? `slider:${scope.id}`;
 
 const zag = zagMachine as unknown as ZagMachine;
 
@@ -107,6 +106,8 @@ export interface Api<T extends PropTypes = PropTypes> extends Omit<
     /** The inactive track before a range, or before a centered slider's active track. */
     getStartTrackProps(): T["element"];
     getActiveTrackProps(): T["element"];
+    /** An icon inside the active track, at its start. */
+    getInsetIconProps(): T["element"];
     /** A thumb's handle: the element with the `slider` role, which takes focus and the keys. */
     getHandleProps(index: number): T["element"];
     /** A thumb's state layer. */
@@ -204,6 +205,14 @@ export function connect<T extends PropTypes>(
                 "data-orientation": service.prop("orientation"),
             } as never);
         },
+        getInsetIconProps() {
+            return normalize.element({
+                ...parts.insetIcon.attrs,
+                ...state,
+                "aria-hidden": "true",
+                "data-orientation": service.prop("orientation"),
+            } as never);
+        },
         getActiveTrackProps() {
             return normalize.element({
                 ...(withoutStyle(api.getRangeProps()) as object),
@@ -228,7 +237,8 @@ export function connect<T extends PropTypes>(
                     onKeyDown(event: KeyboardEvent) {
                         if (!interactive || !horizontal) return;
                         if (event.key === "ArrowUp") api.increment(index);
-                        else if (event.key === "ArrowDown") api.decrement(index);
+                        else if (event.key === "ArrowDown")
+                            api.decrement(index);
                     },
                 } as never),
             );

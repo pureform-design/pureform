@@ -148,7 +148,7 @@ function Root(props: SliderRootProps): ReactNode {
 }
 
 const drawn = (
-    part: "startTrack" | "track" | "activeTrack" | "markerGroup",
+    part: "startTrack" | "track" | "activeTrack" | "markerGroup" | "insetIcon",
     name: string,
     machine: (api: slider.Api<PropTypes>) => object,
 ) =>
@@ -171,6 +171,11 @@ const Track = drawn("track", "Track", (api) => api.getTrackProps());
 /** The active track. Empty. */
 const ActiveTrack = drawn("activeTrack", "ActiveTrack", (api) =>
     api.getActiveTrackProps(),
+);
+/** An icon inside the active track, at its start (medium sliders and up): put the icon in its
+ *  children. */
+const InsetIcon = drawn("insetIcon", "InsetIcon", (api) =>
+    api.getInsetIconProps(),
 );
 /** Holds the stops (`Marker`). */
 const MarkerGroup = drawn("markerGroup", "MarkerGroup", (api) =>
@@ -250,7 +255,11 @@ function ValueIndicator(props: SliderThumbPartProps): ReactNode {
 }
 
 /** A thumb's hidden input, which submits its value with the form. */
-function Input({ unstyled, index = 0, ...props }: SliderThumbPartProps): ReactNode {
+function Input({
+    unstyled,
+    index = 0,
+    ...props
+}: SliderThumbPartProps): ReactNode {
     const { scope, api, setInput } = context.use("Input");
     const ref = useCallback(
         (element: HTMLElement | null) =>
@@ -277,6 +286,8 @@ export interface SliderProps<V extends SliderValue = SliderValue>
         >,
         SlotKeyedProps<Anatomy> {
     readonly "aria-label"?: string | readonly string[] | undefined;
+    /** An icon inside the active track, at its start; drawn at sizes `medium` and up. */
+    readonly insetIcon?: ReactNode;
 }
 
 /** The ready-made slider: every part, in the preset's structure. */
@@ -287,6 +298,7 @@ function ReadyMade<V extends SliderValue = number>(
         className: _className,
         style: _style,
         slotProps: _slotProps,
+        insetIcon: _insetIcon,
         ...rest
     } = props;
     const rootProps = omitProps(rest, SLIDER_INPUT_LABEL_PROPS);
@@ -306,6 +318,9 @@ function ReadyMade<V extends SliderValue = number>(
             <StartTrack {...slot("startTrack")} />
             <Track {...slot("track")} />
             <ActiveTrack {...slot("activeTrack")} />
+            {props.insetIcon !== undefined && (
+                <InsetIcon {...slot("insetIcon")}>{props.insetIcon}</InsetIcon>
+            )}
             {stops.length > 0 && (
                 <MarkerGroup {...slot("markerGroup")}>
                     {stops.map((stop) => (
@@ -340,6 +355,7 @@ export const Slider = Object.assign(ReadyMade, {
     StartTrack,
     Track,
     ActiveTrack,
+    InsetIcon,
     MarkerGroup,
     Marker,
     StateLayer,

@@ -1,7 +1,7 @@
 // The single-part components: Root is the whole component.
 
 import { testIds } from "@pureform/anatomy";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { Avatar } from ".";
 import { PureformProvider } from "..";
@@ -12,9 +12,12 @@ import { Media } from "../media";
 import { Scrim } from "../scrim";
 import { Separator } from "../separator";
 import { SupportingText } from "../supporting-text";
-import { byTestId, mount, settle } from "../testing/mount";
+import { byTestId, mount, settle, until } from "../testing/mount";
 import { Text } from "../text";
 import { TouchTarget } from "../touch-target";
+
+const GIF =
+    "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 
 const withRegistry = (view: () => unknown) =>
     mount(() => (
@@ -24,18 +27,47 @@ const withRegistry = (view: () => unknown) =>
     ));
 
 describe("Avatar", () => {
-    it("is a picture with a src, its label the alt text", async () => {
+    it("shows its fallback until the picture loads, then the picture", async () => {
         withRegistry(() => (
-            <Avatar src="data:," label="Ada Lovelace" size="large" />
+            <Avatar src={GIF} label="Ada Lovelace" size="large">
+                AL
+            </Avatar>
         ));
         await settle();
-        const root = byTestId<HTMLImageElement>(testIds.avatar.root);
-        expect(root.tagName).toBe("IMG");
-        expect(root.alt).toBe("Ada Lovelace");
+        const root = byTestId(testIds.avatar.root);
+        expect(root.tagName).toBe("SPAN");
+        expect(root.getAttribute("role")).toBe("img");
+        expect(root.getAttribute("aria-label")).toBe("Ada Lovelace");
         expect(root.className).toBe("avatar avatar--size-large");
+        const image = byTestId<HTMLImageElement>(testIds.avatar.image);
+        expect(image.className).toBe("avatar__image");
+        expect(image.alt).toBe("");
+        const fallback = byTestId(testIds.avatar.fallback);
+        expect(fallback.textContent).toBe("AL");
+        // A one pixel gif: it loads.
+        await until(() => expect(image.hidden).toBe(false));
+        expect(fallback.hidden).toBe(true);
     });
 
-    it("is a named image of its children without one", async () => {
+    it("keeps its fallback when the picture fails", async () => {
+        const onStatusChange = vi.fn();
+        withRegistry(() => (
+            <Avatar
+                src="/missing-avatar.png"
+                label="Ada"
+                onStatusChange={onStatusChange}
+            >
+                AL
+            </Avatar>
+        ));
+        await until(() =>
+            expect(onStatusChange).toHaveBeenCalledWith({ status: "error" }),
+        );
+        expect(byTestId(testIds.avatar.image).hidden).toBe(true);
+        expect(byTestId(testIds.avatar.fallback).hidden).toBe(false);
+    });
+
+    it("is a named image of its children without a picture", async () => {
         withRegistry(() => <Avatar label="Ada Lovelace">AL</Avatar>);
         await settle();
         const root = byTestId(testIds.avatar.root);
@@ -43,6 +75,17 @@ describe("Avatar", () => {
         expect(root.getAttribute("role")).toBe("img");
         expect(root.getAttribute("aria-label")).toBe("Ada Lovelace");
         expect(root.textContent).toBe("AL");
+        expect(
+            document.querySelector(`[data-testid="${testIds.avatar.image}"]`),
+        ).toBeNull();
+    });
+
+    it("is hidden from assistive technology without a label", async () => {
+        withRegistry(() => <Avatar>AL</Avatar>);
+        await settle();
+        expect(byTestId(testIds.avatar.root).getAttribute("aria-hidden")).toBe(
+            "true",
+        );
     });
 });
 

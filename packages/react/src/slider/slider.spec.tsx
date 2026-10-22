@@ -10,6 +10,9 @@ import { interact, mount, outside, settle } from "../testing/render";
 
 const ids = testIds.slider;
 
+const parts = (root: Element) =>
+    [...root.children].map((part) => part.getAttribute("data-pf-part"));
+
 const withRegistry = (view: ReactNode) =>
     mount(
         <PureformProvider registry={displayRegistry()}>
@@ -33,13 +36,7 @@ describe("Slider", () => {
         const root = byTestId(ids.root);
         expect(
             [...root.children].map((part) => part.getAttribute("data-pf-part")),
-        ).toEqual([
-            "start-track",
-            "track",
-            "active-track",
-            "handle",
-            "input",
-        ]);
+        ).toEqual(["start-track", "track", "active-track", "handle", "input"]);
         expect(root.style.getPropertyValue("--value")).toBe("40");
         const handle = byTestId(ids.handle);
         expect(handle.getAttribute("role")).toBe("slider");
@@ -120,5 +117,37 @@ describe("Slider", () => {
                 marker.style.getPropertyValue("--stopActive"),
             ),
         ).toEqual(["0", "1", "1", "1", "0"]);
+    });
+
+    it("draws an inset icon inside the active track, before the handle, hidden from assistive technology", async () => {
+        withRegistry(
+            <Slider
+                aria-label="Volume"
+                size="large"
+                defaultValue={40}
+                insetIcon="♪"
+            />,
+        );
+        await settle();
+        const root = byTestId(ids.root);
+        expect(parts(root)).toEqual([
+            "start-track",
+            "track",
+            "active-track",
+            "inset-icon",
+            "handle",
+            "input",
+        ]);
+        const icon = byTestId(ids.insetIcon);
+        expect(icon.textContent).toBe("♪");
+        expect(icon.getAttribute("aria-hidden")).toBe("true");
+    });
+
+    it("has no inset icon part without one", async () => {
+        withRegistry(<Slider aria-label="Volume" defaultValue={40} />);
+        await settle();
+        expect(
+            document.querySelector(`[data-testid="${ids.insetIcon}"]`),
+        ).toBeNull();
     });
 });

@@ -19,6 +19,7 @@ import {
     listItemRootProps,
     listItemSelection,
     isInteractiveListItem,
+    isPresent,
     listItemVariants,
 } from "@pureform/binding-core";
 import type {
@@ -62,12 +63,16 @@ import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { combinePartProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
+import { createSwipe } from "./swipe";
+import type { Swipe } from "./swipe";
 
 type Anatomy = typeof listItemAnatomy;
 
 /** What Root shares with its parts. */
 interface ListItemContextValue {
     readonly scope: ComponentScope<Anatomy>;
+    /** A swipeable item's state; `undefined` for any other. */
+    readonly swipe: Swipe | undefined;
 }
 
 const context = createPartContext<ListItemContextValue>("ListItem");
@@ -151,9 +156,29 @@ function Root(props: ListItemRootProps): JSX.Element {
               source,
               () => !interactive() || !!props.disabled,
           );
+    // Whether the row swipes is read once, when it is made: only then does it build its state. An
+    // expandable item's header is a button, so it doesn't swipe (its action would be a button in a
+    // button).
+    const swipe = untrack(() =>
+        !expand && listItemVariants(list?.(), props).swipeable
+            ? createSwipe(props)
+            : undefined,
+    );
     const scope = useComponent(listItemAnatomy, {
-        selection: () =>
-            listItemSelection(listItemVariants(list?.(), props), element()),
+        selection: () => {
+            const variants = expand
+                ? { ...listItemVariants(list?.(), props), swipeable: false }
+                : listItemVariants(list?.(), props);
+            return listItemSelection(
+                swipe
+                    ? {
+                          ...variants,
+                          tokens: { ...variants.tokens, ...swipe.tokens() },
+                      }
+                    : variants,
+                element(),
+            );
+        },
         testId: () => props.testId,
         unstyled: () => props.unstyled,
         indication: () => props.indication,
@@ -161,14 +186,25 @@ function Root(props: ListItemRootProps): JSX.Element {
         interactive,
     });
     return (
-        <context.Provider value={{ scope }}>
+        <context.Provider value={{ scope, swipe }}>
             {scope.render("root", {
                 element: "div",
                 as: () => (element() === "div" ? undefined : element()),
                 machine: () =>
-                    interactive() && handlers
-                        ? combinePartProps([own(), handlers()])
-                        : own(),
+                    swipe
+                        ? combinePartProps([
+                              own(),
+                              interactive() && handlers
+                                  ? handlers()
+                                  : undefined,
+                              swipe.rootProps(interactive()),
+                          ])
+                        : interactive() && handlers
+                          ? combinePartProps([own(), handlers()])
+                          : own(),
+                ...(swipe
+                    ? { states: () => ({ pressed: swipe.dragging() }) }
+                    : {}),
                 props: omit(props, "as", ...LIST_ITEM_ROOT_PROPS),
             })}
         </context.Provider>
@@ -222,6 +258,17 @@ const SupportingText = textPart("supportingText", "SupportingText", "span");
 const Trailing = trailing.Part;
 /** Text after the text, such as a count. */
 const TrailingText = textPart("trailingText", "TrailingText", "span");
+/** The action a swipeable row uncovers as it slides: put a button in it. It is out of reach of
+ *  assistive technology and the keyboard until it's revealed. */
+function Action(props: ListItemPartProps): JSX.Element {
+    const { scope, swipe } = context.use("Action");
+    return scope.render("action", {
+        element: "div",
+        machine: () => ({ inert: swipe ? !swipe.revealed() : true }),
+        unstyled: () => props.unstyled,
+        props: omit(props, "unstyled"),
+    });
+}
 // The ready-made's parts for content that can come and go: the leading and trailing parts build
 // theirs once.
 const OptionalLeading = leading.Optional;
@@ -229,6 +276,7 @@ const OptionalTrailing = trailing.Optional;
 const OptionalOverline = whenPresent(Overline);
 const OptionalSupportingText = whenPresent(SupportingText);
 const OptionalTrailingText = whenPresent(TrailingText);
+const OptionalAction = whenPresent(Action);
 
 /** An expandable item's indicator, after the text: a chevron (or its children) that turns over
  *  while the item is expanded, hidden from assistive technology. */
@@ -361,9 +409,11 @@ function row(
     const supportingText = slots("supportingText");
     const trailing = slots("trailing");
     const trailingText = slots("trailingText");
-    // Picked here, so a row that can't expand makes no node for it.
+    // Picked here, so a row that can't expand makes no node for it, and an expandable row (a
+    // button) no swipe action.
     const IndicatorPart = expandable ? Indicator : NoPart;
     const indicator = expandable ? slots("indicator") : {};
+    const action = expandable ? {} : slots("action");
     const LeadingPart = optionalPart(
         props,
         "leading",
@@ -394,8 +444,21 @@ function row(
         TrailingText,
         OptionalTrailingText,
     );
+    const ActionPart = expandable
+        ? NoPart
+        : optionalPart(props, "swipeAction", Action, OptionalAction);
     return (
-        <Root {...own} lines={props.lines ?? listItemLines(props)} {...root}>
+        <Root
+            {...own}
+            lines={props.lines ?? listItemLines(props)}
+            swipeable={
+                expandable
+                    ? false
+                    : (props.swipeable ??
+                      (isPresent(props.swipeAction) || undefined))
+            }
+            {...root}
+        >
             <LeadingPart mirror={props.mirrorLeading} {...leading}>
                 {props.leading}
             </LeadingPart>
@@ -413,6 +476,7 @@ function row(
                 {props.trailingText}
             </TrailingTextPart>
             <IndicatorPart {...indicator} />
+            <ActionPart {...action}>{props.swipeAction}</ActionPart>
         </Root>
     );
 }
@@ -435,4 +499,5 @@ export const ListItem = Object.assign(ReadyMade, {
     SupportingText,
     Trailing,
     TrailingText,
+    Action,
 });

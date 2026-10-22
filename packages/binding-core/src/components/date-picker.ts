@@ -339,11 +339,17 @@ export const pickerWeekStart = (props: {
 
 /** Zag's date picker or date input props from a picker's, besides `id`, `dir` and the state:
  *  `parse` turns an ISO date into Zag's date value (the machines' `parse`). */
+/** The time zone the user is in. Zag's default is UTC, which makes "today" the wrong day for
+ *  part of every day anywhere else. */
+export const localTimeZone = (): string =>
+    new Intl.DateTimeFormat().resolvedOptions().timeZone;
+
 export const dateMachineProps = <D>(
     props: DatePickerBehaviorProps,
     parse: (value: string) => D | undefined,
 ) => ({
     locale: pickerLocale(props),
+    timeZone: localTimeZone(),
     startOfWeek: pickerWeekStart(props),
     selectionMode: props.selectionMode,
     min: props.min === undefined ? undefined : parse(props.min),

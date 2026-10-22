@@ -189,6 +189,22 @@ describe("DatePicker, ready-made", () => {
         expect(onOpenChange).toHaveBeenLastCalledWith({ open: false });
     });
 
+    it.each([
+        ["just after local midnight", new Date(2026, 7, 15, 0, 30)],
+        ["just before local midnight", new Date(2026, 7, 15, 23, 30)],
+    ])("marks the local date as today, %s", async (_, now) => {
+        vi.useFakeTimers({ toFake: ["Date"], now });
+        try {
+            withRegistry(<DatePicker locale="en-US" defaultOpen />);
+            await settle();
+            expect(cellRoot("2026-08-15").className).toContain(
+                "calendar-cell--today-true",
+            );
+        } finally {
+            vi.useRealTimers();
+        }
+    });
+
     it("marks today, and a range's start, middle and end", async () => {
         const now = new Date();
         const pad = (n: number) => String(n).padStart(2, "0");

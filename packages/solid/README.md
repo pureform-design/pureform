@@ -478,7 +478,10 @@ mirrorIcon?, disabled?, content? }`; a tab without a label shows only its icon, 
   two with an overline or supporting text, three with both) unless given. `Leading` and `Trailing`
   are `aria-hidden` (give `aria-hidden={false}` to one that says something). `leadingType` sizes
   the leading part for an icon, avatar, thumbnail, or video, and `position` places a segmented
-  list's tile.
+  list's tile. `swipeAction` (or `ListItem.Action`) makes the row `swipeable`: dragging it toward
+  the inline start (or the arrow keys on the focused row; Escape closes) slides its parts over the
+  action, which is `inert` until revealed. `revealed`, `defaultRevealed`, `onRevealedChange` and
+  `swipeWidth` (px, 80) control it. Not for a link or button item: the action is a button.
 - **The list** is a `<ul>` (`listAnatomy`, `pf-list-root`) with each list item in an `<li>`
   (`List.Item`, `pf-list-item`). `variant="segmented"` sets the items apart as tiles, and
   `listTokens` are the list's own tokens. Its `density`, `color`, `leadingType` (`icon`, `avatar`,
@@ -508,7 +511,9 @@ mirrorIcon?, disabled?, content? }`; a tab without a label shows only its icon, 
   through a hidden input (`name`, or `name[]` for a range). The ready-made puts `aria-label` (one
   per thumb for a range), `aria-labelledby`, `aria-describedby`, and `aria-valuetext` on the
   handles. Compose with `StartTrack`, `Track`, `ActiveTrack`, `MarkerGroup`/`Marker`, and per
-  thumb `Handle` (holding `StateLayer`), `ValueIndicator`, `Input`. Removed with c1g: the native
+  thumb `Handle` (holding `StateLayer`), `ValueIndicator`, `Input`; `insetIcon` (or `InsetIcon`
+  between `ActiveTrack` and the handles) draws an icon in the active track from size `medium` up.
+  Removed with c1g: the native
   `<input type="range">` (the handle replaces it).
 - **The card** has no machine. Root is a `<div>` surface, a link with `href`, or any element with
   `as`; a link or a button is `interactive` (state layer, hover lift, touch target) unless told
@@ -537,8 +542,10 @@ mirrorIcon?, disabled?, content? }`; a tab without a label shows only its icon, 
   The badge is a `<span>` of its children (`<Badge>3</Badge>`), or a dot with `size="small"`, with
   `placement="anchored"` on the corner of its positioned parent; `label` names it (`role="img"`),
   and a dot without one is `aria-hidden`.
-  The avatar is an `<img>` with `src` (its `label` the `alt`), else a `<span>` of its children,
-  `role="img"` named by `label`, or hidden without one. Media is an `<img>` (`as="video"` for a
+  The avatar is a `<span>` (`role="img"` named by `label`, or hidden without one) holding, with a
+  `src`, an `Image` (decorative, `hidden` until it has loaded; Zag's avatar machine) and a `Fallback`
+  (its children, shown until then and if the picture fails; `onStatusChange` reports it), else its
+  children alone. Compose with `Avatar.Root`, `Avatar.Image`, `Avatar.Fallback`. Media is an `<img>` (`as="video"` for a
   video). The separator is an `<hr>` (another element gets `role="separator"`). The scrim and touch
   target are `aria-hidden`. Text takes the preset's `style` group as `textStyle`, since `style` is
   the element's. The icon is hidden unless given a `label` (then `role="img"`), flips under `rtl`

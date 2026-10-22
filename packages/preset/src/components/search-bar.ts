@@ -45,6 +45,8 @@ const { tokens, ref } = componentTokens("searchBar", {
     leadingColor: sys("onSurface"),
     trailingColor: sys("onSurfaceVariant"),
     height: px(56),
+    // M3 Expressive: a search bar grows with its container up to this width.
+    maxWidth: px(720),
     radius: radius("full"),
     paddingInline: spacing("4"),
     gap: spacing("4"),
@@ -59,7 +61,7 @@ export const searchBar = pf.slotComponent({
     name: "searchBar",
     $meta: {
         description:
-            "Material search bar: a pill holding a leading icon, the search input, and trailing icons. centered centers the text, as M3 Expressive's app bar search does; scrolled takes the app bar's scrolled container color.",
+            "Material search bar: a pill holding a leading icon, the search input, and trailing icons. centered centers the text, as M3 Expressive's app bar search does; scrolled takes the app bar's scrolled container color (the lift on scroll). It grows with its container up to 720px.",
     },
     tokens,
     slots: ["root", "leading", "input", "trailing"],
@@ -78,6 +80,7 @@ export const searchBar = pf.slotComponent({
                 alignItems: center,
                 gap: ref("gap"),
                 height: ref("height"),
+                maxWidth: ref("maxWidth"),
                 paddingInlineStart: ref("paddingInline"),
                 paddingInlineEnd: ref("paddingInline"),
                 borderRadius: ref("radius"),

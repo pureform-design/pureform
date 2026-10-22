@@ -353,6 +353,7 @@
         "@pureform/js-effects": "workspace:^",
         "@zag-js/accordion": "catalog:",
         "@zag-js/anatomy": "catalog:",
+        "@zag-js/avatar": "catalog:",
         "@zag-js/carousel": "catalog:",
         "@zag-js/checkbox": "catalog:",
         "@zag-js/collection": "catalog:",
@@ -918,6 +919,7 @@
     "@vitest/browser-playwright": "5.0.5",
     "@zag-js/accordion": "^1.46.0",
     "@zag-js/anatomy": "^1.46.0",
+    "@zag-js/avatar": "^1.46.0",
     "@zag-js/carousel": "^1.46.0",
     "@zag-js/checkbox": "^1.46.0",
     "@zag-js/collection": "^1.46.0",
@@ -1777,6 +1779,8 @@
     "@zag-js/aria-hidden": ["@zag-js/aria-hidden@1.46.0", "", { "dependencies": { "@zag-js/dom-query": "1.46.0" } }, "sha512-TQRJxzT4wzXHMKX+mnnm4qWEU6ASpkYcpR6/h3oaJ/3g2AreUYzmThdsS1FwDl0SkdoQEsuCQXWrMpHXUdAmJg=="],
 
     "@zag-js/auto-resize": ["@zag-js/auto-resize@1.46.0", "", { "dependencies": { "@zag-js/dom-query": "1.46.0" } }, "sha512-7Kv00dku2Dg/1HYQCQZl8k99TDT/CzHWV5G2smkEVQf1JvLTeHRKv7eQxvP9mc34mSldDC5VoRxKFf8p2NCj0g=="],
+
+    "@zag-js/avatar": ["@zag-js/avatar@1.46.0", "", { "dependencies": { "@zag-js/anatomy": "1.46.0", "@zag-js/core": "1.46.0", "@zag-js/dom-query": "1.46.0", "@zag-js/types": "1.46.0", "@zag-js/utils": "1.46.0" } }, "sha512-5fjm087hbjVccadXCsJBKUmB3ow2r1sJJuIA7DtWsqB6CS43dV+SBXhAFzvKedCdM0oiNTc7GLRVrj2zESDgNw=="],
 
     "@zag-js/carousel": ["@zag-js/carousel@1.46.0", "", { "dependencies": { "@zag-js/anatomy": "1.46.0", "@zag-js/core": "1.46.0", "@zag-js/dom-query": "1.46.0", "@zag-js/scroll-snap": "1.46.0", "@zag-js/types": "1.46.0", "@zag-js/utils": "1.46.0" } }, "sha512-Z1STExmqwwSF0cLkF9ZXEIrBg11PTAf8sAPNfvGoyPf5mL/T7HGaAIRcjMFJnmpFA9nG1eJYvXJ3f5rRrqoKAw=="],
 

@@ -29,14 +29,21 @@
 
 import { typed } from "@pureform/core";
 import {
+    absolute,
     add,
+    center,
     column,
     flex,
     hidden,
+    mul,
     pct,
     px,
     slot,
     start,
+    transform,
+    translateX,
+    unitless,
+    when,
 } from "@pureform/core/ast";
 import type { StyleMap } from "@pureform/core/ast";
 import { radius, spacing, textStyle } from "@pureform/theme";
@@ -47,6 +54,9 @@ import { rowParts, rowTokens } from "./list";
 import {
     DEFAULT_GROUP,
     colorVariant,
+    disabledColor,
+    on,
+    tweens,
     defaultDensities,
     defaultGroups,
     DENSITY_TOKEN,
@@ -62,24 +72,35 @@ import { positionCorners, POSITIONS, TILE_RADII } from "./tiles";
 
 const pf = typed();
 
-const { tokens, ref } = rowTokens("listItem", {
-    paddingInline: spacing("4"),
-    gap: spacing("4"),
-    heightOne: px(56),
-    heightTwo: px(72),
-    heightThree: px(88),
-    // A segmented list's tiles.
-    segmentedContainer: sys("surfaceContainer"),
-    ...TILE_RADII,
-    // The leading part's sizes by type.
-    avatarSize: px(40),
-    thumbnailSize: px(56),
-    videoWidth: px(114),
-    videoHeight: px(64),
-    // An expandable item's nested region: how far its rows sit in from the item's.
-    regionIndent: spacing("4"),
-    ...DENSITY_TOKEN,
-});
+const { tokens, ref, own } = rowTokens(
+    "listItem",
+    {
+        paddingInline: spacing("4"),
+        gap: spacing("4"),
+        heightOne: px(56),
+        heightTwo: px(72),
+        heightThree: px(88),
+        // A segmented list's tiles.
+        segmentedContainer: sys("surfaceContainer"),
+        ...TILE_RADII,
+        // Swipe to reveal: the action under the row, and how far the row has slid (`swipeOffset`,
+        // in pixels along the inline axis, 0 to `swipeWidth`; the binding keeps it in step).
+        actionContainer: sys("secondaryContainer"),
+        actionContent: on("secondaryContainer"),
+        swipeWidth: unitless(80),
+        swipeOffset: unitless(0),
+        // The leading part's sizes by type.
+        avatarSize: px(40),
+        thumbnailSize: px(56),
+        videoWidth: px(114),
+        videoHeight: px(64),
+        // An expandable item's nested region: how far its rows sit in from the item's.
+        regionIndent: spacing("4"),
+        ...DENSITY_TOKEN,
+    },
+    // The offset transitions as a token, so the parts reading it slide without being views that move.
+    { swipeOffset: "number" },
+);
 
 const parts = rowParts(ref, "root");
 
@@ -108,6 +129,23 @@ const tile = (position: Exclude<Position, "none">) => ({
     },
 });
 
+// How far the row has slid, in pixels, along the inline axis: toward the start, so the action
+// at the end shows.
+const SLID = mul(ref("swipeOffset"), px(1));
+const SLID_BACK = mul(ref("swipeOffset"), px(-1));
+
+// The parts that slide over the action: every direct child of the row but the action.
+const slides: StyleMap = {
+    transform: when(
+        "rtl",
+        transform(translateX(SLID)),
+        transform(translateX(SLID_BACK)),
+    ),
+    transition: when()
+        .on(slot("root", "pressed"), tweens())
+        .else(tweens(own("swipeOffset"))),
+};
+
 const lines = (height: LineHeight) => ({
     root: { minHeight: add(ref(height), ref("densityOffset")) },
 });
@@ -126,7 +164,7 @@ export const createListItem = <
             name: "listItem",
             $meta: {
                 description:
-                    "Material list item. Set lines to the number of text lines, interactive when it is clickable, leadingType to what the leading part holds, and position in a segmented list. Mark it selected with aria-selected or aria-current. An expandable item is a button marked aria-expanded, with its indicator and the nested region after it.",
+                    "Material list item. Set lines to the number of text lines, interactive when it is clickable, leadingType to what the leading part holds, and position in a segmented list. Mark it selected with aria-selected or aria-current. An expandable item is a button marked aria-expanded, with its indicator and the nested region after it. swipeable lets the row slide to uncover an action (its swipeOffset token says how far, in pixels).",
             },
             tokens,
             slots: [
@@ -140,6 +178,7 @@ export const createListItem = <
                 "trailingText",
                 "indicator",
                 "region",
+                "action",
             ],
             // The region is the row's sibling, not its child: the row is a button.
             structure: {
@@ -149,6 +188,7 @@ export const createListItem = <
                     "trailing",
                     "trailingText",
                     "indicator",
+                    "action",
                 ],
                 content: ["overline", "headline", "supportingText"],
             },
@@ -166,6 +206,7 @@ export const createListItem = <
                 interactive: ["true", "false"],
                 leadingType: ["icon", "avatar", "thumbnail", "video"],
                 position: [...POSITIONS],
+                swipeable: ["false", "true"],
                 density: densitySteps<string>(densities),
                 color: groups as ColorGroups,
             },
@@ -202,6 +243,26 @@ export const createListItem = <
                     ),
                     // Its display is left to the `hidden` attribute that collapses it.
                     region: { paddingInlineStart: ref("regionIndent") },
+                    // The revealed action, pinned to the row's end and uncovered as the
+                    // row's other parts slide away; the row clips what slides past it.
+                    action: {
+                        position: absolute,
+                        insetInlineEnd: px(0),
+                        insetBlockStart: px(0),
+                        insetBlockEnd: px(0),
+                        width: ref("swipeWidth"),
+                        display: flex,
+                        alignItems: center,
+                        justifyContent: center,
+                        backgroundColor: ref("actionContainer"),
+                        color: ref("actionContent"),
+                        textStyle: textStyle("labelLarge"),
+                        states: {
+                            disabled: {
+                                color: disabledColor("disabledContent"),
+                            },
+                        },
+                    },
                 },
                 variants: {
                     lines: {
@@ -246,6 +307,21 @@ export const createListItem = <
                         last: tile("last"),
                         single: tile("single"),
                     },
+                    // A row that swipes: its parts slide over the action, and the row clips
+                    // them. The binding sets `touch-action: pan-y` on the web, so a horizontal
+                    // drag is the row's and the page scrolls only along the list.
+                    swipeable: {
+                        false: {},
+                        true: {
+                            root: {
+                                overflow: hidden,
+                            },
+                            leading: slides,
+                            content: slides,
+                            trailing: slides,
+                            trailingText: slides,
+                        },
+                    },
                     density: densityTokenVariant(densities),
                     // A group points the selected colors, which the row and its parts read,
                     // at its container roles.
@@ -263,6 +339,7 @@ export const createListItem = <
                     interactive: "false",
                     leadingType: "icon",
                     position: "none",
+                    swipeable: "false",
                     color: DEFAULT_GROUP,
                     density: "inherit",
                 },

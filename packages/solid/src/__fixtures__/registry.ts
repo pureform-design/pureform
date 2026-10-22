@@ -328,6 +328,7 @@ export const navigationRegistry = () =>
             "trailingText",
             "indicator",
             "region",
+            "action",
         ]),
     });
 
@@ -380,6 +381,7 @@ export const displayRegistry = () =>
                     "markerGroup",
                     "marker",
                     "stateLayer",
+                    "insetIcon",
                     "handle",
                     "valueIndicator",
                     "input",
@@ -521,7 +523,7 @@ export const displayRegistry = () =>
             "trailing",
         ]),
         ripple: named("ripple", ["root", "ripple"]),
-        avatar: named("avatar", ["root"]),
+        avatar: named("avatar", ["root", "image", "fallback"]),
         badge: named("badge", ["root"]),
         media: named("media", ["root"]),
         separator: named("separator", ["root"]),

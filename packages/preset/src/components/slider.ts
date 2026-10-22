@@ -23,6 +23,7 @@
 //     <span class={track} />
 //     <span class={activeTrack} />
 //     <div class={markerGroup}><span class={marker} style="--value: 50; --stopActive: 0" /></div>
+//     <span class={insetIcon}>♪</span>
 //     <div class={handle} role="slider" tabindex="0" aria-valuenow="40">
 //       <span class={stateLayer} />
 //     </div>
@@ -62,6 +63,8 @@ import {
     disabledColor,
     entriesOf,
     focusRing,
+    iconBox,
+    iconFill,
     keysOf,
     INDICATION_ROOT,
     mergeSlots,
@@ -86,6 +89,12 @@ const { tokens, ref } = componentTokens("slider", {
     valueIndicatorWidth: px(48),
     valueIndicatorHeight: px(44),
     valueIndicatorGap: px(4),
+    // An icon inside the active track, at its start (medium and larger sliders).
+    insetIconSize: sizeToken("iconMedium"),
+    insetIconPadding: px(8),
+    iconFill: unitless(0),
+    // Set by `size` (1 from medium up), and shown only on the bar handle's thick track.
+    insetIconShown: unitless(0),
     height: sizeToken("touchTarget"),
     trackHeight: px(4),
     handleSize: px(20),
@@ -270,6 +279,21 @@ const geometry = (vertical: boolean) => {
             insetBlockEnd: px(0),
         },
         marker: at(ref("stopSize"), ref("stopSize")),
+        insetIcon: vertical
+            ? {
+                  insetBlockEnd: add(
+                      percent("activeStart"),
+                      ref("insetIconPadding"),
+                  ),
+                  insetInlineStart: sub(pct(50), half(ref("insetIconSize"))),
+              }
+            : {
+                  insetInlineStart: add(
+                      percent("activeStart"),
+                      ref("insetIconPadding"),
+                  ),
+                  insetBlockStart: sub(pct(50), half(ref("insetIconSize"))),
+              },
         handle: handleBox(at),
         valueIndicator: vertical
             ? {
@@ -292,11 +316,36 @@ const geometry = (vertical: boolean) => {
 /** One of M3 Expressive's slider sizes: the track's thickness, the bar handle's height, and the
  *  track's outer corner radius. */
 export const SLIDER_SIZES = {
-    xsmall: { track: px(16), handle: px(44), radius: radius("small") },
-    small: { track: px(24), handle: px(44), radius: radius("small") },
-    medium: { track: px(40), handle: px(52), radius: radius("medium") },
-    large: { track: px(56), handle: px(68), radius: radius("large") },
-    xlarge: { track: px(96), handle: px(108), radius: radius("extraLarge") },
+    xsmall: {
+        track: px(16),
+        handle: px(44),
+        radius: radius("small"),
+        insetIcon: false,
+    },
+    small: {
+        track: px(24),
+        handle: px(44),
+        radius: radius("small"),
+        insetIcon: false,
+    },
+    medium: {
+        track: px(40),
+        handle: px(52),
+        radius: radius("medium"),
+        insetIcon: true,
+    },
+    large: {
+        track: px(56),
+        handle: px(68),
+        radius: radius("large"),
+        insetIcon: true,
+    },
+    xlarge: {
+        track: px(96),
+        handle: px(108),
+        radius: radius("extraLarge"),
+        insetIcon: true,
+    },
 } as const;
 
 const unlessDisabled = (
@@ -310,6 +359,11 @@ const unlessDisabled = (
 const colored = (active: ColorValue, onActive: ColorValue) => ({
     activeTrack: unlessDisabled(active, "disabledContent"),
     handle: unlessDisabled(active, "disabledContent"),
+    insetIcon: {
+        color: when()
+            .on(DISABLED, disabledColor("disabledContainer"))
+            .else(onActive),
+    },
     marker: unlessDisabled(
         colorMix(ref("stopColor"), onActive, mul(ref("stopActive"), pct(100))),
         "disabledContent",
@@ -336,7 +390,7 @@ export const createSlider = <const G extends string = ColorGroup>(
             name: "slider",
             $meta: {
                 description:
-                    "Material slider on Zag's slider machine: standard, centered, or a range, with stops and a value indicator. Keep its tokens (value, activeStart, activeEnd, startGap, endGap; percentages of the range) in step with the value. handleShape bar (M3 Expressive, at sizes xsmall to xlarge) or round (the earlier slider); orientation horizontal or vertical.",
+                    "Material slider on Zag's slider machine: standard, centered, or a range, with stops and a value indicator. Keep its tokens (value, activeStart, activeEnd, startGap, endGap; percentages of the range) in step with the value. handleShape bar (M3 Expressive, at sizes xsmall to xlarge) or round (the earlier slider); orientation horizontal or vertical. insetIcon is an icon inside the active track, shown at sizes medium and up.",
             },
             tokens,
             slots: [
@@ -347,6 +401,7 @@ export const createSlider = <const G extends string = ColorGroup>(
                 "markerGroup",
                 "marker",
                 "stateLayer",
+                "insetIcon",
                 "handle",
                 "valueIndicator",
                 "input",
@@ -357,6 +412,7 @@ export const createSlider = <const G extends string = ColorGroup>(
                     "track",
                     "activeTrack",
                     "markerGroup",
+                    "insetIcon",
                     "handle",
                     "valueIndicator",
                     "input",
@@ -419,6 +475,15 @@ export const createSlider = <const G extends string = ColorGroup>(
                             marker: {
                                 ...piece(horizontal.marker),
                                 borderRadius: radius("full"),
+                            },
+                            // An icon inside the active track, at its start, over the track
+                            // and under the handle; only medium and larger sliders show it.
+                            insetIcon: {
+                                ...iconBox(ref("insetIconSize"), {
+                                    fill: iconFill(ref("iconFill")),
+                                }),
+                                ...piece(horizontal.insetIcon),
+                                opacity: mul(ref("insetIconShown"), ref("bar")),
                             },
                             // Inside the handle, centred on it: it shows the handle's
                             // hover, focus, and press.
@@ -489,6 +554,9 @@ export const createSlider = <const G extends string = ColorGroup>(
                                             barTrackHeight: s.track,
                                             barHandleHeight: s.handle,
                                             barRadius: s.radius,
+                                            insetIconShown: unitless(
+                                                s.insetIcon ? 1 : 0,
+                                            ),
                                         },
                                     },
                                 },

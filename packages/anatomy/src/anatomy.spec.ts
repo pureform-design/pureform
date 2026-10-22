@@ -34,6 +34,7 @@ const ICON_PARTS: Record<string, string[]> = {
     searchBar: ["leading", "trailing"],
     searchView: ["leading", "trailing"],
     select: ["leadingIcon", "trailingIcon"],
+    slider: ["insetIcon"],
     splitButton: ["trailingIcon"],
     dataTable: ["sortIndicator"],
     tabs: ["icon"],

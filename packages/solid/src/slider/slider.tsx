@@ -108,10 +108,7 @@ function Root(props: SliderRootProps): JSX.Element {
         onReset: () =>
             value.reset(() =>
                 api().setValue(
-                    sliderNativeDefault(
-                        value.defaultValue,
-                        props.min,
-                    )
+                    sliderNativeDefault(value.defaultValue, props.min)
                         .split(",")
                         .map(Number),
                 ),
@@ -149,7 +146,7 @@ function Root(props: SliderRootProps): JSX.Element {
 }
 
 const drawn = (
-    part: "startTrack" | "track" | "activeTrack" | "markerGroup",
+    part: "startTrack" | "track" | "activeTrack" | "markerGroup" | "insetIcon",
     name: string,
     machine: (api: slider.Api<PropTypes>) => object,
 ) =>
@@ -172,6 +169,11 @@ const Track = drawn("track", "Track", (api) => api.getTrackProps());
 /** The active track. Empty. */
 const ActiveTrack = drawn("activeTrack", "ActiveTrack", (api) =>
     api.getActiveTrackProps(),
+);
+/** An icon inside the active track, at its start (medium sliders and up): put the icon in its
+ *  children. */
+const InsetIcon = drawn("insetIcon", "InsetIcon", (api) =>
+    api.getInsetIconProps(),
 );
 /** Holds the stops (`Marker`). */
 const MarkerGroup = drawn("markerGroup", "MarkerGroup", (api) =>
@@ -227,8 +229,7 @@ const thumbPart = (
                 part === "handle"
                     ? {
                           pressed:
-                              api().dragging &&
-                              api().focusedIndex === index(),
+                              api().dragging && api().focusedIndex === index(),
                       }
                     : undefined,
             unstyled: () => props.unstyled,
@@ -286,9 +287,12 @@ export interface SliderProps<V extends SliderValue = SliderValue>
         SlotKeyedProps<Anatomy> {
     readonly "aria-label"?: string | readonly string[] | undefined;
     readonly "aria-valuetext"?: string | undefined;
+    /** An icon inside the active track, at its start; drawn at sizes `medium` and up. */
+    readonly insetIcon?: JSX.Element | undefined;
 }
 
 const READY_MADE_PROPS = [
+    "insetIcon",
     "class",
     "style",
     "slotProps",
@@ -320,12 +324,13 @@ function ReadyMade<V extends SliderValue = number>(
             <StartTrack {...slots("startTrack")} />
             <Track {...slots("track")} />
             <ActiveTrack {...slots("activeTrack")} />
+            <Show when={props.insetIcon}>
+                <InsetIcon {...slots("insetIcon")}>{props.insetIcon}</InsetIcon>
+            </Show>
             <Show when={stops().length > 0}>
                 <MarkerGroup {...slots("markerGroup")}>
                     <For each={stops()}>
-                        {(stop) => (
-                            <Marker {...slots("marker")} value={stop} />
-                        )}
+                        {(stop) => <Marker {...slots("marker")} value={stop} />}
                     </For>
                 </MarkerGroup>
             </Show>
@@ -365,6 +370,7 @@ export const Slider = Object.assign(ReadyMade, {
     StartTrack,
     Track,
     ActiveTrack,
+    InsetIcon,
     MarkerGroup,
     Marker,
     StateLayer,

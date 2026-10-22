@@ -114,6 +114,7 @@ describe("pureform", () => {
             "fab",
             "fabMenu",
             "splitButton",
+            "avatar",
             "chip",
             "chipSet",
             "inputChip",

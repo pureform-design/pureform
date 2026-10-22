@@ -3,14 +3,26 @@
 exports[`avatar > compiles to a stable Panda recipe 1`] = `
 {
   "base": {
-    "alignItems": "center",
-    "backgroundColor": "var(--components-avatar-container, token(colors.primaryContainer))",
-    "borderRadius": "var(--components-avatar-radius, token(radii.full))",
-    "color": "var(--components-avatar-content, token(colors.onPrimaryContainer))",
-    "display": "inline-flex",
-    "flexShrink": "0",
-    "justifyContent": "center",
-    "objectFit": "cover",
+    "fallback": {
+      "alignItems": "center",
+      "justifyContent": "center",
+    },
+    "image": {
+      "height": "100%",
+      "objectFit": "cover",
+      "width": "100%",
+    },
+    "root": {
+      "alignItems": "center",
+      "backgroundColor": "var(--components-avatar-container, token(colors.primaryContainer))",
+      "borderRadius": "var(--components-avatar-radius, token(radii.full))",
+      "color": "var(--components-avatar-content, token(colors.onPrimaryContainer))",
+      "display": "inline-flex",
+      "flexShrink": "0",
+      "justifyContent": "center",
+      "overflow": "hidden",
+      "position": "relative",
+    },
   },
   "className": "avatar",
   "compoundVariants": [],
@@ -22,59 +34,86 @@ exports[`avatar > compiles to a stable Panda recipe 1`] = `
   "jsx": [
     "Avatar",
   ],
+  "slots": [
+    "root",
+    "image",
+    "fallback",
+  ],
   "variants": {
     "color": {
       "error": {
-        "backgroundColor": "token(colors.errorContainer)",
-        "color": "token(colors.onErrorContainer)",
+        "root": {
+          "backgroundColor": "token(colors.errorContainer)",
+          "color": "token(colors.onErrorContainer)",
+        },
       },
       "info": {
-        "backgroundColor": "token(colors.infoContainer)",
-        "color": "token(colors.onInfoContainer)",
+        "root": {
+          "backgroundColor": "token(colors.infoContainer)",
+          "color": "token(colors.onInfoContainer)",
+        },
       },
       "primary": {},
       "secondary": {
-        "backgroundColor": "token(colors.secondaryContainer)",
-        "color": "token(colors.onSecondaryContainer)",
+        "root": {
+          "backgroundColor": "token(colors.secondaryContainer)",
+          "color": "token(colors.onSecondaryContainer)",
+        },
       },
       "success": {
-        "backgroundColor": "token(colors.successContainer)",
-        "color": "token(colors.onSuccessContainer)",
+        "root": {
+          "backgroundColor": "token(colors.successContainer)",
+          "color": "token(colors.onSuccessContainer)",
+        },
       },
       "tertiary": {
-        "backgroundColor": "token(colors.tertiaryContainer)",
-        "color": "token(colors.onTertiaryContainer)",
+        "root": {
+          "backgroundColor": "token(colors.tertiaryContainer)",
+          "color": "token(colors.onTertiaryContainer)",
+        },
       },
       "warning": {
-        "backgroundColor": "token(colors.warningContainer)",
-        "color": "token(colors.onWarningContainer)",
+        "root": {
+          "backgroundColor": "token(colors.warningContainer)",
+          "color": "token(colors.onWarningContainer)",
+        },
       },
     },
     "shape": {
       "circle": {
-        "borderRadius": {
-          "@supports (clip-path: shape(from 0 0, line to 0 0))": "0px",
-          "base": "var(--components-avatar-radius, token(radii.full))",
+        "root": {
+          "borderRadius": {
+            "@supports (clip-path: shape(from 0 0, line to 0 0))": "0px",
+            "base": "var(--components-avatar-radius, token(radii.full))",
+          },
+          "clipPath": "shape(from 97.553% 65.451%, line to 97.553% 65.451%, curve to 79.389% 90.451% with 94.29% 75.493% / 87.932% 84.244%, line to 79.389% 90.451%, curve to 50% 100% with 70.847% 96.657% / 60.559% 100%, line to 50% 100%, curve to 20.611% 90.451% with 39.441% 100% / 29.153% 96.657%, line to 20.611% 90.451%, curve to 2.447% 65.451% with 12.068% 84.244% / 5.71% 75.493%, line to 2.447% 65.451%, curve to 2.447% 34.549% with -0.816% 55.409% / -0.816% 44.591%, line to 2.447% 34.549%, curve to 20.611% 9.549% with 5.71% 24.507% / 12.068% 15.756%, line to 20.611% 9.549%, curve to 50% 0% with 29.153% 3.343% / 39.441% 0%, line to 50% 0%, curve to 79.389% 9.549% with 60.559% 0% / 70.847% 3.343%, line to 79.389% 9.549%, curve to 97.553% 34.549% with 87.932% 15.756% / 94.29% 24.507%, line to 97.553% 34.549%, curve to 97.553% 65.451% with 100.816% 44.591% / 100.816% 55.409%, close)",
         },
-        "clipPath": "shape(from 97.553% 65.451%, line to 97.553% 65.451%, curve to 79.389% 90.451% with 94.29% 75.493% / 87.932% 84.244%, line to 79.389% 90.451%, curve to 50% 100% with 70.847% 96.657% / 60.559% 100%, line to 50% 100%, curve to 20.611% 90.451% with 39.441% 100% / 29.153% 96.657%, line to 20.611% 90.451%, curve to 2.447% 65.451% with 12.068% 84.244% / 5.71% 75.493%, line to 2.447% 65.451%, curve to 2.447% 34.549% with -0.816% 55.409% / -0.816% 44.591%, line to 2.447% 34.549%, curve to 20.611% 9.549% with 5.71% 24.507% / 12.068% 15.756%, line to 20.611% 9.549%, curve to 50% 0% with 29.153% 3.343% / 39.441% 0%, line to 50% 0%, curve to 79.389% 9.549% with 60.559% 0% / 70.847% 3.343%, line to 79.389% 9.549%, curve to 97.553% 34.549% with 87.932% 15.756% / 94.29% 24.507%, line to 97.553% 34.549%, curve to 97.553% 65.451% with 100.816% 44.591% / 100.816% 55.409%, close)",
       },
-      "none": {},
+      "none": {
+        "root": {},
+      },
     },
     "size": {
       "large": {
-        "height": "var(--components-avatar-sizeLarge, 56px)",
-        "textStyle": "titleLarge",
-        "width": "var(--components-avatar-sizeLarge, 56px)",
+        "root": {
+          "height": "var(--components-avatar-sizeLarge, 56px)",
+          "textStyle": "titleLarge",
+          "width": "var(--components-avatar-sizeLarge, 56px)",
+        },
       },
       "medium": {
-        "height": "var(--components-avatar-sizeMedium, 40px)",
-        "textStyle": "titleMedium",
-        "width": "var(--components-avatar-sizeMedium, 40px)",
+        "root": {
+          "height": "var(--components-avatar-sizeMedium, 40px)",
+          "textStyle": "titleMedium",
+          "width": "var(--components-avatar-sizeMedium, 40px)",
+        },
       },
       "small": {
-        "height": "var(--components-avatar-sizeSmall, 24px)",
-        "textStyle": "labelSmall",
-        "width": "var(--components-avatar-sizeSmall, 24px)",
+        "root": {
+          "height": "var(--components-avatar-sizeSmall, 24px)",
+          "textStyle": "labelSmall",
+          "width": "var(--components-avatar-sizeSmall, 24px)",
+        },
       },
     },
   },

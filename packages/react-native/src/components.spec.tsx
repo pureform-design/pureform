@@ -1,6 +1,7 @@
 import { act } from "@testing-library/react";
 import { useState } from "react";
 import type { ReactNode } from "react";
+import { View } from "react-native";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
@@ -1045,5 +1046,100 @@ describe("nested rows", () => {
         );
         expect(byTestId("s-section-label").textContent).toBe("Mail");
         expect(computed("s-section-label").display).toBe("flex");
+    });
+
+    it("keeps an item with both a region and a swipe action expandable, without the action", async () => {
+        await render(
+            <ListItem
+                headline="Folders"
+                region={<ListItem headline="Work" />}
+                swipeAction={<Glyph glyph="🗑" />}
+                testId="both"
+            />,
+        );
+        expect(byTestId("both-root").getAttribute("role")).toBe("button");
+        expect(byTestId("both-root").getAttribute("aria-expanded")).toBe(
+            "false",
+        );
+        expect(document.querySelector('[data-testid="both-action"]')).toBe(
+            null,
+        );
+    });
+});
+
+describe("c7c: avatar picture, swipe, inset icon, search bar width", () => {
+    const GIF =
+        "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+
+    it("shows an avatar's fallback until its picture loads, and keeps it when it fails", async () => {
+        const onStatusChange = vi.fn();
+        await render(
+            <>
+                <Avatar
+                    label="Ada"
+                    src={GIF}
+                    onStatusChange={onStatusChange}
+                    testId="ok"
+                >
+                    AL
+                </Avatar>
+                <Avatar label="Bo" src="/no-such-avatar.png" testId="broken">
+                    BO
+                </Avatar>
+            </>,
+        );
+        await until(() =>
+            expect(onStatusChange).toHaveBeenCalledWith({ status: "loaded" }),
+        );
+        expect(
+            document.querySelector('[data-testid="ok-fallback"]'),
+        ).toBeNull();
+        await until(() =>
+            expect(byTestId("broken-fallback").textContent).toBe("BO"),
+        );
+    });
+
+    it("slides a swipeable list item's parts and reveals its action", async () => {
+        await render(
+            <ListItem
+                headline="Message"
+                swipeAction={<Glyph glyph="🗑" />}
+                defaultRevealed
+                testId="row"
+            />,
+        );
+        await pointerAway();
+        expect(byTestId("row-action")).toBeTruthy();
+        await until(() =>
+            expect(computed("row-headline").width).not.toBe("0px"),
+        );
+        const closed = (
+            <ListItem
+                headline="Message"
+                swipeAction={<Glyph glyph="🗑" />}
+                testId="closed"
+            />
+        );
+        await render(closed);
+        expect(byTestId("closed-action").getAttribute("aria-hidden")).toBe(
+            "true",
+        );
+    });
+
+    it("draws a slider's inset icon, and caps a search bar's width", async () => {
+        await render(
+            <View style={{ width: 1200 }}>
+                <Slider
+                    aria-label="Volume"
+                    size="large"
+                    defaultValue={40}
+                    insetIcon={<Glyph glyph="♪" />}
+                    testId="vol"
+                />
+                <SearchBar testId="wide" />
+            </View>,
+        );
+        expect(byTestId("vol-inset-icon").textContent).toBe("♪");
+        await until(() => expect(computed("wide-root").maxWidth).toBe("720px"));
     });
 });

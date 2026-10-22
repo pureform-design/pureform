@@ -5,6 +5,7 @@ import { configWith } from "../__fixtures__/config";
 import { button } from "./button";
 import { fab } from "./fab";
 import { iconButton } from "./icon-button";
+import { listItem } from "./list-item";
 import { navigationBar } from "./navigation-bar";
 import { navigationRail } from "./navigation-rail";
 import { circularProgress, linearProgress } from "./progress";
@@ -115,6 +116,44 @@ describe("M3 Expressive", () => {
         expect(shapes?.bar?.root).toEqual({ "--components-slider-bar": "1" });
         expect(shapes?.round?.root).toEqual({ "--components-slider-bar": "0" });
         expect(shapes?.round?.stateLayer).toBeUndefined();
+    });
+
+    it("shows the slider's inset icon from medium up, on the bar handle only", () => {
+        const sizes = slotRecipe(slider, "slider")?.variants?.size;
+        const shown = (size: string) =>
+            (sizes?.[size]?.root as Record<string, unknown> | undefined)?.[
+                "--components-slider-insetIconShown"
+            ];
+        expect(["xsmall", "small"].map(shown)).toEqual(["0", "0"]);
+        expect(["medium", "large", "xlarge"].map(shown)).toEqual([
+            "1",
+            "1",
+            "1",
+        ]);
+        expect(slider.recipe.base.insetIcon).toHaveProperty("opacity");
+    });
+
+    it("slides a swipeable list item's parts over its action, and clips them", () => {
+        const swipeable = slotRecipe(listItem, "listItem")?.variants?.swipeable;
+        expect(swipeable?.false).toEqual({});
+        expect(Object.keys(swipeable?.true ?? {}).sort()).toEqual([
+            "content",
+            "leading",
+            "root",
+            "trailing",
+            "trailingText",
+        ]);
+        expect(swipeable?.true?.root).toMatchObject({ overflow: "hidden" });
+        expect(listItem.recipe.base.action).toMatchObject({
+            position: { value: "absolute" },
+        });
+        expect(listItem.recipe.defaultVariants).toMatchObject({
+            swipeable: "false",
+        });
+    });
+
+    it("caps the search bar's width at 720px", () => {
+        expect(searchBar.recipe.base.root).toHaveProperty("maxWidth");
     });
 
     it("thickens both progress indicators", () => {

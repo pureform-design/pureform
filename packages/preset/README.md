@@ -362,18 +362,23 @@ a count `role="img"` and an `aria-label`, or leave a dot `aria-hidden`.
 ### Avatar
 
 `avatar` shows a picture, initials, or an icon in a color group's container, `small` (24px),
-`medium` (40px), or `large` (56px). Style the `img` itself, which it crops to fill; give
-initials `role="img"` and an `aria-label`. An avatar isn't interactive, so it takes the clip
-directly.
+`medium` (40px), or `large` (56px). It is a slot recipe: the `root` (give it `role="img"` and an
+`aria-label`) holds the `image`, which crops to fill, and the `fallback` (initials or an icon)
+that shows until the picture has loaded and when it fails; Zag's avatar machine (the bindings')
+hides one or the other with `hidden`, so neither sets `display`. An avatar isn't interactive, so
+its root takes the clip directly.
 
 ```html
-<img
-    class="{avatar({ size: 'large', shape: 'sunny' })}"
-    src="…"
-    alt="Ada Lovelace"
-/>
 <span
-    class="{avatar({ color: 'tertiary', shape: 'cookie9Sided' })}"
+    class="{avatar({ size: 'large', shape: 'sunny' }).root}"
+    role="img"
+    aria-label="Ada Lovelace"
+>
+    <img class="{avatar().image}" src="…" alt="" />
+    <span class="{avatar().fallback}">AL</span>
+</span>
+<span
+    class="{avatar({ color: 'tertiary', shape: 'cookie9Sided' }).root}"
     role="img"
     aria-label="Ada Lovelace"
     >AL</span
@@ -440,7 +445,8 @@ menu's item parts). `variant`: `fullScreen` (default) fills its positioner over 
 `docked` drops over the search bar's place with the large corners; `contained` (M3 Expressive)
 is docked with the header kept as a pill, no divider, and its icons travel outward as it opens
 (keyframes `searchViewFromEnd`/`searchViewFromStart`, web only; still under reduced motion).
-The search bar's `scrolled` variant takes the app bar's scrolled container colour.
+The search bar's `scrolled` variant takes the app bar's scrolled container colour (its lift on
+scroll). It grows with its container up to its `maxWidth` token (720px, M3 Expressive's).
 
 `autocomplete` is the select's field (affixes, icons, colour, density) over an editable
 combobox input: no pointer cursor, the arrow turns while the suggestions are open. The

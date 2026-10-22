@@ -43,6 +43,18 @@ export const slider: ComponentCase = {
         "secondary color": { defaultValue: 60, color: "secondary" },
         round: { defaultValue: 40, handleShape: "round" },
         large: { defaultValue: 40, size: "large" },
+        "with an inset icon": {
+            defaultValue: 40,
+            size: "large",
+            insetIcon: "♪",
+        },
+        "with an inset icon, vertical": {
+            defaultValue: 40,
+            size: "medium",
+            insetIcon: "♪",
+            orientation: "vertical",
+            style: { height: "200px" },
+        },
         "from 1 to 5": { min: 1, max: 5, defaultValue: 3 },
         range: { defaultValue: [20, 60], "aria-label": ["From", "To"] },
         centered: { defaultValue: 30, centered: true },
