@@ -279,6 +279,16 @@ import { RichTooltip } from "@pureform/solid/rich-tooltip";
   colors), in an `li` with `role="presentation"`. `selectionMode` is `single` by default, as
   M3 lists mostly select one; `multiple` selects any number, as Angular's selection list. The list takes focus; the arrow keys and typeahead move a highlight,
   shown as hover, and Enter, Space or a press select.
+- **The horizontal shared axis** (`HorizontalSharedAxis`, `@pureform/solid/horizontal-shared-axis`)
+  moves between spatially related pages as Compose's `MaterialTransitions.HorizontalSharedAxis`:
+  give it the page's `index` and the page as children (or a function from an index to its page, so a leaving page keeps its own). A higher `index` slides forward (the new
+  page from the end, the old one toward the start, a fifth of the width, on the `spatialDefault`
+  spring, fading linearly over 90ms after 50ms); a lower one backward; right to left mirrors the
+  slide and reduced motion keeps the fades. The old page stays, `inert` and `aria-hidden`, until
+  its animations end; `scrim` veils the page underneath in the theme's scrim color (20% over a
+  light surface, 80% over a dark one). The ready-made `Tabs` and a row `Stepper` take
+  `transition="sharedAxis"` (and `transitionScrim`) to move their panels so; a panel leaving
+  stays drawn (`useSharedAxisPage()` says where the page around a part is).
 - **Scrollable tabs** (`scrollable`) scroll the newly selected tab into view
   (`revealInRow` from `@pureform/binding-core/dom`).
 - **The radio group** is an unstyled `div` (`radioGroupAnatomy`, `data-scope="radio-group"`, test
