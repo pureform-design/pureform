@@ -46,6 +46,26 @@ Subphases of one phase don't depend on each other and run at the same time.
 - **Don't refactor across subphases.** Duplicated code between siblings is expected and is
   recorded as a hint; the refactor phase after the wave removes it.
 
+## Choosing what omni reruns
+
+`-f` picks which tasks omni runs instead of taking them from its cache. Pick the narrowest
+one that answers the question:
+
+- **No `-f` (the default):** omni runs every task whose inputs changed and replays the rest
+  from cache. Use it for ordinary checks while working, including after editing a source or
+  config file, which already invalidates the tasks that depend on it.
+- **`-f failed` after a failure:** reruns only the tasks that failed last time, and anything
+  whose inputs changed since. Use it for every rerun after a fix, and for rerunning a
+  suspected flake.
+- **`-f all` only when the cache can't be trusted:**
+    - the phase gate's whole run (below), which must run every task;
+    - checking a result omni replayed from cache ("Cache hit… skipping logs") when you need
+      to know it still holds, for example comparing a branch with main;
+    - when a task reads an input omni doesn't track, such as Vite's dependency cache or the
+      design docs `doc-counts.spec.ts` reads. Name the input when you do.
+
+Narrow `-f all` with `-p <project>` whenever it only needs one project.
+
 ## Similar components share a subphase
 
 Before splitting a phase into subphases, check whether two items share most of their parts,
@@ -127,7 +147,8 @@ Subphases check only what they affect (see [parallel work](#parallel-work)); the
 below happens once, on the merged phase.
 
 1. `omni run build test -f all -o continue` passes on the merged phase (every task, nothing
-   replayed from cache). Failures go to a single fixing subagent, then the run repeats.
+   replayed from cache). Failures go to a single fixing subagent, which reruns with
+   `-f failed` until those pass; the gate doesn't repeat the whole run with `-f all`.
 2. `bunx tsc --noEmit -p tsconfig.json` is clean in each package you touched.
 3. The gap analysis (matrix row, verdicts, totals, §7 done list) matches the code.
 4. Output contexts exist for each subphase, committed with the work.
