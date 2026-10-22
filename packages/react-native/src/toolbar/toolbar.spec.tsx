@@ -100,8 +100,12 @@ describe("Toolbar", () => {
 
     it("keeps every element and no overflow button when they fit", async () => {
         await render(<Toolbar overflow items={ITEMS.slice(0, 3)} testId="x" />);
-        await until(() => expect(shown()).toEqual(["a", "b", "c"]));
-        expect(box(byTestId("x-overflow-root")).width).toBe(0);
+        // Until the row is measured, every element shows with the overflow button, so the
+        // three alone don't say it's measured: wait for both.
+        await until(() => {
+            expect(shown()).toEqual(["a", "b", "c"]);
+            expect(box(byTestId("x-overflow-root")).width).toBe(0);
+        });
     });
 });
 
