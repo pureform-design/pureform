@@ -5,6 +5,7 @@
 import { toolbarAnatomy } from "@pureform/anatomy";
 import {
     isPresent,
+    isUnstyled,
     TOOLBAR_CONTENT_PROPS,
     TOOLBAR_OVERFLOW_LABEL,
     TOOLBAR_ROOT_PROPS,
@@ -14,15 +15,18 @@ import {
     toolbarOverflowTestId,
     toolbarRootProps,
     toolbarSelection,
+    unstyledToolbarProvidedTokens,
 } from "@pureform/binding-core";
 import type {
     ToolbarContentProps,
     ToolbarItem,
+    ToolbarPart,
     ToolbarRootOwnProps,
+    Unstyled,
 } from "@pureform/binding-core";
 import { moveToolbarFocus, watchOverflow } from "@pureform/binding-core/dom";
 import type { JSX, ValidComponent } from "@solidjs/web";
-import { createEffect, createSignal, For, omit, Show } from "solid-js";
+import { createEffect, createSignal, For, merge, omit, Show } from "solid-js";
 
 import { Button } from "../button";
 import { MoreIcon } from "../glyphs";
@@ -31,6 +35,7 @@ import type { IconButtonProps } from "../icon-button";
 import { Menu } from "../menu";
 import { MENU_TRIGGER_ATTRIBUTES } from "../menu/menu";
 import { useComponent } from "../parts";
+import { ProvidedTokens } from "../provided-tokens";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 
@@ -40,6 +45,9 @@ export interface ToolbarRootProps
     extends Omit<PartProps, keyof ToolbarRootOwnProps>, ToolbarRootOwnProps {
     /** Another element or component to render instead of `<div>`. */
     readonly as?: ValidComponent | undefined;
+    /** Opts the root out of the registry's styles. An unstyled `vibrant` toolbar still gives its
+     *  icon buttons the accent that follows its content color. */
+    readonly unstyled?: Unstyled<ToolbarPart> | undefined;
 }
 
 const HIDDEN: JSX.CSSProperties = { display: "none" };
@@ -51,7 +59,12 @@ function Root(props: ToolbarRootProps): JSX.Element {
     const scope = useComponent(toolbarAnatomy, {
         selection: () => toolbarSelection(props),
         testId: () => props.testId,
+        unstyled: () => props.unstyled,
     });
+    const provided = () =>
+        isUnstyled(props.unstyled, "root")
+            ? unstyledToolbarProvidedTokens(props.color)
+            : undefined;
     return scope.render("root", {
         element: "div",
         as: () => props.as,
@@ -67,7 +80,15 @@ function Root(props: ToolbarRootProps): JSX.Element {
                 if (moved) event.preventDefault();
             },
         }),
-        props: omit(props, "as", ...TOOLBAR_ROOT_PROPS),
+        props: merge(omit(props, "as", "unstyled", ...TOOLBAR_ROOT_PROPS), {
+            get children() {
+                return (
+                    <ProvidedTokens tokens={provided()}>
+                        {props.children}
+                    </ProvidedTokens>
+                );
+            },
+        }),
     });
 }
 

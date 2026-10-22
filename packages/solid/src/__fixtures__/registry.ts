@@ -565,13 +565,19 @@ export const toolbarRegistry = () =>
             "secondaryIcon",
             "touchTarget",
         ]),
-        iconButton: named("icon-button", [
-            "root",
-            "touchTarget",
-            "container",
-            "icon",
-            "outline",
-        ]),
+        // Writes the accent token to Root as `--accent`, for the unstyled vibrant toolbar's spec.
+        iconButton: ((s) =>
+            withTokenStyle(
+                named("icon-button", [
+                    "root",
+                    "touchTarget",
+                    "container",
+                    "icon",
+                    "outline",
+                ])(s) as never,
+                s.tokens as never,
+                { accent: "--accent" },
+            )) as ClassFactory<ComponentShape>,
         menu: named("menu", [
             "root",
             "itemGroup",

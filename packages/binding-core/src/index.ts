@@ -515,6 +515,7 @@ export {
     toolbarOverflowTestId,
     toolbarRootProps,
     toolbarSelection,
+    unstyledToolbarProvidedTokens,
 } from "./components/toolbar";
 export type {
     ToolbarContentProps,

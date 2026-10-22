@@ -141,6 +141,47 @@ describe("Toolbar, ready-made", () => {
     });
 });
 
+describe("Toolbar, unstyled", () => {
+    const accent = (id: string) =>
+        byTestId(`${id}-root`).style.getPropertyValue("--accent");
+
+    it("gives its icon buttons the content accent when unstyled and vibrant", async () => {
+        withRegistry(() => (
+            <Toolbar
+                aria-label="Edit"
+                color="vibrant"
+                unstyled
+                testId="bar"
+                items={[{ value: "a", label: "A", icon: "A", testId: "a" }]}
+            />
+        ));
+        expect(accent("a")).toBe(
+            "var(--components-toolbar-content, currentColor)",
+        );
+    });
+
+    it("leaves a styled or standard toolbar's icon buttons to the cascade", async () => {
+        withRegistry(() => (
+            <>
+                <Toolbar
+                    aria-label="Styled"
+                    color="vibrant"
+                    testId="styled"
+                    items={[{ value: "a", label: "A", icon: "A", testId: "a" }]}
+                />
+                <Toolbar
+                    aria-label="Standard"
+                    unstyled
+                    testId="standard"
+                    items={[{ value: "b", label: "B", icon: "B", testId: "b" }]}
+                />
+            </>
+        ));
+        expect(accent("a")).toBe("");
+        expect(accent("b")).toBe("");
+    });
+});
+
 describe("Toolbar, overflow", () => {
     it("keeps every element when they fit, with no overflow button", async () => {
         withRegistry(() => <Toolbar overflow items={ITEMS.slice(0, 3)} />, 400);
