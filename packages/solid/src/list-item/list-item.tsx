@@ -3,7 +3,8 @@
 // draws them; and the ready-made ListItem over them. It has no machine: the app marks it selected
 // or disabled. Inside a List, it takes the list's variants as its defaults. An expandable item sits
 // in `Expandable`, Zag's accordion with one item: Root is its header (a button, with an
-// `Indicator`), and `Region`, after Root, its content.
+// `Indicator`), and `Region`, after Root, its content. A swipeable item sits in a `Frame`, with
+// its `Action` beside Root rather than in it, so a link, a button, or an expandable item swipes.
 
 import { listItemAnatomy } from "@pureform/anatomy";
 import type { PartName, TestIdOverride } from "@pureform/anatomy";
@@ -12,6 +13,7 @@ import {
     LIST_ITEM_CONTENT_PROPS,
     LIST_ITEM_EXPAND_PROPS,
     LIST_ITEM_EXPAND_VALUE,
+    LIST_ITEM_FRAME_PROPS,
     LIST_ITEM_ROOT_PROPS,
     listItemExpandMachineProps,
     listItemElement,
@@ -24,6 +26,7 @@ import {
 import type {
     ListItemContentProps,
     ListItemExpandProps,
+    ListItemFrameOwnProps,
     ListItemPart,
     ListItemRootOwnProps,
     ListVariantProps,
@@ -70,11 +73,17 @@ type Anatomy = typeof listItemAnatomy;
 /** What Root shares with its parts. */
 interface ListItemContextValue {
     readonly scope: ComponentScope<Anatomy>;
-    /** A swipeable item's state; `undefined` for any other. */
-    readonly swipe: Swipe | undefined;
 }
 
 const context = createPartContext<ListItemContextValue>("ListItem");
+
+/** What `Frame` shares with Root and Action: the swipe's state. */
+interface FrameContextValue {
+    readonly scope: ComponentScope<Anatomy>;
+    readonly swipe: Swipe;
+}
+
+const frameContext = createPartContext<FrameContextValue>("ListItem", "Frame");
 
 /** What `Expandable` shares with Root and Region. Root gives it its interaction source, which the
  *  machine's header emits to, as an accordion header's. */
@@ -124,6 +133,7 @@ export interface ListItemIconProps extends ListItemPartProps {
 function Root(props: ListItemRootProps): JSX.Element {
     const list = useContext(ListDefaults);
     const expand = useContext(expandContext.Provider);
+    const frame = useContext(frameContext.Provider);
     // An expandable item's header is a button, unless told otherwise.
     const element = createMemo(() =>
         listItemElement<ValidComponent>({
@@ -155,19 +165,14 @@ function Root(props: ListItemRootProps): JSX.Element {
               source,
               () => !interactive() || !!props.disabled,
           );
-    // Whether the row swipes is read once, when it is made: only then does it build its state. An
-    // expandable item's header is a button, so it doesn't swipe (its action would be a button in a
-    // button).
-    const swipe = untrack(() =>
-        !expand && listItemVariants(list?.(), props).swipeable
-            ? createSwipe(props)
-            : undefined,
-    );
+    // In a frame, the row swipes.
+    const swipe = frame?.swipe;
     const scope = useComponent(listItemAnatomy, {
         selection: () => {
-            const variants = expand
-                ? { ...listItemVariants(list?.(), props), swipeable: false }
-                : listItemVariants(list?.(), props);
+            const variants = {
+                ...listItemVariants(list?.(), props),
+                swipeable: swipe ? true : undefined,
+            };
             return listItemSelection(
                 swipe
                     ? {
@@ -185,7 +190,7 @@ function Root(props: ListItemRootProps): JSX.Element {
         interactive,
     });
     return (
-        <context.Provider value={{ scope, swipe }}>
+        <context.Provider value={{ scope }}>
             {scope.render("root", {
                 element: "div",
                 as: () => (element() === "div" ? undefined : element()),
@@ -257,13 +262,61 @@ const SupportingText = textPart("supportingText", "SupportingText", "span");
 const Trailing = trailing.Part;
 /** Text after the text, such as a count. */
 const TrailingText = textPart("trailingText", "TrailingText", "span");
-/** The action a swipeable row uncovers as it slides: put a button in it. It is out of reach of
- *  assistive technology and the keyboard until it's revealed. */
+/** `Frame`'s props: whether the action is revealed (controllable) and how wide it is, its
+ *  colours, test ids by part, and Action and Root as children. */
+export interface ListItemFrameProps
+    extends
+        Omit<ListItemPartProps, keyof ListItemFrameOwnProps>,
+        ListItemFrameOwnProps,
+        Pick<ListItemRootOwnProps, "position"> {
+    /** A prefix for its parts' test ids, or ids by part (Frame's and Action's). */
+    readonly testId?: TestIdOverride<ListItemPart> | undefined;
+}
+
+/** A swipeable item: its Action and Root, side by side. The row slides toward the start to
+ *  uncover the action under it, by a drag or the arrow keys. */
+function Frame(props: ListItemFrameProps): JSX.Element {
+    const list = useContext(ListDefaults);
+    const swipe = createSwipe(props);
+    const scope = useComponent(listItemAnatomy, {
+        selection: () =>
+            listItemSelection(
+                {
+                    ...listItemVariants(list?.(), { position: props.position }),
+                    swipeable: true,
+                    actionColor: props.actionColor,
+                    tokens: swipe.tokens(),
+                },
+                "div",
+            ),
+        testId: () => props.testId,
+    });
+    // The swipe's tokens go on the frame, which Root and Action inherit.
+    return (
+        <frameContext.Provider value={{ scope, swipe }}>
+            {scope.render("frame", {
+                element: "div",
+                machine: () => ({ style: scope.classes().root?.style }),
+                unstyled: () => props.unstyled,
+                props: omit(
+                    props,
+                    "unstyled",
+                    "position",
+                    "testId",
+                    ...LIST_ITEM_FRAME_PROPS,
+                ),
+            })}
+        </frameContext.Provider>
+    );
+}
+
+/** The action a swipeable row uncovers as it slides, in its `Frame`: put a button in it. It is
+ *  out of reach of assistive technology and the keyboard until it's revealed. */
 function Action(props: ListItemPartProps): JSX.Element {
-    const { scope, swipe } = context.use("Action");
+    const { scope, swipe } = frameContext.use("Action");
     return scope.render("action", {
         element: "div",
-        machine: () => ({ inert: swipe ? !swipe.revealed() : true }),
+        machine: () => ({ inert: !swipe.revealed() }),
         unstyled: () => props.unstyled,
         props: omit(props, "unstyled"),
     });
@@ -275,7 +328,6 @@ const OptionalTrailing = trailing.Optional;
 const OptionalOverline = whenPresent(Overline);
 const OptionalSupportingText = whenPresent(SupportingText);
 const OptionalTrailingText = whenPresent(TrailingText);
-const OptionalAction = whenPresent(Action);
 
 /** An expandable item's indicator, after the text: a chevron (or its children) that turns over
  *  while the item is expanded, hidden from assistive technology. */
@@ -361,7 +413,8 @@ export interface ListItemProps
         Omit<ListItemRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
         SlotKeyedProps<Anatomy>,
         ListItemContentProps<JSX.Element>,
-        ListItemExpandProps {}
+        ListItemExpandProps,
+        ListItemFrameOwnProps {}
 
 const READY_MADE_PROPS = [
     "class",
@@ -369,14 +422,22 @@ const READY_MADE_PROPS = [
     "slotProps",
     ...LIST_ITEM_CONTENT_PROPS,
     ...LIST_ITEM_EXPAND_PROPS,
+    ...LIST_ITEM_FRAME_PROPS,
 ] as const;
 
 /** The ready-made list item: every part in the preset's structure that has content; given a
- *  `region` when it's created, an expandable item showing it under the row. */
+ *  `region` when it's created, an expandable item showing it under the row; given a
+ *  `swipeAction` when it's created, in a frame with it. */
 function ReadyMade(props: ListItemProps): JSX.Element {
     const slots = createSlotProps(props);
-    if (!untrack(() => isPresent(props.region)))
-        return row(props, slots, false);
+    const expandable = untrack(() => isPresent(props.region));
+    const swipeable = untrack(() => isPresent(props.swipeAction));
+    // Made where it's placed, inside the providers around it.
+    const framed = () =>
+        swipeable
+            ? inFrame(props, slots, () => row(props, slots, expandable))
+            : row(props, slots, expandable);
+    if (!expandable) return framed();
     const region = slots("region");
     return (
         <Expandable
@@ -385,9 +446,34 @@ function ReadyMade(props: ListItemProps): JSX.Element {
             onExpandedChange={props.onExpandedChange}
             testId={props.testId}
         >
-            {row(props, slots, true)}
+            {framed()}
             <Region {...region}>{props.region}</Region>
         </Expandable>
+    );
+}
+
+/** A swipeable ready-made item's frame: its action, and the row. */
+function inFrame(
+    props: ListItemProps,
+    slots: (part: PartName<Anatomy>) => PartProps,
+    row: () => JSX.Element,
+): JSX.Element {
+    const frame = slots("frame");
+    const action = slots("action");
+    return (
+        <Frame
+            revealed={props.revealed}
+            defaultRevealed={props.defaultRevealed}
+            onRevealedChange={props.onRevealedChange}
+            swipeWidth={props.swipeWidth}
+            actionColor={props.actionColor}
+            position={props.position}
+            testId={props.testId}
+            {...frame}
+        >
+            <Action {...action}>{props.swipeAction}</Action>
+            {row()}
+        </Frame>
     );
 }
 
@@ -408,11 +494,9 @@ function row(
     const supportingText = slots("supportingText");
     const trailing = slots("trailing");
     const trailingText = slots("trailingText");
-    // Picked here, so a row that can't expand makes no node for it, and an expandable row (a
-    // button) no swipe action.
+    // Picked here, so a row that can't expand makes no node for it.
     const IndicatorPart = expandable ? Indicator : NoPart;
     const indicator = expandable ? slots("indicator") : {};
-    const action = expandable ? {} : slots("action");
     const LeadingPart = optionalPart(
         props,
         "leading",
@@ -443,21 +527,8 @@ function row(
         TrailingText,
         OptionalTrailingText,
     );
-    const ActionPart = expandable
-        ? NoPart
-        : optionalPart(props, "swipeAction", Action, OptionalAction);
     return (
-        <Root
-            {...own}
-            lines={props.lines ?? listItemLines(props)}
-            swipeable={
-                expandable
-                    ? false
-                    : (props.swipeable ??
-                      (isPresent(props.swipeAction) || undefined))
-            }
-            {...root}
-        >
+        <Root {...own} lines={props.lines ?? listItemLines(props)} {...root}>
             <LeadingPart mirror={props.mirrorLeading} {...leading}>
                 {props.leading}
             </LeadingPart>
@@ -475,7 +546,6 @@ function row(
                 {props.trailingText}
             </TrailingTextPart>
             <IndicatorPart {...indicator} />
-            <ActionPart {...action}>{props.swipeAction}</ActionPart>
         </Root>
     );
 }
@@ -485,11 +555,13 @@ function row(
  *  `Overline`, `Headline`, and `SupportingText`, then `Trailing` and `TrailingText`. Put it in a
  *  `List`, or give it the element a list item needs (`as="li"`). An expandable item takes a
  *  `region` (ready-made), or composes `Expandable` around `Root` (holding an `Indicator` last) and
- *  `Region`. */
+ *  `Region`. A swipeable item takes a `swipeAction` (ready-made), or composes `Frame` around
+ *  `Action` and `Root`. */
 export const ListItem = Object.assign(ReadyMade, {
     Root,
     Expandable,
     Region,
+    Frame,
     Indicator,
     Leading,
     Content,

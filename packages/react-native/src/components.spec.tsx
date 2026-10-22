@@ -1048,7 +1048,7 @@ describe("nested rows", () => {
         expect(computed("s-section-label").display).toBe("flex");
     });
 
-    it("keeps an item with both a region and a swipe action expandable, without the action", async () => {
+    it("swipes an expandable item too: its action beside the button, in a frame", async () => {
         await render(
             <ListItem
                 headline="Folders"
@@ -1057,13 +1057,14 @@ describe("nested rows", () => {
                 testId="both"
             />,
         );
-        expect(byTestId("both-root").getAttribute("role")).toBe("button");
-        expect(byTestId("both-root").getAttribute("aria-expanded")).toBe(
-            "false",
-        );
-        expect(document.querySelector('[data-testid="both-action"]')).toBe(
-            null,
-        );
+        const root = byTestId("both-root");
+        expect(root.getAttribute("role")).toBe("button");
+        expect(root.getAttribute("aria-expanded")).toBe("false");
+        const frame = byTestId("both-frame");
+        expect([...frame.children]).toEqual([byTestId("both-action"), root]);
+        await interact(() => userEvent.click(root));
+        expect(root.getAttribute("aria-expanded")).toBe("true");
+        expect(byTestId("both-region")).toBeTruthy();
     });
 });
 

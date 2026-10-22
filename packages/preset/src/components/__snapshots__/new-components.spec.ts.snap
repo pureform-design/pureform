@@ -738,6 +738,10 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
       "textAlign": "start",
       "width": "100%",
     },
+    "frame": {
+      "overflow": "hidden",
+      "position": "relative",
+    },
     "headline": {
       "textStyle": "bodyLarge",
     },
@@ -893,12 +897,13 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
     "trailingText",
     "indicator",
     "region",
+    "frame",
     "action",
   ],
   "variants": {
     "actionColor": {
       "error": {
-        "root": {
+        "action": {
           "--components-listItem-actionContainer": "token(colors.errorContainer)",
           "--components-listItem-actionContent": "token(colors.onErrorContainer)",
         },
@@ -1057,6 +1062,12 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
     },
     "position": {
       "first": {
+        "frame": {
+          "borderEndEndRadius": "var(--components-listItem-innerRadius, token(radii.extraSmall))",
+          "borderEndStartRadius": "var(--components-listItem-innerRadius, token(radii.extraSmall))",
+          "borderStartEndRadius": "var(--components-listItem-outerRadius, token(radii.large))",
+          "borderStartStartRadius": "var(--components-listItem-outerRadius, token(radii.large))",
+        },
         "root": {
           "--components-listItem-container": "var(--components-listItem-segmentedContainer, token(colors.surfaceContainer))",
           "borderEndEndRadius": "var(--components-listItem-innerRadius, token(radii.extraSmall))",
@@ -1066,6 +1077,12 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
         },
       },
       "last": {
+        "frame": {
+          "borderEndEndRadius": "var(--components-listItem-outerRadius, token(radii.large))",
+          "borderEndStartRadius": "var(--components-listItem-outerRadius, token(radii.large))",
+          "borderStartEndRadius": "var(--components-listItem-innerRadius, token(radii.extraSmall))",
+          "borderStartStartRadius": "var(--components-listItem-innerRadius, token(radii.extraSmall))",
+        },
         "root": {
           "--components-listItem-container": "var(--components-listItem-segmentedContainer, token(colors.surfaceContainer))",
           "borderEndEndRadius": "var(--components-listItem-outerRadius, token(radii.large))",
@@ -1075,6 +1092,12 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
         },
       },
       "middle": {
+        "frame": {
+          "borderEndEndRadius": "var(--components-listItem-innerRadius, token(radii.extraSmall))",
+          "borderEndStartRadius": "var(--components-listItem-innerRadius, token(radii.extraSmall))",
+          "borderStartEndRadius": "var(--components-listItem-innerRadius, token(radii.extraSmall))",
+          "borderStartStartRadius": "var(--components-listItem-innerRadius, token(radii.extraSmall))",
+        },
         "root": {
           "--components-listItem-container": "var(--components-listItem-segmentedContainer, token(colors.surfaceContainer))",
           "borderEndEndRadius": "var(--components-listItem-innerRadius, token(radii.extraSmall))",
@@ -1085,6 +1108,12 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
       },
       "none": {},
       "single": {
+        "frame": {
+          "borderEndEndRadius": "var(--components-listItem-outerRadius, token(radii.large))",
+          "borderEndStartRadius": "var(--components-listItem-outerRadius, token(radii.large))",
+          "borderStartEndRadius": "var(--components-listItem-outerRadius, token(radii.large))",
+          "borderStartStartRadius": "var(--components-listItem-outerRadius, token(radii.large))",
+        },
         "root": {
           "--components-listItem-container": "var(--components-listItem-segmentedContainer, token(colors.surfaceContainer))",
           "borderEndEndRadius": "var(--components-listItem-outerRadius, token(radii.large))",
@@ -1097,58 +1126,17 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
     "swipeable": {
       "false": {},
       "true": {
-        "content": {
-          "transform": {
-            "_rtl": "translateX(calc(var(--components-listItem-swipeOffset, 0) * 1px))",
-            "base": "translateX(calc(var(--components-listItem-swipeOffset, 0) * -1px))",
-          },
-          "transition": {
-            ".listItem__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "",
-            "base": {
-              "_motionReduce": "none",
-              "base": "--components-listItem-swipeOffset token(springs.spatialFast.duration) token(springs.spatialFast.easing)",
-            },
-          },
-        },
-        "leading": {
-          "transform": {
-            "_rtl": "translateX(calc(var(--components-listItem-swipeOffset, 0) * 1px))",
-            "base": "translateX(calc(var(--components-listItem-swipeOffset, 0) * -1px))",
-          },
-          "transition": {
-            ".listItem__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "",
-            "base": {
-              "_motionReduce": "none",
-              "base": "--components-listItem-swipeOffset token(springs.spatialFast.duration) token(springs.spatialFast.easing)",
-            },
-          },
-        },
         "root": {
-          "overflow": "hidden",
-        },
-        "trailing": {
+          "--components-listItem-focusIndicatorOuterOffset": "calc(var(--components-listItem-focusIndicatorThickness, token(sizes.focusIndicatorThickness)) * -1)",
           "transform": {
             "_rtl": "translateX(calc(var(--components-listItem-swipeOffset, 0) * 1px))",
             "base": "translateX(calc(var(--components-listItem-swipeOffset, 0) * -1px))",
           },
           "transition": {
-            ".listItem__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "",
+            "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
             "base": {
-              "_motionReduce": "none",
-              "base": "--components-listItem-swipeOffset token(springs.spatialFast.duration) token(springs.spatialFast.easing)",
-            },
-          },
-        },
-        "trailingText": {
-          "transform": {
-            "_rtl": "translateX(calc(var(--components-listItem-swipeOffset, 0) * 1px))",
-            "base": "translateX(calc(var(--components-listItem-swipeOffset, 0) * -1px))",
-          },
-          "transition": {
-            ".listItem__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "",
-            "base": {
-              "_motionReduce": "none",
-              "base": "--components-listItem-swipeOffset token(springs.spatialFast.duration) token(springs.spatialFast.easing)",
+              "_motionReduce": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
+              "base": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard), --components-listItem-swipeOffset token(springs.spatialFast.duration) token(springs.spatialFast.easing)",
             },
           },
         },

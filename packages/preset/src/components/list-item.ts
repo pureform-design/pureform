@@ -26,6 +26,15 @@
 //     </button>
 //     <div class={region} id="r" role="region">…nested list items…</div>
 //   </li>
+//
+// A swipeable item sits in a `frame` with its `action`: the action under the row, at the frame's
+// end, and the row sliding toward the start to uncover it. The action is the row's sibling, so
+// an expandable item (a button) or a link swipes too:
+//
+//   <div class={frame}>
+//     <div class={action} inert><button>Delete</button></div>
+//     <button class={root} aria-expanded="false">…</button>
+//   </div>
 
 import { typed } from "@pureform/core";
 import {
@@ -37,16 +46,18 @@ import {
     hidden,
     mul,
     pct,
+    relative,
     px,
     slot,
     start,
     transform,
     translateX,
+    tween,
     unitless,
     when,
 } from "@pureform/core/ast";
 import type { StyleMap } from "@pureform/core/ast";
-import { radius, spacing, textStyle } from "@pureform/theme";
+import { radius, spacing, spring, textStyle } from "@pureform/theme";
 import type { MaterialDensity } from "@pureform/theme";
 
 import { expandIndicator, rowParts, rowTokens } from "./list";
@@ -55,18 +66,19 @@ import {
     colorVariant,
     disabledColor,
     on,
-    tweens,
     defaultDensities,
     defaultGroups,
     DENSITY_TOKEN,
     densityTokenVariant,
     densitySteps,
     INDICATION_ROOT,
+    motionTransition,
+    STATE_TWEENS,
+    stateTransition,
     sys,
     variantsOf,
 } from "./shared";
 import type { ColorGroup, ColorGroups, Densities } from "./shared";
-import { springTweens } from "./shared";
 import type { Position } from "./tiles";
 import { positionCorners, POSITIONS, TILE_RADII } from "./tiles";
 
@@ -128,6 +140,8 @@ const tile = (position: Exclude<Position, "none">) => ({
         ...corners[position],
         tokens: { container: ref("segmentedContainer") },
     },
+    // A swipeable tile's frame clips the action to the tile's corners.
+    frame: corners[position],
 });
 
 // How far the row has slid, in pixels, along the inline axis: toward the start, so the action
@@ -135,7 +149,8 @@ const tile = (position: Exclude<Position, "none">) => ({
 const SLID = mul(ref("swipeOffset"), px(1));
 const SLID_BACK = mul(ref("swipeOffset"), px(-1));
 
-// The parts that slide over the action: every direct child of the row but the action.
+// The row slides over the action, its state colors fading as ever; it follows a drag at once
+// (the drag sets `pressed`) and settles on the fast spatial spring.
 const slides: StyleMap = {
     transform: when(
         "rtl",
@@ -143,8 +158,13 @@ const slides: StyleMap = {
         transform(translateX(SLID_BACK)),
     ),
     transition: when()
-        .on(slot("root", "pressed"), tweens())
-        .else(springTweens("spatialFast", [own("swipeOffset")])),
+        .on(slot("root", "pressed"), stateTransition)
+        .else(
+            motionTransition(
+                ...STATE_TWEENS,
+                tween(own("swipeOffset"), { spring: spring("spatialFast") }),
+            ),
+        ),
 };
 
 const lines = (height: LineHeight) => ({
@@ -179,9 +199,11 @@ export const createListItem = <
                 "trailingText",
                 "indicator",
                 "region",
+                "frame",
                 "action",
             ],
-            // The region is the row's sibling, not its child: the row is a button.
+            // The region is the row's sibling, not its child: the row is a button. A swipeable
+            // item's frame holds the action and the row, as siblings.
             structure: {
                 root: [
                     "leading",
@@ -189,7 +211,6 @@ export const createListItem = <
                     "trailing",
                     "trailingText",
                     "indicator",
-                    "action",
                 ],
                 content: ["overline", "headline", "supportingText"],
             },
@@ -245,8 +266,10 @@ export const createListItem = <
                     ),
                     // Its display is left to the `hidden` attribute that collapses it.
                     region: { paddingInlineStart: ref("regionIndent") },
-                    // The revealed action, pinned to the row's end and uncovered as the
-                    // row's other parts slide away; the row clips what slides past it.
+                    // A swipeable item's frame: the action and the row, clipped to it.
+                    frame: { position: relative, overflow: hidden },
+                    // The revealed action, pinned to the frame's end under the row and
+                    // uncovered as the row slides away.
                     action: {
                         position: absolute,
                         insetInlineEnd: px(0),
@@ -309,19 +332,22 @@ export const createListItem = <
                         last: tile("last"),
                         single: tile("single"),
                     },
-                    // A row that swipes: its parts slide over the action, and the row clips
-                    // them. The binding sets `touch-action: pan-y` on the web, so a horizontal
-                    // drag is the row's and the page scrolls only along the list.
+                    // A row that swipes: it slides over the action, in its frame. The binding
+                    // sets `touch-action: pan-y` on the web, so a horizontal drag is the row's
+                    // and the page scrolls only along the list. The frame clips, so the focus
+                    // ring sits inside the row.
                     swipeable: {
                         false: {},
                         true: {
                             root: {
-                                overflow: hidden,
+                                ...slides,
+                                tokens: {
+                                    focusIndicatorOuterOffset: mul(
+                                        ref("focusIndicatorThickness"),
+                                        unitless(-1),
+                                    ),
+                                },
                             },
-                            leading: slides,
-                            content: slides,
-                            trailing: slides,
-                            trailingText: slides,
                         },
                     },
                     // The revealed action's colours: the secondary container, or the error
@@ -329,7 +355,7 @@ export const createListItem = <
                     actionColor: {
                         secondary: {},
                         error: {
-                            root: {
+                            action: {
                                 tokens: {
                                     actionContainer: sys("errorContainer"),
                                     actionContent: on("errorContainer"),

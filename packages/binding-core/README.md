@@ -504,6 +504,7 @@ AVATAR_ROOT_PROPS; avatarSelection; avatarMachineProps(props); // id, onStatusCh
 avatarRootProps(props);                  // role img named by label, or hidden; AvatarContentProps: src, children
 // List item swipe (components/list-item-swipe.ts): swipeOffsetOf, swipeSettlesOpen, swipeRestOffset,
 // swipeKeyAction, swipeTokens, ListItemSwipeProps (revealed, defaultRevealed, onRevealedChange, swipeWidth)
+// List item frame (components/list-item.ts): ListItemFrameOwnProps (the swipe props, actionColor), LIST_ITEM_FRAME_PROPS
 BADGE_ROOT_PROPS; badgeSelection;      // size, placement
 badgeRootProps(props);                   // role img named by label; a dot without one is hidden
 MEDIA_ROOT_PROPS; mediaSelection;        // aspect, shape

@@ -308,7 +308,7 @@ describe("a swipeable ListItem", () => {
             }),
         );
 
-    it("renders its action as the last part, out of reach until revealed", async () => {
+    it("renders its action before the row, in a frame, out of reach until revealed", async () => {
         withRegistry(
             <ListItem
                 headline="Message"
@@ -320,8 +320,10 @@ describe("a swipeable ListItem", () => {
         expect(root.className).toContain("list-item--swipeable-true");
         expect(root.style.touchAction).toBe("pan-y");
         expect(root.tabIndex).toBe(0);
+        const frame = byTestId(ids.frame);
+        expect(frame.className).toBe("list-item__frame");
         const action = byTestId(ids.action);
-        expect(root.lastElementChild).toBe(action);
+        expect([...frame.children]).toEqual([action, root]);
         expect(action.hasAttribute("inert")).toBe(true);
         expect(action.textContent).toBe("Delete");
     });
@@ -390,20 +392,6 @@ describe("a swipeable ListItem", () => {
         expect(onRevealedChange).toHaveBeenLastCalledWith({ revealed: false });
     });
 
-    it("takes an error colour for a destructive action", async () => {
-        withRegistry(
-            <ListItem
-                headline="Message"
-                actionColor="error"
-                swipeAction={<button type="button">Delete</button>}
-            />,
-        );
-        await settle();
-        expect(byTestId(ids.root).className).toContain(
-            "list-item--actionColor-error",
-        );
-    });
-
     it("can be started revealed, with its action in reach", async () => {
         withRegistry(
             <ListItem
@@ -415,25 +403,39 @@ describe("a swipeable ListItem", () => {
         await settle();
         expect(byTestId(ids.action).hasAttribute("inert")).toBe(false);
     });
-});
 
-describe("a ListItem with both a region and a swipe action", () => {
-    it("is expandable and doesn't swipe: no action in its button", async () => {
+    it("swipes an expandable item too: its action beside the button, the region after", async () => {
+        const onRevealedChange = vi.fn();
         withRegistry(
             <ListItem
                 headline="Folders"
                 region="Work"
                 swipeAction={<button type="button">Delete</button>}
+                onRevealedChange={onRevealedChange}
             />,
         );
         await settle();
         const root = byTestId(ids.root);
+        const frame = byTestId(ids.frame);
         expect(root.tagName).toBe("BUTTON");
-        expect(root.getAttribute("aria-expanded")).toBe("false");
-        expect(root.className).not.toContain("list-item--swipeable-true");
+        expect(root.className).toContain("list-item--swipeable-true");
         expect(root.querySelector("button")).toBeNull();
-        expect(document.querySelector(`[data-testid="${ids.action}"]`)).toBe(
-            null,
-        );
+        expect([...frame.children]).toEqual([byTestId(ids.action), root]);
+        expect(frame.nextElementSibling).toBe(byTestId(ids.region));
+        // A drag reveals the action without expanding.
+        pointer(root, "pointerdown", 200);
+        pointer(root, "pointermove", 180);
+        pointer(root, "pointermove", 140);
+        pointer(root, "pointerup", 140);
+        // The click that ends a drag isn't a press.
+        root.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+        await settle();
+        expect(onRevealedChange).toHaveBeenLastCalledWith({ revealed: true });
+        expect(root.getAttribute("aria-expanded")).toBe("false");
+        // A click expands it.
+        await userEvent.click(root);
+        await settle();
+        expect(root.getAttribute("aria-expanded")).toBe("true");
+        expect(byTestId(ids.region).hidden).toBe(false);
     });
 });

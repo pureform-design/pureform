@@ -1,7 +1,8 @@
 // The list item: its leading icon, its lines (overline, headline, supporting text), and its
 // trailing icon or text. With `onPress` it's interactive: it takes the state layer and ripples.
 // Given a `region`, it's expandable: a button whose indicator turns over, showing the region under
-// it while expanded (React state, as the accordion's; there's no Zag here).
+// it while expanded (React state, as the accordion's; there's no Zag here). Given a `swipeAction`,
+// it sits in a frame with the action under it, and slides to uncover it; an expandable item too.
 
 import { listItemAnatomy } from "@pureform/anatomy";
 import type { TestIdOverride } from "@pureform/anatomy";
@@ -51,7 +52,7 @@ export interface ListItemProps
     readonly disabled?: boolean | undefined;
     /** Makes the item act. An expandable item (given a `region`) acts as well: it expands. A
      *  swipeable item (one with a `swipeAction`) takes the drag instead, so it can't also be
-     *  pressed: put the press on its content. An expandable item doesn't swipe. */
+     *  pressed, but for an expandable one: put the press on its content. */
     readonly onPress?: (() => void) | undefined;
     /** An interactive item's role in place of `button`: a selection list's options are `option`s,
      *  marked with `aria-selected`. */
@@ -73,9 +74,7 @@ function ListItemImpl(props: ListItemProps): ReactNode {
         props.onExpandedChange,
         false,
     );
-    // An expandable item is a button: it doesn't also take the drag.
-    const swipeable =
-        !expandable && (props.swipeable ?? isPresent(props.swipeAction));
+    const swipeable = props.swipeable ?? isPresent(props.swipeAction);
     const interactive =
         expandable || (props.onPress !== undefined && !swipeable);
     const rtl = useDirection() === "rtl";
@@ -102,7 +101,9 @@ function ListItemImpl(props: ListItemProps): ReactNode {
     const start = useRef(0);
     const pan = useRef(
         PanResponder.create({
-            onMoveShouldSetPanResponder: (_event, gesture) =>
+            // Asked on the way down, so a horizontal drag is the frame's even over a pressable
+            // (expandable) row.
+            onMoveShouldSetPanResponderCapture: (_event, gesture) =>
                 Math.abs(gesture.dx) > LIST_ITEM_SWIPE_SLOP &&
                 Math.abs(gesture.dx) > Math.abs(gesture.dy),
             onPanResponderGrant: () => {
@@ -211,28 +212,41 @@ function ListItemImpl(props: ListItemProps): ReactNode {
             {line("trailingText", props.trailingText)}
         </>
     );
-    // A swipeable row takes the drag itself rather than the press.
-    if (swipeable)
-        return (
-            <v.root.View
+    // The arrow keys reveal and close a swipeable row's action, on the web.
+    const keys = swipeable
+        ? ({
+              onKeyDown: (event: { nativeEvent: { key?: string } }) => {
+                  const next = swipeKeyAction(event.nativeEvent.key ?? "", rtl);
+                  if (next) setRevealed(next === "reveal");
+              },
+          } as object)
+        : {};
+    // A swipeable item's frame: the action under the row, and the row, which takes the drag.
+    const framed = (row: ReactNode) =>
+        swipeable ? (
+            <v.frame.View
                 {...pan.panHandlers}
-                {...({
-                    onKeyDown: (event: { nativeEvent: { key?: string } }) => {
-                        const next = swipeKeyAction(
-                            event.nativeEvent.key ?? "",
-                            rtl,
-                        );
-                        if (next) setRevealed(next === "reveal");
-                    },
-                } as object)}
+                style={s.frame}
+                testID={id("frame")}
+            >
+                {action}
+                {row}
+            </v.frame.View>
+        ) : (
+            row
+        );
+    // A swipeable row takes the drag rather than the press, unless it expands.
+    if (swipeable && !expandable)
+        return framed(
+            <v.root.View
+                {...keys}
                 focusable
                 role="listitem"
                 style={{ ...s.root, ...unselectable }}
                 testID={id("root")}
             >
                 {content}
-                {action}
-            </v.root.View>
+            </v.root.View>,
         );
     const onPress = expandable
         ? () => {
@@ -251,6 +265,7 @@ function ListItemImpl(props: ListItemProps): ReactNode {
             {...(interactive
                 ? { onPress, disabled: props.disabled }
                 : { disabled: true })}
+            {...keys}
             style={{ ...s.root, ...unselectable }}
             testID={id("root")}
         >
@@ -262,7 +277,7 @@ function ListItemImpl(props: ListItemProps): ReactNode {
     if (!expandable) return row;
     return (
         <>
-            {row}
+            {framed(row)}
             {expanded ? (
                 <v.region.View style={s.region} testID={id("region")}>
                     {props.region}

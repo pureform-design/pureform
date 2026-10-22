@@ -51,11 +51,27 @@ export function createSwipe(props: ListItemSwipeProps): Swipe {
     let gesture:
         | { from: number; startOffset: number; offset: number; moved: boolean }
         | undefined;
-    let dragged = false;
+    // The click that ends a drag isn't a press on the row, nor on its own handlers (an
+    // expandable row's): a capturing listener on the row swallows it. Solid has no capture
+    // prop, and the next press takes the listener back if no click came.
+    let swallow: (() => void) | undefined;
+    const swallowNextClick = (row: Element) => {
+        const listener = (event: Event) => {
+            swallow?.();
+            event.preventDefault();
+            event.stopImmediatePropagation();
+        };
+        row.addEventListener("click", listener, { capture: true });
+        swallow = () => {
+            row.removeEventListener("click", listener, { capture: true });
+            swallow = undefined;
+        };
+    };
     const rootProps = (interactive: boolean) => ({
         style: { "touch-action": "pan-y" },
         tabIndex: interactive ? undefined : 0,
         onPointerDown: (event: PointerEvent) => {
+            swallow?.();
             if (event.pointerType === "mouse" && event.button !== 0) return;
             const target = (event.target as Element).closest(OWN_GESTURES);
             if (target && target !== event.currentTarget) return;
@@ -88,24 +104,17 @@ export function createSwipe(props: ListItemSwipeProps): Swipe {
             );
             setDrag(gesture.offset);
         },
-        onPointerUp: () => {
+        onPointerUp: (event: PointerEvent) => {
             const held = gesture;
             gesture = undefined;
             if (!held?.moved) return;
-            dragged = true;
+            swallowNextClick(event.currentTarget as Element);
             setRevealed(swipeSettlesOpen(held.offset, width()));
             setDrag(undefined);
         },
         onPointerCancel: () => {
             gesture = undefined;
             setDrag(undefined);
-        },
-        // A drag isn't a click on the row.
-        onClickCapture: (event: MouseEvent) => {
-            if (!dragged) return;
-            dragged = false;
-            event.preventDefault();
-            event.stopPropagation();
         },
         onKeyDown: (event: KeyboardEvent) => {
             if (event.target !== event.currentTarget) return;
