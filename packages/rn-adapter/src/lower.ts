@@ -380,10 +380,13 @@ export const springFieldNodes = (
     if (!ctx) return undefined;
     switch (value.type) {
         case "alias": {
-            const target = getByPath(ctx.config, value.path);
-            return target === undefined
-                ? undefined
-                : springFieldNodes(tokenValue(target) as ValueNode, ctx);
+            let target: ValueNode;
+            try {
+                target = tokenValue(getByPath(ctx.config, value.path)) as ValueNode;
+            } catch {
+                return undefined;
+            }
+            return springFieldNodes(target, ctx);
         }
         case "dynamic": {
             // Without a default, nothing says the token is a spring.

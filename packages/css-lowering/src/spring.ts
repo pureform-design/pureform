@@ -117,14 +117,34 @@ export const springVarNames = (
     return [`${name}-duration`, `${name}-easing`];
 };
 
-/** Whether a token's value is a spring: a literal one, or an alias to a spring role, also
- *  through a platform's choice. */
+// The value at an alias's path, or `undefined` where there's none (compiling it reports that).
+const tokenAt = (
+    config: LowerCtx["config"],
+    path: string[],
+): ValueNode | undefined => {
+    try {
+        return tokenValue(getByPath(config, path)) as ValueNode;
+    } catch {
+        return undefined;
+    }
+};
+
+/** Whether a token's value is a spring: a literal one, an alias to a spring role, or a
+ *  component token holding one (or an alias to it, such as another component's), also through
+ *  a platform's choice. */
 export const isSpringValue = (node: ValueNode, ctx: LowerCtx): boolean => {
     switch (node.type) {
         case "spring":
             return true;
-        case "alias":
-            return node.path[0] === "springs";
+        case "alias": {
+            if (node.path[0] === "springs") return true;
+            const target = tokenAt(ctx.config, node.path);
+            return target !== undefined && isSpringValue(target, ctx);
+        }
+        case "dynamic":
+            return (
+                node.default !== undefined && isSpringValue(node.default, ctx)
+            );
         case "platform":
             return isSpringValue(node.values[ctx.target] ?? node.default, ctx);
         default:
