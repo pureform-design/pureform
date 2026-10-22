@@ -90,11 +90,12 @@ describe.each(overlays)("$component", (component) => {
         await scene.update({ open: true });
         await frames(2);
         const surface = overlay.surface(scene.host);
+        const entered = overlay.moving?.enter(scene.host) ?? surface;
         expect(shows(scene.host)).toBe(true);
         // The movement (on a spring) and the fade (on its tween) are two animations. A popup
         // grows on the `scale` property (composing with its own transform), a sheet or dialog
         // moves on `transform`.
-        const entering = animated(surface);
+        const entering = animated(entered);
         expect(entering).toHaveLength(2);
         expect(entering).toEqual(
             expect.arrayContaining([
@@ -107,7 +108,9 @@ describe.each(overlays)("$component", (component) => {
         await frames(2);
         expect(surface.dataset.state).toBe("closed");
         expect(shows(scene.host)).toBe(true);
-        expect(animated(surface).flat()).toContain("opacity");
+        expect(
+            animated(overlay.moving?.exit(scene.host) ?? surface).flat(),
+        ).toContain("opacity");
         await animationsDone();
         await frames(3);
         expect(shows(scene.host)).toBe(false);
@@ -119,12 +122,16 @@ describe.each(overlays)("$component", (component) => {
         await scene.update({ open: true });
         await frames(2);
         const surface = overlay.surface(scene.host);
-        expect(animated(surface)).toEqual([["opacity"]]);
+        expect(animated(overlay.moving?.enter(scene.host) ?? surface)).toEqual([
+            ["opacity"],
+        ]);
         await animationsDone();
         await scene.update({ open: false });
         await frames(2);
         expect(shows(scene.host)).toBe(true);
-        expect(animated(surface)).toEqual([["opacity"]]);
+        expect(animated(overlay.moving?.exit(scene.host) ?? surface)).toEqual([
+            ["opacity"],
+        ]);
         await animationsDone();
         await frames(3);
         expect(shows(scene.host)).toBe(false);
@@ -247,6 +254,79 @@ describe("Menu", () => {
         );
         expect(getComputedStyle(group).borderBottomRightRadius).toBe(
             getComputedStyle(parent!).borderBottomRightRadius,
+        );
+    });
+});
+
+// The FAB menu's items enter from the one nearest the FAB, each a step after it, and leave in
+// reverse; its list only holds still until the last has left.
+const fabMenuCase = COMPONENTS.find(
+    (component) => component.component === "FabMenu",
+)!;
+
+describe("FabMenu", () => {
+    const delays = (items: HTMLElement[]) =>
+        items.map((item) =>
+            Math.max(
+                ...item
+                    .getAnimations()
+                    .map((animation) =>
+                        Number(animation.effect!.getTiming().delay),
+                    ),
+            ),
+        );
+    const run = async (motion: "full" | "reduce") => {
+        const host = hostIn(`<div><div data-host></div></div>`);
+        const scene = mountCase(
+            fabMenuCase,
+            { ...fabMenuCase.overlay!.props, open: false },
+            { host, provider: { motion } },
+        );
+        fabMenuCase.overlay!.place?.(host);
+        const items = () => [
+            ...host.querySelectorAll<HTMLElement>(
+                `[data-testid="${testIds.fabMenu.item}"]`,
+            ),
+        ];
+        await settlePlaced();
+        await scene.update({ open: true });
+        await frames(2);
+        const entering = delays(items());
+        await animationsDone();
+        await scene.update({ open: false });
+        await frames(2);
+        const leaving = delays(items());
+        const list = host.querySelector<HTMLElement>(
+            `[data-testid="${testIds.fabMenu.list}"]`,
+        )!;
+        const holding = Math.max(
+            ...list
+                .getAnimations()
+                .map((animation) =>
+                    Number(animation.effect!.getTiming().delay),
+                ),
+        );
+        await animationsDone();
+        return { entering, leaving, holding };
+    };
+
+    it("waits longer to enter the farther an item is from the FAB, and longer to leave the nearer", async () => {
+        const { entering, leaving, holding } = await run("full");
+        expect(entering).toHaveLength(3);
+        // Items run from the top; the FAB is under the last.
+        expect(entering[2]).toBe(0);
+        expect(entering[1]).toBeGreaterThan(0);
+        expect(entering[0]).toBeGreaterThan(entering[1]!);
+        expect(leaving[0]).toBe(0);
+        expect(leaving[1]).toBeGreaterThan(0);
+        expect(leaving[2]).toBeGreaterThan(leaving[1]!);
+        expect(holding).toBeGreaterThan(leaving[2]!);
+    });
+
+    it("drops the stagger under reduced motion", async () => {
+        const { entering, leaving } = await run("reduce");
+        expect([...entering, ...leaving].every((delay) => delay === 0)).toBe(
+            true,
         );
     });
 });

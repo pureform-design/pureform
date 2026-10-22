@@ -194,6 +194,14 @@ export interface OverlayCase {
     surface(host: HTMLElement): HTMLElement;
     /** The other parts that show and hide with it: its positioner, a dialog's backdrop. */
     parts(host: HTMLElement): readonly HTMLElement[];
+    /** The elements whose motion to check on its way in and out, where that isn't the surface:
+     *  the FAB menu's list holds still while its items move, each after the one before. */
+    readonly moving?:
+        | {
+              enter(host: HTMLElement): HTMLElement;
+              exit(host: HTMLElement): HTMLElement;
+          }
+        | undefined;
     /** Props it's mounted with, besides `open`. */
     readonly props?: SceneProps | undefined;
     /** Places it as an app would, where placing it is the app's (the snackbar). */

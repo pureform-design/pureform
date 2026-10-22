@@ -142,14 +142,16 @@ export const FAB_MENU_LIST_MOTION = {
 /** Each item grows and fades in as a popup does (and shrinks as it leaves), after its wait. */
 export const FAB_MENU_ITEM_MOTION = POPUP_MOTION;
 
-// The list leaves once the last staggered item has.
-const LIST_MOTION = overlayMotion({
+// The list leaves once the last staggered item has. It has no enter animation: Zag's presence
+// waits for an exit whose animation differs from the one the surface had open, so one that held
+// still on the way in too would be gone at once.
+const LIST_EXIT = overlayMotion({
     ...FAB_MENU_LIST_MOTION,
     exit: {
         ...FAB_MENU_LIST_MOTION.exit,
         delay: mul(FAB_MENU_STAGGER, unitless(FAB_MENU_STAGGERED - 1)),
     },
-});
+}).rawRules!.css![CLOSED]!;
 
 const pf = typed();
 
@@ -213,7 +215,7 @@ export const createFabMenu = <const G extends string = ColorGroup>(
                         marginBlockEnd: ref("listGap"),
                         rawRules: {
                             css: {
-                                ...LIST_MOTION.rawRules!.css,
+                                [CLOSED]: LIST_EXIT,
                                 ...staggered(),
                             },
                         },

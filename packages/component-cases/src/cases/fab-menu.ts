@@ -34,6 +34,10 @@ const place = (host: HTMLElement) => {
     });
 };
 
+const items = (host: HTMLElement) => [
+    ...host.querySelectorAll<HTMLElement>(`[data-testid="${ids.item}"]`),
+];
+
 const opens: KeyCase = { key: "{ArrowDown}", does: "change" };
 
 export const fabMenu: ComponentCase = {
@@ -84,7 +88,17 @@ export const fabMenu: ComponentCase = {
             ],
         },
     },
-    overlay: { ...overlay(), parts: () => [], place },
+    overlay: {
+        ...overlay(),
+        parts: () => [],
+        place,
+        // The items enter from the one nearest the FAB (the last), which waits for none, and
+        // leave from the farthest (the first), which doesn't wait either.
+        moving: {
+            enter: (host) => items(host).at(-1)!,
+            exit: (host) => items(host)[0]!,
+        },
+    },
     // The FAB, which Tab reaches; the ready-made FAB menu takes no source for it, and it has no
     // disabled state. Its items are `fabMenuItems`.
     indication: { anatomy: { ...fabMenuAnatomy, indication: [CLOSE_TRIGGER] } },

@@ -153,12 +153,6 @@ exports[`FAB menu > compiles to a stable Panda slot recipe 1`] = `
           "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(token(durations.short1) * 7) forwards overlayShrinkOut, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(token(durations.short1) * 7) forwards overlayFadeOut",
         },
       },
-      "&[data-state=open]": {
-        "animation": {
-          "_motionReduce": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) overlayFadeIn",
-          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) overlayHold",
-        },
-      },
       "&[data-state=open] > :nth-last-child(1)": {
         "animation": {
           "_motionReduce": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) overlayFadeIn",

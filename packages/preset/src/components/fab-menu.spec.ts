@@ -53,9 +53,8 @@ describe("fab menu items", () => {
         const closed = rules["&[data-state=closed]"]!.animation.base;
         expect(closed).toContain(`${WAIT}${FAB_MENU_STAGGERED - 1})`);
         expect(closed).toContain("overlayHold");
-        expect(rules["&[data-state=open]"]!.animation.base).not.toContain(
-            "overlayGrowIn",
-        );
+        // Presence waits for an exit that differs from the open state's animation.
+        expect(rules["&[data-state=open]"]).toBeUndefined();
     });
 
     it("drops the stagger under reduced motion", () => {
