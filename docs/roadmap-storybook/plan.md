@@ -101,6 +101,14 @@ no composition fallback.
     - Changing the OS scheme updates every renderer live, without a reload (checked with
       Playwright's `emulateMedia({ colorScheme })` for all three).
     - Named themes go to the provider's `theme` in every renderer.
+    - **A story can pin its scheme** with Storybook's story-level globals
+      (`globals: { scheme: "dark" }`, on a story or a component's meta), which overrides the
+      toolbar for that story and locks its item. No pin: the toolbar decides (System by
+      default). `stories.config.ts` asks for pinned copies per component
+      (`schemes: ["light", "dark"]` → `Light` and `Dark` stories next to `Default`) or pins the
+      whole component (`scheme`); a hook's `extendStory` can set `globals` too. The shared
+      `play` tests and the a11y checks run on the pinned stories, so contrast is checked in both
+      schemes.
 - **Storybook's own UI follows the system:** `.storybook/manager.ts` picks `themes.dark` or
   `themes.light` from `matchMedia("(prefers-color-scheme: dark)")` and switches live on a
   change; docs pages read it once when they load.

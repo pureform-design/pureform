@@ -23,6 +23,11 @@ from `main` (`da4f3d08`). Not pushed.
   `prefers-color-scheme` CSS and React Native's `useColorScheme()` follow the OS live; Light and
   Dark set the page's `.light`/`.dark` class (the shared hook's decorator) or React Native's
   `scheme` prop. Named themes go to the provider's `theme`.
+- **Pinned schemes:** story-level `globals.scheme` overrides and locks the toolbar.
+  `stories.config.ts` takes `schemes` (generated `Light`/`Dark` stories) and `scheme` (the meta's
+  `globals`); `StoryName.scheme` tells hooks a story is pinned, and `isBaseStory` runs the play
+  tests on `Default`, `Light` and `Dark`. Button, Switch and TextField each have both: 48 tests
+  (16 stories × 3 renderers), the a11y checks in both schemes.
 - **System UI:** `.storybook/manager.ts` follows `prefers-color-scheme` and switches live; docs
   pages read it at load (`parameters.docs.theme`). The canvas (`.sb-show-main`, `.docs-story`)
   paints `--colors-canvas`, the theme's surface; the backgrounds addon is off.
@@ -75,7 +80,10 @@ from `main` (`da4f3d08`). Not pushed.
 
 - `omni run build -p @pureform/solid -p @pureform/react -p @pureform/react-native`
 - `omni run build -p @pureform/storybook-web`, `omni run test:e2e -p @pureform/storybook-web`
-  (30 tests: 10 stories × 3 renderers, play + a11y)
+  (now 48 tests: 16 stories × 3 renderers, play + a11y). A throwaway pinned story confirmed
+  Vitest applies story globals (the page's `.dark` class was set); in the built Storybook, the
+  pinned `Switch/Dark` renders dark under a light OS in every renderer with the Scheme item
+  disabled (`/tmp/opencode/sb-web-pinned-dark-<renderer>.png`).
 - `bunx tsc --noEmit -p tsconfig.json` and `-p src/solid/tsconfig.json` in the app; the
   bindings' storybook modules are checked by their builds (declarations).
 - A throwaway story confirmed a11y violations fail a test, and that the `native` project
