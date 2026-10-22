@@ -1035,6 +1035,12 @@ damping, mass? })` builds one; `spring({ duration, bounce })` converts a percept
   effects 3800/1600/800 at ζ 1 (fast/default/slow). The preset's `tweens(...)` and
   `timedAnimation` and each overlay step (`OverlayMotionStep`) take a spring role in place of a
   duration and easing.
+- **Containers (m2c).** Every chevron that turns (the expand indicator of the list item,
+  accordion and tree, the select's arrow) turns on `spatialFast` (`chevronTransition`), its color
+  on its tween; the field label floats on `spatialFast` (Compose's `FastSpatial` in
+  `TextFieldImpl.kt`), its colors on their tween. A swipeable list item's `swipeOffset` follows
+  the drag at once and settles on `spatialFast` after release; on React Native the spring starts
+  at the release velocity (`useComponentSlots`' `velocities`, `Animated.spring`'s `velocity`).
 - **Emphasized.** M3's emphasized easing is a two-segment path, which `cubic-bezier()` can't
   draw; with `linear()` it can. `MATERIAL_EASINGS.emphasized` samples the path from
   material-components-android's tokens with `sampleCubicPath` (each segment densely along its
