@@ -50,7 +50,8 @@ flowchart LR
     m2 --> f1[f1 fixes after m2]
     f1 --> r7[r7 refactor]
     r7 --> f2[f2 fixes after f1]
-    f2 --> m3[m3 Material transitions]
+    f2 --> r8[r8 refactor]
+    r8 --> m3[m3 Material transitions]
     m3 --> c8[c8 Material gaps from Zag]
     c8 --> c9[c9 components beyond M3]
     c9 --> c10[c10 plain form primitives]
@@ -84,6 +85,7 @@ contexts exist.
 | [x]  | [f1 Fixes after m2](phases/f1-fixes.md) ([a](context/f1a.md), [b](context/f1b.md), [c](context/f1c.md), [d](context/f1d.md), [e](context/f1e.md), [f](context/f1f.md), [merge](context/f1.md))                     | f1a lists and navigation, f1b controls, f1c overlays, f1d table sort arrow, f1e React Native tabs spring, f1f spring component tokens | The decisions and open items left by earlier phases                |                  |
 | [x]  | [r7 Refactor after m1, m2 and f1](phases/r7-refactor.md) ([r7](context/r7.md))                                                                                                                                     | r7a                                                                                                                                   | Duplication pass over the springs and the fixes                    |                  |
 | [x]  | [f2 Fixes after f1](phases/f2-fixes.md) ([a](context/f2a.md), [b](context/f2b.md), [c](context/f2c.md), [d](context/f2d.md), [e](context/f2e.md), [merge](context/f2.md))                                          | f2a lists, f2b controls, f2c overlays, f2d table sort arrow, f2e springs                                                              | The answers to f1's open questions                                 |                  |
+| [ ]  | [r8 Refactor after f2](phases/r8-refactor.md)                                                                                                                                                                      | r8a                                                                                                                                   | Duplication pass over f2, and f2's decided follow-ups              |                  |
 | [ ]  | [m3 Material transitions](phases/m3-transitions.md)                                                                                                                                                                | m3a fade through, m3b shared axis, m3c FAB menu items                                                                                 | Page and tab transitions on springs                                |                  |
 | [ ]  | [c8 Material gaps from Zag](phases/c8-zag-gaps.md)                                                                                                                                                                 | c8a bottom sheet partly open, c8b context menu trigger, c8c resizable panes                                                           | M3 behaviours a Zag machine can back                               |                  |
 | [ ]  | [c9 Components beyond M3](phases/c9-beyond-m3.md)                                                                                                                                                                  | c9a NumberField and CodeField, c9b FileUpload, c9c Popover, c9d ColorPicker, c9e CopyButton and Rating                                | Useful components M3 doesn't specify                               |                  |
