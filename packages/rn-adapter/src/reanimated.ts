@@ -156,8 +156,11 @@ export const reanimatedPresence = (): PresenceDriver => {
         const [from, to] = presenceFrames(step);
         // The enter shows its first frame from the start, the exit its last until the overlay
         // goes.
-        const fillMode = phase === "exit" ? "forwards" : "backwards";
         const fade = step.fade;
+        // A delayed animation shows its first frame through the delay too.
+        const delayed = (step.delay ?? 0) > 0 || (fade?.delay ?? 0) > 0;
+        const fillMode =
+            phase === "exit" ? (delayed ? "both" : "forwards") : "backwards";
         const style = fade
             ? {
                   animationName: [
@@ -171,6 +174,9 @@ export const reanimatedPresence = (): PresenceDriver => {
                       },
                   ],
                   animationDuration: [step.duration, fade.duration],
+                  ...(delayed
+                      ? { animationDelay: [step.delay ?? 0, fade.delay ?? 0] }
+                      : {}),
                   animationTimingFunction: [
                       cssEasing(step.easing),
                       cssEasing(fade.easing),
@@ -180,6 +186,7 @@ export const reanimatedPresence = (): PresenceDriver => {
             : {
                   animationName: { from, to },
                   animationDuration: step.duration,
+                  ...(delayed ? { animationDelay: step.delay } : {}),
                   animationTimingFunction: cssEasing(step.easing),
                   animationFillMode: fillMode,
               };

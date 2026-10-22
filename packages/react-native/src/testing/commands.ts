@@ -1,12 +1,14 @@
 // Commands the browser tests run in Node: the preset's React Native styles, which the lowering
 // computes in Node, and each component's instance token keys, as the generated registry holds
 // them. The themed config adds named themes that each change one domain, as an app nests them.
-// And the preset's overlay motions, which the web runs as raw CSS.
+// And the preset's overlay and fade through motions, which the web runs as raw CSS.
 
 import { materialColor, materialLayout } from "@pureform/material";
 import {
     BOTTOM_SHEET_MOTION,
     DIALOG_MOTION,
+    FADE_THROUGH_KEYFRAMES,
+    FADE_THROUGH_MOTION,
     OVERLAY_KEYFRAMES,
     POPUP_MOTION,
     pureform,
@@ -102,35 +104,38 @@ const overlayMotions: BrowserCommand<[]> = () => ({
         bottomSheet: BOTTOM_SHEET_MOTION,
         sideSheet: SIDE_SHEET_MOTION,
         scrim: SCRIM_MOTION,
+        fadeThrough: FADE_THROUGH_MOTION,
     },
     keyframes: Object.fromEntries(
-        Object.entries({ ...OVERLAY_KEYFRAMES, ...SHEET_KEYFRAMES }).map(
-            ([name, frames]) => [
-                name,
-                Object.fromEntries(
-                    Object.entries(frames).map(([at, style]) => {
-                        const frame: Record<string, FrameValue> = {};
-                        for (const [property, node] of Object.entries(style)) {
-                            const value = node as unknown as Record<
-                                string,
-                                unknown
-                            >;
-                            if (property !== "transform") {
-                                frame[property] = frameValue(value);
-                                continue;
-                            }
-                            for (const op of value.ops as {
-                                fn: string;
-                                args: Record<string, unknown>[];
-                            }[]) {
-                                frame[op.fn] = frameValue(op.args[0]!);
-                            }
+        Object.entries({
+            ...OVERLAY_KEYFRAMES,
+            ...SHEET_KEYFRAMES,
+            ...FADE_THROUGH_KEYFRAMES,
+        }).map(([name, frames]) => [
+            name,
+            Object.fromEntries(
+                Object.entries(frames).map(([at, style]) => {
+                    const frame: Record<string, FrameValue> = {};
+                    for (const [property, node] of Object.entries(style)) {
+                        const value = node as unknown as Record<
+                            string,
+                            unknown
+                        >;
+                        if (property !== "transform") {
+                            frame[property] = frameValue(value);
+                            continue;
                         }
-                        return [at, frame];
-                    }),
-                ),
-            ],
-        ),
+                        for (const op of value.ops as {
+                            fn: string;
+                            args: Record<string, unknown>[];
+                        }[]) {
+                            frame[op.fn] = frameValue(op.args[0]!);
+                        }
+                    }
+                    return [at, frame];
+                }),
+            ),
+        ]),
     ),
 });
 
