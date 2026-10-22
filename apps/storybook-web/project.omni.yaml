@@ -1,0 +1,74 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/omni-oss/json-schemas/refs/heads/main/project.json
+name: "@pureform/storybook-web"
+
+extends:
+  - "@workspace/omni/presets/ts-vite-app.omni.yaml"
+
+dependencies:
+  append:
+    - "@pureform/tsconfig"
+    - "@pureform/solid"
+    - "@pureform/react"
+    - "@pureform/react-native"
+    - "@pureform/rn-adapter"
+    - "@pureform/styling"
+    - "@pureform/panda-adapter"
+    - "@pureform/preset"
+    - "@pureform/material"
+    - "@pureform/theme"
+    - "@pureform/core"
+    - "@pureform/generate"
+    - "@pureform/bundler"
+    - "@pureform/cli"
+
+cache:
+  key:
+    files:
+      append:
+        - panda.config.ts
+        - panda.pureform.ts
+        - pureform.config.ts
+        - pureform.codegen.ts
+        - ".storybook/**/*"
+
+tasks:
+  test:unit:
+    enabled: false
+
+  test:integration:
+    enabled: false
+
+  test:e2e:
+    enabled: false
+
+  dev:
+    exec: bun x storybook dev -p 6006 --no-open
+
+  # Writes `.pureform/` (ignored) from `pureform.config.ts` with the built Panda adapter's codegen.
+  generate:
+    # Node runs the CLI, as Vite runs the plugin (see apps/solid-demo).
+    exec: node node_modules/@pureform/cli/dist/pureform.mjs generate
+    dependencies:
+      - ^build
+
+  prepare:
+    exec: bun x panda codegen
+    dependencies:
+      - generate
+
+  build:
+    enabled: true
+    exec: bun x storybook build
+    dependencies:
+      append:
+        - prepare
+    cache:
+      output:
+        files:
+          - storybook-static/**/*
+
+  publish:
+    enabled: false
+
+meta:
+  publish: false

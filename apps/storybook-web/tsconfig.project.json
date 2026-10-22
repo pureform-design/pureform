@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "outDir": "./dist",
+        "rootDir": ".",
+        "types": ["vite/client"],
+        "jsx": "react-jsx",
+        "noEmit": true,
+        "paths": { "$*": ["./styled-system/*"] }
+    },
+    // The Solid folder has its own config (Solid's JSX); `.pureform/` holds the registry.
+    "include": ["src", ".storybook", ".pureform/**/*.*"],
+    "exclude": ["src/solid"]
+}

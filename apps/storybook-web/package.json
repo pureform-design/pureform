@@ -1,0 +1,52 @@
+{
+    "name": "@pureform/storybook-web",
+    "version": "0.0.0-semantically-released",
+    "private": true,
+    "description": "pureform's components in one Storybook, from every renderer",
+    "type": "module",
+    "scripts": {
+        "dev": "storybook dev -p 6006 --no-open",
+        "build": "storybook build"
+    },
+    "dependencies": {
+        "@pureform/react": "workspace:^",
+        "@pureform/react-native": "workspace:^",
+        "@pureform/rn-adapter": "workspace:^",
+        "@pureform/solid": "workspace:^",
+        "@pureform/styling": "workspace:^",
+        "@solidjs/web": "catalog:",
+        "react": "catalog:",
+        "react-dom": "catalog:",
+        "react-native-reanimated": "catalog:",
+        "react-native-svg": "catalog:",
+        "react-native-web": "catalog:",
+        "react-native-worklets": "catalog:",
+        "solid-js": "catalog:"
+    },
+    "devDependencies": {
+        "@pandacss/dev": "catalog:",
+        "@pandacss/preset-base": "catalog:",
+        "@pandacss/preset-panda": "catalog:",
+        "@pandacss/preset-typography": "catalog:",
+        "@pandacss/vite": "catalog:",
+        "@pureform/bundler": "workspace:^",
+        "@pureform/cli": "workspace:^",
+        "@pureform/core": "workspace:^",
+        "@pureform/material": "workspace:^",
+        "@pureform/panda-adapter": "workspace:^",
+        "@pureform/preset": "workspace:^",
+        "@pureform/theme": "workspace:^",
+        "@pureform/tsconfig": "workspace:^",
+        "@solidjs/vite-plugin": "catalog:",
+        "@storybook/html-vite": "catalog:",
+        "@types/node": "catalog:",
+        "@types/react": "catalog:",
+        "@types/react-dom": "catalog:",
+        "@vitejs/plugin-react": "catalog:",
+        "playwright": "catalog:",
+        "react-native": "catalog:",
+        "storybook": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:"
+    }
+}
