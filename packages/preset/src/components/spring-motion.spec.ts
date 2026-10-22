@@ -32,10 +32,13 @@ describe("spring motion", () => {
         },
     );
 
-    it("floats the field label on the spring and fades its colors", () => {
+    it("floats the field label on the effects spring and fades its colors", () => {
         const out = recipe("textField", textField as SlottedComponentSpec);
-        expect(out).toContain(`top ${SPRING}`);
-        expect(out).toContain(`font-size ${SPRING}`);
+        const effects =
+            "token(springs.effectsDefault.duration) token(springs.effectsDefault.easing)";
+        expect(out).toContain(`top ${effects}`);
+        expect(out).toContain(`font-size ${effects}`);
+        expect(out).not.toContain(`top ${SPRING}`);
         expect(out).toContain(`background-color ${TWEEN}, color ${TWEEN}`);
     });
 
