@@ -41,6 +41,10 @@ import {
 } from "solid-js";
 
 import { useControllable } from "../controllable";
+import {
+    HorizontalSharedAxis,
+    useSharedAxisPage,
+} from "../horizontal-shared-axis/horizontal-shared-axis";
 import { itemInteractionSources } from "../interaction";
 import type { ItemInteractionSources } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
@@ -286,9 +290,17 @@ function Indicator(props: TabsPartProps): JSX.Element {
 /** A tab's panel, hidden while its tab isn't selected. The registry doesn't style it. */
 function Content(props: TabsContentPartProps): JSX.Element {
     const { scope, api } = context.use("Content");
+    // A panel leaving in a shared axis stays drawn while it goes.
+    const page = useSharedAxisPage();
     return scope.render("content", {
         element: "div",
-        machine: () => api().getContentProps({ value: props.value }),
+        machine: () =>
+            page() === "leaving"
+                ? {
+                      ...api().getContentProps({ value: props.value }),
+                      hidden: false,
+                  }
+                : api().getContentProps({ value: props.value }),
         unstyled: () => props.unstyled,
         props: omit(props, "unstyled", "value"),
     });
@@ -368,17 +380,53 @@ function ReadyMade(props: TabsProps): JSX.Element {
                     )}
                 </For>
             </List>
-            <For
-                each={items().filter((item) => isPresent(item.content))}
-                keyed={(item: TabsItem<JSX.Element>) => item.value}
+            <Show
+                when={props.transition === "sharedAxis"}
+                fallback={
+                    <For
+                        each={items().filter((item) => isPresent(item.content))}
+                        keyed={(item: TabsItem<JSX.Element>) => item.value}
+                    >
+                        {(item) => (
+                            <Content value={item().value} {...content}>
+                                {item().content}
+                            </Content>
+                        )}
+                    </For>
+                }
             >
-                {(item) => (
-                    <Content value={item().value} {...content}>
-                        {item().content}
-                    </Content>
-                )}
-            </For>
+                <SharedAxisPanels
+                    items={items}
+                    scrim={() => props.transitionScrim}
+                    slot={content}
+                />
+            </Show>
         </Root>
+    );
+}
+
+// The selected tab's panel in a horizontal shared axis, which slides between the panels in the
+// tabs' order.
+function SharedAxisPanels(props: {
+    readonly items: Accessor<readonly TabsItem<JSX.Element>[]>;
+    readonly scrim: Accessor<boolean | undefined>;
+    readonly slot: object;
+}): JSX.Element {
+    const { api } = context.use("Content");
+    const index = createMemo(() =>
+        props.items().findIndex((item) => item.value === api().value),
+    );
+    return (
+        <HorizontalSharedAxis index={index()} scrim={props.scrim()}>
+            {(at: number) => {
+                const item = untrack(() => props.items()[at]);
+                return item && isPresent(item.content) ? (
+                    <Content value={item.value} {...props.slot}>
+                        {item.content}
+                    </Content>
+                ) : null;
+            }}
+        </HorizontalSharedAxis>
     );
 }
 

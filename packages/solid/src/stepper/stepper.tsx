@@ -35,6 +35,10 @@ import {
 
 import { useControllable } from "../controllable";
 import { ToastIcon } from "../glyphs";
+import {
+    HorizontalSharedAxis,
+    useSharedAxisPage,
+} from "../horizontal-shared-axis/horizontal-shared-axis";
 import { itemInteractionSources } from "../interaction";
 import type { ItemInteractionSources } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
@@ -246,9 +250,17 @@ function Content(props: StepperContentPartProps): JSX.Element {
     // Whether it names its step is fixed: a row's content is outside the items.
     const named = untrack(() => props.index !== undefined);
     const index = named ? () => props.index! : itemContext.use("Content").index;
+    // A step's content leaving in a shared axis stays drawn while it goes.
+    const page = useSharedAxisPage();
     return scope.render("content", {
         element: "div",
-        machine: () => api().getContentProps({ index: index() }),
+        machine: () =>
+            page() === "leaving"
+                ? {
+                      ...api().getContentProps({ index: index() }),
+                      hidden: false,
+                  }
+                : api().getContentProps({ index: index() }),
         unstyled: () => props.unstyled,
         props: omit(props, "unstyled", "index"),
     });
@@ -427,7 +439,7 @@ function ReadyMade(props: StepperProps): JSX.Element {
                     )}
                 </For>
             </List>
-            <Show when={!vertical()}>
+            <Show when={!vertical() && props.transition !== "sharedAxis"}>
                 <For each={items()} keyed={false}>
                     {(entry: Accessor<StepperItem<JSX.Element>>, index) => (
                         <StepContent
@@ -438,7 +450,38 @@ function ReadyMade(props: StepperProps): JSX.Element {
                     )}
                 </For>
             </Show>
+            <Show when={!vertical() && props.transition === "sharedAxis"}>
+                <SharedAxisSteps
+                    items={items}
+                    scrim={() => props.transitionScrim}
+                    slot={part.content}
+                />
+            </Show>
         </Root>
+    );
+}
+
+// A row's current step's content in a horizontal shared axis, which slides between the steps in
+// their order.
+function SharedAxisSteps(props: {
+    readonly items: Accessor<readonly StepperItem<JSX.Element>[]>;
+    readonly scrim: Accessor<boolean | undefined>;
+    readonly slot: object;
+}): JSX.Element {
+    const { api } = context.use("Content");
+    return (
+        <HorizontalSharedAxis index={api().value} scrim={props.scrim()}>
+            {(at: number) => {
+                const entry = untrack(() => props.items()[at]);
+                return entry ? (
+                    <StepContent
+                        entry={() => entry}
+                        index={at}
+                        slot={props.slot}
+                    />
+                ) : null;
+            }}
+        </HorizontalSharedAxis>
     );
 }
 

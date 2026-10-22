@@ -544,6 +544,17 @@
                 "default": "./dist/ripple.jsx"
             }
         },
+        "./horizontal-shared-axis": {
+            "types": "./dist/horizontal-shared-axis/index.d.ts",
+            "solid": {
+                "development": "./src/horizontal-shared-axis/index.ts",
+                "default": "./dist/horizontal-shared-axis.jsx"
+            },
+            "import": {
+                "development": "./src/horizontal-shared-axis/index.ts",
+                "default": "./dist/horizontal-shared-axis.jsx"
+            }
+        },
         "./scrim": {
             "types": "./dist/scrim/index.d.ts",
             "solid": {
