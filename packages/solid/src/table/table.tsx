@@ -288,6 +288,11 @@ function SortHeader(props: TableSortHeaderProps): JSX.Element {
                                 api().getSortIndicatorProps({
                                     column: props.column,
                                 }),
+                            states: () => ({
+                                descending:
+                                    api().arrowDirection(props.column) ===
+                                    "descending",
+                            }),
                             props: { children: <ArrowUpwardIcon /> },
                         })}
                     </>

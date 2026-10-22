@@ -85,7 +85,7 @@ describe("table", () => {
 
     it("turns the arrow over on the chevrons' spring while sorted descending", () => {
         const arrow = json(table.recipe.base?.sortIndicator);
-        expect(arrow).toContain('"slot":"headerCell","state":"descending"');
+        expect(arrow).toContain('"slot":"sortIndicator","state":"descending"');
         expect(arrow).toContain('"value":180');
         expect(arrow).toContain("spatialFast");
     });

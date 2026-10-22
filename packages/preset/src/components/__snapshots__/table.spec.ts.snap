@@ -205,7 +205,7 @@ exports[`table > compiles to a stable Panda slot recipe 1`] = `
         "base": "0",
       },
       "transform": {
-        ".dataTable__headerCell:is([aria-sort=descending]) &": "rotate(180deg)",
+        "&:is([data-pf-descending])": "rotate(180deg)",
         "base": "rotate(0deg)",
       },
       "transition": {

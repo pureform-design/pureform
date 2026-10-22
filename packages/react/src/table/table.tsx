@@ -264,6 +264,7 @@ function SortHeader({
         api.getSortHeaderProps({ column }) as Readonly<Record<string, unknown>>,
     ]);
     const sorted = api.sort?.column === column;
+    const descending = api.arrowDirection(column) === "descending";
     return scope.render("sortHeader", {
         ...button,
         states: { filled: sorted },
@@ -279,6 +280,7 @@ function SortHeader({
                     {scope.render("sortIndicator", {
                         element: "span",
                         machine: api.getSortIndicatorProps({ column }),
+                        states: { descending },
                         props: { children: <ArrowUpwardIcon /> },
                     })}
                 </>

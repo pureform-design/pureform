@@ -22,6 +22,7 @@ import type {
     TableSort,
 } from "@pureform/binding-core";
 import {
+    arrowDirection,
     nextSort,
     selectAllState,
     sortRows,
@@ -82,6 +83,7 @@ function SortHeader(props: {
     readonly sort: TableSort | null;
     readonly column: string;
     readonly label: ReactNode;
+    readonly start: TableSort["direction"] | undefined;
     readonly onPress: () => void;
     readonly indication: TableProps["indication"];
     readonly id: Id;
@@ -100,7 +102,9 @@ function SortHeader(props: {
         indication.select(props.selection),
         indication.states({
             filled: sorted,
-            descending: direction === "descending",
+            descending:
+                arrowDirection(props.sort, props.column, props.start) ===
+                "descending",
         }),
     );
     return (
@@ -319,6 +323,7 @@ function TableImpl<Row>(props: TableProps<Row>): ReactNode {
                                     label={column.header ?? column.id}
                                     indication={props.indication}
                                     id={id}
+                                    start={props.sortStart}
                                     onPress={() =>
                                         setSort(
                                             nextSort(sort, column.id, {
