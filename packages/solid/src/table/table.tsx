@@ -45,7 +45,7 @@ import { useMachineButton } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
-import { createSlotProps, useComponent } from "../parts";
+import { createSlotProps, machinePart, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
@@ -129,22 +129,13 @@ function Root(props: TableRootProps): JSX.Element {
 }
 
 // A part on its own element, spreading the machine's props for it.
-const part =
-    (
-        name: PartName<Anatomy>,
-        label: string,
-        element: ValidComponent,
-        machine: (api: Api) => object,
-    ) =>
-    (props: TablePartProps): JSX.Element => {
-        const { scope, api } = context.use(label);
-        return scope.render(name, {
-            element,
-            machine: () => machine(api()),
-            unstyled: () => props.unstyled,
-            props: omit(props, "unstyled"),
-        });
-    };
+const part = (
+    name: PartName<Anatomy>,
+    label: string,
+    element: ValidComponent,
+    machine: (api: Api) => object,
+) =>
+    machinePart(context.use, element)(name, label, ({ api }) => machine(api()));
 
 /** The header rows' group, a `<thead>`. */
 const Header = part("header", "Header", "thead", (api) => api.getHeaderProps());

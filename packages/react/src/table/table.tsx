@@ -40,7 +40,7 @@ import { ArrowDownwardIcon, ArrowUpwardIcon } from "../glyphs";
 import { useMachineButton } from "../interaction";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
-import { useComponent, useSlotProps } from "../parts";
+import { machinePart, useComponent, useSlotProps } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
@@ -129,16 +129,7 @@ const part = (
     label: string,
     element: ElementType,
     machine: (api: Api) => object,
-) =>
-    function Part({ unstyled, ...props }: TablePartProps): ReactNode {
-        const { scope, api } = context.use(label);
-        return scope.render(name, {
-            element,
-            machine: machine(api),
-            unstyled,
-            props,
-        });
-    };
+) => machinePart(context.use, element)(name, label, ({ api }) => machine(api));
 
 /** The header rows' group, a `<thead>`. */
 const Header = part("header", "Header", "thead", (api) => api.getHeaderProps());
