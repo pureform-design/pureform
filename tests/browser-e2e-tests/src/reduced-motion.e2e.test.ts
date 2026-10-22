@@ -77,7 +77,7 @@ const EXPECTED: Record<
     },
     radio: { full: "transform, background-color", reduced: "background-color" },
     textField: {
-        full: "top, inset-inline-start, padding-inline-start, padding-inline-end, margin-inline-start, background-color, transform, font-size, line-height, letter-spacing, color",
+        full: "top, inset-inline-start, padding-inline-start, padding-inline-end, margin-inline-start, transform, font-size, line-height, letter-spacing, background-color, color",
         reduced: "background-color, color",
     },
     linearProgress: { full: "width", reduced: "none" },
