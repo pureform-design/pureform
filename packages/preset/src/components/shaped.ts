@@ -102,7 +102,7 @@ export const shapedOutline = (radius: NumericValue): StyleMap => ({
 
 /** An outlined style's outline layer: the stroke as a border, until a shape clips it. The
  *  `shaped` flag (1 under a shape, set by `shapeVariant`) picks the shape's stroke: none where
- *  the clip draws the ring, a 1px border where a target can't clip. */
+ *  the clip draws the ring, a border `outlineWidth` wide where a target can't clip. */
 export const shapedOutlineStroke = (
     ref: (token: OutlineTokens | "shaped") => AliasNode,
 ): StyleMap => ({
@@ -111,7 +111,7 @@ export const shapedOutlineStroke = (
     borderWidth: when(
         "clipShape",
         blend(ref("outlineWidth"), px(0), ref("shaped")),
-        blend(ref("outlineWidth"), px(1), ref("shaped")),
+        ref("outlineWidth"),
     ),
     borderColor: when(
         DISABLED,
