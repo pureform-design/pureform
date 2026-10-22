@@ -8,6 +8,7 @@
 // engine reports (Animated's completion, Reanimated's `onCSSAnimationEnd`), so a `Modal` or the
 // surface itself goes only then.
 
+import { slowSpring } from "@pureform/rn-adapter/animated";
 import type {
     PresenceDriver,
     PresenceFrame,
@@ -173,28 +174,24 @@ export const overlayMotion = (
         };
         const role = given.spring;
         if (role !== undefined) {
-            // The theme holds a spring as its sampled duration and curve, and its physics; a
-            // spring `timeScale` times as slow has its stiffness over timeScale², its damping
-            // over timeScale.
+            // The theme holds a spring as its sampled duration and curve, and its physics,
+            // slowed `timeScale` times (`slowSpring`).
             const field = (name: string) => tokens[`springs.${role}.${name}`];
             const easing = field("easing");
+            const spring = slowSpring(
+                {
+                    type: "spring",
+                    stiffness: numberOf(field("stiffness"), 1),
+                    damping: numberOf(field("damping"), 0),
+                    mass: numberOf(field("mass"), 1),
+                },
+                timeScale,
+            );
             return {
                 ...ends,
                 duration: numberOf(field("duration"), 0) * timeScale,
                 easing: typeof easing === "string" ? easing : "linear",
-                ...(timeScale > 0
-                    ? {
-                          spring: {
-                              type: "spring" as const,
-                              stiffness:
-                                  numberOf(field("stiffness"), 1) /
-                                  (timeScale * timeScale),
-                              damping:
-                                  numberOf(field("damping"), 0) / timeScale,
-                              mass: numberOf(field("mass"), 1),
-                          },
-                      }
-                    : {}),
+                ...(spring ? { spring } : {}),
             };
         }
         const easing = tokens[`easings.${given.easing}`];

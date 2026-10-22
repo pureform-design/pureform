@@ -8,7 +8,13 @@ export { animatedPresence } from "./animate/presence";
 export { useRipple } from "./animate/ripple";
 export { useAnimatedSlide } from "./animate/slide";
 export type { RippleOptions, Ripples } from "./animate/ripple";
-export { offsetSpan, presenceFrames, slideAt, slideOffset } from "./motion";
+export {
+    offsetSpan,
+    presenceFrames,
+    slideAt,
+    slideOffset,
+    slowSpring,
+} from "./motion";
 export type {
     SlideMotion,
     SlideOffset,

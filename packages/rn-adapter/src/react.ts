@@ -17,7 +17,7 @@ import type { StyleProp, ViewProps, ViewStyle } from "react-native";
 import { animate } from "./animate/curve";
 import { componentFactory } from "./factory";
 import type { Environment, NativeFactory } from "./factory";
-import { movingTokens, tokenTransitions, tokensAt } from "./motion";
+import { movingTokens, slowSpring, tokenTransitions, tokensAt } from "./motion";
 import { overridesFor, themeKey, withDerived } from "./resolve";
 import type { Overrides, Styles } from "./resolve";
 import type { Selected, State, Style } from "./select";
@@ -178,27 +178,22 @@ export const OverridesLayer = (props: {
 // A selection's motion, `by` times as long.
 const slowed = (selected: Selected, by: number): Selected => {
     if (by === 1) return selected;
-    // A spring `by` times as slow: its stiffness over by², its damping coefficient over by. At
-    // no time at all it's dropped, so the change is instant.
+    // A spring `by` times as slow (`slowSpring`); at no time at all it's dropped, so the
+    // change is instant.
     const time = <
         T extends { duration: number; delay: number; spring?: Spring },
     >({
         spring,
         ...t
-    }: T): T => ({
-        ...(t as T),
-        duration: t.duration * by,
-        delay: t.delay * by,
-        ...(spring && by > 0
-            ? {
-                  spring: {
-                      ...spring,
-                      stiffness: spring.stiffness / (by * by),
-                      damping: spring.damping / by,
-                  },
-              }
-            : {}),
-    });
+    }: T): T => {
+        const slow = spring && slowSpring(spring, by);
+        return {
+            ...(t as T),
+            duration: t.duration * by,
+            delay: t.delay * by,
+            ...(slow ? { spring: slow } : {}),
+        };
+    };
     const map = <T, U>(record: Record<string, T>, f: (value: T) => U) =>
         Object.fromEntries(Object.entries(record).map(([k, v]) => [k, f(v)]));
     return {

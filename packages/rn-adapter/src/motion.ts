@@ -276,6 +276,17 @@ export interface PresenceStep {
     readonly spring?: Spring | undefined;
 }
 
+/** A spring `by` times as slow: its stiffness over by², its damping coefficient over by. At
+ *  no time at all (`by` 0) there is no spring, so the change is instant. */
+export const slowSpring = (spring: Spring, by: number): Spring | undefined =>
+    by > 0
+        ? {
+              ...spring,
+              stiffness: spring.stiffness / (by * by),
+              damping: spring.damping / by,
+          }
+        : undefined;
+
 /** How an overlay enters and leaves. The exit holds its last frame until the overlay goes. */
 export interface PresenceMotion {
     readonly enter: PresenceStep;
