@@ -124,9 +124,12 @@ the demos):
       values (`variants`, plain data generated next to the parts from the recipe's variants;
       `generated.ts` is regenerated, never edited, and the drift spec covers it). The controls
       (`argTypes`, a select or a boolean per variant) come from it, so no preset runs in the
-      browser. `bindingVariants` (from the preset spec's field of the same name) marks the
-      variants the binding sets itself (a button's `toggle`/`position`/`density`), which get no
-      control. Composite anatomies (the radio group's) pair too, without controls.
+      browser. Composite anatomies (the radio group's) pair too, without controls.
+    - **`@pureform/binding-core`'s built declarations** say which variants are props: the
+      codegen reads each `<Component>VariantProps`'s property names with the TypeScript
+      compiler API (the checker resolves `extends`). A recipe variant that isn't one (a
+      button's `toggle`) gets no control; `density` and `position` are props and keep theirs.
+      A missing interface fails the codegen; `variantProps` in the config names another.
     - **`@pureform/component-cases`** (the framework-neutral cases moved out of
       `tests/component-suites`, which now imports them) gives each component's stories and play
       tests: `props` is `Default`'s args, each of `examples` and `opened` is a story, `state` gives a play
@@ -136,7 +139,7 @@ the demos):
       share its root test id.
     - **`stories.config.ts` holds overrides only:** the renderers, `skip` (with reasons),
       `schemes` and `overlayHeight` for every component, and per component extra
-      `args`/`argTypes`/`parameters`, `schemes`, `height`, hooks, and story fields by export
+      `args`/`argTypes`/`parameters`, `controls.exclude`, `variantProps`, `schemes`, `height`, hooks, and story fields by export
       name. A renderer whose DOM the cases can't read sets `casePlays: false`, and `tests: false`
       leaves it out of the story tests (React Native Web, for now: **skipped until the cases get
       renderer-neutral readers**).

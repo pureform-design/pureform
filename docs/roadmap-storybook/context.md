@@ -195,18 +195,32 @@ From `main` (`6d8b5460`). Not pushed.
 - **`@pureform/component-cases` joins the core train** (`cog.toml`); its `package.json`
   already matched `packages/anatomy`'s (no `private`, same exports, train version), so the
   release `workspace.spec.ts` passes.
-- **`bindingVariants`** (was `controls.exclude`): an optional field on core's component specs
-  (and the typed builders, checked against the spec's variant names), carried into the
-  anatomy by `deriveAnatomy` (left out when empty; it throws on a name that isn't a variant;
-  `derive.spec.ts` covers both). 26 preset components set it, `generated.ts` regenerated:
-    - `toggle`: button, icon button, chip, input chip; `position`: button, icon button, list
-      item; `density`: every component with that variant (the provider's);
-    - the fields' `leadingIcon`/`trailingIcon`/`prefixText`/`suffixText` (text field, select
-      and autocomplete through `selectField`, docked date picker, date input; text area and
-      tags input the icons);
-    - menu `grouped`, list item `swipeable`, dialog and tabs `icon`, app bar `search`, toast
-      `type`, every calendar-cell variant.
-    The codegen gives them no control; `controls.exclude` is gone.
+- **Controls from binding-core's declarations** (replacing a first attempt, `bindingVariants`
+  on the preset specs and the anatomy, which was reverted, `generated.ts` regenerated):
+  `scripts/variant-props.ts` loads `@pureform/binding-core`'s built `dist/index.d.ts` with the
+  TypeScript compiler API and reads the property names of `<Component>VariantProps` (the
+  checker resolves `extends` and generics). A recipe variant that isn't one gets no control:
+  `toggle` (Button, IconButton, Chip), the app bar's `search`, `scrolled`, `collapsed` (the
+  last two are props, but of `AppBarScrollProps`, not the variant props), the toolbar's
+  `overflow` (a root prop), and the fields' `trailingIcon` where the variant props have none.
+  `density` and `position` are props, so they keep their controls. A property typed
+  `VariantProp<C, "group">` names the variant it sets, so the text's `textStyle` is the control
+  for its `style` variant.
+    - **TypeScript 7** (the repo's `typescript`) ships no JavaScript compiler API, so the script
+      imports `@typescript/typescript6` (the root's catalog entry, now a devDependency of the
+      app). Its value import of a `.ts` file needed `allowImportingTsExtensions` in
+      `tsconfig.project.json`; `@pureform/binding-core` joins the omni dependencies.
+    - **A missing interface fails the codegen**, listing every component at once. Five are
+      named differently and set `variantProps`: CircularProgress and LinearProgress
+      (`ProgressVariantProps`), NavigationBar and NavigationRail (`NavigationVariantProps`),
+      SelectionList (`ListVariantProps`); List reads `ListOwnVariantProps` (its own `variant`;
+      `ListVariantProps` holds its items' defaults). Components with no variants (TouchTarget, the radio
+      group's composite, TimeInput) aren't looked up.
+    - **`controls.exclude` stays** for overrides: the fields' `leadingIcon`/`trailingIcon`/
+      `prefixText`/`suffixText` (TextField, TextArea, TagsInput, Select, Autocomplete,
+      DateInput, DockedDatePicker) and the dialog's `icon` are variant props (the parts'
+      root's flags) but the ready-made components take them as content (`leadingIcon: "@"`),
+      so a boolean control would draw "true".
 - **React Native skipped for now; needs renderer-neutral readers.** `tests: false` on the
   renderer in `stories.config.ts` drops its Vitest project (the projects come from the
   config; `SB_RENDERERS=native` runs it anyway); `casePlays: false` stays. Its stories still
@@ -214,7 +228,7 @@ From `main` (`6d8b5460`). Not pushed.
 - **React Native's disabled text field** is `disabled` on the web (`Platform.OS === "web"`;
   React Native Web forwards `disabled` to the input) rather than `editable={false}`, which
   React Native Web draws as `readonly`. Checked with `SB_RENDERERS=native … TextField -t
-  Disabled`: the input no longer fails, but the **label** does (color-contrast): it's a plain
+Disabled`: the input no longer fails, but the **label** does (color-contrast): it's a plain
   text element, not the input's `<label>`, so axe doesn't exempt it. The `TextField/Disabled`
   a11y todo stays, with that reason. The binding's unit specs (`components.spec.tsx -t ield`)
   pass.
@@ -266,8 +280,8 @@ From `main` (`6d8b5460`). Not pushed.
 
 ### Checks run
 
-- core, preset, anatomy: unit tests (133, 683, 178) and `tsc --noEmit`; release
-  `workspace.spec.ts` (9).
+- release `workspace.spec.ts` (9). (core, preset and anatomy were tested for `bindingVariants`,
+  since reverted; after the revert `generated.ts` regenerates with no diff.)
 - `bunx tsc --noEmit` in the app (`tsconfig.json`, `src/solid/tsconfig.json`) and
   `packages/react-native`.
 - Story tests by group, Solid and React each (`--project storybook/<renderer>` with the
@@ -289,8 +303,11 @@ From `main` (`6d8b5460`). Not pushed.
 
 ### Open questions (round 2)
 
-- **`density` and `position` as binding variants:** they're props too (an override of the
-  provider's or the group's); marked per the decision, so they have no control.
+- **Variant props that are content in the ready-made components** (the fields' affixes, the
+  dialog's `icon`) are excluded by hand; the ready-made props' types (a string, not a flag)
+  could tell the codegen instead, if their interfaces were exported per component.
+- `@typescript/typescript6` is used only for its compiler API; when TypeScript 7 ships one
+  (`typescript/unstable/sync` is a start), the script can move.
 - **Toast and GridList** need a scene a hook could give per renderer (a JSX-free toaster or
   tile builder), or cases whose props the bindings take directly.
 - **Carousel** in Storybook: worth a look at what differs from the suites (focusable masks in

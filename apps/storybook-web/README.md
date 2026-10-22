@@ -41,10 +41,15 @@ Native Web doesn't draw.
   (ignored by git), from data the components already have:
     - **`@pureform/anatomy`**: the component list (the preset's anatomies, then the
       hand-written composites', such as the radio group's), and each variant's values, which
-      become the controls (a select, or a boolean for `true`/`false`). Variants in the
-      anatomy's `bindingVariants` (set by the binding itself: a button's `toggle`, a group's
-      `position`, the provider's `density`, a field's `leadingIcon`) get no control; they come
-      from the preset spec's `bindingVariants`, and `generated.ts` is regenerated, never edited.
+      become the controls (a select, or a boolean for `true`/`false`).
+    - **`@pureform/binding-core`'s declarations**: which variants are props. At generate time
+      `scripts/variant-props.ts` loads its built `dist/index.d.ts` with the TypeScript compiler
+      API (`@typescript/typescript6`; TypeScript 7 has no JS API yet) and reads the property
+      names of `<Component>VariantProps` (the checker resolves `extends`). A recipe variant
+      that isn't one is set by the binding itself (a button's `toggle`) and gets no control;
+      `density` and `position` are props, so they keep theirs. A component whose interface is
+      missing fails the codegen, listing every such component; `variantProps` in its config
+      names another interface (`ProgressVariantProps`).
     - **`@pureform/component-cases`**: `props` gives `Default`, each of `examples` a story, the
       `state` a play test (read gives `from`, one `act`, read gives `to`) on the pinned `Light`
       and `Dark` copies, each of `opened` an `Opened: …` story (an overlay shown), and each
@@ -55,7 +60,9 @@ Native Web doesn't draw.
       through `storybook/test`'s `userEvent` (`createCases(userEvent)`, `src/renderers/plays.ts`).
     - **`stories.config.ts`**, overrides only: renderers (`casePlays`, `tests`), `include`,
       `skip` (by component, with the reason), `schemes` for every component, `overlayHeight`,
-      and per component `args`, `argTypes`, `parameters`, `schemes`, `scheme`, `height`,
+      and per component `args`, `argTypes`, `controls.exclude` (variants that are props but
+      shouldn't get a control, such as the fields' affixes, which the ready-made components
+      take as content), `variantProps`, `parameters`, `schemes`, `scheme`, `height`,
       `hooks`, and `stories` (fields by export name; `tags` are written into the file, where
       Storybook's indexer reads them, so `tags: ["!test"]` keeps a story out of the tests).
 
@@ -121,9 +128,10 @@ component's.
 1. Give it an anatomy (the preset's component, `@pureform/anatomy`'s `generate`) and a case in
    `@pureform/component-cases` (`packages/component-cases/src/cases/<name>.ts`); the generator
    pairs them by the root's test id.
-   Every such component is drawn; a variant the binding sets itself goes in the preset spec's
-   `bindingVariants`, not here.
-2. Override what the data gets wrong in its `components` entry (`args`, `parameters`,
+   Every such component is drawn. Its controls are the variants its binding-core
+   `<Component>VariantProps` declares; name another interface with `variantProps` if its own
+   is named differently.
+2. Override what the data gets wrong in its `components` entry (`args`, `controls.exclude`, `parameters`,
    `stories`), or `skip` it with the reason when its case can't be drawn from props alone.
 3. Run its story tests: `bunx vitest run -c vitest.config.storybook.ts --project
 storybook/solid src/stories/generated/<Component>.stories.ts` (and `storybook/react`).
