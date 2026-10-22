@@ -37,29 +37,30 @@ export const springVars = (spring: SpringNode): SpringVars => {
     };
 };
 
-/** Each spring token as the two token entries the web writes, by alias path:
- *  `["springs", name, "duration"]` and `["springs", name, "easing"]`. */
-export const springTokenEntries = (
-    springs: Record<string, Token<SpringNode>> | undefined,
-): [path: string[], node: ValueNode][] =>
-    Object.entries(springs ?? {}).flatMap(([name, entry]) => {
-        const vars = springVars(tokenValue(entry));
-        return [
-            [["springs", name, "duration"], vars.duration],
-            [["springs", name, "easing"], vars.easing],
-        ];
-    });
-
 /** The spring tokens as nested groups, `name: { duration, easing }`, for a target that nests
  *  token groups (Panda). */
 export const springTokenGroups = (
     springs: Record<string, Token<SpringNode>> | undefined,
-): Record<string, Record<string, ValueNode>> =>
+): Record<string, Record<keyof SpringVars, ValueNode>> =>
     Object.fromEntries(
         Object.entries(springs ?? {}).map(([name, entry]) => {
             const vars = springVars(tokenValue(entry));
             return [name, { duration: vars.duration, easing: vars.easing }];
         }),
+    );
+
+/** Each spring token as the two token entries the web writes, by alias path:
+ *  `["springs", name, "duration"]` and `["springs", name, "easing"]`. */
+export const springTokenEntries = (
+    springs: Record<string, Token<SpringNode>> | undefined,
+): [path: string[], node: ValueNode][] =>
+    Object.entries(springTokenGroups(springs)).flatMap(([name, group]) =>
+        Object.entries(group).map(
+            ([field, node]): [string[], ValueNode] => [
+                ["springs", name, field],
+                node,
+            ],
+        ),
     );
 
 /** A spring timing's duration and curve as CSS: a spring token's two vars, or a literal
