@@ -58,7 +58,7 @@ import type { ColorGroup, ColorGroups, Densities } from "./shared";
 
 const { tokens, ref } = componentTokens("inputChip", {
     height: sizeToken("controlSmall"),
-    ...cornerMorphTokens("square", radius("small"), radius("extraSmall")),
+    ...cornerMorphTokens("square", radius("medium"), radius("small")),
     gap: spacing("2"),
     padding: spacing("3"),
     // Where the leading avatar, the leading icon and the remove button sit from the edge.

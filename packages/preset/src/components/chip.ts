@@ -5,7 +5,7 @@
 // (`aria-selected="true"` or `aria-pressed="true"`) fills it with the secondary container, as a
 // selected filter chip. Render the icon slot only when there is an icon.
 //
-// A chip's corners are `square` at rest (the small radius) and tighten while pressed. `corner`
+// A chip's corners are `square` at rest (the medium radius) and tighten while pressed. `corner`
 // picks them: `square` (the default) or `round`, and a filter chip, which sets `toggle: "true"`,
 // swaps them once selected, as Expressive's filter chips morph. The optional `trailingIcon` slot
 // (a filter chip's dropdown arrow) sits after the label with its own size and spacing.
@@ -60,7 +60,7 @@ const { tokens, ref } = componentTokens("chip", {
     height: sizeToken("controlSmall"),
     // The round corner, and the square one the chip rests in, with the `corner` and `toggle`
     // variants' flags: only a toggle swaps when selected.
-    ...cornerMorphTokens("square", radius("small"), radius("extraSmall")),
+    ...cornerMorphTokens("square", radius("medium"), radius("small")),
     gap: spacing("2"),
     padding: spacing("4"),
     iconSize: sizeToken("iconSmall"),
