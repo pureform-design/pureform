@@ -49,6 +49,8 @@ describe("expandable list item", () => {
             "interactive",
             "leadingType",
             "position",
+            // c7c's swipe, not the expandable item's.
+            "swipeable",
             "density",
             "color",
         ]);

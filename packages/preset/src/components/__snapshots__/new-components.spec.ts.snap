@@ -716,6 +716,22 @@ exports[`list > compiles to a stable Panda slot recipe 1`] = `
 exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
 {
   "base": {
+    "action": {
+      "&:is(:disabled, [aria-disabled=true])": {
+        "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+      },
+      "alignItems": "center",
+      "backgroundColor": "var(--components-listItem-actionContainer, token(colors.secondaryContainer))",
+      "color": "var(--components-listItem-actionContent, token(colors.onSecondaryContainer))",
+      "display": "flex",
+      "insetBlockEnd": "0px",
+      "insetBlockStart": "0px",
+      "insetInlineEnd": "0px",
+      "justifyContent": "center",
+      "position": "absolute",
+      "textStyle": "labelLarge",
+      "width": "var(--components-listItem-swipeWidth, 80)",
+    },
     "content": {
       "display": "flex",
       "flexDirection": "column",
@@ -860,6 +876,7 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
     "leadingType": "icon",
     "lines": "one",
     "position": "none",
+    "swipeable": false,
   },
   "jsx": [
     "ListItem",
@@ -875,6 +892,7 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
     "trailingText",
     "indicator",
     "region",
+    "action",
   ],
   "variants": {
     "color": {
@@ -1063,6 +1081,66 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
           "borderEndStartRadius": "var(--components-listItem-outerRadius, token(radii.large))",
           "borderStartEndRadius": "var(--components-listItem-outerRadius, token(radii.large))",
           "borderStartStartRadius": "var(--components-listItem-outerRadius, token(radii.large))",
+        },
+      },
+    },
+    "swipeable": {
+      "false": {},
+      "true": {
+        "content": {
+          "transform": {
+            "_rtl": "translateX(calc(var(--components-listItem-swipeOffset, 0) * 1px))",
+            "base": "translateX(calc(var(--components-listItem-swipeOffset, 0) * -1px))",
+          },
+          "transition": {
+            ".listItem__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "",
+            "base": {
+              "_motionReduce": "none",
+              "base": "--components-listItem-swipeOffset token(durations.short3) token(easings.standard)",
+            },
+          },
+        },
+        "leading": {
+          "transform": {
+            "_rtl": "translateX(calc(var(--components-listItem-swipeOffset, 0) * 1px))",
+            "base": "translateX(calc(var(--components-listItem-swipeOffset, 0) * -1px))",
+          },
+          "transition": {
+            ".listItem__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "",
+            "base": {
+              "_motionReduce": "none",
+              "base": "--components-listItem-swipeOffset token(durations.short3) token(easings.standard)",
+            },
+          },
+        },
+        "root": {
+          "overflow": "hidden",
+        },
+        "trailing": {
+          "transform": {
+            "_rtl": "translateX(calc(var(--components-listItem-swipeOffset, 0) * 1px))",
+            "base": "translateX(calc(var(--components-listItem-swipeOffset, 0) * -1px))",
+          },
+          "transition": {
+            ".listItem__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "",
+            "base": {
+              "_motionReduce": "none",
+              "base": "--components-listItem-swipeOffset token(durations.short3) token(easings.standard)",
+            },
+          },
+        },
+        "trailingText": {
+          "transform": {
+            "_rtl": "translateX(calc(var(--components-listItem-swipeOffset, 0) * 1px))",
+            "base": "translateX(calc(var(--components-listItem-swipeOffset, 0) * -1px))",
+          },
+          "transition": {
+            ".listItem__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "",
+            "base": {
+              "_motionReduce": "none",
+              "base": "--components-listItem-swipeOffset token(durations.short3) token(easings.standard)",
+            },
+          },
         },
       },
     },
@@ -2539,6 +2617,7 @@ exports[`searchBar > compiles to a stable Panda slot recipe 1`] = `
       "flexDirection": "row",
       "gap": "var(--components-searchBar-gap, token(spacing.4))",
       "height": "var(--components-searchBar-height, 56px)",
+      "maxWidth": "var(--components-searchBar-maxWidth, 720px)",
       "outlineColor": "var(--components-searchBar-focusIndicatorColor, token(colors.secondary))",
       "outlineOffset": "var(--components-searchBar-focusIndicatorOuterOffset, token(sizes.focusIndicatorOuterOffset))",
       "outlineStyle": {
@@ -2549,7 +2628,7 @@ exports[`searchBar > compiles to a stable Panda slot recipe 1`] = `
       "paddingInlineEnd": "var(--components-searchBar-paddingInline, token(spacing.4))",
       "paddingInlineStart": "var(--components-searchBar-paddingInline, token(spacing.4))",
       "position": "relative",
-      "shadowElevation": "level3",
+      "shadowElevation": "level0",
       "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
     },
     "trailing": {
