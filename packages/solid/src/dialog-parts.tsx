@@ -11,16 +11,29 @@ import type {
     TestIdOverride,
 } from "@pureform/anatomy";
 import {
+    askingDismissProps,
+    closeAsker,
     dialogBackdropLayout,
     partAsRoot,
     presentProps,
 } from "@pureform/binding-core";
-import type { Controllable, Unstyled } from "@pureform/binding-core";
+import type {
+    CloseAsker,
+    CloseQuestion,
+    Controllable,
+    Unstyled,
+} from "@pureform/binding-core";
 import { stackPositioner } from "@pureform/binding-core/dom";
 import * as dialog from "@pureform/machines/dialog";
 import type { Selection } from "@pureform/styling";
 import type { JSX, ValidComponent } from "@solidjs/web";
-import { type Accessor, createMemo, createUniqueId, omit } from "solid-js";
+import {
+    type Accessor,
+    createMemo,
+    createUniqueId,
+    omit,
+    onCleanup,
+} from "solid-js";
 
 import { useControllable } from "./controllable";
 import { mergeProps, normalizeProps, useMachine } from "./internal/zag";
@@ -41,6 +54,8 @@ export interface DialogChromeRootProps extends Controllable<"open", boolean> {
     readonly testId?: TestIdOverride | undefined;
     readonly unstyled?: Unstyled | undefined;
     readonly as?: ValidComponent | undefined;
+    readonly closeOnEscape?: boolean | undefined;
+    readonly closeOnInteractOutside?: boolean | undefined;
 }
 
 /** A part's props: the element's own, and the part's `unstyled`. */
@@ -76,6 +91,9 @@ export interface DialogChromeOptions<
     readonly positionerLayout: (present: boolean, props: P) => Layout;
     /** What the surface adds to Zag's props, if anything. */
     readonly contentLayout?: Layout | undefined;
+    /** What the overlay asks before it closes by itself (Escape, a press outside, its own
+     *  close controls), if anything. */
+    readonly onClose?: ((props: P) => CloseQuestion | undefined) | undefined;
 }
 
 /** What Root shares with its parts. */
@@ -92,6 +110,12 @@ export interface DialogChromeContext<
     readonly setPositioner: (element: HTMLElement) => void;
     readonly setSurface: (element: HTMLElement) => void;
     readonly surface: () => HTMLElement | undefined;
+    /** Asks `onClose` for every way the overlay closes by itself. */
+    readonly asker: CloseAsker;
+    /** Asks `onClose`, if the overlay has one, then closes on a yes. */
+    readonly requestClose: () => void;
+    /** Root's `onClose`, if any. */
+    readonly onClose: () => CloseQuestion | undefined;
 }
 
 /** Builds the shared parts of an overlay on Zag's dialog machine. */
@@ -110,10 +134,25 @@ export function dialogParts<
             "open",
             props as Controllable<"open", boolean>,
         );
+        const asker = closeAsker();
+        onCleanup(() => asker.cancel());
+        const closeNow = () => api().setOpen(false);
+        const onClose = () => options.onClose?.(props);
+        const requestClose = () => asker.ask(onClose(), closeNow, () => {});
         const service = useMachine(dialog.machine, () => ({
             id,
             dir: dir(),
             ...options.machineProps(props),
+            ...askingDismissProps(
+                onClose(),
+                {
+                    closeOnEscape: props.closeOnEscape,
+                    closeOnInteractOutside: props.closeOnInteractOutside,
+                    modal: options.modal?.(props) ?? true,
+                },
+                asker,
+                closeNow,
+            ),
             ...open.machineProps(),
         }));
         const api = createMemo(() => dialog.connect(service, normalizeProps));
@@ -153,6 +192,9 @@ export function dialogParts<
                         presence.ref(element);
                     },
                     surface: () => surface,
+                    asker,
+                    requestClose,
+                    onClose,
                 }}
             >
                 {scope.render(name("root"), {

@@ -2,9 +2,12 @@
 // past where it rests), and a drag past a quarter of its height, or a quick flick, closes it,
 // leaving from where the drag let go of it. Shorter drags, and a close the app refuses, put it
 // back. An app asked whether to close (`onClose`) may answer later: the sheet holds where it was
-// let go until then. The press that ends a real drag doesn't also count as a click on the
+// let go until then. Whether the app kept it open is decided once the binding has rendered the
+// close (it calls back), as on React Native, not a frame later. The press that ends a real drag doesn't also count as a click on the
 // handle, so a handle that closes on a press closes only once.
 
+import { closeAsker } from "./components/sheet";
+import type { CloseAsker, CloseQuestion } from "./components/sheet";
 import { swallowNextClick } from "./drag-click";
 
 /** How far down, as a share of the sheet's height, a drag closes it. */
@@ -15,14 +18,18 @@ export const SHEET_FLICK_SPEED = 0.5;
 const SLOP = 4;
 
 /** Lets `handle` drag `sheet` down (give the handle `sheetDragHandleLayout` too, so touch moves
- *  drag rather than scroll), calling `dismiss` when a drag should close it. Given `onClose`, it
- *  asks first: the sheet holds where it was let go until the answer, then leaves on `true` and
- *  settles back on `false` (or a rejection). Returns what stops it. */
+ *  drag rather than scroll), calling `dismiss` when a drag should close it. `dismiss` closes the
+ *  sheet and, once the binding has rendered that, calls `kept` if the sheet is still open (the
+ *  app kept it), which settles it back. Given `onClose`, it asks first, through `asker` (the
+ *  overlay's, so a later question from another way of closing makes this one moot): the sheet
+ *  holds where it was let go until the answer, then leaves on `true` and settles back on
+ *  `false` (or a rejection). Returns what stops it. */
 export const dragToDismiss = (
     handle: HTMLElement,
     sheet: () => HTMLElement | null | undefined,
-    dismiss: () => void,
-    onClose?: () => boolean | Promise<boolean>,
+    dismiss: (kept: () => void) => void,
+    onClose?: CloseQuestion,
+    asker: CloseAsker = closeAsker(),
 ): (() => void) => {
     let start: { y: number; time: number; id: number } | undefined;
     let offset = 0;
@@ -39,14 +46,10 @@ export const dragToDismiss = (
             surface.style.transition = "none";
         }
     };
-    // Counts the questions asked, so an answer after another drag (or after it stops) is moot.
-    let asking = 0;
     let watching: MutationObserver | undefined;
-    let checking = 0;
     const stopWatching = () => {
         watching?.disconnect();
         watching = undefined;
-        cancelAnimationFrame(checking);
     };
     // Back to rest, settling on the sheet's own transition.
     const release = () => {
@@ -62,17 +65,11 @@ export const dragToDismiss = (
         void getComputedStyle(surface).translate;
         surface.style.removeProperty("transition");
     };
-    // Closing: it holds where the drag let go of it, and its exit runs from there. If it's still
-    // open a frame later, the app refused the close, so it settles back; otherwise it goes back
-    // to rest once it opens again.
+    // Closing: it holds where the drag let go of it, and its exit runs from there. If the
+    // binding finds it still open once it has rendered the close, the app refused it, so it
+    // settles back; otherwise it goes back to rest once it opens again.
     const close = (surface: HTMLElement | null | undefined) => {
-        dismiss();
-        if (!surface) return;
-        checking = requestAnimationFrame(() => {
-            if (surface.getAttribute("data-state") !== "closed") {
-                release();
-                return;
-            }
+        if (surface) {
             watching = new MutationObserver(() => {
                 if (surface.getAttribute("data-state") !== "closed")
                     reset(surface);
@@ -81,32 +78,16 @@ export const dragToDismiss = (
                 attributes: true,
                 attributeFilter: ["data-state"],
             });
-        });
+        }
+        dismiss(release);
     };
 
-    const leave = (surface: HTMLElement | null | undefined) => {
-        const answer = onClose?.() ?? true;
-        if (typeof answer === "boolean") {
-            if (answer) close(surface);
-            else release();
-            return;
-        }
-        const asked = ++asking;
-        answer.then(
-            (yes) => {
-                if (asked !== asking) return;
-                if (yes) close(surface);
-                else release();
-            },
-            () => {
-                if (asked === asking) release();
-            },
-        );
-    };
+    const leave = (surface: HTMLElement | null | undefined) =>
+        asker.ask(onClose, () => close(surface), release);
 
     const onDown = (event: PointerEvent) => {
         if (event.button !== 0) return;
-        asking++;
+        asker.cancel();
         swallow?.();
         stopWatching();
         start = {
@@ -153,7 +134,7 @@ export const dragToDismiss = (
         handle.removeEventListener("pointerup", onUp);
         handle.removeEventListener("pointercancel", onCancel);
         swallow?.();
-        asking++;
+        asker.cancel();
         release();
     };
 };

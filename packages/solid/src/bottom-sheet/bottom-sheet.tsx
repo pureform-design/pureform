@@ -76,6 +76,7 @@ const chrome = dialogParts({
     positionerLayout: (present, props) =>
         bottomSheetPositionerLayout(present, sheetModal(props)),
     contentLayout: sheetContentLayout,
+    onClose: (props) => props.onClose,
 });
 
 const { context } = chrome;
@@ -103,7 +104,8 @@ const Content: (props: BottomSheetPartProps) => JSX.Element = chrome.Content;
  *  quarter of its height. Name it with `aria-label`. It renders the drag handle component; give
  *  `as` to render another. */
 function DragHandle(props: BottomSheetTriggerProps): JSX.Element {
-    const { scope, api, surface, props: root } = context.use("DragHandle");
+    const { scope, api, surface, asker, requestClose, onClose } =
+        context.use("DragHandle");
     let stop: (() => void) | undefined;
     onCleanup(() => stop?.());
     return scope.render("dragHandle", {
@@ -114,13 +116,23 @@ function DragHandle(props: BottomSheetTriggerProps): JSX.Element {
             stop = dragToDismiss(
                 element,
                 surface,
-                () => api().setOpen(false),
-                () => root.onClose?.() ?? true,
+                (kept) => {
+                    api().setOpen(false);
+                    // Solid has rendered the close by now; a sheet still open was kept.
+                    queueMicrotask(() => {
+                        if (api().open) kept();
+                    });
+                },
+                () => onClose()?.() ?? true,
+                asker,
             );
         },
         machine: () =>
             mergeProps(
-                api().getCloseTriggerProps(),
+                // A press asks `onClose` too, rather than closing through Zag at once.
+                onClose()
+                    ? { ...api().getCloseTriggerProps(), onClick: requestClose }
+                    : api().getCloseTriggerProps(),
                 normalizeProps.element(sheetDragHandleLayout),
             ),
         unstyled: () => props.unstyled,

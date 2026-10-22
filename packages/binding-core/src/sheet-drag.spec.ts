@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { askingDismissProps, closeAsker } from "./components/sheet";
 import { dragToDismiss } from "./sheet-drag";
 
 const pointer = (
@@ -26,16 +27,24 @@ describe("dragToDismiss", () => {
         document.body.replaceChildren();
     });
 
-    const setup = (onClose?: () => boolean | Promise<boolean>) => {
+    const setup = (
+        onClose?: () => boolean | Promise<boolean>,
+        asker = closeAsker(),
+    ) => {
         const sheet = document.createElement("div");
         sheet.style.height = "400px";
         const handle = document.createElement("button");
         sheet.append(handle);
         document.body.append(sheet);
-        const dismiss = vi.fn();
+        // As a binding does: once it has rendered the close, a sheet still open was kept.
+        const dismiss = vi.fn((kept: () => void) =>
+            queueMicrotask(() => {
+                if (sheet.getAttribute("data-state") !== "closed") kept();
+            }),
+        );
         const click = vi.fn();
         document.addEventListener("click", click);
-        stop = dragToDismiss(handle, () => sheet, dismiss, onClose);
+        stop = dragToDismiss(handle, () => sheet, dismiss, onClose, asker);
         return { sheet, handle, dismiss, click };
     };
 
@@ -86,14 +95,15 @@ describe("dragToDismiss", () => {
         expect(sheet.style.transition).toBe("");
     });
 
-    it("settles back when the app keeps it open", async () => {
+    it("settles back once the binding has rendered a close the app refused", async () => {
         const { sheet, handle, dismiss } = setup();
         sheet.setAttribute("data-state", "open");
         handle.dispatchEvent(pointer("pointerdown", 100, 0));
         handle.dispatchEvent(pointer("pointermove", 250, 1000));
         handle.dispatchEvent(pointer("pointerup", 250, 2000));
         expect(dismiss).toHaveBeenCalledTimes(1);
-        await frame();
+        expect(sheet.style.translate).toBe("0px 150px");
+        await nextChange();
         expect(sheet.style.translate).toBe("");
         expect(sheet.style.transition).toBe("");
     });
@@ -160,6 +170,27 @@ describe("dragToDismiss", () => {
         expect(dismiss).not.toHaveBeenCalled();
     });
 
+    it("ignores a drag's answer once another way of closing asks", async () => {
+        let answer: (yes: boolean) => void = () => {};
+        const asker = closeAsker();
+        const { handle, dismiss } = setup(
+            () =>
+                new Promise<boolean>((resolve) => {
+                    answer = resolve;
+                }),
+            asker,
+        );
+        handle.dispatchEvent(pointer("pointerdown", 100, 0));
+        handle.dispatchEvent(pointer("pointermove", 250, 1000));
+        handle.dispatchEvent(pointer("pointerup", 250, 2000));
+        const first = answer;
+        const escape = vi.fn();
+        asker.ask(() => new Promise<boolean>(() => {}), escape, escape);
+        first(true);
+        await nextChange();
+        expect(dismiss).not.toHaveBeenCalled();
+    });
+
     it("closes on a quick flick however short", () => {
         const { handle, dismiss } = setup();
         handle.dispatchEvent(pointer("pointerdown", 100, 0));
@@ -176,5 +207,67 @@ describe("dragToDismiss", () => {
         expect(dismiss).not.toHaveBeenCalled();
         expect(click).toHaveBeenCalledTimes(1);
         document.removeEventListener("click", click);
+    });
+});
+
+describe("closeAsker", () => {
+    it("answers yes without onClose, and acts on a boolean at once", () => {
+        const asker = closeAsker();
+        const yes = vi.fn();
+        const no = vi.fn();
+        asker.ask(undefined, yes, no);
+        asker.ask(() => false, yes, no);
+        expect(yes).toHaveBeenCalledTimes(1);
+        expect(no).toHaveBeenCalledTimes(1);
+    });
+
+    it("acts on a promise when it settles, a rejection as no, unless cancelled", async () => {
+        const asker = closeAsker();
+        const yes = vi.fn();
+        const no = vi.fn();
+        asker.ask(() => Promise.reject(new Error("no")), yes, no);
+        await Promise.resolve();
+        await Promise.resolve();
+        expect(no).toHaveBeenCalledTimes(1);
+        asker.ask(() => Promise.resolve(true), yes, no);
+        asker.cancel();
+        await Promise.resolve();
+        await Promise.resolve();
+        expect(yes).not.toHaveBeenCalled();
+    });
+});
+
+describe("askingDismissProps", () => {
+    const event = () => ({ preventDefault: vi.fn() });
+
+    it("stops Zag's close on Escape and a press outside, asking first", () => {
+        const close = vi.fn();
+        const onClose = vi.fn(() => true);
+        const props = askingDismissProps(onClose, {}, closeAsker(), close);
+        const escape = event();
+        props.onEscapeKeyDown!(escape);
+        expect(escape.preventDefault).toHaveBeenCalled();
+        const outside = event();
+        props.onInteractOutside!(outside);
+        expect(outside.preventDefault).toHaveBeenCalled();
+        expect(onClose).toHaveBeenCalledTimes(2);
+        expect(close).toHaveBeenCalledTimes(2);
+    });
+
+    it("asks only where Zag would close, and adds nothing without onClose", () => {
+        const close = vi.fn();
+        const onClose = vi.fn(() => true);
+        const props = askingDismissProps(
+            onClose,
+            { closeOnEscape: false, modal: false },
+            closeAsker(),
+            close,
+        );
+        props.onEscapeKeyDown!(event());
+        props.onInteractOutside!(event());
+        expect(onClose).not.toHaveBeenCalled();
+        expect(askingDismissProps(undefined, {}, closeAsker(), close)).toEqual(
+            {},
+        );
     });
 });

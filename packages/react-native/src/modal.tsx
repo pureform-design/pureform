@@ -3,7 +3,9 @@
 // window holding a portal host of its own, so menus, tooltips and selects opened inside draw over
 // it; and, for those over a scrim, the scrim, the press outside and the positioned surface.
 
-import type { ChangeDetails } from "@pureform/binding-core";
+import { closeAsker } from "@pureform/binding-core";
+import type { ChangeDetails, CloseQuestion } from "@pureform/binding-core";
+import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { Modal, Pressable, StyleSheet, View } from "react-native";
 import type { StyleProp, ViewStyle } from "react-native";
@@ -27,10 +29,13 @@ export interface ModalOverlayOptions {
         | undefined;
     /** @default true */
     readonly closeOnEscape?: boolean | undefined;
+    /** Asked before it closes by itself (Escape, the back button, `close`), if given. */
+    readonly onClose?: CloseQuestion | undefined;
 }
 
 /** A modal overlay's state: whether it's open, its presence (at `motion`, the dialog's by
- *  default), and the means to open and close it. Escape and the back button close the topmost overlay: a menu
+ *  default), and the means to open and close it: `close` asks `onClose` first, `closeNow`
+ *  doesn't, and `asker` asks for the overlay's other ways of closing. Escape and the back button close the topmost overlay: a menu
  *  opened inside first, then this one, unless `closeOnEscape` is `false`. */
 export function useModalOverlay(
     component: string,
@@ -46,8 +51,16 @@ export function useModalOverlay(
         false,
     );
     const presence = usePresence(open, motion);
-    const close = useStableCallback(() => {
+    // Every way it closes by itself asks `onClose` through one asker, so a later question
+    // makes an earlier answer moot.
+    const [asker] = useState(closeAsker);
+    useEffect(() => () => asker.cancel(), [asker]);
+    /** Closes it without asking. */
+    const closeNow = useStableCallback(() => {
         if (open) setOpen(false);
+    });
+    const close = useStableCallback(() => {
+        if (open) asker.ask(options.onClose, closeNow, () => {});
     });
     const show = useStableCallback(() => {
         if (!open) setOpen(true);
@@ -56,7 +69,7 @@ export function useModalOverlay(
     useDismiss(open, () => {
         if (closeOnEscape) close();
     });
-    return { open, setOpen, presence, close, show };
+    return { open, setOpen, presence, close, closeNow, asker, show };
 }
 
 /** The `Modal` window an open overlay draws in: a window of its own on a device, which takes the

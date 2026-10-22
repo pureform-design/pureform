@@ -30,7 +30,13 @@ import type {
 } from "@pureform/binding-core";
 import { dragToDismiss } from "@pureform/binding-core/dom";
 import { mergeProps, normalizeProps } from "@zag-js/react";
-import { type ElementType, type ReactNode, useCallback, useRef } from "react";
+import {
+    type ElementType,
+    type ReactNode,
+    useCallback,
+    useEffect,
+    useState,
+} from "react";
 
 import { Button } from "../button";
 import { dialogParts } from "../dialog-parts";
@@ -74,6 +80,7 @@ const chrome = dialogParts({
     positionerLayout: (present, props) =>
         bottomSheetPositionerLayout(present, sheetModal(props)),
     contentLayout: sheetContentLayout,
+    onClose: (props) => props.onClose,
 });
 
 const { context } = chrome;
@@ -113,33 +120,38 @@ function DragHandle({
     as,
     ...props
 }: BottomSheetTriggerProps): ReactNode {
-    const {
-        scope,
-        api,
-        latestApi,
-        surface,
-        props: root,
-    } = context.use("DragHandle");
-    const latestRoot = useRef(root);
-    latestRoot.current = root;
+    const { scope, api, latestApi, surface, asker, requestClose, onClose } =
+        context.use("DragHandle");
+    // After a drag closed it: once that render has committed, a sheet still open (one the app
+    // kept open) settles back.
+    const [left, setLeft] = useState<{ readonly kept: () => void }>();
+    useEffect(() => {
+        if (left && latestApi.current.open) left.kept();
+    }, [left, latestApi]);
     const ref = useCallback(
         (element: HTMLElement | null) =>
             element
                 ? dragToDismiss(
                       element,
                       () => surface.current,
-                      () => latestApi.current.setOpen(false),
-                      () => latestRoot.current.onClose?.() ?? true,
+                      (kept) => {
+                          latestApi.current.setOpen(false);
+                          setLeft({ kept });
+                      },
+                      () => onClose()?.() ?? true,
+                      asker,
                   )
                 : undefined,
-        [surface, latestApi],
+        [surface, latestApi, asker, onClose],
     );
+    const close = api.getCloseTriggerProps();
     return scope.render("dragHandle", {
         element: "button",
         as: (as as ElementType | undefined) ?? DragHandleComponent,
         ref,
+        // A press asks `onClose` too, rather than closing through Zag at once.
         machine: mergeProps(
-            api.getCloseTriggerProps(),
+            onClose() ? { ...close, onClick: requestClose } : close,
             normalizeProps.element(sheetDragHandleLayout),
         ),
         unstyled,

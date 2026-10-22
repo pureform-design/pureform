@@ -5,15 +5,21 @@
 // drag handle, Escape, or the back button closes it, and so does a drag down on the handle past a
 // quarter of the sheet's height. The sheet follows the drag down; a shorter drag lets it settle
 // back on the theme's default spatial spring, carrying the release's velocity (at once under
-// reduced motion), as Compose's sheets do. Given `onClose`, a dismissing drag asks it first and
+// reduced motion), as Compose's sheets do. Given `onClose`, every way it closes by itself asks it
+// first (Escape, the back button, the scrim, a press on the handle, a drag); a dismissing drag
 // holds where it was let go until the answer, then leaves or settles back. Its `Modal` holds a
 // portal host of its own, so menus, tooltips, and selects opened inside draw over it.
 
 import { bottomSheetAnatomy } from "@pureform/anatomy";
 import type { PartName, TestIdOverride } from "@pureform/anatomy";
-import { bottomSheetSelection, sheetModal } from "@pureform/binding-core";
+import {
+    bottomSheetSelection,
+    closeAsker,
+    sheetModal,
+} from "@pureform/binding-core";
 import type {
     BottomSheetCloseProps,
+    CloseAsker,
     BottomSheetVariantProps,
     ChangeDetails,
 } from "@pureform/binding-core";
@@ -78,7 +84,10 @@ const NEEDS_CLOSE: () => void = () => {};
 
 function BottomSheetImpl(
     props: BottomSheetProps & {
+        /** Closes the modal sheet holding it, without asking. */
         readonly close?: (() => void) | undefined;
+        /** The modal sheet's asker, shared with its Escape and scrim. */
+        readonly asker?: CloseAsker | undefined;
         /** Whether the modal sheet holding it is open. */
         readonly shown?: boolean | undefined;
     },
@@ -97,6 +106,12 @@ function BottomSheetImpl(
             ? NEEDS_CLOSE
             : () => props.onOpenChange?.({ open: false }));
     const latestClose = useStableCallback(() => close());
+    const [ownAsker] = useState(closeAsker);
+    const asker = props.asker ?? ownAsker;
+    // A press on the handle asks `onClose` first.
+    const requestClose = useStableCallback(() =>
+        asker.ask(props.onClose, latestClose, () => {}),
+    );
     // How far down the drag has moved the sheet, apart from its enter and exit.
     const drag = useMemo(() => new Animated.Value(0), []);
     const tokens = useTokens();
@@ -129,34 +144,23 @@ function BottomSheetImpl(
         latestClose();
         setLeft({ velocity });
     });
-    // Counts the questions `onClose` was asked, so an answer after another drag is moot.
-    const asking = useRef(0);
-    // A dismissing drag asks `onClose` first; it holds where it was let go until the answer.
+    // A dismissing drag asks `onClose` first; it holds where it was let go until the answer,
+    // and an answer that comes later leaves or settles from rest speed.
     const latestDismiss = useStableCallback((velocity: number) => {
-        const answer = props.onClose?.() ?? true;
-        if (typeof answer === "boolean") {
-            if (answer) latestLeave(velocity);
-            else latestSettle(velocity);
-            return;
-        }
-        const asked = ++asking.current;
-        answer.then(
-            (yes) => {
-                if (asked !== asking.current) return;
-                if (yes) latestLeave(0);
-                else latestSettle(0);
-            },
-            () => {
-                if (asked === asking.current) latestSettle(0);
-            },
+        let now = true;
+        asker.ask(
+            props.onClose,
+            () => latestLeave(now ? velocity : 0),
+            () => latestSettle(now ? velocity : 0),
         );
+        now = false;
     });
     useEffect(
         () => () => {
             stopSettle.current();
-            asking.current++;
+            ownAsker.cancel();
         },
-        [],
+        [ownAsker],
     );
     // A drag down on the handle past a quarter of the sheet's height closes it; it leaves from
     // where the drag left it.
@@ -167,7 +171,7 @@ function BottomSheetImpl(
                     gesture.dy > 4 &&
                     Math.abs(gesture.dy) > Math.abs(gesture.dx),
                 onPanResponderGrant: () => {
-                    asking.current++;
+                    asker.cancel();
                     stopSettle.current();
                 },
                 onPanResponderMove: (_, gesture) =>
@@ -180,7 +184,7 @@ function BottomSheetImpl(
                 onPanResponderTerminate: (_, gesture) =>
                     latestSettle(gesture.vy),
             }),
-        [latestDismiss, latestSettle, drag],
+        [latestDismiss, latestSettle, drag, asker],
     );
     const id = (part: Part) => testIdOf(bottomSheetAnatomy, part, props.testId);
     if (!presence.present) return null;
@@ -216,7 +220,7 @@ function BottomSheetImpl(
                     >
                         <DragHandle
                             aria-label={props.dragHandleLabel ?? "Close sheet"}
-                            onPress={close}
+                            onPress={requestClose}
                         />
                     </v.dragHandle.View>
                 )}
@@ -245,7 +249,7 @@ function ModalBottomSheet(props: BottomSheetProps): ReactNode {
         closeOnEscape: _closeOnEscape,
         ...surface
     } = props;
-    const { open, presence, close, show } = useModalOverlay(
+    const { open, presence, close, closeNow, asker, show } = useModalOverlay(
         "BottomSheet",
         props,
         "bottomSheet",
@@ -268,7 +272,12 @@ function ModalBottomSheet(props: BottomSheetProps): ReactNode {
                     onPressOutside={close}
                     positionerStyle={styles.positioner}
                 >
-                    <Surface {...surface} close={close} shown={open} />
+                    <Surface
+                        {...surface}
+                        close={closeNow}
+                        asker={asker}
+                        shown={open}
+                    />
                 </ModalScrimLayer>
             </ModalWindow>
         </>

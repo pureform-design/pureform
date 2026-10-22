@@ -378,9 +378,10 @@ import { RichTooltip } from "@pureform/react/rich-tooltip";
 - **The bottom sheet** runs on the same Zag machine, in a positioner fixed to the bottom of the
   viewport, over a `Backdrop` when modal (`modal={false}` makes a standard sheet, no backdrop, the
   page usable). Its `DragHandle` (the drag handle component) closes it on a press or a drag down
-  past a quarter of its height. Root's `onClose` is asked before a drag closes it: `true` closes,
-  `false` settles it back, and a promise holds the sheet where it was let go until it settles
-  (resolved `true` leaves). The ready-made takes `trigger`, `dragHandle`, `dragHandleLabel`
+  past a quarter of its height. Root's `onClose` is asked before any close of its own: Escape, the
+  scrim, a press on the handle, or a drag. `true` closes, `false` keeps it open (a dragged sheet
+  settles back), and a promise keeps it open (a dragged sheet holding where it was let go) until
+  it settles (resolved `true` leaves). The ready-made takes `trigger`, `dragHandle`, `dragHandleLabel`
   and `body`. Import it from `@pureform/react/bottom-sheet`.
 - **The side sheet** sits against the end edge of the viewport (`coplanar` puts a standard sheet
   in the page's layout). Its `Header` holds a `BackButton`, the `Headline` and the

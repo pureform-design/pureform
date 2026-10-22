@@ -55,13 +55,99 @@ export interface SideSheetVariantProps {
     readonly tokens?: InstanceTokens<"sideSheet"> | undefined;
 }
 
-/** What a bottom sheet asks before a drag closes it. */
+/** Asked before an overlay closes: `true` closes it, `false` keeps it open. It may answer
+ *  later, with a promise (a rejection keeps it open). */
+export type CloseQuestion = () => boolean | Promise<boolean>;
+
+/** What a bottom sheet asks before it closes. */
 export interface BottomSheetCloseProps {
-    /** Asked when a drag on the drag handle would close the sheet: `true` closes it, `false`
-     *  keeps it open. Given a promise, the sheet holds where the drag let go of it until it
-     *  settles, then leaves (resolved `true`) or springs back. Without, a drag closes it. */
-    readonly onClose?: (() => boolean | Promise<boolean>) | undefined;
+    /** Asked whenever the sheet would close by itself: Escape (or the back button), a press on
+     *  the scrim, a press on the drag handle, or a drag down on it. `true` closes it, `false`
+     *  keeps it open. Given a promise, it stays open until the promise settles, a dragged sheet
+     *  holding where the drag let go of it, then leaves (resolved `true`) or springs back.
+     *  Without, each of these closes it. Closing it through `open` doesn't ask. */
+    readonly onClose?: CloseQuestion | undefined;
 }
+
+/** Asks an overlay's `onClose` and acts on the answer, `yes` or `no`, once it comes. */
+export interface CloseAsker {
+    /** Asks `onClose` (without one, the answer is yes). A boolean answers at once; a promise
+     *  when it settles, a rejection meaning no. An answer after a later question, or after
+     *  `cancel`, is ignored. */
+    ask(
+        onClose: CloseQuestion | undefined,
+        yes: () => void,
+        no: () => void,
+    ): void;
+    /** Ignores the answer to any question still open: another drag started, or the overlay
+     *  went away. */
+    cancel(): void;
+}
+
+/** A `CloseAsker`, one per overlay, shared by every way it closes. */
+export const closeAsker = (): CloseAsker => {
+    // Counts the questions, so an answer to an older one is moot.
+    let asking = 0;
+    return {
+        ask(onClose, yes, no) {
+            const asked = ++asking;
+            let answer: boolean | Promise<boolean>;
+            try {
+                answer = onClose?.() ?? true;
+            } catch (error) {
+                no();
+                throw error;
+            }
+            if (typeof answer === "boolean") {
+                if (answer) yes();
+                else no();
+                return;
+            }
+            answer.then(
+                (closes) => {
+                    if (asked !== asking) return;
+                    if (closes) yes();
+                    else no();
+                },
+                () => {
+                    if (asked === asking) no();
+                },
+            );
+        },
+        cancel() {
+            asking++;
+        },
+    };
+};
+
+/** What Zag's dialog props add so Escape and a press outside ask `onClose` first: each stops
+ *  Zag's own close (only where Zag would close: `closeOnEscape`, and `closeOnInteractOutside`,
+ *  which defaults to `modal`) and asks, and `close` closes on a yes. Without `onClose`,
+ *  nothing. */
+export const askingDismissProps = (
+    onClose: CloseQuestion | undefined,
+    props: Pick<
+        DialogBehaviorProps,
+        "closeOnEscape" | "closeOnInteractOutside"
+    > & { readonly modal?: boolean | undefined },
+    asker: CloseAsker,
+    close: () => void,
+) => {
+    if (!onClose) return {};
+    const ask = (event: { preventDefault(): void }) => {
+        event.preventDefault();
+        asker.ask(onClose, close, () => {});
+    };
+    return {
+        onEscapeKeyDown: (event: { preventDefault(): void }) => {
+            if (props.closeOnEscape !== false) ask(event);
+        },
+        onInteractOutside: (event: { preventDefault(): void }) => {
+            if (props.closeOnInteractOutside ?? props.modal !== false)
+                ask(event);
+        },
+    };
+};
 
 /** Everything the bottom sheet's Root takes for itself, besides the element's own props and
  *  `as`. */

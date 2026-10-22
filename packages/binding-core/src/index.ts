@@ -140,10 +140,12 @@ export type {
     FullscreenDialogVariantProps,
 } from "./components/fullscreen-dialog";
 export {
+    askingDismissProps,
     BOTTOM_SHEET_CONTENT_PROPS,
     BOTTOM_SHEET_ROOT_PROPS,
     bottomSheetPositionerLayout,
     bottomSheetSelection,
+    closeAsker,
     SIDE_SHEET_CONTENT_PROPS,
     SIDE_SHEET_ROOT_PROPS,
     sheetContentLayout,
@@ -155,6 +157,8 @@ export {
 } from "./components/sheet";
 export type {
     BottomSheetCloseProps,
+    CloseAsker,
+    CloseQuestion,
     BottomSheetContentProps,
     BottomSheetPart,
     BottomSheetRootOwnProps,

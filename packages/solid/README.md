@@ -382,9 +382,10 @@ import { RichTooltip } from "@pureform/solid/rich-tooltip";
   given back to the trigger, a click outside closes it); `modal={false}` is a standard sheet that
   leaves the page usable, with no backdrop. A coplanar side sheet (`modal={false} coplanar`)
   stays in the page's layout. The bottom sheet's `DragHandle` closes it on a press, and on a drag
-  down past a quarter of its height or a flick. Root's `onClose` is asked before a drag closes it:
-  `true` closes, `false` settles it back, and a promise holds the sheet where it was let go until
-  it settles (resolved `true` leaves). The side sheet's ready-made draws a back icon
+  down past a quarter of its height or a flick. Root's `onClose` is asked before any close of its own:
+  Escape, the scrim, a press on the handle, or a drag. `true` closes, `false` keeps it open (a
+  dragged sheet settles back), and a promise keeps it open (a dragged sheet holding where it was
+  let go) until it settles (resolved `true` leaves). The side sheet's ready-made draws a back icon
   button when given `onBack`, and always a close icon button. Import them from
   `@pureform/solid/bottom-sheet` and `@pureform/solid/side-sheet`; the drag handle alone from
   `@pureform/solid/drag-handle`.

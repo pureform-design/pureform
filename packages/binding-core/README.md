@@ -282,7 +282,9 @@ fullscreenDialogPositionerLayout(present); // hidden once gone; fixed over the v
 // Sheets: the dialog's Zag machine; bottomSheetOverlayAnatomy, sideSheetOverlayAnatomy
 type BottomSheetPart; type SideSheetPart  // the overlays' parts, and "backdrop"
 interface BottomSheetRootOwnProps        // modal, tokens, onClose, the dialog's behavior props (no role), testId, unstyled
-interface BottomSheetCloseProps          // onClose: asked before a drag closes it (a boolean, or a promise it holds for)
+interface BottomSheetCloseProps          // onClose: asked before any close of its own (Escape, scrim, handle press, drag): a boolean, or a promise
+closeAsker();                            // asks an overlay's onClose for every way it closes; a later question makes an earlier answer moot
+askingDismissProps(onClose, props, asker, close); // Zag dialog props: Escape and a press outside ask onClose first
 interface SideSheetRootOwnProps          // modal, coplanar, tokens, and the same
 BOTTOM_SHEET_ROOT_PROPS; BOTTOM_SHEET_CONTENT_PROPS; // trigger, dragHandle, dragHandleLabel, body
 SIDE_SHEET_ROOT_PROPS; SIDE_SHEET_CONTENT_PROPS;     // trigger, headline, onBack, backLabel, backIcon,
@@ -293,7 +295,8 @@ sheetMachineProps(props);                // modal by default; a click outside cl
 bottomSheetPositionerLayout(present, modal); // fixed to the bottom; a standard one lets presses through
 sideSheetPositionerLayout(present, modal, coplanar); // fixed to the end edge, or in the page's layout
 sheetContentLayout;                      // the surface takes presses back
-dragToDismiss(handle, sheet, dismiss, onClose?); // from /dom: drag a sheet down by its handle to close it
+dragToDismiss(handle, sheet, dismiss, onClose?, asker?); // from /dom: drag a sheet down by its handle to close it; dismiss(kept) calls kept once rendered if the app kept it open
+markMenuGroupEdges(content);             // from /dom: marks a menu's first and last groups data-first/data-last, from DOM order
 swallowNextClick(row);                   // from /dom: drop the click a drag ends with
 
 // Drag handle: dragHandleAnatomy

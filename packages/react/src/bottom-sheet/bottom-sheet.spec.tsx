@@ -117,6 +117,57 @@ describe("BottomSheet, ready-made", () => {
         expect(onOpenChange).toHaveBeenLastCalledWith({ open: false });
     });
 
+    it("asks onClose before Escape, the scrim, the handle's press, or a drag closes it", async () => {
+        const onOpenChange = vi.fn();
+        let answer = false;
+        const onClose = vi.fn(() => answer);
+        withRegistry(
+            <BottomSheet
+                defaultOpen
+                aria-label="Share"
+                body="Options"
+                onOpenChange={onOpenChange}
+                onClose={onClose}
+            />,
+        );
+        await frames();
+        const handle = byTestId(ids.dragHandle);
+        const drag = () => {
+            for (const [type, y] of [
+                ["pointerdown", 0],
+                ["pointermove", 2000],
+                ["pointerup", 2000],
+            ] as const)
+                handle.dispatchEvent(
+                    new PointerEvent(type, {
+                        clientY: y,
+                        pointerId: 1,
+                        button: 0,
+                        bubbles: true,
+                    }),
+                );
+        };
+        await interact(() => userEvent.keyboard("{Escape}"));
+        await interact(() => userEvent.click(byTestId(ids.dragHandle)));
+        await interact(() =>
+            userEvent.click(byTestId(ids.positioner), {
+                position: { x: 5, y: 5 },
+                force: true,
+            }),
+        );
+        drag();
+        await frames();
+        expect(onClose).toHaveBeenCalledTimes(4);
+        expect(onOpenChange).not.toHaveBeenCalled();
+        // Kept open, the dragged sheet settled back once that render committed.
+        expect(byTestId(ids.content).style.translate).toBe("");
+        answer = true;
+        await interact(() => userEvent.keyboard("{Escape}"));
+        await frames();
+        expect(onClose).toHaveBeenCalledTimes(5);
+        expect(onOpenChange).toHaveBeenLastCalledWith({ open: false });
+    });
+
     it("as a standard sheet, has no backdrop, doesn't trap focus, and lets presses beside it through", async () => {
         withRegistry(
             <BottomSheet modal={false} defaultOpen aria-label="Now playing" />,

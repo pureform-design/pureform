@@ -871,6 +871,43 @@ describe("the sheets", () => {
         expect(asked).toEqual([true, false, true, false]);
     });
 
+    it("asks onClose before Escape, the scrim, or the drag handle's press closes a modal bottom sheet", async () => {
+        const asked: boolean[] = [];
+        let answer = false;
+        let questions = 0;
+        await render(
+            <BottomSheet
+                defaultOpen
+                aria-label="Share"
+                onOpenChange={(details) => asked.push(details.open)}
+                onClose={() => {
+                    questions++;
+                    return answer;
+                }}
+            >
+                Share to
+            </BottomSheet>,
+        );
+        await settle(600);
+        expect(sheet("bottom-sheet")).not.toBeNull();
+        await interact(() => userEvent.keyboard("{Escape}"));
+        await press("Close sheet");
+        const beside = document.elementFromPoint(4, 4) as HTMLElement;
+        expect(sheet("bottom-sheet")!.contains(beside)).toBe(false);
+        await interact(() =>
+            userEvent.click(beside, { position: { x: 4, y: 4 } }),
+        );
+        await settle(100);
+        expect(questions).toBe(3);
+        expect(asked).toEqual([]);
+        expect(sheet("bottom-sheet")).not.toBeNull();
+        answer = true;
+        await press("Close sheet");
+        await until(() => sheet("bottom-sheet") === null);
+        expect(questions).toBe(4);
+        expect(asked).toEqual([false]);
+    });
+
     it("renders a standard bottom sheet as its surface alone", async () => {
         await render(<BottomSheet modal={false}>Share to</BottomSheet>);
         expect(sheet("bottom-sheet")).not.toBeNull();
