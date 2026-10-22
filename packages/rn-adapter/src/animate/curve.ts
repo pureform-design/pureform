@@ -24,16 +24,21 @@ export interface AnimatedTiming {
     readonly spring?: Spring | undefined;
 }
 
+/** Where a spring starts moving: its progress per second as it starts, such as a released
+ *  drag's speed. */
+export type StartVelocity = number;
+
 // How close to rest a spring stops, as the web's sampled curve settles: within a thousandth of
 // the distance, which is 0 to 1 here.
 const REST = 0.001;
 
 /** Animate `progress` to 1 on a timing: `Animated.spring` with the spring's stiffness, damping
- *  coefficient, and mass, or `Animated.timing` with its duration and curve. */
+ *  coefficient, and mass (starting at `velocity`, in progress per second), or `Animated.timing` with its duration and curve. */
 export const animate = (
     progress: Animated.Value,
     timing: AnimatedTiming,
     useNativeDriver: boolean,
+    velocity: StartVelocity = 0,
 ): Animated.CompositeAnimation =>
     timing.spring
         ? Animated.spring(progress, {
@@ -41,6 +46,7 @@ export const animate = (
               stiffness: timing.spring.stiffness,
               damping: timing.spring.damping,
               mass: timing.spring.mass,
+              velocity,
               delay: timing.delay ?? 0,
               restDisplacementThreshold: REST,
               restSpeedThreshold: REST,

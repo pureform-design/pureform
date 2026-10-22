@@ -156,11 +156,13 @@ const splitSelection = (
 
 /** A component's styles through the provider's engine, for its selection (variants and
  *  instance tokens, over the provider's defaults) and its state, and its slots' views (`P`, its
- *  slots' names). Instance tokens tween. */
+ *  slots' names). Instance tokens tween, a token in `velocities` starting at that speed (in its
+ *  units per second) where it moves on a spring. */
 export function useComponentSlots<P extends string = string>(
     name: string,
     selection: Record<string, unknown>,
     state: State = {},
+    velocities?: Readonly<Record<string, number>>,
 ): ComponentSlots<P> {
     const provider = usePureform();
     const factory = useEntryFactory(name);
@@ -173,8 +175,22 @@ export function useComponentSlots<P extends string = string>(
             selection as Selection<string>,
         ) as Record<string, unknown>,
     );
-    const styles = provider.engine.useStyles(name, variants, state, tokens);
-    const selected = useComponentState(name, variants, state, tokens);
+    const keyed = velocities
+        ? Object.fromEntries(
+              Object.entries(velocities).map(([token, v]) => [
+                  factory.tokens[token] ?? token,
+                  v,
+              ]),
+          )
+        : undefined;
+    const styles = provider.engine.useStyles(
+        name,
+        variants,
+        state,
+        tokens,
+        keyed,
+    );
+    const selected = useComponentState(name, variants, state, tokens, keyed);
     return { styles, selected, views: viewsOf(provider.engine, factory) };
 }
 

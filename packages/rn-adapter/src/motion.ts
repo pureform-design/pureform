@@ -256,6 +256,28 @@ export const tokensAt = (
     return next;
 };
 
+/** How fast an instance token is moving as its transition starts, in its units per second, by
+ *  key: a released drag's speed, which a spring carries on. */
+export type TokenVelocities = Readonly<Record<string, number>>;
+
+/** The progress per second the moving tokens' one clock starts at: the first moving numeric
+ *  token's velocity over the distance it moves, or 0. */
+export const startVelocity = (
+    from: ThemeValues,
+    to: ThemeValues,
+    moving: readonly [string, Transition][],
+    velocities: TokenVelocities | undefined,
+): number => {
+    if (!velocities) return 0;
+    for (const [token] of moving) {
+        const [v, a, b] = [velocities[token], from[token], to[token]];
+        if (v === undefined || typeof a !== "number" || typeof b !== "number")
+            continue;
+        return a === b ? 0 : v / (b - a);
+    }
+    return 0;
+};
+
 /** Where an overlay is at one end of its enter or exit: how opaque, and how far it's scaled
  *  and moved down (in pixels). A move it leaves out is none. */
 export interface PresenceFrame {

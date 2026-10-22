@@ -64,6 +64,7 @@ import {
     tweens,
 } from "./shared";
 import type { ColorGroups, Densities } from "./shared";
+import { springTweens } from "./spring-motion";
 import { supportingTextStyle } from "./supporting-text";
 
 /** The tokens every text input has. */
@@ -207,18 +208,22 @@ const textValue = (
 
 // The label floats with its color. Its inset moves too where a leading icon pushes it in, and
 // the outlined label's notch (padding, margin, background) grows with it.
-const labelTransition = tweens(
-    "top",
-    "insetInlineStart",
-    "paddingInlineStart",
-    "paddingInlineEnd",
-    "marginInlineStart",
-    "backgroundColor",
-    "transform",
-    "fontSize",
-    "lineHeight",
-    "letterSpacing",
-    "color",
+// Compose floats it on `FastSpatial` and fades its color on `FastEffects` (`TextFieldImpl.kt`);
+// the colors stay on their tween here.
+const labelTransition = springTweens(
+    "spatialFast",
+    [
+        "top",
+        "insetInlineStart",
+        "paddingInlineStart",
+        "paddingInlineEnd",
+        "marginInlineStart",
+        "transform",
+        "fontSize",
+        "lineHeight",
+        "letterSpacing",
+    ],
+    ["backgroundColor", "color"],
 );
 
 // The filled container's bottom indicator, an inset shadow so it thickens without moving

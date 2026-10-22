@@ -1061,6 +1061,12 @@ damping, mass? })` builds one; `spring({ duration, bounce })` converts a percept
   Reanimated as two CSS animations, ending the step when both have. The toast moves and resizes
   in its stack on `spatialFast` and fades on its tween. Reduced motion is unchanged: each moving
   step gives way to its fade alone, and the settle is instant.
+- **Containers (m2c).** Every chevron that turns (the expand indicator of the list item,
+  accordion and tree, the select's arrow) turns on `spatialFast` (`chevronTransition`), its color
+  on its tween; the field label floats on `spatialFast` (Compose's `FastSpatial` in
+  `TextFieldImpl.kt`), its colors on their tween. A swipeable list item's `swipeOffset` follows
+  the drag at once and settles on `spatialFast` after release; on React Native the spring starts
+  at the release velocity (`useComponentSlots`' `velocities`, `Animated.spring`'s `velocity`).
 - **Emphasized.** M3's emphasized easing is a two-segment path, which `cubic-bezier()` can't
   draw; with `linear()` it can. `MATERIAL_EASINGS.emphasized` samples the path from
   material-components-android's tokens with `sampleCubicPath` (each segment densely along its

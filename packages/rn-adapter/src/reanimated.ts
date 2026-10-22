@@ -17,6 +17,7 @@ import type {
     PresenceView,
     SlideMotion,
 } from "./motion";
+import type { TokenVelocities } from "./motion";
 import { useComponentState } from "./react";
 import type { State } from "./select";
 import type { ThemeValues } from "./values";
@@ -89,12 +90,14 @@ export const useReanimatedComponentStyles = (
     variants: Record<string, string | boolean | undefined> = {},
     state: State = {},
     tokens?: ThemeValues,
+    velocities?: TokenVelocities,
 ): Record<string, Record<string, unknown>> => {
     const { styles, transitions, animations } = useComponentState(
         name,
         variants,
         state,
         tokens,
+        velocities,
     );
     return useMemo(
         () =>
