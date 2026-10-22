@@ -177,7 +177,12 @@ describe("COMPONENT_USAGE", () => {
                 PACKAGES[`../../${binding}/package.json`]!.exports,
             )
                 .map((key) => key.replace(/^\.\/?/, ""))
-                .filter((key) => key && !key.startsWith("internal/"));
+                .filter(
+                    (key) =>
+                        key &&
+                        !key.startsWith("internal/") &&
+                        key !== "storybook",
+                );
             expect(exports.sort()).toEqual(Object.keys(COMPONENT_USAGE).sort());
         }
     });
@@ -212,7 +217,12 @@ describe("COMPONENT_USAGE", () => {
             .filter(
                 (key) =>
                     key &&
-                    !["svg", "reanimated", "reanimated-svg"].includes(key),
+                    ![
+                        "svg",
+                        "reanimated",
+                        "reanimated-svg",
+                        "storybook",
+                    ].includes(key),
             );
         expect(exports.length).toBeGreaterThan(0);
         for (const subpath of exports) {
