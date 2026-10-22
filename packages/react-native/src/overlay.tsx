@@ -423,10 +423,7 @@ export function useAnchoredOverlay(
  *  (which measures it, then opens) and `close`, and the button's `onLayout` and `style`, which
  *  cover the trailing icon at the field's height. The back button or Escape closes it. Render
  *  the popup while `presence.present && anchor`. */
-export function useFieldPopup(
-    open: boolean,
-    setOpen: (open: boolean) => void,
-) {
+export function useFieldPopup(open: boolean, setOpen: (open: boolean) => void) {
     const presence = usePresence(open, "popup");
     const container = useRef<Measurable>(null);
     const [anchor, setAnchor] = useState<WindowRect>();

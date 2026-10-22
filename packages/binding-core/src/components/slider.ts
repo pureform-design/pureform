@@ -179,7 +179,11 @@ export const sliderTrackTokens = (
 
 /** The inset icon's measures, as the preset's `insetIconSize` and `insetIconPadding`, and the
  *  bar handle's clearance (half its width and the gap beside it). */
-export const SLIDER_INSET_ICON = { size: 20, padding: 10, clearance: 8 } as const;
+export const SLIDER_INSET_ICON = {
+    size: 20,
+    padding: 10,
+    clearance: 8,
+} as const;
 
 /** Whether the inset icon doesn't fit in the active track, `length` pixels long along the axis
  *  (0 when unmeasured: it fits), so it moves to the start of the inactive track: Compose's track

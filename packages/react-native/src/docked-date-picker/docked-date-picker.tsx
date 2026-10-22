@@ -226,8 +226,10 @@ export function DockedDatePicker(props: DockedDatePickerProps): ReactNode {
     const [text, setText] = useState(shownText);
     useEffect(() => setText(shownText), [shownText]);
     const engine = useEngine();
-    const { presence, container, anchor, show, close, trigger } =
-        useFieldPopup(open, setOpen);
+    const { presence, container, anchor, show, close, trigger } = useFieldPopup(
+        open,
+        setOpen,
+    );
     const commitText = () => {
         if (text.trim() === "") {
             if (value.length > 0) setValue([]);
