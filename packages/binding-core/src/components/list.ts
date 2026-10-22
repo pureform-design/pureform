@@ -85,6 +85,7 @@ export const listItemVariants = (
     leadingType: item.leadingType ?? list?.leadingType,
     position: item.position,
     swipeable: item.swipeable,
+    actionColor: item.actionColor,
     density: item.density ?? list?.density,
     color: item.color ?? list?.color,
     tokens:

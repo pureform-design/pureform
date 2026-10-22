@@ -390,6 +390,20 @@ describe("a swipeable ListItem", () => {
         expect(onRevealedChange).toHaveBeenLastCalledWith({ revealed: false });
     });
 
+    it("takes an error colour for a destructive action", async () => {
+        withRegistry(
+            <ListItem
+                headline="Message"
+                actionColor="error"
+                swipeAction={<button type="button">Delete</button>}
+            />,
+        );
+        await settle();
+        expect(byTestId(ids.root).className).toContain(
+            "list-item--actionColor-error",
+        );
+    });
+
     it("can be started revealed, with its action in reach", async () => {
         withRegistry(
             <ListItem

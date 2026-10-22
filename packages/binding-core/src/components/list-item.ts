@@ -39,6 +39,9 @@ export interface ListItemVariantProps {
     /** The row slides to uncover an action (`swipeAction` on the ready-made item). Set by the
      *  ready-made item when it has one. @default false */
     readonly swipeable?: boolean | undefined;
+    /** The swipe action's colours: the secondary container, or the error container for a
+     *  destructive action. @default "secondary" */
+    readonly actionColor?: VariantProp<"listItem", "actionColor">;
     readonly density?: VariantProp<"listItem", "density">;
     readonly color?: VariantProp<"listItem", "color">;
     readonly tokens?: InstanceTokens<"listItem"> | undefined;
@@ -76,6 +79,7 @@ export const LIST_ITEM_ROOT_PROPS = [
     "leadingType",
     "position",
     "swipeable",
+    "actionColor",
     "density",
     "color",
     "tokens",
@@ -155,6 +159,7 @@ export const listItemSelection = (
     leadingType: props.leadingType,
     position: props.position,
     swipeable: props.swipeable,
+    actionColor: props.actionColor,
     density: props.density,
     color: props.color,
     tokens: props.tokens,

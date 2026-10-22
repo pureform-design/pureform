@@ -730,7 +730,7 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
       "justifyContent": "center",
       "position": "absolute",
       "textStyle": "labelLarge",
-      "width": "var(--components-listItem-swipeWidth, 80)",
+      "width": "var(--components-listItem-actionWidth, 80)",
     },
     "content": {
       "display": "flex",
@@ -870,6 +870,7 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
   "className": "listItem",
   "compoundVariants": [],
   "defaultVariants": {
+    "actionColor": "secondary",
     "color": "primary",
     "density": "inherit",
     "interactive": false,
@@ -895,6 +896,15 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
     "action",
   ],
   "variants": {
+    "actionColor": {
+      "error": {
+        "root": {
+          "--components-listItem-actionContainer": "token(colors.errorContainer)",
+          "--components-listItem-actionContent": "token(colors.onErrorContainer)",
+        },
+      },
+      "secondary": {},
+    },
     "color": {
       "error": {
         "root": {

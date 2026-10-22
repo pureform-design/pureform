@@ -39,7 +39,7 @@ describe("a swipeable list item", () => {
     it("sets the preset's tokens", () => {
         expect(swipeTokens(30, 80)).toEqual({
             swipeOffset: 30,
-            swipeWidth: 80,
+            actionWidth: 80,
         });
     });
 });

@@ -442,7 +442,7 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
   `region` is expandable: a button whose `⌄` indicator turns over, showing the region under it
   while `expanded` (`defaultExpanded`, `onExpandedChange`), React state rather than Zag's
   accordion. A `swipeAction`
-  makes the item swipeable (`revealed`, `defaultRevealed`, `onRevealedChange`, `swipeWidth`): the
+  makes the item swipeable (`revealed`, `defaultRevealed`, `onRevealedChange`, `swipeWidth`; `actionColor="error"` for a destructive action): the
   row takes the drag (a `PanResponder`), so it isn't also pressable; the action is hidden from
   assistive technology until revealed. An item with a `region` doesn't swipe (it's a button, and
   ignores `swipeAction`). `Avatar` takes a `src` that shows once loaded

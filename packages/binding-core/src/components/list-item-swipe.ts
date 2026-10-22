@@ -19,7 +19,7 @@ export const LIST_ITEM_SWIPE_PROPS = [
     "swipeWidth",
 ] as const satisfies readonly (keyof ListItemSwipeProps)[];
 
-/** The action's width when `swipeWidth` isn't given, in pixels (the preset's `swipeWidth`). */
+/** The action's width when `swipeWidth` isn't given, in pixels (the preset's `actionWidth`). */
 export const LIST_ITEM_SWIPE_WIDTH = 80;
 
 /** How far a pointer moves before a press is a drag, in pixels. */
@@ -64,5 +64,5 @@ export const swipeKeyAction = (
  *  in pixels. */
 export const swipeTokens = (offset: number, width: number) => ({
     swipeOffset: offset,
-    swipeWidth: width,
+    actionWidth: width,
 });

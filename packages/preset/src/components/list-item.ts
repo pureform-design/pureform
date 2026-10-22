@@ -84,10 +84,11 @@ const { tokens, ref, own } = rowTokens(
         segmentedContainer: sys("surfaceContainer"),
         ...TILE_RADII,
         // Swipe to reveal: the action under the row, and how far the row has slid (`swipeOffset`,
-        // in pixels along the inline axis, 0 to `swipeWidth`; the binding keeps it in step).
+        // in pixels along the inline axis, 0 to `actionWidth`; the binding keeps it in step).
+        // `actionColor: error` points them at the error container, for a destructive action.
         actionContainer: sys("secondaryContainer"),
         actionContent: on("secondaryContainer"),
-        swipeWidth: unitless(80),
+        actionWidth: unitless(80),
         swipeOffset: unitless(0),
         // The leading part's sizes by type.
         avatarSize: px(40),
@@ -164,7 +165,7 @@ export const createListItem = <
             name: "listItem",
             $meta: {
                 description:
-                    "Material list item. Set lines to the number of text lines, interactive when it is clickable, leadingType to what the leading part holds, and position in a segmented list. Mark it selected with aria-selected or aria-current. An expandable item is a button marked aria-expanded, with its indicator and the nested region after it. swipeable lets the row slide to uncover an action (its swipeOffset token says how far, in pixels).",
+                    "Material list item. Set lines to the number of text lines, interactive when it is clickable, leadingType to what the leading part holds, and position in a segmented list. Mark it selected with aria-selected or aria-current. An expandable item is a button marked aria-expanded, with its indicator and the nested region after it. swipeable lets the row slide to uncover an action (its swipeOffset token says how far, in pixels); actionColor error colours a destructive action.",
             },
             tokens,
             slots: [
@@ -207,6 +208,7 @@ export const createListItem = <
                 leadingType: ["icon", "avatar", "thumbnail", "video"],
                 position: [...POSITIONS],
                 swipeable: ["false", "true"],
+                actionColor: ["secondary", "error"],
                 density: densitySteps<string>(densities),
                 color: groups as ColorGroups,
             },
@@ -250,7 +252,7 @@ export const createListItem = <
                         insetInlineEnd: px(0),
                         insetBlockStart: px(0),
                         insetBlockEnd: px(0),
-                        width: ref("swipeWidth"),
+                        width: ref("actionWidth"),
                         display: flex,
                         alignItems: center,
                         justifyContent: center,
@@ -322,6 +324,19 @@ export const createListItem = <
                             trailingText: slides,
                         },
                     },
+                    // The revealed action's colours: the secondary container, or the error
+                    // container for a destructive action. Tokens only, read by the action.
+                    actionColor: {
+                        secondary: {},
+                        error: {
+                            root: {
+                                tokens: {
+                                    actionContainer: sys("errorContainer"),
+                                    actionContent: on("errorContainer"),
+                                },
+                            },
+                        },
+                    },
                     density: densityTokenVariant(densities),
                     // A group points the selected colors, which the row and its parts read,
                     // at its container roles.
@@ -340,6 +355,7 @@ export const createListItem = <
                     leadingType: "icon",
                     position: "none",
                     swipeable: "false",
+                    actionColor: "secondary",
                     color: DEFAULT_GROUP,
                     density: "inherit",
                 },

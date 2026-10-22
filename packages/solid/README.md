@@ -481,7 +481,9 @@ mirrorIcon?, disabled?, content? }`; a tab without a label shows only its icon, 
   list's tile. `swipeAction` (or `ListItem.Action`) makes the row `swipeable`: dragging it toward
   the inline start (or the arrow keys on the focused row; Escape closes) slides its parts over the
   action, which is `inert` until revealed. `revealed`, `defaultRevealed`, `onRevealedChange` and
-  `swipeWidth` (px, 80) control it. Not for a link or button item: the action is a button.
+  `swipeWidth` (px, 80; the preset's `actionWidth` token) control it; `actionColor="error"`
+  colours a destructive action with the error container. Not for a link or button item: the
+  action is a button. An item with a `region` doesn't swipe.
 - **The list** is a `<ul>` (`listAnatomy`, `pf-list-root`) with each list item in an `<li>`
   (`List.Item`, `pf-list-item`). `variant="segmented"` sets the items apart as tiles, and
   `listTokens` are the list's own tokens. Its `density`, `color`, `leadingType` (`icon`, `avatar`,

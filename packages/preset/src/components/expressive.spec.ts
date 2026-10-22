@@ -167,6 +167,17 @@ describe("M3 Expressive", () => {
         });
     });
 
+    it("colours a list item's swipe action secondary by default, or error for a destructive one", () => {
+        const colors = slotRecipe(listItem, "listItem")?.variants?.actionColor;
+        expect(colors?.secondary).toEqual({});
+        expect(JSON.stringify(colors?.error?.root)).toContain("errorContainer");
+        expect(listItem.recipe.defaultVariants).toMatchObject({
+            actionColor: "secondary",
+        });
+        expect(listItem.tokens).toHaveProperty("actionWidth");
+        expect(listItem.tokens).not.toHaveProperty("swipeWidth");
+    });
+
     it("caps the search bar's width at 720px", () => {
         expect(searchBar.recipe.base.root).toHaveProperty("maxWidth");
     });

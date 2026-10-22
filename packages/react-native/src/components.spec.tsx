@@ -1121,6 +1121,18 @@ describe("c7c: avatar picture, swipe, inset icon, search bar width", () => {
             />
         );
         await render(closed);
+        // A destructive action takes the error container.
+        await render(
+            <ListItem
+                headline="Message"
+                swipeAction={<Glyph glyph="🗑" />}
+                actionColor="error"
+                testId="error"
+            />,
+        );
+        expect(computed("error-action").backgroundColor).not.toBe(
+            computed("closed-action").backgroundColor,
+        );
         expect(byTestId("closed-action").getAttribute("aria-hidden")).toBe(
             "true",
         );

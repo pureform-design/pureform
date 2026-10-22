@@ -183,3 +183,11 @@ variant (c3c/c4b): the bar already rests at elevation 3 and the app bar's scroll
   `insetIconPadding` should change those too. Specs: binding-core `display.spec.ts`, Solid and
   React `slider.spec.tsx`, React Native `components.spec.tsx`, preset `expressive.spec.ts`;
   `variant-overlap.spec.ts` still passes.
+- **Swipe action colour and width (resolved):** the action keeps `secondaryContainer` /
+  `onSecondaryContainer` by default; a new `actionColor` group (`secondary`, `error`) points the
+  `actionContainer` / `actionContent` tokens at `errorContainer` / `onErrorContainer` for a
+  destructive action (tokens only, so `variant-overlap.spec.ts` passes; 0 compounds). The 80px
+  width is the `actionWidth` token (was `swipeWidth`; the bindings' `swipeWidth` prop still sets
+  it through `swipeTokens`). Specs: preset `expressive.spec.ts`, binding-core
+  `list-item-swipe.spec.ts`, Solid and React `list-item.spec.tsx`, React Native
+  `components.spec.tsx`.
