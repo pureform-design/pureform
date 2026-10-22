@@ -1791,6 +1791,14 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
       "false": {},
       "true": {
         "itemGroup": {
+          "&:first-child": {
+            "borderStartEndRadius": "var(--components-menu-outerRadius, token(radii.large))",
+            "borderStartStartRadius": "var(--components-menu-outerRadius, token(radii.large))",
+          },
+          "&:last-child": {
+            "borderEndEndRadius": "var(--components-menu-outerRadius, token(radii.large))",
+            "borderEndStartRadius": "var(--components-menu-outerRadius, token(radii.large))",
+          },
           "backgroundColor": "var(--components-menu-container, token(colors.surfaceContainer))",
           "borderRadius": "var(--components-menu-innerRadius, token(radii.extraSmall))",
           "paddingBlockEnd": "var(--components-menu-paddingBlock, token(spacing.2))",
@@ -1800,7 +1808,7 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
           "backgroundColor": "transparent",
           "borderRadius": "var(--components-menu-outerRadius, token(radii.large))",
           "gap": "var(--components-menu-groupGap, 2px)",
-          "overflow": "hidden",
+          "overflow": "visible",
           "paddingBlockEnd": "0px",
           "paddingBlockStart": "0px",
         },
