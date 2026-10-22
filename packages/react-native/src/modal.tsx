@@ -13,7 +13,7 @@ import { dismissTopOverlay, useDismiss } from "./overlay";
 import { useControllable, useStableCallback } from "./parts";
 import { PortalHost } from "./portal-host";
 import { usePresence } from "./presence";
-import type { Presence } from "./presence";
+import type { OverlayMotionName, Presence } from "./presence";
 import { useEngine } from "./provider";
 import { Scrim } from "./single-part";
 
@@ -29,12 +29,13 @@ export interface ModalOverlayOptions {
     readonly closeOnEscape?: boolean | undefined;
 }
 
-/** A modal overlay's state: whether it's open, its presence (at the dialog's motion), and the
- *  means to open and close it. Escape and the back button close the topmost overlay: a menu
+/** A modal overlay's state: whether it's open, its presence (at `motion`, the dialog's by
+ *  default), and the means to open and close it. Escape and the back button close the topmost overlay: a menu
  *  opened inside first, then this one, unless `closeOnEscape` is `false`. */
 export function useModalOverlay(
     component: string,
     options: ModalOverlayOptions,
+    motion: OverlayMotionName = "dialog",
 ) {
     const [open, setOpen] = useControllable(
         component,
@@ -44,7 +45,7 @@ export function useModalOverlay(
         options.onOpenChange,
         false,
     );
-    const presence = usePresence(open, "dialog");
+    const presence = usePresence(open, motion);
     const close = useStableCallback(() => {
         if (open) setOpen(false);
     });

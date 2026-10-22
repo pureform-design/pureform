@@ -279,10 +279,11 @@ export const startVelocity = (
 };
 
 /** Where an overlay is at one end of its enter or exit: how opaque, and how far it's scaled
- *  and moved down (in pixels). A move it leaves out is none. */
+ *  and moved across and down (in pixels). A move it leaves out is none. */
 export interface PresenceFrame {
     readonly opacity: number;
     readonly scale?: number;
+    readonly translateX?: number;
     readonly translateY?: number;
 }
 
@@ -353,14 +354,22 @@ export interface PresenceDriver {
 export const presenceFrames = (
     step: PresenceStep,
 ): [from: Record<string, unknown>, to: Record<string, unknown>] => {
-    const moves = [step.from, step.to].some(
-        (frame) => (frame.scale ?? 1) !== 1 || (frame.translateY ?? 0) !== 0,
-    );
+    const ends = [step.from, step.to];
+    const across = ends.some((frame) => (frame.translateX ?? 0) !== 0);
+    const moves =
+        across ||
+        ends.some(
+            (frame) =>
+                (frame.scale ?? 1) !== 1 || (frame.translateY ?? 0) !== 0,
+        );
     const style = (frame: PresenceFrame) => ({
         opacity: frame.opacity,
         ...(moves
             ? {
                   transform: [
+                      ...(across
+                          ? [{ translateX: frame.translateX ?? 0 }]
+                          : []),
                       { translateY: frame.translateY ?? 0 },
                       { scale: frame.scale ?? 1 },
                   ],

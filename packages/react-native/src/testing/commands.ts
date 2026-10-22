@@ -5,11 +5,14 @@
 
 import { materialColor, materialLayout } from "@pureform/material";
 import {
+    BOTTOM_SHEET_MOTION,
     DIALOG_MOTION,
     OVERLAY_KEYFRAMES,
     POPUP_MOTION,
     pureform,
     SCRIM_MOTION,
+    SHEET_KEYFRAMES,
+    SIDE_SHEET_MOTION,
 } from "@pureform/preset";
 import { precompute } from "@pureform/rn-adapter";
 import type { PrecomputedStyles } from "@pureform/rn-adapter";
@@ -69,10 +72,14 @@ const emulateReducedMotion: BrowserCommand<
     [value: "reduce" | "no-preference"]
 > = (context, value) => context.page.emulateMedia({ reducedMotion: value });
 
-// A keyframe's value: a number, or a token's length times a factor.
-type FrameValue = number | { token: string; times: number };
+// A keyframe's value: a number, a token's length times a factor, or a percentage as a share.
+type FrameValue = number | { token: string; times: number } | { share: number };
 const frameValue = (node: Record<string, unknown>): FrameValue => {
-    if (node.type === "numeric") return node.value as number;
+    if (node.type === "numeric") {
+        return node.unit === "%"
+            ? { share: (node.value as number) / 100 }
+            : (node.value as number);
+    }
     if (node.type === "alias") {
         return { token: (node.path as string[]).slice(1).join("."), times: 1 };
     }
@@ -80,45 +87,50 @@ const frameValue = (node: Record<string, unknown>): FrameValue => {
         const [a, b] = (node.operands as Record<string, unknown>[]).map(
             frameValue,
         );
-        if (typeof a === "object" && typeof b === "number")
+        if (typeof a === "object" && "token" in a && typeof b === "number")
             return { token: a.token, times: a.times * b };
     }
     throw new Error(`no frame value for ${JSON.stringify(node)}`);
 };
 
-// The preset's overlay motions and their keyframes' frames, as opacity, scale, and translateY.
+// The preset's overlay and sheet motions and their keyframes' frames, as opacity, scale, and
+// translations.
 const overlayMotions: BrowserCommand<[]> = () => ({
     motions: {
         popup: POPUP_MOTION,
         dialog: DIALOG_MOTION,
+        bottomSheet: BOTTOM_SHEET_MOTION,
+        sideSheet: SIDE_SHEET_MOTION,
         scrim: SCRIM_MOTION,
     },
     keyframes: Object.fromEntries(
-        Object.entries(OVERLAY_KEYFRAMES).map(([name, frames]) => [
-            name,
-            Object.fromEntries(
-                Object.entries(frames).map(([at, style]) => {
-                    const frame: Record<string, FrameValue> = {};
-                    for (const [property, node] of Object.entries(style)) {
-                        const value = node as unknown as Record<
-                            string,
-                            unknown
-                        >;
-                        if (property !== "transform") {
-                            frame[property] = frameValue(value);
-                            continue;
+        Object.entries({ ...OVERLAY_KEYFRAMES, ...SHEET_KEYFRAMES }).map(
+            ([name, frames]) => [
+                name,
+                Object.fromEntries(
+                    Object.entries(frames).map(([at, style]) => {
+                        const frame: Record<string, FrameValue> = {};
+                        for (const [property, node] of Object.entries(style)) {
+                            const value = node as unknown as Record<
+                                string,
+                                unknown
+                            >;
+                            if (property !== "transform") {
+                                frame[property] = frameValue(value);
+                                continue;
+                            }
+                            for (const op of value.ops as {
+                                fn: string;
+                                args: Record<string, unknown>[];
+                            }[]) {
+                                frame[op.fn] = frameValue(op.args[0]!);
+                            }
                         }
-                        for (const op of value.ops as {
-                            fn: string;
-                            args: Record<string, unknown>[];
-                        }[]) {
-                            frame[op.fn] = frameValue(op.args[0]!);
-                        }
-                    }
-                    return [at, frame];
-                }),
-            ),
-        ]),
+                        return [at, frame];
+                    }),
+                ),
+            ],
+        ),
     ),
 });
 
