@@ -7,6 +7,7 @@
     "devDependencies": {
         "@pandacss/vite": "catalog:",
         "@pureform/anatomy": "workspace:^",
+        "@pureform/core": "workspace:^",
         "@pureform/css-adapter": "workspace:^",
         "@pureform/generate": "workspace:^",
         "@pureform/material": "workspace:^",
