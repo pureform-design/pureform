@@ -320,7 +320,7 @@ export const generate = async <Options = Record<string, unknown>>(
         }
         let found = shapes.get(name);
         if (!found) {
-            found = componentShape(spec);
+            found = componentShape(spec, config);
             shapes.set(name, found);
         }
         return found;
@@ -424,7 +424,10 @@ export const generate = async <Options = Record<string, unknown>>(
             output.vars,
         ),
     );
-    add(DECLARATIONS_FILE, registryDeclarations(entries));
+    add(
+        DECLARATIONS_FILE,
+        registryDeclarations(entries, Object.keys(config.springs ?? {})),
+    );
 
     const hint = tsconfigHint(root, outDir);
     const files = options.check

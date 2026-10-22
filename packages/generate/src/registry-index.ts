@@ -100,6 +100,7 @@ const union = (values: readonly string[]): string =>
  *  shape. */
 export const registryDeclarations = (
     entries: readonly GeneratedEntry[],
+    springRoles: readonly string[] = [],
 ): string => {
     const components = entries.flatMap((entry) => {
         const { shape } = entry;
@@ -123,6 +124,9 @@ export const registryDeclarations = (
             ...(shape.tokens.length > 0
                 ? [`            tokens: ${union(shape.tokens)};`]
                 : []),
+            ...(shape.springs && shape.springs.length > 0
+                ? [`            springs: ${union(shape.springs)};`]
+                : []),
             ...(entry.lazy ? ["            lazy: true;"] : []),
             "        };",
         ];
@@ -132,6 +136,13 @@ export const registryDeclarations = (
         "    interface ComponentRegistry {",
         ...components,
         "    }",
+        ...(springRoles.length > 0
+            ? [
+                  "    interface SpringRoleRegistry {",
+                  ...springRoles.map((role) => `        ${key(role)}: true;`),
+                  "    }",
+              ]
+            : []),
         "}",
         "",
         "export {};",

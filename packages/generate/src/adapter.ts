@@ -38,6 +38,9 @@ export interface ComponentShape {
     /** The tokens an instance may set (`selection.tokens`): the keys of the component's
      *  `tokens`. */
     readonly tokens: readonly string[];
+    /** The tokens among `tokens` that hold a spring. An instance passes these a spring or a
+     *  spring role's name, and the others a plain value. */
+    readonly springs?: readonly string[];
 }
 
 /** What an adapter's codegen is given. */

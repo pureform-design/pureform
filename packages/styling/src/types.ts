@@ -30,6 +30,8 @@ export interface ComponentShape {
     states?: string;
     /** The `dynamic` tokens an instance may set, as a union. Default none. */
     tokens?: string;
+    /** The tokens among `tokens` that hold a spring, as a union. Default none. */
+    springs?: string;
     /** `true` when the registry entry loads on demand. */
     lazy?: boolean;
 }
@@ -48,6 +50,15 @@ export interface ComponentShape {
  *  }
  *  ``` */
 export interface ComponentRegistry {}
+
+/** The theme's spring roles, by name. Generated declarations augment it from the config's
+ *  `springs`. */
+export interface SpringRoleRegistry {}
+
+/** A spring role's name, such as `"spatialSlow"`, or any string while none is registered. */
+export type SpringRole = [keyof SpringRoleRegistry] extends [never]
+    ? string
+    : keyof SpringRoleRegistry & string;
 
 /** A registered component's name, or any string while nothing is registered. */
 export type ComponentName = [keyof ComponentRegistry] extends [never]
@@ -72,6 +83,7 @@ interface OpenShape {
     slots: string;
     states: ComponentState;
     tokens: string;
+    springs: string;
 }
 
 /** The shape of a component reference: the registered one for a name, or the shape itself. */
@@ -125,13 +137,28 @@ export type TokenOf<C extends ComponentRef> =
 /** A token's value on an instance: a CSS value on the web, a number or string on native. */
 export type TokenValue = string | number;
 
-/** A token's value on an instance: a `TokenValue`, or a spring (core's `spring({ ... })`)
- *  for a spring-valued token, such as tabs' `indicatorSpring`. */
-export type InstanceTokenValue = TokenValue | SpringNode;
+/** The spring-valued tokens among `TokenOf<C>`, such as tabs' `indicatorSpring`. */
+export type SpringTokenOf<C extends ComponentRef> =
+    ShapeOf<C> extends { springs: infer S extends string } ? S : never;
 
-/** The `dynamic` tokens an instance sets, such as a circular progress's `value`. */
+/** A spring token's value on an instance: a spring (core's `spring({ ... })`), or a spring
+ *  role's name (`"spatialSlow"`), which follows the theme's role. */
+export type InstanceSpringValue = SpringNode | SpringRole;
+
+/** Any token's value on an instance: a `TokenValue`, or an `InstanceSpringValue`. */
+export type InstanceTokenValue = TokenValue | InstanceSpringValue;
+
+/** The `dynamic` tokens an instance sets, such as a circular progress's `value`. A spring
+ *  token takes an `InstanceSpringValue`, and only a spring token takes a spring. A component
+ *  the types don't know takes either on any token. */
 export type InstanceTokens<C extends ComponentRef> = {
-    [T in TokenOf<C>]?: InstanceTokenValue | undefined;
+    [T in TokenOf<C>]?:
+        | (string extends T
+              ? InstanceTokenValue
+              : T extends SpringTokenOf<C>
+                ? InstanceSpringValue
+                : TokenValue)
+        | undefined;
 };
 
 /** What a factory takes: variants, plus the instance's tokens. */

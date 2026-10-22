@@ -28,6 +28,7 @@ describe("componentShape", () => {
             defaults: { fill: "filled", interactive: "false" },
             slots: ["root", "media"],
             tokens: ["radius"],
+            springs: [],
         });
     });
 
@@ -38,6 +39,38 @@ describe("componentShape", () => {
                 name: "divider",
                 recipe: { base: {} },
             }),
-        ).toEqual({ variants: {}, defaults: {}, slots: ["root"], tokens: [] });
+        ).toEqual({
+            variants: {},
+            defaults: {},
+            slots: ["root"],
+            tokens: [],
+            springs: [],
+        });
+    });
+
+    it("names the spring tokens, following an alias to another component's", () => {
+        const tabs: AnyComponentSpec = {
+            kind: "component",
+            name: "tabs",
+            tokens: {
+                move: { type: "spring", stiffness: 800, damping: 0.6, mass: 1 },
+                role: { type: "alias", path: ["springs", "spatialFast"] },
+                width: { kind: "raw", value: "2px" } as never,
+            },
+            recipe: { base: {} },
+        };
+        const picker: AnyComponentSpec = {
+            kind: "component",
+            name: "picker",
+            tokens: {
+                hand: { type: "alias", path: ["components", "tabs", "move"] },
+                size: { type: "alias", path: ["components", "tabs", "width"] },
+            },
+            recipe: { base: {} },
+        };
+        const config = { components: { tabs, picker } } as never;
+        expect(componentShape(tabs).springs).toEqual(["move", "role"]);
+        expect(componentShape(picker, config).springs).toEqual(["hand"]);
+        expect(componentShape(picker).springs).toEqual([]);
     });
 });

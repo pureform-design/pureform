@@ -43,5 +43,6 @@ export type {
     ThemeSource,
 } from "./runtime-theme";
 export { joinClasses, tokenStyle, withTokenStyle } from "./tokens";
+export type { SpringVars } from "./tokens";
 export type { TokenVars } from "./tokens";
 export type * from "./types";

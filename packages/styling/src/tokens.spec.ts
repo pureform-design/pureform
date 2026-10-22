@@ -32,6 +32,25 @@ describe("tokenStyle", () => {
         });
     });
 
+    it("reads a spring role's vars for a role's name on a spring token", () => {
+        expect(
+            tokenStyle(
+                { move: "spatialSlow", accent: "red" },
+                {
+                    move: "--components-tabs-indicatorSpring",
+                    accent: "--components-tabs-accent",
+                },
+                { move: "--pf-springs" },
+            ),
+        ).toEqual({
+            "--components-tabs-indicatorSpring-duration":
+                "var(--pf-springs-spatial-slow-duration)",
+            "--components-tabs-indicatorSpring-easing":
+                "var(--pf-springs-spatial-slow-easing)",
+            "--components-tabs-accent": "red",
+        });
+    });
+
     it("gives nothing when no known token is set", () => {
         expect(tokenStyle(undefined, vars)).toBeUndefined();
         expect(tokenStyle({}, vars)).toBeUndefined();

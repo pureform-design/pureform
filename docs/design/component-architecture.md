@@ -1047,7 +1047,11 @@ var(--springs-spatial-default-duration))` and the easing alike, and a theme's or
   token (`alias("components", "tabs", "indicatorSpring")`), and it resolves as a spring on
   both (f2e). A factory instance passes one as a spring
   (`tokens: { indicatorSpring: spring({ ... }) }`): the web factory writes it as the two vars,
-  React Native's as the five keys (f2e). Spring tokens have no `valueType`, so they're never
+  React Native's as the five keys (f2e), or a role by name (`tokens: { indicatorSpring:
+"spatialSlow" }`): the role's two vars on the web, its five values on React Native. The
+  generated registry records which tokens are springs (`springs` beside `tokens`), so only a
+  spring token takes a spring or a role, and a spring on another token is a type error (f2).
+  Spring tokens have no `valueType`, so they're never
   registered with `@property`.
 - **Reduced motion.** A spring times a motion; it doesn't decide whether it moves. So the rule
   above holds unchanged: a spring on a property that moves is instant under reduced motion (its

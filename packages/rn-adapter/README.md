@@ -116,7 +116,8 @@ instance of a component shares one table in the provider's environment, and a st
 `Map.get`. Token tweening passes each frame's tokens as the selection's `tokens`. A factory's
 `tokens` names the theme key each instance token sets; a spring instance token
 (`spring({ ... })`) sets the spring's five keys (`<key>.duration`, `.easing`, `.stiffness`,
-`.damping`, `.mass`), as a theme's override does. `useStyleEnvironment()` gives the
+`.damping`, `.mass`), as a theme's override does; a spring role's name (`"spatialSlow"`) sets
+the five keys to that role's values in the environment's theme. `useStyleEnvironment()` gives the
 environment the caller renders in, for calling a factory directly.
 
 `pureform generate` with the `native` target (`@pureform/rn-adapter/codegen`) writes one module

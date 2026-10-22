@@ -3,6 +3,7 @@
 // those components. The bundler plugin (`@pureform/bundler`) and `pureform generate` run it.
 
 import type { CoreConfig } from "@pureform/core/types";
+import { instanceSpringVars } from "@pureform/css-lowering";
 import { defineCodegen, narrowConfig } from "@pureform/generate";
 import type {
     CodegenContext,
@@ -37,7 +38,9 @@ export const subsetConfig = (
 /** `web/<name>.ts` for each of the context's components: its `ClassFactory`, classed as the
  *  stylesheet names them. Other web adapters over this stylesheet reuse it. */
 export const componentModules = (
-    context: CodegenContext<Pick<CssOptions, "classPrefix" | "prefix">>,
+    context: CodegenContext<
+        Pick<CssOptions, "classPrefix" | "prefix" | "tokenPrefix">
+    >,
 ): ComponentModule[] =>
     context.components.map((name) => {
         const spec = context.config.components[name]!;
@@ -48,6 +51,10 @@ export const componentModules = (
                 name,
                 manifest: manifestOf(spec, context.options),
                 vars: tokenVars(name, spec, context.options.prefix),
+                springs: instanceSpringVars(
+                    context.shape(name).springs,
+                    context.options.tokenPrefix,
+                ),
             }),
         };
     });

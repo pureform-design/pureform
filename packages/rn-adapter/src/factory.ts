@@ -35,7 +35,13 @@ import { BOUND, holds, selectWithTransitions } from "./select";
 import type { Drawing, Selected, State, Style } from "./select";
 import type { Scheme } from "./theme";
 import { ANIMATION, SHAPE, TOKEN, TRANSITION } from "./values";
-import type { Animation, ThemeValues, Transition, Value } from "./values";
+import type {
+    Animation,
+    Concrete,
+    ThemeValues,
+    Transition,
+    Value,
+} from "./values";
 
 export { overridesFor } from "./resolve";
 export type {
@@ -286,6 +292,9 @@ const springValues = (spring: SpringNode): Record<string, number | string> => {
     };
 };
 
+// A spring token's five keys, as `springValues` gives them (lower's `SPRING_FIELDS`).
+const SPRING_FIELDS = ["duration", "easing", "stiffness", "damping", "mass"];
+
 const isPerScheme = (tokens: object) =>
     Object.entries(tokens).every(
         ([key, value]) =>
@@ -306,18 +315,31 @@ export const nativeFactory = <C extends ComponentRef = AnyComponent>(
     const moving = movingSlots(template);
     const groups = new Set(order.variants);
 
-    // An instance's tokens by theme key, per scheme where it gives them so.
-    const tokenKeys = (given: object): Overrides => {
+    // An instance's tokens by theme key, per scheme where it gives them so. A spring role's
+    // name (a string naming one of the theme's `springs`) takes that role's five values from
+    // `theme`, the environment's; the types allow it only on a spring token.
+    const tokenKeys = (
+        given: object,
+        theme: (key: string) => Concrete | undefined,
+    ): Overrides => {
         const rename = (values: object) =>
             Object.fromEntries(
                 Object.entries(values).flatMap(([token, value]) => {
                     const key = tokens[token] ?? token;
                     // A spring is its five values, each a key of its own, as a theme's.
-                    return isSpring(value)
-                        ? Object.entries(springValues(value)).map(
-                              ([field, v]) => [`${key}.${field}`, v],
-                          )
-                        : [[key, value]];
+                    if (isSpring(value))
+                        return Object.entries(springValues(value)).map(
+                            ([field, v]) => [`${key}.${field}`, v],
+                        );
+                    if (
+                        typeof value === "string" &&
+                        theme(`springs.${value}.stiffness`) !== undefined
+                    )
+                        return SPRING_FIELDS.map((field) => [
+                            `${key}.${field}`,
+                            theme(`springs.${value}.${field}`),
+                        ]).filter(([, v]) => v !== undefined);
+                    return [[key, value]];
                 }),
             );
         return Object.keys(given).length > 0 && isPerScheme(given)
@@ -391,7 +413,11 @@ export const nativeFactory = <C extends ComponentRef = AnyComponent>(
             const given = (selection as { tokens?: object }).tokens;
             if (!given || Object.keys(given).length === 0)
                 return cached(selection);
-            const named = tokenKeys(given);
+            const base = styles.themes[where.key];
+            const named = tokenKeys(
+                given,
+                (key) => where.overrides[key] ?? base?.[key],
+            );
             const id = `${selectionKey(order, selection)}${JSON.stringify(named)}`;
             let result = withTokens.get(id);
             if (!result) {

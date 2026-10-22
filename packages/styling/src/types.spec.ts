@@ -17,7 +17,9 @@ import type {
     States,
     StaticComponentName,
     StyleFactory,
-    InstanceTokenValue,
+    InstanceSpringValue,
+    SpringRole,
+    TokenValue,
     Variants,
 } from "./types";
 
@@ -30,12 +32,17 @@ declare module "./types" {
             };
             slots: "root" | "label";
             states: "pressed" | "disabled";
-            tokens: "accent";
+            tokens: "accent" | "move";
+            springs: "move";
         };
         card: {
             variants: { interactive: "true" | "false" };
             lazy: true;
         };
+    }
+    interface SpringRoleRegistry {
+        spatialFast: true;
+        spatialSlow: true;
     }
 }
 
@@ -98,7 +105,8 @@ describe("registered components", () => {
 
     it("types instance tokens", () => {
         expectTypeOf<InstanceTokens<"button">>().toEqualTypeOf<{
-            accent?: InstanceTokenValue | undefined;
+            accent?: TokenValue | undefined;
+            move?: InstanceSpringValue | undefined;
         }>();
         expectTypeOf<InstanceTokens<"card">>().toEqualTypeOf<{}>();
         const selection: Selection<"button"> = {
@@ -108,6 +116,29 @@ describe("registered components", () => {
         // @ts-expect-error a token the component doesn't have
         const bad: Selection<"button"> = { tokens: { value: 1 } };
         void [selection, bad];
+    });
+
+    it("takes a spring or a role's name only on a spring token", () => {
+        expectTypeOf<SpringRole>().toEqualTypeOf<
+            "spatialFast" | "spatialSlow"
+        >();
+        const spring = {
+            type: "spring",
+            stiffness: 800,
+            damping: 0.6,
+            mass: 1,
+        } as const;
+        const springs: Selection<"button"> = {
+            tokens: { move: spring },
+        };
+        const role: Selection<"button"> = { tokens: { move: "spatialSlow" } };
+        // @ts-expect-error a spring on a token that isn't one
+        const misplaced: Selection<"button"> = { tokens: { accent: spring } };
+        // @ts-expect-error a role the theme doesn't have
+        const unknown: Selection<"button"> = { tokens: { move: "bouncy" } };
+        // @ts-expect-error a plain value on a spring token
+        const plain: Selection<"button"> = { tokens: { move: 200 } };
+        void [springs, role, misplaced, unknown, plain];
     });
 
     it("types the web factory: variants in, classes per slot out", () => {
@@ -164,7 +195,7 @@ describe("components described by shape", () => {
         }>();
         expectTypeOf<SlotOf<Progress>>().toEqualTypeOf<"root" | "indicator">();
         expectTypeOf<InstanceTokens<Progress>>().toEqualTypeOf<{
-            value?: InstanceTokenValue | undefined;
+            value?: TokenValue | undefined;
         }>();
     });
 

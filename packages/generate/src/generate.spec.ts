@@ -73,6 +73,7 @@ describe("generate", () => {
             defaults: {},
             slots: ["root"],
             tokens: [],
+            springs: [],
         });
         expect(
             context?.importPath(

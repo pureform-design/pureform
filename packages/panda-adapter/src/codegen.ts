@@ -2,6 +2,7 @@
 // `ClassFactory` module per component over the recipe functions Panda's codegen writes, and
 // the `staticCss` entries that keep their variants in Panda's stylesheet.
 
+import { instanceSpringVars } from "@pureform/css-lowering";
 import type { VarPrefix } from "@pureform/css-lowering";
 import { defineCodegen } from "@pureform/generate";
 import type { CodegenContext } from "@pureform/generate";
@@ -69,6 +70,10 @@ export const codegen = defineCodegen<PandaCodegenOptions>({
                         `${outdir}/recipes/${recipeFile(name)}`,
                     ),
                     vars: tokenVars(name, spec, context.options.prefix),
+                    springs: instanceSpringVars(
+                        context.shape(name).springs,
+                        context.options.tokenPrefix,
+                    ),
                 }),
             };
         });

@@ -31,7 +31,7 @@ import {
 } from "./factory";
 import type { NativeFactory, NativeSlots } from "./factory";
 import type { ComponentStyles } from "./lower";
-import { overridesFor, stylesFor, withSetTokens } from "./resolve";
+import { overridesFor, stylesFor, themeKey, withSetTokens } from "./resolve";
 import type { Overrides, Styles } from "./resolve";
 import { selectWithTransitions } from "./select";
 import type { Selected, State } from "./select";
@@ -416,6 +416,32 @@ describe("nativeFactory", () => {
                 mass: 1,
             },
         });
+    });
+
+    it("sets a spring instance token to a spring role by its name", () => {
+        const preset = pureform();
+        const styles = precompute(preset, { components: ["tabs"] });
+        const tabs = nativeFactory(
+            "tabs",
+            styles,
+            instanceTokenKeys("tabs", preset.components.tabs!),
+        );
+        const theme = styles.themes[themeKey(undefined, "light")]!;
+        const [moved] = tabs.selected({
+            tokens: { indicatorSpring: "spatialSlow" },
+        } as never).transitions.indicator!;
+        expect(moved).toMatchObject({
+            property: "transform",
+            duration: theme["springs.spatialSlow.duration"],
+            spring: {
+                type: "spring",
+                stiffness: theme["springs.spatialSlow.stiffness"],
+                damping: theme["springs.spatialSlow.damping"],
+            },
+        });
+        expect(theme["springs.spatialSlow.stiffness"]).not.toBe(
+            theme["springs.spatialDefault.stiffness"],
+        );
     });
 
     it("gives a component without slots its root", () => {

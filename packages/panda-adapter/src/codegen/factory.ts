@@ -70,6 +70,8 @@ export interface FactoryModuleInput {
     readonly recipe: string;
     /** Each instance token's CSS var. */
     readonly vars: Readonly<Record<string, string>>;
+    /** Each spring token's role var prefix (`instanceSpringVars`). Default none. */
+    readonly springs?: Readonly<Record<string, string>>;
 }
 
 /** The factory module's source. */
@@ -77,6 +79,7 @@ export const factoryModule = (input: FactoryModuleInput): string => {
     const { name, shape, slotted } = input;
     const component = JSON.stringify(name);
     const vars = Object.entries(input.vars);
+    const springs = Object.entries(input.springs ?? {});
     const argument = recipeArgument(shape);
     const defaults = Object.entries(shape.defaults);
     const order = [
@@ -116,13 +119,16 @@ export const factoryModule = (input: FactoryModuleInput): string => {
         ...(vars.length > 0
             ? [`const vars = ${record(vars, "")} as const;`, ""]
             : []),
+        ...(springs.length > 0
+            ? [`const springs = ${record(springs, "")} as const;`, ""]
+            : []),
         `const classes = selectionCache<Selection<${component}>, ClassSlots<${component}>>(`,
         ...order,
         ...compute,
         ");",
         "",
         vars.length > 0
-            ? `export const ${name}: ClassFactory<${component}> = (s) =>\n    withTokenStyle(classes(s), s.tokens, vars);`
+            ? `export const ${name}: ClassFactory<${component}> = (s) =>\n    withTokenStyle(classes(s), s.tokens, vars${springs.length > 0 ? ', "root", springs' : ""});`
             : `export const ${name}: ClassFactory<${component}> = classes;`,
         "",
     ].join("\n");

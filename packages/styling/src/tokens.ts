@@ -9,15 +9,26 @@ export type TokenVars<T extends string = string> = Readonly<
     Record<T, `--${string}`>
 >;
 
+/** Each spring token's role var prefix, such as `{ indicatorSpring: "--springs" }`: a role
+ *  `spatialSlow` is read from `--springs-spatial-slow-duration` and `-easing`. */
+export type SpringVars<T extends string = string> = Readonly<
+    Partial<Record<T, `--${string}`>>
+>;
+
+const hyphenate = (name: string): string =>
+    name.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
+
 /** An instance's tokens as CSS vars, or `undefined` when it sets none. Numbers become their
  *  string, so pass a length with its unit. A spring becomes the two vars a spring token is read
- *  through, `<var>-duration` and `<var>-easing`, sampled as the theme's springs are. Tokens
- *  missing from `vars` are left out. */
+ *  through, `<var>-duration` and `<var>-easing`, sampled as the theme's springs are; a spring
+ *  token (one `springs` names) given a role's name reads that role's two vars. Tokens missing
+ *  from `vars` are left out. */
 export const tokenStyle = (
     tokens:
         | Readonly<Record<string, InstanceTokenValue | undefined>>
         | undefined,
     vars: TokenVars,
+    springs: SpringVars = {},
 ): TokenStyle | undefined => {
     if (!tokens) return undefined;
     let style: Record<`--${string}`, string> | undefined;
@@ -29,6 +40,10 @@ export const tokenStyle = (
             const { duration, points } = sampleSpring(value);
             style[`${v}-duration`] = `${duration}ms`;
             style[`${v}-easing`] = formatLinearEasing(points);
+        } else if (typeof value === "string" && springs[name]) {
+            const role = `${springs[name]}-${hyphenate(value)}`;
+            style[`${v}-duration`] = `var(${role}-duration)`;
+            style[`${v}-easing`] = `var(${role}-easing)`;
         } else {
             style[v] = String(value);
         }
@@ -47,8 +62,9 @@ export const withTokenStyle = <
         | undefined,
     vars: TokenVars,
     slot = "root",
+    springs?: SpringVars,
 ): Slots => {
-    const style = tokenStyle(tokens, vars);
+    const style = tokenStyle(tokens, vars, springs);
     const target = slots[slot];
     if (!style || !target) return slots;
     return Object.freeze({

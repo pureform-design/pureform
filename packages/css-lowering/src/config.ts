@@ -11,7 +11,7 @@ import type {
 
 import { compileNodeToCSS } from "./compile-node";
 import type { LowerCtx, VarPrefix } from "./context";
-import { varName } from "./css";
+import { tokenVarName, varName } from "./css";
 import { isSpringValue, springTokenVars } from "./spring";
 
 const hasSchemeCase = (node: ValueNode): boolean =>
@@ -76,6 +76,20 @@ export const instanceTokenVars = (
                     : ["components", name, token];
             return [token, varName(path, prefix)];
         }),
+    );
+
+/** Each spring token's role var prefix, for a factory's `withTokenStyle`: `--springs` (under
+ *  `tokenPrefix`), which an instance's role name such as `spatialSlow` extends to
+ *  `--springs-spatial-slow-duration` and `-easing`. */
+export const instanceSpringVars = (
+    springs: readonly string[] | undefined,
+    tokenPrefix: string | undefined,
+): Record<string, string> =>
+    Object.fromEntries(
+        (springs ?? []).map((token) => [
+            token,
+            tokenVarName("springs", tokenPrefix),
+        ]),
     );
 
 // CSS's `@property` syntax for each value type.

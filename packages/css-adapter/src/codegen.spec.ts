@@ -566,9 +566,29 @@ describe("generate with the CSS target", () => {
                 for (const [name, spec] of Object.entries(preset.components)) {
                     const factory = factoryOf(generated, name);
                     expect(factory({ tokens: {} })).toBe(factory({}));
+                    const springs = new Set(componentShape(spec).springs);
                     for (const [token, cssVar] of Object.entries(
                         tokenVars(name, spec, options.prefix),
                     )) {
+                        if (springs.has(token)) {
+                            // A spring token takes a role's name, as the role's two vars.
+                            expect(
+                                factory({ tokens: { [token]: "spatialSlow" } })
+                                    .root!.style,
+                            ).toEqual({
+                                [`${cssVar}-duration`]:
+                                    "var(--springs-spatial-slow-duration)",
+                                [`${cssVar}-easing`]:
+                                    "var(--springs-spatial-slow-easing)",
+                            });
+                            expect(css).toContain(
+                                "--springs-spatial-slow-duration:",
+                            );
+                            expect(css.includes(`var(${cssVar}-duration`)).toBe(
+                                true,
+                            );
+                            continue;
+                        }
                         expect(
                             factory({ tokens: { [token]: "3px" } }).root!.style,
                         ).toEqual({ [cssVar]: "3px" });
