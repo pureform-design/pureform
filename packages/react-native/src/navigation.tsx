@@ -49,7 +49,7 @@ import { PortalHost } from "./portal-host";
 import { useEngine } from "./provider";
 import { Scrim } from "./single-part";
 import { useComponentSlots } from "./styles";
-import { useIndicatorSlides } from "./tab-indicator";
+import { omitSpring, useIndicatorSlides } from "./tab-indicator";
 import type { IndicatorSlides } from "./tab-indicator";
 
 type TabsPart = PartName<typeof tabsAnatomy>;
@@ -197,11 +197,15 @@ function TabsImpl(props: TabsProps): ReactNode {
         views: v,
         selected,
     } = useComponentSlots<TabsPart>("tabs", selection);
+    const engine = useEngine();
+    const transform = selected.transitions.indicator?.find(
+        (transition) => transition.property === "transform",
+    );
     const slides = useIndicatorSlides(
         value,
-        selected.transitions.indicator?.find(
-            (transition) => transition.property === "transform",
-        ),
+        engine.slideSpring || !transform?.spring
+            ? transform
+            : omitSpring(transform),
     );
     // Scrollable tabs scroll in a horizontal view (the adapter drops `overflow: auto`), which
     // brings the selected tab into view, centered where it can be.

@@ -390,7 +390,57 @@ export interface SlideMotion {
     readonly duration: number;
     readonly delay: number;
     readonly easing: string;
+    /** The spring the slide runs on, for an engine with springs (it runs it in place of
+     *  `duration` and `easing`); the slide's progress goes from 0 to 1 on it. */
+    readonly spring?: Spring | undefined;
+    /** How fast the slide's progress starts, per second: the speed an interrupted slide had. */
+    readonly velocity?: number | undefined;
 }
+
+/** Where a spring heading for 1 is after `seconds`, and how fast (per second), from 0 at
+ *  `velocity` per second: the closed-form motion of `m·x'' + c·x' + k·x = 0` for the distance
+ *  to 1, with `c` the spring's damping coefficient. */
+export const springProgress = (
+    spring: Spring,
+    velocity: number,
+    seconds: number,
+): { progress: number; velocity: number } => {
+    const { stiffness: k, damping: c, mass: m } = spring;
+    const w = Math.sqrt(k / m);
+    const zeta = c / (2 * Math.sqrt(k * m));
+    const t = Math.max(0, seconds);
+    const x0 = -1;
+    if (zeta < 1) {
+        const wd = w * Math.sqrt(1 - zeta * zeta);
+        const a = zeta * w;
+        const b = (velocity + a * x0) / wd;
+        const decay = Math.exp(-a * t);
+        const [cos, sin] = [Math.cos(wd * t), Math.sin(wd * t)];
+        return {
+            progress: 1 + decay * (x0 * cos + b * sin),
+            velocity:
+                decay *
+                (-a * (x0 * cos + b * sin) + wd * (-x0 * sin + b * cos)),
+        };
+    }
+    if (zeta === 1) {
+        const b = velocity + w * x0;
+        const decay = Math.exp(-w * t);
+        return {
+            progress: 1 + decay * (x0 + b * t),
+            velocity: decay * (b - w * (x0 + b * t)),
+        };
+    }
+    const root = Math.sqrt(zeta * zeta - 1);
+    const [r1, r2] = [-w * (zeta - root), -w * (zeta + root)];
+    const c2 = (velocity - r1 * x0) / (r2 - r1);
+    const c1 = x0 - c2;
+    const [e1, e2] = [Math.exp(r1 * t), Math.exp(r2 * t)];
+    return {
+        progress: 1 + c1 * e1 + c2 * e2,
+        velocity: c1 * r1 * e1 + c2 * r2 * e2,
+    };
+};
 
 /** The offset that draws a view laid out at `to` over `from`: its center on `from`'s, its width
  *  `from`'s. `undefined` when either has no width. */

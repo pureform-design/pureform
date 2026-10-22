@@ -5,7 +5,7 @@
 // the content), so nothing is measured when the selection changes, and the slide starts in the
 // same render that selects the tab. A primary indicator spans its tab's content, so the two can
 // differ in width: the slide scales it from the old one's. A change mid-slide starts from where the
-// slide has got to. The timing is the `transform` transition the indicator's style declares, so
+// slide has got to; on a spring (Animated) it also keeps the slide's speed. The timing is the `transform` transition the indicator's style declares, so
 // reduced motion, which drops it, switches at once.
 
 import {
@@ -13,8 +13,13 @@ import {
     offsetSpan,
     slideAt,
     slideOffset,
+    springProgress,
 } from "@pureform/rn-adapter/animated";
-import type { SlideMotion, Span } from "@pureform/rn-adapter/animated";
+import type {
+    SlideMotion,
+    SlideOffset,
+    Span,
+} from "@pureform/rn-adapter/animated";
 import type { Transition } from "@pureform/rn-adapter/factory";
 import { useCallback, useRef } from "react";
 
@@ -32,13 +37,48 @@ interface Running {
 const now = (): number =>
     typeof performance === "undefined" ? Date.now() : performance.now();
 
-// How far along its curve a slide is at `time`.
-const progressAt = (running: Running, time: number): number => {
-    const { duration, delay, easing } = running.motion;
+/** A transition on its duration and curve, without its spring. */
+export const omitSpring = (transition: Transition): Transition => {
+    const { spring: _, ...rest } = transition;
+    return rest;
+};
+
+// How far along a slide is at `time`, and how fast it's going (progress per second): on its
+// spring where it has one, else along its curve.
+const stateAt = (
+    running: Running,
+    time: number,
+): { progress: number; velocity: number } => {
+    const { duration, delay, easing, spring, velocity = 0 } = running.motion;
     const elapsed = time - running.start - delay;
-    if (elapsed <= 0) return 0;
-    if (elapsed >= duration) return 1;
-    return curve(easing)(elapsed / duration);
+    if (elapsed <= 0) return { progress: 0, velocity };
+    if (spring) return springProgress(spring, velocity, elapsed / 1000);
+    if (elapsed >= duration) return { progress: 1, velocity: 0 };
+    const at = curve(easing);
+    const step = 1;
+    const after = Math.min(duration, elapsed + step) / duration;
+    const before = Math.max(0, elapsed - step) / duration;
+    return {
+        progress: at(elapsed / duration),
+        velocity:
+            ((at(after) - at(before)) /
+                (Math.min(duration, elapsed + step) -
+                    Math.max(0, elapsed - step))) *
+            1000,
+    };
+};
+
+// The progress per second a new slide starts at so the indicator keeps the speed the last had:
+// its centre's, or its width's where the centre doesn't move.
+const carriedVelocity = (
+    before: SlideOffset,
+    going: { progress: number; velocity: number },
+    after: SlideOffset,
+): number => {
+    if (after.translateX !== 0 && before.translateX !== 0)
+        return (before.translateX * going.velocity) / after.translateX;
+    const [a, b] = [1 - before.scaleX, 1 - after.scaleX];
+    return b !== 0 && a !== 0 ? (a * going.velocity) / b : 0;
 };
 
 /** What the tabs' slides give each tab. */
@@ -84,15 +124,25 @@ export const useIndicatorSlides = (
         if (timing && from && to) {
             // Where the old indicator is drawn now: mid-slide, where that slide has got to.
             const last = current.running;
-            const drawn =
+            const going =
                 last && last.value === previous
+                    ? stateAt(last, time)
+                    : undefined;
+            const drawn =
+                last && going
                     ? offsetSpan(
                           from,
-                          slideAt(last.motion.from, progressAt(last, time)),
+                          slideAt(last.motion.from, going.progress),
                       )
                     : from;
             const offset = slideOffset(drawn, to);
             if (offset) {
+                // A spring keeps the old slide's speed: the indicator's own, in pixels (or in
+                // widths, when it only resizes), over the distance it has left.
+                const velocity =
+                    timing.spring && last && going
+                        ? carriedVelocity(last.motion.from, going, offset)
+                        : 0;
                 running = {
                     value,
                     start: time,
@@ -101,6 +151,9 @@ export const useIndicatorSlides = (
                         duration: timing.duration,
                         delay: timing.delay,
                         easing: timing.easing,
+                        ...(timing.spring
+                            ? { spring: timing.spring, velocity }
+                            : {}),
                     },
                 };
             }

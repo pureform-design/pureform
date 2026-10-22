@@ -14,6 +14,7 @@ import {
     slideAt,
     slideFrames,
     slideOffset,
+    springProgress,
     startVelocity,
     stops,
 } from "./motion";
@@ -291,5 +292,33 @@ describe("an indicator's slide", () => {
             { transform: [{ translateX: -230 }, { scaleX: 0.4 }] },
             { transform: [{ translateX: 0 }, { scaleX: 1 }] },
         ]);
+    });
+});
+
+describe("a spring's progress", () => {
+    const spring = {
+        type: "spring" as const,
+        stiffness: 400,
+        damping: 30,
+        mass: 1,
+    };
+
+    it.each([
+        ["under", spring],
+        ["critically", { ...spring, damping: 40 }],
+        ["over", { ...spring, damping: 80 }],
+    ])("goes from 0 to 1 when %s damped", (_, spring) => {
+        expect(springProgress(spring, 0, 0).progress).toBeCloseTo(0, 6);
+        expect(springProgress(spring, 0, 5).progress).toBeCloseTo(1, 4);
+    });
+
+    it("starts at the speed it's given, and agrees with its own slope", () => {
+        const start = springProgress(spring, 3, 0);
+        expect(start.velocity).toBeCloseTo(3, 6);
+        const [a, b] = [
+            springProgress(spring, 3, 0.1),
+            springProgress(spring, 3, 0.1001),
+        ];
+        expect((b.progress - a.progress) / 0.0001).toBeCloseTo(a.velocity, 1);
     });
 });

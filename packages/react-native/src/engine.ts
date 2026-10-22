@@ -56,6 +56,9 @@ export interface MotionEngine {
     /** What runs one overlay's enter and exit, telling when each step ends. Without it,
      *  overlays show and go at once. */
     presence?(): PresenceDriver;
+    /** Whether the engine's slide runs a real spring (`useSlide` takes the motion's `spring`),
+     *  rather than its duration and curve. */
+    readonly slideSpring?: boolean;
     /** The style that slides an active indicator into its place from where another was drawn,
      *  for each new `motion` (a hook). Without it, the indicator moves at once. */
     useSlide?(
@@ -88,6 +91,7 @@ export const animated: MotionEngine = {
     useRipple,
     presence: animatedPresence,
     useSlide: useAnimatedSlide,
+    slideSpring: true,
     View: Animated.View,
     Text: Animated.Text,
     TextInput: Animated.createAnimatedComponent(TextInput),
