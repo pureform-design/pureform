@@ -131,6 +131,22 @@ describe("Table", () => {
         ).toEqual(["row", "alternate-row", "row"]);
     });
 
+    it("marks the sort arrow descending while it points that way", async () => {
+        withRegistry(() => (
+            <Table
+                columns={COLUMNS}
+                rows={ELEMENTS}
+                sortStart="descending"
+                defaultSort={{ column: "name", direction: "ascending" }}
+            />
+        ));
+        await settle();
+        const marked = all(ids.sortIndicator).map((arrow) =>
+            arrow.hasAttribute("data-pf-descending"),
+        );
+        expect(marked).toEqual([false, true]);
+    });
+
     it("composes from its parts", async () => {
         withRegistry(() => (
             <Table.Root defaultSort={{ column: "a", direction: "descending" }}>

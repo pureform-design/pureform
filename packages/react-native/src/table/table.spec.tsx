@@ -91,6 +91,17 @@ describe("table", () => {
         });
     });
 
+    it("hints the way a press would sort: an unsorted arrow is turned when sortStart is descending", async () => {
+        await render(
+            <Table columns={COLUMNS} rows={ELEMENTS} sortStart="descending" />,
+        );
+        await until(() =>
+            expect(computed("pf-data-table-sort-indicator").transform).toMatch(
+                /^matrix\(-1, [^,]+, [^,]+, -1, 0, 0\)$/,
+            ),
+        );
+    });
+
     it("selects rows and fills them with the selected container", async () => {
         const onSelectionChange = vi.fn();
         await render(

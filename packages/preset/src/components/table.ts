@@ -31,7 +31,8 @@
 //
 // A striped table renders every other body row as `alternateRow`. A sorted column's sort header
 // is marked `filled`. The arrow always points up and turns over, on the chevrons' spring, while
-// its header cell is sorted descending (`aria-sort`).
+// it points descending: its column is sorted that way, or unsorted and a press sorts it that way
+// (`sortStart`), which the binding marks on the arrow.
 
 import { typed } from "@pureform/core";
 import {
@@ -157,8 +158,8 @@ const arrowOpacity = when()
     .on(slot("sortHeader", "filled"), unitless(1))
     .else(unitless(0));
 
-// The arrow turns over while its column is sorted descending.
-const arrowTurn = turnedOver(slot("headerCell", "descending"));
+// The arrow turns over while it points descending.
+const arrowTurn = turnedOver(slot("sortIndicator", "descending"));
 
 /** Build the table with a `density` step per entry of `densities`. */
 export const createTable = <D extends string = MaterialDensity>(

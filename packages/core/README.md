@@ -77,6 +77,7 @@ STATE_ATTRIBUTES.pressed; // "data-pf-active"   a press :active misses (keyboard
 STATE_ATTRIBUTES.dragged; // "data-pf-dragging"
 STATE_ATTRIBUTES.filled; //  "data-pf-filled"   a value outside a text input
 STATE_ATTRIBUTES.mirrored; // "data-pf-mirror"  an icon that points, flipped under rtl
+STATE_ATTRIBUTES.descending; // "data-pf-descending"  a sort arrow pointing descending
 ```
 
 `mirrored` isn't a state the user changes but a marking: the `mirrored` condition (one of

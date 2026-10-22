@@ -20,6 +20,9 @@ export const STATE_ATTRIBUTES = {
     /** A part that doesn't fit where it usually sits, so it moves, such as a slider's inset icon
      *  on an active track too short for it; the binding measures it. */
     overflowing: "data-pf-overflowing",
+    /** An element pointing the way a sort runs, descending, such as a table's sort arrow (also
+     *  while its column is unsorted, the way a press would sort it); the binding sets it. */
+    descending: "data-pf-descending",
 } as const;
 
 /** A state the bindings mark with a `data-pf-*` attribute. */
