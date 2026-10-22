@@ -1099,6 +1099,25 @@ describe("c7c: avatar picture, swipe, inset icon, search bar width", () => {
         );
     });
 
+    it("names an avatar as an image by its label, and hides one without", async () => {
+        await render(
+            <>
+                <Avatar label="Ada" testId="named">
+                    AL
+                </Avatar>
+                <Avatar testId="decorative">AL</Avatar>
+            </>,
+        );
+        const named = byTestId("named-root");
+        expect(named.tagName).not.toBe("IMG");
+        expect(named.getAttribute("role")).toBe("img");
+        expect(named.getAttribute("aria-label")).toBe("Ada");
+        expect(byTestId("decorative-root").getAttribute("role")).toBe(null);
+        expect(byTestId("decorative-root").getAttribute("aria-hidden")).toBe(
+            "true",
+        );
+    });
+
     it("slides a swipeable list item's parts and reveals its action", async () => {
         await render(
             <ListItem
