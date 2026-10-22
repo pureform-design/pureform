@@ -5,6 +5,8 @@
         "types": ["vite/client"],
         "jsx": "react-jsx",
         "noEmit": true,
+        // Scripts run under Node, whose relative imports name the `.ts` file.
+        "allowImportingTsExtensions": true,
         "paths": { "$*": ["./styled-system/*"] }
     },
     // The Solid folder has its own config (Solid's JSX); `.pureform/` holds the registry.

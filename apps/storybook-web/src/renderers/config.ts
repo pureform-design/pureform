@@ -27,6 +27,12 @@ export interface ComponentConfig {
     /** Args for every story of the component, over the case's props and the shared and
      *  renderer hooks'. */
     readonly args?: Args;
+    /** Anatomy variants to give no control, besides those that aren't props (see
+     *  `variantProps`). */
+    readonly controls?: { readonly exclude?: readonly string[] };
+    /** The binding-core interface whose properties are the component's variant props, when it
+     *  isn't `<Component>VariantProps` (`ProgressVariantProps` for both progress indicators). */
+    readonly variantProps?: string;
     /** Arg types over the ones from the anatomy's variants. */
     readonly argTypes?: Partial<ArgTypes>;
     /** Scheme-pinned copies of `Default` (`Light`, `Dark`) with the state's play: they set the

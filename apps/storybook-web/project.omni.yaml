@@ -13,6 +13,7 @@ dependencies:
     - "@pureform/rn-adapter"
     - "@pureform/styling"
     - "@pureform/anatomy"
+    - "@pureform/binding-core"
     - "@pureform/component-cases"
     - "@pureform/panda-adapter"
     - "@pureform/preset"

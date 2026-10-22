@@ -24,6 +24,7 @@ import { runnerImport } from "vite";
 
 import type { StoriesConfig } from "../src/renderers/config.ts";
 import type { TransformSource } from "../src/renderers/hooks.ts";
+import { variantProps } from "./variant-props.ts";
 
 const APP = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const STORIES = join(APP, "src/stories");
@@ -152,6 +153,8 @@ const generate = async () => {
             (!include || include.has(c.component)) && !skip.has(c.component),
     );
     const taken = handWritten();
+    const propsOf = variantProps(APP, "@pureform/binding-core");
+    const missing: string[] = [];
     rmSync(OUT, { recursive: true, force: true });
     mkdirSync(OUT, { recursive: true });
 
@@ -194,13 +197,31 @@ const generate = async () => {
             imports.push(`import * as hooks${i} from "${fromOut(path)}";`),
         );
 
-        // Variants the binding sets itself (the anatomy's `bindingVariants`) get no control.
-        const bindingVariants = new Set(a.bindingVariants ?? []);
+        // A recipe variant that isn't a prop (binding-core's `<Component>VariantProps`) is set
+        // by the binding itself: no control. `controls.exclude` drops more.
+        const variants = Object.entries(a.variants ?? {});
+        // Each variant that's a prop, to the prop's name (the text's `style` is `textStyle`).
+        let props: ReadonlyMap<string, string>;
+        try {
+            props = variants.length
+                ? propsOf(options.variantProps ?? `${component}VariantProps`)
+                : new Map();
+        } catch (error) {
+            missing.push(`${component}: ${(error as Error).message}`);
+            continue;
+        }
+        const exclude = new Set(options.controls?.exclude ?? []);
         const argTypes = {
             ...Object.fromEntries(
-                Object.entries(a.variants ?? {})
-                    .filter(([variant]) => !bindingVariants.has(variant))
-                    .map(([variant, values]) => [variant, controlFor(values)]),
+                variants
+                    .filter(
+                        ([variant]) =>
+                            props.has(variant) && !exclude.has(variant),
+                    )
+                    .map(([variant, values]) => [
+                        props.get(variant)!,
+                        controlFor(values),
+                    ]),
             ),
             ...options.argTypes,
         };
@@ -314,6 +335,11 @@ const generate = async () => {
         }
         writeFileSync(join(OUT, `${component}.stories.ts`), source);
         written.push(component);
+    }
+    if (missing.length) {
+        throw new Error(
+            `generate-stories: no variant props for ${missing.length} component(s):\n${missing.join("\n")}`,
+        );
     }
     const skipped = found
         .map(({ case: c }) => c.component)
