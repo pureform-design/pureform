@@ -4,6 +4,8 @@
 // back. The press that ends a real drag doesn't also count as a click on the
 // handle, so a handle that closes on a press closes only once.
 
+import { swallowNextClick } from "./drag-click";
+
 /** How far down, as a share of the sheet's height, a drag closes it. */
 export const SHEET_DISMISS_SHARE = 0.25;
 /** How fast, in pixels per millisecond, a downward flick closes it however short. */
@@ -22,6 +24,8 @@ export const dragToDismiss = (
     let start: { y: number; time: number; id: number } | undefined;
     let offset = 0;
     let dragged = false;
+    // A drag ends with a click on the handle; it was a drag, not a press.
+    let swallow: (() => void) | undefined;
 
     const move = (y: number) => {
         offset = Math.max(0, y - start!.y);
@@ -77,6 +81,7 @@ export const dragToDismiss = (
 
     const onDown = (event: PointerEvent) => {
         if (event.button !== 0) return;
+        swallow?.();
         stopWatching();
         start = {
             y: event.clientY,
@@ -96,6 +101,7 @@ export const dragToDismiss = (
         const height = surface?.getBoundingClientRect().height ?? 0;
         const speed = offset / Math.max(1, event.timeStamp - start.time);
         start = undefined;
+        if (dragged) swallow = swallowNextClick(handle);
         if (
             dragged &&
             (offset > height * SHEET_DISMISS_SHARE || speed > SHEET_FLICK_SPEED)
@@ -110,25 +116,17 @@ export const dragToDismiss = (
         dragged = false;
         release();
     };
-    // A drag ends with a click on the handle; it was a drag, not a press.
-    const onClick = (event: MouseEvent) => {
-        if (!dragged) return;
-        dragged = false;
-        event.preventDefault();
-        event.stopImmediatePropagation();
-    };
 
     handle.addEventListener("pointerdown", onDown);
     handle.addEventListener("pointermove", onMove);
     handle.addEventListener("pointerup", onUp);
     handle.addEventListener("pointercancel", onCancel);
-    handle.addEventListener("click", onClick, true);
     return () => {
         handle.removeEventListener("pointerdown", onDown);
         handle.removeEventListener("pointermove", onMove);
         handle.removeEventListener("pointerup", onUp);
         handle.removeEventListener("pointercancel", onCancel);
-        handle.removeEventListener("click", onClick, true);
+        swallow?.();
         release();
     };
 };

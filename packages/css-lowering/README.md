@@ -38,7 +38,11 @@ the web adapters' generated factories set them on the root.
 A component token holding a spring (a literal, or an alias to a `springs` role) is two vars,
 `<token>-duration` and `<token>-easing`. `compileSpring` reads them with the default's as
 fallback (the role's vars, or a literal's sampled timing); `componentTokenVars` and a style's
-`tokens` set both through `springTokenVars`, the role's vars when the value aliases one.
+`tokens` set both through `springTokenVars`, the role's vars when the value aliases one
+(`springVarNames` names them, `isSpringValue` tells such a token apart). The spring roles
+themselves are written from `springVars` (one spring's sampled duration and `linear()` curve):
+`springTokenGroups` nests them (`name: { duration, easing }`, Panda) and `springTokenEntries`
+lists them by path (the CSS adapter and runtime themes).
 
 ```ts
 import { conditionKey } from "@pureform/css-lowering";

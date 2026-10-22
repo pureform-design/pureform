@@ -40,17 +40,14 @@ import {
     column,
     flex,
     literal,
-    numeric,
     platform,
     pointer,
     px,
     relative,
-    rotate,
     row,
     slot,
     solid,
     start,
-    transform,
     transparent,
     unitless,
     when,
@@ -73,6 +70,7 @@ import {
     springTweens,
     stateTransition,
     sys,
+    turnedOver,
     variantsOf,
 } from "./shared";
 import type { Densities } from "./shared";
@@ -160,12 +158,7 @@ const arrowOpacity = when()
     .else(unitless(0));
 
 // The arrow turns over while its column is sorted descending.
-const arrowTurn = when()
-    .on(
-        slot("headerCell", "descending"),
-        transform(rotate(numeric(180, "deg"))),
-    )
-    .else(transform(rotate(numeric(0, "deg"))));
+const arrowTurn = turnedOver(slot("headerCell", "descending"));
 
 /** Build the table with a `density` step per entry of `densities`. */
 export const createTable = <D extends string = MaterialDensity>(

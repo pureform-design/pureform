@@ -13,6 +13,7 @@ import {
     swipeTokens,
 } from "@pureform/binding-core";
 import type { ListItemSwipeProps } from "@pureform/binding-core";
+import { swallowNextClick } from "@pureform/binding-core/dom";
 import { type Accessor, createSignal, untrack } from "solid-js";
 
 import { useDirection } from "../provider";
@@ -52,21 +53,9 @@ export function createSwipe(props: ListItemSwipeProps): Swipe {
         | { from: number; startOffset: number; offset: number; moved: boolean }
         | undefined;
     // The click that ends a drag isn't a press on the row, nor on its own handlers (an
-    // expandable row's): a capturing listener on the row swallows it. Solid has no capture
-    // prop, and the next press takes the listener back if no click came.
+    // expandable row's): a capturing listener on the row swallows it. The next press takes the
+    // listener back if no click came.
     let swallow: (() => void) | undefined;
-    const swallowNextClick = (row: Element) => {
-        const listener = (event: Event) => {
-            swallow?.();
-            event.preventDefault();
-            event.stopImmediatePropagation();
-        };
-        row.addEventListener("click", listener, { capture: true });
-        swallow = () => {
-            row.removeEventListener("click", listener, { capture: true });
-            swallow = undefined;
-        };
-    };
     const rootProps = (interactive: boolean) => ({
         style: { "touch-action": "pan-y" },
         tabIndex: interactive ? undefined : 0,
@@ -108,7 +97,7 @@ export function createSwipe(props: ListItemSwipeProps): Swipe {
             const held = gesture;
             gesture = undefined;
             if (!held?.moved) return;
-            swallowNextClick(event.currentTarget as Element);
+            swallow = swallowNextClick(event.currentTarget as Element);
             setRevealed(swipeSettlesOpen(held.offset, width()));
             setDrag(undefined);
         },

@@ -4,7 +4,7 @@
 import { Animated } from "react-native";
 
 import type { Spring } from "../values";
-import { NATIVE_DRIVER } from "./curve";
+import { NATIVE_DRIVER, springTo } from "./curve";
 
 // How close to rest, in pixels and pixels per second, a settle stops.
 const REST = 0.5;
@@ -23,15 +23,11 @@ export const settle = (
         offset.setValue(to);
         return () => {};
     }
-    const animation = Animated.spring(offset, {
+    const animation = springTo(offset, spring, {
         toValue: to,
         // Animated takes a spring's velocity per second.
         velocity: velocity * 1000,
-        stiffness: spring.stiffness,
-        damping: spring.damping,
-        mass: spring.mass,
-        restDisplacementThreshold: REST,
-        restSpeedThreshold: REST,
+        rest: REST,
         useNativeDriver: NATIVE_DRIVER,
     });
     animation.start();

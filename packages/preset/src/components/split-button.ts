@@ -17,24 +17,14 @@
 // split button's four: `filled` (default), `tonal`, `outlined` and `elevated`.
 
 import { typed } from "@pureform/core";
-import {
-    add,
-    inlineFlex,
-    numeric,
-    px,
-    rotate,
-    row,
-    slot,
-    transform,
-    when,
-} from "@pureform/core/ast";
+import { add, inlineFlex, px, row, slot, when } from "@pureform/core/ast";
 import type { NumericValue, StyleMap } from "@pureform/core/ast";
 import { radius, spacing, textStyle } from "@pureform/theme";
 import type { MaterialDensity } from "@pureform/theme";
 
 import { INDICATION_TOKENS } from "../state-layer";
 import { BUTTON_SIZES } from "./button";
-import { springTweens } from "./shared";
+import { springTweens, turnedOver } from "./shared";
 import {
     DEFAULT_GROUP,
     colorTokenVariants,
@@ -238,12 +228,7 @@ export const createSplitButton = <
                     // Turns over while the menu is open.
                     trailingIcon: {
                         ...iconBox(ref("iconSize")),
-                        transform: when()
-                            .on(
-                                EXPANDED,
-                                transform(rotate(numeric(180, "deg"))),
-                            )
-                            .else(transform(rotate(numeric(0, "deg")))),
+                        transform: turnedOver(EXPANDED),
                         transition: springTweens("spatialFast", ["transform"]),
                     },
                 },

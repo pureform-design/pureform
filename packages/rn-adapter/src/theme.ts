@@ -5,7 +5,12 @@ import { tokenValue } from "@pureform/core";
 import type { ValueNode } from "@pureform/core/ast";
 import type { CoreConfig, ThemeOverride, Token } from "@pureform/core/types";
 
-import { lowerToken, refKey, SPRING_FIELDS, springTokenValues } from "./lower";
+import {
+    lowerToken,
+    refKey,
+    springFieldNodes,
+    springTokenValues,
+} from "./lower";
 import type { RnOptions } from "./lower";
 import { dependencies, evaluate } from "./values";
 import type { Concrete, ThemeValues, Value } from "./values";
@@ -72,18 +77,10 @@ const tokenNodes = (
             const key = `components.${component}.${token}`;
             const node = tokenValue(entry) as ValueNode;
             // A spring is its five values, each a key of its own.
-            if (node.type === "spring") {
-                for (const [field, value] of Object.entries(
-                    springTokenValues(node),
-                )) {
+            const fields = springFieldNodes(node);
+            if (fields) {
+                for (const [field, value] of Object.entries(fields)) {
                     nodes.set(`${key}.${field}`, value);
-                }
-            } else if (node.type === "alias" && node.path[0] === "springs") {
-                for (const field of SPRING_FIELDS) {
-                    nodes.set(`${key}.${field}`, {
-                        type: "alias",
-                        path: [...node.path, field],
-                    });
                 }
             } else {
                 nodes.set(key, node);

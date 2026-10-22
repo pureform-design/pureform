@@ -12,14 +12,11 @@ import {
     column,
     flex,
     none,
-    numeric,
     pointer,
     px,
     relative,
-    rotate,
     row,
     slot,
-    transform,
     transparent,
     unitless,
     when,
@@ -44,7 +41,7 @@ import {
     stateTransition,
     sys,
 } from "./shared";
-import { chevronTransition } from "./shared";
+import { chevronTransition, turnedOver } from "./shared";
 
 /** The tokens every row has. */
 export const ROW_TOKENS = {
@@ -176,9 +173,7 @@ export const expandIndicator = (
     expanded: Condition,
 ): StyleMap => ({
     ...trailing,
-    transform: when()
-        .on(expanded, transform(rotate(numeric(180, "deg"))))
-        .else(transform(rotate(numeric(0, "deg")))),
+    transform: turnedOver(expanded),
     transition: chevronTransition,
 });
 

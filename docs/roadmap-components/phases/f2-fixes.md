@@ -20,6 +20,9 @@ when its replacement covers it.
 
 ## f2b: Controls
 
+- **Flaky test:** the toolbar's "keeps every element and no overflow button when they fit"
+  fails intermittently under the full parallel suite (r7). Make it deterministic.
+
 - **Slider:** the clipped icon button's focus ring uses the theme's focus ring width, not 1px.
   The handle clearance becomes a component token; add a styled web e2e for the inset icon's
   cut-off.
@@ -29,6 +32,10 @@ when its replacement covers it.
   `FastSpatial`. This replaces f1b's `effectsDefault`.
 
 ## f2c: Overlays
+
+- **Flaky test:** React Native `overlays.spec.tsx` "settles a dragged bottom sheet back when the
+  app keeps it open" fails intermittently under the full parallel suite (also on main). Find the
+  timing it depends on and make it deterministic.
 
 - **React Native sheets:** slide by their own measured size, not the window's.
 - **Toast:** exits with the shared `overlayShrinkOut`, not its own CSS `scale`.

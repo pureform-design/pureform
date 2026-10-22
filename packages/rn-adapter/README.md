@@ -50,16 +50,16 @@ config ──► codegen.ts ──► .pureform/native/<name>.ts (a factory over
 
 ## Public API
 
-| Entry                                         | Exports                                                                                                                                                   |
-| --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `@pureform/rn-adapter`                        | `precompute`, `runtimeStyles`, `lowerRn`, `select`, `selectWithTransitions`, …                                                                            |
-| `@pureform/rn-adapter/react`                  | `StylesProvider`, `PureformProvider`, `useComponentStyles`, `useComponentState`, `useTokens`, `useStyleEnvironment`, `useReducedMotion`, `pressableState` |
-| `@pureform/rn-adapter/animated`               | `useAnimatedComponentStyles`, `useRipple`, `animatedPresence`, `useAnimatedSlide`, and `slowSpring`, through React Native's Animated                      |
-| `@pureform/rn-adapter/reanimated`             | `useReanimatedComponentStyles`, `cssMotion`, `reanimatedPresence`, and `useReanimatedSlide`, through Reanimated 4                                         |
-| `@pureform/rn-adapter/svg`, `/reanimated-svg` | `SvgDrawing`, `ReanimatedSvgDrawing`, and their ripples                                                                                                   |
-| `@pureform/rn-adapter/metro`                  | `withPureform` for `metro.config.js`                                                                                                                      |
-| `@pureform/rn-adapter/factory`                | `nativeFactory`, `componentFactory`, `selectionOrder`, `movingSlots`, `overridesFor`, and the `NativeFactory` types; no React, no lowering                |
-| `@pureform/rn-adapter/codegen`                | `codegen` (the `native` target), `instanceTokenKeys`, `factoryModule`, `themesModule`, `THEMES_FILE`                                                      |
+| Entry                                         | Exports                                                                                                                                                          |
+| --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@pureform/rn-adapter`                        | `precompute`, `runtimeStyles`, `lowerRn`, `select`, `selectWithTransitions`, …                                                                                   |
+| `@pureform/rn-adapter/react`                  | `StylesProvider`, `PureformProvider`, `useComponentStyles`, `useComponentState`, `useTokens`, `useStyleEnvironment`, `useReducedMotion`, `pressableState`        |
+| `@pureform/rn-adapter/animated`               | `useAnimatedComponentStyles`, `useRipple`, `animatedPresence`, `useAnimatedSlide`, `settle`, `slowSpring`, and `springProgress`, through React Native's Animated |
+| `@pureform/rn-adapter/reanimated`             | `useReanimatedComponentStyles`, `cssMotion`, `reanimatedPresence`, and `useReanimatedSlide`, through Reanimated 4                                                |
+| `@pureform/rn-adapter/svg`, `/reanimated-svg` | `SvgDrawing`, `ReanimatedSvgDrawing`, and their ripples                                                                                                          |
+| `@pureform/rn-adapter/metro`                  | `withPureform` for `metro.config.js`                                                                                                                             |
+| `@pureform/rn-adapter/factory`                | `nativeFactory`, `componentFactory`, `selectionOrder`, `movingSlots`, `overridesFor`, and the `NativeFactory` types; no React, no lowering                       |
+| `@pureform/rn-adapter/codegen`                | `codegen` (the `native` target), `instanceTokenKeys`, `factoryModule`, `themesModule`, `THEMES_FILE`                                                             |
 
 ```tsx
 import { precompute } from "@pureform/rn-adapter";
