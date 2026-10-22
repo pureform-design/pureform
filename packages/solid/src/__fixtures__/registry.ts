@@ -317,6 +317,7 @@ export const navigationRegistry = () =>
         ]),
         list: named("list", ["root", "item"]),
         scrim: named("scrim", ["root"]),
+        fadeThrough: named("fade-through", ["root", "page"]),
         listItem: named("list-item", [
             "root",
             "leading",
