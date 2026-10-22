@@ -2,12 +2,14 @@
 // styles: a screenshot per section, plus measured layout rules that screenshots alone catch late
 // (icons centered, labels that float without jumping, the focus ring on keyboard focus).
 //
-// The theme's fonts are bundled, so the screenshots don't depend on the machine's fallback fonts.
+// The theme's fonts and the symbols it uses as icons (`symbols.css`) are bundled, so the
+// screenshots don't depend on the machine's fonts.
 
 import "@fontsource/jetbrains-mono/400.css";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
+import "./symbols.css";
 import "#/styles.css";
 import { render } from "@solidjs/web";
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
@@ -64,6 +66,9 @@ const SECTIONS = [
     "tables",
 ];
 
+// Every non-ASCII character the fixture draws from the symbol faces (`symbols.css`).
+const SYMBOLS = "★▾⌄✓⌕▤⌘⋮←✕✎✉✂⚠♪☺☎◉⏮⏭⎘⎀⌂";
+
 let dispose: (() => void) | undefined;
 
 // Load every face up front: `document.fonts.ready` waits only for the faces already in use.
@@ -76,6 +81,8 @@ beforeAll(async () => {
             "400 1em 'JetBrains Mono'",
         ].map((font) => document.fonts.load(font)),
     );
+    // A face with a unicode-range loads only for text it covers, so ask with the symbols.
+    await document.fonts.load("400 1em Roboto", SYMBOLS);
 });
 
 beforeEach(async () => {
