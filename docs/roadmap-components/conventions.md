@@ -21,6 +21,11 @@ compaction). Where this file differs, it wins for the component roadmap. Context
 Other agents run omni in their own worktrees at the same time. Never stop processes by
 pattern (`pkill -f "omni run"`); stop only the ones you started, by PID.
 
+Wait for a long run by running it in the foreground with a long tool timeout, or with
+`tail --pid=<PID> -f /dev/null` for one already running. Never wait with sleep loops or
+`while pgrep -f "<command>"`: `pgrep -f` matches the waiting shell's own command line, so the
+loop never ends. Put your subphase in log names under `/tmp/opencode`, which agents share.
+
 ## Parallel work
 
 Subphases of one phase don't depend on each other and run at the same time.
