@@ -1051,6 +1051,13 @@ var(--springs-spatial-default-duration))` and the easing alike, and a theme's or
 "spatialSlow" }`): the role's two vars on the web, its five values on React Native. The
   generated registry records which tokens are springs (`springs` beside `tokens`), so only a
   spring token takes a spring or a role, and a spring on another token is a type error (f2).
+  At runtime too, React Native's factory takes a string as a role only on a spring token (the
+  codegen passes the shape's `springs`); any other string stays a string. The web factories name
+  a role's vars under the registry's `tokenPrefix`, which the Panda codegen defaults to Panda's
+  own `prefix` (`pandaPrefix`), so they match Panda's token vars (r8). Whether a token is a
+  spring is core's `isSpringToken(node, { config, target })` everywhere: generate's shape (every
+  platform choice has to be one), css-lowering's `isSpringValue` (the target's choice) and
+  React Native's `springFieldNodes` (through core's `tokenAt`).
   Spring tokens have no `valueType`, so they're never
   registered with `@property`.
 - **Reduced motion.** A spring times a motion; it doesn't decide whether it moves. So the rule

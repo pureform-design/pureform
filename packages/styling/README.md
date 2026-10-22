@@ -207,7 +207,8 @@ tests live only there.
   token's two vars, `<var>-duration` and `<var>-easing`, sampled as a theme's springs are.
   A spring role's name (`"spatialSlow"`) on a spring token reads the role's two vars, given
   the factory's `springs` (each spring token's role var prefix, which the web adapters
-  generate). The registry's `springs` (beside `tokens`) types it: `InstanceTokens` gives a
+  generate under the registry's `tokenPrefix`; the Panda codegen defaults it to Panda's own
+  `prefix`, its `pandaPrefix`). The registry's `springs` (beside `tokens`) types it: `InstanceTokens` gives a
   spring token `InstanceSpringValue` (a spring or a `SpringRole`, from `SpringRoleRegistry`)
   and every other token a `TokenValue`.
 - The hooks (`useClasses`, `useClassFactory`, `useStyles`) are the bindings' (p2a, p2b, p8).

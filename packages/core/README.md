@@ -25,7 +25,7 @@ It depends on nothing else in the workspace.
 | `types.ts`            | The config schema: `CoreConfig`, component specs, utilities, themes.                                                                                                             |
 | `define.ts`           | Builders: `defineConfig`, `defineComponent`, `defineSlotComponent`, the utility builders, `mergeConfigs`, `meta`.                                                                |
 | `typed.ts`            | `typed()`: helpers typed from a registered config, so aliases and breakpoints autocomplete.                                                                                      |
-| `path.ts`             | Path resolution (`getByPath`, `resolveAlias`) and `validateConfig`, which `defineConfig` runs.                                                                                   |
+| `path.ts`             | Path resolution (`getByPath`, `tokenAt`, `resolveAlias`), `isSpringToken`, and `validateConfig`.                                                                                 |
 | `inline.ts`           | `inlineStyles` and `mergeStyles` for style maps.                                                                                                                                 |
 | `state-attributes.ts` | `STATE_ATTRIBUTES`: the `data-pf-*` names the web bindings set and the web adapters match.                                                                                       |
 | `motion.ts`           | `MOTION_ATTRIBUTE` and `MotionSetting` for the provider's motion setting, and `transitionMoves`/`valueTypeMoves`: what reduced motion stops.                                     |

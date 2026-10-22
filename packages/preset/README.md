@@ -777,8 +777,12 @@ spans the tab. The divider under the tabs is an inset shadow on each tab (`divid
 takes no markup.
 The indicator declares a `transform` transition on its `indicatorSpring` token, the
 `spatialDefault` spring (Compose's `TabRow` uses `DefaultSpatial`), none under reduced motion; the bindings slide the new tab's
-indicator in from the old one's box over it (design doc §9.10). It draws over every tab
-(`z-index: 1`) inside the tab list, which is its own stacking context.
+indicator in from the old one's box over it (design doc §9.10). An instance may pass
+`indicatorSpring` a spring or a role's name (`"spatialSlow"`); only a spring token (the generated
+registry's `springs`) takes either. It draws over every tab (`stackAbove()`, `z-index: 1`) inside
+the tab list, which is its own stacking context (`isolated`, `isolation: isolate`). The pair lives
+in `components/shared.ts`; the list item's swipe frame (the row over its action) and the switch
+(its input over the track) use it too.
 
 ```html
 <div class="{root}" role="tablist">

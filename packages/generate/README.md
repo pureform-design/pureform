@@ -33,24 +33,24 @@ generate(options)
   └─ write.ts           write what changed, remove what's no longer wanted, or compare (check)
 ```
 
-| Module              | What it does                                                                     |
-| ------------------- | -------------------------------------------------------------------------------- |
-| `adapter.ts`        | The codegen interface: `CodegenAdapter`, `CodegenContext`, `CodegenOutput`, …    |
-| `shape.ts`          | `componentShape(spec)`: a component's groups, defaults, slots, and tokens        |
-| `generate.ts`       | `generate(options)`: the whole step                                              |
-| `config.ts`         | `loadConfig(path, options)`                                                      |
-| `imports.ts`        | `scanConfigImports(entry, options)`, `formatImportViolations`, `resolveRelative` |
-| `usage.ts`          | Pruning's input: `Usage`, `VariantUsage`, `normalizeVariants`, `narrowConfig`    |
-| `train.ts`          | `CORE_TRAIN_PACKAGES`, `findInstalled(root)`, `checkTrain(installed)`            |
-| `semver.ts`         | `compareVersions`, `satisfies`: just enough semver for the train check           |
-| `hash.ts`           | `stableStringify`, `hashOf`, the header (`GENERATED_MARK`, `headerHash`)         |
-| `registry-index.ts` | `registryIndex`, `registryDeclarations`                                          |
-| `write.ts`          | `writeFiles`, `compareFiles`                                                     |
-| `missing.ts`        | `missingOutputMessage`, `assertGenerated`                                        |
-| `errors.ts`         | `GenerateError` with a `code`, `isGenerateError`                                 |
-| `load-adapter.ts`   | `loadAdapter(target, root)`                                                      |
-| `runner.ts`         | `createGenerateRunner(options)`, `findConfigFile(root)`, `CONFIG_FILES`          |
-| `watch.ts`          | `watchGenerate(options, watching)`: generate on every change, without a bundler  |
+| Module              | What it does                                                                                             |
+| ------------------- | -------------------------------------------------------------------------------------------------------- |
+| `adapter.ts`        | The codegen interface: `CodegenAdapter`, `CodegenContext`, `CodegenOutput`, …                            |
+| `shape.ts`          | `componentShape(spec, config?)`: groups, defaults, slots, tokens, and `springs` (core's `isSpringToken`) |
+| `generate.ts`       | `generate(options)`: the whole step                                                                      |
+| `config.ts`         | `loadConfig(path, options)`                                                                              |
+| `imports.ts`        | `scanConfigImports(entry, options)`, `formatImportViolations`, `resolveRelative`                         |
+| `usage.ts`          | Pruning's input: `Usage`, `VariantUsage`, `normalizeVariants`, `narrowConfig`                            |
+| `train.ts`          | `CORE_TRAIN_PACKAGES`, `findInstalled(root)`, `checkTrain(installed)`                                    |
+| `semver.ts`         | `compareVersions`, `satisfies`: just enough semver for the train check                                   |
+| `hash.ts`           | `stableStringify`, `hashOf`, the header (`GENERATED_MARK`, `headerHash`)                                 |
+| `registry-index.ts` | `registryIndex`, `registryDeclarations`                                                                  |
+| `write.ts`          | `writeFiles`, `compareFiles`                                                                             |
+| `missing.ts`        | `missingOutputMessage`, `assertGenerated`                                                                |
+| `errors.ts`         | `GenerateError` with a `code`, `isGenerateError`                                                         |
+| `load-adapter.ts`   | `loadAdapter(target, root)`                                                                              |
+| `runner.ts`         | `createGenerateRunner(options)`, `findConfigFile(root)`, `CONFIG_FILES`                                  |
+| `watch.ts`          | `watchGenerate(options, watching)`: generate on every change, without a bundler                          |
 
 ## Public API
 
