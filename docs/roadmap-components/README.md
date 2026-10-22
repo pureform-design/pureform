@@ -51,6 +51,7 @@ flowchart LR
     f1 --> m3[m3 Material transitions]
     m3 --> c8[c8 Material gaps from Zag]
     c8 --> c9[c9 components beyond M3]
+    c9 --> c10[c10 plain form primitives]
 ```
 
 A phase depends on the one before it unless its file says it needs only a specific earlier
@@ -82,6 +83,7 @@ contexts exist.
 | [ ]  | [m3 Material transitions](phases/m3-transitions.md)                                                                                                                                                                | m3a fade through, m3b shared axis                                                                                     | Page and tab transitions on springs                                |                  |
 | [ ]  | [c8 Material gaps from Zag](phases/c8-zag-gaps.md)                                                                                                                                                                 | c8a bottom sheet partly open, c8b context menu trigger, c8c resizable panes                                           | M3 behaviours a Zag machine can back                               |                  |
 | [ ]  | [c9 Components beyond M3](phases/c9-beyond-m3.md)                                                                                                                                                                  | c9a NumberField and CodeField, c9b FileUpload, c9c Popover, c9d ColorPicker, c9e CopyButton and Rating                | Useful components M3 doesn't specify                               |                  |
+| [ ]  | [c10 Plain form primitives](phases/c10-plain-form.md)                                                                                                                                                              | c10a Field, Label, Input, Textarea, Description, ErrorText; c10b NativeSelect                                         | Themed form pieces without Material's field design                 |                  |
 
 ## Rules that apply to every phase
 
