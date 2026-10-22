@@ -1077,8 +1077,8 @@ var(--springs-spatial-default-duration))` and the easing alike, and a theme's or
   step gives way to its fade alone, and the settle is instant.
 - **Containers (m2c).** Every chevron that turns (the expand indicator of the list item,
   accordion and tree, the select's arrow) turns on `spatialFast` (`chevronTransition`), its color
-  on its tween; the field label floats on `effectsDefault` (f1b; m2c had Compose's
-  `FastSpatial`, which overshoots under expressive), its colors on their tween. A swipeable list item's `swipeOffset` follows
+  on its tween; the field label floats on `spatialFast`, as Compose's `FastSpatial`, overshooting
+  under expressive (f2b; f1b had it on `effectsDefault`), its colors on their tween. A swipeable list item's `swipeOffset` follows
   the drag at once and settles on `spatialFast` after release; on React Native the spring starts
   at the release velocity (`useComponentSlots`' `velocities`, `Animated.spring`'s `velocity`).
 - **Table sort arrow (f1d).** The arrow is always ↑ and turns over on `spatialFast` while its

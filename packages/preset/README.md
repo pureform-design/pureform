@@ -333,7 +333,8 @@ pureform({
 
 How it works: a clip cuts away everything outside it, so the root keeps the focus ring, the
 touch target, and the elevation, cast as drop shadows that follow the shape. An outlined icon
-button's `outline` slot is clipped to a ring along the shape, 1px wide, exact on straight edges
+button's `outline` slot is clipped to a ring along the shape, its `outlineWidth` wide (1, 2 or 3px
+by size, as its border where a target can't clip), exact on straight edges
 and close on curves. Browsers without `shape()` (Firefox, for now) keep the rounded corners.
 Each shape a page uses adds about 1 to 2 kB of CSS, so avoid `staticCss: ["*"]` for these
 components unless you show every shape.
