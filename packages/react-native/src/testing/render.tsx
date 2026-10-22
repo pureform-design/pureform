@@ -28,6 +28,24 @@ export const settle = (ms = 0): Promise<void> =>
         await new Promise((resolve) => setTimeout(resolve, ms));
     });
 
+/** Waits until React Native Web has reported `element`'s layout to its `onLayout`: its resize
+ *  observer reports on the next rendering frame, and its measure answers a task later. A test
+ *  that reads what a view measures (a sheet's height) waits for this rather than for time, which
+ *  a loaded machine stretches. */
+export const laidOut = async (element: Element): Promise<void> => {
+    await act(
+        () =>
+            new Promise<void>((resolve) => {
+                const observer = new ResizeObserver(() => {
+                    observer.disconnect();
+                    resolve();
+                });
+                observer.observe(element);
+            }),
+    );
+    await settle();
+};
+
 /** Waits, a task at a time, until `check` passes: as long as a loaded machine takes, where a
  *  user event alone can take seconds to come back. */
 export const until = (check: () => void, timeout = 10_000): Promise<void> =>
