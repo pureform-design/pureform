@@ -119,36 +119,24 @@ no composition fallback.
 `scripts/generate-stories.ts`, run by an omni `generate` task (before `build` and `dev`, as in
 the demos):
 
-1. **Input:** `stories.config.ts`:
-    ```ts
-    export default defineStories({
-        renderers: {
-            solid: {
-                package: "@pureform/solid",
-                adapter: "./src/solid/adapter.ts",
-            },
-            react: {
-                package: "@pureform/react",
-                adapter: "./src/react/adapter.ts",
-            },
-            native: {
-                package: "@pureform/react-native",
-                adapter: "./src/native/adapter.ts",
-            },
-        },
-        components: {
-            Button: {
-                args: { children: "Save" },
-                variants: ["filled", "outlined", "text"],
-            },
-            Switch: {},
-            TextField: { args: { label: "Name" } },
-        },
-        hooks: ["./src/hooks.ts"], // shared, applies to every renderer
-    });
-    ```
-    Component names and their variants could later come from `@pureform/anatomy` (its generated
-    list), so no component is listed by hand.
+1. **Inputs:** the data the components already have, so nothing is listed by hand:
+    - **`@pureform/anatomy`** gives the component list and each component's variants with their
+      values (`variants`, plain data generated next to the parts from the recipe's variants;
+      `generated.ts` is regenerated, never edited, and the drift spec covers it). The controls
+      (`argTypes`, a select or a boolean per variant) come from it, so no preset runs in the
+      browser.
+    - **`@pureform/component-cases`** (the framework-neutral cases moved out of
+      `tests/component-suites`, which now imports them) gives each component's stories and play
+      tests: `props` is `Default`'s args, each of `examples` is a story, `state` gives a play
+      (read gives `from`, one `act`, read gives `to`), and each `keyboard` key a story with its
+      play. Cases take `userEvent` as a parameter (`createCases(userEvent)`), so Storybook passes
+      `storybook/test`'s and the suites Vitest's. A component is drawn when an anatomy and a case
+      share its root test id.
+    - **`stories.config.ts` holds overrides only:** the renderers, `include` (this slice: Button,
+      Switch, TextField) and `skip`, and per component extra `args`/`argTypes`, controls to
+      leave out (variants the binding derives), `schemes`, hooks, and story fields by export
+      name. A renderer whose DOM the cases can't read sets `casePlays: false` (React Native Web,
+      for now).
 2. **Output:** `src/stories/generated/<Component>.stories.ts` (ignored by git), one per
    component, importing each renderer's implementation and calling `multiRender`. A renderer
    without that component shows "not implemented" in the canvas.
@@ -170,7 +158,10 @@ Resolution order, later wins:
 
 1. the **shared** hook in `apps/storybook-web/src/hooks.ts`;
 2. the **per-renderer** hook, the binding package's `storybook` export;
-3. a **per-component** override in `stories.config.ts`.
+3. a **per-component** override in `stories.config.ts` (its `hooks` modules and `args`).
+
+The play tests come from the cases, not from hooks; a hook's `extendStory` can still add or
+replace one.
 
 Runtime hooks (`decorators`, `args`, `extendStory`) are imported by the generated files;
 codegen hooks (`transformSource`) run in the script.

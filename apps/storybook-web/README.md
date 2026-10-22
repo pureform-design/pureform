@@ -26,11 +26,22 @@ bunx vitest run -c vitest.config.storybook.ts --project storybook/native -t Butt
   rest. Solid and React draw with the Panda registry in `.pureform/`, React Native with
   rn-adapter's runtime styles from `virtual:pureform-rn`. `pureform.codegen.ts`'s
   `COMPONENTS` lists the components (by anatomy name) for both.
-- **Stories are generated**: `scripts/generate-stories.ts` (the omni `generate:stories` task,
-  before `dev`, `build` and the tests) reads `stories.config.ts` and writes
-  `src/stories/generated/<Component>.stories.ts` (ignored by git). A hand-written
-  `src/stories/*.stories.ts` with the same `title` replaces the generated file; the script never
-  writes outside `generated/`.
+- **Stories are generated** by `scripts/generate-stories.ts` (the omni `generate:stories`
+  task, before `dev`, `build` and the tests) into `src/stories/generated/<Component>.stories.ts`
+  (ignored by git), from data the components already have:
+    - **`@pureform/anatomy`**: the component list, and each variant's values, which become the
+      controls (a select, or a boolean for `true`/`false`).
+    - **`@pureform/component-cases`**: `props` gives `Default`, each of `examples` a story, the
+      `state` a play test (read gives `from`, one `act`, read gives `to`) on the pinned `Light`
+      and `Dark` copies, and each `keyboard` key a `Key: …` story with its play. The cases act
+      through `storybook/test`'s `userEvent` (`createCases(userEvent)`, `src/renderers/plays.ts`).
+    - **`stories.config.ts`**, overrides only: renderers, `include`/`skip`, and per component
+      `args`, `argTypes`, `controls.exclude` (variants the binding derives, which aren't props),
+      `schemes`, `scheme`, `hooks`, and `stories` (fields by export name).
+
+    A hand-written `src/stories/*.stories.ts` with the same `title` replaces the generated file;
+    the script never writes outside `generated/`.
+
 - **Tests:** `@storybook/addon-vitest` runs every story in Chromium (Vitest browser mode), one
   project per renderer (`storybook/solid`, `storybook/react`, `storybook/native`, set by the
   `renderer` global). `@storybook/addon-a11y` checks each story; a violation fails it.
@@ -47,8 +58,9 @@ bunx vitest run -c vitest.config.storybook.ts --project storybook/native -t Butt
   locks the Scheme item while it's pinned). Without a pin, the toolbar decides. In
   `stories.config.ts`, `schemes: ["light", "dark"]` generates `Light` and `Dark` stories next to
   `Default`, and `scheme: "dark"` pins every story of the component; a hook's `extendStory` can
-  set `globals` as well. The shared `play` tests (`isBaseStory`: `Default` and the pinned
-  copies) and the a11y checks run on them, so contrast is checked in both schemes.
+  set `globals` as well. The pinned copies carry the case's state play, and the a11y checks run
+  on them, so contrast is checked in both schemes. (`isBaseStory` tells a hook a story is
+  `Default` or a pinned copy.)
 - **Theme** goes to each provider's `theme` prop.
 - The canvas paints the theme's surface (`src/index.css`), in the current scheme.
 - Storybook's UI follows the system too: `.storybook/manager.ts` switches the manager live when
@@ -76,20 +88,21 @@ They resolve in this order, later wins:
 2. **per renderer**: the binding's `storybook` export (`@pureform/solid/storybook`,
    `@pureform/react/storybook`, `@pureform/react-native/storybook`);
 3. **per component**: the `hooks` modules and `args` of the component's entry in
-   `stories.config.ts` (`src/components/<component>.ts`).
+   `stories.config.ts` (for example `src/components/<component>.ts`; none in this slice).
 
 A renderer's object `args` replace a shared default the controls haven't changed, never a
 component's.
 
 ## Adding a component
 
-1. Add it to `stories.config.ts`'s `components`, by its export name (`TextField` comes from each
-   binding's `./text-field` export): its `args`, `variants` (a control and one story each),
-   `schemes` (pinned `Light`/`Dark` stories) and `argTypes`.
-2. Add its anatomy name (and any sub-component's, such as `supportingText`) to `COMPONENTS` in
-   `pureform.codegen.ts`.
-3. Give it a hook, `src/components/<component>.ts`, whose `extendStory` adds the `play` test to
-   the stories `isBaseStory` picks (`Default` and the scheme-pinned ones). Query by role and accessible name, so it holds in every renderer.
+1. Give it an anatomy (the preset's component, `@pureform/anatomy`'s `generate`) and a case in
+   `@pureform/component-cases` (`packages/component-cases/src/cases/<name>.ts`); the generator
+   pairs them by the root's test id.
+2. Add it to `include` in `stories.config.ts` (or drop `include` to draw every component with
+   both), and its anatomy name (and any sub-component's, such as `supportingText`) to
+   `COMPONENTS` in `pureform.codegen.ts`.
+3. Override what the data gets wrong in its `components` entry: `controls.exclude` for
+   variants that aren't props, `args`, `schemes: ["light", "dark"]` for pinned copies.
 4. Run `omni run test:e2e -p @pureform/storybook-web`.
 
 For a story the generator can't express, write `src/stories/<Component>.stories.ts` with the
@@ -109,7 +122,8 @@ context)` renders the component under `context.decorators` (each called with the
    `{ registry, theme, globals }`) and returns `update` and `unmount`.
 2. Give the binding a `storybook` export (`package.json` export and its build's entry) with
    at least the provider decorator, mapping the theme to its provider's props.
-3. Add it to `stories.config.ts`'s `renderers` (`package`, `adapter`, `export`, `hooks`), to
+3. Add it to `stories.config.ts`'s `renderers` (`package`, `adapter`, `export`, `hooks`, and
+   `casePlays: false` if the cases can't read its DOM), to
    the `renderer` toolbar items in `.storybook/preview.ts`, and to `RENDERERS` in
    `vitest.config.storybook.ts`.
 4. Its compiler in `.storybook/main.ts`: Svelte's and Vue's plugins claim their own extensions;

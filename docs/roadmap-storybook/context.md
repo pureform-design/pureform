@@ -39,8 +39,8 @@ from `main` (`da4f3d08`). Not pushed.
   (ignored). Omni task `generate:stories` before `dev`, `build` and `test:e2e`. The spike's
   hand-written Button story is gone; a hand-written story with the same title replaces a
   generated one.
-- **Components:** Button (5 variant stories + Default), Switch, TextField (filled, outlined).
-  One `play` per component on `Default`, run in every renderer.
+- **Components:** Button, Switch, TextField. (Superseded below: stories and plays now come
+  from the anatomy and the component cases.)
 - **Tests:** `vitest.config.storybook.ts`, `@storybook/addon-vitest` in browser mode, one
   project per renderer through the plugin's `initialGlobals`; `@storybook/addon-a11y` with
   `parameters.a11y.test: "error"`. Omni `test:e2e` runs it.
@@ -116,3 +116,72 @@ from `main` (`da4f3d08`). Not pushed.
   (about 15 s per renderer).
 - `prune: false` and runtime styles for every listed component keep the bundle large (the
   stories chunk was ~1.4 MB in the spike).
+
+## Data sources (anatomy and component cases)
+
+- **Anatomy variants:** `deriveAnatomy` adds `variants` (each recipe variant's values, in order,
+  plain data) to every generated anatomy; `generated.ts` was regenerated with the `generate`
+  task, not edited. The type field is optional because the hand-written composites
+  (`composites.ts`) have none. The drift spec (`anatomy.spec.ts`, `toEqual(deriveAnatomy(spec))`)
+  covers it; `derive.spec.ts` has a case for it. 218 unit tests pass.
+- **`@pureform/component-cases`** (`packages/component-cases`): the cases moved from
+  `tests/component-suites/src/components/` with `git mv` (`cases/<name>.ts`, `cases.ts` for the
+  list, `types.ts`), plus `scene.ts` (`COMPONENT_NAMES`, `SceneProps`, moved out of the suites'
+  `harness/scene.ts`, which re-exports them), `animations.ts` (`animationsDone`, re-exported by
+  the suites' harness) and `user-event.ts`. `MutableInteractionSource` now comes from
+  `@pureform/binding-core/interaction` instead of `@pureform/solid`.
+    - **Scaffolded with the repo's generator:** `omni generator run -n ts-package` (the
+      `omni/generators/ts-package` templates: lib, no unit/integration tests, release group
+      `none`, not published), then trimmed: dropped the template's `src/add.ts` and its
+      `@omni-oss/log`/`zod` dependencies, `@pureform/*` devDependencies as `workspace:^` (as in
+      `packages/anatomy`), the vitest config deps (no tests of its own; it's tested through the
+      suites and Storybook), and added `@pureform/anatomy` and `@pureform/binding-core`. Kept
+      the generated `vite.config.ts` (library build), `tsconfig*.json`, `.npmignore` and
+      `project.omni.yaml` (`ts-vite-lib` preset, publish off); README in anatomy's layout.
+    - **userEvent as a parameter:** `createCases(userEvent)` returns the cases and sets the
+      `userEvent` every action calls through (`user-event.ts`). It's one module-level slot, so
+      two runners in one realm would share it; each runtime here has one (Vitest's in the
+      suites, `storybook/test`'s in Storybook). The cases' `UserEvent` is a three-method
+      interface (`click`, `keyboard`, `type`) both fit.
+    - `tests/component-suites/src/components.ts` calls `createCases(userEvent)` from
+      `vitest/browser` and re-exports the package. Checked narrowed: `controllable`,
+      `keyboard`, `forms`, `accessibility` on `solid/panda` and `react/panda` with
+      `-t "Button|Switch|TextField"` (562 passed), and `overlays`, `tabs-motion`, `direction`,
+      `themes`, `indication`, `server-rendering` on `solid/css` with
+      `-t "Menu|Toast|Tabs|Switch|Slider"` (339 passed). `component-recipe.md`'s suites step
+      points at the package; older phase contexts keep their paths.
+- **Codegen:** the component list is the anatomies that have a case (paired by the root part's
+  test id); `stories.config.ts` keeps renderers, `include` (Button, Switch, TextField), `skip`,
+  and per component `args`, `argTypes`, `controls.exclude`, `schemes`, `scheme`, `hooks` and
+  `stories` (fields by export name). Stories: `Default` (the case's `props`), `Light`/`Dark`
+  (pinned, with the state play, its state starting at `from` through `default<Prop>`), one per
+  example (named as the case names it), one per key (`Key: Enter`, its play). A key that clicks
+  checks an `onClick: fn()` spy the meta adds (React Native's hook maps it to `onPress`) and
+  doesn't make the state uncontrolled, so a button stays a plain button. The component hooks
+  (`src/components/*.ts`) are gone: the play tests come from the cases.
+- **Tests now:** 54 stories × 3 renderers = 162, all passing (`vitest.config.storybook.ts`).
+
+### Problems and decisions
+
+- **React Native runs the stories without the case plays** (`casePlays: false` in
+  `stories.config.ts`). The cases read the web bindings' DOM: the button's `aria-pressed`, the
+  switch's native `<input>` (`pf-switch-control-input`), the field container's
+  `data-pf-filled`; React Native Web draws none of these, so 11 plays failed there. Its a11y
+  checks still run.
+- **React Native Web's disabled text field** renders as `readonly`, so axe applies the contrast
+  rule a disabled field is exempt from (2.25:1). `TextField/Disabled` has
+  `parameters.a11y.test: "todo"` (set through `stories` in the config), for every renderer, since
+  parameters can't vary by renderer.
+- Recipe variants include ones the binding derives (`toggle`, `position`, `density` on the
+  button; the field's `leadingIcon`/`prefixText`/…; the switch's `icons`), which aren't props;
+  `controls.exclude` drops them per component. The anatomy can't tell them apart yet.
+- The case types needed `Promise<unknown>` returns for Testing Library's `keyboard` (it returns
+  its state); the package's own `userEvent` wraps calls to return `Promise<void>`.
+
+### Open questions (data sources)
+
+- Should the cases get renderer-neutral readers (ARIA only: `role=switch` + `aria-checked`, the
+  input's value) so the plays run in React Native too, or should React Native get its own
+  readers?
+- Should the anatomy mark derived variants (not props), so `controls.exclude` isn't needed?
+- React Native's disabled text field: a binding fix (`disabled` instead of `readOnly` on web)?
