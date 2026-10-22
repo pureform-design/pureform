@@ -29,10 +29,17 @@ import type {
     MenuRootOwnProps,
     MenuVariantProps,
 } from "@pureform/binding-core";
+import { markMenuGroupEdges } from "@pureform/binding-core/dom";
 import * as menu from "@pureform/machines/menu";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";
-import { type ElementType, type ReactNode, useEffect, useId } from "react";
+import {
+    type ElementType,
+    type ReactNode,
+    useCallback,
+    useEffect,
+    useId,
+} from "react";
 
 import { Button } from "../button";
 import { useControllable } from "../controllable";
@@ -112,12 +119,10 @@ export interface MenuItemProps
         Omit<MenuPartProps, keyof MenuItemBehaviorProps>,
         MenuItemBehaviorProps {}
 
-/** A group's props: its `id`, which its label points at, whether it's the menu's `first` or
- *  `last` group (a grouped menu rounds their outside corners), and a part's. */
+/** A group's props: its `id`, which its label points at, and a part's. The surface marks its
+ *  first and last groups itself. */
 export interface MenuItemGroupProps extends MenuPartProps {
     readonly id: string;
-    readonly first?: boolean | undefined;
-    readonly last?: boolean | undefined;
 }
 
 /** A group label's props: the `id` of its group, and a part's. */
@@ -245,9 +250,22 @@ function Positioner({ unstyled, ...props }: MenuPartProps): ReactNode {
  *  arrow keys. It stays while its exit animation runs. */
 function Content({ unstyled, ...props }: MenuPartProps): ReactNode {
     const { scope, api, presence } = context.use("Content");
+    // Its groups' first and last are marked from the DOM, so composed menus round them too.
+    const ref = useCallback(
+        (element: HTMLElement | null) => {
+            presence.ref(element);
+            if (!element) return undefined;
+            const stop = markMenuGroupEdges(element);
+            return () => {
+                stop();
+                presence.ref(null);
+            };
+        },
+        [presence.ref],
+    );
     return scope.render("content", {
         element: "div",
-        ref: presence.ref,
+        ref,
         machine: presentProps(api.getContentProps(), presence.present),
         unstyled,
         props,
@@ -255,17 +273,11 @@ function Content({ unstyled, ...props }: MenuPartProps): ReactNode {
 }
 
 /** A group of items, labelled by the ItemGroupLabel with its `id` as `group`. */
-function ItemGroup({
-    unstyled,
-    id,
-    first,
-    last,
-    ...props
-}: MenuItemGroupProps): ReactNode {
+function ItemGroup({ unstyled, id, ...props }: MenuItemGroupProps): ReactNode {
     const { scope, api } = context.use("ItemGroup");
     return scope.render("itemGroup", {
         element: "div",
-        machine: api.getItemGroupProps({ id, first, last }),
+        machine: api.getItemGroupProps({ id }),
         unstyled,
         props,
     });
@@ -536,13 +548,11 @@ function ReadyMade(props: MenuProps): ReactNode {
                     {items.map((item) => (
                         <ItemEntry key={item.value} item={item} slot={slot} />
                     ))}
-                    {groups.map((group, index) => (
+                    {groups.map((group) => (
                         <ItemGroup
                             key={group.id}
                             {...slot("itemGroup")}
                             id={group.id}
-                            first={index === 0}
-                            last={index === groups.length - 1}
                         >
                             {isPresent(group.label) ? (
                                 <ItemGroupLabel

@@ -195,6 +195,7 @@ export {
     SHEET_DISMISS_SHARE,
     SHEET_FLICK_SPEED,
 } from "./sheet-drag";
+export { markMenuGroupEdges } from "./menu-groups";
 export { revealInRow } from "./reveal";
 export { slideIndicator, slideTransform, transformTiming } from "./slide";
 export { moveToolbarFocus, watchOverflow } from "./toolbar-dom";

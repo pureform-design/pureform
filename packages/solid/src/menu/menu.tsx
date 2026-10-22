@@ -31,6 +31,7 @@ import type {
     MenuRootOwnProps,
     MenuVariantProps,
 } from "@pureform/binding-core";
+import { markMenuGroupEdges } from "@pureform/binding-core/dom";
 import * as menu from "@pureform/machines/menu";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {
@@ -39,6 +40,7 @@ import {
     createUniqueId,
     For,
     omit,
+    onCleanup,
     onSettled,
     Show,
     untrack,
@@ -119,12 +121,10 @@ export interface MenuIconProps extends MenuPartProps {
  *  item its `type`, `checked`, and `onCheckedChange`, and a part's. */
 export interface MenuItemProps extends MenuPartProps, MenuItemBehaviorProps {}
 
-/** A group's props: its `id` among the groups, whether it's the menu's `first` or `last` group
- *  (a grouped menu rounds their outside corners), and a part's. */
+/** A group's props: its `id` among the groups, and a part's. The surface marks its first and
+ *  last groups itself. */
 export interface MenuItemGroupProps extends MenuPartProps {
     readonly id: string;
-    readonly first?: boolean | undefined;
-    readonly last?: boolean | undefined;
 }
 
 /** A group label's props: the `id` of the group it names, and a part's. */
@@ -273,9 +273,16 @@ function Positioner(props: MenuPartProps): JSX.Element {
  *  arrow keys. It stays while its exit animation runs. */
 function Content(props: MenuPartProps): JSX.Element {
     const { scope, api, presence } = context.use("Content");
+    // Its groups' first and last are marked from the DOM, so composed menus round them too.
+    let stop: (() => void) | undefined;
+    onCleanup(() => stop?.());
     return scope.render("content", {
         element: "div",
-        ref: presence.ref,
+        ref: (element: HTMLElement) => {
+            presence.ref(element);
+            stop?.();
+            stop = markMenuGroupEdges(element);
+        },
         machine: () =>
             presentProps(api().getContentProps(), presence.present()),
         unstyled: () => props.unstyled,
@@ -288,14 +295,9 @@ function ItemGroup(props: MenuItemGroupProps): JSX.Element {
     const { scope, api } = context.use("ItemGroup");
     return scope.render("itemGroup", {
         element: "div",
-        machine: () =>
-            api().getItemGroupProps({
-                id: props.id,
-                first: props.first,
-                last: props.last,
-            }),
+        machine: () => api().getItemGroupProps({ id: props.id }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "id", "first", "last"),
+        props: omit(props, "unstyled", "id"),
     });
 }
 
@@ -584,13 +586,8 @@ function ReadyMade(props: MenuProps): JSX.Element {
                         each={groups()}
                         keyed={(group: MenuGroup<JSX.Element>) => group.id}
                     >
-                        {(group, index) => (
-                            <ItemGroup
-                                {...itemGroup}
-                                id={group().id}
-                                first={index() === 0}
-                                last={index() === groups().length - 1}
-                            >
+                        {(group) => (
+                            <ItemGroup {...itemGroup} id={group().id}>
                                 <Show when={isPresent(group().label)}>
                                     <ItemGroupLabel
                                         htmlFor={group().id}

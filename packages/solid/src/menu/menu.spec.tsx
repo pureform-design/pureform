@@ -1,5 +1,5 @@
 import { compositeTestIds } from "@pureform/anatomy";
-import { createSignal, Errored } from "solid-js";
+import { createSignal, Errored, For } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
@@ -241,6 +241,44 @@ describe("Menu, compound", () => {
         await userEvent.click(byTestId(ids.item));
         await settle();
         expect(onSelect).toHaveBeenCalledExactlyOnceWith({ value: "share" });
+    });
+
+    it("marks its groups' first and last itself, from where they are", async () => {
+        withRegistry(() => (
+            <Menu.Root defaultOpen>
+                <Menu.Trigger>More</Menu.Trigger>
+                <Menu.Positioner>
+                    <Menu.Content>
+                        <Menu.Item value="loose">
+                            <Menu.ItemLabel>Loose</Menu.ItemLabel>
+                        </Menu.Item>
+                        <For each={["a", "b", "c"]}>
+                            {(id) => (
+                                <Menu.ItemGroup id={id}>
+                                    <Menu.Item value={id}>
+                                        <Menu.ItemLabel>{id}</Menu.ItemLabel>
+                                    </Menu.Item>
+                                </Menu.ItemGroup>
+                            )}
+                        </For>
+                    </Menu.Content>
+                </Menu.Positioner>
+            </Menu.Root>
+        ));
+        await frames();
+        const groups = [
+            ...document.querySelectorAll<HTMLElement>('[role="group"]'),
+        ];
+        expect(
+            groups.map((group) => [
+                group.hasAttribute("data-first"),
+                group.hasAttribute("data-last"),
+            ]),
+        ).toEqual([
+            [true, false],
+            [false, false],
+            [false, true],
+        ]);
     });
 
     it("throws for a part outside Root", () => {

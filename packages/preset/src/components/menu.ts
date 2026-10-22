@@ -232,7 +232,7 @@ export const createMenu = <
                         false: {},
                     },
                     // Each group a tile of the surface, apart from the next, the run's outside
-                    // corners round. On the web the first and last groups (the machine marks
+                    // corners round. On the web the first and last groups (the surface marks
                     // them `data-first`/`data-last`) round them, so the menu doesn't clip, and a
                     // submenu drawn inside it shows whole; React Native (whose submenus drill in)
                     // clips them.

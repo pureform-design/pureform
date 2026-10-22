@@ -2,8 +2,7 @@
 // control, so its form behavior is unchanged. Each item, and each toggleable (checkbox or radio)
 // item, emits to its own interaction source: the highlighted item hovers, the pointer presses an
 // item, and Enter or Space presses the highlighted one. Zag's item groups and their labels
-// (`getItemGroupProps`, `getItemGroupLabelProps`) pass through, a group also marked
-// `data-first`/`data-last` when it's the first or last of the menu's groups. A submenu is another
+// (`getItemGroupProps`, `getItemGroupLabelProps`) pass through unchanged. A submenu is another
 // menu: its trigger item (`getTriggerItemProps`) emits to the parent's source under the child's
 // trigger id, the value the parent highlights it by. A key a submenu's content handles stops
 // there (Zag's), so it presses nothing in the parent's around it.
@@ -15,8 +14,7 @@ import type {
 import {
     connect as zagConnect,
     machine as zagMachine,
-    type Api as ZagApi,
-    type ItemGroupProps as ZagItemGroupProps,
+    type Api,
     type Machine as ZagMachine,
 } from "@zag-js/menu";
 import type { NormalizeProps, PropTypes } from "@zag-js/types";
@@ -40,21 +38,6 @@ export type Schema = WithProps<SchemaOf<ZagMachine>, ItemInteractionProps>;
 export type Props = Schema["props"];
 export type Machine = AnyMachine<Schema>;
 export type Service = AnyService<Schema>;
-
-/** A group's props: its `id`, and whether it's the first or last of the menu's groups, which
- *  the menu's surface rounds the outside corners of when its groups stand apart. */
-export interface ItemGroupProps extends ZagItemGroupProps {
-    readonly first?: boolean | undefined;
-    readonly last?: boolean | undefined;
-}
-
-/** Zag's menu API, its groups marked first and last. */
-export interface Api<T extends PropTypes = PropTypes> extends Omit<
-    ZagApi<T>,
-    "getItemGroupProps"
-> {
-    getItemGroupProps(options: ItemGroupProps): T["element"];
-}
 
 type MenuParams = Parameters<NonNullable<ZagMachine["watch"]>>[0];
 
@@ -97,11 +80,6 @@ export function connect<T extends PropTypes>(
     const emitters = emittersOf(service);
     return {
         ...api,
-        getItemGroupProps: ({ first, last, ...props }) => ({
-            ...api.getItemGroupProps(props),
-            ...(first ? { "data-first": "" } : {}),
-            ...(last ? { "data-last": "" } : {}),
-        }),
         getContentProps: () =>
             highlightedPressProps(
                 api.getContentProps(),
