@@ -15,6 +15,7 @@ import {
 } from "@pureform/binding-core";
 import type {
     ChangeDetails,
+    PageTransitionProps,
     StepperItem,
     StepperPart,
     StepperVariantProps,
@@ -22,6 +23,7 @@ import type {
 import type { Indication } from "@pureform/binding-core/indication";
 import type { ReactNode } from "react";
 
+import { HorizontalSharedAxis } from "../horizontal-shared-axis/horizontal-shared-axis";
 import { IconSlot, iconSlot } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
@@ -30,7 +32,7 @@ import type { ComponentSlots } from "../styles";
 
 const TRIGGER_INDICATION = stepperAnatomy.indication![0] as IndicationAnatomy;
 
-export interface StepperProps extends StepperVariantProps {
+export interface StepperProps extends StepperVariantProps, PageTransitionProps {
     /** The steps, in order. */
     readonly items: readonly StepperItem<ReactNode>[];
     /** The current step: its index, or the number of steps once every one is done. */
@@ -225,7 +227,22 @@ function StepperImpl(props: StepperProps): ReactNode {
                     />
                 ))}
             </v.list.View>
-            {!vertical && isPresent(content) ? (
+            {!vertical && props.transition === "sharedAxis" ? (
+                // A row's content slides between the steps in their order.
+                <HorizontalSharedAxis
+                    index={step}
+                    scrim={props.transitionScrim}
+                >
+                    {isPresent(content) ? (
+                        <v.content.View
+                            style={s.content}
+                            testID={id("content")}
+                        >
+                            {content}
+                        </v.content.View>
+                    ) : null}
+                </HorizontalSharedAxis>
+            ) : !vertical && isPresent(content) ? (
                 <v.content.View style={s.content} testID={id("content")}>
                     {content}
                 </v.content.View>

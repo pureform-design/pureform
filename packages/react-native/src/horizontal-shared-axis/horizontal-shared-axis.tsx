@@ -1,0 +1,280 @@
+// The horizontal shared axis: a view around the page `index` names. When `index` changes, the
+// page shown before slides a fifth of the width and fades out the way the change goes while the
+// new one slides and fades in: the slide on the theme's `spatialDefault` spring, the fades
+// linear over 90ms after 50ms (Compose's `MaterialTransitions.HorizontalSharedAxis`). The
+// outgoing page stays, hidden from assistive technology, until both end. Right to left mirrors
+// the slide; reduced motion keeps the fades. Animated runs it on every engine.
+
+import { horizontalSharedAxisAnatomy } from "@pureform/anatomy";
+import type { TestIdOverride } from "@pureform/anatomy";
+import {
+    horizontalSharedAxisSelection,
+    SHARED_AXIS_FADE,
+    SHARED_AXIS_SLIDE_FRACTION,
+    sharedAxisChange,
+    sharedAxisSettle,
+    sharedAxisStart,
+} from "@pureform/binding-core";
+import type {
+    HorizontalSharedAxisPart,
+    HorizontalSharedAxisVariantProps,
+    SharedAxisDirection,
+    SharedAxisPage,
+} from "@pureform/binding-core";
+import { animate, NATIVE_DRIVER } from "@pureform/rn-adapter/animated";
+import type { AnimatedTiming } from "@pureform/rn-adapter/animated";
+import { useReducedMotion, useTokens } from "@pureform/rn-adapter/react";
+import { useLayoutEffect, useRef, useState } from "react";
+import type { ReactNode } from "react";
+import { Animated } from "react-native";
+import type { LayoutChangeEvent, StyleProp, ViewStyle } from "react-native";
+
+import { testIdOf } from "../parts";
+import { themeSpring } from "../presence";
+import { useDirection, usePureform } from "../provider";
+import { useComponentSlots } from "../styles";
+
+export interface HorizontalSharedAxisProps extends HorizontalSharedAxisVariantProps {
+    /** The page's place in the order: a change to a higher index slides forward, to a lower one
+     *  backward. A change of `index` is a change of page. */
+    readonly index: number;
+    /** Veil the page underneath while a change runs, in the theme's scrim color. @default false */
+    readonly scrim?: boolean | undefined;
+    /** The page `index` names; a leaving page keeps what it showed last. */
+    readonly children?: ReactNode;
+    readonly testId?: TestIdOverride<HorizontalSharedAxisPart> | undefined;
+}
+
+const FILL: ViewStyle = {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+};
+
+interface Motion {
+    readonly slide: AnimatedTiming | undefined;
+    readonly fade: AnimatedTiming;
+    readonly width: number;
+    readonly rtl: boolean;
+}
+
+// Where a page sits, as a share of the width, at the start (entering) or end (leaving) of its
+// move: forward, it enters from the end and leaves to the start.
+const offsetOf = (page: SharedAxisPage, rtl: boolean): number => {
+    const towardEnd =
+        (page.state === "entering") === (page.direction === "forward");
+    return (towardEnd !== rtl ? 1 : -1) * SHARED_AXIS_SLIDE_FRACTION;
+};
+
+function Page(props: {
+    readonly page: SharedAxisPage;
+    readonly motion: Motion;
+    readonly style: StyleProp<ViewStyle>;
+    readonly testID: string | undefined;
+    readonly onSettle: (page: SharedAxisPage) => void;
+    readonly children: ReactNode;
+}): ReactNode {
+    const { page, motion, onSettle } = props;
+    // 0 at the move's start, 1 at its end.
+    const [slide] = useState(() => new Animated.Value(1));
+    const [fade] = useState(() => new Animated.Value(1));
+    const moving = page.state !== "current";
+    useLayoutEffect(() => {
+        if (!moving) {
+            slide.setValue(1);
+            fade.setValue(1);
+            return;
+        }
+        slide.setValue(0);
+        fade.setValue(0);
+        const run = Animated.parallel([
+            ...(motion.slide
+                ? [animate(slide, motion.slide, NATIVE_DRIVER)]
+                : [
+                      Animated.timing(slide, {
+                          toValue: 1,
+                          duration: 0,
+                          useNativeDriver: NATIVE_DRIVER,
+                      }),
+                  ]),
+            animate(fade, motion.fade, NATIVE_DRIVER),
+        ]);
+        run.start(({ finished }) => {
+            if (finished) onSettle(page);
+        });
+        return () => run.stop();
+    }, [page]);
+    const offset = moving ? offsetOf(page, motion.rtl) * motion.width : 0;
+    const entering = page.state === "entering";
+    const leaving = page.state === "leaving";
+    const style: ViewStyle[] = [];
+    if (leaving) style.push(FILL);
+    if (moving) {
+        // Forward, the incoming page draws over the outgoing; backward, under it.
+        style.push({
+            zIndex: entering === (page.direction === "forward") ? 2 : 0,
+        });
+    }
+    return (
+        <Animated.View
+            style={[
+                props.style,
+                ...style,
+                moving
+                    ? {
+                          opacity: fade.interpolate({
+                              inputRange: [0, 1],
+                              outputRange: entering ? [0, 1] : [1, 0],
+                          }),
+                          transform: [
+                              {
+                                  translateX: motion.slide
+                                      ? slide.interpolate({
+                                            inputRange: [0, 1],
+                                            outputRange: entering
+                                                ? [offset, 0]
+                                                : [0, offset],
+                                        })
+                                      : 0,
+                              },
+                          ],
+                      }
+                    : null,
+            ]}
+            testID={props.testID}
+            {...(leaving
+                ? {
+                      "aria-hidden": true,
+                      importantForAccessibility: "no-hide-descendants" as const,
+                      pointerEvents: "none" as const,
+                  }
+                : {})}
+            data-state={page.state}
+            data-direction={page.direction}
+        >
+            {props.children}
+        </Animated.View>
+    );
+}
+
+function Scrim(props: {
+    readonly direction: SharedAxisDirection;
+    readonly timing: AnimatedTiming | undefined;
+    readonly style: StyleProp<ViewStyle>;
+    readonly testID: string | undefined;
+}): ReactNode {
+    const [shown] = useState(() => new Animated.Value(0));
+    useLayoutEffect(() => {
+        shown.setValue(0);
+        const run = props.timing
+            ? animate(shown, props.timing, NATIVE_DRIVER)
+            : undefined;
+        if (run) run.start();
+        else shown.setValue(1);
+        return () => run?.stop();
+    }, [props.direction]);
+    return (
+        <Animated.View
+            aria-hidden
+            pointerEvents="none"
+            style={[
+                props.style,
+                FILL,
+                {
+                    zIndex: 1,
+                    opacity: shown.interpolate({
+                        inputRange: [0, 1],
+                        outputRange:
+                            props.direction === "forward" ? [0, 1] : [1, 0],
+                    }),
+                },
+            ]}
+            testID={props.testID}
+            data-direction={props.direction}
+        />
+    );
+}
+
+/** Material's horizontal shared axis, for spatially related pages (tabs, steps, onboarding):
+ *  `<HorizontalSharedAxis index={step}>{pages[step]}</HorizontalSharedAxis>`. A higher `index`
+ *  slides forward, a lower one backward; `scrim` veils the page underneath while they move. */
+export function HorizontalSharedAxis(
+    props: HorizontalSharedAxisProps,
+): ReactNode {
+    const { styles: s, views: v } = useComponentSlots<HorizontalSharedAxisPart>(
+        "horizontalSharedAxis",
+        horizontalSharedAxisSelection(props),
+    );
+    const tokens = useTokens();
+    const reducedMotion = useReducedMotion();
+    const { timeScale } = usePureform();
+    const rtl = useDirection() === "rtl";
+    const [width, setWidth] = useState(0);
+    const [pages, setPages] = useState(() => sharedAxisStart(props.index));
+    const changed = sharedAxisChange(pages, props.index);
+    if (changed !== pages) setPages(changed);
+    const contents = useRef(new Map<number, ReactNode>());
+    contents.current.set(props.index, props.children);
+    for (const index of contents.current.keys()) {
+        if (!changed.some((page) => page.index === index)) {
+            contents.current.delete(index);
+        }
+    }
+    const [onSettle] = useState(
+        () => (page: SharedAxisPage) =>
+            setPages((now) => sharedAxisSettle(now, page.index, page.state)),
+    );
+    const spring = reducedMotion
+        ? undefined
+        : themeSpring("spatialDefault", tokens, timeScale);
+    const slide: AnimatedTiming | undefined = spring
+        ? { duration: 0, easing: "linear", spring }
+        : undefined;
+    const motion: Motion = {
+        slide,
+        fade: {
+            duration: SHARED_AXIS_FADE.duration * timeScale,
+            delay: SHARED_AXIS_FADE.delay * timeScale,
+            easing: "linear",
+        },
+        width,
+        rtl,
+    };
+    const id = (part: HorizontalSharedAxisPart) =>
+        testIdOf(horizontalSharedAxisAnatomy, part, props.testId);
+    const entering = changed.find((page) => page.state === "entering");
+    const leaving = changed.some((page) => page.state === "leaving");
+    const Root = v.root.View;
+    return (
+        <Root
+            style={s.root}
+            testID={id("root")}
+            onLayout={(event: LayoutChangeEvent) =>
+                setWidth(event.nativeEvent.layout.width)
+            }
+        >
+            {changed.map((page) => (
+                <Page
+                    key={page.index}
+                    page={page}
+                    motion={motion}
+                    style={s.page as StyleProp<ViewStyle>}
+                    testID={id("page")}
+                    onSettle={onSettle}
+                >
+                    {contents.current.get(page.index)}
+                </Page>
+            ))}
+            {props.scrim && leaving && entering?.direction ? (
+                <Scrim
+                    direction={entering.direction}
+                    timing={slide}
+                    style={s.scrim as StyleProp<ViewStyle>}
+                    testID={id("scrim")}
+                />
+            ) : null}
+        </Root>
+    );
+}
