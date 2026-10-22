@@ -317,3 +317,99 @@ Disabled`: the input no longer fails, but the **label** does (color-contrast): i
 - The suites' `controllable` cases ran through Testing Library's synthetic events in the first
   round's Storybook plays; now the plays only see real input under Vitest, and the
   Interactions panel in Storybook still uses the synthetic ones (a slider click there reads 0).
+
+## Round 3 (branch `storybook-web-3`)
+
+From `main` (`85458948`). Not pushed.
+
+### What changed
+
+- **Controls from the components' resolved props** (`scripts/prop-controls.ts`, replacing
+  `scripts/variant-props.ts` and its `<Component>VariantProps` lookup). For each component the
+  codegen loads the export a story renders from the binding's built declarations (with the
+  app's `.pureform/registry.d.ts`) in one `@typescript/typescript6` program, and resolves its
+  props type: the export's first call signature's first parameter (a union's members merged).
+    - **Renderer:** React (`controls: "react"` in `stories.config.ts`). Solid's props give the
+      same controls for all 61 components (compared once, every field equal); React Native's
+      aren't read (its stories use the web args, mapped by its hook).
+    - **Kept:** properties whose declaration is in `@pureform/binding-core` (its `dist` or
+      `node_modules` path). A mapped type's property has no declaration: the checker's root
+      symbol's mapped type gives the file (`Controllable`'s `selected`, `defaultSelected`),
+      read through the internal `links`, since the compiler API exposes none.
+    - **Control by type:** string-literal union → select, `boolean` → boolean, `string` →
+      text, `number` → number; functions, nodes (`ReactNode`, Solid's `JSX.Element`), objects,
+      arrays and mixed unions (`boolean | "indeterminate"`) → none. None is `control: false` when
+      the story has the arg, and left out of `argTypes` otherwise, so the panel doesn't list
+      every callback.
+    - **Variant link:** a prop typed `VariantProp<C, "group">` (or an indexed access to one,
+      `ButtonVariantProps["color"]`) is read from its declaration's type node before it resolves;
+      its control takes the anatomy group's values in the recipe's order (a `true`/`false`
+      group is a boolean), so `textStyle` is the text's `style` select. The registry makes the
+      resolved types concrete too, but `VariantValue<"false" | "true">` is a mixed union.
+    - **`@control` tag:** `@control none | select | boolean | text | number` on the prop's
+      JSDoc in binding-core overrides the type (an unknown kind fails the codegen).
+    - **Other args** (not the component's binding-core props, including the shared hook's
+      `disabled` on components without one, `children`, `as`, `href`, `aria-label` where the
+      binding declares it) get `control: false`.
+    - `variantProps` is gone from the config type and `stories.config.ts`, and so are every
+      `controls.exclude` (the fields' affixes, the dialog's `icon`): `controls.exclude` stays
+      available (now `control: false`), unused.
+- **Spec:** `scripts/prop-controls.spec.ts` (9 tests) on fixtures in
+  `scripts/__fixtures__/prop-controls/` (a binding-core file, a DOM-props file, a component
+  export through `Omit`): one per rule, plus the variant link through an indexed access and
+  `argTypeFor`'s anatomy/tag precedence. `vitest.config.unit.ts`, and the app's `test:unit`
+  task is enabled.
+
+### `@control` tags added (all `@control none`, in `packages/binding-core/src/components/`)
+
+| Prop    | Where                                                                                                                                                                                                                                                                            | Why                                                                                           |
+| ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `id`    | accordion, autocomplete, avatar, button-group, button, carousel, checkbox, chip-set, fab, navigation, paginator, radio-group, ripple, search-bar, search-view, select, selection-list, slider, snackbar, stepper, switch, table, tabs, tags-input, text-field, time-picker, tree | the root element's id: a `string`, so a text field, but nothing to see when changed           |
+| `name`  | autocomplete, button, checkbox, date-picker, fab, radio-group, search-bar, select, slider, switch, tags-input, text-field, time-picker                                                                                                                                           | the name a form submits under; no visible effect                                              |
+| `form`  | autocomplete, button, checkbox, fab, radio-group, search-bar, select, slider, switch, tags-input, text-field, time-picker                                                                                                                                                        | the owning form's id; no visible effect                                                       |
+| `value` | button, fab, checkbox, switch                                                                                                                                                                                                                                                    | the value submitted with the form (not the controlled value the other components' `value` is) |
+| `type`  | button, fab                                                                                                                                                                                                                                                                      | the native `button`/`submit`/`reset`: a select with no visible effect in a story              |
+
+`testId` and `ids` needed none: `testId` is declared by the bindings (`PartProps`), `ids` is an
+object.
+
+### Controls that changed
+
+- **New:** AppBar `scrolled`, `collapsed`, `search`, `scrollOffset`; Toolbar `overflow`;
+  SelectionList `variant`; behaviour flags and values across the board (`disabled`,
+  `selected`/`defaultSelected`, `open`/`defaultOpen`, `checked`, `invalid`, `required`,
+  `readOnly`, `toggle`, `min`/`max`, `placeholder`, labels such as `closeLabel`); `textStyle`
+  stays the text's `style`.
+- **DateInput's** `leadingIcon`/`prefixText`/`suffixText`/`trailingIcon` are booleans now: its
+  ready-made root takes them as flags (the parts are children), which the old blanket
+  `AFFIXES` exclude hid. The other fields' affixes and the dialog's `icon` are nodes and fall
+  out.
+- **Gone:** the fields' affixes, the dialog's `icon`, and everything not declared in
+  binding-core.
+
+### Checks run
+
+- `bunx tsc --noEmit` in the app (`tsconfig.json`, `src/solid/tsconfig.json`) and in
+  `packages/binding-core`; `omni run build -p @pureform/binding-core`.
+- `bunx vitest run -c vitest.config.unit.ts` (9 passed).
+- `omni run build -p @pureform/storybook-web` (generate, prepare, `storybook build`).
+- Story tests per group, Solid and React each (`--project storybook/<renderer>` with the
+  group's generated files): actions 119, selection 70, fields 162, display 199, navigation
+  110, overlays 80: **740 per renderer, all passing**. React's overlays group failed once on
+  `Tooltip/Key Escape` and passed on its rerun (Tooltip alone three times, the group once):
+  a flake under load. After the last commit (the shared `disabled` arg's `control: false`,
+  an argTypes-only change), AppBar, Text, Toolbar and Scrim reran in both (35 each).
+- Controls panels against the static build: `/tmp/opencode/sb-web3-button-controls.png`,
+  `/tmp/opencode/sb-web3-appbar-controls.png`.
+
+### Open questions (round 3)
+
+- **`selected` and `defaultSelected` both get controls** (and `open`/`defaultOpen`,
+  `value`/`defaultValue`): setting the controlled one freezes the story's state. Tag the
+  `default*` ones `@control none`, or hide the controlled ones, if the panel feels busy.
+- **Mixed unions get no control** (`boolean | "indeterminate"`, `number | string`); a
+  `@control select` tag could list them if wanted.
+- **The mapped-type declaration** is read through TypeScript's internal symbol `links`; a
+  compiler upgrade could move it (the spec's `selected` fixture would catch it).
+- `aria-label`/`aria-labelledby` keep text controls where binding-core declares them
+  (IconButton, Menu, dialogs, sheets): they're required labels, arguably content.

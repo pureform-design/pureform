@@ -122,14 +122,18 @@ the demos):
 1. **Inputs:** the data the components already have, so nothing is listed by hand:
     - **`@pureform/anatomy`** gives the component list and each component's variants with their
       values (`variants`, plain data generated next to the parts from the recipe's variants;
-      `generated.ts` is regenerated, never edited, and the drift spec covers it). The controls
-      (`argTypes`, a select or a boolean per variant) come from it, so no preset runs in the
-      browser. Composite anatomies (the radio group's) pair too, without controls.
-    - **`@pureform/binding-core`'s built declarations** say which variants are props: the
-      codegen reads each `<Component>VariantProps`'s property names with the TypeScript
-      compiler API (the checker resolves `extends`). A recipe variant that isn't one (a
-      button's `toggle`) gets no control; `density` and `position` are props and keep theirs.
-      A missing interface fails the codegen; `variantProps` in the config names another.
+      `generated.ts` is regenerated, never edited, and the drift spec covers it). A variant
+      prop's control takes its values from it (a select, or a boolean for `true`/`false`), so
+      no preset runs in the browser. Composite anatomies (the radio group's) pair too, without controls.
+    - **The components' resolved props** give the controls (round 3,
+      `scripts/prop-controls.ts`): the TypeScript checker resolves the props type of the export
+      a story renders (React's; Solid's agree), and only properties declared in
+      `@pureform/binding-core` are kept (DOM, React and Solid attributes, `as`, `children`
+      aren't). A string-literal union is a select, `boolean` a boolean, `string` text, `number`
+      a number; functions, nodes, objects and arrays get none. A prop typed
+      `VariantProp<C, "group">` takes its group's values from the anatomy (the text's
+      `textStyle` is its `style`), and a `@control none | select | boolean | text | number`
+      JSDoc tag in binding-core overrides the type. No interface names in the config.
     - **`@pureform/component-cases`** (the framework-neutral cases moved out of
       `tests/component-suites`, which now imports them) gives each component's stories and play
       tests: `props` is `Default`'s args, each of `examples` and `opened` is a story, `state` gives a play
@@ -139,7 +143,7 @@ the demos):
       share its root test id.
     - **`stories.config.ts` holds overrides only:** the renderers, `skip` (with reasons),
       `schemes` and `overlayHeight` for every component, and per component extra
-      `args`/`argTypes`/`parameters`, `controls.exclude`, `variantProps`, `schemes`, `height`, hooks, and story fields by export
+      `args`/`argTypes`/`parameters`, `controls.exclude`, `schemes`, `height`, hooks, and story fields by export
       name. A renderer whose DOM the cases can't read sets `casePlays: false`, and `tests: false`
       leaves it out of the story tests (React Native Web, for now: **skipped until the cases get
       renderer-neutral readers**).
@@ -192,6 +196,9 @@ codegen hooks (`transformSource`) run in the script.
 
 ## Decisions
 
+- **Controls** come from the component exports' resolved props (round 3), filtered to
+  binding-core's declarations, with `@control` JSDoc tags for strays; `controls.exclude` stays
+  for overrides.
 - **Components:** every one with an anatomy and a case (round 2; the first slice was Button,
   Switch and TextField). Toast and GridList are skipped: their cases need a scene (a toaster,
   tiles as children) that props can't give.
