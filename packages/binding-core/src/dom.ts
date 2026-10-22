@@ -4,7 +4,11 @@
 // DOM readers in the browser, after mount; the root entry stays free of DOM use and of CSS
 // lowering for React Native.
 
-import { SLIDER_INSET_ICON, sliderTrackTokens } from "./components/slider";
+import {
+  SLIDER_INSET_ICON,
+  sliderClearanceOf,
+  sliderTrackTokens,
+} from "./components/slider";
 import type { SliderInsetIconMeasures } from "./components/slider";
 import { DEFAULT_ICON_STYLE, sameIconStyle } from "./icon-style";
 import type { IconStyle } from "./icon-style";
@@ -12,22 +16,21 @@ import { REDUCED_MOTION_QUERY } from "./motion";
 
 /** Whether the system asks for reduced motion now; `false` where there's no `matchMedia`. */
 export const systemReducedMotion = (): boolean =>
-    typeof matchMedia === "function" &&
-    matchMedia(REDUCED_MOTION_QUERY).matches;
+  typeof matchMedia === "function" && matchMedia(REDUCED_MOTION_QUERY).matches;
 
 /** Calls `onChange` with the system's preference now and on every change. Returns the cleanup. */
 export const subscribeReducedMotion = (
-    onChange: (reduce: boolean) => void,
+  onChange: (reduce: boolean) => void,
 ): VoidFunction => {
-    if (typeof matchMedia !== "function") {
-        onChange(false);
-        return () => {};
-    }
-    const query = matchMedia(REDUCED_MOTION_QUERY);
-    const listener = (event: MediaQueryListEvent) => onChange(event.matches);
-    onChange(query.matches);
-    query.addEventListener("change", listener);
-    return () => query.removeEventListener("change", listener);
+  if (typeof matchMedia !== "function") {
+    onChange(false);
+    return () => {};
+  }
+  const query = matchMedia(REDUCED_MOTION_QUERY);
+  const listener = (event: MediaQueryListEvent) => onChange(event.matches);
+  onChange(query.matches);
+  query.addEventListener("change", listener);
+  return () => query.removeEventListener("change", listener);
 };
 
 const FILL = /"FILL"\s+(-?[\d.]+)/;
@@ -35,23 +38,23 @@ const FILL = /"FILL"\s+(-?[\d.]+)/;
 /** An icon slot's style as computed now: its `font-size` (the slot's icon size), `color`, and
  *  Material Symbols' `FILL` axis from `font-variation-settings`. */
 export const readIconStyle = (element: Element): IconStyle => {
-    const computed = getComputedStyle(element);
-    const size = Number.parseFloat(computed.fontSize);
-    const fill = FILL.exec(computed.fontVariationSettings)?.[1];
-    return {
-        size: Number.isFinite(size) ? size : undefined,
-        color: computed.color || DEFAULT_ICON_STYLE.color,
-        filled: fill !== undefined && Number.parseFloat(fill) >= 0.5,
-    };
+  const computed = getComputedStyle(element);
+  const size = Number.parseFloat(computed.fontSize);
+  const fill = FILL.exec(computed.fontVariationSettings)?.[1];
+  return {
+    size: Number.isFinite(size) ? size : undefined,
+    color: computed.color || DEFAULT_ICON_STYLE.color,
+    filled: fill !== undefined && Number.parseFloat(fill) >= 0.5,
+  };
 };
 
 // The component root an icon part belongs to, whose attributes carry the states that restyle it.
 const componentRoot = (element: Element): Element => {
-    const scope = element.getAttribute("data-scope");
-    const root = scope
-        ? element.closest(`[data-scope="${scope}"][data-pf-part="root"]`)
-        : null;
-    return root ?? element.parentElement ?? element;
+  const scope = element.getAttribute("data-scope");
+  const root = scope
+    ? element.closest(`[data-scope="${scope}"][data-pf-part="root"]`)
+    : null;
+  return root ?? element.parentElement ?? element;
 };
 
 /** Calls `onChange` with the icon slot's style now, and again whenever it changes: after an
@@ -60,89 +63,89 @@ const componentRoot = (element: Element): Element => {
  *
  *  A style that changes by a pseudo-class alone (`:hover`) with no transition isn't seen. */
 export const observeIconStyle = (
-    element: Element,
-    onChange: (style: IconStyle) => void,
+  element: Element,
+  onChange: (style: IconStyle) => void,
 ): VoidFunction => {
-    let current = readIconStyle(element);
-    onChange(current);
-    const update = () => {
-        const next = readIconStyle(element);
-        if (sameIconStyle(next, current)) return;
-        current = next;
-        onChange(next);
-    };
-    const root = componentRoot(element);
-    const mutations = new MutationObserver(update);
-    mutations.observe(root, { attributes: true, subtree: true });
-    const resize =
-        typeof ResizeObserver === "function"
-            ? new ResizeObserver(update)
-            : undefined;
-    resize?.observe(element);
-    root.addEventListener("transitionend", update);
-    root.addEventListener("transitioncancel", update);
-    return () => {
-        mutations.disconnect();
-        resize?.disconnect();
-        root.removeEventListener("transitionend", update);
-        root.removeEventListener("transitioncancel", update);
-    };
+  let current = readIconStyle(element);
+  onChange(current);
+  const update = () => {
+    const next = readIconStyle(element);
+    if (sameIconStyle(next, current)) return;
+    current = next;
+    onChange(next);
+  };
+  const root = componentRoot(element);
+  const mutations = new MutationObserver(update);
+  mutations.observe(root, { attributes: true, subtree: true });
+  const resize =
+    typeof ResizeObserver === "function"
+      ? new ResizeObserver(update)
+      : undefined;
+  resize?.observe(element);
+  root.addEventListener("transitionend", update);
+  root.addEventListener("transitioncancel", update);
+  return () => {
+    mutations.disconnect();
+    resize?.disconnect();
+    root.removeEventListener("transitionend", update);
+    root.removeEventListener("transitioncancel", update);
+  };
 };
 
 /** Puts a native checkbox back in step with its machine's state: after a click on a controlled
  *  checkbox whose owner didn't take the change, the browser has toggled the input anyway. Call it
  *  once the machine and the owner have handled the click. */
 export const syncCheckedInput = (
-    input: HTMLInputElement,
-    checked: boolean | "indeterminate",
+  input: HTMLInputElement,
+  checked: boolean | "indeterminate",
 ): void => {
-    const on = checked === true;
-    const mixed = checked === "indeterminate";
-    if (input.checked !== on) input.checked = on;
-    if (input.indeterminate !== mixed) input.indeterminate = mixed;
+  const on = checked === true;
+  const mixed = checked === "indeterminate";
+  if (input.checked !== on) input.checked = on;
+  if (input.indeterminate !== mixed) input.indeterminate = mixed;
 };
 
 /** The native radios of a radio group, in order: every `input[type=radio]` inside its element. */
 export const radioInputs = (
-    group: Element | null | undefined,
+  group: Element | null | undefined,
 ): HTMLInputElement[] =>
-    group
-        ? [...group.querySelectorAll<HTMLInputElement>('input[type="radio"]')]
-        : [];
+  group
+    ? [...group.querySelectorAll<HTMLInputElement>('input[type="radio"]')]
+    : [];
 
 /** Puts a radio group's native radios back in step with its value: after a click on a radio of a
  *  controlled group whose owner didn't take the change, the browser has checked it anyway. */
 export const syncRadioInputs = (
-    group: Element | null | undefined,
-    value: string | null,
+  group: Element | null | undefined,
+  value: string | null,
 ): void => {
-    for (const input of radioInputs(group)) {
-        const on = input.value === value;
-        if (input.checked !== on) input.checked = on;
-    }
+  for (const input of radioInputs(group)) {
+    const on = input.value === value;
+    if (input.checked !== on) input.checked = on;
+  }
 };
 
 /** Sets each native radio's default (what a form reset shows) to whether its value is `value`.
  *  Only a default that differs is written: writing one can check a radio the user hasn't
  *  touched. */
 export const setRadioDefaults = (
-    group: Element | null | undefined,
-    value: string | null | undefined,
+  group: Element | null | undefined,
+  value: string | null | undefined,
 ): void => {
-    for (const input of radioInputs(group)) {
-        const on = value != null && input.value === value;
-        if (input.defaultChecked !== on) input.defaultChecked = on;
-    }
+  for (const input of radioInputs(group)) {
+    const on = value != null && input.value === value;
+    if (input.defaultChecked !== on) input.defaultChecked = on;
+  }
 };
 
 /** Puts a text input or text area back in step with its machine's value: after typing into a
  *  controlled field whose owner didn't take the change, the browser shows the typed text anyway.
  *  An equal value is left alone, so the caret stays where it is. */
 export const syncTextInput = (
-    input: HTMLInputElement | HTMLTextAreaElement,
-    value: string,
+  input: HTMLInputElement | HTMLTextAreaElement,
+  value: string,
 ): void => {
-    if (input.value !== value) input.value = value;
+  if (input.value !== value) input.value = value;
 };
 
 // The `z-index` each positioner was given here, so a later call knows an inline one of the app's.
@@ -158,38 +161,38 @@ const stacked = new WeakMap<HTMLElement, string>();
  *  written all it writes, so reading the surface's style costs only the recalculation the frame
  *  needs anyway, where reading it at once would force one more. Returns what cancels it. */
 export const stackPositioner = (
-    positioner: HTMLElement,
-    surface: HTMLElement,
+  positioner: HTMLElement,
+  surface: HTMLElement,
 ): (() => void) => {
-    const frame = requestAnimationFrame(() => stackNow(positioner, surface));
-    return () => cancelAnimationFrame(frame);
+  const frame = requestAnimationFrame(() => stackNow(positioner, surface));
+  return () => cancelAnimationFrame(frame);
 };
 
 const stackNow = (positioner: HTMLElement, surface: HTMLElement): void => {
-    const own = positioner.style.zIndex;
-    if (own && own !== stacked.get(positioner)) return;
-    const { zIndex } = getComputedStyle(surface);
-    if (zIndex === "auto") {
-        positioner.style.removeProperty("z-index");
-        stacked.delete(positioner);
-        return;
-    }
-    // The `z-index` itself, not a custom property: one would be inherited, so changing it would
-    // restyle everything inside the positioner.
-    positioner.style.zIndex = zIndex;
-    stacked.set(positioner, positioner.style.zIndex);
+  const own = positioner.style.zIndex;
+  if (own && own !== stacked.get(positioner)) return;
+  const { zIndex } = getComputedStyle(surface);
+  if (zIndex === "auto") {
+    positioner.style.removeProperty("z-index");
+    stacked.delete(positioner);
+    return;
+  }
+  // The `z-index` itself, not a custom property: one would be inherited, so changing it would
+  // restyle everything inside the positioner.
+  positioner.style.zIndex = zIndex;
+  stacked.set(positioner, positioner.style.zIndex);
 };
 
 export {
-    carouselRowPadding,
-    measureCarouselRow,
-    observeCarouselRow,
+  carouselRowPadding,
+  measureCarouselRow,
+  observeCarouselRow,
 } from "./carousel-row";
 export { swallowNextClick } from "./drag-click";
 export {
-    dragToDismiss,
-    SHEET_DISMISS_SHARE,
-    SHEET_FLICK_SPEED,
+  dragToDismiss,
+  SHEET_DISMISS_SHARE,
+  SHEET_FLICK_SPEED,
 } from "./sheet-drag";
 export { revealInRow } from "./reveal";
 export { slideIndicator, slideTransform, transformTiming } from "./slide";
@@ -197,18 +200,18 @@ export { moveToolbarFocus, watchOverflow } from "./toolbar-dom";
 export type { OverflowWatch } from "./toolbar-dom";
 export type { SlideTiming } from "./slide";
 export {
-    THEME_BLOCK_ATTRIBUTE,
-    THEME_PRECEDENCE,
-    generateThemeVars,
-    generatedBlock,
-    initialThemeBlock,
-    loadThemeVars,
-    needsThemeLoad,
-    overrideVars,
-    serverThemeCss,
-    themeCss,
-    themeSelector,
-    unloadedThemeMessage,
+  THEME_BLOCK_ATTRIBUTE,
+  THEME_PRECEDENCE,
+  generateThemeVars,
+  generatedBlock,
+  initialThemeBlock,
+  loadThemeVars,
+  needsThemeLoad,
+  overrideVars,
+  serverThemeCss,
+  themeCss,
+  themeSelector,
+  unloadedThemeMessage,
 } from "./web-theme";
 export type { InitialBlockOptions, ThemeBlock } from "./web-theme";
 
@@ -217,61 +220,81 @@ export type ScrollTarget = Element | Window;
 
 /** The vertical scroll offset of `target`, in px. */
 export const scrollOffsetOf = (target: ScrollTarget): number =>
-    "scrollY" in target ? target.scrollY : target.scrollTop;
+  "scrollY" in target ? target.scrollY : target.scrollTop;
 
 /** Calls `onOffset` with `target`'s scroll offset now and on every scroll. Returns the cleanup. */
 export const subscribeScroll = (
-    target: ScrollTarget,
-    onOffset: (offset: number) => void,
+  target: ScrollTarget,
+  onOffset: (offset: number) => void,
 ): VoidFunction => {
-    const listener = () => onOffset(scrollOffsetOf(target));
-    listener();
-    target.addEventListener("scroll", listener, { passive: true });
-    return () => target.removeEventListener("scroll", listener);
+  const listener = () => onOffset(scrollOffsetOf(target));
+  listener();
+  target.addEventListener("scroll", listener, { passive: true });
+  return () => target.removeEventListener("scroll", listener);
 };
 
-/** The inset icon's size and padding as the theme resolves them, read from where the styles
- *  put it: its size is its box along the axis, and its padding is how far it sits in from the
- *  start of the active track (or from the end of it, once it's `overflowing` at the inactive
- *  track's start, past the handle's clearance). The same on every web target, since it reads
- *  the layout and not a target's variables. `undefined` where it isn't placed by the preset (unstyled) or has no box. */
+/** The inset icon's size and padding, and the handle's clearance, as the theme resolves them,
+ *  read from where the styles put them: the icon's size is its box along the axis, and its
+ *  padding how far it sits in from the start of the active track (or from the start of the
+ *  inactive one, once it's `overflowing` there). The clearance is how far the inactive track (a
+ *  sibling marked `data-pf-part="track"`) starts past the active track's end, read only while that
+ *  track isn't moving; `last` keeps the one read before. The same on every web target, since it
+ *  reads the layout and not a target's variables. `undefined` where the icon isn't placed by the
+ *  preset (unstyled) or has no box. */
 export const readSliderInsetIcon = (
-    icon: Element,
-    parent: Element,
-    {
-        vertical,
-        overflowing,
-        percents,
-        centered = false,
-    }: {
-        vertical: boolean;
-        overflowing: boolean;
-        percents: readonly number[];
-        centered?: boolean | undefined;
-    },
+  icon: Element,
+  parent: Element,
+  {
+    vertical,
+    overflowing,
+    percents,
+    centered = false,
+    last,
+  }: {
+    vertical: boolean;
+    overflowing: boolean;
+    percents: readonly number[];
+    centered?: boolean | undefined;
+    last?: SliderInsetIconMeasures | undefined;
+  },
 ): SliderInsetIconMeasures | undefined => {
-    // Only the preset's placement (absolute, by insets) can be read back this way.
-    if (getComputedStyle(icon).position !== "absolute") return undefined;
-    const box = icon.getBoundingClientRect();
-    const track = parent.getBoundingClientRect();
-    const size = vertical ? box.height : box.width;
-    if (!(size > 0)) return undefined;
-    const length = vertical ? track.height : track.width;
-    const rtl = getComputedStyle(parent).direction === "rtl";
-    const offset = vertical
-        ? track.bottom - box.bottom
-        : rtl
-          ? track.right - box.right
-          : box.left - track.left;
-    const { activeStart, activeEnd, endGap } = sliderTrackTokens(
-        percents,
-        centered,
-    );
-    const base = overflowing
-        ? (length * activeEnd) / 100 + SLIDER_INSET_ICON.clearance * endGap
-        : (length * activeStart) / 100;
-    return {
-        size: Math.round(size * 100) / 100,
-        padding: Math.max(0, Math.round((offset - base) * 100) / 100),
-    };
+  // Only the preset's placement (absolute, by insets) can be read back this way.
+  if (getComputedStyle(icon).position !== "absolute") return undefined;
+  const box = icon.getBoundingClientRect();
+  const frame = parent.getBoundingClientRect();
+  const size = vertical ? box.height : box.width;
+  if (!(size > 0)) return undefined;
+  const length = vertical ? frame.height : frame.width;
+  const rtl = getComputedStyle(parent).direction === "rtl";
+  const start = (rect: DOMRect) =>
+    vertical
+      ? frame.bottom - rect.bottom
+      : rtl
+        ? frame.right - rect.right
+        : rect.left - frame.left;
+  const { activeStart, activeEnd, endGap } = sliderTrackTokens(
+    percents,
+    centered,
+  );
+  const end = (length * activeEnd) / 100;
+  const track = [...parent.children].find(
+    (child) => child.getAttribute("data-pf-part") === "track",
+  );
+  const settled =
+    track !== undefined &&
+    !track.getAnimations().some((motion) => motion.playState === "running");
+  const clearance =
+    (settled
+      ? sliderClearanceOf(start(track.getBoundingClientRect()) - end, endGap)
+      : undefined) ??
+    last?.clearance ??
+    SLIDER_INSET_ICON.clearance;
+  const base = overflowing
+    ? end + clearance * endGap
+    : (length * activeStart) / 100;
+  return {
+    size: Math.round(size * 100) / 100,
+    padding: Math.max(0, Math.round((start(box) - base) * 100) / 100),
+    clearance,
+  };
 };
