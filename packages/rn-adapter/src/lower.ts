@@ -341,20 +341,28 @@ export const SPRING_FIELDS = [
     "mass",
 ] as const;
 
+/** A spring's five values as nodes, by field: a literal spring's own, or an alias to a spring
+ *  role's, each by reference (`springs.<name>.<field>`), so a theme's change of the role still
+ *  reaches them. `undefined` for any other value. */
+export const springFieldNodes = (
+    value: ValueNode,
+): Record<(typeof SPRING_FIELDS)[number], ValueNode> | undefined => {
+    if (value.type === "spring") return springTokenValues(value);
+    if (value.type !== "alias" || value.path[0] !== "springs") return undefined;
+    return Object.fromEntries(
+        SPRING_FIELDS.map((field) => [
+            field,
+            { type: "alias", path: [...value.path, field] },
+        ]),
+    ) as Record<(typeof SPRING_FIELDS)[number], ValueNode>;
+};
+
 // A spring's five values as nodes: a spring token's, by reference, or a literal one's.
 const springNodes = (value: SpringValue, ctx: Ctx): ValueNode[] => {
+    const fields = springFieldNodes(value as ValueNode);
+    if (fields) return SPRING_FIELDS.map((field) => fields[field]);
     switch (value.type) {
-        case "spring": {
-            const values = springTokenValues(value);
-            return SPRING_FIELDS.map((field) => values[field]);
-        }
         case "alias":
-            if (value.path[0] === "springs") {
-                return SPRING_FIELDS.map((field) => ({
-                    type: "alias",
-                    path: [...value.path, field],
-                }));
-            }
             return springNodes(
                 tokenValue(getByPath(ctx.config, value.path)) as SpringValue,
                 ctx,
