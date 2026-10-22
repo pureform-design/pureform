@@ -12,6 +12,7 @@
     },
     "dependencies": {
         "@pureform/oxfmt-config": "workspace:^",
+        "@pureform/oxlint-config": "workspace:^",
         "@typescript/typescript6": "catalog:",
         "oxfmt": "catalog:",
         "oxlint": "catalog:",
