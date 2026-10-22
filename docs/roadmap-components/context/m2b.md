@@ -89,7 +89,12 @@ Branch `m2b-overlays`, from main `79f27b1e`. Commits are listed by
   rn-adapter's `factory.spec.ts` "every variant value ... with and without SVG" hits its 60s
   timeout under omni's parallel load (61–66s), passes alone (46s); not from this branch's code.
 - `tsc --noEmit` clean in preset, rn-adapter, react-native.
-- Component suites and browser e2e: see the summary in the final commit message / below.
+- `omni run build test -p @pureform/component-suites`: 1 of 29,994 tests failed (React/Tailwind
+  Select, "animates in ... then hides": already hidden two frames into its unchanged 100ms
+  popup fade); `-f failed` rerun passed (70 tasks succeeded).
+- `omni run build test -p @pureform/browser-e2e-tests`: blocked only by the rn-adapter
+  `factory.spec.ts` timeout above; `-f failed` rerun passed (71 tasks succeeded). No screenshot
+  needed re-recording.
 
 ## Refactoring hints
 
