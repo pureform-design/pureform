@@ -120,9 +120,12 @@ export interface MenuItemProps
         MenuItemBehaviorProps {}
 
 /** A group's props: its `id`, which its label points at, and a part's. The surface marks its
- *  first and last groups itself. */
+ *  first and last groups itself (a grouped menu rounds their outside corners); `first` and
+ *  `last` override that marking. */
 export interface MenuItemGroupProps extends MenuPartProps {
     readonly id: string;
+    readonly first?: boolean | undefined;
+    readonly last?: boolean | undefined;
 }
 
 /** A group label's props: the `id` of its group, and a part's. */
@@ -273,11 +276,17 @@ function Content({ unstyled, ...props }: MenuPartProps): ReactNode {
 }
 
 /** A group of items, labelled by the ItemGroupLabel with its `id` as `group`. */
-function ItemGroup({ unstyled, id, ...props }: MenuItemGroupProps): ReactNode {
+function ItemGroup({
+    unstyled,
+    id,
+    first,
+    last,
+    ...props
+}: MenuItemGroupProps): ReactNode {
     const { scope, api } = context.use("ItemGroup");
     return scope.render("itemGroup", {
         element: "div",
-        machine: api.getItemGroupProps({ id }),
+        machine: api.getItemGroupProps({ id, first, last }),
         unstyled,
         props,
     });

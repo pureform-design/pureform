@@ -268,6 +268,46 @@ describe("Menu, compound", () => {
         ]);
     });
 
+    it("takes a group's own first and last over where it is", async () => {
+        withRegistry(
+            <Menu.Root defaultOpen>
+                <Menu.Trigger>More</Menu.Trigger>
+                <Menu.Positioner>
+                    <Menu.Content>
+                        {["a", "b", "c"].map((id) => (
+                            <Menu.ItemGroup
+                                key={id}
+                                id={id}
+                                {...(id === "a" ? { first: false } : {})}
+                                {...(id === "b"
+                                    ? { first: true, last: true }
+                                    : {})}
+                            >
+                                <Menu.Item value={id}>
+                                    <Menu.ItemLabel>{id}</Menu.ItemLabel>
+                                </Menu.Item>
+                            </Menu.ItemGroup>
+                        ))}
+                    </Menu.Content>
+                </Menu.Positioner>
+            </Menu.Root>,
+        );
+        await frames();
+        const groups = [
+            ...document.querySelectorAll<HTMLElement>('[role="group"]'),
+        ];
+        expect(
+            groups.map((group) => [
+                group.hasAttribute("data-first"),
+                group.hasAttribute("data-last"),
+            ]),
+        ).toEqual([
+            [false, false],
+            [true, true],
+            [false, true],
+        ]);
+    });
+
     it("throws for a part outside Root", () => {
         quietly(() =>
             mount(

@@ -42,4 +42,24 @@ describe("markMenuGroupEdges", () => {
         expect(edges([b, c])).toEqual(["first ", " last"]);
         stop();
     });
+    it("keeps a group's explicit first or last over its place", async () => {
+        const content = element("content");
+        const a = element("item-group");
+        const b = element("item-group");
+        const c = element("item-group");
+        a.setAttribute("data-pf-first", "false");
+        b.setAttribute("data-pf-first", "true");
+        b.setAttribute("data-first", "");
+        content.append(a, b, c);
+        document.body.append(content);
+        const stop = markMenuGroupEdges(content);
+        expect(edges([a, b, c])).toEqual([" ", "first ", " last"]);
+        a.removeAttribute("data-pf-first");
+        await Promise.resolve();
+        expect(edges([a, b, c])).toEqual(["first ", "first ", " last"]);
+        c.setAttribute("data-pf-last", "false");
+        await Promise.resolve();
+        expect(edges([a, b, c])).toEqual(["first ", "first ", " "]);
+        stop();
+    });
 });

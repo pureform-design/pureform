@@ -122,9 +122,12 @@ export interface MenuIconProps extends MenuPartProps {
 export interface MenuItemProps extends MenuPartProps, MenuItemBehaviorProps {}
 
 /** A group's props: its `id` among the groups, and a part's. The surface marks its first and
- *  last groups itself. */
+ *  last groups itself (a grouped menu rounds their outside corners); `first` and `last`
+ *  override that marking. */
 export interface MenuItemGroupProps extends MenuPartProps {
     readonly id: string;
+    readonly first?: boolean | undefined;
+    readonly last?: boolean | undefined;
 }
 
 /** A group label's props: the `id` of the group it names, and a part's. */
@@ -295,9 +298,14 @@ function ItemGroup(props: MenuItemGroupProps): JSX.Element {
     const { scope, api } = context.use("ItemGroup");
     return scope.render("itemGroup", {
         element: "div",
-        machine: () => api().getItemGroupProps({ id: props.id }),
+        machine: () =>
+            api().getItemGroupProps({
+                id: props.id,
+                first: props.first,
+                last: props.last,
+            }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "id"),
+        props: omit(props, "unstyled", "id", "first", "last"),
     });
 }
 

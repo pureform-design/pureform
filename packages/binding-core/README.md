@@ -296,7 +296,7 @@ bottomSheetPositionerLayout(present, modal); // fixed to the bottom; a standard 
 sideSheetPositionerLayout(present, modal, coplanar); // fixed to the end edge, or in the page's layout
 sheetContentLayout;                      // the surface takes presses back
 dragToDismiss(handle, sheet, dismiss, onClose?, asker?); // from /dom: drag a sheet down by its handle to close it; dismiss(kept) calls kept once rendered if the app kept it open
-markMenuGroupEdges(content);             // from /dom: marks a menu's first and last groups data-first/data-last, from DOM order
+markMenuGroupEdges(content);             // from /dom: marks a menu's first and last groups data-first/data-last, from DOM order; a group's data-pf-first/data-pf-last (its explicit first/last) wins
 swallowNextClick(row);                   // from /dom: drop the click a drag ends with
 
 // Drag handle: dragHandleAnatomy
