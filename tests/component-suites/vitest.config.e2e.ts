@@ -19,6 +19,7 @@ import {
     type UserWorkspaceConfig,
 } from "vitest/config";
 
+import machinesPackage from "../../packages/machines/package.json" with { type: "json" };
 import { closeServers, commands } from "./src/commands";
 import { generateRegistries } from "./src/targets/generated";
 import { TARGETS } from "./src/targets/targets";
@@ -47,39 +48,13 @@ const styling: Record<TargetName, () => PluginOption[]> = {
     tailwind: () => [tailwindcss()],
 };
 
-// Zag's packages under a binding, which the machines import.
+// Zag's packages under a binding, which the machines import, read from the machines' own
+// dependencies so a new machine is pre-bundled too (Vite would otherwise find it mid-run and
+// reload the page).
 const machines = (from: string): string[] =>
-    [
-        "anatomy",
-        "checkbox",
-        "collection",
-        "core",
-        "dialog",
-        "dom-query",
-        "menu",
-        "presence",
-        "radio-group",
-        "select",
-        "switch",
-        "tabs",
-        "accordion",
-        "avatar",
-        "carousel",
-        "combobox",
-        "date-input",
-        "date-picker",
-        "pagination",
-        "slider",
-        "steps",
-        "tags-input",
-        "toast",
-        "tree-view",
-        "toggle-group",
-        "listbox",
-        "tooltip",
-        "types",
-        "utils",
-    ].map((name) => `${from} > @pureform/machines > @zag-js/${name}`);
+    Object.keys(machinesPackage.dependencies)
+        .filter((name) => name.startsWith("@zag-js/"))
+        .map((name) => `${from} > @pureform/machines > ${name}`);
 
 // One project per target for a binding, named `<binding>/<target>` ("solid/css").
 const binding = (
