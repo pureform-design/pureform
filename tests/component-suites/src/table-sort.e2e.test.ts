@@ -5,7 +5,7 @@
 import { testIds } from "@pureform/anatomy";
 import { describe, expect, it } from "vitest";
 
-import { table } from "./components/table";
+import { table } from "./components";
 import { mountCase, settlePlaced } from "./harness/page";
 import type { SceneProps } from "./harness/scene";
 

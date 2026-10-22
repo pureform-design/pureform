@@ -7,7 +7,7 @@
 import { testIds } from "@pureform/anatomy";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { slider } from "./components/slider";
+import { slider } from "./components";
 import { mountCase, settlePlaced } from "./harness/page";
 import type { SceneProvider } from "./harness/scene";
 
