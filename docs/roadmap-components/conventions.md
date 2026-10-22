@@ -13,6 +13,13 @@ compaction). Where this file differs, it wins for the component roadmap. Context
    `component-architecture.md` it points to (at least §5.5 tokens and §9.8 indication).
 3. Read the output contexts of every phase you depend on, **including their refactoring
    hints**, then `git log --oneline -20`.
+4. In a fresh worktree, run `bun install`, `omni run build`, then `bun install` again. The
+   second install links the workspace's own bins (`pureform`) that only exist after the build;
+   without it, `bun x pureform generate` fetches an unrelated package from the registry and
+   the demos' `generate` fails.
+
+Other agents run omni in their own worktrees at the same time. Never stop processes by
+pattern (`pkill -f "omni run"`); stop only the ones you started, by PID.
 
 ## Parallel work
 
