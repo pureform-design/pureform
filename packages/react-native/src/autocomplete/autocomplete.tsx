@@ -125,8 +125,10 @@ export function Autocomplete(props: AutocompleteProps): ReactNode {
         false,
     );
     const engine = useEngine();
-    const { presence, container, anchor, show, close, trigger } =
-        useFieldPopup(open, setOpen);
+    const { presence, container, anchor, show, close, trigger } = useFieldPopup(
+        open,
+        setOpen,
+    );
     const matches = autocompleteMatches(items, text, filter);
     const disabled = props.disabled || props.readOnly;
     return (
