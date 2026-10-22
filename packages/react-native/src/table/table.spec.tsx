@@ -75,9 +75,17 @@ describe("table", () => {
         expect(
             byTestId("pf-data-table-sort-header").getAttribute("aria-label"),
         ).toBe("Name, sorted ascending");
+        expect(computed("pf-data-table-sort-indicator").transform).toMatch(
+            /^(none|matrix\(1, 0, 0, 1, 0, 0\))$/,
+        );
         await userEvent.click(byTestId("pf-data-table-sort-header"));
         await settle();
         expect(names()).toEqual(["Lithium", "Hydrogen", "Helium"]);
+        await until(() =>
+            expect(computed("pf-data-table-sort-indicator").transform).toMatch(
+                /^matrix\(-1, [^,]+, [^,]+, -1, 0, 0\)$/,
+            ),
+        );
         expect(onSortChange).toHaveBeenLastCalledWith({
             sort: { column: "name", direction: "descending" },
         });
