@@ -730,7 +730,7 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
       "justifyContent": "center",
       "position": "absolute",
       "textStyle": "labelLarge",
-      "width": "var(--components-listItem-actionWidth, 80)",
+      "width": "calc(var(--components-listItem-actionWidth, 80) * 1px)",
     },
     "content": {
       "display": "flex",
