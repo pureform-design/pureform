@@ -19,6 +19,7 @@ import { describe, expect, it } from "vitest";
 import { precompute, runtimeStyles } from "./build";
 import { lowerRn } from "./lower";
 import {
+    evaluateSetTokens,
     overridesFor,
     resolve,
     stylesFor,
@@ -546,5 +547,65 @@ describe("evaluate", () => {
         expect(() => evaluate({ $ref: "nope" }, {})).toThrow(
             'unknown token "nope"',
         );
+    });
+});
+
+describe("evaluateSetTokens", () => {
+    const ref = (key: string) => ({ $ref: key });
+    const plus = (key: string, n: number) => ({
+        $calc: "+" as const,
+        args: [ref(key), n],
+    });
+    const styles = {
+        themes: { "base:light": { "t.base": 1, "t.derived": 2, "t.a": 0 } },
+        formulas: { "base:light": { "t.derived": plus("t.base", 1) } },
+    };
+    const where = { styles, key: "base:light" };
+
+    it("follows a chain of set tokens longer than four, in any order", () => {
+        const set = {
+            "t.f": plus("t.e", 1),
+            "t.e": plus("t.d", 1),
+            "t.d": plus("t.c", 1),
+            "t.c": plus("t.b", 1),
+            "t.b": plus("t.a", 1),
+            "t.a": 10,
+        };
+        expect(evaluateSetTokens(set, where)).toEqual({
+            "t.a": 10,
+            "t.b": 11,
+            "t.c": 12,
+            "t.d": 13,
+            "t.e": 14,
+            "t.f": 15,
+        });
+    });
+
+    it("reads formulas, overrides and the instance's tokens in order", () => {
+        const set = { "t.x": plus("t.derived", 0), "t.base": 5 };
+        // A formula reading a set token follows it.
+        expect(evaluateSetTokens(set, where)["t.x"]).toBe(6);
+        // The instance's own tokens win over set ones.
+        expect(
+            evaluateSetTokens(set, { ...where, tokens: { "t.base": 7 } })[
+                "t.x"
+            ],
+        ).toBe(8);
+        // An override given outright stays as given.
+        expect(
+            evaluateSetTokens(
+                { "t.x": plus("t.derived", 0) },
+                { ...where, overrides: { "t.derived": 40 } },
+            )["t.x"],
+        ).toBe(40);
+    });
+
+    it("throws on a cycle in development", () => {
+        expect(() =>
+            evaluateSetTokens(
+                { "t.p": plus("t.q", 1), "t.q": plus("t.p", 1) },
+                where,
+            ),
+        ).toThrow(/t\.p → t\.q → t\.p/);
     });
 });

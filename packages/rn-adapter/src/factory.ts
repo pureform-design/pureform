@@ -382,6 +382,8 @@ export const nativeFactory = <C extends ComponentRef = AnyComponent>(
                 key: where.key,
                 name: component,
                 scheme: where.scheme,
+                variants,
+                state,
                 overrides: where.overrides,
                 ...(given ? { tokens: given } : {}),
             });

@@ -155,6 +155,8 @@ const reference = (
         key,
         name,
         scheme,
+        variants,
+        state: { scheme, ...state },
         overrides,
         ...(tokens ? { tokens } : {}),
     });
