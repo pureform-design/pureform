@@ -70,7 +70,14 @@ describe("Carousel", () => {
         const masks = all(ids.mask);
         expect(masks).toHaveLength(8);
         expect(masks[0]!.getAttribute("aria-label")).toBe("Item 1");
-        expect(masks.map((mask) => mask.tabIndex).slice(0, 2)).toEqual([0, -1]);
+        // Every item is a tab stop, none hidden; the page's mask is current.
+        expect(masks.every((mask) => mask.tabIndex === 0)).toBe(true);
+        expect(
+            masks.map((mask) => mask.hasAttribute("data-current")).slice(0, 2),
+        ).toEqual([true, false]);
+        expect(
+            all(ids.item).some((item) => item.hasAttribute("aria-hidden")),
+        ).toBe(false);
         expect(all(ids.item)[0]!.getAttribute("aria-roledescription")).toBe(
             "slide",
         );

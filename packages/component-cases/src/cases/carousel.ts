@@ -1,5 +1,6 @@
-// The carousel: a region of items, each a focusable mask. Only the current page's mask takes focus
-// from Tab; the arrow keys move focus to the item before or after, by direction, and scroll it into
+// The carousel: a region of items, each a focusable mask. Every mask takes focus from Tab (Material's
+// carousel: "Tab or Arrows moves to the previous or next carousel item"), the current page's
+// marked `data-current`; the arrow keys move focus to the item before or after, by direction, and scroll it into
 // place, which changes the `page`. Enter and Space do nothing of their own: what an item does is
 // the app's. It isn't a form control, and has no disabled state of its own (an item has).
 
@@ -20,9 +21,9 @@ const masks = (host: HTMLElement) => [
     ...host.querySelectorAll<HTMLElement>(`[data-testid="${ids.mask}"]`),
 ];
 
-/** The page: the index of the item whose mask takes focus from Tab. */
+/** The page: the index of the item whose mask is current. */
 const read = (host: HTMLElement): number =>
-    masks(host).findIndex((mask) => mask.tabIndex === 0);
+    masks(host).findIndex((mask) => mask.hasAttribute("data-current"));
 
 export const carouselCase: ComponentCase = {
     component: "Carousel",

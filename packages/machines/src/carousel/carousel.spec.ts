@@ -69,9 +69,12 @@ describe("carousel machine", () => {
         expect($("[data-group]").style.gap).toBe("");
         // Items size themselves, so the row is a flex row.
         expect($("[data-group]").style.display).toBe("flex");
-        // Only the current page's mask takes focus from Tab.
+        // Every mask takes focus from Tab; the current page's is marked.
         expect($('[data-mask="0"]').tabIndex).toBe(0);
-        expect($('[data-mask="1"]').tabIndex).toBe(-1);
+        expect($('[data-mask="1"]').tabIndex).toBe(0);
+        expect($('[data-mask="0"]').hasAttribute("data-current")).toBe(true);
+        expect($('[data-mask="1"]').hasAttribute("data-current")).toBe(false);
+        expect($('[data-item="1"]').hasAttribute("aria-hidden")).toBe(false);
         stop();
     });
 
