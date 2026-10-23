@@ -768,6 +768,8 @@ export type {
 } from "./components/tabs";
 export {
     NUMBER_FIELD_CONTENT_PROPS,
+    NUMBER_FIELD_FORMAT,
+    NUMBER_FIELD_LOCALE,
     NUMBER_FIELD_LABELS,
     NUMBER_FIELD_ROOT_PROPS,
     NUMBER_FIELD_SPIN_DELAY,

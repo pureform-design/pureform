@@ -74,6 +74,12 @@ export const ExpandIcon = (): JSX.Element => (
     <Glyph path={GLYPH_PATHS.expand} />
 );
 
+/** A minus: a number field's decrement button. */
+export const RemoveIcon = (): JSX.Element => <Glyph path={GLYPH_PATHS.remove} />;
+
+/** A plus: a number field's increment button. */
+export const AddIcon = (): JSX.Element => <Glyph path={GLYPH_PATHS.add} />;
+
 /** Three dots in a column: the toolbar's overflow button. */
 export const MoreIcon = (): JSX.Element => <Glyph path={GLYPH_PATHS.more} />;
 

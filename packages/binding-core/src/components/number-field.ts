@@ -38,7 +38,8 @@ export interface NumberFieldVariantProps {
 }
 
 /** What a value change reports: the text as shown (formatted in the locale) and the number it
- *  stands for (`NaN` while empty), as Zag's. */
+ *  stands for (`NaN` while empty), as Zag's. The `value` and `defaultValue` props are text in the
+ *  locale too: `"1.234,5"` under `de-DE`. */
 export interface NumberFieldValueDetails {
     readonly value: string;
     readonly valueAsNumber: number;
@@ -67,7 +68,7 @@ export interface NumberFieldBehaviorProps extends Controllable<
     /** The locale the value is formatted and parsed in. @default "en-US" */
     readonly locale?: string | undefined;
     /** How the value is formatted: `Intl.NumberFormat`'s options (a currency, a percent, the
-     *  fraction digits).
+     *  fraction digits). @default `{ maximumFractionDigits: 20 }`, grouped in the locale.
      *  @control object */
     readonly formatOptions?: Intl.NumberFormatOptions | undefined;
     readonly disabled?: boolean | undefined;
@@ -89,7 +90,7 @@ export interface NumberFieldBehaviorProps extends Controllable<
     readonly form?: string | undefined;
     /** The decrement button's accessible name. @default "decrease value" */
     readonly decrementLabel?: string | undefined;
-    /** The increment button's accessible name. @default "increase value" */
+    /** The increment button's accessible name. @default "increment value" */
     readonly incrementLabel?: string | undefined;
     /** The root element's id; the machine builds the other ids from it.
      *  @control none */
@@ -191,6 +192,17 @@ export const numberFieldSelection = (
     tokens: props.tokens,
 });
 
+/** The locale a number field formats and parses in unless given one: Zag's. A fixed default
+ *  rather than the browser's, so the server renders what the client hydrates. */
+export const NUMBER_FIELD_LOCALE = "en-US";
+
+/** How a number field formats unless given options: in the locale (its grouping and decimal
+ *  separator), keeping every fraction digit typed. Zag formats and parses in the locale only
+ *  with format options, so there are always some. */
+export const NUMBER_FIELD_FORMAT: Intl.NumberFormatOptions = {
+    maximumFractionDigits: 20,
+};
+
 /** The number input machine's props from Root's, besides `id`, `dir`, and the controllable
  *  `value` (the binding's `useControllable`). An error marks the field invalid. */
 export const numberFieldMachineProps = (props: NumberFieldBehaviorProps) => ({
@@ -201,8 +213,8 @@ export const numberFieldMachineProps = (props: NumberFieldBehaviorProps) => ({
     allowOverflow: props.allowOverflow,
     allowMouseWheel: props.allowMouseWheel,
     spinOnPress: props.spinOnPress,
-    locale: props.locale,
-    formatOptions: props.formatOptions,
+    locale: props.locale ?? NUMBER_FIELD_LOCALE,
+    formatOptions: props.formatOptions ?? NUMBER_FIELD_FORMAT,
     disabled: props.disabled,
     invalid: props.error !== undefined ? true : props.invalid,
     required: props.required,
@@ -232,7 +244,7 @@ export const NUMBER_FIELD_SPIN_INTERVAL = 50;
 /** The accessible names Zag gives the buttons by default. */
 export const NUMBER_FIELD_LABELS = {
     decrement: "decrease value",
-    increment: "increase value",
+    increment: "increment value",
 } as const;
 
 /** The limits and steps a number field works in, with Zag's defaults filled in. */
@@ -295,8 +307,8 @@ export const numberFieldCanStep = (
 /** `value` in `locale` with `options`; empty for `NaN`. */
 export const numberFieldFormat = (
     value: number,
-    locale = "en-US",
-    options?: Intl.NumberFormatOptions,
+    locale = NUMBER_FIELD_LOCALE,
+    options: Intl.NumberFormatOptions = NUMBER_FIELD_FORMAT,
 ): string =>
     Number.isNaN(value)
         ? ""
@@ -308,7 +320,7 @@ export const numberFieldFormat = (
  *  number in it. */
 export const numberFieldParse = (
     text: string,
-    locale = "en-US",
+    locale = NUMBER_FIELD_LOCALE,
     options?: Intl.NumberFormatOptions,
 ): number => {
     const parts = new Intl.NumberFormat(locale, {
