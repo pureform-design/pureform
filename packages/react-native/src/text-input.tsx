@@ -203,6 +203,11 @@ function FieldImpl(props: FieldOptions): ReactNode {
                     {...(labelled ? { "aria-labelledby": labelId } : {})}
                     aria-invalid={invalid}
                     {...(props.secure ? { secureTextEntry: !revealed } : {})}
+                    // The label rests where the placeholder would be until the field is focused,
+                    // so the placeholder shows only then (the web's `placeholder=" "` rule).
+                    {...(labelled && !focused
+                        ? { placeholder: undefined }
+                        : {})}
                     multiline={props.name === "textArea"}
                     numberOfLines={props.lines}
                     style={s.input}

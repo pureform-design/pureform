@@ -179,6 +179,16 @@ describe("DatePicker", () => {
 });
 
 describe("DockedDatePicker", () => {
+    it("shows the format hint in the input only once focused, not under its resting label", async () => {
+        await render(<DockedDatePicker label="Date" locale="en-US" />);
+        const input = byTestId(
+            "pf-docked-date-picker-input",
+        ) as HTMLInputElement;
+        expect(input.placeholder).toBe("");
+        await interact(() => input.focus());
+        expect(input.placeholder).toBe("mm/dd/yyyy");
+    });
+
     it("reads typed text on blur", async () => {
         const onValueChange = vi.fn();
         await render(
