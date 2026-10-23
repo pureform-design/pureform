@@ -44,6 +44,7 @@ import {
     INDICATION_ROOT,
     stateTransition,
     sys,
+    THEME_DENSITY,
 } from "./shared";
 
 const pf = typed();
@@ -143,6 +144,13 @@ type BoxToken =
 /** The box Input and Textarea share: the theme's shape, an outline in the outline color (the
  *  error color while invalid), the body text, a state layer of the text color on hover and
  *  press, and the focus ring. */
+const blockPadding = (ref: (token: BoxToken) => AliasNode) =>
+    add(
+        ref("paddingBlock"),
+        mul(ref("outlineWidth"), unitless(-1)),
+        mul(THEME_DENSITY, unitless(0.5)),
+    );
+
 const boxStyle = (ref: (token: BoxToken) => AliasNode): StyleMap => ({
     ...INDICATION_ROOT,
     ...focusRing(ref, "focusVisible"),
@@ -161,15 +169,10 @@ const boxStyle = (ref: (token: BoxToken) => AliasNode): StyleMap => ({
         .on(ROOT_INVALID, ref("errorColor"))
         .on(ROOT_DISABLED, disabledColor("disabledContainer"))
         .else(ref("outlineColor")),
-    // The outline's width comes out of the padding, so the box is the text plus the padding.
-    paddingBlockStart: add(
-        ref("paddingBlock"),
-        mul(ref("outlineWidth"), unitless(-1)),
-    ),
-    paddingBlockEnd: add(
-        ref("paddingBlock"),
-        mul(ref("outlineWidth"), unitless(-1)),
-    ),
+    // The outline's width comes out of the padding, so the box is the text plus the padding;
+    // the theme's density takes half its offset off each side.
+    paddingBlockStart: blockPadding(ref),
+    paddingBlockEnd: blockPadding(ref),
     paddingInlineStart: ref("paddingInline"),
     paddingInlineEnd: ref("paddingInline"),
     backgroundColor: stateLayer(ref, {
