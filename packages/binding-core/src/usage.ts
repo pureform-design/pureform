@@ -136,6 +136,10 @@ export const COMPONENT_USAGE = {
     },
     "drag-handle": { entries: { dragHandle: same("orientation") } },
     splitter: { entries: { splitter: same("orientation") } },
+    // The hex field is an outlined text field and the eye dropper an icon button.
+    "color-picker": {
+        entries: { colorPicker: {}, textField: {}, iconButton: {}, ripple: {} },
+    },
     // `extended` follows the label.
     fab: {
         entries: { fab: same("color", "variant", "size", "shape"), ripple: {} },
