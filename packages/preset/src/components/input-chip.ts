@@ -96,7 +96,7 @@ const pullOut = (inset: "avatarInset" | "iconInset" | "removeInset") =>
     sub(ref(inset), ref("padding"));
 
 const root: StyleMap = {
-    ...chipShape(ref),
+    ...chipShape("inputChip", ref),
     backgroundColor: stateLayer(ref, {
         base: ref("container"),
         content: ref("content"),
@@ -214,7 +214,10 @@ export const createInputChip = <
                         root: {
                             height: add(ref("height"), offset),
                             tokens: {
-                                radius: pillRadius(add(ref("height"), offset)),
+                                radius: pillRadius(
+                                    "inputChip",
+                                    add(ref("height"), offset),
+                                ),
                             },
                         },
                     })),

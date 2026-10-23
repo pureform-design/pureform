@@ -166,6 +166,7 @@ export type ChipShapeToken =
 /** A chip's root without its colors, shared by the chip and the input chip: a pressable row at
  *  the density's height, padded inline, with the corner morph. */
 export const chipShape = (
+    name: "chip" | "inputChip",
     ref: IndicationRef & ((token: ChipShapeToken) => NumericValue),
 ): StyleMap => ({
     ...INDICATION_ROOT,
@@ -179,7 +180,7 @@ export const chipShape = (
     borderRadius: cornerRadius(ref),
     tokens: {
         ...INDICATION_ROOT.tokens,
-        radius: pillRadius(dense(ref("height"))),
+        radius: pillRadius(name, dense(ref("height"))),
     },
 });
 
@@ -223,7 +224,7 @@ export const createChip = <
             },
             recipe: () => ({
                 base: {
-                    root: chipShape(ref),
+                    root: chipShape("chip", ref),
                     icon: {
                         ...iconBox(ref("iconSize"), {
                             fill: iconFill(ref("iconFill")),
@@ -264,7 +265,10 @@ export const createChip = <
                         root: {
                             height: add(ref("height"), offset),
                             tokens: {
-                                radius: pillRadius(add(ref("height"), offset)),
+                                radius: pillRadius(
+                                    "chip",
+                                    add(ref("height"), offset),
+                                ),
                             },
                         },
                     })),

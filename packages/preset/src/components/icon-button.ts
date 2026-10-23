@@ -375,6 +375,7 @@ export const createIconButton = <
                                         iconSize: s.icon,
                                         outlineWidth: s.outline,
                                         radius: pillRadius(
+                                            "iconButton",
                                             dense(
                                                 ref(
                                                     sizeTokenName("size", name),

@@ -419,6 +419,7 @@ export const createButton = <
                                         secondaryIconSize: s.icon,
                                         outlineWidth: s.outline,
                                         radius: pillRadius(
+                                            "button",
                                             add(
                                                 ref(
                                                     sizeTokenName(

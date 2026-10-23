@@ -103,7 +103,7 @@ exports[`input chip > compiles to a stable Panda slot recipe 1`] = `
       "--components-inputChip-focusIndicatorColor": "token(colors.secondary)",
       "--components-inputChip-focusIndicatorOuterOffset": "token(sizes.focusIndicatorOuterOffset)",
       "--components-inputChip-focusIndicatorThickness": "token(sizes.focusIndicatorThickness)",
-      "--components-inputChip-radius": "min(token(radii.full), calc(calc(var(--components-inputChip-height, token(sizes.controlSmall)) + token(sizes.densityOffset)) * 0.5))",
+      "--components-inputChip-radius": "min(token(radii.full), var(--components-inputChip-pillRadius, calc(calc(var(--components-inputChip-height, token(sizes.controlSmall)) + token(sizes.densityOffset)) * 0.5)))",
       "--components-inputChip-stateDraggedOpacity": "token(opacity.stateDragged)",
       "--components-inputChip-stateFocusOpacity": "token(opacity.stateFocus)",
       "--components-inputChip-stateHoverOpacity": "token(opacity.stateHover)",
@@ -228,25 +228,25 @@ exports[`input chip > compiles to a stable Panda slot recipe 1`] = `
     "density": {
       "-1": {
         "root": {
-          "--components-inputChip-radius": "min(token(radii.full), calc(calc(var(--components-inputChip-height, token(sizes.controlSmall)) + calc(token(spacing.1) * -1)) * 0.5))",
+          "--components-inputChip-radius": "min(token(radii.full), var(--components-inputChip-pillRadius, calc(calc(var(--components-inputChip-height, token(sizes.controlSmall)) + calc(token(spacing.1) * -1)) * 0.5)))",
           "height": "calc(var(--components-inputChip-height, token(sizes.controlSmall)) + calc(token(spacing.1) * -1))",
         },
       },
       "-2": {
         "root": {
-          "--components-inputChip-radius": "min(token(radii.full), calc(calc(var(--components-inputChip-height, token(sizes.controlSmall)) + calc(token(spacing.1) * -2)) * 0.5))",
+          "--components-inputChip-radius": "min(token(radii.full), var(--components-inputChip-pillRadius, calc(calc(var(--components-inputChip-height, token(sizes.controlSmall)) + calc(token(spacing.1) * -2)) * 0.5)))",
           "height": "calc(var(--components-inputChip-height, token(sizes.controlSmall)) + calc(token(spacing.1) * -2))",
         },
       },
       "-3": {
         "root": {
-          "--components-inputChip-radius": "min(token(radii.full), calc(calc(var(--components-inputChip-height, token(sizes.controlSmall)) + calc(token(spacing.1) * -3)) * 0.5))",
+          "--components-inputChip-radius": "min(token(radii.full), var(--components-inputChip-pillRadius, calc(calc(var(--components-inputChip-height, token(sizes.controlSmall)) + calc(token(spacing.1) * -3)) * 0.5)))",
           "height": "calc(var(--components-inputChip-height, token(sizes.controlSmall)) + calc(token(spacing.1) * -3))",
         },
       },
       "0": {
         "root": {
-          "--components-inputChip-radius": "min(token(radii.full), calc(calc(var(--components-inputChip-height, token(sizes.controlSmall)) + 0px) * 0.5))",
+          "--components-inputChip-radius": "min(token(radii.full), var(--components-inputChip-pillRadius, calc(calc(var(--components-inputChip-height, token(sizes.controlSmall)) + 0px) * 0.5)))",
           "height": "calc(var(--components-inputChip-height, token(sizes.controlSmall)) + 0px)",
         },
       },

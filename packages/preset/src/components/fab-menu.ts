@@ -66,6 +66,7 @@ import {
     slotStateLayer,
     variantsOf,
     pillRadius,
+    PILL_RADIUS_TOKEN,
 } from "./shared";
 import type { ColorGroup, ColorGroups } from "./shared";
 
@@ -82,6 +83,7 @@ const { tokens, ref } = componentTokens("fabMenu", {
     ...sizeTokens(SIZES, "size", "size"),
     ...sizeTokens(SIZES, "radius", "radius"),
     closeRadius: radius("full"),
+    ...PILL_RADIUS_TOKEN,
     iconSize: sizeToken("iconMedium"),
     // The FAB's icon, by size.
     closeIconSize: sizeToken("iconMedium"),
@@ -300,6 +302,7 @@ export const createFabMenu = <const G extends string = ColorGroup>(
                                     tokens: {
                                         closeIconSize: f.icon,
                                         closeRadius: pillRadius(
+                                            "fabMenu",
                                             ref(sizeTokenName("size", name)),
                                         ),
                                     },
