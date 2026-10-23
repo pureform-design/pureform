@@ -40,6 +40,15 @@ covers it pureform's own attributes: `data-pf-hover`, `data-pf-active` (a keyboa
 these; a behavior library's attributes, such as Zag's `data-state="checked"` or
 `data-selected`, don't style anything.
 
+## Round corners
+
+The components whose corners morph (button, icon button, chip, input chip, split button, and
+the FAB menu's close button) round "fully" with a `pillRadius` token: half the part's height by
+default, at each size and density, and never more than the theme's `radii.full`. A theme sets
+`components.<component>.pillRadius` (for example `components.button.pillRadius: 12px`) to
+choose how round "fully round" is; an instance's `tokens` set it the same way. A `radius`
+override doesn't reach these corners, since each size sets `radius` from `pillRadius`.
+
 ## Indication
 
 Every interactive component shows Material's state layer (a tint of its content color while

@@ -337,9 +337,15 @@ trigger shows their labels joined by ", " (the placeholder when none):
       when a trigger doesn't emit. A surface's `onLayout` (in `PressableHandlers`) tells its
       source where it is, so an overlay open from the start (`defaultOpen`) finds its trigger
       once it's laid out.
-    - **Inline roots** (the badge, the time picker and time input) keep their own size, as the
-      web's `inline-flex` does: `alignSelf: "flex-start"` unless their style places them, and
-      `inline-flex` on React Native Web (`inFlowInline` in `styles.ts`).
+    - **Own size:** the button, icon button, FAB, chips, checkbox, switch, radio and badge keep
+      their own size, as the web's `inline-flex` roots do: the preset's `OWN_SIZE` makes them
+      `width: "fit-content"` (Yoga's, React Native 0.88), so a parent's `alignItems` (a centred
+      column or row) still places them. Each takes a `style` over its root (`RootStyleProps`):
+      `width: "100%"` stretches one across its parent, and `alignSelf` places it; note that
+      `alignSelf: "stretch"` alone doesn't stretch it, since its width wins.
+    - **Inline roots** (the time picker and time input) keep their own size the older way:
+      `alignSelf: "flex-start"` unless their style places them, and `inline-flex` on React Native
+      Web (`inFlowInline` in `styles.ts`).
 
     - **The full-screen dialog** is the same, in a `Modal` that fills the screen with no scrim:
       a header (a close icon button named by `closeLabel`, the headline, and the `confirmAction`,
@@ -536,6 +542,12 @@ trigger shows their labels joined by ", " (the placeholder when none):
   `PanResponder`): a drag past the slop takes the touch from the row, so its `onPress` (or an
   expandable item's expanding) fires on a tap only; the action is hidden from assistive technology until revealed. `Avatar` takes a `src` that shows once loaded
   (`onStatusChange`), its children the fallback.
+- **Media:** `Media` takes the web's `src`, or a `source` as React Native's `Image` takes it
+  (`ImageSourcePropType`): a `require()`d asset (its proportions from
+  `Image.resolveAssetSource`), `{ uri, headers, cache }` (measured with
+  `Image.getSizeWithHeaders`; React Native Web measures without the headers), or an array of
+  resolutions. `source` wins over `src`, and development warns when both are set. A shaped
+  picture draws with the whole source.
 - **Button groups:** `ButtonGroup` renders a `Button` per labelled entry of `items` and an
   `IconButton` per icon-only one, in its `size` and the buttons' `color`, `variant`, `corner` and
   `density`, each with its `position` (`single`, or its place in the run when `connected`).

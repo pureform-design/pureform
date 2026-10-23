@@ -5,7 +5,8 @@
 
 import type { ComponentStyles } from "./lower";
 import { formatColor } from "./rgba";
-import type { Selected } from "./select";
+import { setTokens } from "./select";
+import type { Selected, State } from "./select";
 import { readColorFunction } from "./spaces";
 import type { Scheme } from "./theme";
 import { dependencies, evaluate, isExpr } from "./values";
@@ -309,10 +310,67 @@ export const resolvedWith = (
     return resolved;
 };
 
+declare const process: { readonly env: { readonly NODE_ENV?: string } };
+const isDev = (): boolean =>
+    typeof process === "undefined" || process.env.NODE_ENV !== "production";
+
+/** The tokens a selection sets, evaluated together: a set token may read another one set
+ *  (a size's corner reads the density's offset), a theme formula, an override, or the theme.
+ *  Each is evaluated once, when first read, in the order a lookup reaches it. The instance's
+ *  own tokens win over the set ones, which win over the provider's overrides; a formula
+ *  reading any of them follows. A cycle throws in development and reads the theme's value
+ *  otherwise. */
+export const evaluateSetTokens = (
+    set: Record<string, Value>,
+    where: {
+        styles: Pick<Styles, "themes" | "formulas">;
+        key: string;
+        overrides?: ThemeValues | undefined;
+        tokens?: ThemeValues | undefined;
+    },
+): ThemeValues => {
+    const theme = where.styles.themes[where.key] ?? {};
+    const formulas = where.styles.formulas?.[where.key] ?? {};
+    const given = where.tokens ?? {};
+    const overrides = where.overrides ?? {};
+    const done = new Map<string, Concrete | undefined>();
+    const reading: string[] = [];
+    const read = (key: string): Concrete | undefined => {
+        if (key in given) return given[key];
+        if (done.has(key)) return done.get(key);
+        const formula = Object.hasOwn(set, key)
+            ? set[key]!
+            : key in overrides
+              ? undefined
+              : formulas[key];
+        if (formula === undefined) return overrides[key] ?? theme[key];
+        if (reading.includes(key)) {
+            const chain = [...reading.slice(reading.indexOf(key)), key];
+            if (isDev())
+                throw new Error(`tokens read each other: ${chain.join(" → ")}`);
+            return overrides[key] ?? theme[key];
+        }
+        reading.push(key);
+        try {
+            const value = evaluate(formula, read) as Concrete;
+            done.set(key, value);
+            return value;
+        } finally {
+            reading.pop();
+        }
+    };
+    const out: ThemeValues = {};
+    for (const key of Object.keys(set)) {
+        const value = read(key);
+        if (value !== undefined) out[key] = value;
+    }
+    return out;
+};
+
 /** A selection with the tokens its variants and state set taken into account: when it sets
- *  any, the component is resolved again with them, under the provider's overrides and the
- *  instance's own `tokens`, and `selectFrom` selects from that, so every style reading them
- *  follows. */
+ *  any, they're evaluated together from their templates (`evaluateSetTokens`), and the
+ *  component is resolved again with them, under the provider's overrides and the instance's
+ *  own `tokens`, and `selectFrom` selects from that, so every style reading them follows. */
 export const withSetTokens = (
     selected: Selected,
     selectFrom: (component: ComponentStyles<Value>) => Selected,
@@ -323,34 +381,32 @@ export const withSetTokens = (
         /** The component's name. */
         name: string;
         scheme: Scheme;
+        /** The selection's variants and state, for the templates of the tokens it sets. */
+        variants: Record<string, string | boolean | undefined>;
+        state: State;
         /** The provider's overrides. */
         overrides?: ThemeValues;
         /** The instance's own tokens, which win over the ones it sets. */
         tokens?: Overrides;
     },
 ): Selected => {
-    // A token one variant sets may read one another sets (a size's corner reads the density's
-    // offset), so it's resolved again until the tokens it sets settle.
-    let current = selected;
-    for (let pass = 0; pass < 4; pass++) {
-        if (Object.keys(current.tokens).length === 0) return current;
-        const again = resolvedWith(where.styles, where.key, {
-            ...where.overrides,
-            ...overridesFor(current.tokens, where.scheme),
-            ...overridesFor(where.tokens, where.scheme),
-        })[where.name];
-        if (!again) return current;
-        const next = selectFrom(again);
-        if (sameValues(next.tokens, current.tokens)) return next;
-        current = next;
-    }
-    return current;
-};
-
-const sameValues = (a: ThemeValues, b: ThemeValues) => {
-    const keys = Object.keys(a);
-    return (
-        keys.length === Object.keys(b).length &&
-        keys.every((key) => Object.is(a[key], b[key]))
+    if (Object.keys(selected.tokens).length === 0) return selected;
+    const template = where.styles.templates[where.name];
+    if (!template) return selected;
+    const tokens = overridesFor(where.tokens, where.scheme);
+    const set = evaluateSetTokens(
+        setTokens(template, where.variants, where.state),
+        {
+            styles: where.styles,
+            key: where.key,
+            overrides: where.overrides,
+            tokens,
+        },
     );
+    const again = resolvedWith(where.styles, where.key, {
+        ...where.overrides,
+        ...set,
+        ...tokens,
+    })[where.name];
+    return again ? selectFrom(again) : selected;
 };

@@ -156,6 +156,8 @@ describe("drawings", () => {
                 key: "base:light",
                 name: "iconButton",
                 scheme: "light",
+                variants: { shape: "cookie4Sided", variant: "outlined" },
+                state: { svg },
             });
         };
         const off = pick(false);
@@ -370,6 +372,8 @@ describe("shape points that read tokens", () => {
             key: "base:light",
             name: "band",
             scheme,
+            variants: { wide },
+            state: { svg: true },
             ...(tokens ? { tokens } : {}),
         });
         return shapeCoordinates(selected.drawings.root!.shape!, {
@@ -405,6 +409,8 @@ describe("the wavy linear progress", () => {
             key: "base:light",
             name: "linearProgress",
             scheme: "light",
+            variants: { shape: "wavy", thickness },
+            state: { svg: true },
         }).drawings.indicator!;
         const ys = shapeCoordinates(shape!, { width: 960, height: 20 }).filter(
             (_, i) => i % 2 === 1,

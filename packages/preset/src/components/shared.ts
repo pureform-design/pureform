@@ -586,10 +586,12 @@ export const roundIconButton = (
 
 /** A root that keeps its own size where its parent would stretch it. The web's `inline-flex`
  *  root hugs its content and keeps its parent's alignment (a row's `center`); React Native has
- *  no inline flow, and a view in a column stretches across it, so there it sits at the start,
- *  as the badge does. */
+ *  no inline flow, and a view in a column stretches across it, so there it is `fit-content`
+ *  wide (Yoga's, React Native 0.88), which leaves its parent's `alignItems` to place it. Spread
+ *  it before a root's own `width`. A user stretches it with `width: "100%"`, not with
+ *  `alignSelf: "stretch"` alone. */
 export const OWN_SIZE = {
-    alignSelf: platform({ css: literal("auto") }, start),
+    width: platform({ css: literal("auto") }, literal("fit-content")),
 } satisfies StyleMap;
 
 /** The root every pressable component shares: the focus ring (reading `token`, the
@@ -805,13 +807,28 @@ export const cornerRadius = (
         .else(rest);
 };
 
-/** A full (pill) radius for a part `height` tall: half its height, or less where the theme's
- *  full radius is smaller. The theme's full radius is a huge length (9999px) that the browser
- *  clamps, so a corner morphing from it spends nearly all its spring above the clamp and
- *  snaps at the end; half the height interpolates over the visible range, as Compose's
- *  `RoundedCornerShape(50)` morphs in pixels of the shape's size. */
-export const pillRadius = (height: NumericValue): NumericValue =>
-    min(radius("full"), mul(height, unitless(0.5)));
+/** A full (pill) radius for a part of `component` `height` tall: its `pillRadius` token, which
+ *  defaults to half the height, or less where the theme's full radius is smaller. The theme's
+ *  full radius is a huge length (9999px) that the browser clamps, so a corner morphing from it
+ *  spends nearly all its spring above the clamp and snaps at the end; half the height
+ *  interpolates over the visible range, as Compose's `RoundedCornerShape(50)` morphs in pixels
+ *  of the shape's size. A theme (or an instance) sets `components.<component>.pillRadius` to
+ *  choose how round "fully round" is; the component declares it with `PILL_RADIUS_TOKEN`. */
+export const pillRadius = (
+    component: string,
+    height: NumericValue,
+): NumericValue =>
+    min(
+        radius("full"),
+        dynamic(
+            ["components", component, "pillRadius"],
+            mul(height, unitless(0.5)),
+        ),
+    );
+
+/** The `pillRadius` token's declaration, for a component that rounds with `pillRadius`. Read
+ *  alone, outside a size that knows the height, it is the theme's full radius. */
+export const PILL_RADIUS_TOKEN = { pillRadius: radius("full") };
 
 /** Which corners a corner-morphing component rests in by default. */
 export type RestingCorner = "round" | "square";
@@ -825,6 +842,7 @@ export const cornerMorphTokens = (
     pressedRadius: ValueNode,
 ) => ({
     radius: radius("full"),
+    ...PILL_RADIUS_TOKEN,
     squareRadius,
     pressedRadius,
     square: unitless(rest === "square" ? 1 : 0),

@@ -10,6 +10,7 @@ exports[`badge > compiles to a stable Panda recipe 1`] = `
     "display": "inline-flex",
     "flexShrink": "0",
     "justifyContent": "center",
+    "width": "auto",
   },
   "className": "badge",
   "compoundVariants": [
@@ -42,9 +43,7 @@ exports[`badge > compiles to a stable Panda recipe 1`] = `
       "anchored": {
         "position": "absolute",
       },
-      "flow": {
-        "alignSelf": "auto",
-      },
+      "flow": {},
     },
     "size": {
       "large": {

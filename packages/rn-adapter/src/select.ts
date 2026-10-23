@@ -234,21 +234,13 @@ export interface Selected {
     iconFills: Record<string, number>;
 }
 
-/** A component's style per slot (or its one style under `""`, without slots) for variants and
- *  state. */
-export const select = (
+// Each slot's rules that apply, merged in cascade order: by layer, then specificity, then
+// source order.
+const cascade = (
     component: ComponentStyles<Value>,
-    variants: Record<string, string | boolean | undefined> = {},
-    state: State = {},
-): Record<string, Style> =>
-    selectWithTransitions(component, variants, state).styles;
-
-/** As `select`, with each slot's transitions beside its style. */
-export const selectWithTransitions = (
-    component: ComponentStyles<Value>,
-    variants: Record<string, string | boolean | undefined> = {},
-    state: State = {},
-): Selected => {
+    variants: Record<string, string | boolean | undefined>,
+    state: State,
+): Record<string, Style> => {
     const chosen: Record<string, string> = { ...component.defaultVariants };
     for (const [group, value] of Object.entries(variants)) {
         if (value !== undefined) chosen[group] = String(value);
@@ -280,6 +272,42 @@ export const selectWithTransitions = (
             );
         }
     }
+    return styles;
+};
+
+/** The tokens a selection's styles set, by key, as their templates give them: unevaluated, for
+ *  evaluating together (`withSetTokens`), since one may read another. */
+export const setTokens = (
+    component: ComponentStyles<Value>,
+    variants: Record<string, string | boolean | undefined> = {},
+    state: State = {},
+): Record<string, Value> => {
+    const tokens: Record<string, Value> = {};
+    for (const style of Object.values(cascade(component, variants, state))) {
+        for (const property of Object.keys(style)) {
+            if (property.startsWith(TOKEN))
+                tokens[property.slice(TOKEN.length)] = style[property] as Value;
+        }
+    }
+    return tokens;
+};
+
+/** A component's style per slot (or its one style under `""`, without slots) for variants and
+ *  state. */
+export const select = (
+    component: ComponentStyles<Value>,
+    variants: Record<string, string | boolean | undefined> = {},
+    state: State = {},
+): Record<string, Style> =>
+    selectWithTransitions(component, variants, state).styles;
+
+/** As `select`, with each slot's transitions beside its style. */
+export const selectWithTransitions = (
+    component: ComponentStyles<Value>,
+    variants: Record<string, string | boolean | undefined> = {},
+    state: State = {},
+): Selected => {
+    const styles = cascade(component, variants, state);
     for (const slot of component.slots ?? [""]) styles[slot] ??= {};
     // Parents before children: walk the structure from the slots no one contains.
     const structure = component.structure ?? {};

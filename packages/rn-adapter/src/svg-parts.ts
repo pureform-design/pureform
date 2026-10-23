@@ -5,6 +5,7 @@
 import { createElement as h, useId, useState } from "react";
 import type { ComponentType, ReactNode } from "react";
 import { StyleSheet, View } from "react-native";
+import type { ImageSourcePropType } from "react-native";
 import Svg, {
     ClipPath,
     Defs,
@@ -59,8 +60,12 @@ export interface SvgDrawingProps {
      *  Default black. */
     color?: string;
     /** A picture to draw clipped to the shape, for a slot that shows one, such as media: its
-     *  source and how it fits the box, as `objectFit` gives it. Default `cover`. */
-    image?: { uri: string; fit?: "cover" | "contain" | "fill" };
+     *  source, as React Native's `Image` takes it, and how it fits the box, as `objectFit`
+     *  gives it. Default `cover`. */
+    image?: {
+        source: ImageSourcePropType;
+        fit?: "cover" | "contain" | "fill";
+    };
 }
 
 /** A view filling its slot, which measures it: the box to draw in, once laid out. */
@@ -150,7 +155,7 @@ export const drawingSvg = (props: {
         d && fill && h(ShapePath, { d, fill, fillRule, ...props.motion }),
         image &&
             h(Image, {
-                href: { uri: image.uri },
+                href: image.source,
                 width: box.width,
                 height: box.height,
                 preserveAspectRatio:

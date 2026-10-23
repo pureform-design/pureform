@@ -18,7 +18,8 @@ import { IconSlot, iconSlot } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
 import { useEngine } from "../provider";
-import { useComponentSlots } from "../styles";
+import { useComponentSlots, withUserStyle } from "../styles";
+import type { RootStyleProps } from "../styles";
 
 const [INDICATION] = iconButtonAnatomy.indication!;
 
@@ -26,7 +27,8 @@ export interface IconButtonProps
     extends
         IconButtonVariantProps,
         IconButtonContentProps<ReactNode>,
-        InteractiveProps {
+        InteractiveProps,
+        RootStyleProps {
     /** What the button does, for assistive technology: an icon alone says nothing. */
     readonly "aria-label": string;
     readonly disabled?: boolean | undefined;
@@ -88,7 +90,7 @@ function IconButtonImpl(props: IconButtonProps): ReactNode {
                 if (toggle) setSelected(!selected);
                 props.onPress?.();
             }}
-            style={{ ...s.root, ...unselectable }}
+            style={withUserStyle({ ...s.root, ...unselectable }, props.style)}
             testID={id("root")}
         >
             <v.touchTarget.View

@@ -53,6 +53,7 @@ import {
     focusRing,
     INDICATION_ROOT,
     mergeSlots,
+    OWN_SIZE,
     stateTransition,
     sys,
     tweens,
@@ -129,6 +130,7 @@ export const createRadio = <
                         root: {
                             ...INDICATION_ROOT,
                             ...focusRing(ref, CONTROL_FOCUS),
+                            ...OWN_SIZE,
                             ...controlRoot(dense(ref("size"))),
                             transition: stateTransition,
                             borderRadius: circle,

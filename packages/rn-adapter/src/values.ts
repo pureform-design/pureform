@@ -256,8 +256,15 @@ const ARITHMETIC: Record<
     },
 };
 
+/** Where evaluation reads tokens: a theme's values, or a lookup that works one out when it's
+ *  read (`withSetTokens` evaluates the tokens a selection sets that way). */
+export type Tokens = ThemeValues | ((key: string) => Concrete | undefined);
+
+const read = (theme: Tokens, key: string): Concrete | undefined =>
+    typeof theme === "function" ? theme(key) : theme[key];
+
 /** Evaluate a value against a theme. */
-export const evaluate = (value: Value, theme: ThemeValues): Value => {
+export const evaluate = (value: Value, theme: Tokens): Value => {
     if (typeof value !== "object") return value;
     if (Array.isArray(value)) return value.map((v) => evaluate(v, theme));
     if (!isExpr(value)) {
@@ -282,13 +289,13 @@ export const evaluate = (value: Value, theme: ThemeValues): Value => {
         } as Value;
     }
     if ("$ref" in value) {
-        const found = theme[value.$ref];
+        const found = read(theme, value.$ref);
         if (found === undefined)
             throw new Error(`unknown token "${value.$ref}"`);
         return found;
     }
     if ("$dyn" in value) {
-        const found = theme[value.$dyn];
+        const found = read(theme, value.$dyn);
         if (found !== undefined) return found;
         if (value.default === undefined) {
             throw new Error(`"${value.$dyn}" has no value and no default`);
@@ -355,7 +362,7 @@ const mentions = (value: Value, what: string): boolean =>
 
 // A color, or, where it mixes with the current color, the mix with its tokens read, for
 // `colorWith` to finish where the current color is known.
-const deferred = (value: Value, theme: ThemeValues): Value => {
+const deferred = (value: Value, theme: Tokens): Value => {
     const read = tokensIn(value, theme);
     return mentions(read, CURRENT) ? read : evaluate(read, theme);
 };
@@ -379,7 +386,7 @@ export const colorWith = (value: Value, current: string): string => {
 };
 
 // A value with its tokens read and its arithmetic kept.
-const tokensIn = (value: Value, theme: ThemeValues): Value => {
+const tokensIn = (value: Value, theme: Tokens): Value => {
     if (typeof value !== "object") return value;
     if (Array.isArray(value)) return value.map((v) => tokensIn(v, theme));
     if ("$ref" in value || "$dyn" in value) return evaluate(value, theme);

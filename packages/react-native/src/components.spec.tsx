@@ -1,7 +1,7 @@
 import { act } from "@testing-library/react";
 import { useState } from "react";
 import type { ReactNode } from "react";
-import { Linking, View } from "react-native";
+import { Image, Linking, View } from "react-native";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
@@ -1542,6 +1542,140 @@ describe("media", () => {
         expect(box("auto").width).toBe(200);
         expect(box("square").height).toBe(200);
     });
+
+    const box = (id: string) => byTestId(`${id}-root`).getBoundingClientRect();
+
+    it("takes a source's own size and an array's first, without loading it", async () => {
+        const getSize = vi.spyOn(Image, "getSize");
+        await render(
+            <View style={{ width: 200 }}>
+                <Media
+                    source={{ uri: PICTURE, width: 40, height: 20 }}
+                    testId="sized"
+                />
+                <Media
+                    source={[
+                        { uri: PICTURE, width: 40, height: 10 },
+                        { uri: PICTURE, width: 80, height: 20 },
+                    ]}
+                    testId="resolutions"
+                />
+            </View>,
+        );
+        expect(box("sized").height).toBeCloseTo(100, 0);
+        expect(box("resolutions").height).toBeCloseTo(50, 0);
+        expect(getSize).not.toHaveBeenCalled();
+        getSize.mockRestore();
+    });
+
+    it("measures a remote source with its headers where React Native can", async () => {
+        const headers = { Authorization: "Bearer token" };
+        const withHeaders = vi.fn(
+            (
+                _uri: string,
+                _headers: Record<string, string>,
+                done: (width: number, height: number) => void,
+            ) => done(40, 10),
+        );
+        const statics = Image as unknown as {
+            getSizeWithHeaders?: typeof withHeaders | undefined;
+        };
+        const before = statics.getSizeWithHeaders;
+        statics.getSizeWithHeaders = withHeaders;
+        try {
+            await render(
+                <View style={{ width: 200 }}>
+                    <Media
+                        source={{ uri: PICTURE, headers, cache: "reload" }}
+                        testId="remote"
+                    />
+                </View>,
+            );
+            await until(() => expect(box("remote").height).toBeCloseTo(50, 0));
+            expect(withHeaders).toHaveBeenCalledWith(
+                PICTURE,
+                headers,
+                expect.any(Function),
+                expect.any(Function),
+            );
+        } finally {
+            statics.getSizeWithHeaders = before;
+        }
+    });
+
+    it("takes a bundled asset's size from the bundler", async () => {
+        const statics = Image as unknown as {
+            resolveAssetSource?: ((source: number) => object) | undefined;
+        };
+        const before = statics.resolveAssetSource;
+        statics.resolveAssetSource = () => ({
+            uri: PICTURE,
+            width: 40,
+            height: 40,
+        });
+        try {
+            // React Native Web's registry, which a bundler's `require()` of a picture fills.
+            const assets = (globalThis as Record<symbol, object[]>)[
+                Symbol.for("react-native-web.AssetRegistry")
+            ]!;
+            const id = assets.push({
+                httpServerLocation: "/assets",
+                name: "picture",
+                type: "png",
+                width: 40,
+                height: 40,
+                scales: [1],
+            });
+            await render(
+                <View style={{ width: 200 }}>
+                    <Media source={id} testId="asset" />
+                </View>,
+            );
+            expect(box("asset").height).toBeCloseTo(200, 0);
+        } finally {
+            statics.resolveAssetSource = before;
+        }
+    });
+
+    it("draws a shaped picture from the whole source", async () => {
+        await mount(
+            <PureformProvider registry={registry} engine={animatedSvg}>
+                <View style={{ width: 200 }}>
+                    <Media
+                        source={{ uri: PICTURE, width: 40, height: 40 }}
+                        shape="cookie4Sided"
+                        testId="shaped"
+                    />
+                </View>
+            </PureformProvider>,
+        );
+        await until(() =>
+            expect(
+                byTestId("shaped-root")
+                    .querySelector("image")
+                    ?.getAttribute("href"),
+            ).toBe(PICTURE),
+        );
+        expect(box("shaped").height).toBeCloseTo(200, 0);
+    });
+
+    it("prefers `source` over `src`, and warns in development", async () => {
+        const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+        await render(
+            <View style={{ width: 200 }}>
+                <Media
+                    src="data:,"
+                    source={{ uri: PICTURE, width: 40, height: 10 }}
+                    testId="both"
+                />
+            </View>,
+        );
+        expect(box("both").height).toBeCloseTo(50, 0);
+        expect(warn).toHaveBeenCalledWith(
+            expect.stringContaining("`source` wins"),
+        );
+        warn.mockRestore();
+    });
 });
 
 describe("standard bottom sheet", () => {
@@ -1590,31 +1724,114 @@ describe("badge in flow", () => {
 });
 
 describe("inline roots in flow", () => {
-    it("keep their own width in a column, as the web's do", async () => {
+    // Each root keeps its own size (`OWN_SIZE`: `width: "fit-content"`), so its parent's
+    // `alignItems` places it, as the web's `inline-flex` root.
+    const roots = (style?: { width?: string; alignSelf?: "stretch" }) => (
+        <>
+            <Button label="Save" style={style} testId="button" />
+            <IconButton
+                aria-label="Edit"
+                icon={<Glyph glyph="✎" />}
+                style={style}
+                testId="icon"
+            />
+            <Fab
+                icon={<Glyph glyph="+" />}
+                label="Compose"
+                style={style}
+                testId="fab"
+            />
+            <Chip label="Nearby" style={style} testId="chip" />
+            <Checkbox aria-label="Agree" style={style} testId="checkbox" />
+            <Switch aria-label="Wi-Fi" style={style} testId="switch" />
+            <Radio aria-label="On" style={style} testId="radio" />
+            <Badge style={style} testId="badge">
+                3
+            </Badge>
+        </>
+    );
+    const IDS = [
+        "button",
+        "icon",
+        "fab",
+        "chip",
+        "checkbox",
+        "switch",
+        "radio",
+        "badge",
+    ];
+    const box = (id: string) => byTestId(`${id}-root`).getBoundingClientRect();
+
+    it("keep their own width in a column, at its start, as the web's do", async () => {
+        await render(<View style={{ width: 400 }}>{roots()}</View>);
+        const column = byTestId("button-root").parentElement!;
+        const left = column.getBoundingClientRect().left;
+        for (const id of IDS) {
+            expect(box(id).width, id).toBeLessThan(200);
+            expect(box(id).left, id).toBeCloseTo(left, 0);
+        }
+    });
+
+    it("follow a centred column's alignment", async () => {
         await render(
-            <View style={{ width: 400 }}>
-                <Button label="Save" testId="button" />
-                <IconButton
-                    aria-label="Edit"
-                    icon={<Glyph glyph="✎" />}
-                    testId="icon"
-                />
-                <Fab icon={<Glyph glyph="+" />} label="Compose" testId="fab" />
-                <Chip label="Nearby" testId="chip" />
-                <Checkbox aria-label="Agree" testId="checkbox" />
-                <Switch aria-label="Wi-Fi" testId="switch" />
+            <View style={{ width: 400, alignItems: "center" }} testID="column">
+                {roots()}
             </View>,
         );
-        for (const id of [
-            "button",
-            "icon",
-            "fab",
-            "chip",
-            "checkbox",
-            "switch",
-        ]) {
-            const box = byTestId(`${id}-root`).getBoundingClientRect();
-            expect(box.width, id).toBeLessThan(200);
+        const column = byTestId("column").getBoundingClientRect();
+        for (const id of IDS) {
+            const own = box(id);
+            expect(own.width, id).toBeLessThan(200);
+            expect(own.left - column.left, id).toBeCloseTo(
+                column.right - own.right,
+                0,
+            );
+        }
+    });
+
+    it("follow a centred row's alignment", async () => {
+        await render(
+            <View
+                style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    height: 120,
+                }}
+                testID="row"
+            >
+                {roots()}
+            </View>,
+        );
+        const row = byTestId("row").getBoundingClientRect();
+        for (const id of IDS) {
+            const own = box(id);
+            expect(own.top - row.top, id).toBeCloseTo(
+                row.bottom - own.bottom,
+                0,
+            );
+        }
+    });
+
+    it("take a user's width, and keep their own with alignSelf stretch alone", async () => {
+        await render(
+            <View style={{ width: 400 }}>
+                <View testID="full">{roots({ width: "100%" })}</View>
+                <View testID="stretch">{roots({ alignSelf: "stretch" })}</View>
+            </View>,
+        );
+        const full = byTestId("full");
+        for (const id of IDS) {
+            const own = full
+                .querySelector(`[data-testid="${id}-root"]`)!
+                .getBoundingClientRect();
+            expect(own.width, id).toBeCloseTo(400, 0);
+        }
+        const stretch = byTestId("stretch");
+        for (const id of IDS) {
+            const own = stretch
+                .querySelector(`[data-testid="${id}-root"]`)!
+                .getBoundingClientRect();
+            expect(own.width, id).toBeLessThan(200);
         }
     });
 });
