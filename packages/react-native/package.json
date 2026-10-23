@@ -460,6 +460,13 @@
                 "default": "./dist/file-upload.mjs"
             }
         },
+        "./native-select": {
+            "types": "./dist/native-select/index.d.ts",
+            "import": {
+                "development": "./src/native-select/index.ts",
+                "default": "./dist/native-select.mjs"
+            }
+        },
         "./rating": {
             "types": "./dist/rating/index.d.ts",
             "import": {

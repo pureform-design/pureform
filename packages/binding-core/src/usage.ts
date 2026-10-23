@@ -362,6 +362,8 @@ export const COMPONENT_USAGE = {
         entries: { codeField: same("variant", "color", "density") },
     },
     rating: { entries: { rating: same("color", "size") } },
+    // One look: no variant groups.
+    "native-select": { entries: { nativeSelect: {}, ripple: {} } },
     text: { entries: { text: { style: "textStyle" } } },
     // The icons, prefix and suffix follow their content.
     "text-area": {

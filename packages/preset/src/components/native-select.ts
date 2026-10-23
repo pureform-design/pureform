@@ -47,7 +47,6 @@ import {
 } from "@pureform/theme";
 
 import { INDICATION_TOKENS } from "../state-layer";
-
 import {
     componentTokens,
     DENSITY_TOKEN,

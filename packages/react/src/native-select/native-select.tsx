@@ -1,0 +1,281 @@
+// The native select: Root, a wrapper span that holds the platform's own `<select>` (Select) and its
+// chevron (Icon); Group (`<optgroup>`) and Option (`<option>`) inside it; and the ready-made
+// NativeSelect over them, which takes its options as data. It has no machine: the browser's
+// `<select>` takes the value, the form, the keyboard and the list. Root owns the value (controlled
+// or not), the form reset and the fieldset rule, and the interaction source the state layer reads.
+
+import { nativeSelectAnatomy } from "@pureform/anatomy";
+import {
+    NATIVE_SELECT_ATTRIBUTE_PROPS,
+    NATIVE_SELECT_CONTENT_PROPS,
+    NATIVE_SELECT_ROOT_PROPS,
+    nativeSelectGroups,
+    nativeSelectProps,
+    nativeSelectSelection,
+} from "@pureform/binding-core";
+import type {
+    NativeSelectContentProps,
+    NativeSelectItem,
+    NativeSelectRootOwnProps,
+} from "@pureform/binding-core";
+import {
+    type ChangeEvent,
+    type ElementType,
+    type ReactNode,
+    type SelectHTMLAttributes,
+    useId,
+    useRef,
+    useState,
+} from "react";
+
+import { useControllable } from "../controllable";
+import { useFieldsetDisabled, useFormReset } from "../form";
+import { DropDownArrow } from "../glyphs";
+import {
+    useInteractionHandlers,
+    useOwnInteractionSource,
+} from "../interaction";
+import { createPartContext } from "../part-context";
+import { useComponent, useSlotProps } from "../parts";
+import type { ComponentScope, SlotKeyedProps } from "../parts";
+import { combinePartProps, omitProps } from "../props";
+import type { PartProps } from "../props";
+
+type Anatomy = typeof nativeSelectAnatomy;
+
+/** What Root shares with its parts. */
+interface NativeSelectContextValue {
+    readonly scope: ComponentScope<Anatomy>;
+    readonly setSelect: (select: HTMLSelectElement | null) => void;
+    /** The `<select>`'s own props: its value, id, name, validity and the handlers that emit its
+     *  interactions. */
+    readonly selectProps: Readonly<Record<string, unknown>>;
+}
+
+const context = createPartContext<NativeSelectContextValue>("NativeSelect");
+
+/** Root's props: the instance tokens, the value (`value`, `defaultValue`, `onValueChange`),
+ *  `disabled`, `invalid`, `required`, `name`, `form`, `id` (the select's), `testId` and `unstyled`
+ *  for every part, `as`, and the element's own props. */
+export interface NativeSelectRootProps
+    extends
+        Omit<PartProps, keyof NativeSelectRootOwnProps>,
+        NativeSelectRootOwnProps {
+    /** Another element or component to render instead of `<span>`. */
+    readonly as?: ElementType | undefined;
+}
+
+/** A part's props: the element's own, and the part's `unstyled`. */
+export interface NativeSelectPartProps extends PartProps {
+    readonly unstyled?: boolean | undefined;
+}
+
+/** The `<select>`'s props: its attributes (`aria-label`, `autoComplete`, …), and `unstyled`. */
+export interface NativeSelectSelectProps extends Omit<
+    SelectHTMLAttributes<HTMLSelectElement>,
+    "value" | "defaultValue" | "onChange" | "multiple" | "ref"
+> {
+    readonly ref?: PartProps["ref"];
+    readonly unstyled?: boolean | undefined;
+}
+
+/** An `<optgroup>`'s props. */
+export interface NativeSelectGroupProps extends NativeSelectPartProps {
+    readonly label: string;
+    readonly disabled?: boolean | undefined;
+}
+
+/** An `<option>`'s props. */
+export interface NativeSelectOptionProps extends NativeSelectPartProps {
+    readonly value?: string | undefined;
+    readonly disabled?: boolean | undefined;
+}
+
+const firstValue = (select: HTMLSelectElement) =>
+    select.options.length > 0 ? select.options[0]!.value : "";
+
+/** The select's root: a `<span>` around the `<select>` and the chevron. It draws the state layer. */
+function Root(props: NativeSelectRootProps): ReactNode {
+    const id = useId();
+    const value = useControllable("NativeSelect", "value", props);
+    const [select, setSelect] = useState<HTMLSelectElement | null>(null);
+    const fieldsetDisabled = useFieldsetDisabled(select);
+    const source = useOwnInteractionSource(props.interactionSource);
+    const handlers = useInteractionHandlers(
+        source,
+        !!props.disabled || fieldsetDisabled,
+    );
+    const shown = useRef(value.value ?? value.defaultValue);
+    const report = (next: string) => {
+        shown.current = next;
+        value.machineProps.onValueChange?.({ value: next });
+    };
+    useFormReset(select, {
+        resetsTo: value.resetsTo,
+        onBeforeReset: value.beforeReset,
+        onReset: () => {
+            if (!select) return;
+            // The browser has put an uncontrolled select back; a controlled one keeps its value
+            // until the owner takes the default we report.
+            const next = value.controlled
+                ? (value.defaultValue ?? firstValue(select))
+                : select.value;
+            if (next !== shown.current) value.reset(() => report(next));
+        },
+    });
+    const scope = useComponent(nativeSelectAnatomy, {
+        selection: nativeSelectSelection(props),
+        testId: props.testId,
+        unstyled: props.unstyled,
+        indication: props.indication,
+        interactionSource: source,
+    });
+    const { as, ...rest } = omitProps(props, NATIVE_SELECT_ROOT_PROPS);
+    const selectProps = combinePartProps([
+        nativeSelectProps({ ...props, id: props.id ?? id }, fieldsetDisabled),
+        value.controlled
+            ? { value: value.value }
+            : { defaultValue: value.defaultValue },
+        {
+            onChange: (event: ChangeEvent<HTMLSelectElement>) =>
+                report(event.currentTarget.value),
+        },
+        handlers,
+    ]);
+    return (
+        <context.Provider value={{ scope, setSelect, selectProps }}>
+            {scope.render("root", {
+                element: "span",
+                as,
+                props: rest,
+            })}
+        </context.Provider>
+    );
+}
+
+/** The native `<select>`, laid over the whole box: it takes every interaction, submits with the
+ *  form, and is what assistive technology reads, so name it (`aria-label`, or a `<label for>`
+ *  and Root's `id`). */
+function Select({ unstyled, ...props }: NativeSelectSelectProps): ReactNode {
+    const { scope, setSelect, selectProps } = context.use("Select");
+    return scope.render("select", {
+        element: "select",
+        machine: selectProps,
+        ref: setSelect as (element: HTMLElement | null) => void,
+        unstyled,
+        props,
+    });
+}
+
+/** The chevron, hidden from assistive technology: the platform's own arrow is turned off. */
+function Icon({ unstyled, ...props }: NativeSelectPartProps): ReactNode {
+    const { scope } = context.use("Icon");
+    return scope.render("icon", {
+        element: "span",
+        machine: { "aria-hidden": "true" },
+        unstyled,
+        props,
+    });
+}
+
+/** A group of options, an `<optgroup>` with its `label`. */
+function Group({ unstyled, ...props }: NativeSelectGroupProps): ReactNode {
+    const { scope } = context.use("Group");
+    return scope.render("group", { element: "optgroup", unstyled, props });
+}
+
+/** An option: an `<option>` with its `value`. */
+function Option({ unstyled, ...props }: NativeSelectOptionProps): ReactNode {
+    const { scope } = context.use("Option");
+    return scope.render("option", { element: "option", unstyled, props });
+}
+
+/** The attributes of the ready-made component that go on the `<select>`, in React's spelling. */
+const REACT_SELECT_PROPS = ["autoComplete", "autoFocus", "size"] as const;
+
+/** The ready-made native select's props: Root's, with `className`, `style`, and `slotProps` keyed
+ *  by part, the options as `items`, a `placeholder` and the `icon`, and the select's attributes
+ *  (`aria-label`, `autoComplete`, …), which go on it. Option elements as `children` come after the
+ *  items. */
+export interface NativeSelectProps
+    extends
+        Omit<NativeSelectRootProps, keyof SlotKeyedProps<Anatomy>>,
+        SlotKeyedProps<Anatomy>,
+        NativeSelectContentProps<ReactNode>,
+        Pick<
+            SelectHTMLAttributes<HTMLSelectElement>,
+            | (typeof NATIVE_SELECT_ATTRIBUTE_PROPS)[number]
+            | (typeof REACT_SELECT_PROPS)[number]
+        > {}
+
+const SELECT_PROPS = [...NATIVE_SELECT_ATTRIBUTE_PROPS, ...REACT_SELECT_PROPS];
+
+const READY_MADE_PROPS = [
+    "className",
+    "style",
+    "slotProps",
+    "children",
+    ...NATIVE_SELECT_CONTENT_PROPS,
+    ...SELECT_PROPS,
+] as const;
+
+const options = (
+    items: readonly NativeSelectItem[],
+    slot: (part: "group" | "option") => object,
+): ReactNode =>
+    nativeSelectGroups(items).map((run, index) => {
+        const entries = run.items.map((item) => (
+            <Option
+                key={item.value}
+                value={item.value}
+                disabled={item.disabled}
+                {...slot("option")}
+            >
+                {item.label}
+            </Option>
+        ));
+        return run.group === undefined ? (
+            entries
+        ) : (
+            <Group key={`group-${index}`} label={run.group} {...slot("group")}>
+                {entries}
+            </Group>
+        );
+    });
+
+/** The ready-made native select: Root around the `<select>` with its options, and the chevron. */
+function ReadyMade(props: NativeSelectProps): ReactNode {
+    const slot = useSlotProps(props);
+    const rootProps = omitProps(
+        props as NativeSelectProps & Record<string, unknown>,
+        READY_MADE_PROPS as never,
+    ) as NativeSelectRootProps;
+    const selectAttributes: Record<string, unknown> = {};
+    for (const key of SELECT_PROPS)
+        selectAttributes[key] = (props as Record<string, unknown>)[key];
+    return (
+        <Root {...rootProps} {...(slot("root") as object)}>
+            <Select {...selectAttributes} {...slot("select")}>
+                {props.placeholder !== undefined ? (
+                    <Option value="" {...slot("option")}>
+                        {props.placeholder}
+                    </Option>
+                ) : null}
+                {options(props.items ?? [], slot)}
+                {props.children}
+            </Select>
+            <Icon {...slot("icon")}>{props.icon ?? <DropDownArrow />}</Icon>
+        </Root>
+    );
+}
+
+/** A styled native `<select>`: `<NativeSelect name="size" items={sizes} aria-label="Size" />`.
+ *  Or compose `NativeSelect.Root` around `NativeSelect.Select` (with `NativeSelect.Group` and
+ *  `NativeSelect.Option`) and `NativeSelect.Icon`. */
+export const NativeSelect = Object.assign(ReadyMade, {
+    Root,
+    Select,
+    Icon,
+    Group,
+    Option,
+});

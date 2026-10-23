@@ -74,6 +74,7 @@ export default createConfig({
                     "supporting-text": "src/supporting-text/index.ts",
                     switch: "src/switch/index.ts",
                     tabs: "src/tabs/index.ts",
+                    "native-select": "src/native-select/index.ts",
                     rating: "src/rating/index.ts",
                     "tags-input": "src/tags-input/index.ts",
                     "number-field": "src/number-field/index.ts",

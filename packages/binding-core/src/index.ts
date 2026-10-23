@@ -873,6 +873,22 @@ export type {
     CopyButtonVariantProps,
 } from "./components/copy-button";
 export {
+    NATIVE_SELECT_ATTRIBUTE_PROPS,
+    NATIVE_SELECT_CONTENT_PROPS,
+    NATIVE_SELECT_ROOT_PROPS,
+    nativeSelectGroups,
+    nativeSelectProps,
+    nativeSelectSelection,
+} from "./components/native-select";
+export type {
+    NativeSelectBehaviorProps,
+    NativeSelectContentProps,
+    NativeSelectItem,
+    NativeSelectPart,
+    NativeSelectRootOwnProps,
+    NativeSelectVariantProps,
+} from "./components/native-select";
+export {
     RATING_CONTENT_PROPS,
     RATING_ROOT_PROPS,
     ratingMachineProps,
