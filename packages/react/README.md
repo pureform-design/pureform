@@ -419,7 +419,7 @@ import { RichTooltip } from "@pureform/react/rich-tooltip";
   past where it rested (see below). With the default `partiallyExpandable`, a sheet taller than half the screen
   opens partly (its top at half the screen, Compose's `PartiallyExpanded`; `partiallyExpandable={false}`
   opens it fully, as Compose's `skipPartiallyExpanded`), and a drag or a press on the handle moves it
-  between partly and fully open (`expanded` controlled, `defaultExpanded`, `onExpandedChange`); a
+  between partly and fully open (`expanded` controlled, `defaultExpanded`, `onExpandedChange`, which hears only those drags and presses, not an opening at a rest); a
   drag down from partly open closes it. Where a drag goes is Compose's rule: 56px past where it
   rested, or a flick at 125dp/s. A partly open sheet is placed again when it or the window resizes,
   and the body is in the tab order only while it overflows. A settle after a drag starts at the release's speed. Without

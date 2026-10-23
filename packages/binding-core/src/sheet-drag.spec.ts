@@ -244,7 +244,8 @@ describe("a sheet that rests partly open", () => {
             closeAsker(),
             {
                 partial: () => true,
-                onRest: (rest, movable) => rests.push(`${rest} ${movable}`),
+                onRest: (rest, movable, byUser) =>
+                    rests.push(`${rest} ${movable}${byUser ? " by user" : ""}`),
             },
         );
         sheet.setAttribute("data-state", "open");
@@ -269,7 +270,7 @@ describe("a sheet that rests partly open", () => {
         expect(rests).toEqual(["partial true"]);
         drag(handle, -partial);
         expect(sheet.style.translate).toBe("");
-        expect(rests).toEqual(["partial true", "expanded true"]);
+        expect(rests).toEqual(["partial true", "expanded true by user"]);
         drag(handle, partial * 0.8);
         expect(sheet.style.translate).toBe(`0px ${partial}px`);
         expect(dismiss).not.toHaveBeenCalled();

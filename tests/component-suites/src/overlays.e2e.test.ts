@@ -452,3 +452,56 @@ describe("FabMenu", () => {
         );
     });
 });
+
+describe("Overlays inside a dialog", () => {
+    const find = (name: string) =>
+        COMPONENTS.find((component) => component.component === name)!;
+
+    // The host overlay opened, then the nested one mounted into its body, as an app rendering it
+    // in place there would.
+    const nest = async (
+        hostName: string,
+        body: string,
+        hostProps: SceneProps,
+        nestedName: string,
+    ) => {
+        const outer = hostIn(`<div><div data-host></div></div>`);
+        mountCase(find(hostName), hostProps, { host: outer });
+        await settlePlaced();
+        const inner = document.createElement("div");
+        inner.setAttribute("data-host", "");
+        outer.querySelector<HTMLElement>(`[data-testid="${body}"]`)!.append(
+            inner,
+        );
+        const nested = find(nestedName);
+        mountCase(nested, { open: true }, { host: inner });
+        await settlePlaced();
+        return { outer, surface: nested.overlay!.surface(inner) };
+    };
+
+    const drawnWhole = (surface: HTMLElement) => {
+        surface.style.pointerEvents = "auto";
+        const box = surface.getBoundingClientRect();
+        expect(box.width).toBeGreaterThan(0);
+        for (const [x, y] of [
+            [box.left + box.width / 2, box.top + box.height / 2],
+            [box.left + 2, box.top + 2],
+            [box.right - 2, box.bottom - 2],
+        ] as const)
+            expect(surface.contains(document.elementFromPoint(x, y))).toBe(
+                true,
+            );
+    };
+
+    it.each([
+        ["Dialog", compositeTestIds.dialog.body, { defaultOpen: true, body: "Body" }],
+        ["SideSheet", compositeTestIds.sideSheet.body, { defaultOpen: true, body: "Body" }],
+        ["BottomSheet", compositeTestIds.bottomSheet.body, { defaultOpen: true, body: "Body" }],
+    ] as const)("draws a popover and a menu opened inside a %s over it, whole", async (hostName, body, props) => {
+        for (const nestedName of ["Popover", "Menu"]) {
+            const { outer, surface } = await nest(hostName, body, props, nestedName);
+            drawnWhole(surface);
+            outer.remove();
+        }
+    });
+});

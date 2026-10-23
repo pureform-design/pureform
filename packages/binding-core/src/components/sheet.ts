@@ -279,7 +279,8 @@ export interface BottomSheetRestProps {
      *  @default false */
     readonly defaultExpanded?: boolean | undefined;
     /** Called when it comes to rest partly open (`expanded: false`) or fully open (`true`) from
-     *  a drag or a press on the drag handle. */
+     *  a drag or a press on the drag handle; not when it opens at a rest, nor for a move
+     *  `expanded` itself causes. */
     readonly onExpandedChange?:
         | ((details: ChangeDetails<"expanded", boolean>) => void)
         | undefined;

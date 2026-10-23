@@ -137,12 +137,14 @@ describe("BottomSheet, ready-made", () => {
         const handle = byTestId(ids.dragHandle);
         await until(() => expect(content.style.translate).not.toBe(""));
         expect(handle.getAttribute("aria-label")).toBe("Expand sheet");
-        expect(onExpandedChange).toHaveBeenLastCalledWith({ expanded: false });
+        // Opening partly open isn't the user's move: nothing reports it.
+        expect(onExpandedChange).not.toHaveBeenCalled();
         await interact(() => userEvent.click(handle));
         await frames();
         expect(content.style.translate).toBe("");
         expect(handle.getAttribute("aria-label")).toBe("Collapse sheet");
         expect(onExpandedChange).toHaveBeenLastCalledWith({ expanded: true });
+        expect(onExpandedChange).toHaveBeenCalledTimes(1);
         expect(onOpenChange).not.toHaveBeenCalled();
     });
 
