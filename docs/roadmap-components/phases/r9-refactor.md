@@ -31,6 +31,15 @@ One pass over everything since r8: m3 (Material transitions), c8 (Material gaps 
   an uncontrolled sheet reopens at a different rest.
 - **Splitter transitions:** document that the snap's spring overrides a pane's own inline
   `transition` while it runs.
+- **Overlays inside dialogs:** a popover (or menu) opened inside a dialog layers beneath it,
+  since the bindings render overlays in place; portal them, or give nested overlays a layer
+  above their host (c9).
+- **List item trailing controls:** the list item's `trailing` part is `aria-hidden`; fix it in
+  the list item for a trailing control, and drop the file upload's `slotProps` override (c9b).
+- **Machines root export:** find why exporting the color picker from `@pureform/machines`'s root
+  breaks React Native's splitter drag spec, then export it there (c9d).
+- **c9's declined refactors:** the secure field's visibility toggle against `roundIconButton`, a
+  `holdRepeat` once a second user exists, the code field's per-cell field styles (`context/c9.md`).
 
 ## Done when
 
