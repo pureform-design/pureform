@@ -4,6 +4,7 @@
 import type { ArgTypes, Decorator, StoryObj } from "@storybook/html-vite";
 import { fn } from "storybook/test";
 
+import { summarizeEvent } from "./event-summary";
 import { extendWith, type StoryHooks } from "./hooks";
 import { type Impls, multiRender } from "./multi-render";
 import { caseFor, defaultProp, keyPlay, statePlay } from "./plays";
@@ -39,8 +40,8 @@ export const composeStories = (input: ComposeInput) => {
     // channel, whose `view` is `window`, so serializing it reads every global (Storybook's
     // deprecated `__STORYBOOK_STORY_STORE__` among them; from a React synthetic event it also
     // walks the fiber tree, ~200ms a click, which made a split button's menu open late). The spy
-    // gets the event's type instead.
-    const clicks = fn();
+    // gets a plain summary of the event instead (`summarizeEvent`).
+    const clicks = fn().mockName("onClick");
     const component = Object.assign(
         {},
         c.props,
@@ -48,12 +49,9 @@ export const composeStories = (input: ComposeInput) => {
             ? {
                   // A link's click would navigate the story's frame away (a list's
                   // `href="#inbox"`), so the handler keeps it in place.
-                  onClick: (event?: {
-                      type?: string;
-                      preventDefault?: () => void;
-                  }) => {
+                  onClick: (event?: { preventDefault?: () => void }) => {
                       event?.preventDefault?.();
-                      clicks(event?.type);
+                      clicks(summarizeEvent(event));
                   },
               }
             : {},

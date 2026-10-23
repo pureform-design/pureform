@@ -64,6 +64,7 @@ export default defineStories({
         Media: { hooks: ["./src/stages/media.ts"] },
         Switch: { hooks: ["./src/checks/switch.ts"] },
         Badge: { hooks: ["./src/checks/badge.ts"] },
+        Slider: { hooks: ["./src/checks/slider.ts"] },
         // Their cases carry data (`toasts`, `tiles`) that each renderer's scenes turn into
         // children; the plays check it is drawn.
         Toast: { hooks: ["./src/stages/toast.ts"] },
@@ -95,9 +96,28 @@ export default defineStories({
             },
         },
         Carousel: {
-            // The pinned copies' state play reads page 2 for 1: the items are sized from the
-            // row's width once mounted (the case's `measured`), which the Storybook canvas gives
-            // differently from the component suites' page.
+            // Its items are sized from the row's width once mounted (the case's `measured`): a
+            // frame as wide as the component suites' page (their 1280px viewport, the reset's
+            // margin-free body), with no canvas padding, and the story tests' viewport at that
+            // width too (the Vitest addon's default is 1200px).
+            parameters: {
+                layout: "fullscreen",
+                pureform: { width: 1280 },
+                viewport: {
+                    options: {
+                        suites: {
+                            name: "Component suites",
+                            styles: { width: "1280px", height: "900px" },
+                        },
+                    },
+                    defaultViewport: "suites",
+                },
+            },
+            // The pinned copies' state play still reads page 2 for 1 in Solid (React passes): once
+            // measured, Solid's multi-browse items differ in size (React's stay equal), and the
+            // page Solid's carousel picks for the second item is 2. A binding bug, not the
+            // canvas's; the component suites act before the items are measured, so they miss it
+            // (see docs/roadmap-components/context/fix-storybook-4.md).
             stories: {
                 Light: { tags: ["!test"] },
                 Dark: { tags: ["!test"] },

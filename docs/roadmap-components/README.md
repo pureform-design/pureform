@@ -56,6 +56,8 @@ flowchart LR
     c8 --> c9[c9 components beyond M3]
     c9 --> c10[c10 plain form primitives]
     c10 --> r9[r9 refactor]
+    r9 --> fs5[fix-storybook-5]
+    fs5 --> r10[r10 refactor]
 ```
 
 A phase depends on the one before it unless its file says it needs only a specific earlier
@@ -92,6 +94,7 @@ contexts exist.
 | [x]  | [c9 Components beyond M3](phases/c9-beyond-m3.md) ([a](context/c9a.md), [b](context/c9b.md), [c](context/c9c.md), [d](context/c9d.md), [e](context/c9e.md), [c9](context/c9.md))                                   | c9a NumberField and CodeField, c9b FileUpload, c9c Popover, c9d ColorPicker, c9e CopyButton and Rating                                | Useful components M3 doesn't specify                               |                  |
 | [x]  | [c10 Plain form primitives](phases/c10-plain-form.md) ([a](context/c10a.md), [b](context/c10b.md), [c10](context/c10.md))                                                                                          | c10a Field, Label, Input, Textarea, Description, ErrorText; c10b NativeSelect                                                         | Themed form pieces without Material's field design                 |                  |
 | [x]  | [r9 Refactor after m3 to c10](phases/r9-refactor.md) ([r9](context/r9.md))                                                                                                                                         | r9a, r9b, r9c, r9d                                                                                                                    | Duplication pass over m3, c8, c9 and c10                           |                  |
+| [ ]  | [r10 Refactor after r9 and fix-storybook-5](phases/r10-refactor.md) | | Duplication pass over r9 and fix-storybook-5 | |
 
 ## Rules that apply to every phase
 

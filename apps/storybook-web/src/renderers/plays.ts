@@ -10,6 +10,8 @@ import { expect, waitFor } from "storybook/test";
 
 import { userEvent } from "#user-event";
 
+import { reachesWindow } from "./reaches-window";
+
 const CASES = createCases(userEvent);
 
 /** The case for a component, by its export name (`Switch`). */
@@ -60,6 +62,13 @@ export const keyPlay =
         const clicks = args["onClick"] === undefined ? undefined : onClick;
         if (key.does === "click") {
             await waitFor(() => expect(clicks).toHaveBeenCalledOnce());
+            // The Actions panel logs the spy's calls: a plain summary, nothing reaching window.
+            await expect(clicks).toHaveBeenCalledWith(
+                expect.objectContaining({ type: "click" }),
+            );
+            await expect(
+                reachesWindow((onClick as { mock: { calls: unknown } }).mock.calls),
+            ).toBe(false);
         } else if (key.does === "change") {
             const to = key.to ?? c.state!.to;
             await waitFor(() => expect(c.state!.read(host)).toEqual(to));
