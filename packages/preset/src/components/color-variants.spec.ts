@@ -57,7 +57,12 @@ describe.each([
 
     it("leaves primary to the tokens and reads other groups' roles", () => {
         const variants = spec.recipe.variants?.color ?? {};
-        expect(variants.primary).toEqual({});
+        // No styles in any slot (`{}` or `{ root: {} }` alike).
+        expect(
+            Object.values(variants.primary ?? {}).flatMap((slot) =>
+                Object.keys(slot as object),
+            ),
+        ).toEqual([]);
         const brand = JSON.stringify([
             variants.brand,
             spec.recipe.compoundVariants?.filter(

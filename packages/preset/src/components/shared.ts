@@ -557,6 +557,20 @@ export const iconBox = (
     },
 });
 
+/** A button inside a component with no chrome of its own: no border or padding, fully round,
+ *  a pointer, and the focus ring reading `token`. `roundIconButton` adds the icon box and state
+ *  layer; the secure field's visibility toggle draws only this. */
+export const bareRoundButton = (token: IndicationRef): StyleMap => ({
+    ...focusRing(token),
+    cursor: pointer,
+    borderWidth: px(0),
+    paddingInlineStart: px(0),
+    paddingInlineEnd: px(0),
+    paddingBlockStart: px(0),
+    paddingBlockEnd: px(0),
+    borderRadius: radius("full"),
+});
+
 /** A round button as large as its icon box: no border or padding, the focus ring, and a state
  *  layer of `content` over nothing. The number field's steppers and the input chip's remove
  *  button; a part adds its own color, margins and disabled rule. */
@@ -572,15 +586,8 @@ export const roundIconButton = (
     },
 ): StyleMap => ({
     ...iconBox(size, { fill }),
-    ...focusRing(token),
+    ...bareRoundButton(token),
     position: relative,
-    cursor: pointer,
-    borderWidth: px(0),
-    paddingInlineStart: px(0),
-    paddingInlineEnd: px(0),
-    paddingBlockStart: px(0),
-    paddingBlockEnd: px(0),
-    borderRadius: radius("full"),
     backgroundColor: stateLayer(token, { base: transparent, content }),
 });
 
