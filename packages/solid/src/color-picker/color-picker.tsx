@@ -350,7 +350,16 @@ function HexField(props: ColorPickerHexFieldProps): JSX.Element {
             invalid={draft() !== null && colorPickerHex(draft()!) === undefined}
             {...props}
             value={draft() ?? colorPickerHexText(hex())}
-            onValueChange={({ value }: { value: string }) => setDraft(value)}
+            // A form reset is the picker's: the field follows its value.
+            onValueChange={({
+                value,
+                reason,
+            }: {
+                value: string;
+                reason?: string;
+            }) => {
+                if (reason !== "reset") setDraft(value);
+            }}
             onFocusOut={commit}
             onKeyDown={(event: KeyboardEvent) => {
                 if (event.key === "Enter") commit();

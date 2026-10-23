@@ -63,7 +63,7 @@ describe.each(stateful)("$component, state", (component) => {
     const state = component.state!;
     const names = stateNames(state.prop);
 
-    it.each([
+    it.runIf(state.serverRendered !== false).each([
         ["default", names.defaultValue],
         ["controlled", names.value],
     ])("renders the %s value on the server", async (_, prop) => {

@@ -17,6 +17,9 @@ export interface StateCase<T = unknown> {
     readonly to: T;
     /** Props every scene of the state gets besides the three. */
     readonly props?: SceneProps | undefined;
+    /** `false` for a value the server can't be given (the file upload's `File`s): the server
+     *  rendering suite renders it on the client alone. */
+    readonly serverRendered?: false | undefined;
     /** One user action that changes the state: a click. `force` skips the checks that the
      *  element can take it (for a disabled one). */
     act(host: HTMLElement, options?: ActOptions): Promise<void>;

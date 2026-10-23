@@ -316,7 +316,10 @@ function HexField(props: ColorPickerHexFieldProps): ReactNode {
             invalid={draft !== null && colorPickerHex(draft) === undefined}
             {...props}
             value={draft ?? colorPickerHexText(hex)}
-            onValueChange={({ value }) => setDraft(value)}
+            // A form reset is the picker's: the field follows its value.
+            onValueChange={({ value, reason }) => {
+                if (reason !== "reset") setDraft(value);
+            }}
             onBlur={commit}
             onKeyDown={(event: KeyboardEvent) => {
                 if (event.key === "Enter") commit();

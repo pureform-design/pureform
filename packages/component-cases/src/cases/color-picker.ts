@@ -19,8 +19,9 @@ const thumb = (host: HTMLElement) => byTestId(host, ids.areaThumb);
 const read = (host: HTMLElement): string =>
     `#${byTestId<HTMLInputElement>(host, testIds.textField.input).value.toLowerCase()}`;
 
+/** The hidden input the value submits with: the root's own input. */
 const hidden = (host: HTMLElement) =>
-    host.querySelector<HTMLInputElement>('input[name="seed"]')!;
+    byTestId(host, ids.root).querySelector<HTMLInputElement>(":scope > input")!;
 
 const SWATCHES = ["#6750a4", "#006a6a", "#8b5000", "#bf4040"];
 

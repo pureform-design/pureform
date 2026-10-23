@@ -60,6 +60,8 @@ export const fileUpload: ComponentCase = {
         prop: "value",
         from: [],
         to: [notes],
+        // A `File` can't be sent to the server.
+        serverRendered: false,
         // Choosing a file in the dialog: the hidden input's files change.
         act: async (host) => {
             const input = hiddenInput(host);
