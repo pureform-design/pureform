@@ -37,7 +37,7 @@ import type {
 } from "@pureform/binding-core";
 import type { Selected, Style } from "@pureform/rn-adapter/factory";
 import { useTokens } from "@pureform/rn-adapter/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { Image, Text as NativeText, View } from "react-native";
 import type { ImageStyle, StyleProp, TextStyle, ViewStyle } from "react-native";
@@ -304,8 +304,10 @@ export function Scrim(props: ScrimProps): ReactNode {
 }
 
 export interface MediaProps extends MediaVariantProps {
-    /** The picture. */
-    readonly source: { readonly uri: string };
+    /** The picture's address, as the web's `src` and the avatar's. */
+    readonly src?: string | undefined;
+    /** The picture, as React Native's `Image` takes it; `src` wins when both are given. */
+    readonly source?: { readonly uri: string } | undefined;
     /** What it shows, for assistive technology; empty when decorative. */
     readonly alt?: string | undefined;
     readonly testId?: TestIdOverride<Root> | undefined;
@@ -319,6 +321,28 @@ function MediaImpl(props: MediaProps): ReactNode {
     const drawing = rootDrawing(selected);
     const testID = testIdOf(mediaAnatomy, "root", props.testId);
     const Drawing = engine.Drawing;
+    const uri = props.src ?? props.source?.uri ?? "";
+    // At `auto`, the web's picture takes its own proportions at the container's width. A React
+    // Native image has none until it's measured, so it would draw with no height.
+    const auto = style.aspectRatio === undefined;
+    const [ratio, setRatio] = useState<{ uri: string; ratio: number }>();
+    useEffect(() => {
+        if (!auto || uri === "") return undefined;
+        let current = true;
+        Image.getSize(
+            uri,
+            (width, height) =>
+                current &&
+                width > 0 &&
+                height > 0 &&
+                setRatio({ uri, ratio: width / height }),
+            () => {},
+        );
+        return () => {
+            current = false;
+        };
+    }, [auto, uri]);
+    if (auto && ratio?.uri === uri) style.aspectRatio = ratio.ratio;
     // A shaped picture is drawn clipped to its shape; React Native's Image can't clip to one.
     if (drawing && Drawing) {
         return (
@@ -330,14 +354,14 @@ function MediaImpl(props: MediaProps): ReactNode {
             >
                 <Drawing
                     drawing={drawing}
-                    image={{ uri: props.source.uri, fit }}
+                    image={{ uri, fit }}
                 />
             </View>
         );
     }
     return (
         <Image
-            source={{ uri: props.source.uri }}
+            source={{ uri }}
             accessibilityLabel={props.alt ?? ""}
             resizeMode={fit}
             style={style as ImageStyle}
@@ -346,5 +370,5 @@ function MediaImpl(props: MediaProps): ReactNode {
     );
 }
 
-/** A picture in Material's aspects and shapes: `<Media source={{ uri }} aspect="square" />`. */
+/** A picture in Material's aspects and shapes: `<Media src={uri} aspect="square" />`. */
 export const Media = withEngine(MediaImpl, "Media");

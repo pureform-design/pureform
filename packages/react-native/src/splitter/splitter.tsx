@@ -319,7 +319,13 @@ function SplitterImpl(props: SplitterProps): ReactNode {
     };
     const id = (part: Part) => testIdOf(splitterAnatomy, part, props.testId);
     return (
-        <v.root.View style={s.root} onLayout={onLayout} testID={id("root")}>
+        <v.root.View
+            // It fills its parent, as the web's root does (Zag sizes it 100% both ways): a
+            // stacked splitter has no height of its own to divide.
+            style={{ flexGrow: 1, ...s.root }}
+            onLayout={onLayout}
+            testID={id("root")}
+        >
             {props.panes.map((pane, index) => (
                 <Fragment key={pane.id}>
                     <Animated.View
