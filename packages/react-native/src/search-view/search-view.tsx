@@ -32,7 +32,7 @@ import type { ReactNode } from "react";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 
 import { IconButton } from "../icon-button/icon-button";
-import { Menu } from "../menu/menu";
+import { MenuItems } from "../menu/menu";
 import { ModalWindow, modalViewProps, useModalOverlay } from "../modal";
 import { testIdOf, useControllable, useStableCallback } from "../parts";
 import { useEngine } from "../provider";
@@ -280,7 +280,7 @@ export function SearchView(props: SearchViewProps): ReactNode {
                                 <ScrollView keyboardShouldPersistTaps="handled">
                                     {props.children ??
                                         (matches.length > 0 ? (
-                                            <Menu
+                                            <MenuItems
                                                 {...searchViewMenuSelection()}
                                                 items={matches}
                                                 {...(props.indication ===

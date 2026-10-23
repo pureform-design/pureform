@@ -227,7 +227,13 @@ const submenusOf = (
     return found;
 };
 
-function MenuImpl(props: MenuProps): ReactNode {
+function MenuImpl(
+    props: MenuProps & {
+        /** Its items alone, without the surface (container, elevation, width), for a view that
+         *  draws its own, as the search view's content does. */
+        readonly bare?: boolean;
+    },
+): ReactNode {
     const engine = useEngine();
     const [path, setPath] = useState<readonly string[]>([]);
     const all = [
@@ -277,7 +283,9 @@ function MenuImpl(props: MenuProps): ReactNode {
             {...(props["aria-label"] === undefined
                 ? {}
                 : { "aria-label": props["aria-label"] })}
-            style={{ ...s.root, ...presence.style }}
+            style={
+                props.bare ? presence.style : { ...s.root, ...presence.style }
+            }
             testID={id("root")}
         >
             {submenu ? (
@@ -320,6 +328,14 @@ function MenuImpl(props: MenuProps): ReactNode {
 }
 
 const Surface = withEngine(MenuImpl, "Menu");
+
+/** The menu's items without its surface, filling the view they're in (the search view's
+ *  suggestions). */
+export function MenuItems(
+    props: Omit<MenuProps, "trigger" | "contextTrigger">,
+): ReactNode {
+    return <Surface {...props} bare />;
+}
 
 // The items' elements on the web, where the keyboard moves between them.
 interface WebElement {

@@ -1011,6 +1011,24 @@ describe("lists, menus, and selects", () => {
         await until(() => expect(view()).toBeNull());
     });
 
+    it("draws its suggestions across the whole view, not in a menu's narrow surface", async () => {
+        await render(
+            <SearchView
+                defaultOpen
+                defaultInputValue="a"
+                items={[{ value: "a", label: "Alpha" }]}
+            />,
+        );
+        await until(() => byTestId("pf-search-view-content"));
+        const content = byTestId("pf-search-view-content");
+        const item = document.querySelector('[role="menuitem"]')!;
+        expect(content.getBoundingClientRect().width).toBeGreaterThan(400);
+        expect(item.getBoundingClientRect().width).toBeCloseTo(
+            content.getBoundingClientRect().width,
+            0,
+        );
+    });
+
     it("closes a search view from its back button", async () => {
         await render(<SearchView defaultOpen variant="docked" />);
         const view = () => document.querySelector('[role="dialog"]');
