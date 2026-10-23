@@ -242,6 +242,9 @@ export const createListItem = <
                     root: {
                         ...INDICATION_ROOT,
                         ...parts.row,
+                        // The whole line, as Compose's `ListItem` (`fillMaxWidth`): a `<button>`
+                        // would otherwise take only its content's width.
+                        width: pct(100),
                         gap: ref("gap"),
                         paddingInlineStart: ref("paddingInline"),
                         paddingInlineEnd: ref("paddingInline"),
