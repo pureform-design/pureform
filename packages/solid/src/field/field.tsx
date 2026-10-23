@@ -282,7 +282,7 @@ export function Textarea(props: TextareaProps): JSX.Element {
             props as Parameters<typeof fieldControlProps>[1],
         );
     return scope.render("root", {
-        element: "plainTextarea",
+        element: "textarea",
         as: () => props.as,
         props: merge(
             omit(props, "as", ...TEXTAREA_ROOT_PROPS),

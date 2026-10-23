@@ -243,7 +243,7 @@ export function Textarea(props: TextareaProps): ReactNode {
     });
     const { as, ...rest } = omitProps(props, TEXTAREA_ROOT_PROPS);
     return scope.render("root", {
-        element: "plainTextarea",
+        element: "textarea",
         as,
         props: { ...rest, ...fieldControlProps(field?.state, props) },
     });
