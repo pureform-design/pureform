@@ -42,6 +42,7 @@ import { Separator } from "./separator";
 import { SideSheet } from "./side-sheet";
 import { Slider } from "./slider";
 import { Snackbar } from "./snackbar";
+import { Splitter } from "./splitter";
 import { SupportingText } from "./supporting-text";
 import { Switch } from "./switch";
 import { Tabs } from "./tabs";
@@ -105,6 +106,7 @@ const COMPONENTS = [
     "bottomSheet",
     "sideSheet",
     "dragHandle",
+    "splitter",
     "snackbar",
     "tooltip",
     "richTooltip",
@@ -1253,5 +1255,95 @@ describe("c7c: avatar picture, swipe, inset icon, search bar width", () => {
             expect(from("themed", "inset-icon")).toBeCloseTo(52 + 14 + 10, 0);
         });
         expect(from("default", "inset-icon")).toBeCloseTo(10, 0);
+    });
+});
+
+describe("c8c: splitter", () => {
+    const panes = [
+        { id: "list", content: <Text>List</Text> },
+        { id: "detail", content: <Text>Detail</Text> },
+    ];
+    const width = (element: HTMLElement) =>
+        element.getBoundingClientRect().width;
+    const panels = () => [
+        ...document.querySelectorAll<HTMLElement>(
+            '[data-testid="pf-splitter-panel"]',
+        ),
+    ];
+
+    it("lays its panes out with a 24px divider holding Compose's 4×48 pill", async () => {
+        await render(
+            <View style={{ width: 1024, height: 200 }}>
+                <Splitter
+                    panes={panes}
+                    defaultSize={[30, 70]}
+                    resizeLabel="Resize list"
+                />
+            </View>,
+        );
+        const trigger = byTestId("pf-splitter-resize-trigger");
+        const pill = byTestId("pf-splitter-resize-trigger-indicator");
+        await until(() => expect(width(panels()[0]!)).toBeCloseTo(300, 0));
+        expect(width(trigger)).toBe(24);
+        expect(width(pill)).toBe(4);
+        expect(pill.getBoundingClientRect().height).toBe(48);
+        expect(trigger.getAttribute("aria-label")).toBe("Resize list");
+    });
+
+    it("grows its pill while dragged and snaps the divider to the nearest anchor", async () => {
+        const changes: number[][] = [];
+        await render(
+            <View style={{ width: 1024, height: 200 }}>
+                <Splitter
+                    panes={panes}
+                    defaultSize={[30, 70]}
+                    onSizeChange={({ size }) => changes.push(size)}
+                />
+            </View>,
+        );
+        const trigger = byTestId("pf-splitter-resize-trigger");
+        await until(() => expect(width(panels()[0]!)).toBeCloseTo(300, 0));
+        const release = await drag(trigger, [
+            [50, 0],
+            [100, 0],
+            [150, 0],
+        ]);
+        // Grown while it's held, as Compose's pressed handle.
+        await until(() =>
+            expect(
+                width(byTestId("pf-splitter-resize-trigger-indicator")),
+            ).toBe(12),
+        );
+        await release();
+        await until(() => expect(width(panels()[0]!)).toBeCloseTo(500, 0));
+        expect(changes.at(-1)![0]).toBeCloseTo(50, 1);
+    });
+
+    it("rests where it's let go without anchors, and stops at a pane's least size", async () => {
+        await render(
+            <View style={{ width: 1024, height: 200 }}>
+                <Splitter
+                    panes={[{ ...panes[0]!, minSize: "200px" }, panes[1]!]}
+                    anchors={[]}
+                    defaultSize={[30, 70]}
+                />
+            </View>,
+        );
+        const trigger = byTestId("pf-splitter-resize-trigger");
+        await until(() => expect(width(panels()[0]!)).toBeCloseTo(300, 0));
+        await (
+            await drag(trigger, [
+                [50, 0],
+                [150, 0],
+            ])
+        )();
+        await until(() => expect(width(panels()[0]!)).toBeCloseTo(450, 0));
+        await (
+            await drag(trigger, [
+                [-200, 0],
+                [-400, 0],
+            ])
+        )();
+        await until(() => expect(width(panels()[0]!)).toBeCloseTo(200, 0));
     });
 });

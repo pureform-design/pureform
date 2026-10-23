@@ -29,6 +29,7 @@ export default createConfig({
                     "bottom-sheet": "src/bottom-sheet/index.ts",
                     "side-sheet": "src/side-sheet/index.ts",
                     "drag-handle": "src/drag-handle/index.ts",
+                    splitter: "src/splitter/index.ts",
                     carousel: "src/carousel/index.ts",
                     accordion: "src/accordion/index.ts",
                     tree: "src/tree/index.ts",
