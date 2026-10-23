@@ -35,6 +35,8 @@ export const RN_COMPONENTS = [
     "textField",
     "textArea",
     "tagsInput",
+    "numberField",
+    "codeField",
     "appBar",
     "timePicker",
     "timeInput",

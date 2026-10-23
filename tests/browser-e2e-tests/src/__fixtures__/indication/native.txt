@@ -1909,6 +1909,192 @@ tagsInput[color=error].label: bg none | color rgba(73, 69, 78, 1) | outline none
 tagsInput[color=info].label: bg none | color rgba(73, 69, 78, 1) | outline none
     focused: color rgba(0, 104, 124, 1)
     focused-checked: color rgba(0, 104, 124, 1)
+numberField.label: bg none | color rgba(73, 69, 78, 1) | outline none
+    focused: color rgba(103, 80, 164, 1)
+    focused-checked: color rgba(103, 80, 164, 1)
+numberField.decrementTrigger: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(73, 69, 78, 0.08)
+    focused: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(73, 69, 78, 0.1)
+    dragged: bg rgba(73, 69, 78, 0.16)
+    hovered-selected: bg rgba(73, 69, 78, 0.08)
+    pressed-checked: bg rgba(73, 69, 78, 0.1)
+    focused-checked: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+numberField.incrementTrigger: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(73, 69, 78, 0.08)
+    focused: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(73, 69, 78, 0.1)
+    dragged: bg rgba(73, 69, 78, 0.16)
+    hovered-selected: bg rgba(73, 69, 78, 0.08)
+    pressed-checked: bg rgba(73, 69, 78, 0.1)
+    focused-checked: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+numberField[variant=outlined].container: bg none | color none | outline solid 1 rgba(122, 117, 127, 1) offset -1
+    hovered: outline solid 1 rgba(28, 27, 30, 1) offset -1
+    focused: outline solid 2 rgba(103, 80, 164, 1) offset -2
+    hovered-selected: outline solid 1 rgba(28, 27, 30, 1) offset -1
+    focused-checked: outline solid 2 rgba(103, 80, 164, 1) offset -2
+numberField[variant=outlined].label: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    focused: bg rgba(253, 248, 253, 1) | color rgba(103, 80, 164, 1)
+    focused-checked: bg rgba(253, 248, 253, 1) | color rgba(103, 80, 164, 1)
+numberField[variant=outlined].decrementTrigger: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(73, 69, 78, 0.08)
+    focused: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(73, 69, 78, 0.1)
+    dragged: bg rgba(73, 69, 78, 0.16)
+    hovered-selected: bg rgba(73, 69, 78, 0.08)
+    pressed-checked: bg rgba(73, 69, 78, 0.1)
+    focused-checked: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+numberField[variant=outlined].incrementTrigger: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(73, 69, 78, 0.08)
+    focused: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(73, 69, 78, 0.1)
+    dragged: bg rgba(73, 69, 78, 0.16)
+    hovered-selected: bg rgba(73, 69, 78, 0.08)
+    pressed-checked: bg rgba(73, 69, 78, 0.1)
+    focused-checked: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+numberField[color=secondary].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    focused: color rgba(98, 91, 112, 1)
+    focused-checked: color rgba(98, 91, 112, 1)
+numberField[color=secondary].decrementTrigger: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(73, 69, 78, 0.08)
+    focused: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(73, 69, 78, 0.1)
+    dragged: bg rgba(73, 69, 78, 0.16)
+    hovered-selected: bg rgba(73, 69, 78, 0.08)
+    pressed-checked: bg rgba(73, 69, 78, 0.1)
+    focused-checked: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+numberField[color=secondary].incrementTrigger: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(73, 69, 78, 0.08)
+    focused: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(73, 69, 78, 0.1)
+    dragged: bg rgba(73, 69, 78, 0.16)
+    hovered-selected: bg rgba(73, 69, 78, 0.08)
+    pressed-checked: bg rgba(73, 69, 78, 0.1)
+    focused-checked: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+numberField[color=tertiary].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    focused: color rgba(125, 82, 96, 1)
+    focused-checked: color rgba(125, 82, 96, 1)
+numberField[color=tertiary].decrementTrigger: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(73, 69, 78, 0.08)
+    focused: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(73, 69, 78, 0.1)
+    dragged: bg rgba(73, 69, 78, 0.16)
+    hovered-selected: bg rgba(73, 69, 78, 0.08)
+    pressed-checked: bg rgba(73, 69, 78, 0.1)
+    focused-checked: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+numberField[color=tertiary].incrementTrigger: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(73, 69, 78, 0.08)
+    focused: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(73, 69, 78, 0.1)
+    dragged: bg rgba(73, 69, 78, 0.16)
+    hovered-selected: bg rgba(73, 69, 78, 0.08)
+    pressed-checked: bg rgba(73, 69, 78, 0.1)
+    focused-checked: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+numberField[color=success].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    focused: color rgba(0, 110, 33, 1)
+    focused-checked: color rgba(0, 110, 33, 1)
+numberField[color=success].decrementTrigger: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(73, 69, 78, 0.08)
+    focused: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(73, 69, 78, 0.1)
+    dragged: bg rgba(73, 69, 78, 0.16)
+    hovered-selected: bg rgba(73, 69, 78, 0.08)
+    pressed-checked: bg rgba(73, 69, 78, 0.1)
+    focused-checked: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+numberField[color=success].incrementTrigger: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(73, 69, 78, 0.08)
+    focused: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(73, 69, 78, 0.1)
+    dragged: bg rgba(73, 69, 78, 0.16)
+    hovered-selected: bg rgba(73, 69, 78, 0.08)
+    pressed-checked: bg rgba(73, 69, 78, 0.1)
+    focused-checked: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+numberField[color=warning].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    focused: color rgba(116, 91, 0, 1)
+    focused-checked: color rgba(116, 91, 0, 1)
+numberField[color=warning].decrementTrigger: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(73, 69, 78, 0.08)
+    focused: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(73, 69, 78, 0.1)
+    dragged: bg rgba(73, 69, 78, 0.16)
+    hovered-selected: bg rgba(73, 69, 78, 0.08)
+    pressed-checked: bg rgba(73, 69, 78, 0.1)
+    focused-checked: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+numberField[color=warning].incrementTrigger: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(73, 69, 78, 0.08)
+    focused: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(73, 69, 78, 0.1)
+    dragged: bg rgba(73, 69, 78, 0.16)
+    hovered-selected: bg rgba(73, 69, 78, 0.08)
+    pressed-checked: bg rgba(73, 69, 78, 0.1)
+    focused-checked: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+numberField[color=error].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    focused: color rgba(186, 26, 26, 1)
+    focused-checked: color rgba(186, 26, 26, 1)
+numberField[color=error].decrementTrigger: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(73, 69, 78, 0.08)
+    focused: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(73, 69, 78, 0.1)
+    dragged: bg rgba(73, 69, 78, 0.16)
+    hovered-selected: bg rgba(73, 69, 78, 0.08)
+    pressed-checked: bg rgba(73, 69, 78, 0.1)
+    focused-checked: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+numberField[color=error].incrementTrigger: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(73, 69, 78, 0.08)
+    focused: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(73, 69, 78, 0.1)
+    dragged: bg rgba(73, 69, 78, 0.16)
+    hovered-selected: bg rgba(73, 69, 78, 0.08)
+    pressed-checked: bg rgba(73, 69, 78, 0.1)
+    focused-checked: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+numberField[color=info].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    focused: color rgba(0, 104, 124, 1)
+    focused-checked: color rgba(0, 104, 124, 1)
+numberField[color=info].decrementTrigger: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(73, 69, 78, 0.08)
+    focused: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(73, 69, 78, 0.1)
+    dragged: bg rgba(73, 69, 78, 0.16)
+    hovered-selected: bg rgba(73, 69, 78, 0.08)
+    pressed-checked: bg rgba(73, 69, 78, 0.1)
+    focused-checked: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+numberField[color=info].incrementTrigger: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(73, 69, 78, 0.08)
+    focused: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(73, 69, 78, 0.1)
+    dragged: bg rgba(73, 69, 78, 0.16)
+    hovered-selected: bg rgba(73, 69, 78, 0.08)
+    pressed-checked: bg rgba(73, 69, 78, 0.1)
+    focused-checked: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+codeField.label: bg none | color rgba(73, 69, 78, 1) | outline none
+    focused: color rgba(103, 80, 164, 1)
+    focused-checked: color rgba(103, 80, 164, 1)
+codeField[variant=outlined].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    focused: color rgba(103, 80, 164, 1)
+    focused-checked: color rgba(103, 80, 164, 1)
+codeField[variant=outlined].input: bg transparent | color rgba(28, 27, 30, 1) | outline solid 1 rgba(122, 117, 127, 1) offset -1
+    hovered: outline solid 1 rgba(28, 27, 30, 1) offset -1
+    focused: outline solid 2 rgba(103, 80, 164, 1) offset -2
+    hovered-selected: outline solid 1 rgba(28, 27, 30, 1) offset -1
+    focused-checked: outline solid 2 rgba(103, 80, 164, 1) offset -2
+codeField[color=secondary].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    focused: color rgba(98, 91, 112, 1)
+    focused-checked: color rgba(98, 91, 112, 1)
+codeField[color=tertiary].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    focused: color rgba(125, 82, 96, 1)
+    focused-checked: color rgba(125, 82, 96, 1)
+codeField[color=success].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    focused: color rgba(0, 110, 33, 1)
+    focused-checked: color rgba(0, 110, 33, 1)
+codeField[color=warning].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    focused: color rgba(116, 91, 0, 1)
+    focused-checked: color rgba(116, 91, 0, 1)
+codeField[color=error].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    focused: color rgba(186, 26, 26, 1)
+    focused-checked: color rgba(186, 26, 26, 1)
+codeField[color=info].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    focused: color rgba(0, 104, 124, 1)
+    focused-checked: color rgba(0, 104, 124, 1)
 timePicker.hourSelector: bg rgba(230, 225, 230, 1) | color rgba(28, 27, 30, 1) | outline none
     hovered: bg rgba(214, 209, 214, 1)
     focused: bg rgba(210, 205, 210, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2

@@ -38,6 +38,8 @@ import {
     menu,
     tabs,
     tagsInput,
+    numberField,
+    codeField,
     separator,
     fab,
     fullscreenDialog,
@@ -830,6 +832,83 @@ export function Page() {
                                     </button>
                                 </div>
                                 <span class={t.counter}>7 / 6</span>
+                            </div>
+                        );
+                    }}
+                </For>
+            </section>
+            <section
+                data-section="number-and-code-fields"
+                style={{ ...row, "align-items": "flex-start" }}
+            >
+                <For each={["filled", "outlined"] as const}>
+                    {(variant) => {
+                        const t = numberField({ variant, suffixText: true });
+                        const id = `number-${variant}`;
+                        return (
+                            <div class={t.root} style={{ width: "240px" }}>
+                                <div class={t.container}>
+                                    <input
+                                        class={t.input}
+                                        id={id}
+                                        role="spinbutton"
+                                        placeholder=" "
+                                        value="12"
+                                    />
+                                    <span class={t.suffixText}>kg</span>
+                                    <label class={t.label} for={id}>
+                                        Weight
+                                    </label>
+                                    <div class={t.control} role="group">
+                                        <button
+                                            type="button"
+                                            class={t.decrementTrigger}
+                                            aria-label="decrease value"
+                                        >
+                                            -
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class={t.incrementTrigger}
+                                            aria-label="increment value"
+                                            aria-disabled="true"
+                                        >
+                                            +
+                                        </button>
+                                    </div>
+                                </div>
+                                <span class={t.supportingText}>Up to 12</span>
+                            </div>
+                        );
+                    }}
+                </For>
+                <For each={["filled", "outlined"] as const}>
+                    {(variant) => {
+                        const t = codeField({ variant });
+                        const values = ["4", "2", "", ""];
+                        return (
+                            <div class={t.root}>
+                                <label class={t.label}>Code</label>
+                                <div class={t.control}>
+                                    <For each={values}>
+                                        {(value, index) => (
+                                            <input
+                                                class={t.input}
+                                                aria-label={`Digit ${index() + 1}`}
+                                                aria-invalid={
+                                                    variant === "outlined" &&
+                                                    index() === 1
+                                                        ? "true"
+                                                        : undefined
+                                                }
+                                                value={value}
+                                            />
+                                        )}
+                                    </For>
+                                </div>
+                                <span class={t.supportingText}>
+                                    Sent by text
+                                </span>
                             </div>
                         );
                     }}

@@ -41,6 +41,7 @@ const SECTIONS = [
     "text-fields",
     "icon-fields-and-areas",
     "affixes-and-counter",
+    "number-and-code-fields",
     "icons",
     "fabs",
     "split-buttons-and-fab-menus",
