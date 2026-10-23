@@ -53,9 +53,12 @@ export const keyPlay =
         const host = await mounted(c, canvasElement);
         c.keyboard!.focusable(host).focus();
         await userEvent.keyboard(key.key);
-        const onClick = args["onClick"] as
-            | { mock: { calls: unknown[] } }
-            | undefined;
+        // The spy of compose's `clickHandler`.
+        const onClick = (
+            args["onClick"] as
+                | { spy?: { mock: { calls: unknown[] } } }
+                | undefined
+        )?.spy;
         if (key.does === "click") {
             await waitFor(() => expect(onClick).toHaveBeenCalledOnce());
         } else if (key.does === "change") {
