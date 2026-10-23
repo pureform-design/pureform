@@ -63,6 +63,8 @@ export * from "./components/tooltip";
 export * from "./components/table";
 export * from "./components/tabs";
 export * from "./components/tags-input";
+export * from "./components/number-field";
+export * from "./components/code-field";
 export * from "./components/touch-target";
 export * from "./components/supporting-text";
 export * from "./components/switch";

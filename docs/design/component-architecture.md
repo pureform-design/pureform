@@ -577,7 +577,7 @@ variant: { filled: { root: { backgroundColor: token("accent"), color: token("onA
   circular spinner's wave while indeterminate (one group's clip, another's condition). c4a added
   4; r4-findings drew the wave clips from the `height`/`thickness` and `amplitude` tokens, which
   dropped the three per thickness. c5a's docked date picker and date input each add the
-  text field's one (fill with a leading icon). 28 across the preset, counting every
+  text field's one (fill with a leading icon), and c9a's number field too. 29 across the preset, counting every
   `compoundVariants` entry of every component in `pureform()` (`packages/preset/src/doc-counts.spec.ts`
   checks this number against the code).
 - **Flags for two groups (M3 Expressive):** when a value depends on two groups, one sets a

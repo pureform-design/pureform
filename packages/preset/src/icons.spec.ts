@@ -32,6 +32,7 @@ const ICON_SLOTS: Record<string, string[]> = {
     searchView: ["leading", "trailing"],
     tabs: ["icon"],
     tagsInput: ["leadingIcon", "trailingIcon"],
+    numberField: ["leadingIcon", "decrementTrigger", "incrementTrigger"],
     textArea: ["leadingIcon", "trailingIcon"],
     textField: ["leadingIcon", "trailingIcon"],
 };

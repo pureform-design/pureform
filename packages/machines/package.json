@@ -201,6 +201,20 @@
                 "default": "./dist/accordion.mjs"
             }
         },
+        "./number-input": {
+            "types": "./dist/number-input/index.d.ts",
+            "import": {
+                "development": "./src/number-input/index.ts",
+                "default": "./dist/number-input.mjs"
+            }
+        },
+        "./pin-input": {
+            "types": "./dist/pin-input/index.d.ts",
+            "import": {
+                "development": "./src/pin-input/index.ts",
+                "default": "./dist/pin-input.mjs"
+            }
+        },
         "./splitter": {
             "types": "./dist/splitter/index.d.ts",
             "import": {
@@ -262,7 +276,9 @@
         "@zag-js/dom-query": "catalog:",
         "@zag-js/listbox": "catalog:",
         "@zag-js/menu": "catalog:",
+        "@zag-js/number-input": "catalog:",
         "@zag-js/pagination": "catalog:",
+        "@zag-js/pin-input": "catalog:",
         "@zag-js/presence": "catalog:",
         "@zag-js/radio-group": "catalog:",
         "@zag-js/select": "catalog:",

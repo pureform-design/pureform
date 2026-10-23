@@ -433,7 +433,9 @@
         "@zag-js/dom-query": "catalog:",
         "@zag-js/listbox": "catalog:",
         "@zag-js/menu": "catalog:",
+        "@zag-js/number-input": "catalog:",
         "@zag-js/pagination": "catalog:",
+        "@zag-js/pin-input": "catalog:",
         "@zag-js/presence": "catalog:",
         "@zag-js/radio-group": "catalog:",
         "@zag-js/select": "catalog:",
@@ -1012,7 +1014,9 @@
     "@zag-js/dom-query": "^1.46.0",
     "@zag-js/listbox": "^1.46.0",
     "@zag-js/menu": "^1.46.0",
+    "@zag-js/number-input": "^1.46.0",
     "@zag-js/pagination": "^1.46.0",
+    "@zag-js/pin-input": "^1.46.0",
     "@zag-js/presence": "^1.46.0",
     "@zag-js/radio-group": "^1.46.0",
     "@zag-js/react": "^1.46.0",
@@ -1312,6 +1316,8 @@
     "@humanwhocodes/retry": ["@humanwhocodes/retry@0.4.3", "", {}, "sha512-bV0Tgo9K4hfPCek+aMAn81RppFKv2ySDQeMoSZuvTASywNTnVJCArCZE2FWqpvIatKu7VMRLWlR1EazvVhDyhQ=="],
 
     "@internationalized/date": ["@internationalized/date@3.12.4", "", { "dependencies": { "@swc/helpers": "^0.5.0" } }, "sha512-M1dEn4c1U1HsSlaVR8upZtSqvXrTkHDfv18H01uCSJyjVLDxnBR38v/fMxecmlwXKR4i9HeZcmgQAPE6A+aGJQ=="],
+
+    "@internationalized/number": ["@internationalized/number@3.6.9", "", { "dependencies": { "@swc/helpers": "^0.5.0" } }, "sha512-GgWy2caO/+hV9sT/oCTWGHvbjmJMPT9kkXzoKRLnkEq7adghhR7UprhvY9sXrKfrp3NcDfhF6QQHXR1KfQbB8g=="],
 
     "@isaacs/ttlcache": ["@isaacs/ttlcache@1.4.1", "", {}, "sha512-RQgQ4uQ+pLbqXfOmieB91ejmLwvSgv9nLx6sT6sD83s7umBypgg+OIBOBbEUiJXrfpnp9j0mRhYYdzp9uqq3lA=="],
 
@@ -2019,7 +2025,11 @@
 
     "@zag-js/menu": ["@zag-js/menu@1.46.0", "", { "dependencies": { "@zag-js/anatomy": "1.46.0", "@zag-js/core": "1.46.0", "@zag-js/dismissable": "1.46.0", "@zag-js/dom-query": "1.46.0", "@zag-js/focus-visible": "1.46.0", "@zag-js/popper": "1.46.0", "@zag-js/rect-utils": "1.46.0", "@zag-js/types": "1.46.0", "@zag-js/utils": "1.46.0" } }, "sha512-oQZ0SUI4AWQP5CocSVyiP55SVQZUa6eHTl3Ia8W0ByH/LK6ShFHTpEr/7eDt6uoHT9pDMpAscIIoMF70LvunTg=="],
 
+    "@zag-js/number-input": ["@zag-js/number-input@1.46.0", "", { "dependencies": { "@internationalized/number": "3.6.9", "@zag-js/anatomy": "1.46.0", "@zag-js/core": "1.46.0", "@zag-js/dom-query": "1.46.0", "@zag-js/types": "1.46.0", "@zag-js/utils": "1.46.0" } }, "sha512-/3Dmjn2J3Pu9vRUTApEFd8PIpUlk4n3TQVbiZmhOUrYQqiawelPoFDQOlbfmNbyjUc/12c6M1deEvpCbHEwuEg=="],
+
     "@zag-js/pagination": ["@zag-js/pagination@1.46.0", "", { "dependencies": { "@zag-js/anatomy": "1.46.0", "@zag-js/core": "1.46.0", "@zag-js/dom-query": "1.46.0", "@zag-js/types": "1.46.0", "@zag-js/utils": "1.46.0" } }, "sha512-WGMByrSC+wHM/QbemkuaIm69aJpW3dYU1Jv/qt0CHMCMUqrtYZ8WZJr4kKHUTsrgdigTX2MGIKM7IQ7cxIeS6A=="],
+
+    "@zag-js/pin-input": ["@zag-js/pin-input@1.46.0", "", { "dependencies": { "@zag-js/anatomy": "1.46.0", "@zag-js/core": "1.46.0", "@zag-js/dom-query": "1.46.0", "@zag-js/types": "1.46.0", "@zag-js/utils": "1.46.0" } }, "sha512-bv4uZCT5D6kPtjB3WZttInsX1e8mynozT+7ghlo/nFuBR/TAy+V3oouFBD7V9q9FXdaLIetidPDFcDRa8vZNpw=="],
 
     "@zag-js/popper": ["@zag-js/popper@1.46.0", "", { "dependencies": { "@floating-ui/dom": "^1.7.6", "@zag-js/dom-query": "1.46.0", "@zag-js/utils": "1.46.0" } }, "sha512-tpTOiwWY8FRQHzKycKbj+aJbhMpjvTsH871XXQdB2H+56eJ7sgffECCJZTByq3qsC+d2g/WCJqAfLJqgtYagww=="],
 

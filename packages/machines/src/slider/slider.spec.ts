@@ -17,17 +17,12 @@ const ROOT = `<div data-root style="position: relative; width: 200px; height: 40
 
 /** A slider in `markup` (around `ROOT`), run with `props`; a single slider spreads the first
  *  thumb only. */
-const render = (
-    props: MachineProps<slider.Schema>,
-    markup = ROOT,
-) => {
+const render = (props: MachineProps<slider.Schema>, markup = ROOT) => {
     const host = document.createElement("div");
     host.innerHTML = markup;
     document.body.append(host);
     const root = host.querySelector<HTMLElement>("[data-root]")!;
-    const handles = [
-        ...host.querySelectorAll<HTMLElement>("[data-handle]"),
-    ];
+    const handles = [...host.querySelectorAll<HTMLElement>("[data-handle]")];
     const inputs = [...host.querySelectorAll<HTMLInputElement>("[data-input]")];
     const thumbs = (props.defaultValue ?? props.value ?? [0]).length;
     const running = run(

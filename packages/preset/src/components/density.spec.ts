@@ -8,10 +8,12 @@ import { autocomplete } from "./autocomplete";
 import { button } from "./button";
 import { checkbox } from "./checkbox";
 import { chip } from "./chip";
+import { codeField } from "./code-field";
 import { iconButton } from "./icon-button";
 import { inputChip } from "./input-chip";
 import { listItem } from "./list-item";
 import { menu } from "./menu";
+import { numberField } from "./number-field";
 import { radio } from "./radio";
 import { select } from "./select";
 import { tagsInput } from "./tags-input";
@@ -28,6 +30,8 @@ describe.each([
     ["select", select],
     ["autocomplete", autocomplete],
     ["tagsInput", tagsInput],
+    ["numberField", numberField],
+    ["codeField", codeField],
     ["listItem", listItem],
     ["menu", menu],
 ] as const)("%s density", (_, spec) => {

@@ -57,6 +57,7 @@ import { card } from "./components/card";
 import { carousel } from "./components/carousel";
 import { createCheckbox } from "./components/checkbox";
 import { chipSet, createChip } from "./components/chip";
+import { createCodeField } from "./components/code-field";
 import { createDateInput } from "./components/date-input";
 import { datePicker } from "./components/date-picker";
 import { dialog } from "./components/dialog";
@@ -84,6 +85,7 @@ import { createMedia } from "./components/media";
 import { createMenu } from "./components/menu";
 import { createNavigationBar } from "./components/navigation-bar";
 import { createNavigationRail } from "./components/navigation-rail";
+import { createNumberField } from "./components/number-field";
 import { OVERLAY_KEYFRAMES } from "./components/overlay";
 import { createPaginator } from "./components/paginator";
 import {
@@ -321,6 +323,8 @@ const defaultComponents = <G extends string>(
         textField: createTextField<G, Step>(theme.color.groups, densities),
         textArea: createTextArea<G, Step>(theme.color.groups, densities),
         tagsInput: createTagsInput<G, Step>(theme.color.groups, densities),
+        numberField: createNumberField<G, Step>(theme.color.groups, densities),
+        codeField: createCodeField<G, Step>(theme.color.groups, densities),
         searchBar,
         searchView,
         select: createSelect<G, Step>(theme.color.groups, densities),

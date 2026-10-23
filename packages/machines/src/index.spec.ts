@@ -8,6 +8,8 @@ import * as zagDatePicker from "@zag-js/date-picker";
 import * as zagDialog from "@zag-js/dialog";
 import * as zagListbox from "@zag-js/listbox";
 import * as zagMenu from "@zag-js/menu";
+import * as zagNumberInput from "@zag-js/number-input";
+import * as zagPinInput from "@zag-js/pin-input";
 import * as zagRadioGroup from "@zag-js/radio-group";
 import * as zagSelect from "@zag-js/select";
 import * as zagSplitter from "@zag-js/splitter";
@@ -63,6 +65,29 @@ describe("@pureform/machines", () => {
         expect(
             machines.datePicker.toISO(machines.datePicker.parse("2026-08-17")!),
         ).toBe("2026-08-17");
+    });
+
+    it("re-exports Zag's number input and pin input, with the parts the preset's number and code fields draw", () => {
+        expect(machines.numberInput.machine).toBe(zagNumberInput.machine);
+        expect(machines.numberInput.connect).toBe(zagNumberInput.connect);
+        expect(machines.numberInput.anatomy.keys()).toEqual(
+            expect.arrayContaining([
+                "container",
+                "control",
+                "decrementTrigger",
+                "incrementTrigger",
+                "supportingText",
+            ]),
+        );
+        expect(machines.pinInput.machine).toBe(zagPinInput.machine);
+        expect(machines.pinInput.connect).toBe(zagPinInput.connect);
+        expect(machines.pinInput.anatomy.keys()).toEqual([
+            "root",
+            "label",
+            "input",
+            "control",
+            "supportingText",
+        ]);
     });
 
     it("keeps Zag's states and transitions for the machines that emit to an interaction source", () => {

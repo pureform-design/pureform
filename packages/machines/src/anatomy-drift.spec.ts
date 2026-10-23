@@ -23,6 +23,8 @@ import {
     stepperAnatomy,
     dataTableAnatomy,
     tagsInputAnatomy,
+    numberFieldAnatomy,
+    codeFieldAnatomy,
     textAreaAnatomy,
     textFieldAnatomy,
     timeInputAnatomy,
@@ -48,7 +50,9 @@ import {
     dockedAnatomy as dockedDatePicker,
 } from "./date-picker/date-picker.anatomy";
 import { anatomy as navigation } from "./navigation/navigation.anatomy";
+import { anatomy as numberInput } from "./number-input/number-input.anatomy";
 import { anatomy as paginator } from "./paginator/paginator.anatomy";
+import { anatomy as pinInput } from "./pin-input/pin-input.anatomy";
 import { anatomy as slider } from "./slider/slider.anatomy";
 import { anatomy as snackbar } from "./snackbar/snackbar.anatomy";
 import { anatomy as splitter } from "./splitter/splitter.anatomy";
@@ -96,6 +100,8 @@ const pairs: Record<string, Pair> = {
     stepper: { machine: stepper, preset: stepperAnatomy },
     dataTable: { machine: table, preset: dataTableAnatomy },
     tagsInput: { machine: tagsInput, preset: tagsInputAnatomy },
+    numberField: { machine: numberInput, preset: numberFieldAnatomy },
+    codeField: { machine: pinInput, preset: codeFieldAnatomy },
     inputChip: { machine: inputChip, preset: inputChipAnatomy },
     textField: { machine: textField, preset: textFieldAnatomy },
     textArea: { machine: textField, preset: textAreaAnatomy },

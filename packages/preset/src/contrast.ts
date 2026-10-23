@@ -266,6 +266,8 @@ export const COMPONENT_CONTRAST: Record<string, ContrastPair[]> = {
     textArea: FIELD_PAIRS,
     select: FIELD_PAIRS,
     autocomplete: FIELD_PAIRS,
+    numberField: FIELD_PAIRS,
+    codeField: FIELD_PAIRS,
     calendarCell: [
         pair(token("content"), role("surfaceContainerHigh"), TEXT_CONTRAST),
         pair(

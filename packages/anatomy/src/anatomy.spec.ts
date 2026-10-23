@@ -39,6 +39,7 @@ const ICON_PARTS: Record<string, string[]> = {
     dataTable: ["sortIndicator"],
     tabs: ["icon"],
     tagsInput: ["leadingIcon", "trailingIcon"],
+    numberField: ["leadingIcon", "decrementTrigger", "incrementTrigger"],
     textArea: ["leadingIcon", "trailingIcon"],
     textField: ["leadingIcon", "trailingIcon"],
     tree: ["leading", "indicator"],
@@ -58,6 +59,11 @@ const INDICATION: Record<string, IndicationAnatomy[]> = {
     chip: [at("root", "root", false)],
     // The chip, and its remove button as a surface of its own.
     inputChip: [at("root", "root", false), at("remove", "remove", true)],
+    // Each of the number field's round step buttons.
+    numberField: [
+        at("decrementTrigger", "decrementTrigger", true),
+        at("incrementTrigger", "incrementTrigger", true),
+    ],
     // When interactive, as a link or a button; with an action area, the container shows its
     // states and its layer sits in the action area.
     card: [

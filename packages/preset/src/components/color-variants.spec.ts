@@ -4,11 +4,13 @@ import { describe, expect, it } from "vitest";
 import { createAutocomplete } from "./autocomplete";
 import { createCheckbox } from "./checkbox";
 import { createChip } from "./chip";
+import { createCodeField } from "./code-field";
 import { createInputChip } from "./input-chip";
 import { createListItem } from "./list-item";
 import { createMenu } from "./menu";
 import { createNavigationBar } from "./navigation-bar";
 import { createNavigationRail } from "./navigation-rail";
+import { createNumberField } from "./number-field";
 import { createCircularProgress, createLinearProgress } from "./progress";
 import { createRadio } from "./radio";
 import { createSelect } from "./select";
@@ -31,6 +33,8 @@ describe.each([
     ["textField", createTextField],
     ["textArea", createTextArea],
     ["tagsInput", createTagsInput],
+    ["numberField", createNumberField],
+    ["codeField", createCodeField],
     ["select", createSelect],
     ["autocomplete", createAutocomplete],
     ["listItem", createListItem],
