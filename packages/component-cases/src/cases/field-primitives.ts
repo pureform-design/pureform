@@ -39,13 +39,14 @@ const control = (
     const element = (host: HTMLElement) =>
         byTestId<HTMLInputElement | HTMLTextAreaElement>(host, id);
     return {
-        // Typing one character at the end.
+        // Typing one character at the end (a textarea's click leaves the caret at the start).
         state: {
             prop: "value",
             from: "Ada",
             to: "Ada!",
             act: async (host, options) => {
-                await userEvent.type(element(host), "!", options);
+                await userEvent.click(element(host), options);
+                await userEvent.keyboard("{End}!");
             },
             read: (host) => element(host).value,
         },
