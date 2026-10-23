@@ -45,6 +45,8 @@ One pass over everything since r8: m3 (Material transitions), c8 (Material gaps 
   number fields don't reformat on load.
 - **Wavy progress like Compose:** the linear wave travels along the track; the circular arc grows
   and shrinks.
+- **Side sheet drag everywhere:** the coplanar side sheet and React Native's non-modal side sheet
+  drag too.
 
 ## Done when
 
