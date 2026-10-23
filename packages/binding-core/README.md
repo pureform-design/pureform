@@ -515,12 +515,13 @@ codeFieldMachineProps(props);
 
 // File upload: Zag's file upload; a drop zone with a trigger button over a list of files, each a
 // list item (with an icon button to remove it, and a linear progress while the app reports one).
-// The files are Zag's names: acceptedFiles, defaultAcceptedFiles, onFileChange. React Native has
-// no picker or drop, so the app keeps `files` (FileUploadEntry).
-type FileUploadPart; interface FileUploadRootOwnProps // color, tokens, acceptedFiles, accept,
+// The accepted files are `value` (Zag's acceptedFiles), with defaultValue and onValueChange
+// ({ value, rejectedFiles }). React Native has no picker or drop, so the app keeps `files`
+// (FileUploadEntry).
+type FileUploadPart; interface FileUploadRootOwnProps // color, tokens, value, accept,
 // maxFiles, maxFileSize, validate, progress, errorMessage, removeLabel, error, …
 FILE_UPLOAD_ROOT_PROPS; FILE_UPLOAD_CONTENT_PROPS; fileUploadSelection(props);
-fileUploadMachineProps(props); fileUploadErrorText(errors, file, errorMessage);
+fileUploadMachineProps(props); fileUploadValueProps(controllable); fileUploadErrorText(errors, file, errorMessage);
 fileUploadProgress(progress, file); fileUploadItemTestId(testId); isPreviewable(file);
 interface FileUploadEntry; formatFileSize(bytes);
 

@@ -1,8 +1,8 @@
 // The file upload: a drop zone holding a trigger button (the keyboard's way in: the zone takes
 // drops, it isn't a button), a hidden file input, and a list of files. The examples are plain
 // data, so none holds files: the files are chosen through the hidden input in the binding specs.
-// It isn't a controllable component in the suites' sense (its files are `acceptedFiles`, Zag's
-// names), and a file input submits files, not text entries.
+// Its state is the accepted files, `value` (Zag's `acceptedFiles`), which the state case chooses
+// through the hidden input. There's no form case: a file input submits files, not text entries.
 
 import { testIds } from "@pureform/anatomy";
 
@@ -10,6 +10,28 @@ import type { ComponentCase } from "../types";
 import { byTestId } from "../types";
 
 const ids = testIds.fileUpload;
+
+const hiddenInput = (host: HTMLElement) =>
+    host.querySelector<HTMLInputElement>('input[type="file"]')!;
+
+const notes = new File(["pureform"], "notes.txt", { type: "text/plain" });
+
+/** The accepted files listed, as `File`s by their names (Vitest compares two `File`s by their
+ *  type alone, so this checks the names against the case's own files). */
+const read = (host: HTMLElement): File[] =>
+    [
+        ...host.querySelectorAll(
+            '[data-scope="file-upload"][data-part="item-name"]',
+        ),
+    ]
+        .filter((name) => !name.closest('[data-type="rejected"]'))
+        .map((name) => {
+            const file = [notes].find((one) => one.name === name.textContent);
+            if (!file) {
+                throw new Error(`lists ${name.textContent}, not a case's file`);
+            }
+            return file;
+        });
 
 const trigger = (host: HTMLElement) =>
     byTestId(host, ids.dropzone).querySelector<HTMLButtonElement>("button")!;
@@ -33,6 +55,21 @@ export const fileUpload: ComponentCase = {
         "several files": { maxFiles: 5, accept: "image/*" },
         disabled: { disabled: true },
         "read only": { readOnly: true },
+    },
+    state: {
+        prop: "value",
+        from: [],
+        to: [notes],
+        // Choosing a file in the dialog: the hidden input's files change.
+        act: async (host) => {
+            const input = hiddenInput(host);
+            const transfer = new DataTransfer();
+            transfer.items.add(notes);
+            input.files = transfer.files;
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+            input.dispatchEvent(new Event("change", { bubbles: true }));
+        },
+        read,
     },
     keyboard: {
         focusable: trigger,

@@ -49,12 +49,12 @@ describe("FileUpload, ready-made", () => {
     });
 
     it("lists the files chosen, each a list item with its size and a remove button", async () => {
-        const onFileChange = vi.fn();
+        const onValueChange = vi.fn();
         withRegistry(() => (
             <FileUpload
                 label="Files"
                 maxFiles={3}
-                onFileChange={onFileChange}
+                onValueChange={onValueChange}
             />
         ));
         await userEvent.upload(hiddenInput(), [
@@ -63,7 +63,7 @@ describe("FileUpload, ready-made", () => {
         ]);
         await settle();
         expect(names()).toEqual(["a.txt", "b.txt"]);
-        expect(onFileChange).toHaveBeenCalled();
+        expect(onValueChange).toHaveBeenCalled();
         await userEvent.click(removeButton("a.txt"));
         await settle();
         expect(names()).toEqual(["b.txt"]);
@@ -87,7 +87,7 @@ describe("FileUpload, ready-made", () => {
         withRegistry(() => (
             <FileUpload
                 label="Files"
-                defaultAcceptedFiles={[file("a.txt"), file("b.txt")]}
+                defaultValue={[file("a.txt"), file("b.txt")]}
                 maxFiles={2}
                 progress={(item) => (item.name === "a.txt" ? 40 : undefined)}
             />
@@ -137,7 +137,7 @@ describe("FileUpload, ready-made", () => {
             <FileUpload
                 label="Files"
                 testId="docs"
-                defaultAcceptedFiles={[file("a.txt")]}
+                defaultValue={[file("a.txt")]}
             />
         ));
         await settle();

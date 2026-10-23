@@ -845,6 +845,7 @@ export {
     fileUploadMachineProps,
     fileUploadProgress,
     fileUploadSelection,
+    fileUploadValueProps,
     isPreviewable,
 } from "./components/file-upload";
 export type {
@@ -855,6 +856,7 @@ export type {
     FileUploadPart,
     FileUploadRootOwnProps,
     FileUploadVariantProps,
+    FileUploadValueDetails,
 } from "./components/file-upload";
 export {
     COPIED_LABEL,

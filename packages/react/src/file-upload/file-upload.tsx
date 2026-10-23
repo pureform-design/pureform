@@ -11,6 +11,7 @@ import {
     fileUploadErrorText,
     fileUploadItemTestId,
     fileUploadMachineProps,
+    fileUploadValueProps,
     fileUploadProgress,
     fileUploadSelection,
     isPresent,
@@ -19,6 +20,7 @@ import {
 import type {
     FileUploadContentProps,
     FileUploadRootOwnProps,
+    FileUploadValueDetails,
 } from "@pureform/binding-core";
 import type { MutableInteractionSource } from "@pureform/binding-core/interaction";
 import * as fileUpload from "@pureform/machines/file-upload";
@@ -33,6 +35,7 @@ import {
 } from "react";
 
 import { Button } from "../button";
+import { useControllable } from "../controllable";
 import { useFieldsetDisabled } from "../form";
 import { CloseIcon, FileIcon, UploadIcon } from "../glyphs";
 import { IconButton } from "../icon-button";
@@ -59,7 +62,7 @@ interface FileUploadContextValue {
 
 const context = createPartContext<FileUploadContextValue>("FileUpload");
 
-/** Root's props: the variant and tokens, the machine's props (`acceptedFiles`, `accept`,
+/** Root's props: the variant and tokens, the machine's props (`value`, `accept`,
  *  `maxFiles`, …), `testId` and `unstyled` for every part, `as`, and the element's own props. */
 export interface FileUploadRootProps
     extends
@@ -102,6 +105,11 @@ export interface FileUploadItemProps extends Omit<
 function Root(props: FileUploadRootProps): ReactNode {
     const id = useId();
     const dir = useDirection();
+    const value = useControllable<"value", File[], FileUploadValueDetails>(
+        "FileUpload",
+        "value",
+        props,
+    );
     const [hidden, setHidden] = useState<HTMLInputElement | null>(null);
     const fieldsetDisabled = useFieldsetDisabled(hidden);
     const source = useOwnInteractionSource(props.interactionSource);
@@ -111,6 +119,7 @@ function Root(props: FileUploadRootProps): ReactNode {
         ...fileUploadMachineProps(props),
         // Zag reads a disabled fieldset only for its own form control state.
         disabled: props.disabled || fieldsetDisabled || undefined,
+        ...fileUploadValueProps(value.machineProps),
     });
     const api = fileUpload.connect(service, normalizeProps);
     const scope = useComponent(fileUploadAnatomy, {

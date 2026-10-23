@@ -12,6 +12,7 @@ import {
     fileUploadErrorText,
     fileUploadItemTestId,
     fileUploadMachineProps,
+    fileUploadValueProps,
     fileUploadProgress,
     fileUploadSelection,
     isPresent,
@@ -20,6 +21,7 @@ import {
 import type {
     FileUploadContentProps,
     FileUploadRootOwnProps,
+    FileUploadValueDetails,
 } from "@pureform/binding-core";
 import * as fileUpload from "@pureform/machines/file-upload";
 import type { JSX, ValidComponent } from "@solidjs/web";
@@ -37,6 +39,7 @@ import {
 
 import { Button } from "../button";
 import type { ButtonProps } from "../button";
+import { useControllable } from "../controllable";
 import { useFieldsetDisabled } from "../form";
 import { CloseIcon, FileIcon, UploadIcon } from "../glyphs";
 import { IconButton } from "../icon-button";
@@ -61,7 +64,7 @@ interface FileUploadContextValue {
 
 const context = createPartContext<FileUploadContextValue>("FileUpload");
 
-/** Root's props: the variant and tokens, the machine's props (`acceptedFiles`, `accept`,
+/** Root's props: the variant and tokens, the machine's props (`value`, `accept`,
  *  `maxFiles`, …), `testId` and `unstyled` for every part, `as`, and the element's own props. */
 export interface FileUploadRootProps
     extends
@@ -100,6 +103,11 @@ export interface FileUploadItemProps extends FileUploadPartProps {
 function Root(props: FileUploadRootProps): JSX.Element {
     const id = createUniqueId();
     const dir = useDirection();
+    const value = useControllable<"value", File[], FileUploadValueDetails>(
+        "FileUpload",
+        "value",
+        props,
+    );
     const [hidden, setHidden] = createSignal<HTMLInputElement | undefined>(
         undefined,
         { ownedWrite: true },
@@ -111,6 +119,7 @@ function Root(props: FileUploadRootProps): JSX.Element {
         ...fileUploadMachineProps(props),
         // Zag reads a disabled fieldset only for its own form control state.
         disabled: props.disabled || fieldsetDisabled() || undefined,
+        ...fileUploadValueProps(value.machineProps()),
     }));
     const api = createMemo(() => fileUpload.connect(service, normalizeProps));
     const scope = useComponent(fileUploadAnatomy, {

@@ -12,6 +12,7 @@ import type {
 } from "@pureform/anatomy";
 import type { InstanceTokens, Selection } from "@pureform/styling";
 
+import type { ControllableMachineProps } from "../controllable";
 import type { Unstyled } from "../parts";
 import type { InteractiveProps } from "./indication";
 import type { VariantProp } from "./variants";
@@ -37,19 +38,23 @@ export type FileUploadErrorCode =
     | "FILE_INVALID"
     | "FILE_EXISTS";
 
-/** What the file upload takes for itself and passes on to the machine. Zag's names stand:
- *  `acceptedFiles` (controlled), `defaultAcceptedFiles`, and `onFileChange` and its two parts. */
+/** What a change of the files reports: the accepted files as `value`, and the rejected ones with
+ *  their reasons. */
+export interface FileUploadValueDetails {
+    readonly value: File[];
+    readonly rejectedFiles: { file: File; errors: string[] }[];
+}
+
+/** What the file upload takes for itself and passes on to the machine. The accepted files are
+ *  the `value` (Zag's `acceptedFiles`), with `defaultValue` and `onValueChange`. */
 export interface FileUploadBehaviorProps {
     /** The accepted files, to control them. Leave it out and the machine keeps them. */
-    readonly acceptedFiles?: File[] | undefined;
+    readonly value?: File[] | undefined;
     /** @control none */
-    readonly defaultAcceptedFiles?: File[] | undefined;
-    /** Called with the accepted and the rejected files when either changes. */
-    readonly onFileChange?:
-        | ((details: {
-              acceptedFiles: File[];
-              rejectedFiles: { file: File; errors: string[] }[];
-          }) => void)
+    readonly defaultValue?: File[] | undefined;
+    /** Called with the accepted (`value`) and the rejected files when either changes. */
+    readonly onValueChange?:
+        | ((details: FileUploadValueDetails) => void)
         | undefined;
     /** Called when files are accepted. */
     readonly onFileAccept?: ((details: { files: File[] }) => void) | undefined;
@@ -110,9 +115,9 @@ export interface FileUploadRootOwnProps
 export const FILE_UPLOAD_ROOT_PROPS = [
     "color",
     "tokens",
-    "acceptedFiles",
-    "defaultAcceptedFiles",
-    "onFileChange",
+    "value",
+    "defaultValue",
+    "onValueChange",
     "onFileAccept",
     "onFileReject",
     "disabled",
@@ -179,12 +184,9 @@ export const fileUploadSelection = (
     tokens: props.tokens,
 });
 
-/** The file upload machine's props from Root's, besides `id` and `dir`. An error marks the drop
- *  zone invalid. */
+/** The file upload machine's props from Root's, besides `id`, `dir` and the files (see
+ *  `fileUploadValueProps`). An error marks the drop zone invalid. */
 export const fileUploadMachineProps = (props: FileUploadBehaviorProps) => ({
-    acceptedFiles: props.acceptedFiles,
-    defaultAcceptedFiles: props.defaultAcceptedFiles,
-    onFileChange: props.onFileChange,
     onFileAccept: props.onFileAccept,
     onFileReject: props.onFileReject,
     disabled: props.disabled,
@@ -278,3 +280,20 @@ export const formatFileSize = (bytes: number): string => {
     }
     return `${Number(value.toFixed(value < 10 ? 1 : 0))} ${units[unit]}`;
 };
+
+/** The files' controllable props (`useControllable`'s `value`, `defaultValue`, `onValueChange`)
+ *  in Zag's names: `acceptedFiles`, `defaultAcceptedFiles`, `onFileChange`. */
+export const fileUploadValueProps = (
+    value: ControllableMachineProps<"value", File[], FileUploadValueDetails>,
+) => ({
+    acceptedFiles: value.value,
+    defaultAcceptedFiles: value.defaultValue,
+    onFileChange: (details: {
+        acceptedFiles: File[];
+        rejectedFiles: { file: File; errors: string[] }[];
+    }) =>
+        value.onValueChange({
+            value: details.acceptedFiles,
+            rejectedFiles: details.rejectedFiles,
+        }),
+});
