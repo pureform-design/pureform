@@ -201,6 +201,13 @@
                 "default": "./dist/accordion.mjs"
             }
         },
+        "./color-picker": {
+            "types": "./dist/color-picker/index.d.ts",
+            "import": {
+                "development": "./src/color-picker/index.ts",
+                "default": "./dist/color-picker.mjs"
+            }
+        },
         "./splitter": {
             "types": "./dist/splitter/index.d.ts",
             "import": {
@@ -254,6 +261,7 @@
         "@zag-js/carousel": "catalog:",
         "@zag-js/checkbox": "catalog:",
         "@zag-js/collection": "catalog:",
+        "@zag-js/color-picker": "catalog:",
         "@zag-js/combobox": "catalog:",
         "@zag-js/core": "catalog:",
         "@zag-js/date-input": "catalog:",

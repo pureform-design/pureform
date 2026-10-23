@@ -57,6 +57,7 @@ import { card } from "./components/card";
 import { carousel } from "./components/carousel";
 import { createCheckbox } from "./components/checkbox";
 import { chipSet, createChip } from "./components/chip";
+import { colorPicker } from "./components/color-picker";
 import { createDateInput } from "./components/date-input";
 import { datePicker } from "./components/date-picker";
 import { dialog } from "./components/dialog";
@@ -359,6 +360,7 @@ const defaultComponents = <G extends string>(
         sideSheet,
         dragHandle,
         splitter,
+        colorPicker,
         snackbar,
         toast,
         toolbar,

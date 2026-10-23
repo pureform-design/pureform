@@ -2,6 +2,7 @@ import * as zagAccordion from "@zag-js/accordion";
 import * as zagAvatar from "@zag-js/avatar";
 import * as zagCarousel from "@zag-js/carousel";
 import * as zagCheckbox from "@zag-js/checkbox";
+import * as zagColorPicker from "@zag-js/color-picker";
 import * as zagCombobox from "@zag-js/combobox";
 import * as zagDateInput from "@zag-js/date-input";
 import * as zagDatePicker from "@zag-js/date-picker";
@@ -53,6 +54,14 @@ describe("@pureform/machines", () => {
             "resizeTrigger",
             "resizeTriggerIndicator",
         ]);
+    });
+
+    it("re-exports Zag's color picker, with a valueSwatch part", () => {
+        expect(machines.colorPicker.machine).toBe(zagColorPicker.machine);
+        expect(machines.colorPicker.connect).toBe(zagColorPicker.connect);
+        expect(machines.colorPicker.parse).toBe(zagColorPicker.parse);
+        expect(machines.colorPicker.anatomy.keys()).toContain("valueSwatch");
+        expect(machines.colorPicker.anatomy.keys()).toContain("areaThumb");
     });
 
     it("re-exports Zag's date picker and date input unchanged", () => {

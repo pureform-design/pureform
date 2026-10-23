@@ -161,6 +161,10 @@ export const COMPONENT_CONTRAST: Record<string, ContrastPair[]> = {
     dragHandle: [
         pair(token("color"), role("surfaceContainerLow"), UI_CONTRAST),
     ],
+    colorPicker: [
+        pair(token("labelColor"), role("surface"), TEXT_CONTRAST),
+        pair(token("swatchRingColor"), role("surface"), UI_CONTRAST),
+    ],
     splitter: [
         pair(token("handleColor"), role("surface"), UI_CONTRAST),
         pair(token("handleActiveColor"), role("surface"), UI_CONTRAST),
