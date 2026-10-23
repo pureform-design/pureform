@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { useState } from "react";
 import { View } from "react-native";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
@@ -375,5 +376,35 @@ describe("DateInput", () => {
         await interact(() => userEvent.keyboard("0817"));
         await interact(() => userEvent.click(button("OK")));
         expect(onConfirm).toHaveBeenCalledWith([]);
+    });
+
+    it("follows a controlled value changed later, keeping focus and the digits it typed", async () => {
+        let setOutside: (value: readonly string[]) => void = () => {};
+        function Controlled() {
+            const [value, setValue] = useState<readonly string[]>([]);
+            setOutside = setValue;
+            return (
+                <DateInput
+                    locale="en-US"
+                    value={value}
+                    onValueChange={(details) => setValue(details.value)}
+                />
+            );
+        }
+        await render(<Controlled />);
+        const digits = () => segments().map((segment) => segment.value);
+        await interact(() => userEvent.click(segments()[0]!));
+        // Typed through the value: the digits stay as typed (a partial year included).
+        await interact(() => userEvent.keyboard("0817202"));
+        expect(digits()).toEqual(["08", "17", "202"]);
+        await interact(() => userEvent.keyboard("6"));
+        expect(digits()).toEqual(["08", "17", "2026"]);
+        await interact(() => userEvent.click(segments()[1]!));
+        // Set from outside mid-typing: the segments show it, focus stays on the day.
+        await interact(() => setOutside(["2027-03-09"]));
+        expect(digits()).toEqual(["03", "09", "2027"]);
+        expect(document.activeElement).toBe(segments()[1]);
+        await interact(() => setOutside([]));
+        expect(digits()).toEqual(["", "", ""]);
     });
 });

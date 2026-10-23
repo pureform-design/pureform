@@ -4,7 +4,8 @@
 // and the locale's separators between. A full segment moves on to the next; Backspace in an empty
 // one goes back; on the web the arrow keys move along the row by direction and step a segment up
 // and down. Its `value` follows the segments: the date when they make a whole, real date the
-// picker allows, else none. Cancel calls `onCancel`, OK calls `onConfirm` with the date.
+// picker allows, else none; a controlled `value` changed later rewrites the digits (focus stays
+// where it is). Cancel calls `onCancel`, OK calls `onConfirm` with the date.
 
 import { dateInputAnatomy } from "@pureform/anatomy";
 import {
@@ -178,6 +179,16 @@ function DateInputImpl(props: DateInputProps): ReactNode {
     const [texts, setTexts] = useState(() => dateSegmentTexts(value[0]));
     // The last digits written, which keys typed before the next render build on.
     const latest = useRef(texts);
+    // A value set from outside (a controlled `value` changed later) rewrites the digits; one the
+    // segments made (or a partial date's empty one) leaves them, and focus, as they are.
+    const [seen, setSeen] = useState(value[0]);
+    if (seen !== value[0]) {
+        setSeen(value[0]);
+        if (dateFromSegments(latest.current) !== (value[0] ?? null)) {
+            latest.current = dateSegmentTexts(value[0]);
+            setTexts(latest.current);
+        }
+    }
     const [focused, setFocused] = useState(false);
     const segments = dateTextSegments(locale);
     const order = segments.flatMap((segment) =>
