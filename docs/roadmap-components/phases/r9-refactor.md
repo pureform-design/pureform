@@ -24,6 +24,9 @@ One pass over everything since r8: m3 (Material transitions), c8 (Material gaps 
 
 - **Shared axis clipping:** its root clips only while a page moves, like the fade through since
   m3's merge, so focus rings and shadows at its edges aren't cut at rest.
+- **Settling:** the list item's swipe settles through c8a's `settleTransition`.
+- **Exact springs on the web:** springs written out as CSS vars (stiffness, damping), so a
+  settle from a release speed reads them instead of fitting the `linear()` curve.
 
 ## Done when
 
