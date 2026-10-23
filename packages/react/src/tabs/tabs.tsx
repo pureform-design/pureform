@@ -38,10 +38,10 @@ import {
 import { useControllable } from "../controllable";
 import { FadeThrough } from "../fade-through/fade-through";
 import { HorizontalSharedAxis } from "../horizontal-shared-axis/horizontal-shared-axis";
-import { useTransitionPage } from "../page-transition";
 import { useItemInteractionSources } from "../interaction";
 import type { ItemInteractionSources } from "../interaction";
 import { useMachine } from "../machine";
+import { useTransitionPage } from "../page-transition";
 import { createPartContext } from "../part-context";
 import { useComponent, useSlotProps } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";

@@ -59,9 +59,7 @@ export const fabMenuSelection = (
     color: props.color,
     size: props.size,
     tokens:
-        itemCount === undefined
-            ? props.tokens
-            : { itemCount, ...props.tokens },
+        itemCount === undefined ? props.tokens : { itemCount, ...props.tokens },
 });
 
 /** The FAB menu's items open above the FAB, at its end. */

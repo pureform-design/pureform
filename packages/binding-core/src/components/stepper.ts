@@ -14,9 +14,9 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 import type { Controllable } from "../controllable";
 import type { Unstyled } from "../parts";
 import { withoutControls } from "./content";
+import type { IndicationProps, InteractionSourceProps } from "./indication";
 import { PAGE_TRANSITION_PROPS } from "./page-transition";
 import type { PageTransitionProps } from "./page-transition";
-import type { IndicationProps, InteractionSourceProps } from "./indication";
 import type { VariantProp } from "./variants";
 
 /** The stepper's parts: `"root" | "list" | "item"` (a step) `| "trigger"` (its header)

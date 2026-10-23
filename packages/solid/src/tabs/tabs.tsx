@@ -45,11 +45,11 @@ import {
 import { useControllable } from "../controllable";
 import { FadeThrough } from "../fade-through/fade-through";
 import { HorizontalSharedAxis } from "../horizontal-shared-axis/horizontal-shared-axis";
-import { useTransitionPage } from "../page-transition";
 import { itemInteractionSources } from "../interaction";
 import type { ItemInteractionSources } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
+import { useTransitionPage } from "../page-transition";
 import { createPartContext } from "../part-context";
 import { createSlotProps, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";

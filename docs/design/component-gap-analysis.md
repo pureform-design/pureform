@@ -101,7 +101,7 @@ their sources in [`next.md`](../roadmap-components/next.md); none is applied yet
 | Icon button                                  | ✅ `iconButton`             | own (button)  | ✅ 5 sizes, 3 widths, toggle                | ✅ (toggle)         | ✅ `mat-icon-button`         | `toggle`                               | Expressive sizes, `width` and `corner` done (§7)                                  |
 | FAB                                          | ✅ `fab`                    | own (button)  | ✅ FAB, medium, large; ⚠️ small, ⚠️ surface | ✅ fab, branded-fab | ✅ `mat-fab`, `mat-mini-fab` | —                                      | Expressive sizes done; `small` and `surface` kept (§7)                            |
 | Extended FAB                                 | ✅ `fab` `extended` variant | own (button)  | ✅ small, medium, large                     | ✅ (label)          | ✅ extended                  | —                                      | Per-size padding, gap and type done                                               |
-| FAB menu                                     | ✅ `fabMenu`                | zag `menu`    | ✅ new                                      | —                   | —                            | `menu`                                 | Done (c2f): `list` above the FAB, `closeTrigger` (§7); items stagger (m3c)                      |
+| FAB menu                                     | ✅ `fabMenu`                | zag `menu`    | ✅ new                                      | —                   | —                            | `menu`                                 | Done (c2f): `list` above the FAB, `closeTrigger` (§7); items stagger (m3c)        |
 | Button group (standard / connected)          | ✅ `buttonGroup` (c2e)      | zag           | ✅ new                                      | —                   | —                            | `toggle-group` (when selectable)       | `connected`; a `position` on buttons; replaces segmented                          |
 | Segmented button                             | ✅ connected `buttonGroup`  | —             | ⚠️ use connected button group               | 🧪 labs             | ✅ `mat-button-toggle-group` | `toggle-group`, `segmented-control`    | Not built: a connected, selectable `buttonGroup` (c2e)                            |
 | Split button                                 | ✅ `splitButton`            | zag `menu`    | ✅ new                                      | —                   | —                            | `menu`                                 | Done (c2f): opens the `menu` component (§7)                                       |
@@ -572,59 +572,59 @@ icon, title, description, actionTrigger, closeTrigger`, plus a `type` variant. E
    slider joined the test when c1g moved it to zag `slider`.
 2. **Variant explosion.** Every new variant group must avoid compounds where it can
    (`component-architecture.md` §5.5):
-   - A variant sets one of the component's tokens, and another variant (or the base) reads it:
-     the `color` group's `accent`, the size's `squareRadius` and `pressedRadius`.
-   - When a value depends on two groups, one sets a literal and the other a 0/1 **flag**, and
-     `blend(from, to, flag)` picks between them: `corner` sets `square`, `width` sets `narrow`
-     and `wide`, `inset` sets `insetStart` and `insetEnd`.
-   - **Never chain variant-set tokens** (a variant setting `a: ref("b")` where another variant
-     sets `b`). CSS resolves it, but React Native resolves `b` from the theme default, not the
-     variant, so the two targets disagree. Tokens the theme or instance sets (per-size tokens such
-     as `heightSmall`) are fine to read directly in a variant's styles.
-   - What stays compound needs a token value from one group _and_ a colour role from another
-     (each fill's toggle colours, 5 each on button and icon button), or a size that a `shape`
-     would otherwise tie with (the FAB's corner radius, 4).
-   - Compounds across the preset: 17 before the Expressive work, 21 after (the button's 5
-     toggle compounds are new; the FAB went from 5 to 4), 28 at r6 (2026-10-22), counting every
-     `compoundVariants` entry in `pureform()` as `component-architecture.md` §5.5 does.
-   - The selection space still grows with each group: the icon button now has about 1.4
-     million combinations. Tests that enumerate every combination sample past 40,000: `rn-adapter`'s codegen test
-     (an even spread plus each value), and the browser suite's Panda factory test (every
-     pair of values from every two groups, so each compound is covered, plus an even spread).
+    - A variant sets one of the component's tokens, and another variant (or the base) reads it:
+      the `color` group's `accent`, the size's `squareRadius` and `pressedRadius`.
+    - When a value depends on two groups, one sets a literal and the other a 0/1 **flag**, and
+      `blend(from, to, flag)` picks between them: `corner` sets `square`, `width` sets `narrow`
+      and `wide`, `inset` sets `insetStart` and `insetEnd`.
+    - **Never chain variant-set tokens** (a variant setting `a: ref("b")` where another variant
+      sets `b`). CSS resolves it, but React Native resolves `b` from the theme default, not the
+      variant, so the two targets disagree. Tokens the theme or instance sets (per-size tokens such
+      as `heightSmall`) are fine to read directly in a variant's styles.
+    - What stays compound needs a token value from one group _and_ a colour role from another
+      (each fill's toggle colours, 5 each on button and icon button), or a size that a `shape`
+      would otherwise tie with (the FAB's corner radius, 4).
+    - Compounds across the preset: 17 before the Expressive work, 21 after (the button's 5
+      toggle compounds are new; the FAB went from 5 to 4), 28 at r6 (2026-10-22), counting every
+      `compoundVariants` entry in `pureform()` as `component-architecture.md` §5.5 does.
+    - The selection space still grows with each group: the icon button now has about 1.4
+      million combinations. Tests that enumerate every combination sample past 40,000: `rn-adapter`'s codegen test
+      (an even spread plus each value), and the browser suite's Panda factory test (every
+      pair of values from every two groups, so each compound is covered, plus an even spread).
 3. **Theming concepts every new variant must keep.** Checked for the Expressive work:
-   - **Density:** sized heights and widths add `densityOffset` (button, icon button, including
-     the blended widths). Components without density before (FAB, slider, switch, nav) still
-     have none.
-   - **Shape:** every radius comes from the theme's roles (`radius("small")`, …), scaled or
-     combined where Material's value has no role: 2px is `extraSmall × 0.5`, 3px
-     `extraSmall × 0.75`, Expressive's 20px `large + extraSmall`. A shape theme (`sharp`,
-     `soft`, `squircle`) then rescales them; `corners.ts` adds the theme's corner style
-     wherever a radius is set. `packages/preset/src/radii.spec.ts` fails on any fixed px radius
-     in a style or a token. This fixed the bar slider and the FAB's medium corner, plus the
-     older checkbox box and tab indicator. Components whose geometry is the shape (circular
-     progress, the loading indicator) are the exception: see the guidelines' shape rule.
-   - **Colour groups:** colours come from group tokens or the `color` variant, never a fixed
-     role where a group should apply. The nav label's `secondary` follows the group's main
-     colour.
-   - **Direction:** logical properties only (inline insets, `borderStartStartRadius`, block
-     margins for the vertical divider), so right to left needs nothing extra.
-   - **Interaction source:** pressed styles read the `pressed` state (`:active` or
-     `data-pf-active`), so a press forwarded by a shared source morphs corners and narrows the
-     slider's handle. `selected` also matches `aria-current`/`aria-selected`, so the corner
-     swap is gated by the `toggle` variant's `toggles` flag.
-   - **Indication:** the bar slider has no state layer, so its declared surface (`stateLayer`)
-     stays hidden. Only the focus ring and the handle's press show. The round slider keeps the
-     surface, so the indication suites (component suites, React Native) test the round slider;
-     the slider suite also renders `round` and `large` examples. Compose 1.5 adds an
-     **inset focus ring**, drawn inside the component rather than outside it or as an opacity
-     layer (§0.1). **Done (c0d):** `materialState(..., { focusRing: "inset" })` sets the ring's
-     offset to minus its thickness for every component at once; `outer` stays the default.
-   - **Motion:** moving tweens (corners, the handle's width and position) go through
-     `motionTransition`, so reduced motion drops them and keeps colour fades.
-   - **Theme and instance tokens:** per-size tokens can be retuned by a theme or an instance.
-     Flag tokens (`square`, `toggles`, `narrow`, `wide`, `insetStart`, `insetEnd`) are
-     component tokens too, so an instance can set them, but the variants are the intended
-     interface.
+    - **Density:** sized heights and widths add `densityOffset` (button, icon button, including
+      the blended widths). Components without density before (FAB, slider, switch, nav) still
+      have none.
+    - **Shape:** every radius comes from the theme's roles (`radius("small")`, …), scaled or
+      combined where Material's value has no role: 2px is `extraSmall × 0.5`, 3px
+      `extraSmall × 0.75`, Expressive's 20px `large + extraSmall`. A shape theme (`sharp`,
+      `soft`, `squircle`) then rescales them; `corners.ts` adds the theme's corner style
+      wherever a radius is set. `packages/preset/src/radii.spec.ts` fails on any fixed px radius
+      in a style or a token. This fixed the bar slider and the FAB's medium corner, plus the
+      older checkbox box and tab indicator. Components whose geometry is the shape (circular
+      progress, the loading indicator) are the exception: see the guidelines' shape rule.
+    - **Colour groups:** colours come from group tokens or the `color` variant, never a fixed
+      role where a group should apply. The nav label's `secondary` follows the group's main
+      colour.
+    - **Direction:** logical properties only (inline insets, `borderStartStartRadius`, block
+      margins for the vertical divider), so right to left needs nothing extra.
+    - **Interaction source:** pressed styles read the `pressed` state (`:active` or
+      `data-pf-active`), so a press forwarded by a shared source morphs corners and narrows the
+      slider's handle. `selected` also matches `aria-current`/`aria-selected`, so the corner
+      swap is gated by the `toggle` variant's `toggles` flag.
+    - **Indication:** the bar slider has no state layer, so its declared surface (`stateLayer`)
+      stays hidden. Only the focus ring and the handle's press show. The round slider keeps the
+      surface, so the indication suites (component suites, React Native) test the round slider;
+      the slider suite also renders `round` and `large` examples. Compose 1.5 adds an
+      **inset focus ring**, drawn inside the component rather than outside it or as an opacity
+      layer (§0.1). **Done (c0d):** `materialState(..., { focusRing: "inset" })` sets the ring's
+      offset to minus its thickness for every component at once; `outer` stays the default.
+    - **Motion:** moving tweens (corners, the handle's width and position) go through
+      `motionTransition`, so reduced motion drops them and keeps colour fades.
+    - **Theme and instance tokens:** per-size tokens can be retuned by a theme or an instance.
+      Flag tokens (`square`, `toggles`, `narrow`, `wide`, `insetStart`, `insetEnd`) are
+      component tokens too, so an instance can set them, but the variants are the intended
+      interface.
 4. **Containers.** Only `list`, `chipSet` (with its behaviour) and `buttonGroup` (c2e) need
    styled containers. Radio group and tab list are rendered by the bindings and need no styles.
 5. **Badges are composed, not parts.** Nav bar, rail and tabs place the badge component
@@ -634,16 +634,16 @@ icon, title, description, actionTrigger, closeTrigger`, plus a `type` variant. E
    bar or the non-flexible medium/large app bars; their replacements cover them.
 7. **Repo issues found while testing** (not caused by this work). All fixed, and
    `omni run build test -f all` passes:
-   - The snackbar focus-timer test and the right-to-left tooltip tests failed when an earlier
-     test left the pointer over them; both now park it first.
-   - Rebuilding `packages/cli` dropped the executable bit from `dist/pureform.mjs`; the build
-     now restores it.
-   - Screenshots used the machine's fallback font, and Chromium's `color-mix` varies in the
-     sixth decimal. The browser suite now bundles Roboto and JetBrains Mono and rounds
-     indication colours to four decimals.
-   - Still open: omni's cache can replay an older build or `generate` output after files
-     change back (for example after a stash). Force with `-f all`, or regenerate the fixture
-     directly.
+    - The snackbar focus-timer test and the right-to-left tooltip tests failed when an earlier
+      test left the pointer over them; both now park it first.
+    - Rebuilding `packages/cli` dropped the executable bit from `dist/pureform.mjs`; the build
+      now restores it.
+    - Screenshots used the machine's fallback font, and Chromium's `color-mix` varies in the
+      sixth decimal. The browser suite now bundles Roboto and JetBrains Mono and rounds
+      indication colours to four decimals.
+    - Still open: omni's cache can replay an older build or `generate` output after files
+      change back (for example after a stash). Force with `-f all`, or regenerate the fixture
+      directly.
 
 ---
 

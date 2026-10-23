@@ -30,13 +30,13 @@ import {
 } from "react";
 
 import { useControllable } from "../controllable";
-import { ToastIcon } from "../glyphs";
 import { FadeThrough } from "../fade-through/fade-through";
+import { ToastIcon } from "../glyphs";
 import { HorizontalSharedAxis } from "../horizontal-shared-axis/horizontal-shared-axis";
-import { useTransitionPage } from "../page-transition";
 import { useItemInteractionSources } from "../interaction";
 import type { ItemInteractionSources } from "../interaction";
 import { useMachine } from "../machine";
+import { useTransitionPage } from "../page-transition";
 import { createPartContext } from "../part-context";
 import { plainParts, useComponent, useSlotProps } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";

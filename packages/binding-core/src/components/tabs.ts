@@ -14,9 +14,9 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 import type { Controllable } from "../controllable";
 import type { Unstyled } from "../parts";
 import { isPresent, withoutControls } from "./content";
+import type { IndicationProps, InteractionSourceProps } from "./indication";
 import { PAGE_TRANSITION_PROPS } from "./page-transition";
 import type { PageTransitionProps } from "./page-transition";
-import type { IndicationProps, InteractionSourceProps } from "./indication";
 import type { VariantProp } from "./variants";
 
 /** The tabs' parts: `"root" | "list"` (the tab list) `| "tab" | "tabContent"` (around a tab's

@@ -93,7 +93,10 @@ export const keepContents = <C>(
 };
 
 /** The attributes a leaving page takes: out of reach and hidden from assistive technology. */
-export const LEAVING_PAGE_PROPS = { inert: true, "aria-hidden": "true" } as const;
+export const LEAVING_PAGE_PROPS = {
+    inert: true,
+    "aria-hidden": "true",
+} as const;
 
 /** The root's attributes while a page leaves: `data-transitioning`, which clips the root. */
 export const pageRootProps = (

@@ -128,10 +128,10 @@ export const timedAnimation = (
     // isn't drawn before it enters.
     const fill =
         timing.delay || delay
-        ? fillMode === "forwards"
-            ? "both"
-            : "backwards"
-        : fillMode;
+            ? fillMode === "forwards"
+                ? "both"
+                : "backwards"
+            : fillMode;
     return animation({
         name,
         ...(delay ? { delay } : {}),

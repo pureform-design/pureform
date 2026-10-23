@@ -13,7 +13,6 @@ import type {
     PresenceDriver,
     PresencePhase,
     PresenceStep,
-    PresenceTiming,
     PresenceView,
     SlideMotion,
 } from "./motion";

@@ -6,8 +6,8 @@
 // close (it calls back), as on React Native, not a frame later. The press that ends a real drag doesn't also count as a click on the
 // handle, so a handle that closes on a press closes only once.
 
-import { closeAsker } from "./components/sheet";
 import type { CloseQuestion } from "./components/dialog";
+import { closeAsker } from "./components/sheet";
 import type { CloseAsker } from "./components/sheet";
 import { swallowNextClick } from "./drag-click";
 

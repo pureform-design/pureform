@@ -90,7 +90,7 @@ describe("HorizontalSharedAxis", () => {
         );
         // Let the browser see the page at rest, as a frame would, so its next animation is a new
         // one rather than the finished one with the same name.
-        for (const page of pages()) getComputedStyle(page).animationName;
+        for (const page of pages()) void getComputedStyle(page).animationName;
         await index.set(1);
         await settle();
         expect(pages().map((page) => page.dataset["direction"])).toEqual([

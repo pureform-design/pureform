@@ -79,7 +79,9 @@ export const fadeThrough = pf.slotComponent({
                 // While a page leaves, the root clips to the incoming page, so a taller outgoing
                 // one doesn't spill past it (Compose's `AnimatedContent` clips by default too);
                 // at rest it doesn't, so the content's focus rings and shadows show.
-                rawRules: { css: { "&[data-transitioning]": { overflow: clip } } },
+                rawRules: {
+                    css: { "&[data-transitioning]": { overflow: clip } },
+                },
             },
             page: {
                 rawRules: {

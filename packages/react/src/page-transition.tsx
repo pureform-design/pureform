@@ -4,11 +4,7 @@
 // settles. The transition gives the change (its direction, whether pages still leaving stay) and
 // each page's attributes.
 
-import {
-    keepContents,
-    settlePage,
-    startPages,
-} from "@pureform/binding-core";
+import { keepContents, settlePage, startPages } from "@pureform/binding-core";
 import type {
     PageKey,
     PageState,
