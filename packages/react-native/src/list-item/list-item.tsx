@@ -32,6 +32,7 @@ import { createContext, use, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { PanResponder } from "react-native";
 
+import { useExpandMotion } from "../expand";
 import { iconParts } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
@@ -73,6 +74,7 @@ function ListItemImpl(props: ListItemProps): ReactNode {
         props.onExpandedChange,
         false,
     );
+    const expandMotion = useExpandMotion();
     const swipeable = isPresent(props.swipeAction);
     const interactive = expandable || props.onPress !== undefined;
     const rtl = useDirection() === "rtl";
@@ -250,6 +252,7 @@ function ListItemImpl(props: ListItemProps): ReactNode {
         );
     const onPress = expandable
         ? () => {
+              expandMotion();
               setExpanded(!expanded);
               props.onPress?.();
           }

@@ -26,6 +26,7 @@ import { ExpandIcon } from "../glyphs";
 import { useItemInteractionSources } from "../interaction";
 import type { ItemInteractionSources } from "../interaction";
 import { useMachine } from "../machine";
+import { collapsible } from "../motion";
 import { createPartContext } from "../part-context";
 import { plainParts, useComponent, useSlotProps } from "../parts";
 import type { ComponentScope, PlainPartProps, SlotKeyedProps } from "../parts";
@@ -164,6 +165,7 @@ function Content({ unstyled, ...props }: AccordionPartProps): ReactNode {
     const { props: item } = itemContext.use("Content");
     return scope.render("content", {
         element: "div",
+        ref: collapsible,
         machine: api.getItemContentProps(item),
         unstyled,
         props,

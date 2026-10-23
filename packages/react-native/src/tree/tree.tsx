@@ -16,6 +16,7 @@ import type {
 } from "@pureform/binding-core";
 import type { ReactNode } from "react";
 
+import { useExpandMotion } from "../expand";
 import { iconParts } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
@@ -138,16 +139,19 @@ function TreeImpl(props: TreeProps): ReactNode {
         "tree",
         treeSelection(props),
     );
+    const expandMotion = useExpandMotion();
     const tree: TreeState = {
         props,
         expanded,
         selected,
-        toggle: (value) =>
+        toggle: (value) => {
+            expandMotion();
             setExpanded(
                 expanded.includes(value)
                     ? expanded.filter((open) => open !== value)
                     : [...expanded, value],
-            ),
+            );
+        },
         select: (value) =>
             setSelected(
                 props.selectionMode === "multiple"

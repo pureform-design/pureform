@@ -50,6 +50,7 @@ import {
     useOwnInteractionSource,
 } from "../interaction";
 import { useMachine } from "../machine";
+import { collapsible } from "../motion";
 import { createPartContext } from "../part-context";
 import { useComponent, useSlotProps } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
@@ -300,6 +301,7 @@ function Region({
     const { scope, api } = expandContext.use("Region");
     return scope.render("region", {
         element: "div",
+        ref: collapsible,
         machine: api.getItemContentProps(expandItem(undefined)),
         unstyled,
         // The items inside are its content, not more headers.

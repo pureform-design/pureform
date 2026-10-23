@@ -50,6 +50,7 @@ import type { MaterialDensity } from "@pureform/theme";
 
 import { INDICATION_TOKENS, stateLayer } from "../state-layer";
 import {
+    collapseTransition,
     componentTokens,
     defaultDensities,
     DENSITY_TOKEN,
@@ -292,6 +293,9 @@ export const createStepper = <D extends string = MaterialDensity>(
                                     ref("gap"),
                                 ),
                                 width: pct(100),
+                                // A step's content grows open and shrinks shut as the current
+                                // step changes. A row swaps its content in place instead.
+                                transition: collapseTransition,
                             },
                         },
                     },

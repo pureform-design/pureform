@@ -4,8 +4,17 @@
 // runs after an interaction.
 
 import { resolveReducedMotion } from "@pureform/binding-core";
-import { subscribeReducedMotion } from "@pureform/binding-core/dom";
-import { type Accessor, createMemo, createSignal, onSettled } from "solid-js";
+import {
+    subscribeReducedMotion,
+    watchCollapse,
+} from "@pureform/binding-core/dom";
+import {
+    type Accessor,
+    createMemo,
+    createSignal,
+    onCleanup,
+    onSettled,
+} from "solid-js";
 
 import { usePureform } from "./provider";
 
@@ -16,3 +25,9 @@ export function useReducedMotion(): Accessor<boolean> {
     onSettled(() => subscribeReducedMotion(setSystem));
     return createMemo(() => resolveReducedMotion(state().motion, system()));
 }
+
+/** A ref for a part that expands and collapses with `hidden` (an accordion's content, a tree's
+ *  group): its height grows and shrinks on the part's own transition (`watchCollapse`). */
+export const collapsible = (element: HTMLElement) => {
+    onCleanup(watchCollapse(element));
+};
