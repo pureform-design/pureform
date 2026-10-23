@@ -65,6 +65,7 @@ export default createConfig({
                     "linear-progress": "src/linear-progress/index.ts",
                     media: "src/media/index.ts",
                     ripple: "src/ripple/index.ts",
+                    "horizontal-shared-axis": "src/horizontal-shared-axis/index.ts",
                     scrim: "src/scrim/index.ts",
                     "fade-through": "src/fade-through/index.ts",
                     "app-bar": "src/app-bar/index.ts",

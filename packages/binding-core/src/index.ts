@@ -981,6 +981,29 @@ export type {
     RippleVariantProps,
 } from "./components/ripple";
 export { SCRIM_ROOT_PROPS, scrimSelection } from "./components/scrim";
+export {
+    HORIZONTAL_SHARED_AXIS_ROOT_PROPS,
+    horizontalSharedAxisSelection,
+    PAGE_TRANSITION_PROPS,
+    SHARED_AXIS_FADE,
+    SHARED_AXIS_SLIDE_FRACTION,
+    sharedAxisChange,
+    sharedAxisDirection,
+    sharedAxisMoving,
+    sharedAxisPageProps,
+    sharedAxisScrimProps,
+    sharedAxisSettle,
+    sharedAxisStart,
+} from "./components/horizontal-shared-axis";
+export type {
+    HorizontalSharedAxisPart,
+    HorizontalSharedAxisRootOwnProps,
+    HorizontalSharedAxisVariantProps,
+    PageTransitionProps,
+    SharedAxisDirection,
+    SharedAxisPage,
+    SharedAxisPageState,
+} from "./components/horizontal-shared-axis";
 export type {
     ScrimPart,
     ScrimRootOwnProps,

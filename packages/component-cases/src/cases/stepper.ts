@@ -60,6 +60,7 @@ export const stepper: ComponentCase = {
     examples: {
         "first step": {},
         "second step": { defaultStep: 1 },
+        "shared axis": { transition: "sharedAxis", defaultStep: 1 },
         vertical: { orientation: "vertical" },
         "vertical, second step": { orientation: "vertical", defaultStep: 1 },
         "every step done": { defaultStep: 3 },

@@ -71,6 +71,11 @@ export const tabsCase: ComponentCase = {
     examples: {
         "first selected": {},
         "second selected": { defaultValue: "hotels" },
+        "shared axis": {
+            transition: "sharedAxis",
+            transitionScrim: true,
+            defaultValue: "hotels",
+        },
         secondary: { variant: "secondary", defaultValue: "cars" },
         scrollable: { scrollable: true, defaultValue: "hotels" },
         "secondary color": { color: "secondary" },

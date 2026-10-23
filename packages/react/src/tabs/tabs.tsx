@@ -36,6 +36,10 @@ import {
 } from "react";
 
 import { useControllable } from "../controllable";
+import {
+    HorizontalSharedAxis,
+    useSharedAxisPage,
+} from "../horizontal-shared-axis/horizontal-shared-axis";
 import { useItemInteractionSources } from "../interaction";
 import type { ItemInteractionSources } from "../interaction";
 import { useMachine } from "../machine";
@@ -268,9 +272,13 @@ function Content({
     ...props
 }: TabsContentPartProps): ReactNode {
     const { scope, api } = context.use("Content");
+    // A panel leaving in a shared axis stays drawn while it goes.
+    const leaving = useSharedAxisPage() === "leaving";
     return scope.render("content", {
         element: "div",
-        machine: api.getContentProps({ value }),
+        machine: leaving
+            ? { ...api.getContentProps({ value }), hidden: false }
+            : api.getContentProps({ value }),
         unstyled,
         props,
     });
@@ -294,6 +302,8 @@ function ReadyMade(props: TabsProps): ReactNode {
         items = [],
         "aria-label": label,
         "aria-labelledby": labelledBy,
+        transition,
+        transitionScrim,
         ...rootProps
     } = props;
     const slot = useSlotProps(props);
@@ -335,18 +345,47 @@ function ReadyMade(props: TabsProps): ReactNode {
                     </Tab>
                 ))}
             </List>
-            {items
-                .filter((item) => isPresent(item.content))
-                .map((item) => (
-                    <Content
-                        key={item.value}
-                        value={item.value}
-                        {...slot("content")}
-                    >
-                        {item.content}
-                    </Content>
-                ))}
+            {transition === "sharedAxis" ? (
+                <SharedAxisPanels
+                    items={items}
+                    scrim={transitionScrim}
+                    slot={slot("content")}
+                />
+            ) : (
+                items
+                    .filter((item) => isPresent(item.content))
+                    .map((item) => (
+                        <Content
+                            key={item.value}
+                            value={item.value}
+                            {...slot("content")}
+                        >
+                            {item.content}
+                        </Content>
+                    ))
+            )}
         </Root>
+    );
+}
+
+// The selected tab's panel in a horizontal shared axis, which slides between the panels in the
+// tabs' order.
+function SharedAxisPanels(props: {
+    readonly items: TabsProps["items"] & object;
+    readonly scrim: boolean | undefined;
+    readonly slot: object;
+}): ReactNode {
+    const { api } = context.use("Content");
+    const index = props.items.findIndex((item) => item.value === api.value);
+    const item = props.items[index];
+    return (
+        <HorizontalSharedAxis index={index} scrim={props.scrim}>
+            {item && isPresent(item.content) ? (
+                <Content value={item.value} {...props.slot}>
+                    {item.content}
+                </Content>
+            ) : null}
+        </HorizontalSharedAxis>
     );
 }
 

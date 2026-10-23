@@ -769,6 +769,18 @@ items), and that no Solid or React source sets a listed group from anything but 
 `stepperTriggerDisabled` (disabled, or done and not `editable`) and `stepperIndicator` (what the
 indicator shows: an error, a check, the icon or the number).
 
+## Horizontal shared axis
+
+`components/horizontal-shared-axis.ts`: `HorizontalSharedAxisRootOwnProps` (`index`, `scrim`),
+`HORIZONTAL_SHARED_AXIS_ROOT_PROPS`, `horizontalSharedAxisSelection`, and the pages a binding keeps:
+`sharedAxisStart`, `sharedAxisChange` (the shown page leaves, the new one enters, the way
+`sharedAxisDirection` says: forward to a higher index), `sharedAxisSettle` (once a page's
+animations end), `sharedAxisMoving`, `sharedAxisPageProps` (`data-state`, `data-direction`, a
+leaving page `inert` and `aria-hidden`) and `sharedAxisScrimProps`. `PageTransitionProps`
+(`transition: "none" | "sharedAxis"`, `transitionScrim`) is on the ready-made tabs' and stepper's
+content props. `SHARED_AXIS_SLIDE_FRACTION` and `SHARED_AXIS_FADE` give React Native, which moves
+the pages in code, the slide and fade the web's keyframes and tokens hold.
+
 ## Carousel
 
 `components/carousel.ts`: `CarouselRootOwnProps`, `CAROUSEL_ROOT_PROPS`, `carouselSelection`,

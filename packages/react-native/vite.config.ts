@@ -51,6 +51,7 @@ export default createConfig({
                     "navigation-bar": "src/navigation-bar/index.ts",
                     "navigation-rail": "src/navigation-rail/index.ts",
                     "radio-group": "src/radio-group/index.ts",
+                    "horizontal-shared-axis": "src/horizontal-shared-axis/index.ts",
                     scrim: "src/scrim/index.ts",
                     "fade-through": "src/fade-through/index.ts",
                     "app-bar": "src/app-bar/index.ts",

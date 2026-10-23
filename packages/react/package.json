@@ -348,6 +348,13 @@
                 "default": "./dist/fade-through.mjs"
             }
         },
+        "./horizontal-shared-axis": {
+            "types": "./dist/horizontal-shared-axis/index.d.ts",
+            "import": {
+                "development": "./src/horizontal-shared-axis/index.ts",
+                "default": "./dist/horizontal-shared-axis.mjs"
+            }
+        },
         "./scrim": {
             "types": "./dist/scrim/index.d.ts",
             "import": {

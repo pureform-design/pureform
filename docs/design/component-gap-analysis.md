@@ -86,7 +86,7 @@ MDC-Android's `master` since 2026-05-06 (no doc changes; latest release still `1
 Compose is now the first source ([guidelines §1](component-guidelines.md#1-sources-and-provenance)).
 No component was added, removed or renamed. The findings (expressive chip shapes, transparent
 outlined text field container, adaptive bar and rail specs, fade-through and shared-axis
-transitions (fade through done in m3a), time picker scroll items without indication, and smaller fixes) are listed with
+transitions (done in m3a and m3b), time picker scroll items without indication, and smaller fixes) are listed with
 their sources in [`next.md`](../roadmap-components/next.md); none is applied yet.
 
 ---
@@ -185,29 +185,30 @@ their sources in [`next.md`](../roadmap-components/next.md); none is applied yet
 
 ### 1.7 Primitives
 
-| Component                                  | pureform              | M3 / Material Web                         | Angular Material           | zag        | Notes                           |
-| ------------------------------------------ | --------------------- | ----------------------------------------- | -------------------------- | ---------- | ------------------------------- |
-| Ripple                                     | ✅ `ripple` (own)     | ✅                                        | ✅ `matRipple`             | —          |                                 |
-| Focus ring                                 | 🟡 `indication` model | ✅ MW focus-ring                          | (core)                     | —          | Not a part                      |
-| Elevation                                  | 🟡 tokens             | ✅ MW elevation                           | (tokens)                   | —          | Not a part                      |
-| Icon                                       | ✅ `icon`             | ✅                                        | ✅ `mat-icon`              | —          |                                 |
-| Avatar                                     | ✅ `avatar`           | (inside list, chip, app bar)              | (card, list, chip avatars) | `avatar`   | `image` + `fallback` done (c7c) |
-| Presence                                   | ✅ `presence`         | —                                         | —                          | `presence` |                                 |
-| Touch target, text, media, supporting text | ✅                    | (internal)                                | —                          | —          |                                 |
-| Fade through (transition)                  | ✅ `fadeThrough`      | Compose `MaterialTransitions.FadeThrough` | —                          | —          | m3a; predictive back left out   |
+| Component                                  | pureform                  | M3 / Material Web                                  | Angular Material           | zag        | Notes                                       |
+| ------------------------------------------ | ------------------------- | -------------------------------------------------- | -------------------------- | ---------- | ------------------------------------------- |
+| Ripple                                     | ✅ `ripple` (own)         | ✅                                                 | ✅ `matRipple`             | —          |                                             |
+| Focus ring                                 | 🟡 `indication` model     | ✅ MW focus-ring                                   | (core)                     | —          | Not a part                                  |
+| Elevation                                  | 🟡 tokens                 | ✅ MW elevation                                    | (tokens)                   | —          | Not a part                                  |
+| Icon                                       | ✅ `icon`                 | ✅                                                 | ✅ `mat-icon`              | —          |                                             |
+| Avatar                                     | ✅ `avatar`               | (inside list, chip, app bar)                       | (card, list, chip avatars) | `avatar`   | `image` + `fallback` done (c7c)             |
+| Presence                                   | ✅ `presence`             | —                                                  | —                          | `presence` |                                             |
+| Touch target, text, media, supporting text | ✅                        | (internal)                                         | —                          | —          |                                             |
+| Fade through (transition)                  | ✅ `fadeThrough`          | Compose `MaterialTransitions.FadeThrough`          | —                          | —          | m3a; predictive back left out               |
+| Horizontal shared axis (transition)        | ✅ `horizontalSharedAxis` | Compose `MaterialTransitions.HorizontalSharedAxis` | —                          | —          | m3b; `transition` on tabs and a row stepper |
 
 ### 1.8 Totals
 
-|                                                  | Count                                                                                                                                                                                                                                                                                                                                                                                    |
-| ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Our preset components                            | 65, every entry of `pureform().components` (`packages/preset/src/doc-counts.spec.ts` checks it) (c4 added loadingIndicator, appBar, toolbar, carousel; progress gained `shape: wavy`; c5 added calendarCell, datePicker, dockedDatePicker, dateInput, timePicker, timeInput; c6 added accordion, tree, stepper, paginator, dataTable, gridList; c7 added chipSet; m3a added fadeThrough) |
-| zag machines                                     | 54; 23 wrapped today (accordion, avatar, carousel, checkbox, combobox, date-input, date-picker, dialog, listbox, menu, pagination, presence, radio-group, select, slider, steps, switch, tabs, tags-input, toast, toggle-group, tooltip, tree-view)                                                                                                                                      |
-| Our own machines                                 | 7 (button, navigation, ripple, snackbar, table, text-field, time-picker: the time picker and time input)                                                                                                                                                                                                                                                                                 |
-| M3 Expressive components we're missing           | 0 (the selection list is built, c7a)                                                                                                                                                                                                                                                                                                                                                     |
-| …of which zag covers the behaviour               | 0                                                                                                                                                                                                                                                                                                                                                                                        |
-| …needing our own machine or styling only         | 0 (the time picker and time input are built, c5b). The existing components' own work (segmented list, progress parts) is done too (c1b, c1c)                                                                                                                                                                                                                                             |
-| M3-deprecated components we should **not** build | 4: segmented button, navigation drawer, bottom app bar, medium/large (non-flexible) app bar                                                                                                                                                                                                                                                                                              |
-| Angular parity components, in scope (§1.9)       | 6, all built (c6): accordion, stepper, paginator, tree, dataTable, gridList. Button toggle is the button group; the sidenav is a side sheet or rail                                                                                                                                                                                                                                      |
+|                                                  | Count                                                                                                                                                                                                                                                                                                                                                                                                              |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Our preset components                            | 66, every entry of `pureform().components` (`packages/preset/src/doc-counts.spec.ts` checks it) (c4 added loadingIndicator, appBar, toolbar, carousel; progress gained `shape: wavy`; c5 added calendarCell, datePicker, dockedDatePicker, dateInput, timePicker, timeInput; c6 added accordion, tree, stepper, paginator, dataTable, gridList; c7 added chipSet; m3a added fadeThrough, m3b horizontalSharedAxis) |
+| zag machines                                     | 54; 23 wrapped today (accordion, avatar, carousel, checkbox, combobox, date-input, date-picker, dialog, listbox, menu, pagination, presence, radio-group, select, slider, steps, switch, tabs, tags-input, toast, toggle-group, tooltip, tree-view)                                                                                                                                                                |
+| Our own machines                                 | 7 (button, navigation, ripple, snackbar, table, text-field, time-picker: the time picker and time input)                                                                                                                                                                                                                                                                                                           |
+| M3 Expressive components we're missing           | 0 (the selection list is built, c7a)                                                                                                                                                                                                                                                                                                                                                                               |
+| …of which zag covers the behaviour               | 0                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| …needing our own machine or styling only         | 0 (the time picker and time input are built, c5b). The existing components' own work (segmented list, progress parts) is done too (c1b, c1c)                                                                                                                                                                                                                                                                       |
+| M3-deprecated components we should **not** build | 4: segmented button, navigation drawer, bottom app bar, medium/large (non-flexible) app bar                                                                                                                                                                                                                                                                                                                        |
+| Angular parity components, in scope (§1.9)       | 6, all built (c6): accordion, stepper, paginator, tree, dataTable, gridList. Button toggle is the button group; the sidenav is a side sheet or rail                                                                                                                                                                                                                                                                |
 
 ### 1.9 Angular Material parity (decision 2026-10-20)
 
@@ -571,59 +572,59 @@ icon, title, description, actionTrigger, closeTrigger`, plus a `type` variant. E
    slider joined the test when c1g moved it to zag `slider`.
 2. **Variant explosion.** Every new variant group must avoid compounds where it can
    (`component-architecture.md` §5.5):
-    - A variant sets one of the component's tokens, and another variant (or the base) reads it:
-      the `color` group's `accent`, the size's `squareRadius` and `pressedRadius`.
-    - When a value depends on two groups, one sets a literal and the other a 0/1 **flag**, and
-      `blend(from, to, flag)` picks between them: `corner` sets `square`, `width` sets `narrow`
-      and `wide`, `inset` sets `insetStart` and `insetEnd`.
-    - **Never chain variant-set tokens** (a variant setting `a: ref("b")` where another variant
-      sets `b`). CSS resolves it, but React Native resolves `b` from the theme default, not the
-      variant, so the two targets disagree. Tokens the theme or instance sets (per-size tokens such
-      as `heightSmall`) are fine to read directly in a variant's styles.
-    - What stays compound needs a token value from one group _and_ a colour role from another
-      (each fill's toggle colours, 5 each on button and icon button), or a size that a `shape`
-      would otherwise tie with (the FAB's corner radius, 4).
-    - Compounds across the preset: 17 before the Expressive work, 21 after (the button's 5
-      toggle compounds are new; the FAB went from 5 to 4), 28 at r6 (2026-10-22), counting every
-      `compoundVariants` entry in `pureform()` as `component-architecture.md` §5.5 does.
-    - The selection space still grows with each group: the icon button now has about 1.4
-      million combinations. Tests that enumerate every combination sample past 40,000: `rn-adapter`'s codegen test
-      (an even spread plus each value), and the browser suite's Panda factory test (every
-      pair of values from every two groups, so each compound is covered, plus an even spread).
+   - A variant sets one of the component's tokens, and another variant (or the base) reads it:
+     the `color` group's `accent`, the size's `squareRadius` and `pressedRadius`.
+   - When a value depends on two groups, one sets a literal and the other a 0/1 **flag**, and
+     `blend(from, to, flag)` picks between them: `corner` sets `square`, `width` sets `narrow`
+     and `wide`, `inset` sets `insetStart` and `insetEnd`.
+   - **Never chain variant-set tokens** (a variant setting `a: ref("b")` where another variant
+     sets `b`). CSS resolves it, but React Native resolves `b` from the theme default, not the
+     variant, so the two targets disagree. Tokens the theme or instance sets (per-size tokens such
+     as `heightSmall`) are fine to read directly in a variant's styles.
+   - What stays compound needs a token value from one group _and_ a colour role from another
+     (each fill's toggle colours, 5 each on button and icon button), or a size that a `shape`
+     would otherwise tie with (the FAB's corner radius, 4).
+   - Compounds across the preset: 17 before the Expressive work, 21 after (the button's 5
+     toggle compounds are new; the FAB went from 5 to 4), 28 at r6 (2026-10-22), counting every
+     `compoundVariants` entry in `pureform()` as `component-architecture.md` §5.5 does.
+   - The selection space still grows with each group: the icon button now has about 1.4
+     million combinations. Tests that enumerate every combination sample past 40,000: `rn-adapter`'s codegen test
+     (an even spread plus each value), and the browser suite's Panda factory test (every
+     pair of values from every two groups, so each compound is covered, plus an even spread).
 3. **Theming concepts every new variant must keep.** Checked for the Expressive work:
-    - **Density:** sized heights and widths add `densityOffset` (button, icon button, including
-      the blended widths). Components without density before (FAB, slider, switch, nav) still
-      have none.
-    - **Shape:** every radius comes from the theme's roles (`radius("small")`, …), scaled or
-      combined where Material's value has no role: 2px is `extraSmall × 0.5`, 3px
-      `extraSmall × 0.75`, Expressive's 20px `large + extraSmall`. A shape theme (`sharp`,
-      `soft`, `squircle`) then rescales them; `corners.ts` adds the theme's corner style
-      wherever a radius is set. `packages/preset/src/radii.spec.ts` fails on any fixed px radius
-      in a style or a token. This fixed the bar slider and the FAB's medium corner, plus the
-      older checkbox box and tab indicator. Components whose geometry is the shape (circular
-      progress, the loading indicator) are the exception: see the guidelines' shape rule.
-    - **Colour groups:** colours come from group tokens or the `color` variant, never a fixed
-      role where a group should apply. The nav label's `secondary` follows the group's main
-      colour.
-    - **Direction:** logical properties only (inline insets, `borderStartStartRadius`, block
-      margins for the vertical divider), so right to left needs nothing extra.
-    - **Interaction source:** pressed styles read the `pressed` state (`:active` or
-      `data-pf-active`), so a press forwarded by a shared source morphs corners and narrows the
-      slider's handle. `selected` also matches `aria-current`/`aria-selected`, so the corner
-      swap is gated by the `toggle` variant's `toggles` flag.
-    - **Indication:** the bar slider has no state layer, so its declared surface (`stateLayer`)
-      stays hidden. Only the focus ring and the handle's press show. The round slider keeps the
-      surface, so the indication suites (component suites, React Native) test the round slider;
-      the slider suite also renders `round` and `large` examples. Compose 1.5 adds an
-      **inset focus ring**, drawn inside the component rather than outside it or as an opacity
-      layer (§0.1). **Done (c0d):** `materialState(..., { focusRing: "inset" })` sets the ring's
-      offset to minus its thickness for every component at once; `outer` stays the default.
-    - **Motion:** moving tweens (corners, the handle's width and position) go through
-      `motionTransition`, so reduced motion drops them and keeps colour fades.
-    - **Theme and instance tokens:** per-size tokens can be retuned by a theme or an instance.
-      Flag tokens (`square`, `toggles`, `narrow`, `wide`, `insetStart`, `insetEnd`) are
-      component tokens too, so an instance can set them, but the variants are the intended
-      interface.
+   - **Density:** sized heights and widths add `densityOffset` (button, icon button, including
+     the blended widths). Components without density before (FAB, slider, switch, nav) still
+     have none.
+   - **Shape:** every radius comes from the theme's roles (`radius("small")`, …), scaled or
+     combined where Material's value has no role: 2px is `extraSmall × 0.5`, 3px
+     `extraSmall × 0.75`, Expressive's 20px `large + extraSmall`. A shape theme (`sharp`,
+     `soft`, `squircle`) then rescales them; `corners.ts` adds the theme's corner style
+     wherever a radius is set. `packages/preset/src/radii.spec.ts` fails on any fixed px radius
+     in a style or a token. This fixed the bar slider and the FAB's medium corner, plus the
+     older checkbox box and tab indicator. Components whose geometry is the shape (circular
+     progress, the loading indicator) are the exception: see the guidelines' shape rule.
+   - **Colour groups:** colours come from group tokens or the `color` variant, never a fixed
+     role where a group should apply. The nav label's `secondary` follows the group's main
+     colour.
+   - **Direction:** logical properties only (inline insets, `borderStartStartRadius`, block
+     margins for the vertical divider), so right to left needs nothing extra.
+   - **Interaction source:** pressed styles read the `pressed` state (`:active` or
+     `data-pf-active`), so a press forwarded by a shared source morphs corners and narrows the
+     slider's handle. `selected` also matches `aria-current`/`aria-selected`, so the corner
+     swap is gated by the `toggle` variant's `toggles` flag.
+   - **Indication:** the bar slider has no state layer, so its declared surface (`stateLayer`)
+     stays hidden. Only the focus ring and the handle's press show. The round slider keeps the
+     surface, so the indication suites (component suites, React Native) test the round slider;
+     the slider suite also renders `round` and `large` examples. Compose 1.5 adds an
+     **inset focus ring**, drawn inside the component rather than outside it or as an opacity
+     layer (§0.1). **Done (c0d):** `materialState(..., { focusRing: "inset" })` sets the ring's
+     offset to minus its thickness for every component at once; `outer` stays the default.
+   - **Motion:** moving tweens (corners, the handle's width and position) go through
+     `motionTransition`, so reduced motion drops them and keeps colour fades.
+   - **Theme and instance tokens:** per-size tokens can be retuned by a theme or an instance.
+     Flag tokens (`square`, `toggles`, `narrow`, `wide`, `insetStart`, `insetEnd`) are
+     component tokens too, so an instance can set them, but the variants are the intended
+     interface.
 4. **Containers.** Only `list`, `chipSet` (with its behaviour) and `buttonGroup` (c2e) need
    styled containers. Radio group and tab list are rendered by the bindings and need no styles.
 5. **Badges are composed, not parts.** Nav bar, rail and tabs place the badge component
@@ -633,16 +634,16 @@ icon, title, description, actionTrigger, closeTrigger`, plus a `type` variant. E
    bar or the non-flexible medium/large app bars; their replacements cover them.
 7. **Repo issues found while testing** (not caused by this work). All fixed, and
    `omni run build test -f all` passes:
-    - The snackbar focus-timer test and the right-to-left tooltip tests failed when an earlier
-      test left the pointer over them; both now park it first.
-    - Rebuilding `packages/cli` dropped the executable bit from `dist/pureform.mjs`; the build
-      now restores it.
-    - Screenshots used the machine's fallback font, and Chromium's `color-mix` varies in the
-      sixth decimal. The browser suite now bundles Roboto and JetBrains Mono and rounds
-      indication colours to four decimals.
-    - Still open: omni's cache can replay an older build or `generate` output after files
-      change back (for example after a stash). Force with `-f all`, or regenerate the fixture
-      directly.
+   - The snackbar focus-timer test and the right-to-left tooltip tests failed when an earlier
+     test left the pointer over them; both now park it first.
+   - Rebuilding `packages/cli` dropped the executable bit from `dist/pureform.mjs`; the build
+     now restores it.
+   - Screenshots used the machine's fallback font, and Chromium's `color-mix` varies in the
+     sixth decimal. The browser suite now bundles Roboto and JetBrains Mono and rounds
+     indication colours to four decimals.
+   - Still open: omni's cache can replay an older build or `generate` output after files
+     change back (for example after a stash). Force with `-f all`, or regenerate the fixture
+     directly.
 
 ---
 
@@ -705,6 +706,7 @@ Expressive values are the defaults; every deprecated option stays as a variant.
 | Toolbar                                   | New (c4c): `root` holding icon buttons and buttons; `placement` floating (a level 3 pill) or docked (fills its edge, square, spreads its elements; replaces the bottom app bar), `orientation`, `color` standard/vibrant (vibrant provides its icon buttons its content color, r4-findings), `overflow` (a menu for what doesn't fit); 0 compounds                                                                                                              | —                                               |
 | Carousel                                  | New (c4d): `item` slots in a scrolling `itemGroup`, each a rounded `mask` (extra-large corners) over its `content`; `layout` multiBrowse (default), hero, uncontained, multiAspect, fullScreen; masks follow Material's keylines as the row scrolls; zag `carousel`; 0 compounds                                                                                                                                                                                | —                                               |
 | Stepper                                   | New (c6b): zag `steps`; `list` of `item`s, each a `trigger` (`indicator`, `label`, `caption`) and a `separator`, with the `content`; `orientation` horizontal (tabs keys, content after the list) or vertical (a disclosure list); a done step's check and an error's warning from state; `density`; 0 compounds                                                                                                                                                | —                                               |
+| Horizontal shared axis                    | New (m3b): `root` around `page`s and a `scrim`; Compose's `MaterialTransitions.HorizontalSharedAxis` (slide a fifth of the width on `spatialDefault`, fade 90ms after 50ms, mirrored under rtl, fade only under reduced motion) and its luminance-based scrim (0.2 over a light surface, 0.8 over a dark one); `transition: "sharedAxis"` (and `transitionScrim`) on the ready-made tabs and a row stepper; 0 compounds                                         |
 | Time picker                               | New (c5b): `timePicker` (`headline`, `body` with the hour and minute selectors and the `period` selector, a `dial` with track, handle, centre and labels, `actions`; `mode` dial/scroll, `color` standard/vibrant) and `timeInput` (two fields, the same period selector and actions); own machine, 12/24-hour from the locale; the dial stays round and unmirrored (shape exception); 0 compounds                                                              | —                                               |
 | Data table                                | New (c6d): `dataTable` (`header`, `body`, `footer` row groups; `headerRow`, `row`, `alternateRow` (striped), `footerRow`; `headerCell`, `cell`, `footerCell`, `selectionCell`; `sortHeader` with `sortLabel` and `sortIndicator`); `stickyHeader`, `density`; own machine for the sort and selection; 0 compounds                                                                                                                                               | —                                               |
 
@@ -719,6 +721,8 @@ c4b removed nothing: the app bar is new; M3's deprecated medium and large
 (non-flexible) bars were never built, and `mediumFlexible`/`largeFlexible` are their replacement.
 c4c removed nothing: the toolbar is new, and the bottom app bar it
 replaces was never built.
+m3b removed nothing: the horizontal shared axis is new, and the tabs and stepper had no
+transition option to replace.
 c4d removed nothing: the carousel is new, and M3 deprecates none of its layouts.
 c5a removed nothing: the date pickers and the date input are new, with no deprecated options.
 The text field's and text area's `supportingRow` part was removed

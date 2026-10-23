@@ -807,6 +807,21 @@ in `components/shared.ts`; the list item's swipe frame (the row over its action)
 </div>
 ```
 
+## Horizontal shared axis
+
+`horizontalSharedAxis` (`root`, `page`, `scrim`) is Compose's
+`MaterialTransitions.HorizontalSharedAxis`: the binding marks each page `data-state="entering"`
+or `"leaving"` and `data-direction="forward"` or `"backward"`, and the page's styles run
+`sharedAxisFrom*`/`sharedAxisTo*` (a fifth of its width, `SHARED_AXIS_KEYFRAMES`, physical, the
+mirrored pair under `rtl`) on `slideSpring` (`spatialDefault`) alongside the overlays' fades on
+`fadeDuration` and `fadeDelay` (90ms after 50ms, linear). Reduced motion keeps the fades. Forward
+the incoming page draws over the outgoing one, backward under it; the leaving page sits over the
+incoming one (`position: absolute`), which sizes the root (`overflow: clip`). The `scrim` part
+veils the page underneath, fading in going forward and out going backward over the slide, in
+`scrimColor` at `scrimOpacity`: `createHorizontalSharedAxis(theme.color)` picks Compose's 20%
+or 80% in each scheme from the surface's luminance (under 0.5 is dark), as
+`MaterialTransitions.scrimColor` does.
+
 ## Dialog
 
 Put the text buttons in the actions, the confirming one last. Turn on `icon` when you render

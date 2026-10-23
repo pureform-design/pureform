@@ -549,6 +549,21 @@
             "solid": {
                 "development": "./src/fade-through/index.ts",
                 "default": "./dist/fade-through.jsx"
+            },
+            "import": {
+                "development": "./src/fade-through/index.ts",
+                "default": "./dist/fade-through.jsx"
+            }
+        },
+        "./horizontal-shared-axis": {
+            "types": "./dist/horizontal-shared-axis/index.d.ts",
+            "solid": {
+                "development": "./src/horizontal-shared-axis/index.ts",
+                "default": "./dist/horizontal-shared-axis.jsx"
+            },
+            "import": {
+                "development": "./src/horizontal-shared-axis/index.ts",
+                "default": "./dist/horizontal-shared-axis.jsx"
             }
         },
         "./scrim": {

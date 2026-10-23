@@ -12,6 +12,7 @@ export * from "./components/stepper";
 export * from "./components/grid-list";
 export * from "./components/scrim";
 export * from "./components/fade-through";
+export * from "./components/horizontal-shared-axis";
 export * from "./components/radio";
 export * from "./components/ripple";
 export * from "./components/checkbox";

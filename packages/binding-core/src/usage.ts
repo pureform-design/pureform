@@ -209,6 +209,7 @@ export const COMPONENT_USAGE = {
     ripple: { entries: { ripple: {} } },
     scrim: { entries: { scrim: {} } },
     "fade-through": { entries: { fadeThrough: {} } },
+    "horizontal-shared-axis": { entries: { horizontalSharedAxis: {} } },
     // The scroll state sets `scrolled` and `collapsed`, and `search` follows the search bar; the
     // search bar is drawn scrolled and centered.
     "app-bar": {
@@ -295,14 +296,21 @@ export const COMPONENT_USAGE = {
         },
     },
     "supporting-text": { entries: { supportingText: same("tone") } },
+    // `transition: "sharedAxis"` moves a row's content in a shared axis.
     stepper: {
-        entries: { stepper: same("orientation", "density"), ripple: {} },
+        entries: {
+            stepper: same("orientation", "density"),
+            horizontalSharedAxis: {},
+            ripple: {},
+        },
     },
     switch: { entries: { switchControl: same("color"), ripple: {} } },
-    // `icon` follows the tabs' icons.
+    // `icon` follows the tabs' icons; `transition: "sharedAxis"` moves the panels in a shared
+    // axis.
     tabs: {
         entries: {
             tabs: same("variant", "inlineIcon", "scrollable", "color"),
+            horizontalSharedAxis: {},
             ripple: {},
         },
     },

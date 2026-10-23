@@ -80,6 +80,7 @@ describe("pureform", () => {
             "gridList",
             "scrim",
             "fadeThrough",
+            "horizontalSharedAxis",
             "ripple",
             "icon",
             "touchTarget",
@@ -166,6 +167,7 @@ describe("pureform", () => {
             "gridList",
             "scrim",
             "fadeThrough",
+            "horizontalSharedAxis",
             "ripple",
         ]);
     });
