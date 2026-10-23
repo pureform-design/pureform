@@ -112,6 +112,7 @@ export {
 export type { IconOnlyName } from "./components/content";
 export {
     DIALOG_CONTENT_PROPS,
+    closeTriggerProps,
     DIALOG_BEHAVIOR_PROPS,
     DIALOG_ROOT_PROPS,
     dialogBackdropLayout,
@@ -120,13 +121,14 @@ export {
     dialogSelection,
 } from "./components/dialog";
 export type {
+    CloseQuestion,
     DialogBehaviorProps,
-    DialogCloseProps,
     DialogContentProps,
     DialogElementIds,
     DialogPart,
     DialogRootOwnProps,
     DialogVariantProps,
+    OverlayCloseProps,
 } from "./components/dialog";
 export {
     FULLSCREEN_DIALOG_CONTENT_PROPS,
@@ -157,10 +159,7 @@ export {
     sideSheetSelection,
 } from "./components/sheet";
 export type {
-    BottomSheetCloseProps,
-    SideSheetCloseProps,
     CloseAsker,
-    CloseQuestion,
     BottomSheetContentProps,
     BottomSheetPart,
     BottomSheetRootOwnProps,
@@ -986,43 +985,51 @@ export { SCRIM_ROOT_PROPS, scrimSelection } from "./components/scrim";
 export {
     HORIZONTAL_SHARED_AXIS_ROOT_PROPS,
     horizontalSharedAxisSelection,
-    PAGE_TRANSITION_PROPS,
     SHARED_AXIS_FADE,
     SHARED_AXIS_SLIDE_FRACTION,
     sharedAxisChange,
     sharedAxisDirection,
-    sharedAxisMoving,
     sharedAxisPageProps,
     sharedAxisScrimProps,
-    sharedAxisSettle,
-    sharedAxisStart,
 } from "./components/horizontal-shared-axis";
 export type {
     HorizontalSharedAxisPart,
     HorizontalSharedAxisRootOwnProps,
     HorizontalSharedAxisVariantProps,
-    PageTransitionProps,
     SharedAxisDirection,
-    SharedAxisPage,
-    SharedAxisPageState,
 } from "./components/horizontal-shared-axis";
+export {
+    changePages,
+    keepContents,
+    LEAVING_PAGE_PROPS,
+    PAGE_TRANSITION_PROPS,
+    pageRootProps,
+    pagesLeaving,
+    pagesMoving,
+    settlePage,
+    startPages,
+} from "./components/page-transition";
+export type {
+    PageChange,
+    PageDirection,
+    PageKey,
+    PageState,
+    PageTransitionProps,
+    TransitionPage,
+} from "./components/page-transition";
 export type {
     ScrimPart,
     ScrimRootOwnProps,
     ScrimVariantProps,
 } from "./components/scrim";
 export {
-    dropPage,
     FADE_THROUGH_ROOT_PROPS,
+    fadeThroughPageProps,
     fadeThroughSelection,
-    pageStateProps,
-    showPage,
 } from "./components/fade-through";
 export type {
-    FadeThroughPage,
     FadeThroughPart,
     FadeThroughRootOwnProps,
-    FadeThroughState,
     FadeThroughValue,
 } from "./components/fade-through";
 export {

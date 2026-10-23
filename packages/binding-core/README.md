@@ -260,7 +260,7 @@ richTooltipSelection(props); isInteractiveRichTooltip(props); richTooltipMachine
 
 // Dialog: Zag's dialog; dialogOverlayAnatomy, and dialogBackdropAnatomy (the scrim)
 type DialogPart                          // the overlay's parts, and "backdrop"
-interface DialogRootOwnProps             // icon (the variant), tokens, modal, role, onClose (DialogCloseProps),
+interface DialogRootOwnProps             // icon (the variant), tokens, modal, role, onClose (OverlayCloseProps),
                                          // closeOnInteractOutside, closeOnEscape, restoreFocus,
                                          // initialFocusEl, finalFocusEl, aria-label, ids (headline,
                                          // body: Zag's title and description), open, defaultOpen,
@@ -269,6 +269,13 @@ DIALOG_ROOT_PROPS; DIALOG_CONTENT_PROPS; // trigger, mirrorIcon, headline, body,
 dialogSelection(props); dialogMachineProps(props);
 dialogPositionerLayout(present);         // hidden once gone; fixed over the viewport, centering
 dialogBackdropLayout(present);           // hidden once gone; the scrim fixed over the viewport
+interface OverlayCloseProps              // onClose, for the dialog, full-screen dialog and both sheets: asked before
+                                         // any close of its own (Escape, scrim, close trigger, a bottom sheet's handle
+                                         // press or drag): a boolean, or a promise; a controlled `open` closing it doesn't
+                                         // ask, by design. An app's Cancel button asks it by being a CloseTrigger. In React
+                                         // Native a surface alone (no trigger) accepts it but never calls it
+type CloseQuestion                       // () => boolean | Promise<boolean>
+closeTriggerProps(close, onClose, requestClose); // Zag's close props, its click asking onClose when there is one
 
 // Full-screen dialog: the same Zag dialog machine (`dialogMachineProps`); fullscreenDialogOverlayAnatomy,
 // no backdrop and no variants
@@ -282,10 +289,9 @@ fullscreenDialogPositionerLayout(present); // hidden once gone; fixed over the v
 // Sheets: the dialog's Zag machine; bottomSheetOverlayAnatomy, sideSheetOverlayAnatomy
 type BottomSheetPart; type SideSheetPart  // the overlays' parts, and "backdrop"
 interface BottomSheetRootOwnProps        // modal, tokens, onClose, the dialog's behavior props (no role), testId, unstyled
-interface BottomSheetCloseProps          // onClose: asked before any close of its own (Escape, scrim, handle press, drag): a boolean, or a promise; a controlled `open` closing it doesn't ask, by design
 closeAsker();                            // asks an overlay's onClose for every way it closes; a later question makes an earlier answer moot
 askingDismissProps(onClose, props, asker, close); // Zag dialog props: Escape and a press outside ask onClose first
-interface SideSheetRootOwnProps          // modal, coplanar, tokens, onClose (SideSheetCloseProps), and the same
+interface SideSheetRootOwnProps          // modal, coplanar, tokens, onClose (OverlayCloseProps), and the same
 BOTTOM_SHEET_ROOT_PROPS; BOTTOM_SHEET_CONTENT_PROPS; // trigger, dragHandle, dragHandleLabel, body
 SIDE_SHEET_ROOT_PROPS; SIDE_SHEET_CONTENT_PROPS;     // trigger, headline, onBack, backLabel, backIcon,
                                          // closeLabel, closeIcon, body, actions
@@ -517,8 +523,7 @@ MEDIA_ROOT_PROPS; mediaSelection;        // aspect, shape
 SEPARATOR_ROOT_PROPS; separatorSelection; separatorRootProps(element); // role on anything but hr
 SCRIM_ROOT_PROPS; scrimSelection;
 FADE_THROUGH_ROOT_PROPS; fadeThroughSelection; // value names what's shown
-showPage(pages, value, content); dropPage(pages, value); // the fade through's pages: the shown one leaves (closed), a new one enters (open), the first has no state; a left page goes once its exit ends
-pageStateProps(state);                   // data-state; a leaving page aria-hidden and inert
+fadeThroughPageProps(page);              // data-state open (entering) or closed (leaving, also aria-hidden and inert); none for the first page
 SUPPORTING_TEXT_ROOT_PROPS; supportingTextSelection; // tone
 TEXT_ROOT_PROPS; textSelection;          // textStyle, the preset's `style` group
 ICON_ROOT_PROPS; iconSelection; iconRootProps(props); // role img named by label, or hidden
@@ -769,17 +774,30 @@ items), and that no Solid or React source sets a listed group from anything but 
 `stepperTriggerDisabled` (disabled, or done and not `editable`) and `stepperIndicator` (what the
 indicator shows: an error, a check, the icon or the number).
 
+## Page transitions
+
+`components/page-transition.ts` holds the pages the fade through and the horizontal shared axis
+keep in every binding: `startPages(key)`, `changePages(pages, key, { direction, keepLeaving })`
+(the shown page leaves, the new one enters; a page still leaving goes at once unless
+`keepLeaving`, which the fade through sets), `settlePage(pages, key, state)` (once a page's
+motion ends: a leaving page goes, an entering one becomes current), `pagesLeaving`,
+`pagesMoving`, `keepContents(contents, pages, key, content)` (each page's content as it last
+was), `LEAVING_PAGE_PROPS` (`inert`, `aria-hidden`) and `pageRootProps(pages)`
+(`data-transitioning` while a page leaves, which clips the root so a taller old page doesn't
+spill). `PageTransitionProps` (`transition: "none" | "fadeThrough" | "sharedAxis"`,
+`transitionScrim`) is on the ready-made tabs' and stepper's content props. `/dom`'s
+`whenAnimationsEnd(element, done)` tells a web binding when a page's motion has ended.
+
 ## Horizontal shared axis
 
-`components/horizontal-shared-axis.ts`: `HorizontalSharedAxisRootOwnProps` (`index`, `scrim`),
-`HORIZONTAL_SHARED_AXIS_ROOT_PROPS`, `horizontalSharedAxisSelection`, and the pages a binding keeps:
-`sharedAxisStart`, `sharedAxisChange` (the shown page leaves, the new one enters, the way
-`sharedAxisDirection` says: forward to a higher index), `sharedAxisSettle` (once a page's
-animations end), `sharedAxisMoving`, `sharedAxisPageProps` (`data-state`, `data-direction`, a
-leaving page `inert` and `aria-hidden`) and `sharedAxisScrimProps`. `PageTransitionProps`
-(`transition: "none" | "sharedAxis"`, `transitionScrim`) is on the ready-made tabs' and stepper's
-content props. `SHARED_AXIS_SLIDE_FRACTION` and `SHARED_AXIS_FADE` give React Native, which moves
-the pages in code, the slide and fade the web's keyframes and tokens hold.
+`components/horizontal-shared-axis.ts`: `HorizontalSharedAxisRootOwnProps` (`index`, `scrim`, off
+by default: Compose draws its scrim only behind predictive back), `HORIZONTAL_SHARED_AXIS_ROOT_PROPS`,
+`horizontalSharedAxisSelection`, `sharedAxisChange` (the page transition's change, the way
+`sharedAxisDirection` says: forward to a higher index, at most two pages),
+`sharedAxisPageProps` (`data-state`, `data-direction`, a leaving page `inert` and `aria-hidden`)
+and `sharedAxisScrimProps`. `SHARED_AXIS_SLIDE_FRACTION` and `SHARED_AXIS_FADE` give React
+Native, which moves the pages in code, the slide and the default fade the web's keyframes and
+tokens hold (an instance's `slideSpring`, `fadeDuration` and `fadeDelay` tokens override them).
 
 ## Carousel
 

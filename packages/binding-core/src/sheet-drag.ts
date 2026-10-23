@@ -7,7 +7,8 @@
 // handle, so a handle that closes on a press closes only once.
 
 import { closeAsker } from "./components/sheet";
-import type { CloseAsker, CloseQuestion } from "./components/sheet";
+import type { CloseQuestion } from "./components/dialog";
+import type { CloseAsker } from "./components/sheet";
 import { swallowNextClick } from "./drag-click";
 
 /** How far down, as a share of the sheet's height, a drag closes it. */

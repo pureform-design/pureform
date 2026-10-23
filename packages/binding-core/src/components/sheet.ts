@@ -16,7 +16,11 @@ import type {
 import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Unstyled } from "../parts";
-import type { DialogBehaviorProps } from "./dialog";
+import type {
+    CloseQuestion,
+    DialogBehaviorProps,
+    OverlayCloseProps,
+} from "./dialog";
 import { DIALOG_BEHAVIOR_PROPS, dialogMachineProps } from "./dialog";
 
 /** What the sheets' machine takes from Root's props: the dialog's, but for `modal`, which is the
@@ -53,31 +57,6 @@ export interface SideSheetVariantProps {
      *  covering it. Ignored on a modal sheet. @default false */
     readonly coplanar?: boolean | undefined;
     readonly tokens?: InstanceTokens<"sideSheet"> | undefined;
-}
-
-/** Asked before an overlay closes: `true` closes it, `false` keeps it open. It may answer
- *  later, with a promise (a rejection keeps it open). */
-export type CloseQuestion = () => boolean | Promise<boolean>;
-
-/** What a bottom sheet asks before it closes. */
-export interface BottomSheetCloseProps {
-    /** Asked whenever the sheet would close by itself: Escape (or the back button), a press on
-     *  the scrim, a press on the drag handle, or a drag down on it. `true` closes it, `false`
-     *  keeps it open. Given a promise, it stays open until the promise settles, a dragged sheet
-     *  holding where the drag let go of it, then leaves (resolved `true`) or springs back.
-     *  Without, each of these closes it. Closing it through a controlled `open` doesn't ask, by
-     *  design (as in Radix and MUI): the app has already decided. */
-    readonly onClose?: CloseQuestion | undefined;
-}
-
-/** What a side sheet asks before it closes. */
-export interface SideSheetCloseProps {
-    /** Asked whenever the sheet would close by itself: Escape (or the back button), a press on
-     *  the scrim, or the close trigger. `true` closes it, `false` keeps it open. Given a
-     *  promise, it stays open until the promise settles (a rejection keeps it open). Without,
-     *  each of these closes it. Closing it through a controlled `open` doesn't ask, by design
-     *  (as in Radix and MUI): the app has already decided. */
-    readonly onClose?: CloseQuestion | undefined;
 }
 
 /** Asks an overlay's `onClose` and acts on the answer, `yes` or `no`, once it comes. */
@@ -163,7 +142,7 @@ export const askingDismissProps = (
 /** Everything the bottom sheet's Root takes for itself, besides the element's own props and
  *  `as`. */
 export interface BottomSheetRootOwnProps
-    extends BottomSheetVariantProps, SheetBehaviorProps, BottomSheetCloseProps {
+    extends BottomSheetVariantProps, SheetBehaviorProps, OverlayCloseProps {
     /** A prefix for every part's test id (`share` → `share-trigger`, `share-content`), or ids by
      *  part. */
     readonly testId?: TestIdOverride<BottomSheetPart> | undefined;
@@ -174,7 +153,7 @@ export interface BottomSheetRootOwnProps
 /** Everything the side sheet's Root takes for itself, besides the element's own props and
  *  `as`. */
 export interface SideSheetRootOwnProps
-    extends SideSheetVariantProps, SheetBehaviorProps, SideSheetCloseProps {
+    extends SideSheetVariantProps, SheetBehaviorProps, OverlayCloseProps {
     /** A prefix for every part's test id (`filters` → `filters-trigger`, `filters-content`), or
      *  ids by part. */
     readonly testId?: TestIdOverride<SideSheetPart> | undefined;

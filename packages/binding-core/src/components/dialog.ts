@@ -14,7 +14,6 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Controllable } from "../controllable";
 import type { Unstyled } from "../parts";
-import type { CloseQuestion } from "./sheet";
 
 /** The dialog's parts: `"root" | "trigger" | "positioner" | "content"` (the surface) `| "icon" |
  *  "headline" | "body" | "actions" | "closeTrigger"`, and `"backdrop"`. */
@@ -64,19 +63,37 @@ export interface DialogBehaviorProps extends Controllable<"open", boolean> {
     readonly ids?: DialogElementIds | undefined;
 }
 
-/** What a dialog asks before it closes. */
-export interface DialogCloseProps {
-    /** Asked whenever the dialog would close by itself: Escape (or the back button), a press on
-     *  the scrim, or a close trigger. `true` closes it, `false` keeps it open. Given a promise,
-     *  it stays open until the promise settles (a rejection keeps it open). Without, each of
-     *  these closes it. Closing it through a controlled `open` doesn't ask, by design (as in
-     *  Radix and MUI): the app has already decided. */
+/** Asked before an overlay closes: `true` closes it, `false` keeps it open. It may answer
+ *  later, with a promise (a rejection keeps it open). */
+export type CloseQuestion = () => boolean | Promise<boolean>;
+
+/** What a dialog, full-screen dialog, side sheet or bottom sheet asks before it closes. */
+export interface OverlayCloseProps {
+    /** Asked whenever the overlay would close by itself: Escape (or the back button), a press on
+     *  the scrim, or a close trigger (`CloseTrigger`, which is also how an app's own Cancel
+     *  button asks: render it as one); on a bottom sheet, also a press on the drag handle or a
+     *  drag down on it. `true` closes it, `false` keeps it open. Given a promise, it stays open
+     *  until the promise settles (a rejection keeps it open), a dragged bottom sheet holding
+     *  where the drag let go of it, then leaves or springs back. Without, each of these closes
+     *  it. Closing it through a controlled `open` doesn't ask, by design (as in Radix and MUI):
+     *  the app has already decided. In React Native, a dialog, full-screen dialog or side sheet
+     *  shown as a surface alone (no trigger or `onOpenChange`) accepts `onClose` but never calls
+     *  it: nothing closes it by itself. */
     readonly onClose?: CloseQuestion | undefined;
 }
 
+/** A close trigger's props: Zag's `close` props as they are, or, with an `onClose`, its click
+ *  replaced by `requestClose`, which asks first (a dialog's close trigger, a bottom sheet's drag
+ *  handle). */
+export const closeTriggerProps = <P extends object>(
+    close: P,
+    onClose: CloseQuestion | undefined,
+    requestClose: () => void,
+): P => (onClose ? { ...close, onClick: requestClose } : close);
+
 /** Everything Root takes for itself, besides the element's own props and `as`. */
 export interface DialogRootOwnProps
-    extends DialogVariantProps, DialogBehaviorProps, DialogCloseProps {
+    extends DialogVariantProps, DialogBehaviorProps, OverlayCloseProps {
     /** A prefix for every part's test id (`discard` → `discard-trigger`, `discard-content`), or
      *  ids by part. */
     readonly testId?: TestIdOverride<DialogPart> | undefined;
