@@ -23,7 +23,8 @@
 // The scrim (Compose's `MaterialTransitions.scrimColor`) veils the page underneath: the
 // outgoing page going forward, which it dims as it fades in, and the incoming page going
 // backward, which it lifts off. Its opacity follows the luminance of the theme's surface:
-// 0.8 over a dark surface, 0.2 over a light one.
+// 0.8 over a dark surface, 0.2 over a light one. It's an option the bindings leave off by
+// default: Compose draws this scrim only behind predictive back, which pureform leaves out.
 
 import { typed } from "@pureform/core";
 import {
