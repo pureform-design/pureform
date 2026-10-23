@@ -2095,6 +2095,54 @@ codeField[color=error].label: bg none | color rgba(73, 69, 78, 1) | outline none
 codeField[color=info].label: bg none | color rgba(73, 69, 78, 1) | outline none
     focused: color rgba(0, 104, 124, 1)
     focused-checked: color rgba(0, 104, 124, 1)
+fileUpload.dropzone: bg rgba(253, 248, 253, 1) | color rgba(28, 27, 30, 1) | outline none
+    dragged: bg rgba(233, 221, 255, 1) | color rgba(79, 55, 138, 1)
+fileUpload.icon: bg none | color rgba(28, 27, 30, 1) | outline none
+    dragged: color rgba(79, 55, 138, 1)
+fileUpload.headline: bg none | color rgba(28, 27, 30, 1) | outline none
+    dragged: color rgba(79, 55, 138, 1)
+fileUpload[color=secondary].dropzone: bg rgba(253, 248, 253, 1) | color rgba(28, 27, 30, 1) | outline none
+    dragged: bg rgba(232, 222, 248, 1) | color rgba(74, 68, 88, 1)
+fileUpload[color=secondary].icon: bg none | color rgba(28, 27, 30, 1) | outline none
+    dragged: color rgba(74, 68, 88, 1)
+fileUpload[color=secondary].headline: bg none | color rgba(28, 27, 30, 1) | outline none
+    dragged: color rgba(74, 68, 88, 1)
+fileUpload[color=tertiary].dropzone: bg rgba(253, 248, 253, 1) | color rgba(28, 27, 30, 1) | outline none
+    dragged: bg rgba(255, 217, 227, 1) | color rgba(99, 59, 72, 1)
+fileUpload[color=tertiary].icon: bg none | color rgba(28, 27, 30, 1) | outline none
+    dragged: color rgba(99, 59, 72, 1)
+fileUpload[color=tertiary].headline: bg none | color rgba(28, 27, 30, 1) | outline none
+    dragged: color rgba(99, 59, 72, 1)
+fileUpload[color=success].dropzone: bg rgba(253, 248, 253, 1) | color rgba(28, 27, 30, 1) | outline none
+    dragged: bg rgba(116, 254, 128, 1) | color rgba(0, 83, 23, 1)
+fileUpload[color=success].icon: bg none | color rgba(28, 27, 30, 1) | outline none
+    dragged: color rgba(0, 83, 23, 1)
+fileUpload[color=success].headline: bg none | color rgba(28, 27, 30, 1) | outline none
+    dragged: color rgba(0, 83, 23, 1)
+fileUpload[color=warning].dropzone: bg rgba(253, 248, 253, 1) | color rgba(28, 27, 30, 1) | outline none
+    dragged: bg rgba(255, 224, 138, 1) | color rgba(87, 68, 0, 1)
+fileUpload[color=warning].icon: bg none | color rgba(28, 27, 30, 1) | outline none
+    dragged: color rgba(87, 68, 0, 1)
+fileUpload[color=warning].headline: bg none | color rgba(28, 27, 30, 1) | outline none
+    dragged: color rgba(87, 68, 0, 1)
+fileUpload[color=error].dropzone: bg rgba(253, 248, 253, 1) | color rgba(28, 27, 30, 1) | outline none
+    dragged: bg rgba(255, 218, 214, 1) | color rgba(147, 0, 10, 1)
+fileUpload[color=error].icon: bg none | color rgba(28, 27, 30, 1) | outline none
+    dragged: color rgba(147, 0, 10, 1)
+fileUpload[color=error].headline: bg none | color rgba(28, 27, 30, 1) | outline none
+    dragged: color rgba(147, 0, 10, 1)
+fileUpload[color=info].dropzone: bg rgba(253, 248, 253, 1) | color rgba(28, 27, 30, 1) | outline none
+    dragged: bg rgba(176, 236, 255, 1) | color rgba(0, 78, 94, 1)
+fileUpload[color=info].icon: bg none | color rgba(28, 27, 30, 1) | outline none
+    dragged: color rgba(0, 78, 94, 1)
+fileUpload[color=info].headline: bg none | color rgba(28, 27, 30, 1) | outline none
+    dragged: color rgba(0, 78, 94, 1)
+fileUpload[invalid=true].dropzone: bg rgba(253, 248, 253, 1) | color rgba(28, 27, 30, 1) | outline none
+    dragged: bg rgba(233, 221, 255, 1) | color rgba(79, 55, 138, 1)
+fileUpload[invalid=true].icon: bg none | color rgba(28, 27, 30, 1) | outline none
+    dragged: color rgba(79, 55, 138, 1)
+fileUpload[invalid=true].headline: bg none | color rgba(28, 27, 30, 1) | outline none
+    dragged: color rgba(79, 55, 138, 1)
 timePicker.hourSelector: bg rgba(230, 225, 230, 1) | color rgba(28, 27, 30, 1) | outline none
     hovered: bg rgba(214, 209, 214, 1)
     focused: bg rgba(210, 205, 210, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
