@@ -28,13 +28,11 @@ export const bottomSheet: ComponentCase = {
     opened: {
         plain: { defaultOpen: true },
         standard: { defaultOpen: true, modal: false },
-        // Taller than half the screen, so it opens with its top at half the screen.
+        // Taller than half the screen, so it opens with its top at half the screen (the
+        // default); its body scrolls, so it takes focus for the keyboard.
         "partly open": {
             defaultOpen: true,
-            partiallyExpandable: true,
             body: "Send it to a friend, or copy the link. ".repeat(120),
-            // Text alone scrolls, so the body takes focus for the keyboard to scroll it.
-            slotProps: { body: { tabIndex: 0 } },
         },
     },
     state: { prop: "open", from: false, to: true, act: click, read },
