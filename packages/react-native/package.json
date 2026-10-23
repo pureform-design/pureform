@@ -166,6 +166,13 @@
                 "default": "./dist/grid-list.mjs"
             }
         },
+        "./color-picker": {
+            "types": "./dist/color-picker/index.d.ts",
+            "import": {
+                "development": "./src/color-picker/index.ts",
+                "default": "./dist/color-picker.mjs"
+            }
+        },
         "./splitter": {
             "types": "./dist/splitter/index.d.ts",
             "import": {
