@@ -221,6 +221,7 @@ export {
 } from "./sheet-drag";
 export type { SheetDrag, SheetDragOptions } from "./sheet-drag";
 export { sideSheetDragToDismiss } from "./side-sheet-drag";
+export { splitterRelease, splitterRoom } from "./splitter-release";
 export {
     createSwipeSettle,
     LIST_ITEM_SWIPE_SPRING,
