@@ -331,7 +331,10 @@ function ReadyMadeContent({ own }: { readonly own: DateInputProps }) {
             <Field {...slot("field")}>
                 <Container {...slot("container")}>
                     {isPresent(own.leadingIcon) ? (
-                        <LeadingIcon {...slot("leadingIcon")}>
+                        <LeadingIcon
+                            mirror={own.mirrorLeadingIcon}
+                            {...slot("leadingIcon")}
+                        >
                             {own.leadingIcon}
                         </LeadingIcon>
                     ) : null}
@@ -348,7 +351,10 @@ function ReadyMadeContent({ own }: { readonly own: DateInputProps }) {
                     ) : null}
                     <Label {...slot("label")}>{own.label ?? "Date"}</Label>
                     {isPresent(own.trailingIcon) ? (
-                        <TrailingIcon {...slot("trailingIcon")}>
+                        <TrailingIcon
+                            mirror={own.mirrorTrailingIcon}
+                            {...slot("trailingIcon")}
+                        >
                             {own.trailingIcon}
                         </TrailingIcon>
                     ) : null}

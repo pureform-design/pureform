@@ -204,7 +204,10 @@ codegen hooks (`transformSource`) run in the script.
   binding-core's declarations, with `@control` JSDoc tags for strays; `controls.exclude` stays
   for overrides. Round 4: literal unions are selects with a mapping, `default*` props have no
   control, and the ready-made date input takes its icons and affixes as content (as the text
-  field and the docked date picker do), so the codegen needs no special case.
+  field and the docked date picker do), so the codegen needs no special case. Round 5: a select
+  of 3 options or fewer is a `radio` control (`@control radio` forces it, `@control select`
+  keeps a select), and the ready-made date input takes `mirrorLeadingIcon` and
+  `mirrorTrailingIcon` like the text field.
 - **Components:** every one with an anatomy and a case (round 2; the first slice was Button,
   Switch and TextField). Toast and GridList are skipped: their cases need a scene (a toaster,
   tiles as children) that props can't give.

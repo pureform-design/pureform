@@ -205,6 +205,15 @@ export const dateInput: ComponentCase = {
         "secondary color": { color: "secondary", defaultValue: DATE },
         error: { error: "Pick a weekday" },
         "day first": { locale: "en-GB", defaultValue: DATE },
+        "icons and affixes": {
+            leadingIcon: "→",
+            trailingIcon: "→",
+            mirrorLeadingIcon: true,
+            mirrorTrailingIcon: true,
+            prefixText: "$",
+            suffixText: "USD",
+            defaultValue: DATE,
+        },
     },
     opened: { "mode toggle": { onModeToggle: () => {} } },
     keyboard: {

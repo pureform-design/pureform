@@ -7,13 +7,15 @@
 // - A union of literals (string, number, boolean) with a non-boolean member is a select of the
 //   stringified values, with a `mapping` back to the real ones (`boolean | "indeterminate"` →
 //   `["true", "false", "indeterminate"]`); plain `true | false` stays boolean.
+// - A select of 3 options or fewer is drawn as a `radio` control (`argTypeFor`); more stay a
+//   select. A `@control select` tag keeps the select, `@control radio` forces the radio.
 // - A string-literal union is a select, `boolean` a boolean, `string` a text field, `number` a
 //   number field; functions, nodes, objects, arrays and mixed unions get no control.
 // - A prop typed `VariantProp<C, "group">` names the variant group it sets (the text's
 //   `textStyle` sets `style`): read from the declaration before the alias resolves, following
 //   indexed accesses (`ButtonVariantProps["color"]`).
 // - A JSDoc tag on the prop in binding-core overrides the type: `@control none | select |
-//   boolean | text | number`.
+//   boolean | text | number | radio`.
 
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -21,11 +23,18 @@ import { dirname, join } from "node:path";
 // The JavaScript compiler API: TypeScript 7 (the repo's `typescript`) ships none yet.
 import ts from "@typescript/typescript6";
 
-export type ControlKind = "none" | "select" | "boolean" | "text" | "number";
+export type ControlKind =
+    | "none"
+    | "select"
+    | "radio"
+    | "boolean"
+    | "text"
+    | "number";
 
 const KINDS = new Set<ControlKind>([
     "none",
     "select",
+    "radio",
     "boolean",
     "text",
     "number",
@@ -230,11 +239,18 @@ export const propControls = (
     return out;
 };
 
-/** A control per variant from the anatomy: a boolean for `["true", "false"]`, else a select. */
+/** The most options a radio control draws; a select has more. */
+export const RADIO_MAX = 3;
+
+/** A control per variant from the anatomy: a boolean for `["true", "false"]`, else a radio (3
+ *  options or fewer) or a select. */
 export const controlFor = (values: readonly string[]) =>
     values.length === 2 && values.includes("true") && values.includes("false")
         ? { control: "boolean" }
-        : { control: "select", options: values };
+        : {
+              control: values.length <= RADIO_MAX ? "radio" : "select",
+              options: values,
+          };
 
 /** A prop's arg type. A variant prop (`VariantProp<C, "group">`) takes its group's values from
  *  the anatomy, in the recipe's order (a `true`/`false` group is a boolean), unless a
@@ -250,11 +266,19 @@ export const argTypeFor = (
         case "none":
             return { control: false };
         case "select":
+        case "radio": {
+            const options = values ?? prop.options ?? [];
+            const control =
+                prop.control === "radio" ||
+                (!prop.tagged && options.length <= RADIO_MAX)
+                    ? "radio"
+                    : "select";
             return {
-                control: "select",
-                options: values ?? prop.options ?? [],
+                control,
+                options,
                 ...(prop.mapping && !values ? { mapping: prop.mapping } : {}),
             };
+        }
         default:
             return { control: prop.control };
     }

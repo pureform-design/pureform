@@ -481,3 +481,46 @@ leadingIcon />` (a flag) is now a node, so nothing is drawn for `true`.
   mapping; none exists.
 - The date input's icons render `children` only; no `mirror` content props (the text field has
   `mirrorLeadingIcon`/`mirrorTrailingIcon`).
+
+## Round 5 (branch `storybook-web-5`)
+
+From `main` (`42cef4ad`). Not pushed.
+
+### What changed
+
+- **DateInput's affix props take content, not a flag** (unreleased, accepted without a
+  deprecation): `leadingIcon`, `trailingIcon`, `prefixText` and `suffixText` on the ready-made
+  are nodes (round 4); Root and the composed parts keep the flags. The binding READMEs didn't
+  mention the flags; they now say the ready-made takes content.
+- **`mirrorLeadingIcon` and `mirrorTrailingIcon` on the ready-made DateInput** (React, Solid,
+  React Native), like the text field: they join `DateInputContentProps` and
+  `DATE_INPUT_CONTENT_PROPS` in binding-core, and the icon parts get `mirror` (the parts already
+  took it). React Native sets the `mirrored` state when either is on, so both flip, as in its
+  text field. Specs: React and Solid check `data-pf-mirror` on the marked icon only; React
+  Native checks the computed transform flips under `dir="rtl"` and not unmarked. A new
+  `icons and affixes` example in `@pureform/component-cases` (date input) puts them through the
+  direction suite and a story.
+- **`radio` controls:** `argTypeFor` turns a select of 3 options or fewer into `radio`
+  (`RADIO_MAX`), for the resolved types, the mappings (`true`, `false`, `indeterminate`) and the
+  anatomy's variant groups (`controlFor`); above 3 stays `select`. `@control radio` is a new tag
+  kind (forces it); `@control select` keeps a select. `PropControl.control` itself still says
+  `select` (the decision is in `argTypeFor`, so the spec's type fixtures are unchanged); the spec
+  gained fixtures `scale` (4 options), `wide` (`@control radio`) and `pair` (`@control select`).
+
+### Checks run
+
+- `bunx tsc --noEmit` in binding-core, react, solid, react-native (clean) and the app's
+  `tsconfig.json` (clean; `tsconfig.project.json` has the same 253 lines of third-party
+  declaration errors as `main`).
+- `omni run build test -p` binding-core, react, solid, react-native: passing (React Native's
+  new specs included).
+- The app's unit spec: 14 passed.
+- `omni run generate prepare -p @pureform/panda-fixture`, then the direction suite narrowed with
+  `-t DateInput` on `solid/panda` and `react/css`: 16 passed.
+- `omni run build -p @pureform/storybook-web`; story tests for **all 61 groups**, since a radio
+  lands in most of them: **741 per renderer, Solid and React, all passing**.
+
+### Open questions (round 5)
+
+- Boolean-valued variant groups with a third option, and `checked`'s `true`/`false`/
+  `indeterminate`, are now radios; confirm that suits the panel.

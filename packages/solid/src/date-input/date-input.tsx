@@ -355,7 +355,10 @@ function ReadyMadeContent(props: {
             <Field {...slots("field")}>
                 <Container {...slots("container")}>
                     <Show when={isPresent(own.leadingIcon)}>
-                        <LeadingIcon {...slots("leadingIcon")}>
+                        <LeadingIcon
+                            mirror={own.mirrorLeadingIcon}
+                            {...slots("leadingIcon")}
+                        >
                             {own.leadingIcon}
                         </LeadingIcon>
                     </Show>
@@ -398,7 +401,10 @@ function ReadyMadeContent(props: {
                         {isPresent(own.label) ? own.label : "Date"}
                     </Label>
                     <Show when={isPresent(own.trailingIcon)}>
-                        <TrailingIcon {...slots("trailingIcon")}>
+                        <TrailingIcon
+                            mirror={own.mirrorTrailingIcon}
+                            {...slots("trailingIcon")}
+                        >
                             {own.trailingIcon}
                         </TrailingIcon>
                     </Show>

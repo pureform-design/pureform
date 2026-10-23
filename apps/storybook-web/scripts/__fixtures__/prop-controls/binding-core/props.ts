@@ -31,6 +31,11 @@ export interface FixtureProps
     readonly items?: readonly string[] | undefined;
     readonly mixed?: boolean | "indeterminate" | undefined;
     readonly count?: 1 | 2 | "auto" | undefined;
+    readonly scale?: "xs" | "s" | "m" | "l" | undefined;
+    /** @control radio */
+    readonly wide?: "a" | "b" | "c" | "d" | undefined;
+    /** @control select */
+    readonly pair?: "left" | "right" | undefined;
     readonly flag?: true | false | undefined;
     readonly loose?: boolean | string | undefined;
     readonly tricky?: boolean | { readonly a: string } | undefined;
