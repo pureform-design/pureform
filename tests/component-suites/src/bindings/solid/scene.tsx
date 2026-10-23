@@ -21,6 +21,7 @@ import { Checkbox } from "@pureform/solid/checkbox";
 import { Chip } from "@pureform/solid/chip";
 import { ChipSet } from "@pureform/solid/chip-set";
 import { CircularProgress } from "@pureform/solid/circular-progress";
+import { CopyButton } from "@pureform/solid/copy-button";
 import { DateInput } from "@pureform/solid/date-input";
 import { DatePicker } from "@pureform/solid/date-picker";
 import { Dialog } from "@pureform/solid/dialog";
@@ -43,6 +44,7 @@ import { NavigationBar } from "@pureform/solid/navigation-bar";
 import { NavigationRail } from "@pureform/solid/navigation-rail";
 import { Paginator } from "@pureform/solid/paginator";
 import { RadioGroup } from "@pureform/solid/radio-group";
+import { Rating } from "@pureform/solid/rating";
 import { RichTooltip } from "@pureform/solid/rich-tooltip";
 import { Ripple } from "@pureform/solid/ripple";
 import { Scrim } from "@pureform/solid/scrim";
@@ -208,6 +210,8 @@ export const components: Record<ComponentName, ValidComponent> = {
     Switch,
     Tabs,
     TagsInput,
+    CopyButton,
+    Rating,
     Text,
     TextArea,
     TextField,

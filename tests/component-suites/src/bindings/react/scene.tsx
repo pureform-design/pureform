@@ -22,6 +22,7 @@ import { Checkbox } from "@pureform/react/checkbox";
 import { Chip } from "@pureform/react/chip";
 import { ChipSet } from "@pureform/react/chip-set";
 import { CircularProgress } from "@pureform/react/circular-progress";
+import { CopyButton } from "@pureform/react/copy-button";
 import { DateInput } from "@pureform/react/date-input";
 import { DatePicker } from "@pureform/react/date-picker";
 import { Dialog } from "@pureform/react/dialog";
@@ -44,6 +45,7 @@ import { NavigationBar } from "@pureform/react/navigation-bar";
 import { NavigationRail } from "@pureform/react/navigation-rail";
 import { Paginator } from "@pureform/react/paginator";
 import { RadioGroup } from "@pureform/react/radio-group";
+import { Rating } from "@pureform/react/rating";
 import { RichTooltip } from "@pureform/react/rich-tooltip";
 import { Ripple } from "@pureform/react/ripple";
 import { Scrim } from "@pureform/react/scrim";
@@ -218,6 +220,8 @@ export const components: Record<ComponentName, ComponentType<never>> = {
     Switch,
     Tabs,
     TagsInput,
+    CopyButton,
+    Rating,
     Text,
     TextArea,
     TextField,

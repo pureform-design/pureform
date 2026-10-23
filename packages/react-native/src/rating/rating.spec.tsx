@@ -59,8 +59,9 @@ describe("Rating on React Native", () => {
         );
         expect(onValueChange).toHaveBeenLastCalledWith({ value: 3 });
         expect(all("live-fill")).toHaveLength(3);
-        await interact(() =>
-            userEvent.click(all("shown-item")[3] as HTMLElement),
+        // A read-only star can't be pressed.
+        expect(all("shown-item")[3]?.getAttribute("aria-disabled")).toBe(
+            "true",
         );
         expect(all("shown-fill")).toHaveLength(1);
     });
