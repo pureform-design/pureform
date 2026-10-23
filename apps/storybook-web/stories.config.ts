@@ -78,6 +78,7 @@ export default defineStories({
         Switch: { hooks: ["./src/checks/switch.ts"] },
         Badge: { hooks: ["./src/checks/badge.ts"] },
         Slider: { hooks: ["./src/checks/slider.ts"] },
+        CopyButton: { hooks: ["./src/checks/copy-button.ts"] },
         // Their cases carry data (`toasts`, `tiles`) that each renderer's scenes turn into
         // children; the plays check it is drawn.
         Toast: { hooks: ["./src/stages/toast.ts"] },

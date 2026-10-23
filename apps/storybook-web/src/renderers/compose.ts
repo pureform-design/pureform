@@ -48,9 +48,19 @@ export const composeStories = (input: ComposeInput) => {
         c.keyboard?.keys.some((key) => key.does === "click")
             ? {
                   // A link's click would navigate the story's frame away (a list's
-                  // `href="#inbox"`), so the handler keeps it in place.
-                  onClick: (event?: { preventDefault?: () => void }) => {
-                      event?.preventDefault?.();
+                  // `href="#inbox"`), so the handler keeps it in place. Only a link's: a
+                  // component skips its own action on a prevented click (the copy button's
+                  // copy).
+                  onClick: (event?: {
+                      preventDefault?: () => void;
+                      target?: unknown;
+                  }) => {
+                      if (
+                          event?.target instanceof Element &&
+                          event.target.closest("a[href]")
+                      ) {
+                          event.preventDefault?.();
+                      }
                       clicks(summarizeEvent(event));
                   },
               }
