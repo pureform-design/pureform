@@ -52,6 +52,19 @@ const drag = (sheet: HTMLElement, by: number, steps = 4, ms = 200) => {
 };
 
 describe("SideSheet, dragged", () => {
+    // A scroll container doesn't take its touch actions from the sheet around it, so the body
+    // (which scrolls) says `pan-y` itself: otherwise the browser takes a sideways touch on it and
+    // the sheet drags only by its header (fix-storybook-5a).
+    it("leaves sideways touches on its scrolling body to the drag", async () => {
+        const { host, content } = await mount(sheetCase.opened!.plain!);
+        const body = content.querySelector<HTMLElement>(
+            `[data-testid="${ids.body}"]`,
+        )!;
+        expect(getComputedStyle(body).overflowY).toMatch(/auto|scroll/);
+        expect(getComputedStyle(body).touchAction).toBe("pan-y");
+        host.remove();
+    });
+
     it("follows a touch toward its edge and settles back when let go short of halfway", async () => {
         const { host, content } = await mount(sheetCase.opened!.plain!);
         expect(getComputedStyle(content).touchAction).toBe("pan-y");

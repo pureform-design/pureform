@@ -14,6 +14,7 @@ import {
 import type { TestIdOverride } from "@pureform/anatomy";
 import {
     isPresent,
+    sideSheetBodyLayout,
     sideSheetContentLayout,
     sheetMachineProps,
     sheetModal,
@@ -189,7 +190,7 @@ const Body: (props: SideSheetPartProps) => ReactNode = chrome.part(
     "body",
     "Body",
     "div",
-    (api) => api.getDescriptionProps(),
+    (api) => ({ ...api.getDescriptionProps(), ...sideSheetBodyLayout }),
 );
 
 /** The buttons under the content, over a divider: the main one first. */
