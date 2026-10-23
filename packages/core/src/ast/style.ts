@@ -87,6 +87,7 @@ export interface StyleMap {
     flexWrap?: Keyword<FlexWrapKeyword>;
     alignItems?: Keyword<AlignKeyword>;
     justifyContent?: Keyword<AlignKeyword>;
+    alignSelf?: Keyword<AlignKeyword>;
     overflow?: Keyword<OverflowKeyword>;
     // a flex item's starting size, then its share of free space and of a shortfall (unitless)
     flexBasis?: Dimension;
