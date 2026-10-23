@@ -66,7 +66,11 @@ import {
     STATE_LAYER_OPACITY,
     stateLayer,
 } from "../state-layer";
-import type { IndicationRef, IndicationToken } from "../state-layer";
+import type {
+    IndicationRef,
+    IndicationToken,
+    StateLayerOptions,
+} from "../state-layer";
 
 /** The corners of a shape Material draws as a circle, such as a radio's dot or a handle: a
  *  circle whatever the theme's corners, which a full radius follows. */
@@ -539,6 +543,33 @@ export const iconBox = (
             },
         },
     },
+});
+
+/** A round button as large as its icon box: no border or padding, the focus ring, and a state
+ *  layer of `content` over nothing. The number field's steppers and the input chip's remove
+ *  button; a part adds its own color, margins and disabled rule. */
+export const roundIconButton = (
+    token: IndicationRef,
+    size: NonNullable<StyleMap["width"]>,
+    {
+        fill,
+        content,
+    }: {
+        fill?: StyleMap["fontVariationSettings"];
+        content: StateLayerOptions["content"];
+    },
+): StyleMap => ({
+    ...iconBox(size, { fill }),
+    ...focusRing(token),
+    position: relative,
+    cursor: pointer,
+    borderWidth: px(0),
+    paddingInlineStart: px(0),
+    paddingInlineEnd: px(0),
+    paddingBlockStart: px(0),
+    paddingBlockEnd: px(0),
+    borderRadius: radius("full"),
+    backgroundColor: stateLayer(token, { base: transparent, content }),
 });
 
 /** The root every pressable component shares: the focus ring (reading `token`, the

@@ -20,9 +20,7 @@ import {
     center,
     hidden,
     inlineFlex,
-    pointer,
     px,
-    relative,
     slot,
     solid,
     sub,
@@ -47,12 +45,12 @@ import {
     densitySteps,
     densityVariant,
     disabledColor,
-    focusRing,
     iconBox,
     iconFill,
     sys,
     touchTarget,
     variantsOf,
+    roundIconButton,
 } from "./shared";
 import type { ColorGroup, ColorGroups, Densities } from "./shared";
 
@@ -190,23 +188,11 @@ export const createInputChip = <
                     label: { textStyle: textStyle("labelLarge") },
                     // A borderless round button around the remove icon.
                     remove: {
-                        ...iconBox(ref("removeSize"), {
+                        ...roundIconButton(ref, ref("removeSize"), {
                             fill: iconFill(ref("iconFill")),
-                        }),
-                        ...focusRing(ref),
-                        position: relative,
-                        cursor: pointer,
-                        borderWidth: px(0),
-                        paddingInlineStart: px(0),
-                        paddingInlineEnd: px(0),
-                        paddingBlockStart: px(0),
-                        paddingBlockEnd: px(0),
-                        borderRadius: radius("full"),
-                        marginInlineEnd: pullOut("removeInset"),
-                        backgroundColor: stateLayer(ref, {
-                            base: transparent,
                             content: ref("removeColor"),
                         }),
+                        marginInlineEnd: pullOut("removeInset"),
                         color: partColor("removeColor"),
                     },
                     touchTarget,

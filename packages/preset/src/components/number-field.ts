@@ -46,10 +46,10 @@ import {
     when,
 } from "@pureform/core/ast";
 import type { StyleMap } from "@pureform/core/ast";
-import { radius, spacing } from "@pureform/theme";
+import { spacing } from "@pureform/theme";
 import type { MaterialDensity } from "@pureform/theme";
 
-import { INDICATION_TOKENS, stateLayer } from "../state-layer";
+import { INDICATION_TOKENS } from "../state-layer";
 import { AFFIX_TOKENS, affixField, DISABLED, fieldTokens } from "./field";
 import {
     blend,
@@ -58,11 +58,10 @@ import {
     defaultGroups,
     densitySteps,
     disabledColor,
-    focusRing,
     INDICATION_ROOT,
-    iconBox,
     iconFill,
     variantsOf,
+    roundIconButton,
 } from "./shared";
 import type { ColorGroup, ColorGroups, Densities } from "./shared";
 
@@ -81,33 +80,24 @@ const textInsetWithControl = add(
     spacing("1"),
 );
 
-const icon = iconBox(ref("triggerSize"), { fill: iconFill(ref("iconFill")) });
-
-const trigger = (part: "decrementTrigger" | "incrementTrigger"): StyleMap => ({
-    ...icon,
-    ...focusRing(ref),
-    // The button is the icon button's size; its icon stays the field's icon size.
-    fontSize: ref("iconSize"),
-    position: relative,
-    flexShrink: unitless(0),
-    cursor: pointer,
-    borderWidth: px(0),
-    paddingInlineStart: px(0),
-    paddingInlineEnd: px(0),
-    paddingBlockStart: px(0),
-    paddingBlockEnd: px(0),
-    borderRadius: radius("full"),
-    backgroundColor: stateLayer(ref, {
-        base: transparent,
+const trigger = (part: "decrementTrigger" | "incrementTrigger"): StyleMap => {
+    const button = roundIconButton(ref, ref("triggerSize"), {
+        fill: iconFill(ref("iconFill")),
         content: ref("iconColor"),
-    }),
-    // At its limit a button is disabled.
-    color: when()
-        .on(slot(part, "disabled"), disabledColor("disabledContent"))
-        .else(ref("iconColor")),
-    // A disabled button takes no hover or press, so it shows no state layer.
-    states: { ...icon.states, disabled: { pointerEvents: none } },
-});
+    });
+    return {
+        ...button,
+        // The button is the icon button's size; its icon stays the field's icon size.
+        fontSize: ref("iconSize"),
+        flexShrink: unitless(0),
+        // At its limit a button is disabled.
+        color: when()
+            .on(slot(part, "disabled"), disabledColor("disabledContent"))
+            .else(ref("iconColor")),
+        // A disabled button takes no hover or press, so it shows no state layer.
+        states: { ...button.states, disabled: { pointerEvents: none } },
+    };
+};
 
 const control: StyleMap = {
     position: absolute,
