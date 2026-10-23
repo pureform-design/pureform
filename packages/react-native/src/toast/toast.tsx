@@ -211,6 +211,7 @@ function ToasterImpl(props: ToasterProps): ReactNode {
     return (
         <v.group.View
             pointerEvents="box-none"
+            role="region"
             aria-label="Notifications"
             style={{
                 ...s.group,
