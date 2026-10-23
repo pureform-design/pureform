@@ -1,5 +1,6 @@
 // The color picker, inline: `value` from #bf4040 by the area's thumb (the first Tab stop), whose
-// arrow keys move saturation across (by direction) and brightness up and down, a step of 1 each.
+// arrow keys move saturation across (by direction) and brightness up and down, a step of 1 each
+// (Zag rounds the HSB channels first, so #bf4040's saturation 66.5 moves from 66).
 // The text field shows the value's hex, which `read` reports. The eye dropper is left out: it
 // renders only once mounted, where the browser has one, so hydration would add it.
 
@@ -34,7 +35,7 @@ export const colorPicker: ComponentCase = {
     state: {
         prop: "value",
         from: "#bf4040",
-        to: "#bf3e3e",
+        to: "#bf3f3f",
         async act(host) {
             thumb(host).focus();
             await userEvent.keyboard("{ArrowRight}");
@@ -49,16 +50,16 @@ export const colorPicker: ComponentCase = {
         ],
         arrows: {
             ltr: [
-                { key: "{ArrowLeft}", does: "change", to: "#bf4242" },
-                { key: "{ArrowRight}", does: "change", to: "#bf3e3e" },
+                { key: "{ArrowLeft}", does: "change", to: "#bf4343" },
+                { key: "{ArrowRight}", does: "change", to: "#bf3f3f" },
                 { key: "{ArrowUp}", does: "change", to: "#c24141" },
-                { key: "{ArrowDown}", does: "change", to: "#bc3f3f" },
+                { key: "{ArrowDown}", does: "change", to: "#bd3f3f" },
             ],
             rtl: [
-                { key: "{ArrowLeft}", does: "change", to: "#bf3e3e" },
-                { key: "{ArrowRight}", does: "change", to: "#bf4242" },
+                { key: "{ArrowLeft}", does: "change", to: "#bf3f3f" },
+                { key: "{ArrowRight}", does: "change", to: "#bf4343" },
                 { key: "{ArrowUp}", does: "change", to: "#c24141" },
-                { key: "{ArrowDown}", does: "change", to: "#bc3f3f" },
+                { key: "{ArrowDown}", does: "change", to: "#bd3f3f" },
             ],
         },
     },
