@@ -49,6 +49,17 @@ export const buttonGroup: ComponentCase = {
             selectable: "single",
             defaultValue: ["week"],
         },
+        // The selected button turns fully round, its outside corners included.
+        "connected, first selected": {
+            connected: true,
+            selectable: "single",
+            defaultValue: ["day"],
+        },
+        "connected, last selected": {
+            connected: true,
+            selectable: "single",
+            defaultValue: ["month"],
+        },
         "multiple select": {
             selectable: "multiple",
             defaultValue: ["day", "month"],

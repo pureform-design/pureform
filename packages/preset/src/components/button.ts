@@ -55,6 +55,7 @@ import {
     cornerMorphVariants,
     cornerRadius,
     cornerTransition,
+    pillRadius,
     componentTokens,
     defaultDensities,
     defaultGroups,
@@ -415,6 +416,17 @@ export const createButton = <
                                         iconSize: s.icon,
                                         secondaryIconSize: s.icon,
                                         outlineWidth: s.outline,
+                                        radius: pillRadius(
+                                            add(
+                                                ref(
+                                                    sizeTokenName(
+                                                        "height",
+                                                        name,
+                                                    ),
+                                                ),
+                                                ref("densityOffset"),
+                                            ),
+                                        ),
                                         squareRadius: s.square,
                                         pressedRadius: s.pressed,
                                         ...GROUP_INNER_RADII[name],

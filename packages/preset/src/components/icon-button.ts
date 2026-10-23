@@ -77,6 +77,7 @@ import {
     sizeTokenName,
     sizeTokens,
     mergeSlotStyles,
+    pillRadius,
     pressableRoot,
     sys,
     tokenFillColors,
@@ -371,6 +372,13 @@ export const createIconButton = <
                                     tokens: {
                                         iconSize: s.icon,
                                         outlineWidth: s.outline,
+                                        radius: pillRadius(
+                                            dense(
+                                                ref(
+                                                    sizeTokenName("size", name),
+                                                ),
+                                            ),
+                                        ),
                                         squareRadius: s.square,
                                         pressedRadius: s.pressed,
                                         ...GROUP_INNER_RADII[name],

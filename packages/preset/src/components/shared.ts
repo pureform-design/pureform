@@ -4,6 +4,7 @@ import { mergeStyles, transitionMoves } from "@pureform/core";
 import {
     absolute,
     add,
+    min,
     mul,
     sub,
     pointer,
@@ -395,6 +396,14 @@ export const chevronTransition = springTweens(
     ["color"],
 );
 
+/** How an expanding part (the accordion's content, a tree's group, a list item's region, a
+ *  vertical stepper's content) grows open and shrinks shut: its height on the default spatial
+ *  spring, which binding-core's `watchCollapse` runs as the part's `hidden` changes. Compose
+ *  expands and shrinks with `AnimatedVisibility`'s `expandVertically`/`shrinkVertically`, a
+ *  size change, which M3 Expressive's motion scheme moves on `DefaultSpatial`. Under reduced
+ *  motion it has no transition, so the part shows and hides at once. */
+export const collapseTransition = springTweens("spatialDefault", ["height"]);
+
 /** A turning icon's transform: turned over (180°) while `turned` holds, else upright. The
  *  expand indicators', the split button's chevron and the table's sort arrow; give it
  *  `chevronTransition`, or `springTweens("spatialFast", ["transform"], fades)` for other fades. */
@@ -761,8 +770,9 @@ export const blend = (
 ): NumericValue => add(from, mul(sub(to, from), flag));
 
 /** M3 Expressive's corner morph from a component's tokens: `radius` (round) and `squareRadius`
- *  at rest, swapped while a toggle is on, and `pressedRadius` while pressed (which wins, from
- *  the element or a shared interaction source). `square` is the flag the `corner` variant
+ *  at rest, swapped while a toggle is on, and `pressedRadius` while pressed (which wins over
+ *  selected, as in Compose's `shapeByInteraction`; from the element or a shared interaction
+ *  source). `square` is the flag the `corner` variant
  *  sets, so the size sets the radii and the corner picks between them with no compound per
  *  size and corner. `toggles` is the flag the `toggle` variant sets: `selected` also matches
  *  `aria-current` and `aria-selected`, so only a toggle swaps its corners when selected. */
@@ -779,10 +789,18 @@ export const cornerRadius = (
     const rest = blend(ref("radius"), ref("squareRadius"), ref("square"));
     const swapped = blend(ref("squareRadius"), ref("radius"), ref("square"));
     return when()
-        .on(slot("root", "selected"), blend(rest, swapped, ref("toggles")))
         .on(slot("root", "pressed"), ref("pressedRadius"))
+        .on(slot("root", "selected"), blend(rest, swapped, ref("toggles")))
         .else(rest);
 };
+
+/** A full (pill) radius for a part `height` tall: half its height, or less where the theme's
+ *  full radius is smaller. The theme's full radius is a huge length (9999px) that the browser
+ *  clamps, so a corner morphing from it spends nearly all its spring above the clamp and
+ *  snaps at the end; half the height interpolates over the visible range, as Compose's
+ *  `RoundedCornerShape(50)` morphs in pixels of the shape's size. */
+export const pillRadius = (height: NumericValue): NumericValue =>
+    min(radius("full"), mul(height, unitless(0.5)));
 
 /** Which corners a corner-morphing component rests in by default. */
 export type RestingCorner = "round" | "square";

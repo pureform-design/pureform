@@ -29,7 +29,6 @@ import { radius, spacing, spring } from "@pureform/theme";
 import {
     blend,
     componentTokens,
-    cornerRadius,
     entriesOf,
     keysOf,
     motionTransition,
@@ -66,20 +65,30 @@ export type GroupCornerToken =
     | "innerRadius"
     | "pressedInnerRadius";
 
-/** A grouped button's corners by its `position` in a connected group, along the inline axis:
- *  the run's outside corners morph as the button's own (`cornerRadius`), and the inside ones
- *  take `innerRadius`, `pressedInnerRadius` while pressed, and the round radius once a toggle
- *  is on. `none` and `single` keep the button's own corners. */
+/** A grouped button's corners by its `position` in a connected group, along the inline axis,
+ *  as Compose's `ButtonGroupDefaults.connected*ButtonShapes` draw them: the run's outside
+ *  corners keep the button's resting corners (full by default) while pressed, and the inside
+ *  ones take `innerRadius`, and `pressedInnerRadius` while pressed. A toggle that is on turns
+ *  fully round on every corner (`connectedButtonCheckedShape`, `CornerFull`). Pressed wins over
+ *  selected, as in Compose's `shapeByInteraction`. `none` and `single` keep the button's own
+ *  corners. */
 export const groupCorners = (
     ref: (token: GroupCornerToken) => NumericValue,
 ): Record<Position, StyleMap> => {
-    const outer = cornerRadius(ref);
+    const rest = blend(ref("radius"), ref("squareRadius"), ref("square"));
+    const outer = when()
+        .on(slot("root", "pressed"), rest)
+        .on(
+            slot("root", "selected"),
+            blend(rest, ref("radius"), ref("toggles")),
+        )
+        .else(rest);
     const inner = when()
+        .on(slot("root", "pressed"), ref("pressedInnerRadius"))
         .on(
             slot("root", "selected"),
             blend(ref("innerRadius"), ref("radius"), ref("toggles")),
         )
-        .on(slot("root", "pressed"), ref("pressedInnerRadius"))
         .else(ref("innerRadius"));
     return { ...positionCorners(outer, inner, "inline"), single: {} };
 };
