@@ -1,5 +1,6 @@
 import type { Preview } from "@storybook/html-vite";
 
+import { reachesWindow } from "../src/renderers/reaches-window";
 import { systemTheme } from "./system-theme";
 
 import "../src/index.css";
@@ -52,6 +53,20 @@ export default {
                 dynamicTitle: true,
             },
         },
+    },
+    // The Actions panel sends every call of a spy arg across the channel, and serializing a
+    // `window` in one (a click event's `view`) reads every global, which Storybook answers with
+    // "Accessing the Story Store is deprecated". A spy arg must not record one.
+    afterEach: ({ args }) => {
+        for (const [name, arg] of Object.entries(args)) {
+            const calls = (arg as { mock?: { calls?: unknown[] } } | undefined)
+                ?.mock?.calls;
+            if (calls && reachesWindow(calls)) {
+                throw new Error(
+                    `the "${name}" spy recorded a call that reaches window (an event?): Storybook's Actions panel would serialize every global, including the deprecated story store. Record the event's type or data instead.`,
+                );
+            }
+        }
     },
     initialGlobals: { renderer: "solid", scheme: "system", theme: "default" },
     // The a11y addon's violations fail the story's test (in Vitest and in the panel's runs).

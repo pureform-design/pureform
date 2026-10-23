@@ -31,32 +31,30 @@ export interface ComposeInput {
     readonly parameters?: Readonly<Record<string, unknown>> | undefined;
 }
 
-/** A click handler a play can check through its `spy`. A link's click would navigate the story's
- *  frame away (a list's `href="#inbox"`), so it keeps it in place. The spy hears the click's type,
- *  not the event: the actions panel serializes what a spy is called with, and from a React
- *  synthetic event that walks the page's fiber tree, which held up every click for ~200ms (a
- *  split button's menu opened that much later than Solid's). */
-export const clickHandler = () => {
-    const spy = fn().mockName("onClick");
-    return Object.assign(
-        (event?: { type?: string; preventDefault?: () => void }) => {
-            event?.preventDefault?.();
-            spy({ type: event?.type });
-        },
-        { spy },
-    );
-};
-
 export const composeStories = (input: ComposeInput) => {
     const shared = Object.assign({}, ...input.shared.map((h) => h.args));
     const c = caseFor(input.component);
-    // The case's props (an accessible name), and a spy for a key that clicks.
+    // The case's props (an accessible name), and a handler for a key that clicks. The spy isn't
+    // an arg: the Actions panel logs every spy arg's calls and sends the click event across the
+    // channel, whose `view` is `window`, so serializing it reads every global (Storybook's
+    // deprecated `__STORYBOOK_STORY_STORE__` among them; from a React synthetic event it also
+    // walks the fiber tree, ~200ms a click, which made a split button's menu open late). The spy
+    // gets the event's type instead.
+    const clicks = fn();
     const component = Object.assign(
         {},
         c.props,
         c.keyboard?.keys.some((key) => key.does === "click")
             ? {
-                  onClick: clickHandler(),
+                  // A link's click would navigate the story's frame away (a list's
+                  // `href="#inbox"`), so the handler keeps it in place.
+                  onClick: (event?: {
+                      type?: string;
+                      preventDefault?: () => void;
+                  }) => {
+                      event?.preventDefault?.();
+                      clicks(event?.type);
+                  },
               }
             : {},
         ...input.hooks.map((h) => h.args),
@@ -97,7 +95,7 @@ export const composeStories = (input: ComposeInput) => {
         return {
             ...base,
             args,
-            play: skipping(key ? keyPlay(c, key) : statePlay(c)),
+            play: skipping(key ? keyPlay(c, key, clicks) : statePlay(c)),
         };
     };
     const decorators: Decorator[] = [...input.shared, ...input.hooks].flatMap(

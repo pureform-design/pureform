@@ -1,5 +1,6 @@
 import { testIds } from "@pureform/anatomy";
 import { describe, expect, it, vi } from "vitest";
+import { flush, createSignal } from "solid-js";
 import { userEvent } from "vitest/browser";
 
 import { CodeField } from ".";
@@ -96,5 +97,24 @@ describe("CodeField, ready-made", () => {
         expect(cells()[0]!.type).toBe("password");
         expect(cells()[0]!.getAttribute("aria-invalid")).toBe("true");
         expect(byTestId(ids.supportingText).textContent).toBe("Wrong PIN");
+    });
+});
+
+describe("CodeField, reactive props", () => {
+    it("follows a changed length without a remount", async () => {
+        const [length, setLength] = createSignal(4);
+        withRegistry(() => <CodeField label="Code" length={length()} />);
+        await settle();
+        expect(cells()).toHaveLength(4);
+        const first = cells()[0]!;
+        setLength(6);
+        flush();
+        await settle();
+        expect(cells()).toHaveLength(6);
+        expect(cells()[0]).toBe(first);
+        setLength(3);
+        flush();
+        await settle();
+        expect(cells()).toHaveLength(3);
     });
 });

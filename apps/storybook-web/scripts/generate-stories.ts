@@ -193,8 +193,13 @@ const generate = async () => {
                     `import * as ${name}Hooks from "${renderer.hooks}";`,
                 );
             }
-            const has = exportsComponent(renderer.package, component);
-            if (has) {
+            const scene = renderer.scenes?.components.includes(component);
+            const has = scene || exportsComponent(renderer.package, component);
+            if (scene) {
+                imports.push(
+                    `import { ${component} as ${name}${component} } from "${fromOut(renderer.scenes!.module)}";`,
+                );
+            } else if (has) {
                 imports.push(
                     `import { ${component} as ${name}${component} } from "${renderer.package}/${kebab(component)}";`,
                 );

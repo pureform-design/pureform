@@ -4,9 +4,10 @@
 // generated ones; it runs in the Solid project and skips the others.
 
 import { Button } from "@pureform/solid/button";
+import { CodeField } from "@pureform/solid/code-field";
 import * as solidHooks from "@pureform/solid/storybook";
 import type { Meta, StoryObj } from "@storybook/html-vite";
-import { expect } from "storybook/test";
+import { expect, waitFor } from "storybook/test";
 
 import { solidAdapter } from "../solid/adapter";
 
@@ -73,6 +74,39 @@ export const Updates = {
             handle.unmount();
             host.remove();
             Object.assign(console, original);
+        }
+    },
+} satisfies StoryObj;
+
+/** A control that changes a prop the machine takes (the code field's `length`) applies at once,
+ *  without switching the renderer. */
+export const MachineProps = {
+    render: () => document.createElement("div"),
+    play: async ({ globals, canvasElement }) => {
+        if (globals["renderer"] !== "solid") return;
+        const host = document.createElement("div");
+        canvasElement.append(host);
+        const context = {
+            theme: { scheme: undefined, name: undefined },
+            globals: { renderer: "solid" },
+            decorators: solidHooks.decorators,
+        };
+        const handle = solidAdapter.mount(
+            host,
+            CodeField,
+            { "aria-label": "Code", length: 4 },
+            context,
+        );
+        try {
+            const cells = () => host.querySelectorAll("input[data-index]");
+            await expect(cells()).toHaveLength(4);
+            for (const length of [6, 3]) {
+                handle.update({ "aria-label": "Code", length }, context);
+                await waitFor(() => expect(cells()).toHaveLength(length));
+            }
+        } finally {
+            handle.unmount();
+            host.remove();
         }
     },
 } satisfies StoryObj;

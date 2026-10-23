@@ -80,13 +80,18 @@ false` when the story has the arg, so Storybook doesn't infer one; left out
       or `opened` gets a canvas at least `overlayHeight` tall (`parameters.pureform.height`,
       drawn by the shared hook), so a menu, a sheet or a dialog opens inside it. The cases act
       through `storybook/test`'s `userEvent` (`createCases(userEvent)`, `src/renderers/plays.ts`).
-    - **`stories.config.ts`**, overrides only: renderers (`casePlays`, `tests`), `include`,
+    - **`stories.config.ts`**, overrides only: renderers (`casePlays`, `tests`, `scenes`), `include`,
       `skip` (by component, with the reason), `schemes` for every component, `overlayHeight`,
       and `controls` (the renderer whose exports give the props), and per component `args`,
       `argTypes`, `controls.exclude` (props to give no control, over the rules above; none
       needed today), `parameters`, `schemes`, `scheme`, `height`,
       `hooks`, and `stories` (fields by export name; `tags` are written into the file, where
       Storybook's indexer reads them, so `tags: ["!test"]` keeps a story out of the tests).
+
+    A renderer's **`scenes`** (`{ module, components }`) name the components whose case carries
+      data, not props of the binding's export (`Toast`'s `toasts`, `GridList`'s `tiles`): the story
+      draws the module's export of that name, which builds the toaster or the tiles
+      (`src/<renderer>/scenes.ts`, the suites' `ToastScene` and `GridListScene`).
 
     A hand-written `src/stories/*.stories.ts` with the same `title` replaces the generated file;
     the script never writes outside `generated/`.

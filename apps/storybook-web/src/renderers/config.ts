@@ -13,6 +13,14 @@ export interface RendererConfig {
     readonly export: string;
     /** The renderer's hook module, the binding's `storybook` export. */
     readonly hooks?: string;
+    /** A module of scenes, relative to the app, for the components whose case carries data, not
+     *  props of the binding's export (`Toast`'s `toasts`, `GridList`'s `tiles`). It exports each
+     *  component named in `components`, taking the case's props; the story draws that instead
+     *  of the binding's export. */
+    readonly scenes?: {
+        readonly module: string;
+        readonly components: readonly string[];
+    };
     /** `false` where the cases' readers can't read the renderer's DOM (they read the web
      *  bindings' native elements, ARIA and data attributes): its stories run without the
      *  generated play tests. The a11y checks still run. */
