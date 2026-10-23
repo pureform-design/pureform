@@ -44,8 +44,12 @@ describe("fadeThrough", () => {
         });
     });
 
-    it("positions the root for the outgoing page", () => {
+    it("positions the root for the outgoing page, and clips it only while a page leaves", () => {
         expect(recipe().root).toMatchObject({ position: "relative" });
+        expect(recipe().root!["&[data-transitioning]"]).toEqual({
+            overflow: "clip",
+        });
+        expect(recipe().root!["overflow"]).toBeUndefined();
     });
 
     it("adds its keyframes to the pureform config; they only scale", () => {

@@ -10,31 +10,18 @@ import {
     sharedAxisChange,
     sharedAxisPageProps,
     sharedAxisScrimProps,
-    sharedAxisSettle,
-    sharedAxisStart,
 } from "@pureform/binding-core";
 import type {
     HorizontalSharedAxisRootOwnProps,
-    SharedAxisPage,
-    SharedAxisPageState,
+    PageKey,
+    TransitionPage,
 } from "@pureform/binding-core";
-import {
-    createContext,
-    Fragment,
-    type ElementType,
-    type ReactNode,
-    useContext,
-    useLayoutEffect,
-    useRef,
-    useState,
-} from "react";
+import { Fragment, type ElementType, type ReactNode } from "react";
 
+import { TransitionPageView, useTransitionPages } from "../page-transition";
 import { useComponent } from "../parts";
-import type { ComponentScope } from "../parts";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
-
-type Anatomy = typeof horizontalSharedAxisAnatomy;
 
 /** The shared axis's props: its own (`index`, `scrim`, tokens, `testId`, `unstyled`), `as`, and
  *  the root element's own props. Its children are the page `index` names. */
@@ -46,47 +33,8 @@ export interface HorizontalSharedAxisProps
     readonly as?: ElementType | undefined;
 }
 
-const PageContext = createContext<SharedAxisPageState>("current");
-
-/** Where the page around the caller is: `"current"`, `"entering"`, or `"leaving"` (still
- *  drawn while it goes; a part that hides itself when it isn't selected, such as a tab's
- *  panel, stays shown). `"current"` outside a shared axis. */
-export const useSharedAxisPage = (): SharedAxisPageState =>
-    useContext(PageContext);
-
-// Waits for the element's own animations, then reports that its page settled. An element with
-// none (unstyled, or no animation support) settles at once.
-function Page(props: {
-    readonly scope: ComponentScope<Anatomy>;
-    readonly page: SharedAxisPage;
-    readonly onSettle: (page: SharedAxisPage) => void;
-    readonly children: ReactNode;
-}): ReactNode {
-    const { page, onSettle } = props;
-    const element = useRef<HTMLElement>(null);
-    useLayoutEffect(() => {
-        if (page.state === "current") return;
-        let live = true;
-        const animations = element.current?.getAnimations?.() ?? [];
-        Promise.all(animations.map((animation) => animation.finished)).then(
-            () => live && onSettle(page),
-            () => undefined,
-        );
-        return () => {
-            live = false;
-        };
-    }, [page, onSettle]);
-    return (
-        <PageContext.Provider value={page.state}>
-            {props.scope.render("page", {
-                element: "div",
-                ref: element,
-                machine: sharedAxisPageProps(page),
-                props: { children: props.children },
-            })}
-        </PageContext.Provider>
-    );
-}
+const change = (pages: readonly TransitionPage[], key: PageKey) =>
+    sharedAxisChange(pages, Number(key));
 
 function Root(props: HorizontalSharedAxisProps): ReactNode {
     const scope = useComponent(horizontalSharedAxisAnatomy, {
@@ -94,33 +42,32 @@ function Root(props: HorizontalSharedAxisProps): ReactNode {
         testId: props.testId,
         unstyled: props.unstyled,
     });
-    const [pages, setPages] = useState(() => sharedAxisStart(props.index));
-    // A change of index is a change of page: adjust the pages while rendering.
-    const changed = sharedAxisChange(pages, props.index);
-    if (changed !== pages) setPages(changed);
-    // Each page's latest children; a leaving page keeps what it showed last.
-    const contents = useRef(new Map<number, ReactNode>());
-    contents.current.set(props.index, props.children);
-    for (const index of contents.current.keys()) {
-        if (!changed.some((page) => page.index === index)) {
-            contents.current.delete(index);
-        }
-    }
-    const [onSettle] = useState(
-        () => (page: SharedAxisPage) =>
-            setPages((now) => sharedAxisSettle(now, page.index, page.state)),
+    const { pages, contents, settle } = useTransitionPages(
+        props.index,
+        props.children,
+        change,
     );
     const {
         as,
         children: _children,
         ...rest
     } = omitProps(props, HORIZONTAL_SHARED_AXIS_ROOT_PROPS);
-    const entering = changed.find((page) => page.state === "entering");
-    const leaving = changed.some((page) => page.state === "leaving");
-    const children = changed.map((page) => (
-        <Page key={page.index} scope={scope} page={page} onSettle={onSettle}>
-            {contents.current.get(page.index)}
-        </Page>
+    const entering = pages.find((page) => page.state === "entering");
+    const leaving = pages.some((page) => page.state === "leaving");
+    const children = pages.map((page) => (
+        <TransitionPageView
+            key={page.key}
+            page={page}
+            settle={settle}
+            render={(ref) =>
+                scope.render("page", {
+                    element: "div",
+                    ref,
+                    machine: sharedAxisPageProps(page),
+                    props: { children: contents.get(page.key) },
+                })
+            }
+        />
     ));
     // Between the pages while both show; their stacking puts it over the one underneath.
     if (props.scrim && leaving && entering?.direction) {
@@ -144,7 +91,8 @@ function Root(props: HorizontalSharedAxisProps): ReactNode {
 
 /** Material's horizontal shared axis, for spatially related pages (tabs, steps, onboarding):
  *  `<HorizontalSharedAxis index={step}>{pages[step]}</HorizontalSharedAxis>`. A higher `index`
- *  slides forward, a lower one backward; `scrim` veils the page underneath while they move. */
+ *  slides forward, a lower one backward; `scrim` (off by default: Compose draws it only behind
+ *  predictive back) veils the page underneath while they move. */
 export const HorizontalSharedAxis: ((
     props: HorizontalSharedAxisProps,
 ) => ReactNode) & {

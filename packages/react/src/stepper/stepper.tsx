@@ -31,10 +31,9 @@ import {
 
 import { useControllable } from "../controllable";
 import { ToastIcon } from "../glyphs";
-import {
-    HorizontalSharedAxis,
-    useSharedAxisPage,
-} from "../horizontal-shared-axis/horizontal-shared-axis";
+import { FadeThrough } from "../fade-through/fade-through";
+import { HorizontalSharedAxis } from "../horizontal-shared-axis/horizontal-shared-axis";
+import { useTransitionPage } from "../page-transition";
 import { useItemInteractionSources } from "../interaction";
 import type { ItemInteractionSources } from "../interaction";
 import { useMachine } from "../machine";
@@ -245,8 +244,8 @@ function Content({
 }: StepperContentPartProps): ReactNode {
     const { scope, api } = context.use("Content");
     const at = index ?? itemContext.use("Content").index;
-    // A step's content leaving in a shared axis stays drawn while it goes.
-    const leaving = useSharedAxisPage() === "leaving";
+    // A step's content leaving in a page transition stays drawn while it goes.
+    const leaving = useTransitionPage() === "leaving";
     return scope.render("content", {
         element: "div",
         machine: leaving
@@ -389,9 +388,11 @@ function ReadyMade(props: StepperProps): ReactNode {
                     </Item>
                 ))}
             </List>
-            {vertical ? null : transition === "sharedAxis" ? (
-                <SharedAxisSteps
+            {vertical ? null : transition === "sharedAxis" ||
+              transition === "fadeThrough" ? (
+                <TransitionSteps
                     items={items}
+                    transition={transition}
                     scrim={transitionScrim}
                     content={content}
                 />
@@ -403,9 +404,10 @@ function ReadyMade(props: StepperProps): ReactNode {
 }
 
 // A row's current step's content in a horizontal shared axis, which slides between the steps in
-// their order.
-function SharedAxisSteps(props: {
+// their order, or a fade through.
+function TransitionSteps(props: {
     readonly items: readonly StepperItem<ReactNode>[];
+    readonly transition: "sharedAxis" | "fadeThrough";
     readonly scrim: boolean | undefined;
     readonly content: (
         item: StepperItem<ReactNode>,
@@ -415,9 +417,12 @@ function SharedAxisSteps(props: {
     const { api } = context.use("Content");
     const index = api.value;
     const item = props.items[index];
-    return (
+    const step = item ? props.content(item, index) : null;
+    return props.transition === "fadeThrough" ? (
+        <FadeThrough value={index}>{step}</FadeThrough>
+    ) : (
         <HorizontalSharedAxis index={index} scrim={props.scrim}>
-            {item ? props.content(item, index) : null}
+            {step}
         </HorizontalSharedAxis>
     );
 }

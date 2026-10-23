@@ -5,23 +5,22 @@
 
 import { fadeThroughAnatomy } from "@pureform/anatomy";
 import {
-    dropPage,
+    changePages,
     FADE_THROUGH_ROOT_PROPS,
+    fadeThroughPageProps,
     fadeThroughSelection,
-    pageStateProps,
-    showPage,
+    pageRootProps,
 } from "@pureform/binding-core";
 import type {
     FadeThroughRootOwnProps,
-    FadeThroughState,
     FadeThroughValue,
+    PageKey,
+    TransitionPage,
 } from "@pureform/binding-core";
-import { whenAnimationsEnd } from "@pureform/binding-core/dom";
-import { useLayoutEffect, useRef, useState } from "react";
 import type { ElementType, ReactNode } from "react";
 
+import { TransitionPageView, useTransitionPages } from "../page-transition";
 import { useComponent } from "../parts";
-import type { PartScope } from "../parts";
 import type { PartProps } from "../props";
 import { omitProps } from "../props";
 
@@ -37,28 +36,9 @@ export interface FadeThroughProps
     readonly children?: ReactNode | ((value: FadeThroughValue) => ReactNode);
 }
 
-interface PageProps {
-    readonly scope: PartScope<typeof fadeThroughAnatomy>;
-    readonly state: FadeThroughState;
-    readonly gone: () => void;
-    readonly children: ReactNode;
-}
-
-function Page({ scope, state, gone, children }: PageProps): ReactNode {
-    const node = useRef<HTMLElement>(null);
-    const leave = useRef(gone);
-    leave.current = gone;
-    useLayoutEffect(() => {
-        if (state !== "closed" || !node.current) return;
-        return whenAnimationsEnd(node.current, () => leave.current());
-    }, [state]);
-    return scope.render("page", {
-        element: "div",
-        machine: pageStateProps(state),
-        ref: node,
-        props: { children },
-    });
-}
+// Quick switches keep every page still leaving until its own exit ends.
+const change = (pages: readonly TransitionPage[], key: PageKey) =>
+    changePages(pages, key, { keepLeaving: true });
 
 /** Material's fade through: `<FadeThrough value={destination}>{page}</FadeThrough>`, with the
  *  navigation bar's or rail's `value`. */
@@ -68,43 +48,37 @@ export function FadeThrough(props: FadeThroughProps): ReactNode {
         testId: props.testId,
         unstyled: props.unstyled,
     });
-    const [pages, setPages] = useState(() =>
-        showPage<null>([], props.value, null),
-    );
-    const next = showPage(pages, props.value, null);
-    // A new value updates the pages during this render, as derived state does.
-    if (next !== pages) setPages(next);
-    // Each page's content: the shown one's from this render, a leaving one's as it last was.
-    const contents = useRef(new Map<FadeThroughValue, ReactNode>()).current;
     const given = props.children;
-    contents.set(
+    const { pages, contents, settle } = useTransitionPages(
         props.value,
         typeof given === "function" ? given(props.value) : given,
+        change,
     );
-    for (const value of contents.keys()) {
-        if (!next.some((page) => page.value === value)) contents.delete(value);
-    }
     const rest = omitProps(props, [
         "as",
         "children",
         ...FADE_THROUGH_ROOT_PROPS,
     ]);
-    const drop = (value: FadeThroughValue) => () =>
-        setPages((current) => dropPage(current, value));
     return scope.render("root", {
         element: "div",
         as: props.as,
+        machine: pageRootProps(pages),
         props: {
             ...rest,
-            children: next.map((page) => (
-                <Page
-                    key={page.value}
-                    scope={scope}
-                    state={page.state}
-                    gone={drop(page.value)}
-                >
-                    {contents.get(page.value)}
-                </Page>
+            children: pages.map((page) => (
+                <TransitionPageView
+                    key={page.key}
+                    page={page}
+                    settle={settle}
+                    render={(ref) =>
+                        scope.render("page", {
+                            element: "div",
+                            machine: fadeThroughPageProps(page),
+                            ref,
+                            props: { children: contents.get(page.key) },
+                        })
+                    }
+                />
             )),
         },
     });

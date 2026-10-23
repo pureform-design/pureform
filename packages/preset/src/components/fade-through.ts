@@ -2,9 +2,10 @@
 // (switching navigation destinations). The outgoing page fades out, then the incoming one fades
 // in as it grows into place. The bindings keep the outgoing page, marked `data-state="closed"`,
 // until its exit ends, over the incoming one, marked `data-state="open"`; the page shown first
-// has neither, so it doesn't animate.
+// has neither, so it doesn't animate. While a page leaves, the root is `data-transitioning` and
+// clips.
 //
-//   <div class={fadeThrough().root}>
+//   <div class={fadeThrough().root} data-transitioning>
 //     <div class={fadeThrough().page} data-state="closed">   (fades out, out of the flow)
 //     <div class={fadeThrough().page} data-state="open">     (fades and grows in)
 //
@@ -16,7 +17,14 @@
 // run. React Native runs the same motion from its binding.
 
 import { typed } from "@pureform/core";
-import { absolute, none, px, relative, unitless } from "@pureform/core/ast";
+import {
+    absolute,
+    clip,
+    none,
+    px,
+    relative,
+    unitless,
+} from "@pureform/core/ast";
 import type { StyleMap } from "@pureform/core/ast";
 
 import { overlayMotion } from "./overlay";
@@ -66,7 +74,13 @@ export const fadeThrough = pf.slotComponent({
     structure: { root: ["page"] },
     recipe: () => ({
         base: {
-            root: { position: relative },
+            root: {
+                position: relative,
+                // While a page leaves, the root clips to the incoming page, so a taller outgoing
+                // one doesn't spill past it (Compose's `AnimatedContent` clips by default too);
+                // at rest it doesn't, so the content's focus rings and shadows show.
+                rawRules: { css: { "&[data-transitioning]": { overflow: clip } } },
+            },
             page: {
                 rawRules: {
                     css: {

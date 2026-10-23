@@ -2,10 +2,12 @@ import { testIds } from "@pureform/anatomy";
 import { act, cleanup } from "@testing-library/react";
 import { useState } from "react";
 import { afterEach, describe, expect, it } from "vitest";
+import { userEvent } from "vitest/browser";
 
 import { FadeThrough } from ".";
 import { PureformProvider } from "..";
 import { navigationRegistry } from "../__fixtures__/registry";
+import { Tabs } from "../tabs";
 import { mount, settle, until } from "../testing/render";
 
 const ids = testIds.fadeThrough;
@@ -14,12 +16,13 @@ const pages = () => [
     ...document.querySelectorAll<HTMLElement>(`[data-testid="${ids.page}"]`),
 ];
 
-// A leaving page that fades for a while, so a test can see it before it goes.
+// Pages that move for a while, so a test can see them before they settle.
 const leaving = (ms: number) => {
     const style = document.head.appendChild(document.createElement("style"));
     style.dataset.test = "";
     style.textContent = `@keyframes test-out { to { opacity: 0 } }
-        .fade-through__page[data-state=closed] { animation: test-out ${ms}ms forwards }`;
+        .fade-through__page[data-state=closed] { animation: test-out ${ms}ms forwards }
+        .fade-through__page[data-state=open] { animation: test-out ${ms}ms }`;
 };
 
 afterEach(() => {
@@ -70,8 +73,14 @@ describe("FadeThrough", () => {
         expect(out!.inert).toBe(true);
         expect(into!.textContent).toBe("mail");
         expect(into!.dataset.state).toBe("open");
+        const root = document.querySelector<HTMLElement>(
+            `[data-testid="${ids.root}"]`,
+        )!;
+        // The root clips while a page leaves, so a taller one doesn't spill.
+        expect(root.hasAttribute("data-transitioning")).toBe(true);
         await until(() => expect(pages()).toHaveLength(1));
         expect(pages()[0]).toBe(into);
+        expect(root.hasAttribute("data-transitioning")).toBe(false);
     });
 
     it("drops the old page at once when nothing animates it (unstyled)", async () => {
@@ -119,5 +128,49 @@ describe("FadeThrough", () => {
         ]);
         await until(() => expect(pages()).toHaveLength(1));
         expect(pages()[0]!.textContent).toBe("home");
+    });
+});
+
+describe("Tabs with transition=fadeThrough", () => {
+    it("fades the selected panel through, keeping the old one drawn while it leaves", async () => {
+        leaving(400);
+        mount(
+            <PureformProvider registry={navigationRegistry()}>
+                <Tabs
+                    aria-label="Trips"
+                    transition="fadeThrough"
+                    items={[
+                        { value: "a", label: "A", content: "Panel A" },
+                        { value: "b", label: "B", content: "Panel B" },
+                    ]}
+                />
+            </PureformProvider>,
+        );
+        await settle();
+        await userEvent.click(
+            document.querySelectorAll<HTMLElement>('[role="tab"]')[1]!,
+        );
+        await settle();
+        expect(
+            [
+                ...document.querySelectorAll<HTMLElement>('[role="tabpanel"]'),
+            ].map((panel) => [panel.textContent, panel.hidden]),
+        ).toEqual([
+            ["Panel A", false],
+            ["Panel B", false],
+        ]);
+        expect(pages().map((page) => page.dataset.state)).toEqual([
+            "closed",
+            "open",
+        ]);
+        await until(() =>
+            expect(
+                [
+                    ...document.querySelectorAll<HTMLElement>(
+                        '[role="tabpanel"]',
+                    ),
+                ].map((panel) => panel.textContent),
+            ).toEqual(["Panel B"]),
+        );
     });
 });

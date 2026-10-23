@@ -13,12 +13,13 @@ const pages = () => [
     ...document.querySelectorAll<HTMLElement>(`[data-testid="${ids.page}"]`),
 ];
 
-// A leaving page that fades for a while, so a test can see it before it goes.
+// Pages that move for a while, so a test can see them before they settle.
 const leaving = (ms: number) => {
     const style = document.head.appendChild(document.createElement("style"));
     style.dataset.test = "";
     style.textContent = `@keyframes test-out { to { opacity: 0 } }
-        .fade-through__page[data-state=closed] { animation: test-out ${ms}ms forwards }`;
+        .fade-through__page[data-state=closed] { animation: test-out ${ms}ms forwards }
+        .fade-through__page[data-state=open] { animation: test-out ${ms}ms }`;
 };
 
 afterEach(() => {

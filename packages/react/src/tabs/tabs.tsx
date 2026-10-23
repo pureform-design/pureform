@@ -36,10 +36,9 @@ import {
 } from "react";
 
 import { useControllable } from "../controllable";
-import {
-    HorizontalSharedAxis,
-    useSharedAxisPage,
-} from "../horizontal-shared-axis/horizontal-shared-axis";
+import { FadeThrough } from "../fade-through/fade-through";
+import { HorizontalSharedAxis } from "../horizontal-shared-axis/horizontal-shared-axis";
+import { useTransitionPage } from "../page-transition";
 import { useItemInteractionSources } from "../interaction";
 import type { ItemInteractionSources } from "../interaction";
 import { useMachine } from "../machine";
@@ -272,8 +271,8 @@ function Content({
     ...props
 }: TabsContentPartProps): ReactNode {
     const { scope, api } = context.use("Content");
-    // A panel leaving in a shared axis stays drawn while it goes.
-    const leaving = useSharedAxisPage() === "leaving";
+    // A panel leaving in a page transition stays drawn while it goes.
+    const leaving = useTransitionPage() === "leaving";
     return scope.render("content", {
         element: "div",
         machine: leaving
@@ -345,9 +344,10 @@ function ReadyMade(props: TabsProps): ReactNode {
                     </Tab>
                 ))}
             </List>
-            {transition === "sharedAxis" ? (
-                <SharedAxisPanels
+            {transition === "sharedAxis" || transition === "fadeThrough" ? (
+                <TransitionPanels
                     items={items}
+                    transition={transition}
                     scrim={transitionScrim}
                     slot={slot("content")}
                 />
@@ -369,22 +369,27 @@ function ReadyMade(props: TabsProps): ReactNode {
 }
 
 // The selected tab's panel in a horizontal shared axis, which slides between the panels in the
-// tabs' order.
-function SharedAxisPanels(props: {
+// tabs' order, or a fade through.
+function TransitionPanels(props: {
     readonly items: TabsProps["items"] & object;
+    readonly transition: "sharedAxis" | "fadeThrough";
     readonly scrim: boolean | undefined;
     readonly slot: object;
 }): ReactNode {
     const { api } = context.use("Content");
     const index = props.items.findIndex((item) => item.value === api.value);
     const item = props.items[index];
-    return (
+    const panel =
+        item && isPresent(item.content) ? (
+            <Content value={item.value} {...props.slot}>
+                {item.content}
+            </Content>
+        ) : null;
+    return props.transition === "fadeThrough" ? (
+        <FadeThrough value={index}>{panel}</FadeThrough>
+    ) : (
         <HorizontalSharedAxis index={index} scrim={props.scrim}>
-            {item && isPresent(item.content) ? (
-                <Content value={item.value} {...props.slot}>
-                    {item.content}
-                </Content>
-            ) : null}
+            {panel}
         </HorizontalSharedAxis>
     );
 }
