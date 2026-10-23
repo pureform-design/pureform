@@ -129,9 +129,7 @@ interface FabMenuTabEvent {
 
 /** The list's (the menu content's) props, with Tab from its last item going on to the FAB. Zag's
  *  menu keeps Tab inside its content at the last tabbable item; the FAB follows the list. */
-export const fabMenuListProps = <
-    P extends { readonly onKeyDown?: ((event: any) => void) | undefined },
->(
+export const fabMenuListProps = <P extends object>(
     content: P,
     getFab: () => HTMLElement | null | undefined,
 ): P => ({
@@ -150,6 +148,8 @@ export const fabMenuListProps = <
                 return;
             }
         }
-        content.onKeyDown?.(event);
+        (
+            content as { onKeyDown?: (event: FabMenuTabEvent) => void }
+        ).onKeyDown?.(event);
     },
 });
