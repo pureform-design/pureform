@@ -708,7 +708,7 @@ describe("lists, menus, and selects", () => {
     });
 
     it("makes an item with an href an interactive link, which a press opens", async () => {
-        const open = vi.spyOn(Linking, "openURL").mockResolvedValue(true);
+        const open = vi.spyOn(Linking, "openURL").mockResolvedValue(undefined);
         await render(
             <List
                 items={[{ headline: "Inbox", href: "#inbox" }, { headline: "Sent" }]}
