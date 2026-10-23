@@ -15,6 +15,22 @@ otherwise).
   existing drag and press helpers.
 - Remaining known flakes and timing-only tests.
 
+## Decided work
+- **React Native toast swipe:** sideways swipe-to-dismiss like the web (past half the width or a
+  flick; settles back otherwise; timer pauses while held; non-closable toasts don't move), built
+  on a shared drag skeleton with the side sheet, list item swipe and the web toast if the refactor
+  rule passes.
+- **FabMenu focus follows the highlight:** one model; arrow keys and Tab move the same focus.
+- **Toast swipe direction:** stays sideways at every placement (Material's snackbars); no change.
+- **Solid stories render after Storybook returns the story:** no change; note it in
+  docs/roadmap-storybook/context.md for future plays.
+- **Menu `submenu="auto"`:** decide by the space the menu actually has (measured beside the
+  item against its container/viewport), not the window width; cascade when the submenu fits.
+- **React Native Web cascaded submenu:** reachable with the arrow keys (Right/Left open and close,
+  focus moves in and back), as on the web.
+- **React Native DateInput:** follows a controlled `value` changed later (segments update without
+  losing focus mid-typing).
+
 ## Done when
 Each candidate is extracted or declined with its failed check in context/r10.md; full gate
 green.
