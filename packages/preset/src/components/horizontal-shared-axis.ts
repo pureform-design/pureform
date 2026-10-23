@@ -4,10 +4,10 @@
 // of its width from the side the order puts it on and fades in; the outgoing page slides a fifth
 // the other way and fades out.
 //
-// Markup: a root around the pages. The binding keeps the outgoing page until its animations end,
+// Markup: a root around the pages, `data-transitioning` while they move. The binding keeps the outgoing page until its animations end,
 // and marks each page (and the scrim, while a change runs) with where it's going and which way:
 //
-//   <div class={root}>
+//   <div class={root} data-transitioning>
 //     <div class={page} data-state="leaving" data-direction="forward" inert>…</div>
 //     <div class={scrim} data-direction="forward" />             (only with the scrim)
 //     <div class={page} data-state="entering" data-direction="forward">…</div>
@@ -202,7 +202,12 @@ export const createHorizontalSharedAxis = (
                 root: {
                     ...isolated,
                     position: relative,
-                    overflow: clip,
+                    // While the pages move, the root clips them to its size, so a sliding page
+                    // doesn't spill past it; at rest it doesn't, so the content's focus rings
+                    // and shadows show (as the fade through).
+                    rawRules: {
+                        css: { "&[data-transitioning]": { overflow: clip } },
+                    },
                 },
                 page: {
                     position: relative,

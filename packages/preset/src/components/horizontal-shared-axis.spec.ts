@@ -21,6 +21,14 @@ describe("horizontal shared axis", () => {
         expect(recipe()?.slots).toEqual(["root", "page", "scrim"]);
     });
 
+    it("clips the root only while the pages move", () => {
+        const root = (
+            recipe()?.base as Record<string, Record<string, unknown>>
+        )["root"]!;
+        expect(root["overflow"]).toBeUndefined();
+        expect(root["&[data-transitioning]"]).toEqual({ overflow: "clip" });
+    });
+
     it("slides each page a fifth of its width, mirrored under right to left", () => {
         expect(SHARED_AXIS_KEYFRAMES["sharedAxisFromRight"]).toMatchObject({
             from: {
