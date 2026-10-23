@@ -56,6 +56,10 @@ export const OVERLAY_KEYFRAMES = {
         from: { scale: 1 },
         to: { scale: 0.8 },
     },
+    overlayHold: {
+        from: { opacity: 1 },
+        to: { opacity: 1 },
+    },
     dialogSlideIn: {
         from: { translateY: { token: "spacing.12", times: -1 } },
         to: { translateY: 0 },
@@ -127,10 +131,30 @@ export type OverlayMotionStep = {
     readonly fade?: OverlayTiming;
 } & OverlayTiming;
 
-/** The preset's overlay motions (`POPUP_MOTION`, `DIALOG_MOTION`, `SCRIM_MOTION`). */
+/** The preset's overlay motions (`POPUP_MOTION`, `DIALOG_MOTION`, `SCRIM_MOTION`, and the FAB
+ *  menu's list and items). */
 export const OVERLAY_MOTIONS = {
     /** A menu, select list, tooltip, or snackbar. */
     popup: {
+        enter: {
+            keyframes: "overlayGrowIn",
+            spring: "spatialFast",
+            fade: { spring: "effectsFast" },
+        },
+        exit: {
+            keyframes: "overlayShrinkOut",
+            spring: "spatialFast",
+            fade: { spring: "effectsFast" },
+        },
+    },
+    /** The FAB menu's list, which holds still until its items (`fabMenuItem`) have left. */
+    fabMenuList: {
+        enter: { keyframes: "overlayHold", spring: "spatialFast" },
+        exit: { keyframes: "overlayHold", spring: "spatialFast" },
+    },
+    /** One of the FAB menu's items: grows and fades in as a popup does, each after the one nearer
+     *  the FAB, and leaves in reverse. */
+    fabMenuItem: {
         enter: {
             keyframes: "overlayGrowIn",
             spring: "spatialFast",
@@ -207,7 +231,8 @@ export const OVERLAY_MOTIONS = {
 >;
 
 /** How an overlay enters and leaves: `popup` (a menu, select list, tooltip, or snackbar),
- *  `dialog`, `bottomSheet`, `sideSheet`, or `scrim`; or a fade through's page (`fadeThrough`). */
+ *  `fabMenuList`, `fabMenuItem`, `dialog`, `bottomSheet`, `sideSheet`, or `scrim`; or a fade
+ *  through's page (`fadeThrough`). */
 export type OverlayMotionName = keyof typeof OVERLAY_MOTIONS;
 
 const FADES = {
@@ -324,6 +349,12 @@ const timingOf = (
     };
 };
 
+/** How long each step waits before it starts, in ms (before `timeScale`). */
+export interface OverlayDelay {
+    readonly enter?: number;
+    readonly exit?: number;
+}
+
 /** An overlay's motion in a theme: its frames (a move by a share of its own `size`, and
  *  under `rtl` its right-to-left keyframes), its durations (`timeScale` times as long), curves
  *  and springs from the theme's tokens, and under `reducedMotion` its fade alone in place of
@@ -335,6 +366,7 @@ export const overlayMotion = (
     timeScale = 1,
     size: OverlaySize = { width: 0, height: 0 },
     rtl = false,
+    delay: OverlayDelay = {},
 ): PresenceMotion => {
     const step = (phase: PresencePhase): PresenceStep => {
         const {
@@ -357,10 +389,15 @@ export const overlayMotion = (
         if (reducedMotion && moving) {
             return { ...ends, ...timingOf(fade ?? timing, tokens, timeScale) };
         }
+        const wait = (delay[phase] ?? 0) * timeScale;
+        const waiting = wait > 0 ? { delay: wait } : {};
         return {
             ...ends,
             ...timingOf(timing, tokens, timeScale),
-            ...(fade ? { fade: timingOf(fade, tokens, timeScale) } : {}),
+            ...waiting,
+            ...(fade
+                ? { fade: { ...timingOf(fade, tokens, timeScale), ...waiting } }
+                : {}),
         };
     };
     return { enter: step("enter"), exit: step("exit") };
@@ -400,7 +437,7 @@ const SIZED = new Set<OverlayMotionName>(
     ),
 );
 
-/** An overlay's enter and exit through the provider's engine: it enters when `open` turns
+/** An overlay's enter and exit through the provider's engine (each step waiting its `delay`): it enters when `open` turns
  *  true (or mounts open), and stays present when it turns false until the exit ends, so the
  *  overlay (or the `Modal` it's in) goes only then. Give `style` and `props` to the engine's
  *  view that moves.
@@ -416,8 +453,9 @@ const SIZED = new Set<OverlayMotionName>(
 export function usePresence(
     open: boolean,
     motion: OverlayMotionName = "popup",
+    delay?: OverlayDelay,
 ): Presence {
-    return useOverlayPresence(open, motion);
+    return useOverlayPresence(open, motion, delay);
 }
 
 /** As `usePresence`, for a surface whose `open` is optional: without it, the surface is always
@@ -427,6 +465,7 @@ export function usePresence(
 export function useOverlayPresence(
     open: boolean | undefined,
     motion: OverlayMotionName,
+    delay?: OverlayDelay,
 ): Presence {
     const engine = useEngine();
     const tokens = useTokens();
@@ -452,6 +491,7 @@ export function useOverlayPresence(
         timeScale,
         held.current?.size ?? window,
         rtl,
+        delay,
     );
     const onLayout = useCallback((event: LayoutChangeEvent) => {
         const { width, height } = event.nativeEvent.layout;

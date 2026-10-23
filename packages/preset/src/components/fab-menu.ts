@@ -24,13 +24,17 @@ import {
     end,
     flex,
     inlineFlex,
+    mul,
     pct,
     px,
     relative,
     slot,
+    unitless,
     when,
 } from "@pureform/core/ast";
+import type { StyleMap } from "@pureform/core/ast";
 import {
+    duration,
     radius,
     size as sizeToken,
     spacing,
@@ -41,6 +45,7 @@ import {
 import { INDICATION_TOKENS } from "../state-layer";
 import { FAB_SIZES } from "./fab";
 import { overlayMotion, POPUP_MOTION } from "./overlay";
+import type { OverlayMotion } from "./overlay";
 import { spatialCornerTransition } from "./shared";
 import {
     DEFAULT_GROUP,
@@ -89,6 +94,64 @@ const { tokens, ref } = componentTokens("fabMenu", {
 });
 
 const EXPANDED = slot("closeTrigger", "expanded");
+
+/** How long each item waits after the one before it: the items enter from the one nearest the
+ *  FAB outward, and leave in reverse, as Compose's `FloatingActionButtonMenu` staggers them. */
+export const FAB_MENU_STAGGER = duration("short1");
+
+/** How many items stagger: the rest share the last one's wait. The list holds until the last
+ *  of these has left, so a menu of fewer waits that bit longer to hide. */
+export const FAB_MENU_STAGGERED = 8;
+
+const wait = (index: number) =>
+    index === 0 ? undefined : mul(FAB_MENU_STAGGER, unitless(index));
+
+const OPEN = "&[data-state=open]";
+const CLOSED = "&[data-state=closed]";
+
+// The items as the list's children, which the machine gives no state of their own: the nearest
+// the FAB (the last) enters first, the farthest (the first) leaves first.
+const staggered = (): Record<string, StyleMap> => {
+    const rules: Record<string, StyleMap> = {};
+    for (let index = 0; index < FAB_MENU_STAGGERED; index++) {
+        const last = index === FAB_MENU_STAGGERED - 1;
+        const delay = wait(index);
+        const motion = overlayMotion({
+            enter: {
+                ...FAB_MENU_ITEM_MOTION.enter,
+                ...(delay ? { delay } : {}),
+            },
+            exit: { ...FAB_MENU_ITEM_MOTION.exit, ...(delay ? { delay } : {}) },
+        }).rawRules!.css as Record<string, StyleMap>;
+        rules[
+            `${OPEN} > :nth-last-child(${last ? `n+${index + 1}` : index + 1})`
+        ] = motion[OPEN]!;
+        rules[
+            `${CLOSED} > :nth-child(${last ? `n+${index + 1}` : index + 1})`
+        ] = motion[CLOSED]!;
+    }
+    return rules;
+};
+
+/** The list itself only holds still: its presence waits for the items, which move. */
+export const FAB_MENU_LIST_MOTION = {
+    enter: { keyframes: "overlayHold", spring: "spatialFast" },
+    exit: { keyframes: "overlayHold", spring: "spatialFast" },
+} as const satisfies OverlayMotion;
+
+/** Each item grows and fades in as a popup does (and shrinks as it leaves), after its wait. */
+export const FAB_MENU_ITEM_MOTION = POPUP_MOTION;
+
+// The list leaves once the last staggered item has. It has no enter animation: Zag's presence
+// waits for an exit whose animation differs from the one the surface had open, so one that held
+// still on the way in too would be gone at once.
+const LIST_EXIT = overlayMotion({
+    ...FAB_MENU_LIST_MOTION,
+    exit: {
+        ...FAB_MENU_LIST_MOTION.exit,
+        delay: mul(FAB_MENU_STAGGER, unitless(FAB_MENU_STAGGERED - 1)),
+    },
+}).rawRules!.css![CLOSED]!;
 
 const pf = typed();
 
@@ -150,7 +213,12 @@ export const createFabMenu = <const G extends string = ColorGroup>(
                         insetBlockEnd: pct(100),
                         insetInlineEnd: px(0),
                         marginBlockEnd: ref("listGap"),
-                        ...overlayMotion(POPUP_MOTION),
+                        rawRules: {
+                            css: {
+                                [CLOSED]: LIST_EXIT,
+                                ...staggered(),
+                            },
+                        },
                         zIndex: zIndex("menu"),
                         display: flex,
                         flexDirection: column,

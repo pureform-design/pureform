@@ -23,7 +23,7 @@ import {
     unitless,
     when,
 } from "@pureform/core/ast";
-import type { StyleMap } from "@pureform/core/ast";
+import type { NumericValue, StyleMap } from "@pureform/core/ast";
 import { duration, easing, spacing, spring } from "@pureform/theme";
 import type { DurationRole, EasingRole, SpringRole } from "@pureform/theme";
 
@@ -50,6 +50,12 @@ export const OVERLAY_KEYFRAMES: Record<string, Record<string, StyleMap>> = {
     overlayShrinkOut: {
         from: { scale: unitless(1) },
         to: { scale: unitless(0.8) },
+    },
+    // A surface that only holds still while its parts move (the FAB menu's list, whose items
+    // enter and leave on their own), so its presence waits for them.
+    overlayHold: {
+        from: { opacity: unitless(1) },
+        to: { opacity: unitless(1) },
     },
     // A dialog comes down into place, and goes back up.
     dialogSlideIn: {
@@ -93,6 +99,9 @@ export type OverlayMotionStep = {
      *  overlay fade in or out), so the movement and the fade can each take their own spring.
      *  Under reduced motion it runs alone. */
     readonly fade?: MotionTiming;
+    /** How long the step waits before it starts, which its fade waits too. Under reduced motion
+     *  the fade runs at once. */
+    readonly delay?: NumericValue;
 } & MotionTiming;
 
 /** How an overlay enters and leaves. */
@@ -113,6 +122,7 @@ export const timedAnimation = (
     name: string,
     timing: MotionTiming,
     fillMode: "none" | "forwards" = "none",
+    delay?: NumericValue,
 ) => {
     const fill = timing.delay
         ? fillMode === "forwards"
@@ -121,6 +131,7 @@ export const timedAnimation = (
         : fillMode;
     return animation({
         name,
+        ...(delay ? { delay } : {}),
         ...(timing.spring
             ? { spring: spring(timing.spring) }
             : {
@@ -142,14 +153,19 @@ export const motionAnimation = (
 ) => timedAnimation(name, { duration: time, easing: curve }, fillMode);
 
 const step = (
-    { keyframes, rtl, fade: fadeTiming, ...timing }: OverlayMotionStep,
+    { keyframes, rtl, fade: fadeTiming, delay, ...timing }: OverlayMotionStep,
     fade: string,
     fillMode: "none" | "forwards",
 ) => {
     const fading = timedAnimation(fade, fadeTiming ?? timing, fillMode);
     const run = (name: string) => {
-        const moving = timedAnimation(name, timing, fillMode);
-        return fadeTiming ? animations(moving, fading) : moving;
+        const moving = timedAnimation(name, timing, fillMode, delay);
+        return fadeTiming
+            ? animations(
+                  moving,
+                  timedAnimation(fade, fadeTiming, fillMode, delay),
+              )
+            : moving;
     };
     if (FADES.has(keyframes))
         return timedAnimation(keyframes, timing, fillMode);

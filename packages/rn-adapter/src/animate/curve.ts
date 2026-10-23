@@ -20,7 +20,7 @@ export const curve = (easing: string) => {
 export interface AnimatedTiming {
     readonly duration: number;
     readonly easing: string;
-    readonly delay?: number;
+    readonly delay?: number | undefined;
     readonly spring?: Spring | undefined;
 }
 

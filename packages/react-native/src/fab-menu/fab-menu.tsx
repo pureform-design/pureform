@@ -20,6 +20,7 @@ import type {
     OverlayPositioning,
 } from "@pureform/binding-core";
 import type { Indication } from "@pureform/binding-core/indication";
+import { useReducedMotion, useTokens } from "@pureform/rn-adapter/react";
 import type { Selection } from "@pureform/styling";
 import type { ReactNode } from "react";
 
@@ -34,6 +35,7 @@ import {
     withEngine,
 } from "../parts";
 import { Portal } from "../portal";
+import { useOverlayPresence } from "../presence";
 import { useEngine } from "../provider";
 import { useComponentSlots } from "../styles";
 
@@ -64,8 +66,23 @@ export interface FabMenuProps
     readonly testId?: TestIdOverride<FabMenuPart> | undefined;
 }
 
+// The items that stagger, as the preset's `FAB_MENU_STAGGERED`: the rest share the last one's
+// wait. Each waits a `short1` duration more than the one before it.
+const STAGGERED = 8;
+
+/** How long each item waits after the one before it, in ms. */
+const useStagger = (): number => {
+    const value = useTokens()["durations.short1"];
+    const ms =
+        typeof value === "number" ? value : Number.parseFloat(String(value));
+    return Number.isFinite(ms) ? ms : 0;
+};
+
 function FabMenuItemImpl(props: {
     readonly item: FabMenuItem<ReactNode>;
+    readonly index: number;
+    readonly count: number;
+    readonly open: boolean;
     readonly selection: Selection<"fabMenu">;
     readonly indication: Indication | undefined;
     readonly testId: TestIdOverride<FabMenuPart> | undefined;
@@ -91,34 +108,44 @@ function FabMenuItemImpl(props: {
     );
     const id = (part: FabMenuPart) =>
         testIdOf(fabMenuAnatomy, part, props.testId);
+    const engine = useEngine();
+    const stagger = useStagger();
+    const wait = (steps: number) => Math.min(steps, STAGGERED - 1) * stagger;
+    // The item nearest the FAB (the last) enters first, the farthest leaves first.
+    const presence = useOverlayPresence(props.open, "fabMenuItem", {
+        enter: wait(props.count - 1 - props.index),
+        exit: wait(props.index),
+    });
     return (
-        <v.item.Pressable
-            {...indication.handlers}
-            role="menuitem"
-            disabled={item.disabled}
-            onPress={() => props.onSelect(item.value)}
-            style={{ ...s.item, ...unselectable }}
-            testID={id("item")}
-        >
-            {isPresent(item.icon) ? (
-                <v.itemIcon.View style={s.itemIcon} testID={id("itemIcon")}>
-                    <IconSlot
-                        {...iconSlot(selected, "itemIcon")}
-                        motion={s.itemIcon}
-                    >
-                        {item.icon}
-                    </IconSlot>
-                </v.itemIcon.View>
-            ) : null}
-            <v.itemLabel.Text
-                selectable={false}
-                style={s.itemLabel}
-                testID={id("itemLabel")}
+        <engine.View {...presence.props} style={presence.style}>
+            <v.item.Pressable
+                {...indication.handlers}
+                role="menuitem"
+                disabled={item.disabled}
+                onPress={() => props.onSelect(item.value)}
+                style={{ ...s.item, ...unselectable }}
+                testID={id("item")}
             >
-                {item.label}
-            </v.itemLabel.Text>
-            {indication.layer(selected)}
-        </v.item.Pressable>
+                {isPresent(item.icon) ? (
+                    <v.itemIcon.View style={s.itemIcon} testID={id("itemIcon")}>
+                        <IconSlot
+                            {...iconSlot(selected, "itemIcon")}
+                            motion={s.itemIcon}
+                        >
+                            {item.icon}
+                        </IconSlot>
+                    </v.itemIcon.View>
+                ) : null}
+                <v.itemLabel.Text
+                    selectable={false}
+                    style={s.itemLabel}
+                    testID={id("itemLabel")}
+                >
+                    {item.label}
+                </v.itemLabel.Text>
+                {indication.layer(selected)}
+            </v.item.Pressable>
+        </engine.View>
     );
 }
 
@@ -190,8 +217,16 @@ function FabMenuImpl(props: FabMenuProps): ReactNode {
         "fabMenu",
         selection,
     );
+    const stagger = useStagger();
+    const reducedMotion = useReducedMotion();
+    const items = props.items ?? [];
+    // The list holds until the last staggered item has left.
     const { open, source, measured, presence, close, toggle } =
-        useAnchoredOverlay("FabMenu", props);
+        useAnchoredOverlay("FabMenu", props, "fabMenuList", {
+            exit: reducedMotion
+                ? 0
+                : Math.min(items.length - 1, STAGGERED - 1) * stagger,
+        });
     const select = useStableCallback((value: string) => {
         props.onSelect?.({ value });
         if (props.closeOnSelect ?? true) close();
@@ -229,10 +264,13 @@ function FabMenuImpl(props: FabMenuProps): ReactNode {
                                 }}
                                 testID={id("list")}
                             >
-                                {(props.items ?? []).map((item) => (
+                                {items.map((item, index) => (
                                     <Item
                                         key={item.value}
                                         item={item}
+                                        index={index}
+                                        count={items.length}
+                                        open={open}
                                         selection={selection}
                                         indication={props.indication}
                                         testId={props.testId}
