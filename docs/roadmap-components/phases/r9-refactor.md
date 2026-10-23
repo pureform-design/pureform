@@ -27,6 +27,10 @@ One pass over everything since r8: m3 (Material transitions), c8 (Material gaps 
 - **Settling:** the list item's swipe settles through c8a's `settleTransition`.
 - **Exact springs on the web:** springs written out as CSS vars (stiffness, damping), so a
   settle from a release speed reads them instead of fitting the `linear()` curve.
+- **Sheet expanded events:** `onExpandedChange` fires only for a user's drag or press, not when
+  an uncontrolled sheet reopens at a different rest.
+- **Splitter transitions:** document that the snap's spring overrides a pane's own inline
+  `transition` while it runs.
 
 ## Done when
 
