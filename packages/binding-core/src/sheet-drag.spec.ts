@@ -244,7 +244,7 @@ describe("a sheet that rests partly open", () => {
             closeAsker(),
             {
                 partial: () => true,
-                onRest: (rest) => rests.push(rest),
+                onRest: (rest, movable) => rests.push(`${rest} ${movable}`),
             },
         );
         sheet.setAttribute("data-state", "open");
@@ -266,10 +266,10 @@ describe("a sheet that rests partly open", () => {
         const { sheet, handle, dismiss, rests, partial } = await setup(true);
         expect(partial).toBeGreaterThan(0);
         expect(sheet.style.translate).toBe(`0px ${partial}px`);
-        expect(rests).toEqual(["partial"]);
+        expect(rests).toEqual(["partial true"]);
         drag(handle, -partial);
         expect(sheet.style.translate).toBe("");
-        expect(rests).toEqual(["partial", "expanded"]);
+        expect(rests).toEqual(["partial true", "expanded true"]);
         drag(handle, partial * 0.8);
         expect(sheet.style.translate).toBe(`0px ${partial}px`);
         expect(dismiss).not.toHaveBeenCalled();
@@ -304,7 +304,7 @@ describe("a sheet that rests partly open", () => {
     it("rests fully open when it's no taller than half the screen", async () => {
         const { sheet, handle, rests } = await setup(false);
         expect(sheet.style.translate).toBe("");
-        expect(rests).toEqual([]);
+        expect(rests).toEqual(["expanded false"]);
         const click = vi.fn();
         sheet.addEventListener("click", click);
         handle.click();

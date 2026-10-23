@@ -30,8 +30,9 @@ const SPEED_WINDOW = 100;
 export interface SheetDragOptions {
     /** Whether the sheet can rest partly open, read at each open and each release. */
     readonly partial?: (() => boolean) | undefined;
-    /** Called when where it rests changes: partly or fully open. */
-    readonly onRest?: ((rest: SheetRest) => void) | undefined;
+    /** Called when where it rests changes (partly or fully open), and each time it opens, with
+     *  whether it can move between the two (it's tall enough to rest partly open). */
+    readonly onRest?: ((rest: SheetRest, movable: boolean) => void) | undefined;
 }
 
 /** Lets `handle` drag `sheet` (give the handle `sheetDragHandleLayout` too, so touch moves drag
@@ -60,10 +61,14 @@ export const dragToDismiss = (
     let swallow: (() => void) | undefined;
     let stopSettle: (() => void) | undefined;
 
-    const setRest = (next: SheetRest) => {
-        if (next === rest) return;
+    const setRest = (next: SheetRest, opening = false) => {
+        if (next === rest && !opening) return;
         rest = next;
-        options.onRest?.(next);
+        const surface = sheet();
+        options.onRest?.(
+            next,
+            surface ? partialOffset(surface) !== undefined : false,
+        );
     };
     // How far down the sheet rests partly open, or `undefined` when it can't (or is too short).
     const partialOffset = (surface: HTMLElement) => {
@@ -118,6 +123,7 @@ export const dragToDismiss = (
             stopSettle?.();
             setRest(
                 partialOffset(surface) === undefined ? "expanded" : "partial",
+                true,
             );
             surface.style.transition = "none";
             place(surface, restOffset(surface));
@@ -137,11 +143,7 @@ export const dragToDismiss = (
             attributeFilter: ["data-state"],
             attributeOldValue: true,
         });
-        if (
-            surface.getAttribute("data-state") === "open" &&
-            options.partial?.()
-        )
-            open();
+        if (surface.getAttribute("data-state") === "open") open();
     };
     // The handle can be in place before the binding has the sheet.
     queueMicrotask(watch);
