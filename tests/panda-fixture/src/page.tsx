@@ -41,6 +41,8 @@ import {
     tagsInput,
     numberField,
     codeField,
+    fileUpload,
+    rating,
     separator,
     fab,
     fullscreenDialog,
@@ -912,6 +914,227 @@ export function Page() {
                                     Sent by text
                                 </span>
                             </div>
+                        );
+                    }}
+                </For>
+            </section>
+            <section
+                data-section="file-uploads"
+                style={{ ...row, "align-items": "flex-start" }}
+            >
+                <For each={["idle", "dragged", "invalid"] as const}>
+                    {(state) => {
+                        const t = fileUpload({
+                            invalid: state === "invalid" ? "true" : "false",
+                        });
+                        return (
+                            <div class={t.root} style={{ width: "300px" }}>
+                                <label class={t.label}>Attachments</label>
+                                <div
+                                    class={t.dropzone}
+                                    data-pf-dragging={
+                                        state === "dragged" ? "" : undefined
+                                    }
+                                >
+                                    <span class={t.icon}>
+                                        <svg viewBox="0 0 24 24">
+                                            <path
+                                                fill="currentColor"
+                                                d="M11 16V7.85l-2.6 2.6L7 9l5-5 5 5-1.4 1.45-2.6-2.6V16zm-5 4q-.825 0-1.412-.587Q4 18.825 4 18v-3h2v3h12v-3h2v3q0 .825-.587 1.413Q18.825 20 18 20z"
+                                            />
+                                        </svg>
+                                    </span>
+                                    <span class={t.headline}>
+                                        Drop files here
+                                    </span>
+                                    <span class={t.supportingText}>
+                                        {state === "invalid"
+                                            ? "Add at least one file"
+                                            : "PNG or PDF, up to 5 MB"}
+                                    </span>
+                                    <button
+                                        type="button"
+                                        class={
+                                            button({ variant: "outlined" }).root
+                                        }
+                                    >
+                                        Choose files
+                                    </button>
+                                </div>
+                                {state === "idle" ? (
+                                    <ul class={t.itemGroup}>
+                                        <li class={t.item}>
+                                            <div
+                                                class={
+                                                    listItem({ lines: "two" })
+                                                        .root
+                                                }
+                                            >
+                                                <span
+                                                    class={listItem().leading}
+                                                >
+                                                    ✉
+                                                </span>
+                                                <div class={listItem().content}>
+                                                    <span
+                                                        class={
+                                                            listItem().headline
+                                                        }
+                                                    >
+                                                        report.pdf
+                                                    </span>
+                                                    <span
+                                                        class={
+                                                            listItem()
+                                                                .supportingText
+                                                        }
+                                                    >
+                                                        1.2 MB
+                                                    </span>
+                                                </div>
+                                                <span
+                                                    class={listItem().trailing}
+                                                >
+                                                    ✕
+                                                </span>
+                                            </div>
+                                            <div
+                                                class={linearProgress().root}
+                                                role="progressbar"
+                                                aria-valuenow="40"
+                                                aria-label="Uploading report.pdf"
+                                                style={{
+                                                    "--pf-components-linearProgress-value":
+                                                        "40",
+                                                }}
+                                            >
+                                                <div
+                                                    class={
+                                                        linearProgress().track
+                                                    }
+                                                />
+                                                <div
+                                                    class={
+                                                        linearProgress()
+                                                            .indicator
+                                                    }
+                                                />
+                                                <div
+                                                    class={
+                                                        linearProgress()
+                                                            .stopIndicator
+                                                    }
+                                                />
+                                            </div>
+                                        </li>
+                                        <li class={t.item} data-type="rejected">
+                                            <div
+                                                class={
+                                                    listItem({ lines: "two" })
+                                                        .root
+                                                }
+                                            >
+                                                <span
+                                                    class={listItem().leading}
+                                                >
+                                                    ✉
+                                                </span>
+                                                <div class={listItem().content}>
+                                                    <span
+                                                        class={
+                                                            listItem().headline
+                                                        }
+                                                    >
+                                                        movie.mov
+                                                    </span>
+                                                    <span class={t.error}>
+                                                        This type of file isn't
+                                                        accepted
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                ) : null}
+                            </div>
+                        );
+                    }}
+                </For>
+            </section>
+            <section
+                data-section="ratings-and-copy-buttons"
+                style={{ ...row, "align-items": "center" }}
+            >
+                <For each={["small", "medium", "large"] as const}>
+                    {(size) => {
+                        const t = rating({ size });
+                        return (
+                            <div class={t.root}>
+                                <label class={t.label}>Rating</label>
+                                <div class={t.control} role="radiogroup">
+                                    <For each={[1, 2, 3, 4, 5]}>
+                                        {(star) => (
+                                            <span
+                                                class={t.item}
+                                                role="radio"
+                                                aria-checked={
+                                                    star === 4
+                                                        ? "true"
+                                                        : "false"
+                                                }
+                                            >
+                                                <span class={t.icon}>★</span>
+                                                {star <= 3 ? (
+                                                    <span class={t.fill}>
+                                                        ★
+                                                    </span>
+                                                ) : star === 4 ? (
+                                                    <span class={t.halfFill}>
+                                                        ★
+                                                    </span>
+                                                ) : null}
+                                            </span>
+                                        )}
+                                    </For>
+                                </div>
+                            </div>
+                        );
+                    }}
+                </For>
+                <div class={rating({ color: "secondary" }).root}>
+                    <div class={rating().control} role="radiogroup">
+                        <For each={[1, 2, 3]}>
+                            {(star) => (
+                                <span
+                                    class={rating({ color: "secondary" }).item}
+                                    role="radio"
+                                    aria-disabled="true"
+                                    data-disabled=""
+                                >
+                                    <span class={rating().icon}>★</span>
+                                    {star === 1 ? (
+                                        <span class={rating().fill}>★</span>
+                                    ) : null}
+                                </span>
+                            )}
+                        </For>
+                    </div>
+                </div>
+                <For each={["⎘", "✓"]}>
+                    {(glyph) => {
+                        const b = iconButton({ variant: "standard" });
+                        return (
+                            <button
+                                class={b.root}
+                                type="button"
+                                aria-label={glyph === "✓" ? "Copied" : "Copy"}
+                                data-copied={glyph === "✓" ? "" : undefined}
+                            >
+                                <span class={b.touchTarget} />
+                                <span class={b.container}>
+                                    <span class={b.icon}>{glyph}</span>
+                                </span>
+                            </button>
                         );
                     }}
                 </For>

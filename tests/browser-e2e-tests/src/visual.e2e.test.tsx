@@ -43,6 +43,8 @@ const SECTIONS = [
     "icon-fields-and-areas",
     "affixes-and-counter",
     "number-and-code-fields",
+    "file-uploads",
+    "ratings-and-copy-buttons",
     "icons",
     "fabs",
     "split-buttons-and-fab-menus",
