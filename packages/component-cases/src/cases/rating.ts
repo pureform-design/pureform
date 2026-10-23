@@ -1,6 +1,7 @@
 // The rating: `value`, a radio group of stars (a `radio` each, the chosen one checked) with a
 // hidden input that submits the value, half values, a read-only display, and arrow keys that
-// move by a star, by direction. A star is filled by its `fill` part, or half by `halfFill`.
+// move by a star, by direction. A star is filled by its `fill` part, or half by `halfFill`; the
+// stars also preview the one under the pointer, so the state is read from the hidden input.
 
 import { testIds } from "@pureform/anatomy";
 
@@ -15,22 +16,14 @@ const items = (host: HTMLElement) => [
 ];
 
 const hidden = (host: HTMLElement) =>
-    host.querySelector<HTMLInputElement>('input[name="quality"]');
+    host.querySelector<HTMLInputElement>("input[hidden]");
 
-const count = (host: HTMLElement, id: string) =>
-    host.querySelectorAll(`[data-testid="${id}"]`).length;
-
-/** The stars drawn filled (a half one counts half), checked against the hidden input when it's
- *  named. */
+/** The hidden input's value. The stars and the checked radio also preview the star under the
+ *  pointer, so only the input shows the value itself. */
 const read = (host: HTMLElement): number => {
-    const drawn = count(host, ids.fill) + count(host, ids.halfFill) / 2;
-    const submitted = hidden(host);
-    if (submitted && Math.max(0, Number(submitted.value)) !== drawn) {
-        throw new Error(
-            `${drawn} stars are drawn, the hidden input holds ${submitted.value}`,
-        );
-    }
-    return drawn;
+    const input = hidden(host);
+    if (!input) throw new Error("no hidden input");
+    return Math.max(0, Number(input.value));
 };
 
 const click =
@@ -56,7 +49,7 @@ export const rating: ComponentCase = {
     },
     state: { prop: "value", from: 1, to: 3, act: click(3), read },
     form: {
-        control: (host) => hidden(host) ?? items(host)[0]!,
+        control: (host) => hidden(host)!,
         disabled: (host) =>
             byTestId(host, ids.control).hasAttribute("data-disabled"),
         submits: {

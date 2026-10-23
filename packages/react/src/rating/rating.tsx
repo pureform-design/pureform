@@ -18,9 +18,10 @@ import type {
 import * as ratingGroup from "@pureform/machines/rating-group";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";
-import { type ElementType, type ReactNode, useId } from "react";
+import { type ElementType, type ReactNode, useId, useState } from "react";
 
 import { useControllable } from "../controllable";
+import { useFormReset } from "../form";
 import { StarIcon } from "../glyphs";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
@@ -66,13 +67,27 @@ function Root(props: RatingRootProps): ReactNode {
     const id = useId();
     const dir = useDirection();
     const value = useControllable<"value", number>("Rating", "value", props);
+    const [input, setInput] = useState<HTMLInputElement | null>(null);
     const service = useMachine(ratingGroup.machine, {
         id: props.id ?? id,
         dir,
         ...ratingMachineProps(props),
         ...value.machineProps,
+        // Zag's none is -1; the rating's is 0, which the hidden input and a reset show too.
+        defaultValue: value.machineProps.defaultValue ?? 0,
     });
     const api = ratingGroup.connect(service, normalizeProps);
+    useFormReset(input, {
+        resetsTo: value.resetsTo ?? 0,
+        onBeforeReset: value.beforeReset,
+        onReset: () =>
+            value.reset(() =>
+                service.send({
+                    type: "SET_VALUE",
+                    value: value.defaultValue ?? 0,
+                }),
+            ),
+    });
     const scope = useComponent(ratingAnatomy, {
         selection: ratingSelection(props),
         testId: props.testId,
@@ -93,6 +108,8 @@ function Root(props: RatingRootProps): ReactNode {
                             {/* Its value follows the rating: Zag's sets it once. */}
                             <input
                                 {...api.getHiddenInputProps()}
+                                ref={setInput}
+                                name={props.name}
                                 defaultValue={undefined}
                                 value={api.value}
                                 onChange={noop}

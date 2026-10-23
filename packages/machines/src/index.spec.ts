@@ -31,10 +31,16 @@ describe("@pureform/machines", () => {
         expect(machines.tooltip.connect).toBe(zagTooltip.connect);
     });
 
-    it("re-exports Zag's clipboard and rating group machines unchanged, the rating with the parts the preset draws", () => {
-        expect(machines.clipboard.machine).toBe(zagClipboard.machine);
+    it("re-exports Zag's clipboard with a copy that never rejects, and its rating group with the fieldset rule and the parts the preset draws", () => {
+        expect(machines.clipboard.machine.states).toBe(
+            zagClipboard.machine.states,
+        );
+        expect(machines.clipboard.machine).not.toBe(zagClipboard.machine);
         expect(machines.clipboard.connect).toBe(zagClipboard.connect);
-        expect(machines.ratingGroup.machine).toBe(zagRatingGroup.machine);
+        expect(machines.ratingGroup.machine.states).toBe(
+            zagRatingGroup.machine.states,
+        );
+        expect(machines.ratingGroup.machine).not.toBe(zagRatingGroup.machine);
         expect(machines.ratingGroup.connect).toBe(zagRatingGroup.connect);
         expect(machines.ratingGroup.anatomy.keys()).toEqual([
             "root",

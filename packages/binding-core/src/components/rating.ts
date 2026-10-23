@@ -23,7 +23,7 @@ export interface RatingVariantProps {
     readonly tokens?: InstanceTokens<"rating"> | undefined;
 }
 
-/** What the rating machine takes from Root's props. The value runs from 0 (none) to `count`, in
+/** What the rating machine takes from Root's props. The value runs from 0 (none, the default) to `count`, in
  *  halves with `allowHalf`. */
 export interface RatingBehaviorProps extends Controllable<"value", number> {
     /** The number of stars. @default 5 */

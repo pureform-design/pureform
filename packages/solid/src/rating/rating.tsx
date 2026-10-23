@@ -19,6 +19,7 @@ import type { JSX, ValidComponent } from "@solidjs/web";
 import {
     type Accessor,
     createMemo,
+    createSignal,
     createUniqueId,
     For,
     merge,
@@ -27,6 +28,7 @@ import {
 } from "solid-js";
 
 import { useControllable } from "../controllable";
+import { useFormReset } from "../form";
 import { StarIcon } from "../glyphs";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
@@ -70,13 +72,30 @@ function Root(props: RatingRootProps): JSX.Element {
     const id = createUniqueId();
     const dir = useDirection();
     const value = useControllable<"value", number>("Rating", "value", props);
+    const [input, setInput] = createSignal<HTMLInputElement | undefined>(
+        undefined,
+        { ownedWrite: true },
+    );
     const service = useMachine(ratingGroup.machine, () => ({
         id: props.id ?? id,
         dir: dir(),
         ...ratingMachineProps(props),
         ...value.machineProps(),
+        // Zag's none is -1; the rating's is 0, which the hidden input and a reset show too.
+        defaultValue: value.machineProps().defaultValue ?? 0,
     }));
     const api = createMemo(() => ratingGroup.connect(service, normalizeProps));
+    useFormReset(input, {
+        resetsTo: () => value.resetsTo() ?? 0,
+        onBeforeReset: value.beforeReset,
+        onReset: () =>
+            value.reset(() =>
+                service.send({
+                    type: "SET_VALUE",
+                    value: value.defaultValue ?? 0,
+                }),
+            ),
+    });
     const scope = useComponent(ratingAnatomy, {
         selection: () => ratingSelection(props),
         testId: () => props.testId,
@@ -96,6 +115,8 @@ function Root(props: RatingRootProps): JSX.Element {
                                 {/* Its value follows the rating: Zag's sets it once. */}
                                 <input
                                     {...api().getHiddenInputProps()}
+                                    ref={setInput}
+                                    name={props.name}
                                     value={api().value}
                                 />
                             </>
