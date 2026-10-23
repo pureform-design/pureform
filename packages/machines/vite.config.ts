@@ -14,6 +14,8 @@ export default createConfig({
                     checkbox: "src/checkbox.ts",
                     switch: "src/switch.ts",
                     "radio-group": "src/radio-group.ts",
+                    clipboard: "src/clipboard.ts",
+                    "rating-group": "src/rating-group.ts",
                     select: "src/select.ts",
                     menu: "src/menu.ts",
                     dialog: "src/dialog.ts",

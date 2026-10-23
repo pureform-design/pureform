@@ -2,6 +2,7 @@ import * as zagAccordion from "@zag-js/accordion";
 import * as zagAvatar from "@zag-js/avatar";
 import * as zagCarousel from "@zag-js/carousel";
 import * as zagCheckbox from "@zag-js/checkbox";
+import * as zagClipboard from "@zag-js/clipboard";
 import * as zagCombobox from "@zag-js/combobox";
 import * as zagDateInput from "@zag-js/date-input";
 import * as zagDatePicker from "@zag-js/date-picker";
@@ -9,6 +10,7 @@ import * as zagDialog from "@zag-js/dialog";
 import * as zagListbox from "@zag-js/listbox";
 import * as zagMenu from "@zag-js/menu";
 import * as zagRadioGroup from "@zag-js/radio-group";
+import * as zagRatingGroup from "@zag-js/rating-group";
 import * as zagSelect from "@zag-js/select";
 import * as zagSplitter from "@zag-js/splitter";
 import * as zagSteps from "@zag-js/steps";
@@ -27,6 +29,22 @@ describe("@pureform/machines", () => {
         expect(machines.dialog.connect).toBe(zagDialog.connect);
         expect(machines.tooltip.machine).toBe(zagTooltip.machine);
         expect(machines.tooltip.connect).toBe(zagTooltip.connect);
+    });
+
+    it("re-exports Zag's clipboard and rating group machines unchanged, the rating with the parts the preset draws", () => {
+        expect(machines.clipboard.machine).toBe(zagClipboard.machine);
+        expect(machines.clipboard.connect).toBe(zagClipboard.connect);
+        expect(machines.ratingGroup.machine).toBe(zagRatingGroup.machine);
+        expect(machines.ratingGroup.connect).toBe(zagRatingGroup.connect);
+        expect(machines.ratingGroup.anatomy.keys()).toEqual([
+            "root",
+            "label",
+            "item",
+            "control",
+            "icon",
+            "fill",
+            "halfFill",
+        ]);
     });
 
     it("re-exports Zag's avatar unchanged, with the parts the preset draws", () => {

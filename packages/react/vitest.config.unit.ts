@@ -42,6 +42,8 @@ export default mergeConfig(mergeConfig(baseConfig, unitTestConfig), {
             "@pureform/machines > @zag-js/date-input",
             "@pureform/machines > @zag-js/combobox",
             "@pureform/machines > @zag-js/tags-input",
+            "@pureform/machines > @zag-js/clipboard",
+            "@pureform/machines > @zag-js/rating-group",
             "@pureform/machines > @zag-js/toggle-group",
             "@pureform/machines > @zag-js/slider",
             "@pureform/machines > @zag-js/avatar",

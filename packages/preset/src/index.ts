@@ -62,6 +62,7 @@ export * from "./components/toolbar";
 export * from "./components/tooltip";
 export * from "./components/table";
 export * from "./components/tabs";
+export * from "./components/rating";
 export * from "./components/tags-input";
 export * from "./components/touch-target";
 export * from "./components/supporting-text";

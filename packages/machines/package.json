@@ -33,6 +33,20 @@
                 "default": "./dist/switch.mjs"
             }
         },
+        "./clipboard": {
+            "types": "./dist/clipboard.d.ts",
+            "import": {
+                "development": "./src/clipboard.ts",
+                "default": "./dist/clipboard.mjs"
+            }
+        },
+        "./rating-group": {
+            "types": "./dist/rating-group.d.ts",
+            "import": {
+                "development": "./src/rating-group.ts",
+                "default": "./dist/rating-group.mjs"
+            }
+        },
         "./radio-group": {
             "types": "./dist/radio-group.d.ts",
             "import": {
