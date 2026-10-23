@@ -503,7 +503,7 @@ TAGS_INPUT_ROOT_PROPS; TAGS_INPUT_CONTENT_PROPS; tagsInputSelection(props);
 tagsInputMachineProps(props); tagsInputFilled(count, text); tagsInputChipTestId(testId);
 // Copy button: CopyButtonBehaviorProps (onCopy, onCopyError), CopyButtonContentProps, COPY_BUTTON_OWN_PROPS, copyButtonMachineProps(props), COPY_LABEL, COPIED_LABEL,
 // copyAnnouncement(props, copied) and COPY_ANNOUNCEMENT_STYLE (the visually hidden live region that announces the copy).
-// Native select: NativeSelectRootOwnProps, NativeSelectBehaviorProps, NativeSelectContentProps, NativeSelectItem, NATIVE_SELECT_ROOT_PROPS, NATIVE_SELECT_CONTENT_PROPS, NATIVE_SELECT_ATTRIBUTE_PROPS, nativeSelectSelection(props), nativeSelectProps(props, fieldsetDisabled) (the `<select>`'s id, name, validity), nativeSelectGroups(items).
+// Native select: NativeSelectRootOwnProps, NativeSelectBehaviorProps, NativeSelectContentProps, NativeSelectItem, NATIVE_SELECT_ROOT_PROPS, NATIVE_SELECT_CONTENT_PROPS, NATIVE_SELECT_ATTRIBUTE_PROPS, nativeSelectSelection(props), nativeSelectProps(props, fieldsetDisabled, field) (the `<select>`'s id, name, validity, `multiple`, and the Field's states and descriptions), NativeSelectValue (a string, or an array with `multiple`), nativeSelectValues(value), nativeSelectValue(chosen, multiple), sameNativeSelectValue(a, b), nativeSelectGroups(items).
 // Rating: RatingRootOwnProps, RatingBehaviorProps, RATING_ROOT_PROPS, ratingSelection(props), ratingMachineProps(props), starFill(itemState).
 type InputChipPart; interface InputChipVariantProps; inputChipSelection(props);
 
