@@ -44,3 +44,26 @@ export const text = (
     Object.assign(node.style, { margin: "0", ...style });
     return node;
 };
+
+/** A frame of a given size that the story's element fills, for a component that fills its
+ *  parent: without one it takes the canvas's whole width, or no height at all. */
+export const frame =
+    (style: Partial<CSSStyleDeclaration>): Decorator =>
+    (story) => {
+        const el = story() as HTMLElement;
+        const box = document.createElement("div");
+        box.setAttribute(STAGE_ATTRIBUTE, "");
+        Object.assign(box.style, {
+            display: "flex",
+            flexDirection: "column",
+            ...style,
+        });
+        Object.assign(el.style, {
+            display: "flex",
+            flexDirection: "column",
+            flexGrow: "1",
+            minHeight: "0",
+        });
+        box.append(el);
+        return box;
+    };

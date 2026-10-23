@@ -50,6 +50,9 @@ export default defineStories({
         // Both act on what's around them: a surface to press, and content to dim.
         Ripple: { hooks: ["./src/stages/ripple.ts"] },
         Scrim: { hooks: ["./src/stages/scrim.ts"] },
+        // They fill their parent, so they draw in a frame of a set size.
+        Splitter: { hooks: ["./src/stages/splitter.ts"] },
+        Media: { hooks: ["./src/stages/media.ts"] },
         TextField: {
             // React Native Web: the disabled field's input is `disabled` now (not `readonly`)
             // and passes, but its label is a plain text element, not the input's `<label>`, so
