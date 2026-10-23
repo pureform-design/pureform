@@ -281,7 +281,9 @@ export type {
 export {
     FAB_MENU_CONTENT_PROPS,
     FAB_MENU_ROOT_PROPS,
+    fabMenuItemFocusProps,
     fabMenuItemProps,
+    fabMenuListProps,
     fabMenuMachineProps,
     fabMenuSelection,
 } from "./components/fab-menu";

@@ -5,7 +5,9 @@
 import { fabMenuAnatomy } from "@pureform/anatomy";
 import {
     FAB_MENU_ROOT_PROPS,
+    fabMenuItemFocusProps,
     fabMenuItemProps,
+    fabMenuListProps,
     fabMenuMachineProps,
     fabMenuSelection,
     isPresent,
@@ -134,7 +136,13 @@ function List({ unstyled, ...props }: FabMenuPartProps): ReactNode {
     return scope.render("list", {
         element: "div",
         ref: presence.ref,
-        machine: presentProps(api.getContentProps(), presence.present),
+        machine: presentProps(
+            fabMenuListProps(api.getContentProps(), () => {
+                const { id } = api.getTriggerProps();
+                return id ? document.getElementById(id) : null;
+            }),
+            presence.present,
+        ),
         unstyled,
         props,
     });
@@ -155,7 +163,12 @@ function Item({
     return scope.render("item", {
         element: "div",
         interactionSource: source,
-        machine: api.getItemProps(item),
+        machine: {
+            ...api.getItemProps(item),
+            ...fabMenuItemFocusProps(disabled, () =>
+                api.setHighlightedValue(value),
+            ),
+        },
         states: { hover: api.getItemState(item).highlighted },
         unstyled,
         props,
