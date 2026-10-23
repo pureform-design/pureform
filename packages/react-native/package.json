@@ -215,6 +215,13 @@
                 "default": "./dist/icon.mjs"
             }
         },
+        "./copy-button": {
+            "types": "./dist/copy-button/index.d.ts",
+            "import": {
+                "development": "./src/copy-button/index.ts",
+                "default": "./dist/copy-button.mjs"
+            }
+        },
         "./icon-button": {
             "types": "./dist/icon-button/index.d.ts",
             "import": {
@@ -437,6 +444,13 @@
             "import": {
                 "development": "./src/tabs/index.ts",
                 "default": "./dist/tabs.mjs"
+            }
+        },
+        "./rating": {
+            "types": "./dist/rating/index.d.ts",
+            "import": {
+                "development": "./src/rating/index.ts",
+                "default": "./dist/rating.mjs"
             }
         },
         "./tags-input": {
