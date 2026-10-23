@@ -808,6 +808,61 @@
                 "default": "./dist/field.jsx"
             }
         },
+        "./label": {
+            "types": "./dist/label/index.d.ts",
+            "solid": {
+                "development": "./src/label/index.ts",
+                "default": "./dist/label.jsx"
+            },
+            "import": {
+                "development": "./src/label/index.ts",
+                "default": "./dist/label.jsx"
+            }
+        },
+        "./input": {
+            "types": "./dist/input/index.d.ts",
+            "solid": {
+                "development": "./src/input/index.ts",
+                "default": "./dist/input.jsx"
+            },
+            "import": {
+                "development": "./src/input/index.ts",
+                "default": "./dist/input.jsx"
+            }
+        },
+        "./textarea": {
+            "types": "./dist/textarea/index.d.ts",
+            "solid": {
+                "development": "./src/textarea/index.ts",
+                "default": "./dist/textarea.jsx"
+            },
+            "import": {
+                "development": "./src/textarea/index.ts",
+                "default": "./dist/textarea.jsx"
+            }
+        },
+        "./description": {
+            "types": "./dist/description/index.d.ts",
+            "solid": {
+                "development": "./src/description/index.ts",
+                "default": "./dist/description.jsx"
+            },
+            "import": {
+                "development": "./src/description/index.ts",
+                "default": "./dist/description.jsx"
+            }
+        },
+        "./error-text": {
+            "types": "./dist/error-text/index.d.ts",
+            "solid": {
+                "development": "./src/error-text/index.ts",
+                "default": "./dist/error-text.jsx"
+            },
+            "import": {
+                "development": "./src/error-text/index.ts",
+                "default": "./dist/error-text.jsx"
+            }
+        },
         "./supporting-text": {
             "types": "./dist/supporting-text/index.d.ts",
             "solid": {

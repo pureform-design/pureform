@@ -439,6 +439,41 @@
                 "default": "./dist/field.mjs"
             }
         },
+        "./label": {
+            "types": "./dist/label/index.d.ts",
+            "import": {
+                "development": "./src/label/index.ts",
+                "default": "./dist/label.mjs"
+            }
+        },
+        "./input": {
+            "types": "./dist/input/index.d.ts",
+            "import": {
+                "development": "./src/input/index.ts",
+                "default": "./dist/input.mjs"
+            }
+        },
+        "./textarea": {
+            "types": "./dist/textarea/index.d.ts",
+            "import": {
+                "development": "./src/textarea/index.ts",
+                "default": "./dist/textarea.mjs"
+            }
+        },
+        "./description": {
+            "types": "./dist/description/index.d.ts",
+            "import": {
+                "development": "./src/description/index.ts",
+                "default": "./dist/description.mjs"
+            }
+        },
+        "./error-text": {
+            "types": "./dist/error-text/index.d.ts",
+            "import": {
+                "development": "./src/error-text/index.ts",
+                "default": "./dist/error-text.mjs"
+            }
+        },
         "./supporting-text": {
             "types": "./dist/supporting-text/index.d.ts",
             "import": {

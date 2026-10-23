@@ -64,11 +64,14 @@ export interface FieldStateProps {
 /** The ready-made field's content: with no children, Field renders a label, an Input, a
  *  description and an error from these. */
 export interface FieldContentProps<N> {
-    /** The label's text. */
+    /** The label's text.
+     *  @control text */
     readonly label?: N | undefined;
-    /** The supporting text under the input. */
+    /** The supporting text under the input.
+     *  @control text */
     readonly description?: N | undefined;
-    /** The error under the input. Given, it marks the field invalid. */
+    /** The error under the input. Given, it marks the field invalid.
+     *  @control text */
     readonly error?: N | undefined;
 }
 
