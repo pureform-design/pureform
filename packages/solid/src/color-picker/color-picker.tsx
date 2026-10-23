@@ -38,7 +38,7 @@ import {
 import { useControllable } from "../controllable";
 import { ColorizeIcon } from "../glyphs";
 import { IconButton } from "../icon-button";
-import type { IconButtonProps } from "../icon-button";
+import type { IconButtonProps } from "../icon-button/icon-button";
 import { normalizeProps, useMachine } from "../internal/zag";
 import { createPartContext } from "../part-context";
 import { createSlotProps, useComponent } from "../parts";
@@ -47,7 +47,7 @@ import { combinePartProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 import { TextField } from "../text-field";
-import type { TextFieldProps } from "../text-field";
+import type { TextFieldProps } from "../text-field/text-field";
 
 type Anatomy = typeof colorPickerAnatomy;
 type Color = colorPicker.Color;
