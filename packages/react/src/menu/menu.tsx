@@ -10,13 +10,16 @@ import type { PartName } from "@pureform/anatomy";
 import {
     hasSubmenu,
     isPresent,
+    MENU_BACK_VALUE,
     MENU_ITEM_PROPS,
     MENU_ROOT_PROPS,
     menuGrouped,
     menuItemMachineProps,
+    menuDrillLevel,
     menuItemProps,
     menuMachineProps,
     menuSelection,
+    menuSubmenuMode,
     overlayPositionerProps,
     presentProps,
     submenuPositioning,
@@ -27,6 +30,7 @@ import type {
     MenuItem as MenuItemData,
     MenuItemBehaviorProps,
     MenuRootOwnProps,
+    MenuSelectDetails,
     MenuVariantProps,
 } from "@pureform/binding-core";
 import { markMenuGroupEdges } from "@pureform/binding-core/dom";
@@ -39,11 +43,12 @@ import {
     useCallback,
     useEffect,
     useId,
+    useState,
 } from "react";
 
 import { Button } from "../button";
 import { useControllable } from "../controllable";
-import { ChevronEndIcon } from "../glyphs";
+import { ChevronEndIcon, ChevronStartIcon } from "../glyphs";
 import { useItemInteractionSources } from "../interaction";
 import type { ItemInteractionSources } from "../interaction";
 import { useMachine } from "../machine";
@@ -460,13 +465,35 @@ function ItemTrailingText({ unstyled, ...props }: MenuPartProps): ReactNode {
 export interface MenuItemEntryProps {
     readonly item: MenuItemData<ReactNode>;
     readonly slot?: ((part: PartName<Anatomy>) => PartProps) | undefined;
+    /** An item with `items` is a row that drills into them (the menu's `onSelect` hears its
+     *  value) rather than a submenu beside it. */
+    readonly drill?: boolean | undefined;
 }
 
 const NO_SLOT = (): PartProps => ({});
 
 /** An `Item` from data, with its icons, label, supporting text and trailing text: what the
  *  ready-made menu renders per entry, for a component that holds a menu (the split button). */
-function ItemEntry({ item, slot = NO_SLOT }: MenuItemEntryProps): ReactNode {
+function ItemEntry({
+    item,
+    slot = NO_SLOT,
+    drill,
+}: MenuItemEntryProps): ReactNode {
+    if (hasSubmenu(item) && drill) {
+        return (
+            <Item
+                {...menuItemProps(item)}
+                closeOnSelect={false}
+                aria-haspopup="menu"
+                {...slot("item")}
+            >
+                <ItemParts item={item} slot={slot} />
+                <ItemTrailing mirror {...slot("itemTrailing")}>
+                    <ChevronEndIcon />
+                </ItemTrailing>
+            </Item>
+        );
+    }
     if (hasSubmenu(item)) {
         return (
             <Submenu>
@@ -540,6 +567,35 @@ function ItemParts({
     );
 }
 
+/** The window's width, once mounted (so a server's render and the first client render agree),
+ *  following its resizes; `undefined` while `track` is off. */
+function useWindowWidth(track: boolean): number | undefined {
+    const [width, setWidth] = useState<number>();
+    useEffect(() => {
+        if (!track) return undefined;
+        const read = () => setWidth(window.innerWidth);
+        read();
+        window.addEventListener("resize", read);
+        return () => window.removeEventListener("resize", read);
+    }, [track]);
+    return width;
+}
+
+/** A drilled-in level's first row, highlighted as the level comes in, so the keys go on from
+ *  there. */
+function HighlightOnDrill(props: {
+    readonly level: string;
+    readonly first: string | undefined;
+}): null {
+    const { api } = context.use("Content");
+    const { level, first } = props;
+    useEffect(() => {
+        if (level !== "" && first !== undefined) api.setHighlightedValue(first);
+        // Only a new level moves the highlight.
+    }, [level]);
+    return null;
+}
+
 /** The ready-made menu's props: Root's, with `className`, `style`, and `slotProps` keyed by part,
  *  the trigger's label, and the items as data. */
 export interface MenuProps
@@ -557,15 +613,47 @@ function ReadyMade(props: MenuProps): ReactNode {
         slotProps: _slotProps,
         trigger,
         contextTrigger,
-        items = [],
-        groups = [],
+        items: allItems = [],
+        groups: allGroups = [],
+        submenu: submenuProp,
         ...rootProps
     } = props;
     const slot = useSlotProps(props);
+    const drill =
+        menuSubmenuMode(
+            submenuProp,
+            useWindowWidth(submenuProp === undefined || submenuProp === "auto"),
+        ) === "drill";
+    // The submenu items drilled into, outermost first.
+    const [path, setPath] = useState<readonly string[]>([]);
+    const level = menuDrillLevel(allItems, allGroups, drill ? path : []);
+    const { items, groups, submenu } = level;
+    // Out of any submenu once it closes.
+    useEffect(() => {
+        if (props.open === false) setPath([]);
+    }, [props.open]);
+    const onSelect = (details: MenuSelectDetails) => {
+        if (drill && details.value === MENU_BACK_VALUE)
+            return setPath((at) => at.slice(0, -1));
+        const chosen = drill
+            ? [...items, ...groups.flatMap((group) => group.items)].find(
+                  (entry) => entry.value === details.value,
+              )
+            : undefined;
+        if (chosen && hasSubmenu(chosen))
+            return setPath((at) => [...at.slice(0, level.depth), chosen.value]);
+        rootProps.onSelect?.(details);
+    };
+    const onOpenChange: MenuRootProps["onOpenChange"] = (details) => {
+        if (!details.open) setPath([]);
+        rootProps.onOpenChange?.(details);
+    };
     return (
         <Root
             {...rootProps}
-            grouped={menuGrouped(props) || undefined}
+            onSelect={onSelect}
+            onOpenChange={onOpenChange}
+            grouped={(!submenu && menuGrouped(props)) || undefined}
             {...(slot("root") as object)}
         >
             {isPresent(trigger) ? (
@@ -578,8 +666,37 @@ function ReadyMade(props: MenuProps): ReactNode {
             ) : null}
             <Positioner {...slot("positioner")}>
                 <Content {...slot("content")}>
+                    {drill ? (
+                        <HighlightOnDrill
+                            level={path.join("\u0000")}
+                            first={submenu ? MENU_BACK_VALUE : items[0]?.value}
+                        />
+                    ) : null}
+                    {submenu ? (
+                        // The row that goes back out, headed by the submenu's item.
+                        <Item
+                            value={MENU_BACK_VALUE}
+                            valueText={submenu.valueText}
+                            closeOnSelect={false}
+                            {...slot("item")}
+                        >
+                            <ItemLeading mirror {...slot("itemLeading")}>
+                                <ChevronStartIcon />
+                            </ItemLeading>
+                            <ItemContent {...slot("itemContent")}>
+                                <ItemLabel {...slot("itemLabel")}>
+                                    {submenu.label}
+                                </ItemLabel>
+                            </ItemContent>
+                        </Item>
+                    ) : null}
                     {items.map((item) => (
-                        <ItemEntry key={item.value} item={item} slot={slot} />
+                        <ItemEntry
+                            key={item.value}
+                            item={item}
+                            slot={slot}
+                            drill={drill}
+                        />
                     ))}
                     {groups.map((group) => (
                         <ItemGroup
@@ -600,6 +717,7 @@ function ReadyMade(props: MenuProps): ReactNode {
                                     key={item.value}
                                     item={item}
                                     slot={slot}
+                                    drill={drill}
                                 />
                             ))}
                         </ItemGroup>

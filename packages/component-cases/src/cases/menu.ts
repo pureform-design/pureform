@@ -70,6 +70,21 @@ export const menu: ComponentCase = {
                 },
             ],
         },
+        "with a drilled submenu": {
+            defaultOpen: true,
+            submenu: "drill",
+            items: [
+                { value: "cut", label: "Cut" },
+                {
+                    value: "share",
+                    label: "Share",
+                    items: [
+                        { value: "mail", label: "Mail" },
+                        { value: "link", label: "Copy link" },
+                    ],
+                },
+            ],
+        },
         "secondary color, compact": {
             defaultOpen: true,
             color: "secondary",

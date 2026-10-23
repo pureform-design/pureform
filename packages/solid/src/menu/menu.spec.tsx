@@ -1,7 +1,7 @@
 import { compositeTestIds } from "@pureform/anatomy";
 import { createSignal, Errored, For } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
-import { userEvent } from "vitest/browser";
+import { page, userEvent } from "vitest/browser";
 
 import { Menu } from ".";
 import { PureformProvider } from "..";
@@ -414,7 +414,9 @@ describe("Menu, submenus", () => {
     ];
 
     it("draws an item with items as the submenu's trigger, an arrow at its end", async () => {
-        withRegistry(() => <Menu trigger="Edit" items={NESTED} />);
+        withRegistry(() => (
+            <Menu trigger="Edit" submenu="cascade" items={NESTED} />
+        ));
         await settle();
         expect(contents()).toHaveLength(2);
         const share = items()[1]!;
@@ -433,7 +435,12 @@ describe("Menu, submenus", () => {
     it("opens the submenu with the arrow toward the end, and reports its items' choice", async () => {
         const onSelect = vi.fn();
         withRegistry(() => (
-            <Menu trigger="Edit" items={NESTED} onSelect={onSelect} />
+            <Menu
+                trigger="Edit"
+                submenu="cascade"
+                items={NESTED}
+                onSelect={onSelect}
+            />
         ));
         await settle();
         await userEvent.click(byTestId(ids.trigger));
@@ -460,7 +467,9 @@ describe("Menu, submenus", () => {
     });
 
     it("closes the submenu with the arrow toward the start, back on its item", async () => {
-        withRegistry(() => <Menu trigger="Edit" items={NESTED} />);
+        withRegistry(() => (
+            <Menu trigger="Edit" submenu="cascade" items={NESTED} />
+        ));
         await settle();
         await userEvent.click(byTestId(ids.trigger));
         await frames();
@@ -470,5 +479,73 @@ describe("Menu, submenus", () => {
         await frames(6);
         expect(items()[1]!.getAttribute("aria-expanded")).toBe("false");
         expect(document.activeElement).toBe(contents()[0]);
+    });
+
+    const labels = () =>
+        items().map(
+            (item) =>
+                item.querySelector(`[data-testid="${ids.itemLabel}"]`)
+                    ?.textContent,
+        );
+
+    it("drills into a submenu in the menu's place, under a row that goes back", async () => {
+        const onSelect = vi.fn();
+        withRegistry(() => (
+            <Menu
+                trigger="Edit"
+                submenu="drill"
+                items={NESTED}
+                onSelect={onSelect}
+            />
+        ));
+        await settle();
+        // One surface: the submenu's item is a row of the menu, its arrow at its end.
+        expect(contents()).toHaveLength(1);
+        expect(items()[1]!.getAttribute("aria-haspopup")).toBe("menu");
+        expect(
+            items()[1]!.querySelector(
+                `[data-testid="${ids.itemTrailing}"] svg`,
+            ),
+        ).not.toBeNull();
+        await userEvent.click(byTestId(ids.trigger));
+        await frames();
+        await userEvent.click(items()[1]!);
+        await frames();
+        expect(labels()).toEqual(["Share", "Mail", "Copy link"]);
+        expect(onSelect).not.toHaveBeenCalled();
+        expect(byTestId(ids.trigger).getAttribute("aria-expanded")).toBe(
+            "true",
+        );
+        // The back row is highlighted, so the keys go on from it.
+        expect(items()[0]!.hasAttribute("data-pf-hover")).toBe(true);
+        await userEvent.keyboard("{Enter}");
+        await frames();
+        expect(labels()).toEqual(["Cut", "Share"]);
+        await userEvent.click(items()[1]!);
+        await frames();
+        await userEvent.click(items()[1]!);
+        await frames(6);
+        expect(onSelect).toHaveBeenCalledExactlyOnceWith({ value: "mail" });
+        // Choosing closes the menu; it opens again at the top.
+        expect(byTestId(ids.trigger).getAttribute("aria-expanded")).toBe(
+            "false",
+        );
+        expect(labels()).toEqual(["Cut", "Share"]);
+    });
+
+    it("cascades by default in a wide window and drills in a compact one", async () => {
+        try {
+            await page.viewport(1000, 800);
+            withRegistry(() => <Menu trigger="Edit" items={NESTED} />);
+            await frames();
+            expect(contents()).toHaveLength(2);
+            document.body.innerHTML = "";
+            await page.viewport(400, 800);
+            withRegistry(() => <Menu trigger="Edit" items={NESTED} />);
+            await frames();
+            expect(contents()).toHaveLength(1);
+        } finally {
+            await page.viewport(414, 896);
+        }
     });
 });

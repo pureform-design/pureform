@@ -141,6 +141,61 @@ export const submenuPositioning = (
     ...positioning,
 });
 
+/** How the ready-made menu opens a submenu: `cascade` beside its item, `drill` in the menu's
+ *  place (the submenu's items under a row that goes back, headed by the item's label), `auto`
+ *  cascading when there's room beside the menu, else drilling. */
+export type MenuSubmenu = "cascade" | "drill" | "auto";
+
+/** The narrowest window `auto` cascades in: Material's compact windows (under 600dp) have no room
+ *  for a 280dp-wide menu beside another, so their submenus drill. */
+export const MENU_CASCADE_MIN_WIDTH = 600;
+
+/** What `submenu` comes to in a window `width` wide (`undefined` before it's known, as when
+ *  rendering on a server: cascading, the default's in a wide window). */
+export const menuSubmenuMode = (
+    submenu: MenuSubmenu | undefined,
+    width: number | undefined,
+): "cascade" | "drill" =>
+    submenu === "cascade" || submenu === "drill"
+        ? submenu
+        : width !== undefined && width < MENU_CASCADE_MIN_WIDTH
+          ? "drill"
+          : "cascade";
+
+/** The value of a drilled-in submenu's row that goes back out. */
+export const MENU_BACK_VALUE = "pf-menu-back";
+
+/** A drilled menu at `path` (the values of the submenu items drilled into, outermost first):
+ *  the innermost submenu's item, if any, and the items it shows (the top level's `items` and
+ *  `groups`, or that submenu's items). A value that no longer opens a submenu ends the path. */
+export const menuDrillLevel = <Node>(
+    items: readonly MenuItem<Node>[],
+    groups: readonly MenuGroup<Node>[],
+    path: readonly string[],
+): {
+    readonly submenu: MenuItem<Node> | undefined;
+    readonly depth: number;
+    readonly items: readonly MenuItem<Node>[];
+    readonly groups: readonly MenuGroup<Node>[];
+} => {
+    let level: readonly MenuItem<Node>[] = [
+        ...items,
+        ...groups.flatMap((group) => group.items),
+    ];
+    let submenu: MenuItem<Node> | undefined;
+    let depth = 0;
+    for (const value of path) {
+        const next = level.find((entry) => entry.value === value);
+        if (!next || !hasSubmenu(next)) break;
+        submenu = next;
+        depth++;
+        level = next.items!;
+    }
+    return submenu
+        ? { submenu, depth, items: level, groups: [] }
+        : { submenu, depth, items, groups };
+};
+
 /** A group of the ready-made menu's items, with an optional label. */
 export interface MenuGroup<Node = unknown> {
     /** Its id among the groups, which its label's id is built from. */
@@ -162,6 +217,10 @@ export interface MenuContentProps<Node> {
     readonly items?: readonly MenuItem<Node>[] | undefined;
     /** Groups of items, after `items`; the menu is `grouped` unless told otherwise. */
     readonly groups?: readonly MenuGroup<Node>[] | undefined;
+    /** How an item with `items` opens its submenu: `cascade` beside it, `drill` in the menu's
+     *  place under a row that goes back, `auto` cascading in a window at least
+     *  `MENU_CASCADE_MIN_WIDTH` wide, else drilling. @default "auto" */
+    readonly submenu?: MenuSubmenu | undefined;
 }
 
 /** The keys of `MenuContentProps`. */
@@ -170,6 +229,7 @@ export const MENU_CONTENT_PROPS = [
     "contextTrigger",
     "items",
     "groups",
+    "submenu",
 ] as const satisfies readonly (keyof MenuContentProps<unknown>)[];
 
 /** The menu's registry selection from Root's props. */

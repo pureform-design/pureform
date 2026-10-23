@@ -372,15 +372,19 @@ export type {
     ListItemVariantProps,
 } from "./components/list-item";
 export {
+    MENU_BACK_VALUE,
+    MENU_CASCADE_MIN_WIDTH,
     MENU_CONTENT_PROPS,
     MENU_ITEM_PROPS,
     MENU_ROOT_PROPS,
     hasSubmenu,
+    menuDrillLevel,
     menuGrouped,
     menuItemMachineProps,
     menuItemProps,
     menuMachineProps,
     menuSelection,
+    menuSubmenuMode,
     submenuPositioning,
 } from "./components/menu";
 export type {
@@ -393,6 +397,7 @@ export type {
     MenuPart,
     MenuRootOwnProps,
     MenuSelectDetails,
+    MenuSubmenu,
     MenuVariantProps,
 } from "./components/menu";
 export {

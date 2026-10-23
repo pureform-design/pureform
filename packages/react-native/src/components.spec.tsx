@@ -3,7 +3,7 @@ import { useState } from "react";
 import type { ReactNode } from "react";
 import { Image, Linking, View } from "react-native";
 import { beforeAll, describe, expect, it, vi } from "vitest";
-import { userEvent } from "vitest/browser";
+import { page, userEvent } from "vitest/browser";
 
 import { Glyph, PureformProvider, useIconStyle } from ".";
 import { AppBar } from "./app-bar";
@@ -1137,6 +1137,7 @@ describe("nested rows", () => {
         const onSelect = vi.fn();
         await render(
             <Menu
+                submenu="drill"
                 items={[
                     { value: "cut", label: "Cut" },
                     {
@@ -1164,6 +1165,80 @@ describe("nested rows", () => {
         expect(onSelect).toHaveBeenCalledExactlyOnceWith({ value: "mail" });
         await interact(() => userEvent.click(back!));
         expect(labels()).toEqual(["Cut", "Share›"]);
+    });
+
+    const SHARE = [
+        { value: "cut", label: "Cut" },
+        {
+            value: "share",
+            label: "Share",
+            items: [{ value: "mail", label: "Mail" }],
+        },
+    ];
+    const menuLabels = () =>
+        [...document.querySelectorAll('[role="menuitem"]')].map(
+            (item) => item.textContent,
+        );
+
+    it("cascades a menu item's submenu beside its row", async () => {
+        const onSelect = vi.fn();
+        await render(
+            <Menu submenu="cascade" items={SHARE} onSelect={onSelect} />,
+        );
+        const share =
+            document.querySelectorAll<HTMLElement>('[role="menuitem"]')[1]!;
+        await interact(() => userEvent.click(share));
+        await until(() =>
+            expect(menuLabels()).toEqual(["Cut", "Share›", "Mail"]),
+        );
+        const menus = [...document.querySelectorAll('[role="menu"]')];
+        expect(menus).toHaveLength(2);
+        const row = share.getBoundingClientRect();
+        await until(() => {
+            const beside = menus[1]!.getBoundingClientRect();
+            // Beside the row, at its top (or flipped before it, without room after).
+            expect(
+                Math.abs(beside.left - row.right) < 1 ||
+                    Math.abs(beside.right - row.left) < 1,
+            ).toBe(true);
+        });
+        const mail = [
+            ...document.querySelectorAll<HTMLElement>('[role="menuitem"]'),
+        ].find((item) => item.textContent === "Mail")!;
+        await interact(() => userEvent.click(mail));
+        expect(onSelect).toHaveBeenCalledExactlyOnceWith({ value: "mail" });
+        // Picking an item puts the submenu away; pressing its row again does too.
+        await until(() => expect(menuLabels()).toEqual(["Cut", "Share›"]));
+    });
+
+    it("cascades by default in a wide window and drills in a compact one", async () => {
+        try {
+            await page.viewport(1000, 800);
+            await render(<Menu items={SHARE} />);
+            await interact(() =>
+                userEvent.click(
+                    document.querySelectorAll<HTMLElement>(
+                        '[role="menuitem"]',
+                    )[1]!,
+                ),
+            );
+            await until(() =>
+                expect(menuLabels()).toEqual(["Cut", "Share›", "Mail"]),
+            );
+            document.body.innerHTML = "";
+            await page.viewport(400, 800);
+            await render(<Menu items={SHARE} />);
+            await interact(() =>
+                userEvent.click(
+                    document.querySelectorAll<HTMLElement>(
+                        '[role="menuitem"]',
+                    )[1]!,
+                ),
+            );
+            expect(menuLabels()).toEqual(["‹Share", "Mail"]);
+        } finally {
+            await page.viewport(414, 896);
+        }
     });
 
     it("shows an expanded rail's section headings", async () => {

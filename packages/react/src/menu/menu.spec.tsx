@@ -2,7 +2,7 @@ import { compositeTestIds } from "@pureform/anatomy";
 import { screen } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
-import { userEvent } from "vitest/browser";
+import { page, userEvent } from "vitest/browser";
 
 import { Menu } from ".";
 import { PureformProvider } from "..";
@@ -396,7 +396,7 @@ describe("Menu, submenus", () => {
     ];
 
     it("draws an item with items as the submenu's trigger, an arrow at its end", async () => {
-        withRegistry(<Menu trigger="Edit" items={NESTED} />);
+        withRegistry(<Menu trigger="Edit" submenu="cascade" items={NESTED} />);
         await settle();
         expect(contents()).toHaveLength(2);
         const share = items()[1]!;
@@ -415,7 +415,12 @@ describe("Menu, submenus", () => {
     it("opens the submenu with the arrow toward the end, reports its items' choice, and closes back", async () => {
         const onSelect = vi.fn();
         withRegistry(
-            <Menu trigger="Edit" items={NESTED} onSelect={onSelect} />,
+            <Menu
+                trigger="Edit"
+                submenu="cascade"
+                items={NESTED}
+                onSelect={onSelect}
+            />,
         );
         await settle();
         await interact(() => userEvent.click(byTestId(ids.trigger)));
@@ -439,5 +444,75 @@ describe("Menu, submenus", () => {
         await interact(() => userEvent.keyboard("{Enter}"));
         await frames();
         expect(onSelect).toHaveBeenCalledWith({ value: "mail" });
+    });
+
+    const labels = () =>
+        [...items()].map(
+            (item) =>
+                item.querySelector(`[data-testid="${ids.itemLabel}"]`)
+                    ?.textContent,
+        );
+
+    it("drills into a submenu in the menu's place, under a row that goes back", async () => {
+        const onSelect = vi.fn();
+        const onOpenChange = vi.fn();
+        withRegistry(
+            <Menu
+                trigger="Edit"
+                submenu="drill"
+                items={NESTED}
+                onSelect={onSelect}
+                onOpenChange={onOpenChange}
+            />,
+        );
+        await settle();
+        // One surface: the submenu's item is a row of the menu, its arrow at its end.
+        expect(contents()).toHaveLength(1);
+        const share = items()[1]!;
+        expect(share.getAttribute("aria-haspopup")).toBe("menu");
+        expect(
+            share.querySelector(`[data-testid="${ids.itemTrailing}"] svg`),
+        ).not.toBeNull();
+        await interact(() => userEvent.click(byTestId(ids.trigger)));
+        await frames();
+        await interact(() => userEvent.click(share));
+        await frames();
+        expect(labels()).toEqual(["Share", "Mail", "Copy link"]);
+        expect(onSelect).not.toHaveBeenCalled();
+        expect(byTestId(ids.trigger).getAttribute("aria-expanded")).toBe(
+            "true",
+        );
+        // The back row is highlighted, so the keys go on from it.
+        expect(items()[0]!.hasAttribute("data-pf-hover")).toBe(true);
+        await interact(() => userEvent.keyboard("{Enter}"));
+        await frames();
+        expect(labels()).toEqual(["Cut", "Share"]);
+        await interact(() => userEvent.click(items()[1]!));
+        await frames();
+        await interact(() => userEvent.click(items()[1]!));
+        await frames();
+        expect(onSelect).toHaveBeenCalledExactlyOnceWith({ value: "mail" });
+        // Choosing closes the menu; it opens again at the top.
+        await frames(6);
+        expect(byTestId(ids.trigger).getAttribute("aria-expanded")).toBe(
+            "false",
+        );
+        expect(labels()).toEqual(["Cut", "Share"]);
+    });
+
+    it("cascades by default in a wide window and drills in a compact one", async () => {
+        try {
+            await page.viewport(1000, 800);
+            withRegistry(<Menu trigger="Edit" items={NESTED} />);
+            await frames();
+            expect(contents()).toHaveLength(2);
+            document.body.innerHTML = "";
+            await page.viewport(400, 800);
+            withRegistry(<Menu trigger="Edit" items={NESTED} />);
+            await frames();
+            expect(contents()).toHaveLength(1);
+        } finally {
+            await page.viewport(414, 896);
+        }
     });
 });

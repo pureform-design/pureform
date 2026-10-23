@@ -10,14 +10,17 @@ import type { PartName } from "@pureform/anatomy";
 import {
     hasSubmenu,
     isPresent,
+    MENU_BACK_VALUE,
     MENU_CONTENT_PROPS,
     MENU_ITEM_PROPS,
     MENU_ROOT_PROPS,
+    menuDrillLevel,
     menuGrouped,
     menuItemMachineProps,
     menuItemProps,
     menuMachineProps,
     menuSelection,
+    menuSubmenuMode,
     overlayPositionerProps,
     presentProps,
     submenuPositioning,
@@ -29,6 +32,7 @@ import type {
     MenuBehaviorProps,
     MenuItemBehaviorProps,
     MenuRootOwnProps,
+    MenuSelectDetails,
     MenuVariantProps,
 } from "@pureform/binding-core";
 import { markMenuGroupEdges } from "@pureform/binding-core/dom";
@@ -36,7 +40,9 @@ import * as menu from "@pureform/machines/menu";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {
     type Accessor,
+    createEffect,
     createMemo,
+    createSignal,
     createUniqueId,
     For,
     omit,
@@ -48,7 +54,7 @@ import {
 
 import { Button } from "../button";
 import { useControllable } from "../controllable";
-import { ChevronEndIcon } from "../glyphs";
+import { ChevronEndIcon, ChevronStartIcon } from "../glyphs";
 import { itemInteractionSources } from "../interaction";
 import type { ItemInteractionSources } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
@@ -481,6 +487,9 @@ function ItemTrailingText(props: MenuPartProps): JSX.Element {
 export interface MenuItemsProps {
     readonly items: readonly MenuItem<JSX.Element>[];
     readonly slot?: ((part: PartName<Anatomy>) => PartProps) | undefined;
+    /** An entry with `items` is a row that drills into them (the menu's `onSelect` hears its
+     *  value) rather than a submenu beside it. */
+    readonly drill?: boolean | undefined;
 }
 
 const NO_SLOT = (): PartProps => ({});
@@ -540,11 +549,30 @@ function Items(props: MenuItemsProps): JSX.Element {
         >
             {(item) => (
                 <Show
-                    when={hasSubmenu(item())}
+                    when={hasSubmenu(item()) && !props.drill}
                     fallback={
-                        <Item {...menuItemProps(item())} {...itemSlot}>
-                            {parts(item)}
-                        </Item>
+                        <Show
+                            when={hasSubmenu(item())}
+                            fallback={
+                                <Item {...menuItemProps(item())} {...itemSlot}>
+                                    {parts(item)}
+                                </Item>
+                            }
+                        >
+                            <Item
+                                {...menuItemProps(item())}
+                                closeOnSelect={false}
+                                aria-haspopup="menu"
+                                {...itemSlot}
+                            >
+                                {parts(
+                                    item,
+                                    <ItemTrailing mirror {...itemTrailing}>
+                                        <ChevronEndIcon />
+                                    </ItemTrailing>,
+                                )}
+                            </Item>
+                        </Show>
                     }
                 >
                     <Submenu>
@@ -583,13 +611,94 @@ const READY_MADE_PROPS = [
     ...MENU_CONTENT_PROPS,
 ] as const;
 
+/** The window's width once mounted (so a server's render and the first client render agree),
+ *  following its resizes. */
+function windowWidth(): Accessor<number | undefined> {
+    const [width, setWidth] = createSignal<number>();
+    onSettled(() => {
+        const read = () => setWidth(window.innerWidth);
+        read();
+        window.addEventListener("resize", read);
+        return () => window.removeEventListener("resize", read);
+    });
+    return width;
+}
+
+/** A drilled-in level's first row, highlighted as the level comes in, so the keys go on from
+ *  there. */
+function HighlightOnDrill(props: {
+    readonly level: string;
+    readonly first: string | undefined;
+}): JSX.Element {
+    const { api } = context.use("Content");
+    createEffect(
+        () => [props.level, props.first] as const,
+        ([level, first]) => {
+            if (level !== "" && first !== undefined)
+                untrack(api).setHighlightedValue(first);
+        },
+    );
+    return null;
+}
+
 /** The ready-made menu: the trigger, drawn as a button, when given a label, and the menu with an
- *  item per entry of `items`, then a group per entry of `groups`. */
+ *  item per entry of `items`, then a group per entry of `groups`; an entry with `items` opens
+ *  its submenu as `submenu` says. */
 function ReadyMade(props: MenuProps): JSX.Element {
-    const items = () => props.items ?? [];
-    const groups = () => props.groups ?? [];
+    const width = windowWidth();
+    const drill = () =>
+        menuSubmenuMode(
+            props.submenu,
+            props.submenu === undefined || props.submenu === "auto"
+                ? width()
+                : undefined,
+        ) === "drill";
+    // The submenu items drilled into, outermost first.
+    const [path, setPath] = createSignal<readonly string[]>([]);
+    const level = createMemo(() =>
+        menuDrillLevel(
+            props.items ?? [],
+            props.groups ?? [],
+            drill() ? path() : [],
+        ),
+    );
+    const items = () => level().items;
+    const groups = () => level().groups;
+    // Out of any submenu once it closes.
+    createEffect(
+        () => props.open,
+        (open) => {
+            if (open === false) setPath([]);
+        },
+    );
+    const onSelect = (details: MenuSelectDetails) => {
+        if (drill() && details.value === MENU_BACK_VALUE) {
+            setPath((at) => at.slice(0, -1));
+            return;
+        }
+        const chosen = drill()
+            ? [...items(), ...groups().flatMap((group) => group.items)].find(
+                  (entry) => entry.value === details.value,
+              )
+            : undefined;
+        if (chosen && hasSubmenu(chosen)) {
+            const depth = level().depth;
+            setPath((at) => [...at.slice(0, depth), chosen.value]);
+            return;
+        }
+        props.onSelect?.(details);
+    };
+    const onOpenChange: MenuRootProps["onOpenChange"] = (details) => {
+        if (!details.open) setPath([]);
+        props.onOpenChange?.(details);
+    };
     const slots = createSlotProps(props);
-    const own = omit(props, ...READY_MADE_PROPS) as MenuRootProps;
+    const own = omit(
+        props,
+        ...READY_MADE_PROPS,
+        "onSelect",
+        "onOpenChange",
+    ) as MenuRootProps;
     const root = slots("root") as object;
     const trigger = slots("trigger") as object;
     const contextTrigger = slots("contextTrigger") as object;
@@ -598,7 +707,17 @@ function ReadyMade(props: MenuProps): JSX.Element {
     const itemGroup = slots("itemGroup");
     const itemGroupLabel = slots("itemGroupLabel");
     return (
-        <Root {...own} grouped={menuGrouped(props) || props.grouped} {...root}>
+        <Root
+            {...own}
+            onSelect={onSelect}
+            onOpenChange={onOpenChange}
+            grouped={
+                level().submenu
+                    ? props.grouped
+                    : menuGrouped(props) || props.grouped
+            }
+            {...root}
+        >
             <Show when={isPresent(props.trigger)}>
                 <Trigger as={Button} label={props.trigger} {...trigger} />
             </Show>
@@ -609,7 +728,37 @@ function ReadyMade(props: MenuProps): JSX.Element {
             </Show>
             <Positioner {...positioner}>
                 <Content {...content}>
-                    <Items items={items()} slot={slots} />
+                    <Show when={drill()}>
+                        <HighlightOnDrill
+                            level={path().join("\u0000")}
+                            first={
+                                level().submenu
+                                    ? MENU_BACK_VALUE
+                                    : items()[0]?.value
+                            }
+                        />
+                    </Show>
+                    <Show when={level().submenu}>
+                        {(submenu) => (
+                            // The row that goes back out, headed by the submenu's item.
+                            <Item
+                                value={MENU_BACK_VALUE}
+                                valueText={submenu().valueText}
+                                closeOnSelect={false}
+                                {...slots("item")}
+                            >
+                                <ItemLeading mirror {...slots("itemLeading")}>
+                                    <ChevronStartIcon />
+                                </ItemLeading>
+                                <ItemContent {...slots("itemContent")}>
+                                    <ItemLabel {...slots("itemLabel")}>
+                                        {submenu().label}
+                                    </ItemLabel>
+                                </ItemContent>
+                            </Item>
+                        )}
+                    </Show>
+                    <Items items={items()} slot={slots} drill={drill()} />
                     <For
                         each={groups()}
                         keyed={(group: MenuGroup<JSX.Element>) => group.id}
@@ -624,7 +773,11 @@ function ReadyMade(props: MenuProps): JSX.Element {
                                         {group().label}
                                     </ItemGroupLabel>
                                 </Show>
-                                <Items items={group().items} slot={slots} />
+                                <Items
+                                    items={group().items}
+                                    slot={slots}
+                                    drill={drill()}
+                                />
                             </ItemGroup>
                         )}
                     </For>

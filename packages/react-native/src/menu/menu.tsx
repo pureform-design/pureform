@@ -4,16 +4,22 @@
 // given `open` it grows in and fades out. With one, it renders the trigger in place and opens the
 // surface under it, over the page through the portal host: placed against the trigger, closed by
 // a press outside, the back button or Escape, or picking an item. An item with `items` opens a
-// submenu in its place, drilling in rather than cascading beside it (React Native has no nested
-// popup here): the submenu's items under a row that goes back, headed by the item's label.
+// submenu as `submenu` says: beside it (`cascade`, over the page against the item's row, as a
+// trigger's menu is against its trigger), or in its place (`drill`: the submenu's items under a
+// row that goes back, headed by the item's label); `auto` cascades in a window at least
+// `MENU_CASCADE_MIN_WIDTH` wide, else drills.
 
 import { menuAnatomy, menuOverlayAnatomy } from "@pureform/anatomy";
 import type { PartName, TestIdOverride } from "@pureform/anatomy";
 import {
     hasSubmenu,
     isPresent,
+    MENU_BACK_VALUE,
+    menuDrillLevel,
     menuGrouped,
     menuSelection,
+    menuSubmenuMode,
+    submenuPositioning,
 } from "@pureform/binding-core";
 import type {
     ChangeDetails,
@@ -21,6 +27,7 @@ import type {
     MenuGroup,
     MenuItem,
     MenuSelectDetails,
+    MenuSubmenu,
     MenuVariantProps,
     OverlayPositioning,
 } from "@pureform/binding-core";
@@ -29,7 +36,7 @@ import type { MutableInteractionSource } from "@pureform/binding-core/interactio
 import type { Selection } from "@pureform/styling";
 import { memo, useEffect, useRef, useState } from "react";
 import type { ComponentRef, ReactNode } from "react";
-import { Platform, Pressable, View } from "react-native";
+import { Platform, Pressable, useWindowDimensions, View } from "react-native";
 
 import { Button } from "../button/button";
 import { iconParts } from "../icon-style";
@@ -43,8 +50,9 @@ import {
     withEngine,
 } from "../parts";
 import { Portal } from "../portal";
+import type { WindowRect } from "../portal-host";
 import { useOverlayPresence } from "../presence";
-import { useEngine } from "../provider";
+import { useDirection, useEngine } from "../provider";
 import { useComponentSlots } from "../styles";
 
 /** The menu's parts this binding renders. */
@@ -104,6 +112,10 @@ export interface MenuProps extends MenuVariantProps, IndicationProps {
     readonly value?: string | null | undefined;
     /** An item was picked. */
     readonly onSelect?: ((details: MenuSelectDetails) => void) | undefined;
+    /** How an item with `items` opens its submenu: `cascade` beside it, `drill` in the menu's
+     *  place under a row that goes back, `auto` cascading in a window at least
+     *  `MENU_CASCADE_MIN_WIDTH` wide, else drilling. @default "auto" */
+    readonly submenu?: MenuSubmenu | undefined;
     readonly "aria-label"?: string | undefined;
     readonly testId?: TestIdOverride<Part> | undefined;
 }
@@ -116,7 +128,14 @@ interface ItemProps {
     readonly indication: Indication | undefined;
     readonly testId: TestIdOverride<Part> | undefined;
     readonly selected: boolean;
-    readonly onSelect: (value: string) => void;
+    readonly onSelect: (value: string, row: Measurable | null) => void;
+}
+
+// An item's row, measured for where a cascading submenu opens beside it.
+interface Measurable {
+    measureInWindow(
+        done: (x: number, y: number, width: number, height: number) => void,
+    ): void;
 }
 
 function MenuItemImpl(props: ItemProps): ReactNode {
@@ -145,8 +164,10 @@ function MenuItemImpl(props: ItemProps): ReactNode {
     const { styles: s, selected, views: v } = slots;
     const id = (part: Part) => testIdOf(menuAnatomy, part, props.testId);
     const icon = iconParts(slots, id);
+    const row = useRef<Measurable>(null);
     return (
         <v.item.Pressable
+            ref={row as never}
             {...indication.handlers}
             role={item.type === undefined ? "menuitem" : `menuitem${item.type}`}
             {...(hasSubmenu(item) ? { "aria-haspopup": "menu" as const } : {})}
@@ -159,7 +180,7 @@ function MenuItemImpl(props: ItemProps): ReactNode {
                     item.onCheckedChange?.(
                         item.type === "radio" || !item.checked,
                     );
-                props.onSelect(item.value);
+                props.onSelect(item.value, row.current);
             }}
             style={{ ...s.item, ...unselectable }}
             testID={id("item")}
@@ -208,25 +229,6 @@ function MenuItemImpl(props: ItemProps): ReactNode {
 
 const Item = memo(withEngine(MenuItemImpl, "MenuItem"));
 
-/** The value of the row that goes back out of a submenu. */
-const BACK = "\u0000back";
-
-/** The submenus drilled into, outermost first, from `path` (their items' values). */
-const submenusOf = (
-    items: readonly MenuItem<ReactNode>[],
-    path: readonly string[],
-): MenuItem<ReactNode>[] => {
-    const found: MenuItem<ReactNode>[] = [];
-    let level = items;
-    for (const value of path) {
-        const next = level.find((entry) => entry.value === value);
-        if (!next?.items) break;
-        found.push(next);
-        level = next.items;
-    }
-    return found;
-};
-
 function MenuImpl(
     props: MenuProps & {
         /** Its items alone, without the surface (container, elevation, width), for a view that
@@ -235,29 +237,56 @@ function MenuImpl(
     },
 ): ReactNode {
     const engine = useEngine();
+    const rtl = useDirection() === "rtl";
+    const drill =
+        menuSubmenuMode(props.submenu, useWindowDimensions().width) === "drill";
+    // The submenu items drilled into, outermost first.
     const [path, setPath] = useState<readonly string[]>([]);
-    const all = [
-        ...(props.items ?? []),
-        ...(props.groups ?? []).flatMap((group) => group.items),
+    // The submenu cascading beside its item's row.
+    const [beside, setBeside] = useState<{
+        readonly item: MenuItem<ReactNode>;
+        readonly row: WindowRect;
+    }>();
+    const level = menuDrillLevel(
+        props.items ?? [],
+        props.groups ?? [],
+        drill ? path : [],
+    );
+    const { submenu } = level;
+    const shown = [
+        ...level.items,
+        ...level.groups.flatMap((group) => group.items),
     ];
-    const submenus = submenusOf(all, path);
-    const submenu = submenus.at(-1);
     const selection = useStableSelection(
         menuSelection({
             ...props,
             grouped: submenu ? false : menuGrouped(props),
         }),
     );
-    const select = useStableCallback((value: string) => {
-        if (value === BACK) return setPath(path.slice(0, -1));
-        const level = submenu?.items ?? all;
-        const chosen = level.find((entry) => entry.value === value);
-        if (chosen && hasSubmenu(chosen)) return setPath([...path, value]);
-        props.onSelect?.({ value });
-    });
+    const select = useStableCallback(
+        (value: string, row: Measurable | null) => {
+            if (value === MENU_BACK_VALUE)
+                return setPath(path.slice(0, level.depth - 1));
+            const chosen = shown.find((entry) => entry.value === value);
+            if (chosen && hasSubmenu(chosen)) {
+                if (drill)
+                    return setPath([...path.slice(0, level.depth), value]);
+                if (beside?.item.value === value) return setBeside(undefined);
+                if (!row) return undefined;
+                return row.measureInWindow((x, y, width, height) =>
+                    setBeside({ item: chosen, row: { x, y, width, height } }),
+                );
+            }
+            setBeside(undefined);
+            props.onSelect?.({ value });
+        },
+    );
     // Out of any submenu once it closes.
     useEffect(() => {
-        if (props.open === false) setPath([]);
+        if (props.open === false) {
+            setPath([]);
+            setBeside(undefined);
+        }
     }, [props.open]);
     const { styles: s, views: v } = useComponentSlots<Part>("menu", selection);
     const presence = useOverlayPresence(props.open, "popup");
@@ -291,17 +320,17 @@ function MenuImpl(
             {submenu ? (
                 <>
                     {item({
-                        value: BACK,
+                        value: MENU_BACK_VALUE,
                         label: submenu.label,
                         leadingIcon: "‹",
                         mirrorLeadingIcon: true,
                         closeOnSelect: false,
                     })}
-                    {(submenu.items ?? []).map(item)}
+                    {level.items.map(item)}
                 </>
             ) : null}
-            {submenu ? null : (props.items ?? []).map(item)}
-            {(submenu ? [] : (props.groups ?? [])).map((group) => (
+            {submenu ? null : level.items.map(item)}
+            {level.groups.map((group) => (
                 <v.itemGroup.View
                     key={group.id}
                     role="group"
@@ -323,6 +352,37 @@ function MenuImpl(
                     {group.items.map(item)}
                 </v.itemGroup.View>
             ))}
+            {beside ? (
+                // Beside its item, over the page; the menu's own layer under it takes a press
+                // outside both.
+                <Portal layer="menu">
+                    <Anchored
+                        anchor={beside.row}
+                        positioning={submenuPositioning(rtl ? "rtl" : "ltr")}
+                        placement="right-start"
+                        gutter={0}
+                    >
+                        {() => (
+                            <Surface
+                                {...props}
+                                items={beside.item.items}
+                                groups={undefined}
+                                grouped={false}
+                                open={undefined}
+                                onSelect={(details) => {
+                                    setBeside(undefined);
+                                    props.onSelect?.(details);
+                                }}
+                                aria-label={
+                                    typeof beside.item.label === "string"
+                                        ? beside.item.label
+                                        : undefined
+                                }
+                            />
+                        )}
+                    </Anchored>
+                </Portal>
+            ) : null}
         </Root.View>
     );
 }
