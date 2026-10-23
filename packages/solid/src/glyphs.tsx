@@ -75,7 +75,9 @@ export const ExpandIcon = (): JSX.Element => (
 );
 
 /** A minus: a number field's decrement button. */
-export const RemoveIcon = (): JSX.Element => <Glyph path={GLYPH_PATHS.remove} />;
+export const RemoveIcon = (): JSX.Element => (
+    <Glyph path={GLYPH_PATHS.remove} />
+);
 
 /** A plus: a number field's increment button. */
 export const AddIcon = (): JSX.Element => <Glyph path={GLYPH_PATHS.add} />;

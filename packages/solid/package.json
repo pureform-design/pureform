@@ -313,6 +313,28 @@
                 "default": "./dist/tags-input.jsx"
             }
         },
+        "./number-field": {
+            "types": "./dist/number-field/index.d.ts",
+            "solid": {
+                "development": "./src/number-field/index.ts",
+                "default": "./dist/number-field.jsx"
+            },
+            "import": {
+                "development": "./src/number-field/index.ts",
+                "default": "./dist/number-field.jsx"
+            }
+        },
+        "./code-field": {
+            "types": "./dist/code-field/index.d.ts",
+            "solid": {
+                "development": "./src/code-field/index.ts",
+                "default": "./dist/code-field.jsx"
+            },
+            "import": {
+                "development": "./src/code-field/index.ts",
+                "default": "./dist/code-field.jsx"
+            }
+        },
         "./navigation-bar": {
             "types": "./dist/navigation-bar/index.d.ts",
             "solid": {
