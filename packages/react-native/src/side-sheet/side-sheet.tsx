@@ -17,7 +17,7 @@ import {
 import type {
     ChangeDetails,
     SideSheetVariantProps,
-    SideSheetCloseProps,
+    OverlayCloseProps,
 } from "@pureform/binding-core";
 import type { ReactNode } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
@@ -41,7 +41,7 @@ export interface SideSheetTriggerProps {
 }
 
 export interface SideSheetProps
-    extends SideSheetVariantProps, SideSheetCloseProps {
+    extends SideSheetVariantProps, OverlayCloseProps {
     /** The title, which names the sheet. */
     readonly headline?: ReactNode;
     /** The content, in the scrolling body. */

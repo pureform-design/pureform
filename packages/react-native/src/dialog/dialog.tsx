@@ -12,7 +12,7 @@ import { dialogSelection, isPresent } from "@pureform/binding-core";
 import type {
     ChangeDetails,
     DialogVariantProps,
-    DialogCloseProps,
+    OverlayCloseProps,
 } from "@pureform/binding-core";
 import type { ReactNode } from "react";
 import { StyleSheet } from "react-native";
@@ -44,7 +44,7 @@ export interface DialogTriggerProps {
 const NO_ACTIONS: DialogActions = { close: () => {} };
 
 export interface DialogProps
-    extends Omit<DialogVariantProps, "icon">, DialogCloseProps {
+    extends Omit<DialogVariantProps, "icon">, OverlayCloseProps {
     /** An icon over the headline, which centers it. */
     readonly icon?: ReactNode;
     readonly mirrorIcon?: boolean | undefined;

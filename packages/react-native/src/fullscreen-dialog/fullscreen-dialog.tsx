@@ -13,7 +13,7 @@ import { fullscreenDialogSelection, isPresent } from "@pureform/binding-core";
 import type {
     ChangeDetails,
     FullscreenDialogVariantProps,
-    DialogCloseProps,
+    OverlayCloseProps,
 } from "@pureform/binding-core";
 import type { ReactNode } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
@@ -43,7 +43,7 @@ export interface FullscreenDialogTriggerProps {
 }
 
 export interface FullscreenDialogProps
-    extends FullscreenDialogVariantProps, DialogCloseProps {
+    extends FullscreenDialogVariantProps, OverlayCloseProps {
     readonly headline?: ReactNode;
     /** The content, in the scrolling body. */
     readonly children?: ReactNode;

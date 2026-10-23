@@ -1,7 +1,8 @@
 // The horizontal shared axis: a view around the page `index` names. When `index` changes, the
 // page shown before slides a fifth of the width and fades out the way the change goes while the
-// new one slides and fades in: the slide on the theme's `spatialDefault` spring, the fades
-// linear over 90ms after 50ms (Compose's `MaterialTransitions.HorizontalSharedAxis`). The
+// new one slides and fades in: the slide on the instance's `slideSpring` (the theme's
+// `spatialDefault` spring), the fades linear over its `fadeDuration` after its `fadeDelay` (90ms
+// after 50ms, Compose's `MaterialTransitions.HorizontalSharedAxis`). The
 // outgoing page stays, hidden from assistive technology, until both end. Right to left mirrors
 // the slide; reduced motion keeps the fades. Animated runs it on every engine.
 
@@ -12,23 +13,27 @@ import {
     SHARED_AXIS_FADE,
     SHARED_AXIS_SLIDE_FRACTION,
     sharedAxisChange,
-    sharedAxisSettle,
-    sharedAxisStart,
 } from "@pureform/binding-core";
 import type {
     HorizontalSharedAxisPart,
     HorizontalSharedAxisVariantProps,
+    PageKey,
     SharedAxisDirection,
-    SharedAxisPage,
+    TransitionPage,
 } from "@pureform/binding-core";
-import { animate, NATIVE_DRIVER } from "@pureform/rn-adapter/animated";
-import type { AnimatedTiming } from "@pureform/rn-adapter/animated";
+import {
+    animate,
+    NATIVE_DRIVER,
+    slowSpring,
+} from "@pureform/rn-adapter/animated";
+import type { AnimatedTiming, Spring } from "@pureform/rn-adapter/animated";
 import { useReducedMotion, useTokens } from "@pureform/rn-adapter/react";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { Animated } from "react-native";
 import type { LayoutChangeEvent, StyleProp, ViewStyle } from "react-native";
 
+import { useTransitionPages } from "../page-transition";
 import { testIdOf } from "../parts";
 import { themeSpring } from "../presence";
 import { useDirection, usePureform } from "../provider";
@@ -62,18 +67,18 @@ interface Motion {
 
 // Where a page sits, as a share of the width, at the start (entering) or end (leaving) of its
 // move: forward, it enters from the end and leaves to the start.
-const offsetOf = (page: SharedAxisPage, rtl: boolean): number => {
+const offsetOf = (page: TransitionPage, rtl: boolean): number => {
     const towardEnd =
         (page.state === "entering") === (page.direction === "forward");
     return (towardEnd !== rtl ? 1 : -1) * SHARED_AXIS_SLIDE_FRACTION;
 };
 
 function Page(props: {
-    readonly page: SharedAxisPage;
+    readonly page: TransitionPage;
     readonly motion: Motion;
     readonly style: StyleProp<ViewStyle>;
     readonly testID: string | undefined;
-    readonly onSettle: (page: SharedAxisPage) => void;
+    readonly onSettle: (page: TransitionPage) => void;
     readonly children: ReactNode;
 }): ReactNode {
     const { page, motion, onSettle } = props;
@@ -197,6 +202,33 @@ function Scrim(props: {
     );
 }
 
+const change = (pages: readonly TransitionPage[], key: PageKey) =>
+    sharedAxisChange(pages, Number(key));
+
+// A duration token in ms: a number, or a CSS time (`120ms`, `0.12s`); else the default.
+const msOf = (value: unknown, fallback: number): number => {
+    if (typeof value === "number") return value;
+    if (typeof value !== "string") return fallback;
+    const n = Number.parseFloat(value);
+    if (!Number.isFinite(n)) return fallback;
+    return value.trim().endsWith("ms") || !value.trim().endsWith("s")
+        ? n
+        : n * 1000;
+};
+
+// The slide's spring: a role the theme names, or a spring of its own; the theme's
+// `spatialDefault` without one.
+const springOf = (
+    value: unknown,
+    tokens: Parameters<typeof themeSpring>[1],
+    timeScale: number,
+): Spring | undefined => {
+    if (typeof value === "string") return themeSpring(value, tokens, timeScale);
+    if (value && typeof value === "object" && "stiffness" in value)
+        return slowSpring(value as Spring, timeScale);
+    return themeSpring("spatialDefault", tokens, timeScale);
+};
+
 /** Material's horizontal shared axis, for spatially related pages (tabs, steps, onboarding):
  *  `<HorizontalSharedAxis index={step}>{pages[step]}</HorizontalSharedAxis>`. A higher `index`
  *  slides forward, a lower one backward; `scrim` veils the page underneath while they move. */
@@ -209,34 +241,32 @@ export function HorizontalSharedAxis(
     );
     const tokens = useTokens();
     const reducedMotion = useReducedMotion();
-    const { timeScale } = usePureform();
+    const { timeScale, defaults } = usePureform();
     const rtl = useDirection() === "rtl";
     const [width, setWidth] = useState(0);
-    const [pages, setPages] = useState(() => sharedAxisStart(props.index));
-    const changed = sharedAxisChange(pages, props.index);
-    if (changed !== pages) setPages(changed);
-    const contents = useRef(new Map<number, ReactNode>());
-    contents.current.set(props.index, props.children);
-    for (const index of contents.current.keys()) {
-        if (!changed.some((page) => page.index === index)) {
-            contents.current.delete(index);
-        }
-    }
-    const [onSettle] = useState(
-        () => (page: SharedAxisPage) =>
-            setPages((now) => sharedAxisSettle(now, page.index, page.state)),
-    );
+    const {
+        pages: changed,
+        contents,
+        settle: onSettle,
+    } = useTransitionPages(props.index, props.children, change);
+    // The instance's tokens, over the provider's defaults, as the web's vars would be.
+    const own = {
+        ...(defaults.horizontalSharedAxis as HorizontalSharedAxisVariantProps)
+            ?.tokens,
+        ...props.tokens,
+    };
     const spring = reducedMotion
         ? undefined
-        : themeSpring("spatialDefault", tokens, timeScale);
+        : springOf(own.slideSpring, tokens, timeScale);
     const slide: AnimatedTiming | undefined = spring
         ? { duration: 0, easing: "linear", spring }
         : undefined;
     const motion: Motion = {
         slide,
         fade: {
-            duration: SHARED_AXIS_FADE.duration * timeScale,
-            delay: SHARED_AXIS_FADE.delay * timeScale,
+            duration:
+                msOf(own.fadeDuration, SHARED_AXIS_FADE.duration) * timeScale,
+            delay: msOf(own.fadeDelay, SHARED_AXIS_FADE.delay) * timeScale,
             easing: "linear",
         },
         width,
@@ -257,14 +287,14 @@ export function HorizontalSharedAxis(
         >
             {changed.map((page) => (
                 <Page
-                    key={page.index}
+                    key={page.key}
                     page={page}
                     motion={motion}
                     style={s.page as StyleProp<ViewStyle>}
                     testID={id("page")}
                     onSettle={onSettle}
                 >
-                    {contents.current.get(page.index)}
+                    {contents.get(page.key)}
                 </Page>
             ))}
             {props.scrim && leaving && entering?.direction ? (

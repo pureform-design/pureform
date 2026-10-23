@@ -130,6 +130,35 @@ describe("HorizontalSharedAxis on React Native", () => {
         expect(pages().map(translateOf)).toEqual([0, 0]);
     });
 
+    it("takes the instance's fade tokens", async () => {
+        const opacityAfter = async (
+            tokens: { fadeDuration: number; fadeDelay: number } | undefined,
+        ) => {
+            const index = outside(0);
+            await render(
+                <index.Holder>
+                    {(at) => (
+                        <HorizontalSharedAxis index={at} tokens={tokens}>
+                            <Text>{`Page ${at}`}</Text>
+                        </HorizontalSharedAxis>
+                    )}
+                </index.Holder>,
+            );
+            await settle();
+            await index.set(1);
+            // 400ms in: the default fade (slowed, 1.8s after 1s) hasn't started; 10ms at once has
+            // (200ms slowed).
+            await settle(400);
+            const opacity = Number(pages()[1]!.style.opacity || 1);
+            document.body.innerHTML = "";
+            return opacity;
+        };
+        expect(await opacityAfter(undefined)).toBeLessThan(0.1);
+        expect(
+            await opacityAfter({ fadeDuration: 10, fadeDelay: 0 }),
+        ).toBeGreaterThan(0.9);
+    });
+
     it("moves a row stepper's content with transition=sharedAxis", async () => {
         const step = outside(0);
         await render(

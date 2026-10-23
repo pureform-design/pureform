@@ -8,20 +8,22 @@
 import { fadeThroughAnatomy } from "@pureform/anatomy";
 import type { TestIdOverride } from "@pureform/anatomy";
 import {
-    dropPage,
+    changePages,
     fadeThroughSelection,
-    showPage,
+    pagesLeaving,
 } from "@pureform/binding-core";
 import type {
     FadeThroughPart,
-    FadeThroughState,
     FadeThroughValue,
+    PageKey,
+    TransitionPage,
 } from "@pureform/binding-core";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import type { ReactNode } from "react";
 import { StyleSheet, View } from "react-native";
 import type { StyleProp, ViewStyle } from "react-native";
 
+import { useTransitionPages } from "../page-transition";
 import { testIdOf } from "../parts";
 import { useOverlayPresence } from "../presence";
 import { useEngine } from "../provider";
@@ -39,26 +41,27 @@ export interface FadeThroughProps {
 }
 
 interface PageProps {
-    readonly state: FadeThroughState;
-    readonly gone: () => void;
+    readonly page: TransitionPage;
+    readonly gone: (page: TransitionPage) => void;
     readonly style: StyleProp<ViewStyle>;
     readonly testID: string;
     readonly children: ReactNode;
 }
 
-function Page({ state, gone, style, testID, children }: PageProps): ReactNode {
+function Page({ page, gone, style, testID, children }: PageProps): ReactNode {
     const engine = useEngine();
-    // The first page is still; the others enter, and leave once closed.
+    // The first page is still; the others enter, and leave once closed. An entered page stays
+    // `entering` (it doesn't settle), so its presence stays open.
     const presence = useOverlayPresence(
-        state === undefined ? undefined : state === "open",
+        page.state === "current" ? undefined : page.state === "entering",
         "fadeThrough",
     );
-    const leave = useRef(gone);
-    leave.current = gone;
+    const leave = useRef(() => gone(page));
+    leave.current = () => gone(page);
     useEffect(() => {
         if (!presence.present) leave.current();
     }, [presence.present]);
-    const leaving = state === "closed";
+    const leaving = page.state === "leaving";
     return (
         <engine.View
             {...presence.props}
@@ -77,45 +80,44 @@ function Page({ state, gone, style, testID, children }: PageProps): ReactNode {
     );
 }
 
+// Quick switches keep every page still leaving until its own exit ends.
+const change = (pages: readonly TransitionPage[], key: PageKey) =>
+    changePages(pages, key, { keepLeaving: true });
+
 /** Material's fade through: `<FadeThrough value={destination}>{page}</FadeThrough>`, with the
  *  navigation bar's or rail's `value`. */
 export function FadeThrough(props: FadeThroughProps): ReactNode {
     const selected = useSelectedStyles("fadeThrough", fadeThroughSelection());
-    const [pages, setPages] = useState(() =>
-        showPage<null>([], props.value, null),
-    );
-    const next = showPage(pages, props.value, null);
-    // A new value updates the pages during this render, as derived state does.
-    if (next !== pages) setPages(next);
-    // Each page's content: the shown one's from this render, a leaving one's as it last was.
-    const contents = useRef(new Map<FadeThroughValue, ReactNode>()).current;
     const given = props.children;
-    contents.set(
+    const { pages, contents, settle } = useTransitionPages(
         props.value,
         typeof given === "function" ? given(props.value) : given,
+        change,
     );
-    for (const value of contents.keys()) {
-        if (!next.some((page) => page.value === value)) contents.delete(value);
-    }
     const pageTestId = testIdOf(fadeThroughAnatomy, "page", props.testId);
     return (
         <View
-            style={[selected.styles.root as ViewStyle, props.style]}
+            style={[
+                selected.styles.root as ViewStyle,
+                // While a page leaves, clip to the incoming one, so a taller page doesn't spill.
+                pagesLeaving(pages) ? CLIP : null,
+                props.style,
+            ]}
             testID={testIdOf(fadeThroughAnatomy, "root", props.testId)}
         >
-            {next.map((page) => (
+            {pages.map((page) => (
                 <Page
-                    key={page.value}
-                    state={page.state}
-                    gone={() =>
-                        setPages((current) => dropPage(current, page.value))
-                    }
+                    key={page.key}
+                    page={page}
+                    gone={settle}
                     style={selected.styles.page as ViewStyle}
                     testID={pageTestId}
                 >
-                    {contents.get(page.value)}
+                    {contents.get(page.key)}
                 </Page>
             ))}
         </View>
     );
 }
+
+const CLIP: ViewStyle = { overflow: "hidden" };

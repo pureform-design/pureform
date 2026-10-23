@@ -18,7 +18,7 @@ import {
     sheetModal,
 } from "@pureform/binding-core";
 import type {
-    BottomSheetCloseProps,
+    OverlayCloseProps,
     CloseAsker,
     BottomSheetVariantProps,
     ChangeDetails,
@@ -49,7 +49,7 @@ export interface BottomSheetTriggerProps {
 }
 
 export interface BottomSheetProps
-    extends BottomSheetVariantProps, BottomSheetCloseProps {
+    extends BottomSheetVariantProps, OverlayCloseProps {
     /** The content, scrolling under the drag handle. */
     readonly children?: ReactNode;
     /** Whether it shows the drag handle at its top edge. @default true */
