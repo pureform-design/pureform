@@ -4,7 +4,8 @@
 // indicator. The preset places every part from its tokens, so Zag's inline styles are left off.
 // It takes pureform's fieldset rule, leaves the form reset to the bindings, emits to an
 // interaction source (a drag presses and drags it, a thumb takes focus, the root hovers), and
-// steps with the up and down arrows when horizontal too, as a range input does.
+// steps with the up and down arrows when horizontal too, as a range input does. A changed
+// `thumbSize` prop is followed (Zag reads it once).
 
 import type {
     Machine as AnyMachine,
@@ -65,6 +66,21 @@ export const machine: Machine = withInteraction(
     withFieldsetRule(
         {
             ...zag,
+            // Zag seeds its `thumbSize` context from the prop once (it measures the thumbs when the
+            // prop isn't given); a changed `thumbSize` is followed here, as the pin input's
+            // `count` is.
+            watch(params) {
+                zag.watch?.(params);
+                const { prop, context, track } = params;
+                const size = () => {
+                    const given = prop("thumbSize");
+                    return given ? `${given.width}x${given.height}` : "";
+                };
+                track([size], () => {
+                    const given = prop("thumbSize");
+                    if (given) context.set("thumbSize", given);
+                });
+            },
             props: (params) => {
                 const props = zag.props!(params);
                 const root = rootId(props as never);

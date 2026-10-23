@@ -158,4 +158,25 @@ describe("slider machine", () => {
         expect(api().disabled).toBe(true);
         stop();
     });
+
+    it("follows a changed thumbSize prop, which Zag reads once", async () => {
+        const props = {
+            defaultValue: [40],
+            thumbAlignment: "contain" as const,
+            thumbSize: { width: 20, height: 20 },
+        };
+        const view = render(props);
+        await settle();
+        expect(view.service.context.get("thumbSize")).toEqual({
+            width: 20,
+            height: 20,
+        });
+        view.setProps({ ...props, thumbSize: { width: 32, height: 24 } });
+        await settle();
+        expect(view.service.context.get("thumbSize")).toEqual({
+            width: 32,
+            height: 24,
+        });
+        view.stop();
+    });
 });
