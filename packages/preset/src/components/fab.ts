@@ -49,6 +49,7 @@ import {
     tokenFillColors,
     touchTarget,
     variantsOf,
+    OWN_SIZE,
 } from "./shared";
 import type { ColorGroup, ColorGroups, Fill } from "./shared";
 
@@ -162,6 +163,7 @@ export const createFab = <const G extends string = ColorGroup>(
                     root: {
                         ...INDICATION_ROOT,
                         ...pressableRoot(ref),
+                        ...OWN_SIZE,
                         ...elevation.root,
                         states: {
                             ...elevation.root.states,

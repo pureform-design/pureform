@@ -59,6 +59,7 @@ import {
     variantsOf,
     isolated,
     stackAbove,
+    OWN_SIZE,
 } from "./shared";
 import type { ColorGroup, ColorGroups } from "./shared";
 
@@ -206,6 +207,7 @@ export const createSwitch = <const G extends string = ColorGroup>(
                             // So the input stacks only against the track.
                             ...isolated,
                             display: inlineFlex,
+                            ...OWN_SIZE,
                             cursor: pointer,
                             width: ref("trackWidth"),
                             height: ref("trackHeight"),

@@ -78,6 +78,7 @@ import {
     sys,
     touchTarget,
     variantsOf,
+    OWN_SIZE,
 } from "./shared";
 import type { ColorGroup, ColorGroups, Densities, Fill } from "./shared";
 import { POSITIONS } from "./tiles";
@@ -357,6 +358,7 @@ export const createButton = <
                     root: {
                         ...INDICATION_ROOT,
                         ...pressableRoot(ref),
+                        ...OWN_SIZE,
                         transition: cornerTransition,
                         gap: ref("gap"),
                         borderRadius: cornerRadius(ref),

@@ -14,6 +14,9 @@ import {
     center,
     inlineFlex,
     isolate,
+    literal,
+    platform,
+    start,
     unitless,
     alias,
     colorMix,
@@ -580,6 +583,14 @@ export const roundIconButton = (
     borderRadius: radius("full"),
     backgroundColor: stateLayer(token, { base: transparent, content }),
 });
+
+/** A root that keeps its own size where its parent would stretch it. The web's `inline-flex`
+ *  root hugs its content and keeps its parent's alignment (a row's `center`); React Native has
+ *  no inline flow, and a view in a column stretches across it, so there it sits at the start,
+ *  as the badge does. */
+export const OWN_SIZE = {
+    alignSelf: platform({ css: literal("auto") }, start),
+} satisfies StyleMap;
 
 /** The root every pressable component shares: the focus ring (reading `token`, the
  *  component's indication tokens) and state transition, a positioned inline row that centers

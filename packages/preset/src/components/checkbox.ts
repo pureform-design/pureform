@@ -67,6 +67,7 @@ import {
     stateTransition,
     sys,
     variantsOf,
+    OWN_SIZE,
 } from "./shared";
 import type { ColorGroup, ColorGroups, Densities } from "./shared";
 
@@ -180,6 +181,7 @@ export const createCheckbox = <
                             ...INDICATION_ROOT,
                             ...focusRing(ref, CONTROL_FOCUS),
                             ...controlRoot(dense(ref("size"))),
+                            ...OWN_SIZE,
                             transition: stateTransition,
                             borderRadius: circle,
                             cursor: pointer,
