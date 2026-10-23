@@ -195,7 +195,8 @@ FIELD_ROOT_PROPS; LABEL_ROOT_PROPS; INPUT_ROOT_PROPS; TEXTAREA_ROOT_PROPS;
 DESCRIPTION_ROOT_PROPS; ERROR_TEXT_ROOT_PROPS;
 fieldSelection(props); labelSelection(props); inputSelection(props); // and the others'
 fieldIds(controlId);                     // { control, label, description, error }
-fieldState(props, ids, described);       // disabled, invalid (or an error), required
+fieldState(props, ids, described);       // disabled, invalid (or an error, or a mounted ErrorText), required
+// Input and Textarea take PlainTextProps: Controllable<"value", string>
 fieldControlProps(field, own);           // id, disabled, required, aria-invalid, aria-describedby
 fieldLabelState(field, own); fieldLabelProps(field, state); // id, for, aria-disabled
 REQUIRED_MARK;                           // the required mark, hidden from assistive technology

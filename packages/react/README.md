@@ -51,7 +51,7 @@ binding share one copy. See the [design doc](../../docs/design/component-archite
 | `linear-progress/`, `circular-progress/`, `loading-indicator/`, `slider/`, `card/`, `search-bar/`, `app-bar/`, `ripple/` | Display components, in the same layout                                                                                                                                                         |
 | `fade-through/`                                                                                                          | The fade through, in the same layout                                                                                                                                                           |
 | `avatar/`, `media/`, `separator/`, `scrim/`, `supporting-text/`, `text/`, `icon/`, `touch-target/`                       | Single-part components: the export is Root itself                                                                                                                                              |
-| `field/`, and `label/`, `input/`, `textarea/`, `description/`, `error-text/`                                             | The plain form primitives in `field/field.tsx`; each piece's subpath re-exports it                                                                                                             |
+| `field/`, and `label/`, `input/`, `textarea/`, `description/`, `error-text/`                                             | The plain form primitives, one module each (`field/context.ts` is the Field's context)                                                                                                         |
 | `single-part.tsx`                                                                                                        | `createSinglePart` (internal): a single-part component's Root                                                                                                                                  |
 | `navigation.tsx`                                                                                                         | `createNavigation` (internal): the navigation bar's and rail's parts and ready-made component                                                                                                  |
 | `text-input.tsx`                                                                                                         | `createTextInput` (internal): the text field's and text area's parts and ready-made component                                                                                                  |
@@ -671,9 +671,15 @@ mirrorIcon?, disabled?, content? }`; a tab without a label shows only its icon, 
 Material's floating label. `Field` connects the pieces inside it: the label's `for`, the
 control's `aria-describedby` (the description and error it holds), and its `disabled`,
 `invalid` and `required`, which a piece's own prop overrides. Without children it renders
-them from `label`, `description` and `error` (an `error` marks it invalid). `Input` and
-`Textarea` are the native elements, with their own props (`value`, `name`, `type`); the date
-and time types keep the browser's pickers (use `DatePicker` and `TimePicker` for Material's).
+them from `label`, `description` and `error` (an `error`, or a rendered `ErrorText`, marks it
+invalid unless `invalid` is given). `Input` and `Textarea` are the native elements with their own
+props (`name`, `type`, `onChange`), and their text is pureform's controllable `value`,
+`defaultValue` and `onValueChange` (a form reset reports `reason: "reset"`); the date and time
+types keep the browser's pickers (use `DatePicker` and `TimePicker` for Material's). Each piece
+is its own module, so a subpath pulls in only its own styles. `FieldContext` and `useField` are
+exported for other controls: `NativeSelect` reads them, taking the field's id, states and
+descriptions (its own props win). `NativeSelect` takes `multiple` (a `<select multiple>`, the
+value an array; a form submits every chosen value).
 
 ```tsx
 <Field required>

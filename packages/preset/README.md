@@ -687,6 +687,8 @@ since `textarea` and `textArea` collide in case-insensitive file names.
   is redrawn in `indicatorColor` (a calendar, or a clock for `time`) where the browser exposes
   it (`::-webkit-calendar-picker-indicator`: Chromium and Safari; Firefox draws its own).
 - The label dims with `aria-disabled="true"`; `requiredIndicator` is in the error color.
+- `plain-box.ts` holds the box `input`, `plainTextarea` and `nativeSelect` share
+  (`PLAIN_BOX_TOKENS`, `plainBoxStyle`): the same token names in each.
 
 ## Select
 
