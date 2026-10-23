@@ -1532,3 +1532,16 @@ describe("standard bottom sheet", () => {
         );
     });
 });
+
+describe("badge in flow", () => {
+    it("keeps its own width in a column", async () => {
+        await render(
+            <View style={{ width: 400 }}>
+                <Badge testId="count">999+</Badge>
+            </View>,
+        );
+        const box = byTestId("count-root").getBoundingClientRect();
+        expect(box.width).toBeLessThan(48);
+        expect(box.height).toBe(16);
+    });
+});

@@ -43,7 +43,7 @@ exports[`badge > compiles to a stable Panda recipe 1`] = `
         "position": "absolute",
       },
       "flow": {
-        "alignSelf": "start",
+        "alignSelf": "auto",
       },
     },
     "size": {

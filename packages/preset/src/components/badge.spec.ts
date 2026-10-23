@@ -32,10 +32,11 @@ describe("badge", () => {
         });
     });
 
-    it("flows at its own size unless anchored, then absolute at the top end corner", () => {
-        // Not stretched across a flex column, such as any React Native view.
+    it("flows inline unless anchored, then absolute at the top end corner", () => {
+        // React Native alone takes `start` (see the React Native badge spec): the web keeps
+        // its parent's alignment.
         expect(compiled()?.variants?.placement?.flow).toEqual({
-            alignSelf: "start",
+            alignSelf: "auto",
         });
         expect(compiled()?.variants?.placement?.anchored).toMatchObject({
             position: "absolute",
