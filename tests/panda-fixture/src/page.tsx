@@ -2,6 +2,12 @@
 // visual suite in `tests/browser-e2e-tests` screenshots each section.
 
 import {
+    description as plainDescription,
+    errorText as plainErrorText,
+    field as plainField,
+    input as plainInput,
+    label as plainLabel,
+    textarea as plainTextarea,
     appBar,
     timeInput,
     timePicker,
@@ -1169,6 +1175,85 @@ export function Page() {
                         );
                     }}
                 </For>
+            </section>
+            <section
+                data-section="plain-fields"
+                style={{ ...row, "align-items": "flex-start" }}
+            >
+                <div class={plainField().root} style={{ width: "200px" }}>
+                    <label class={plainLabel().root} for="plain-name">
+                        Name
+                        <span
+                            class={plainLabel().requiredIndicator}
+                            aria-hidden="true"
+                        >
+                            *
+                        </span>
+                    </label>
+                    <input
+                        class={plainInput().root}
+                        id="plain-name"
+                        placeholder="Ada Lovelace"
+                        required
+                    />
+                    <span class={plainDescription().root}>
+                        As on your passport
+                    </span>
+                </div>
+                <div class={plainField().root} style={{ width: "200px" }}>
+                    <label class={plainLabel().root} for="plain-email">
+                        Email
+                    </label>
+                    <input
+                        class={plainInput().root}
+                        id="plain-email"
+                        value="ada@"
+                        aria-invalid="true"
+                    />
+                    <span class={plainErrorText().root}>
+                        Enter a whole address
+                    </span>
+                </div>
+                <div class={plainField().root} style={{ width: "200px" }}>
+                    <label
+                        class={plainLabel().root}
+                        for="plain-locked"
+                        aria-disabled="true"
+                    >
+                        Locked
+                    </label>
+                    <input
+                        class={plainInput().root}
+                        id="plain-locked"
+                        value="Ada"
+                        disabled
+                    />
+                </div>
+                <div class={plainField().root} style={{ width: "200px" }}>
+                    <label class={plainLabel().root} for="plain-day">
+                        Day
+                    </label>
+                    <input
+                        class={plainInput().root}
+                        id="plain-day"
+                        type="date"
+                        value="1815-12-10"
+                    />
+                    <input
+                        class={plainInput().root}
+                        aria-label="Time"
+                        type="time"
+                        value="09:30"
+                    />
+                </div>
+                <div class={plainField().root} style={{ width: "240px" }}>
+                    <label class={plainLabel().root} for="plain-bio">
+                        Bio
+                    </label>
+                    <textarea class={plainTextarea().root} id="plain-bio">
+                        Ada
+                    </textarea>
+                </div>
             </section>
             <section
                 data-section="icon-fields-and-areas"
