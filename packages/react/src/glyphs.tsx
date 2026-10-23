@@ -21,6 +21,12 @@ const Glyph = (props: { readonly path: string }): ReactNode => (
  *  trigger, the open FAB menu's FAB, and the input chips' remove buttons. */
 export const CloseIcon = (): ReactNode => <Glyph path={GLYPH_PATHS.close} />;
 
+/** An arrow pointing up out of a tray: the file upload's drop zone. */
+export const UploadIcon = (): ReactNode => <Glyph path={GLYPH_PATHS.upload} />;
+
+/** A document: a file's icon in the file upload's list. */
+export const FileIcon = (): ReactNode => <Glyph path={GLYPH_PATHS.file} />;
+
 /** A toast's icon for its type: a check, a warning triangle, an error or info disc, or a partial
  *  ring while loading. */
 export const ToastIcon = (props: { readonly type: ToastType }): ReactNode => (

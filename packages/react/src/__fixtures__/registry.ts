@@ -376,6 +376,57 @@ const valued =
             value: "--value",
         }) as never;
 
+/** The file upload's fake factories, all static: the file upload, and the button, list item, icon
+ *  button and linear progress it draws its trigger and files with. */
+export const fileUploadRegistry = () =>
+    createRegistry({
+        fileUpload: named("file-upload", [
+            "root",
+            "label",
+            "dropzone",
+            "icon",
+            "headline",
+            "supportingText",
+            "itemGroup",
+            "item",
+            "error",
+        ]),
+        button: named("button", [
+            "root",
+            "touchTarget",
+            "icon",
+            "label",
+            "secondaryIcon",
+        ]),
+        iconButton: named("icon-button", [
+            "root",
+            "touchTarget",
+            "container",
+            "icon",
+            "outline",
+        ]),
+        listItem: named("list-item", [
+            "root",
+            "leading",
+            "content",
+            "overline",
+            "headline",
+            "supportingText",
+            "trailing",
+            "trailingText",
+            "indicator",
+            "region",
+            "frame",
+            "action",
+        ]),
+        linearProgress: valued("linear-progress", [
+            "root",
+            "track",
+            "indicator",
+            "stopIndicator",
+        ]),
+    });
+
 /** The display components' fake factories, all static: the progress indicators and slider (with
  *  their `value` token), card, search bar, ripple, and the single-part components. */
 export const displayRegistry = () =>

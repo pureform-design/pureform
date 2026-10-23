@@ -818,6 +818,26 @@ export type {
     CodeFieldVariantProps,
 } from "./components/code-field";
 export {
+    FILE_UPLOAD_CONTENT_PROPS,
+    FILE_UPLOAD_ROOT_PROPS,
+    fileUploadErrorText,
+    formatFileSize,
+    fileUploadItemTestId,
+    fileUploadMachineProps,
+    fileUploadProgress,
+    fileUploadSelection,
+    isPreviewable,
+} from "./components/file-upload";
+export type {
+    FileUploadBehaviorProps,
+    FileUploadContentProps,
+    FileUploadEntry,
+    FileUploadErrorCode,
+    FileUploadPart,
+    FileUploadRootOwnProps,
+    FileUploadVariantProps,
+} from "./components/file-upload";
+export {
     TAGS_INPUT_CONTENT_PROPS,
     TAGS_INPUT_ROOT_PROPS,
     tagsInputChipTestId,

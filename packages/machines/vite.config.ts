@@ -33,6 +33,7 @@ export default createConfig({
                     "tags-input": "src/tags-input/index.ts",
                     "number-input": "src/number-input/index.ts",
                     "pin-input": "src/pin-input/index.ts",
+                    "file-upload": "src/file-upload/index.ts",
                     toast: "src/toast/index.ts",
                     carousel: "src/carousel/index.ts",
                     accordion: "src/accordion/index.ts",

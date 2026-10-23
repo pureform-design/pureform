@@ -302,6 +302,17 @@
                 "default": "./dist/tabs.jsx"
             }
         },
+        "./file-upload": {
+            "types": "./dist/file-upload/index.d.ts",
+            "solid": {
+                "development": "./src/file-upload/index.ts",
+                "default": "./dist/file-upload.jsx"
+            },
+            "import": {
+                "development": "./src/file-upload/index.ts",
+                "default": "./dist/file-upload.jsx"
+            }
+        },
         "./tags-input": {
             "types": "./dist/tags-input/index.d.ts",
             "solid": {

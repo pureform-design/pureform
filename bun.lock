@@ -431,6 +431,7 @@
         "@zag-js/date-picker": "catalog:",
         "@zag-js/dialog": "catalog:",
         "@zag-js/dom-query": "catalog:",
+        "@zag-js/file-upload": "catalog:",
         "@zag-js/listbox": "catalog:",
         "@zag-js/menu": "catalog:",
         "@zag-js/number-input": "catalog:",
@@ -1012,6 +1013,7 @@
     "@zag-js/date-picker": "^1.46.0",
     "@zag-js/dialog": "^1.46.0",
     "@zag-js/dom-query": "^1.46.0",
+    "@zag-js/file-upload": "^1.46.0",
     "@zag-js/listbox": "^1.46.0",
     "@zag-js/menu": "^1.46.0",
     "@zag-js/number-input": "^1.46.0",
@@ -2013,9 +2015,15 @@
 
     "@zag-js/dom-query": ["@zag-js/dom-query@1.46.0", "", { "dependencies": { "@zag-js/types": "1.46.0" } }, "sha512-ibkO0VkQ2rLaclrO/O7kunvvwK8ZiW2L78arxsPYOEWmTqdNM6eQh721l9jGREUggh8nGsydNaoJH7lP3z1DUg=="],
 
+    "@zag-js/file-upload": ["@zag-js/file-upload@1.46.0", "", { "dependencies": { "@zag-js/anatomy": "1.46.0", "@zag-js/core": "1.46.0", "@zag-js/dom-query": "1.46.0", "@zag-js/file-utils": "1.46.0", "@zag-js/i18n-utils": "1.46.0", "@zag-js/types": "1.46.0", "@zag-js/utils": "1.46.0" } }, "sha512-uhNH6dCPbyOQKHsMR2QezI+06BRHq+CjL7Emf8cLXk7F30amBQh5WKwX5qPhIuCV6154nre7b8CmBOWULMz0eA=="],
+
+    "@zag-js/file-utils": ["@zag-js/file-utils@1.46.0", "", { "dependencies": { "@zag-js/i18n-utils": "1.46.0" } }, "sha512-gIYi73gln3Hdzc0pY2uxOF+Bmeru0AlF3IbWvjOb5vCFjkTdToNoExeqZHUzp+AZexcbQzako7249+MglzB2sQ=="],
+
     "@zag-js/focus-trap": ["@zag-js/focus-trap@1.46.0", "", { "dependencies": { "@zag-js/dom-query": "1.46.0" } }, "sha512-c+CiVRGj4yGQeAwqJB5GGo0kERrpR5MxjohpKcZuIy7uaQSXsxY+TzSjP2+JRBSDHMMV2UuCdkV+G0RbWyzEjQ=="],
 
     "@zag-js/focus-visible": ["@zag-js/focus-visible@1.46.0", "", { "dependencies": { "@zag-js/dom-query": "1.46.0" } }, "sha512-H/npFbU9yRLWhzPud/uuGKxwtsh/FcMaL5IisBJxo3txqotbfcgPNN9VvqQY2BuSbJi2gg01u9ngwBIZPVaUmQ=="],
+
+    "@zag-js/i18n-utils": ["@zag-js/i18n-utils@1.46.0", "", { "dependencies": { "@zag-js/dom-query": "1.46.0" } }, "sha512-NoctvbCnJ0J4BoQNXlfcvkE9Kcczo7+k85gGQ0vdAHqWzRVOU61+uBhgtW4LiJqIUiMtGyFqT1D2UI5J6+BRWg=="],
 
     "@zag-js/interact-outside": ["@zag-js/interact-outside@1.46.0", "", { "dependencies": { "@zag-js/dom-query": "1.46.0", "@zag-js/utils": "1.46.0" } }, "sha512-gzOj8zNvZzrF8l7ikYcYmdOlhLXEBGm7Qsp++hE/in47Nhi1uHWlamW21orqYdNF8Y250qrK24vIr0ZW4xTPcw=="],
 

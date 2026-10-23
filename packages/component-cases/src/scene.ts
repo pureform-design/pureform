@@ -64,6 +64,7 @@ export const COMPONENT_NAMES = [
     "TagsInput",
     "NumberField",
     "CodeField",
+    "FileUpload",
     "Text",
     "TextArea",
     "TextField",

@@ -317,6 +317,17 @@ export const COMPONENT_USAGE = {
             ripple: {},
         },
     },
+    // Its trigger is a button, each file a list item with an icon button and a progress bar.
+    "file-upload": {
+        entries: {
+            fileUpload: same("color"),
+            button: {},
+            iconButton: {},
+            listItem: {},
+            linearProgress: {},
+            ripple: {},
+        },
+    },
     // The icons follow their content, and the chips' groups come in one `chip` prop.
     "tags-input": {
         entries: {

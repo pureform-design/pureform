@@ -25,6 +25,7 @@ export * as splitter from "./splitter";
 export * as stepper from "./stepper";
 export * as switchControl from "./switch";
 export * as tabs from "./tabs";
+export * as fileUpload from "./file-upload";
 export * as tagsInput from "./tags-input";
 export * as numberInput from "./number-input";
 export * as pinInput from "./pin-input";

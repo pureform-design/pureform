@@ -23,6 +23,7 @@ const ICON_PARTS: Record<string, string[]> = {
     dialog: ["icon"],
     fab: ["icon"],
     fabMenu: ["itemIcon"],
+    fileUpload: ["icon"],
     icon: ["root"],
     iconButton: ["icon"],
     inputChip: ["icon", "remove"],

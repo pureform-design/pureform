@@ -5,6 +5,7 @@ import { createAutocomplete } from "./autocomplete";
 import { createCheckbox } from "./checkbox";
 import { createChip } from "./chip";
 import { createCodeField } from "./code-field";
+import { createFileUpload } from "./file-upload";
 import { createInputChip } from "./input-chip";
 import { createListItem } from "./list-item";
 import { createMenu } from "./menu";
@@ -35,6 +36,7 @@ describe.each([
     ["tagsInput", createTagsInput],
     ["numberField", createNumberField],
     ["codeField", createCodeField],
+    ["fileUpload", createFileUpload],
     ["select", createSelect],
     ["autocomplete", createAutocomplete],
     ["listItem", createListItem],

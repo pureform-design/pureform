@@ -33,7 +33,12 @@ export function createBindable<T>(
     const eq = untrack(() => props().isEqual ?? Object.is);
 
     // Boxed, since Solid 2 treats a function passed to `createSignal` as a computation.
-    const [value, setValue] = createSignal<{ v: T }>({ v: initial as T });
+    // Owned writes are allowed: a machine's context changes from handlers, effects, and cleanups
+    // alike (a hovered button leaving the page ends its source's hover, which its machine hears).
+    const [value, setValue] = createSignal<{ v: T }>(
+        { v: initial as T },
+        { ownedWrite: true },
+    );
     let latest = initial as T;
     const controlled = createMemo(() => props().value !== undefined);
 

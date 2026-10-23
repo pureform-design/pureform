@@ -439,6 +439,13 @@
                 "default": "./dist/tabs.mjs"
             }
         },
+        "./file-upload": {
+            "types": "./dist/file-upload/index.d.ts",
+            "import": {
+                "development": "./src/file-upload/index.ts",
+                "default": "./dist/file-upload.mjs"
+            }
+        },
         "./tags-input": {
             "types": "./dist/tags-input/index.d.ts",
             "import": {

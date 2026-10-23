@@ -23,6 +23,7 @@ export * from "./components/separator";
 export * from "./components/shaped";
 export * from "./components/fab";
 export * from "./components/fab-menu";
+export * from "./components/file-upload";
 export * from "./components/icon";
 export * from "./components/dialog";
 export * from "./components/fullscreen-dialog";

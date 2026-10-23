@@ -66,6 +66,7 @@ import { dragHandle } from "./components/drag-handle";
 import { createFab } from "./components/fab";
 import { createFabMenu } from "./components/fab-menu";
 import { FADE_THROUGH_KEYFRAMES, fadeThrough } from "./components/fade-through";
+import { createFileUpload } from "./components/file-upload";
 import { fullscreenDialog } from "./components/fullscreen-dialog";
 import { gridList } from "./components/grid-list";
 import {
@@ -325,6 +326,7 @@ const defaultComponents = <G extends string>(
         tagsInput: createTagsInput<G, Step>(theme.color.groups, densities),
         numberField: createNumberField<G, Step>(theme.color.groups, densities),
         codeField: createCodeField<G, Step>(theme.color.groups, densities),
+        fileUpload: createFileUpload<G>(theme.color.groups),
         searchBar,
         searchView,
         select: createSelect<G, Step>(theme.color.groups, densities),

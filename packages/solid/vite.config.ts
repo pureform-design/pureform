@@ -55,6 +55,7 @@ export default createConfig({
                     "tags-input": "src/tags-input/index.ts",
                     "number-field": "src/number-field/index.ts",
                     "code-field": "src/code-field/index.ts",
+                    "file-upload": "src/file-upload/index.ts",
                     "navigation-bar": "src/navigation-bar/index.ts",
                     "navigation-rail": "src/navigation-rail/index.ts",
                     list: "src/list/index.ts",
