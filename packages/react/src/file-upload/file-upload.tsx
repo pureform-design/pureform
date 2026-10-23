@@ -22,6 +22,7 @@ import type {
     FileUploadRootOwnProps,
     FileUploadValueDetails,
 } from "@pureform/binding-core";
+import { writeInputFiles } from "@pureform/binding-core/dom";
 import type { MutableInteractionSource } from "@pureform/binding-core/interaction";
 import * as fileUpload from "@pureform/machines/file-upload";
 import { normalizeProps } from "@zag-js/react";
@@ -36,7 +37,7 @@ import {
 
 import { Button } from "../button";
 import { useControllable } from "../controllable";
-import { useFieldsetDisabled } from "../form";
+import { useFieldsetDisabled, useFormReset } from "../form";
 import { CloseIcon, FileIcon, UploadIcon } from "../glyphs";
 import { IconButton } from "../icon-button";
 import { useOwnInteractionSource } from "../interaction";
@@ -122,6 +123,22 @@ function Root(props: FileUploadRootProps): ReactNode {
         ...fileUploadValueProps(value.machineProps),
     });
     const api = fileUpload.connect(service, normalizeProps);
+    // Zag writes the files into the input when they change, not the default at mount.
+    useEffect(() => {
+        if (hidden) writeInputFiles(hidden, api.acceptedFiles);
+    }, [hidden]);
+    useFormReset(hidden, {
+        // A file input has no default to write: the browser's reset empties it.
+        resetsTo: "",
+        writeDefault: () => {},
+        onBeforeReset: value.beforeReset,
+        onReset: () => {
+            // Put back the files shown, then report the default; the input follows the files
+            // once they change.
+            if (hidden) writeInputFiles(hidden, api.acceptedFiles);
+            value.reset(() => api.setFiles(value.defaultValue ?? []));
+        },
+    });
     const scope = useComponent(fileUploadAnatomy, {
         selection: fileUploadSelection(props),
         testId: props.testId,
@@ -141,6 +158,7 @@ function Root(props: FileUploadRootProps): ReactNode {
                             {children}
                             <input
                                 {...(api.getHiddenInputProps() as object)}
+                                form={props.form}
                                 ref={setHidden}
                             />
                         </>
@@ -306,6 +324,7 @@ function Item({
                                 api.getFileSize(file)
                             )
                         }
+                        trailingControl
                         trailing={
                             <IconButton
                                 {...(api.getItemDeleteTriggerProps(
@@ -322,8 +341,6 @@ function Item({
                             {
                                 headline: api.getItemNameProps(item),
                                 supportingText: api.getItemSizeTextProps(item),
-                                // The trailing part is an icon's, hidden; here it holds a button.
-                                trailing: { "aria-hidden": false },
                             } as object
                         }
                     />

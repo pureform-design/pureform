@@ -571,6 +571,15 @@ describe("text field affixes, counter and secure", () => {
         expect(input.getAttribute("aria-invalid")).not.toBe("true");
     });
 
+    it("is labelled by its label, which a disabled field's input disables on the web", async () => {
+        await render(<TextField label="Name" disabled />);
+        const input = byTestId("pf-text-field-input") as HTMLInputElement;
+        const label = byTestId("pf-text-field-label");
+        expect(label.id).not.toBe("");
+        expect(input.getAttribute("aria-labelledby")).toBe(label.id);
+        expect(input.disabled).toBe(true);
+    });
+
     it("hides a secure field's text until the trailing icon reveals it", async () => {
         await render(<TextField label="Password" secure />);
         const input = byTestId("pf-text-field-input") as HTMLInputElement;

@@ -378,9 +378,10 @@ trigger shows their labels joined by ", " (the placeholder when none):
       until it settles. Closing it through a controlled `open` doesn't ask: by design (as in
       Radix and MUI), the app already decided. The drag moves a view around the surface that
       takes the surface's place in its parent (size, margins, position, layer).
-      A modal side sheet drags sideways toward its edge (MDC-Android's `SideSheetDialog`): let go
+      A side sheet drags sideways toward its edge (MDC-Android's `SideSheetBehavior`): let go
       at least halfway out or on a flick it closes, asking `onClose` first, else it settles back;
-      a mostly vertical drag is its content's scroll. `dragHandle={false}` pads the bottom sheet's
+      a mostly vertical drag is its content's scroll. A standard sheet (`modal={false}`, coplanar
+      or not) drags once it has `onOpenChange`, which the drag calls with `{ open: false }`. `dragHandle={false}` pads the bottom sheet's
       content where the handle was.
       The side sheet's header takes a back button when given `onBack`, and an `actions` row
       under the content. With `modal={false}` (and, for the side sheet, `coplanar`) each is its

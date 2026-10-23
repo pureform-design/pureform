@@ -198,6 +198,17 @@ export interface FieldState {
     };
 }
 
+/** Id reference lists (`aria-describedby`'s) joined in order, each id once; `undefined` for
+ *  none. */
+export const joinIdRefs = (
+    ...lists: readonly (string | undefined | null | false)[]
+): string | undefined => {
+    const ids = [
+        ...new Set(lists.flatMap((list) => (list ? list.split(/\s+/) : []))),
+    ].filter(Boolean);
+    return ids.length > 0 ? ids.join(" ") : undefined;
+};
+
 /** Field's state from its props and the supporting pieces it holds. An `error` marks it
  *  invalid; so does an ErrorText inside it, unless `invalid` says otherwise. */
 export const fieldState = (
@@ -228,18 +239,17 @@ export const fieldControlProps = (
     const invalid = own.invalid ?? field?.invalid ?? false;
     const disabled = own.disabled ?? field?.disabled ?? false;
     const required = own.required ?? field?.required ?? false;
-    const describedBy = [
+    const describedBy = joinIdRefs(
         own["aria-describedby"],
         field?.described.description ? field.ids.description : undefined,
         field?.described.error ? field.ids.error : undefined,
-    ].filter(Boolean);
+    );
     return {
         id: own.id ?? field?.ids.control,
         disabled: disabled || undefined,
         required: required || undefined,
         "aria-invalid": invalid ? ("true" as const) : undefined,
-        "aria-describedby":
-            describedBy.length > 0 ? describedBy.join(" ") : undefined,
+        "aria-describedby": describedBy,
     };
 };
 

@@ -10,4 +10,5 @@ export type {
     NativeSelectProps,
     NativeSelectRootProps,
     NativeSelectSelectProps,
+    NativeSelectValueProps,
 } from "./native-select";

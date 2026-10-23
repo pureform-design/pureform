@@ -2,7 +2,8 @@
 // drops, it isn't a button), a hidden file input, and a list of files. The examples are plain
 // data, so none holds files: the files are chosen through the hidden input in the binding specs.
 // Its state is the accepted files, `value` (Zag's `acceptedFiles`), which the state case chooses
-// through the hidden input. There's no form case: a file input submits files, not text entries.
+// through the hidden input. Its form case submits the chosen file under `name` (the forms suite
+// compares files by name and type), resets to no files, and requires one.
 
 import { testIds } from "@pureform/anatomy";
 
@@ -33,6 +34,16 @@ const read = (host: HTMLElement): File[] =>
             return file;
         });
 
+/** Chooses `notes` in the file dialog: the hidden input's files change. */
+const choose = async (host: HTMLElement) => {
+    const input = hiddenInput(host);
+    const transfer = new DataTransfer();
+    transfer.items.add(notes);
+    input.files = transfer.files;
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+};
+
 const trigger = (host: HTMLElement) =>
     byTestId(host, ids.dropzone).querySelector<HTMLButtonElement>("button")!;
 
@@ -62,16 +73,21 @@ export const fileUpload: ComponentCase = {
         to: [notes],
         // A `File` can't be sent to the server.
         serverRendered: false,
-        // Choosing a file in the dialog: the hidden input's files change.
-        act: async (host) => {
-            const input = hiddenInput(host);
-            const transfer = new DataTransfer();
-            transfer.items.add(notes);
-            input.files = transfer.files;
-            input.dispatchEvent(new Event("input", { bubbles: true }));
-            input.dispatchEvent(new Event("change", { bubbles: true }));
-        },
+        act: choose,
         read,
+    },
+    form: {
+        control: hiddenInput,
+        disabled: (host) =>
+            byTestId(host, ids.root).hasAttribute("data-disabled"),
+        submits: {
+            props: { name: "attachments", defaultValue: [notes] },
+            entries: [
+                ["attachments", { file: "notes.txt", type: "text/plain" }],
+            ],
+        },
+        resets: true,
+        required: { props: { required: true }, satisfy: choose },
     },
     keyboard: {
         focusable: trigger,

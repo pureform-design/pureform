@@ -5,13 +5,15 @@
 // the surface in the app's own layout. A modal sheet opens in a `Modal` over a scrim, against the
 // end edge: a press on the scrim, its close button, Escape, or the back button closes it. Its
 // `Modal` holds a portal host of its own, so menus, tooltips, and selects opened inside draw
-// over it. A modal sheet drags sideways toward its edge, as MDC-Android's `SideSheetDialog`: let
-// go past halfway or on a flick, it closes (asking `onClose` first); short of that, it settles
-// back. A drag mostly up or down is its content's native scroll.
+// over it. A sheet drags sideways toward its edge, as MDC-Android's `SideSheetBehavior`: let go
+// past halfway or on a flick, it closes (asking `onClose` first); short of that, it settles back.
+// A standard sheet (coplanar too) drags once the app can hide it (`onOpenChange`). A drag mostly
+// up or down is its content's native scroll.
 
 import { sideSheetAnatomy } from "@pureform/anatomy";
 import type { PartName, TestIdOverride } from "@pureform/anatomy";
 import {
+    closeAsker,
     isPresent,
     sheetModal,
     sideSheetRelease,
@@ -182,7 +184,7 @@ const Surface = withEngine(SideSheetImpl, "SideSheet");
 // Moves shorter than this are a press, not a drag.
 const SLOP = 8;
 
-/** A modal sheet's drag toward its edge: `children` (the surface) moves with it, and let go it
+/** A sheet's drag toward its edge (a modal or a standard one): `children` (the surface) moves with it, and let go it
  *  closes or settles back as `sideSheetRelease` says. */
 function SideSheetDrag(props: {
     readonly open: boolean;
@@ -314,7 +316,15 @@ function ModalSideSheet(props: SideSheetProps): ReactNode {
             ) : (
                 <Button label={trigger} onPress={show} />
             )}
-            <ModalWindow visible={presence.present}>
+            <ModalWindow
+                visible={presence.present}
+                label={
+                    props["aria-label"] ??
+                    (typeof props.headline === "string"
+                        ? props.headline
+                        : undefined)
+                }
+            >
                 <ModalScrimLayer
                     open={open}
                     presence={presence}
@@ -352,14 +362,36 @@ const styles = StyleSheet.create({
     drag: { flexShrink: 1, maxWidth: "100%" },
 });
 
+/** A standard sheet (`modal={false}`, coplanar or not): it drags too once the app can hide it
+ *  (`onOpenChange`), asking `onClose` first; the app's `open` keeps showing it. */
+function StandardSideSheet(props: SideSheetProps): ReactNode {
+    const [asker] = useState(closeAsker);
+    useEffect(() => () => asker.cancel(), [asker]);
+    const closeNow = useStableCallback(() =>
+        props.onOpenChange?.({ open: false }),
+    );
+    if (props.onOpenChange === undefined) return <Surface {...props} />;
+    return (
+        <SideSheetDrag
+            open={props.open ?? true}
+            asker={asker}
+            onClose={props.onClose}
+            closeNow={closeNow}
+        >
+            <Surface {...props} />
+        </SideSheetDrag>
+    );
+}
+
 /** Material's side sheet. Given a trigger, `onOpenChange`, or `defaultOpen`, the modal sheet:
  *  `<SideSheet trigger="Filters" headline="Filters">…</SideSheet>`; without, or with
  *  `modal={false}` (and `coplanar`, in the app's layout), its surface. */
 export function SideSheet(props: SideSheetProps): ReactNode {
-    return !sheetModal(props) ||
-        (props.trigger === undefined &&
-            props.onOpenChange === undefined &&
-            props.defaultOpen === undefined) ? (
+    return !sheetModal(props) ? (
+        <StandardSideSheet {...props} />
+    ) : props.trigger === undefined &&
+      props.onOpenChange === undefined &&
+      props.defaultOpen === undefined ? (
         <Surface {...props} />
     ) : (
         <ModalSideSheet {...props} />

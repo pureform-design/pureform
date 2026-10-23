@@ -116,7 +116,8 @@ describe.each(controls)("$component", (component) => {
             await afterReset();
             expect(state.read(host)).toEqual(state.from);
             expect(onChange).toHaveBeenCalledTimes(2);
-            expect(onChange.mock.calls[1]![0]).toEqual({
+            // `toMatchObject`: a component may report more (the file upload's rejected files).
+            expect(onChange.mock.calls[1]![0]).toMatchObject({
                 [state.prop]: state.from,
                 reason: "reset",
             });
@@ -141,7 +142,7 @@ describe.each(controls)("$component", (component) => {
             element.reset();
             await afterReset();
             expect(onChange).toHaveBeenCalledTimes(1);
-            expect(onChange.mock.calls[0]![0]).toEqual({
+            expect(onChange.mock.calls[0]![0]).toMatchObject({
                 [state.prop]: state.from,
                 reason: "reset",
             });

@@ -5,7 +5,7 @@ import { vi } from "vitest";
 
 import { harness } from "#binding";
 
-import type { ComponentCase } from "../components";
+import type { ComponentCase, FormEntryValue } from "../components";
 import { animationsDone } from "./animations";
 import type { Mounted } from "./harness";
 import type { SceneProps, SceneProvider } from "./scene";
@@ -73,12 +73,17 @@ export const hostIn = (markup: string): HTMLElement => {
 export const submitted = async (
     form: HTMLFormElement,
     submit: () => Promise<void> | void,
-): Promise<[string, string][] | null> => {
-    let entries: [string, string][] | null = null;
+): Promise<[string, FormEntryValue][] | null> => {
+    let entries: [string, FormEntryValue][] | null = null;
     const onSubmit = (event: SubmitEvent) => {
         event.preventDefault();
         entries = [...new FormData(form, event.submitter)].map(
-            ([name, value]) => [name, String(value)],
+            ([name, value]) => [
+                name,
+                typeof value === "string"
+                    ? value
+                    : { file: value.name, type: value.type },
+            ],
         );
     };
     form.addEventListener("submit", onSubmit);

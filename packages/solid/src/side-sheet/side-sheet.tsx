@@ -108,7 +108,8 @@ const Surface: (props: SideSheetPartProps) => JSX.Element = chrome.Content;
 
 /** The sheet's surface. It stays while its exit animation runs. A touch or a pen dragging it
  *  sideways toward its edge moves it, and it settles back or closes once let go (asking
- *  `onClose` first), as MDC-Android's side sheet; a coplanar sheet doesn't drag. */
+ *  `onClose` first), as MDC-Android's side sheet. A coplanar sheet gives its room in the
+ *  page's layout up as it moves, so the content beside it widens. */
 function Content(props: SideSheetPartProps): JSX.Element {
     const {
         surface,
@@ -134,7 +135,11 @@ function Content(props: SideSheetPartProps): JSX.Element {
             },
             () => onClose()?.() ?? true,
             asker,
-            () => sideSheetSelection(root).coplanar !== true,
+            // A coplanar sheet's positioner holds its place in the page's layout.
+            () =>
+                sideSheetSelection(root).coplanar === true
+                    ? element.parentElement
+                    : undefined,
             springRoleVar(state().registry, "spatialDefault"),
         );
     });

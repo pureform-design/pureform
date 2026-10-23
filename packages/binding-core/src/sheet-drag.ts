@@ -37,8 +37,12 @@ export interface SheetDragOptions {
      *  each open. @default "partial" */
     readonly opening?: (() => SheetRest) | undefined;
     /** Called when where it rests changes (partly or fully open), and each time it opens, with
-     *  whether it can move between the two (it's tall enough to rest partly open). */
-    readonly onRest?: ((rest: SheetRest, movable: boolean) => void) | undefined;
+     *  whether it can move between the two (it's tall enough to rest partly open), and whether
+     *  the user moved it (a drag let go, or a press on the handle), not an opening, a resize or
+     *  a controlled `expanded`: only those report `onExpandedChange`. */
+    readonly onRest?:
+        | ((rest: SheetRest, movable: boolean, byUser: boolean) => void)
+        | undefined;
     /** The var of the spring the sheet settles on (`springRoleVar(registry, "spatialDefault")`),
      *  so a settle samples it exactly rather than fitting one to its curve. */
     readonly spring?: string | undefined;
@@ -79,13 +83,13 @@ export const dragToDismiss = (
     let stopSettle: (() => void) | undefined;
 
     let movable = false;
-    const setRest = (next: SheetRest, opening = false) => {
+    const setRest = (next: SheetRest, opening = false, byUser = false) => {
         const surface = sheet();
         const canMove = surface ? partialOffset(surface) !== undefined : false;
         if (next === rest && canMove === movable && !opening) return;
         rest = next;
         movable = canMove;
-        options.onRest?.(next, canMove);
+        options.onRest?.(next, canMove, byUser);
     };
     // How far down the sheet rests partly open, or `undefined` when it can't (or is too short).
     const partialOffset = (surface: HTMLElement) => {
@@ -240,7 +244,7 @@ export const dragToDismiss = (
         });
         if (to === "closed") leave(velocity);
         else {
-            setRest(to);
+            setRest(to, false, true);
             settleTo(velocity);
         }
     };
@@ -256,7 +260,7 @@ export const dragToDismiss = (
         if (!surface || partialOffset(surface) === undefined) return;
         event.stopPropagation();
         offset = restOffset(surface);
-        setRest(rest === "partial" ? "expanded" : "partial");
+        setRest(rest === "partial" ? "expanded" : "partial", false, true);
         settleTo(0);
     };
 

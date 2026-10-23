@@ -33,7 +33,7 @@ import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 
 import { IconButton } from "../icon-button/icon-button";
 import { Menu } from "../menu/menu";
-import { ModalWindow, useModalOverlay } from "../modal";
+import { ModalWindow, modalViewProps, useModalOverlay } from "../modal";
 import { testIdOf, useControllable, useStableCallback } from "../parts";
 import { useEngine } from "../provider";
 import { SearchBar } from "../search-bar/search-bar";
@@ -186,7 +186,7 @@ export function SearchView(props: SearchViewProps): ReactNode {
                 )}
             </View>
             <ModalWindow visible={presence.present}>
-                <View aria-modal style={StyleSheet.absoluteFill}>
+                <View {...modalViewProps()} style={StyleSheet.absoluteFill}>
                     {anchored ? (
                         <Pressable
                             aria-label="Close"

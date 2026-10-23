@@ -981,6 +981,10 @@ describe("the sheets", () => {
         expect(
             sheet("bottom-sheet")!.closest('[aria-modal="true"]'),
         ).not.toBeNull();
+        // Only a dialog says it's modal on the web (axe's aria-allowed-attr): React Native Web's
+        // Modal is that dialog.
+        for (const modal of document.querySelectorAll("[aria-modal]"))
+            expect(modal.getAttribute("role")).toBe("dialog");
 
         await press("Close sheet");
         await until(() => sheet("bottom-sheet") === null);
@@ -1385,6 +1389,55 @@ describe("the sheets", () => {
         await until(() => sheet("side-sheet") === null);
         expect(sheet("side-sheet")).toBeNull();
     });
+
+    it.each([false, true])(
+        "drags a standard side sheet (coplanar: %s) closed, asking through onOpenChange",
+        async (coplanar) => {
+            const onOpenChange = vi.fn();
+            await render(
+                <SideSheet
+                    modal={false}
+                    coplanar={coplanar}
+                    open
+                    onOpenChange={onOpenChange}
+                    headline="Details"
+                >
+                    Info
+                </SideSheet>,
+            );
+            await settle(600);
+            const root = sheet("side-sheet")!;
+            const from = box(root);
+            const x = from.left + from.width / 2;
+            const y = from.top + from.height / 2;
+            const at = (dx: number) => ({
+                bubbles: true,
+                button: 0,
+                buttons: 1,
+                clientX: x + dx,
+                clientY: y,
+            });
+            await interact(() => {
+                root.dispatchEvent(new MouseEvent("mousedown", at(0)));
+            });
+            for (const dx of [20, from.width * 0.4, from.width * 0.7]) {
+                await settle(120);
+                await interact(() => {
+                    root.dispatchEvent(new MouseEvent("mousemove", at(dx)));
+                });
+            }
+            expect(box(root).left).toBeGreaterThan(from.left + 15);
+            await interact(() => {
+                root.dispatchEvent(
+                    new MouseEvent("mouseup", at(from.width * 0.7)),
+                );
+            });
+            await until(() => onOpenChange.mock.calls.length > 0);
+            expect(onOpenChange).toHaveBeenCalledWith({ open: false });
+            // The app kept it open: it settles back.
+            await until(() => Math.abs(box(root).left - from.left) < 1);
+        },
+    );
 
     it("renders a coplanar side sheet as its surface alone", async () => {
         await render(

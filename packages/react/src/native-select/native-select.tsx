@@ -10,6 +10,7 @@ import {
     NATIVE_SELECT_ATTRIBUTE_PROPS,
     NATIVE_SELECT_CONTENT_PROPS,
     NATIVE_SELECT_ROOT_PROPS,
+    joinIdRefs,
     nativeSelectGroups,
     nativeSelectProps,
     nativeSelectSelection,
@@ -21,6 +22,8 @@ import type {
     NativeSelectItem,
     NativeSelectRootOwnProps,
     NativeSelectValue,
+    NativeSelectValueKeys,
+    NativeSelectValueProps,
 } from "@pureform/binding-core";
 import {
     type ChangeEvent,
@@ -63,13 +66,15 @@ const context = createPartContext<NativeSelectContextValue>("NativeSelect");
  *  array with `multiple`), `disabled`, `invalid`, `required`, `name`, `form`, `id` (the select's;
  *  a Field around gives it, and the states and descriptions), `testId` and `unstyled`
  *  for every part, `as`, and the element's own props. */
-export interface NativeSelectRootProps
-    extends
-        Omit<PartProps, keyof NativeSelectRootOwnProps>,
-        NativeSelectRootOwnProps {
-    /** Another element or component to render instead of `<span>`. */
-    readonly as?: ElementType | undefined;
-}
+export type NativeSelectRootProps = RootBaseProps & NativeSelectValueProps;
+
+type RootBaseProps = Omit<PartProps, keyof NativeSelectRootOwnProps> &
+    Omit<NativeSelectRootOwnProps, NativeSelectValueKeys> & {
+        /** Another element or component to render instead of `<span>`. */
+        readonly as?: ElementType | undefined;
+    };
+
+export type { NativeSelectValueProps };
 
 /** A part's props: the element's own, and the part's `unstyled`. */
 export interface NativeSelectPartProps extends PartProps {
@@ -115,7 +120,7 @@ function Root(props: NativeSelectRootProps): ReactNode {
     const value = useControllable<"value", NativeSelectValue>(
         "NativeSelect",
         "value",
-        props,
+        props as NativeSelectRootOwnProps,
     );
     const [select, setSelect] = useState<HTMLSelectElement | null>(null);
     const fieldsetDisabled = useFieldsetDisabled(select);
@@ -193,7 +198,14 @@ function Select({ unstyled, ...props }: NativeSelectSelectProps): ReactNode {
         machine: selectProps,
         ref: setSelect as (element: HTMLElement | null) => void,
         unstyled,
-        props,
+        // Its own descriptions join the Field's rather than replacing them.
+        props: {
+            ...props,
+            "aria-describedby": joinIdRefs(
+                props["aria-describedby"],
+                selectProps["aria-describedby"] as string | undefined,
+            ),
+        },
     });
 }
 
@@ -227,16 +239,18 @@ const REACT_SELECT_PROPS = ["autoComplete", "autoFocus", "size"] as const;
  *  by part, the options as `items`, a `placeholder` and the `icon`, and the select's attributes
  *  (`aria-label`, `autoComplete`, …), which go on it. Option elements as `children` come after the
  *  items. */
-export interface NativeSelectProps
-    extends
-        Omit<NativeSelectRootProps, keyof SlotKeyedProps<Anatomy>>,
-        SlotKeyedProps<Anatomy>,
-        NativeSelectContentProps<ReactNode>,
-        Pick<
-            SelectHTMLAttributes<HTMLSelectElement>,
-            | (typeof NATIVE_SELECT_ATTRIBUTE_PROPS)[number]
-            | (typeof REACT_SELECT_PROPS)[number]
-        > {}
+export type NativeSelectProps = Omit<
+    RootBaseProps,
+    keyof SlotKeyedProps<Anatomy>
+> &
+    SlotKeyedProps<Anatomy> &
+    NativeSelectContentProps<ReactNode> &
+    Pick<
+        SelectHTMLAttributes<HTMLSelectElement>,
+        | (typeof NATIVE_SELECT_ATTRIBUTE_PROPS)[number]
+        | (typeof REACT_SELECT_PROPS)[number]
+    > &
+    NativeSelectValueProps;
 
 const SELECT_PROPS = [...NATIVE_SELECT_ATTRIBUTE_PROPS, ...REACT_SELECT_PROPS];
 

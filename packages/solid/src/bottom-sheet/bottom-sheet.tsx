@@ -176,8 +176,10 @@ function DragHandle(props: BottomSheetTriggerProps): JSX.Element {
                     partial: () => sheetPartiallyExpandable(root),
                     opening: () => sheetOpeningRest(root),
                     spring: springRoleVar(state().registry, "spatialDefault"),
-                    onRest: (next, movable) => {
-                        if (next !== lastRest)
+                    onRest: (next, movable, byUser) => {
+                        // Only the user's drag or press reports, not an opening at another
+                        // rest (an uncontrolled sheet reopening partly open).
+                        if (byUser && next !== lastRest)
                             root.onExpandedChange?.({
                                 expanded: next === "expanded",
                             });

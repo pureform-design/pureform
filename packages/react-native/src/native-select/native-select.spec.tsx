@@ -135,6 +135,32 @@ describe("NativeSelect on React Native", () => {
         ]);
     });
 
+    it("joins its own aria-describedby with the Field's", async () => {
+        await withRegistry(
+            <Field controlId="size">
+                <NativeSelect items={ITEMS} aria-describedby="hint" />
+                <Description>Pick one</Description>
+            </Field>,
+        );
+        const select = byTestId(ids.select) as HTMLSelectElement;
+        expect(select.getAttribute("aria-describedby")!.split(" ")).toEqual([
+            "hint",
+            byTestId("pf-description-root").id,
+        ]);
+    });
+
+    it("types the value by multiple", () => {
+        const one = <NativeSelect items={ITEMS} defaultValue="s" />;
+        const several = (
+            <NativeSelect items={ITEMS} multiple defaultValue={["s"]} />
+        );
+        // @ts-expect-error an array needs `multiple`
+        const wrong = <NativeSelect items={ITEMS} defaultValue={["s"]} />;
+        // @ts-expect-error `multiple` takes an array
+        const wrongMany = <NativeSelect items={ITEMS} multiple value="s" />;
+        expect([one, several, wrong, wrongMany]).toHaveLength(4);
+    });
+
     it("lets its own props win inside a Field", async () => {
         await withRegistry(
             <Field disabled>

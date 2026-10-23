@@ -23,6 +23,7 @@ import type {
     FileUploadRootOwnProps,
     FileUploadValueDetails,
 } from "@pureform/binding-core";
+import { writeInputFiles } from "@pureform/binding-core/dom";
 import * as fileUpload from "@pureform/machines/file-upload";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {
@@ -35,12 +36,13 @@ import {
     merge,
     omit,
     Show,
+    untrack,
 } from "solid-js";
 
 import { Button } from "../button";
 import type { ButtonProps } from "../button";
 import { useControllable } from "../controllable";
-import { useFieldsetDisabled } from "../form";
+import { useFieldsetDisabled, useFormReset } from "../form";
 import { CloseIcon, FileIcon, UploadIcon } from "../glyphs";
 import { IconButton } from "../icon-button";
 import { normalizeProps, useMachine } from "../internal/zag";
@@ -122,6 +124,27 @@ function Root(props: FileUploadRootProps): JSX.Element {
         ...fileUploadValueProps(value.machineProps()),
     }));
     const api = createMemo(() => fileUpload.connect(service, normalizeProps));
+    // Zag writes the files into the input when they change, not the default at mount.
+    createEffect(hidden, (input) => {
+        if (input)
+            writeInputFiles(
+                input,
+                untrack(() => api().acceptedFiles),
+            );
+    });
+    useFormReset(hidden, {
+        // A file input has no default to write: the browser's reset empties it.
+        resetsTo: () => "",
+        writeDefault: () => {},
+        onBeforeReset: value.beforeReset,
+        onReset: () => {
+            // Put back the files shown, then report the default; the input follows the files
+            // once they change.
+            const input = hidden();
+            if (input) writeInputFiles(input, api().acceptedFiles);
+            value.reset(() => api().setFiles(value.defaultValue ?? []));
+        },
+    });
     const scope = useComponent(fileUploadAnatomy, {
         selection: () => fileUploadSelection(props),
         testId: () => props.testId,
@@ -140,6 +163,7 @@ function Root(props: FileUploadRootProps): JSX.Element {
                                 {props.children}
                                 <input
                                     {...api().getHiddenInputProps()}
+                                    form={props.form}
                                     ref={setHidden}
                                 />
                             </>
@@ -341,6 +365,7 @@ function Item(props: FileUploadItemProps): JSX.Element {
                                             api().getFileSize(props.file)
                                         )
                                     }
+                                    trailingControl
                                     trailing={
                                         <IconButton
                                             {...(api().getItemDeleteTriggerProps(
@@ -366,9 +391,6 @@ function Item(props: FileUploadItemProps): JSX.Element {
                                                 api().getItemSizeTextProps(
                                                     item(),
                                                 ),
-                                            // The trailing part is an icon's, hidden; here it
-                                            // holds a button.
-                                            trailing: { "aria-hidden": false },
                                         } as object
                                     }
                                 />

@@ -113,9 +113,13 @@ export interface ListItemPartProps extends PartProps {
     readonly unstyled?: boolean | undefined;
 }
 
-/** A leading or trailing part's props: a part's, and `mirror` to flip an icon under `rtl`. */
+/** A leading or trailing part's props: a part's, `mirror` to flip an icon under `rtl`, and
+ *  `control` for one holding a control rather than an icon. */
 export interface ListItemIconProps extends ListItemPartProps {
     readonly mirror?: boolean | undefined;
+    /** It holds a control (a button, a switch), which assistive technology reaches: it isn't
+     *  hidden as an icon is. */
+    readonly control?: boolean | undefined;
 }
 
 /** The list item's root: the row. A link or a button is interactive: it takes the state layer and
@@ -194,12 +198,13 @@ const iconPart = (part: "leading" | "trailing", name: string) =>
     function IconPart({
         unstyled,
         mirror,
+        control,
         ...props
     }: ListItemIconProps): ReactNode {
         const { scope } = context.use(name);
         return scope.render(part, {
             element: "span",
-            machine: { "aria-hidden": "true" },
+            machine: control ? {} : { "aria-hidden": "true" },
             states: { mirrored: mirror },
             unstyled,
             props,
@@ -232,7 +237,8 @@ const Overline = textPart("overline", "Overline", "span");
 const Headline = textPart("headline", "Headline", "span");
 /** Text under the headline. */
 const SupportingText = textPart("supportingText", "SupportingText", "span");
-/** An icon after the text, hidden from assistive technology. */
+/** An icon after the text, hidden from assistive technology; or with `control`, a control
+ *  (a button, a switch) it reaches. */
 const Trailing = iconPart("trailing", "Trailing");
 /** Text after the text, such as a count. */
 const TrailingText = textPart("trailingText", "TrailingText", "span");
@@ -442,6 +448,7 @@ function Row({
         supportingText,
         leading,
         trailing,
+        trailingControl,
         trailingText,
         swipeAction: _swipeAction,
         revealed: _revealed,
@@ -480,7 +487,11 @@ function Row({
                 ) : null}
             </Content>
             {isPresent(trailing) ? (
-                <Trailing mirror={mirrorTrailing} {...slot("trailing")}>
+                <Trailing
+                    mirror={mirrorTrailing}
+                    control={trailingControl}
+                    {...slot("trailing")}
+                >
                     {trailing}
                 </Trailing>
             ) : null}

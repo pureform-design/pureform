@@ -9,7 +9,7 @@
 // and keeps focus inside. `coplanar` applies to a standard sheet only. It slides in from the end
 // edge while Zag's `data-state` is `open`. A touch dragging it toward that edge moves it, and the
 // binding settles it back or closes it (MDC-Android's draggable `SideSheetBehavior`); a coplanar
-// sheet doesn't drag.
+// sheet gives its room in the layout up as it moves.
 //
 //   <div class={root} role="dialog" aria-labelledby="title">
 //     <div class={header}>

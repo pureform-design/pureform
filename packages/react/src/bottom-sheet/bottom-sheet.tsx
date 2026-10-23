@@ -200,8 +200,10 @@ function DragHandle({
                     partial: () => sheetPartiallyExpandable(latestRoot.current),
                     opening: () => sheetOpeningRest(latestRoot.current),
                     spring,
-                    onRest: (next, movable) => {
-                        if (lastRest.current !== next)
+                    onRest: (next, movable, byUser) => {
+                        // Only the user's drag or press reports, not an opening at another
+                        // rest (an uncontrolled sheet reopening partly open).
+                        if (byUser && lastRest.current !== next)
                             latestRoot.current.onExpandedChange?.({
                                 expanded: next === "expanded",
                             });

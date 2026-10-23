@@ -471,26 +471,34 @@ export interface IconPartProps extends PartProps {
 /** An icon part rendered as a `<span>` from Root's `scope`, with `machine`'s props (hidden from
  *  assistive technology by them): `Part` to compose, and `Optional` for the ready-made's
  *  `optionalPart`, which builds the icon once. `mirror` marks the part `mirrored` while its
- *  `mirror` prop is on. `use` reads Root's context, naming the part. */
+ *  `mirror` prop is on. `use` reads Root's context, naming the part; its `machine` reads the
+ *  part's props, and `own` names the props of the part's own it reads that stay off the element. */
 export function iconParts<A extends ComponentAnatomy, P extends IconPartProps>(
     use: (name: string) => {
         readonly scope: PartScope<A>;
-        readonly machine: () => object | undefined;
+        readonly machine: (props: P) => object | undefined;
     },
     name: string,
     part: PartName<A>,
-    { mirror = false }: { readonly mirror?: boolean } = {},
+    {
+        mirror = false,
+        own = [],
+    }: {
+        readonly mirror?: boolean;
+        readonly own?: readonly Exclude<keyof P, "unstyled" | "mirror">[];
+    } = {},
 ) {
     const render = (props: P, optional: boolean): JSX.Element => {
         const { scope, machine } = use(name);
+        const kept = mirror
+            ? ["unstyled", "mirror", ...own]
+            : ["unstyled", ...own];
         return scope.render(part, {
             element: "span",
-            machine,
+            machine: () => machine(props),
             ...(mirror ? { states: () => ({ mirrored: props.mirror }) } : {}),
             unstyled: () => props.unstyled,
-            props: mirror
-                ? omit(props, "unstyled", "mirror")
-                : omit(props, "unstyled"),
+            props: omit(props, ...(kept as (keyof P)[])),
             optional,
         });
     };

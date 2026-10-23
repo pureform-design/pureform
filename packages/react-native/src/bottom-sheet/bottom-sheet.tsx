@@ -409,7 +409,7 @@ function ModalBottomSheet(props: BottomSheetProps): ReactNode {
             ) : (
                 <Button label={trigger} onPress={show} />
             )}
-            <ModalWindow visible={presence.present}>
+            <ModalWindow visible={presence.present} label={props["aria-label"]}>
                 <ModalScrimLayer
                     open={open}
                     presence={presence}

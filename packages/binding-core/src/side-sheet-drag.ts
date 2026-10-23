@@ -5,7 +5,9 @@
 // drag let go of it; settling, it starts at the drag's speed (`settleTransition`). A drag that
 // starts mostly up or down is left to the browser, which scrolls the sheet's content natively
 // (`touch-action: pan-y`), and a mouse selects text as ever. An app asked whether to close
-// (`onClose`) may answer later: the sheet holds where it was let go until then.
+// (`onClose`) may answer later: the sheet holds where it was let go until then. A coplanar sheet
+// sits in the page's layout: as it moves out, the element holding its place (`layout()`) gives
+// the room up, so the content beside it widens as MDC's coplanar sheet lets it.
 
 import type { CloseQuestion } from "./components/dialog";
 import { closeAsker, sideSheetRelease } from "./components/sheet";
@@ -22,16 +24,17 @@ const SLOP = 8;
  *  sheet and, once the binding has rendered that, calls `kept` if the sheet is still open (the
  *  app kept it), which settles it back. Given `onClose`, it asks first, through `asker`: the
  *  sheet holds where it was let go until the answer, then leaves on `true` and settles back on
- *  `false` (or a rejection). While `draggable()` is false (a coplanar sheet), a drag doesn't
- *  start. `spring` is the var of the spring it settles on (`springRoleVar(registry,
- *  "spatialDefault")`), so a settle samples it exactly. Returns what stops it. */
+ *  `false` (or a rejection). Given `layout()` (a coplanar sheet's positioner, in the page's
+ *  flow), its end margin follows the sheet out, so what's beside it takes the room. `spring` is the var of
+ *  the spring it settles on (`springRoleVar(registry, "spatialDefault")`), so a settle samples
+ *  it exactly. Returns what stops it. */
 export const sideSheetDragToDismiss = (
     sheet: HTMLElement,
     rtl: () => boolean,
     dismiss: (kept: () => void) => void,
     onClose?: CloseQuestion,
     asker: CloseAsker = closeAsker(),
-    draggable: () => boolean = () => true,
+    layout: () => HTMLElement | null | undefined = () => undefined,
     spring?: string,
 ): (() => void) => {
     // Where the pointer went down, and whether it's dragging the sheet yet (`undefined` while
@@ -46,23 +49,56 @@ export const sideSheetDragToDismiss = (
     let stopSettle: (() => void) | undefined;
     // Toward the edge: right, or left under right to left.
     const outward = () => (rtl() ? -1 : 1);
+    // The coplanar sheet's place in the layout, while a drag moves it.
+    let holder: HTMLElement | undefined;
     const place = (at: number) => {
         if (at === 0) sheet.style.removeProperty("translate");
         else sheet.style.translate = `${at * outward()}px 0`;
+        if (!holder) return;
+        if (at === 0) holder.style.removeProperty("margin-inline-end");
+        else holder.style.marginInlineEnd = `${-at}px`;
+    };
+    const release = () => {
+        if (!holder) return;
+        holder.style.removeProperty("margin-inline-end");
+        holder.style.removeProperty("transition");
+        holder = undefined;
     };
     const settleBack = (velocity: number) => {
         stopSettle?.();
         sheet.style.removeProperty("transition");
         // Back is inward: a release moving out still settles from its speed, the other way.
-        stopSettle = settleTransition(
+        const stopSheet = settleTransition(
             sheet,
             "translate",
             -offset,
             -velocity,
             spring,
         );
+        const settling = holder;
+        if (settling) {
+            // The margin settles on the sheet's own curve.
+            const transition = getComputedStyle(sheet).transition;
+            settling.style.transition = transition.replace(
+                /\btranslate\b/g,
+                "margin-inline-end",
+            );
+            settling.addEventListener(
+                "transitionend",
+                () => {
+                    if (holder === undefined)
+                        settling.style.removeProperty("transition");
+                },
+                { once: true },
+            );
+        }
+        stopSettle = () => {
+            stopSheet();
+            if (settling) settling.style.removeProperty("transition");
+        };
         offset = 0;
         place(0);
+        holder = undefined;
     };
     const leave = (velocity: number) =>
         asker.ask(
@@ -73,7 +109,6 @@ export const sideSheetDragToDismiss = (
 
     const onDown = (event: PointerEvent) => {
         if (event.button !== 0 || event.pointerType === "mouse") return;
-        if (!draggable()) return;
         if (sheet.getAttribute("data-state") !== "open") return;
         asker.cancel();
         swallow?.();
@@ -97,6 +132,8 @@ export const sideSheetDragToDismiss = (
                 sheet.setPointerCapture?.(event.pointerId);
             } catch {}
             stopSettle?.();
+            holder = layout() ?? undefined;
+            if (holder) holder.style.transition = "none";
         }
         speed.add(event.clientX * outward(), event.timeStamp);
         offset = Math.max(0, dx);
@@ -137,6 +174,8 @@ export const sideSheetDragToDismiss = (
             offset = 0;
             sheet.style.removeProperty("translate");
             sheet.style.removeProperty("transition");
+            release();
+            layout()?.style.removeProperty("margin-inline-end");
         }
     });
     opens.observe(sheet, {
@@ -164,5 +203,6 @@ export const sideSheetDragToDismiss = (
         asker.cancel();
         sheet.style.removeProperty("translate");
         sheet.style.removeProperty("transition");
+        release();
     };
 };

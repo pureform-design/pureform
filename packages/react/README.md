@@ -365,11 +365,17 @@ import { RichTooltip } from "@pureform/react/rich-tooltip";
   and then removes it, and each chip's remove button removes it. The input chip exists only inside
   it (drawn with the `inputChip` registry entry, styled by Root's `chip`); tags aren't edited in
   place. `value` is a `string[]`; the ready-made takes `chipAvatar` / `chipIcon` from a value.
+- **The number field** parses and formats in `locale`, else the browser's language
+  (`navigator.language`), else the platform's `Intl` locale, else `en-US`. **When server
+  rendering, pass `locale`**: the server's language can differ from the browser's, and the text it
+  rendered (`1,234.5` against `1.234,5`) would be re-formatted on hydration.
 - **Overlays render in place.** The menu, tooltip, and dialog have an unstyled `Root` element
   (test id `pf-<name>-root`) around their trigger and a `Positioner`, and draw the preset's surface
   as `Content` (`data-pf-part="content"`, `pf-<name>-content`; the registry's `root` slot styles
   it). Nothing is portaled: the provider's theme, `dir`, and registry reach the overlay as any part,
-  and server rendering and hydration see one tree. A clipping or stacking ancestor can cut a menu or
+  and server rendering and hydration see one tree. An overlay rendered inside a dialog or a sheet
+  (in its body, say) is inside the host's stacking context, so it draws over the host, whole; one
+  rendered outside a modal host stacks at its own layer, beneath it. A clipping or stacking ancestor can cut a menu or
   tooltip off; `positioning={{ strategy: "fixed" }}` escapes most. Each surface stacks at its
   layer of the theme's stacking scale (the positioner takes the surface's `z-index`) and animates
   on `data-state`; `usePresence` (Zag's presence machine on the surface) keeps the positioner and
@@ -415,7 +421,7 @@ import { RichTooltip } from "@pureform/react/rich-tooltip";
   past where it rested (see below). With the default `partiallyExpandable`, a sheet taller than half the screen
   opens partly (its top at half the screen, Compose's `PartiallyExpanded`; `partiallyExpandable={false}`
   opens it fully, as Compose's `skipPartiallyExpanded`), and a drag or a press on the handle moves it
-  between partly and fully open (`expanded` controlled, `defaultExpanded`, `onExpandedChange`); a
+  between partly and fully open (`expanded` controlled, `defaultExpanded`, `onExpandedChange`, which hears only those drags and presses, not an opening at a rest); a
   drag down from partly open closes it. Where a drag goes is Compose's rule: 56px past where it
   rested, or a flick at 125dp/s. A partly open sheet is placed again when it or the window resizes,
   and the body is in the tab order only while it overflows. A settle after a drag starts at the release's speed. Without
@@ -428,7 +434,7 @@ import { RichTooltip } from "@pureform/react/rich-tooltip";
   a pen dragging `Content` sideways toward its edge moves it; let go at least halfway out or on a
   flick (`SIDE_SHEET_VELOCITY_THRESHOLD`, 500px/s) it closes, asking `onClose` first, else it settles
   back on its spring. Vertical moves stay the content's native scroll (`touch-action: pan-y`); a
-  mouse selects text as ever; a coplanar sheet doesn't drag. The bottom sheet's `dragHandle={false}`
+  mouse selects text as ever; a coplanar sheet drags too, its positioner giving its room in the layout up as it moves (so the content beside it widens). The bottom sheet's `dragHandle={false}`
   (now a Root prop too) gives its body the top padding the handle gave it.
 - **`onClose` on the dialog, the full-screen dialog and the side sheet.** Root's `onClose` is asked,
   as the bottom sheet's, before any close of their own: Escape, a press on the scrim (the dialog and
@@ -576,7 +582,9 @@ mirrorIcon?, disabled?, content? }`; a tab without a label shows only its icon, 
   `aria-disabled`. The ready-made takes `headline`, `overline`, `supportingText`, `leading`,
   `trailing`, `trailingText`, `mirrorLeading`, `mirrorTrailing`, and sets `lines` from them (one,
   two with an overline or supporting text, three with both) unless given. `Leading` and `Trailing`
-  are `aria-hidden` (give `aria-hidden={false}` to one that says something). `leadingType`
+  are `aria-hidden` (give `aria-hidden={false}` to one that says something), except a
+  trailing control: `trailingControl` (the `Trailing` part's `control`) leaves a button or a switch
+  there reachable. `leadingType`
   (`icon`, `avatar`, `thumbnail`, `video`) sizes the leading part, and `position` (`none`,
   `first`, `middle`, `last`, `single`) shapes a tile in a segmented list. `swipeAction` puts the item in a `frame` with its `action`
   (composed: `ListItem.Frame` around `ListItem.Root` and `ListItem.Action`): the action sits

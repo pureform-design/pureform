@@ -132,6 +132,37 @@ describe("FileUpload, ready-made", () => {
         expect(hiddenInput().name).toBe("docs");
     });
 
+    it("submits its default files, and a form reset puts them back", async () => {
+        const defaults = file("a.txt");
+        const onValueChange = vi.fn();
+        withRegistry(() => (
+            <form data-testid="form">
+                <FileUpload
+                    label="Files"
+                    name="docs"
+                    defaultValue={[defaults]}
+                    onValueChange={onValueChange}
+                />
+            </form>
+        ));
+        await settle();
+        const form = byTestId("form") as HTMLFormElement;
+        expect(
+            new FormData(form)
+                .getAll("docs")
+                .map((entry) => (entry as File).name),
+        ).toEqual(["a.txt"]);
+        form.reset();
+        await settle();
+        await settle();
+        expect(onValueChange).not.toHaveBeenCalled();
+        expect(
+            new FormData(form)
+                .getAll("docs")
+                .map((entry) => (entry as File).name),
+        ).toEqual(["a.txt"]);
+    });
+
     it("prefixes the item parts' test ids from Root's", async () => {
         withRegistry(() => (
             <FileUpload
