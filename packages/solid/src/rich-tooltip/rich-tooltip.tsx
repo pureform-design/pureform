@@ -41,6 +41,7 @@ import { usePresence } from "../presence";
 import type { Presence } from "../presence";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
+import { useTooltipLongPress } from "../tooltip/long-press";
 
 type Anatomy = typeof richTooltipOverlayAnatomy;
 
@@ -116,9 +117,14 @@ function Root(props: RichTooltipRootProps): JSX.Element {
 /** What the tooltip describes: it opens when the pointer rests on it or keyboard focus reaches
  *  it, and the trigger points `aria-describedby` at it while it's open. */
 function Trigger(props: RichTooltipTriggerProps): JSX.Element {
-    const { scope, api } = context.use("Trigger");
+    const { scope, api, interactive } = context.use("Trigger");
+    const longPress = useTooltipLongPress(
+        (open) => api().setOpen(open),
+        interactive,
+    );
     return scope.render("trigger", {
         element: "button",
+        ref: longPress,
         as: () => props.as,
         machine: () => api().getTriggerProps(),
         unstyled: () => props.unstyled,

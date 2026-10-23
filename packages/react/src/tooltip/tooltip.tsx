@@ -36,6 +36,7 @@ import type { Presence } from "../presence";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
+import { useTooltipLongPress } from "./long-press";
 
 type Anatomy = typeof tooltipOverlayAnatomy;
 
@@ -106,9 +107,11 @@ function Root(props: TooltipRootProps): ReactNode {
 /** What the tooltip describes: it opens when the pointer rests on it or keyboard focus reaches
  *  it, and the trigger points `aria-describedby` at it while it's open. */
 function Trigger({ unstyled, as, ...props }: TooltipTriggerProps): ReactNode {
-    const { scope, api } = context.use("Trigger");
+    const { scope, api, interactive } = context.use("Trigger");
+    const longPress = useTooltipLongPress(api.setOpen, interactive);
     return scope.render("trigger", {
         element: "button",
+        ref: longPress,
         as: as as ElementType | undefined,
         machine: api.getTriggerProps(),
         unstyled,
