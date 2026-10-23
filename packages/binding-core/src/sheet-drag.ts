@@ -7,7 +7,8 @@
 // has rendered the close (it calls back), as on React Native, not a frame later. The press that
 // ends a real drag doesn't also count as a click on the handle, so a handle that closes on a
 // press closes only once; on a sheet resting partly open, a press opens it fully, and on one
-// fully open, puts it back partly open.
+// fully open, puts it back partly open. A sheet resting partly open is placed again when it or
+// the window changes size.
 
 import type { CloseQuestion } from "./components/dialog";
 import {
@@ -16,23 +17,36 @@ import {
     sheetRelease,
 } from "./components/sheet";
 import type { CloseAsker, SheetRest } from "./components/sheet";
+import { createDragVelocity } from "./drag";
 import { swallowNextClick } from "./drag-click";
 import { settleTransition } from "./settle";
 
-export { SHEET_DISMISS_SHARE, SHEET_FLICK_SPEED } from "./components/sheet";
+export {
+    SHEET_POSITIONAL_THRESHOLD,
+    SHEET_VELOCITY_THRESHOLD,
+} from "./components/sheet";
 
 // Moves shorter than this are a press, not a drag.
 const SLOP = 4;
-// How far back, in ms, the release speed is measured.
-const SPEED_WINDOW = 100;
 
 /** What `dragToDismiss` takes besides the handle, the sheet, and what closes it. */
 export interface SheetDragOptions {
     /** Whether the sheet can rest partly open, read at each open and each release. */
     readonly partial?: (() => boolean) | undefined;
+    /** Where a sheet that can rest partly open rests as it opens (`sheetOpeningRest`), read at
+     *  each open. @default "partial" */
+    readonly opening?: (() => SheetRest) | undefined;
     /** Called when where it rests changes (partly or fully open), and each time it opens, with
      *  whether it can move between the two (it's tall enough to rest partly open). */
     readonly onRest?: ((rest: SheetRest, movable: boolean) => void) | undefined;
+}
+
+/** What stops `dragToDismiss`, and moves the sheet to rest partly or fully open, as a
+ *  controlled `expanded` asks (nothing when it's closed, already there, or too short to rest
+ *  partly open; `onRest` hears it). */
+export interface SheetDrag {
+    (): void;
+    readonly rest: (rest: SheetRest) => void;
 }
 
 /** Lets `handle` drag `sheet` (give the handle `sheetDragHandleLayout` too, so touch moves drag
@@ -50,10 +64,10 @@ export const dragToDismiss = (
     onClose?: CloseQuestion,
     asker: CloseAsker = closeAsker(),
     options: SheetDragOptions = {},
-): (() => void) => {
+): SheetDrag => {
     let start: { y: number; id: number } | undefined;
     // The pointer's recent positions, for the release's speed.
-    let samples: { y: number; time: number }[] = [];
+    const speed = createDragVelocity();
     let offset = 0;
     let dragged = false;
     let rest: SheetRest = "expanded";
@@ -61,14 +75,14 @@ export const dragToDismiss = (
     let swallow: (() => void) | undefined;
     let stopSettle: (() => void) | undefined;
 
+    let movable = false;
     const setRest = (next: SheetRest, opening = false) => {
-        if (next === rest && !opening) return;
-        rest = next;
         const surface = sheet();
-        options.onRest?.(
-            next,
-            surface ? partialOffset(surface) !== undefined : false,
-        );
+        const canMove = surface ? partialOffset(surface) !== undefined : false;
+        if (next === rest && canMove === movable && !opening) return;
+        rest = next;
+        movable = canMove;
+        options.onRest?.(next, canMove);
     };
     // How far down the sheet rests partly open, or `undefined` when it can't (or is too short).
     const partialOffset = (surface: HTMLElement) => {
@@ -81,7 +95,10 @@ export const dragToDismiss = (
     };
     const restOffset = (surface: HTMLElement) =>
         rest === "partial" ? (partialOffset(surface) ?? 0) : 0;
+    // Where `place` last put it.
+    let placed = 0;
     const place = (surface: HTMLElement, at: number) => {
+        placed = at;
         if (at === 0) surface.style.removeProperty("translate");
         else surface.style.translate = `0 ${at}px`;
     };
@@ -122,7 +139,9 @@ export const dragToDismiss = (
         const open = () => {
             stopSettle?.();
             setRest(
-                partialOffset(surface) === undefined ? "expanded" : "partial",
+                partialOffset(surface) === undefined
+                    ? "expanded"
+                    : (options.opening?.() ?? "partial"),
                 true,
             );
             surface.style.transition = "none";
@@ -144,6 +163,29 @@ export const dragToDismiss = (
             attributeOldValue: true,
         });
         if (surface.getAttribute("data-state") === "open") open();
+        if (typeof ResizeObserver !== "undefined") {
+            resizes = new ResizeObserver(replace);
+            resizes.observe(surface);
+        }
+        view = surface.ownerDocument.defaultView ?? undefined;
+        view?.addEventListener("resize", replace);
+    };
+    // A resize (its content, or the window) moves where it rests partly open, or leaves it too
+    // short to: it's placed there again at once, unless it's being dragged.
+    let resizes: ResizeObserver | undefined;
+    let view: Window | undefined;
+    const replace = () => {
+        const surface = sheet();
+        if (!surface || start || surface.getAttribute("data-state") !== "open")
+            return;
+        setRest(partialOffset(surface) === undefined ? "expanded" : rest);
+        const to = restOffset(surface);
+        if (to === placed) return;
+        stopSettle?.();
+        surface.style.transition = "none";
+        place(surface, restOffset(surface));
+        void getComputedStyle(surface).translate;
+        surface.style.removeProperty("transition");
     };
     // The handle can be in place before the binding has the sheet.
     queueMicrotask(watch);
@@ -164,7 +206,8 @@ export const dragToDismiss = (
         asker.cancel();
         swallow?.();
         start = { y: event.clientY, id: event.pointerId };
-        samples = [{ y: event.clientY, time: event.timeStamp }];
+        speed.reset();
+        speed.add(event.clientY, event.timeStamp);
         const surface = sheet();
         offset = surface ? restOffset(surface) : 0;
         dragged = false;
@@ -172,21 +215,16 @@ export const dragToDismiss = (
     };
     const onMove = (event: PointerEvent) => {
         if (start?.id !== event.pointerId) return;
-        samples.push({ y: event.clientY, time: event.timeStamp });
+        speed.add(event.clientY, event.timeStamp);
         move(event.clientY);
     };
     const onUp = (event: PointerEvent) => {
         if (start?.id !== event.pointerId) return;
         const surface = sheet();
         const height = surface?.getBoundingClientRect().height ?? 0;
-        // The speed since the oldest position within the window, or the last one before it.
-        const since =
-            samples.find(
-                (sample) => event.timeStamp - sample.time <= SPEED_WINDOW,
-            ) ?? samples.at(-1)!;
-        const velocity =
-            (event.clientY - since.y) /
-            Math.max(1, event.timeStamp - since.time);
+        speed.add(event.clientY, event.timeStamp);
+        // In pixels per millisecond.
+        const velocity = speed.velocity() / 1000;
         start = undefined;
         if (!dragged) return;
         swallow = swallowNextClick(handle);
@@ -223,13 +261,15 @@ export const dragToDismiss = (
     handle.addEventListener("pointerup", onUp);
     handle.addEventListener("pointercancel", onCancel);
     handle.addEventListener("click", onClick);
-    return () => {
+    const stop = () => {
         handle.removeEventListener("pointerdown", onDown);
         handle.removeEventListener("pointermove", onMove);
         handle.removeEventListener("pointerup", onUp);
         handle.removeEventListener("pointercancel", onCancel);
         handle.removeEventListener("click", onClick);
         opens?.disconnect();
+        resizes?.disconnect();
+        view?.removeEventListener("resize", replace);
         stopSettle?.();
         swallow?.();
         asker.cancel();
@@ -237,4 +277,14 @@ export const dragToDismiss = (
         surface?.style.removeProperty("translate");
         surface?.style.removeProperty("transition");
     };
+    const moveTo = (next: SheetRest) => {
+        const surface = sheet();
+        if (!surface || start || surface.getAttribute("data-state") !== "open")
+            return;
+        if (next === rest || partialOffset(surface) === undefined) return;
+        offset = restOffset(surface);
+        setRest(next);
+        settleTo(0);
+    };
+    return Object.assign(stop, { rest: moveTo });
 };

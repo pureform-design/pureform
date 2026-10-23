@@ -216,11 +216,11 @@ export {
 export { swallowNextClick } from "./drag-click";
 export {
     dragToDismiss,
-    SHEET_DISMISS_SHARE,
-    SHEET_FLICK_SPEED,
+    SHEET_POSITIONAL_THRESHOLD,
+    SHEET_VELOCITY_THRESHOLD,
 } from "./sheet-drag";
 export type { SheetDragOptions } from "./sheet-drag";
-export { settleTransition } from "./settle";
+export { settleOnSpring, settleTransition } from "./settle";
 export { markMenuGroupEdges } from "./menu-groups";
 export { revealInRow } from "./reveal";
 export { slideIndicator, slideTransform, transformTiming } from "./slide";

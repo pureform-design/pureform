@@ -9,8 +9,10 @@ import type {
     splitterAnatomy,
     TestIdOverride,
 } from "@pureform/anatomy";
+import type { SpringNode } from "@pureform/core/ast";
 import type { InstanceTokens, Selection } from "@pureform/styling";
 
+import { chooseAnchor } from "../drag";
 import type { Unstyled } from "../parts";
 import type { VariantProp } from "./variants";
 
@@ -50,6 +52,15 @@ export const SPLITTER_ANCHORS: readonly SplitterAnchor[] = [
 /** How fast a fling has to be (px/s) to snap to the next anchor its way rather than the nearest
  *  (Compose's `AnchoringVelocityThreshold`). */
 export const SPLITTER_FLING_VELOCITY = 200;
+
+/** The spring a divider settles on once it snaps, from the drag's speed (Compose's
+ *  `PaneExpansionState`: `spring(dampingRatio = 0.8f, stiffness = 380f)`). */
+export const SPLITTER_SETTLE: SpringNode = {
+    type: "spring",
+    damping: 0.8,
+    stiffness: 380,
+    mass: 1,
+};
 
 /** The splitter's variant groups and instance tokens. */
 export interface SplitterVariantProps {
@@ -286,46 +297,16 @@ export const splitterSnap = (options: {
         .filter((place) => Number.isFinite(place))
         .map((place) => Math.min(range.high, Math.max(range.low, place)));
     if (places.length === 0) return [...sizes];
-    const way =
-        velocity >= SPLITTER_FLING_VELOCITY
-            ? 1
-            : velocity <= -SPLITTER_FLING_VELOCITY
-              ? -1
-              : 0;
-    const EPSILON = 1e-6;
-    const ahead = places.filter((place) =>
-        way > 0 ? place > at + EPSILON : place < at - EPSILON,
-    );
-    const pool = way !== 0 && ahead.length > 0 ? ahead : places;
-    const to = pool.reduce((best, place) =>
-        Math.abs(place - at) < Math.abs(best - at) ? place : best,
-    );
+    const to =
+        places[
+            chooseAnchor({
+                anchors: places,
+                at,
+                velocity,
+                velocityThreshold: SPLITTER_FLING_VELOCITY,
+            })
+        ]!;
     return splitterMoveBy(sizes, index, to - at, limits);
-};
-
-/** Tracks a drag's speed from its last moves, for the snap. `position` is along the panes'
- *  axis, toward the end; `time` in ms. */
-export const createDragVelocity = (window = 100) => {
-    let samples: { position: number; time: number }[] = [];
-    return {
-        reset() {
-            samples = [];
-        },
-        add(position: number, time: number) {
-            samples.push({ position, time });
-            samples = samples.filter((sample) => time - sample.time <= window);
-        },
-        /** px/s over the last `window` ms. */
-        velocity(): number {
-            const first = samples[0];
-            const last = samples.at(-1);
-            if (!first || !last || last.time === first.time) return 0;
-            return (
-                ((last.position - first.position) / (last.time - first.time)) *
-                1000
-            );
-        },
-    };
 };
 
 /** The divider's element props beside the machine's: named by `label`, marked pressed while

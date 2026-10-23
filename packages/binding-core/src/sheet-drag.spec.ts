@@ -6,7 +6,7 @@ import {
     sheetPartialOffset,
     sheetRelease,
 } from "./components/sheet";
-import { settleTransition } from "./settle";
+import { settleOnSpring, settleTransition } from "./settle";
 import { dragToDismiss } from "./sheet-drag";
 
 const pointer = (
@@ -66,11 +66,11 @@ describe("dragToDismiss", () => {
         expect(sheet.style.translate).toBe("");
     });
 
-    it("closes after a drag past a quarter of its height, and swallows the click that ends it", () => {
+    it("closes after a drag let go nearer gone than open, and swallows the click that ends it", () => {
         const { handle, dismiss, click } = setup();
         handle.dispatchEvent(pointer("pointerdown", 100, 0));
-        handle.dispatchEvent(pointer("pointermove", 250, 1000));
-        handle.dispatchEvent(pointer("pointerup", 250, 2000));
+        handle.dispatchEvent(pointer("pointermove", 350, 1000));
+        handle.dispatchEvent(pointer("pointerup", 350, 2000));
         expect(dismiss).toHaveBeenCalledTimes(1);
         handle.click();
         expect(click).not.toHaveBeenCalled();
@@ -89,12 +89,12 @@ describe("dragToDismiss", () => {
             sheet.setAttribute("data-state", "closed"),
         );
         handle.dispatchEvent(pointer("pointerdown", 100, 0));
-        handle.dispatchEvent(pointer("pointermove", 250, 1000));
-        handle.dispatchEvent(pointer("pointerup", 250, 2000));
+        handle.dispatchEvent(pointer("pointermove", 350, 1000));
+        handle.dispatchEvent(pointer("pointerup", 350, 2000));
         expect(dismiss).toHaveBeenCalledTimes(1);
-        expect(sheet.style.translate).toBe("0px 150px");
+        expect(sheet.style.translate).toBe("0px 250px");
         await frame();
-        expect(sheet.style.translate).toBe("0px 150px");
+        expect(sheet.style.translate).toBe("0px 250px");
         sheet.setAttribute("data-state", "open");
         await nextChange();
         expect(sheet.style.translate).toBe("");
@@ -105,10 +105,10 @@ describe("dragToDismiss", () => {
         const { sheet, handle, dismiss } = setup();
         sheet.setAttribute("data-state", "open");
         handle.dispatchEvent(pointer("pointerdown", 100, 0));
-        handle.dispatchEvent(pointer("pointermove", 250, 1000));
-        handle.dispatchEvent(pointer("pointerup", 250, 2000));
+        handle.dispatchEvent(pointer("pointermove", 350, 1000));
+        handle.dispatchEvent(pointer("pointerup", 350, 2000));
         expect(dismiss).toHaveBeenCalledTimes(1);
-        expect(sheet.style.translate).toBe("0px 150px");
+        expect(sheet.style.translate).toBe("0px 250px");
         await nextChange();
         expect(sheet.style.translate).toBe("");
         expect(sheet.style.transition).toBe("");
@@ -118,8 +118,8 @@ describe("dragToDismiss", () => {
         const onClose = vi.fn(() => false);
         const { sheet, handle, dismiss } = setup(onClose);
         handle.dispatchEvent(pointer("pointerdown", 100, 0));
-        handle.dispatchEvent(pointer("pointermove", 250, 1000));
-        handle.dispatchEvent(pointer("pointerup", 250, 2000));
+        handle.dispatchEvent(pointer("pointermove", 350, 1000));
+        handle.dispatchEvent(pointer("pointerup", 350, 2000));
         expect(onClose).toHaveBeenCalledTimes(1);
         expect(dismiss).not.toHaveBeenCalled();
         expect(sheet.style.translate).toBe("");
@@ -135,12 +135,12 @@ describe("dragToDismiss", () => {
         );
         const release = () => {
             handle.dispatchEvent(pointer("pointerdown", 100, 0));
-            handle.dispatchEvent(pointer("pointermove", 250, 1000));
-            handle.dispatchEvent(pointer("pointerup", 250, 2000));
+            handle.dispatchEvent(pointer("pointermove", 350, 1000));
+            handle.dispatchEvent(pointer("pointerup", 350, 2000));
         };
         release();
         await frame();
-        expect(sheet.style.translate).toBe("0px 150px");
+        expect(sheet.style.translate).toBe("0px 250px");
         answer(false);
         await nextChange();
         expect(dismiss).not.toHaveBeenCalled();
@@ -158,7 +158,7 @@ describe("dragToDismiss", () => {
         expect(dismiss).toHaveBeenCalledTimes(1);
         await frame();
         // Closed: it leaves from where it was let go.
-        expect(sheet.style.translate).toBe("0px 150px");
+        expect(sheet.style.translate).toBe("0px 250px");
     });
 
     it("ignores an answer that comes after another drag", async () => {
@@ -170,8 +170,8 @@ describe("dragToDismiss", () => {
                 }),
         );
         handle.dispatchEvent(pointer("pointerdown", 100, 0));
-        handle.dispatchEvent(pointer("pointermove", 250, 1000));
-        handle.dispatchEvent(pointer("pointerup", 250, 2000));
+        handle.dispatchEvent(pointer("pointermove", 350, 1000));
+        handle.dispatchEvent(pointer("pointerup", 350, 2000));
         handle.dispatchEvent(pointer("pointerdown", 250, 3000));
         answer(true);
         await nextChange();
@@ -189,8 +189,8 @@ describe("dragToDismiss", () => {
             asker,
         );
         handle.dispatchEvent(pointer("pointerdown", 100, 0));
-        handle.dispatchEvent(pointer("pointermove", 250, 1000));
-        handle.dispatchEvent(pointer("pointerup", 250, 2000));
+        handle.dispatchEvent(pointer("pointermove", 350, 1000));
+        handle.dispatchEvent(pointer("pointerup", 350, 2000));
         const first = answer;
         const escape = vi.fn();
         asker.ask(() => new Promise<boolean>(() => {}), escape, escape);
@@ -273,9 +273,36 @@ describe("a sheet that rests partly open", () => {
         drag(handle, partial * 0.8);
         expect(sheet.style.translate).toBe(`0px ${partial}px`);
         expect(dismiss).not.toHaveBeenCalled();
-        // From partly open, a drag a quarter of the rest of the way down closes it.
-        drag(handle, (sheet.getBoundingClientRect().height - partial) * 0.3);
+        // From partly open, let go nearer gone than partly open, it closes.
+        drag(handle, (sheet.getBoundingClientRect().height - partial) * 0.6);
         expect(dismiss).toHaveBeenCalledTimes(1);
+    });
+
+    it("moves where a controlled expanded asks, and opens where it says", async () => {
+        const { sheet, rests, partial } = await setup(true);
+        const control = stop as unknown as { rest: (rest: string) => void };
+        control.rest("expanded");
+        expect(sheet.style.translate).toBe("");
+        expect(rests).toEqual(["partial true", "expanded true"]);
+        control.rest("expanded");
+        expect(rests).toHaveLength(2);
+        control.rest("partial");
+        expect(sheet.style.translate).toBe(`0px ${partial}px`);
+    });
+
+    it("is placed again when it's resized while partly open", async () => {
+        const { sheet, rests } = await setup(true);
+        const viewport = document.documentElement.clientHeight;
+        sheet.style.height = `${viewport - 120}px`;
+        await frame();
+        await frame();
+        const partial = sheetPartialOffset(viewport - 120, viewport);
+        expect(sheet.style.translate).toBe(`0px ${partial}px`);
+        sheet.style.height = `${viewport / 4}px`;
+        await frame();
+        await frame();
+        expect(sheet.style.translate).toBe("");
+        expect(rests.at(-1)).toBe("expanded false");
     });
 
     it("moves on to the next place with a flick, and a press toggles it", async () => {
@@ -316,21 +343,31 @@ describe("sheetRelease", () => {
     const at = (offset: number, velocity = 0, partial?: number) =>
         sheetRelease({ offset, velocity, height: 800, partial });
 
-    it("closes past a quarter of the height without a partly open place", () => {
-        expect(at(150)).toBe("expanded");
-        expect(at(250)).toBe("closed");
-        expect(at(10, 0.6)).toBe("closed");
+    it("closes 56px past where it rested, as Compose's sheet", () => {
+        // Moving down slowly, from fully open.
+        expect(at(50, 0.05)).toBe("expanded");
+        expect(at(60, 0.05)).toBe("closed");
+        // Let go still, the nearest.
+        expect(at(350)).toBe("expanded");
+        expect(at(450)).toBe("closed");
+        // A flick at 125dp/s or more goes on, however short.
+        expect(at(10, 0.13)).toBe("closed");
+        expect(at(10, 0.12)).toBe("expanded");
     });
 
-    it("goes to the nearer place, or the next one on a flick", () => {
+    it("goes to the next place past 56px, or the next one on a flick", () => {
+        expect(at(50, 0.05, 400)).toBe("expanded");
+        expect(at(60, 0.05, 400)).toBe("partial");
+        expect(at(340, -0.05, 400)).toBe("expanded");
+        expect(at(350, -0.05, 400)).toBe("partial");
+        expect(at(450, 0.05, 400)).toBe("partial");
+        expect(at(460, 0.05, 400)).toBe("closed");
         expect(at(150, 0, 400)).toBe("expanded");
         expect(at(250, 0, 400)).toBe("partial");
-        expect(at(450, 0, 400)).toBe("partial");
-        expect(at(550, 0, 400)).toBe("closed");
-        expect(at(50, 0.6, 400)).toBe("partial");
-        expect(at(420, 0.6, 400)).toBe("closed");
-        expect(at(380, -0.6, 400)).toBe("expanded");
-        expect(at(500, -0.6, 400)).toBe("partial");
+        expect(at(50, 0.2, 400)).toBe("partial");
+        expect(at(420, 0.2, 400)).toBe("closed");
+        expect(at(380, -0.2, 400)).toBe("expanded");
+        expect(at(500, -0.2, 400)).toBe("partial");
     });
 });
 
@@ -420,5 +457,25 @@ describe("askingDismissProps", () => {
         expect(askingDismissProps(undefined, {}, closeAsker(), close)).toEqual(
             {},
         );
+    });
+
+    it("settles elements on a spring of their own, from the release's speed", () => {
+        const a = document.createElement("div");
+        const b = document.createElement("div");
+        document.body.append(a, b);
+        const spring = {
+            type: "spring",
+            damping: 0.8,
+            stiffness: 380,
+            mass: 1,
+        } as const;
+        const drop = settleOnSpring([a, b], "flex-grow", spring, 100, 0.5);
+        expect(a.style.transition).toMatch(/^flex-grow \d+ms linear\(/);
+        expect(b.style.transition).toBe(a.style.transition);
+        drop();
+        expect(a.style.transition).toBe("");
+        expect(b.style.transition).toBe("");
+        settleOnSpring([a], "flex-grow", spring, 0.5, 0.5);
+        expect(a.style.transition).toBe("");
     });
 });

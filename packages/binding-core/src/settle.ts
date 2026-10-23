@@ -70,20 +70,60 @@ export const settleTransition = (
         spring = springFromCurve(points, duration * 1000);
         fitted.set(key, spring);
     }
+    return startOn([element], property, spring, distance, velocity);
+};
+
+// Sets each element's transition of `property` to `spring` sampled from `velocity`, until it ends.
+const startOn = (
+    elements: readonly HTMLElement[],
+    property: string,
+    spring: SpringNode,
+    distance: number,
+    velocity: number,
+): (() => void) => {
     // The release's speed as a share of the move per second.
     const sampled = sampleSpring(spring, {
         velocity: (velocity * 1000) / distance,
     });
-    element.style.transition = `${property} ${sampled.duration}ms ${formatLinearEasing(sampled.points)}`;
-    const drop = () => {
-        element.removeEventListener("transitionend", ended);
-        element.removeEventListener("transitioncancel", ended);
-        element.style.removeProperty("transition");
+    const transition = `${property} ${sampled.duration}ms ${formatLinearEasing(sampled.points)}`;
+    const drops = elements.map((element) => {
+        element.style.transition = transition;
+        const drop = () => {
+            element.removeEventListener("transitionend", ended);
+            element.removeEventListener("transitioncancel", ended);
+            element.style.removeProperty("transition");
+        };
+        const ended = (event: TransitionEvent) => {
+            if (event.target === element && event.propertyName === property)
+                drop();
+        };
+        element.addEventListener("transitionend", ended);
+        element.addEventListener("transitioncancel", ended);
+        return drop;
+    });
+    return () => {
+        for (const drop of drops) drop();
     };
-    const ended = (event: TransitionEvent) => {
-        if (event.target === element && event.propertyName === property) drop();
-    };
-    element.addEventListener("transitionend", ended);
-    element.addEventListener("transitioncancel", ended);
-    return drop;
+};
+
+/** Starts `elements`' transition of `property` on `spring` itself (one with no transition of its
+ *  own, such as a splitter's panes on Compose's `spring(0.8, 380)`), at `velocity` (pixels per
+ *  millisecond, in the direction of a positive `distance`) for a move of `distance` pixels the
+ *  caller makes next. Under reduced motion, or without a move, nothing changes. Returns what
+ *  drops the inline transitions, which also go once each ends. */
+export const settleOnSpring = (
+    elements: readonly HTMLElement[],
+    property: string,
+    spring: SpringNode,
+    distance: number,
+    velocity: number,
+): (() => void) => {
+    const view = elements[0]?.ownerDocument.defaultView;
+    if (
+        Math.abs(distance) < 1 ||
+        !view ||
+        view.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+    )
+        return () => {};
+    return startOn(elements, property, spring, distance, velocity);
 };

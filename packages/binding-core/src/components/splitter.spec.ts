@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 
 import {
-    createDragVelocity,
     SPLITTER_ANCHORS,
     splitterInitialSizes,
     splitterLimits,
@@ -116,16 +115,6 @@ describe("splitter", () => {
                 limits: FREE,
             }),
         ).toEqual([33, 67]);
-    });
-
-    it("measures a drag's speed over its last moves", () => {
-        const drag = createDragVelocity();
-        drag.add(0, 0);
-        drag.add(10, 50);
-        drag.add(30, 100);
-        expect(drag.velocity()).toBe(300);
-        drag.reset();
-        expect(drag.velocity()).toBe(0);
     });
 
     it("maps Root's props onto Zag's and names the divider", () => {

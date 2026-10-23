@@ -157,10 +157,12 @@ export {
     sheetDragHandleLayout,
     sheetMachineProps,
     sheetModal,
+    sheetOpeningRest,
     sheetPartialOffset,
+    sheetPartiallyExpandable,
     sheetRelease,
-    SHEET_DISMISS_SHARE,
-    SHEET_FLICK_SPEED,
+    SHEET_POSITIONAL_THRESHOLD,
+    SHEET_VELOCITY_THRESHOLD,
     SHEET_PARTIAL_SHARE,
     sideSheetPositionerLayout,
     sideSheetSelection,
@@ -210,10 +212,11 @@ export type {
     DragHandleRootOwnProps,
     DragHandleVariantProps,
 } from "./components/drag-handle";
+export { chooseAnchor, createDragVelocity } from "./drag";
 export {
-    createDragVelocity,
     SPLITTER_ANCHORS,
     SPLITTER_FLING_VELOCITY,
+    SPLITTER_SETTLE,
     SPLITTER_ROOT_PROPS,
     splitterInitialSizes,
     splitterLimits,
