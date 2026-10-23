@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it } from "vitest";
 
 import { createSwipeSettle } from "./list-item-swipe-settle";
 import {
+    settleOnSpring,
     springFromVars,
     springRoleVar,
     transitionSpring,
@@ -104,5 +105,17 @@ describe("createSwipeSettle", () => {
         settle.move(40, 32);
         settle.release(element, 40, 80);
         expect(element.style.transition).toBe("");
+    });
+});
+
+describe("settleOnSpring", () => {
+    it("overrides an element's own inline transition while it runs, and puts it back", () => {
+        const pane = document.createElement("div");
+        document.body.append(pane);
+        pane.style.transition = "opacity 200ms linear";
+        const drop = settleOnSpring([pane], "flex-grow", exact, 100, 0.5);
+        expect(pane.style.transition).toMatch(/^flex-grow \d+ms linear\(/);
+        drop();
+        expect(pane.style.transition).toBe("opacity 200ms linear");
     });
 });

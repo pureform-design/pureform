@@ -120,6 +120,9 @@ export const settleTransition = (
         : nothing;
 };
 
+// Each settling element's own inline transition (an app's `style`), put back once it settles.
+const ownTransitions = new WeakMap<HTMLElement, string>();
+
 // Sets each element's transition of `property` to `spring` sampled from `velocity`, until it ends.
 const startOn = (
     elements: readonly HTMLElement[],
@@ -134,11 +137,20 @@ const startOn = (
     });
     const transition = `${property} ${sampled.duration}ms ${formatLinearEasing(sampled.points)}`;
     const drops = elements.map((element) => {
+        if (!ownTransitions.has(element))
+            ownTransitions.set(element, element.style.transition);
         element.style.transition = transition;
+        // As the browser writes it back, to tell this settle's from a later one's.
+        const set = element.style.transition;
         const drop = () => {
             element.removeEventListener("transitionend", ended);
             element.removeEventListener("transitioncancel", ended);
-            element.style.removeProperty("transition");
+            // Only this settle's; a later one puts it back itself.
+            if (element.style.transition !== set) return;
+            const own = ownTransitions.get(element) ?? "";
+            ownTransitions.delete(element);
+            if (own) element.style.transition = own;
+            else element.style.removeProperty("transition");
         };
         const ended = (event: TransitionEvent) => {
             if (event.target === element && event.propertyName === property)
@@ -157,7 +169,9 @@ const startOn = (
  *  own, such as a splitter's panes on Compose's `spring(0.8, 380)`), at `velocity` (pixels per
  *  millisecond, in the direction of a positive `distance`) for a move of `distance` pixels the
  *  caller makes next. Under reduced motion, or without a move, nothing changes. Returns what
- *  drops the inline transitions, which also go once each ends. */
+ *  drops the inline transitions, which also go once each ends. The settle is each element's
+ *  inline `transition` while it runs, so it overrides one the app set inline (a splitter
+ *  pane's `style`), and puts that back once done. */
 export const settleOnSpring = (
     elements: readonly HTMLElement[],
     property: string,
