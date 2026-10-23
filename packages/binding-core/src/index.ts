@@ -202,6 +202,33 @@ export type {
     DragHandleVariantProps,
 } from "./components/drag-handle";
 export {
+    createDragVelocity,
+    SPLITTER_ANCHORS,
+    SPLITTER_FLING_VELOCITY,
+    SPLITTER_ROOT_PROPS,
+    splitterInitialSizes,
+    splitterLimits,
+    splitterMachineProps,
+    splitterMoveBy,
+    splitterOrientation,
+    splitterPercent,
+    splitterSelection,
+    splitterSnap,
+    splitterTriggerId,
+    splitterTriggerProps,
+} from "./components/splitter";
+export type {
+    SplitterAnchor,
+    SplitterContentProps,
+    SplitterPane,
+    SplitterPanelData,
+    SplitterPart,
+    SplitterRootOwnProps,
+    SplitterSize,
+    SplitterSizeDetails,
+    SplitterVariantProps,
+} from "./components/splitter";
+export {
     FAB_CONTENT_PROPS,
     FAB_ROOT_PROPS,
     fabMachineProps,
