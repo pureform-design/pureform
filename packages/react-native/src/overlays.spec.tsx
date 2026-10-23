@@ -13,6 +13,7 @@ import { reanimated } from "./engines/reanimated";
 import { FullscreenDialog } from "./fullscreen-dialog";
 import { IconButton } from "./icon-button";
 import { Menu } from "./menu";
+import { Popover } from "./popover";
 import { RichTooltip } from "./rich-tooltip";
 import { SideSheet } from "./side-sheet";
 import { useSnackbar } from "./snackbar";
@@ -43,6 +44,7 @@ beforeAll(async () => {
         "toast",
         "tooltip",
         "richTooltip",
+        "popover",
         "dialog",
         "fullscreenDialog",
         "bottomSheet",
@@ -764,6 +766,66 @@ it("shows a rich tooltip's parts open, interactive by default", async () => {
         ).not.toBeNull();
     }
     expect(tip.parentElement!.style.pointerEvents).toBe("auto");
+});
+
+describe.each([animated, reanimated])("the popover with $name", (engine) => {
+    const popover = () =>
+        document.querySelector<HTMLElement>('[role="dialog"]');
+
+    it("opens from its trigger with its parts, closes on a press outside or Escape", async () => {
+        const changes: boolean[] = [];
+        await render(
+            <Popover
+                trigger="Filters"
+                heading="Filters"
+                body="Show only the items that match."
+                actions={({ close }) => (
+                    <IconButton aria-label="Done" icon="✓" onPress={close} />
+                )}
+                onOpenChange={({ open }) => changes.push(open)}
+            />,
+            engine,
+        );
+        expect(popover()).toBeNull();
+        await interact(() => userEvent.click(byTestId("pf-button-root")));
+        await settle(400);
+        expect(popover()).not.toBeNull();
+        for (const part of ["title", "body", "actions"]) {
+            expect(
+                popover()!.querySelector(`[data-testid="pf-popover-${part}"]`),
+            ).not.toBeNull();
+        }
+        expect(changes).toEqual([true]);
+        const page = document.elementFromPoint(300, 300) as HTMLElement;
+        expect(popover()!.contains(page)).toBe(false);
+        await interact(() => userEvent.click(page));
+        await until(() => popover() === null);
+        expect(popover()).toBeNull();
+        expect(changes).toEqual([true, false]);
+        await interact(() => userEvent.click(byTestId("pf-button-root")));
+        await settle(400);
+        expect(popover()).not.toBeNull();
+        await interact(() => userEvent.keyboard("{Escape}"));
+        await until(() => popover() === null);
+        expect(popover()).toBeNull();
+    });
+
+    it("stays open on a press outside with closeOnInteractOutside off", async () => {
+        await render(
+            <Popover
+                defaultOpen
+                closeOnInteractOutside={false}
+                trigger="Filters"
+                heading="Filters"
+            />,
+            engine,
+        );
+        await settle(400);
+        const page = document.elementFromPoint(300, 300) as HTMLElement;
+        await interact(() => userEvent.click(page));
+        await settle(400);
+        expect(popover()).not.toBeNull();
+    });
 });
 
 describe.each([animated, reanimated])(
