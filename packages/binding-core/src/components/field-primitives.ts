@@ -173,7 +173,10 @@ export interface FieldState {
     readonly disabled: boolean;
     readonly invalid: boolean;
     readonly required: boolean;
-    readonly described: { readonly description: boolean; readonly error: boolean };
+    readonly described: {
+        readonly description: boolean;
+        readonly error: boolean;
+    };
 }
 
 /** Field's state from its props and the supporting pieces it holds. An `error` marks it
@@ -215,7 +218,7 @@ export const fieldControlProps = (
         id: own.id ?? field?.ids.control,
         disabled: disabled || undefined,
         required: required || undefined,
-        "aria-invalid": invalid || undefined,
+        "aria-invalid": invalid ? ("true" as const) : undefined,
         "aria-describedby":
             describedBy.length > 0 ? describedBy.join(" ") : undefined,
     };
@@ -238,7 +241,7 @@ export const fieldLabelProps = (
 ) => ({
     id: field?.ids.label,
     for: field?.ids.control,
-    "aria-disabled": state.disabled || undefined,
+    "aria-disabled": state.disabled ? ("true" as const) : undefined,
 });
 
 /** The required mark's text, hidden from assistive technology: the control's `required` says

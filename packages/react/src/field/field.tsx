@@ -265,7 +265,9 @@ const useDescribes = (
 /** The supporting pieces' props: their tokens, `testId` and `unstyled`, `as`, and the element's
  *  own props. */
 export interface DescriptionProps
-    extends Omit<PartProps, keyof DescriptionRootOwnProps>, DescriptionRootOwnProps {
+    extends
+        Omit<PartProps, keyof DescriptionRootOwnProps>,
+        DescriptionRootOwnProps {
     /** Another element or component to render instead of `<span>`. */
     readonly as?: ElementType | undefined;
 }
@@ -289,7 +291,9 @@ export function Description(props: DescriptionProps): ReactNode {
 }
 
 export interface ErrorTextProps
-    extends Omit<PartProps, keyof ErrorTextRootOwnProps>, ErrorTextRootOwnProps {
+    extends
+        Omit<PartProps, keyof ErrorTextRootOwnProps>,
+        ErrorTextRootOwnProps {
     /** Another element or component to render instead of `<span>`. */
     readonly as?: ElementType | undefined;
 }

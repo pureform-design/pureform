@@ -16,22 +16,19 @@ const PIECES = { field, label, input, textarea, description, errorText };
 const recipe = (name: keyof typeof PIECES) =>
     (compilePreset(configWith(PIECES[name])).theme?.slotRecipes ?? {})[name];
 
-describe.each(Object.keys(PIECES) as (keyof typeof PIECES)[])(
-    "%s",
-    (name) => {
-        it("validates against a full pureform config", () => {
-            expect(() => configWith(PIECES[name])).not.toThrow();
-        });
+describe.each(Object.keys(PIECES) as (keyof typeof PIECES)[])("%s", (name) => {
+    it("validates against a full pureform config", () => {
+        expect(() => configWith(PIECES[name])).not.toThrow();
+    });
 
-        it("has one look: no variants", () => {
-            expect(Object.keys(PIECES[name].recipe.variants ?? {})).toEqual([]);
-        });
+    it("has one look: no variants", () => {
+        expect(Object.keys(PIECES[name].recipe.variants ?? {})).toEqual([]);
+    });
 
-        it("compiles to a stable Panda recipe", () => {
-            expect(recipe(name)).toMatchSnapshot();
-        });
-    },
-);
+    it("compiles to a stable Panda recipe", () => {
+        expect(recipe(name)).toMatchSnapshot();
+    });
+});
 
 describe("the plain box", () => {
     it.each(["input", "textarea"] as const)(

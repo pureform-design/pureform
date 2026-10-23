@@ -157,8 +157,14 @@ const boxStyle = (ref: (token: BoxToken) => AliasNode): StyleMap => ({
         .on(ROOT_DISABLED, disabledColor("disabledContainer"))
         .else(ref("outlineColor")),
     // The outline's width comes out of the padding, so the box is the text plus the padding.
-    paddingBlockStart: add(ref("paddingBlock"), mul(ref("outlineWidth"), unitless(-1))),
-    paddingBlockEnd: add(ref("paddingBlock"), mul(ref("outlineWidth"), unitless(-1))),
+    paddingBlockStart: add(
+        ref("paddingBlock"),
+        mul(ref("outlineWidth"), unitless(-1)),
+    ),
+    paddingBlockEnd: add(
+        ref("paddingBlock"),
+        mul(ref("outlineWidth"), unitless(-1)),
+    ),
     paddingInlineStart: ref("paddingInline"),
     paddingInlineEnd: ref("paddingInline"),
     backgroundColor: stateLayer(ref, {
@@ -218,7 +224,9 @@ export const input = pf.slotComponent({
                     ...boxStyle(ref),
                     rawRules: {
                         css: {
-                            "&::placeholder": { color: ref("placeholderColor") },
+                            "&::placeholder": {
+                                color: ref("placeholderColor"),
+                            },
                             "&::-webkit-calendar-picker-indicator":
                                 picker(CALENDAR_PATH),
                             "&[type=time]::-webkit-calendar-picker-indicator":
@@ -269,7 +277,9 @@ export const textarea = pf.slotComponent({
                     resize: vertical,
                     rawRules: {
                         css: {
-                            "&::placeholder": { color: ref("placeholderColor") },
+                            "&::placeholder": {
+                                color: ref("placeholderColor"),
+                            },
                         },
                     },
                 },
@@ -334,4 +344,3 @@ export const errorText = pf.slotComponent({
         defaultVariants: {},
     }),
 });
-

@@ -35,7 +35,9 @@ describe("the plain field", () => {
             ],
         ).toBe("hint name-description name-error");
         expect(
-            fieldControlProps(fieldState({}, ids, none), {})["aria-describedby"],
+            fieldControlProps(fieldState({}, ids, none), {})[
+                "aria-describedby"
+            ],
         ).toBeUndefined();
     });
 
@@ -57,7 +59,7 @@ describe("the plain field", () => {
     it("works outside a field", () => {
         expect(fieldControlProps(undefined, { invalid: true })).toMatchObject({
             id: undefined,
-            "aria-invalid": true,
+            "aria-invalid": "true",
         });
     });
 
@@ -68,7 +70,7 @@ describe("the plain field", () => {
         expect(fieldLabelProps(field, state)).toEqual({
             id: "name-label",
             for: "name",
-            "aria-disabled": true,
+            "aria-disabled": "true",
         });
     });
 });

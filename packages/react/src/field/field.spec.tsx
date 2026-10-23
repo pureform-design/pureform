@@ -4,21 +4,16 @@ import { testIds } from "@pureform/anatomy";
 import type { ReactNode } from "react";
 import { describe, expect, it } from "vitest";
 
-import {
-    Description,
-    ErrorText,
-    Field,
-    Input,
-    Label,
-    Textarea,
-} from ".";
+import { Description, ErrorText, Field, Input, Label, Textarea } from ".";
 import { PureformProvider } from "..";
 import { displayRegistry } from "../__fixtures__/registry";
 import { mount, settle } from "../testing/render";
 
 const withRegistry = async (view: ReactNode) => {
     mount(
-        <PureformProvider registry={displayRegistry()}>{view}</PureformProvider>,
+        <PureformProvider registry={displayRegistry()}>
+            {view}
+        </PureformProvider>,
     );
     await settle();
 };
@@ -68,16 +63,20 @@ describe("Field", () => {
         expect(textarea.tagName).toBe("TEXTAREA");
         expect(textarea.disabled).toBe(true);
         expect(textarea.labels?.length).toBe(1);
-        expect(
-            byTestId(testIds.label.root).getAttribute("aria-disabled"),
-        ).toBe("true");
+        expect(byTestId(testIds.label.root).getAttribute("aria-disabled")).toBe(
+            "true",
+        );
         expect(textarea.hasAttribute("aria-describedby")).toBe(false);
     });
 
     it("lets a piece's own state win, and keeps the control's own description", async () => {
         await withRegistry(
             <Field invalid disabled>
-                <Input invalid={false} disabled={false} aria-describedby="hint" />
+                <Input
+                    invalid={false}
+                    disabled={false}
+                    aria-describedby="hint"
+                />
                 <Description>More</Description>
             </Field>,
         );
@@ -91,7 +90,11 @@ describe("Field", () => {
 
     it("renders the ready-made pieces from its content", async () => {
         await withRegistry(
-            <Field label="Email" description="We never share it" error="Taken" />,
+            <Field
+                label="Email"
+                description="We never share it"
+                error="Taken"
+            />,
         );
         const input = byTestId<HTMLInputElement>(testIds.input.root);
         expect(input.labels?.[0]?.textContent).toBe("Email");
