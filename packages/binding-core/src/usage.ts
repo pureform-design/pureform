@@ -22,6 +22,16 @@ const same = <const G extends readonly string[]>(
         readonly [K in G[number]]: K;
     };
 
+// The plain form primitives' entries.
+const FORM_PRIMITIVES = {
+    field: {},
+    label: {},
+    input: {},
+    plainTextarea: {},
+    description: {},
+    errorText: {},
+} as const;
+
 /** Every component, by subpath. */
 export const COMPONENT_USAGE = {
     // `leadingIcon` follows the icon content and `trailingIcon` is always set; the list is a
@@ -312,6 +322,14 @@ export const COMPONENT_USAGE = {
         },
     },
     "supporting-text": { entries: { supportingText: same("tone") } },
+    // The plain form primitives: one look each, no variants. Each piece's subpath re-exports
+    // it from the field's module, which holds them all.
+    field: { entries: FORM_PRIMITIVES },
+    label: { entries: FORM_PRIMITIVES },
+    input: { entries: FORM_PRIMITIVES },
+    textarea: { entries: FORM_PRIMITIVES },
+    description: { entries: FORM_PRIMITIVES },
+    "error-text": { entries: FORM_PRIMITIVES },
     // `transition` moves a row's content in a shared axis or a fade through.
     stepper: {
         entries: {

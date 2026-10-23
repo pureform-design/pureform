@@ -175,7 +175,8 @@ const generate = async () => {
     for (const { anatomy: a, case: c, more } of found) {
         const component = c.component;
         const options = config.components?.[component] ?? {};
-        if (taken.has(component)) continue;
+        const title = options.title ?? component;
+        if (taken.has(title)) continue;
         const hooks = options.hooks ?? [];
         const imports = [
             `import type { Meta, StoryObj } from "@storybook/html-vite";`,
@@ -355,7 +356,7 @@ const generate = async () => {
                 : []),
             "});",
             "",
-            `export default { title: ${JSON.stringify(component)}, ...stories.meta } satisfies Meta;`,
+            `export default { title: ${JSON.stringify(title)}, ...stories.meta } satisfies Meta;`,
             "",
             ...stories,
             "",
@@ -369,7 +370,10 @@ const generate = async () => {
         for (const hook of [...sharedModules, ...componentModules]) {
             source = hook.transformSource?.(component, source) ?? source;
         }
-        writeFileSync(join(OUT, `${component}.stories.ts`), source);
+        writeFileSync(
+            join(OUT, `${title.replace(/[\s/]+/g, "-")}.stories.ts`),
+            source,
+        );
         written.push(component);
     }
     if (missing.length) {

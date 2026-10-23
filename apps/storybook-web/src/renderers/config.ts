@@ -24,6 +24,10 @@ export interface RendererConfig {
 
 /** Overrides for one component; everything else comes from its anatomy and its case. */
 export interface ComponentConfig {
+    /** The stories' title, over the component's name, for one whose name differs from
+     *  another's only in case (`Textarea`, `TextArea`): Storybook's ids ignore case. A `/` files
+     *  it in a group; the generated file is named after it. */
+    readonly title?: string;
     /** Args for every story of the component, over the case's props and the shared and
      *  renderer hooks'. */
     readonly args?: Args;

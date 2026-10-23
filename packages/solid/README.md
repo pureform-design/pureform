@@ -47,6 +47,7 @@ is a peer, so the app's generated registry and the binding share one copy. See t
 | `linear-progress/`, `circular-progress/`, `loading-indicator/`, `slider/`, `card/`, `search-bar/`, `app-bar/`, `ripple/`                     | Display components, in the same layout                                                                                                                                                                                        |
 | `fade-through/`                                                                                                                              | The fade through, in the same layout                                                                                                                                                                                          |
 | `avatar/`, `media/`, `separator/`, `scrim/`, `supporting-text/`, `text/`, `icon/`, `touch-target/`                                           | Single-part components: the export is Root itself                                                                                                                                                                             |
+| `field/`, and `label/`, `input/`, `textarea/`, `description/`, `error-text/`                                                                 | The plain form primitives in `field/field.tsx`; each piece's subpath re-exports it                                                                                                                                            |
 | `single-part.tsx`                                                                                                                            | `createSinglePart` (internal): a single-part component's Root                                                                                                                                                                 |
 | `navigation.tsx`                                                                                                                             | `createNavigation` (internal): the navigation bar's and rail's parts and ready-made component                                                                                                                                 |
 | `text-input.tsx`                                                                                                                             | `createTextInput` (internal): the text field's and text area's parts and ready-made component                                                                                                                                 |
@@ -652,6 +653,27 @@ mirrorIcon?, disabled?, content? }`; a tab without a label shows only its icon, 
   wrap it in another label. The input carries every native state the CSS reads (`:checked`,
   `:indeterminate`, `:disabled`, `aria-invalid`), and the form reset and fieldset rule are the
   binding's (below).
+
+#### Plain form primitives
+
+`@pureform/solid/field` has `Field`, `Label`, `Input`, `Textarea`, `Description` and `ErrorText`
+(each also at its own subpath, `@pureform/solid/input`): for a form in the theme without
+Material's floating label. `Field` connects the pieces inside it: the label's `for`, the
+control's `aria-describedby` (the description and error it holds), and its `disabled`,
+`invalid` and `required`, which a piece's own prop overrides. Without children it renders
+them from `label`, `description` and `error` (an `error` marks it invalid). `Input` and
+`Textarea` are the native elements, with their own props (`value`, `name`, `type`); the date
+and time types keep the browser's pickers (use `DatePicker` and `TimePicker` for Material's).
+
+```tsx
+<Field required>
+    <Label>Email</Label>
+    <Input type="email" name="email" />
+    <Description>We won't share it</Description>
+    {taken && <ErrorText>Taken</ErrorText>}
+</Field>
+<Field label="Bio" description="A line or two" />
+```
 
 ### Provider
 

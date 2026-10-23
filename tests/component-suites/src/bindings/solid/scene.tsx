@@ -21,6 +21,7 @@ import { Checkbox } from "@pureform/solid/checkbox";
 import { Chip } from "@pureform/solid/chip";
 import { ChipSet } from "@pureform/solid/chip-set";
 import { CircularProgress } from "@pureform/solid/circular-progress";
+import { CodeField } from "@pureform/solid/code-field";
 import { ColorPicker } from "@pureform/solid/color-picker";
 import { CopyButton } from "@pureform/solid/copy-button";
 import { DateInput } from "@pureform/solid/date-input";
@@ -31,6 +32,15 @@ import { DragHandle } from "@pureform/solid/drag-handle";
 import { Fab } from "@pureform/solid/fab";
 import { FabMenu } from "@pureform/solid/fab-menu";
 import { FadeThrough } from "@pureform/solid/fade-through";
+import {
+    Description,
+    ErrorText,
+    Field,
+    Input,
+    Label,
+    Textarea,
+} from "@pureform/solid/field";
+import { FileUpload } from "@pureform/solid/file-upload";
 import { FullscreenDialog } from "@pureform/solid/fullscreen-dialog";
 import { GridList } from "@pureform/solid/grid-list";
 import { Icon } from "@pureform/solid/icon";
@@ -43,6 +53,7 @@ import { Media } from "@pureform/solid/media";
 import { Menu } from "@pureform/solid/menu";
 import { NavigationBar } from "@pureform/solid/navigation-bar";
 import { NavigationRail } from "@pureform/solid/navigation-rail";
+import { NumberField } from "@pureform/solid/number-field";
 import { Paginator } from "@pureform/solid/paginator";
 import { Popover } from "@pureform/solid/popover";
 import { RadioGroup } from "@pureform/solid/radio-group";
@@ -65,10 +76,7 @@ import { SupportingText } from "@pureform/solid/supporting-text";
 import { Switch } from "@pureform/solid/switch";
 import { Table } from "@pureform/solid/table";
 import { Tabs } from "@pureform/solid/tabs";
-import { FileUpload } from "@pureform/solid/file-upload";
 import { TagsInput } from "@pureform/solid/tags-input";
-import { NumberField } from "@pureform/solid/number-field";
-import { CodeField } from "@pureform/solid/code-field";
 import { Text } from "@pureform/solid/text";
 import { TextArea } from "@pureform/solid/text-area";
 import { TextField } from "@pureform/solid/text-field";
@@ -214,6 +222,12 @@ export const components: Record<ComponentName, ValidComponent> = {
     SplitButton,
     Stepper,
     SupportingText,
+    Field,
+    Label,
+    Input,
+    Textarea,
+    Description,
+    ErrorText,
     Switch,
     Tabs,
     TagsInput,

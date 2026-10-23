@@ -1,0 +1,256 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`description > compiles to a stable Panda recipe 1`] = `
+{
+  "base": {
+    "root": {
+      "color": "var(--components-description-color, token(colors.onSurfaceVariant))",
+      "display": "flex",
+      "flexDirection": "column",
+      "textStyle": "bodySmall",
+    },
+  },
+  "className": "description",
+  "compoundVariants": [],
+  "defaultVariants": {},
+  "jsx": [
+    "Description",
+  ],
+  "slots": [
+    "root",
+  ],
+  "variants": {},
+}
+`;
+
+exports[`errorText > compiles to a stable Panda recipe 1`] = `
+{
+  "base": {
+    "root": {
+      "color": "var(--components-errorText-color, token(colors.error))",
+      "display": "flex",
+      "flexDirection": "column",
+      "textStyle": "bodySmall",
+    },
+  },
+  "className": "errorText",
+  "compoundVariants": [],
+  "defaultVariants": {},
+  "jsx": [
+    "ErrorText",
+  ],
+  "slots": [
+    "root",
+  ],
+  "variants": {},
+}
+`;
+
+exports[`field > compiles to a stable Panda recipe 1`] = `
+{
+  "base": {
+    "root": {
+      "display": "flex",
+      "flexDirection": "column",
+      "gap": "var(--components-field-gap, token(spacing.1))",
+    },
+  },
+  "className": "field",
+  "compoundVariants": [],
+  "defaultVariants": {},
+  "jsx": [
+    "Field",
+  ],
+  "slots": [
+    "root",
+  ],
+  "variants": {},
+}
+`;
+
+exports[`input > compiles to a stable Panda recipe 1`] = `
+{
+  "base": {
+    "root": {
+      "&::-webkit-calendar-picker-indicator": {
+        "backgroundColor": {
+          "&:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+          "base": "var(--components-input-indicatorColor, token(colors.onSurfaceVariant))",
+        },
+        "backgroundImage": "none",
+        "clipPath": "path(evenodd, "M19 4h-1V2h-2v2H8V2H6v2H5C3.89 4 3 4.9 3 6v14a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zM5 10h14v10H5z")",
+        "height": "var(--components-input-indicatorSize, token(sizes.iconMedium))",
+        "paddingBlockEnd": "0px",
+        "paddingBlockStart": "0px",
+        "paddingInlineEnd": "0px",
+        "paddingInlineStart": "0px",
+        "width": "var(--components-input-indicatorSize, token(sizes.iconMedium))",
+      },
+      "&::placeholder": {
+        "color": "var(--components-input-placeholderColor, token(colors.onSurfaceVariant))",
+      },
+      "&[type=time]::-webkit-calendar-picker-indicator": {
+        "clipPath": "path(evenodd, "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 2c4.42 0 8 3.58 8 8s-3.58 8-8 8-8-3.58-8-8 3.58-8 8-8zm.5 3H11v6l5.25 3.15.75-1.23-4.5-2.67z")",
+      },
+      "--components-input-focusIndicatorColor": "token(colors.secondary)",
+      "--components-input-focusIndicatorOuterOffset": "token(sizes.focusIndicatorOuterOffset)",
+      "--components-input-focusIndicatorThickness": "token(sizes.focusIndicatorThickness)",
+      "--components-input-stateDraggedOpacity": "token(opacity.stateDragged)",
+      "--components-input-stateFocusOpacity": "token(opacity.stateFocus)",
+      "--components-input-stateHoverOpacity": "token(opacity.stateHover)",
+      "--components-input-statePressedOpacity": "token(opacity.statePressed)",
+      "backgroundColor": {
+        "&:focus-visible": "color-mix(in srgb, var(--components-input-container, transparent), var(--components-input-inputColor, token(colors.onSurface)) var(--components-input-stateFocusOpacity, token(opacity.stateFocus)))",
+        "&:is(:active, [data-pf-active])": "color-mix(in srgb, var(--components-input-container, transparent), var(--components-input-inputColor, token(colors.onSurface)) var(--components-input-statePressedOpacity, token(opacity.statePressed)))",
+        "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, var(--components-input-container, transparent), var(--components-input-inputColor, token(colors.onSurface)) var(--components-input-stateHoverOpacity, token(opacity.stateHover)))",
+        "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, var(--components-input-container, transparent), var(--components-input-inputColor, token(colors.onSurface)) var(--components-input-stateDraggedOpacity, token(opacity.stateDragged)))",
+        "base": "var(--components-input-container, transparent)",
+      },
+      "borderColor": {
+        "&:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+        "&:is(:hover, [data-pf-hover])": "var(--components-input-hoverOutlineColor, token(colors.onSurface))",
+        "&:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true]))": "var(--components-input-errorColor, token(colors.error))",
+        "base": "var(--components-input-outlineColor, token(colors.outline))",
+      },
+      "borderRadius": "var(--components-input-radius, token(radii.extraSmall))",
+      "borderStyle": "solid",
+      "borderWidth": "var(--components-input-outlineWidth, 1px)",
+      "color": {
+        "&:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        "base": "var(--components-input-inputColor, token(colors.onSurface))",
+      },
+      "marginBlockEnd": "0px",
+      "marginBlockStart": "0px",
+      "marginInlineEnd": "0px",
+      "marginInlineStart": "0px",
+      "minWidth": "0px",
+      "outlineColor": "var(--components-input-focusIndicatorColor, token(colors.secondary))",
+      "outlineOffset": "var(--components-input-focusIndicatorOuterOffset, token(sizes.focusIndicatorOuterOffset))",
+      "outlineStyle": {
+        "&:focus-visible": "solid",
+        "base": "none",
+      },
+      "outlineWidth": "var(--components-input-focusIndicatorThickness, token(sizes.focusIndicatorThickness))",
+      "paddingBlockEnd": "calc(var(--components-input-paddingBlock, token(spacing.2)) + calc(var(--components-input-outlineWidth, 1px) * -1) + calc(token(sizes.densityOffset) * 0.5))",
+      "paddingBlockStart": "calc(var(--components-input-paddingBlock, token(spacing.2)) + calc(var(--components-input-outlineWidth, 1px) * -1) + calc(token(sizes.densityOffset) * 0.5))",
+      "paddingInlineEnd": "var(--components-input-paddingInline, token(spacing.3))",
+      "paddingInlineStart": "var(--components-input-paddingInline, token(spacing.3))",
+      "textStyle": "bodyLarge",
+      "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
+    },
+  },
+  "className": "input",
+  "compoundVariants": [],
+  "defaultVariants": {},
+  "jsx": [
+    "Input",
+  ],
+  "slots": [
+    "root",
+  ],
+  "variants": {},
+}
+`;
+
+exports[`label > compiles to a stable Panda recipe 1`] = `
+{
+  "base": {
+    "requiredIndicator": {
+      "color": {
+        ".label__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        "base": "var(--components-label-requiredColor, token(colors.error))",
+      },
+      "marginInlineStart": "token(spacing.1)",
+    },
+    "root": {
+      "alignItems": "baseline",
+      "color": {
+        "&:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        "base": "var(--components-label-color, token(colors.onSurface))",
+      },
+      "display": "inline-flex",
+      "textStyle": "labelLarge",
+    },
+  },
+  "className": "label",
+  "compoundVariants": [],
+  "defaultVariants": {},
+  "jsx": [
+    "Label",
+  ],
+  "slots": [
+    "root",
+    "requiredIndicator",
+  ],
+  "variants": {},
+}
+`;
+
+exports[`plainTextarea > compiles to a stable Panda recipe 1`] = `
+{
+  "base": {
+    "root": {
+      "&::placeholder": {
+        "color": "var(--components-plainTextarea-placeholderColor, token(colors.onSurfaceVariant))",
+      },
+      "--components-plainTextarea-focusIndicatorColor": "token(colors.secondary)",
+      "--components-plainTextarea-focusIndicatorOuterOffset": "token(sizes.focusIndicatorOuterOffset)",
+      "--components-plainTextarea-focusIndicatorThickness": "token(sizes.focusIndicatorThickness)",
+      "--components-plainTextarea-stateDraggedOpacity": "token(opacity.stateDragged)",
+      "--components-plainTextarea-stateFocusOpacity": "token(opacity.stateFocus)",
+      "--components-plainTextarea-stateHoverOpacity": "token(opacity.stateHover)",
+      "--components-plainTextarea-statePressedOpacity": "token(opacity.statePressed)",
+      "backgroundColor": {
+        "&:focus-visible": "color-mix(in srgb, var(--components-plainTextarea-container, transparent), var(--components-plainTextarea-inputColor, token(colors.onSurface)) var(--components-plainTextarea-stateFocusOpacity, token(opacity.stateFocus)))",
+        "&:is(:active, [data-pf-active])": "color-mix(in srgb, var(--components-plainTextarea-container, transparent), var(--components-plainTextarea-inputColor, token(colors.onSurface)) var(--components-plainTextarea-statePressedOpacity, token(opacity.statePressed)))",
+        "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, var(--components-plainTextarea-container, transparent), var(--components-plainTextarea-inputColor, token(colors.onSurface)) var(--components-plainTextarea-stateHoverOpacity, token(opacity.stateHover)))",
+        "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, var(--components-plainTextarea-container, transparent), var(--components-plainTextarea-inputColor, token(colors.onSurface)) var(--components-plainTextarea-stateDraggedOpacity, token(opacity.stateDragged)))",
+        "base": "var(--components-plainTextarea-container, transparent)",
+      },
+      "borderColor": {
+        "&:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+        "&:is(:hover, [data-pf-hover])": "var(--components-plainTextarea-hoverOutlineColor, token(colors.onSurface))",
+        "&:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true]))": "var(--components-plainTextarea-errorColor, token(colors.error))",
+        "base": "var(--components-plainTextarea-outlineColor, token(colors.outline))",
+      },
+      "borderRadius": "var(--components-plainTextarea-radius, token(radii.extraSmall))",
+      "borderStyle": "solid",
+      "borderWidth": "var(--components-plainTextarea-outlineWidth, 1px)",
+      "color": {
+        "&:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        "base": "var(--components-plainTextarea-inputColor, token(colors.onSurface))",
+      },
+      "marginBlockEnd": "0px",
+      "marginBlockStart": "0px",
+      "marginInlineEnd": "0px",
+      "marginInlineStart": "0px",
+      "minHeight": "var(--components-plainTextarea-minHeight, 88px)",
+      "minWidth": "0px",
+      "outlineColor": "var(--components-plainTextarea-focusIndicatorColor, token(colors.secondary))",
+      "outlineOffset": "var(--components-plainTextarea-focusIndicatorOuterOffset, token(sizes.focusIndicatorOuterOffset))",
+      "outlineStyle": {
+        "&:focus-visible": "solid",
+        "base": "none",
+      },
+      "outlineWidth": "var(--components-plainTextarea-focusIndicatorThickness, token(sizes.focusIndicatorThickness))",
+      "paddingBlockEnd": "calc(var(--components-plainTextarea-paddingBlock, token(spacing.2)) + calc(var(--components-plainTextarea-outlineWidth, 1px) * -1) + calc(token(sizes.densityOffset) * 0.5))",
+      "paddingBlockStart": "calc(var(--components-plainTextarea-paddingBlock, token(spacing.2)) + calc(var(--components-plainTextarea-outlineWidth, 1px) * -1) + calc(token(sizes.densityOffset) * 0.5))",
+      "paddingInlineEnd": "var(--components-plainTextarea-paddingInline, token(spacing.3))",
+      "paddingInlineStart": "var(--components-plainTextarea-paddingInline, token(spacing.3))",
+      "resize": "vertical",
+      "textStyle": "bodyLarge",
+      "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
+    },
+  },
+  "className": "plainTextarea",
+  "compoundVariants": [],
+  "defaultVariants": {},
+  "jsx": [
+    "PlainTextarea",
+  ],
+  "slots": [
+    "root",
+  ],
+  "variants": {},
+}
+`;

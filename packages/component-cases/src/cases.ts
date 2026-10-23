@@ -20,6 +20,14 @@ import { accordionCase, treeCase } from "./cases/expandable";
 import { fab } from "./cases/fab";
 import { fabMenu, fabMenuItems } from "./cases/fab-menu";
 import { fadeThrough } from "./cases/fade-through";
+import {
+    description,
+    errorText,
+    field,
+    input,
+    label,
+    textarea,
+} from "./cases/field-primitives";
 import { fileUpload } from "./cases/file-upload";
 import { fullscreenDialog } from "./cases/fullscreen-dialog";
 import { gridList } from "./cases/grid-list";
@@ -130,6 +138,12 @@ export const COMPONENTS: readonly ComponentCase[] = [
     stepper,
     splitButton,
     supportingText,
+    field,
+    label,
+    input,
+    textarea,
+    description,
+    errorText,
     switchControl,
     tabsCase,
     table,
