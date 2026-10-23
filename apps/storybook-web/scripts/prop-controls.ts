@@ -15,7 +15,8 @@
 //   `textStyle` sets `style`): read from the declaration before the alias resolves, following
 //   indexed accesses (`ButtonVariantProps["color"]`).
 // - A JSDoc tag on the prop in binding-core overrides the type: `@control none | select |
-//   boolean | text | number | radio`.
+//   boolean | text | number | radio | color` (`color`: Storybook's color picker, for a CSS color
+//   string).
 
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -29,7 +30,8 @@ export type ControlKind =
     | "radio"
     | "boolean"
     | "text"
-    | "number";
+    | "number"
+    | "color";
 
 const KINDS = new Set<ControlKind>([
     "none",
@@ -38,6 +40,7 @@ const KINDS = new Set<ControlKind>([
     "boolean",
     "text",
     "number",
+    "color",
 ]);
 
 export interface PropControl {

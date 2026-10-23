@@ -37,9 +37,11 @@ export interface ColorPickerVariantProps {
 
 /** Everything Root takes for itself, besides the element's own props and `as`. */
 export interface ColorPickerRootOwnProps extends ColorPickerVariantProps {
-    /** The color, controlled: any CSS color Zag reads (`#6750a4`, `rgb(…)`, `hsl(…)`). */
+    /** The color, controlled: any CSS color Zag reads (`#6750a4`, `rgb(…)`, `hsl(…)`).
+     *  @control color */
     readonly value?: string | undefined;
-    /** The color to start with. @default "#6750a4" */
+    /** The color to start with. @default "#6750a4"
+     *  @control color */
     readonly defaultValue?: string | undefined;
     /** Called as the color changes, while dragging too. */
     readonly onValueChange?:

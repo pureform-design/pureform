@@ -222,5 +222,11 @@ describe("arg types", () => {
         ).toEqual({
             control: "text",
         });
+        expect(
+            argTypeFor(
+                { name: "value", control: "color", tagged: true },
+                variants,
+            ),
+        ).toEqual({ control: "color" });
     });
 });
