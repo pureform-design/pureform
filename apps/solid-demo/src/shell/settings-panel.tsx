@@ -7,13 +7,13 @@ import { PureformProvider } from "@pureform/solid";
 import { Avatar } from "@pureform/solid/avatar";
 import { Button } from "@pureform/solid/button";
 import { Chip } from "@pureform/solid/chip";
+import { ColorPicker } from "@pureform/solid/color-picker";
 import { Dialog } from "@pureform/solid/dialog";
 import { Fab } from "@pureform/solid/fab";
 import { IconButton } from "@pureform/solid/icon-button";
 import { List } from "@pureform/solid/list";
 import { Tabs } from "@pureform/solid/tabs";
 import { Text } from "@pureform/solid/text";
-import { TextField } from "@pureform/solid/text-field";
 import type { JSX } from "@solidjs/web";
 import { useLocation } from "@tanstack/solid-router";
 import {
@@ -190,13 +190,10 @@ function ChipSetting<K extends keyof Settings>(props: {
 }
 
 /** The color setting: a swatch per palette, each drawn by the theme it would apply (a nested
- *  provider), and a field for any seed. */
+ *  provider), and a color picker for any seed. */
 function ColorSetting(): JSX.Element {
     const { settings, update } = useSettings();
     const id = createUniqueId();
-    const [seed, setSeed] = createSignal<string>(
-        untrack(() => settings().customSeed),
-    );
     const current = () =>
         COLORS.find((color) => color.value === settings().color)!;
     return (
@@ -240,20 +237,17 @@ function ColorSetting(): JSX.Element {
                             current().seed ?? settings().customSeed
                         }`}
             </Text>
-            <TextField
+            <ColorPicker
                 label="Custom seed"
-                value={seed()}
-                onValueChange={(details) => {
-                    setSeed(details.value);
+                defaultValue={untrack(() => settings().customSeed)}
+                swatches={COLORS.flatMap((color) =>
+                    color.seed ? [color.seed.toLowerCase()] : [],
+                )}
+                eyeDropperLabel="Pick a seed from the screen"
+                onValueChangeEnd={(details) => {
                     if (isHexColor(details.value))
                         update({ color: "custom", customSeed: details.value });
                 }}
-                error={isHexColor(seed()) ? undefined : "A color as #rrggbb"}
-                supportingText="Any #rrggbb color"
-                leadingIcon={<Glyph name="palette" />}
-                maxlength={7}
-                autocomplete="off"
-                spellcheck={false}
             />
         </section>
     );

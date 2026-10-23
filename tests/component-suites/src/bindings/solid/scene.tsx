@@ -21,6 +21,7 @@ import { Checkbox } from "@pureform/solid/checkbox";
 import { Chip } from "@pureform/solid/chip";
 import { ChipSet } from "@pureform/solid/chip-set";
 import { CircularProgress } from "@pureform/solid/circular-progress";
+import { ColorPicker } from "@pureform/solid/color-picker";
 import { DateInput } from "@pureform/solid/date-input";
 import { DatePicker } from "@pureform/solid/date-picker";
 import { Dialog } from "@pureform/solid/dialog";
@@ -172,6 +173,7 @@ export const components: Record<ComponentName, ValidComponent> = {
     Dialog,
     DragHandle,
     Splitter,
+    ColorPicker,
     Fab,
     FullscreenDialog,
     GridList: GridListScene,

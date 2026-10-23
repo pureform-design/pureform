@@ -1,0 +1,12 @@
+// `@pureform/solid/color-picker`: an inline color picker over Zag's color picker.
+
+export { ColorPicker } from "./color-picker";
+export type {
+    ColorPickerChannelSliderProps,
+    ColorPickerEyeDropperTriggerProps,
+    ColorPickerHexFieldProps,
+    ColorPickerPartProps,
+    ColorPickerProps,
+    ColorPickerRootProps,
+    ColorPickerSwatchTriggerProps,
+} from "./color-picker";

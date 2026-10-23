@@ -489,6 +489,17 @@
                 "default": "./dist/internal/zag/index.jsx"
             }
         },
+        "./color-picker": {
+            "types": "./dist/color-picker/index.d.ts",
+            "solid": {
+                "development": "./src/color-picker/index.ts",
+                "default": "./dist/color-picker.jsx"
+            },
+            "import": {
+                "development": "./src/color-picker/index.ts",
+                "default": "./dist/color-picker.jsx"
+            }
+        },
         "./splitter": {
             "types": "./dist/splitter/index.d.ts",
             "solid": {

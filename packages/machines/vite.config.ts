@@ -40,6 +40,7 @@ export default createConfig({
                     accordion: "src/accordion/index.ts",
                     avatar: "src/avatar/index.ts",
                     splitter: "src/splitter/index.ts",
+                    "color-picker": "src/color-picker/index.ts",
                     "tree-view": "src/tree-view/index.ts",
                     paginator: "src/paginator/index.ts",
                     combobox: "src/combobox/index.ts",

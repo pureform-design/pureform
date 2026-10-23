@@ -31,6 +31,7 @@ export * from "./components/bottom-sheet";
 export * from "./components/side-sheet";
 export * from "./components/drag-handle";
 export * from "./components/splitter";
+export * from "./components/color-picker";
 export * from "./components/sheet";
 export * from "./components/list";
 export * from "./components/list-item";

@@ -41,6 +41,7 @@ export default createConfig({
                     "side-sheet": "src/side-sheet/index.ts",
                     "drag-handle": "src/drag-handle/index.ts",
                     splitter: "src/splitter/index.ts",
+                    "color-picker": "src/color-picker/index.ts",
                     tooltip: "src/tooltip/index.ts",
                     "rich-tooltip": "src/rich-tooltip/index.ts",
                     popover: "src/popover/index.ts",

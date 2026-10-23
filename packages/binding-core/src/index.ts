@@ -212,6 +212,25 @@ export type {
     DragHandleRootOwnProps,
     DragHandleVariantProps,
 } from "./components/drag-handle";
+export {
+    COLOR_PICKER_DEFAULT,
+    COLOR_PICKER_ROOT_PROPS,
+    COLOR_PICKER_THUMB_CENTRE,
+    colorPickerFraction,
+    colorPickerHex,
+    colorPickerHexText,
+    colorPickerSelection,
+    colorPickerSwatchLabel,
+    hasEyeDropper,
+} from "./components/color-picker";
+export type {
+    ColorPickerChannel,
+    ColorPickerContentProps,
+    ColorPickerPart,
+    ColorPickerRootOwnProps,
+    ColorPickerValueDetails,
+    ColorPickerVariantProps,
+} from "./components/color-picker";
 export { chooseAnchor, createDragVelocity } from "./drag";
 export {
     SPLITTER_ANCHORS,

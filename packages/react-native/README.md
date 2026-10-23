@@ -329,6 +329,14 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
       surface, which the app places. The drag handle is a component of its own, a pressable
       pill. Import them from `@pureform/react-native/bottom-sheet`, `/side-sheet`, and
       `/drag-handle`.
+    - **The color picker** (`@pureform/react-native/color-picker`) takes the web's props
+      (`value`/`defaultValue`/`onValueChange`, `onValueChangeEnd`, `label`, `area`, `alpha`,
+      `swatches`, `inputLabel`, `disabled`, `readOnly`); it's ready-made only. Its area and
+      sliders are pureform's own drags (`PanResponder`) over Zag's color math, adjustable by
+      assistive technology and the arrow keys on the web; the gradients are
+      `experimental_backgroundImage` (`backgroundImage` on React Native Web), which needs React
+      Native 0.76 or newer. The hex field is the text field (submit or leaving it sets the
+      color). The eye dropper shows only on React Native Web where the browser has one.
     - **The splitter** (`@pureform/react-native/splitter`) takes `panes` (each an `id`, its
       `content`, and `minSize`/`maxSize` in percent or `"240px"`), `size`/`defaultSize`/
       `onSizeChange` (percent), `anchors`, `keyboardResizeBy`, `orientation` and `resizeLabel`.

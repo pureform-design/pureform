@@ -2,6 +2,7 @@ import * as zagAccordion from "@zag-js/accordion";
 import * as zagAvatar from "@zag-js/avatar";
 import * as zagCarousel from "@zag-js/carousel";
 import * as zagCheckbox from "@zag-js/checkbox";
+import * as zagColorPicker from "@zag-js/color-picker";
 import * as zagCombobox from "@zag-js/combobox";
 import * as zagDateInput from "@zag-js/date-input";
 import * as zagDatePicker from "@zag-js/date-picker";
@@ -23,6 +24,7 @@ import * as zagTreeView from "@zag-js/tree-view";
 import { describe, expect, it } from "vitest";
 
 import * as machines from ".";
+import * as colorPicker from "./color-picker";
 
 describe("@pureform/machines", () => {
     it("re-exports Zag's tooltip unchanged, and its dialog with its states and transitions", () => {
@@ -64,6 +66,17 @@ describe("@pureform/machines", () => {
             "resizeTrigger",
             "resizeTriggerIndicator",
         ]);
+    });
+
+    // Only from its subpath: in the root it changes React Native's unit runs (its splitter's
+    // drags stop reaching the responder); see c9d's context.
+    it("re-exports Zag's color picker from its subpath, with a valueSwatch part", () => {
+        expect(colorPicker.machine).toBe(zagColorPicker.machine);
+        expect(colorPicker.connect).toBe(zagColorPicker.connect);
+        expect(colorPicker.parse).toBe(zagColorPicker.parse);
+        expect(colorPicker.anatomy.keys()).toContain("valueSwatch");
+        expect(colorPicker.anatomy.keys()).toContain("areaThumb");
+        expect("colorPicker" in machines).toBe(false);
     });
 
     it("re-exports Zag's date picker and date input unchanged", () => {

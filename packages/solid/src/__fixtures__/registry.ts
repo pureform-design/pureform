@@ -821,3 +821,35 @@ export const chipSetRegistry = () =>
             "touchTarget",
         ]),
     });
+
+/** The color picker's fake factories: the picker, the text field its hex field is, and the icon
+ *  button its eye dropper is. */
+export const colorPickerRegistry = () =>
+    createRegistry({
+        colorPicker: named("colorPicker", [
+            "root",
+            "label",
+            "content",
+            "area",
+            "areaBackground",
+            "areaThumb",
+            "channelSlider",
+            "transparencyGrid",
+            "channelSliderTrack",
+            "channelSliderThumb",
+            "control",
+            "valueSwatch",
+            "swatchGroup",
+            "swatchTrigger",
+            "swatch",
+        ]),
+        textField: named("text-field", FIELD_SLOTS),
+        iconButton: named("icon-button", [
+            "root",
+            "touchTarget",
+            "container",
+            "icon",
+            "outline",
+        ]),
+        ripple: named("ripple", ["root", "ripple"]),
+    });

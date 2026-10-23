@@ -20,6 +20,7 @@ import {
     searchViewAnatomy,
     sliderAnatomy,
     splitterAnatomy,
+    colorPickerAnatomy,
     snackbarAnatomy,
     stepperAnatomy,
     dataTableAnatomy,
@@ -40,6 +41,7 @@ import { anatomy as avatar } from "./avatar/avatar.anatomy";
 import { anatomy as buttonGroup } from "./button-group";
 import { anatomy as button } from "./button/button.anatomy";
 import { anatomy as carousel } from "./carousel/carousel.anatomy";
+import { anatomy as colorPicker } from "./color-picker/color-picker.anatomy";
 import {
     anatomy as autocomplete,
     searchViewAnatomy as searchView,
@@ -83,6 +85,7 @@ const pairs: Record<string, Pair> = {
     avatar: { machine: avatar, preset: avatarAnatomy },
     fileUpload: { machine: fileUpload, preset: fileUploadAnatomy },
     splitter: { machine: splitter, preset: splitterAnatomy },
+    colorPicker: { machine: colorPicker, preset: colorPickerAnatomy },
     button: { machine: button, preset: buttonAnatomy },
     buttonGroup: { machine: buttonGroup, preset: buttonGroupAnatomy },
     chipSet: { machine: buttonGroup, preset: chipSetAnatomy },
