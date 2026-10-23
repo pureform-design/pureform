@@ -46,7 +46,7 @@ import { IconSlot, ownText } from "./icon-style";
 import { testIdOf, withEngine } from "./parts";
 import { useOverlayPresence } from "./presence";
 import { useEngine } from "./provider";
-import { inFlowInline, useSelectedStyles } from "./styles";
+import { useSelectedStyles } from "./styles";
 
 // The one style of a component: under `root` where it has slots, else `""`.
 const rootOf = (selected: Selected): Style =>
@@ -171,14 +171,13 @@ function BadgeImpl(props: BadgeProps): ReactNode {
     const style = rootOf(selected);
     const Drawing = engine.Drawing;
     const hidden = props.label === undefined && props.size === "small";
-    const placed = props.placement === "anchored" ? style : inFlowInline(style);
     return (
         <View
             {...(props.label === undefined
                 ? {}
                 : { role: "img" as const, "aria-label": props.label })}
             aria-hidden={hidden ? true : undefined}
-            style={placed as ViewStyle}
+            style={style as ViewStyle}
             testID={testIdOf(badgeAnatomy, "root", props.testId)}
         >
             {Drawing ? <Drawing drawing={rootDrawing(selected)} /> : null}
