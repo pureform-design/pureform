@@ -68,9 +68,14 @@ const control = (
             resets: true,
             invalid: { props: { invalid: true } },
         },
+        // Typing changes the value (Tab selects an input's text, and a textarea's caret lands
+        // at either end, so the key goes to the end first); Escape does nothing.
         keyboard: {
             focusable: element,
-            keys: [{ key: "a", does: "nothing" }],
+            keys: [
+                { key: "{End}!", does: "change" },
+                { key: "{Escape}", does: "nothing" },
+            ],
         },
     };
 };

@@ -141,4 +141,19 @@ export const nativeSelectMultiple: ComponentCase = {
         },
         invalid: { props: { invalid: true } },
     },
+    // A list box: an arrow moves to the option before or after and chooses it alone.
+    keyboard: {
+        focusable: select,
+        keys: [],
+        arrows: {
+            ltr: [
+                { key: "{ArrowDown}", does: "change", to: ["l"] },
+                { key: "{ArrowUp}", does: "change", to: ["s"] },
+            ],
+            rtl: [
+                { key: "{ArrowDown}", does: "change", to: ["l"] },
+                { key: "{ArrowUp}", does: "change", to: ["s"] },
+            ],
+        },
+    },
 };
