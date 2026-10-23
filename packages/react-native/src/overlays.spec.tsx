@@ -232,6 +232,57 @@ describe.each([animated, reanimated])("the menu with $name", (engine) => {
 });
 
 describe.each([animated, reanimated])(
+    "the menu's context trigger with $name",
+    (engine) => {
+        it("opens where it's right-clicked, or from the context menu key, without a trigger", async () => {
+            await render(
+                <Menu
+                    contextTrigger={
+                        <View style={{ width: 300, height: 200 }} />
+                    }
+                    items={ITEMS}
+                />,
+                engine,
+            );
+            const area = byTestId("pf-menu-context-trigger");
+            expect(menu()).toBeNull();
+            expect(
+                document.querySelector('[data-testid="pf-button-root"]'),
+            ).toBe(null);
+            await interact(() => {
+                area.dispatchEvent(
+                    new MouseEvent("contextmenu", {
+                        bubbles: true,
+                        cancelable: true,
+                        clientX: 120,
+                        clientY: 90,
+                    }),
+                );
+            });
+            await settle(400);
+            expect(menu()).not.toBeNull();
+            // At the pointer, over the page; the placement's gutter is 8.
+            expect(box(menu()!).left).toBeCloseTo(120, 0);
+            expect(box(menu()!).top).toBeCloseTo(98, 0);
+            await interact(() => userEvent.keyboard("{Escape}"));
+            await until(() => menu() === null);
+            await interact(() => {
+                area.dispatchEvent(
+                    new KeyboardEvent("keydown", {
+                        bubbles: true,
+                        cancelable: true,
+                        key: "F10",
+                        shiftKey: true,
+                    }),
+                );
+            });
+            await settle(400);
+            expect(menu()).not.toBeNull();
+        });
+    },
+);
+
+describe.each([animated, reanimated])(
     "the snackbar queue with $name",
     (engine) => {
         let snackbars!: Snackbars;

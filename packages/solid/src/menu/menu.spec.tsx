@@ -113,6 +113,62 @@ describe("Menu, ready-made", () => {
     });
 });
 
+describe("Menu, context trigger", () => {
+    it("renders an area before the menu and opens it at a right-click and the context menu key", async () => {
+        withRegistry(() => (
+            <Menu contextTrigger="Right-click here" items={ITEMS} />
+        ));
+        await settle();
+        const area = byTestId(ids.contextTrigger);
+        expect(area.textContent).toBe("Right-click here");
+        expect(area.getAttribute("data-part")).toBe("context-trigger");
+        expect(document.querySelector(`[data-testid="${ids.trigger}"]`)).toBe(
+            null,
+        );
+        expect(byTestId(ids.positioner).hidden).toBe(true);
+        const event = new MouseEvent("contextmenu", {
+            bubbles: true,
+            cancelable: true,
+            clientX: 40,
+            clientY: 50,
+        });
+        area.dispatchEvent(event);
+        await frames();
+        expect(event.defaultPrevented).toBe(true);
+        expect(byTestId(ids.positioner).hidden).toBe(false);
+        await userEvent.keyboard("{Escape}");
+        await frames();
+        expect(byTestId(ids.positioner).hidden).toBe(true);
+        const key = new KeyboardEvent("keydown", {
+            bubbles: true,
+            cancelable: true,
+            key: "F10",
+            shiftKey: true,
+        });
+        area.dispatchEvent(key);
+        await frames();
+        expect(key.defaultPrevented).toBe(true);
+        expect(byTestId(ids.positioner).hidden).toBe(false);
+    });
+
+    it("composes, beside a trigger", async () => {
+        withRegistry(() => (
+            <Menu.Root>
+                <Menu.Trigger>Edit</Menu.Trigger>
+                <Menu.ContextTrigger>Area</Menu.ContextTrigger>
+                <Menu.Positioner>
+                    <Menu.Content>
+                        <Menu.Items items={[ITEMS[1]!]} />
+                    </Menu.Content>
+                </Menu.Positioner>
+            </Menu.Root>
+        ));
+        await settle();
+        expect(byTestId(ids.trigger).textContent).toBe("Edit");
+        expect(byTestId(ids.contextTrigger).textContent).toBe("Area");
+    });
+});
+
 describe("Menu, groups and toggleable items", () => {
     it("renders groups after the items, each a group named by its label, and sets grouped", async () => {
         withRegistry(() => (
