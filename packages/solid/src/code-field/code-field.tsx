@@ -31,6 +31,7 @@ import {
 } from "solid-js";
 
 import { useControllable } from "../controllable";
+import { renderErrorSupportingText } from "../error-supporting-text";
 import { useFieldsetDisabled } from "../form";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
@@ -160,15 +161,7 @@ function Input(props: CodeFieldInputProps): JSX.Element {
 /** Helper text under the cells. While Root has an `error`, it shows the error instead. */
 function SupportingText(props: CodeFieldPartProps): JSX.Element {
     const { scope, error } = context.use("SupportingText");
-    return scope.render("supportingText", {
-        element: "span",
-        unstyled: () => props.unstyled,
-        props: merge(omit(props, "unstyled"), {
-            get children() {
-                return error() ?? props.children;
-            },
-        }),
-    });
+    return renderErrorSupportingText(scope, error, props);
 }
 
 /** The ready-made code field's props: Root's, with `class`, `style`, and `slotProps` keyed by

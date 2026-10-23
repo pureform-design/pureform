@@ -198,8 +198,7 @@ export const colorTokenVariants = <G extends string>(
         groups.map((group): [G, { root: StyleMap }] => [
             group,
             {
-                root:
-                    group === DEFAULT_GROUP ? {} : { tokens: tokens(group) },
+                root: group === DEFAULT_GROUP ? {} : { tokens: tokens(group) },
             },
         ]),
     ) as Record<G, { root: StyleMap }>;

@@ -25,6 +25,7 @@ import type { PropTypes } from "@zag-js/react";
 import { type ElementType, type ReactNode, useId, useState } from "react";
 
 import { useControllable } from "../controllable";
+import { renderErrorSupportingText } from "../error-supporting-text";
 import { useFieldsetDisabled } from "../form";
 import { CloseIcon } from "../glyphs";
 import { useItemInteractionSources, useMachineButton } from "../interaction";
@@ -210,13 +211,9 @@ const LeadingIcon = icon("leadingIcon", "LeadingIcon");
 const TrailingIcon = icon("trailingIcon", "TrailingIcon");
 
 /** Helper text under the field. While Root has an `error`, it shows the error instead. */
-function SupportingText({ unstyled, ...props }: TagsInputPartProps): ReactNode {
+function SupportingText(props: TagsInputPartProps): ReactNode {
     const { scope, error } = context.use("SupportingText");
-    return scope.render("supportingText", {
-        element: "span",
-        unstyled,
-        props: { ...props, children: error ?? props.children },
-    });
+    return renderErrorSupportingText(scope, error, props);
 }
 
 /** An input chip for one value: the machine's tag, which the arrow keys and Backspace highlight

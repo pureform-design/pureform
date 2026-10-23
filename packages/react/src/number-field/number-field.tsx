@@ -24,6 +24,7 @@ import type { PropTypes } from "@zag-js/react";
 import { type ElementType, type ReactNode, useId } from "react";
 
 import { useControllable } from "../controllable";
+import { renderErrorSupportingText } from "../error-supporting-text";
 import { AddIcon, RemoveIcon } from "../glyphs";
 import { useMachineButton } from "../interaction";
 import type { MachineButtonProps } from "../interaction";
@@ -212,16 +213,9 @@ function IncrementTrigger(props: NumberFieldTriggerProps): ReactNode {
 }
 
 /** Helper text under the field. While Root has an `error`, it shows the error instead. */
-function SupportingText({
-    unstyled,
-    ...props
-}: NumberFieldPartProps): ReactNode {
+function SupportingText(props: NumberFieldPartProps): ReactNode {
     const { scope, error } = context.use("SupportingText");
-    return scope.render("supportingText", {
-        element: "span",
-        unstyled,
-        props: { ...props, children: error ?? props.children },
-    });
+    return renderErrorSupportingText(scope, error, props);
 }
 
 /** The ready-made number field's props: Root's, with `className`, `style`, and `slotProps` keyed
