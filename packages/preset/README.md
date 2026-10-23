@@ -525,6 +525,8 @@ themselves to Material's insets (4, 8 and 8) with negative margins, so no varian
 rendered. The remove button is its own indication surface. The chip has no `variant`: input chips
 are only outlined.
 
+`rating` is a row of star icons (`item` holds the empty `icon` and the `fill` or `halfFill` over it; `color`, `size`), pureform's own: M3 has none. The copy button has no recipe; it is the `iconButton`.
+
 `tagsInput` is the text field (filled or outlined, `leadingIcon`, `trailingIcon`, `color`,
 `density`) whose container is a wrapping row: an `inputChip` per value, then the input, which
 grows to fill the line. Mark the container filled (`data-pf-filled`) while it holds a chip so the
