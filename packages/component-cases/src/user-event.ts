@@ -8,8 +8,8 @@ export interface UserEvent {
     keyboard(text: string): Promise<unknown>;
     type(element: Element, text: string, options?: any): Promise<unknown>;
     selectOptions(
-        element: Element,
-        values: string | readonly string[],
+        element: HTMLElement,
+        values: string | string[],
         options?: any,
     ): Promise<unknown>;
 }
@@ -46,8 +46,8 @@ export const userEvent = {
         await user().type(element, text, options);
     },
     selectOptions: async (
-        element: Element,
-        values: string | readonly string[],
+        element: HTMLElement,
+        values: string | string[],
         options?: unknown,
     ): Promise<void> => {
         await user().selectOptions(element, values, options);

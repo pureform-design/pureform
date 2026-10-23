@@ -1,11 +1,33 @@
 import { createConfig } from "@pureform/vite-config/library";
+import type { Plugin } from "vite";
 
 import packageJson from "./package.json" with { type: "json" };
+
+// A `dist/<entry>.jsx` beside the `dist/<entry>/` declarations would win the declarations'
+// extensionless `../<entry>` imports in a consumer with `allowJs` (Storybook, the component
+// suites), which then type-checks the JSX. A `dist/<entry>.d.ts` beside each points back at them.
+const declarationsBesideEntries = (): Plugin => ({
+    name: "pureform:declarations-beside-entries",
+    generateBundle(_, bundle) {
+        for (const chunk of Object.values(bundle)) {
+            if (chunk.type !== "chunk" || !chunk.isEntry) continue;
+            const entry = chunk.fileName.replace(/\.jsx$/, "");
+            if (entry === "index" || entry.endsWith("/index")) continue;
+            const name = entry.slice(entry.lastIndexOf("/") + 1);
+            this.emitFile({
+                type: "asset",
+                fileName: `${entry}.d.ts`,
+                source: `export * from "./${name}/index";\n`,
+            });
+        }
+    },
+});
 
 export default createConfig({
     package: packageJson,
 
     overrides: {
+        plugins: [declarationsBesideEntries()],
         // JSX stays as written: an app's Solid plugin compiles it for the DOM or the server.
         oxc: false,
         build: {
