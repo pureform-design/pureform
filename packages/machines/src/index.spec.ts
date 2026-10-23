@@ -67,9 +67,9 @@ describe("@pureform/machines", () => {
         ).toBe("2026-08-17");
     });
 
-    it("re-exports Zag's number input and pin input, with the parts the preset's number and code fields draw", () => {
+    it("re-exports Zag's number input (a press ending wherever the pointer is released) and pin input, with the parts the preset's number and code fields draw", () => {
         expect(machines.numberInput.machine).toBe(zagNumberInput.machine);
-        expect(machines.numberInput.connect).toBe(zagNumberInput.connect);
+        expect(machines.numberInput.connect).not.toBe(zagNumberInput.connect);
         expect(machines.numberInput.anatomy.keys()).toEqual(
             expect.arrayContaining([
                 "container",
@@ -79,7 +79,10 @@ describe("@pureform/machines", () => {
                 "supportingText",
             ]),
         );
-        expect(machines.pinInput.machine).toBe(zagPinInput.machine);
+        expect(machines.pinInput.machine.context).toBe(
+            zagPinInput.machine.context,
+        );
+        expect(machines.pinInput.machine).not.toBe(zagPinInput.machine);
         expect(machines.pinInput.connect).toBe(zagPinInput.connect);
         expect(machines.pinInput.anatomy.keys()).toEqual([
             "root",

@@ -227,18 +227,15 @@ export const codeFieldEnter = (
     return { cells: next, focus: Math.min(at, next.length - 1) };
 };
 
-/** What Backspace in cell `index` does: clears it, or the one before it when it's already empty,
- *  and moves focus back there. */
+/** What Backspace in cell `index` does, as Zag's: removes its character, or the one before it
+ *  when it's already empty (the characters after move up a cell), and moves focus back a cell. */
 export const codeFieldBackspace = (
     cells: readonly string[],
     index: number,
 ): { readonly cells: string[]; readonly focus: number } => {
+    const at = cells[index] !== "" ? index : Math.max(0, index - 1);
     const next = [...cells];
-    if (next[index] !== "") {
-        next[index] = "";
-        return { cells: next, focus: Math.max(0, index - 1) };
-    }
-    const before = Math.max(0, index - 1);
-    next[before] = "";
-    return { cells: next, focus: before };
+    next.splice(at, 1);
+    next.push("");
+    return { cells: next, focus: Math.max(0, index - 1) };
 };

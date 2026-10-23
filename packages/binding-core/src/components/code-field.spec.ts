@@ -42,7 +42,11 @@ describe("code field", () => {
         expect(codeFieldString(cells)).toBe("1234");
     });
 
-    it("clears on Backspace, then moves back", () => {
+    it("removes on Backspace, moving the characters after up, then moves back", () => {
+        expect(codeFieldBackspace(["1", "2", "3", ""], 1)).toEqual({
+            cells: ["1", "3", "", ""],
+            focus: 0,
+        });
         const cells = ["1", "2", "", ""];
         expect(codeFieldBackspace(cells, 1)).toEqual({
             cells: ["1", "", "", ""],
