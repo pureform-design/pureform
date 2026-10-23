@@ -291,7 +291,7 @@ fullscreenDialogPositionerLayout(present); // hidden once gone; fixed over the v
 
 // Sheets: the dialog's Zag machine; bottomSheetOverlayAnatomy, sideSheetOverlayAnatomy
 type BottomSheetPart; type SideSheetPart  // the overlays' parts, and "backdrop"
-interface BottomSheetRootOwnProps        // modal, tokens, onClose, the dialog's behavior props (no role), testId, unstyled
+interface BottomSheetRootOwnProps        // modal, dragHandle (false pads the content), tokens, onClose, the dialog's behavior props (no role), testId, unstyled
 closeAsker();                            // asks an overlay's onClose for every way it closes; a later question makes an earlier answer moot
 askingDismissProps(onClose, props, asker, close); // Zag dialog props: Escape and a press outside ask onClose first
 interface SideSheetRootOwnProps          // modal, coplanar, tokens, onClose (OverlayCloseProps), and the same
@@ -308,6 +308,8 @@ dragToDismiss(handle, sheet, dismiss, onClose?, asker?, { partial?, opening?, on
 sheetPartiallyExpandable(props); sheetOpeningRest(props); // partly open unless `partiallyExpandable: false`; where it opens (`expanded` ?? `defaultExpanded`)
 SHEET_POSITIONAL_THRESHOLD; SHEET_VELOCITY_THRESHOLD; // Compose's 56px and 125dp/s (0.125px/ms); replace SHEET_DISMISS_SHARE and SHEET_FLICK_SPEED
 sheetRelease({ offset, velocity, height, partial? }); // where a let-go sheet goes: "expanded" | "partial" | "closed", by chooseAnchor (shared with React Native)
+sideSheetDragToDismiss(sheet, rtl, dismiss, onClose?, asker?, draggable?); // from /dom: a touch or pen drags a side sheet toward its edge (pan-y keeps vertical scroll native); closes it or settles it back; returns stop
+SIDE_SHEET_VELOCITY_THRESHOLD; sideSheetRelease({ offset, velocity, width }); // MDC-Android's SideSheetBehavior: 500px/s (0.5px/ms) or halfway out closes; "open" | "closed" (shared with React Native)
 sheetPartialOffset(height, screen); sheetDragHandleLabel(rest, movable); // partly open's offset (top at half the screen); the handle's default name
 settleTransition(element, property, distance, velocity); // from /dom: starts an element's spring transition at a release's speed (core's springFromCurve + sampleSpring's `velocity`)
 settleOnSpring(elements, property, spring, distance, velocity); // from /dom: the same on a given spring (the splitter's panes on SPLITTER_SETTLE)

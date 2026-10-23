@@ -293,7 +293,12 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
       back closes that first. A press on the scrim closes it, but not an `alertdialog`.
     - **Triggers say where they are** through the `interactionSource` they're given: the overlay
       measures the view the source last saw (`measureInWindow`), or opens at the press's point
-      when a trigger doesn't emit.
+      when a trigger doesn't emit. A surface's `onLayout` (in `PressableHandlers`) tells its
+      source where it is, so an overlay open from the start (`defaultOpen`) finds its trigger
+      once it's laid out.
+    - **Inline roots** (the badge, the time picker and time input) keep their own size, as the
+      web's `inline-flex` does: `alignSelf: "flex-start"` unless their style places them, and
+      `inline-flex` on React Native Web (`inFlowInline` in `styles.ts`).
 
     - **The full-screen dialog** is the same, in a `Modal` that fills the screen with no scrim:
       a header (a close icon button named by `closeLabel`, the headline, and the `confirmAction`,
@@ -326,6 +331,10 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
       until it settles. Closing it through a controlled `open` doesn't ask: by design (as in
       Radix and MUI), the app already decided. The drag moves a view around the surface that
       takes the surface's place in its parent (size, margins, position, layer).
+      A modal side sheet drags sideways toward its edge (MDC-Android's `SideSheetDialog`): let go
+      at least halfway out or on a flick it closes, asking `onClose` first, else it settles back;
+      a mostly vertical drag is its content's scroll. `dragHandle={false}` pads the bottom sheet's
+      content where the handle was.
       The side sheet's header takes a back button when given `onBack`, and an `actions` row
       under the content. With `modal={false}` (and, for the side sheet, `coplanar`) each is its
       surface, which the app places. The drag handle is a component of its own, a pressable
