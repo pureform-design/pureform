@@ -76,11 +76,9 @@ export default defineStories({
             stories: { Disabled: { parameters: { a11y: { test: "todo" } } } },
         },
         Carousel: {
-            // In the story tests axe finds focusable masks inside the items Zag hides
-            // (`aria-hidden-focus`), and the pinned copies' state play reads page 2 for 1: the
-            // items are sized from the row's width once mounted (the case's `measured`), which
-            // the Storybook canvas gives differently from the component suites' page.
-            parameters: { a11y: { test: "todo" } },
+            // The pinned copies' state play reads page 2 for 1: the items are sized from the
+            // row's width once mounted (the case's `measured`), which the Storybook canvas gives
+            // differently from the component suites' page.
             stories: {
                 Light: { tags: ["!test"] },
                 Dark: { tags: ["!test"] },
