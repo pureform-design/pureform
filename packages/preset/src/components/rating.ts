@@ -42,9 +42,9 @@ import type { NumericValue, StyleMap } from "@pureform/core/ast";
 import { radius, textStyle } from "@pureform/theme";
 
 import { INDICATION_TOKENS } from "../state-layer";
+import type { IndicationRef } from "../state-layer";
 import {
     DEFAULT_GROUP,
-    colorTokenVariants,
     componentTokens,
     defaultGroups,
     disabledColor,
@@ -53,7 +53,6 @@ import {
     groupTokens,
     iconBox,
     iconFill,
-    INDICATION_ROOT,
     keysOf,
     stateTransition,
     sys,
@@ -67,15 +66,27 @@ export const RATING_SIZES = {
     large: px(32),
 } satisfies Record<string, NumericValue>;
 
+const FOCUS_TOKENS = {
+    focusIndicatorThickness: INDICATION_TOKENS.focusIndicatorThickness,
+    focusIndicatorOuterOffset: INDICATION_TOKENS.focusIndicatorOuterOffset,
+    focusIndicatorColor: INDICATION_TOKENS.focusIndicatorColor,
+};
+
 const { tokens, ref } = componentTokens("rating", {
     iconSize: px(24),
     // The space around the icon in an item, which is also its touch size.
     itemPadding: px(4),
     gap: px(4),
     emptyColor: sys("onSurfaceVariant"),
-    ...groupTokens(DEFAULT_GROUP),
-    ...INDICATION_TOKENS,
+    // The stars draw only the group's main role, and no state layer: only the focus ring's
+    // indication tokens.
+    accent: groupTokens(DEFAULT_GROUP).accent,
+    ...FOCUS_TOKENS,
 });
+
+/** The focus ring's tokens, the only indication tokens a star draws. */
+const focusRef: IndicationRef = (token) =>
+    ref(token as keyof typeof FOCUS_TOKENS);
 
 const itemSide = add(
     ref("iconSize"),
@@ -134,7 +145,7 @@ export const createRating = <const G extends string = ColorGroup>(
             recipe: () => ({
                 base: {
                     root: {
-                        ...INDICATION_ROOT,
+                        tokens: FOCUS_TOKENS,
                         display: inlineFlex,
                         flexDirection: column,
                         gap: px(4),
@@ -148,7 +159,7 @@ export const createRating = <const G extends string = ColorGroup>(
                         gap: ref("gap"),
                     },
                     item: {
-                        ...focusRing(ref),
+                        ...focusRing(focusRef),
                         transition: stateTransition,
                         position: relative,
                         display: inlineFlex,
@@ -174,7 +185,21 @@ export const createRating = <const G extends string = ColorGroup>(
                     halfFill: filled(0.5),
                 },
                 variants: {
-                    color: colorTokenVariants(groups),
+                    // The default group's accent is the base's.
+                    color: Object.fromEntries(
+                        groups.map((group) => [
+                            group,
+                            group === DEFAULT_GROUP
+                                ? { root: {} }
+                                : {
+                                      root: {
+                                          tokens: {
+                                              accent: groupTokens(group).accent,
+                                          },
+                                      },
+                                  },
+                        ]),
+                    ),
                     size: Object.fromEntries(
                         entriesOf(RATING_SIZES).map(([name, icon]) => [
                             name,

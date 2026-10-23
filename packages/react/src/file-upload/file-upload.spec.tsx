@@ -106,7 +106,7 @@ describe("FileUpload, ready-made", () => {
         withRegistry(<FileUpload label="Files" error="Add a file" />);
         await settle();
         expect(byTestId(ids.root).className).toContain(
-            "file-upload--invalid-true",
+            "file-upload--error-true",
         );
         expect(byTestId(ids.supportingText).textContent).toBe("Add a file");
     });

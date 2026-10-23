@@ -180,7 +180,7 @@ export const fileUploadSelection = (
         Pick<FileUploadBehaviorProps, "invalid" | "error">,
 ): Selection<"fileUpload"> => ({
     color: props.color,
-    invalid: props.invalid || props.error !== undefined || undefined,
+    error: props.invalid || props.error !== undefined || undefined,
     tokens: props.tokens,
 });
 

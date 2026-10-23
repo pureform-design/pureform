@@ -23,8 +23,8 @@
 //   </div>
 //
 // The dropzone is outlined with a dashed line. While files are dragged over it (the `dragged`
-// state) it takes the color group's container and a solid outline; `invalid` outlines it in the
-// error color. The color group sets the drag-over color, as a button's sets its fill. It has no
+// state) it takes the color group's container and a solid outline; `error` outlines it in the
+// error color (a group not named `invalid`, which React Native would read as the state). The color group sets the drag-over color, as a button's sets its fill. It has no
 // state layer or focus ring of its own: the trigger, a `button`, shows those.
 
 import { typed } from "@pureform/core";
@@ -70,7 +70,6 @@ const { tokens, ref } = componentTokens("fileUpload", {
     container: sys("surface"),
     content: sys("onSurface"),
     supportingColor: sys("onSurfaceVariant"),
-    iconColor: sys("onSurfaceVariant"),
     iconSize: sizeToken("iconMedium"),
     outlineWidth: px(1),
     outlineColor: sys("outline"),
@@ -89,7 +88,7 @@ export const createFileUpload = <const G extends string = ColorGroup>(
             name: "fileUpload",
             $meta: {
                 description:
-                    "File upload: a label, a dropzone (an icon, a headline, supporting text and the trigger button) and a list of files, each a list item with an optional progress bar under it. Set invalid for the error outline; dragged files tint the dropzone with the color group. A rejected file's reason goes in the error slot.",
+                    "File upload: a label, a dropzone (an icon, a headline, supporting text and the trigger button) and a list of files, each a list item with an optional progress bar under it. Set error for the error outline; dragged files tint the dropzone with the color group. A rejected file's reason goes in the error slot.",
             },
             tokens,
             slots: [
@@ -111,7 +110,7 @@ export const createFileUpload = <const G extends string = ColorGroup>(
             },
             variants: {
                 color: groups as ColorGroups,
-                invalid: ["true", "false"],
+                error: ["true", "false"],
             },
             recipe: () => ({
                 base: {
@@ -184,7 +183,7 @@ export const createFileUpload = <const G extends string = ColorGroup>(
                                 : { root: { tokens: groupTokens(group) } },
                         ]),
                     ),
-                    invalid: {
+                    error: {
                         true: {
                             dropzone: { borderColor: ref("errorColor") },
                             supportingText: { color: ref("errorColor") },
@@ -192,7 +191,7 @@ export const createFileUpload = <const G extends string = ColorGroup>(
                         false: {},
                     },
                 },
-                defaultVariants: { color: DEFAULT_GROUP, invalid: "false" },
+                defaultVariants: { color: DEFAULT_GROUP, error: "false" },
             }),
         }),
     );

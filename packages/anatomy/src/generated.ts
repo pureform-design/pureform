@@ -1505,7 +1505,7 @@ export const fileUploadAnatomy = {
             "error",
             "info",
         ],
-        invalid: ["true", "false"],
+        error: ["true", "false"],
     },
 } as const satisfies ComponentAnatomy;
 

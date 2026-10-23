@@ -39,7 +39,7 @@ describe("file upload", () => {
     });
 
     it("draws the invalid outline in the error color, with no compound variants", () => {
-        const invalid = JSON.stringify(compiled()?.variants?.invalid?.true);
+        const invalid = JSON.stringify(compiled()?.variants?.error?.true);
         expect(invalid).toContain("components-fileUpload-errorColor");
         expect(fileUpload.recipe.compoundVariants ?? []).toHaveLength(0);
     });

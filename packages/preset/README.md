@@ -599,7 +599,7 @@ read as disabled). `codeField` (pureform's own) is a `label` over a `control` ro
 each holding a `listItem` (the preview as its leading part, the name and size, an `iconButton` to
 remove it) and optionally a `linearProgress`; a rejected file's reason goes in `error`. The drop
 zone is dashed; while files are dragged over it (`data-pf-dragging`) it takes the `color` group's
-container and a solid outline, and `invalid` outlines it in the error color. It isn't a button (a
+container and a solid outline, and `error` (the binding sets it for `invalid` or an `error` message) outlines it in the error color. It isn't a button (a
 button around the trigger would nest controls), so it shows no indication; the trigger does.
 
 ```html

@@ -156,14 +156,14 @@ describe("overlays", () => {
         expect(richTooltipSelection({})).toEqual({ tokens: undefined });
     });
 
-    it("map the popover's props onto Zag's: in place, bottom by default, body as the description", () => {
+    it("map the popover's props onto Zag's: in place, bottom-start by default, body as the description", () => {
         const props = popoverMachineProps({
             modal: true,
             ids: { title: "t", body: "b", caret: "c" },
         });
         expect(props.modal).toBe(true);
         expect(props.portalled).toBe(false);
-        expect(props.positioning).toEqual({ placement: "bottom" });
+        expect(props.positioning).toEqual({ placement: "bottom-start" });
         expect(props.ids).toMatchObject({
             title: "t",
             description: "b",

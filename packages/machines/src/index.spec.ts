@@ -107,8 +107,9 @@ describe("@pureform/machines", () => {
 
     // Only from its subpath: in the root it changes React Native's unit runs (its splitter's
     // drags stop reaching the responder); see c9d's context.
-    it("re-exports Zag's color picker from its subpath, with a valueSwatch part", () => {
-        expect(colorPicker.machine).toBe(zagColorPicker.machine);
+    it("re-exports Zag's color picker from its subpath, with the fieldset rule and a valueSwatch part", () => {
+        expect(colorPicker.machine.states).toBe(zagColorPicker.machine.states);
+        expect(colorPicker.machine).not.toBe(zagColorPicker.machine);
         expect(colorPicker.connect).toBe(zagColorPicker.connect);
         expect(colorPicker.parse).toBe(zagColorPicker.parse);
         expect(colorPicker.anatomy.keys()).toContain("valueSwatch");

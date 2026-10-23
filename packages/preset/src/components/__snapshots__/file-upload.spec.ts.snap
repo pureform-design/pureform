@@ -82,7 +82,7 @@ exports[`file upload > compiles to a stable Panda slot recipe 1`] = `
   "compoundVariants": [],
   "defaultVariants": {
     "color": "primary",
-    "invalid": false,
+    "error": false,
   },
   "jsx": [
     "FileUpload",
@@ -150,7 +150,7 @@ exports[`file upload > compiles to a stable Panda slot recipe 1`] = `
         },
       },
     },
-    "invalid": {
+    "error": {
       "false": {},
       "true": {
         "dropzone": {

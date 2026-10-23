@@ -946,7 +946,7 @@ export function Page() {
                 <For each={["idle", "dragged", "invalid"] as const}>
                     {(state) => {
                         const t = fileUpload({
-                            invalid: state === "invalid",
+                            error: state === "invalid",
                         });
                         return (
                             <div class={t.root} style={{ width: "300px" }}>

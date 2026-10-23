@@ -88,10 +88,6 @@ exports[`rating > compiles to a stable Panda slot recipe 1`] = `
       "--components-rating-focusIndicatorColor": "token(colors.secondary)",
       "--components-rating-focusIndicatorOuterOffset": "token(sizes.focusIndicatorOuterOffset)",
       "--components-rating-focusIndicatorThickness": "token(sizes.focusIndicatorThickness)",
-      "--components-rating-stateDraggedOpacity": "token(opacity.stateDragged)",
-      "--components-rating-stateFocusOpacity": "token(opacity.stateFocus)",
-      "--components-rating-stateHoverOpacity": "token(opacity.stateHover)",
-      "--components-rating-statePressedOpacity": "token(opacity.statePressed)",
       "display": "inline-flex",
       "flexDirection": "column",
       "gap": "4px",
@@ -120,17 +116,11 @@ exports[`rating > compiles to a stable Panda slot recipe 1`] = `
       "error": {
         "root": {
           "--components-rating-accent": "token(colors.error)",
-          "--components-rating-accentContainer": "token(colors.errorContainer)",
-          "--components-rating-onAccent": "token(colors.onError)",
-          "--components-rating-onAccentContainer": "token(colors.onErrorContainer)",
         },
       },
       "info": {
         "root": {
           "--components-rating-accent": "token(colors.info)",
-          "--components-rating-accentContainer": "token(colors.infoContainer)",
-          "--components-rating-onAccent": "token(colors.onInfo)",
-          "--components-rating-onAccentContainer": "token(colors.onInfoContainer)",
         },
       },
       "primary": {
@@ -139,33 +129,21 @@ exports[`rating > compiles to a stable Panda slot recipe 1`] = `
       "secondary": {
         "root": {
           "--components-rating-accent": "token(colors.secondary)",
-          "--components-rating-accentContainer": "token(colors.secondaryContainer)",
-          "--components-rating-onAccent": "token(colors.onSecondary)",
-          "--components-rating-onAccentContainer": "token(colors.onSecondaryContainer)",
         },
       },
       "success": {
         "root": {
           "--components-rating-accent": "token(colors.success)",
-          "--components-rating-accentContainer": "token(colors.successContainer)",
-          "--components-rating-onAccent": "token(colors.onSuccess)",
-          "--components-rating-onAccentContainer": "token(colors.onSuccessContainer)",
         },
       },
       "tertiary": {
         "root": {
           "--components-rating-accent": "token(colors.tertiary)",
-          "--components-rating-accentContainer": "token(colors.tertiaryContainer)",
-          "--components-rating-onAccent": "token(colors.onTertiary)",
-          "--components-rating-onAccentContainer": "token(colors.onTertiaryContainer)",
         },
       },
       "warning": {
         "root": {
           "--components-rating-accent": "token(colors.warning)",
-          "--components-rating-accentContainer": "token(colors.warningContainer)",
-          "--components-rating-onAccent": "token(colors.onWarning)",
-          "--components-rating-onAccentContainer": "token(colors.onWarningContainer)",
         },
       },
     },
