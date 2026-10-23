@@ -59,6 +59,8 @@ describe("FadeThrough", () => {
         expect(leaving.pointerEvents).toBe("none");
         expect(out!.getAttribute("aria-hidden")).toBe("true");
         expect(out!.inert).toBe(true);
+        // The root clips while it goes, so a taller old page doesn't spill.
+        expect(getComputedStyle(out!.parentElement!).overflow).toBe("clip");
 
         const exit = motions(out!);
         expect(exit.map((motion) => motion.name)).toEqual([
