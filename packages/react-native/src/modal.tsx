@@ -7,7 +7,7 @@ import { closeAsker } from "@pureform/binding-core";
 import type { ChangeDetails, CloseQuestion } from "@pureform/binding-core";
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
-import { Modal, Pressable, StyleSheet, View } from "react-native";
+import { Modal, Platform, Pressable, StyleSheet, View } from "react-native";
 import type { StyleProp, ViewStyle } from "react-native";
 
 import { useLayer } from "./layer";
@@ -95,6 +95,12 @@ export function ModalWindow(props: {
     );
 }
 
+/** What marks the view inside `ModalWindow` modal: `aria-modal` on a device. React Native Web's
+ *  `Modal` already draws its content as a `role="dialog"` with `aria-modal`, and `aria-modal` on
+ *  a view with no dialog role is an ARIA error there (axe's `aria-allowed-attr`). */
+export const modalViewProps = (): { readonly "aria-modal"?: true } =>
+    Platform.OS === "web" ? {} : { "aria-modal": true };
+
 /** What `ModalScrimLayer` takes. */
 export interface ModalScrimLayerProps {
     readonly open: boolean;
@@ -128,7 +134,7 @@ export function ModalScrimLayer(props: ModalScrimLayerProps): ReactNode {
             />
             <View
                 pointerEvents="box-none"
-                aria-modal
+                {...modalViewProps()}
                 style={[props.positionerStyle, { zIndex: layer }]}
             >
                 <engine.View

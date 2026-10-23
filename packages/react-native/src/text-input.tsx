@@ -27,7 +27,7 @@ import type {
     TextFieldPart,
     TextFieldVariantProps,
 } from "@pureform/binding-core";
-import { useState } from "react";
+import { useId, useState } from "react";
 import type { ReactNode, Ref } from "react";
 import { Platform, Pressable } from "react-native";
 import type { TextInputProps } from "react-native";
@@ -94,6 +94,11 @@ function FieldImpl(props: FieldOptions): ReactNode {
         "",
     );
     const [revealed, setRevealed] = useState(false);
+    // The label names the input (`aria-labelledby`), so on the web it's the input's label: a
+    // disabled input's label is exempt from the contrast rule, as a `<label>` is. A string label
+    // is its `aria-label` too, for iOS, which doesn't follow `aria-labelledby`.
+    const labelId = `pf-field-label${useId().replace(/:/g, "")}`;
+    const labelled = isPresent(props.label);
     const focused = ownFocus || (props.expanded ?? false);
     const counterText =
         props.counterMax === undefined
@@ -195,6 +200,7 @@ function FieldImpl(props: FieldOptions): ReactNode {
                     {...(typeof props.label === "string"
                         ? { "aria-label": props.label }
                         : {})}
+                    {...(labelled ? { "aria-labelledby": labelId } : {})}
                     aria-invalid={invalid}
                     {...(props.secure ? { secureTextEntry: !revealed } : {})}
                     multiline={props.name === "textArea"}
@@ -204,6 +210,7 @@ function FieldImpl(props: FieldOptions): ReactNode {
                 />
                 {affix("suffixText", props.suffixText)}
                 <v.label.Text
+                    {...(labelled ? { nativeID: labelId } : {})}
                     selectable={false}
                     pointerEvents="none"
                     style={s.label}

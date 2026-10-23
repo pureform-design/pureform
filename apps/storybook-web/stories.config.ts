@@ -94,13 +94,6 @@ export default defineStories({
                 },
             },
         },
-        TextField: {
-            // React Native Web: the disabled field's input is `disabled` now (not `readonly`)
-            // and passes, but its label is a plain text element, not the input's `<label>`, so
-            // axe holds its disabled color to the contrast ratio (React Native only; parameters
-            // can't vary by renderer).
-            stories: { Disabled: { parameters: { a11y: { test: "todo" } } } },
-        },
         Carousel: {
             // The pinned copies' state play reads page 2 for 1: the items are sized from the
             // row's width once mounted (the case's `measured`), which the Storybook canvas gives

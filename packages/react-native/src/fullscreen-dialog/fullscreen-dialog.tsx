@@ -20,7 +20,7 @@ import { ScrollView, StyleSheet, View } from "react-native";
 
 import { Button } from "../button/button";
 import { IconButton } from "../icon-button/icon-button";
-import { ModalWindow, useModalOverlay } from "../modal";
+import { ModalWindow, modalViewProps, useModalOverlay } from "../modal";
 import { testIdOf, withEngine } from "../parts";
 import { useOverlayPresence } from "../presence";
 import { useEngine } from "../provider";
@@ -184,7 +184,7 @@ function ModalFullscreenDialog(props: FullscreenDialogProps): ReactNode {
                 <Button label={trigger} onPress={show} />
             )}
             <ModalWindow visible={presence.present}>
-                <View aria-modal style={StyleSheet.absoluteFill}>
+                <View {...modalViewProps()} style={StyleSheet.absoluteFill}>
                     <engine.View
                         {...presence.props}
                         style={{

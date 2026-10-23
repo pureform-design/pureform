@@ -981,6 +981,10 @@ describe("the sheets", () => {
         expect(
             sheet("bottom-sheet")!.closest('[aria-modal="true"]'),
         ).not.toBeNull();
+        // Only a dialog says it's modal on the web (axe's aria-allowed-attr): React Native Web's
+        // Modal is that dialog.
+        for (const modal of document.querySelectorAll("[aria-modal]"))
+            expect(modal.getAttribute("role")).toBe("dialog");
 
         await press("Close sheet");
         await until(() => sheet("bottom-sheet") === null);
