@@ -65,6 +65,11 @@ export const CalendarIcon = (): JSX.Element => (
     <Glyph path={GLYPH_PATHS.calendar} />
 );
 
+/** An eye dropper: the color picker's button that picks a color from the screen. */
+export const ColorizeIcon = (): JSX.Element => (
+    <Glyph path={GLYPH_PATHS.colorize} />
+);
+
 /** A pencil: the modal date picker's mode toggle. */
 export const EditIcon = (): JSX.Element => <Glyph path={GLYPH_PATHS.edit} />;
 
