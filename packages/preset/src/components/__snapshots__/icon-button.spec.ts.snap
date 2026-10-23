@@ -70,6 +70,7 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
         "--components-iconButton-stateHoverOpacity": "token(opacity.stateHover)",
         "--components-iconButton-statePressedOpacity": "token(opacity.statePressed)",
         "alignItems": "center",
+        "alignSelf": "auto",
         "borderRadius": {
           "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "var(--components-iconButton-pressedRadius, token(radii.small))",
           "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": "calc(calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0))) + calc(calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) + calc(calc(var(--components-iconButton-radius, token(radii.full)) - var(--components-iconButton-squareRadius, token(radii.medium))) * var(--components-iconButton-square, 0))) - calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0)))) * var(--components-iconButton-toggles, 0)))",

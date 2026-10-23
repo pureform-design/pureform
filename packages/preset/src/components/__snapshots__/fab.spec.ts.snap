@@ -54,6 +54,7 @@ exports[`fab > compiles to a stable Panda slot recipe 1`] = `
       "--components-fab-stateHoverOpacity": "token(opacity.stateHover)",
       "--components-fab-statePressedOpacity": "token(opacity.statePressed)",
       "alignItems": "center",
+      "alignSelf": "auto",
       "borderWidth": "0px",
       "cursor": "pointer",
       "display": "inline-flex",

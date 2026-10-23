@@ -294,8 +294,6 @@ describe("badge", () => {
         const count = byTestId("count-root").getBoundingClientRect();
         expect(count.width).toBeLessThan(40);
         expect(count.height).toBe(16);
-        // Inline on the web, so a page's block doesn't stretch it either.
-        expect(byTestId("count-root").style.display).toBe("inline-flex");
         expect(byTestId("dot-root").getBoundingClientRect().width).toBe(6);
         expect(
             byTestId("corner-root").getBoundingClientRect().width,
@@ -1588,5 +1586,35 @@ describe("badge in flow", () => {
         const box = byTestId("count-root").getBoundingClientRect();
         expect(box.width).toBeLessThan(48);
         expect(box.height).toBe(16);
+    });
+});
+
+describe("inline roots in flow", () => {
+    it("keep their own width in a column, as the web's do", async () => {
+        await render(
+            <View style={{ width: 400 }}>
+                <Button label="Save" testId="button" />
+                <IconButton
+                    aria-label="Edit"
+                    icon={<Glyph glyph="✎" />}
+                    testId="icon"
+                />
+                <Fab icon={<Glyph glyph="+" />} label="Compose" testId="fab" />
+                <Chip label="Nearby" testId="chip" />
+                <Checkbox aria-label="Agree" testId="checkbox" />
+                <Switch aria-label="Wi-Fi" testId="switch" />
+            </View>,
+        );
+        for (const id of [
+            "button",
+            "icon",
+            "fab",
+            "chip",
+            "checkbox",
+            "switch",
+        ]) {
+            const box = byTestId(`${id}-root`).getBoundingClientRect();
+            expect(box.width, id).toBeLessThan(200);
+        }
     });
 });

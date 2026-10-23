@@ -177,7 +177,10 @@ export const chipShape = (
     paddingInlineEnd: ref("padding"),
     transition: spatialCornerTransition,
     borderRadius: cornerRadius(ref),
-    tokens: { radius: pillRadius(dense(ref("height"))) },
+    tokens: {
+        ...INDICATION_ROOT.tokens,
+        radius: pillRadius(dense(ref("height"))),
+    },
 });
 
 const pf = typed();
