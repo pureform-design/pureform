@@ -253,9 +253,7 @@ export function useMeasuredAnchor(
         if (!lost) return undefined;
         let current = true;
         const remeasure = () =>
-            anchor.measure(
-                (rect) => current && rect && setMeasured({ rect }),
-            );
+            anchor.measure((rect) => current && rect && setMeasured({ rect }));
         const stop = subscribeLocated(source, remeasure);
         // It may have been laid out since it was measured.
         remeasure();

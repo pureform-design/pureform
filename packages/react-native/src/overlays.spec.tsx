@@ -244,8 +244,7 @@ describe.each([animated, reanimated])("the menu with $name", (engine) => {
             return (
                 surface !== null &&
                 Math.abs(
-                    box(surface).top -
-                        box(byTestId("pf-button-root")).bottom,
+                    box(surface).top - box(byTestId("pf-button-root")).bottom,
                 ) < 16
             );
         });

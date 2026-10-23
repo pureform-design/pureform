@@ -171,13 +171,21 @@ function BadgeImpl(props: BadgeProps): ReactNode {
     const style = rootOf(selected);
     const Drawing = engine.Drawing;
     const hidden = props.label === undefined && props.size === "small";
+    // React Native has no inline flow: the web's `inline-flex` badge hugs its content, where a
+    // view would stretch across a column. In flow, it keeps its own size at the start.
+    const flow =
+        props.placement !== "anchored" && style.alignSelf === undefined;
     return (
         <View
             {...(props.label === undefined
                 ? {}
                 : { role: "img" as const, "aria-label": props.label })}
             aria-hidden={hidden ? true : undefined}
-            style={style as ViewStyle}
+            style={
+                (flow
+                    ? { ...style, alignSelf: "flex-start" }
+                    : style) as ViewStyle
+            }
             testID={testIdOf(badgeAnatomy, "root", props.testId)}
         >
             {Drawing ? <Drawing drawing={rootDrawing(selected)} /> : null}

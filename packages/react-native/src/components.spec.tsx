@@ -278,6 +278,29 @@ describe("every component", () => {
     });
 });
 
+describe("badge", () => {
+    it("keeps its own size in a column rather than stretching across it, and in an anchored corner", async () => {
+        await render(
+            <View style={{ width: 400 }}>
+                <Badge testId="count">3</Badge>
+                <Badge size="small" testId="dot" />
+                <View style={{ width: 24, height: 24 }}>
+                    <Badge placement="anchored" testId="corner">
+                        9
+                    </Badge>
+                </View>
+            </View>,
+        );
+        const count = byTestId("count-root").getBoundingClientRect();
+        expect(count.width).toBeLessThan(40);
+        expect(count.height).toBe(16);
+        expect(byTestId("dot-root").getBoundingClientRect().width).toBe(6);
+        expect(
+            byTestId("corner-root").getBoundingClientRect().width,
+        ).toBeLessThan(40);
+    });
+});
+
 describe("controlled and uncontrolled state", () => {
     it("checks an uncontrolled checkbox and reports it", async () => {
         const change = vi.fn();
