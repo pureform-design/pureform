@@ -56,6 +56,7 @@ export * from "./components/date-input";
 export * from "./components/slider";
 export * from "./components/split-button";
 export * from "./components/snackbar";
+export * from "./components/popover";
 export * from "./components/rich-tooltip";
 export * from "./components/toast";
 export * from "./components/toolbar";

@@ -250,6 +250,10 @@ export const COMPONENT_CONTRAST: Record<string, ContrastPair[]> = {
         pair(token("iconColor"), token("container"), UI_CONTRAST),
     ],
     tooltip: [pair(token("content"), token("container"), TEXT_CONTRAST)],
+    popover: [
+        pair(token("content"), token("container"), TEXT_CONTRAST),
+        pair(token("titleColor"), token("container"), TEXT_CONTRAST),
+    ],
     richTooltip: [
         pair(token("content"), token("container"), TEXT_CONTRAST),
         pair(token("subheadColor"), token("container"), TEXT_CONTRAST),

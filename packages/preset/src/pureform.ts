@@ -86,6 +86,7 @@ import { createNavigationBar } from "./components/navigation-bar";
 import { createNavigationRail } from "./components/navigation-rail";
 import { OVERLAY_KEYFRAMES } from "./components/overlay";
 import { createPaginator } from "./components/paginator";
+import { popover } from "./components/popover";
 import {
     PROGRESS_KEYFRAMES,
     createCircularProgress,
@@ -364,6 +365,7 @@ const defaultComponents = <G extends string>(
         toolbar,
         tooltip,
         richTooltip,
+        popover,
         paginator: createPaginator<Step>(densities),
         card,
         carousel,
