@@ -365,6 +365,7 @@ function Item(props: FileUploadItemProps): JSX.Element {
                                             api().getFileSize(props.file)
                                         )
                                     }
+                                    trailingControl
                                     trailing={
                                         <IconButton
                                             {...(api().getItemDeleteTriggerProps(
@@ -390,9 +391,6 @@ function Item(props: FileUploadItemProps): JSX.Element {
                                                 api().getItemSizeTextProps(
                                                     item(),
                                                 ),
-                                            // The trailing part is an icon's, hidden; here it
-                                            // holds a button.
-                                            trailing: { "aria-hidden": false },
                                         } as object
                                     }
                                 />

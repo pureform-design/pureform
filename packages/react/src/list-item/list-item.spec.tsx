@@ -53,6 +53,25 @@ describe("ListItem", () => {
         );
     });
 
+    it("hides a trailing icon from assistive technology, but not a trailing control", async () => {
+        withRegistry(<>
+                <ListItem headline="Icon" trailing="★" testId="icon" />
+                <ListItem
+                    headline="Control"
+                    trailing={<button type="button">Remove</button>}
+                    trailingControl
+                    testId="control"
+                />
+            </>);
+        await settle();
+        expect(byTestId("icon-trailing").getAttribute("aria-hidden")).toBe(
+            "true",
+        );
+        const control = byTestId("control-trailing");
+        expect(control.hasAttribute("aria-hidden")).toBe(false);
+        expect(control.hasAttribute("control")).toBe(false);
+    });
+
     it("is an interactive link with an href, current while selected", async () => {
         withRegistry(<ListItem headline="Inbox" href="#inbox" selected />);
         await settle();

@@ -570,7 +570,9 @@ mirrorIcon?, disabled?, content? }`; a tab without a label shows only its icon, 
   `aria-disabled`. The ready-made takes `headline`, `overline`, `supportingText`, `leading`,
   `trailing`, `trailingText`, `mirrorLeading`, `mirrorTrailing`, and sets `lines` from them (one,
   two with an overline or supporting text, three with both) unless given. `Leading` and `Trailing`
-  are `aria-hidden` (give `aria-hidden={false}` to one that says something). `leadingType` sizes
+  are `aria-hidden` (give `aria-hidden={false}` to one that says something), except a
+  trailing control: `trailingControl` (the `Trailing` part's `control`) leaves a button or a switch
+  there reachable. `leadingType` sizes
   the leading part for an icon, avatar, thumbnail, or video, and `position` places a segmented
   list's tile. `swipeAction` puts the item in a `frame` with its `action`
   (composed: `ListItem.Frame` around `ListItem.Root` and `ListItem.Action`): the action sits

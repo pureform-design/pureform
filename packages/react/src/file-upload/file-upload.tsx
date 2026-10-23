@@ -324,6 +324,7 @@ function Item({
                                 api.getFileSize(file)
                             )
                         }
+                        trailingControl
                         trailing={
                             <IconButton
                                 {...(api.getItemDeleteTriggerProps(
@@ -340,8 +341,6 @@ function Item({
                             {
                                 headline: api.getItemNameProps(item),
                                 supportingText: api.getItemSizeTextProps(item),
-                                // The trailing part is an icon's, hidden; here it holds a button.
-                                trailing: { "aria-hidden": false },
                             } as object
                         }
                     />

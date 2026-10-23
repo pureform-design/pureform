@@ -113,8 +113,12 @@ export interface ListItemContentProps<Node> {
     readonly supportingText?: Node;
     /** An icon, avatar, or image before the text. */
     readonly leading?: Node;
-    /** An icon or control after the text. */
+    /** An icon or control after the text. An icon is hidden from assistive technology; say
+     *  `trailingControl` for a control (a button, a switch). */
     readonly trailing?: Node;
+    /** `trailing` is a control (a button, a switch), which assistive technology reaches, rather
+     *  than an icon it skips. */
+    readonly trailingControl?: boolean | undefined;
     /** Text after the text, such as a count. */
     readonly trailingText?: Node;
     /** The action the row slides to uncover: a button. Makes the item swipeable: the action sits
@@ -135,6 +139,7 @@ export const LIST_ITEM_CONTENT_PROPS = [
     "supportingText",
     "leading",
     "trailing",
+    "trailingControl",
     "trailingText",
     "swipeAction",
     "mirrorLeading",
