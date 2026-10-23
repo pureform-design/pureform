@@ -28,8 +28,9 @@ import type {
     SideSheetRootOwnProps,
     Unstyled,
 } from "@pureform/binding-core";
+import { sideSheetDragToDismiss } from "@pureform/binding-core/dom";
 import type { JSX, ValidComponent } from "@solidjs/web";
-import { omit, Show } from "solid-js";
+import { omit, onSettled, Show } from "solid-js";
 
 import { Button } from "../button";
 import { dialogParts } from "../dialog-parts";
@@ -38,6 +39,7 @@ import { IconButton } from "../icon-button";
 import { createSlotProps } from "../parts";
 import type { SlotKeyedProps } from "../parts";
 import type { PartProps } from "../props";
+import { useDirection } from "../provider";
 
 type Anatomy = typeof sideSheetOverlayAnatomy;
 
@@ -98,8 +100,41 @@ const Backdrop: (props: SideSheetPartProps) => JSX.Element = chrome.Backdrop;
 const Positioner: (props: SideSheetPartProps) => JSX.Element =
     chrome.Positioner;
 
-/** The sheet's surface. It stays while its exit animation runs. */
-const Content: (props: SideSheetPartProps) => JSX.Element = chrome.Content;
+const { context } = chrome;
+const Surface: (props: SideSheetPartProps) => JSX.Element = chrome.Content;
+
+/** The sheet's surface. It stays while its exit animation runs. A touch or a pen dragging it
+ *  sideways toward its edge moves it, and it settles back or closes once let go (asking
+ *  `onClose` first), as MDC-Android's side sheet; a coplanar sheet doesn't drag. */
+function Content(props: SideSheetPartProps): JSX.Element {
+    const {
+        surface,
+        api,
+        asker,
+        onClose,
+        props: root,
+    } = context.use("Content");
+    const dir = useDirection();
+    onSettled(() => {
+        const element = surface();
+        if (!element) return;
+        return sideSheetDragToDismiss(
+            element,
+            () => dir() === "rtl",
+            (kept) => {
+                api().setOpen(false);
+                // Solid has rendered the close by now; a sheet still open was kept.
+                queueMicrotask(() => {
+                    if (api().open) kept();
+                });
+            },
+            () => onClose()?.() ?? true,
+            asker,
+            () => sideSheetSelection(root).coplanar !== true,
+        );
+    });
+    return <Surface {...props} />;
+}
 
 /** The row at the top: the back button, the headline, and the close trigger. */
 const Header: (props: SideSheetPartProps) => JSX.Element = chrome.part(

@@ -220,6 +220,7 @@ export {
     SHEET_VELOCITY_THRESHOLD,
 } from "./sheet-drag";
 export type { SheetDrag, SheetDragOptions } from "./sheet-drag";
+export { sideSheetDragToDismiss } from "./side-sheet-drag";
 export { focusableWhileOverflowing } from "./scroll-focus";
 export { settleOnSpring, settleTransition } from "./settle";
 export { markMenuGroupEdges } from "./menu-groups";
