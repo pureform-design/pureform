@@ -415,6 +415,18 @@ import { RichTooltip } from "@pureform/react/rich-tooltip";
   from `@pureform/react/side-sheet`.
 - **The drag handle** is a `<button>` holding the pill (`orientation="vertical"` for a pane
   divider); name it with `aria-label`. Import it from `@pureform/react/drag-handle`.
+- **The splitter** runs Zag's splitter: `Splitter.Root` takes the `panels` (`id`, `minSize`,
+  `maxSize`, in percent or `"240px"`), `size`/`defaultSize`/`onSizeChange` (percent, the default
+  read once; without either the panes share the room from the first render), `anchors`,
+  `keyboardResizeBy` and `orientation`; each `Panel` takes its `id`, and a `ResizeTrigger`
+  (`id` `"list:detail"`, `label`, default "Resize panes") sits between two, holding Material's
+  drag handle pill (Compose's `VerticalDragHandle`, which grows while pressed or dragged). A drag
+  or the arrow keys resize the panes (Shift moves 10%, Home and End to the limits). When a drag
+  lets go, the divider snaps to the nearest anchor, or the next one the way it was flung past
+  200px/s, as Compose's pane expansion: `SPLITTER_ANCHORS` (either edge, 240px from either edge,
+  half) by default, `anchors={[]}` to rest where it's let go. A pane's content scrolls natively.
+  The ready-made takes `panes` (each with its `content`) and `resizeLabel`. Import it from
+  `@pureform/react/splitter`.
 - **The search view** runs Zag's dialog (modal: focus stays in it and goes back to the search bar
   once it closes) and Zag's combobox (the query and its suggestions). Its `Trigger` wraps the
   search bar that opens it (a press, Enter, the down arrow, or typing, which carries the key into

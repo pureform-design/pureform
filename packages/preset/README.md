@@ -907,6 +907,34 @@ focus ring, no state layer.
 </div>
 ```
 
+## Splitter
+
+`splitter` is resizable panes on Zag's splitter, as Material 3's adaptive list-detail layouts
+(Compose's `VerticalDragHandle` with `ThreePaneScaffold`'s pane expansion). Its parts are Zag's:
+`root` (a flex row, or a column under `orientation: "vertical"`), each `panel` (its content scrolls
+natively when it overflows), and a `resizeTrigger` between each pair holding the
+`resizeTriggerIndicator` pill. The handle follows Compose's `DragHandleTokens`: a 24-wide container
+(`handleContainer`, at least a touch target long) with a 4 by 48 `outline` pill, fully rounded,
+which grows to 12 by 52 in `onSurface` with `medium` corners while the trigger is pressed
+(`:active` or `data-pf-active`, which the bindings set while it's dragged). The trigger draws the
+focus ring, no state layer. No compounds. The bindings snap a let-go drag to anchors; the preset
+only draws.
+
+```html
+<div class="{splitter.root}">
+    <div class="{splitter.panel}">List</div>
+    <div
+        class="{splitter.resizeTrigger}"
+        role="separator"
+        tabindex="0"
+        aria-label="Resize panes"
+    >
+        <div class="{splitter.resizeTriggerIndicator}"></div>
+    </div>
+    <div class="{splitter.panel}">Detail</div>
+</div>
+```
+
 ## Snackbar and tooltip
 
 Both sit on the inverse surface. Placing, showing, and dismissing them is the app's job; placed,

@@ -310,6 +310,18 @@ whenAnimationsEnd(element, done);        // from /dom: done once every animation
 interface DragHandleRootOwnProps         // orientation, tokens, testId, unstyled
 DRAG_HANDLE_ROOT_PROPS; dragHandleSelection(props);
 
+// Splitter: splitterAnatomy (Zag's splitter)
+interface SplitterRootOwnProps           // orientation, tokens, panels, size/defaultSize/onSizeChange, anchors, keyboardResizeBy, id, testId, unstyled
+SPLITTER_ROOT_PROPS; splitterSelection(props); splitterOrientation(props);
+splitterMachineProps(props);             // id, orientation, panels, keyboardResizeBy
+splitterSizeProps(sizes, panels);        // size, defaultSize (shared out when neither is given), onResize from onSizeChange
+SPLITTER_ANCHORS;                        // Compose's sample anchors: 0, 240 from the start, 50%, 240 from the end, 100%
+SPLITTER_FLING_VELOCITY;                 // 200px/s: faster snaps to the next anchor that way (Compose's)
+splitterSnap({ sizes, index, room, anchors, limits, velocity }); // the sizes once a let-go divider snaps
+splitterMoveBy(sizes, index, delta, limits); splitterLimits(panels, room); splitterPercent(size, room, fallback);
+splitterInitialSizes(panels, sizes, room); splitterTriggerId(before, after); splitterTriggerProps({ label, dragging });
+createDragVelocity();                    // a drag's speed (px/s) over its last 100ms
+
 // Snackbar: pureform's snackbar machine; the generated snackbarAnatomy
 interface SnackbarRootOwnProps           // layout, tokens, duration, onAction, id, ids, open, defaultOpen,
                                          // onOpenChange ({ open, reason }), testId, unstyled
