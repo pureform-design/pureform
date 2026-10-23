@@ -10,6 +10,7 @@ import { carouselCase } from "./cases/carousel";
 import { checkbox } from "./cases/checkbox";
 import { chip } from "./cases/chip";
 import { chipSet } from "./cases/chip-set";
+import { codeField } from "./cases/code-field";
 import { dateInput, datePicker, dockedDatePicker } from "./cases/date-pickers";
 import { dialog } from "./cases/dialog";
 import { dragHandle } from "./cases/drag-handle";
@@ -24,6 +25,7 @@ import { expandableListItem, list, listItem } from "./cases/list";
 import { loadingIndicator } from "./cases/loading-indicator";
 import { menu } from "./cases/menu";
 import { navigationBar, navigationRail } from "./cases/navigation";
+import { numberField } from "./cases/number-field";
 import { paginator } from "./cases/paginator";
 import { circularProgress, linearProgress } from "./cases/progress";
 import { radioGroup } from "./cases/radio-group";
@@ -125,6 +127,8 @@ export const COMPONENTS: readonly ComponentCase[] = [
     tabsCase,
     table,
     tagsInput,
+    numberField,
+    codeField,
     text,
     textArea,
     textField,

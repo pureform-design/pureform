@@ -63,6 +63,8 @@ import { Switch } from "@pureform/react/switch";
 import { Table } from "@pureform/react/table";
 import { Tabs } from "@pureform/react/tabs";
 import { TagsInput } from "@pureform/react/tags-input";
+import { NumberField } from "@pureform/react/number-field";
+import { CodeField } from "@pureform/react/code-field";
 import { Text } from "@pureform/react/text";
 import { TextArea } from "@pureform/react/text-area";
 import { TextField } from "@pureform/react/text-field";
@@ -218,6 +220,8 @@ export const components: Record<ComponentName, ComponentType<never>> = {
     Switch,
     Tabs,
     TagsInput,
+    NumberField,
+    CodeField,
     Text,
     TextArea,
     TextField,

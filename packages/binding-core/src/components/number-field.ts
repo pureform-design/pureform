@@ -69,7 +69,7 @@ export interface NumberFieldBehaviorProps extends Controllable<
     readonly locale?: string | undefined;
     /** How the value is formatted: `Intl.NumberFormat`'s options (a currency, a percent, the
      *  fraction digits). @default `{ maximumFractionDigits: 20 }`, grouped in the locale.
-     *  @control object */
+     *  @control none */
     readonly formatOptions?: Intl.NumberFormatOptions | undefined;
     readonly disabled?: boolean | undefined;
     /** Marks the field invalid (`aria-invalid`), which the error look keys on. Without it, a

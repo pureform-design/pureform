@@ -62,6 +62,8 @@ import { Switch } from "@pureform/solid/switch";
 import { Table } from "@pureform/solid/table";
 import { Tabs } from "@pureform/solid/tabs";
 import { TagsInput } from "@pureform/solid/tags-input";
+import { NumberField } from "@pureform/solid/number-field";
+import { CodeField } from "@pureform/solid/code-field";
 import { Text } from "@pureform/solid/text";
 import { TextArea } from "@pureform/solid/text-area";
 import { TextField } from "@pureform/solid/text-field";
@@ -208,6 +210,8 @@ export const components: Record<ComponentName, ValidComponent> = {
     Switch,
     Tabs,
     TagsInput,
+    NumberField,
+    CodeField,
     Text,
     TextArea,
     TextField,
