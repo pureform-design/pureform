@@ -2,7 +2,8 @@
 // chevron (Icon); Group (`<optgroup>`) and Option (`<option>`) inside it; and the ready-made
 // NativeSelect over them, which takes its options as data. It has no machine: the browser's
 // `<select>` takes the value, the form, the keyboard and the list. Root owns the value (controlled
-// or not), the form reset and the fieldset rule, and the interaction source the state layer reads.
+// or not, one value or with `multiple` several), the form reset and the fieldset rule, the interaction
+// source the state layer reads, and inside a Field, the field's id, states and descriptions.
 
 import { nativeSelectAnatomy } from "@pureform/anatomy";
 import {
@@ -12,11 +13,14 @@ import {
     nativeSelectGroups,
     nativeSelectProps,
     nativeSelectSelection,
+    nativeSelectValue,
+    sameNativeSelectValue,
 } from "@pureform/binding-core";
 import type {
     NativeSelectContentProps,
     NativeSelectItem,
     NativeSelectRootOwnProps,
+    NativeSelectValue,
 } from "@pureform/binding-core";
 import {
     type ChangeEvent,
@@ -29,6 +33,7 @@ import {
 } from "react";
 
 import { useControllable } from "../controllable";
+import { useField } from "../field/context";
 import { useFieldsetDisabled, useFormReset } from "../form";
 import { DropDownArrow } from "../glyphs";
 import {
@@ -54,8 +59,9 @@ interface NativeSelectContextValue {
 
 const context = createPartContext<NativeSelectContextValue>("NativeSelect");
 
-/** Root's props: the instance tokens, the value (`value`, `defaultValue`, `onValueChange`),
- *  `disabled`, `invalid`, `required`, `name`, `form`, `id` (the select's), `testId` and `unstyled`
+/** Root's props: the instance tokens, the value (`value`, `defaultValue`, `onValueChange`; an
+ *  array with `multiple`), `disabled`, `invalid`, `required`, `name`, `form`, `id` (the select's;
+ *  a Field around gives it, and the states and descriptions), `testId` and `unstyled`
  *  for every part, `as`, and the element's own props. */
 export interface NativeSelectRootProps
     extends
@@ -94,19 +100,32 @@ export interface NativeSelectOptionProps extends NativeSelectPartProps {
 const firstValue = (select: HTMLSelectElement) =>
     select.options.length > 0 ? select.options[0]!.value : "";
 
+/** The chosen options' values, in the options' order. */
+const chosenValues = (select: HTMLSelectElement) =>
+    [...select.selectedOptions].map((option) => option.value);
+
+/** React's spelling of a value: a mutable array for a `<select multiple>`. */
+const reactValue = (value: NativeSelectValue | undefined) =>
+    typeof value === "string" || value === undefined ? value : [...value];
+
 /** The select's root: a `<span>` around the `<select>` and the chevron. It draws the state layer. */
 function Root(props: NativeSelectRootProps): ReactNode {
     const id = useId();
-    const value = useControllable("NativeSelect", "value", props);
+    const field = useField();
+    const value = useControllable<"value", NativeSelectValue>(
+        "NativeSelect",
+        "value",
+        props,
+    );
     const [select, setSelect] = useState<HTMLSelectElement | null>(null);
     const fieldsetDisabled = useFieldsetDisabled(select);
     const source = useOwnInteractionSource(props.interactionSource);
     const handlers = useInteractionHandlers(
         source,
-        !!props.disabled || fieldsetDisabled,
+        !!(props.disabled ?? field?.state.disabled) || fieldsetDisabled,
     );
     const shown = useRef(value.value ?? value.defaultValue);
-    const report = (next: string) => {
+    const report = (next: NativeSelectValue) => {
         shown.current = next;
         value.machineProps.onValueChange?.({ value: next });
     };
@@ -118,9 +137,11 @@ function Root(props: NativeSelectRootProps): ReactNode {
             // The browser has put an uncontrolled select back; a controlled one keeps its value
             // until the owner takes the default we report.
             const next = value.controlled
-                ? (value.defaultValue ?? firstValue(select))
-                : select.value;
-            if (next !== shown.current) value.reset(() => report(next));
+                ? (value.defaultValue ??
+                  (props.multiple ? [] : firstValue(select)))
+                : nativeSelectValue(chosenValues(select), props.multiple);
+            if (!sameNativeSelectValue(next, shown.current))
+                value.reset(() => report(next));
         },
     });
     const scope = useComponent(nativeSelectAnatomy, {
@@ -132,13 +153,22 @@ function Root(props: NativeSelectRootProps): ReactNode {
     });
     const { as, ...rest } = omitProps(props, NATIVE_SELECT_ROOT_PROPS);
     const selectProps = combinePartProps([
-        nativeSelectProps({ ...props, id: props.id ?? id }, fieldsetDisabled),
+        nativeSelectProps(
+            { ...props, id: props.id ?? (field ? undefined : id) },
+            fieldsetDisabled,
+            field?.state,
+        ),
         value.controlled
-            ? { value: value.value }
-            : { defaultValue: value.defaultValue },
+            ? { value: reactValue(value.value) }
+            : { defaultValue: reactValue(value.defaultValue) },
         {
             onChange: (event: ChangeEvent<HTMLSelectElement>) =>
-                report(event.currentTarget.value),
+                report(
+                    nativeSelectValue(
+                        chosenValues(event.currentTarget),
+                        props.multiple,
+                    ),
+                ),
         },
         handlers,
     ]);

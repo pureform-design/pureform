@@ -25,7 +25,6 @@ import type { PropTypes } from "@zag-js/react";
 import { type ElementType, type ReactNode, useMemo, useState } from "react";
 
 import { useControllable } from "./controllable";
-
 import { useInteractionHandlers, useOwnInteractionSource } from "./interaction";
 import type { PartContext } from "./part-context";
 import { useComponent } from "./parts";

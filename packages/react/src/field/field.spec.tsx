@@ -2,9 +2,11 @@
 
 import { testIds } from "@pureform/anatomy";
 import type { ReactNode } from "react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import { userEvent } from "vitest/browser";
 
 import { Description, ErrorText, Field, Input, Label, Textarea } from ".";
+import { FieldContext, useField } from ".";
 import { PureformProvider } from "..";
 import { displayRegistry } from "../__fixtures__/registry";
 import { mount, settle } from "../testing/render";
@@ -59,7 +61,9 @@ describe("Field", () => {
                 <Textarea />
             </Field>,
         );
-        const textarea = byTestId<HTMLTextAreaElement>(testIds.plainTextarea.root);
+        const textarea = byTestId<HTMLTextAreaElement>(
+            testIds.plainTextarea.root,
+        );
         expect(textarea.tagName).toBe("TEXTAREA");
         expect(textarea.disabled).toBe(true);
         expect(textarea.labels?.length).toBe(1);
@@ -111,5 +115,107 @@ describe("Field", () => {
         expect(input.type).toBe("date");
         expect(input.getAttribute("aria-invalid")).toBe("true");
         expect(input.className).toBe("input");
+    });
+
+    it("is invalid while it holds an ErrorText, unless `invalid` says otherwise", async () => {
+        await withRegistry(
+            <>
+                <Field controlId="a">
+                    <Input />
+                    <ErrorText>Required</ErrorText>
+                </Field>
+                <Field controlId="b" invalid={false}>
+                    <Textarea />
+                    <ErrorText>Required</ErrorText>
+                </Field>
+            </>,
+        );
+        expect(document.getElementById("a")?.getAttribute("aria-invalid")).toBe(
+            "true",
+        );
+        expect(document.getElementById("b")?.hasAttribute("aria-invalid")).toBe(
+            false,
+        );
+    });
+
+    it("shares its state through FieldContext, for other controls", async () => {
+        let seen: string | undefined;
+        const Probe = () => {
+            seen = useField()?.state.ids.control;
+            return null;
+        };
+        await withRegistry(
+            <Field controlId="probe">
+                <Probe />
+            </Field>,
+        );
+        expect(seen).toBe("probe");
+        expect(FieldContext).toBeDefined();
+    });
+});
+
+describe("Input and Textarea, value", () => {
+    it("uncontrolled: keeps its own text and reports each change", async () => {
+        const onValueChange = vi.fn();
+        const onChange = vi.fn();
+        await withRegistry(
+            <Input
+                aria-label="Name"
+                defaultValue="Ada"
+                onValueChange={onValueChange}
+                onChange={onChange}
+            />,
+        );
+        const input = byTestId<HTMLInputElement>(testIds.input.root);
+        await userEvent.type(input, "!");
+        expect(input.value).toBe("Ada!");
+        expect(onValueChange).toHaveBeenCalledExactlyOnceWith({
+            value: "Ada!",
+        });
+        expect(onChange).toHaveBeenCalledTimes(1);
+    });
+
+    it("controlled: asks, and stays until the owner moves it", async () => {
+        const onValueChange = vi.fn();
+        await withRegistry(
+            <Textarea
+                aria-label="Bio"
+                value="Ada"
+                onValueChange={onValueChange}
+            />,
+        );
+        const textarea = byTestId<HTMLTextAreaElement>(
+            testIds.plainTextarea.root,
+        );
+        await userEvent.click(textarea);
+        await userEvent.keyboard("{End}!");
+        expect(onValueChange).toHaveBeenCalledExactlyOnceWith({
+            value: "Ada!",
+        });
+        await vi.waitFor(() => expect(textarea.value).toBe("Ada"));
+    });
+
+    it("a form reset puts it back, reported with reason reset", async () => {
+        const onValueChange = vi.fn();
+        await withRegistry(
+            <form data-testid="form">
+                <Input
+                    aria-label="Name"
+                    name="name"
+                    defaultValue="Ada"
+                    onValueChange={onValueChange}
+                />
+            </form>,
+        );
+        const input = byTestId<HTMLInputElement>(testIds.input.root);
+        await userEvent.type(input, "!");
+        byTestId<HTMLFormElement>("form").reset();
+        await vi.waitFor(() => expect(input.value).toBe("Ada"));
+        await vi.waitFor(() =>
+            expect(onValueChange).toHaveBeenLastCalledWith({
+                value: "Ada",
+                reason: "reset",
+            }),
+        );
     });
 });
