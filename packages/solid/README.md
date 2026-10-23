@@ -407,7 +407,11 @@ import { RichTooltip } from "@pureform/solid/rich-tooltip";
   given back to the trigger, a click outside closes it); `modal={false}` is a standard sheet that
   leaves the page usable, with no backdrop. A coplanar side sheet (`modal={false} coplanar`)
   stays in the page's layout. The bottom sheet's `DragHandle` closes it on a press, and on a drag
-  down past a quarter of its height or a flick. Root's `onClose` is asked before any close of its own:
+  down past a quarter of its height or a flick. With `partiallyExpandable`, a sheet taller than
+  half the screen opens partly (its top at half the screen, Compose's `PartiallyExpanded`), and a
+  drag or a press on the handle moves it between partly and fully open (`onExpandedChange` hears
+  it); a drag down from partly open closes it. A settle after a drag starts at the release's
+  speed. Without `aria-label`, the handle is named for what a press does. Root's `onClose` is asked before any close of its own:
   Escape, the scrim, a press on the handle, or a drag. `true` closes, `false` keeps it open (a
   dragged sheet settles back), and a promise keeps it open (a dragged sheet holding where it was
   let go) until it settles (resolved `true` leaves). Closing it through a controlled `open` (the app's own `setOpen(false)`) doesn't ask: by design, as in Radix and MUI, the app already decided. The side sheet's ready-made draws a back icon

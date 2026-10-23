@@ -300,6 +300,9 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
       bottom edge or the end edge. A press on the scrim, Escape, or back closes them; so does
       the bottom sheet's drag handle (`dragHandleLabel`, "Close sheet"), on a press or a drag
       down past a quarter of its height, and the side sheet's close icon button (`closeLabel`).
+      With `partiallyExpandable`, a bottom sheet taller than half the window opens partly, and
+      a drag or a press on the handle moves it between partly and fully open
+      (`onExpandedChange`); its content scrolls in its own `ScrollView` either way.
       A drag that closes it lets it leave from where it was let go; a close the app refuses
       (it keeps `open`) springs it back to rest. Given `onClose`, every close of its own asks it
       first (Escape, the back button, the scrim, a press on the handle, a dismissing drag), all
