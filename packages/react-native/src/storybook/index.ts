@@ -4,6 +4,7 @@
 
 import type { AnyRegistry } from "@pureform/binding-core";
 import { createElement } from "react";
+import { View } from "react-native";
 import type { ReactNode } from "react";
 
 import { PureformProvider } from "../provider";
@@ -40,7 +41,13 @@ const withProvider: Decorator = (story, context) =>
         story(),
     );
 
-export const decorators: readonly Decorator[] = [withProvider];
+/** A view around the story, as an app's root is: React Native lays out in flex columns, so
+ *  what keeps its own size there (a badge's `alignSelf`) would otherwise stretch across the
+ *  canvas's block element. */
+const withAppRoot: Decorator = (story) =>
+    createElement(View, { style: { flexGrow: 1 } }, story());
+
+export const decorators: readonly Decorator[] = [withAppRoot, withProvider];
 
 /** The stories' args as React Native's props: a press is `onPress`, where the web clicks. */
 export const args = ({
