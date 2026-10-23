@@ -19,9 +19,10 @@ import type {
 import * as pinInput from "@pureform/machines/pin-input";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";
-import { type ElementType, type ReactNode, useId } from "react";
+import { type ElementType, type ReactNode, useId, useState } from "react";
 
 import { useControllable } from "../controllable";
+import { useFieldsetDisabled } from "../form";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import { useComponent, useSlotProps } from "../parts";
@@ -71,10 +72,14 @@ function Root(props: CodeFieldRootProps): ReactNode {
         "value",
         props,
     );
+    const [hidden, setHidden] = useState<HTMLInputElement | null>(null);
+    // Zag's pin input doesn't follow a disabled fieldset.
+    const fieldsetDisabled = useFieldsetDisabled(hidden);
     const service = useMachine(pinInput.machine, {
         id: props.id ?? id,
         dir,
         ...codeFieldMachineProps(props),
+        disabled: props.disabled || fieldsetDisabled || undefined,
         ...value.machineProps,
     });
     const api = pinInput.connect(service, normalizeProps);
@@ -95,7 +100,10 @@ function Root(props: CodeFieldRootProps): ReactNode {
                     children: (
                         <>
                             {children}
-                            <input {...api.getHiddenInputProps()} />
+                            <input
+                                {...api.getHiddenInputProps()}
+                                ref={setHidden}
+                            />
                         </>
                     ),
                 },

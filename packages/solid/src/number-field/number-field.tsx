@@ -198,7 +198,7 @@ function Control(props: NumberFieldPartProps): JSX.Element {
 
 type Dict = Readonly<Record<string, unknown>>;
 
-/** The button that steps the value down; holding it repeats. Disabled at the minimum. */
+/** The button that steps the value down; holding it repeats. `aria-disabled` at the minimum. */
 function DecrementTrigger(props: NumberFieldTriggerProps): JSX.Element {
     const { scope, api } = context.use("DecrementTrigger");
     const machine = () => api().getDecrementTriggerProps() as Dict;
@@ -207,12 +207,12 @@ function DecrementTrigger(props: NumberFieldTriggerProps): JSX.Element {
         useMachineButton(
             props,
             () => [machine()],
-            () => !!machine()["disabled"],
+            () => machine()["aria-disabled"] === "true",
         ),
     );
 }
 
-/** The button that steps the value up; holding it repeats. Disabled at the maximum. */
+/** The button that steps the value up; holding it repeats. `aria-disabled` at the maximum. */
 function IncrementTrigger(props: NumberFieldTriggerProps): JSX.Element {
     const { scope, api } = context.use("IncrementTrigger");
     const machine = () => api().getIncrementTriggerProps() as Dict;
@@ -221,7 +221,7 @@ function IncrementTrigger(props: NumberFieldTriggerProps): JSX.Element {
         useMachineButton(
             props,
             () => [machine()],
-            () => !!machine()["disabled"],
+            () => machine()["aria-disabled"] === "true",
         ),
     );
 }

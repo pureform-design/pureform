@@ -76,7 +76,9 @@ describe("NumberField, ready-made", () => {
         expect(onValueChange).toHaveBeenLastCalledWith(
             expect.objectContaining({ value: "3", valueAsNumber: 3 }),
         );
-        expect(byTestId(ids.incrementTrigger)).toBeDisabled();
+        expect(
+            byTestId(ids.incrementTrigger).getAttribute("aria-disabled"),
+        ).toBe("true");
         input.focus();
         await userEvent.keyboard("{ArrowDown}{ArrowDown}");
         await expect.poll(() => input.value).toBe("1");

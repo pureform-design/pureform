@@ -22,6 +22,7 @@ import type { JSX, ValidComponent } from "@solidjs/web";
 import {
     type Accessor,
     createMemo,
+    createSignal,
     createUniqueId,
     For,
     merge,
@@ -30,6 +31,7 @@ import {
 } from "solid-js";
 
 import { useControllable } from "../controllable";
+import { useFieldsetDisabled } from "../form";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
@@ -79,10 +81,17 @@ function Root(props: CodeFieldRootProps): JSX.Element {
         "value",
         props,
     );
+    const [hidden, setHidden] = createSignal<HTMLInputElement | undefined>(
+        undefined,
+        { ownedWrite: true },
+    );
+    // Zag's pin input doesn't follow a disabled fieldset.
+    const fieldsetDisabled = useFieldsetDisabled(hidden);
     const service = useMachine(pinInput.machine, () => ({
         id: props.id ?? id,
         dir: dir(),
         ...codeFieldMachineProps(props),
+        disabled: props.disabled || fieldsetDisabled() || undefined,
         ...value.machineProps(),
     }));
     const api = createMemo(() => pinInput.connect(service, normalizeProps));
@@ -102,7 +111,10 @@ function Root(props: CodeFieldRootProps): JSX.Element {
                         return (
                             <>
                                 {props.children}
-                                <input {...api().getHiddenInputProps()} />
+                                <input
+                                    {...api().getHiddenInputProps()}
+                                    ref={setHidden}
+                                />
                             </>
                         );
                     },

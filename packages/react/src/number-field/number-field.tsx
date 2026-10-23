@@ -187,7 +187,7 @@ function Control({ unstyled, ...props }: NumberFieldPartProps): ReactNode {
     });
 }
 
-/** The button that steps the value down; holding it repeats. Disabled at the minimum. */
+/** The button that steps the value down; holding it repeats. `aria-disabled` at the minimum. */
 function DecrementTrigger(props: NumberFieldTriggerProps): ReactNode {
     const { scope, api } = context.use("DecrementTrigger");
     const machine = api.getDecrementTriggerProps() as Readonly<
@@ -195,11 +195,11 @@ function DecrementTrigger(props: NumberFieldTriggerProps): ReactNode {
     >;
     return scope.render(
         "decrementTrigger",
-        useMachineButton(props, [machine], !!machine["disabled"]),
+        useMachineButton(props, [machine], machine["aria-disabled"] === "true"),
     );
 }
 
-/** The button that steps the value up; holding it repeats. Disabled at the maximum. */
+/** The button that steps the value up; holding it repeats. `aria-disabled` at the maximum. */
 function IncrementTrigger(props: NumberFieldTriggerProps): ReactNode {
     const { scope, api } = context.use("IncrementTrigger");
     const machine = api.getIncrementTriggerProps() as Readonly<
@@ -207,7 +207,7 @@ function IncrementTrigger(props: NumberFieldTriggerProps): ReactNode {
     >;
     return scope.render(
         "incrementTrigger",
-        useMachineButton(props, [machine], !!machine["disabled"]),
+        useMachineButton(props, [machine], machine["aria-disabled"] === "true"),
     );
 }
 
