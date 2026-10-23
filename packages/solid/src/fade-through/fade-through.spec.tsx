@@ -97,6 +97,9 @@ describe("FadeThrough", () => {
         const show = pagesOf();
         await settle();
         show("mail");
+        // A page settles a frame on, once its new state's styles apply; a task alone can come
+        // before that frame (the flake this waited on under load).
+        await new Promise(requestAnimationFrame);
         await settle();
         expect(pages().map((page) => page.textContent)).toEqual(["mail"]);
     });
