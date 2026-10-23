@@ -47,6 +47,9 @@ export default defineStories({
     // Floating and modal overlays open into the canvas; this keeps room for them.
     overlayHeight: 480,
     components: {
+        // Both act on what's around them: a surface to press, and content to dim.
+        Ripple: { hooks: ["./src/stages/ripple.ts"] },
+        Scrim: { hooks: ["./src/stages/scrim.ts"] },
         TextField: {
             // React Native Web: the disabled field's input is `disabled` now (not `readonly`)
             // and passes, but its label is a plain text element, not the input's `<label>`, so
