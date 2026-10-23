@@ -259,7 +259,7 @@ RichTooltipRootOwnProps; RICH_TOOLTIP_ROOT_PROPS; RICH_TOOLTIP_CONTENT_PROPS; //
 richTooltipSelection(props); isInteractiveRichTooltip(props); richTooltipMachineProps(props);
 // Popover: Zag's popover, rendered in place; popoverOverlayAnatomy
 PopoverRootOwnProps; POPOVER_ROOT_PROPS; POPOVER_CONTENT_PROPS; // heading, body, actions, caret
-popoverSelection(props); popoverMachineProps(props);
+popoverSelection(props); popoverMachineProps(props); // placement "bottom-start" unless given
 
 // Dialog: Zag's dialog; dialogOverlayAnatomy, and dialogBackdropAnatomy (the scrim)
 type DialogPart                          // the overlay's parts, and "backdrop"
@@ -335,7 +335,7 @@ splitterMoveBy(sizes, index, delta, limits); splitterLimits(panels, room); split
 splitterInitialSizes(panels, sizes, room); splitterTriggerId(before, after); splitterTriggerProps({ label, dragging });
 
 // Color picker: colorPickerAnatomy (Zag's color picker, with valueSwatch)
-interface ColorPickerRootOwnProps        // tokens, value/defaultValue/onValueChange, onValueChangeEnd, disabled, readOnly, name, id, testId, unstyled
+interface ColorPickerRootOwnProps        // tokens, value/defaultValue/onValueChange, onValueChangeEnd, disabled, readOnly, name, form, id, testId, unstyled
 interface ColorPickerContentProps<Node>  // label, area, alpha, swatches, inputLabel, eyeDropper, eyeDropperLabel
 COLOR_PICKER_ROOT_PROPS; colorPickerSelection(props); COLOR_PICKER_DEFAULT; // "#6750a4", Material's baseline seed
 colorPickerHex(text);                    // "#rrggbb" (or "#rrggbbaa" when not opaque) from 3, 4, 6 or 8 hex digits, else undefined
@@ -490,7 +490,8 @@ type TagsInputPart; interface TagsInputRootOwnProps // variant, color, density, 
 // value (string[]), max, maxLength, delimiter, validate, removeLabel, error, …
 TAGS_INPUT_ROOT_PROPS; TAGS_INPUT_CONTENT_PROPS; tagsInputSelection(props);
 tagsInputMachineProps(props); tagsInputFilled(count, text); tagsInputChipTestId(testId);
-// Copy button: CopyButtonBehaviorProps, CopyButtonContentProps, COPY_BUTTON_OWN_PROPS, copyButtonMachineProps(props), COPY_LABEL, COPIED_LABEL.
+// Copy button: CopyButtonBehaviorProps (onCopy, onCopyError), CopyButtonContentProps, COPY_BUTTON_OWN_PROPS, copyButtonMachineProps(props), COPY_LABEL, COPIED_LABEL,
+// copyAnnouncement(props, copied) and COPY_ANNOUNCEMENT_STYLE (the visually hidden live region that announces the copy).
 // Rating: RatingRootOwnProps, RatingBehaviorProps, RATING_ROOT_PROPS, ratingSelection(props), ratingMachineProps(props), starFill(itemState).
 type InputChipPart; interface InputChipVariantProps; inputChipSelection(props);
 
