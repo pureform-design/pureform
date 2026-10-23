@@ -62,6 +62,7 @@ import { SupportingText } from "@pureform/react/supporting-text";
 import { Switch } from "@pureform/react/switch";
 import { Table } from "@pureform/react/table";
 import { Tabs } from "@pureform/react/tabs";
+import { FileUpload } from "@pureform/react/file-upload";
 import { TagsInput } from "@pureform/react/tags-input";
 import { Text } from "@pureform/react/text";
 import { TextArea } from "@pureform/react/text-area";
@@ -218,6 +219,7 @@ export const components: Record<ComponentName, ComponentType<never>> = {
     Switch,
     Tabs,
     TagsInput,
+    FileUpload,
     Text,
     TextArea,
     TextField,

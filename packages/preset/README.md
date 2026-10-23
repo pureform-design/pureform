@@ -547,6 +547,34 @@ label floats; the bindings do. Tags aren't edited in place.
 </div>
 ```
 
+## File upload
+
+`fileUpload` is pureform's own (Material has none), over Zag's `file-upload`: a label, a drop zone
+(`icon`, `headline`, `supportingText`, and the trigger, a `button`), and an `itemGroup` of `item`s,
+each holding a `listItem` (the preview as its leading part, the name and size, an `iconButton` to
+remove it) and optionally a `linearProgress`; a rejected file's reason goes in `error`. The drop
+zone is dashed; while files are dragged over it (`data-pf-dragging`) it takes the `color` group's
+container and a solid outline, and `invalid` outlines it in the error color. It isn't a button (a
+button around the trigger would nest controls), so it shows no indication; the trigger does.
+
+```html
+<div class="{fileUpload.root}">
+    <label class="{fileUpload.label}" for="files">Attachments</label>
+    <div class="{fileUpload.dropzone}">
+        <span class="{fileUpload.icon}">↑</span>
+        <span class="{fileUpload.headline}">Drop files here</span>
+        <span class="{fileUpload.supportingText}">PNG or PDF, up to 5 MB</span>
+        <button class="{button.root}">Choose files</button>
+    </div>
+    <ul class="{fileUpload.itemGroup}">
+        <li class="{fileUpload.item}">
+            <div class="{listItem.root}">…</div>
+            <div class="{linearProgress.root}">…</div>
+        </li>
+    </ul>
+</div>
+```
+
 ## Text field and text area
 
 The input needs a placeholder (a single space when none should show) so CSS can tell when it

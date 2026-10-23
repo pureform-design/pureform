@@ -61,6 +61,7 @@ import { SupportingText } from "@pureform/solid/supporting-text";
 import { Switch } from "@pureform/solid/switch";
 import { Table } from "@pureform/solid/table";
 import { Tabs } from "@pureform/solid/tabs";
+import { FileUpload } from "@pureform/solid/file-upload";
 import { TagsInput } from "@pureform/solid/tags-input";
 import { Text } from "@pureform/solid/text";
 import { TextArea } from "@pureform/solid/text-area";
@@ -208,6 +209,7 @@ export const components: Record<ComponentName, ValidComponent> = {
     Switch,
     Tabs,
     TagsInput,
+    FileUpload,
     Text,
     TextArea,
     TextField,

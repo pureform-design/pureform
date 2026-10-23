@@ -65,7 +65,8 @@ export interface FileUploadBehaviorProps {
     /** An error message: marks the drop zone invalid and replaces its supporting text. */
     readonly error?: string | undefined;
     /** What files it takes: a MIME type, a list of them, or Zag's map from a type to its
-     *  extensions (`{ "image/png": [".png"] }`). */
+     *  extensions (`{ "image/png": [".png"] }`).
+     *  @control text */
     readonly accept?: string | string[] | Record<string, string[]> | undefined;
     /** The most files it holds. @default 1 */
     readonly maxFiles?: number | undefined;

@@ -17,6 +17,7 @@ import { accordionCase, treeCase } from "./cases/expandable";
 import { fab } from "./cases/fab";
 import { fabMenu, fabMenuItems } from "./cases/fab-menu";
 import { fadeThrough } from "./cases/fade-through";
+import { fileUpload } from "./cases/file-upload";
 import { fullscreenDialog } from "./cases/fullscreen-dialog";
 import { gridList } from "./cases/grid-list";
 import { iconButton } from "./cases/icon-button";
@@ -125,6 +126,7 @@ export const COMPONENTS: readonly ComponentCase[] = [
     tabsCase,
     table,
     tagsInput,
+    fileUpload,
     text,
     textArea,
     textField,
