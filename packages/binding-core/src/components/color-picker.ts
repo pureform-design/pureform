@@ -53,7 +53,8 @@ export interface ColorPickerRootOwnProps extends ColorPickerVariantProps {
         | undefined;
     readonly disabled?: boolean | undefined;
     readonly readOnly?: boolean | undefined;
-    /** The form field's name; a hidden input holds the value. */
+    /** The form field's name; a hidden input holds the value.
+     *  @control none */
     readonly name?: string | undefined;
     /** Root's id, also the machine's.
      *  @control none */
