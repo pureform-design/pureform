@@ -400,7 +400,10 @@ import { RichTooltip } from "@pureform/react/rich-tooltip";
   their `CloseTrigger`s, through binding-core's `closeAsker`. `true` closes, `false` keeps it open, a
   promise keeps it open until it settles (a rejection keeps it open). Closing it through a controlled
   `open` doesn't ask, by design. A `BackButton` and the full-screen dialog's `ConfirmAction` don't close
-  by themselves, so they don't ask.
+  by themselves, so they don't ask. An app's own Cancel button asks `onClose` by being a
+  `CloseTrigger` (`<Dialog.CloseTrigger as={Button}>Cancel</Dialog.CloseTrigger>`); a button that
+  sets `open` itself closes without asking. Every overlay takes binding-core's one
+  `OverlayCloseProps`.
 - **The side sheet** sits against the end edge of the viewport (`coplanar` puts a standard sheet
   in the page's layout). Its `Header` holds a `BackButton`, the `Headline` and the
   `CloseTrigger`; `Body` and `Actions` follow. The ready-made takes `trigger`, `headline`,

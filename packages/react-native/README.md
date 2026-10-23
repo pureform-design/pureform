@@ -292,7 +292,9 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
       asked before Escape, the back button, the scrim (the dialog and the side sheet) or the close
       button closes them, and by the `close` their `actions` and `confirmAction` render, through
       binding-core's `closeAsker`. `true` closes, `false` keeps them open, and a promise keeps them
-      open until it settles. Closing through a controlled `open` doesn't ask.
+      open until it settles. Closing through a controlled `open` doesn't ask. Shown as a surface
+      alone (no trigger or `onOpenChange`), they still accept `onClose` but never call it:
+      nothing closes them by themselves there.
     - **The bottom and side sheets** open the same way, in a `Modal` over a scrim, against the
       bottom edge or the end edge. A press on the scrim, Escape, or back closes them; so does
       the bottom sheet's drag handle (`dragHandleLabel`, "Close sheet"), on a press or a drag

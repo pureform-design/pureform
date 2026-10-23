@@ -13,6 +13,7 @@ import type {
 import {
     askingDismissProps,
     closeAsker,
+    closeTriggerProps,
     dialogBackdropLayout,
     partAsRoot,
     presentProps,
@@ -254,12 +255,12 @@ export function dialogParts<
             return scope.render(name(key), {
                 element: "button",
                 as: () => props.as,
-                machine: () => {
-                    const close = api().getCloseTriggerProps();
-                    return onClose()
-                        ? { ...close, onClick: requestClose }
-                        : close;
-                },
+                machine: () =>
+                    closeTriggerProps(
+                        api().getCloseTriggerProps(),
+                        onClose(),
+                        requestClose,
+                    ),
                 unstyled: () => props.unstyled,
                 props: omit(props, "unstyled", "as"),
             });

@@ -16,6 +16,7 @@ import {
     BOTTOM_SHEET_ROOT_PROPS,
     bottomSheetPositionerLayout,
     bottomSheetSelection,
+    closeTriggerProps,
     isPresent,
     sheetContentLayout,
     sheetDragHandleLayout,
@@ -151,7 +152,7 @@ function DragHandle({
         ref,
         // A press asks `onClose` too, rather than closing through Zag at once.
         machine: mergeProps(
-            onClose() ? { ...close, onClick: requestClose } : close,
+            closeTriggerProps(close, onClose(), requestClose),
             normalizeProps.element(sheetDragHandleLayout),
         ),
         unstyled,
