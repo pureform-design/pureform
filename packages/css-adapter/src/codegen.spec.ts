@@ -559,6 +559,7 @@ describe("generate with the CSS target", () => {
                         "slider",
                         "navigationBar",
                         "navigationRail",
+                        "nativeSelect",
                     ].map(
                         (name) => `--pf-components-${name}-stateDraggedOpacity`,
                     ),

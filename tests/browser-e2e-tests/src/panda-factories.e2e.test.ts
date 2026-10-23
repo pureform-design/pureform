@@ -299,6 +299,7 @@ const UNREAD = [
         "slider",
         "navigationBar",
         "navigationRail",
+        "nativeSelect",
     ].map((name) => `--pf-components-${name}-stateDraggedOpacity`),
 ];
 
