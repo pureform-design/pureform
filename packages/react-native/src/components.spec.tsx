@@ -1338,6 +1338,10 @@ describe("c8c: splitter", () => {
         );
         const trigger = byTestId("pf-splitter-resize-trigger");
         await until(() => expect(width(panels()[0]!)).toBeCloseTo(300, 0));
+        // The splitter takes its room from `onLayout`, which can land a frame after the panes
+        // are laid out; a drag before it moves nothing.
+        for (let frame = 0; frame < 2; frame++)
+            await new Promise(requestAnimationFrame);
         await (
             await drag(trigger, [
                 [50, 0],
