@@ -15,7 +15,7 @@ import type {
 } from "@pureform/binding-core";
 import type { ReactNode } from "react";
 
-import { useExpandMotion } from "../expand";
+import { Expanding } from "../expand";
 import { iconParts, ownText } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
@@ -95,7 +95,7 @@ function Item(props: ItemProps): ReactNode {
                 {icon("indicator", "⌄")}
                 {indication.layer(selected)}
             </v.trigger.Pressable>
-            {props.expanded ? (
+            <Expanding open={props.expanded}>
                 <v.content.View style={s.content} testID={id("content")}>
                     {typeof item.content === "string" ? (
                         <v.content.Text style={ownText(s.content)}>
@@ -105,7 +105,7 @@ function Item(props: ItemProps): ReactNode {
                         item.content
                     )}
                 </v.content.View>
-            ) : null}
+            </Expanding>
         </v.item.View>
     );
 }
@@ -124,9 +124,7 @@ function AccordionImpl(props: AccordionProps): ReactNode {
         accordionSelection(props),
     );
     const collapsible = props.collapsible ?? true;
-    const expandMotion = useExpandMotion();
     const toggle = (item: string) => {
-        expandMotion();
         if (value.includes(item)) {
             if (collapsible || value.length > 1)
                 setValue(value.filter((open) => open !== item));

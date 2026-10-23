@@ -71,9 +71,12 @@ describe.each([animated, reanimated])("the stepper with $name", (engine) => {
             <Stepper orientation="vertical" items={ITEMS} defaultStep={1} />,
         );
         await settle();
-        expect(all("pf-stepper-content")[0]!.parentElement).toBe(
-            all("pf-stepper-item")[1],
-        );
+        // Inside the item, in the views that grow it open and shrink it shut.
+        expect(
+            all("pf-stepper-content")[0]!.closest(
+                '[data-testid="pf-stepper-item"]',
+            ),
+        ).toBe(all("pf-stepper-item")[1]);
         // A column's headers disclose their content.
         expect(byTestId("pf-stepper-list").getAttribute("role")).toBe("list");
         const headers = all("pf-stepper-trigger");

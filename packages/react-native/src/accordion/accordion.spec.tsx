@@ -69,6 +69,53 @@ describe("Accordion", () => {
     });
 });
 
+describe("Expanding parts", () => {
+    it("grows an accordion's content open and shrinks it shut, as the web's height transition", async () => {
+        await mount(
+            <PureformProvider registry={registry} engine={animated}>
+                <Accordion
+                    items={[
+                        {
+                            value: "a",
+                            title: "A",
+                            content: "A body\nwith\nseveral\nlines",
+                        },
+                    ]}
+                />
+            </PureformProvider>,
+        );
+        await settle();
+        const item = () => all("pf-accordion-item")[0]!;
+        const closed = item().getBoundingClientRect().height;
+        all("pf-accordion-trigger")[0]!.click();
+        await settle(16 * 4);
+        const content = all("pf-accordion-content")[0]!;
+        const full = content.getBoundingClientRect().height;
+        // Part way: the item has grown, but not by the whole content yet.
+        const midway = item().getBoundingClientRect().height - closed;
+        expect(midway).toBeGreaterThanOrEqual(0);
+        expect(midway).toBeLessThan(full);
+        await vi.waitFor(
+            () =>
+                expect(item().getBoundingClientRect().height).toBeCloseTo(
+                    closed + full,
+                    0,
+                ),
+            { timeout: 5000 },
+        );
+        // Shutting: the content stays until the spring has taken it away.
+        all("pf-accordion-trigger")[0]!.click();
+        await settle(16 * 4);
+        expect(all("pf-accordion-content")).toHaveLength(1);
+        expect(item().getBoundingClientRect().height).toBeGreaterThan(closed);
+        await vi.waitFor(
+            () => expect(all("pf-accordion-content")).toHaveLength(0),
+            { timeout: 5000 },
+        );
+        expect(item().getBoundingClientRect().height).toBeCloseTo(closed, 0);
+    });
+});
+
 describe("Tree", () => {
     it("expands a branch and selects a node from its row, indenting its children", async () => {
         const onExpandedValueChange = vi.fn();

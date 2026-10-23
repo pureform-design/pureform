@@ -23,7 +23,7 @@ import type {
 import type { Indication } from "@pureform/binding-core/indication";
 import type { ReactNode } from "react";
 
-import { useExpandMotion } from "../expand";
+import { Expanding } from "../expand";
 import { FadeThrough } from "../fade-through/fade-through";
 import { HorizontalSharedAxis } from "../horizontal-shared-axis/horizontal-shared-axis";
 import { IconSlot, iconSlot } from "../icon-style";
@@ -174,10 +174,12 @@ function StepImpl({
                     testID={id("separator")}
                 />
             ) : null}
-            {vertical && current && isPresent(item.content) ? (
-                <v.content.View style={s.content} testID={id("content")}>
-                    {item.content}
-                </v.content.View>
+            {vertical && isPresent(item.content) ? (
+                <Expanding open={current}>
+                    <v.content.View style={s.content} testID={id("content")}>
+                        {item.content}
+                    </v.content.View>
+                </Expanding>
             ) : null}
         </v.item.View>
     );
@@ -203,12 +205,6 @@ function StepperImpl(props: StepperProps): ReactNode {
         testIdOf(stepperAnatomy, part, props.testId);
     const vertical = props.orientation === "vertical";
     const content = props.items[step]?.content;
-    const expandMotion = useExpandMotion();
-    // A column's contents grow open and shrink shut as the step changes.
-    const go = (index: number) => {
-        if (vertical) expandMotion();
-        setStep(index);
-    };
     return (
         <v.root.View style={s.root} testID={id("root")}>
             <v.list.View
@@ -230,7 +226,7 @@ function StepperImpl(props: StepperProps): ReactNode {
                         linear={!!props.linear}
                         selection={selection}
                         indication={props.indication}
-                        onPress={go}
+                        onPress={setStep}
                         testId={props.testId}
                     />
                 ))}

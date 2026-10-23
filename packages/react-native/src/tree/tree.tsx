@@ -16,7 +16,7 @@ import type {
 } from "@pureform/binding-core";
 import type { ReactNode } from "react";
 
-import { useExpandMotion } from "../expand";
+import { Expanding } from "../expand";
 import { iconParts } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
@@ -102,7 +102,7 @@ function Row(props: {
     return (
         <v.branch.View style={s.branch} testID={id("branch")}>
             {row}
-            {expanded ? (
+            <Expanding open={expanded}>
                 <v.group.View style={s.group} role="group" testID={id("group")}>
                     {(node.children ?? []).map((child) => (
                         <Row
@@ -113,7 +113,7 @@ function Row(props: {
                         />
                     ))}
                 </v.group.View>
-            ) : null}
+            </Expanding>
         </v.branch.View>
     );
 }
@@ -139,13 +139,11 @@ function TreeImpl(props: TreeProps): ReactNode {
         "tree",
         treeSelection(props),
     );
-    const expandMotion = useExpandMotion();
     const tree: TreeState = {
         props,
         expanded,
         selected,
         toggle: (value) => {
-            expandMotion();
             setExpanded(
                 expanded.includes(value)
                     ? expanded.filter((open) => open !== value)

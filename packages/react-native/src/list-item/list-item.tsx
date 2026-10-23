@@ -32,7 +32,7 @@ import { createContext, use, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Linking, PanResponder } from "react-native";
 
-import { useExpandMotion } from "../expand";
+import { Expanding } from "../expand";
 import { iconParts } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
@@ -76,7 +76,6 @@ function ListItemImpl(props: ListItemProps): ReactNode {
         props.onExpandedChange,
         false,
     );
-    const expandMotion = useExpandMotion();
     const swipeable = isPresent(props.swipeAction);
     const link = !expandable && props.href !== undefined;
     const interactive = expandable || link || props.onPress !== undefined;
@@ -255,7 +254,6 @@ function ListItemImpl(props: ListItemProps): ReactNode {
         );
     const onPress = expandable
         ? () => {
-              expandMotion();
               setExpanded(!expanded);
               props.onPress?.();
           }
@@ -293,10 +291,12 @@ function ListItemImpl(props: ListItemProps): ReactNode {
     return (
         <>
             {framed(row)}
-            {expanded ? (
-                <v.region.View style={s.region} testID={id("region")}>
-                    {props.region}
-                </v.region.View>
+            {expandable ? (
+                <Expanding open={expanded}>
+                    <v.region.View style={s.region} testID={id("region")}>
+                        {props.region}
+                    </v.region.View>
+                </Expanding>
             ) : null}
         </>
     );
