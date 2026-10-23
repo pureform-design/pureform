@@ -58,6 +58,40 @@ export interface NativeSelectBehaviorProps extends Controllable<
     readonly id?: string | undefined;
 }
 
+/** The value props, typed by `multiple`: a string for one option, an array of strings for
+ *  several. Each binding's Root and ready-made component take these in place of
+ *  `NativeSelectBehaviorProps`' untyped union. */
+export type NativeSelectValueProps =
+    | {
+          readonly multiple?: false | undefined;
+          readonly value?: string | undefined;
+          readonly defaultValue?: string | undefined;
+          readonly onValueChange?:
+              | ((details: {
+                    readonly value: string;
+                    readonly reason?: "reset" | undefined;
+                }) => void)
+              | undefined;
+      }
+    | {
+          readonly multiple: true;
+          readonly value?: readonly string[] | undefined;
+          readonly defaultValue?: readonly string[] | undefined;
+          readonly onValueChange?:
+              | ((details: {
+                    readonly value: readonly string[];
+                    readonly reason?: "reset" | undefined;
+                }) => void)
+              | undefined;
+      };
+
+/** The keys `NativeSelectValueProps` types. */
+export type NativeSelectValueKeys =
+    | "multiple"
+    | "value"
+    | "defaultValue"
+    | "onValueChange";
+
 /** Everything Root takes for itself, besides the element's own props and `as`. */
 export interface NativeSelectRootOwnProps
     extends
@@ -143,7 +177,10 @@ export const nativeSelectProps = (
         | "form"
         | "id"
         | "multiple"
-    >,
+    > & {
+        /** Its own descriptions, which the field's join after. */
+        readonly "aria-describedby"?: string | undefined;
+    },
     fieldsetDisabled = false,
     field?: FieldState | undefined,
 ) => {

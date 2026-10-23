@@ -9,6 +9,7 @@ import {
     NATIVE_SELECT_ATTRIBUTE_PROPS,
     NATIVE_SELECT_CONTENT_PROPS,
     NATIVE_SELECT_ROOT_PROPS,
+    joinIdRefs,
     nativeSelectGroups,
     nativeSelectProps,
     nativeSelectSelection,
@@ -20,6 +21,8 @@ import type {
     NativeSelectContentProps,
     NativeSelectRootOwnProps,
     NativeSelectValue,
+    NativeSelectValueKeys,
+    NativeSelectValueProps,
 } from "@pureform/binding-core";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {
@@ -27,6 +30,7 @@ import {
     createSignal,
     createUniqueId,
     flush,
+    merge,
     For,
     omit,
     Show,
@@ -62,33 +66,9 @@ interface NativeSelectContextValue {
 
 const context = createPartContext<NativeSelectContextValue>("NativeSelect");
 
-/** The value props, typed by `multiple`: a string for one option, an array of strings for
- *  several. */
-export type NativeSelectValueProps =
-    | {
-          readonly multiple?: false | undefined;
-          readonly value?: string | undefined;
-          readonly defaultValue?: string | undefined;
-          readonly onValueChange?:
-              | ((details: {
-                    readonly value: string;
-                    readonly reason?: "reset" | undefined;
-                }) => void)
-              | undefined;
-      }
-    | {
-          readonly multiple: true;
-          readonly value?: readonly string[] | undefined;
-          readonly defaultValue?: readonly string[] | undefined;
-          readonly onValueChange?:
-              | ((details: {
-                    readonly value: readonly string[];
-                    readonly reason?: "reset" | undefined;
-                }) => void)
-              | undefined;
-      };
+export type { NativeSelectValueProps };
 
-type ValueKeys = "multiple" | "value" | "defaultValue" | "onValueChange";
+type ValueKeys = NativeSelectValueKeys;
 
 /** Root's props: the instance tokens, the value (`value`, `defaultValue`, `onValueChange`; arrays
  *  with `multiple`), `disabled`, `invalid`, `required`, `name`, `form`, `id` (the select's),
@@ -251,7 +231,15 @@ function Select(props: NativeSelectSelectProps): JSX.Element {
         machine: selectProps,
         ref: (element) => setSelect(element as HTMLSelectElement),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        // Its own descriptions join the Field's rather than replacing them.
+        props: merge(omit(props, "unstyled"), {
+            get "aria-describedby"() {
+                return joinIdRefs(
+                    props["aria-describedby"],
+                    selectProps()["aria-describedby"] as string | undefined,
+                );
+            },
+        }),
     });
 }
 

@@ -39,6 +39,12 @@ export type FormControl =
     | HTMLTextAreaElement
     | HTMLSelectElement;
 
+/** A form entry's value as the forms suite compares it: the text, or a file by its name and
+ *  type (two `File`s don't compare by content). */
+export type FormEntryValue =
+    | string
+    | { readonly file: string; readonly type: string };
+
 /** How the component takes part in a native form (design doc §9.5). */
 export interface FormCase {
     /** The native element the browser treats as the form control. */
@@ -51,7 +57,7 @@ export interface FormCase {
     /** Props under which it submits, and the entries it adds to the form's data. */
     readonly submits: {
         readonly props: SceneProps;
-        readonly entries: readonly (readonly [string, string])[];
+        readonly entries: readonly (readonly [string, FormEntryValue])[];
     };
     /** Props under which it's named but adds nothing (an unchecked checkbox). */
     readonly omits?: SceneProps | undefined;

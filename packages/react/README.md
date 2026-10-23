@@ -365,6 +365,10 @@ import { RichTooltip } from "@pureform/react/rich-tooltip";
   and then removes it, and each chip's remove button removes it. The input chip exists only inside
   it (drawn with the `inputChip` registry entry, styled by Root's `chip`); tags aren't edited in
   place. `value` is a `string[]`; the ready-made takes `chipAvatar` / `chipIcon` from a value.
+- **The number field** parses and formats in `locale`, else the browser's language
+  (`navigator.language`), else the platform's `Intl` locale, else `en-US`. **When server
+  rendering, pass `locale`**: the server's language can differ from the browser's, and the text it
+  rendered (`1,234.5` against `1.234,5`) would be re-formatted on hydration.
 - **Overlays render in place.** The menu, tooltip, and dialog have an unstyled `Root` element
   (test id `pf-<name>-root`) around their trigger and a `Positioner`, and draw the preset's surface
   as `Content` (`data-pf-part="content"`, `pf-<name>-content`; the registry's `root` slot styles

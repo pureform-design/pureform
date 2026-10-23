@@ -4,6 +4,7 @@ import {
     numberFieldCanStep,
     numberFieldClamp,
     numberFieldFormat,
+    numberFieldLocale,
     numberFieldMachineProps,
     numberFieldOutOfRange,
     numberFieldParse,
@@ -58,5 +59,13 @@ describe("number field", () => {
         expect(
             numberFieldMachineProps({ decrementLabel: "Fewer" }).translations,
         ).toEqual({ decrementLabel: "Fewer" });
+    });
+
+    it("takes `locale` over the environment's, so a server render matches the client's", () => {
+        expect(numberFieldLocale({ locale: "de-DE" })).toBe("de-DE");
+        expect(numberFieldMachineProps({ locale: "de-DE" }).locale).toBe(
+            "de-DE",
+        );
+        expect(numberFieldLocale()).toBeTruthy();
     });
 });

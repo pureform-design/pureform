@@ -31,6 +31,7 @@ import type {
     NativeSelectItem,
     NativeSelectPart,
     NativeSelectValue,
+    NativeSelectValueProps,
     NativeSelectVariantProps,
 } from "@pureform/binding-core";
 import { createElement, useRef, useState } from "react";
@@ -94,22 +95,13 @@ const nativeMenu = (): ComponentType<MenuViewProps> | null => {
 export const MISSING_MENU_MESSAGE =
     "pureform: NativeSelect uses the platform's menu through `@react-native-menu/menu`, which isn't installed, so it opens the Material menu instead. Install it (`npm i @react-native-menu/menu`) for the native list.";
 
-export interface NativeSelectProps
+interface NativeSelectBaseProps
     extends
         NativeSelectVariantProps,
         IndicationProps,
         Pick<
             NativeSelectBehaviorProps,
-            | "value"
-            | "defaultValue"
-            | "onValueChange"
-            | "disabled"
-            | "invalid"
-            | "required"
-            | "name"
-            | "form"
-            | "id"
-            | "multiple"
+            "disabled" | "invalid" | "required" | "name" | "form" | "id"
         > {
     /** The options. */
     readonly items?: readonly NativeSelectItem[] | undefined;
@@ -121,8 +113,15 @@ export interface NativeSelectProps
     readonly "aria-label"?: string | undefined;
     /** The id of what names it; inside a Field, its label. */
     readonly "aria-labelledby"?: string | undefined;
+    /** The ids of what describes it; inside a Field, the field's description and error join
+     *  after them. */
+    readonly "aria-describedby"?: string | undefined;
     readonly testId?: TestIdOverride<NativeSelectPart> | undefined;
 }
+
+/** The native select's props; the value props are typed by `multiple` (a string, or an array of
+ *  strings with `multiple`). */
+export type NativeSelectProps = NativeSelectBaseProps & NativeSelectValueProps;
 
 // A style's text keys, for the label inside the box (a `Text` doesn't inherit from its parent).
 const TEXT_KEYS = [

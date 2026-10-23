@@ -89,6 +89,8 @@ export interface FileUploadBehaviorProps {
     readonly validate?: ((file: File) => string[] | null) | undefined;
     /** The name the files submit under. @control none */
     readonly name?: string | undefined;
+    /** The id of the form the files belong to, for one outside it. @control none */
+    readonly form?: string | undefined;
     /** A remove button's accessible name, from its file. @default `Remove ${file.name}` */
     readonly removeLabel?: ((file: File) => string) | undefined;
     /** How far a file's upload has got, from 0 to 100, as the app reports it: a progress bar
@@ -134,6 +136,7 @@ export const FILE_UPLOAD_ROOT_PROPS = [
     "capture",
     "validate",
     "name",
+    "form",
     "removeLabel",
     "progress",
     "errorMessage",

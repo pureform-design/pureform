@@ -332,3 +332,15 @@ export const readSliderInsetIcon = (
         clearance,
     };
 };
+
+/** Puts `files` in a file input, as if chosen in its dialog (a form reset empties it). Does
+ *  nothing where the browser has no `DataTransfer`. */
+export const writeInputFiles = (
+    input: HTMLInputElement,
+    files: readonly File[],
+): void => {
+    if (typeof DataTransfer !== "function") return;
+    const transfer = new DataTransfer();
+    for (const file of files) transfer.items.add(file);
+    input.files = transfer.files;
+};

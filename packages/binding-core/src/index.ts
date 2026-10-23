@@ -893,6 +893,8 @@ export type {
     NativeSelectPart,
     NativeSelectRootOwnProps,
     NativeSelectValue,
+    NativeSelectValueKeys,
+    NativeSelectValueProps,
     NativeSelectVariantProps,
 } from "./components/native-select";
 export {
@@ -1335,6 +1337,7 @@ export {
     ERROR_TEXT_ROOT_PROPS,
     FIELD_ROOT_PROPS,
     fieldControlProps,
+    joinIdRefs,
     fieldIds,
     fieldLabelProps,
     fieldLabelState,

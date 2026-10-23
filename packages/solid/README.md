@@ -369,6 +369,10 @@ import { RichTooltip } from "@pureform/solid/rich-tooltip";
   (`pf-select-item-group-label`); options without one render as before. Composing, list the
   options in `selectGroupedItems(items)`' order (`selectItemGroups(items)` gives the runs) so the
   arrow keys follow the eye. One value only: no `multiple` yet.
+- **The number field** parses and formats in `locale`, else the browser's language
+  (`navigator.language`), else the platform's `Intl` locale, else `en-US`. **When server
+  rendering, pass `locale`**: the server's language can differ from the browser's, and the text it
+  rendered (`1,234.5` against `1.234,5`) would be re-formatted on hydration.
 - **Overlays render in place.** The menu, tooltip, and dialog have an unstyled `Root` element
   (test id `pf-<name>-root`) around their trigger and a `Positioner`, and draw the preset's surface
   as `Content` (`data-pf-part="content"`, `pf-<name>-content`; the registry's `root` slot styles

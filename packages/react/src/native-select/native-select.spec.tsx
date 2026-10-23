@@ -165,6 +165,34 @@ describe("NativeSelect, inside a Field", () => {
         );
     });
 
+    it("joins its own aria-describedby with the field's", async () => {
+        withRegistry(
+            <Field controlId="size">
+                <NativeSelect items={ITEMS} aria-describedby="hint" />
+                <Description>Pick one</Description>
+            </Field>,
+        );
+        await settle();
+        expect(
+            byTestId<HTMLSelectElement>(ids.select).getAttribute(
+                "aria-describedby",
+            ),
+        ).toBe("hint size-description");
+    });
+
+    it("types the value by multiple", () => {
+        const one = <NativeSelect items={ITEMS} defaultValue="s" />;
+        const several = (
+            <NativeSelect items={ITEMS} multiple defaultValue={["s"]} />
+        );
+        // @ts-expect-error an array needs `multiple`
+        const wrong = <NativeSelect items={ITEMS} defaultValue={["s"]} />;
+        const onMany = (details: { value: readonly string[] }) => details;
+        // @ts-expect-error one value reports a string, not an array
+        const wrongReport = <NativeSelect items={ITEMS} onValueChange={onMany} />;
+        expect([one, several, wrong, wrongReport]).toHaveLength(4);
+    });
+
     it("keeps its own props over the field's", async () => {
         withRegistry(
             <Field controlId="size" invalid disabled>

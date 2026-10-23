@@ -6,6 +6,7 @@ import {
     fieldLabelProps,
     fieldLabelState,
     fieldState,
+    joinIdRefs,
 } from "./field-primitives";
 
 const ids = fieldIds("name");
@@ -80,5 +81,12 @@ describe("the plain field", () => {
             for: "name",
             "aria-disabled": "true",
         });
+    });
+});
+
+describe("joinIdRefs", () => {
+    it("joins id lists in order, each id once, and gives undefined for none", () => {
+        expect(joinIdRefs("hint", undefined, "a b", "hint")).toBe("hint a b");
+        expect(joinIdRefs(undefined, "", false)).toBeUndefined();
     });
 });

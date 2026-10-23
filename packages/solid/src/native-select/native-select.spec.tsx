@@ -214,6 +214,24 @@ describe("NativeSelect, multiple", () => {
 });
 
 describe("NativeSelect, in a Field", () => {
+    it("joins its own aria-describedby with the field's", async () => {
+        withRegistry(() => (
+            <Field controlId="size">
+                <NativeSelect
+                    items={[{ value: "s", label: "Small" }]}
+                    aria-describedby="hint"
+                />
+                <Description>Pick one</Description>
+            </Field>
+        ));
+        await settle();
+        expect(
+            byTestId<HTMLSelectElement>(ids.select).getAttribute(
+                "aria-describedby",
+            ),
+        ).toBe("hint size-description");
+    });
+
     it("connects a NativeSelect inside it, its own props winning", async () => {
         withRegistry(() => (
             <>
