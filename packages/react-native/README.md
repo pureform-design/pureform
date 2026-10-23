@@ -299,10 +299,15 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
     - **The bottom and side sheets** open the same way, in a `Modal` over a scrim, against the
       bottom edge or the end edge. A press on the scrim, Escape, or back closes them; so does
       the bottom sheet's drag handle (`dragHandleLabel`, "Close sheet"), on a press or a drag
-      down past a quarter of its height, and the side sheet's close icon button (`closeLabel`).
-      With `partiallyExpandable`, a bottom sheet taller than half the window opens partly, and
-      a drag or a press on the handle moves it between partly and fully open
-      (`onExpandedChange`); its content scrolls in its own `ScrollView` either way.
+      down past Compose's thresholds (56px past where it rested, or a flick), and the side
+      sheet's close icon button (`closeLabel`). A bottom sheet taller than half the window
+      opens partly by default (`partiallyExpandable={false}` opens it fully, as Compose's
+      `skipPartiallyExpanded`), or fully as `defaultExpanded`, or a controlled `expanded`,
+      says; a drag or a press on the handle moves it between partly and fully open
+      (`onExpandedChange`, not called for moves `expanded` itself causes; one the app doesn't
+      follow settles back). A partly open sheet whose content or window changes size is placed
+      again (fully open if it's now too short). Only the handle drags: its content scrolls in
+      its own `ScrollView` either way.
       A drag that closes it lets it leave from where it was let go; a close the app refuses
       (it keeps `open`) springs it back to rest. Given `onClose`, every close of its own asks it
       first (Escape, the back button, the scrim, a press on the handle, a dismissing drag), all
@@ -321,7 +326,10 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
       `onSizeChange` (percent), `anchors`, `keyboardResizeBy`, `orientation` and `resizeLabel`.
       A drag on a divider (a `PanResponder`) resizes the two panes beside it, and when it lets
       go, the divider snaps to the nearest anchor, or the next one the way it was flung, as on
-      the web; the pill grows while it's held. Assistive technology adjusts a divider
+      the web, settling there on Compose's spring (`SPLITTER_SETTLE`) from the release's speed
+      (at once under reduced motion; `onSizeChange` reports the snapped sizes at once, and
+      adjustments don't animate); the pill grows while it's held. It's ready-made only (no
+      parts). Assistive technology adjusts a divider
       (increment, decrement), and on the web the arrow keys move it. It lays the panes out with
       `flexGrow`; a pane that scrolls is the app's own `ScrollView`.
     - **The toolbar** (`@pureform/react-native/toolbar`) takes its elements as `items`, as on

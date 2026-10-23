@@ -991,7 +991,8 @@ describe("the sheets", () => {
         const handle = document.querySelector<HTMLElement>(
             '[data-testid="pf-bottom-sheet-drag-handle"]',
         )!;
-        // A drag closes it past a quarter of its height, which it knows once laid out.
+        // A drag closes it past Compose's thresholds, from its height, which it knows once laid
+        // out.
         await laidOut(root);
         const start = box(root).top;
         const release = await dragDown(handle, [20, 100, 200, 300]);
@@ -1002,7 +1003,7 @@ describe("the sheets", () => {
         expect(box(root).top).toBe(start);
     });
 
-    it("rests a tall bottom sheet partly open, and moves it between partly and fully open", async () => {
+    it("rests a tall bottom sheet partly open by default, and moves it between partly and fully open", async () => {
         const expanded: boolean[] = [];
         const tall = window.innerHeight;
         await render(
@@ -1010,7 +1011,6 @@ describe("the sheets", () => {
                 <BottomSheet
                     modal={false}
                     open
-                    partiallyExpandable
                     onExpandedChange={(details) =>
                         expanded.push(details.expanded)
                     }
@@ -1026,15 +1026,138 @@ describe("the sheets", () => {
         await until(
             () => Math.abs(box(root).top - box(frame).top - partial) < 2,
         );
-        expect(expanded).toEqual([false]);
+        // Opening where it rests isn't a change of the user's.
+        expect(expanded).toEqual([]);
         await press("Expand sheet");
         await until(() => Math.abs(box(root).top - box(frame).top) < 1);
-        expect(expanded).toEqual([false, true]);
+        expect(expanded).toEqual([true]);
         await press("Collapse sheet");
         await until(
             () => Math.abs(box(root).top - box(frame).top - partial) < 2,
         );
-        expect(expanded).toEqual([false, true, false]);
+        expect(expanded).toEqual([true, false]);
+        // A short drag up, past Compose's 56px, goes on to fully open.
+        const handle = document.querySelector<HTMLElement>(
+            '[data-testid="pf-bottom-sheet-drag-handle"]',
+        )!;
+        await (
+            await drag(
+                handle,
+                [
+                    [0, -20],
+                    [0, -40],
+                    [0, -70],
+                ],
+                { x: 4, y: 4 },
+            )
+        )();
+        await until(() => Math.abs(box(root).top - box(frame).top) < 1);
+        expect(expanded).toEqual([true, false, true]);
+    });
+
+    it("opens a tall bottom sheet fully given partiallyExpandable={false} or defaultExpanded", async () => {
+        const tall = window.innerHeight;
+        for (const props of [
+            { partiallyExpandable: false },
+            { defaultExpanded: true },
+        ]) {
+            await render(
+                <View style={{ height: tall }}>
+                    <BottomSheet modal={false} open {...props}>
+                        <View style={{ height: tall }} />
+                    </BottomSheet>
+                </View>,
+            );
+            const root = sheet("bottom-sheet")!;
+            const frame = root.parentElement!.parentElement!;
+            await laidOut(root);
+            await settle(100);
+            expect(Math.abs(box(root).top - box(frame).top)).toBeLessThan(1);
+            expect(
+                document.querySelector(
+                    props.partiallyExpandable === false
+                        ? '[aria-label="Close sheet"]'
+                        : '[aria-label="Collapse sheet"]',
+                ),
+            ).not.toBeNull();
+        }
+    });
+
+    it("follows a controlled expanded, and settles back where it says when the app doesn't follow", async () => {
+        const expanded: boolean[] = [];
+        const tall = window.innerHeight;
+        const value = outside(true);
+        await render(
+            <value.Holder>
+                {(expandedProp) => (
+                    <View style={{ height: tall }}>
+                        <BottomSheet
+                            modal={false}
+                            open
+                            expanded={expandedProp}
+                            onExpandedChange={(details) =>
+                                expanded.push(details.expanded)
+                            }
+                        >
+                            <View style={{ height: tall }} />
+                        </BottomSheet>
+                    </View>
+                )}
+            </value.Holder>,
+        );
+        const root = sheet("bottom-sheet")!;
+        const frame = root.parentElement!.parentElement!;
+        await laidOut(root);
+        await settle(100);
+        expect(Math.abs(box(root).top - box(frame).top)).toBeLessThan(1);
+        const partial = box(root).height - tall / 2;
+        // The prop moves it, without calling back.
+        await value.set(false);
+        await until(
+            () => Math.abs(box(root).top - box(frame).top - partial) < 2,
+        );
+        expect(expanded).toEqual([]);
+        // A press asks; kept partly open, it settles back.
+        await press("Expand sheet");
+        expect(expanded).toEqual([true]);
+        await settle(600);
+        expect(Math.abs(box(root).top - box(frame).top - partial)).toBeLessThan(
+            2,
+        );
+    });
+
+    it("places a partly open bottom sheet again when its content changes size", async () => {
+        const tall = window.innerHeight;
+        const content = outside(tall);
+        await render(
+            <content.Holder>
+                {(height) => (
+                    <View style={{ height: tall }}>
+                        <BottomSheet modal={false} open>
+                            <View style={{ height }} />
+                        </BottomSheet>
+                    </View>
+                )}
+            </content.Holder>,
+        );
+        const root = sheet("bottom-sheet")!;
+        const frame = root.parentElement!.parentElement!;
+        await laidOut(root);
+        const offset = () => box(root).top - box(frame).top;
+        await until(
+            () => Math.abs(offset() - (box(root).height - tall / 2)) < 2,
+        );
+        await content.set(tall - 100);
+        await until(
+            () => Math.abs(offset() - (box(root).height - tall / 2)) < 2,
+        );
+        expect(box(root).height).toBeLessThan(tall);
+        // Too short to rest partly open: fully open, and the handle closes it.
+        await content.set(40);
+        await until(() => Math.abs(offset()) < 1);
+        expect(
+            document.querySelector('[aria-label="Close sheet"]'),
+        ).not.toBeNull();
     });
 
     it("holds a dragged bottom sheet until onClose answers, then springs back or leaves", async () => {

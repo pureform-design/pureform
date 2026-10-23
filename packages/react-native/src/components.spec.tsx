@@ -1319,6 +1319,46 @@ describe("c8c: splitter", () => {
         expect(changes.at(-1)![0]).toBeCloseTo(50, 1);
     });
 
+    it("settles the snap on a spring, reporting the snapped sizes once", async () => {
+        const changes: number[][] = [];
+        await mount(
+            <PureformProvider
+                registry={registry}
+                engine={animated}
+                motion="full"
+            >
+                <View style={{ width: 1024, height: 200 }}>
+                    <Splitter
+                        panes={panes}
+                        defaultSize={[30, 70]}
+                        onSizeChange={({ size }) => changes.push(size)}
+                    />
+                </View>
+            </PureformProvider>,
+        );
+        const trigger = byTestId("pf-splitter-resize-trigger");
+        await until(() => expect(width(panels()[0]!)).toBeCloseTo(300, 0));
+        await (
+            await drag(trigger, [
+                [50, 0],
+                [100, 0],
+                [150, 0],
+            ])
+        )();
+        const dragged = changes.length;
+        // Committed at once, while the panes are still on their way.
+        expect(changes.at(-1)![0]).toBeCloseTo(50, 1);
+        const seen: number[] = [];
+        for (let frame = 0; frame < 10; frame++) {
+            seen.push(width(panels()[0]!));
+            await new Promise(requestAnimationFrame);
+        }
+        expect(seen.some((at) => Math.abs(at - 500) > 0.5)).toBe(true);
+        await until(() => expect(width(panels()[0]!)).toBeCloseTo(500, 0));
+        expect(changes.length).toBe(dragged);
+        expect(width(panels()[0]!) + width(panels()[1]!)).toBeCloseTo(1000, 0);
+    });
+
     it("rests where it's let go without anchors, and stops at a pane's least size", async () => {
         await render(
             <View style={{ width: 1024, height: 200 }}>

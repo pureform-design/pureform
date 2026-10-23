@@ -2,14 +2,15 @@
 // trigger, `onOpenChange`, or `defaultOpen`, the whole modal sheet. Without them, or with
 // `modal={false}`, showing it is the app's, and given `open`, it enters and leaves in place. A
 // modal sheet opens in a `Modal` over a scrim, against the bottom edge: a press on the scrim, the
-// drag handle, Escape, or the back button closes it, and so does a drag down on the handle past a
-// quarter of the sheet's height. The sheet follows the drag down; a shorter drag lets it settle
-// back on the theme's default spatial spring, carrying the release's velocity (at once under
-// reduced motion), as Compose's sheets do. Given `partiallyExpandable`, a sheet taller than half
-// the window opens with its top at half the window, and a drag (or a press on the handle) moves it
-// between partly and fully open (`sheetRelease`); a drag down from partly open closes it. The
-// content scrolls in its own `ScrollView` either way. Given `onClose`, every way it closes by itself asks it
-// first (Escape, the back button, the scrim, a press on the handle, a drag); a dismissing drag
+// drag handle, Escape, or the back button closes it, and so does a drag down on the handle past
+// Compose's thresholds (`sheetRelease`: 56px past where it rested, or a flick). The sheet follows the drag down; a shorter
+// drag lets it settle back on the theme's default spatial spring, carrying the release's velocity
+// (at once under reduced motion), as Compose's sheets do. Unless `partiallyExpandable={false}`, a
+// sheet taller than half the window opens with its top at half the window (or fully, as
+// `expanded`/`defaultExpanded` say), and a drag (or a press on the handle) moves it between partly
+// and fully open; a drag down from partly open closes it. A partly open sheet whose content or
+// window changes size is placed again. The content scrolls in its own `ScrollView` either way.
+// Given `onClose`, every way it closes by itself asks it first (Escape, the back button, the scrim, a press on the handle, a drag); a dismissing drag
 // holds where it was let go until the answer, then leaves or settles back. Its `Modal` holds a
 // portal host of its own, so menus, tooltips, and selects opened inside draw over it.
 
@@ -20,7 +21,9 @@ import {
     closeAsker,
     sheetDragHandleLabel,
     sheetModal,
+    sheetOpeningRest,
     sheetPartialOffset,
+    sheetPartiallyExpandable,
     sheetRelease,
 } from "@pureform/binding-core";
 import type {
@@ -135,7 +138,7 @@ function BottomSheetImpl(
     const screen = useWindowDimensions();
     // How far down it rests partly open, or `undefined` when it can't (or is too short).
     const latestPartial = useStableCallback(() => {
-        if (props.partiallyExpandable !== true) return undefined;
+        if (!sheetPartiallyExpandable(props)) return undefined;
         const offset = sheetPartialOffset(height.current, screen.height);
         return offset > 0 ? offset : undefined;
     });
@@ -145,12 +148,18 @@ function BottomSheetImpl(
         readonly movable: boolean;
     }>({ rest: "expanded", movable: false });
     const restAt = useRef<SheetRest>("expanded");
-    const latestSetRest = useStableCallback((next: SheetRest) => {
-        if (next !== restAt.current)
-            props.onExpandedChange?.({ expanded: next === "expanded" });
-        restAt.current = next;
-        setRestState({ rest: next, movable: latestPartial() !== undefined });
-    });
+    // `report` is for moves of the user's (a drag, a press), not those the props cause.
+    const latestSetRest = useStableCallback(
+        (next: SheetRest, report = true) => {
+            if (report && next !== restAt.current)
+                props.onExpandedChange?.({ expanded: next === "expanded" });
+            restAt.current = next;
+            setRestState({
+                rest: next,
+                movable: latestPartial() !== undefined,
+            });
+        },
+    );
     const latestRestOffset = useStableCallback(() =>
         restAt.current === "partial" ? (latestPartial() ?? 0) : 0,
     );
@@ -170,11 +179,48 @@ function BottomSheetImpl(
     shown.current = (props.shown ?? props.open) !== false;
     // Each time it opens, it starts where it rests: partly open when it can, once it's laid out.
     const placing = useRef(false);
+    const dragging = useRef(false);
     const latestPlace = useStableCallback(() => {
         placing.current = false;
-        latestSetRest(latestPartial() === undefined ? "expanded" : "partial");
+        latestSetRest(
+            latestPartial() === undefined
+                ? "expanded"
+                : sheetOpeningRest(props),
+            false,
+        );
         drag.setValue(latestRestOffset());
     });
+    // Once open and placed, it rests where a controlled `expanded` says: when the prop changes,
+    // and after a move the app didn't follow.
+    useEffect(() => {
+        if (
+            props.expanded === undefined ||
+            !shown.current ||
+            placing.current ||
+            dragging.current ||
+            height.current <= 0 ||
+            latestPartial() === undefined
+        )
+            return;
+        const wanted: SheetRest = props.expanded ? "expanded" : "partial";
+        if (wanted === restAt.current) return;
+        stopSettle.current();
+        latestSetRest(wanted, false);
+        latestSettle(0);
+    });
+    // A sheet resting partly open whose content or window changes size is placed again: at the
+    // new partial offset, or fully open if it's now too short to rest partly.
+    const latestReplace = useStableCallback(() => {
+        if (!shown.current || placing.current || dragging.current) return;
+        stopSettle.current();
+        if (restAt.current === "partial" && latestPartial() === undefined)
+            latestSetRest("expanded", false);
+        else latestSetRest(restAt.current, false);
+        drag.setValue(latestRestOffset());
+    });
+    useEffect(() => {
+        if (height.current > 0) latestReplace();
+    }, [screen.height, latestReplace]);
     useEffect(() => {
         if (!shown.current) return;
         drag.setValue(0);
@@ -209,9 +255,9 @@ function BottomSheetImpl(
         },
         [ownAsker],
     );
-    // A drag down on the handle past a quarter of the sheet's height (below where it rests
-    // partly open, if it can) closes it, leaving from where the drag left it; otherwise it goes
-    // to the nearer place it rests, or the next one on a flick.
+    // Let go, the handle's drag goes where `sheetRelease` says: on to the next place its way
+    // once 56px past where it rested or on a flick, else back. Closing leaves from where the
+    // drag left it.
     const from = useRef(0);
     const pan = useMemo(
         () =>
@@ -222,11 +268,13 @@ function BottomSheetImpl(
                 onPanResponderGrant: () => {
                     asker.cancel();
                     stopSettle.current();
+                    dragging.current = true;
                     from.current = latestRestOffset();
                 },
                 onPanResponderMove: (_, gesture) =>
                     drag.setValue(Math.max(0, from.current + gesture.dy)),
                 onPanResponderRelease: (_, gesture) => {
+                    dragging.current = false;
                     const to = sheetRelease({
                         offset: Math.max(0, from.current + gesture.dy),
                         velocity: gesture.vy,
@@ -239,8 +287,10 @@ function BottomSheetImpl(
                         latestSettle(gesture.vy);
                     }
                 },
-                onPanResponderTerminate: (_, gesture) =>
-                    latestSettle(gesture.vy),
+                onPanResponderTerminate: (_, gesture) => {
+                    dragging.current = false;
+                    latestSettle(gesture.vy);
+                },
             }),
         [
             latestDismiss,
@@ -279,8 +329,10 @@ function BottomSheetImpl(
                     ? {}
                     : { "aria-label": props["aria-label"] })}
                 onLayout={(event: LayoutChangeEvent) => {
+                    const was = height.current;
                     height.current = event.nativeEvent.layout.height;
                     if (placing.current) latestPlace();
+                    else if (was > 0 && was !== height.current) latestReplace();
                     (
                         presence.props.onLayout as
                             | ((event: LayoutChangeEvent) => void)

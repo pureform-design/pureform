@@ -1,7 +1,8 @@
 // The splitter: panes side by side (or stacked) with Material's vertical drag handle between each
 // pair. A drag on a divider resizes the two panes beside it, and when it lets go, the divider
 // snaps to the nearest anchor (or the next one the way it was flung), as Compose's pane expansion
-// does. Assistive technology adjusts it (increment, decrement), and on the web the arrow keys do.
+// does, settling there on Compose's spring (`SPLITTER_SETTLE`) from the release's speed (at once
+// under reduced motion). Assistive technology adjusts it (increment, decrement), and on the web the arrow keys do.
 // A pane's content scrolls in its own `ScrollView` if the app gives it one; the splitter never
 // scrolls anything.
 
@@ -9,6 +10,7 @@ import { splitterAnatomy } from "@pureform/anatomy";
 import type { PartName, TestIdOverride } from "@pureform/anatomy";
 import {
     SPLITTER_ANCHORS,
+    SPLITTER_SETTLE,
     splitterInitialSizes,
     splitterLimits,
     splitterMoveBy,
@@ -24,13 +26,15 @@ import type {
     SplitterSizeDetails,
     SplitterVariantProps,
 } from "@pureform/binding-core";
-import { Fragment, useRef, useState } from "react";
+import { settle, slowSpring } from "@pureform/rn-adapter/animated";
+import { useReducedMotion } from "@pureform/rn-adapter/react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { PanResponder } from "react-native";
+import { Animated, PanResponder } from "react-native";
 import type { LayoutChangeEvent } from "react-native";
 
 import { testIdOf, unselectable, withEngine } from "../parts";
-import { useDirection } from "../provider";
+import { useDirection, usePureform } from "../provider";
 import { useComponentSlots } from "../styles";
 
 /** The splitter's parts: `"root" | "panel" | "resizeTrigger" | "resizeTriggerIndicator"`. */
@@ -64,7 +68,25 @@ interface TriggerProps {
     readonly horizontal: boolean;
     readonly rtl: boolean;
     readonly set: (next: number[]) => void;
+    /** Snaps the divider from `moved` to `snapped`, let go at `velocity` (px/ms toward the
+     *  end). */
+    readonly snap: (
+        moved: readonly number[],
+        snapped: number[],
+        velocity: number,
+    ) => void;
     readonly onLayout?: ((event: LayoutChangeEvent) => void) | undefined;
+    /** Stops a divider settling, for a new drag. */
+    readonly stop: () => void;
+}
+
+/** A divider settling after a snap: pane `index` grows by `value` (in percent) and the next by
+ *  what's left of their `pair`, until the sizes are no longer the `snapped` ones. */
+interface Settling {
+    readonly index: number;
+    readonly value: Animated.Value;
+    readonly pair: number;
+    readonly snapped: readonly number[];
 }
 
 /** The divider after pane `index`: it takes the drag, the adjustments and the keys. */
@@ -90,6 +112,7 @@ function ResizeTrigger(props: TriggerProps): ReactNode {
             onStartShouldSetPanResponder: () => true,
             onMoveShouldSetPanResponder: () => true,
             onPanResponderGrant: () => {
+                latest.current.stop();
                 start.current = latest.current.sizes;
                 setDragging(true);
             },
@@ -107,7 +130,12 @@ function ResizeTrigger(props: TriggerProps): ReactNode {
             },
             onPanResponderRelease: (_event, gesture) => {
                 setDragging(false);
-                const { room, set, limits, splitter: current } = latest.current;
+                const {
+                    room,
+                    snap,
+                    limits,
+                    splitter: current,
+                } = latest.current;
                 if (room <= 0) return;
                 const moved = splitterMoveBy(
                     start.current,
@@ -116,15 +144,18 @@ function ResizeTrigger(props: TriggerProps): ReactNode {
                     limits,
                 );
                 // `vx`/`vy` are in pixels per millisecond.
-                set(
+                const velocity = along(gesture.vx, gesture.vy);
+                snap(
+                    moved,
                     splitterSnap({
                         sizes: moved,
                         index,
                         room,
                         anchors: current.anchors ?? SPLITTER_ANCHORS,
                         limits,
-                        velocity: along(gesture.vx, gesture.vy) * 1000,
+                        velocity: velocity * 1000,
                     }),
+                    velocity,
                 );
             },
             onPanResponderTerminate: () => setDragging(false),
@@ -207,6 +238,75 @@ function SplitterImpl(props: SplitterProps): ReactNode {
         if (props.size === undefined) setOwn(next);
         props.onSizeChange?.({ size: next });
     };
+    const reducedMotion = useReducedMotion();
+    const { timeScale } = usePureform();
+    const [settling, setSettling] = useState<Settling>();
+    const stopSettle = useRef<() => void>(() => {});
+    useEffect(() => () => stopSettle.current(), []);
+    const stop = () => {
+        stopSettle.current();
+        setSettling(undefined);
+    };
+    // The sizes commit at once; the panes beside the divider follow on the spring.
+    const snap = (
+        moved: readonly number[],
+        snapped: number[],
+        velocity: number,
+    ) => {
+        stopSettle.current();
+        set(snapped);
+        const index = snapped.findIndex((size, at) => size !== moved[at]);
+        if (index < 0 || room <= 0) {
+            setSettling(undefined);
+            return;
+        }
+        const value = new Animated.Value(moved[index]!);
+        stopSettle.current = settle(
+            value,
+            (velocity / room) * 100,
+            reducedMotion
+                ? undefined
+                : slowSpring(
+                      {
+                          type: "spring",
+                          stiffness: SPLITTER_SETTLE.stiffness,
+                          // Animated takes a damping coefficient, not a ratio.
+                          damping:
+                              2 *
+                              SPLITTER_SETTLE.damping *
+                              Math.sqrt(
+                                  SPLITTER_SETTLE.stiffness *
+                                      SPLITTER_SETTLE.mass,
+                              ),
+                          mass: SPLITTER_SETTLE.mass,
+                      },
+                      timeScale,
+                  ),
+            snapped[index]!,
+        );
+        setSettling({
+            index,
+            value,
+            pair: moved[index]! + (moved[index + 1] ?? 0),
+            snapped,
+        });
+    };
+    // A settle lasts while the sizes are the snapped ones; a controlled `size` that didn't
+    // follow, an adjustment, or a new drag ends it.
+    const moving =
+        settling !== undefined &&
+        settling.snapped.length === sizes.length &&
+        settling.snapped.every((size, at) => size === sizes[at])
+            ? settling
+            : undefined;
+    const grow = (index: number): number | Animated.AnimatedNode =>
+        moving === undefined
+            ? (sizes[index] ?? 0)
+            : index === moving.index
+              ? moving.value
+              : index === moving.index + 1
+                ? Animated.subtract(moving.pair, moving.value)
+                : (sizes[index] ?? 0);
     const onLayout = (event: LayoutChangeEvent) => {
         const { width, height } = event.nativeEvent.layout;
         setLength(horizontal ? width : height);
@@ -221,17 +321,25 @@ function SplitterImpl(props: SplitterProps): ReactNode {
         <v.root.View style={s.root} onLayout={onLayout} testID={id("root")}>
             {props.panes.map((pane, index) => (
                 <Fragment key={pane.id}>
-                    <v.panel.View
+                    <Animated.View
                         style={{
-                            ...s.panel,
-                            flexGrow: sizes[index] ?? 0,
+                            flexGrow: grow(index),
                             flexShrink: 1,
                             flexBasis: 0,
                         }}
-                        testID={id("panel")}
                     >
-                        {pane.content}
-                    </v.panel.View>
+                        <v.panel.View
+                            style={{
+                                ...s.panel,
+                                flexGrow: 1,
+                                flexShrink: 1,
+                                flexBasis: 0,
+                            }}
+                            testID={id("panel")}
+                        >
+                            {pane.content}
+                        </v.panel.View>
+                    </Animated.View>
                     {index < props.panes.length - 1 ? (
                         <ResizeTrigger
                             splitter={props}
@@ -241,6 +349,8 @@ function SplitterImpl(props: SplitterProps): ReactNode {
                             horizontal={horizontal}
                             rtl={rtl}
                             set={set}
+                            snap={snap}
+                            stop={stop}
                             onLayout={index === 0 ? onTriggerLayout : undefined}
                         />
                     ) : null}
