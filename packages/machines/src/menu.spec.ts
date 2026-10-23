@@ -145,3 +145,21 @@ describe("menu", () => {
         expect(seen).toContain(`${triggerItem.id}:press`);
     });
 });
+
+describe("isContextMenuKey", () => {
+    it("is the context menu key, or Shift+F10 alone", () => {
+        expect(menu.isContextMenuKey({ key: "ContextMenu" })).toBe(true);
+        expect(menu.isContextMenuKey({ key: "F10", shiftKey: true })).toBe(
+            true,
+        );
+        expect(menu.isContextMenuKey({ key: "F10" })).toBe(false);
+        expect(
+            menu.isContextMenuKey({
+                key: "F10",
+                shiftKey: true,
+                ctrlKey: true,
+            }),
+        ).toBe(false);
+        expect(menu.isContextMenuKey({ key: "Enter" })).toBe(false);
+    });
+});

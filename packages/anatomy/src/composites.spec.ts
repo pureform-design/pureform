@@ -147,6 +147,16 @@ describe("composites", () => {
         },
     );
 
+    it("the menu's context trigger is an unstyled part of the root, named as Zag names it", () => {
+        const part = menuOverlayAnatomy.parts.contextTrigger;
+        expect(part.styled).toBe(false);
+        expect(part.parent).toBe("root");
+        expect(part.attribute).toBe("context-trigger");
+        expect(menuOverlayAnatomy.parts.root.children).toContain(
+            "contextTrigger",
+        );
+    });
+
     it("the autocomplete's menu is the select's under the autocomplete's scope and test ids", () => {
         expect(autocompleteMenuAnatomy.partNames).toEqual(
             selectMenuAnatomy.partNames,

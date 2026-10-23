@@ -6,7 +6,9 @@
 // given, override the surface's own marking (`markMenuGroupEdges`). A submenu is another
 // menu: its trigger item (`getTriggerItemProps`) emits to the parent's source under the child's
 // trigger id, the value the parent highlights it by. A key a submenu's content handles stops
-// there (Zag's), so it presses nothing in the parent's around it.
+// there (Zag's), so it presses nothing in the parent's around it. The context trigger
+// (`getContextTriggerProps`) opens the menu at the pointer, from a right-click or a touch held
+// down; the context menu key and Shift+F10, pressed in it, open it beside the focused element.
 
 import type {
     Machine as AnyMachine,
@@ -48,6 +50,21 @@ export interface ItemGroupProps extends ZagItemGroupProps {
     readonly first?: boolean | undefined;
     readonly last?: boolean | undefined;
 }
+
+/** Whether a key press asks for the context menu: the context menu key, or Shift+F10. */
+export const isContextMenuKey = (event: {
+    readonly key: string;
+    readonly shiftKey?: boolean | undefined;
+    readonly ctrlKey?: boolean | undefined;
+    readonly altKey?: boolean | undefined;
+    readonly metaKey?: boolean | undefined;
+}): boolean =>
+    event.key === "ContextMenu" ||
+    (event.key === "F10" &&
+        !!event.shiftKey &&
+        !event.ctrlKey &&
+        !event.altKey &&
+        !event.metaKey);
 
 /** Zag's menu API, its groups' edges overridable. */
 export interface Api<T extends PropTypes = PropTypes> extends Omit<
@@ -113,6 +130,29 @@ export function connect<T extends PropTypes>(
             ...edgeProps("first", first),
             ...edgeProps("last", last),
         }),
+        getContextTriggerProps: (props) => {
+            const trigger = api.getContextTriggerProps(props) as Record<
+                string,
+                unknown
+            >;
+            return {
+                ...trigger,
+                onKeyDown(event: KeyboardEvent) {
+                    if (event.defaultPrevented || !isContextMenuKey(event))
+                        return;
+                    const target = event.target as Element | null;
+                    const rect = target?.getBoundingClientRect();
+                    service.send({
+                        type: "CONTEXT_MENU",
+                        point: rect
+                            ? { x: rect.left, y: rect.bottom }
+                            : { x: 0, y: 0 },
+                        value: props?.value,
+                    } as never);
+                    event.preventDefault();
+                },
+            } as ReturnType<typeof api.getContextTriggerProps>;
+        },
         getContentProps: () =>
             highlightedPressProps(
                 api.getContentProps(),

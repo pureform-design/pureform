@@ -178,7 +178,7 @@ export const autocompleteMenuAnatomy = {
     ],
 } as const satisfies ComponentAnatomy;
 
-/** The menu as the bindings render it: Root, an unstyled element around the trigger and the menu, the trigger, and Zag's positioner, also unstyled, around the menu's surface (`content`, the preset's `root` slot) and its items, which the menu's registry entry styles. */
+/** The menu as the bindings render it: Root, an unstyled element around the trigger and the menu, the trigger, the context trigger (an area a right-click or long-press opens the menu at), and Zag's positioner, also unstyled, around the menu's surface (`content`, the preset's `root` slot) and its items, which the menu's registry entry styles. */
 export const menuOverlayAnatomy = {
     name: "menu",
     scope: "menu",
@@ -186,6 +186,7 @@ export const menuOverlayAnatomy = {
     partNames: [
         "root",
         "trigger",
+        "contextTrigger",
         "positioner",
         "content",
         "itemGroup",
@@ -204,7 +205,7 @@ export const menuOverlayAnatomy = {
             attribute: "root",
             testId: "pf-menu-root",
             parent: null,
-            children: ["trigger", "positioner"],
+            children: ["trigger", "contextTrigger", "positioner"],
             styled: false,
             mirror: false,
             slot: null,
@@ -213,6 +214,15 @@ export const menuOverlayAnatomy = {
             name: "trigger",
             attribute: "trigger",
             testId: "pf-menu-trigger",
+            parent: "root",
+            children: [],
+            styled: false,
+            mirror: false,
+        },
+        contextTrigger: {
+            name: "contextTrigger",
+            attribute: "context-trigger",
+            testId: "pf-menu-context-trigger",
             parent: "root",
             children: [],
             styled: false,
@@ -1786,6 +1796,7 @@ export const compositeTestIds = {
     menu: {
         root: "pf-menu-root",
         trigger: "pf-menu-trigger",
+        contextTrigger: "pf-menu-context-trigger",
         positioner: "pf-menu-positioner",
         content: "pf-menu-content",
         itemGroup: "pf-menu-item-group",

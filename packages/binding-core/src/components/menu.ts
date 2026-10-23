@@ -17,7 +17,7 @@ import type { IndicationProps, InteractionSourceProps } from "./indication";
 import type { OverlayPositioning } from "./overlay";
 import type { VariantProp } from "./variants";
 
-/** The menu's parts: `"root" | "trigger" | "positioner" | "content"` (the surface) `|
+/** The menu's parts: `"root" | "trigger" | "contextTrigger" | "positioner" | "content"` (the surface) `|
  *  "itemGroup" | "itemGroupLabel" | "item" | "itemLeading" | "itemContent" | "itemLabel" |
  *  "itemSupportingText" | "itemTrailing" | "itemTrailingText"`. */
 export type MenuPart = PartName<typeof menuOverlayAnatomy>;
@@ -153,6 +153,11 @@ export interface MenuGroup<Node = unknown> {
 export interface MenuContentProps<Node> {
     /** The trigger's label: the ready-made menu renders its trigger as a button only when given. */
     readonly trigger?: Node;
+    /** An area that opens the menu at the pointer: a right-click, a touch held down (React Native: a
+     *  long press, at the touch point), or the context menu key or Shift+F10 pressed in it. Given,
+     *  the ready-made menu renders it (around this content) before the menu; it works with or
+     *  without a `trigger`. */
+    readonly contextTrigger?: Node;
     /** The items, in order. */
     readonly items?: readonly MenuItem<Node>[] | undefined;
     /** Groups of items, after `items`; the menu is `grouped` unless told otherwise. */
@@ -162,6 +167,7 @@ export interface MenuContentProps<Node> {
 /** The keys of `MenuContentProps`. */
 export const MENU_CONTENT_PROPS = [
     "trigger",
+    "contextTrigger",
     "items",
     "groups",
 ] as const satisfies readonly (keyof MenuContentProps<unknown>)[];
