@@ -5,7 +5,8 @@
 // renders in place, inside Root: while a modal sheet is open, Zag keeps focus inside it, hides the
 // rest of the page from assistive technology, and stops the page scrolling. A standard sheet
 // (`modal={false}`) leaves the page usable. The drag handle closes the sheet on a press, and on a
-// drag down past a quarter of its height.
+// drag down past a quarter of its height; a sheet that can rest partly open
+// (`partiallyExpandable`) moves between partly and fully open instead.
 
 import {
     bottomSheetBackdropAnatomy,
@@ -20,6 +21,7 @@ import {
     closeTriggerProps,
     isPresent,
     sheetContentLayout,
+    sheetDragHandleLabel,
     sheetDragHandleLayout,
     sheetMachineProps,
     sheetModal,
@@ -28,11 +30,12 @@ import type {
     BottomSheetContentProps,
     BottomSheetPart,
     BottomSheetRootOwnProps,
+    SheetRest,
     Unstyled,
 } from "@pureform/binding-core";
 import { dragToDismiss } from "@pureform/binding-core/dom";
 import type { JSX, ValidComponent } from "@solidjs/web";
-import { omit, onCleanup, Show } from "solid-js";
+import { createSignal, merge, omit, onCleanup, Show } from "solid-js";
 
 import { Button } from "../button";
 import { dialogParts } from "../dialog-parts";
@@ -102,11 +105,26 @@ const Positioner: (props: BottomSheetPartProps) => JSX.Element =
 const Content: (props: BottomSheetPartProps) => JSX.Element = chrome.Content;
 
 /** The drag handle at the top edge: a press closes the sheet, and so does a drag down past a
- *  quarter of its height. Name it with `aria-label`. It renders the drag handle component; give
- *  `as` to render another. */
+ *  quarter of its height. On a sheet that can rest partly open (`partiallyExpandable`), a drag
+ *  or a press moves it between partly and fully open, and a drag down from partly open closes
+ *  it. Without `aria-label`, it's named for what a press does. It renders the drag handle
+ *  component; give `as` to render another. */
 function DragHandle(props: BottomSheetTriggerProps): JSX.Element {
-    const { scope, api, surface, asker, requestClose, onClose } =
-        context.use("DragHandle");
+    const {
+        scope,
+        api,
+        surface,
+        asker,
+        requestClose,
+        onClose,
+        props: root,
+    } = context.use("DragHandle");
+    // Where it rests, and whether it can move between partly and fully open.
+    const [rest, setRest] = createSignal<{
+        readonly rest: SheetRest;
+        readonly movable: boolean;
+    }>({ rest: "expanded", movable: false });
+    let lastRest: SheetRest = "expanded";
     let stop: (() => void) | undefined;
     onCleanup(() => stop?.());
     return scope.render("dragHandle", {
@@ -126,6 +144,17 @@ function DragHandle(props: BottomSheetTriggerProps): JSX.Element {
                 },
                 () => onClose()?.() ?? true,
                 asker,
+                {
+                    partial: () => root.partiallyExpandable === true,
+                    onRest: (next, movable) => {
+                        if (next !== lastRest)
+                            root.onExpandedChange?.({
+                                expanded: next === "expanded",
+                            });
+                        lastRest = next;
+                        setRest({ rest: next, movable });
+                    },
+                },
             );
         },
         machine: () =>
@@ -139,7 +168,14 @@ function DragHandle(props: BottomSheetTriggerProps): JSX.Element {
                 normalizeProps.element(sheetDragHandleLayout),
             ),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "as"),
+        props: merge(
+            {
+                get "aria-label"() {
+                    return sheetDragHandleLabel(rest().rest, rest().movable);
+                },
+            },
+            omit(props, "unstyled", "as"),
+        ),
     });
 }
 
@@ -190,7 +226,9 @@ function ReadyMade(props: BottomSheetProps): JSX.Element {
                 <Content {...content}>
                     <Show when={props.dragHandle !== false}>
                         <DragHandle
-                            aria-label={props.dragHandleLabel ?? "Close sheet"}
+                            {...(props.dragHandleLabel === undefined
+                                ? {}
+                                : { "aria-label": props.dragHandleLabel })}
                             {...dragHandle}
                         />
                     </Show>

@@ -219,6 +219,8 @@ export {
     SHEET_DISMISS_SHARE,
     SHEET_FLICK_SPEED,
 } from "./sheet-drag";
+export type { SheetDragOptions } from "./sheet-drag";
+export { settleTransition } from "./settle";
 export { markMenuGroupEdges } from "./menu-groups";
 export { revealInRow } from "./reveal";
 export { slideIndicator, slideTransform, transformTiming } from "./slide";

@@ -393,7 +393,11 @@ import { RichTooltip } from "@pureform/react/rich-tooltip";
 - **The bottom sheet** runs on the same Zag machine, in a positioner fixed to the bottom of the
   viewport, over a `Backdrop` when modal (`modal={false}` makes a standard sheet, no backdrop, the
   page usable). Its `DragHandle` (the drag handle component) closes it on a press or a drag down
-  past a quarter of its height. Root's `onClose` is asked before any close of its own: Escape, the
+  past a quarter of its height. With `partiallyExpandable`, a sheet taller than half the screen
+  opens partly (its top at half the screen, Compose's `PartiallyExpanded`), and a drag or a press
+  on the handle moves it between partly and fully open (`onExpandedChange` hears it); a drag down
+  from partly open closes it. A settle after a drag starts at the release's speed. Without
+  `aria-label`, the handle is named for what a press does. Root's `onClose` is asked before any close of its own: Escape, the
   scrim, a press on the handle, or a drag. `true` closes, `false` keeps it open (a dragged sheet
   settles back), and a promise keeps it open (a dragged sheet holding where it was let go) until
   it settles (resolved `true` leaves). Closing it through a controlled `open` (the app's own `setOpen(false)`) doesn't ask: by design, as in Radix and MUI, the app already decided. The ready-made takes `trigger`, `dragHandle`, `dragHandleLabel`

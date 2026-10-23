@@ -301,7 +301,10 @@ sheetMachineProps(props);                // modal by default; a click outside cl
 bottomSheetPositionerLayout(present, modal); // fixed to the bottom; a standard one lets presses through
 sideSheetPositionerLayout(present, modal, coplanar); // fixed to the end edge, or in the page's layout
 sheetContentLayout;                      // the surface takes presses back
-dragToDismiss(handle, sheet, dismiss, onClose?, asker?); // from /dom: drag a sheet down by its handle to close it; dismiss(kept) calls kept once rendered if the app kept it open
+dragToDismiss(handle, sheet, dismiss, onClose?, asker?, { partial?, onRest? }); // from /dom: drag a sheet by its handle; closes it, or with `partial`, moves it between partly and fully open; dismiss(kept) calls kept once rendered if the app kept it open
+sheetRelease({ offset, velocity, height, partial? }); // where a let-go sheet goes: "expanded" | "partial" | "closed" (shared with React Native)
+sheetPartialOffset(height, screen); sheetDragHandleLabel(rest, movable); // partly open's offset (top at half the screen); the handle's default name
+settleTransition(element, property, distance, velocity); // from /dom: starts an element's spring transition at a release's speed (core's springFromCurve + sampleSpring's `velocity`)
 markMenuGroupEdges(content);             // from /dom: marks a menu's first and last groups data-first/data-last, from DOM order; a group's data-pf-first/data-pf-last (its explicit first/last) wins
 swallowNextClick(row);                   // from /dom: drop the click a drag ends with
 whenAnimationsEnd(element, done);        // from /dom: done once every animation running on it ends (at once with none); returns what stops waiting

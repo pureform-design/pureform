@@ -117,6 +117,33 @@ describe("BottomSheet, ready-made", () => {
         expect(onOpenChange).toHaveBeenLastCalledWith({ open: false });
     });
 
+    it("rests partly open when it can, and moves between partly and fully open", async () => {
+        const onExpandedChange = vi.fn();
+        const onOpenChange = vi.fn();
+        withRegistry(
+            <BottomSheet
+                defaultOpen
+                partiallyExpandable
+                aria-label="Share"
+                body={<div style={{ height: "200vh" }}>Options</div>}
+                onExpandedChange={onExpandedChange}
+                onOpenChange={onOpenChange}
+            />,
+        );
+        await frames();
+        const content = byTestId(ids.content);
+        const handle = byTestId(ids.dragHandle);
+        await until(() => expect(content.style.translate).not.toBe(""));
+        expect(handle.getAttribute("aria-label")).toBe("Expand sheet");
+        expect(onExpandedChange).toHaveBeenLastCalledWith({ expanded: false });
+        await interact(() => userEvent.click(handle));
+        await frames();
+        expect(content.style.translate).toBe("");
+        expect(handle.getAttribute("aria-label")).toBe("Collapse sheet");
+        expect(onExpandedChange).toHaveBeenLastCalledWith({ expanded: true });
+        expect(onOpenChange).not.toHaveBeenCalled();
+    });
+
     it("asks onClose before Escape, the scrim, the handle's press, or a drag closes it", async () => {
         const onOpenChange = vi.fn();
         let answer = false;
