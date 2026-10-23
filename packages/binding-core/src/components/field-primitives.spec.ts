@@ -27,6 +27,14 @@ describe("the plain field", () => {
         expect(fieldState({ invalid: true }, ids, none).invalid).toBe(true);
     });
 
+    it("is invalid while it holds an ErrorText, unless `invalid` says otherwise", () => {
+        const holding = { description: false, error: true };
+        expect(fieldState({}, ids, holding).invalid).toBe(true);
+        expect(fieldState({ invalid: false }, ids, holding).invalid).toBe(
+            false,
+        );
+    });
+
     it("points the control at the description and the error it holds, after its own", () => {
         const field = fieldState({}, ids, { description: true, error: true });
         expect(

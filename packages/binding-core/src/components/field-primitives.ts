@@ -16,6 +16,7 @@ import type {
 } from "@pureform/anatomy";
 import type { InstanceTokens, Selection } from "@pureform/styling";
 
+import type { Controllable } from "../controllable";
 import type { Unstyled } from "../parts";
 
 /** The field's parts: `"root"`. */
@@ -112,21 +113,36 @@ export const LABEL_ROOT_PROPS = [
     "disabled",
 ] as const satisfies readonly (keyof LabelRootOwnProps)[];
 
+/** The text of Input and Textarea, as pureform's other controls take theirs: `value` (controlled),
+ *  `defaultValue`, and `onValueChange({ value })`, which a form reset calls with
+ *  `reason: "reset"`. The element's own `onChange` (`onInput` in Solid) still works beside it. */
+export type PlainTextProps = Controllable<"value", string>;
+
 /** What Input and Textarea take for themselves: the field's states, which win over the
- *  field's, and the pieces' own. */
+ *  field's, their text, and the pieces' own. */
 export interface InputRootOwnProps
-    extends FieldStateProps, PieceOwnProps<"input", InputPart> {}
+    extends
+        FieldStateProps,
+        PlainTextProps,
+        PieceOwnProps<"input", InputPart> {}
 
 export interface TextareaRootOwnProps
-    extends FieldStateProps, PieceOwnProps<"plainTextarea", TextareaPart> {}
+    extends
+        FieldStateProps,
+        PlainTextProps,
+        PieceOwnProps<"plainTextarea", TextareaPart> {}
+
+const PLAIN_TEXT_PROPS = ["value", "defaultValue", "onValueChange"] as const;
 
 export const INPUT_ROOT_PROPS = [
     ...PIECE_PROPS,
+    ...PLAIN_TEXT_PROPS,
     "invalid",
 ] as const satisfies readonly (keyof InputRootOwnProps)[];
 
 export const TEXTAREA_ROOT_PROPS = [
     ...PIECE_PROPS,
+    ...PLAIN_TEXT_PROPS,
     "invalid",
 ] as const satisfies readonly (keyof TextareaRootOwnProps)[];
 
@@ -183,7 +199,7 @@ export interface FieldState {
 }
 
 /** Field's state from its props and the supporting pieces it holds. An `error` marks it
- *  invalid. */
+ *  invalid; so does an ErrorText inside it, unless `invalid` says otherwise. */
 export const fieldState = (
     props: FieldStateProps & FieldContentProps<unknown>,
     ids: FieldIds,
@@ -191,7 +207,7 @@ export const fieldState = (
 ): FieldState => ({
     ids,
     disabled: props.disabled ?? false,
-    invalid: (props.invalid ?? false) || isGiven(props.error),
+    invalid: (props.invalid ?? described.error) || isGiven(props.error),
     required: props.required ?? false,
     described,
 });

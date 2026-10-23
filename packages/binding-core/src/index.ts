@@ -879,6 +879,9 @@ export {
     nativeSelectGroups,
     nativeSelectProps,
     nativeSelectSelection,
+    nativeSelectValue,
+    nativeSelectValues,
+    sameNativeSelectValue,
 } from "./components/native-select";
 export type {
     NativeSelectBehaviorProps,
@@ -886,6 +889,7 @@ export type {
     NativeSelectItem,
     NativeSelectPart,
     NativeSelectRootOwnProps,
+    NativeSelectValue,
     NativeSelectVariantProps,
 } from "./components/native-select";
 export {
@@ -1358,6 +1362,7 @@ export type {
     InputRootOwnProps,
     LabelPart,
     LabelRootOwnProps,
+    PlainTextProps,
     TextareaPart,
     TextareaRootOwnProps,
 } from "./components/field-primitives";

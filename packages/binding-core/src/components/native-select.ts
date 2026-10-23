@@ -13,6 +13,8 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Controllable } from "../controllable";
 import type { Unstyled } from "../parts";
+import { fieldControlProps } from "./field-primitives";
+import type { FieldState } from "./field-primitives";
 import type { InteractiveProps } from "./indication";
 import { selectItemGroups } from "./select";
 import type { SelectItemGroup } from "./select";
@@ -25,11 +27,19 @@ export interface NativeSelectVariantProps {
     readonly tokens?: InstanceTokens<"nativeSelect"> | undefined;
 }
 
-/** What the native `<select>` takes from Root's props. The value is the chosen option's value. */
+/** The chosen option's value; with `multiple`, every chosen option's, in the options' order. */
+export type NativeSelectValue = string | readonly string[];
+
+/** What the native `<select>` takes from Root's props. The value is the chosen option's value, or
+ *  with `multiple` an array of the chosen options' values. Inside a Field, the field's id, states
+ *  and descriptions apply, its own props winning. */
 export interface NativeSelectBehaviorProps extends Controllable<
     "value",
-    string
+    NativeSelectValue
 > {
+    /** Lets several options be chosen (`<select multiple>`): the value is an array, and a form
+     *  submits each chosen value under `name`. */
+    readonly multiple?: boolean | undefined;
     /** A disabled fieldset around the select disables it too. */
     readonly disabled?: boolean | undefined;
     /** Marks the select invalid (`aria-invalid`), which the error look keys on. */
@@ -69,6 +79,7 @@ export const NATIVE_SELECT_ROOT_PROPS = [
     "name",
     "form",
     "id",
+    "multiple",
     "value",
     "defaultValue",
     "onValueChange",
@@ -119,22 +130,63 @@ export const nativeSelectSelection = (
     props: NativeSelectVariantProps,
 ): Selection<"nativeSelect"> => ({ tokens: props.tokens });
 
-/** The `<select>`'s own props from Root's: what it submits, validates and is disabled by. The
- *  root's `data-disabled` follows the same `disabled`. */
+/** The `<select>`'s own props from Root's and the Field around it, if any (its own props win):
+ *  what it submits, validates and is disabled by, its id, and its descriptions. The root's
+ *  `data-disabled` follows the same `disabled`. */
 export const nativeSelectProps = (
     props: Pick<
         NativeSelectBehaviorProps,
-        "disabled" | "invalid" | "required" | "name" | "form" | "id"
+        | "disabled"
+        | "invalid"
+        | "required"
+        | "name"
+        | "form"
+        | "id"
+        | "multiple"
     >,
     fieldsetDisabled = false,
-) => ({
-    id: props.id,
-    name: props.name,
-    form: props.form,
-    required: props.required || undefined,
-    disabled: props.disabled || fieldsetDisabled || undefined,
-    "aria-invalid": props.invalid ? ("true" as const) : undefined,
-});
+    field?: FieldState | undefined,
+) => {
+    const control = fieldControlProps(field, props);
+    return {
+        ...control,
+        name: props.name,
+        form: props.form,
+        multiple: props.multiple || undefined,
+        disabled: control.disabled || fieldsetDisabled || undefined,
+    };
+};
+
+/** The value as a list of chosen values: `""` (nothing chosen) is none. */
+export const nativeSelectValues = (
+    value: NativeSelectValue | undefined,
+): readonly string[] =>
+    value === undefined
+        ? []
+        : typeof value === "string"
+          ? value === ""
+              ? []
+              : [value]
+          : value;
+
+/** The value to report from the chosen options' values: an array with `multiple`, else the first
+ *  (`""` for none). */
+export const nativeSelectValue = (
+    chosen: readonly string[],
+    multiple: boolean | undefined,
+): NativeSelectValue => (multiple ? [...chosen] : (chosen[0] ?? ""));
+
+/** Whether two values choose the same options. */
+export const sameNativeSelectValue = (
+    a: NativeSelectValue | undefined,
+    b: NativeSelectValue | undefined,
+): boolean => {
+    if (typeof a === "string" || typeof b === "string" || !a || !b)
+        return a === b;
+    return (
+        a.length === b.length && a.every((value, index) => value === b[index])
+    );
+};
 
 /** The options by `<optgroup>`: options outside any group come in their own runs, in order. */
 export const nativeSelectGroups = (

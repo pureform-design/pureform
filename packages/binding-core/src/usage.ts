@@ -22,7 +22,7 @@ const same = <const G extends readonly string[]>(
         readonly [K in G[number]]: K;
     };
 
-// The plain form primitives' entries.
+// The field's subpath, which renders the ready-made pieces and re-exports every one.
 const FORM_PRIMITIVES = {
     field: {},
     label: {},
@@ -325,11 +325,11 @@ export const COMPONENT_USAGE = {
     // The plain form primitives: one look each, no variants. Each piece's subpath re-exports
     // it from the field's module, which holds them all.
     field: { entries: FORM_PRIMITIVES },
-    label: { entries: FORM_PRIMITIVES },
-    input: { entries: FORM_PRIMITIVES },
-    textarea: { entries: FORM_PRIMITIVES },
-    description: { entries: FORM_PRIMITIVES },
-    "error-text": { entries: FORM_PRIMITIVES },
+    label: { entries: { label: {} } },
+    input: { entries: { input: {} } },
+    textarea: { entries: { plainTextarea: {} } },
+    description: { entries: { description: {} } },
+    "error-text": { entries: { errorText: {} } },
     // `transition` moves a row's content in a shared axis or a fade through.
     stepper: {
         entries: {
@@ -382,7 +382,7 @@ export const COMPONENT_USAGE = {
     rating: { entries: { rating: same("color", "size") } },
     // One look: no variant groups. React Native opens the Material menu where the platform's isn't
     // installed.
-    "native-select": { entries: { nativeSelect: {}, menu: {}, ripple: {} } },
+    "native-select": { entries: { nativeSelect: {}, menu: {} } },
     text: { entries: { text: { style: "textStyle" } } },
     // The icons, prefix and suffix follow their content.
     "text-area": {
