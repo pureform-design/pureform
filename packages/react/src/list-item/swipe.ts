@@ -1,6 +1,7 @@
 // A swipeable list item's state and gesture: how far the row has slid, whether its action is
 // revealed (controlled by `revealed`, or kept from `defaultRevealed`), the pointer drag that
-// slides it and the keys that open and close it.
+// slides it and the keys that open and close it. Let go, the row settles from the drag's speed
+// (`createSwipeSettle`).
 
 import {
     LIST_ITEM_SWIPE_SLOP,
@@ -12,11 +13,14 @@ import {
     swipeTokens,
 } from "@pureform/binding-core";
 import type { ListItemSwipeProps } from "@pureform/binding-core";
-import { swallowNextClick } from "@pureform/binding-core/dom";
+import {
+    createSwipeSettle,
+    swallowNextClick,
+} from "@pureform/binding-core/dom";
 import type { KeyboardEvent, PointerEvent } from "react";
 import { useRef, useState } from "react";
 
-import { useDirection } from "../provider";
+import { useComponentState, useDirection } from "../provider";
 
 // A press on these is theirs, not the start of a swipe.
 const OWN_GESTURES = "button, a, input, select, textarea, [role='button']";
@@ -55,6 +59,12 @@ export function useSwipe(
     // The click that ends a drag isn't a press on the row, nor on its own handlers (an
     // expandable row's); the next press takes the listener back if no click came.
     const swallow = useRef<() => void>(undefined);
+    const { registry } = useComponentState();
+    const latestRegistry = useRef(registry);
+    latestRegistry.current = registry;
+    const [settle] = useState(() =>
+        createSwipeSettle(() => latestRegistry.current),
+    );
     if (!swipeable) return undefined;
     const setRevealed = (next: boolean) => {
         if (next === revealed) return;
@@ -79,6 +89,7 @@ export function useSwipe(
                     offset,
                     moved: false,
                 };
+                settle.start(event.currentTarget, offset, event.timeStamp);
             },
             onPointerMove: (event: PointerEvent<HTMLElement>) => {
                 const held = gesture.current;
@@ -99,6 +110,7 @@ export function useSwipe(
                     width,
                     rtl,
                 );
+                settle.move(held.offset, event.timeStamp);
                 setDrag(held.offset);
             },
             onPointerUp: (event: PointerEvent<HTMLElement>) => {
@@ -108,7 +120,13 @@ export function useSwipe(
                 swallow.current = swallowNextClick(
                     event.currentTarget as Element,
                 );
-                setRevealed(swipeSettlesOpen(held.offset, width));
+                const open = swipeSettlesOpen(held.offset, width);
+                settle.release(
+                    event.currentTarget,
+                    held.offset,
+                    swipeRestOffset(open, width),
+                );
+                setRevealed(open);
                 setDrag(undefined);
             },
             onPointerCancel: () => {

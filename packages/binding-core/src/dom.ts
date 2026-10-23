@@ -221,9 +221,20 @@ export {
 } from "./sheet-drag";
 export type { SheetDrag, SheetDragOptions } from "./sheet-drag";
 export { sideSheetDragToDismiss } from "./side-sheet-drag";
+export {
+    createSwipeSettle,
+    LIST_ITEM_SWIPE_SPRING,
+} from "./list-item-swipe-settle";
+export type { SwipeSettle } from "./list-item-swipe-settle";
 export { focusableWhileOverflowing } from "./scroll-focus";
 export { transitionTiming, watchCollapse } from "./collapse";
-export { settleOnSpring, settleTransition } from "./settle";
+export {
+    settleOnSpring,
+    settleTransition,
+    springFromVars,
+    springRoleVar,
+    transitionSpring,
+} from "./settle";
 export { markMenuGroupEdges } from "./menu-groups";
 export { revealInRow } from "./reveal";
 export { slideIndicator, slideTransform, transformTiming } from "./slide";
