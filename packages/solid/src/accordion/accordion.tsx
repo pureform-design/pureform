@@ -35,7 +35,7 @@ import { itemInteractionSources } from "../interaction";
 import type { ItemInteractionSources } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
-import { collapsible } from "../motion";
+import { useCollapsible } from "../motion";
 import { createPartContext } from "../part-context";
 import {
     createSlotProps,
@@ -176,7 +176,7 @@ function Content(props: AccordionPartProps): JSX.Element {
     const { props: item } = itemContext.use("Content");
     return scope.render("content", {
         element: "div",
-        ref: collapsible,
+        ref: useCollapsible(),
         machine: () => api().getItemContentProps(item()),
         unstyled: () => props.unstyled,
         props: omit(props, "unstyled"),

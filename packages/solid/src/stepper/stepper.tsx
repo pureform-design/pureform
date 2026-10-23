@@ -43,7 +43,7 @@ import { itemInteractionSources } from "../interaction";
 import type { ItemInteractionSources } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
-import { collapsible } from "../motion";
+import { useCollapsible } from "../motion";
 import { useTransitionPage } from "../page-transition";
 import { createPartContext } from "../part-context";
 import { createSlotProps, plainParts, useComponent } from "../parts";
@@ -256,7 +256,7 @@ function Content(props: StepperContentPartProps): JSX.Element {
     const page = useTransitionPage();
     return scope.render("content", {
         element: "div",
-        ref: collapsible,
+        ref: useCollapsible(),
         machine: () =>
             page() === "leaving"
                 ? {

@@ -12,7 +12,6 @@ import {
     type Accessor,
     createMemo,
     createSignal,
-    onCleanup,
     onSettled,
 } from "solid-js";
 
@@ -27,7 +26,12 @@ export function useReducedMotion(): Accessor<boolean> {
 }
 
 /** A ref for a part that expands and collapses with `hidden` (an accordion's content, a tree's
- *  group): its height grows and shrinks on the part's own transition (`watchCollapse`). */
-export const collapsible = (element: HTMLElement) => {
-    onCleanup(watchCollapse(element));
+ *  group): its height grows and shrinks on the part's own transition (`watchCollapse`). Call it
+ *  in the component: a ref runs outside it while hydrating, where a cleanup would be lost. */
+export const useCollapsible = (): ((element: HTMLElement) => void) => {
+    let part: HTMLElement | undefined;
+    onSettled(() => (part ? watchCollapse(part) : undefined));
+    return (element) => {
+        part = element;
+    };
 };

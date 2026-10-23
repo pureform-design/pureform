@@ -18,7 +18,7 @@ import {
     sideSheetPositionerLayout,
     sideSheetSelection,
     isPresent,
-    sheetContentLayout,
+    sideSheetContentLayout,
     sheetMachineProps,
     sheetModal,
 } from "@pureform/binding-core";
@@ -79,7 +79,7 @@ const chrome = dialogParts({
             sheetModal(props),
             sideSheetSelection(props).coplanar === true,
         ),
-    contentLayout: sheetContentLayout,
+    contentLayout: sideSheetContentLayout,
     onClose: (props) => props.onClose,
 });
 

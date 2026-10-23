@@ -54,7 +54,7 @@ import {
 } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
-import { collapsible } from "../motion";
+import { useCollapsible } from "../motion";
 import { createPartContext } from "../part-context";
 import {
     createSlotProps,
@@ -393,7 +393,7 @@ function Region(props: ListItemPartProps): JSX.Element {
     const expand = expandContext.use("Region");
     return expand.scope.render("region", {
         element: "div",
-        ref: collapsible,
+        ref: useCollapsible(),
         machine: () => expand.api().getItemContentProps(expandItem(undefined)),
         unstyled: () => props.unstyled,
         // The items inside are its content, not more headers.
