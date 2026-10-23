@@ -29,6 +29,18 @@ const focused = zag.states["focused" as keyof typeof zag.states] as {
 
 export const machine = {
     ...zag,
+    // Zag seeds its `count` context from the `count` prop once and never follows the prop after
+    // that, so a changed `length` left the old number of cells. It follows the prop here.
+    watch(params: ZagParams) {
+        zag.watch?.(params);
+        const { prop, context, track } = params;
+        track([() => prop("count")], () => {
+            const count = prop("count");
+            if (count && count !== context.get("count")) {
+                context.set("count", count);
+            }
+        });
+    },
     states: {
         ...zag.states,
         focused: {

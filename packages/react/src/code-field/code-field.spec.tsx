@@ -1,5 +1,5 @@
 import { testIds } from "@pureform/anatomy";
-import { screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
@@ -93,5 +93,24 @@ describe("CodeField, ready-made", () => {
         expect(screen.getByTestId(ids.supportingText).textContent).toBe(
             "Wrong PIN",
         );
+    });
+});
+
+describe("CodeField, changed props", () => {
+    it("follows a changed length", async () => {
+        const view = (length: number) => (
+            <PureformProvider registry={textInputsRegistry()}>
+                <CodeField label="Code" length={length} />
+            </PureformProvider>
+        );
+        const { rerender } = render(view(4));
+        await settle();
+        expect(cells()).toHaveLength(4);
+        rerender(view(6));
+        await settle();
+        expect(cells()).toHaveLength(6);
+        rerender(view(3));
+        await settle();
+        expect(cells()).toHaveLength(3);
     });
 });
