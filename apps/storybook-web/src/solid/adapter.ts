@@ -52,7 +52,20 @@ export const solidAdapter: RendererAdapter<Component<any>> = {
                     )(),
                 el,
             );
-        let dispose = draw();
+        // Storybook puts the story's element in the document only after the story (and its
+        // decorators) return it. Solid runs a machine's effects as it renders, and those that
+        // find their parts by id (the ripple's layer) would find nothing in a detached element,
+        // so it draws once the element is in.
+        let dispose: () => void = () => {};
+        let disposed = false;
+        let drawn = false;
+        const drawOnce = () => {
+            if (drawn || disposed) return;
+            drawn = true;
+            dispose = draw();
+        };
+        if (el.isConnected) drawOnce();
+        else queueMicrotask(drawOnce);
         return {
             update: (next: Args, nextContext: MountContext) => {
                 setCurrent({ ...next });
@@ -64,11 +77,15 @@ export const solidAdapter: RendererAdapter<Component<any>> = {
                 const nextKeys = keysOf(next);
                 if (nextKeys !== keys) {
                     keys = nextKeys;
+                    if (!drawn) return;
                     dispose();
                     dispose = draw();
                 }
             },
-            unmount: () => dispose(),
+            unmount: () => {
+                disposed = true;
+                dispose();
+            },
         };
     },
 };
