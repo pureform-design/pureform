@@ -68,7 +68,7 @@ See the [design doc](../../docs/design/component-architecture.md), §5.1, §5.3,
 | `accordion/`                                                            | `Accordion`: a column of item tiles, each a pressable header (`aria-expanded`) over its content while expanded; the expanded items are React state, as there's no Zag machine                                              |
 | `tree/`                                                                 | `Tree`: rows (`role="treeitem"`) with a branch's children indented under it while expanded; the expanded and selected nodes are React state                                                                                |
 | `stepper/`                                                              | `Stepper`: a list of steps with a pressable header each (an indicator, a label, a caption), a connector and the current content; `step` controllable, `linear`, `orientation`; no arrow keys or next and previous triggers |
-| `horizontal-shared-axis/`                                               | `HorizontalSharedAxis`: the page `index` names, sliding and fading forward or backward (Animated, `spatialDefault`), mirrored under rtl; `scrim`; a row `Stepper` takes `transition="sharedAxis"`                          |
+| `horizontal-shared-axis/`                                               | `HorizontalSharedAxis`: the page `index` names, sliding and fading forward or backward (Animated, the instance's `slideSpring` and fade tokens), mirrored under rtl; `scrim` (off by default); a row `Stepper` takes `transition="sharedAxis"` or `"fadeThrough"`                        |
 | `table/`                                                                | `Table`: views in flex rows with their table roles, sort headers and a checkbox column, the sort and selection in state through `@pureform/machines/table`'s arithmetic; `stickyHeader` doesn't stick (no sticky position) |
 | `grid-list/`                                                            | `GridList`: Root (a list), `Tile` (`listitem`), `Content`, `Media` (an `Image`), `Header`, `Footer`, `Headline`, `Subhead`; compound only                                                                                  |
 
@@ -152,7 +152,8 @@ import { registry } from "./.pureform";
   over `short2` as it grows to 105%, absolutely filling the root, hidden from assistive
   technology and taking no touches, and goes once its exit ends; the new page grows from 80% on
   `spatialDefault` and fades in over `short4` after a `short2` delay. The first page is still;
-  reduced motion keeps the fades. A presence step's timing may carry a `delay` (both engines).
+  reduced motion keeps the fades. While a page leaves, the root clips (`overflow: hidden`). A
+  presence step's timing may carry a `delay` (both engines).
 - **Portals:** `Portal` renders its children at the nearest `PortalHost`, in a layer over the
   page, sorted by the theme's z-index for its `layer` and then by the order each opened (a portal
   inside another sorts over it), keeping the provider it was declared under. The root

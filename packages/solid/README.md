@@ -286,10 +286,13 @@ import { RichTooltip } from "@pureform/solid/rich-tooltip";
   page from the end, the old one toward the start, a fifth of the width, on the `spatialDefault`
   spring, fading linearly over 90ms after 50ms); a lower one backward; right to left mirrors the
   slide and reduced motion keeps the fades. The old page stays, `inert` and `aria-hidden`, until
-  its animations end; `scrim` veils the page underneath in the theme's scrim color (20% over a
-  light surface, 80% over a dark one). The ready-made `Tabs` and a row `Stepper` take
-  `transition="sharedAxis"` (and `transitionScrim`) to move their panels so; a panel leaving
-  stays drawn (`useSharedAxisPage()` says where the page around a part is).
+  its animations end; `scrim` (off by default: Compose draws it only behind predictive back, which
+  pureform leaves out) veils the page underneath in the theme's scrim color (20% over a light
+  surface, 80% over a dark one). The ready-made `Tabs` and a row `Stepper` take
+  `transition="sharedAxis"` (and `transitionScrim`) to move their panels so, or
+  `transition="fadeThrough"` for pages that aren't spatially related; a panel leaving stays drawn
+  (`useTransitionPage()`, from either entry, says where the page around a part is). Both
+  transitions keep their pages with binding-core's `page-transition` model.
 - **Scrollable tabs** (`scrollable`) scroll the newly selected tab into view
   (`revealInRow` from `@pureform/binding-core/dom`).
 - **The radio group** is an unstyled `div` (`radioGroupAnatomy`, `data-scope="radio-group"`, test
@@ -572,7 +575,8 @@ mirrorIcon?, disabled?, content? }`; a tab without a label shows only its icon, 
   the fades are linear, `short2` out and `short4` in after `short2`, as Compose's 90 and 210ms.
   Reduced motion keeps the fades only. The first page doesn't animate; the leaving page
   (`data-state="closed"`) leaves the flow, is `aria-hidden` and `inert`, and goes once its
-  animations end (at once unstyled). Children are the content or a function of the value,
+  animations end (at once unstyled); meanwhile the root is `data-transitioning` and clips, so a
+  taller old page doesn't spill. The entering page drops `data-state` once its animations end. Children are the content or a function of the value,
   `{(value) => <Page of={value} />}`. Each page keeps the content it was given when its value came in; content that reads
   the signal setting `value` takes the function form, so the leaving page keeps its own. Props: `value`, `testId`, `unstyled`, `as`, and the element's own.
 - **The ripple** is the layer a press ripple draws in: put `<Ripple />` inside a positioned

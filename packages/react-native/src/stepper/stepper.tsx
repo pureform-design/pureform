@@ -23,6 +23,7 @@ import type {
 import type { Indication } from "@pureform/binding-core/indication";
 import type { ReactNode } from "react";
 
+import { FadeThrough } from "../fade-through/fade-through";
 import { HorizontalSharedAxis } from "../horizontal-shared-axis/horizontal-shared-axis";
 import { IconSlot, iconSlot } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
@@ -227,21 +228,30 @@ function StepperImpl(props: StepperProps): ReactNode {
                     />
                 ))}
             </v.list.View>
-            {!vertical && props.transition === "sharedAxis" ? (
-                // A row's content slides between the steps in their order.
-                <HorizontalSharedAxis
-                    index={step}
-                    scrim={props.transitionScrim}
-                >
-                    {isPresent(content) ? (
+            {!vertical &&
+            (props.transition === "sharedAxis" ||
+                props.transition === "fadeThrough") ? (
+                // A row's content slides between the steps in their order, or fades through.
+                (() => {
+                    const page = isPresent(content) ? (
                         <v.content.View
                             style={s.content}
                             testID={id("content")}
                         >
                             {content}
                         </v.content.View>
-                    ) : null}
-                </HorizontalSharedAxis>
+                    ) : null;
+                    return props.transition === "fadeThrough" ? (
+                        <FadeThrough value={step}>{page}</FadeThrough>
+                    ) : (
+                        <HorizontalSharedAxis
+                            index={step}
+                            scrim={props.transitionScrim}
+                        >
+                            {page}
+                        </HorizontalSharedAxis>
+                    );
+                })()
             ) : !vertical && isPresent(content) ? (
                 <v.content.View style={s.content} testID={id("content")}>
                     {content}

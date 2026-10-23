@@ -296,21 +296,23 @@ export const COMPONENT_USAGE = {
         },
     },
     "supporting-text": { entries: { supportingText: same("tone") } },
-    // `transition: "sharedAxis"` moves a row's content in a shared axis.
+    // `transition` moves a row's content in a shared axis or a fade through.
     stepper: {
         entries: {
             stepper: same("orientation", "density"),
             horizontalSharedAxis: {},
+            fadeThrough: {},
             ripple: {},
         },
     },
     switch: { entries: { switchControl: same("color"), ripple: {} } },
-    // `icon` follows the tabs' icons; `transition: "sharedAxis"` moves the panels in a shared
-    // axis.
+    // `icon` follows the tabs' icons; `transition` moves the panels in a shared axis or a fade
+    // through.
     tabs: {
         entries: {
             tabs: same("variant", "inlineIcon", "scrollable", "color"),
             horizontalSharedAxis: {},
+            fadeThrough: {},
             ripple: {},
         },
     },

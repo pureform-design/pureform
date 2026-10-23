@@ -14,6 +14,7 @@ let registry: TestRegistry;
 beforeAll(async () => {
     registry = await presetRegistry([
         "horizontalSharedAxis",
+        "fadeThrough",
         "stepper",
         "ripple",
     ]);
@@ -183,5 +184,34 @@ describe("HorizontalSharedAxis on React Native", () => {
             "Step one",
             "Step two",
         ]);
+    });
+
+    it("fades a row stepper's content through with transition=fadeThrough", async () => {
+        const step = outside(0);
+        await render(
+            <step.Holder>
+                {(at) => (
+                    <Stepper
+                        aria-label="Checkout"
+                        transition="fadeThrough"
+                        step={at}
+                        items={[
+                            { label: "One", content: <Text>Step one</Text> },
+                            { label: "Two", content: <Text>Step two</Text> },
+                        ]}
+                    />
+                )}
+            </step.Holder>,
+        );
+        await settle();
+        await step.set(1);
+        await settle(100);
+        expect(
+            [
+                ...document.querySelectorAll<HTMLElement>(
+                    '[data-testid="pf-fade-through-page"]',
+                ),
+            ].map((page) => page.textContent),
+        ).toEqual(["Step one", "Step two"]);
     });
 });
