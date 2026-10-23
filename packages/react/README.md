@@ -373,7 +373,9 @@ import { RichTooltip } from "@pureform/react/rich-tooltip";
   (test id `pf-<name>-root`) around their trigger and a `Positioner`, and draw the preset's surface
   as `Content` (`data-pf-part="content"`, `pf-<name>-content`; the registry's `root` slot styles
   it). Nothing is portaled: the provider's theme, `dir`, and registry reach the overlay as any part,
-  and server rendering and hydration see one tree. A clipping or stacking ancestor can cut a menu or
+  and server rendering and hydration see one tree. An overlay rendered inside a dialog or a sheet
+  (in its body, say) is inside the host's stacking context, so it draws over the host, whole; one
+  rendered outside a modal host stacks at its own layer, beneath it. A clipping or stacking ancestor can cut a menu or
   tooltip off; `positioning={{ strategy: "fixed" }}` escapes most. Each surface stacks at its
   layer of the theme's stacking scale (the positioner takes the surface's `z-index`) and animates
   on `data-state`; `usePresence` (Zag's presence machine on the surface) keeps the positioner and

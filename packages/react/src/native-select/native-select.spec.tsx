@@ -189,7 +189,9 @@ describe("NativeSelect, inside a Field", () => {
         const wrong = <NativeSelect items={ITEMS} defaultValue={["s"]} />;
         const onMany = (details: { value: readonly string[] }) => details;
         // @ts-expect-error one value reports a string, not an array
-        const wrongReport = <NativeSelect items={ITEMS} onValueChange={onMany} />;
+        const wrongReport = (
+            <NativeSelect items={ITEMS} onValueChange={onMany} />
+        );
         expect([one, several, wrong, wrongReport]).toHaveLength(4);
     });
 

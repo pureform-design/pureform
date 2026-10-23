@@ -204,9 +204,7 @@ export const joinIdRefs = (
     ...lists: readonly (string | undefined | null | false)[]
 ): string | undefined => {
     const ids = [
-        ...new Set(
-            lists.flatMap((list) => (list ? list.split(/\s+/) : [])),
-        ),
+        ...new Set(lists.flatMap((list) => (list ? list.split(/\s+/) : []))),
     ].filter(Boolean);
     return ids.length > 0 ? ids.join(" ") : undefined;
 };

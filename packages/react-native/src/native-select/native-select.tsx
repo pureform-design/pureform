@@ -193,7 +193,9 @@ function NativeSelectImpl(props: NativeSelectProps): ReactNode {
         "value",
         props.value,
         props.defaultValue,
-        props.onValueChange,
+        props.onValueChange as
+            | ((details: ChangeDetails<"value", NativeSelectValue>) => void)
+            | undefined,
         multiple ? [] : first,
     );
     const chosen = nativeSelectValues(value);

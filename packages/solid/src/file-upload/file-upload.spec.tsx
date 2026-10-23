@@ -148,14 +148,18 @@ describe("FileUpload, ready-made", () => {
         await settle();
         const form = byTestId("form") as HTMLFormElement;
         expect(
-            new FormData(form).getAll("docs").map((entry) => (entry as File).name),
+            new FormData(form)
+                .getAll("docs")
+                .map((entry) => (entry as File).name),
         ).toEqual(["a.txt"]);
         form.reset();
         await settle();
         await settle();
         expect(onValueChange).not.toHaveBeenCalled();
         expect(
-            new FormData(form).getAll("docs").map((entry) => (entry as File).name),
+            new FormData(form)
+                .getAll("docs")
+                .map((entry) => (entry as File).name),
         ).toEqual(["a.txt"]);
     });
 

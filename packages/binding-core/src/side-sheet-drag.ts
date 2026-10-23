@@ -66,7 +66,12 @@ export const sideSheetDragToDismiss = (
         stopSettle?.();
         sheet.style.removeProperty("transition");
         // Back is inward: a release moving out still settles from its speed, the other way.
-        const stopSheet = settleTransition(sheet, "translate", -offset, -velocity);
+        const stopSheet = settleTransition(
+            sheet,
+            "translate",
+            -offset,
+            -velocity,
+        );
         const settling = holder;
         if (settling) {
             // The margin settles on the sheet's own curve.

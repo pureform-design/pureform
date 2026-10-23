@@ -78,10 +78,13 @@ export const fileUpload: ComponentCase = {
     },
     form: {
         control: hiddenInput,
-        disabled: (host) => byTestId(host, ids.root).hasAttribute("data-disabled"),
+        disabled: (host) =>
+            byTestId(host, ids.root).hasAttribute("data-disabled"),
         submits: {
             props: { name: "attachments", defaultValue: [notes] },
-            entries: [["attachments", { file: "notes.txt", type: "text/plain" }]],
+            entries: [
+                ["attachments", { file: "notes.txt", type: "text/plain" }],
+            ],
         },
         resets: true,
         required: { props: { required: true }, satisfy: choose },

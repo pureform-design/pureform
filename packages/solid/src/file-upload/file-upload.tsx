@@ -126,7 +126,11 @@ function Root(props: FileUploadRootProps): JSX.Element {
     const api = createMemo(() => fileUpload.connect(service, normalizeProps));
     // Zag writes the files into the input when they change, not the default at mount.
     createEffect(hidden, (input) => {
-        if (input) writeInputFiles(input, untrack(() => api().acceptedFiles));
+        if (input)
+            writeInputFiles(
+                input,
+                untrack(() => api().acceptedFiles),
+            );
     });
     useFormReset(hidden, {
         // A file input has no default to write: the browser's reset empties it.
