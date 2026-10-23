@@ -542,6 +542,12 @@ export const displayRegistry = () =>
         ]),
         ripple: named("ripple", ["root", "ripple"]),
         avatar: named("avatar", ["root", "image", "fallback"]),
+        splitter: named("splitter", [
+            "root",
+            "panel",
+            "resizeTrigger",
+            "resizeTriggerIndicator",
+        ]),
         badge: named("badge", ["root"]),
         media: named("media", ["root"]),
         separator: named("separator", ["root"]),

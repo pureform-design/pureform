@@ -37,6 +37,7 @@ export default createConfig({
                     "bottom-sheet": "src/bottom-sheet/index.ts",
                     "side-sheet": "src/side-sheet/index.ts",
                     "drag-handle": "src/drag-handle/index.ts",
+                    splitter: "src/splitter/index.ts",
                     tooltip: "src/tooltip/index.ts",
                     "rich-tooltip": "src/rich-tooltip/index.ts",
                     snackbar: "src/snackbar/index.ts",
