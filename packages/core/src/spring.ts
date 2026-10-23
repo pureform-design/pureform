@@ -85,6 +85,9 @@ export interface SampleOptions {
     maxPoints?: number;
     /** The longest a spring may take, in ms; one with no damping never settles. Default 10000. */
     maxDuration?: number;
+    /** How fast it starts, as a share of the distance per second (positive toward the target),
+     *  as a motion let go mid-flight does. Default 0, from rest. */
+    velocity?: number;
 }
 
 /** A spring sampled for a target with no springs: how long it takes to settle, in whole ms, and
@@ -100,11 +103,13 @@ const round = (value: number, places: number) => {
     return Object.is(r, -0) ? 0 : r;
 };
 
-/** How long, in seconds, a spring takes to stay within `tolerance` of its target. */
+/** How long, in seconds, a spring takes to stay within `tolerance` of its target, starting at
+ *  `velocity` (a share of the distance per second; default 0, from rest). */
 export const settleTime = (
     spring: SpringNode,
     tolerance = 0.001,
     maxDuration = 10000,
+    velocity = 0,
 ): number => {
     const { stiffness: k, damping: zeta, mass: m } = spring;
     const w0 = Math.sqrt(k / m);
@@ -127,11 +132,17 @@ export const settleTime = (
                 bound *= 1.1;
         }
     }
+    // A starting speed scales the motion's envelope by at most 1 + |v|/rate.
+    if (velocity !== 0 && zeta > 0) {
+        const rate =
+            zeta < 1 ? zeta * w0 : w0 * (zeta - Math.sqrt(zeta * zeta - 1));
+        bound += Math.log(1 + Math.abs(velocity) / rate) / rate;
+    }
     bound = Math.min(Math.max(bound, 0), limit);
     // The last moment, scanning back from the bound, the spring is out of tolerance.
     const step = Math.max(bound / 4000, 1e-5);
     for (let t = bound; t > 0; t -= step) {
-        if (Math.abs(1 - springAt(spring, t)) > tolerance)
+        if (Math.abs(1 - springState(spring, velocity, t).progress) > tolerance)
             return Math.min(t + step, limit);
     }
     return 0;
@@ -201,8 +212,9 @@ export const sampleSpring = (
         precision = 0.002,
         maxPoints = 48,
         maxDuration = 10000,
+        velocity = 0,
     } = options;
-    const settle = settleTime(spring, tolerance, maxDuration);
+    const settle = settleTime(spring, tolerance, maxDuration, velocity);
     const duration = Math.max(1, Math.ceil(settle * 1000));
     const seconds = duration / 1000;
     const count = 1000;
@@ -210,10 +222,54 @@ export const sampleSpring = (
         { length: count + 1 },
         (_, i) => {
             const x = i / count;
-            return [x, i === count ? 1 : springAt(spring, x * seconds)];
+            return [
+                x,
+                i === count
+                    ? 1
+                    : springState(spring, velocity, x * seconds).progress,
+            ];
         },
     );
     return { duration, points: toLinearPoints(dense, precision, maxPoints) };
+};
+
+/** The spring (of mass 1) a sampled curve was most likely taken from: the damping ratio whose
+ *  motion, at the stiffness that settles in `duration` ms (within `tolerance`), strays least
+ *  from `points`. A web page reads a spring as its sampled duration and `linear()` curve; this
+ *  takes it back, so a motion can start from a speed the curve doesn't have (`velocity`). */
+export const springFromCurve = (
+    points: readonly LinearEasingPoint[],
+    duration: number,
+    tolerance = 0.001,
+): SpringNode => {
+    const stops = linearStops(points);
+    const seconds = Math.max(duration, 1) / 1000;
+    let best: SpringNode | undefined;
+    let least = Infinity;
+    for (let step = 0; step <= 150; step++) {
+        const damping = 0.25 + step * 0.01;
+        // Settle time scales with 1/ω: at ω = 1 it's `unit` seconds.
+        const unit = settleTime(
+            { type: "spring", stiffness: 1, damping, mass: 1 },
+            tolerance,
+            1e6,
+        );
+        const w = unit / seconds;
+        const spring: SpringNode = {
+            type: "spring",
+            stiffness: w * w,
+            damping,
+            mass: 1,
+        };
+        let error = 0;
+        for (const [output, input] of stops)
+            error += (springAt(spring, input * seconds) - output) ** 2;
+        if (error < least) {
+            least = error;
+            best = spring;
+        }
+    }
+    return best!;
 };
 
 /** A cubic Bézier segment of an easing path: its start, two control points, and end, each

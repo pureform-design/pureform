@@ -15,6 +15,7 @@ const ms = (value: number) => numeric(value, "ms");
 import { MotionConfigError, validateConfig } from "./path";
 import {
     dampingCoefficient,
+    springFromCurve,
     formatLinearEasing,
     linearEasingAt,
     parseLinearEasing,
@@ -292,5 +293,32 @@ describe("validation", () => {
             easing: linearEasing(0, 1),
         });
         expect(true).toBe(true);
+    });
+});
+
+describe("a spring let go mid-flight", () => {
+    const sheet: SpringNode = {
+        type: "spring",
+        stiffness: 700,
+        damping: 0.9,
+        mass: 1,
+    };
+
+    it("starts at the given speed and still ends at 1", () => {
+        const still = sampleSpring(sheet);
+        const moving = sampleSpring(sheet, { velocity: 20 });
+        // Faster from the start: further along at the first kept point.
+        expect(linearEasingAt(moving.points, 0.05)).toBeGreaterThan(
+            linearEasingAt(still.points, 0.05),
+        );
+        expect(moving.points.at(-1)).toEqual([1]);
+        expect(sampleSpring(sheet, { velocity: 0 })).toEqual(still);
+    });
+
+    it("takes the spring back from its sampled curve", () => {
+        const { duration, points } = sampleSpring(sheet);
+        const fitted = springFromCurve(points, duration);
+        expect(fitted.damping).toBeCloseTo(0.9, 1);
+        expect(Math.sqrt(fitted.stiffness)).toBeCloseTo(Math.sqrt(700), -0.5);
     });
 });
