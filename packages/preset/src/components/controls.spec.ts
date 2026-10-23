@@ -92,7 +92,7 @@ describe("switchControl", () => {
             ([key]) => key.includes(":active") && key.includes(":disabled"),
         );
         expect(disabledPressed.map(([, value]) => value)).toEqual([
-            expect.stringContaining("handleSize)"),
+            expect.stringContaining("handleSize,"),
             expect.stringContaining("handleSizeChecked"),
         ]);
     });
