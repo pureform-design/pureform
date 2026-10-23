@@ -30,6 +30,7 @@ const SECTIONS = [
     "fullscreen-dialog",
     "sheets",
     "panes",
+    "color-pickers",
     "media",
     "grid-lists",
     "carousels",

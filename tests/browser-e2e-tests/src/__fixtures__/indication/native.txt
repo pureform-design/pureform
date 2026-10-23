@@ -3038,6 +3038,15 @@ splitter.resizeTrigger: bg transparent | color none | outline none
 splitter.resizeTriggerIndicator: bg rgba(122, 117, 127, 1) | color none | outline none
     pressed: bg rgba(28, 27, 30, 1)
     pressed-checked: bg rgba(28, 27, 30, 1)
+colorPicker.areaThumb: bg rgba(0, 0, 0, 0) | color none | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+colorPicker.channelSliderThumb: bg rgba(0, 0, 0, 0) | color none | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+colorPicker.swatchTrigger: bg transparent | color none | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
 snackbar.action: bg transparent | color rgba(207, 188, 255, 1) | outline none
     hovered: bg rgba(207, 188, 255, 0.08)
     focused: bg rgba(207, 188, 255, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2

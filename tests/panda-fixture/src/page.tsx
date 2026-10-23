@@ -46,6 +46,7 @@ import {
     sideSheet,
     dragHandle,
     splitter,
+    colorPicker,
     fabMenu,
     splitButton,
     stepper,
@@ -3399,6 +3400,124 @@ export function Page() {
                         </div>
                     );
                 })}
+            </section>
+
+            <section data-section="color-pickers" style={row}>
+                {(() => {
+                    const s = colorPicker();
+                    const hue =
+                        "linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00)";
+                    const at = (left: string) => ({
+                        left,
+                        top: "50%",
+                        transform: "translate(-50%, -50%)",
+                    });
+                    return (
+                        <div class={s.root}>
+                            <label class={s.label}>Seed color</label>
+                            <div class={s.content}>
+                                <div
+                                    class={s.area}
+                                    style={{ position: "relative" }}
+                                >
+                                    <div
+                                        class={s.areaBackground}
+                                        style={{
+                                            background:
+                                                "linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, transparent), hsl(256, 100%, 50%)",
+                                        }}
+                                    />
+                                    <div
+                                        class={s.areaThumb}
+                                        role="slider"
+                                        aria-label="saturation and brightness"
+                                        aria-valuenow={51}
+                                        tabindex="0"
+                                        style={{
+                                            ...at("51%"),
+                                            top: "36%",
+                                            background: "#6750a4",
+                                        }}
+                                    />
+                                </div>
+                                <div class={s.channelSlider}>
+                                    <div
+                                        class={s.channelSliderTrack}
+                                        style={{ "background-image": hue }}
+                                    />
+                                    <div
+                                        class={s.channelSliderThumb}
+                                        role="slider"
+                                        aria-label="hue"
+                                        aria-valuenow={256}
+                                        tabindex="0"
+                                        style={{
+                                            ...at("71%"),
+                                            background: "hsl(256, 100%, 50%)",
+                                        }}
+                                    />
+                                </div>
+                                <div class={s.channelSlider}>
+                                    <div
+                                        class={s.transparencyGrid}
+                                        style={{
+                                            "background-color": "#fff",
+                                            "background-image":
+                                                "conic-gradient(#eee 0 25%, transparent 0 50%, #eee 0 75%, transparent 0)",
+                                            "background-size": "8px 8px",
+                                        }}
+                                    />
+                                    <div
+                                        class={s.channelSliderTrack}
+                                        style={{
+                                            "background-image":
+                                                "linear-gradient(to right, transparent, #6750a4)",
+                                        }}
+                                    />
+                                    <div
+                                        class={s.channelSliderThumb}
+                                        role="slider"
+                                        aria-label="alpha"
+                                        aria-valuenow={1}
+                                        tabindex="0"
+                                        style={{
+                                            ...at("100%"),
+                                            background: "#6750a4",
+                                        }}
+                                    />
+                                </div>
+                                <div class={s.control}>
+                                    <div
+                                        class={s.valueSwatch}
+                                        style={{ background: "#6750a4" }}
+                                    />
+                                </div>
+                                <div class={s.swatchGroup} role="group">
+                                    {[
+                                        "#6750a4",
+                                        "#006a6a",
+                                        "#8b5000",
+                                        "#bf4040",
+                                    ].map((color, index) => (
+                                        <button
+                                            class={s.swatchTrigger}
+                                            type="button"
+                                            aria-label={`Select ${color}`}
+                                            aria-pressed={
+                                                index === 0 ? "true" : "false"
+                                            }
+                                        >
+                                            <div
+                                                class={s.swatch}
+                                                style={{ background: color }}
+                                            />
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    );
+                })()}
             </section>
 
             <section
