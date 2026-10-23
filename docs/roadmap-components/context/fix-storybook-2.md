@@ -92,3 +92,28 @@ Follows [fix-storybook](fix-storybook.md).
   `__STORYBOOK_STORY_STORE__`) would name the reader.
 - The scenes build a toaster once from `toasts`; changing that arg from the controls (it has
   none) wouldn't update it.
+
+## Follow-up (fix-storybook-3): the Story Store warning, reproduced
+
+- **Reproduced** in `storybook dev` with Playwright: React renderer, **Interactions/Actions
+  panel open** (the manager must be listening), SplitButton, then Dark. Item 2 above missed it
+  because it never loaded a story that logs an action.
+- **Cause:** ours. `composeStories` gave a key-clicking component's stories
+  `onClick: fn(...)` as an **arg**. The Actions addon logs every spy arg's calls and sends them
+  across the channel; the call's argument is the click event, whose `view` is `window`.
+  Serializing it (`JSON.stringify` in `PostMessageTransport.send`) reads every global, including
+  the `__STORYBOOK_STORY_STORE__` proxy, whose getter `deprecate()`s. Stack:
+  `Proxy get` ← `JSON.stringify` ← `PostMessageTransport.send`; payload path
+  `storybook/actions/action-event` `.args.0.data.args.0.view`. Any story with a "click" key
+  (Button, SplitButton, links, list items…) in React/Solid; the first click of the page warns
+  (`deprecate` logs once).
+- **Fix:** `src/renderers/compose.ts`: the spy (`clicks`) is no longer an arg; the arg is a plain
+  handler that `preventDefault`s and records only the event's type. `plays.ts` `keyPlay` takes the
+  spy as a parameter. Other components' Dark scenes and the other renderers have no other
+  source: the only `fn()` in the app is that one.
+- **Test:** `.storybook/preview.ts` `afterEach` fails a story whose spy arg recorded a call that
+  reaches `window` (`src/renderers/reaches-window.ts`, depth 6). Checked against the old code:
+  `SplitButton.stories` in React failed 4 (Light, Dark, Key Enter, Key Space) with the message;
+  with the fix SplitButton, Button, Link and List stories pass in React and Solid (86 each).
+  A console-warn assertion wasn't used: `deprecate` logs once per page, so only the first story
+  would fail.

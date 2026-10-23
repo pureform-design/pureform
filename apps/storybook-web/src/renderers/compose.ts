@@ -34,17 +34,25 @@ export interface ComposeInput {
 export const composeStories = (input: ComposeInput) => {
     const shared = Object.assign({}, ...input.shared.map((h) => h.args));
     const c = caseFor(input.component);
-    // The case's props (an accessible name), and a spy for a key that clicks.
+    // The case's props (an accessible name), and a handler for a key that clicks. The spy isn't
+    // an arg: the Actions panel logs every spy arg's calls and sends the click event across the
+    // channel, whose `view` is `window`, so serializing it reads every global (Storybook's
+    // deprecated `__STORYBOOK_STORY_STORE__` among them). The spy gets the event's type instead.
+    const clicks = fn();
     const component = Object.assign(
         {},
         c.props,
         c.keyboard?.keys.some((key) => key.does === "click")
             ? {
                   // A link's click would navigate the story's frame away (a list's
-                  // `href="#inbox"`), so the spy keeps it in place.
-                  onClick: fn((event?: { preventDefault?: () => void }) =>
-                      event?.preventDefault?.(),
-                  ),
+                  // `href="#inbox"`), so the handler keeps it in place.
+                  onClick: (event?: {
+                      type?: string;
+                      preventDefault?: () => void;
+                  }) => {
+                      event?.preventDefault?.();
+                      clicks(event?.type);
+                  },
               }
             : {},
         ...input.hooks.map((h) => h.args),
@@ -85,7 +93,7 @@ export const composeStories = (input: ComposeInput) => {
         return {
             ...base,
             args,
-            play: skipping(key ? keyPlay(c, key) : statePlay(c)),
+            play: skipping(key ? keyPlay(c, key, clicks) : statePlay(c)),
         };
     };
     const decorators: Decorator[] = [...input.shared, ...input.hooks].flatMap(

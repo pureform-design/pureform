@@ -48,21 +48,23 @@ export const statePlay =
 
 /** A key on the focused component does what the case says. */
 export const keyPlay =
-    (c: ComponentCase, key: KeyCase): Play =>
+    (
+        c: ComponentCase,
+        key: KeyCase,
+        onClick: Parameters<typeof expect>[0],
+    ): Play =>
     async ({ args, canvasElement }) => {
         const host = await mounted(c, canvasElement);
         c.keyboard!.focusable(host).focus();
         await userEvent.keyboard(key.key);
-        const onClick = args["onClick"] as
-            | { mock: { calls: unknown[] } }
-            | undefined;
+        const clicks = args["onClick"] === undefined ? undefined : onClick;
         if (key.does === "click") {
-            await waitFor(() => expect(onClick).toHaveBeenCalledOnce());
+            await waitFor(() => expect(clicks).toHaveBeenCalledOnce());
         } else if (key.does === "change") {
             const to = key.to ?? c.state!.to;
             await waitFor(() => expect(c.state!.read(host)).toEqual(to));
         } else {
             if (c.state) await expect(c.state.read(host)).toEqual(c.state.from);
-            if (onClick) await expect(onClick).not.toHaveBeenCalled();
+            if (clicks) await expect(clicks).not.toHaveBeenCalled();
         }
     };
