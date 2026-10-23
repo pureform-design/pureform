@@ -12,6 +12,7 @@ import {
     splitterMachineProps,
     splitterOrientation,
     splitterSelection,
+    splitterSizeProps,
     splitterSnap,
     splitterTriggerId,
     splitterTriggerProps,
@@ -19,6 +20,8 @@ import {
 import type {
     SplitterContentProps,
     SplitterRootOwnProps,
+    SplitterSize,
+    SplitterSizeDetails,
 } from "@pureform/binding-core";
 import * as splitter from "@pureform/machines/splitter";
 import { normalizeProps } from "@zag-js/react";
@@ -26,6 +29,7 @@ import type { PropTypes } from "@zag-js/react";
 import type { ElementType, PointerEvent, ReactNode } from "react";
 import { Fragment, useId, useRef } from "react";
 
+import { useControllable } from "../controllable";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import { useComponent, useSlotProps } from "../parts";
@@ -101,9 +105,15 @@ function Root(props: SplitterRootProps): ReactNode {
         velocity: createDragVelocity(),
     }).current;
     const horizontal = splitterOrientation(props) === "horizontal";
+    const size = useControllable<
+        "size",
+        readonly SplitterSize[],
+        SplitterSizeDetails
+    >("Splitter", "size", props);
     const service = useMachine(splitter.machine, {
         dir,
         ...splitterMachineProps({ id: generated, ...props }),
+        ...splitterSizeProps(size.machineProps, props.panels),
         onResizeEnd: (details) => {
             const trigger = drag.trigger;
             drag.trigger = null;

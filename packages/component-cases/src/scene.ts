@@ -56,6 +56,7 @@ export const COMPONENT_NAMES = [
     "Slider",
     "Snackbar",
     "SplitButton",
+    "Splitter",
     "Stepper",
     "SupportingText",
     "Switch",

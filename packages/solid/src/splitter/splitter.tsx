@@ -12,6 +12,7 @@ import {
     splitterMachineProps,
     splitterOrientation,
     splitterSelection,
+    splitterSizeProps,
     splitterSnap,
     splitterTriggerId,
     splitterTriggerProps,
@@ -20,9 +21,11 @@ import type {
     SplitterContentProps,
     SplitterPane,
     SplitterRootOwnProps,
+    SplitterSize,
+    SplitterSizeDetails,
 } from "@pureform/binding-core";
-import * as splitter from "@pureform/machines/splitter";
 import type { PropTypes } from "@pureform/machines";
+import * as splitter from "@pureform/machines/splitter";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {
     type Accessor,
@@ -34,6 +37,7 @@ import {
     Show,
 } from "solid-js";
 
+import { useControllable } from "../controllable";
 import { normalizeProps, useMachine } from "../internal/zag";
 import { createPartContext } from "../part-context";
 import { createSlotProps, useComponent } from "../parts";
@@ -104,9 +108,15 @@ function Root(props: SplitterRootProps): JSX.Element {
     let root: HTMLElement | undefined;
     const drag: Drag = { trigger: null, velocity: createDragVelocity() };
     const horizontal = () => splitterOrientation(props) === "horizontal";
+    const size = useControllable<
+        "size",
+        readonly SplitterSize[],
+        SplitterSizeDetails
+    >("Splitter", "size", props);
     const service = useMachine(splitter.machine, () => ({
         dir: dir(),
         ...splitterMachineProps({ ...props, id: props.id ?? generated }),
+        ...splitterSizeProps(size.machineProps(), props.panels),
         onResizeEnd: (details: { size: number[] }) => {
             const trigger = drag.trigger;
             drag.trigger = null;

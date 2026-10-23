@@ -72,7 +72,9 @@ export interface SplitterRootOwnProps extends SplitterVariantProps {
     /** Each pane's size to start with. Left out, they share the room. */
     readonly defaultSize?: readonly SplitterSize[] | undefined;
     /** Called as the sizes change: while dragging, on a key, on a snap. */
-    readonly onSizeChange?: ((details: SplitterSizeDetails) => void) | undefined;
+    readonly onSizeChange?:
+        | ((details: SplitterSizeDetails) => void)
+        | undefined;
     /** Where a dragged divider snaps when let go. `[]` lets it rest where it's let go.
      *  @default SPLITTER_ANCHORS */
     readonly anchors?: readonly SplitterAnchor[] | undefined;
@@ -129,26 +131,33 @@ export const splitterOrientation = (
 ): "horizontal" | "vertical" =>
     props.orientation === "vertical" ? "vertical" : "horizontal";
 
-/** The machine's props from Root's. */
+/** The machine's props from Root's, besides the sizes (`splitterSizeProps`). */
 export const splitterMachineProps = (
     props: Pick<
         SplitterRootOwnProps,
-        | "id"
-        | "orientation"
-        | "panels"
-        | "size"
-        | "defaultSize"
-        | "onSizeChange"
-        | "keyboardResizeBy"
+        "id" | "orientation" | "panels" | "keyboardResizeBy"
     >,
 ) => ({
     id: props.id,
     orientation: splitterOrientation(props),
     panels: props.panels.map((panel) => ({ ...panel })),
+    keyboardResizeBy: props.keyboardResizeBy,
+});
+
+/** The machine's size props from the controllable ones (`size`, `defaultSize`, `onSizeChange`).
+ *  Without either size, the panes share the room from the first render, so the server draws
+ *  what the browser does. */
+export const splitterSizeProps = (
+    props: Pick<SplitterRootOwnProps, "size" | "defaultSize" | "onSizeChange">,
+    panels: readonly SplitterPanelData[],
+) => ({
     size: props.size === undefined ? undefined : [...props.size],
     defaultSize:
-        props.defaultSize === undefined ? undefined : [...props.defaultSize],
-    keyboardResizeBy: props.keyboardResizeBy,
+        props.defaultSize === undefined
+            ? props.size === undefined
+                ? splitterInitialSizes(panels, undefined, 0)
+                : undefined
+            : [...props.defaultSize],
     onResize:
         props.onSizeChange &&
         ((details: { size: number[] }) =>
@@ -196,10 +205,13 @@ export const splitterInitialSizes = (
             : splitterPercent(sizes[index], room, Number.NaN),
     );
     const taken = given.reduce<number>(
-        (sum, size) => sum + (size !== undefined && !Number.isNaN(size) ? size : 0),
+        (sum, size) =>
+            sum + (size !== undefined && !Number.isNaN(size) ? size : 0),
         0,
     );
-    const open = given.filter((size) => size === undefined || Number.isNaN(size));
+    const open = given.filter(
+        (size) => size === undefined || Number.isNaN(size),
+    );
     const share = open.length > 0 ? Math.max(0, 100 - taken) / open.length : 0;
     return given.map((size) =>
         size === undefined || Number.isNaN(size) ? share : size,
@@ -308,7 +320,10 @@ export const createDragVelocity = (window = 100) => {
             const first = samples[0];
             const last = samples.at(-1);
             if (!first || !last || last.time === first.time) return 0;
-            return ((last.position - first.position) / (last.time - first.time)) * 1000;
+            return (
+                ((last.position - first.position) / (last.time - first.time)) *
+                1000
+            );
         },
     };
 };

@@ -50,8 +50,8 @@ import {
 import { anatomy as navigation } from "./navigation/navigation.anatomy";
 import { anatomy as paginator } from "./paginator/paginator.anatomy";
 import { anatomy as slider } from "./slider/slider.anatomy";
-import { anatomy as splitter } from "./splitter/splitter.anatomy";
 import { anatomy as snackbar } from "./snackbar/snackbar.anatomy";
+import { anatomy as splitter } from "./splitter/splitter.anatomy";
 import { anatomy as stepper } from "./stepper/stepper.anatomy";
 import { anatomy as table } from "./table/table.anatomy";
 import {

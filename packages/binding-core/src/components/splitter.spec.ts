@@ -7,6 +7,7 @@ import {
     splitterLimits,
     splitterMachineProps,
     splitterMoveBy,
+    splitterSizeProps,
     splitterPercent,
     splitterSnap,
     splitterTriggerProps,
@@ -17,7 +18,8 @@ const FREE = [
     { min: 0, max: 100 },
 ];
 
-const near = (sizes: number[]) => sizes.map((size) => Math.round(size * 100) / 100);
+const near = (sizes: number[]) =>
+    sizes.map((size) => Math.round(size * 100) / 100);
 
 describe("splitter", () => {
     it("reads sizes in percent or pixels of the room", () => {
@@ -35,11 +37,15 @@ describe("splitter", () => {
 
     it("shares out the room the given sizes leave", () => {
         expect(
-            splitterInitialSizes([{ id: "a" }, { id: "b" }, { id: "c" }], [40], 1000),
+            splitterInitialSizes(
+                [{ id: "a" }, { id: "b" }, { id: "c" }],
+                [40],
+                1000,
+            ),
         ).toEqual([40, 30, 30]);
-        expect(splitterInitialSizes([{ id: "a" }, { id: "b" }], undefined, 0)).toEqual(
-            [50, 50],
-        );
+        expect(
+            splitterInitialSizes([{ id: "a" }, { id: "b" }], undefined, 0),
+        ).toEqual([50, 50]);
     });
 
     it("moves a divider, stopping at its panes' limits", () => {
@@ -124,21 +130,28 @@ describe("splitter", () => {
 
     it("maps Root's props onto Zag's and names the divider", () => {
         const onSizeChange = (_: { size: number[] }) => {};
-        const props = splitterMachineProps({
-            panels: [{ id: "a" }, { id: "b" }],
-            defaultSize: [30, 70],
-            orientation: "vertical",
-            onSizeChange,
-        });
-        expect(props.orientation).toBe("vertical");
-        expect(props.defaultSize).toEqual([30, 70]);
-        expect(props.onResize).toBeTypeOf("function");
+        const panels = [{ id: "a" }, { id: "b" }];
+        expect(
+            splitterMachineProps({ panels, orientation: "vertical" })
+                .orientation,
+        ).toBe("vertical");
+        const sizes = splitterSizeProps(
+            { defaultSize: [30, 70], onSizeChange },
+            panels,
+        );
+        expect(sizes.defaultSize).toEqual([30, 70]);
+        expect(sizes.onResize).toBeTypeOf("function");
+        // Without sizes, the panes share the room from the first render.
+        expect(splitterSizeProps({}, panels).defaultSize).toEqual([50, 50]);
+        expect(
+            splitterSizeProps({ size: [20, 80] }, panels).defaultSize,
+        ).toBeUndefined();
         expect(splitterTriggerProps({ dragging: true })).toEqual({
             "aria-label": "Resize panes",
             "data-pf-active": "",
         });
-        expect(splitterTriggerProps({ label: "Resize list", dragging: false })).toEqual(
-            { "aria-label": "Resize list", "data-pf-active": undefined },
-        );
+        expect(
+            splitterTriggerProps({ label: "Resize list", dragging: false }),
+        ).toEqual({ "aria-label": "Resize list", "data-pf-active": undefined });
     });
 });

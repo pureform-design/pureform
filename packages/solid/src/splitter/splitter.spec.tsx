@@ -60,7 +60,9 @@ const panes = [
 
 describe("Splitter", () => {
     it("renders its panes with a named divider holding the pill between them", async () => {
-        withRegistry(() => <Splitter panes={panes} resizeLabel="Resize list" />);
+        withRegistry(() => (
+            <Splitter panes={panes} resizeLabel="Resize list" />
+        ));
         await settle();
         const root = all(testIds.splitter.root)[0]!;
         expect(root.className).toBe("splitter");

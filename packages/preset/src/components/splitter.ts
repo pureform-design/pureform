@@ -56,7 +56,11 @@ const ACTIVE = slot("resizeTrigger", "pressed");
 
 /** The pill's size across and along the divider: rest, or pressed and dragged. */
 const pill = (across: "width" | "height", along: "width" | "height") => ({
-    [across]: when(ACTIVE, ref("handleActiveThickness"), ref("handleThickness")),
+    [across]: when(
+        ACTIVE,
+        ref("handleActiveThickness"),
+        ref("handleThickness"),
+    ),
     [along]: when(ACTIVE, ref("handleActiveLength"), ref("handleLength")),
 });
 
@@ -99,8 +103,16 @@ export const splitter = pf.slotComponent({
             },
             resizeTriggerIndicator: {
                 flexShrink: unitless(0),
-                backgroundColor: when(ACTIVE, ref("handleActiveColor"), ref("handleColor")),
-                borderRadius: when(ACTIVE, ref("handleActiveRadius"), ref("handleRadius")),
+                backgroundColor: when(
+                    ACTIVE,
+                    ref("handleActiveColor"),
+                    ref("handleColor"),
+                ),
+                borderRadius: when(
+                    ACTIVE,
+                    ref("handleActiveRadius"),
+                    ref("handleRadius"),
+                ),
             },
         },
         variants: {

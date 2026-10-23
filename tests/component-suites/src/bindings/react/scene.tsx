@@ -56,6 +56,7 @@ import { SideSheet } from "@pureform/react/side-sheet";
 import { Slider } from "@pureform/react/slider";
 import { Snackbar } from "@pureform/react/snackbar";
 import { SplitButton } from "@pureform/react/split-button";
+import { Splitter } from "@pureform/react/splitter";
 import { Stepper } from "@pureform/react/stepper";
 import { SupportingText } from "@pureform/react/supporting-text";
 import { Switch } from "@pureform/react/switch";
@@ -176,6 +177,7 @@ export const components: Record<ComponentName, ComponentType<never>> = {
     LoadingIndicator,
     Dialog,
     DragHandle,
+    Splitter,
     Fab,
     FullscreenDialog,
     GridList: GridListScene,

@@ -213,6 +213,7 @@ export {
     splitterOrientation,
     splitterPercent,
     splitterSelection,
+    splitterSizeProps,
     splitterSnap,
     splitterTriggerId,
     splitterTriggerProps,
