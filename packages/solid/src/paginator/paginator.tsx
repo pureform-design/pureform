@@ -201,9 +201,17 @@ const trigger = (kind: TriggerKind) =>
             machine,
             states: () => ({ mirrored: props.mirror ?? true }),
             unstyled: () => props.unstyled,
+            // The ready-made icon button draws its `icon`, not children.
             props: merge(omit(props, "unstyled", "mirror", "as", "children"), {
                 get children() {
-                    return props.children ?? GLYPHS[kind]();
+                    return props.as === IconButton
+                        ? undefined
+                        : (props.children ?? GLYPHS[kind]());
+                },
+                get icon() {
+                    return props.as === IconButton
+                        ? (props.children ?? GLYPHS[kind]())
+                        : undefined;
                 },
             }),
         });
