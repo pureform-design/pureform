@@ -1,6 +1,7 @@
 import { compositeTestIds } from "@pureform/anatomy";
 import { screen } from "@testing-library/react";
 import type { ReactNode } from "react";
+import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
@@ -123,7 +124,6 @@ describe("BottomSheet, ready-made", () => {
         withRegistry(
             <BottomSheet
                 defaultOpen
-                partiallyExpandable
                 aria-label="Share"
                 body={<div style={{ height: "200vh" }}>Options</div>}
                 onExpandedChange={onExpandedChange}
@@ -142,6 +142,74 @@ describe("BottomSheet, ready-made", () => {
         expect(handle.getAttribute("aria-label")).toBe("Collapse sheet");
         expect(onExpandedChange).toHaveBeenLastCalledWith({ expanded: true });
         expect(onOpenChange).not.toHaveBeenCalled();
+    });
+
+    it("follows a controlled expanded, opens fully when told, and scrolls its body by keyboard", async () => {
+        const onExpandedChange = vi.fn();
+        function Controlled() {
+            const [expanded, setExpanded] = useState(true);
+            return (
+                <>
+                    <button type="button" onClick={() => setExpanded(false)}>
+                        Collapse
+                    </button>
+                    <BottomSheet
+                        defaultOpen
+                        modal={false}
+                        aria-label="Share"
+                        body={<div style={{ height: "200vh" }}>Options</div>}
+                        expanded={expanded}
+                        onExpandedChange={onExpandedChange}
+                        // This registry doesn't bound the body; the preset does.
+                        slotProps={{
+                            body: {
+                                style: { maxHeight: "70vh", overflow: "auto" },
+                            },
+                        }}
+                    />
+                </>
+            );
+        }
+        withRegistry(<Controlled />);
+        await frames();
+        const content = byTestId(ids.content);
+        const handle = byTestId(ids.dragHandle);
+        expect(content.style.translate).toBe("");
+        expect(byTestId(ids.body).getAttribute("tabindex")).toBe("0");
+        // A press asks to collapse; the app didn't take it, so it stays fully open.
+        await interact(() => userEvent.click(handle));
+        await frames();
+        expect(onExpandedChange).toHaveBeenLastCalledWith({ expanded: false });
+        expect(content.style.translate).toBe("");
+        await interact(() => userEvent.click(screen.getByText("Collapse")));
+        await frames();
+        expect(content.style.translate).not.toBe("");
+    });
+
+    it("opens fully with partiallyExpandable off", async () => {
+        withRegistry(
+            <>
+                <BottomSheet
+                    defaultOpen
+                    partiallyExpandable={false}
+                    aria-label="Share"
+                    body={<div style={{ height: "200vh" }}>Options</div>}
+                />
+            </>,
+        );
+        await frames();
+        expect(byTestId(ids.content).style.translate).toBe("");
+        expect(byTestId(ids.dragHandle).getAttribute("aria-label")).toBe(
+            "Close sheet",
+        );
+    });
+
+    it("keeps a short body out of the tab order", async () => {
+        withRegistry(
+            <BottomSheet defaultOpen aria-label="Share" body="Options" />,
+        );
+        await frames();
+        expect(byTestId(ids.body).hasAttribute("tabindex")).toBe(false);
     });
 
     it("asks onClose before Escape, the scrim, the handle's press, or a drag closes it", async () => {

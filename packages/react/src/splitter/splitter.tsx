@@ -1,13 +1,15 @@
 // The splitter: Root on Zag's splitter machine, its `Panel`s and a `ResizeTrigger` (Material's
 // vertical drag handle) between each pair, and the ready-made Splitter over them. A drag or the
 // arrow keys resize the panes; when a drag lets go, the divider snaps to the nearest anchor (or
-// the next one the way it was flung), as Compose's pane expansion does.
+// the next one the way it was flung), as Compose's pane expansion does, settling there on its
+// spring from the drag's speed.
 
 import { splitterAnatomy } from "@pureform/anatomy";
 import {
     createDragVelocity,
     SPLITTER_ANCHORS,
     SPLITTER_ROOT_PROPS,
+    SPLITTER_SETTLE,
     splitterLimits,
     splitterMachineProps,
     splitterOrientation,
@@ -23,6 +25,7 @@ import type {
     SplitterSize,
     SplitterSizeDetails,
 } from "@pureform/binding-core";
+import { settleOnSpring } from "@pureform/binding-core/dom";
 import * as splitter from "@pureform/machines/splitter";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";
@@ -40,10 +43,11 @@ import { useDirection } from "../provider";
 
 type Anatomy = typeof splitterAnatomy;
 
-/** A drag under way: its divider and its speed. */
+/** A drag under way: its divider and its speed, and what stops the last snap's settle. */
 interface Drag {
     trigger: string | null;
     readonly velocity: ReturnType<typeof createDragVelocity>;
+    stopSettle: () => void;
 }
 
 /** What Root shares with its parts. */
@@ -103,6 +107,7 @@ function Root(props: SplitterRootProps): ReactNode {
     const drag = useRef<Drag>({
         trigger: null,
         velocity: createDragVelocity(),
+        stopSettle: () => {},
     }).current;
     const horizontal = splitterOrientation(props) === "horizontal";
     const size = useControllable<
@@ -131,8 +136,21 @@ function Root(props: SplitterRootProps): ReactNode {
                 limits: splitterLimits(current.panels, room),
                 velocity: drag.velocity.velocity(),
             });
-            if (snapped.some((size, at) => size !== details.size[at]))
+            if (snapped.some((size, at) => size !== details.size[at])) {
+                // The two panes beside the divider settle on Compose's spring from the drag's
+                // speed (px/ms toward the end).
+                const panels = [...(rootRef.current?.children ?? [])].filter(
+                    (child) => child.getAttribute("data-part") === "panel",
+                ) as HTMLElement[];
+                drag.stopSettle = settleOnSpring(
+                    panels.slice(index, index + 2),
+                    "flex-grow",
+                    SPLITTER_SETTLE,
+                    ((snapped[index]! - details.size[index]!) / 100) * room,
+                    drag.velocity.velocity() / 1000,
+                );
                 service.send({ type: "SIZE.SET", size: snapped });
+            }
         },
     });
     const api = splitter.connect(service, normalizeProps);
@@ -190,6 +208,7 @@ function ResizeTrigger({
             {
                 onPointerDown: (event: PointerEvent) => {
                     if (event.button !== 0 || disabled) return;
+                    drag.stopSettle();
                     drag.trigger = id;
                     drag.velocity.reset();
                     drag.velocity.add(along(event), event.timeStamp);

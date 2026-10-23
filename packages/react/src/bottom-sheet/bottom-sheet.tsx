@@ -5,8 +5,9 @@
 // renders in place, inside Root: while a modal sheet is open, Zag keeps focus inside it, hides the
 // rest of the page from assistive technology, and stops the page scrolling. A standard sheet
 // (`modal={false}`) leaves the page usable. The drag handle closes the sheet on a press, and on a
-// drag down past a quarter of its height; a sheet that can rest partly open
-// (`partiallyExpandable`) moves between partly and fully open instead.
+// drag down; a sheet taller than half the screen rests partly open (unless
+// `partiallyExpandable={false}`) and moves between partly and fully open instead. The body is
+// in the tab order only while it overflows.
 
 import {
     bottomSheetBackdropAnatomy,
@@ -24,6 +25,8 @@ import {
     sheetDragHandleLayout,
     sheetMachineProps,
     sheetModal,
+    sheetOpeningRest,
+    sheetPartiallyExpandable,
 } from "@pureform/binding-core";
 import type {
     BottomSheetContentProps,
@@ -32,7 +35,11 @@ import type {
     SheetRest,
     Unstyled,
 } from "@pureform/binding-core";
-import { dragToDismiss } from "@pureform/binding-core/dom";
+import {
+    dragToDismiss,
+    focusableWhileOverflowing,
+} from "@pureform/binding-core/dom";
+import type { SheetDrag } from "@pureform/binding-core/dom";
 import { mergeProps, normalizeProps } from "@zag-js/react";
 import {
     type ElementType,
@@ -109,18 +116,29 @@ const Positioner: (props: BottomSheetPartProps) => ReactNode =
 /** The sheet's surface. It stays while its exit animation runs. */
 const Content: (props: BottomSheetPartProps) => ReactNode = chrome.Content;
 
-/** The content, which describes the sheet. It scrolls when it's taller than the sheet. */
-const Body: (props: BottomSheetPartProps) => ReactNode = chrome.part(
-    "body",
-    "Body",
-    "div",
-    (api) => api.getDescriptionProps(),
-);
+/** The content, which describes the sheet. It scrolls natively when it's taller than the
+ *  sheet, and is in the tab order only then, so a keyboard can scroll it. */
+function Body({ unstyled, ...props }: BottomSheetPartProps): ReactNode {
+    const { scope, api } = context.use("Body");
+    const ref = useCallback(
+        (element: HTMLElement | null) =>
+            element ? focusableWhileOverflowing(element) : undefined,
+        [],
+    );
+    return scope.render("body", {
+        element: "div",
+        ref,
+        machine: api.getDescriptionProps(),
+        unstyled,
+        props,
+    });
+}
 
-/** The drag handle at the top edge: a press closes the sheet, and so does a drag down past a
- *  quarter of its height. On a sheet that can rest partly open (`partiallyExpandable`), a drag
- *  or a press moves it between partly and fully open, and a drag down from partly open closes
- *  it. Without `aria-label`, it's named for what a press does. It renders the drag handle
+/** The drag handle at the top edge: a press closes the sheet, and so does a drag down (as
+ *  Compose's: 56px past where it rested, or a flick). On a sheet that rests partly open (taller
+ *  than half the screen, unless `partiallyExpandable={false}`), a drag or a press moves it
+ *  between partly and fully open (`expanded`, `onExpandedChange`), and a drag down from partly
+ *  open closes it. Without `aria-label`, it's named for what a press does. It renders the drag handle
  *  component; give `as` to render another. */
 function DragHandle({
     unstyled,
@@ -145,6 +163,15 @@ function DragHandle({
         readonly movable: boolean;
     }>({ rest: "expanded", movable: false });
     const lastRest = useRef<SheetRest>("expanded");
+    const drag = useRef<SheetDrag | undefined>(undefined);
+    // A controlled `expanded`: once each render has committed, the sheet rests where it says
+    // (it moves when the prop changes, and goes back when a drag's change wasn't taken).
+    const expanded = rootProps.expanded;
+    useEffect(() => {
+        if (expanded === undefined) return;
+        lastRest.current = expanded ? "expanded" : "partial";
+        drag.current?.rest(lastRest.current);
+    });
     // After a drag closed it: once that render has committed, a sheet still open (one the app
     // kept open) settles back.
     const [left, setLeft] = useState<{ readonly kept: () => void }>();
@@ -152,31 +179,36 @@ function DragHandle({
         if (left && latestApi.current.open) left.kept();
     }, [left, latestApi]);
     const ref = useCallback(
-        (element: HTMLElement | null) =>
-            element
-                ? dragToDismiss(
-                      element,
-                      () => surface.current,
-                      (kept) => {
-                          latestApi.current.setOpen(false);
-                          setLeft({ kept });
-                      },
-                      () => onClose()?.() ?? true,
-                      asker,
-                      {
-                          partial: () =>
-                              latestRoot.current.partiallyExpandable === true,
-                          onRest: (next, movable) => {
-                              if (lastRest.current !== next)
-                                  latestRoot.current.onExpandedChange?.({
-                                      expanded: next === "expanded",
-                                  });
-                              lastRest.current = next;
-                              setRest({ rest: next, movable });
-                          },
-                      },
-                  )
-                : undefined,
+        (element: HTMLElement | null) => {
+            if (!element) return undefined;
+            const stop = dragToDismiss(
+                element,
+                () => surface.current,
+                (kept) => {
+                    latestApi.current.setOpen(false);
+                    setLeft({ kept });
+                },
+                () => onClose()?.() ?? true,
+                asker,
+                {
+                    partial: () => sheetPartiallyExpandable(latestRoot.current),
+                    opening: () => sheetOpeningRest(latestRoot.current),
+                    onRest: (next, movable) => {
+                        if (lastRest.current !== next)
+                            latestRoot.current.onExpandedChange?.({
+                                expanded: next === "expanded",
+                            });
+                        lastRest.current = next;
+                        setRest({ rest: next, movable });
+                    },
+                },
+            );
+            drag.current = stop;
+            return () => {
+                drag.current = undefined;
+                stop();
+            };
+        },
         [surface, latestApi, asker, onClose],
     );
     const close = api.getCloseTriggerProps();

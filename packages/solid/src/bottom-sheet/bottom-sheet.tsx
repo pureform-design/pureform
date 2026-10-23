@@ -5,8 +5,9 @@
 // renders in place, inside Root: while a modal sheet is open, Zag keeps focus inside it, hides the
 // rest of the page from assistive technology, and stops the page scrolling. A standard sheet
 // (`modal={false}`) leaves the page usable. The drag handle closes the sheet on a press, and on a
-// drag down past a quarter of its height; a sheet that can rest partly open
-// (`partiallyExpandable`) moves between partly and fully open instead.
+// drag down; a sheet taller than half the screen rests partly open (unless
+// `partiallyExpandable={false}`) and moves between partly and fully open instead. The body is
+// in the tab order only while it overflows.
 
 import {
     bottomSheetBackdropAnatomy,
@@ -25,6 +26,8 @@ import {
     sheetDragHandleLayout,
     sheetMachineProps,
     sheetModal,
+    sheetOpeningRest,
+    sheetPartiallyExpandable,
 } from "@pureform/binding-core";
 import type {
     BottomSheetContentProps,
@@ -33,9 +36,20 @@ import type {
     SheetRest,
     Unstyled,
 } from "@pureform/binding-core";
-import { dragToDismiss } from "@pureform/binding-core/dom";
+import {
+    dragToDismiss,
+    focusableWhileOverflowing,
+} from "@pureform/binding-core/dom";
+import type { SheetDrag } from "@pureform/binding-core/dom";
 import type { JSX, ValidComponent } from "@solidjs/web";
-import { createSignal, merge, omit, onCleanup, Show } from "solid-js";
+import {
+    createEffect,
+    createSignal,
+    merge,
+    omit,
+    onCleanup,
+    Show,
+} from "solid-js";
 
 import { Button } from "../button";
 import { dialogParts } from "../dialog-parts";
@@ -104,10 +118,11 @@ const Positioner: (props: BottomSheetPartProps) => JSX.Element =
 /** The sheet's surface. It stays while its exit animation runs. */
 const Content: (props: BottomSheetPartProps) => JSX.Element = chrome.Content;
 
-/** The drag handle at the top edge: a press closes the sheet, and so does a drag down past a
- *  quarter of its height. On a sheet that can rest partly open (`partiallyExpandable`), a drag
- *  or a press moves it between partly and fully open, and a drag down from partly open closes
- *  it. Without `aria-label`, it's named for what a press does. It renders the drag handle
+/** The drag handle at the top edge: a press closes the sheet, and so does a drag down (as
+ *  Compose's: 56px past where it rested, or a flick). On a sheet that rests partly open (taller
+ *  than half the screen, unless `partiallyExpandable={false}`), a drag or a press moves it
+ *  between partly and fully open (`expanded`, `onExpandedChange`), and a drag down from partly
+ *  open closes it. Without `aria-label`, it's named for what a press does. It renders the drag handle
  *  component; give `as` to render another. */
 function DragHandle(props: BottomSheetTriggerProps): JSX.Element {
     const {
@@ -125,8 +140,18 @@ function DragHandle(props: BottomSheetTriggerProps): JSX.Element {
         readonly movable: boolean;
     }>({ rest: "expanded", movable: false });
     let lastRest: SheetRest = "expanded";
-    let stop: (() => void) | undefined;
+    let stop: SheetDrag | undefined;
     onCleanup(() => stop?.());
+    // A controlled `expanded`: the sheet rests where it says (it moves when the prop changes,
+    // and goes back when a drag's change wasn't taken).
+    createEffect(
+        () => [root.expanded, rest().rest] as const,
+        ([expanded]) => {
+            if (expanded === undefined) return;
+            lastRest = expanded ? "expanded" : "partial";
+            stop?.rest(lastRest);
+        },
+    );
     return scope.render("dragHandle", {
         element: "button",
         as: () => props.as ?? DragHandleComponent,
@@ -145,7 +170,8 @@ function DragHandle(props: BottomSheetTriggerProps): JSX.Element {
                 () => onClose()?.() ?? true,
                 asker,
                 {
-                    partial: () => root.partiallyExpandable === true,
+                    partial: () => sheetPartiallyExpandable(root),
+                    opening: () => sheetOpeningRest(root),
                     onRest: (next, movable) => {
                         if (next !== lastRest)
                             root.onExpandedChange?.({
@@ -179,13 +205,30 @@ function DragHandle(props: BottomSheetTriggerProps): JSX.Element {
     });
 }
 
-/** The content, which describes the sheet. It scrolls when it's taller than the sheet. */
-const Body: (props: BottomSheetPartProps) => JSX.Element = chrome.part(
-    "body",
-    "Body",
-    "div",
-    (api) => api.getDescriptionProps(),
-);
+/** The content, which describes the sheet. It scrolls natively when it's taller than the
+ *  sheet, and is in the tab order only then, so a keyboard can scroll it. */
+function Body(props: BottomSheetPartProps): JSX.Element {
+    const { scope, api } = context.use("Body");
+    let stop: (() => void) | undefined;
+    let gone = false;
+    onCleanup(() => {
+        gone = true;
+        stop?.();
+    });
+    return scope.render("body", {
+        element: "div",
+        ref: (element: HTMLElement) => {
+            stop?.();
+            // Once the app's props are on it, so a `tabindex` it gave stays.
+            queueMicrotask(() => {
+                if (!gone) stop = focusableWhileOverflowing(element);
+            });
+        },
+        machine: () => api().getDescriptionProps(),
+        unstyled: () => props.unstyled,
+        props: omit(props, "unstyled"),
+    });
+}
 
 /** The ready-made sheet's props: Root's, with `class`, `style`, and `slotProps` keyed by part,
  *  the trigger's label, the drag handle and its name, and the body as content. */
