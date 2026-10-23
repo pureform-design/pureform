@@ -73,6 +73,8 @@ export default createConfig({
                     switch: "src/switch/index.ts",
                     tabs: "src/tabs/index.ts",
                     "tags-input": "src/tags-input/index.ts",
+                    "number-field": "src/number-field/index.ts",
+                    "code-field": "src/code-field/index.ts",
                     text: "src/text/index.ts",
                     "text-area": "src/text-area/index.ts",
                     "text-field": "src/text-field/index.ts",

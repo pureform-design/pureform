@@ -446,6 +446,20 @@
                 "default": "./dist/tags-input.mjs"
             }
         },
+        "./number-field": {
+            "types": "./dist/number-field/index.d.ts",
+            "import": {
+                "development": "./src/number-field/index.ts",
+                "default": "./dist/number-field.mjs"
+            }
+        },
+        "./code-field": {
+            "types": "./dist/code-field/index.d.ts",
+            "import": {
+                "development": "./src/code-field/index.ts",
+                "default": "./dist/code-field.mjs"
+            }
+        },
         "./text": {
             "types": "./dist/text/index.d.ts",
             "import": {
