@@ -6,7 +6,6 @@ export * as avatar from "./avatar";
 export * as button from "./button";
 export * as buttonGroup from "./button-group";
 export * as carousel from "./carousel";
-export * as colorPicker from "./color-picker";
 export * as checkbox from "./checkbox";
 export * as combobox from "./combobox";
 export * as datePicker from "./date-picker";
