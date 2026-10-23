@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { View } from "react-native";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
@@ -28,6 +29,20 @@ const all = (id: string) => [
 ];
 
 describe("time picker", () => {
+    it("keeps its own width rather than stretching across a column, as the time input does", async () => {
+        await render(
+            <View style={{ width: 900 }}>
+                <TimePicker defaultValue="09:30" hourCycle={12} />
+                <TimeInput defaultValue="09:30" hourCycle={12} />
+            </View>,
+        );
+        const picker = byTestId("pf-time-picker-root").getBoundingClientRect();
+        const input = byTestId("pf-time-input-root").getBoundingClientRect();
+        expect(picker.width).toBeLessThan(500);
+        expect(input.width).toBeLessThan(500);
+        expect(picker.left).toBe(input.left);
+    });
+
     it("lays out the selectors, periods and a dial of twelve hours", async () => {
         await render(
             <TimePicker defaultValue="21:05" hourCycle={12} locale="en-US" />,

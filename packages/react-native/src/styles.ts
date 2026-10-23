@@ -215,3 +215,13 @@ export function useSelectedStyles(
     );
     return useComponentState(name, variants, state, tokens);
 }
+
+/** A root the web draws `inline-flex`, as it flows here: React Native has no inline flow, so a
+ *  view would stretch across a column where the web's hugs its content. It keeps its own size at
+ *  the start instead, unless its style places it itself. */
+export const inFlowInline = <S extends Readonly<Record<string, unknown>>>(
+    style: S,
+): S =>
+    style["alignSelf"] === undefined
+        ? { ...style, alignSelf: "flex-start" }
+        : style;

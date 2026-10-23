@@ -26,7 +26,7 @@ import type { HourCycle, Time } from "@pureform/machines/time-picker";
 import { Fragment, type ReactNode, useState } from "react";
 
 import { testIdOf, withEngine } from "../parts";
-import { useComponentSlots } from "../styles";
+import { inFlowInline, useComponentSlots } from "../styles";
 import { TimeButton, timeLocale, useTime } from "../time";
 
 export interface TimeInputProps
@@ -70,7 +70,7 @@ function TimeInputImpl(props: TimeInputProps): ReactNode {
                     ? props.headline
                     : TIME_INPUT_HEADLINE
             }
-            style={s.root}
+            style={inFlowInline(s.root ?? {})}
             testID={id("root")}
         >
             <v.headline.Text style={s.headline} testID={id("headline")}>
