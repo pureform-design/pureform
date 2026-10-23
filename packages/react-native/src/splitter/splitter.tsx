@@ -27,7 +27,7 @@ import type {
     SplitterVariantProps,
 } from "@pureform/binding-core";
 import { settle, slowSpring } from "@pureform/rn-adapter/animated";
-import { useReducedMotion } from "@pureform/rn-adapter/react";
+import { useReducedMotion, useTokens } from "@pureform/rn-adapter/react";
 import { Fragment, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Animated, PanResponder } from "react-native";
@@ -225,6 +225,7 @@ function SplitterImpl(props: SplitterProps): ReactNode {
     );
     const horizontal = splitterOrientation(props) === "horizontal";
     const rtl = useDirection() === "rtl";
+    const tokens = useTokens();
     const [length, setLength] = useState(0);
     const [triggers, setTriggers] = useState(0);
     const room = Math.max(0, length - triggers);
@@ -347,7 +348,15 @@ function SplitterImpl(props: SplitterProps): ReactNode {
                             {typeof pane.content === "string" ||
                             typeof pane.content === "number" ? (
                                 // A View can't hold a string.
-                                <v.panel.Text style={ownText(s.panel)}>
+                                <v.panel.Text
+                                    style={{
+                                        // Nothing inherits on React Native.
+                                        color: String(
+                                            tokens["colors.onSurface"],
+                                        ),
+                                        ...ownText(s.panel),
+                                    }}
+                                >
                                     {pane.content}
                                 </v.panel.Text>
                             ) : (
