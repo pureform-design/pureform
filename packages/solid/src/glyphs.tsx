@@ -27,6 +27,12 @@ export const ToastIcon = (props: { readonly type: ToastType }): JSX.Element => (
     <Glyph path={TOAST_GLYPH_PATHS[props.type]} />
 );
 
+/** An arrow pointing up out of a tray: the file upload's drop zone. */
+export const UploadIcon = (): JSX.Element => <Glyph path={GLYPH_PATHS.upload} />;
+
+/** A document: a file's icon in the file upload's list. */
+export const FileIcon = (): JSX.Element => <Glyph path={GLYPH_PATHS.file} />;
+
 /** The arrow of a back button, pointing toward the start: the side sheet's back button and the
  *  search view's. Mirror it under right to left (`mirrorIcon`). */
 export const BackIcon = (): JSX.Element => <Glyph path={GLYPH_PATHS.back} />;

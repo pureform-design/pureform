@@ -83,8 +83,6 @@ const INDICATION: Record<string, IndicationAnatomy[]> = {
         at("closeTrigger", "closeTrigger", false),
     ],
     iconButton: [at("root", "container", true)],
-    // The dropzone, a button that takes drops.
-    fileUpload: [at("dropzone", "dropzone", false)],
     fab: [at("root", "container", false)],
     // The FAB that opens and closes it, and each item.
     fabMenu: [

@@ -1271,14 +1271,6 @@ export const fileUploadAnatomy = {
             mirror: false,
         },
     },
-    indication: [
-        {
-            trigger: "dropzone",
-            surface: "dropzone",
-            centered: false,
-            focus: "dropzone",
-        },
-    ],
     variants: {
         color: [
             "primary",

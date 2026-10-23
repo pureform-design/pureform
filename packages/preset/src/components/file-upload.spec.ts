@@ -44,15 +44,8 @@ describe("file upload", () => {
         expect(fileUpload.recipe.compoundVariants ?? []).toHaveLength(0);
     });
 
-    it("indicates the dropzone as one surface", () => {
-        expect(fileUpload.indication).toEqual([
-            {
-                trigger: "dropzone",
-                surface: "dropzone",
-                centered: false,
-                focus: "dropzone",
-            },
-        ]);
+    it("shows no indication of its own: the trigger button does", () => {
+        expect(fileUpload.indication ?? []).toEqual([]);
     });
 
     it("compiles to a stable Panda slot recipe", () => {

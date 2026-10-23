@@ -5,12 +5,13 @@
 // the progress the app reports, and a rejected file shows its error as supporting text.
 //
 // Markup: the label, the dropzone holding an icon, a headline, supporting text (the accepted
-// types and limits) and the trigger, then the list. The dropzone is a button (Enter and Space open
-// the file dialog) and a drop target; the hidden file input sits beside it, out of the way.
+// types and limits) and the trigger, then the list. The dropzone is a drop target, not a button: it
+// holds the trigger, which opens the file dialog and is what the keyboard reaches (a button inside
+// a button is invalid); the hidden file input sits beside it, out of the way.
 //
 //   <div class={root}>
 //     <label class={label}>Attachments</label>
-//     <div class={dropzone} role="button" tabindex="0">
+//     <div class={dropzone}>
 //       <span class={icon}>↑</span>
 //       <span class={headline}>Drop files here</span>
 //       <span class={supportingText}>PNG or PDF, up to 5 MB</span>
@@ -23,7 +24,8 @@
 //
 // The dropzone is outlined with a dashed line. While files are dragged over it (the `dragged`
 // state) it takes the color group's container and a solid outline; `invalid` outlines it in the
-// error color. The color group sets the drag-over color, as a button's sets its fill.
+// error color. The color group sets the drag-over color, as a button's sets its fill. It has no
+// state layer or focus ring of its own: the trigger, a `button`, shows those.
 
 import { typed } from "@pureform/core";
 import {
@@ -32,9 +34,7 @@ import {
     dashed,
     flex,
     none,
-    pointer,
     px,
-    relative,
     solid,
     stretch,
     transparent,
@@ -48,16 +48,13 @@ import {
     textStyle,
 } from "@pureform/theme";
 
-import { INDICATION_TOKENS, stateLayer } from "../state-layer";
 import {
     DEFAULT_GROUP,
     componentTokens,
     defaultGroups,
     disabledColor,
-    focusRing,
     groupTokens,
     iconBox,
-    INDICATION_ROOT,
     stateTransition,
     sys,
     variantsOf,
@@ -78,7 +75,6 @@ const { tokens, ref } = componentTokens("fileUpload", {
     outlineWidth: px(1),
     outlineColor: sys("outline"),
     errorColor: colorRole("error"),
-    ...INDICATION_TOKENS,
 });
 
 const pf = typed();
@@ -113,14 +109,6 @@ export const createFileUpload = <const G extends string = ColorGroup>(
                 itemGroup: ["item"],
                 item: ["error"],
             },
-            indication: [
-                {
-                    trigger: "dropzone",
-                    surface: "dropzone",
-                    centered: false,
-                    focus: "dropzone",
-                },
-            ],
             variants: {
                 color: groups as ColorGroups,
                 invalid: ["true", "false"],
@@ -128,7 +116,6 @@ export const createFileUpload = <const G extends string = ColorGroup>(
             recipe: () => ({
                 base: {
                     root: {
-                        ...INDICATION_ROOT,
                         display: flex,
                         flexDirection: column,
                         gap: ref("gap"),
@@ -136,9 +123,7 @@ export const createFileUpload = <const G extends string = ColorGroup>(
                     },
                     label: { textStyle: textStyle("labelLarge") },
                     dropzone: {
-                        ...focusRing(ref),
                         transition: stateTransition,
-                        position: relative,
                         display: flex,
                         flexDirection: column,
                         alignItems: center,
@@ -151,18 +136,11 @@ export const createFileUpload = <const G extends string = ColorGroup>(
                         borderWidth: ref("outlineWidth"),
                         borderStyle: dashed,
                         borderColor: ref("outlineColor"),
-                        backgroundColor: stateLayer(ref, {
-                            base: ref("container"),
-                            content: ref("content"),
-                        }),
+                        backgroundColor: ref("container"),
                         color: ref("content"),
-                        cursor: pointer,
                         states: {
                             dragged: {
-                                backgroundColor: stateLayer(ref, {
-                                    base: ref("accentContainer"),
-                                    content: ref("onAccentContainer"),
-                                }),
+                                backgroundColor: ref("accentContainer"),
                                 color: ref("onAccentContainer"),
                                 borderStyle: solid,
                                 borderColor: ref("accent"),

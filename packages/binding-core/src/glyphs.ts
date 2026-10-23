@@ -7,6 +7,10 @@ import type { ToastType } from "./components/toast";
 export const GLYPH_PATHS = {
     /** The cross of a close or remove button. */
     close: "M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z",
+    /** An arrow pointing up out of a tray: the file upload's drop zone. */
+    upload: "M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z",
+    /** A document: a file's icon in the file upload's list. */
+    file: "M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8zm2 16H8v-2h8zm0-4H8v-2h8zm-3-5V3.5L18.5 9z",
     /** The arrow of a back button, pointing toward the start (mirror it under right to left). */
     back: "M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z",
     /** Material's drop-down arrow: a select's, an autocomplete's, a split button's. */
