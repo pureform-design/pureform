@@ -52,14 +52,10 @@ export interface FileUploadBehaviorProps {
           }) => void)
         | undefined;
     /** Called when files are accepted. */
-    readonly onFileAccept?:
-        | ((details: { files: File[] }) => void)
-        | undefined;
+    readonly onFileAccept?: ((details: { files: File[] }) => void) | undefined;
     /** Called when files are rejected, each with the reasons. */
     readonly onFileReject?:
-        | ((details: {
-              files: { file: File; errors: string[] }[];
-          }) => void)
+        | ((details: { files: { file: File; errors: string[] }[] }) => void)
         | undefined;
     readonly disabled?: boolean | undefined;
     readonly readOnly?: boolean | undefined;
@@ -70,11 +66,7 @@ export interface FileUploadBehaviorProps {
     readonly error?: string | undefined;
     /** What files it takes: a MIME type, a list of them, or Zag's map from a type to its
      *  extensions (`{ "image/png": [".png"] }`). */
-    readonly accept?:
-        | string
-        | string[]
-        | Record<string, string[]>
-        | undefined;
+    readonly accept?: string | string[] | Record<string, string[]> | undefined;
     /** The most files it holds. @default 1 */
     readonly maxFiles?: number | undefined;
     /** The largest file, in bytes. */
@@ -88,9 +80,7 @@ export interface FileUploadBehaviorProps {
     /** The camera to capture media with, on devices that have one. */
     readonly capture?: "user" | "environment" | undefined;
     /** Rejects a file by returning the reasons. */
-    readonly validate?:
-        | ((file: File) => string[] | null)
-        | undefined;
+    readonly validate?: ((file: File) => string[] | null) | undefined;
     /** The name the files submit under. @control none */
     readonly name?: string | undefined;
     /** A remove button's accessible name, from its file. @default `Remove ${file.name}` */
@@ -98,13 +88,9 @@ export interface FileUploadBehaviorProps {
     /** How far a file's upload has got, from 0 to 100, as the app reports it: a progress bar
      *  under the file while this returns a number, an indeterminate one for `null`, none for
      *  `undefined`. */
-    readonly progress?:
-        | ((file: File) => number | null | undefined)
-        | undefined;
+    readonly progress?: ((file: File) => number | null | undefined) | undefined;
     /** A rejected file's message, from the reason. @default the messages below */
-    readonly errorMessage?:
-        | ((code: string, file: File) => string)
-        | undefined;
+    readonly errorMessage?: ((code: string, file: File) => string) | undefined;
     /** The root element's id; the machine builds the other ids from it.
      *  @control none */
     readonly id?: string | undefined;
@@ -184,7 +170,8 @@ export const FILE_UPLOAD_CONTENT_PROPS = [
 
 /** The file upload's registry selection from Root's props. */
 export const fileUploadSelection = (
-    props: FileUploadVariantProps & Pick<FileUploadBehaviorProps, "invalid" | "error">,
+    props: FileUploadVariantProps &
+        Pick<FileUploadBehaviorProps, "invalid" | "error">,
 ): Selection<"fileUpload"> => ({
     color: props.color,
     invalid: props.invalid || props.error !== undefined || undefined,
@@ -213,7 +200,8 @@ export const fileUploadMachineProps = (props: FileUploadBehaviorProps) => ({
     validate: props.validate,
     name: props.name,
     translations: {
-        deleteFile: props.removeLabel ?? ((file: File) => `Remove ${file.name}`),
+        deleteFile:
+            props.removeLabel ?? ((file: File) => `Remove ${file.name}`),
     },
 });
 
@@ -228,13 +216,16 @@ const ERROR_MESSAGES: Readonly<Record<string, string>> = {
 
 /** A rejected file's message: the app's `errorMessage` for each reason, else the default for
  *  Zag's reasons (a reason of the app's own is shown as it is), joined by a comma. */
-export const fileUploadErrorText = (
+export const fileUploadErrorText = <F>(
     errors: readonly string[],
-    file: File,
-    errorMessage?: FileUploadBehaviorProps["errorMessage"],
+    file: F,
+    errorMessage?: ((code: string, file: F) => string) | undefined,
 ): string =>
     errors
-        .map((code) => errorMessage?.(code, file) ?? ERROR_MESSAGES[code] ?? code)
+        .map(
+            (code) =>
+                errorMessage?.(code, file) ?? ERROR_MESSAGES[code] ?? code,
+        )
         .join(", ");
 
 /** What a file's upload shows: whether there's a progress bar, and its value (`null` for
@@ -257,3 +248,32 @@ export const fileUploadItemTestId = (
     testId: TestIdOverride<FileUploadPart> | undefined,
 ): string | undefined =>
     typeof testId === "string" ? `${testId}-item` : undefined;
+
+/** A file the React Native file upload lists. React Native has no file dialog or drop to take
+ *  files from: the app picks them (with the platform's picker), keeps the list, and says how each
+ *  upload is going. */
+export interface FileUploadEntry {
+    readonly name: string;
+    /** The size in bytes, shown beside the name. */
+    readonly size?: number | undefined;
+    /** The MIME type: an `image/…` file with a `uri` shows a preview. */
+    readonly type?: string | undefined;
+    readonly uri?: string | undefined;
+    /** Why it was rejected: it shows them in place of its size, in the error color. */
+    readonly errors?: readonly string[] | undefined;
+    /** How far its upload has got, from 0 to 100, `null` for unknown, left out for no bar. */
+    readonly progress?: number | null | undefined;
+}
+
+/** A size in bytes as the file list shows it: `1.5 KB`, `10 bytes`. */
+export const formatFileSize = (bytes: number): string => {
+    if (bytes < 1024) return `${bytes} ${bytes === 1 ? "byte" : "bytes"}`;
+    const units = ["KB", "MB", "GB", "TB"];
+    let value = bytes / 1024;
+    let unit = 0;
+    while (value >= 1024 && unit < units.length - 1) {
+        value /= 1024;
+        unit++;
+    }
+    return `${Number(value.toFixed(value < 10 ? 1 : 0))} ${units[unit]}`;
+};

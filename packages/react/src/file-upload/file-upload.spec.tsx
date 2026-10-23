@@ -53,9 +53,16 @@ describe("FileUpload, ready-made", () => {
     it("lists the files chosen, each a list item with its size and a remove button", async () => {
         const onFileChange = vi.fn();
         withRegistry(
-            <FileUpload label="Files" maxFiles={3} onFileChange={onFileChange} />,
+            <FileUpload
+                label="Files"
+                maxFiles={3}
+                onFileChange={onFileChange}
+            />,
         );
-        await userEvent.upload(hiddenInput(), [file("a.txt"), file("b.txt", 2048)]);
+        await userEvent.upload(hiddenInput(), [
+            file("a.txt"),
+            file("b.txt", 2048),
+        ]);
         await settle();
         expect(names()).toEqual(["a.txt", "b.txt"]);
         expect(onFileChange).toHaveBeenCalled();
@@ -72,7 +79,9 @@ describe("FileUpload, ready-made", () => {
         );
         await userEvent.upload(hiddenInput(), [file("big.txt", 500)]);
         await settle();
-        const item = document.querySelector<HTMLElement>('li[data-type="rejected"]')!;
+        const item = document.querySelector<HTMLElement>(
+            'li[data-type="rejected"]',
+        )!;
         expect(item.querySelector('[data-pf-part="error"]')?.textContent).toBe(
             "The file is too large",
         );
@@ -96,7 +105,9 @@ describe("FileUpload, ready-made", () => {
     it("marks the drop zone invalid and shows an error message", async () => {
         withRegistry(<FileUpload label="Files" error="Add a file" />);
         await settle();
-        expect(byTestId(ids.root).className).toContain("file-upload--invalid-true");
+        expect(byTestId(ids.root).className).toContain(
+            "file-upload--invalid-true",
+        );
         expect(byTestId(ids.supportingText).textContent).toBe("Add a file");
     });
 
@@ -106,7 +117,11 @@ describe("FileUpload, ready-made", () => {
         const dataTransfer = new DataTransfer();
         dataTransfer.items.add(file("a.txt"));
         zone.dispatchEvent(
-            new DragEvent("dragover", { dataTransfer, bubbles: true, cancelable: true }),
+            new DragEvent("dragover", {
+                dataTransfer,
+                bubbles: true,
+                cancelable: true,
+            }),
         );
         await settle();
         expect(zone.hasAttribute("data-pf-dragging")).toBe(true);

@@ -82,8 +82,10 @@ export interface FileUploadIconProps extends FileUploadPartProps {
 /** An item's props: its file, whether it's accepted or rejected (with the reasons), what its
  *  upload has done (`progress`: a number from 0 to 100, `null` for unknown, left out for none),
  *  and the content of its list item. Without children, it renders the file's row. */
-export interface FileUploadItemProps
-    extends Omit<FileUploadPartProps, "children"> {
+export interface FileUploadItemProps extends Omit<
+    FileUploadPartProps,
+    "children"
+> {
     readonly file: File;
     readonly type?: fileUpload.ItemType | undefined;
     readonly errors?: readonly string[] | undefined;
@@ -234,7 +236,6 @@ function Preview({
     const [url, setUrl] = useState<string | undefined>(undefined);
     useEffect(() => api.createFileUrl(file, setUrl), [file]);
     return url === undefined ? null : (
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         <img
             {...(api.getItemPreviewImageProps({ file, type, url }) as object)}
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
@@ -276,7 +277,11 @@ function Item({
                         leadingType={image ? "thumbnail" : "icon"}
                         testId={fileUploadItemTestId(root.testId)}
                         leading={
-                            image ? <Preview file={file} type={type} /> : (icon ?? <FileIcon />)
+                            image ? (
+                                <Preview file={file} type={type} />
+                            ) : (
+                                (icon ?? <FileIcon />)
+                            )
                         }
                         headline={file.name}
                         supportingText={
@@ -329,10 +334,7 @@ function Item({
  *  by part, and the content. */
 export interface FileUploadProps
     extends
-        Omit<
-            FileUploadRootProps,
-            keyof SlotKeyedProps<Anatomy> | "children"
-        >,
+        Omit<FileUploadRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
         SlotKeyedProps<Anatomy>,
         FileUploadContentProps<ReactNode> {}
 
@@ -344,7 +346,8 @@ function ReadyMadeContent({
 }): ReactNode {
     const { api, props } = context.use("Root");
     const slot = useSlotProps(own);
-    const supporting = isPresent(own.supportingText) || props.error !== undefined;
+    const supporting =
+        isPresent(own.supportingText) || props.error !== undefined;
     return (
         <>
             {isPresent(own.label) ? (
@@ -361,7 +364,10 @@ function ReadyMadeContent({
                     </SupportingText>
                 ) : null}
                 {own.trigger === null ? null : (
-                    <Trigger variant="outlined" label={own.trigger ?? "Choose files"} />
+                    <Trigger
+                        variant="outlined"
+                        label={own.trigger ?? "Choose files"}
+                    />
                 )}
             </Dropzone>
             {api.acceptedFiles.length + api.rejectedFiles.length > 0 ? (

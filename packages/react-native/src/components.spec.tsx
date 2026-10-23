@@ -21,6 +21,7 @@ import { DragHandle } from "./drag-handle";
 import { animated } from "./engine";
 import { animatedSvg } from "./engines/svg";
 import { Fab } from "./fab";
+import { FileUpload } from "./file-upload";
 import { FullscreenDialog } from "./fullscreen-dialog";
 import { Icon } from "./icon";
 import { IconButton } from "./icon-button";
@@ -95,6 +96,7 @@ const COMPONENTS = [
     "autocomplete",
     "searchView",
     "tagsInput",
+    "fileUpload",
     "inputChip",
     "slider",
     "menu",
@@ -554,6 +556,63 @@ describe("text field affixes, counter and secure", () => {
         await interact(() => toggle.click());
         await settle();
         expect(input.type).toBe("text");
+    });
+});
+
+describe("file upload", () => {
+    const FILES = [
+        { name: "a.txt", size: 2048 },
+        { name: "big.png", errors: ["FILE_TOO_LARGE"] },
+        { name: "c.pdf", size: 10, progress: 40 },
+    ];
+
+    it("lists each file with its size, its rejection, and its progress", async () => {
+        await render(<FileUpload label="Files" files={FILES} />);
+        const headlines = [
+            ...document.querySelectorAll(
+                '[data-testid="pf-list-item-headline"]',
+            ),
+        ].map((node) => node.textContent);
+        expect(headlines).toEqual(["a.txt", "big.png", "c.pdf"]);
+        expect(byTestId("pf-file-upload-error").textContent).toBe(
+            "The file is too large",
+        );
+        const bars = document.querySelectorAll('[role="progressbar"]');
+        expect(bars).toHaveLength(1);
+        expect(bars[0]?.getAttribute("aria-valuenow")).toBe("40");
+    });
+
+    it("asks the app to pick through the trigger, and to remove through a file's button", async () => {
+        const picked = vi.fn();
+        const removed = vi.fn();
+        await render(
+            <FileUpload
+                label="Files"
+                files={FILES.slice(0, 1)}
+                onPick={picked}
+                onRemove={removed}
+            />,
+        );
+        await interact(() => byTestId("pf-button-root").click());
+        expect(picked).toHaveBeenCalledOnce();
+        await interact(() =>
+            (
+                document.querySelector(
+                    '[aria-label="Remove a.txt"]',
+                ) as HTMLElement
+            ).click(),
+        );
+        expect(removed).toHaveBeenCalledWith(FILES[0]);
+    });
+
+    it("has no trigger without onPick, and shows an error message for the supporting text", async () => {
+        await render(<FileUpload label="Files" error="Add a file" />);
+        expect(
+            document.querySelector('[data-testid="pf-button-root"]'),
+        ).toBeNull();
+        expect(byTestId("pf-file-upload-supporting-text").textContent).toBe(
+            "Add a file",
+        );
     });
 });
 

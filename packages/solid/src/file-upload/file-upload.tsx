@@ -40,10 +40,10 @@ import type { ButtonProps } from "../button";
 import { useFieldsetDisabled } from "../form";
 import { CloseIcon, FileIcon, UploadIcon } from "../glyphs";
 import { IconButton } from "../icon-button";
-import { LinearProgress } from "../linear-progress";
-import { ListItem } from "../list-item";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
+import { LinearProgress } from "../linear-progress";
+import { ListItem } from "../list-item";
 import { createPartContext } from "../part-context";
 import { createSlotProps, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
@@ -382,10 +382,7 @@ function Item(props: FileUploadItemProps): JSX.Element {
  *  part, and the content. */
 export interface FileUploadProps
     extends
-        Omit<
-            FileUploadRootProps,
-            keyof SlotKeyedProps<Anatomy> | "children"
-        >,
+        Omit<FileUploadRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
         SlotKeyedProps<Anatomy>,
         FileUploadContentProps<JSX.Element> {}
 
@@ -409,7 +406,9 @@ function Content(props: {
                 <Label {...props.slots("label")}>{own.label}</Label>
             </Show>
             <Dropzone {...props.slots("dropzone")}>
-                <Icon {...props.slots("icon")}>{own.icon ?? <UploadIcon />}</Icon>
+                <Icon {...props.slots("icon")}>
+                    {own.icon ?? <UploadIcon />}
+                </Icon>
                 <Headline {...props.slots("headline")}>
                     {own.headline ?? "Drop files here"}
                 </Headline>

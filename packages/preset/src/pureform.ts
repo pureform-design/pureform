@@ -64,8 +64,8 @@ import { createDockedDatePicker } from "./components/docked-date-picker";
 import { dragHandle } from "./components/drag-handle";
 import { createFab } from "./components/fab";
 import { createFabMenu } from "./components/fab-menu";
-import { createFileUpload } from "./components/file-upload";
 import { FADE_THROUGH_KEYFRAMES, fadeThrough } from "./components/fade-through";
+import { createFileUpload } from "./components/file-upload";
 import { fullscreenDialog } from "./components/fullscreen-dialog";
 import { gridList } from "./components/grid-list";
 import {

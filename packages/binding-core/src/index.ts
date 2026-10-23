@@ -770,6 +770,7 @@ export {
     FILE_UPLOAD_CONTENT_PROPS,
     FILE_UPLOAD_ROOT_PROPS,
     fileUploadErrorText,
+    formatFileSize,
     fileUploadItemTestId,
     fileUploadMachineProps,
     fileUploadProgress,
@@ -779,6 +780,7 @@ export {
 export type {
     FileUploadBehaviorProps,
     FileUploadContentProps,
+    FileUploadEntry,
     FileUploadErrorCode,
     FileUploadPart,
     FileUploadRootOwnProps,

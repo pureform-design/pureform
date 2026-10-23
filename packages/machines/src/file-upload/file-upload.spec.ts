@@ -66,7 +66,11 @@ describe("file upload machine", () => {
         const dataTransfer = new DataTransfer();
         dataTransfer.items.add(file("a.txt"));
         zone.dispatchEvent(
-            new DragEvent("dragover", { dataTransfer, bubbles: true, cancelable: true }),
+            new DragEvent("dragover", {
+                dataTransfer,
+                bubbles: true,
+                cancelable: true,
+            }),
         );
         await settle();
         expect(api().dragging).toBe(true);

@@ -28,7 +28,9 @@ export const ToastIcon = (props: { readonly type: ToastType }): JSX.Element => (
 );
 
 /** An arrow pointing up out of a tray: the file upload's drop zone. */
-export const UploadIcon = (): JSX.Element => <Glyph path={GLYPH_PATHS.upload} />;
+export const UploadIcon = (): JSX.Element => (
+    <Glyph path={GLYPH_PATHS.upload} />
+);
 
 /** A document: a file's icon in the file upload's list. */
 export const FileIcon = (): JSX.Element => <Glyph path={GLYPH_PATHS.file} />;
