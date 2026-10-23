@@ -30,6 +30,7 @@ export * as textField from "./text-field";
 export * as table from "./table";
 export * as timePicker from "./time-picker";
 export * as toast from "./toast";
+export * as popover from "./popover";
 export * as tooltip from "./tooltip";
 export * as treeView from "./tree-view";
 
