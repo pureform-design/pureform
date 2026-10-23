@@ -27,7 +27,10 @@ import type {
     SideSheetRootOwnProps,
     Unstyled,
 } from "@pureform/binding-core";
-import { sideSheetDragToDismiss } from "@pureform/binding-core/dom";
+import {
+    sideSheetDragToDismiss,
+    springRoleVar,
+} from "@pureform/binding-core/dom";
 import {
     type ElementType,
     type ReactNode,
@@ -43,7 +46,7 @@ import { IconButton } from "../icon-button";
 import { useSlotProps } from "../parts";
 import type { SlotKeyedProps } from "../parts";
 import type { PartProps } from "../props";
-import { useDirection } from "../provider";
+import { useComponentState, useDirection } from "../provider";
 
 type Anatomy = typeof sideSheetOverlayAnatomy;
 
@@ -122,6 +125,10 @@ function Content(props: SideSheetPartProps): ReactNode {
     const rtl = useRef(dir === "rtl");
     rtl.current = dir === "rtl";
     const coplanar = useRef(false);
+    const spring = springRoleVar(
+        useComponentState().registry,
+        "spatialDefault",
+    );
     coplanar.current = sideSheetSelection(root).coplanar === true;
     // After a drag closed it: once that render has committed, a sheet still open (one the app
     // kept open) settles back.
@@ -142,6 +149,7 @@ function Content(props: SideSheetPartProps): ReactNode {
             () => onClose()?.() ?? true,
             asker,
             () => !coplanar.current,
+            spring,
         );
     }, [surface, latestApi, asker, onClose]);
     return <Surface {...props} />;

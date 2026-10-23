@@ -39,6 +39,9 @@ export interface SheetDragOptions {
     /** Called when where it rests changes (partly or fully open), and each time it opens, with
      *  whether it can move between the two (it's tall enough to rest partly open). */
     readonly onRest?: ((rest: SheetRest, movable: boolean) => void) | undefined;
+    /** The var of the spring the sheet settles on (`springRoleVar(registry, "spatialDefault")`),
+     *  so a settle samples it exactly rather than fitting one to its curve. */
+    readonly spring?: string | undefined;
 }
 
 /** What stops `dragToDismiss`, and moves the sheet to rest partly or fully open, as a
@@ -115,6 +118,7 @@ export const dragToDismiss = (
             "translate",
             to - offset,
             velocity,
+            options.spring,
         );
         place(surface, to);
     };

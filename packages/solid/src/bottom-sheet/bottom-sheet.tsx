@@ -38,6 +38,7 @@ import type {
 } from "@pureform/binding-core";
 import {
     dragToDismiss,
+    springRoleVar,
     focusableWhileOverflowing,
 } from "@pureform/binding-core/dom";
 import type { SheetDrag } from "@pureform/binding-core/dom";
@@ -56,6 +57,7 @@ import { dialogParts } from "../dialog-parts";
 import { DragHandle as DragHandleComponent } from "../drag-handle";
 import { mergeProps, normalizeProps } from "../internal/zag";
 import { createSlotProps } from "../parts";
+import { usePureform } from "../provider";
 import type { SlotKeyedProps } from "../parts";
 import type { PartProps } from "../props";
 
@@ -141,6 +143,7 @@ function DragHandle(props: BottomSheetTriggerProps): JSX.Element {
     }>({ rest: "expanded", movable: false });
     let lastRest: SheetRest = "expanded";
     let stop: SheetDrag | undefined;
+    const state = usePureform();
     onCleanup(() => stop?.());
     // A controlled `expanded`: the sheet rests where it says (it moves when the prop changes,
     // and goes back when a drag's change wasn't taken).
@@ -172,6 +175,7 @@ function DragHandle(props: BottomSheetTriggerProps): JSX.Element {
                 {
                     partial: () => sheetPartiallyExpandable(root),
                     opening: () => sheetOpeningRest(root),
+                    spring: springRoleVar(state().registry, "spatialDefault"),
                     onRest: (next, movable) => {
                         if (next !== lastRest)
                             root.onExpandedChange?.({

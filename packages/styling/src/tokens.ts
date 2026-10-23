@@ -15,12 +15,16 @@ export type SpringVars<T extends string = string> = Readonly<
     Partial<Record<T, `--${string}`>>
 >;
 
+// The spring's own parameters, written beside its duration and curve for a settle to read.
+const SPRING_PARAMS = ["stiffness", "damping", "mass"] as const;
+
 const hyphenate = (name: string): string =>
     name.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
 
 /** An instance's tokens as CSS vars, or `undefined` when it sets none. Numbers become their
- *  string, so pass a length with its unit. A spring becomes the two vars a spring token is read
- *  through, `<var>-duration` and `<var>-easing`, sampled as the theme's springs are; a spring
+ *  string, so pass a length with its unit. A spring becomes the vars a spring token is read
+ *  through, `<var>-duration` and `<var>-easing` (and its parameters, `-stiffness`, `-damping`,
+ *  `-mass`), sampled as the theme's springs are; a spring
  *  token (one `springs` names) given a role's name reads that role's two vars. Tokens missing
  *  from `vars` are left out. */
 export const tokenStyle = (
@@ -40,10 +44,14 @@ export const tokenStyle = (
             const { duration, points } = sampleSpring(value);
             style[`${v}-duration`] = `${duration}ms`;
             style[`${v}-easing`] = formatLinearEasing(points);
+            for (const param of SPRING_PARAMS)
+                style[`${v}-${param}`] = String(value[param]);
         } else if (typeof value === "string" && springs[name]) {
             const role = `${springs[name]}-${hyphenate(value)}`;
             style[`${v}-duration`] = `var(${role}-duration)`;
             style[`${v}-easing`] = `var(${role}-easing)`;
+            for (const param of SPRING_PARAMS)
+                style[`${v}-${param}`] = `var(${role}-${param})`;
         } else {
             style[v] = String(value);
         }

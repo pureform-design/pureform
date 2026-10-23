@@ -46,7 +46,7 @@ describe("springs on the web", () => {
         ).toBe("linear(0, 0.6 30%, 1.1 70%, 1)");
     });
 
-    it("writes a spring token as a duration var and an easing var", () => {
+    it("writes a spring token as a duration var and an easing var, with its exact parameters", () => {
         const vars = themeVars(config);
         const sampled = sampleSpring(fast);
         expect(vars["--springs-spatial-fast-duration"]).toBe(
@@ -55,6 +55,10 @@ describe("springs on the web", () => {
         expect(vars["--springs-spatial-fast-easing"]).toMatch(
             /^linear\(0, .* 1\)$/,
         );
+        // A settle from a release speed samples the spring itself again from these.
+        expect(vars["--springs-spatial-fast-stiffness"]).toBe("800");
+        expect(vars["--springs-spatial-fast-damping"]).toBe("0.6");
+        expect(vars["--springs-spatial-fast-mass"]).toBe("1");
         expect(vars).toMatchSnapshot();
     });
 
@@ -207,6 +211,11 @@ describe("spring component tokens on the web", () => {
                 "var(--springs-spatial-fast-duration)",
             "--components-box-move-easing":
                 "var(--springs-spatial-fast-easing)",
+            "--components-box-move-stiffness":
+                "var(--springs-spatial-fast-stiffness)",
+            "--components-box-move-damping":
+                "var(--springs-spatial-fast-damping)",
+            "--components-box-move-mass": "var(--springs-spatial-fast-mass)",
         });
         const literal = componentTokenVars(aliased.themes!.literal!, {
             ...ctx,
@@ -218,7 +227,11 @@ describe("spring component tokens on the web", () => {
         expect(Object.keys(literal)).toEqual([
             "--components-box-move-duration",
             "--components-box-move-easing",
+            "--components-box-move-stiffness",
+            "--components-box-move-damping",
+            "--components-box-move-mass",
         ]);
+        expect(literal["--components-box-move-stiffness"]).toBe("800");
     });
 
     it("writes a theme's alias to another component's spring token as the two vars, reading that token's", () => {
@@ -233,6 +246,12 @@ describe("spring component tokens on the web", () => {
                 "var(--components-card-lift-duration, var(--springs-spatial-fast-duration))",
             "--components-box-move-easing":
                 "var(--components-card-lift-easing, var(--springs-spatial-fast-easing))",
+            "--components-box-move-stiffness":
+                "var(--components-card-lift-stiffness, var(--springs-spatial-fast-stiffness))",
+            "--components-box-move-damping":
+                "var(--components-card-lift-damping, var(--springs-spatial-fast-damping))",
+            "--components-box-move-mass":
+                "var(--components-card-lift-mass, var(--springs-spatial-fast-mass))",
         });
     });
 
@@ -255,6 +274,11 @@ describe("spring component tokens on the web", () => {
                 "var(--springs-spatial-fast-duration)",
             "--components-box-move-easing":
                 "var(--springs-spatial-fast-easing)",
+            "--components-box-move-stiffness":
+                "var(--springs-spatial-fast-stiffness)",
+            "--components-box-move-damping":
+                "var(--springs-spatial-fast-damping)",
+            "--components-box-move-mass": "var(--springs-spatial-fast-mass)",
         });
     });
 });
