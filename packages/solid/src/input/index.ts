@@ -1,5 +1,6 @@
-// `@pureform/solid/input`: the plain Input, also exported with the other form primitives from
-// `@pureform/solid/field`.
+// `@pureform/solid/input`: the plain Input, also in the field's subpath with the other form primitives.
 
-export { Input } from "../field/field";
+import { Input } from "../field/field";
+
+export { Input };
 export type { InputProps } from "../field/field";

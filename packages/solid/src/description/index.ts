@@ -1,5 +1,6 @@
-// `@pureform/solid/description`: the plain Description, also exported with the other form primitives from
-// `@pureform/solid/field`.
+// `@pureform/solid/description`: the plain Description, also in the field's subpath with the other form primitives.
 
-export { Description } from "../field/field";
+import { Description } from "../field/field";
+
+export { Description };
 export type { DescriptionProps } from "../field/field";

@@ -330,7 +330,6 @@ export const COMPONENT_USAGE = {
     textarea: { entries: FORM_PRIMITIVES },
     description: { entries: FORM_PRIMITIVES },
     "error-text": { entries: FORM_PRIMITIVES },
-    },
     // `transition` moves a row's content in a shared axis or a fade through.
     stepper: {
         entries: {

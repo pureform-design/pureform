@@ -1,5 +1,6 @@
-// `@pureform/solid/textarea`: the plain Textarea, also exported with the other form primitives from
-// `@pureform/solid/field`.
+// `@pureform/solid/textarea`: the plain Textarea, also in the field's subpath with the other form primitives.
 
-export { Textarea } from "../field/field";
+import { Textarea } from "../field/field";
+
+export { Textarea };
 export type { TextareaProps } from "../field/field";

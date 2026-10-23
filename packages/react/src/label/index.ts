@@ -1,7 +1,8 @@
 "use client";
 
-// `@pureform/react/label`: the plain Label, also exported with the other form primitives from
-// `@pureform/react/field`.
+// `@pureform/react/label`: the plain Label, also in the field's subpath with the other form primitives.
 
-export { Label } from "../field/field";
+import { Label } from "../field/field";
+
+export { Label };
 export type { LabelProps } from "../field/field";
