@@ -311,7 +311,9 @@ trigger shows their labels joined by ", " (the placeholder when none):
       8, `flip`, `sameWidth`), flipped where there's no room and shifted inside the host's insets.
       A press outside closes it (a layer under the menu takes that press, as a native popup does),
       as do picking an item (`closeOnSelect`), Escape, and Android's back button. On the web it
-      focuses its first item; the arrow keys, Home, and End move focus, and Tab closes it.
+      focuses its first item; the arrow keys, Home, and End move focus, and Tab closes it. A cascaded
+      submenu opens on the arrow toward the inline end (focus goes to its first item) and closes on
+      the arrow toward the start or Tab (focus goes back to its item).
     - **The tooltip** shows once the pointer rests on its trigger (`openDelay`, 400 ms), at once on
       keyboard focus, or on a long press, and hides as the pointer leaves (`closeDelay`, 150 ms), on
       blur, a press, Escape or back, or `LONG_PRESS_TOOLTIP_MS` (1.5 s) after a long press. Give

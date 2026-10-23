@@ -232,6 +232,53 @@ describe.each([animated, reanimated])("the menu with $name", (engine) => {
         expect(document.activeElement).toBe(byTestId("pf-button-root"));
     });
 
+    it("opens a cascaded submenu with the arrow toward the end and backs out with the other, on the web", async () => {
+        const label = () =>
+            (document.activeElement as HTMLElement | null)?.textContent;
+        const picked: string[] = [];
+        await render(
+            <Menu
+                trigger="Edit"
+                submenu="cascade"
+                items={[
+                    { value: "cut", label: "Cut" },
+                    {
+                        value: "share",
+                        label: "Share",
+                        items: [
+                            { value: "mail", label: "Mail" },
+                            { value: "link", label: "Copy link" },
+                        ],
+                    },
+                ]}
+                onSelect={(details) => picked.push(details.value)}
+            />,
+            engine,
+        );
+        await interact(() => userEvent.click(byTestId("pf-button-root")));
+        await settle(400);
+        await interact(() => userEvent.keyboard("{ArrowDown}"));
+        expect(label()).toContain("Share");
+        await interact(() => userEvent.keyboard("{ArrowRight}"));
+        await until(() => label() === "Mail");
+        expect(label()).toBe("Mail");
+        expect(document.querySelectorAll('[role="menu"]')).toHaveLength(2);
+        await interact(() => userEvent.keyboard("{ArrowDown}"));
+        expect(label()).toBe("Copy link");
+        await interact(() => userEvent.keyboard("{ArrowLeft}"));
+        await until(
+            () => document.querySelectorAll('[role="menu"]').length === 1,
+        );
+        expect(label()).toContain("Share");
+        // In again, and Enter picks the leaf.
+        await interact(() => userEvent.keyboard("{ArrowRight}"));
+        await until(() => label() === "Mail");
+        expect(label()).toBe("Mail");
+        await interact(() => userEvent.keyboard("{Enter}"));
+        await until(() => picked.length > 0);
+        expect(picked).toEqual(["mail"]);
+    });
+
     it("opens against its trigger with defaultOpen, before any interaction", async () => {
         await render(
             <View style={{ paddingTop: 120, paddingLeft: 200 }}>

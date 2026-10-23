@@ -131,7 +131,13 @@ interface ItemProps {
     readonly indication: Indication | undefined;
     readonly testId: TestIdOverride<Part> | undefined;
     readonly selected: boolean;
-    readonly onSelect: (value: string, row: Measurable | null) => void;
+    readonly onSelect: (
+        value: string,
+        row: Measurable | null,
+        how?: SelectHow,
+    ) => void;
+    /** The key that opens its submenu on the web: the arrow toward the inline end. */
+    readonly openKey: string;
 }
 
 // An item's row, measured for where a cascading submenu opens beside it.
@@ -139,7 +145,13 @@ interface Measurable {
     measureInWindow(
         done: (x: number, y: number, width: number, height: number) => void,
     ): void;
+    /** On the web, where the keys move focus. */
+    focus?(): void;
 }
+
+// How an item asks for its submenu: by a press, or on the web by the key that opens it (which
+// moves focus into the submenu).
+type SelectHow = "press" | "key";
 
 function MenuItemImpl(props: ItemProps): ReactNode {
     const { item } = props;
@@ -185,6 +197,18 @@ function MenuItemImpl(props: ItemProps): ReactNode {
                     );
                 props.onSelect(item.value, row.current);
             }}
+            {...(Platform.OS === "web" && hasSubmenu(item)
+                ? {
+                      onKeyDown: (event: {
+                          nativeEvent: { key: string };
+                          preventDefault(): void;
+                      }) => {
+                          if (event.nativeEvent.key !== props.openKey) return;
+                          event.preventDefault();
+                          props.onSelect(item.value, row.current, "key");
+                      },
+                  }
+                : {})}
             style={{ ...s.item, ...unselectable }}
             testID={id("item")}
         >
@@ -262,6 +286,8 @@ function MenuImpl(
     const [beside, setBeside] = useState<{
         readonly item: MenuItem<ReactNode>;
         readonly row: WindowRect;
+        // The row's element, which focus goes back to; set when the key opened it.
+        readonly from?: Measurable;
     }>();
     const level = menuDrillLevel(
         props.items ?? [],
@@ -280,17 +306,22 @@ function MenuImpl(
         }),
     );
     const select = useStableCallback(
-        (value: string, row: Measurable | null) => {
+        (value: string, row: Measurable | null, how: SelectHow = "press") => {
             if (value === MENU_BACK_VALUE)
                 return setPath(path.slice(0, level.depth - 1));
             const chosen = shown.find((entry) => entry.value === value);
             if (chosen && hasSubmenu(chosen)) {
                 if (drill)
                     return setPath([...path.slice(0, level.depth), value]);
-                if (beside?.item.value === value) return setBeside(undefined);
+                if (beside?.item.value === value)
+                    return how === "press" ? setBeside(undefined) : undefined;
                 if (!row) return undefined;
                 return row.measureInWindow((x, y, width, height) =>
-                    setBeside({ item: chosen, row: { x, y, width, height } }),
+                    setBeside({
+                        item: chosen,
+                        row: { x, y, width, height },
+                        ...(how === "key" ? { from: row } : {}),
+                    }),
                 );
             }
             setBeside(undefined);
@@ -317,6 +348,7 @@ function MenuImpl(
             testId={props.testId}
             selected={props.value === entry.value}
             onSelect={select}
+            openKey={rtl ? "ArrowLeft" : "ArrowRight"}
         />
     );
     // The engine's view where it enters and leaves, the slot's own while it's still.
@@ -392,22 +424,42 @@ function MenuImpl(
                         gutter={0}
                     >
                         {() => (
-                            <Surface
-                                {...props}
-                                items={beside.item.items}
-                                groups={undefined}
-                                grouped={false}
-                                open={undefined}
-                                onSelect={(details) => {
+                            <MenuKeys
+                                autoFocus={beside.from !== undefined}
+                                onKey={(key) => {
+                                    // Back out to the item: the arrow toward the inline start,
+                                    // or Tab.
+                                    if (
+                                        key !==
+                                            (rtl
+                                                ? "ArrowRight"
+                                                : "ArrowLeft") &&
+                                        key !== "Tab"
+                                    )
+                                        return false;
+                                    const from = beside.from;
                                     setBeside(undefined);
-                                    props.onSelect?.(details);
+                                    from?.focus?.();
+                                    return true;
                                 }}
-                                aria-label={
-                                    typeof beside.item.label === "string"
-                                        ? beside.item.label
-                                        : undefined
-                                }
-                            />
+                            >
+                                <Surface
+                                    {...props}
+                                    items={beside.item.items}
+                                    groups={undefined}
+                                    grouped={false}
+                                    open={undefined}
+                                    onSelect={(details) => {
+                                        setBeside(undefined);
+                                        props.onSelect?.(details);
+                                    }}
+                                    aria-label={
+                                        typeof beside.item.label === "string"
+                                            ? beside.item.label
+                                            : undefined
+                                    }
+                                />
+                            </MenuKeys>
                         )}
                     </Anchored>
                 </Portal>
@@ -437,10 +489,12 @@ const ITEM = ["menuitem", "menuitemcheckbox", "menuitemradio"]
     .map((role) => `[role="${role}"]:not([aria-disabled="true"])`)
     .join(", ");
 
-// The open menu, placed: on the web it takes focus on its first item, and the arrow keys, Home,
-// and End move it; Tab closes it.
-function Popup(props: {
-    readonly onClose: () => void;
+// A menu's items on the web: it takes focus on its first item (given `autoFocus`), and the arrow
+// keys, Home, and End move it; `onKey` hears the other keys first, and takes those it returns
+// true for. A cascaded submenu is another portal entry, so it has its own.
+function MenuKeys(props: {
+    readonly autoFocus: boolean;
+    readonly onKey?: ((key: string) => boolean) | undefined;
     readonly children: ReactNode;
 }): ReactNode {
     const root = useRef<ComponentRef<typeof View>>(null);
@@ -451,11 +505,12 @@ function Popup(props: {
             ) ?? [],
         );
     useEffect(() => {
-        if (Platform.OS === "web") items()[0]?.focus();
+        if (Platform.OS === "web" && props.autoFocus) items()[0]?.focus();
     }, []);
     const onKeyDown = (event: {
         nativeEvent: { key: string };
         preventDefault(): void;
+        stopPropagation(): void;
     }) => {
         const all = items();
         const at = all.indexOf(
@@ -465,7 +520,13 @@ function Popup(props: {
             event.preventDefault();
             all[(index + all.length) % all.length]?.focus();
         };
-        switch (event.nativeEvent.key) {
+        const { key } = event.nativeEvent;
+        if (props.onKey?.(key)) {
+            event.preventDefault();
+            event.stopPropagation();
+            return;
+        }
+        switch (key) {
             case "ArrowDown":
                 return go(at + 1);
             case "ArrowUp":
@@ -474,14 +535,31 @@ function Popup(props: {
                 return go(0);
             case "End":
                 return go(-1);
-            case "Tab":
-                return props.onClose();
         }
     };
     return (
         <View ref={root} {...(Platform.OS === "web" ? { onKeyDown } : {})}>
             {props.children}
         </View>
+    );
+}
+
+// The open menu, placed: on the web it takes focus on its first item, the keys move it, and Tab
+// closes it.
+function Popup(props: {
+    readonly onClose: () => void;
+    readonly children: ReactNode;
+}): ReactNode {
+    return (
+        <MenuKeys
+            autoFocus
+            onKey={(key) => {
+                if (key === "Tab") props.onClose();
+                return false;
+            }}
+        >
+            {props.children}
+        </MenuKeys>
     );
 }
 
