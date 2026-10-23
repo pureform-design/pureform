@@ -20,6 +20,11 @@ One pass over everything since r8: m3 (Material transitions), c8 (Material gaps 
   `aria-describedby` wiring); c10b's NativeSelect against Select.
 - **Pointer drags:** c8c's resizable panes, c9d's ColorPicker areas and the slider's thumbs.
 
+## Decided work
+
+- **Shared axis clipping:** its root clips only while a page moves, like the fade through since
+  m3's merge, so focus rings and shadows at its edges aren't cut at rest.
+
 ## Done when
 
 As for r1, with `context/r9.md` for the next phase's authors.
