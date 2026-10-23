@@ -81,6 +81,7 @@ export default createConfig({
                     "text-field": "src/text-field/index.ts",
                     tooltip: "src/tooltip/index.ts",
                     "rich-tooltip": "src/rich-tooltip/index.ts",
+                    popover: "src/popover/index.ts",
                     storybook: "src/storybook/index.ts",
                 },
                 formats: ["es"],

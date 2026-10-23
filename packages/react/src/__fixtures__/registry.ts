@@ -246,6 +246,13 @@ export const overlaysRegistry = () =>
             "supportingText",
             "actions",
         ]),
+        popover: named("popover", [
+            "root",
+            "caret",
+            "title",
+            "body",
+            "actions",
+        ]),
         dialog: named("dialog", [
             "root",
             "icon",

@@ -28,6 +28,7 @@ import { menu } from "./cases/menu";
 import { navigationBar, navigationRail } from "./cases/navigation";
 import { numberField } from "./cases/number-field";
 import { paginator } from "./cases/paginator";
+import { popover } from "./cases/popover";
 import { circularProgress, linearProgress } from "./cases/progress";
 import { radioGroup } from "./cases/radio-group";
 import { richTooltip } from "./cases/rich-tooltip";
@@ -102,6 +103,7 @@ export const COMPONENTS: readonly ComponentCase[] = [
     navigationBar,
     navigationRail,
     radioGroup,
+    popover,
     richTooltip,
     ripple,
     scrim,

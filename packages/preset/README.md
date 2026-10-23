@@ -1024,6 +1024,11 @@ tooltip is its own component, `richTooltip` (`root`, `caret`, `subhead`, `suppor
 The `caret` takes the surface's color through its `color`; the binding draws Zag's arrow tip
 inside it in `currentColor`.
 
+`popover` (c9c, pureform's own; M3 has no popover) is an anchored panel for filters and small forms:
+`root` (the rich tooltip's surface and popup motion, stacked at the menu's layer), `title`, `body`,
+`actions`, and an optional `caret`. The rich tooltip holds text and opens on hover or focus; the
+popover holds controls and opens on a press.
+
 ## Toast
 
 Outside Material 3, skinned with its tokens: notifications that stack, several at once, with a

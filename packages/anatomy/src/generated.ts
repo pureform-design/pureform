@@ -4756,6 +4756,61 @@ export const richTooltipAnatomy = {
     variants: {},
 } as const satisfies ComponentAnatomy;
 
+export const popoverAnatomy = {
+    name: "popover",
+    scope: "popover",
+    root: "root",
+    partNames: ["root", "caret", "title", "body", "actions"],
+    parts: {
+        root: {
+            name: "root",
+            attribute: "root",
+            testId: "pf-popover-root",
+            parent: null,
+            children: ["title", "body", "actions", "caret"],
+            styled: true,
+            mirror: false,
+        },
+        caret: {
+            name: "caret",
+            attribute: "caret",
+            testId: "pf-popover-caret",
+            parent: "root",
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+        title: {
+            name: "title",
+            attribute: "title",
+            testId: "pf-popover-title",
+            parent: "root",
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+        body: {
+            name: "body",
+            attribute: "body",
+            testId: "pf-popover-body",
+            parent: "root",
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+        actions: {
+            name: "actions",
+            attribute: "actions",
+            testId: "pf-popover-actions",
+            parent: "root",
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+    },
+    variants: {},
+} as const satisfies ComponentAnatomy;
+
 export const paginatorAnatomy = {
     name: "paginator",
     scope: "paginator",
@@ -5971,6 +6026,7 @@ export const anatomy = {
     toolbar: toolbarAnatomy,
     tooltip: tooltipAnatomy,
     richTooltip: richTooltipAnatomy,
+    popover: popoverAnatomy,
     paginator: paginatorAnatomy,
     card: cardAnatomy,
     carousel: carouselAnatomy,
@@ -6423,6 +6479,13 @@ export const testIds = {
         subhead: "pf-rich-tooltip-subhead",
         supportingText: "pf-rich-tooltip-supporting-text",
         actions: "pf-rich-tooltip-actions",
+    },
+    popover: {
+        root: "pf-popover-root",
+        caret: "pf-popover-caret",
+        title: "pf-popover-title",
+        body: "pf-popover-body",
+        actions: "pf-popover-actions",
     },
     paginator: {
         root: "pf-paginator-root",

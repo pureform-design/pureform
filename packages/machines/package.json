@@ -61,6 +61,13 @@
                 "default": "./dist/dialog.mjs"
             }
         },
+        "./popover": {
+            "types": "./dist/popover.d.ts",
+            "import": {
+                "development": "./src/popover.ts",
+                "default": "./dist/popover.mjs"
+            }
+        },
         "./tooltip": {
             "types": "./dist/tooltip.d.ts",
             "import": {
@@ -287,6 +294,7 @@
         "@zag-js/number-input": "catalog:",
         "@zag-js/pagination": "catalog:",
         "@zag-js/pin-input": "catalog:",
+        "@zag-js/popover": "catalog:",
         "@zag-js/presence": "catalog:",
         "@zag-js/radio-group": "catalog:",
         "@zag-js/select": "catalog:",

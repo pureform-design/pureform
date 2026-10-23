@@ -885,6 +885,20 @@ export {
     tooltipSelection,
 } from "./components/tooltip";
 export {
+    POPOVER_CONTENT_PROPS,
+    POPOVER_ROOT_PROPS,
+    popoverMachineProps,
+    popoverSelection,
+} from "./components/popover";
+export type {
+    PopoverBehaviorProps,
+    PopoverContentProps,
+    PopoverElementIds,
+    PopoverPart,
+    PopoverRootOwnProps,
+    PopoverVariantProps,
+} from "./components/popover";
+export {
     isInteractiveRichTooltip,
     RICH_TOOLTIP_CONTENT_PROPS,
     RICH_TOOLTIP_ROOT_PROPS,

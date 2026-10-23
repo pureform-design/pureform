@@ -7,6 +7,7 @@ import { pureform } from "../pureform";
 import { dialog } from "./dialog";
 import { menu } from "./menu";
 import { OVERLAY_KEYFRAMES } from "./overlay";
+import { popover } from "./popover";
 import { richTooltip } from "./rich-tooltip";
 import { scrim } from "./scrim";
 import { snackbar } from "./snackbar";
@@ -16,6 +17,7 @@ const OVERLAYS = [
     ["menu", menu, "menu"],
     ["tooltip", tooltip, "tooltip"],
     ["richTooltip", richTooltip, "tooltip"],
+    ["popover", popover, "menu"],
     ["dialog", dialog, "dialog"],
     ["scrim", scrim, "scrim"],
     ["snackbar", snackbar, "snackbar"],
@@ -56,7 +58,7 @@ describe("overlays", () => {
     });
 
     it("grows a menu and a tooltip in from the side they open on, and shrinks them as they fade out", () => {
-        for (const component of [menu, tooltip, richTooltip]) {
+        for (const component of [menu, tooltip, richTooltip, popover]) {
             const root = rootOf(component);
             expect(root[OPEN]).toEqual({
                 animation: {

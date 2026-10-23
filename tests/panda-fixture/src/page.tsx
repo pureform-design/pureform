@@ -30,6 +30,7 @@ import {
     slider,
     snackbar,
     toast,
+    popover,
     richTooltip,
     tooltip,
     dialog,
@@ -2471,6 +2472,20 @@ export function Page() {
                             type="button"
                         >
                             <span class={button().label}>Learn more</span>
+                        </button>
+                    </div>
+                </div>
+                <div class={popover().root} role="dialog">
+                    <span class={popover().title}>Filters</span>
+                    <div class={popover().body}>
+                        Show only the items that match.
+                    </div>
+                    <div class={popover().actions}>
+                        <button
+                            class={button({ variant: "text" }).root}
+                            type="button"
+                        >
+                            <span class={button().label}>Apply</span>
                         </button>
                     </div>
                 </div>

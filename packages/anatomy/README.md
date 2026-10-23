@@ -191,7 +191,7 @@ and its part names are the menu's slots (`root`, `itemGroup`, `itemGroupLabel`, 
 `pf-select-positioner` (`compositeTestIds.selectMenu`).
 
 **The overlays** (`menuOverlayAnatomy`, `tooltipOverlayAnatomy`, `richTooltipOverlayAnatomy`,
-`dialogOverlayAnatomy`) are the
+`popoverOverlayAnatomy`, `dialogOverlayAnatomy`) are the
 menu, tooltips, and dialog as the bindings render them: an unstyled `root` (the element around
 everything, `pf-<scope>-root`), `trigger`, and `positioner`, then the preset's slots. The preset's
 `root` slot is the surface, so its part is `content` (`data-pf-part="content"`,
@@ -199,7 +199,7 @@ everything, `pf-<scope>-root`), `trigger`, and `positioner`, then the preset's s
 takes the provider's `slotProps` (`partSlot(part)` reads it; `null` for none, as on the wrapper).
 The dialog also has an unstyled `closeTrigger`, and its backdrop is `dialogBackdropAnatomy`, drawn
 by the scrim's entry (`name: "scrim"`) under the dialog's scope (`pf-dialog-backdrop`). Their test
-ids are in `compositeTestIds.menu`, `.tooltip`, `.richTooltip`, `.dialog`, `.dialogBackdrop`; the snackbar uses
+ids are in `compositeTestIds.menu`, `.tooltip`, `.richTooltip`, `.popover`, `.dialog`, `.dialogBackdrop`; the snackbar uses
 its generated anatomy as is.
 
 **The full-screen dialog** (`fullscreenDialogOverlayAnatomy`, scope `fullscreen-dialog`) is the

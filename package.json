@@ -110,6 +110,7 @@
         "@zag-js/dialog": "^1.46.0",
         "@zag-js/file-upload": "^1.46.0",
         "@zag-js/tooltip": "^1.46.0",
+        "@zag-js/popover": "^1.46.0",
         "@zag-js/presence": "^1.46.0",
         "@zag-js/tabs": "^1.46.0",
         "@zag-js/tags-input": "^1.46.0",

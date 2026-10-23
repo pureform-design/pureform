@@ -112,6 +112,7 @@ const COMPONENTS = [
     "snackbar",
     "tooltip",
     "richTooltip",
+    "popover",
     "ripple",
 ];
 

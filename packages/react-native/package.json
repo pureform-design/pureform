@@ -502,6 +502,13 @@
                 "default": "./dist/rich-tooltip.mjs"
             }
         },
+        "./popover": {
+            "types": "./dist/popover/index.d.ts",
+            "import": {
+                "development": "./src/popover/index.ts",
+                "default": "./dist/popover.mjs"
+            }
+        },
         "./storybook": {
             "types": "./dist/storybook/index.d.ts",
             "import": {

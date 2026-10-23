@@ -14,6 +14,7 @@ import { loadingIndicator } from "./loading-indicator";
 import { menu } from "./menu";
 import { navigationBar } from "./navigation-bar";
 import { navigationRail } from "./navigation-rail";
+import { popover } from "./popover";
 import { circularProgress, linearProgress } from "./progress";
 import { richTooltip } from "./rich-tooltip";
 import { searchBar } from "./search-bar";
@@ -41,6 +42,7 @@ describe.each([
     ["toast", toast],
     ["tooltip", tooltip],
     ["richTooltip", richTooltip],
+    ["popover", popover],
     ["slider", slider],
     ["linearProgress", linearProgress],
     ["circularProgress", circularProgress],

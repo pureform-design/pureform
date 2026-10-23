@@ -204,6 +204,10 @@ export const COMPONENT_USAGE = {
     // The group's color and density reach each radio.
     "radio-group": { entries: { radio: same("color", "density"), ripple: {} } },
     // The trigger is a button.
+    popover: {
+        entries: { popover: {}, button: {}, ripple: {} },
+    },
+    // The trigger is a button.
     "rich-tooltip": {
         entries: { richTooltip: {}, button: {}, ripple: {} },
     },

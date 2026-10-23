@@ -2507,6 +2507,73 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
 }
 `;
 
+exports[`popover > compiles to a stable Panda slot recipe 1`] = `
+{
+  "base": {
+    "actions": {
+      "display": "flex",
+      "flexDirection": "row",
+      "gap": "token(spacing.2)",
+      "justifyContent": "end",
+    },
+    "body": {
+      "textStyle": "bodyMedium",
+    },
+    "caret": {
+      "color": "var(--components-popover-container, token(colors.surfaceContainer))",
+    },
+    "root": {
+      "&[data-state=closed]": {
+        "animation": {
+          "_motionReduce": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) forwards overlayFadeOut",
+          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) forwards overlayShrinkOut, token(springs.effectsFast.duration) token(springs.effectsFast.easing) forwards overlayFadeOut",
+        },
+        "transformOrigin": "var(--transform-origin)",
+      },
+      "&[data-state=open]": {
+        "animation": {
+          "_motionReduce": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) overlayFadeIn",
+          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) overlayGrowIn, token(springs.effectsFast.duration) token(springs.effectsFast.easing) overlayFadeIn",
+        },
+        "transformOrigin": "var(--transform-origin)",
+      },
+      "backgroundColor": "var(--components-popover-container, token(colors.surfaceContainer))",
+      "borderRadius": "var(--components-popover-radius, token(radii.medium))",
+      "color": "var(--components-popover-content, token(colors.onSurface))",
+      "display": "flex",
+      "flexDirection": "column",
+      "gap": "token(spacing.2)",
+      "maxWidth": "var(--components-popover-maxWidth, 360px)",
+      "minWidth": "var(--components-popover-minWidth, 200px)",
+      "paddingBlockEnd": "token(spacing.3)",
+      "paddingBlockStart": "token(spacing.4)",
+      "paddingInlineEnd": "token(spacing.4)",
+      "paddingInlineStart": "token(spacing.4)",
+      "shadowElevation": "level2",
+      "zIndex": "token(zIndex.menu)",
+    },
+    "title": {
+      "color": "var(--components-popover-titleColor, token(colors.onSurface))",
+      "textStyle": "titleMedium",
+    },
+  },
+  "className": "popover",
+  "compoundVariants": [],
+  "defaultVariants": {},
+  "jsx": [
+    "Popover",
+  ],
+  "slots": [
+    "root",
+    "caret",
+    "title",
+    "body",
+    "actions",
+  ],
+  "variants": {},
+}
+`;
+
 exports[`richTooltip > compiles to a stable Panda slot recipe 1`] = `
 {
   "base": {
