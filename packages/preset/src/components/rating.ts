@@ -31,7 +31,7 @@ import {
     hidden,
     inlineFlex,
     none,
-    pct,
+    mul,
     pointer,
     px,
     relative,
@@ -90,7 +90,8 @@ const filled = (share: number): StyleMap => ({
     position: absolute,
     insetBlockStart: ref("itemPadding"),
     insetInlineStart: ref("itemPadding"),
-    width: share === 1 ? ref("iconSize") : pct(share * 100),
+    width:
+        share === 1 ? ref("iconSize") : mul(ref("iconSize"), unitless(share)),
     minWidth: unitless(0),
     overflow: hidden,
     color: ref("accent"),

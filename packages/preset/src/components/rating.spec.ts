@@ -26,7 +26,10 @@ describe("rating", () => {
 
     it("clips the half star to half the icon, from the inline start", () => {
         const base = compiled()?.base;
-        expect(JSON.stringify(base?.halfFill?.width)).toBe('"50%"');
+        // Half the icon, not half the item: the item's padding would show more than half.
+        expect(JSON.stringify(base?.halfFill?.width)).toBe(
+            '"calc(var(--components-rating-iconSize, 24px) * 0.5)"',
+        );
         expect(base?.halfFill?.insetInlineStart).toBeDefined();
         expect(base?.halfFill?.overflow).toBe("hidden");
     });

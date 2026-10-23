@@ -90,6 +90,27 @@ const ICON_FILLS = [
 ] as const;
 const CARD_FILLS = ["elevated", "filled", "outlined"] as const;
 
+// The bindings' glyphs (binding-core's `GLYPH_PATHS`): the rating's star, the copy button's icons.
+const GLYPHS = {
+    star: "m12 17.27 4.15 2.51c.76.46 1.69-.22 1.49-1.08l-1.1-4.72 3.67-3.18c.67-.58.31-1.68-.57-1.75l-4.83-.41-1.89-4.46c-.34-.81-1.5-.81-1.84 0L9.19 8.63l-4.83.41c-.88.07-1.24 1.17-.57 1.75l3.67 3.18-1.1 4.72c-.2.86.73 1.54 1.49 1.08z",
+    copy: "M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2m0 16H8V7h11z",
+    check: "M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z",
+} as const;
+
+function Glyph(props: { readonly glyph: keyof typeof GLYPHS }) {
+    return (
+        <svg
+            viewBox="0 0 24 24"
+            width="1em"
+            height="1em"
+            fill="currentColor"
+            aria-hidden="true"
+        >
+            <path d={GLYPHS[props.glyph]} />
+        </svg>
+    );
+}
+
 // An app bar's icon button: the standard icon button around a glyph.
 function BarButton(props: { readonly label: string; readonly glyph: string }) {
     const b = iconButton({ variant: "standard" });
@@ -1083,14 +1104,16 @@ export function Page() {
                                                         : "false"
                                                 }
                                             >
-                                                <span class={t.icon}>★</span>
+                                                <span class={t.icon}>
+                                                    <Glyph glyph="star" />
+                                                </span>
                                                 {star <= 3 ? (
                                                     <span class={t.fill}>
-                                                        ★
+                                                        <Glyph glyph="star" />
                                                     </span>
                                                 ) : star === 4 ? (
                                                     <span class={t.halfFill}>
-                                                        ★
+                                                        <Glyph glyph="star" />
                                                     </span>
                                                 ) : null}
                                             </span>
@@ -1111,28 +1134,36 @@ export function Page() {
                                     aria-disabled="true"
                                     data-disabled=""
                                 >
-                                    <span class={rating().icon}>★</span>
+                                    <span class={rating().icon}>
+                                        <Glyph glyph="star" />
+                                    </span>
                                     {star === 1 ? (
-                                        <span class={rating().fill}>★</span>
+                                        <span class={rating().fill}>
+                                            <Glyph glyph="star" />
+                                        </span>
                                     ) : null}
                                 </span>
                             )}
                         </For>
                     </div>
                 </div>
-                <For each={["⎘", "✓"]}>
+                <For each={["copy", "check"] as const}>
                     {(glyph) => {
                         const b = iconButton({ variant: "standard" });
                         return (
                             <button
                                 class={b.root}
                                 type="button"
-                                aria-label={glyph === "✓" ? "Copied" : "Copy"}
-                                data-copied={glyph === "✓" ? "" : undefined}
+                                aria-label={
+                                    glyph === "check" ? "Copied" : "Copy"
+                                }
+                                data-copied={glyph === "check" ? "" : undefined}
                             >
                                 <span class={b.touchTarget} />
                                 <span class={b.container}>
-                                    <span class={b.icon}>{glyph}</span>
+                                    <span class={b.icon}>
+                                        <Glyph glyph={glyph} />
+                                    </span>
                                 </span>
                             </button>
                         );

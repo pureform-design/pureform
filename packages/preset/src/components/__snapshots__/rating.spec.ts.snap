@@ -45,7 +45,7 @@ exports[`rating > compiles to a stable Panda slot recipe 1`] = `
       "overflow": "hidden",
       "pointerEvents": "none",
       "position": "absolute",
-      "width": "50%",
+      "width": "calc(var(--components-rating-iconSize, 24px) * 0.5)",
     },
     "icon": {
       "&:is(:disabled, [aria-disabled=true])": {
