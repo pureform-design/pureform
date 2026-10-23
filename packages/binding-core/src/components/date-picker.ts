@@ -636,6 +636,10 @@ export interface DateInputContentProps<Node> extends PickerContentProps<Node> {
     readonly leadingIcon?: Node;
     /** An icon at the end of the field; renders only when given. */
     readonly trailingIcon?: Node;
+    /** Flip the leading icon under `rtl` (an arrow that points). */
+    readonly mirrorLeadingIcon?: boolean | undefined;
+    /** Flip the trailing icon under `rtl`. */
+    readonly mirrorTrailingIcon?: boolean | undefined;
     /** Text before the segments; renders only when given. */
     readonly prefixText?: Node;
     /** Text after the segments; renders only when given. */
@@ -649,6 +653,8 @@ export const DATE_INPUT_CONTENT_PROPS = [
     "supportingText",
     "leadingIcon",
     "trailingIcon",
+    "mirrorLeadingIcon",
+    "mirrorTrailingIcon",
     "prefixText",
     "suffixText",
 ] as const satisfies readonly (keyof DateInputContentProps<unknown>)[];

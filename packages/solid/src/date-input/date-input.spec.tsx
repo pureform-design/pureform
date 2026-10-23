@@ -63,6 +63,24 @@ describe("DateInput, ready-made", () => {
         expect(byTestId(ids.suffixText).textContent).toBe("USD");
     });
 
+    it("marks an icon to flip under rtl only when asked", async () => {
+        withRegistry(() => (
+            <DateInput
+                locale="en-US"
+                leadingIcon="L"
+                trailingIcon="T"
+                mirrorLeadingIcon
+            />
+        ));
+        await settle();
+        expect(byTestId(ids.leadingIcon).hasAttribute("data-pf-mirror")).toBe(
+            true,
+        );
+        expect(byTestId(ids.trailingIcon).hasAttribute("data-pf-mirror")).toBe(
+            false,
+        );
+    });
+
     it("draws none of them without content", async () => {
         withRegistry(() => <DateInput locale="en-US" />);
         await settle();

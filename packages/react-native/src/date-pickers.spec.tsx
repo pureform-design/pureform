@@ -10,7 +10,7 @@ import { DockedDatePicker } from "./docked-date-picker";
 import { animated } from "./engine";
 import { presetRegistry } from "./testing/registry";
 import type { TestRegistry } from "./testing/registry";
-import { byTestId, interact, mount, until } from "./testing/render";
+import { byTestId, computed, interact, mount, until } from "./testing/render";
 
 let registry: TestRegistry;
 
@@ -245,6 +245,36 @@ describe("DateInput", () => {
                 '[data-testid="pf-date-input-trailing-icon"]',
             ),
         ).toBeNull();
+    });
+
+    const iconsUnder = async (dir: "ltr" | "rtl", mirror: boolean) => {
+        await mount(
+            <PureformProvider
+                registry={registry}
+                engine={animated}
+                motion="reduce"
+                dir={dir}
+            >
+                <View style={{ width: 600, height: 700 }}>
+                    <DateInput
+                        locale="en-US"
+                        leadingIcon="L"
+                        trailingIcon="T"
+                        mirrorLeadingIcon={mirror}
+                    />
+                </View>
+            </PureformProvider>,
+        );
+        return computed("pf-date-input-leading-icon").transform;
+    };
+
+    it("flips a marked icon under rtl", async () => {
+        const marked = await iconsUnder("rtl", true);
+        expect(new DOMMatrix(marked).a).toBe(-1);
+    });
+
+    it("leaves the icons alone under rtl unless marked, and under ltr", async () => {
+        expect(new DOMMatrix(await iconsUnder("rtl", false)).a).toBe(1);
     });
 
     it("confirms the typed date", async () => {

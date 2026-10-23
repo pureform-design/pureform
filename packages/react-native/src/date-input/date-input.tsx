@@ -77,6 +77,9 @@ function DateInputImpl(props: DateInputProps): ReactNode {
             invalid,
             disabled: props.disabled ?? false,
             ...(props.readOnly ? { readOnly: true } : {}),
+            ...(props.mirrorLeadingIcon || props.mirrorTrailingIcon
+                ? { mirrored: true }
+                : {}),
         },
     );
     const id = (part: DateInputPart) =>
