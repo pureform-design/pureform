@@ -22,6 +22,7 @@ import { Checkbox } from "@pureform/react/checkbox";
 import { Chip } from "@pureform/react/chip";
 import { ChipSet } from "@pureform/react/chip-set";
 import { CircularProgress } from "@pureform/react/circular-progress";
+import { ColorPicker } from "@pureform/react/color-picker";
 import { DateInput } from "@pureform/react/date-input";
 import { DatePicker } from "@pureform/react/date-picker";
 import { Dialog } from "@pureform/react/dialog";
@@ -178,6 +179,7 @@ export const components: Record<ComponentName, ComponentType<never>> = {
     Dialog,
     DragHandle,
     Splitter,
+    ColorPicker,
     Fab,
     FullscreenDialog,
     GridList: GridListScene,

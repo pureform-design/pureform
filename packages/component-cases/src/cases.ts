@@ -10,6 +10,7 @@ import { carouselCase } from "./cases/carousel";
 import { checkbox } from "./cases/checkbox";
 import { chip } from "./cases/chip";
 import { chipSet } from "./cases/chip-set";
+import { colorPicker } from "./cases/color-picker";
 import { dateInput, datePicker, dockedDatePicker } from "./cases/date-pickers";
 import { dialog } from "./cases/dialog";
 import { dragHandle } from "./cases/drag-handle";
@@ -82,6 +83,7 @@ export const COMPONENTS: readonly ComponentCase[] = [
     dialog,
     dragHandle,
     splitter,
+    colorPicker,
     fab,
     fadeThrough,
     fullscreenDialog,
