@@ -1,5 +1,5 @@
 // The list item: its leading icon, its lines (overline, headline, supporting text), and its
-// trailing icon or text. With `onPress` it's interactive: it takes the state layer and ripples.
+// trailing icon or text. With `onPress` or an `href` it's interactive: it takes the state layer and ripples.
 // Given a `region`, it's expandable: a button whose indicator turns over, showing the region under
 // it while expanded (React state, as the accordion's; there's no Zag here). Given a `swipeAction`,
 // it sits in a frame with the action under it, and slides to uncover it; an expandable item too.
@@ -30,7 +30,7 @@ import type {
 } from "@pureform/binding-core";
 import { createContext, use, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { PanResponder } from "react-native";
+import { Linking, PanResponder } from "react-native";
 
 import { iconParts } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
@@ -53,6 +53,8 @@ export interface ListItemProps
     /** Makes the item act. An expandable item (given a `region`) acts as well: it expands. On a
      *  swipeable item (one with a `swipeAction`), a tap fires it and a drag doesn't. */
     readonly onPress?: (() => void) | undefined;
+    /** Where the item leads: it's an interactive link, which a press opens (after `onPress`). */
+    readonly href?: string | undefined;
     /** An interactive item's role in place of `button`: a selection list's options are `option`s,
      *  marked with `aria-selected`. */
     readonly role?: "option" | undefined;
@@ -74,7 +76,8 @@ function ListItemImpl(props: ListItemProps): ReactNode {
         false,
     );
     const swipeable = isPresent(props.swipeAction);
-    const interactive = expandable || props.onPress !== undefined;
+    const link = !expandable && props.href !== undefined;
+    const interactive = expandable || link || props.onPress !== undefined;
     const rtl = useDirection() === "rtl";
     const width = props.swipeWidth ?? LIST_ITEM_SWIPE_WIDTH;
     const [own, setOwn] = useState(props.defaultRevealed ?? false);
@@ -253,11 +256,20 @@ function ListItemImpl(props: ListItemProps): ReactNode {
               setExpanded(!expanded);
               props.onPress?.();
           }
-        : props.onPress;
+        : link
+          ? () => {
+                props.onPress?.();
+                void Linking.openURL(props.href!);
+            }
+          : props.onPress;
     const row = (
         <v.root.Pressable
             {...(interactive ? indication.handlers : {})}
-            role={interactive ? (props.role ?? "button") : "listitem"}
+            role={
+                interactive
+                    ? (props.role ?? (link ? "link" : "button"))
+                    : "listitem"
+            }
             {...(interactive && props.role === "option"
                 ? { "aria-selected": props.selected ?? false }
                 : {})}
