@@ -313,7 +313,8 @@ import { RichTooltip } from "@pureform/solid/rich-tooltip";
   `CancelTrigger` drops it; the view trigger switches between the days and the years. The
   `DockedDatePicker` is a text field (the date typed in the locale's format, read once the field
   loses focus) with a calendar popup under it; choosing a date sets `value` and closes it. The
-  `DateInput` takes the date as segments (Zag's date input), always marked filled, and calls
+  `DateInput` takes the date as segments (Zag's date input), always marked filled (ready-made, it
+  takes its icons and affixes as content, and `mirrorLeadingIcon` and `mirrorTrailingIcon`), and calls
   `onConfirm(value)` and `onCancel` from its actions. `Prev` and `Next` flip their chevrons under
   `rtl` (`mirror`, on by default).
 - **The select** is the text field's look over Zag's select: the `Input` part is a read-only

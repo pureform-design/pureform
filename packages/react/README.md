@@ -324,7 +324,8 @@ import { RichTooltip } from "@pureform/react/rich-tooltip";
   (`@pureform/react/docked-date-picker`) is a text field whose button opens the calendar under
   it; a typed date sets the value once the field loses focus, a chosen one at once.
   `DateInput` (`@pureform/react/date-input`) takes the date as segments and calls `onConfirm`
-  with it. Every day, month and year is its own `calendarCell` component (`view`, `selection`,
+  with it; ready-made, it takes `leadingIcon`, `trailingIcon`, `prefixText` and `suffixText` as
+  content (not flags) and `mirrorLeadingIcon` and `mirrorTrailingIcon`. Every day, month and year is its own `calendarCell` component (`view`, `selection`,
   `today`, `outside`).
 - **The tags input** draws Material's input chips inside the text field's container: Enter (or
   `delimiter`) adds the typed text as a chip, Backspace highlights the last chip (the hover state)
