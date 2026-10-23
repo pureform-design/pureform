@@ -1816,6 +1816,22 @@ radio[color=info].root: bg transparent | color none | outline none
     hovered-selected: bg rgba(28, 27, 30, 0.08)
     pressed-checked: bg rgba(0, 104, 124, 0.1)
     focused-checked: bg rgba(0, 104, 124, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+input.root: bg transparent | color rgba(28, 27, 30, 1) | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(28, 27, 30, 0.1)
+    dragged: bg rgba(28, 27, 30, 0.16)
+    hovered-selected: bg rgba(28, 27, 30, 0.08)
+    pressed-checked: bg rgba(28, 27, 30, 0.1)
+    focused-checked: bg rgba(28, 27, 30, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+plainTextarea.root: bg transparent | color rgba(28, 27, 30, 1) | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(28, 27, 30, 0.1)
+    dragged: bg rgba(28, 27, 30, 0.16)
+    hovered-selected: bg rgba(28, 27, 30, 0.08)
+    pressed-checked: bg rgba(28, 27, 30, 0.1)
+    focused-checked: bg rgba(28, 27, 30, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
 textField.label: bg none | color rgba(73, 69, 78, 1) | outline none
     focused: color rgba(103, 80, 164, 1)
     focused-checked: color rgba(103, 80, 164, 1)
