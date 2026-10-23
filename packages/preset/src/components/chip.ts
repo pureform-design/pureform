@@ -53,6 +53,8 @@ import {
     sys,
     touchTarget,
     variantsOf,
+    pillRadius,
+    OWN_SIZE,
 } from "./shared";
 import type { ColorGroup, ColorGroups, Densities } from "./shared";
 
@@ -168,12 +170,14 @@ export const chipShape = (
 ): StyleMap => ({
     ...INDICATION_ROOT,
     ...pressableRoot(ref),
+    ...OWN_SIZE,
     gap: ref("gap"),
     height: dense(ref("height")),
     paddingInlineStart: ref("padding"),
     paddingInlineEnd: ref("padding"),
     transition: spatialCornerTransition,
     borderRadius: cornerRadius(ref),
+    tokens: { radius: pillRadius(dense(ref("height"))) },
 });
 
 const pf = typed();
@@ -254,7 +258,12 @@ export const createChip = <
                         },
                     })),
                     density: densityVariant(densities, (offset) => ({
-                        root: { height: add(ref("height"), offset) },
+                        root: {
+                            height: add(ref("height"), offset),
+                            tokens: {
+                                radius: pillRadius(add(ref("height"), offset)),
+                            },
+                        },
                     })),
                 },
                 defaultVariants: {

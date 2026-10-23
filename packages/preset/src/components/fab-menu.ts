@@ -65,6 +65,7 @@ import {
     sizeTokens,
     slotStateLayer,
     variantsOf,
+    pillRadius,
 } from "./shared";
 import type { ColorGroup, ColorGroups } from "./shared";
 
@@ -295,7 +296,14 @@ export const createFabMenu = <const G extends string = ColorGroup>(
                         entriesOf(SIZES).map(([name, f]) => [
                             name,
                             {
-                                root: { tokens: { closeIconSize: f.icon } },
+                                root: {
+                                    tokens: {
+                                        closeIconSize: f.icon,
+                                        closeRadius: pillRadius(
+                                            ref(sizeTokenName("size", name)),
+                                        ),
+                                    },
+                                },
                                 closeTrigger: {
                                     // Round once open.
                                     borderRadius: when(

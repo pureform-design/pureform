@@ -47,6 +47,7 @@ import {
     sizeTokens,
     sys,
     variantsOf,
+    pillRadius,
 } from "./shared";
 import type { ColorGroup, ColorGroups, Densities, Fill } from "./shared";
 import { runCorners } from "./tiles";
@@ -271,6 +272,7 @@ export const createSplitButton = <
                                             iconSize: b.icon,
                                             leadingGap: b.gap,
                                             outlineWidth: b.outline,
+                                            radius: pillRadius(height),
                                             innerRadius: s.inner,
                                             pressedInnerRadius: s.pressed,
                                             trailingPadding: s.trailingPadding,

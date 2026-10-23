@@ -51,6 +51,7 @@ import {
     touchTarget,
     variantsOf,
     roundIconButton,
+    pillRadius,
 } from "./shared";
 import type { ColorGroup, ColorGroups, Densities } from "./shared";
 
@@ -210,7 +211,12 @@ export const createInputChip = <
                         },
                     })),
                     density: densityVariant(densities, (offset) => ({
-                        root: { height: add(ref("height"), offset) },
+                        root: {
+                            height: add(ref("height"), offset),
+                            tokens: {
+                                radius: pillRadius(add(ref("height"), offset)),
+                            },
+                        },
                     })),
                 },
                 defaultVariants: {
