@@ -50,6 +50,7 @@ import {
 
 import {
     DEFAULT_GROUP,
+    colorTokenVariants,
     componentTokens,
     defaultGroups,
     disabledColor,
@@ -175,14 +176,7 @@ export const createFileUpload = <const G extends string = ColorGroup>(
                 } satisfies Record<string, StyleMap>,
                 variants: {
                     // The default group's tokens are the base's.
-                    color: Object.fromEntries(
-                        groups.map((group) => [
-                            group,
-                            group === DEFAULT_GROUP
-                                ? {}
-                                : { root: { tokens: groupTokens(group) } },
-                        ]),
-                    ),
+                    color: colorTokenVariants(groups),
                     error: {
                         true: {
                             dropzone: { borderColor: ref("errorColor") },

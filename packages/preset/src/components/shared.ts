@@ -188,18 +188,18 @@ export const groupTokens = (group: string) => ({
 export type GroupToken = keyof ReturnType<typeof groupTokens>;
 
 /** The `color` variant group for a component with group tokens: each group points them at its
- *  roles, except the default group, which the tokens' defaults already name. */
+ *  roles, except the default group, which the tokens' defaults already name. `tokens` picks the
+ *  group tokens a component declares (all four by default; the rating has only `accent`). */
 export const colorTokenVariants = <G extends string>(
     groups: ColorGroups<G>,
+    tokens: (group: string) => NonNullable<StyleMap["tokens"]> = groupTokens,
 ): Record<G, { root: StyleMap }> =>
     Object.fromEntries(
         groups.map((group): [G, { root: StyleMap }] => [
             group,
             {
                 root:
-                    group === DEFAULT_GROUP
-                        ? {}
-                        : { tokens: groupTokens(group) },
+                    group === DEFAULT_GROUP ? {} : { tokens: tokens(group) },
             },
         ]),
     ) as Record<G, { root: StyleMap }>;
