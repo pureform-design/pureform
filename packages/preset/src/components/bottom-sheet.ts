@@ -3,7 +3,8 @@
 // edge lets it be dragged down, or closed with a press.
 //
 // Markup: the surface holding the drag handle (the drag handle component, centered) and the
-// content, which scrolls. The binding places it at the bottom of the viewport. `modal` stacks it
+// content, which scrolls. Without the drag handle (`dragHandle: false`), the content takes its
+// top padding. The binding places it at the bottom of the viewport. `modal` stacks it
 // at the theme's `dialog` layer, over a scrim, with focus kept inside; a standard sheet sits at the
 // `raised` layer, beside what the page is doing. Both slide up while Zag's `data-state` is `open`.
 //
@@ -28,6 +29,8 @@ const { tokens, ref } = componentTokens("bottomSheet", {
     maxWidth: px(640),
     contentPadding: spacing("4"),
     contentPaddingEnd: spacing("6"),
+    // The content's top padding on a sheet without a drag handle, which otherwise gives it room.
+    contentPaddingStart: spacing("6"),
 });
 
 const pf = typed();
@@ -41,7 +44,7 @@ export const bottomSheet = pf.slotComponent({
     tokens,
     slots: ["root", "dragHandle", "content"],
     structure: { root: ["dragHandle", "content"] },
-    variants: { modal: ["true", "false"] },
+    variants: { modal: ["true", "false"], dragHandle: ["true", "false"] },
     recipe: () => ({
         base: {
             root: {
@@ -78,7 +81,13 @@ export const bottomSheet = pf.slotComponent({
                 true: { root: { zIndex: zIndex("dialog") } },
                 false: { root: { zIndex: zIndex("raised") } },
             },
+            dragHandle: {
+                true: {},
+                false: {
+                    content: { paddingBlockStart: ref("contentPaddingStart") },
+                },
+            },
         },
-        defaultVariants: { modal: "true" },
+        defaultVariants: { modal: "true", dragHandle: "true" },
     }),
 });

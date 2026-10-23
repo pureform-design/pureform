@@ -295,7 +295,7 @@ interface BottomSheetRootOwnProps        // modal, tokens, onClose, the dialog's
 closeAsker();                            // asks an overlay's onClose for every way it closes; a later question makes an earlier answer moot
 askingDismissProps(onClose, props, asker, close); // Zag dialog props: Escape and a press outside ask onClose first
 interface SideSheetRootOwnProps          // modal, coplanar, tokens, onClose (OverlayCloseProps), and the same
-BOTTOM_SHEET_ROOT_PROPS; BOTTOM_SHEET_CONTENT_PROPS; // trigger, dragHandle, dragHandleLabel, body
+BOTTOM_SHEET_ROOT_PROPS; BOTTOM_SHEET_CONTENT_PROPS; // trigger, dragHandleLabel, body
 SIDE_SHEET_ROOT_PROPS; SIDE_SHEET_CONTENT_PROPS;     // trigger, headline, onBack, backLabel, backIcon,
                                          // closeLabel, closeIcon, body, actions
 sheetModal(props);                       // modal unless `modal: false`

@@ -59,7 +59,16 @@ describe("bottomSheet", () => {
         const modal = bottomSheet.recipe.variants!.modal!;
         expect(json(modal.true)).toContain("dialog");
         expect(json(modal.false)).toContain("raised");
-        expect(bottomSheet.recipe.defaultVariants).toEqual({ modal: "true" });
+        expect(bottomSheet.recipe.defaultVariants).toEqual({
+            modal: "true",
+            dragHandle: "true",
+        });
+    });
+
+    it("pads the top of its content without a drag handle", () => {
+        const dragHandle = bottomSheet.recipe.variants!.dragHandle!;
+        expect(json(dragHandle.false)).toContain("contentPaddingStart");
+        expect(json(dragHandle.true)).toBe("{}");
     });
 });
 

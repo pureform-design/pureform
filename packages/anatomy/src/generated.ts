@@ -4513,7 +4513,7 @@ export const bottomSheetAnatomy = {
             mirror: false,
         },
     },
-    variants: { modal: ["true", "false"] },
+    variants: { modal: ["true", "false"], dragHandle: ["true", "false"] },
 } as const satisfies ComponentAnatomy;
 
 export const sideSheetAnatomy = {

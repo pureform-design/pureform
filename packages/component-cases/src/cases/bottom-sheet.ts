@@ -23,11 +23,12 @@ export const bottomSheet: ComponentCase = {
     root: ids.root,
     examples: {
         closed: {},
-        "without a drag handle": { dragHandle: false },
     },
     opened: {
         plain: { defaultOpen: true },
         standard: { defaultOpen: true, modal: false },
+        // The body takes the top padding the handle gave it.
+        "without a drag handle": { defaultOpen: true, dragHandle: false },
         // Taller than half the screen, so it opens with its top at half the screen (the
         // default); its body scrolls, so it takes focus for the keyboard.
         "partly open": {

@@ -12,8 +12,12 @@ describe("sheets", () => {
     it("are modal unless told otherwise, and a modal side sheet isn't coplanar", () => {
         expect(bottomSheetSelection({})).toEqual({
             modal: true,
+            dragHandle: true,
             tokens: undefined,
         });
+        expect(bottomSheetSelection({ dragHandle: false }).dragHandle).toBe(
+            false,
+        );
         expect(bottomSheetSelection({ modal: false }).modal).toBe(false);
         expect(sideSheetSelection({ coplanar: true })).toEqual({
             modal: true,

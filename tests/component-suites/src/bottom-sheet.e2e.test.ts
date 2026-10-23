@@ -80,3 +80,28 @@ describe("BottomSheet, partly open", () => {
         await harness.settle();
     });
 });
+
+describe("BottomSheet without a drag handle", () => {
+    it("gives its body the top padding the handle gave it", async () => {
+        const host = document.createElement("div");
+        document.body.append(host);
+        mountCase(sheetCase, sheetCase.opened!["without a drag handle"], {
+            host,
+        });
+        await settlePlaced();
+        const content = host.querySelector<HTMLElement>(
+            `[data-testid="${ids.content}"]`,
+        )!;
+        const body = host.querySelector<HTMLElement>(
+            `[data-testid="${ids.body}"]`,
+        )!;
+        expect(
+            host.querySelector(`[data-testid="${ids.dragHandle}"]`),
+        ).toBeNull();
+        expect(getComputedStyle(body).paddingTop).toBe("24px");
+        expect(body.getBoundingClientRect().top).toBe(
+            content.getBoundingClientRect().top,
+        );
+        host.remove();
+    });
+});
