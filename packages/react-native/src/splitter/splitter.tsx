@@ -33,6 +33,7 @@ import type { ReactNode } from "react";
 import { Animated, PanResponder } from "react-native";
 import type { LayoutChangeEvent } from "react-native";
 
+import { ownText } from "../icon-style";
 import { testIdOf, unselectable, withEngine } from "../parts";
 import { useDirection, usePureform } from "../provider";
 import { useComponentSlots } from "../styles";
@@ -337,7 +338,15 @@ function SplitterImpl(props: SplitterProps): ReactNode {
                             }}
                             testID={id("panel")}
                         >
-                            {pane.content}
+                            {typeof pane.content === "string" ||
+                            typeof pane.content === "number" ? (
+                                // A View can't hold a string.
+                                <v.panel.Text style={ownText(s.panel)}>
+                                    {pane.content}
+                                </v.panel.Text>
+                            ) : (
+                                pane.content
+                            )}
                         </v.panel.View>
                     </Animated.View>
                     {index < props.panes.length - 1 ? (
