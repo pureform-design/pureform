@@ -23,6 +23,9 @@ exports[`numberField > compiles to a stable Panda slot recipe 1`] = `
       "transform": "translateY(-50%)",
     },
     "decrementTrigger": {
+      "&:is(:disabled, [aria-disabled=true])": {
+        "pointerEvents": "none",
+      },
       "_rtl": {
         "&[data-pf-mirror]": {
           "transform": "scaleX(-1)",
@@ -66,6 +69,9 @@ exports[`numberField > compiles to a stable Panda slot recipe 1`] = `
       "width": "var(--components-numberField-triggerSize, 40px)",
     },
     "incrementTrigger": {
+      "&:is(:disabled, [aria-disabled=true])": {
+        "pointerEvents": "none",
+      },
       "_rtl": {
         "&[data-pf-mirror]": {
           "transform": "scaleX(-1)",
