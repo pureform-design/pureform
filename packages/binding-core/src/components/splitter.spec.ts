@@ -129,7 +129,7 @@ describe("splitter", () => {
     });
 
     it("maps Root's props onto Zag's and names the divider", () => {
-        const onSizeChange = (_: { size: number[] }) => {};
+        const onSizeChange = () => {};
         const panels = [{ id: "a" }, { id: "b" }];
         expect(
             splitterMachineProps({ panels, orientation: "vertical" })
