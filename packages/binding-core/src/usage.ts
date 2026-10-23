@@ -312,6 +312,17 @@ export const COMPONENT_USAGE = {
         },
     },
     "supporting-text": { entries: { supportingText: same("tone") } },
+    // The plain form primitives: one look each, no variants.
+    field: {
+        entries: {
+            field: {},
+            label: {},
+            input: {},
+            textarea: {},
+            description: {},
+            errorText: {},
+        },
+    },
     // `transition` moves a row's content in a shared axis or a fade through.
     stepper: {
         entries: {
