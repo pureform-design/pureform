@@ -50,7 +50,7 @@ const animate = (element: HTMLElement, open: boolean): void => {
     running.delete(element);
     if (!timing) return;
     // Drawn while it shrinks, whatever `hidden` says; dropped once it's shut.
-    if (!open) element.style.display = "block";
+    if (!open) element.style.setProperty("display", "block", "important");
     const style = getComputedStyle(element);
     const full = {
         height: `${element.scrollHeight}px`,
