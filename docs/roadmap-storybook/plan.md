@@ -228,3 +228,11 @@ codegen hooks (`transformSource`) run in the script.
 8. **Spike, on-device React Native:** can `@storybook/react-native` read the same stories and the
    React Native hook (`@pureform/react-native/storybook`) without the web adapters? Report the
    setup cost (Metro config, the app to host it, story format differences).
+
+## After r9: renderer-neutral case readers
+
+The shared cases read state only through ARIA (`role` with `aria-checked`, `aria-valuenow`,
+`aria-selected`, `aria-expanded`, accessible names, and the input's value where a textbox is the
+role), never through web-only DOM properties, so the story plays run on React Native's web build
+too. React Native's story tests then turn on by default; ARIA gaps they find in the React Native
+bindings get fixed in the bindings.
