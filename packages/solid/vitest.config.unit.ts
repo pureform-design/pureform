@@ -41,6 +41,7 @@ export default mergeConfig(mergeConfig(baseConfig, unitTestConfig), {
             "@pureform/machines > @zag-js/slider",
             "@pureform/machines > @zag-js/avatar",
             "@pureform/machines > @zag-js/listbox",
+            "@pureform/machines > @zag-js/splitter",
             "@pureform/machines > @zag-js/anatomy",
             "@pureform/machines > @zag-js/collection",
         ],

@@ -445,6 +445,17 @@
                 "default": "./dist/internal/zag/index.jsx"
             }
         },
+        "./splitter": {
+            "types": "./dist/splitter/index.d.ts",
+            "solid": {
+                "development": "./src/splitter/index.ts",
+                "default": "./dist/splitter.jsx"
+            },
+            "import": {
+                "development": "./src/splitter/index.ts",
+                "default": "./dist/splitter.jsx"
+            }
+        },
         "./avatar": {
             "types": "./dist/avatar/index.d.ts",
             "solid": {
