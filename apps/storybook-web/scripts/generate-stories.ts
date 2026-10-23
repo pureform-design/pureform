@@ -286,6 +286,30 @@ const generate = async () => {
             const id = unique(name);
             if (base.name) base = { ...base, name: shown(base.name) };
             base = { ...base, ...options.stories?.[id] };
+            // An arg the example leaves out (`as: undefined`, over the case's `as: "button"`):
+            // JSON drops it, and Storybook keeps the component's arg for an `undefined` one, so
+            // the story names it for the render to drop (see `multi-render.ts`).
+            const unset = Object.entries(
+                (base["args"] ?? {}) as Record<string, unknown>,
+            )
+                .filter(([, value]) => value === undefined)
+                .map(([key]) => key);
+            if (unset.length > 0) {
+                const parameters = (base["parameters"] ?? {}) as Record<
+                    string,
+                    unknown
+                >;
+                base = {
+                    ...base,
+                    parameters: {
+                        ...parameters,
+                        pureform: {
+                            ...(parameters["pureform"] as object | undefined),
+                            unset,
+                        },
+                    },
+                };
+            }
             // Tags written out: Storybook's indexer reads them from the file, not at run time.
             const tags = Array.isArray(base["tags"])
                 ? `\n    tags: ${JSON.stringify(base["tags"])},`
