@@ -711,7 +711,10 @@ describe("lists, menus, and selects", () => {
         const open = vi.spyOn(Linking, "openURL").mockResolvedValue(undefined);
         await render(
             <List
-                items={[{ headline: "Inbox", href: "#inbox" }, { headline: "Sent" }]}
+                items={[
+                    { headline: "Inbox", href: "#inbox" },
+                    { headline: "Sent" },
+                ]}
             />,
         );
         const [link, row] = document.querySelectorAll<HTMLElement>(
