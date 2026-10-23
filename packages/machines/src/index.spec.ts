@@ -105,16 +105,15 @@ describe("@pureform/machines", () => {
         ]);
     });
 
-    // Only from its subpath: in the root it changes React Native's unit runs (its splitter's
-    // drags stop reaching the responder); see c9d's context.
-    it("re-exports Zag's color picker from its subpath, with the fieldset rule and a valueSwatch part", () => {
+    it("re-exports Zag's color picker from the root and its subpath, with the fieldset rule and a valueSwatch part", () => {
+        expect(machines.colorPicker.machine).toBe(colorPicker.machine);
+        expect(machines.colorPicker.anatomy).toBe(colorPicker.anatomy);
         expect(colorPicker.machine.states).toBe(zagColorPicker.machine.states);
         expect(colorPicker.machine).not.toBe(zagColorPicker.machine);
         expect(colorPicker.connect).toBe(zagColorPicker.connect);
         expect(colorPicker.parse).toBe(zagColorPicker.parse);
         expect(colorPicker.anatomy.keys()).toContain("valueSwatch");
         expect(colorPicker.anatomy.keys()).toContain("areaThumb");
-        expect("colorPicker" in machines).toBe(false);
     });
 
     it("re-exports Zag's date picker and date input unchanged", () => {
