@@ -166,6 +166,7 @@ import { RichTooltip } from "@pureform/react/rich-tooltip";
     </Menu.Positioner>
 </Menu.Root>
 <Menu contextTrigger={<Canvas />} items={[{ value: "paste", label: "Paste" }]} /> // opens at a right-click, a long press, or the context menu key / Shift+F10
+// (or compose `Menu.ContextTrigger` around any content). Zag holds a long press 700ms and doesn't let it change; React Native's is 500ms.
 
 <Checkbox.Root ids={{ input: "terms" }} color="error" invalid>
     <Checkbox.TouchTarget />
@@ -394,10 +395,13 @@ import { RichTooltip } from "@pureform/react/rich-tooltip";
 - **The bottom sheet** runs on the same Zag machine, in a positioner fixed to the bottom of the
   viewport, over a `Backdrop` when modal (`modal={false}` makes a standard sheet, no backdrop, the
   page usable). Its `DragHandle` (the drag handle component) closes it on a press or a drag down
-  past a quarter of its height. With `partiallyExpandable`, a sheet taller than half the screen
-  opens partly (its top at half the screen, Compose's `PartiallyExpanded`), and a drag or a press
-  on the handle moves it between partly and fully open (`onExpandedChange` hears it); a drag down
-  from partly open closes it. A settle after a drag starts at the release's speed. Without
+  past where it rested (see below). With the default `partiallyExpandable`, a sheet taller than half the screen
+  opens partly (its top at half the screen, Compose's `PartiallyExpanded`; `partiallyExpandable={false}`
+  opens it fully, as Compose's `skipPartiallyExpanded`), and a drag or a press on the handle moves it
+  between partly and fully open (`expanded` controlled, `defaultExpanded`, `onExpandedChange`); a
+  drag down from partly open closes it. Where a drag goes is Compose's rule: 56px past where it
+  rested, or a flick at 125dp/s. A partly open sheet is placed again when it or the window resizes,
+  and the body is in the tab order only while it overflows. A settle after a drag starts at the release's speed. Without
   `aria-label`, the handle is named for what a press does. Root's `onClose` is asked before any close of its own: Escape, the
   scrim, a press on the handle, or a drag. `true` closes, `false` keeps it open (a dragged sheet
   settles back), and a promise keeps it open (a dragged sheet holding where it was let go) until

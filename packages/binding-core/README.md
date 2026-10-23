@@ -301,10 +301,16 @@ sheetMachineProps(props);                // modal by default; a click outside cl
 bottomSheetPositionerLayout(present, modal); // fixed to the bottom; a standard one lets presses through
 sideSheetPositionerLayout(present, modal, coplanar); // fixed to the end edge, or in the page's layout
 sheetContentLayout;                      // the surface takes presses back
-dragToDismiss(handle, sheet, dismiss, onClose?, asker?, { partial?, onRest? }); // from /dom: drag a sheet by its handle; closes it, or with `partial`, moves it between partly and fully open; dismiss(kept) calls kept once rendered if the app kept it open
-sheetRelease({ offset, velocity, height, partial? }); // where a let-go sheet goes: "expanded" | "partial" | "closed" (shared with React Native)
+dragToDismiss(handle, sheet, dismiss, onClose?, asker?, { partial?, opening?, onRest? }); // from /dom: drag a sheet by its handle; closes it, or with `partial`, moves it between partly and fully open (re-placed on a resize); returns stop, with stop.rest(rest) for a controlled `expanded`; dismiss(kept) calls kept once rendered if the app kept it open
+sheetPartiallyExpandable(props); sheetOpeningRest(props); // partly open unless `partiallyExpandable: false`; where it opens (`expanded` ?? `defaultExpanded`)
+SHEET_POSITIONAL_THRESHOLD; SHEET_VELOCITY_THRESHOLD; // Compose's 56px and 125dp/s (0.125px/ms); replace SHEET_DISMISS_SHARE and SHEET_FLICK_SPEED
+sheetRelease({ offset, velocity, height, partial? }); // where a let-go sheet goes: "expanded" | "partial" | "closed", by chooseAnchor (shared with React Native)
 sheetPartialOffset(height, screen); sheetDragHandleLabel(rest, movable); // partly open's offset (top at half the screen); the handle's default name
 settleTransition(element, property, distance, velocity); // from /dom: starts an element's spring transition at a release's speed (core's springFromCurve + sampleSpring's `velocity`)
+settleOnSpring(elements, property, spring, distance, velocity); // from /dom: the same on a given spring (the splitter's panes on SPLITTER_SETTLE)
+focusableWhileOverflowing(element);      // from /dom: tabindex="0" only while its content overflows (the bottom sheet's body)
+createDragVelocity();                    // a drag's speed (px/s) over its last 100ms (drag.ts; the sheet and the splitter)
+chooseAnchor({ anchors, at, velocity, velocityThreshold, positionalThreshold? }); // Compose's anchored-drag target: the next one on a fling, else the nearest or past a positional threshold
 markMenuGroupEdges(content);             // from /dom: marks a menu's first and last groups data-first/data-last, from DOM order; a group's data-pf-first/data-pf-last (its explicit first/last) wins
 swallowNextClick(row);                   // from /dom: drop the click a drag ends with
 whenAnimationsEnd(element, done);        // from /dom: done once every animation running on it ends (at once with none); returns what stops waiting
@@ -320,10 +326,10 @@ splitterMachineProps(props);             // id, orientation, panels, keyboardRes
 splitterSizeProps(sizes, panels);        // size, defaultSize (shared out when neither is given), onResize from onSizeChange
 SPLITTER_ANCHORS;                        // Compose's sample anchors: 0, 240 from the start, 50%, 240 from the end, 100%
 SPLITTER_FLING_VELOCITY;                 // 200px/s: faster snaps to the next anchor that way (Compose's)
+SPLITTER_SETTLE;                         // spring(0.8, 380): the snap's settle, from the release's speed (Compose's)
 splitterSnap({ sizes, index, room, anchors, limits, velocity }); // the sizes once a let-go divider snaps
 splitterMoveBy(sizes, index, delta, limits); splitterLimits(panels, room); splitterPercent(size, room, fallback);
 splitterInitialSizes(panels, sizes, room); splitterTriggerId(before, after); splitterTriggerProps({ label, dragging });
-createDragVelocity();                    // a drag's speed (px/s) over its last 100ms
 
 // Snackbar: pureform's snackbar machine; the generated snackbarAnatomy
 interface SnackbarRootOwnProps           // layout, tokens, duration, onAction, id, ids, open, defaultOpen,
