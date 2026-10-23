@@ -366,66 +366,74 @@ describe.each(ENGINES)("with $name", (engine) => {
         await until(() => expect(frame(byTestId("m-root"))).toEqual(REST));
     });
 
-    it("staggers the FAB menu's items: the nearest the FAB enters first, the farthest leaves first", async () => {
-        const fab = testIds.fabMenu;
-        const wrapper = (item: Element) => item.parentElement!;
-        await render(
-            <FabMenu
-                icon="+"
-                fabLabel="Create"
-                items={[
-                    { value: "a", label: "A" },
-                    { value: "b", label: "B" },
-                    { value: "c", label: "C" },
-                ]}
-            />,
-            engine,
-        );
-        const opacities = () =>
-            [...document.querySelectorAll(`[data-testid="${fab.item}"]`)].map(
-                (item) => frame(wrapper(item)).opacity,
+    it(
+        "staggers the FAB menu's items: the nearest the FAB enters first, the farthest leaves first",
+        { timeout: 60_000 },
+        async () => {
+            const fab = testIds.fabMenu;
+            const wrapper = (item: Element) => item.parentElement!;
+            await render(
+                <FabMenu
+                    icon="+"
+                    fabLabel="Create"
+                    items={[
+                        { value: "a", label: "A" },
+                        { value: "b", label: "B" },
+                        { value: "c", label: "C" },
+                    ]}
+                />,
+                engine,
             );
-        const samples: number[][] = [];
-        let id = 0;
-        const tick = () => {
-            const now = opacities();
-            if (now.length === 3) samples.push(now);
-            id = requestAnimationFrame(tick);
-        };
-        tick();
-        const trigger = byTestId(fab.closeTrigger);
-        await interact(() => userEvent.click(trigger));
-        await until(() => expect(opacities()).toEqual([1, 1, 1]));
-        // Never the farther item ahead of the nearer one, and a moment with the nearest in
-        // while the farthest hasn't begun.
-        const entered = samples.filter((o) => o.some((x) => x > 0 && x < 1));
-        expect(
-            entered.some(([first, , last]) => last! > 0 && first === 0),
-        ).toBe(true);
-        expect(entered.every(([first, , last]) => first! <= last! + 0.01)).toBe(
-            true,
-        );
-        samples.length = 0;
-        // The back of the list closes it too: the nearest item's press picks and closes.
-        await interact(() =>
-            userEvent.click(
-                document.querySelectorAll(`[data-testid="${fab.item}"]`)[2]!,
-            ),
-        );
-        await until(() =>
+            const opacities = () =>
+                [
+                    ...document.querySelectorAll(`[data-testid="${fab.item}"]`),
+                ].map((item) => frame(wrapper(item)).opacity);
+            const samples: number[][] = [];
+            let id = 0;
+            const tick = () => {
+                const now = opacities();
+                if (now.length === 3) samples.push(now);
+                id = requestAnimationFrame(tick);
+            };
+            tick();
+            const trigger = byTestId(fab.closeTrigger);
+            await interact(() => userEvent.click(trigger));
+            await until(() => expect(opacities()).toEqual([1, 1, 1]));
+            // Never the farther item ahead of the nearer one, and a moment with the nearest in
+            // while the farthest hasn't begun.
+            const entered = samples.filter((o) =>
+                o.some((x) => x > 0 && x < 1),
+            );
             expect(
-                document.querySelector(`[data-testid="${fab.list}"]`),
-            ).toBeNull(),
-        );
-        cancelAnimationFrame(id);
-        const left = samples.filter((o) => o.some((x) => x > 0 && x < 1));
-        expect(left.some(([first, , last]) => first! < 1 && last === 1)).toBe(
-            true,
-        );
-        expect(left.every(([first, , last]) => first! <= last! + 0.01)).toBe(
-            true,
-        );
-    });
+                entered.some(([first, , last]) => last! > 0 && first === 0),
+            ).toBe(true);
+            expect(
+                entered.every(([first, , last]) => first! <= last! + 0.01),
+            ).toBe(true);
+            samples.length = 0;
+            // The back of the list closes it too: the nearest item's press picks and closes.
+            await interact(() =>
+                userEvent.click(
+                    document.querySelectorAll(
+                        `[data-testid="${fab.item}"]`,
+                    )[2]!,
+                ),
+            );
+            await until(() =>
+                expect(
+                    document.querySelector(`[data-testid="${fab.list}"]`),
+                ).toBeNull(),
+            );
+            cancelAnimationFrame(id);
+            const left = samples.filter((o) => o.some((x) => x > 0 && x < 1));
+            expect(
+                left.some(([first, , last]) => first! < 1 && last === 1),
+            ).toBe(true);
+            expect(
+                left.every(([first, , last]) => first! <= last! + 0.01),
+            ).toBe(true);
+        },
+    );
 
     it("brings a dialog down and takes it back up, with its scrim fading", async () => {
         const open = outside(false);

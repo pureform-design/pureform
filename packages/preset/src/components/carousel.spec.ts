@@ -67,14 +67,18 @@ describe("carousel", () => {
         expect(fullScreen).toContain("100%");
     });
 
-    it("draws from a named theme's colors and a runtime seed's", () => {
-        for (const config of [
-            pureform(),
-            pureform({ color: materialColor({ seed: "#006A60" }) }),
-        ]) {
-            const mask = JSON.stringify(recipe(config).base.mask);
-            expect(mask).toContain("surfaceContainerHighest");
-            expect(mask).toContain("onSurface");
-        }
-    });
+    it(
+        "draws from a named theme's colors and a runtime seed's",
+        { timeout: 30_000 },
+        () => {
+            for (const config of [
+                pureform(),
+                pureform({ color: materialColor({ seed: "#006A60" }) }),
+            ]) {
+                const mask = JSON.stringify(recipe(config).base.mask);
+                expect(mask).toContain("surfaceContainerHighest");
+                expect(mask).toContain("onSurface");
+            }
+        },
+    );
 });

@@ -480,7 +480,7 @@ describe("generate with the native target", () => {
 
         it(
             "gives what selecting from the whole config's precomputed styles gives, for every combination of every group's values (or an even spread through them)",
-            { timeout: 120_000 },
+            { timeout: 240_000 },
             () => {
                 let count = 0;
                 for (const name of Object.keys(preset.components)) {

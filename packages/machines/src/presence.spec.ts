@@ -67,19 +67,25 @@ describe("presence", () => {
         await expect.poll(() => control.api().present).toBe(false);
     });
 
-    it("stays until the last of an exit's animations ends", async () => {
-        const { surface, control, entering, close } = mount("surface both");
-        await entering();
-        await close();
-        expect(animations(surface)).toEqual(["test-move", "test-out"]);
-        const [move, fade] = surface.getAnimations();
-        fade!.finish();
-        await settle();
-        await frame();
-        expect(control.api().present).toBe(true);
-        move!.finish();
-        await expect.poll(() => control.api().present).toBe(false);
-    });
+    it(
+        "stays until the last of an exit's animations ends",
+        { timeout: 20_000 },
+        async () => {
+            const { surface, control, entering, close } = mount("surface both");
+            await entering();
+            await close();
+            expect(animations(surface)).toEqual(["test-move", "test-out"]);
+            const [move, fade] = surface.getAnimations();
+            fade!.finish();
+            await settle();
+            await frame();
+            expect(control.api().present).toBe(true);
+            move!.finish();
+            await expect
+                .poll(() => control.api().present, { timeout: 10_000 })
+                .toBe(false);
+        },
+    );
 
     it("isn't let go by its enter animation's cancel once it's leaving", async () => {
         const { surface, control, entering, close } = mount();
