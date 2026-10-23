@@ -5,29 +5,43 @@
 // the surface in the app's own layout. A modal sheet opens in a `Modal` over a scrim, against the
 // end edge: a press on the scrim, its close button, Escape, or the back button closes it. Its
 // `Modal` holds a portal host of its own, so menus, tooltips, and selects opened inside draw
-// over it.
+// over it. A modal sheet drags sideways toward its edge, as MDC-Android's `SideSheetDialog`: let
+// go past halfway or on a flick, it closes (asking `onClose` first); short of that, it settles
+// back. A drag mostly up or down is its content's native scroll.
 
 import { sideSheetAnatomy } from "@pureform/anatomy";
 import type { PartName, TestIdOverride } from "@pureform/anatomy";
 import {
     isPresent,
     sheetModal,
+    sideSheetRelease,
     sideSheetSelection,
 } from "@pureform/binding-core";
 import type {
     ChangeDetails,
+    CloseAsker,
+    CloseQuestion,
     SideSheetVariantProps,
     OverlayCloseProps,
 } from "@pureform/binding-core";
+import { settle } from "@pureform/rn-adapter/animated";
+import { useReducedMotion, useTokens } from "@pureform/rn-adapter/react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import {
+    Animated,
+    PanResponder,
+    ScrollView,
+    StyleSheet,
+    View,
+} from "react-native";
 
 import { Button } from "../button/button";
 import { IconButton } from "../icon-button/icon-button";
 import { ModalScrimLayer, ModalWindow, useModalOverlay } from "../modal";
-import { testIdOf, withEngine } from "../parts";
-import { useOverlayPresence } from "../presence";
-import { useEngine } from "../provider";
+import { testIdOf, useStableCallback, withEngine } from "../parts";
+import { themeSpring, useOverlayPresence } from "../presence";
+import { useDirection, useEngine, usePureform } from "../provider";
 import { useComponentSlots } from "../styles";
 
 /** The sheet's parts this binding renders. */
@@ -165,6 +179,115 @@ function SideSheetImpl(
 
 const Surface = withEngine(SideSheetImpl, "SideSheet");
 
+// Moves shorter than this are a press, not a drag.
+const SLOP = 8;
+
+/** A modal sheet's drag toward its edge: `children` (the surface) moves with it, and let go it
+ *  closes or settles back as `sideSheetRelease` says. */
+function SideSheetDrag(props: {
+    readonly open: boolean;
+    readonly asker: CloseAsker;
+    readonly onClose: CloseQuestion | undefined;
+    readonly closeNow: () => void;
+    readonly children: ReactNode;
+}): ReactNode {
+    const drag = useMemo(() => new Animated.Value(0), []);
+    const width = useRef(0);
+    const offset = useRef(0);
+    // Toward the edge: right, or left under right to left.
+    const outward = useDirection() === "rtl" ? -1 : 1;
+    const latestOutward = useRef(outward);
+    latestOutward.current = outward;
+    const tokens = useTokens();
+    const reducedMotion = useReducedMotion();
+    const { timeScale } = usePureform();
+    const stopSettle = useRef<() => void>(() => {});
+    const latestSettle = useStableCallback((velocity: number) => {
+        stopSettle.current();
+        offset.current = 0;
+        stopSettle.current = settle(
+            drag,
+            velocity * latestOutward.current,
+            reducedMotion
+                ? undefined
+                : themeSpring("spatialDefault", tokens, timeScale),
+            0,
+        );
+    });
+    // Each time it opens, it starts open, wherever a drag let it go last time.
+    const shown = useRef(props.open);
+    shown.current = props.open;
+    useEffect(() => {
+        if (!props.open) return;
+        stopSettle.current();
+        offset.current = 0;
+        drag.setValue(0);
+    }, [props.open, drag]);
+    // After a drag closed it: once that render has committed, a sheet still open (one the app
+    // kept open) settles back.
+    const [left, setLeft] = useState<{ readonly velocity: number }>();
+    useEffect(() => {
+        if (left && shown.current) latestSettle(left.velocity);
+    }, [left, latestSettle]);
+    const latestDismiss = useStableCallback((velocity: number) => {
+        let now = true;
+        props.asker.ask(
+            props.onClose,
+            () => {
+                props.closeNow();
+                setLeft({ velocity: now ? velocity : 0 });
+            },
+            () => latestSettle(now ? velocity : 0),
+        );
+        now = false;
+    });
+    useEffect(() => () => stopSettle.current(), []);
+    const pan = useMemo(
+        () =>
+            PanResponder.create({
+                // Mostly sideways: a drag of the sheet; mostly up or down: its content's scroll.
+                onMoveShouldSetPanResponderCapture: (_, gesture) =>
+                    Math.abs(gesture.dx) > SLOP &&
+                    Math.abs(gesture.dx) > Math.abs(gesture.dy),
+                onPanResponderGrant: () => {
+                    props.asker.cancel();
+                    stopSettle.current();
+                },
+                onPanResponderMove: (_, gesture) => {
+                    offset.current = Math.max(
+                        0,
+                        gesture.dx * latestOutward.current,
+                    );
+                    drag.setValue(offset.current * latestOutward.current);
+                },
+                onPanResponderRelease: (_, gesture) => {
+                    // In pixels per millisecond, toward the edge.
+                    const velocity = gesture.vx * latestOutward.current;
+                    const to = sideSheetRelease({
+                        offset: offset.current,
+                        velocity,
+                        width: width.current,
+                    });
+                    if (to === "closed") latestDismiss(velocity);
+                    else latestSettle(velocity);
+                },
+                onPanResponderTerminate: () => latestSettle(0),
+            }),
+        [drag, props.asker, latestDismiss, latestSettle],
+    );
+    return (
+        <Animated.View
+            {...pan.panHandlers}
+            onLayout={(event) => {
+                width.current = event.nativeEvent.layout.width;
+            }}
+            style={[styles.drag, { transform: [{ translateX: drag }] }]}
+        >
+            {props.children}
+        </Animated.View>
+    );
+}
+
 function ModalSideSheet(props: SideSheetProps): ReactNode {
     const {
         trigger,
@@ -172,10 +295,10 @@ function ModalSideSheet(props: SideSheetProps): ReactNode {
         defaultOpen: _defaultOpen,
         onOpenChange: _onOpenChange,
         closeOnEscape: _closeOnEscape,
-        onClose: _onClose,
+        onClose,
         ...surface
     } = props;
-    const { open, presence, close, show } = useModalOverlay(
+    const { open, presence, close, closeNow, asker, show } = useModalOverlay(
         "SideSheet",
         props,
         "sideSheet",
@@ -199,7 +322,14 @@ function ModalSideSheet(props: SideSheetProps): ReactNode {
                     positionerStyle={styles.positioner}
                     surfaceStyle={{ flexDirection: "row" }}
                 >
-                    <Surface {...surface} close={close} />
+                    <SideSheetDrag
+                        open={open}
+                        asker={asker}
+                        onClose={onClose}
+                        closeNow={closeNow}
+                    >
+                        <Surface {...surface} close={close} />
+                    </SideSheetDrag>
                 </ModalScrimLayer>
             </ModalWindow>
         </>
@@ -218,6 +348,8 @@ const styles = StyleSheet.create({
         justifyContent: "flex-end",
         alignItems: "stretch",
     },
+    // The drag's view around the surface: as wide as the surface, at most the screen.
+    drag: { flexShrink: 1, maxWidth: "100%" },
 });
 
 /** Material's side sheet. Given a trigger, `onOpenChange`, or `defaultOpen`, the modal sheet:
