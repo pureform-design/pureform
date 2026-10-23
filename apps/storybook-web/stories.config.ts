@@ -54,6 +54,7 @@ export default defineStories({
         Splitter: { hooks: ["./src/stages/splitter.ts"] },
         Media: { hooks: ["./src/stages/media.ts"] },
         Switch: { hooks: ["./src/checks/switch.ts"] },
+        Badge: { hooks: ["./src/checks/badge.ts"] },
         TextField: {
             // React Native Web: the disabled field's input is `disabled` now (not `readonly`)
             // and passes, but its label is a plain text element, not the input's `<label>`, so
