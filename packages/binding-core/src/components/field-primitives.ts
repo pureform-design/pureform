@@ -250,10 +250,3 @@ export const fieldLabelProps = (
 /** The required mark's text, hidden from assistive technology: the control's `required` says
  *  it. */
 export const REQUIRED_MARK = "*";
-
-/** Input types that open the platform's own date or time picker. */
-export const DATE_TIME_INPUT_TYPES = [
-    "date",
-    "time",
-    "datetime-local",
-] as const;

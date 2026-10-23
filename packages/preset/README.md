@@ -653,6 +653,39 @@ input; the label, icons, and supporting text follow it.
 - Removed: the `supportingRow` part (breaking). It held the supporting text and the counter
   while core had no `flexWrap`; the root now wraps, so both sit in the root directly.
 
+## Plain form primitives
+
+For an app that wants the theme without Material's field design: `field`, `label`, `input`,
+`plainTextarea`, `description`, and `errorText`, one look each and no variants (pureform's own
+design; Material's text field doesn't change). The textarea's registry name is `plainTextarea`,
+since `textarea` and `textArea` collide in case-insensitive file names.
+
+```html
+<div class="{field.root}">
+    <label class="{label.root}" for="name">
+        Name<span class="{label.requiredIndicator}" aria-hidden="true">*</span>
+    </label>
+    <input
+        class="{input.root}"
+        id="name"
+        aria-describedby="name-description"
+        required
+    />
+    <span class="{description.root}" id="name-description"
+        >As on your passport</span
+    >
+</div>
+```
+
+- `field` is spacing only: a column whose pieces stretch to its width.
+- `input` and `plainTextarea` are a box in the theme's `extraSmall` shape with an outline, a
+  state layer of the text color, and the focus ring; `aria-invalid="true"` draws the error
+  color. Their block padding follows the theme's density.
+- `type="date"`, `"time"` and `"datetime-local"` keep the browser's own pickers; the indicator
+  is redrawn in `indicatorColor` (a calendar, or a clock for `time`) where the browser exposes
+  it (`::-webkit-calendar-picker-indicator`: Chromium and Safari; Firefox draws its own).
+- The label dims with `aria-disabled="true"`; `requiredIndicator` is in the error color.
+
 ## Select
 
 A text field whose read-only combobox input picks from a menu, with the arrow as its trailing

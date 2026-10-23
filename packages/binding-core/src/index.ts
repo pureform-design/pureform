@@ -1308,7 +1308,6 @@ export type {
     SliderVariantProps,
 } from "./components/slider";
 export {
-    DATE_TIME_INPUT_TYPES,
     DESCRIPTION_ROOT_PROPS,
     ERROR_TEXT_ROOT_PROPS,
     FIELD_ROOT_PROPS,

@@ -190,6 +190,16 @@ ICON_BUTTON_ROOT_PROPS; ICON_BUTTON_CONTENT_PROPS; iconButtonSelection(props); /
 isToggle(props);                         // toggle ?? (selected or defaultSelected given)
 FAB_ROOT_PROPS; FAB_CONTENT_PROPS; fabSelection(props); fabMachineProps(props); // never a toggle
 
+// The plain form primitives (`components/field-primitives.ts`)
+FIELD_ROOT_PROPS; LABEL_ROOT_PROPS; INPUT_ROOT_PROPS; TEXTAREA_ROOT_PROPS;
+DESCRIPTION_ROOT_PROPS; ERROR_TEXT_ROOT_PROPS;
+fieldSelection(props); labelSelection(props); inputSelection(props); // and the others'
+fieldIds(controlId);                     // { control, label, description, error }
+fieldState(props, ids, described);       // disabled, invalid (or an error), required
+fieldControlProps(field, own);           // id, disabled, required, aria-invalid, aria-describedby
+fieldLabelState(field, own); fieldLabelProps(field, state); // id, for, aria-disabled
+REQUIRED_MARK;                           // the required mark, hidden from assistive technology
+
 // Text field and text area: on pureform's text field machine; one contract for both
 interface TextFieldRootOwnProps          // variant, color, density, leadingIcon, trailingIcon,
                                          // prefixText, suffixText (room for them), secure, counterMax,

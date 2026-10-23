@@ -58,6 +58,7 @@ See the [design doc](../../docs/design/component-architecture.md), §5.1, §5.3,
 | `navigation.tsx`, `tabs/`, `navigation-bar/`, `navigation-rail/`        | Tabs and navigation, sharing one file                                                                                                                                                                                                                                                                                                                                                                         |
 | `list/`, `list-item/`, `menu/`, `dialog/`, `snackbar/`, `tooltip/`      | Lists and overlays: each surface, and the ready-made overlay (`snackbar/queue.tsx`: `useSnackbar`; the menu's `contextTrigger` opens it at a long press's touch point (`Pressable`'s 500ms; Zag's web long press is a fixed 700ms), and a pressable nested in the area keeps its own touches, so a long press on it doesn't open the menu; `tooltip-overlay.tsx`, the trigger overlay the two tooltips share) |
 | `progress.tsx`, `single-part.tsx`, and their subpaths                   | Progress indicators; avatar, icon, media, scrim, separator, supporting text, text                                                                                                                                                                                                                                                                                                                             |
+| `field/`, and a subpath per piece                                       | The plain form primitives (below)                                                                                                                                                                                                                                                                                                                                                                             |
 | `loading-indicator/`                                                    | `LoadingIndicator`: turns, drawn in its first shape with an SVG engine (React Native's keyframes carry no clip, so it doesn't morph) and as a circle without one                                                                                                                                                                                                                                              |
 | `file-upload/`                                                          | `FileUpload`: a drop zone with a trigger, and a list of the files the app picked (each a list item with a remove icon button and, while uploading, a linear progress); the app picks, keeps `files` and reports `progress`                                                                                                                                                                                    |
 | `tags-input/`                                                           | `TagsInput`: input chips in a text field (submit or the delimiter adds one, Backspace or its remove button removes one)                                                                                                                                                                                                                                                                                       |
@@ -192,6 +193,15 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
   content props too where it has them (`label`, `icon`, `mirrorIcon`, `leadingIcon`, …).
   Controlled state follows Zag's shape: `checked` / `defaultChecked` / `onCheckedChange({ checked })`.
   Test ids are the anatomy's (`pf-button-root`), or `testId` as a prefix or per part.
+
+### Plain form primitives
+
+`@pureform/react-native/field` has `Field`, `Label`, `Input`, `Textarea`, `Description` and
+`ErrorText`, as on the web. `Field` labels its control by the label (`aria-labelledby`, the
+label's `nativeID`) and gives it `disabled`, `invalid` and `required`. React Native has no
+`aria-describedby`, so the description and error are read as the text after the control. It
+has no date or time input: for a date or a time, use Material's `DatePicker` and `TimePicker`.
+`Input` and `Textarea` take `TextInput`'s props; the box shows focus, not hover.
 
 ## Build and test
 
