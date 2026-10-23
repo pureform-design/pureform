@@ -73,7 +73,7 @@ describe("CopyButton", () => {
     });
 
     it("announces the copy in a polite live region beside the button", async () => {
-        withRegistry(<CopyButton value="x" copiedLabel="Token copied" />);
+        withRegistry(() => <CopyButton value="x" copiedLabel="Token copied" />);
         await settle();
         const status = document.querySelector<HTMLElement>('[role="status"]')!;
         expect(status.textContent).toBe("");
@@ -88,15 +88,15 @@ describe("CopyButton", () => {
         vi.spyOn(document, "execCommand").mockReturnValue(false);
         const onCopy = vi.fn();
         const onCopyError = vi.fn();
-        withRegistry(
+        withRegistry(() => (
             <CopyButton
                 value="secret"
                 icon="C"
                 copiedIcon="OK"
                 onCopy={onCopy}
                 onCopyError={onCopyError}
-            />,
-        );
+            />
+        ));
         await settle();
         await userEvent.click(byTestId(ids.root));
         await vi.waitFor(() =>
