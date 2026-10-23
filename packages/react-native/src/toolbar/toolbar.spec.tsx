@@ -50,6 +50,23 @@ const shown = () =>
     }).map((item) => item.value);
 
 describe("Toolbar", () => {
+    it("hugs its elements when floating, as the web's inline-flex bar, and fills its edge when docked", async () => {
+        await render(<Toolbar aria-label="Edit" items={ITEMS.slice(0, 3)} />);
+        const floating = box(byTestId(testIds.toolbar.root)).width;
+        // Three 48px icon buttons, 4px apart, and the bar's padding: far less than the column.
+        expect(floating).toBeLessThan(200);
+        document.body.innerHTML = "";
+        await render(
+            <Toolbar
+                aria-label="Edit"
+                placement="docked"
+                items={ITEMS.slice(0, 3)}
+            />,
+        );
+        // The column is 600 wide less the 160 padding on each side.
+        expect(box(byTestId(testIds.toolbar.root)).width).toBeCloseTo(280, 0);
+    });
+
     it("draws a 64px pill with its elements 4px apart, a toolbar to assistive technology", async () => {
         await render(<Toolbar aria-label="Edit" items={ITEMS.slice(0, 3)} />);
         const root = byTestId(testIds.toolbar.root);

@@ -31,7 +31,7 @@ import { Menu } from "../menu";
 import type { MenuTriggerProps } from "../menu";
 import { testIdOf, withEngine } from "../parts";
 import { ProvidedTokens } from "../provided-tokens";
-import { useComponentSlots } from "../styles";
+import { inFlowInline, useComponentSlots } from "../styles";
 
 export interface ToolbarProps
     extends ToolbarRootOwnProps, ToolbarContentProps<ReactNode> {
@@ -162,7 +162,13 @@ function ToolbarImpl(props: ToolbarProps): ReactNode {
             {...(props["aria-label"] === undefined
                 ? {}
                 : { "aria-label": props["aria-label"] })}
-            style={s.root}
+            // A floating bar hugs its elements as the web's `inline-flex` one does; a docked one
+            // fills its edge.
+            style={
+                props.placement === "docked"
+                    ? s.root
+                    : inFlowInline(s.root ?? {})
+            }
             testID={id("root")}
         >
             {items.map((item, index) =>
