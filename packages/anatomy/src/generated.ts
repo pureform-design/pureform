@@ -3357,6 +3357,129 @@ export const separatorAnatomy = {
     },
 } as const satisfies ComponentAnatomy;
 
+export const fieldAnatomy = {
+    name: "field",
+    scope: "field",
+    root: "root",
+    partNames: ["root"],
+    parts: {
+        root: {
+            name: "root",
+            attribute: "root",
+            testId: "pf-field-root",
+            parent: null,
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+    },
+    variants: {},
+} as const satisfies ComponentAnatomy;
+
+export const labelAnatomy = {
+    name: "label",
+    scope: "label",
+    root: "root",
+    partNames: ["root", "requiredIndicator"],
+    parts: {
+        root: {
+            name: "root",
+            attribute: "root",
+            testId: "pf-label-root",
+            parent: null,
+            children: ["requiredIndicator"],
+            styled: true,
+            mirror: false,
+        },
+        requiredIndicator: {
+            name: "requiredIndicator",
+            attribute: "required-indicator",
+            testId: "pf-label-required-indicator",
+            parent: "root",
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+    },
+    variants: {},
+} as const satisfies ComponentAnatomy;
+
+export const inputAnatomy = {
+    name: "input",
+    scope: "input",
+    root: "root",
+    partNames: ["root"],
+    parts: {
+        root: {
+            name: "root",
+            attribute: "root",
+            testId: "pf-input-root",
+            parent: null,
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+    },
+    variants: {},
+} as const satisfies ComponentAnatomy;
+
+export const textareaAnatomy = {
+    name: "textarea",
+    scope: "textarea",
+    root: "root",
+    partNames: ["root"],
+    parts: {
+        root: {
+            name: "root",
+            attribute: "root",
+            testId: "pf-textarea-root",
+            parent: null,
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+    },
+    variants: {},
+} as const satisfies ComponentAnatomy;
+
+export const descriptionAnatomy = {
+    name: "description",
+    scope: "description",
+    root: "root",
+    partNames: ["root"],
+    parts: {
+        root: {
+            name: "root",
+            attribute: "root",
+            testId: "pf-description-root",
+            parent: null,
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+    },
+    variants: {},
+} as const satisfies ComponentAnatomy;
+
+export const errorTextAnatomy = {
+    name: "errorText",
+    scope: "error-text",
+    root: "root",
+    partNames: ["root"],
+    parts: {
+        root: {
+            name: "root",
+            attribute: "root",
+            testId: "pf-error-text-root",
+            parent: null,
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+    },
+    variants: {},
+} as const satisfies ComponentAnatomy;
+
 export const listAnatomy = {
     name: "list",
     scope: "list",
@@ -6369,6 +6492,12 @@ export const anatomy = {
     circularProgress: circularProgressAnatomy,
     loadingIndicator: loadingIndicatorAnatomy,
     separator: separatorAnatomy,
+    field: fieldAnatomy,
+    label: labelAnatomy,
+    input: inputAnatomy,
+    textarea: textareaAnatomy,
+    description: descriptionAnatomy,
+    errorText: errorTextAnatomy,
     list: listAnatomy,
     listItem: listItemAnatomy,
     menu: menuAnatomy,
@@ -6705,6 +6834,15 @@ export const testIds = {
         indicator: "pf-loading-indicator-indicator",
     },
     separator: { root: "pf-separator-root" },
+    field: { root: "pf-field-root" },
+    label: {
+        root: "pf-label-root",
+        requiredIndicator: "pf-label-required-indicator",
+    },
+    input: { root: "pf-input-root" },
+    textarea: { root: "pf-textarea-root" },
+    description: { root: "pf-description-root" },
+    errorText: { root: "pf-error-text-root" },
     list: { root: "pf-list-root", item: "pf-list-item" },
     listItem: {
         root: "pf-list-item-root",
