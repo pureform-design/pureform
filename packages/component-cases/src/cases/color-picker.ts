@@ -2,7 +2,8 @@
 // arrow keys move saturation across (by direction) and brightness up and down, a step of 1 each
 // (Zag rounds the HSB channels first, so #bf4040's saturation 66.5 moves from 66).
 // The text field shows the value's hex, which `read` reports. The eye dropper is left out: it
-// renders only once mounted, where the browser has one, so hydration would add it.
+// renders only once mounted, where the browser has one, so hydration would add it. A hidden input
+// submits the hex under `name`; a form reset puts the default back.
 
 import { testIds } from "@pureform/anatomy";
 
@@ -17,6 +18,9 @@ const thumb = (host: HTMLElement) => byTestId(host, ids.areaThumb);
 /** The value, as the hex field shows it. */
 const read = (host: HTMLElement): string =>
     `#${byTestId<HTMLInputElement>(host, testIds.textField.input).value.toLowerCase()}`;
+
+const hidden = (host: HTMLElement) =>
+    host.querySelector<HTMLInputElement>('input[name="seed"]')!;
 
 const SWATCHES = ["#6750a4", "#006a6a", "#8b5000", "#bf4040"];
 
@@ -41,6 +45,16 @@ export const colorPicker: ComponentCase = {
             await userEvent.keyboard("{ArrowRight}");
         },
         read,
+    },
+    form: {
+        control: hidden,
+        disabled: (host) =>
+            byTestId(host, ids.root).hasAttribute("data-disabled"),
+        resets: true,
+        submits: {
+            props: { name: "seed", defaultValue: "#006a6a" },
+            entries: [["seed", "#006a6a"]],
+        },
     },
     keyboard: {
         focusable: thumb,

@@ -27,6 +27,7 @@ import type { ElementType, KeyboardEvent, ReactNode } from "react";
 import { useEffect, useId, useRef, useState } from "react";
 
 import { useControllable } from "../controllable";
+import { useFormReset } from "../form";
 import { ColorizeIcon } from "../glyphs";
 import { IconButton } from "../icon-button";
 import type { IconButtonProps } from "../icon-button";
@@ -112,6 +113,17 @@ function Root(props: ColorPickerRootProps): ReactNode {
             }),
     });
     const api = colorPicker.connect(service, normalizeProps);
+    const [input, setInput] = useState<HTMLInputElement | null>(null);
+    useFormReset(input, {
+        resetsTo: hexOf(
+            colorPicker.parse(value.resetsTo ?? COLOR_PICKER_DEFAULT),
+        ),
+        onBeforeReset: value.beforeReset,
+        onReset: () =>
+            value.reset(() =>
+                api.setValue(value.defaultValue ?? COLOR_PICKER_DEFAULT),
+            ),
+    });
     const scope = useComponent(colorPickerAnatomy, {
         selection: colorPickerSelection(props),
         testId: props.testId,
@@ -146,7 +158,13 @@ function Root(props: ColorPickerRootProps): ReactNode {
                     children: (
                         <>
                             {children}
-                            <input {...hidden} value={hex} readOnly />
+                            <input
+                                {...hidden}
+                                ref={setInput}
+                                form={props.form}
+                                value={hex}
+                                readOnly
+                            />
                         </>
                     ),
                 },

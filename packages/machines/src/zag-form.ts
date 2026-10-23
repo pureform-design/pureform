@@ -7,18 +7,20 @@ import type { Machine, MachineSchema, Params, Scope } from "@zag-js/core";
 
 import { trackFieldsetDisabled } from "./form";
 
-/** `machine` with its `trackFormControlState` effect replaced: it follows the fieldsets around
- *  `element(scope)` and sets the `fieldsetDisabled` context, and nothing else. */
+/** `machine` with its form effect (`trackFormControlState`, or the name Zag gives it there)
+ *  replaced: it follows the fieldsets around `element(scope)` and sets the `fieldsetDisabled`
+ *  context, and nothing else. */
 export const withFieldsetRule = <T extends MachineSchema>(
     machine: Machine<T>,
     element: (scope: Scope) => Element | null | undefined,
+    effect = "trackFormControlState",
 ): Machine<T> => ({
     ...machine,
     implementations: {
         ...machine.implementations,
         effects: {
             ...machine.implementations?.effects,
-            trackFormControlState: ({ context, scope }: Params<T>) =>
+            [effect]: ({ context, scope }: Params<T>) =>
                 trackFieldsetDisabled(element(scope), (disabled) =>
                     (
                         context as unknown as {

@@ -36,6 +36,7 @@ import {
 } from "solid-js";
 
 import { useControllable } from "../controllable";
+import { useFormReset } from "../form";
 import { ColorizeIcon } from "../glyphs";
 import { IconButton } from "../icon-button";
 import type { IconButtonProps } from "../icon-button/icon-button";
@@ -126,6 +127,19 @@ function Root(props: ColorPickerRootProps): JSX.Element {
     }));
     const api = createMemo(() => colorPicker.connect(service, normalizeProps));
     const hex = createMemo(() => hexOf(api().value));
+    const [input, setInput] = createSignal<HTMLInputElement | undefined>(
+        undefined,
+        { ownedWrite: true },
+    );
+    useFormReset(input, {
+        resetsTo: () =>
+            hexOf(colorPicker.parse(value.resetsTo() ?? COLOR_PICKER_DEFAULT)),
+        onBeforeReset: value.beforeReset,
+        onReset: () =>
+            value.reset(() =>
+                api().setValue(value.defaultValue ?? COLOR_PICKER_DEFAULT),
+            ),
+    });
     const scope = useComponent(colorPickerAnatomy, {
         selection: () => colorPickerSelection(props),
         testId: () => props.testId,
@@ -165,6 +179,8 @@ function Root(props: ColorPickerRootProps): JSX.Element {
                                     {props.children}
                                     <input
                                         {...hidden()}
+                                        ref={setInput}
+                                        form={props.form}
                                         value={hex()}
                                         readonly
                                     />
