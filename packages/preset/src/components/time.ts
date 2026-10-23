@@ -8,6 +8,7 @@ import {
     end,
     flex,
     hidden,
+    inlineFlex,
     pointer,
     px,
     relative,
@@ -73,7 +74,9 @@ export const timeSlots = (ref: TimeRef, fieldHeight: AliasNode) =>
             ...INDICATION_ROOT,
             ...surface(ref("container"), ref("fieldContent"), "level3"),
             transition: stateTransition,
-            display: flex,
+            // Its own size, as Compose's `TimePicker` and `TimeInput` and MDC's time picker
+            // (wrap_content), rather than the whole width it's in.
+            display: inlineFlex,
             flexDirection: column,
             alignItems: stretch,
             gap: ref("gap"),
