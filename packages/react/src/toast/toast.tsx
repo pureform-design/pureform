@@ -20,10 +20,17 @@ import type {
     ToasterOptions,
     ToasterOwnProps,
 } from "@pureform/binding-core";
+import { toastSwipeToDismiss } from "@pureform/binding-core/dom";
 import * as toast from "@pureform/machines/toast";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";
-import { type CSSProperties, type ReactNode, useId } from "react";
+import {
+    type CSSProperties,
+    type ReactNode,
+    useCallback,
+    useId,
+    useRef,
+} from "react";
 
 import { CloseIcon, ToastIcon } from "../glyphs";
 import { useMachineButton } from "../interaction";
@@ -146,16 +153,33 @@ function Root({
         indication: group.props.indication,
     });
     const machine = api.getRootProps() as { style?: CSSProperties };
+    const latest = useRef(api);
+    latest.current = api;
+    const swipe = useCallback(
+        (element: HTMLElement | null) =>
+            element
+                ? toastSwipeToDismiss(element, {
+                      closable: () => latest.current.closable,
+                      dismiss: () => latest.current.dismiss(),
+                      pause: () => latest.current.pause(),
+                      resume: () => latest.current.resume(),
+                  })
+                : undefined,
+        [],
+    );
     return (
         <context.Provider value={{ scope, api }}>
             {scope.render("root", {
                 element: "div",
+                ref: swipe,
                 machine: {
                     ...machine,
                     style: {
                         ...machine.style,
                         ...TOAST_STACK_STYLE,
                         zIndex: "var(--z-index)",
+                        // Sideways moves are the swipe's (`toastSwipeToDismiss`).
+                        touchAction: "pan-y",
                     },
                 },
                 props: {

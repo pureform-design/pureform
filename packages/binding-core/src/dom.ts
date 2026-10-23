@@ -362,3 +362,8 @@ export {
     tooltipLongPress,
 } from "./tooltip-long-press";
 export type { TooltipLongPressOptions } from "./tooltip-long-press";
+export {
+    TOAST_SWIPE_VELOCITY_THRESHOLD,
+    toastSwipeToDismiss,
+} from "./toast-swipe";
+export type { ToastSwipeOptions } from "./toast-swipe";

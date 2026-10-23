@@ -21,6 +21,7 @@ import type {
     ToasterOwnProps,
     ToastType,
 } from "@pureform/binding-core";
+import { toastSwipeToDismiss } from "@pureform/binding-core/dom";
 import * as toast from "@pureform/machines/toast";
 import type { JSX } from "@solidjs/web";
 import {
@@ -29,6 +30,7 @@ import {
     createUniqueId,
     For,
     omit,
+    onSettled,
     Show,
 } from "solid-js";
 
@@ -152,10 +154,23 @@ function Root(props: ToastRootProps): JSX.Element {
         unstyled: () => group.props.unstyled,
         indication: () => group.props.indication,
     });
+    let element: HTMLElement | undefined;
+    onSettled(() => {
+        if (!element) return;
+        return toastSwipeToDismiss(element, {
+            closable: () => api().closable,
+            dismiss: () => api().dismiss(),
+            pause: () => api().pause(),
+            resume: () => api().resume(),
+        });
+    });
     return (
         <context.Provider value={{ scope, api }}>
             {scope.render("root", {
                 element: "div",
+                ref: (el: HTMLElement) => {
+                    element = el;
+                },
                 machine: () => {
                     const machine = api().getRootProps();
                     return {
@@ -164,6 +179,8 @@ function Root(props: ToastRootProps): JSX.Element {
                             ...(machine.style as JSX.CSSProperties),
                             ...TOAST_STACK_STYLE,
                             "z-index": "var(--z-index)",
+                            // Sideways moves are the swipe's (`toastSwipeToDismiss`).
+                            "touch-action": "pan-y",
                         },
                     };
                 },
