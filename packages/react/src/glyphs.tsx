@@ -80,6 +80,11 @@ export const ArrowUpwardIcon = (): ReactNode => (
     <Glyph path={GLYPH_PATHS.arrowUpward} />
 );
 
+/** An eye dropper: the color picker's button that picks a color from the screen. */
+export const ColorizeIcon = (): ReactNode => (
+    <Glyph path={GLYPH_PATHS.colorize} />
+);
+
 /** An arrow pointing down: a table's sort arrow, descending. */
 export const ArrowDownwardIcon = (): ReactNode => (
     <Glyph path={GLYPH_PATHS.arrowDownward} />

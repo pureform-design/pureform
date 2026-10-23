@@ -35,6 +35,9 @@ export const GLYPH_PATHS = {
     edit: "M3 17.25V21h3.75L17.81 9.94l-3.75-3.75zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75z",
     /** An arrow pointing up: a table's sort arrow, ascending. */
     arrowUpward: "M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8z",
+    /** An eye dropper: the color picker's button that picks a color from the screen. */
+    colorize:
+        "M20.71 5.63 18.37 3.29a1 1 0 0 0-1.41 0l-3.12 3.12-1.93-1.91-1.41 1.41 1.42 1.42L3 16.25V21h4.75l8.92-8.92 1.42 1.42 1.41-1.41-1.92-1.92 3.12-3.12a1 1 0 0 0 0-1.42M6.92 19 5 17.08l8.06-8.06 1.92 1.92z",
     /** An arrow pointing down: a table's sort arrow, descending. */
     arrowDownward: "M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8z",
 } as const;
