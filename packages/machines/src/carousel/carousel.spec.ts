@@ -12,7 +12,10 @@ afterEach(() => {
 const COUNT = 6;
 
 // Six 100px items in a 250px row, without the preset: each item a mask around its content.
-const render = (props: MachineProps<carousel.Schema>) => {
+const render = (
+    props: MachineProps<carousel.Schema>,
+    disabled: readonly number[] = [],
+) => {
     const host = document.createElement("div");
     host.innerHTML = `<div data-root><div data-group style="width:250px;height:80px">${Array.from(
         { length: COUNT },
@@ -36,7 +39,10 @@ const render = (props: MachineProps<carousel.Schema>) => {
                 );
                 spread(
                     $(`[data-mask="${index}"]`),
-                    api.getMaskProps({ index }),
+                    api.getMaskProps({
+                        index,
+                        disabled: disabled.includes(index),
+                    }),
                 );
                 spread(
                     $(`[data-content="${index}"]`),
@@ -88,6 +94,18 @@ describe("carousel machine", () => {
         expect(document.activeElement).toBe($(`[data-mask="${COUNT - 1}"]`));
         await userEvent.keyboard("{Home}");
         expect(document.activeElement).toBe($('[data-mask="0"]'));
+        stop();
+    });
+
+    it("keeps a disabled item out of the Tab order but reachable with the arrow keys", async () => {
+        const { $, stop } = render({ reducedMotion: true }, [1]);
+        await settle();
+        expect($('[data-mask="1"]').tabIndex).toBe(-1);
+        $('[data-mask="0"]').focus();
+        await userEvent.keyboard("{ArrowRight}");
+        expect(document.activeElement).toBe($('[data-mask="1"]'));
+        await userEvent.keyboard("{ArrowRight}");
+        expect(document.activeElement).toBe($('[data-mask="2"]'));
         stop();
     });
 
