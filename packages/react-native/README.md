@@ -435,7 +435,7 @@ trigger shows their labels joined by ", " (the placeholder when none):
       placeholder (`mm`), the label always floated. A full segment moves on to the next and
       Backspace in an empty one goes back; on the web the arrow keys move along the row by
       direction and step a segment up and down. `value` follows the segments when they make a
-      whole date. It takes its icons and affixes as content, and `mirrorLeadingIcon` and
+      whole date, and a controlled `value` changed later rewrites them (focus stays). It takes its icons and affixes as content, and `mirrorLeadingIcon` and
       `mirrorTrailingIcon` (either flips both, as the text field's do).
     - **The search view** (`@pureform/react-native/search-view`) opens from its `trigger` (a
       read-only `SearchBar` showing the query, by default) in a `Modal`: a header (back, the
