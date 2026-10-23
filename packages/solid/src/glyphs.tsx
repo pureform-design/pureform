@@ -86,3 +86,12 @@ export const ArrowUpwardIcon = (): JSX.Element => (
 export const ArrowDownwardIcon = (): JSX.Element => (
     <Glyph path={GLYPH_PATHS.arrowDownward} />
 );
+
+/** Two sheets: the copy button's icon. */
+export const CopyIcon = (): JSX.Element => <Glyph path={GLYPH_PATHS.copy} />;
+
+/** A check: the copy button's icon once copied. */
+export const CheckIcon = (): JSX.Element => <Glyph path={GLYPH_PATHS.check} />;
+
+/** A filled star: the rating's icon. */
+export const StarIcon = (): JSX.Element => <Glyph path={GLYPH_PATHS.star} />;

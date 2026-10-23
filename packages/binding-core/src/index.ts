@@ -767,6 +767,31 @@ export type {
     TabsVariantProps,
 } from "./components/tabs";
 export {
+    COPIED_LABEL,
+    COPY_BUTTON_OWN_PROPS,
+    COPY_LABEL,
+    copyButtonMachineProps,
+} from "./components/copy-button";
+export type {
+    CopyButtonBehaviorProps,
+    CopyButtonContentProps,
+    CopyButtonVariantProps,
+} from "./components/copy-button";
+export {
+    RATING_CONTENT_PROPS,
+    RATING_ROOT_PROPS,
+    ratingMachineProps,
+    ratingSelection,
+    starFill,
+} from "./components/rating";
+export type {
+    RatingBehaviorProps,
+    RatingContentProps,
+    RatingPart,
+    RatingRootOwnProps,
+    RatingVariantProps,
+} from "./components/rating";
+export {
     TAGS_INPUT_CONTENT_PROPS,
     TAGS_INPUT_ROOT_PROPS,
     tagsInputChipTestId,

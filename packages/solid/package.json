@@ -82,6 +82,12 @@
                 "default": "./dist/split-button.jsx"
             }
         },
+        "./copy-button": {
+            "types": "./dist/copy-button/index.d.ts",
+            "solid": {
+                "development": "./src/copy-button/index.ts",
+                "default": "./dist/copy-button.jsx"
+            },
         "./icon-button": {
             "types": "./dist/icon-button/index.d.ts",
             "solid": {
@@ -302,6 +308,12 @@
                 "default": "./dist/tabs.jsx"
             }
         },
+        "./rating": {
+            "types": "./dist/rating/index.d.ts",
+            "solid": {
+                "development": "./src/rating/index.ts",
+                "default": "./dist/rating.jsx"
+            },
         "./tags-input": {
             "types": "./dist/tags-input/index.d.ts",
             "solid": {
