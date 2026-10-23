@@ -186,6 +186,71 @@ describe("time picker machine", () => {
         stop();
     });
 
+    it("turns the hand with a dragging pointer at once, and to the value, animated, after", async () => {
+        const { api, dial, stop } = picker({ defaultValue: "02:00" });
+        const box = dial.getBoundingClientRect();
+        const at = (turn: number) => ({
+            clientX:
+                box.left +
+                box.width * (0.5 + 0.4 * Math.sin(turn * 2 * Math.PI)),
+            clientY:
+                box.top +
+                box.height * (0.5 - 0.4 * Math.cos(turn * 2 * Math.PI)),
+        });
+        const track = () =>
+            api().getDialTrackProps().style as Record<string, string>;
+        dial.dispatchEvent(
+            new PointerEvent("pointerdown", {
+                bubbles: true,
+                button: 0,
+                pointerId: 1,
+                ...at(0.24),
+            }),
+        );
+        await settle();
+        // A press jumps to the value under it, over the track's transition.
+        expect(track()["transform"]).toBe("rotate(90deg)");
+        expect(track()["transition"]).toBeUndefined();
+        document.dispatchEvent(
+            new PointerEvent("pointermove", {
+                bubbles: true,
+                pointerId: 1,
+                ...at(0.27),
+            }),
+        );
+        await settle();
+        // Between 3 and 4 o'clock: the hand is where the pointer is, not on the hour.
+        expect(api().value).toBe("03:00");
+        const turned = Number.parseFloat(track()["transform"]!.slice(7));
+        expect(turned).toBeCloseTo(0.27 * 360, 0);
+        expect(track()["transition"]).toBe("none");
+        document.dispatchEvent(
+            new PointerEvent("pointerup", {
+                bubbles: true,
+                pointerId: 1,
+                ...at(0.27),
+            }),
+        );
+        await settle();
+        expect(api().view).toBe("minute");
+        expect(track()["transition"]).toBeUndefined();
+        stop();
+    });
+
+    it("turns the hand to a new value the short way round", async () => {
+        const { api, dial, stop } = picker({ defaultValue: "11:00" });
+        dial.focus();
+        await userEvent.keyboard("{ArrowUp}");
+        await settle();
+        // 12 AM, in the period it was in.
+        expect(api().value).toBe("00:00");
+        // From 330° on to 360°, not back to 0°.
+        expect(api().getDialTrackProps().style).toMatchObject({
+            transform: "rotate(360deg)",
+        });
+        stop();
+    });
+
     it("picks the hour a pointer lets go of, then shows the minutes", async () => {
         const { api, dial, stop } = picker({ defaultValue: "09:00" });
         const box = dial.getBoundingClientRect();

@@ -7,7 +7,14 @@ import { PureformProvider } from "..";
 import { animated } from "../engine";
 import { presetRegistry } from "../testing/registry";
 import type { TestRegistry } from "../testing/registry";
-import { byTestId, computed, mount, settle, until } from "../testing/render";
+import {
+    byTestId,
+    computed,
+    drag,
+    mount,
+    settle,
+    until,
+} from "../testing/render";
 import { TimeInput } from "../time-input";
 
 let registry: TestRegistry;
@@ -64,6 +71,29 @@ describe("time picker", () => {
             expect(getComputedStyle(pm!).backgroundColor).not.toBe(resting),
         );
         expect(am!.getAttribute("aria-pressed")).toBe("false");
+    });
+
+    it("turns the hand with a dragging touch itself, onto the value once let go", async () => {
+        await render(<TimePicker defaultValue="02:00" hourCycle={12} />);
+        const dial = byTestId("pf-time-picker-dial");
+        const track = byTestId("pf-time-picker-dial-track");
+        const box = dial.getBoundingClientRect();
+        const r = box.width * 0.4;
+        // Pressed right of the centre (3 o'clock), then dragged between 3 and 4: the moves are
+        // from the press.
+        const turn = 0.27 * 2 * Math.PI;
+        const release = await drag(
+            dial,
+            [[r * Math.sin(turn) - r, -r * Math.cos(turn)]],
+            { x: box.width / 2 + r, y: box.height / 2 },
+        );
+        expect(byTestId("pf-time-picker-hour-selector").textContent).toBe("3");
+        const turned = track.style.transform;
+        expect(turned).not.toBe("rotate(90deg)");
+        expect(Number.parseFloat(turned.slice(7))).toBeCloseTo(0.27 * 360, 0);
+        await release();
+        // Letting go of an hour shows the minutes, the hand on the value's.
+        await until(() => expect(track.style.transform).toBe("rotate(0deg)"));
     });
 
     it("has two rings on a 24-hour clock, and no period selector", async () => {

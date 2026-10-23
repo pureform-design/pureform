@@ -23,6 +23,7 @@ import {
     dialHand,
     dialLabels,
     dialLabelSelected,
+    dialTurnAt,
     displayValue,
     periodOf,
     spokenTime,
@@ -250,20 +251,18 @@ function Dial(props: {
 }): ReactNode {
     const { styles: s, views: v, id, time, view, cycle } = props;
     const size = useRef({ width: 0, height: 0 });
-    const at = (event: GestureResponderEvent) => {
+    // The turn of a moving touch, which the hand follows exactly, as Compose's dial does; a
+    // touch's start and end put it on the value.
+    const [dragTurn, setDragTurn] = useState<number | undefined>(undefined);
+    const at = (event: GestureResponderEvent, moving: boolean) => {
         const { width, height } = size.current;
         if (width === 0 || height === 0) return;
-        props.onTime(
-            timeAtPoint(
-                time,
-                view,
-                cycle,
-                (event.nativeEvent.locationX / width) * 100,
-                (event.nativeEvent.locationY / height) * 100,
-            ),
-        );
+        const x = (event.nativeEvent.locationX / width) * 100;
+        const y = (event.nativeEvent.locationY / height) * 100;
+        setDragTurn(moving ? dialTurnAt(x, y) : undefined);
+        props.onTime(timeAtPoint(time, view, cycle, x, y));
     };
-    const hand = dialHand(time, view, cycle);
+    const hand = dialHand(time, view, cycle, dragTurn);
     const angle = hand.turn * 2 * Math.PI;
     return (
         <v.dial.View
@@ -275,9 +274,15 @@ function Dial(props: {
             }}
             onStartShouldSetResponder={() => true}
             onMoveShouldSetResponder={() => true}
-            onResponderGrant={at}
-            onResponderMove={at}
-            onResponderRelease={props.onRelease}
+            onResponderGrant={(event: GestureResponderEvent) =>
+                at(event, false)
+            }
+            onResponderMove={(event: GestureResponderEvent) => at(event, true)}
+            onResponderRelease={() => {
+                setDragTurn(undefined);
+                props.onRelease();
+            }}
+            onResponderTerminate={() => setDragTurn(undefined)}
             style={s.dial}
             testID={id("dial")}
         >
