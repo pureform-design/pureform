@@ -1,118 +1,92 @@
-# r9a: React Native adapter and layout
+# r9a: React Native adapter and layout (output context)
 
-Branch `r9a`, from main `24fb399f`. Items from `phases/r9-refactor.md` "Decided work": React
-Native token resolution, pill radius token, own size on React Native, React Native Media
-`source`.
+Branch `r9a`, from main. Commits (`git log main..r9a`):
 
-## React Native token resolution
+| Commit     | What                                                                                              |
+| ---------- | ------------------------------------------------------------------------------------------------- |
+| `15581773` | refactor(rn-adapter): evaluate set tokens together from their templates instead of up to 4 passes |
+| `a39df3f7` | feat(preset): pillRadius token on corner-morphing components so themes retune full round          |
+| `bb8d9e45` | feat(react-native): own size is width fit-content, radio and badge join, roots take a user style  |
+| `8d7f9583` | feat(react-native): Media source takes ImageSourcePropType                                        |
 
-- **Done.** `withSetTokens` (`rn-adapter/src/resolve.ts`) no longer loops up to 4 passes. It
-  selects the set tokens' unevaluated templates (`setTokens` in `select.ts`, which shares the new
-  `cascade` with `selectWithTransitions`), evaluates them together with `evaluateSetTokens`, then
-  resolves the component once with them and selects.
-- **How:** `evaluateSetTokens` reads through a `read(key)` lookup, memoised, in this order: the
-  instance's tokens, then set tokens, then provider overrides (given outright), then theme
-  formulas (evaluated lazily, so a formula that reads a set token follows it), then the theme.
-  `evaluate` in `values.ts` now takes `Tokens`, which is theme values or a lookup function. A
-  cycle throws in development, naming the chain. In production it reads the theme's value.
-  `withSetTokens` now needs the selection's `variants` and `state`. I updated its callers:
-  `factory.ts` and the specs.
-- **Tests:** `resolve.spec.ts` "evaluateSetTokens" covers a chain of 6, the order of formulas,
-  overrides and instance tokens, and a cycle error. Unchanged and passing: `geometry.spec`,
-  `factory.spec`, all rn-adapter unit tests (394 before the additions), and `rn-parity` (10/10).
+This file is the last commit. The README is not ticked; the orchestrator ticks it after merging.
 
-## Pill radius token
+## Decided work
 
-- **Done.** `pillRadius(component, height)` (`preset/src/components/shared.ts`) is
-  `min(radius("full"), dynamic(components.<c>.pillRadius, height × 0.5))`. `PILL_RADIUS_TOKEN`
-  declares the token. It's on button, icon button, chip, input chip (through
-  `cornerMorphTokens`), split button and FAB menu (`closeRadius`). `chipShape` now takes the
-  component's name.
-- **How:** the token isn't set by any variant. Each size reads it through a var with a per-size
-  fallback, so a theme's `components.button.pillRadius` (or an instance's `tokens`) wins at every
-  size and density. The preset README has a "Round corners" section.
-- **Tests:** `rn-adapter/src/pill-radius.spec.ts` checks every size × density of the 5 components
-  for radius = root height / 2 (the same formula CSS computes). It also checks that a theme and an
-  instance retune it, that the FAB menu's close button follows it, and that `radii.full: 0` still
-  wins. Recipe snapshots were updated: button, icon button, chip, input chip and split button.
-  `rn-parity` passes. The visual sections `buttons`, `icon-buttons`, `button-groups`, `density`
-  and `controls` pass, with nothing re-recorded.
+- **React Native token resolution.** `withSetTokens`' up-to-4-pass loop in
+  `packages/rn-adapter/src/resolve.ts` is gone. The selected variants', states' and props' token
+  expressions merge unevaluated in cascade order, then evaluate lazily and memoised through a
+  `read(key)` lookup (`evaluate` in `values.ts`). A cycle throws in development. `select.ts`
+  keeps the templates so the evaluation can run after selection.
+  Tests: `resolve.spec.ts` (a chain longer than 4 resolves; a cycle errors), plus
+  `factory.spec.ts` and `geometry.spec.ts`. The existing parity and geometry specs pass unchanged.
+- **Pill radius token.** Button, icon button, chip, input chip, FAB menu toggle and split button
+  each have a `pillRadius` token, default `height × 0.5`. Their `radius` is
+  `min(radius("full"), pillRadius)` (helper in `packages/preset/src/components/shared.ts`). A
+  theme sets `pillRadius` to choose how round "fully round" is. The preset README documents it.
+  The preset snapshots changed for the new token only.
+  Tests: `rn-adapter/src/pill-radius.spec.ts` checks every size and density, React Native
+  against the web.
+- **Own size on React Native.** `OWN_SIZE` is now `width: "fit-content"` on native and `auto`
+  on CSS, replacing `alignSelf: "flex-start"`, so a parent's `alignItems` still places the
+  component. Radio and Badge join Button, IconButton, FAB, chips, Checkbox and Switch. Each of
+  these roots takes a user `style` through `withUserStyle`/`RootStyleProps` in
+  `packages/react-native/src/styles.ts`. The React Native README says that `width: "100%"`
+  stretches the component and `alignSelf: "stretch"` alone doesn't.
+  Tests: `rn-adapter/src/own-size.spec.ts` and `react-native/src/components.spec.tsx` cover a
+  default column, a centred column, a centred row and a user width.
+- **Media `source`.** It is typed as `ImageSourcePropType`:
+  - A `require()` asset takes its ratio from `Image.resolveAssetSource`.
+  - A source with a width and height gives the ratio without loading.
+  - `{ uri, headers }` is measured with `Image.getSizeWithHeaders`, or with `getSize` on React
+    Native Web, which doesn't have it.
+  - An array uses its first resolution.
+  - `cache` passes through.
 
-## Own size on React Native
+  `source` wins over `src`, and development warns once when both are set. The clipped `Drawing`
+  path (`rn-adapter/src/svg-parts.ts`) takes the whole source.
+  Tests: five new cases in the `media` block of `components.spec.tsx`.
 
-- **Done.** `OWN_SIZE` is `width: platform({ css: auto }, "fit-content")`, so `alignSelf` is
-  gone. Radio joined it (spread before `controlRoot`). The badge now spreads it on its base
-  instead of its own `placement.flow` value, which fixes fix-merge's duplicate hint. Checkbox
-  spreads it before `controlRoot` so the control's own width wins.
-- **Users control it through `style`:** button, icon button, FAB, chip, checkbox, switch, radio
-  and badge on React Native take `style` (`RootStyleProps`, applied with `withUserStyle` in
-  `react-native/src/styles.ts`). The React Native README says `width: "100%"` stretches a root
-  and `alignSelf: "stretch"` alone doesn't.
-- **Tests:** React Native `components.spec.tsx` "inline roots in flow" covers the default column
-  (at the start), a centred column, a centred row, a user `width: "100%"`, and `alignSelf:
-"stretch"` alone, on React Native Web. `rn-adapter/src/own-size.spec.ts` checks the native
-  resolved styles: no `alignSelf`, and `fit-content` or the root's own width. Preset
-  `badge.spec.ts` was updated. No Yoga runs in this repo, so device layout is checked through
-  the resolved styles only.
-
-## React Native Media `source`
-
-- **Done.** `source?: ImageSourcePropType`. Its proportions come from:
-    - `require()`: `Image.resolveAssetSource`.
-    - A source's own `width`/`height`, or an array's first sized entry: no load.
-    - `{ uri, headers }`: `Image.getSizeWithHeaders`. React Native Web lacks it, so the web
-      measures with `getSize`.
-    - Otherwise: `getSize`.
-
-    `cache` and the other fields pass through to `Image`. `source` wins over `src`, and
-    development warns once when both are set. The clipped `Drawing` gets the whole source:
-    `SvgDrawingProps.image` is now `{ source, fit }` (in `rn-adapter/src/svg-parts.ts`, a
-    one-line type change plus `href: image.source`). Media sets `height: "auto"` when its style
-    has none, so a sized source doesn't override the aspect.
-
-- **Tests:** React Native `components.spec.tsx` "media" covers a sized source and an array
-  (without `getSize`), headers passed to `getSizeWithHeaders`, a registered asset, a shaped
-  picture's SVG `href`, and `source` over `src` with the warning. The README is updated.
-
-## Declined refactors
-
-- `inFlowInline` (React Native, time input and time picker) does the same job as `OWN_SIZE`, but
-  I left it. Moving those roots onto `OWN_SIZE` would change the time picker's and time input's
-  layout on React Native Web (`inline-flex`), which this subphase doesn't check. Failed check:
-  the shared code doesn't yet take that web case. It's left for r9d or a later pass.
-
-## Checks run
+## Checks
 
 - `omni run build test -p @pureform/rn-adapter -p @pureform/preset -p @pureform/react-native`:
-  everything passes except 2 React Native tests: c8c splitter "rests where it's let go…" and
-  presence "staggers the FAB menu's items". Both are listed flakes, and both pass when run alone
-  (83/83 with `-t "splitter|staggers the FAB menu"`).
-- `tsc --noEmit` is clean in preset, rn-adapter and react-native.
-- browser-e2e: `rn-parity` 10/10. Visual `-t "density|buttons|icon-buttons|button-groups|media|
-controls|chips|badges|fab"`: 14 pass, nothing re-recorded.
-- component-suites `direction` and `themes`, `-t "Button|Chip|Radio|Badge|Checkbox|Switch|Fab|
-IconButton|SplitButton|Media"`, on solid/panda, react/css and react/tailwind: 247 pass each.
+  - Builds pass.
+  - preset and rn-adapter unit tests pass.
+  - react-native: 619/621 pass. The 2 failures are timing tests: the splitter's "rests where
+    it's let go" and the presence "staggers the FAB menu's items". See open questions.
+- `bunx tsc --noEmit -p tsconfig.json` is clean in rn-adapter, preset and react-native.
 - `omni run build -p @pureform/storybook-web` passes.
-- Story tests with `SB_RENDERERS=solid,react,native`:
-    - media and badge: 48/48 pass.
-    - button, chip, radio, switch, checkbox and fab: 360 pass. The 6 that fail are React Native
-      ButtonGroup stories, which fail on `aria-allowed-attr` (`aria-checked` on `role=button`, from
-      `button.tsx`'s existing toggle). React Native story tests are off by default, and I didn't
-      change this code.
+- e2e in `tests/component-suites` after `generate prepare -p @pureform/panda-fixture`, narrowed
+  to the touched components: 247 passed on each of solid/panda, react/css and react/tailwind.
+- The visual suite, narrowed to the touched sections, passed (14) with nothing re-recorded.
+- rn-parity passed (10/10). Stories narrowed to the touched components passed (48).
+- No conflict markers.
 
 ## Refactoring hints
 
 - **Helpers that look generic:**
-    - `evaluateSetTokens`: anything that evaluates templates in which tokens read each other.
-    - `RootStyleProps`/`withUserStyle`: other React Native components whose root should take a
-      user `style`.
-    - `PILL_RADIUS_TOKEN`/`pillRadius(component, h)`: any new corner-morphing component.
-- **What must not change:** `rn-parity`, `pill-radius.spec.ts`, `own-size.spec.ts`, and the
-  recipe snapshots updated here.
+  - `withUserStyle`/`RootStyleProps` (`react-native/src/styles.ts`). Every React Native root
+    that keeps its own size should use them. Single-part components still hand-merge styles.
+  - `knownRatio`/`remoteOf` in `react-native/src/single-part.tsx`. Avatar's image could reuse
+    them if it starts taking `source`.
+- **Code that looks like a sibling's:** none.
+- **Suggested home:** keep these where they are until a second user appears.
+- **What must not change:** the preset snapshots, `pill-radius.spec.ts`, `own-size.spec.ts`,
+  the rn-parity and visual suites.
+
+No refactors were declined. The token-resolution item was itself the refactor, and it kept the
+parity and geometry output identical.
 
 ## Open questions
 
-- Native Yoga `fit-content` couldn't be checked on a device here.
-- React Native ButtonGroup stories' `aria-checked` on `role=button` (above).
-- `withSetTokens`'s signature now needs `variants` and `state`. It's exported from
-  `@pureform/rn-adapter`, so any outside caller needs updating.
+- **Flaky timing tests in `@pureform/react-native`, not caused by r9a:**
+  - "staggers the FAB menu's items" (presence) also fails on main's sources under the same
+    load.
+  - The splitter's "rests where it's let go" fails only while Vitest's type check runs in the
+    same process under high load (load average 20–30). It passes at HEAD with
+    `--typecheck.enabled=false` (2/2) and passed at each earlier commit.
+  - Worth a retry, or a less load-sensitive wait in r9d's "known flakes".
+- `alignSelf: "stretch"` alone doesn't stretch an own-size root, because the `fit-content` width
+  wins. It is documented rather than handled. Mapping it to `width: "100%"` in `withUserStyle`
+  is an option.
+- `getSizeWithHeaders` isn't available on React Native Web, which measures without headers.
