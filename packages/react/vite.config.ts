@@ -52,6 +52,7 @@ export default createConfig({
                     tree: "src/tree/index.ts",
                     stepper: "src/stepper/index.ts",
                     "grid-list": "src/grid-list/index.ts",
+                    "native-select": "src/native-select/index.ts",
                     rating: "src/rating/index.ts",
                     "tags-input": "src/tags-input/index.ts",
                     "number-field": "src/number-field/index.ts",

@@ -40,6 +40,7 @@ const ICON_PARTS: Record<string, string[]> = {
     dataTable: ["sortIndicator"],
     tabs: ["icon"],
     tagsInput: ["leadingIcon", "trailingIcon"],
+    nativeSelect: ["icon"],
     numberField: ["leadingIcon", "decrementTrigger", "incrementTrigger"],
     textArea: ["leadingIcon", "trailingIcon"],
     textField: ["leadingIcon", "trailingIcon"],
@@ -103,6 +104,8 @@ const INDICATION: Record<string, IndicationAnatomy[]> = {
     // The pill: the active indicator inside it draws only on the current destination.
     navigationBar: [at("item", "indicator", true)],
     navigationRail: [at("item", "indicator", true)],
+    // The select inside its wrapper, which draws the state layer.
+    nativeSelect: [at("select", "root", false)],
     checkbox: [at("input", "root", true, "root")],
     radio: [at("input", "root", true, "root")],
     switchControl: [at("input", "stateLayer", true, "root")],

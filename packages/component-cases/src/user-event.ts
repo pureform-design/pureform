@@ -7,6 +7,11 @@ export interface UserEvent {
     click(element: Element, options?: any): Promise<unknown>;
     keyboard(text: string): Promise<unknown>;
     type(element: Element, text: string, options?: any): Promise<unknown>;
+    selectOptions(
+        element: Element,
+        values: string | readonly string[],
+        options?: any,
+    ): Promise<unknown>;
 }
 
 let current: UserEvent | undefined;
@@ -39,5 +44,12 @@ export const userEvent = {
         options?: unknown,
     ): Promise<void> => {
         await user().type(element, text, options);
+    },
+    selectOptions: async (
+        element: Element,
+        values: string | readonly string[],
+        options?: unknown,
+    ): Promise<void> => {
+        await user().selectOptions(element, values, options);
     },
 };

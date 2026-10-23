@@ -878,3 +878,15 @@ export const ratingRegistry = () =>
             "halfFill",
         ]),
     });
+
+/** The native select's fake factory: its parts. */
+export const nativeSelectRegistry = () =>
+    createRegistry({
+        nativeSelect: named("nativeSelect", [
+            "root",
+            "select",
+            "icon",
+            "group",
+            "option",
+        ]),
+    });

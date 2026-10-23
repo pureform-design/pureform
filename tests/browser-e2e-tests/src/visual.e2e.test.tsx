@@ -46,6 +46,7 @@ const SECTIONS = [
     "file-uploads",
     "ratings-and-copy-buttons",
     "plain-fields",
+    "native-selects",
     "icons",
     "fabs",
     "split-buttons-and-fab-menus",

@@ -2308,6 +2308,16 @@ select[color=error].label: bg none | color rgba(73, 69, 78, 1) | outline none
 select[color=info].label: bg none | color rgba(73, 69, 78, 1) | outline none
     focused: color rgba(0, 104, 124, 1)
     focused-checked: color rgba(0, 104, 124, 1)
+nativeSelect.root: bg transparent | color none | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1)
+    pressed: bg rgba(28, 27, 30, 0.1)
+    hovered-selected: bg rgba(28, 27, 30, 0.08)
+    pressed-checked: bg rgba(28, 27, 30, 0.1)
+    focused-checked: bg rgba(28, 27, 30, 0.1)
+nativeSelect.select: bg transparent | color rgba(28, 27, 30, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
 autocomplete.label: bg none | color rgba(73, 69, 78, 1) | outline none
     focused: color rgba(103, 80, 164, 1)
     focused-checked: color rgba(103, 80, 164, 1)

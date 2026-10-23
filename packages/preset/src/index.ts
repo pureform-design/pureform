@@ -65,6 +65,7 @@ export * from "./components/toolbar";
 export * from "./components/tooltip";
 export * from "./components/table";
 export * from "./components/tabs";
+export * from "./components/native-select";
 export * from "./components/rating";
 export * from "./components/tags-input";
 export * from "./components/number-field";

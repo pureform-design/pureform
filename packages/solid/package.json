@@ -335,6 +335,17 @@
                 "default": "./dist/file-upload.jsx"
             }
         },
+        "./native-select": {
+            "types": "./dist/native-select/index.d.ts",
+            "solid": {
+                "development": "./src/native-select/index.ts",
+                "default": "./dist/native-select.jsx"
+            },
+            "import": {
+                "development": "./src/native-select/index.ts",
+                "default": "./dist/native-select.jsx"
+            }
+        },
         "./rating": {
             "types": "./dist/rating/index.d.ts",
             "solid": {

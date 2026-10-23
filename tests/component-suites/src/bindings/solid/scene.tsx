@@ -51,6 +51,7 @@ import { ListItem } from "@pureform/solid/list-item";
 import { LoadingIndicator } from "@pureform/solid/loading-indicator";
 import { Media } from "@pureform/solid/media";
 import { Menu } from "@pureform/solid/menu";
+import { NativeSelect } from "@pureform/solid/native-select";
 import { NavigationBar } from "@pureform/solid/navigation-bar";
 import { NavigationRail } from "@pureform/solid/navigation-rail";
 import { NumberField } from "@pureform/solid/number-field";
@@ -195,6 +196,7 @@ export const components: Record<ComponentName, ValidComponent> = {
     ListItem,
     Media,
     Menu,
+    NativeSelect,
     NavigationBar,
     NavigationRail,
     RadioGroup,

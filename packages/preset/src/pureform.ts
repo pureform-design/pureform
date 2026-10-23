@@ -95,6 +95,7 @@ import { createMedia } from "./components/media";
 import { createMenu } from "./components/menu";
 import { createNavigationBar } from "./components/navigation-bar";
 import { createNavigationRail } from "./components/navigation-rail";
+import { nativeSelect } from "./components/native-select";
 import { createNumberField } from "./components/number-field";
 import { OVERLAY_KEYFRAMES } from "./components/overlay";
 import { createPaginator } from "./components/paginator";
@@ -342,6 +343,7 @@ const defaultComponents = <G extends string>(
         searchBar,
         searchView,
         select: createSelect<G, Step>(theme.color.groups, densities),
+        nativeSelect,
         autocomplete: createAutocomplete<G, Step>(
             theme.color.groups,
             densities,

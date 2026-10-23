@@ -215,6 +215,9 @@ export type TextAlignKeyword = "start" | "end" | "center" | "justify";
 /** Which way a user can resize the element, as a text area's drag handle. Web-only, like
  *  `cursor`: native text inputs have no handle, so the native adapter drops it. */
 export type ResizeKeyword = "none" | "vertical" | "horizontal" | "both";
+/** Whether a form control draws the platform's own widget (`auto`) or only its box (`none`), as a
+ *  native select does without its arrow. Web-only; the native adapter drops it. */
+export type AppearanceKeyword = "none" | "auto";
 /** Whether a form control grows with its content (`content`) or keeps its set size (`fixed`).
  *  Web-only, like `resize`; browsers without it keep the set size. */
 export type FieldSizingKeyword = "fixed" | "content";

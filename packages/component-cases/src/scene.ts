@@ -39,6 +39,7 @@ export const COMPONENT_NAMES = [
     "ListItem",
     "Media",
     "Menu",
+    "NativeSelect",
     "NavigationBar",
     "NavigationRail",
     "RadioGroup",

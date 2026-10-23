@@ -525,6 +525,8 @@ themselves to Material's insets (4, 8 and 8) with negative margins, so no varian
 rendered. The remove button is its own indication surface. The chip has no `variant`: input chips
 are only outlined.
 
+`nativeSelect` is a styled native `<select>` (pureform's own; M3's select is the field with a menu): a `root` holding the `select`, a chevron `icon`, and the list's `group` and `option` colors, one look with no variants. The box is the plain input's (outline, extra small radius, body type); the state layer is on the root and follows the select, the focus ring is on the select, and `aria-invalid` and disabled recolor it. The chevron sits over the select's end padding and takes no pointer; `appearance: none` (new in the style AST, dropped on React Native) turns the platform's own arrow off.
+
 `rating` is a row of star icons (`item` holds the empty `icon` and the `fill` or `halfFill` over it; `color`, `size`), pureform's own: M3 has none. The copy button has no recipe; it is the `iconButton`.
 
 `tagsInput` is the text field (filled or outlined, `leadingIcon`, `trailingIcon`, `color`,

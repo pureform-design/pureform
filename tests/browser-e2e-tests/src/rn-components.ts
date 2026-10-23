@@ -50,6 +50,7 @@ export const RN_COMPONENTS = [
     "searchBar",
     "searchView",
     "select",
+    "nativeSelect",
     "autocomplete",
     "calendarCell",
     "datePicker",

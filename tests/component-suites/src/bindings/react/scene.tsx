@@ -52,6 +52,7 @@ import { ListItem } from "@pureform/react/list-item";
 import { LoadingIndicator } from "@pureform/react/loading-indicator";
 import { Media } from "@pureform/react/media";
 import { Menu } from "@pureform/react/menu";
+import { NativeSelect } from "@pureform/react/native-select";
 import { NavigationBar } from "@pureform/react/navigation-bar";
 import { NavigationRail } from "@pureform/react/navigation-rail";
 import { NumberField } from "@pureform/react/number-field";
@@ -205,6 +206,7 @@ export const components: Record<ComponentName, ComponentType<never>> = {
     ListItem,
     Media,
     Menu,
+    NativeSelect,
     NavigationBar,
     NavigationRail,
     RadioGroup,

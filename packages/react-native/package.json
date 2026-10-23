@@ -502,6 +502,13 @@
                 "default": "./dist/file-upload.mjs"
             }
         },
+        "./native-select": {
+            "types": "./dist/native-select/index.d.ts",
+            "import": {
+                "development": "./src/native-select/index.ts",
+                "default": "./dist/native-select.mjs"
+            }
+        },
         "./rating": {
             "types": "./dist/rating/index.d.ts",
             "import": {
@@ -620,12 +627,16 @@
     "peerDependencies": {
         "@pureform/rn-adapter": "workspace:^",
         "@pureform/styling": "workspace:^",
+        "@react-native-menu/menu": ">=1.0.0",
         "react": "^19.0.0",
         "react-native": "catalog:",
         "react-native-reanimated": "catalog:",
         "react-native-svg": "catalog:"
     },
     "peerDependenciesMeta": {
+        "@react-native-menu/menu": {
+            "optional": true
+        },
         "react-native-reanimated": {
             "optional": true
         },

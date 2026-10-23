@@ -35,6 +35,7 @@ import { iconButton } from "./cases/icon-button";
 import { expandableListItem, list, listItem } from "./cases/list";
 import { loadingIndicator } from "./cases/loading-indicator";
 import { menu } from "./cases/menu";
+import { nativeSelect } from "./cases/native-select";
 import { navigationBar, navigationRail } from "./cases/navigation";
 import { numberField } from "./cases/number-field";
 import { paginator } from "./cases/paginator";
@@ -126,6 +127,7 @@ export const COMPONENTS: readonly ComponentCase[] = [
     searchBar,
     searchView,
     select,
+    nativeSelect,
     selectionList,
     autocomplete,
     datePicker,
