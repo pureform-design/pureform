@@ -4,10 +4,12 @@
 // field with a menu, `select`), so the design is pureform's own: one box, no variants.
 //
 // The box is the plain input's: an outline in the theme's outline color, the theme's extra small
-// radius, the body type, a state layer on hover and focus (on the root, under the select's
-// transparent box), and the focus ring through the indication tokens. An invalid select (`aria-invalid`) takes the error color, and a disabled one
-// the disabled colors. The chevron is a sibling that ignores the pointer, over the select's end
-// padding (it reads the invalid and disabled states from the root, which holds the select); the select keeps its own arrow off (`appearance: none`).
+// radius, the body type, a state layer on hover and focus (on the root, following the select, under
+// its transparent box), and the focus ring through the indication tokens. An invalid select
+// (`aria-invalid`) takes the error color, and a disabled one the disabled colors. The chevron is a
+// sibling that ignores the pointer, over the select's end padding (it reads the invalid and
+// disabled states from the root, which holds the select); the select keeps its own arrow off
+// (`appearance: none`).
 //
 //   <span class={root}>
 //     <select class={select} id="size">
@@ -114,9 +116,9 @@ export const createNativeSelect = () =>
                     position: relative,
                     display: inlineFlex,
                     alignItems: center,
-                    // The state layer, under the select's transparent box.
+                    // The state layer, following the select inside it, under the select's transparent box.
                     borderRadius: ref("radius"),
-                    backgroundColor: slotStateLayer(FOCUS, "root", {
+                    backgroundColor: slotStateLayer(FOCUS, "select", {
                         base: ref("container"),
                         content: ref("hoverColor"),
                         disabled: ref("container"),

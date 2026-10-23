@@ -20,7 +20,6 @@ import type {
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {
     type Accessor,
-    createEffect,
     createSignal,
     createUniqueId,
     flush,
@@ -49,6 +48,8 @@ type Anatomy = typeof nativeSelectAnatomy;
 interface NativeSelectContextValue {
     readonly scope: ComponentScope<Anatomy>;
     readonly setSelect: (select: HTMLSelectElement) => void;
+    /** The chosen value, if any: the options mark theirs `selected`, which the server renders. */
+    readonly chosen: Accessor<string | undefined>;
     /** The `<select>`'s own props: its id, name, validity and the handlers that emit its
      *  interactions. */
     readonly selectProps: Accessor<Readonly<Record<string, unknown>>>;
@@ -107,22 +108,16 @@ function Root(props: NativeSelectRootProps): JSX.Element {
     const source = useOwnInteractionSource(() => props.interactionSource);
     const disabled = () => !!props.disabled || fieldsetDisabled();
     const handlers = useInteractionHandlers(source, disabled);
-    let shown = untrack(() => value.value() ?? value.defaultValue);
+    const [own, setOwn] = createSignal(value.defaultValue, {
+        ownedWrite: true,
+    });
+    const chosen = () => value.value() ?? own();
+    let shown = untrack(chosen);
     const report = (next: string) => {
         shown = next;
+        setOwn(next);
         untrack(value.machineProps).onValueChange?.({ value: next });
     };
-    // The options are rendered after the select's own props apply, so the value is written once
-    // the select is mounted: the controlled value as it changes, else the default, once.
-    createEffect(
-        () => [select(), value.value()] as const,
-        ([element, controlled]) => {
-            if (!element) return;
-            const wanted = controlled ?? untrack(() => shown);
-            if (wanted !== undefined && element.value !== wanted)
-                element.value = wanted;
-        },
-    );
     useFormReset(select, {
         resetsTo: value.resetsTo,
         onBeforeReset: value.beforeReset,
@@ -173,7 +168,7 @@ function Root(props: NativeSelectRootProps): JSX.Element {
             handlers(),
         ]);
     return (
-        <context.Provider value={{ scope, setSelect, selectProps }}>
+        <context.Provider value={{ scope, setSelect, chosen, selectProps }}>
             {scope.render("root", {
                 element: "span",
                 as: () => props.as,
@@ -220,9 +215,12 @@ function Group(props: NativeSelectGroupProps): JSX.Element {
 
 /** An option: an `<option>` with its `value`. */
 function Option(props: NativeSelectOptionProps): JSX.Element {
-    const { scope } = context.use("Option");
+    const { scope, chosen } = context.use("Option");
     return scope.render("option", {
         element: "option",
+        machine: () => ({
+            selected: props.value !== undefined && chosen() === props.value,
+        }),
         unstyled: () => props.unstyled,
         props: omit(props, "unstyled"),
     });

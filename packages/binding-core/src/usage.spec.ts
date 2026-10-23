@@ -106,6 +106,13 @@ const NATIVE_SHARED: Readonly<Record<string, readonly string[]>> = {
     ],
 };
 
+// Entries only React Native's component draws: the native select opens the Material menu where the
+// platform's isn't installed. The web bindings don't draw them, but the list keeps them for React
+// Native's pruning.
+const NATIVE_ONLY: Readonly<Record<string, readonly string[]>> = {
+    "native-select": ["menu"],
+};
+
 const sharedFiles = (binding: Binding) =>
     binding === "react-native" ? NATIVE_SHARED : SHARED;
 
@@ -282,7 +289,9 @@ describe("COMPONENT_USAGE", () => {
                                 : []),
                         ].join("\n"),
                     );
-                    const own = Object.keys(entries);
+                    const own = Object.keys(entries).filter(
+                        (entry) => !NATIVE_ONLY[subpath]?.includes(entry),
+                    );
                     expect(own.sort(), subpath).toEqual([...drawn].sort());
                 }
             });
