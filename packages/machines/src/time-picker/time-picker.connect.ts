@@ -318,7 +318,20 @@ export function connect<T extends PropTypes>(
             return normalize.element({
                 dir,
                 "aria-hidden": true,
-                style: { left: pct(handPoint.x), top: pct(handPoint.y) },
+                style: {
+                    // Where a browser without motion paths places it.
+                    left: pct(handPoint.x),
+                    top: pct(handPoint.y),
+                    // Round the centre at the hand's length, as far along as the hand has
+                    // turned (the path starts at three o'clock), so a transition of the distance
+                    // moves it round with the track rather than jumping. Its corner sits on the
+                    // path; the styles' own centring shifts it back by half its size.
+                    offsetPath: `circle(${pct(hand.radius)} at 50% 50%)`,
+                    offsetDistance: pct((hand.turn - 0.25) * 100),
+                    offsetRotate: "0deg",
+                    offsetAnchor: "0 0",
+                    ...(following ? { transition: "none" } : {}),
+                },
             });
         },
         getDialCenterProps() {

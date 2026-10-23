@@ -238,12 +238,19 @@ export const timePicker = pf.slotComponent({
                         }),
                     ),
                 },
+                // At the hand's tip: the bindings set its path round the centre and how far
+                // along it is, so it moves round with the track on the same spring.
                 dialHandle: {
                     ...centered(ref("handleSize")),
                     borderRadius: circle,
                     cornerShape: cornerKeyword("round"),
                     backgroundColor: ref("dialHandleColor"),
                     pointerEvents: none,
+                    transition: motionTransition(
+                        tween("offsetDistance", {
+                            spring: ref("handSpring"),
+                        }),
+                    ),
                 },
                 dialCenter: {
                     ...centered(ref("centerSize")),

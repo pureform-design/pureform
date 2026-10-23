@@ -214,6 +214,10 @@ exports[`timePicker > compiles to a stable Panda slot recipe 1`] = `
       "pointerEvents": "none",
       "position": "absolute",
       "transform": "translate(calc(var(--components-timePicker-handleSize, 48px) * -0.5), calc(var(--components-timePicker-handleSize, 48px) * -0.5))",
+      "transition": {
+        "_motionReduce": "none",
+        "base": "offset-distance var(--components-timePicker-handSpring-duration, token(springs.spatialDefault.duration)) var(--components-timePicker-handSpring-easing, token(springs.spatialDefault.easing))",
+      },
       "width": "var(--components-timePicker-handleSize, 48px)",
     },
     "dialLabel": {

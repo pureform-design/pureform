@@ -25,6 +25,7 @@ import {
     dialLabelSelected,
     dialTurnAt,
     displayValue,
+    nearestTurn,
     periodOf,
     spokenTime,
     stepTime,
@@ -32,10 +33,21 @@ import {
     viewValue,
     withPeriod,
 } from "@pureform/machines/time-picker";
-import { Fragment, type ReactNode, useRef, useState } from "react";
+import { settle } from "@pureform/rn-adapter/animated";
+import { useReducedMotion, useTokens } from "@pureform/rn-adapter/react";
+import {
+    Fragment,
+    type ReactNode,
+    useLayoutEffect,
+    useRef,
+    useState,
+} from "react";
+import { Animated } from "react-native";
 import type { GestureResponderEvent, LayoutChangeEvent } from "react-native";
 
 import { testIdOf, withEngine } from "../parts";
+import { themeSpring } from "../presence";
+import { usePureform } from "../provider";
 import { inFlowInline, useComponentSlots } from "../styles";
 import { TimeButton, timeLocale, useTime } from "../time";
 
@@ -263,7 +275,35 @@ function Dial(props: {
         props.onTime(timeAtPoint(time, view, cycle, x, y));
     };
     const hand = dialHand(time, view, cycle, dragTurn);
-    const angle = hand.turn * 2 * Math.PI;
+    // The hand's turn, unwrapped: a dragging touch sets it at once; otherwise it springs to the
+    // value the short way round (on a tap, a release, a key), as the web's track does.
+    // In degrees, so the settle's rest (half a unit) is fine enough.
+    const [degrees] = useState(() => new Animated.Value(hand.turn * 360));
+    const shown = useRef(hand.turn);
+    const tokens = useTokens();
+    const reducedMotion = useReducedMotion();
+    const { timeScale } = usePureform();
+    const spring = reducedMotion
+        ? undefined
+        : themeSpring("spatialDefault", tokens, timeScale);
+    useLayoutEffect(() => {
+        const to = nearestTurn(hand.turn, shown.current);
+        if (to === shown.current) return undefined;
+        shown.current = to;
+        if (dragTurn !== undefined) {
+            degrees.stopAnimation();
+            degrees.setValue(to * 360);
+            return undefined;
+        }
+        return settle(degrees, 0, spring, to * 360);
+    }, [hand.turn, dragTurn !== undefined]);
+    const rotate = degrees.interpolate({
+        inputRange: [0, 360],
+        outputRange: ["0deg", "360deg"],
+    });
+    // The handle sits at the hand's tip: centred on the dial, moved out along the turned hand.
+    const [width, setWidth] = useState(0);
+    const reach = (hand.radius / 100) * width;
     return (
         <v.dial.View
             role="adjustable"
@@ -271,6 +311,7 @@ function Dial(props: {
             {...props.adjust}
             onLayout={(event: LayoutChangeEvent) => {
                 size.current = event.nativeEvent.layout;
+                setWidth(event.nativeEvent.layout.width);
             }}
             onStartShouldSetResponder={() => true}
             onMoveShouldSetResponder={() => true}
@@ -286,7 +327,7 @@ function Dial(props: {
             style={s.dial}
             testID={id("dial")}
         >
-            <v.dialTrack.View
+            <Animated.View
                 pointerEvents="none"
                 style={{
                     ...s.dialTrack,
@@ -294,16 +335,21 @@ function Dial(props: {
                     bottom: "50%",
                     height: pct(hand.radius),
                     transformOrigin: "bottom",
-                    transform: [{ rotate: `${hand.turn * 360}deg` }],
+                    transform: [{ rotate }],
                 }}
                 testID={id("dialTrack")}
             />
-            <v.dialHandle.View
+            <Animated.View
                 pointerEvents="none"
                 style={{
                     ...s.dialHandle,
-                    left: pct(50 + hand.radius * Math.sin(angle)),
-                    top: pct(50 - hand.radius * Math.cos(angle)),
+                    left: "50%",
+                    top: "50%",
+                    transform: [
+                        ...handleCentring(s.dialHandle),
+                        { rotate },
+                        { translateY: -reach },
+                    ],
                 }}
                 testID={id("dialHandle")}
             />
@@ -326,6 +372,12 @@ function Dial(props: {
         </v.dial.View>
     );
 }
+
+// The handle's own centring (the preset's translate by half its size), kept under the turn.
+const handleCentring = (style: unknown): object[] => {
+    const transform = (style as { transform?: unknown } | undefined)?.transform;
+    return Array.isArray(transform) ? (transform as object[]) : [];
+};
 
 // A label: its own selection, so the selected one takes the handle's content color.
 function DialLabelImpl(props: {

@@ -13,6 +13,7 @@ import {
     computed,
     drag,
     mount,
+    outside,
     settle,
     until,
 } from "../testing/render";
@@ -109,6 +110,36 @@ describe("time picker", () => {
         await release();
         // Letting go of an hour shows the minutes, the hand on the value's.
         await until(() => expect(track.style.transform).toBe("rotate(0deg)"));
+    });
+
+    it("springs the hand to a new value the short way round, the handle at its tip", async () => {
+        const value = outside("11:00");
+        await mount(
+            <PureformProvider
+                registry={registry}
+                engine={animated}
+                motion="full"
+                timeScale={20}
+            >
+                <value.Holder>
+                    {(at) => <TimePicker value={at} hourCycle={12} />}
+                </value.Holder>
+            </PureformProvider>,
+        );
+        await settle();
+        const track = byTestId("pf-time-picker-dial-track");
+        const handle = byTestId("pf-time-picker-dial-handle");
+        const angle = () => Number.parseFloat(track.style.transform.slice(7));
+        expect(angle()).toBeCloseTo(330, 0);
+        await value.set("01:00");
+        await settle(100);
+        // From 11 to 1 through 12: up past 330, not back down through the other hours.
+        const moving = angle();
+        expect(moving).toBeGreaterThan(330);
+        expect(moving).toBeLessThan(390);
+        // The handle turns with it rather than jumping to the value.
+        expect(handle.style.transform).toContain(`rotate(${moving}deg)`);
+        await until(() => expect(angle()).toBeCloseTo(390, 0), 30_000);
     });
 
     it("has two rings on a 24-hour clock, and no period selector", async () => {
