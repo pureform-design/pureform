@@ -797,6 +797,12 @@
                 "default": "./dist/slider.jsx"
             }
         },
+        "./field": {
+            "types": "./dist/field/index.d.ts",
+            "solid": {
+                "development": "./src/field/index.ts",
+                "default": "./dist/field.jsx"
+            },
         "./supporting-text": {
             "types": "./dist/supporting-text/index.d.ts",
             "solid": {

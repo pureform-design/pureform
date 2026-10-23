@@ -502,6 +502,13 @@
                 "default": "./dist/slider.mjs"
             }
         },
+        "./field": {
+            "types": "./dist/field/index.d.ts",
+            "import": {
+                "development": "./src/field/index.ts",
+                "default": "./dist/field.mjs"
+            }
+        },
         "./supporting-text": {
             "types": "./dist/supporting-text/index.d.ts",
             "import": {

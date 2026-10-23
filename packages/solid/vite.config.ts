@@ -92,6 +92,7 @@ export default createConfig({
                     "date-input": "src/date-input/index.ts",
                     separator: "src/separator/index.ts",
                     slider: "src/slider/index.ts",
+                    field: "src/field/index.ts",
                     "supporting-text": "src/supporting-text/index.ts",
                     text: "src/text/index.ts",
                     "touch-target": "src/touch-target/index.ts",

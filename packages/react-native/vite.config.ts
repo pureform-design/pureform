@@ -71,6 +71,7 @@ export default createConfig({
                     snackbar: "src/snackbar/index.ts",
                     toast: "src/toast/index.ts",
                     toolbar: "src/toolbar/index.ts",
+                    field: "src/field/index.ts",
                     "supporting-text": "src/supporting-text/index.ts",
                     switch: "src/switch/index.ts",
                     tabs: "src/tabs/index.ts",
