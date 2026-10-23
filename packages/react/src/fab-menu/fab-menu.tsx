@@ -19,7 +19,14 @@ import type {
 import * as menu from "@pureform/machines/menu";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";
-import { type ElementType, type ReactNode, useId } from "react";
+import {
+    Children,
+    type ElementType,
+    type ReactNode,
+    useId,
+    useLayoutEffect,
+    useState,
+} from "react";
 
 import { useControllable } from "../controllable";
 import { CloseIcon } from "../glyphs";
@@ -43,6 +50,8 @@ interface FabMenuContextValue {
     readonly api: menu.Api<PropTypes>;
     readonly sources: ItemInteractionSources;
     readonly presence: Presence;
+    /** The list tells Root how many items it holds. */
+    readonly setItemCount: (count: number) => void;
 }
 
 const context = createPartContext<FabMenuContextValue>("FabMenu");
@@ -92,24 +101,30 @@ function Root(props: FabMenuRootProps): ReactNode {
     });
     const api = menu.connect(service, normalizeProps);
     const presence = usePresence(api.open);
+    const [itemCount, setItemCount] = useState<number>();
     const scope = useComponent(fabMenuAnatomy, {
-        selection: fabMenuSelection(props),
+        selection: fabMenuSelection(props, itemCount),
         testId: props.testId,
         unstyled: props.unstyled,
         indication: props.indication,
     });
     const { as, ...rest } = omitProps(props, FAB_MENU_ROOT_PROPS);
     return (
-        <context.Provider value={{ scope, api, sources, presence }}>
+        <context.Provider
+            value={{ scope, api, sources, presence, setItemCount }}
+        >
             {scope.render("root", { element: "div", as, props: rest })}
         </context.Provider>
     );
 }
 
 /** The list of items, the menu's content, which holds focus while it's open and moves through
- *  the items with the arrow keys. It stays while its exit animation runs. */
+ *  the items with the arrow keys. It stays while its exit animation runs, which ends with its
+ *  last item's: it tells Root how many it holds. */
 function List({ unstyled, ...props }: FabMenuPartProps): ReactNode {
-    const { scope, api, presence } = context.use("List");
+    const { scope, api, presence, setItemCount } = context.use("List");
+    const count = Children.toArray(props.children).length;
+    useLayoutEffect(() => setItemCount(count), [count, setItemCount]);
     return scope.render("list", {
         element: "div",
         ref: presence.ref,

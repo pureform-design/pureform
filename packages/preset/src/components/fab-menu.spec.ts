@@ -10,11 +10,21 @@ const list = () =>
 
 const OPEN = "&[data-state=open] > :nth-last-child";
 const CLOSED = "&[data-state=closed] > :nth-child";
-const WAIT = "calc(token(durations.short1) * ";
+const WAIT = "calc(25ms * ";
 
 describe("fab menu items", () => {
-    it("staggers on the short1 duration", () => {
-        expect(FAB_MENU_STAGGER).toMatchObject({ type: "alias" });
+    it("staggers 25ms a step, Compose's spring-driven stagger evenly spaced", () => {
+        expect(FAB_MENU_STAGGER).toMatchObject({
+            type: "numeric",
+            value: 25,
+            unit: "ms",
+        });
+    });
+
+    it("shows a waiting item's first frame through its wait, so it isn't drawn before it enters", () => {
+        const rules = list();
+        expect(rules[`${OPEN}(2)`]!.animation.base).toContain("backwards");
+        expect(rules[`${CLOSED}(2)`]!.animation.base).toContain("both");
     });
 
     it("grows the item nearest the FAB first, and each one after it a step later", () => {
@@ -48,10 +58,12 @@ describe("fab menu items", () => {
         );
     });
 
-    it("holds the list until the last item has left, and moves none of it", () => {
+    it("holds the list until its last item has left, by the count the bindings set, and moves none of it", () => {
         const rules = list();
         const closed = rules["&[data-state=closed]"]!.animation.base;
-        expect(closed).toContain(`${WAIT}${FAB_MENU_STAGGERED - 1})`);
+        expect(closed).toContain(
+            `${WAIT}calc(min(var(--components-fabMenu-itemCount, ${FAB_MENU_STAGGERED}), ${FAB_MENU_STAGGERED}) - 1))`,
+        );
         expect(closed).toContain("overlayHold");
         // Presence waits for an exit that differs from the open state's animation.
         expect(rules["&[data-state=open]"]).toBeUndefined();

@@ -24,17 +24,19 @@ import {
     end,
     flex,
     inlineFlex,
+    min,
     mul,
+    numeric,
     pct,
     px,
     relative,
     slot,
+    sub,
     unitless,
     when,
 } from "@pureform/core/ast";
 import type { StyleMap } from "@pureform/core/ast";
 import {
-    duration,
     radius,
     size as sizeToken,
     spacing,
@@ -89,6 +91,9 @@ const { tokens, ref } = componentTokens("fabMenu", {
     itemRadius: radius("full"),
     gap: spacing("1"),
     listGap: spacing("2"),
+    // How many items the list holds, which the bindings set, so the list's exit holds exactly
+    // until its last item has left.
+    itemCount: unitless(8),
     ...groupTokens(DEFAULT_GROUP),
     ...INDICATION_TOKENS,
 });
@@ -96,11 +101,15 @@ const { tokens, ref } = componentTokens("fabMenu", {
 const EXPANDED = slot("closeTrigger", "expanded");
 
 /** How long each item waits after the one before it: the items enter from the one nearest the
- *  FAB outward, and leave in reverse, as Compose's `FloatingActionButtonMenu` staggers them. */
-export const FAB_MENU_STAGGER = duration("short1");
+ *  FAB outward, and leave in reverse. Compose's `FloatingActionButtonMenu` (androidx-main
+ *  `FloatingActionButtonMenu.kt`) has no fixed step: it runs an item count from 0 to the number
+ *  of items on the `SlowEffects` spring (stiffness 800, critically damped) and shows each item as
+ *  the count passes it, so the gaps run about 15ms to 50ms and the whole stagger 90ms (3 items) to
+ *  150ms (8). 25ms a step is that, evenly spaced. */
+export const FAB_MENU_STAGGER = numeric(25, "ms");
 
-/** How many items stagger: the rest share the last one's wait. The list holds until the last
- *  of these has left, so a menu of fewer waits that bit longer to hide. */
+/** How many items stagger: the rest share the last one's wait. Compose has no cap; CSS needs one
+ *  for its `nth-child` rules, and eight is past M3's six items a menu holds at most. */
 export const FAB_MENU_STAGGERED = 8;
 
 const wait = (index: number) =>
@@ -119,9 +128,12 @@ const staggered = (): Record<string, StyleMap> => {
         const motion = overlayMotion({
             enter: {
                 ...FAB_MENU_ITEM_MOTION.enter,
-                ...(delay ? { delay } : {}),
+                ...(delay ? { wait: delay } : {}),
             },
-            exit: { ...FAB_MENU_ITEM_MOTION.exit, ...(delay ? { delay } : {}) },
+            exit: {
+                ...FAB_MENU_ITEM_MOTION.exit,
+                ...(delay ? { wait: delay } : {}),
+            },
         }).rawRules!.css as Record<string, StyleMap>;
         rules[
             `${OPEN} > :nth-last-child(${last ? `n+${index + 1}` : index + 1})`
@@ -142,14 +154,21 @@ export const FAB_MENU_LIST_MOTION = {
 /** Each item grows and fades in as a popup does (and shrinks as it leaves), after its wait. */
 export const FAB_MENU_ITEM_MOTION = POPUP_MOTION;
 
-// The list leaves once the last staggered item has. It has no enter animation: Zag's presence
-// waits for an exit whose animation differs from the one the surface had open, so one that held
-// still on the way in too would be gone at once.
+// The list leaves once the last staggered item has: `itemCount` (the bindings set it) less one
+// steps, at most the staggered ones. It has no enter animation: Zag's presence waits for an exit
+// whose animation differs from the one the surface had open, so one that held still on the way in
+// too would be gone at once.
 const LIST_EXIT = overlayMotion({
     ...FAB_MENU_LIST_MOTION,
     exit: {
         ...FAB_MENU_LIST_MOTION.exit,
-        delay: mul(FAB_MENU_STAGGER, unitless(FAB_MENU_STAGGERED - 1)),
+        wait: mul(
+            FAB_MENU_STAGGER,
+            sub(
+                min(ref("itemCount"), unitless(FAB_MENU_STAGGERED)),
+                unitless(1),
+            ),
+        ),
     },
 }).rawRules!.css![CLOSED]!;
 

@@ -101,7 +101,7 @@ export type OverlayMotionStep = {
     readonly fade?: MotionTiming;
     /** How long the step waits before it starts, which its fade waits too. Under reduced motion
      *  the fade runs at once. */
-    readonly delay?: NumericValue;
+    readonly wait?: NumericValue;
 } & MotionTiming;
 
 /** How an overlay enters and leaves. */
@@ -124,7 +124,10 @@ export const timedAnimation = (
     fillMode: "none" | "forwards" = "none",
     delay?: NumericValue,
 ) => {
-    const fill = timing.delay
+    // A delayed run shows its first frame through the delay, so an item that waits its turn
+    // isn't drawn before it enters.
+    const fill =
+        timing.delay || delay
         ? fillMode === "forwards"
             ? "both"
             : "backwards"
@@ -153,17 +156,17 @@ export const motionAnimation = (
 ) => timedAnimation(name, { duration: time, easing: curve }, fillMode);
 
 const step = (
-    { keyframes, rtl, fade: fadeTiming, delay, ...timing }: OverlayMotionStep,
+    { keyframes, rtl, fade: fadeTiming, wait, ...timing }: OverlayMotionStep,
     fade: string,
     fillMode: "none" | "forwards",
 ) => {
     const fading = timedAnimation(fade, fadeTiming ?? timing, fillMode);
     const run = (name: string) => {
-        const moving = timedAnimation(name, timing, fillMode, delay);
+        const moving = timedAnimation(name, timing, fillMode, wait);
         return fadeTiming
             ? animations(
                   moving,
-                  timedAnimation(fade, fadeTiming, fillMode, delay),
+                  timedAnimation(fade, fadeTiming, fillMode, wait),
               )
             : moving;
     };

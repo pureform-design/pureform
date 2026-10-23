@@ -298,10 +298,13 @@ target first, and render the icon slot only when there is an icon.
   which turns into a round close button in the group's main color while `aria-expanded`;
   `list` (the menu's content) sits above it at its end through logical insets, holding `item`
   pills (`itemIcon`, `itemLabel`) in the group's container color. `color` takes any group. The
-  items stagger as Compose's do: each grows and fades in (the popup's motion) a `short1` after
-  the one nearer the FAB, and they leave in reverse (the first item goes first); the `list`
-  itself only holds until the last has left (`FAB_MENU_STAGGER`, `FAB_MENU_STAGGERED`: up to
-  eight steps, the rest share the last wait). Under reduced motion they fade together.
+  items stagger as Compose's do: each grows and fades in (the popup's motion) 25ms after the one
+  nearer the FAB (`FAB_MENU_STAGGER`: Compose's `FloatingActionButtonMenu` runs its stagger on the
+  `SlowEffects` spring, about 90ms to 150ms in all, which 25ms a step spaces evenly), showing
+  its first frame while it waits, and they leave in reverse (the first item goes first); the
+  `list` itself only holds until the last has left, for the `itemCount` token the bindings set
+  (`FAB_MENU_STAGGERED`: up to eight steps, the rest share the last wait). Under reduced motion
+  they fade together.
 
 ## Shapes
 

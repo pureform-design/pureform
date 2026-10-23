@@ -49,13 +49,19 @@ export const FAB_MENU_ROOT_PROPS = [
     "indication",
 ] as const satisfies readonly (keyof FabMenuRootOwnProps)[];
 
-/** The FAB menu's registry selection from Root's props. */
+/** The FAB menu's registry selection from Root's props, with the number of items its list
+ *  holds (the `itemCount` token, which times the list's exit to its last item's), under the
+ *  app's own tokens. */
 export const fabMenuSelection = (
     props: FabMenuVariantProps,
+    itemCount?: number,
 ): Selection<"fabMenu"> => ({
     color: props.color,
     size: props.size,
-    tokens: props.tokens,
+    tokens:
+        itemCount === undefined
+            ? props.tokens
+            : { itemCount, ...props.tokens },
 });
 
 /** The FAB menu's items open above the FAB, at its end. */

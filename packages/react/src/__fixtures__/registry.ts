@@ -204,14 +204,20 @@ export const overlaysRegistry = () =>
             "trailingButton",
             "trailingIcon",
         ]),
-        fabMenu: named("fab-menu", [
-            "root",
-            "list",
-            "item",
-            "itemIcon",
-            "itemLabel",
-            "closeTrigger",
-        ]),
+        // The list's item count is a token, which the root's style shows.
+        fabMenu: ((s) =>
+            withTokenStyle(
+                named("fab-menu", [
+                    "root",
+                    "list",
+                    "item",
+                    "itemIcon",
+                    "itemLabel",
+                    "closeTrigger",
+                ])(s) as never,
+                s.tokens as never,
+                { itemCount: "--pf-fab-menu-item-count" },
+            )) as ClassFactory<ComponentShape>,
         tooltip: named("tooltip", ["root", "caret", "supportingText"]),
         richTooltip: named("richTooltip", [
             "root",

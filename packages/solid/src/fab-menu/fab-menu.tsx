@@ -23,9 +23,11 @@ import type { JSX, ValidComponent } from "@solidjs/web";
 import {
     type Accessor,
     createMemo,
+    createSignal,
     createUniqueId,
     For,
     omit,
+    onSettled,
     Show,
 } from "solid-js";
 
@@ -51,6 +53,8 @@ interface FabMenuContextValue {
     readonly api: Accessor<menu.Api<PropTypes>>;
     readonly sources: ItemInteractionSources;
     readonly presence: Presence;
+    /** The list tells Root how many items it holds. */
+    readonly setItemCount: (count: number) => void;
 }
 
 const context = createPartContext<FabMenuContextValue>("FabMenu");
@@ -100,14 +104,17 @@ function Root(props: FabMenuRootProps): JSX.Element {
     }));
     const api = createMemo(() => menu.connect(service, normalizeProps));
     const presence = usePresence(() => api().open);
+    const [itemCount, setItemCount] = createSignal<number>();
     const scope = useComponent(fabMenuAnatomy, {
-        selection: () => fabMenuSelection(props),
+        selection: () => fabMenuSelection(props, itemCount()),
         testId: () => props.testId,
         unstyled: () => props.unstyled,
         indication: () => props.indication,
     });
     return (
-        <context.Provider value={{ scope, api, sources, presence }}>
+        <context.Provider
+            value={{ scope, api, sources, presence, setItemCount }}
+        >
             {scope.render("root", {
                 element: "div",
                 as: () => props.as,
@@ -118,12 +125,27 @@ function Root(props: FabMenuRootProps): JSX.Element {
 }
 
 /** The list of items, the menu's content, which holds focus while it's open and moves through
- *  the items with the arrow keys. It stays while its exit animation runs. */
+ *  the items with the arrow keys. It stays while its exit animation runs, which ends with its
+ *  last item's: it tells Root how many it holds, counting its elements as they change. */
 function List(props: FabMenuPartProps): JSX.Element {
-    const { scope, api, presence } = context.use("List");
+    const { scope, api, presence, setItemCount } = context.use("List");
+    let list: HTMLElement | undefined;
+    onSettled(() => {
+        const element = list;
+        if (!element) return;
+        const count = () => setItemCount(element.childElementCount);
+        count();
+        if (typeof MutationObserver === "undefined") return;
+        const observer = new MutationObserver(count);
+        observer.observe(element, { childList: true });
+        return () => observer.disconnect();
+    });
     return scope.render("list", {
         element: "div",
-        ref: presence.ref,
+        ref: (element: HTMLElement) => {
+            list = element;
+            presence.ref(element);
+        },
         machine: () =>
             presentProps(api().getContentProps(), presence.present()),
         unstyled: () => props.unstyled,

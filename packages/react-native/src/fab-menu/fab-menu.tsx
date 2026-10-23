@@ -20,7 +20,7 @@ import type {
     OverlayPositioning,
 } from "@pureform/binding-core";
 import type { Indication } from "@pureform/binding-core/indication";
-import { useReducedMotion, useTokens } from "@pureform/rn-adapter/react";
+import { useReducedMotion } from "@pureform/rn-adapter/react";
 import type { Selection } from "@pureform/styling";
 import type { ReactNode } from "react";
 
@@ -67,16 +67,12 @@ export interface FabMenuProps
 }
 
 // The items that stagger, as the preset's `FAB_MENU_STAGGERED`: the rest share the last one's
-// wait. Each waits a `short1` duration more than the one before it.
+// wait. Each waits the preset's `FAB_MENU_STAGGER` (25ms) more than the one before it: Compose's
+// spring-driven stagger, evenly spaced.
 const STAGGERED = 8;
 
 /** How long each item waits after the one before it, in ms. */
-const useStagger = (): number => {
-    const value = useTokens()["durations.short1"];
-    const ms =
-        typeof value === "number" ? value : Number.parseFloat(String(value));
-    return Number.isFinite(ms) ? ms : 0;
-};
+const STAGGER = 25;
 
 function FabMenuItemImpl(props: {
     readonly item: FabMenuItem<ReactNode>;
@@ -109,8 +105,7 @@ function FabMenuItemImpl(props: {
     const id = (part: FabMenuPart) =>
         testIdOf(fabMenuAnatomy, part, props.testId);
     const engine = useEngine();
-    const stagger = useStagger();
-    const wait = (steps: number) => Math.min(steps, STAGGERED - 1) * stagger;
+    const wait = (steps: number) => Math.min(steps, STAGGERED - 1) * STAGGER;
     // The item nearest the FAB (the last) enters first, the farthest leaves first.
     const presence = useOverlayPresence(props.open, "fabMenuItem", {
         enter: wait(props.count - 1 - props.index),
@@ -217,7 +212,6 @@ function FabMenuImpl(props: FabMenuProps): ReactNode {
         "fabMenu",
         selection,
     );
-    const stagger = useStagger();
     const reducedMotion = useReducedMotion();
     const items = props.items ?? [];
     // The list holds until the last staggered item has left.
@@ -225,7 +219,7 @@ function FabMenuImpl(props: FabMenuProps): ReactNode {
         useAnchoredOverlay("FabMenu", props, "fabMenuList", {
             exit: reducedMotion
                 ? 0
-                : Math.min(items.length - 1, STAGGERED - 1) * stagger,
+                : Math.min(items.length - 1, STAGGERED - 1) * STAGGER,
         });
     const select = useStableCallback((value: string) => {
         props.onSelect?.({ value });

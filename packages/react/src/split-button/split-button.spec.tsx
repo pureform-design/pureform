@@ -130,6 +130,8 @@ describe("FabMenu, ready-made", () => {
         expect(byTestId(fab.list).getAttribute("role")).toBe("menu");
         const items = document.querySelectorAll(`[data-testid="${fab.item}"]`);
         expect(items).toHaveLength(2);
+        // The list's exit holds for exactly its items: Root's itemCount token.
+        expect(root.style.getPropertyValue("--pf-fab-menu-item-count")).toBe("2");
         expect(
             document
                 .querySelector(`[data-testid="${fab.itemIcon}"]`)
