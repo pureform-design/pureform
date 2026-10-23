@@ -61,6 +61,15 @@ config ──► codegen.ts ──► .pureform/native/<name>.ts (a factory over
 | `@pureform/rn-adapter/factory`                | `nativeFactory`, `componentFactory`, `selectionOrder`, `movingSlots`, `overridesFor`, and the `NativeFactory` types; no React, no lowering                       |
 | `@pureform/rn-adapter/codegen`                | `codegen` (the `native` target), `instanceTokenKeys`, `factoryModule`, `themesModule`, `THEMES_FILE`                                                             |
 
+`SvgDrawing` and its ripples keep React out of each frame. On the web the browser runs them: a
+shape morphs through CSS's `d` (SMIL's `<animate>` where `d` doesn't animate), a fill cross-fades
+two stacked paths, and a ripple drawn at its end size grows with its group's transform and
+opacity. On a device ripples run on the native driver, but a morph or a cross-fade still writes
+the paths' props from the JavaScript thread: for components whose shapes morph, such as icon
+buttons and toggles, use `ReanimatedSvgDrawing` from `/reanimated-svg` (the `reanimatedSvg`
+engine), which runs them on the UI thread. A device's SVG ripples clip to the surface's corners,
+not to a drawn shape.
+
 ```tsx
 import { precompute } from "@pureform/rn-adapter";
 import { useAnimatedComponentStyles } from "@pureform/rn-adapter/animated";

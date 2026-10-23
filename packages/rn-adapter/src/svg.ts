@@ -1,84 +1,187 @@
 // Drawing with react-native-svg: a slot's shape and fill, and its gradient, which React Native
 // views can't draw, and press ripples with their soft edge, clipped to the shape. Turn on the
 // provider's `svg` so selection returns the drawings, and put an `SvgDrawing` first in the
-// slot's view, so it paints under the content as a background does. Shapes morph, fills blend,
-// and ripples grow with Animated, on the JavaScript thread; `@pureform/rn-adapter/reanimated-svg`
-// runs them on the UI thread.
+// slot's view, so it paints under the content as a background does. Nothing here moves through
+// React state: on the web the browser runs every motion (a shape's morph through CSS's `d` or
+// SMIL, a fill's cross-fade, a ripple's transform and opacity); on a device ripples run on the
+// native driver, and a morph or a cross-fade writes the native paths' props from Animated, on the
+// JavaScript thread. `@pureform/rn-adapter/reanimated-svg` runs those on the UI thread.
 
 import {
     createElement as h,
-    useEffect,
+    useLayoutEffect,
     useMemo,
     useRef,
     useState,
 } from "react";
-import { Animated } from "react-native";
-import { Circle } from "react-native-svg";
-import type { CircleProps } from "react-native-svg";
+import type { ComponentType } from "react";
+import { Animated, Platform } from "react-native";
+import Svg, { Circle, Defs, G, Path } from "react-native-svg";
+import type { PathProps } from "react-native-svg";
 
-import { animate } from "./animate/curve";
-import { DISCS, useRippleDrawn, useRippleMotion } from "./animate/ripple";
-import type { RippleOptions, Ripples } from "./animate/ripple";
-import { pathAt, shapeCoordinates, shapePath } from "./geometry";
+import { animate, curve } from "./animate/curve";
+import {
+    DISCS,
+    useBrowserRipple,
+    useRippleDrawn,
+    useRippleMotion,
+} from "./animate/ripple";
+import type {
+    RippleDrawing,
+    RippleOptions,
+    RippleProps,
+    Ripples,
+} from "./animate/ripple";
+import { pathAt, placeGradient, shapeCoordinates, shapePath } from "./geometry";
+import type { PlacedGradient } from "./geometry";
 import { animatable, blend } from "./motion";
 import { useComponentState } from "./react";
 import type { Drawing } from "./select";
 import {
     drawingSvg,
+    gradientElement,
     svgRipple,
     svgRipples,
     useSlotBox,
     useSvgId,
 } from "./svg-parts";
 import type { RippleCircleProps, SvgDrawingProps } from "./svg-parts";
-import type { Transition } from "./values";
+import type { GradientValue, Transition } from "./values";
 
 export { placeGradient, shapePath } from "./geometry";
 export type { RippleOptions, Ripples } from "./animate/ripple";
 export type { Box, GradientStop, PlacedGradient } from "./geometry";
 export type { SvgDrawingProps } from "./svg-parts";
 
-// A value that moves to each new target over its transition, from wherever it is, as CSS's
-// transitions do. `key` says when the target changes; `mix` gives the value `t` of the way,
-// or undefined where the two can't mix, and the value jumps.
-const useTween = <T>(
-    target: T | undefined,
-    key: string,
-    transition: Transition | undefined,
-    mix: (from: T, to: T, t: number) => T | undefined,
-): T | undefined => {
-    const [shown, setShown] = useState(target);
-    const current = useRef(target);
-    const last = useRef(key);
-    useEffect(() => {
-        if (last.current === key) return;
-        last.current = key;
-        const from = current.current;
-        const show = (value: T | undefined) => {
-            current.current = value;
-            setShown(value);
-        };
-        if (
-            target === undefined ||
-            from === undefined ||
-            !transition ||
-            transition.duration <= 0 ||
-            mix(from, target, 0) === undefined
-        ) {
-            show(target);
-            return;
-        }
-        const progress = new Animated.Value(0);
-        const listener = progress.addListener(({ value }) =>
-            show(mix(from, target, value)),
+const WEB = Platform.OS === "web";
+
+// What a react-native-svg element's ref gets: on the web, a component holding its DOM element;
+// on a device, a component taking native props.
+type SvgNode = {
+    elementRef?: { current: Element | null };
+    setNativeProps?: (props: object) => void;
+};
+
+const elementOf = (node: unknown) =>
+    (node as SvgNode | null)?.elementRef?.current ?? (node as Element | null);
+
+/** A motion under way: how far along it is, 0 to 1 in its curve's progress, and how to stop it. */
+interface Run {
+    progress: () => number;
+    stop: () => void;
+}
+
+const clamp = (t: number) => Math.min(1, Math.max(0, t));
+
+// The browser's animations over a transition: how far they are, from their own clock.
+const browserRun = (
+    transition: Transition,
+    animations: Animation[],
+    done: () => void,
+): Run => {
+    const ease = curve(transition.easing);
+    const first = animations[0];
+    if (first) first.finished.then(done, () => {});
+    else done();
+    return {
+        progress: () => {
+            const time = first?.currentTime;
+            if (time === null || time === undefined) return 1;
+            return ease(
+                clamp((Number(time) - transition.delay) / transition.duration),
+            );
+        },
+        stop: () => {
+            for (const animation of animations) animation.cancel();
+        },
+    };
+};
+
+// Animated stepping `frame` from 0 to 1 over a transition, its spring where it has one, with no
+// React state: `frame` writes native props.
+const animatedRun = (
+    transition: Transition,
+    frame: (progress: number) => void,
+    done: () => void,
+): Run => {
+    const value = new Animated.Value(0);
+    let at = 0;
+    frame(0);
+    const listener = value.addListener(({ value: v }) => {
+        at = v;
+        frame(v);
+    });
+    animate(value, transition, false).start(({ finished }) => {
+        if (!finished) return;
+        at = 1;
+        frame(1);
+        done();
+    });
+    return {
+        progress: () => at,
+        stop: () => {
+            value.removeListener(listener);
+            value.stopAnimation();
+        },
+    };
+};
+
+const SVG_NS = "http://www.w3.org/2000/svg";
+// SMIL's samples of a morph's curve, where CSS can't animate `d`.
+const SAMPLES = 30;
+
+const cssPathAnimates = () =>
+    typeof CSS !== "undefined" && CSS.supports?.("d", 'path("M0 0")');
+
+// One path's morph in the browser: CSS's `d` where it animates, else SMIL's `<animate>` through
+// the curve's samples. Either ends on the path's own `d`, the target's.
+const browserMorph = (
+    element: Element,
+    transition: Transition,
+    pathOf: (progress: number) => string,
+): Animation | undefined => {
+    const timing = {
+        duration: transition.duration,
+        delay: transition.delay,
+    };
+    if (cssPathAnimates()) {
+        return element.animate(
+            [{ d: `path("${pathOf(0)}")` }, { d: `path("${pathOf(1)}")` }],
+            { ...timing, easing: transition.easing, fill: "backwards" },
         );
-        animate(progress, transition, false).start();
-        return () => {
-            progress.removeListener(listener);
-            progress.stopAnimation();
-        };
-    }, [key]);
-    return last.current === key ? shown : current.current;
+    }
+    const animation = element.ownerDocument.createElementNS(
+        SVG_NS,
+        "animate",
+    ) as SVGAnimationElement;
+    const ease = curve(transition.easing);
+    const total = transition.delay + transition.duration;
+    const times: number[] = transition.delay > 0 ? [0] : [];
+    const values: string[] = transition.delay > 0 ? [pathOf(0)] : [];
+    for (let i = 0; i <= SAMPLES; i++) {
+        times.push(
+            (transition.delay + (transition.duration * i) / SAMPLES) / total,
+        );
+        values.push(pathOf(ease(i / SAMPLES)));
+    }
+    for (const [name, value] of [
+        ["attributeName", "d"],
+        ["dur", `${total}ms`],
+        ["begin", "indefinite"],
+        ["fill", "remove"],
+        ["calcMode", "linear"],
+        ["keyTimes", times.join(";")],
+        ["values", values.join(";")],
+    ]) {
+        animation.setAttribute(name!, value!);
+    }
+    element.append(animation);
+    animation.beginElement();
+    // The same clock as CSS's, for its progress and its end, which takes the SMIL away.
+    const clock = element.animate([{}, {}], { ...timing, easing: "linear" });
+    const remove = () => animation.remove();
+    clock.finished.then(remove, remove);
+    return clock;
 };
 
 const mixPoints = (from: number[], to: number[], t: number) =>
@@ -89,81 +192,289 @@ const mixPoints = (from: number[], to: number[], t: number) =>
 const mixColors = (from: string, to: string, t: number) =>
     String(blend(animatable(from), animatable(to), t));
 
-/** A slot's drawing, filling the slot. A change of shape morphs, and a change of fill blends,
- *  over the slot's transitions. */
+// The drawing's shape paths, each registered while it's mounted: `fading` ones are the fill's
+// top path, which cross-fades over the color under it.
+const useShapePaths = () => {
+    const [paths] = useState(() => ({
+        all: new Set<unknown>(),
+        fading: new Set<unknown>(),
+        // A path mounting mid-morph, such as a cross-fade's, joins it.
+        join: (_node: unknown) => {},
+    }));
+    const ShapePath = useMemo(
+        () =>
+            ((props: PathProps & { fading?: boolean }) => {
+                const { fading, ...own } = props;
+                const node = useRef<unknown>(null);
+                useLayoutEffect(() => {
+                    const n = node.current;
+                    paths.all.add(n);
+                    if (fading) paths.fading.add(n);
+                    paths.join(n);
+                    return () => {
+                        paths.all.delete(n);
+                        paths.fading.delete(n);
+                    };
+                }, [fading]);
+                return h(Path, { ...own, ref: node as never });
+            }) as ComponentType<PathProps>,
+        [paths],
+    );
+    return { paths, ShapePath };
+};
+
+// A change of shape morphs over its transition, from wherever the last morph had reached.
+const useMorph = (
+    drawing: Drawing | undefined,
+    box: { width: number; height: number } | undefined,
+    paths: { all: Set<unknown>; join: (node: unknown) => void },
+) => {
+    const shape = drawing?.shape;
+    const transition = drawing?.transitions?.shape;
+    const target = useMemo(
+        () => (box && shape ? shapeCoordinates(shape, box) : undefined),
+        [box, shape],
+    );
+    const key = target ? target.join(",") : "";
+    const last = useRef({ key, points: target });
+    const run = useRef<{ run: Run; from: number[] }>(undefined);
+    useLayoutEffect(() => {
+        if (last.current.key === key) return;
+        const before = last.current.points;
+        const running = run.current;
+        const from =
+            running && before
+                ? mixPoints(running.from, before, running.run.progress())
+                : before;
+        last.current = { key, points: target };
+        running?.run.stop();
+        run.current = undefined;
+        paths.join = () => {};
+        if (
+            !shape ||
+            !target ||
+            !from ||
+            !transition ||
+            transition.duration <= 0 ||
+            mixPoints(from, target, 0) === undefined
+        ) {
+            return;
+        }
+        const pathOf = (t: number) =>
+            pathAt(shape, mixPoints(from, target, t)!);
+        const settled = () => {
+            run.current = undefined;
+            paths.join = () => {};
+        };
+        const animations: Animation[] = [];
+        if (WEB) {
+            for (const node of paths.all) {
+                const element = elementOf(node);
+                const animation =
+                    element && browserMorph(element, transition, pathOf);
+                if (animation) animations.push(animation);
+            }
+            if (animations.length === 0) return;
+        }
+        run.current = {
+            from,
+            run: WEB
+                ? browserRun(transition, animations, settled)
+                : animatedRun(
+                      transition,
+                      (t) => {
+                          const d = pathOf(t);
+                          for (const node of paths.all) {
+                              (node as SvgNode).setNativeProps?.({ d });
+                          }
+                      },
+                      settled,
+                  ),
+        };
+        const started = run.current;
+        paths.join = (node) => {
+            if (WEB) {
+                // The same morph, at the same time.
+                const element = elementOf(node);
+                const first = animations[0];
+                const animation =
+                    element && browserMorph(element, transition, pathOf);
+                if (!animation) return;
+                if (first) animation.currentTime = first.currentTime;
+                animations.push(animation);
+            } else {
+                (node as SvgNode).setNativeProps?.({
+                    d: pathOf(started.run.progress()),
+                });
+            }
+        };
+    }, [key]);
+    useLayoutEffect(() => () => run.current?.run.stop(), []);
+};
+
+// A change of fill cross-fades over its transition: the new fill's path fades in over a path of
+// the color shown before, which goes once it has.
+const useCrossFade = (drawing: Drawing | undefined, fading: Set<unknown>) => {
+    const fill = drawing?.fill;
+    const transition = drawing?.transitions?.fill;
+    // An object, so a fade restarting from the same color still starts again.
+    const [under, setUnder] = useState<{ color: string }>();
+    const last = useRef(fill);
+    const run = useRef<Run>(undefined);
+    useLayoutEffect(() => {
+        const before = last.current;
+        if (before === fill) return;
+        last.current = fill;
+        const shown =
+            run.current && under && before !== undefined
+                ? mixColors(under.color, before, run.current.progress())
+                : before;
+        run.current?.stop();
+        run.current = undefined;
+        const fades =
+            shown !== undefined &&
+            fill !== undefined &&
+            transition &&
+            transition.duration > 0;
+        setUnder(fades ? { color: shown } : undefined);
+    }, [fill]);
+    useLayoutEffect(() => {
+        if (!under || !transition) return;
+        const nodes = [...fading];
+        const done = () => {
+            run.current = undefined;
+            setUnder(undefined);
+        };
+        run.current = WEB
+            ? browserRun(
+                  transition,
+                  nodes.flatMap((node) => {
+                      const animation = elementOf(node)?.animate(
+                          [{ opacity: 0 }, { opacity: 1 }],
+                          {
+                              duration: transition.duration,
+                              delay: transition.delay,
+                              easing: transition.easing,
+                              fill: "backwards",
+                          },
+                      );
+                      return animation ? [animation] : [];
+                  }),
+                  done,
+              )
+            : animatedRun(
+                  transition,
+                  (t) => {
+                      for (const node of nodes) {
+                          (node as SvgNode).setNativeProps?.({ opacity: t });
+                      }
+                  },
+                  done,
+              );
+    }, [under]);
+    useLayoutEffect(() => () => run.current?.stop(), []);
+    return under?.color;
+};
+
+/** A slot's drawing, filling the slot. A change of shape morphs, and a change of fill
+ *  cross-fades, over the slot's transitions. */
 export const SvgDrawing = ({ drawing, color, image }: SvgDrawingProps) => {
     const { box, fill: inSlot } = useSlotBox();
     const id = useSvgId();
-    const shapeNow = drawing?.shape;
-    const target = useMemo(
-        () => (box && shapeNow ? shapeCoordinates(shapeNow, box) : undefined),
-        [box, shapeNow],
-    );
-    const points = useTween(
-        target,
-        target ? target.join(",") : "",
-        drawing?.transitions?.shape,
-        mixPoints,
-    );
-    const fillNow = useTween(
-        drawing?.fill,
-        drawing?.fill ?? "",
-        drawing?.transitions?.fill,
-        mixColors,
-    );
+    const { paths, ShapePath } = useShapePaths();
+    useMorph(drawing, box, paths);
+    const under = useCrossFade(drawing, paths.fading);
     if (!drawing) return null;
     const { shape } = drawing;
-    // Mid-morph, the points so far; until the morph starts, or for points of another
-    // structure, the target's.
-    const d =
-        box &&
-        shape &&
-        (points && target && points.length === target.length
-            ? pathAt(shape, points)
-            : shapePath(shape, box));
     return inSlot(
         box &&
             drawingSvg({
                 id,
                 box,
                 drawing,
-                d,
-                fill: fillNow ?? drawing.fill,
+                d: shape && shapePath(shape, box),
+                fill: drawing.fill,
                 color,
                 image,
+                ShapePath,
+                fadeFrom: under,
+                fadeIn: { fading: true },
             }),
     );
 };
 
-// Animated marks its views `collapsable`, which react-native-svg would pass to the DOM on the
-// web, where it means nothing.
-const AnimatedCircle = Animated.createAnimatedComponent(
-    (props: CircleProps & { collapsable?: boolean }) => {
-        const { collapsable, ...own } = props;
-        return h(Circle, collapsable === undefined ? props : own);
-    },
-);
-
-// A ripple's circle, grown and faded with Animated. SVG's props can't take the native driver.
-const RippleCircle = (props: RippleCircleProps) => {
-    const { grow, fade } = useRippleMotion(props, false);
-    const along = (key: "cx" | "cy" | "r") =>
-        grow.interpolate({
-            inputRange: [0, 1],
-            outputRange: [props.from[key], props.to[key]],
-        });
-    return h(AnimatedCircle, {
-        cx: along("cx"),
-        cy: along("cy"),
-        r: along("r"),
-        fill: props.fill,
-        opacity: fade,
-    });
+// On the web, a ripple's circle drawn at its end, and moved there from its start by the
+// browser's animation of its group's transform, which also fades it.
+const BrowserRippleCircle = (props: RippleCircleProps) => {
+    const { from, to } = props;
+    const k = from.r / to.r;
+    const ref = useBrowserRipple(
+        props,
+        [
+            {
+                transform: `translate(${from.cx - k * to.cx}px, ${from.cy - k * to.cy}px) scale(${k})`,
+            },
+            { transform: "translate(0px, 0px) scale(1)" },
+        ],
+        elementOf as never,
+    );
+    return h(G, { ref } as never, h(Circle, { ...to, fill: props.fill }));
 };
 
+// On a device, a ripple drawn at its end in its own SVG, in a view the native driver moves there
+// from its start and fades. Its layer clips it to the surface's corners, not to an SVG shape.
+const nativeSvgRipple =
+    (gradient: GradientValue, id: string) => (props: RippleProps) => {
+        const { grow, fade } = useRippleMotion(props, true);
+        const { id: n, geometry } = props.ripple;
+        const { size, scale, start, end } = geometry;
+        const half = size / 2;
+        const r = half * scale;
+        const along = (from: number, to: number) =>
+            grow.interpolate({ inputRange: [0, 1], outputRange: [from, to] });
+        return h(
+            Animated.View,
+            {
+                pointerEvents: "none",
+                style: {
+                    position: "absolute",
+                    left: end.x + half - r,
+                    top: end.y + half - r,
+                    width: 2 * r,
+                    height: 2 * r,
+                    opacity: fade,
+                    transform: [
+                        { translateX: along(start.x - end.x, 0) },
+                        { translateY: along(start.y - end.y, 0) },
+                        { scale: along(1 / scale, 1) },
+                    ],
+                },
+            },
+            h(
+                Svg,
+                { width: 2 * r, height: 2 * r },
+                h(
+                    Defs,
+                    null,
+                    // The gradient is in the circle's own units, so its edge scales with it.
+                    gradientElement(
+                        `${id}r${n}`,
+                        placeGradient(
+                            gradient,
+                            { width: size, height: size },
+                            props.color,
+                        ) as Exclude<PlacedGradient, { kind: "conic" }>,
+                    ),
+                ),
+                h(Circle, { cx: r, cy: r, r, fill: `url(#${id}r${n})` }),
+            ),
+        );
+    };
+
 /** Press ripples as `useRipple` makes them, drawn with SVG: each a circle with the ripple's
- *  soft edge, clipped to the surface's shape when `clip` gives its drawing. Without the
- *  provider's `svg`, they're `useRipple`'s discs. */
+ *  soft edge, clipped to the surface's shape when `clip` gives its drawing (on the web; a
+ *  device's clip to the surface's corners). Without the provider's `svg`, they're `useRipple`'s
+ *  discs. */
 export const useSvgRipple = (
     options: RippleOptions & {
         /** The surface's drawing, from its `drawings`, to clip the ripples to its shape. */
@@ -174,11 +485,20 @@ export const useSvgRipple = (
     const shape = options.clip?.shape;
     const id = useSvgId();
     const Ripple = useMemo(
-        () => gradient && svgRipple(gradient, id, RippleCircle),
+        () =>
+            gradient &&
+            (WEB
+                ? svgRipple(gradient, id, BrowserRippleCircle)
+                : nativeSvgRipple(gradient, id)),
         [gradient, id],
     );
-    const drawing = useMemo(
-        () => (Ripple ? svgRipples(Ripple, shape, id) : DISCS),
+    const drawing = useMemo<RippleDrawing>(
+        () =>
+            !Ripple
+                ? DISCS
+                : WEB
+                  ? svgRipples(Ripple, shape, id)
+                  : { surfaceColor: true, Ripple },
         [Ripple, shape, id],
     );
     return useRippleDrawn(options, drawing);

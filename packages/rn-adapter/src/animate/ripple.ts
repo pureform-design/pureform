@@ -127,36 +127,40 @@ type Animatable = {
     ) => { finished: Promise<unknown> };
 };
 
-// On the web, the same disc grown and faded by the browser's own animations of its transform and
-// opacity, which run off the main thread: Animated would step them from JavaScript each frame,
-// so a surface's re-render (its pressed state) stalls the ripple. Each starts before the disc is
-// first painted.
-const WebDisc = (props: RippleProps) => {
-    const node = useRef<Animatable | null>(null);
+/** On the web, a ripple grown through `grow`, its two keyframes, and faded once released, by
+ *  the browser's own animations of the node `ref` gets, which run off the main thread:
+ *  Animated would step them from JavaScript each frame, so a surface's re-render (its pressed
+ *  state) stalls the ripple. Each starts before the ripple is first painted. `node` reads the
+ *  element from what `ref` gets, such as react-native-svg's element. */
+export const useBrowserRipple = (
+    props: RippleProps,
+    grow: Keyframe[],
+    node: (ref: unknown) => Animatable | null | undefined = (ref) =>
+        ref as Animatable | null,
+) => {
+    const ref = useRef<unknown>(null);
     const latest = useRef(props.done);
     latest.current = props.done;
-    const { size: _size, scale, start, end } = props.ripple.geometry;
     const { timing } = props;
     useLayoutEffect(() => {
-        node.current?.animate?.(
-            [
-                { transform: "translate(0px, 0px) scale(1)" },
-                {
-                    transform: `translate(${end.x - start.x}px, ${end.y - start.y}px) scale(${scale})`,
-                },
-            ],
-            { duration: timing.grow, easing: timing.easing, fill: "forwards" },
-        );
+        node(ref.current)?.animate?.(grow, {
+            duration: timing.grow,
+            easing: timing.easing,
+            fill: "forwards",
+        });
     }, []);
     const release = props.ripple.release;
     useLayoutEffect(() => {
         if (release === undefined) return;
-        const fade = node.current?.animate?.([{ opacity: 1 }, { opacity: 0 }], {
-            duration: timing.fade,
-            delay: release,
-            easing: "linear",
-            fill: "forwards",
-        });
+        const fade = node(ref.current)?.animate?.(
+            [{ opacity: 1 }, { opacity: 0 }],
+            {
+                duration: timing.fade,
+                delay: release,
+                easing: "linear",
+                fill: "forwards",
+            },
+        );
         if (!fade) {
             latest.current();
             return;
@@ -170,7 +174,19 @@ const WebDisc = (props: RippleProps) => {
             live = false;
         };
     }, [release]);
-    return createElement(View, { ref: node as never, style: discStyle(props) });
+    return ref;
+};
+
+// On the web, the disc grown and faded by the browser's animations of its transform and opacity.
+const WebDisc = (props: RippleProps) => {
+    const { scale, start, end } = props.ripple.geometry;
+    const ref = useBrowserRipple(props, [
+        { transform: "translate(0px, 0px) scale(1)" },
+        {
+            transform: `translate(${end.x - start.x}px, ${end.y - start.y}px) scale(${scale})`,
+        },
+    ]);
+    return createElement(View, { ref: ref as never, style: discStyle(props) });
 };
 
 const Disc = Platform.OS === "web" ? WebDisc : NativeDisc;
