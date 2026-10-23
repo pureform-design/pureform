@@ -36,12 +36,10 @@ import {
     pct,
     pointer,
     px,
-    relative,
     row,
     slot,
     translateY,
     transform,
-    transparent,
     unitless,
     when,
 } from "@pureform/core/ast";
