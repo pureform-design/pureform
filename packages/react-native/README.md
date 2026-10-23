@@ -139,12 +139,19 @@ import { registry } from "./.pureform";
 - **Presence:** `usePresence(open, motion?)` gives an overlay its enter and exit through the
   engine, as the web's preset runs them (`motion`: `"popup"`, the default, for a menu, select
   list, tooltip, toast, or snackbar; `"dialog"`; `"bottomSheet"` and `"sideSheet"`, which slide
-  in from their edge; `"scrim"`): `{ present, style, props }`. It stays `present` after `open`
+  in from their edge; `"scrim"`; `"fadeThrough"`, a fade through's page): `{ present, style, props }`. It stays `present` after `open`
   turns false until the exit has run to its end, so render the overlay (or a `Modal`'s
   `visible`) from `present`, and give `style` and `props` to the engine's view that moves.
   `overlayMotion(name, tokens, reducedMotion, timeScale, size, rtl)` gives the frames and
   timings; a sheet slides by its own measured size along its edge (the web's `100%`), its enter
   waiting, unseen, for its first layout, and the side sheet's runs from the left under `rtl`.
+- **Fade through:** `FadeThrough` (`@pureform/react-native/fade-through`, m3a) takes `value` and
+  the content (or a function of the value), `style` and `testId`. A new `value` runs the web's
+  fade through on the engine (`usePresence`'s `"fadeThrough"` motion): the shown page fades out
+  over `short2` as it grows to 105%, absolutely filling the root, hidden from assistive
+  technology and taking no touches, and goes once its exit ends; the new page grows from 80% on
+  `spatialDefault` and fades in over `short4` after a `short2` delay. The first page is still;
+  reduced motion keeps the fades. A presence step's timing may carry a `delay` (both engines).
 - **Portals:** `Portal` renders its children at the nearest `PortalHost`, in a layer over the
   page, sorted by the theme's z-index for its `layer` and then by the order each opened (a portal
   inside another sorts over it), keeping the provider it was declared under. The root
@@ -458,6 +465,7 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
 - **Navigation rail:** destinations with the same `section` sit together under one heading with
   its text, shown only while the rail is `expanded`, in the order the sections first appear (like
   a select's `group`). The bar ignores `section`. It replaces the removed `sectionLabel`.
+  The page content the bar or rail switches goes in a `FadeThrough` given the same `value`.
 - **Split button and FAB menu:** `SplitButton` renders its two buttons as the `Menu`'s trigger
   (`trigger` as a function), so the menu opens over the page under the trailing button, at its
   end. `FabMenu` opens its items in the portal above the FAB, at its end; the `list` slot's

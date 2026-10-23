@@ -88,6 +88,14 @@ export const OVERLAY_KEYFRAMES = {
         from: { translateX: 0 },
         to: { translateX: { share: -1 } },
     },
+    fadeThroughGrowIn: {
+        from: { scale: 0.8 },
+        to: { scale: 1 },
+    },
+    fadeThroughGrowOut: {
+        from: { scale: 1 },
+        to: { scale: 1.05 },
+    },
 } as const satisfies Record<
     string,
     { readonly from: OverlayFrame; readonly to: OverlayFrame }
@@ -96,8 +104,8 @@ export const OVERLAY_KEYFRAMES = {
 type KeyframesName = keyof typeof OVERLAY_KEYFRAMES;
 
 /** A timing as the preset names it: the theme's duration and easing roles, or its spring
- *  role. */
-export type OverlayTiming =
+ *  role, after an optional duration role's `delay`. */
+export type OverlayTiming = (
     | {
           readonly duration: string;
           readonly easing: string;
@@ -107,7 +115,8 @@ export type OverlayTiming =
           readonly spring: string;
           readonly duration?: never;
           readonly easing?: never;
-      };
+      }
+) & { readonly delay?: string };
 
 /** One way in or out, as the preset names it: the keyframes and their timing, and for keyframes
  *  that only move, the fade's own timing alongside. */
@@ -178,13 +187,27 @@ export const OVERLAY_MOTIONS = {
         enter: { keyframes: "overlayFadeIn", spring: "effectsDefault" },
         exit: { keyframes: "overlayFadeOut", spring: "effectsDefault" },
     },
+    /** A fade through's page (`FADE_THROUGH_MOTION`): the incoming one grows from 80% as it
+     *  fades in once the outgoing one has faded out, growing to 105%. */
+    fadeThrough: {
+        enter: {
+            keyframes: "fadeThroughGrowIn",
+            spring: "spatialDefault",
+            fade: { duration: "short4", easing: "linear", delay: "short2" },
+        },
+        exit: {
+            keyframes: "fadeThroughGrowOut",
+            spring: "spatialDefault",
+            fade: { duration: "short2", easing: "linear" },
+        },
+    },
 } as const satisfies Record<
     string,
     { readonly enter: OverlayMotionStep; readonly exit: OverlayMotionStep }
 >;
 
 /** How an overlay enters and leaves: `popup` (a menu, select list, tooltip, or snackbar),
- *  `dialog`, `bottomSheet`, `sideSheet`, or `scrim`. */
+ *  `dialog`, `bottomSheet`, `sideSheet`, or `scrim`; or a fade through's page (`fadeThrough`). */
 export type OverlayMotionName = keyof typeof OVERLAY_MOTIONS;
 
 const FADES = {
@@ -203,6 +226,8 @@ const MOVES = new Set<KeyframesName>([
     "sideSheetOut",
     "sideSheetInRtl",
     "sideSheetOutRtl",
+    "fadeThroughGrowIn",
+    "fadeThroughGrowOut",
 ]);
 
 const numberOf = (value: unknown, fallback: number): number => {
@@ -270,6 +295,14 @@ const timingOf = (
     tokens: ThemeValues,
     timeScale: number,
 ): PresenceTiming => {
+    const delay =
+        given.delay === undefined
+            ? {}
+            : {
+                  delay:
+                      numberOf(tokens[`durations.${given.delay}`], 0) *
+                      timeScale,
+              };
     const role = given.spring;
     if (role !== undefined) {
         const field = (name: string) => tokens[`springs.${role}.${name}`];
@@ -279,6 +312,7 @@ const timingOf = (
             duration: numberOf(field("duration"), 0) * timeScale,
             easing: typeof easing === "string" ? easing : "linear",
             ...(spring ? { spring } : {}),
+            ...delay,
         };
     }
     const easing = tokens[`easings.${given.easing}`];
@@ -286,6 +320,7 @@ const timingOf = (
         duration:
             numberOf(tokens[`durations.${given.duration}`], 0) * timeScale,
         easing: typeof easing === "string" ? easing : "linear",
+        ...delay,
     };
 };
 

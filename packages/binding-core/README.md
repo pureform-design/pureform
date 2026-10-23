@@ -298,6 +298,7 @@ sheetContentLayout;                      // the surface takes presses back
 dragToDismiss(handle, sheet, dismiss, onClose?, asker?); // from /dom: drag a sheet down by its handle to close it; dismiss(kept) calls kept once rendered if the app kept it open
 markMenuGroupEdges(content);             // from /dom: marks a menu's first and last groups data-first/data-last, from DOM order; a group's data-pf-first/data-pf-last (its explicit first/last) wins
 swallowNextClick(row);                   // from /dom: drop the click a drag ends with
+whenAnimationsEnd(element, done);        // from /dom: done once every animation running on it ends (at once with none); returns what stops waiting
 
 // Drag handle: dragHandleAnatomy
 interface DragHandleRootOwnProps         // orientation, tokens, testId, unstyled
@@ -515,6 +516,9 @@ badgeRootProps(props);                   // role img named by label; a dot witho
 MEDIA_ROOT_PROPS; mediaSelection;        // aspect, shape
 SEPARATOR_ROOT_PROPS; separatorSelection; separatorRootProps(element); // role on anything but hr
 SCRIM_ROOT_PROPS; scrimSelection;
+FADE_THROUGH_ROOT_PROPS; fadeThroughSelection; // value names what's shown
+showPage(pages, value, content); dropPage(pages, value); // the fade through's pages: the shown one leaves (closed), a new one enters (open), the first has no state; a left page goes once its exit ends
+pageStateProps(state);                   // data-state; a leaving page aria-hidden and inert
 SUPPORTING_TEXT_ROOT_PROPS; supportingTextSelection; // tone
 TEXT_ROOT_PROPS; textSelection;          // textStyle, the preset's `style` group
 ICON_ROOT_PROPS; iconSelection; iconRootProps(props); // role img named by label, or hidden

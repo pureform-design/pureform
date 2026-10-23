@@ -208,6 +208,7 @@ export const COMPONENT_USAGE = {
     },
     ripple: { entries: { ripple: {} } },
     scrim: { entries: { scrim: {} } },
+    "fade-through": { entries: { fadeThrough: {} } },
     // The scroll state sets `scrolled` and `collapsed`, and `search` follows the search bar; the
     // search bar is drawn scrolled and centered.
     "app-bar": {

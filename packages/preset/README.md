@@ -123,6 +123,17 @@ spring, as Compose's do: two animations per step (`fade` on an `OverlayMotionSte
 | bottom and side sheet      | slides in from its edge on `spatialDefault`; fades in on `effectsFast`               | slides back out on `effectsFast`; fades out on `effectsFast`     |
 | scrim                      | fades in on `effectsDefault`                                                         | fades out on `effectsDefault`                                    |
 
+The fade through (`fadeThrough`, `components/fade-through.ts`, m3a) runs the same way on its
+`page` slot: the bindings mark the leaving page `closed` and the incoming one `open` (the first
+page has neither). Leaving, a page fades out over `short2` (linear) as it grows to 105% on
+`spatialDefault`, out of the flow (`position: absolute` over the root's top) and taking no input;
+the incoming page grows from 80% on `spatialDefault` and fades in over `short4` once the old one
+is gone (a `short2` delay, its first frame held meanwhile). Compose's
+`MaterialTransitions.FadeThrough` fades 90 and 210ms, linearly, and scales on its default spring.
+Under reduced motion only the fades run. `MotionTiming` takes an optional `delay` (a duration
+role) for this; `timedAnimation` holds a delayed run's first frame (`backwards`, or `both` with
+`forwards`). The keyframes are `FADE_THROUGH_KEYFRAMES`, the motion `FADE_THROUGH_MOTION`.
+
 The springs are Compose's: its menu, tooltip and snackbar host scale between 80% and full size on
 `FastSpatial` and fade on `FastEffects`, both ways (`Menu.kt`, `Tooltip.kt`, `SnackbarHost.kt`);
 its sheets and drawers show on `DefaultSpatial` and hide on `FastEffects`, and its modal bottom

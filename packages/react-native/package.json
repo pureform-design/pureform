@@ -299,6 +299,13 @@
                 "default": "./dist/radio-group.mjs"
             }
         },
+        "./fade-through": {
+            "types": "./dist/fade-through/index.d.ts",
+            "import": {
+                "development": "./src/fade-through/index.ts",
+                "default": "./dist/fade-through.mjs"
+            }
+        },
         "./scrim": {
             "types": "./dist/scrim/index.d.ts",
             "import": {

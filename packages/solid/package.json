@@ -544,6 +544,13 @@
                 "default": "./dist/ripple.jsx"
             }
         },
+        "./fade-through": {
+            "types": "./dist/fade-through/index.d.ts",
+            "solid": {
+                "development": "./src/fade-through/index.ts",
+                "default": "./dist/fade-through.jsx"
+            }
+        },
         "./scrim": {
             "types": "./dist/scrim/index.d.ts",
             "solid": {

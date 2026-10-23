@@ -62,6 +62,10 @@ import { datePicker } from "./components/date-picker";
 import { dialog } from "./components/dialog";
 import { createDockedDatePicker } from "./components/docked-date-picker";
 import { dragHandle } from "./components/drag-handle";
+import {
+    FADE_THROUGH_KEYFRAMES,
+    fadeThrough,
+} from "./components/fade-through";
 import { createFab } from "./components/fab";
 import { createFabMenu } from "./components/fab-menu";
 import { fullscreenDialog } from "./components/fullscreen-dialog";
@@ -366,6 +370,7 @@ const defaultComponents = <G extends string>(
         dataTable: createTable<Step>(densities),
         gridList,
         scrim,
+        fadeThrough,
         ripple,
         icon: createIcon(theme.color.groups),
         touchTarget,
@@ -522,6 +527,7 @@ export const pureform = <
                     ...SHEET_KEYFRAMES,
                     ...SEARCH_VIEW_KEYFRAMES,
                     ...APP_BAR_KEYFRAMES,
+                    ...FADE_THROUGH_KEYFRAMES,
                 },
                 components,
                 ...(Object.keys(themes).length > 0 ? { themes } : {}),

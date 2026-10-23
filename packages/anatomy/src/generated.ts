@@ -5464,6 +5464,34 @@ export const scrimAnatomy = {
     variants: {},
 } as const satisfies ComponentAnatomy;
 
+export const fadeThroughAnatomy = {
+    name: "fadeThrough",
+    scope: "fade-through",
+    root: "root",
+    partNames: ["root", "page"],
+    parts: {
+        root: {
+            name: "root",
+            attribute: "root",
+            testId: "pf-fade-through-root",
+            parent: null,
+            children: ["page"],
+            styled: true,
+            mirror: false,
+        },
+        page: {
+            name: "page",
+            attribute: "page",
+            testId: "pf-fade-through-page",
+            parent: "root",
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+    },
+    variants: {},
+} as const satisfies ComponentAnatomy;
+
 export const rippleAnatomy = {
     name: "ripple",
     scope: "ripple",
@@ -5642,6 +5670,7 @@ export const anatomy = {
     dataTable: dataTableAnatomy,
     gridList: gridListAnatomy,
     scrim: scrimAnatomy,
+    fadeThrough: fadeThroughAnatomy,
     ripple: rippleAnatomy,
     icon: iconAnatomy,
     touchTarget: touchTargetAnatomy,
@@ -6154,6 +6183,7 @@ export const testIds = {
         subhead: "pf-grid-list-subhead",
     },
     scrim: { root: "pf-scrim-root" },
+    fadeThrough: { root: "pf-fade-through-root", page: "pf-fade-through-page" },
     ripple: { root: "pf-ripple-root", ripple: "pf-ripple-ripple" },
     icon: { root: "pf-icon-root" },
     touchTarget: { root: "pf-touch-target-root" },

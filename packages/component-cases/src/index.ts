@@ -18,6 +18,7 @@ export { menu } from "./cases/menu";
 export { slider } from "./cases/slider";
 export { switchControl } from "./cases/switch";
 export { table } from "./cases/table";
+export { fadeThrough } from "./cases/fade-through";
 export { tabsCase } from "./cases/tabs";
 export { textField } from "./cases/text-field";
 export { toastCase } from "./cases/toast";

@@ -28,6 +28,7 @@ import { DockedDatePicker } from "@pureform/solid/docked-date-picker";
 import { DragHandle } from "@pureform/solid/drag-handle";
 import { Fab } from "@pureform/solid/fab";
 import { FabMenu } from "@pureform/solid/fab-menu";
+import { FadeThrough } from "@pureform/solid/fade-through";
 import { FullscreenDialog } from "@pureform/solid/fullscreen-dialog";
 import { GridList } from "@pureform/solid/grid-list";
 import { Icon } from "@pureform/solid/icon";
@@ -182,6 +183,7 @@ export const components: Record<ComponentName, ValidComponent> = {
     Ripple,
     RichTooltip,
     Scrim,
+    FadeThrough,
     AppBar,
     Paginator,
     TimePicker,

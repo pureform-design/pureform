@@ -288,12 +288,14 @@ export interface PresenceFrame {
 }
 
 /** How long a step takes: milliseconds, on a curve as transitions take it (`cubic-bezier(...)`,
- *  `linear(...)`, or `linear`). A spring also carries its physics, which an engine with springs
- *  runs in place of the sampled duration and curve. */
+ *  `linear(...)`, or `linear`), after an optional delay. A spring also carries its physics, which
+ *  an engine with springs runs in place of the sampled duration and curve. */
 export interface PresenceTiming {
     readonly duration: number;
     readonly easing: string;
     readonly spring?: Spring | undefined;
+    /** Milliseconds to wait first, showing the step's first frame meanwhile. */
+    readonly delay?: number;
 }
 
 /** One way in or out: from one frame to another on a timing. With `fade`, the opacity runs on

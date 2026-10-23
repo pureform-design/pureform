@@ -86,7 +86,7 @@ MDC-Android's `master` since 2026-05-06 (no doc changes; latest release still `1
 Compose is now the first source ([guidelines §1](component-guidelines.md#1-sources-and-provenance)).
 No component was added, removed or renamed. The findings (expressive chip shapes, transparent
 outlined text field container, adaptive bar and rail specs, fade-through and shared-axis
-transitions, time picker scroll items without indication, and smaller fixes) are listed with
+transitions (fade through done in m3a), time picker scroll items without indication, and smaller fixes) are listed with
 their sources in [`next.md`](../roadmap-components/next.md); none is applied yet.
 
 ---
@@ -185,28 +185,29 @@ their sources in [`next.md`](../roadmap-components/next.md); none is applied yet
 
 ### 1.7 Primitives
 
-| Component                                  | pureform              | M3 / Material Web            | Angular Material           | zag        | Notes                           |
-| ------------------------------------------ | --------------------- | ---------------------------- | -------------------------- | ---------- | ------------------------------- |
-| Ripple                                     | ✅ `ripple` (own)     | ✅                           | ✅ `matRipple`             | —          |                                 |
-| Focus ring                                 | 🟡 `indication` model | ✅ MW focus-ring             | (core)                     | —          | Not a part                      |
-| Elevation                                  | 🟡 tokens             | ✅ MW elevation              | (tokens)                   | —          | Not a part                      |
-| Icon                                       | ✅ `icon`             | ✅                           | ✅ `mat-icon`              | —          |                                 |
-| Avatar                                     | ✅ `avatar`           | (inside list, chip, app bar) | (card, list, chip avatars) | `avatar`   | `image` + `fallback` done (c7c) |
-| Presence                                   | ✅ `presence`         | —                            | —                          | `presence` |                                 |
-| Touch target, text, media, supporting text | ✅                    | (internal)                   | —                          | —          |                                 |
+| Component                                  | pureform              | M3 / Material Web                         | Angular Material           | zag        | Notes                           |
+| ------------------------------------------ | --------------------- | ----------------------------------------- | -------------------------- | ---------- | ------------------------------- |
+| Ripple                                     | ✅ `ripple` (own)     | ✅                                        | ✅ `matRipple`             | —          |                                 |
+| Focus ring                                 | 🟡 `indication` model | ✅ MW focus-ring                          | (core)                     | —          | Not a part                      |
+| Elevation                                  | 🟡 tokens             | ✅ MW elevation                           | (tokens)                   | —          | Not a part                      |
+| Icon                                       | ✅ `icon`             | ✅                                        | ✅ `mat-icon`              | —          |                                 |
+| Avatar                                     | ✅ `avatar`           | (inside list, chip, app bar)              | (card, list, chip avatars) | `avatar`   | `image` + `fallback` done (c7c) |
+| Presence                                   | ✅ `presence`         | —                                         | —                          | `presence` |                                 |
+| Touch target, text, media, supporting text | ✅                    | (internal)                                | —                          | —          |                                 |
+| Fade through (transition)                  | ✅ `fadeThrough`      | Compose `MaterialTransitions.FadeThrough` | —                          | —          | m3a; predictive back left out   |
 
 ### 1.8 Totals
 
-|                                                  | Count                                                                                                                                                                                                                                                                                                                                                             |
-| ------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Our preset components                            | 64, every entry of `pureform().components` (`packages/preset/src/doc-counts.spec.ts` checks it) (c4 added loadingIndicator, appBar, toolbar, carousel; progress gained `shape: wavy`; c5 added calendarCell, datePicker, dockedDatePicker, dateInput, timePicker, timeInput; c6 added accordion, tree, stepper, paginator, dataTable, gridList; c7 added chipSet) |
-| zag machines                                     | 54; 23 wrapped today (accordion, avatar, carousel, checkbox, combobox, date-input, date-picker, dialog, listbox, menu, pagination, presence, radio-group, select, slider, steps, switch, tabs, tags-input, toast, toggle-group, tooltip, tree-view)                                                                                                               |
-| Our own machines                                 | 7 (button, navigation, ripple, snackbar, table, text-field, time-picker: the time picker and time input)                                                                                                                                                                                                                                                          |
-| M3 Expressive components we're missing           | 0 (the selection list is built, c7a)                                                                                                                                                                                                                                                                                                                              |
-| …of which zag covers the behaviour               | 0                                                                                                                                                                                                                                                                                                                                                                 |
-| …needing our own machine or styling only         | 0 (the time picker and time input are built, c5b). The existing components' own work (segmented list, progress parts) is done too (c1b, c1c)                                                                                                                                                                                                                      |
-| M3-deprecated components we should **not** build | 4: segmented button, navigation drawer, bottom app bar, medium/large (non-flexible) app bar                                                                                                                                                                                                                                                                       |
-| Angular parity components, in scope (§1.9)       | 6, all built (c6): accordion, stepper, paginator, tree, dataTable, gridList. Button toggle is the button group; the sidenav is a side sheet or rail                                                                                                                                                                                                               |
+|                                                  | Count                                                                                                                                                                                                                                                                                                                                                                                    |
+| ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Our preset components                            | 65, every entry of `pureform().components` (`packages/preset/src/doc-counts.spec.ts` checks it) (c4 added loadingIndicator, appBar, toolbar, carousel; progress gained `shape: wavy`; c5 added calendarCell, datePicker, dockedDatePicker, dateInput, timePicker, timeInput; c6 added accordion, tree, stepper, paginator, dataTable, gridList; c7 added chipSet; m3a added fadeThrough) |
+| zag machines                                     | 54; 23 wrapped today (accordion, avatar, carousel, checkbox, combobox, date-input, date-picker, dialog, listbox, menu, pagination, presence, radio-group, select, slider, steps, switch, tabs, tags-input, toast, toggle-group, tooltip, tree-view)                                                                                                                                      |
+| Our own machines                                 | 7 (button, navigation, ripple, snackbar, table, text-field, time-picker: the time picker and time input)                                                                                                                                                                                                                                                                                 |
+| M3 Expressive components we're missing           | 0 (the selection list is built, c7a)                                                                                                                                                                                                                                                                                                                                                     |
+| …of which zag covers the behaviour               | 0                                                                                                                                                                                                                                                                                                                                                                                        |
+| …needing our own machine or styling only         | 0 (the time picker and time input are built, c5b). The existing components' own work (segmented list, progress parts) is done too (c1b, c1c)                                                                                                                                                                                                                                             |
+| M3-deprecated components we should **not** build | 4: segmented button, navigation drawer, bottom app bar, medium/large (non-flexible) app bar                                                                                                                                                                                                                                                                                              |
+| Angular parity components, in scope (§1.9)       | 6, all built (c6): accordion, stepper, paginator, tree, dataTable, gridList. Button toggle is the button group; the sidenav is a side sheet or rail                                                                                                                                                                                                                                      |
 
 ### 1.9 Angular Material parity (decision 2026-10-20)
 
@@ -725,3 +726,9 @@ The text field's and text area's `supportingRow` part was removed
 replacement is `flexWrap` on the existing row, the root, so the supporting text and the
 counter sit in the root directly (the bindings' `SupportingRow` parts and the machine's
 `getSupportingRowProps` are gone with it).
+
+The fade through (m3a, `fadeThrough`: `root`, `page`; no variants, 0 compounds) follows
+Compose's `MaterialTransitions.FadeThrough` (androidx-main 62637abaa5): the outgoing page fades out
+(`short2`, linear) as it grows to 105%, the incoming fades in (`short4` after `short2`) as it grows
+from 80% on `spatialDefault`; reduced motion keeps the fades. React, Solid and React Native; it
+replaces nothing, so nothing deprecated is removed.

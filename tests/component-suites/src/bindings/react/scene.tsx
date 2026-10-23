@@ -29,6 +29,7 @@ import { DockedDatePicker } from "@pureform/react/docked-date-picker";
 import { DragHandle } from "@pureform/react/drag-handle";
 import { Fab } from "@pureform/react/fab";
 import { FabMenu } from "@pureform/react/fab-menu";
+import { FadeThrough } from "@pureform/react/fade-through";
 import { FullscreenDialog } from "@pureform/react/fullscreen-dialog";
 import { GridList } from "@pureform/react/grid-list";
 import { Icon } from "@pureform/react/icon";
@@ -192,6 +193,7 @@ export const components: Record<ComponentName, ComponentType<never>> = {
     Ripple,
     RichTooltip,
     Scrim,
+    FadeThrough,
     AppBar,
     Paginator,
     TimePicker,

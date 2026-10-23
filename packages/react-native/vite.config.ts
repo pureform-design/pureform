@@ -52,6 +52,7 @@ export default createConfig({
                     "navigation-rail": "src/navigation-rail/index.ts",
                     "radio-group": "src/radio-group/index.ts",
                     scrim: "src/scrim/index.ts",
+                    "fade-through": "src/fade-through/index.ts",
                     "app-bar": "src/app-bar/index.ts",
                     table: "src/table/index.ts",
                     "time-picker": "src/time-picker/index.ts",

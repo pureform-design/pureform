@@ -66,6 +66,7 @@ export default createConfig({
                     media: "src/media/index.ts",
                     ripple: "src/ripple/index.ts",
                     scrim: "src/scrim/index.ts",
+                    "fade-through": "src/fade-through/index.ts",
                     "app-bar": "src/app-bar/index.ts",
                     table: "src/table/index.ts",
                     "time-picker": "src/time-picker/index.ts",
