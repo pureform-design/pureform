@@ -428,8 +428,12 @@ trigger shows their labels joined by ", " (the placeholder when none):
       writes it; typed text is read with `parseDateText` on blur or submit) whose calendar
       button opens the calendar under it through the portal host, with month and year lists.
       The **date input** (`@pureform/react-native/date-input`) is the picker's surface with a
-      text field: `value` follows the text when it's a whole date. Arrow keys don't move
-      between days. It takes its icons and affixes as content, and `mirrorLeadingIcon` and
+      text field whose input is a row of segments, as the web's: the month, the day and the
+      year in the locale's order (`dateTextSegments`), each a numeric spin button with its
+      placeholder (`mm`), the label always floated. A full segment moves on to the next and
+      Backspace in an empty one goes back; on the web the arrow keys move along the row by
+      direction and step a segment up and down. `value` follows the segments when they make a
+      whole date. It takes its icons and affixes as content, and `mirrorLeadingIcon` and
       `mirrorTrailingIcon` (either flips both, as the text field's do).
     - **The search view** (`@pureform/react-native/search-view`) opens from its `trigger` (a
       read-only `SearchBar` showing the query, by default) in a `Modal`: a header (back, the
@@ -570,8 +574,10 @@ trigger shows their labels joined by ", " (the placeholder when none):
   render after `items`, each in an `itemGroup` with its optional label, and draw the menu as tiles
   (`grouped`) unless told otherwise; `vibrant` takes the tertiary colors. A select's items with a
   `group` sit together under its label, in the order each group first appears. An item with
-  `items` opens a submenu, an arrow (`›`) at its end: React Native drills into it in place, under a
-  row that goes back, where the web cascades it beside the item.
+  `items` opens a submenu, an arrow (`›`) at its end, as `submenu` says on every renderer:
+  `cascade` beside the item (React Native: over the page through the portal host, against the
+  item's row), `drill` in the menu's place under a row that goes back, and `auto` (the default)
+  cascading in a window at least `MENU_CASCADE_MIN_WIDTH` (600) wide, else drilling.
 - **Navigation rail:** destinations with the same `section` sit together under one heading with
   its text, shown only while the rail is `expanded`, in the order the sections first appear (like
   a select's `group`). The bar ignores `section`. It replaces the removed `sectionLabel`.

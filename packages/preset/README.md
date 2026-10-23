@@ -809,8 +809,8 @@ with `aria-checked="true"`).
   first and last groups (marked `data-first`/`data-last` by the menu's surface, from DOM order; a group's own
   `first`/`last` overrides that) round the run's outside
   corners to its `large` radius, so the menu
-  doesn't clip and a submenu inside it shows whole (React Native, whose submenus drill in, clips
-  them at the menu). `vibrant`
+  doesn't clip and a submenu inside it shows whole (React Native, whose cascading submenus open
+  over the page, clips them at the menu). `vibrant`
   swaps the menu to the tertiary container's colors, and a chosen item to the tertiary's. The
   label always sits in `itemContent`, with `itemSupportingText` under it when there is some.
 - `buttonGroup` (`button-group.ts`): a row of buttons or icon buttons, spaced by its `size`

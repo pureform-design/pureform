@@ -399,6 +399,11 @@ import { RichTooltip } from "@pureform/solid/rich-tooltip";
   `onSelect({ value })`, `closeOnSelect`, `loopFocus`, `typeahead`, and `positioning`
   (`bottom-start` by default). Open, the surface holds focus and the highlighted item shows the
   hover state (`data-pf-hover`).
+  An item with `items` opens a submenu, as the ready-made's `submenu` says: `cascade` (a
+  `Submenu` beside the item), `drill` (the menu shows the submenu's items in its place under a row
+  that goes back, headed by the item's label; `onSelect` hears only the leaves), or `auto`, the
+  default: cascading in a window at least `MENU_CASCADE_MIN_WIDTH` (600) wide, read once mounted
+  so a server's render cascades, else drilling. Composed menus cascade.
 - **The tooltip** opens on hover after `openDelay` (400 ms) and on keyboard focus, and points the
   trigger's `aria-describedby` at itself. The ready-made renders `supportingText` in its part, and
   a `Caret` with `caret`. `RichTooltip` is the rich one (it replaces `variant="rich"`): `subhead`,
