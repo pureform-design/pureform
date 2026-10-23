@@ -7,7 +7,9 @@
 // page's plane instead, in the layout next to the content it squeezes. `modal` stacks it at the
 // `dialog` layer over a scrim, rounds its start corners, lifts it to level 1 on the low container,
 // and keeps focus inside. `coplanar` applies to a standard sheet only. It slides in from the end
-// edge while Zag's `data-state` is `open`.
+// edge while Zag's `data-state` is `open`. A touch dragging it toward that edge moves it, and the
+// binding settles it back or closes it (MDC-Android's draggable `SideSheetBehavior`); a coplanar
+// sheet doesn't drag.
 //
 //   <div class={root} role="dialog" aria-labelledby="title">
 //     <div class={header}>
@@ -36,7 +38,7 @@ import { radius, spacing, textStyle, zIndex } from "@pureform/theme";
 
 import { overlayMotion } from "./overlay";
 import { blend, componentTokens, surface, sys } from "./shared";
-import { SIDE_SHEET_MOTION } from "./sheet";
+import { SHEET_SETTLE, SIDE_SHEET_MOTION } from "./sheet";
 import { runCorners } from "./tiles";
 
 const { tokens, ref } = componentTokens("sideSheet", {
@@ -86,6 +88,8 @@ export const sideSheet = pf.slotComponent({
             root: {
                 ...surface(ref("container"), ref("content"), "level0"),
                 ...overlayMotion(SIDE_SHEET_MOTION),
+                // Settles back on a spring after a drag the binding lets go of.
+                transition: SHEET_SETTLE,
                 display: flex,
                 flexDirection: column,
                 width: ref("width"),

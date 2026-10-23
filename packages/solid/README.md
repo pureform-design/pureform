@@ -411,6 +411,12 @@ import { RichTooltip } from "@pureform/solid/rich-tooltip";
   and the `ConfirmAction` (a text button); the `Body` scrolls. Zag focuses the first focusable
   element, the close trigger. The ready-made takes `trigger`, `closeLabel`, `closeIcon`,
   `headline`, `confirmAction` and `body`. Import it from `@pureform/solid/fullscreen-dialog`.
+- **The side sheet drags to dismiss** (fix-layout), as MDC-Android's `SideSheetBehavior`: a touch or
+  a pen dragging `Content` sideways toward its edge moves it; let go at least halfway out or on a
+  flick (`SIDE_SHEET_VELOCITY_THRESHOLD`, 500px/s) it closes, asking `onClose` first, else it settles
+  back on its spring. Vertical moves stay the content's native scroll (`touch-action: pan-y`); a
+  mouse selects text as ever; a coplanar sheet doesn't drag. The bottom sheet's `dragHandle={false}`
+  (now a Root prop too) gives its body the top padding the handle gave it.
 - **`onClose` on the dialog, the full-screen dialog and the side sheet.** Root's `onClose` is asked,
   as the bottom sheet's, before any close of their own: Escape, a press on the scrim (the dialog and
   the side sheet; an `alertdialog` or `closeOnInteractOutside={false}` doesn't close on one), and

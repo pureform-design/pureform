@@ -231,6 +231,30 @@ describe.each([animated, reanimated])("the menu with $name", (engine) => {
         expect(menu()).toBeNull();
         expect(document.activeElement).toBe(byTestId("pf-button-root"));
     });
+
+    it("opens against its trigger with defaultOpen, before any interaction", async () => {
+        await render(
+            <View style={{ paddingTop: 120, paddingLeft: 200 }}>
+                <Menu defaultOpen trigger="Edit" items={ITEMS} />
+            </View>,
+            engine,
+        );
+        await until(() => {
+            const surface = menu();
+            return (
+                surface !== null &&
+                Math.abs(
+                    box(surface).top - box(byTestId("pf-button-root")).bottom,
+                ) < 16
+            );
+        });
+        const trigger = box(byTestId("pf-button-root"));
+        const surface = box(menu()!);
+        // Below the trigger, at its start, as a menu opened by a press.
+        expect(surface.top).toBeGreaterThanOrEqual(trigger.bottom);
+        expect(surface.top - trigger.bottom).toBeLessThan(16);
+        expect(Math.abs(surface.left - trigger.left)).toBeLessThan(1);
+    });
 });
 
 describe.each([animated, reanimated])(
@@ -1288,6 +1312,76 @@ describe("the sheets", () => {
         await press("Back");
         expect(backs).toEqual([1]);
         await press("Close");
+        await until(() => sheet("side-sheet") === null);
+        expect(sheet("side-sheet")).toBeNull();
+    });
+
+    it("drags a modal side sheet toward its edge, settling back short of halfway and closing past it", async () => {
+        await render(
+            <SideSheet trigger="Filters" headline="Filters">
+                Narrow it down.
+            </SideSheet>,
+        );
+        await press("Filters");
+        await settle(600);
+        const root = sheet("side-sheet")!;
+        const start = box(root).left;
+        // Slow moves, so the release isn't a flick.
+        const slowly = async (
+            moves: readonly (readonly [number, number])[],
+        ) => {
+            const from = box(root);
+            const x = from.left + from.width / 2;
+            const y = from.top + from.height / 2;
+            const at = ([dx, dy]: readonly [number, number]) => ({
+                bubbles: true,
+                button: 0,
+                buttons: 1,
+                clientX: x + dx,
+                clientY: y + dy,
+            });
+            await interact(() => {
+                root.dispatchEvent(new MouseEvent("mousedown", at([0, 0])));
+            });
+            for (const move of moves) {
+                await settle(120);
+                await interact(() => {
+                    root.dispatchEvent(new MouseEvent("mousemove", at(move)));
+                });
+            }
+            return () =>
+                interact(() => {
+                    root.dispatchEvent(
+                        new MouseEvent("mouseup", at(moves.at(-1) ?? [0, 0])),
+                    );
+                });
+        };
+        const short = await slowly([
+            [20, 0],
+            [40, 0],
+            [42, 0],
+        ]);
+        // It follows the pointer once the move is past the slop.
+        expect(box(root).left).toBeGreaterThan(start + 15);
+        await short();
+        await until(() => Math.abs(box(root).left - start) < 1);
+        expect(sheet("side-sheet")).not.toBeNull();
+        expect(Math.abs(box(root).left - start)).toBeLessThan(1);
+        // Mostly down: its content's, not a drag.
+        const down = await slowly([
+            [2, 20],
+            [4, 60],
+        ]);
+        expect(box(root).left).toBe(start);
+        await down();
+        const width = box(root).width;
+        const far = await slowly([
+            [20, 0],
+            [width * 0.4, 0],
+            [width * 0.7, 0],
+            [width * 0.7 + 1, 0],
+        ]);
+        await far();
         await until(() => sheet("side-sheet") === null);
         expect(sheet("side-sheet")).toBeNull();
     });

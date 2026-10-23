@@ -161,6 +161,8 @@ export {
     sheetPartialOffset,
     sheetPartiallyExpandable,
     sheetRelease,
+    sideSheetRelease,
+    SIDE_SHEET_VELOCITY_THRESHOLD,
     SHEET_POSITIONAL_THRESHOLD,
     SHEET_VELOCITY_THRESHOLD,
     SHEET_PARTIAL_SHARE,

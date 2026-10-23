@@ -255,7 +255,11 @@ function ReadyMade(props: BottomSheetProps): ReactNode {
     } = props;
     const slot = useSlotProps(props);
     return (
-        <Root {...rootProps} {...(slot("root") as object)}>
+        <Root
+            {...rootProps}
+            dragHandle={dragHandle}
+            {...(slot("root") as object)}
+        >
             {isPresent(trigger) ? (
                 <Trigger as={Button} label={trigger} {...slot("trigger")} />
             ) : null}

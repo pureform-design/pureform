@@ -50,6 +50,12 @@ export default defineStories({
         // Both act on what's around them: a surface to press, and content to dim.
         Ripple: { hooks: ["./src/stages/ripple.ts"] },
         Scrim: { hooks: ["./src/stages/scrim.ts"] },
+        FabMenu: {
+            // An app places it at the screen's bottom end, and its list opens above it: at the
+            // canvas's top, the list would open off the top of the frame.
+            parameters: { pureform: { place: "bottom-end" } },
+            hooks: ["./src/fab-menu.hooks.ts"],
+        },
         TextField: {
             // React Native Web: the disabled field's input is `disabled` now (not `readonly`)
             // and passes, but its label is a plain text element, not the input's `<label>`, so

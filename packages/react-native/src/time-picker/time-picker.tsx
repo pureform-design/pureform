@@ -36,7 +36,7 @@ import { Fragment, type ReactNode, useRef, useState } from "react";
 import type { GestureResponderEvent, LayoutChangeEvent } from "react-native";
 
 import { testIdOf, withEngine } from "../parts";
-import { useComponentSlots } from "../styles";
+import { inFlowInline, useComponentSlots } from "../styles";
 import { TimeButton, timeLocale, useTime } from "../time";
 
 export interface TimePickerProps
@@ -167,7 +167,7 @@ function TimePickerImpl(props: TimePickerProps): ReactNode {
                     ? props.headline
                     : TIME_PICKER_HEADLINE
             }
-            style={s.root}
+            style={inFlowInline(s.root ?? {})}
             testID={id("root")}
         >
             <v.headline.Text style={s.headline} testID={id("headline")}>

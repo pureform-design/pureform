@@ -27,7 +27,14 @@ import type {
     SideSheetRootOwnProps,
     Unstyled,
 } from "@pureform/binding-core";
-import { type ElementType, type ReactNode } from "react";
+import { sideSheetDragToDismiss } from "@pureform/binding-core/dom";
+import {
+    type ElementType,
+    type ReactNode,
+    useEffect,
+    useRef,
+    useState,
+} from "react";
 
 import { Button } from "../button";
 import { dialogParts } from "../dialog-parts";
@@ -36,6 +43,7 @@ import { IconButton } from "../icon-button";
 import { useSlotProps } from "../parts";
 import type { SlotKeyedProps } from "../parts";
 import type { PartProps } from "../props";
+import { useDirection } from "../provider";
 
 type Anatomy = typeof sideSheetOverlayAnatomy;
 
@@ -96,8 +104,48 @@ const Backdrop: (props: SideSheetPartProps) => ReactNode = chrome.Backdrop;
  *  it's closed and its exit animation is over. The registry doesn't style it. */
 const Positioner: (props: SideSheetPartProps) => ReactNode = chrome.Positioner;
 
-/** The sheet's surface. It stays while its exit animation runs. */
-const Content: (props: SideSheetPartProps) => ReactNode = chrome.Content;
+const { context } = chrome;
+const Surface: (props: SideSheetPartProps) => ReactNode = chrome.Content;
+
+/** The sheet's surface. It stays while its exit animation runs. A touch or a pen dragging it
+ *  sideways toward its edge moves it, and it settles back or closes once let go (asking
+ *  `onClose` first), as MDC-Android's side sheet; a coplanar sheet doesn't drag. */
+function Content(props: SideSheetPartProps): ReactNode {
+    const {
+        surface,
+        latestApi,
+        asker,
+        onClose,
+        props: root,
+    } = context.use("Content");
+    const dir = useDirection();
+    const rtl = useRef(dir === "rtl");
+    rtl.current = dir === "rtl";
+    const coplanar = useRef(false);
+    coplanar.current = sideSheetSelection(root).coplanar === true;
+    // After a drag closed it: once that render has committed, a sheet still open (one the app
+    // kept open) settles back.
+    const [left, setLeft] = useState<{ readonly kept: () => void }>();
+    useEffect(() => {
+        if (left && latestApi.current.open) left.kept();
+    }, [left, latestApi]);
+    useEffect(() => {
+        const element = surface.current;
+        if (!element) return undefined;
+        return sideSheetDragToDismiss(
+            element,
+            () => rtl.current,
+            (kept) => {
+                latestApi.current.setOpen(false);
+                setLeft({ kept });
+            },
+            () => onClose()?.() ?? true,
+            asker,
+            () => !coplanar.current,
+        );
+    }, [surface, latestApi, asker, onClose]);
+    return <Surface {...props} />;
+}
 
 /** The row at the top: the back button, the headline, and the close trigger. */
 const Header: (props: SideSheetPartProps) => ReactNode = chrome.part(

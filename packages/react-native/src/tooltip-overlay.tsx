@@ -6,17 +6,16 @@
 
 import type { ChangeDetails, OverlayPositioning } from "@pureform/binding-core";
 import type { MutableInteractionSource } from "@pureform/binding-core/interaction";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ComponentType, ReactNode } from "react";
 import { Pressable } from "react-native";
 
 import { Button } from "./button/button";
 import { useInteractionSource } from "./interaction";
-import { Anchored, useAnchor, useDismiss } from "./overlay";
+import { Anchored, useAnchor, useDismiss, useMeasuredAnchor } from "./overlay";
 import type { Placed } from "./overlay";
 import { useControllable, useStableCallback } from "./parts";
 import { Portal } from "./portal";
-import type { WindowRect } from "./portal-host";
 import { usePresence } from "./presence";
 import { useEngine } from "./provider";
 
@@ -106,20 +105,9 @@ function TooltipOverlay<S extends object>({
     );
     const source = useInteractionSource();
     const anchor = useAnchor(source);
-    const [measured, setMeasured] = useState<{
-        rect: WindowRect | undefined;
-    }>();
     const [cause, setCause] = useState<Cause>();
     const presence = usePresence(open, "popup");
-    useLayoutEffect(() => {
-        if (!open) return;
-        let current = true;
-        anchor.measure((rect) => current && setMeasured({ rect }));
-        return () => {
-            current = false;
-        };
-    }, [open, anchor]);
-    if (!presence.present && measured) setMeasured(undefined);
+    const measured = useMeasuredAnchor(open, presence.present, source, anchor);
 
     // One pending change at a time: showing after the open delay, or hiding after the close
     // delay.

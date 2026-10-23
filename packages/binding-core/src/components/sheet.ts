@@ -47,6 +47,10 @@ export interface BottomSheetVariantProps {
     /** Over a scrim, with focus kept inside and the page out of reach while it's open. Without,
      *  a standard sheet: the page stays usable. @default true */
     readonly modal?: boolean | undefined;
+    /** Whether it shows the drag handle at its top edge. Without, the content takes the top
+     *  padding the handle gave it. A composed sheet without a `DragHandle` sets it `false`.
+     *  @default true */
+    readonly dragHandle?: boolean | undefined;
     readonly tokens?: InstanceTokens<"bottomSheet"> | undefined;
 }
 
@@ -117,6 +121,31 @@ export const sheetRelease = (release: {
             positionalThreshold: () => SHEET_POSITIONAL_THRESHOLD,
         })
     ]!;
+};
+
+/** How fast, in pixels per millisecond, a mostly sideways flick takes a side sheet away however
+ *  short (MDC-Android's `SideSheetBehavior.SIGNIFICANT_VEL_THRESHOLD`, 500 pixels a second). */
+export const SIDE_SHEET_VELOCITY_THRESHOLD = 0.5;
+
+/** Where a side sheet `width` wide goes once a drag lets it go `offset` pixels toward its edge
+ *  (away from open) at `velocity` (pixels per millisecond, toward its edge), as MDC-Android's
+ *  `SideSheetBehavior` (`calculateTargetStateOnViewReleased`): moving back in, it stays open;
+ *  moving out, it goes once the flick is `SIDE_SHEET_VELOCITY_THRESHOLD` or faster or it's at
+ *  least halfway out, else it stays; let go still, to the nearer of open and gone. */
+export const sideSheetRelease = (release: {
+    readonly offset: number;
+    readonly velocity: number;
+    readonly width: number;
+}): "open" | "closed" => {
+    const { offset, velocity, width } = release;
+    if (width <= 0) return "open";
+    const halfway = offset >= width / 2;
+    if (velocity < 0) return "open";
+    if (velocity > 0)
+        return velocity >= SIDE_SHEET_VELOCITY_THRESHOLD || halfway
+            ? "closed"
+            : "open";
+    return halfway ? "closed" : "open";
 };
 
 /** The drag handle's name when the app gives none, for what a press does: on a sheet that can
@@ -276,6 +305,7 @@ export const sheetOpeningRest = (props: BottomSheetRestProps): SheetRest =>
 /** The keys of `BottomSheetRootOwnProps`, which Root keeps off its element. */
 export const BOTTOM_SHEET_ROOT_PROPS = [
     "modal",
+    "dragHandle",
     "tokens",
     "onClose",
     ...BOTTOM_SHEET_REST_PROPS,
@@ -296,8 +326,6 @@ export interface BottomSheetContentProps<Node> {
     /** The trigger's label: the ready-made sheet renders its trigger as a button only when
      *  given. */
     readonly trigger?: Node;
-    /** Whether it shows the drag handle at its top edge. @default true */
-    readonly dragHandle?: boolean | undefined;
     /** The drag handle's accessible name. @default for what a press does: "Close sheet", or on a
      *  sheet moving between partly and fully open, "Expand sheet" or "Collapse sheet" */
     readonly dragHandleLabel?: string | undefined;
@@ -308,7 +336,6 @@ export interface BottomSheetContentProps<Node> {
 /** The keys of `BottomSheetContentProps`. */
 export const BOTTOM_SHEET_CONTENT_PROPS = [
     "trigger",
-    "dragHandle",
     "dragHandleLabel",
     "body",
 ] as const satisfies readonly (keyof BottomSheetContentProps<unknown>)[];
@@ -359,6 +386,7 @@ export const bottomSheetSelection = (
     props: BottomSheetVariantProps,
 ): Selection<"bottomSheet"> => ({
     modal: sheetModal(props),
+    dragHandle: props.dragHandle !== false,
     tokens: props.tokens,
 });
 

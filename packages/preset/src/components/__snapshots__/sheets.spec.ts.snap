@@ -55,6 +55,7 @@ exports[`bottomSheet > compiles to a stable Panda slot recipe 1`] = `
   "className": "bottomSheet",
   "compoundVariants": [],
   "defaultVariants": {
+    "dragHandle": true,
     "modal": true,
   },
   "jsx": [
@@ -66,6 +67,14 @@ exports[`bottomSheet > compiles to a stable Panda slot recipe 1`] = `
     "content",
   ],
   "variants": {
+    "dragHandle": {
+      "false": {
+        "content": {
+          "paddingBlockStart": "var(--components-bottomSheet-contentPaddingStart, token(spacing.6))",
+        },
+      },
+      "true": {},
+    },
     "modal": {
       "false": {
         "root": {
@@ -217,6 +226,10 @@ exports[`sideSheet > compiles to a stable Panda slot recipe 1`] = `
       "maxWidth": "100%",
       "minHeight": "0px",
       "shadowElevation": "level0",
+      "transition": {
+        "_motionReduce": "none",
+        "base": "translate token(springs.spatialDefault.duration) token(springs.spatialDefault.easing)",
+      },
       "width": "var(--components-sideSheet-width, 360px)",
       "zIndex": "calc(var(--components-sideSheet-layer, token(zIndex.dialog)) + calc(calc(token(zIndex.base) - var(--components-sideSheet-layer, token(zIndex.dialog))) * var(--components-sideSheet-coplanar, 0)))",
     },

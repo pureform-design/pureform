@@ -40,7 +40,9 @@ describe("BottomSheet, ready-made", () => {
         );
         await settle();
         const content = byTestId(ids.content);
-        expect(content.className).toBe("bottom-sheet bottom-sheet--modal-true");
+        expect(content.className).toBe(
+            "bottom-sheet bottom-sheet--modal-true bottom-sheet--dragHandle-true",
+        );
         expect(content.getAttribute("role")).toBe("dialog");
         expect(content.getAttribute("aria-modal")).toBe("true");
         const handle = byTestId(ids.dragHandle);
@@ -288,6 +290,10 @@ describe("BottomSheet, ready-made", () => {
         expect(
             document.querySelector(`[data-testid="${ids.dragHandle}"]`),
         ).toBeNull();
+        // Its body takes the top padding the handle gave it.
+        expect(byTestId(ids.content).className).toContain(
+            "bottom-sheet--dragHandle-false",
+        );
     });
 });
 

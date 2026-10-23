@@ -82,7 +82,8 @@ interface NativeLike {
 const nativeOf = (event: PressableEvent | undefined): NativeLike =>
     (event?.nativeEvent ?? {}) as NativeLike;
 
-/** `Pressable`'s callbacks that emit a surface's interactions. */
+/** `Pressable`'s callbacks that emit a surface's interactions. `onLayout` tells the source where
+ *  the surface is (`locatedView`), so an overlay open from the start finds its trigger. */
 export interface PressableHandlers {
     readonly onPressIn: (event?: PressableEvent) => void;
     readonly onPressOut: (event?: PressableEvent) => void;
@@ -90,7 +91,33 @@ export interface PressableHandlers {
     readonly onHoverOut: (event?: PressableEvent) => void;
     readonly onFocus: (event?: PressableEvent) => void;
     readonly onBlur: (event?: PressableEvent) => void;
+    readonly onLayout: (event?: PressableEvent) => void;
 }
+
+// The view each source's surface was last laid out on, and who waits to hear of it.
+const located = new WeakMap<object, unknown>();
+const locateListeners = new WeakMap<object, Set<() => void>>();
+
+/** The view `source`'s surface was last laid out on, if any. */
+export const locatedView = (source: InteractionSource): unknown =>
+    located.get(source);
+
+/** Calls `listener` whenever `source`'s surface is laid out; returns what stops it. */
+export function subscribeLocated(
+    source: InteractionSource,
+    listener: () => void,
+): () => void {
+    let listeners = locateListeners.get(source);
+    if (!listeners) locateListeners.set(source, (listeners = new Set()));
+    listeners.add(listener);
+    return () => listeners.delete(listener);
+}
+
+// React Native's layout event names its view as `currentTarget`; React Native Web's as
+// `nativeEvent.target`.
+const layoutView = (event: PressableEvent | undefined): unknown =>
+    event?.currentTarget ??
+    (event?.nativeEvent as { readonly target?: unknown } | undefined)?.target;
 
 const finite = (value: number | undefined): value is number =>
     typeof value === "number" && Number.isFinite(value);
@@ -128,8 +155,20 @@ export class NativeInteraction {
     #focus: OwnFocus = NOT_FOCUSED;
     readonly #focusListeners = new Set<() => void>();
 
+    readonly #source: () => MutableInteractionSource | undefined;
+
     constructor(source: () => MutableInteractionSource | undefined) {
         this.emitter = new InteractionEmitter(source);
+        this.#source = source;
+    }
+
+    /** Tells the source the view the surface is laid out on. */
+    layout(event?: PressableEvent): void {
+        const source = this.#source();
+        const view = layoutView(event);
+        if (!source || view === undefined || view === null) return;
+        located.set(source, view);
+        for (const listener of locateListeners.get(source) ?? []) listener();
     }
 
     /** Starts a press, unless one is in progress. */
@@ -233,6 +272,7 @@ export class NativeInteraction {
         onHoverOut: (event) => this.hoverOut(event),
         onFocus: (event) => this.focus(event),
         onBlur: (event) => this.blur(event),
+        onLayout: (event) => this.layout(event),
     };
 }
 

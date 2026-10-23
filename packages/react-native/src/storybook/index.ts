@@ -42,9 +42,16 @@ const withProvider: Decorator = (story, context) =>
 
 export const decorators: readonly Decorator[] = [withProvider];
 
-/** The stories' args as React Native's props: a press is `onPress`, where the web clicks. */
+/** The stories' args as React Native's props: a press is `onPress`, where the web clicks, and the
+ *  web's ready-made `body` (a dialog's, a sheet's) is the content React Native takes as
+ *  `children`. */
 export const args = ({
     onClick,
     ...rest
-}: Readonly<Record<string, unknown>>): Record<string, unknown> =>
-    onClick === undefined ? rest : { onPress: onClick, ...rest };
+}: Readonly<Record<string, unknown>>): Record<string, unknown> => {
+    const props: Record<string, unknown> =
+        onClick === undefined ? rest : { onPress: onClick, ...rest };
+    if (rest["body"] !== undefined && rest["children"] === undefined)
+        props["children"] = rest["body"];
+    return props;
+};
