@@ -14,11 +14,13 @@ import type { ReactNode } from "react";
 
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
-import { useComponentSlots } from "../styles";
+import { useComponentSlots, withUserStyle } from "../styles";
+import type { RootStyleProps } from "../styles";
 
 const [INDICATION] = switchControlAnatomy.indication!;
 
-export interface SwitchProps extends SwitchVariantProps, InteractiveProps {
+export interface SwitchProps
+    extends SwitchVariantProps, InteractiveProps, RootStyleProps {
     /** Whether it's on. Controlled when defined. */
     readonly checked?: boolean | undefined;
     readonly defaultChecked?: boolean | undefined;
@@ -77,7 +79,7 @@ function SwitchImpl(props: SwitchProps): ReactNode {
             onPress={() => {
                 if (!props.readOnly) setChecked(!checked);
             }}
-            style={{ ...s.root, ...unselectable }}
+            style={withUserStyle({ ...s.root, ...unselectable }, props.style)}
             testID={id("root")}
         >
             <v.touchTarget.View

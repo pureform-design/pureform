@@ -11,7 +11,14 @@ import type { ThemeValues } from "./values";
 // factory selects it: at every size and density it is half the root's height, as CSS computes
 // the same formula, and a theme or an instance retunes it through `pillRadius`.
 const precomputed = precompute(pureform(), {
-    components: ["button", "iconButton", "chip", "inputChip", "splitButton", "fabMenu"],
+    components: [
+        "button",
+        "iconButton",
+        "chip",
+        "inputChip",
+        "splitButton",
+        "fabMenu",
+    ],
 });
 const KEY = "base:light";
 

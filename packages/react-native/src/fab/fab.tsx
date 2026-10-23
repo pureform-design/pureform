@@ -16,12 +16,17 @@ import { IconSlot, iconSlot } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, unselectable, withEngine } from "../parts";
 import { useEngine } from "../provider";
-import { useComponentSlots } from "../styles";
+import { useComponentSlots, withUserStyle } from "../styles";
+import type { RootStyleProps } from "../styles";
 
 const [INDICATION] = fabAnatomy.indication!;
 
 export interface FabProps
-    extends FabVariantProps, FabContentProps<ReactNode>, InteractiveProps {
+    extends
+        FabVariantProps,
+        FabContentProps<ReactNode>,
+        InteractiveProps,
+        RootStyleProps {
     /** What the button does, for assistive technology; the label's text by default. */
     readonly "aria-label"?: string | undefined;
     readonly disabled?: boolean | undefined;
@@ -71,7 +76,7 @@ function FabImpl(props: FabProps): ReactNode {
             disabled={props.disabled}
             onLongPress={props.onLongPress}
             onPress={props.onPress}
-            style={{ ...s.root, ...unselectable }}
+            style={withUserStyle({ ...s.root, ...unselectable }, props.style)}
             testID={id("root")}
         >
             <v.touchTarget.View

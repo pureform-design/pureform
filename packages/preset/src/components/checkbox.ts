@@ -180,8 +180,8 @@ export const createCheckbox = <
                         root: {
                             ...INDICATION_ROOT,
                             ...focusRing(ref, CONTROL_FOCUS),
-                            ...controlRoot(dense(ref("size"))),
                             ...OWN_SIZE,
+                            ...controlRoot(dense(ref("size"))),
                             transition: stateTransition,
                             borderRadius: circle,
                             cursor: pointer,

@@ -1590,31 +1590,114 @@ describe("badge in flow", () => {
 });
 
 describe("inline roots in flow", () => {
-    it("keep their own width in a column, as the web's do", async () => {
+    // Each root keeps its own size (`OWN_SIZE`: `width: "fit-content"`), so its parent's
+    // `alignItems` places it, as the web's `inline-flex` root.
+    const roots = (style?: { width?: string; alignSelf?: "stretch" }) => (
+        <>
+            <Button label="Save" style={style} testId="button" />
+            <IconButton
+                aria-label="Edit"
+                icon={<Glyph glyph="✎" />}
+                style={style}
+                testId="icon"
+            />
+            <Fab
+                icon={<Glyph glyph="+" />}
+                label="Compose"
+                style={style}
+                testId="fab"
+            />
+            <Chip label="Nearby" style={style} testId="chip" />
+            <Checkbox aria-label="Agree" style={style} testId="checkbox" />
+            <Switch aria-label="Wi-Fi" style={style} testId="switch" />
+            <Radio aria-label="On" style={style} testId="radio" />
+            <Badge style={style} testId="badge">
+                3
+            </Badge>
+        </>
+    );
+    const IDS = [
+        "button",
+        "icon",
+        "fab",
+        "chip",
+        "checkbox",
+        "switch",
+        "radio",
+        "badge",
+    ];
+    const box = (id: string) => byTestId(`${id}-root`).getBoundingClientRect();
+
+    it("keep their own width in a column, at its start, as the web's do", async () => {
+        await render(<View style={{ width: 400 }}>{roots()}</View>);
+        const column = byTestId("button-root").parentElement!;
+        const left = column.getBoundingClientRect().left;
+        for (const id of IDS) {
+            expect(box(id).width, id).toBeLessThan(200);
+            expect(box(id).left, id).toBeCloseTo(left, 0);
+        }
+    });
+
+    it("follow a centred column's alignment", async () => {
         await render(
-            <View style={{ width: 400 }}>
-                <Button label="Save" testId="button" />
-                <IconButton
-                    aria-label="Edit"
-                    icon={<Glyph glyph="✎" />}
-                    testId="icon"
-                />
-                <Fab icon={<Glyph glyph="+" />} label="Compose" testId="fab" />
-                <Chip label="Nearby" testId="chip" />
-                <Checkbox aria-label="Agree" testId="checkbox" />
-                <Switch aria-label="Wi-Fi" testId="switch" />
+            <View style={{ width: 400, alignItems: "center" }} testID="column">
+                {roots()}
             </View>,
         );
-        for (const id of [
-            "button",
-            "icon",
-            "fab",
-            "chip",
-            "checkbox",
-            "switch",
-        ]) {
-            const box = byTestId(`${id}-root`).getBoundingClientRect();
-            expect(box.width, id).toBeLessThan(200);
+        const column = byTestId("column").getBoundingClientRect();
+        for (const id of IDS) {
+            const own = box(id);
+            expect(own.width, id).toBeLessThan(200);
+            expect(own.left - column.left, id).toBeCloseTo(
+                column.right - own.right,
+                0,
+            );
+        }
+    });
+
+    it("follow a centred row's alignment", async () => {
+        await render(
+            <View
+                style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    height: 120,
+                }}
+                testID="row"
+            >
+                {roots()}
+            </View>,
+        );
+        const row = byTestId("row").getBoundingClientRect();
+        for (const id of IDS) {
+            const own = box(id);
+            expect(own.top - row.top, id).toBeCloseTo(
+                row.bottom - own.bottom,
+                0,
+            );
+        }
+    });
+
+    it("take a user's width, and keep their own with alignSelf stretch alone", async () => {
+        await render(
+            <View style={{ width: 400 }}>
+                <View testID="full">{roots({ width: "100%" })}</View>
+                <View testID="stretch">{roots({ alignSelf: "stretch" })}</View>
+            </View>,
+        );
+        const full = byTestId("full");
+        for (const id of IDS) {
+            const own = full
+                .querySelector(`[data-testid="${id}-root"]`)!
+                .getBoundingClientRect();
+            expect(own.width, id).toBeCloseTo(400, 0);
+        }
+        const stretch = byTestId("stretch");
+        for (const id of IDS) {
+            const own = stretch
+                .querySelector(`[data-testid="${id}-root"]`)!
+                .getBoundingClientRect();
+            expect(own.width, id).toBeLessThan(200);
         }
     });
 });

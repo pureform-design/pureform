@@ -16,11 +16,13 @@ import type { ReactNode } from "react";
 
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
-import { useComponentSlots } from "../styles";
+import { useComponentSlots, withUserStyle } from "../styles";
+import type { RootStyleProps } from "../styles";
 
 const [INDICATION] = checkboxAnatomy.indication!;
 
-export interface CheckboxProps extends CheckboxVariantProps, InteractiveProps {
+export interface CheckboxProps
+    extends CheckboxVariantProps, InteractiveProps, RootStyleProps {
     /** Whether it's checked, or `"indeterminate"`. Controlled when defined. */
     readonly checked?: CheckedState | undefined;
     readonly defaultChecked?: CheckedState | undefined;
@@ -80,7 +82,7 @@ function CheckboxImpl(props: CheckboxProps): ReactNode {
             onPress={() => {
                 if (!props.readOnly) setChecked(checked !== true);
             }}
-            style={{ ...s.root, ...unselectable }}
+            style={withUserStyle({ ...s.root, ...unselectable }, props.style)}
             testID={id("root")}
         >
             <v.touchTarget.View

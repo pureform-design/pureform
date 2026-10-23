@@ -274,7 +274,10 @@ export const createSplitButton = <
                                             iconSize: b.icon,
                                             leadingGap: b.gap,
                                             outlineWidth: b.outline,
-                                            radius: pillRadius("splitButton", height),
+                                            radius: pillRadius(
+                                                "splitButton",
+                                                height,
+                                            ),
                                             innerRadius: s.inner,
                                             pressedInnerRadius: s.pressed,
                                             trailingPadding: s.trailingPadding,

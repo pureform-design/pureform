@@ -46,7 +46,8 @@ import { IconSlot, ownText } from "./icon-style";
 import { testIdOf, withEngine } from "./parts";
 import { useOverlayPresence } from "./presence";
 import { useEngine } from "./provider";
-import { useSelectedStyles } from "./styles";
+import { useSelectedStyles, withUserStyle } from "./styles";
+import type { RootStyleProps } from "./styles";
 
 // The one style of a component: under `root` where it has slots, else `""`.
 const rootOf = (selected: Selected): Style =>
@@ -157,7 +158,7 @@ function AvatarImpl(props: AvatarProps): ReactNode {
 /** Material's avatar, in its shape: `<Avatar label="Ada Lovelace">AL</Avatar>`. */
 export const Avatar = withEngine(AvatarImpl, "Avatar");
 
-export interface BadgeProps extends BadgeVariantProps {
+export interface BadgeProps extends BadgeVariantProps, RootStyleProps {
     /** What it says for assistive technology ("3 unread"). */
     readonly label?: string | undefined;
     /** The count or short label of a large badge. */
@@ -177,7 +178,7 @@ function BadgeImpl(props: BadgeProps): ReactNode {
                 ? {}
                 : { role: "img" as const, "aria-label": props.label })}
             aria-hidden={hidden ? true : undefined}
-            style={style as ViewStyle}
+            style={withUserStyle(style as ViewStyle, props.style)}
             testID={testIdOf(badgeAnatomy, "root", props.testId)}
         >
             {Drawing ? <Drawing drawing={rootDrawing(selected)} /> : null}

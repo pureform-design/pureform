@@ -40,7 +40,6 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
       "--components-chip-stateHoverOpacity": "token(opacity.stateHover)",
       "--components-chip-statePressedOpacity": "token(opacity.statePressed)",
       "alignItems": "center",
-      "alignSelf": "auto",
       "borderRadius": {
         "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "var(--components-chip-pressedRadius, token(radii.small))",
         "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": "calc(calc(var(--components-chip-radius, token(radii.full)) + calc(calc(var(--components-chip-squareRadius, token(radii.medium)) - var(--components-chip-radius, token(radii.full))) * var(--components-chip-square, 1))) + calc(calc(calc(var(--components-chip-squareRadius, token(radii.medium)) + calc(calc(var(--components-chip-radius, token(radii.full)) - var(--components-chip-squareRadius, token(radii.medium))) * var(--components-chip-square, 1))) - calc(var(--components-chip-radius, token(radii.full)) + calc(calc(var(--components-chip-squareRadius, token(radii.medium)) - var(--components-chip-radius, token(radii.full))) * var(--components-chip-square, 1)))) * var(--components-chip-toggles, 0)))",
@@ -67,6 +66,7 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
         "_motionReduce": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
         "base": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard), border-radius token(springs.spatialFast.duration) token(springs.spatialFast.easing)",
       },
+      "width": "auto",
     },
     "touchTarget": {
       "height": "100%",

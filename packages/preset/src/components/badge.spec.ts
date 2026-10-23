@@ -33,11 +33,11 @@ describe("badge", () => {
     });
 
     it("flows inline unless anchored, then absolute at the top end corner", () => {
-        // React Native alone takes `start` (see the React Native badge spec): the web keeps
-        // its parent's alignment.
-        expect(compiled()?.variants?.placement?.flow).toEqual({
-            alignSelf: "auto",
-        });
+        // React Native alone takes `fit-content` (see the React Native badge spec): the web's
+        // width stays `auto`, and its parent's alignment places it.
+        expect(compiled()?.base).toMatchObject({ width: "auto" });
+        expect(compiled()?.base).not.toHaveProperty("alignSelf");
+        expect(compiled()?.variants?.placement?.flow ?? {}).toEqual({});
         expect(compiled()?.variants?.placement?.anchored).toMatchObject({
             position: "absolute",
         });

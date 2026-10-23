@@ -27,7 +27,8 @@ import {
     useStableSelection,
     withEngine,
 } from "../parts";
-import { useComponentSlots } from "../styles";
+import { useComponentSlots, withUserStyle } from "../styles";
+import type { RootStyleProps } from "../styles";
 
 const [INDICATION] = radioAnatomy.indication!;
 
@@ -41,7 +42,8 @@ interface GroupContext extends RadioVariantProps {
 
 const RadioGroupContext = createContext<GroupContext | undefined>(undefined);
 
-export interface RadioProps extends RadioVariantProps, InteractiveProps {
+export interface RadioProps
+    extends RadioVariantProps, InteractiveProps, RootStyleProps {
     /** The radio's value in its group. */
     readonly value?: string | undefined;
     /** Whether it's checked, outside a group. */
@@ -94,7 +96,7 @@ function RadioImpl(props: RadioProps): ReactNode {
                 if (group && props.value !== undefined) group.pick(props.value);
                 props.onPress?.();
             }}
-            style={{ ...s.root, ...unselectable }}
+            style={withUserStyle({ ...s.root, ...unselectable }, props.style)}
             testID={id("root")}
         >
             <v.touchTarget.View

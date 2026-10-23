@@ -15,7 +15,8 @@ import type { ReactNode } from "react";
 import { IconSlot, iconSlot } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, unselectable, withEngine } from "../parts";
-import { useComponentSlots } from "../styles";
+import { useComponentSlots, withUserStyle } from "../styles";
+import type { RootStyleProps } from "../styles";
 
 const [INDICATION] = buttonAnatomy.indication!;
 
@@ -23,7 +24,8 @@ export interface ButtonProps
     extends
         ButtonVariantProps,
         ButtonContentProps<ReactNode>,
-        InteractiveProps {
+        InteractiveProps,
+        RootStyleProps {
     readonly disabled?: boolean | undefined;
     /** Whether a toggle is on, as a selectable button group sets it. Giving it makes the button
      *  a toggle; its owner flips it from `onPress`. */
@@ -85,7 +87,7 @@ function ButtonImpl(props: ButtonProps): ReactNode {
             disabled={props.disabled}
             onLongPress={props.onLongPress}
             onPress={props.onPress}
-            style={{ ...s.root, ...unselectable }}
+            style={withUserStyle({ ...s.root, ...unselectable }, props.style)}
             testID={id("root")}
         >
             <v.touchTarget.View

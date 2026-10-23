@@ -109,7 +109,6 @@ exports[`input chip > compiles to a stable Panda slot recipe 1`] = `
       "--components-inputChip-stateHoverOpacity": "token(opacity.stateHover)",
       "--components-inputChip-statePressedOpacity": "token(opacity.statePressed)",
       "alignItems": "center",
-      "alignSelf": "auto",
       "backgroundColor": {
         "&:focus-visible": "color-mix(in srgb, var(--components-inputChip-container, transparent), var(--components-inputChip-content, token(colors.onSurfaceVariant)) var(--components-inputChip-stateFocusOpacity, token(opacity.stateFocus)))",
         "&:is(:active, [data-pf-active])": "color-mix(in srgb, var(--components-inputChip-container, transparent), var(--components-inputChip-content, token(colors.onSurfaceVariant)) var(--components-inputChip-statePressedOpacity, token(opacity.statePressed)))",
@@ -146,6 +145,7 @@ exports[`input chip > compiles to a stable Panda slot recipe 1`] = `
         "_motionReduce": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
         "base": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard), border-radius token(springs.spatialFast.duration) token(springs.spatialFast.easing)",
       },
+      "width": "auto",
     },
     "touchTarget": {
       "height": "100%",

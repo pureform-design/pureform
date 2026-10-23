@@ -20,7 +20,7 @@ import {
 import type { StyleMap } from "@pureform/core/ast";
 import { radius, spacing, textStyle } from "@pureform/theme";
 
-import { componentTokens, on, sys } from "./shared";
+import { componentTokens, on, OWN_SIZE, sys } from "./shared";
 
 const { tokens, ref } = componentTokens("badge", {
     radius: radius("full"),
@@ -51,6 +51,7 @@ export const badge = pf.component({
     },
     recipe: () => ({
         base: {
+            ...OWN_SIZE,
             display: inlineFlex,
             alignItems: center,
             justifyContent: center,
@@ -74,12 +75,8 @@ export const badge = pf.component({
                 } satisfies StyleMap,
             },
             placement: {
-                // A badge keeps its own size. On the web it flows inline; React Native has no
-                // inline flow, and every view is a flex column that would stretch it across.
-                // The web keeps its parent's alignment (a row's `center`).
-                flow: {
-                    alignSelf: platform({ css: literal("auto") }, start),
-                } satisfies StyleMap,
+                // A badge keeps its own size (`OWN_SIZE`, on its base) in flow too.
+                flow: {} satisfies StyleMap,
                 anchored: { position: absolute } satisfies StyleMap,
             },
         },

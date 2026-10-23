@@ -337,9 +337,15 @@ trigger shows their labels joined by ", " (the placeholder when none):
       when a trigger doesn't emit. A surface's `onLayout` (in `PressableHandlers`) tells its
       source where it is, so an overlay open from the start (`defaultOpen`) finds its trigger
       once it's laid out.
-    - **Inline roots** (the badge, the time picker and time input) keep their own size, as the
-      web's `inline-flex` does: `alignSelf: "flex-start"` unless their style places them, and
-      `inline-flex` on React Native Web (`inFlowInline` in `styles.ts`).
+    - **Own size:** the button, icon button, FAB, chips, checkbox, switch, radio and badge keep
+      their own size, as the web's `inline-flex` roots do: the preset's `OWN_SIZE` makes them
+      `width: "fit-content"` (Yoga's, React Native 0.88), so a parent's `alignItems` (a centred
+      column or row) still places them. Each takes a `style` over its root (`RootStyleProps`):
+      `width: "100%"` stretches one across its parent, and `alignSelf` places it; note that
+      `alignSelf: "stretch"` alone doesn't stretch it, since its width wins.
+    - **Inline roots** (the time picker and time input) keep their own size the older way:
+      `alignSelf: "flex-start"` unless their style places them, and `inline-flex` on React Native
+      Web (`inFlowInline` in `styles.ts`).
 
     - **The full-screen dialog** is the same, in a `Modal` that fills the screen with no scrim:
       a header (a close icon button named by `closeLabel`, the headline, and the `confirmAction`,

@@ -14,11 +14,13 @@ import type { ReactNode } from "react";
 import { IconSlot, iconSlot } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, unselectable, withEngine } from "../parts";
-import { useComponentSlots } from "../styles";
+import { useComponentSlots, withUserStyle } from "../styles";
+import type { RootStyleProps } from "../styles";
 
 const [INDICATION] = chipAnatomy.indication!;
 
-export interface ChipProps extends ChipVariantProps, InteractiveProps {
+export interface ChipProps
+    extends ChipVariantProps, InteractiveProps, RootStyleProps {
     readonly label?: ReactNode;
     /** An icon before the label. */
     readonly icon?: ReactNode;
@@ -63,7 +65,7 @@ function ChipImpl(props: ChipProps): ReactNode {
             disabled={props.disabled}
             onLongPress={props.onLongPress}
             onPress={props.onPress}
-            style={{ ...s.root, ...unselectable }}
+            style={withUserStyle({ ...s.root, ...unselectable }, props.style)}
             testID={id("root")}
         >
             <v.touchTarget.View

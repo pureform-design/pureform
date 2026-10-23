@@ -21,7 +21,15 @@ import {
 import type { ComponentName, Selection } from "@pureform/styling";
 import { use, useMemo } from "react";
 import type { ComponentType } from "react";
-import { Platform, Pressable, Text, TextInput, View } from "react-native";
+import {
+    Platform,
+    Pressable,
+    StyleSheet,
+    Text,
+    TextInput,
+    View,
+} from "react-native";
+import type { StyleProp, ViewStyle } from "react-native";
 
 import { pressNow } from "./engine";
 import type { MotionEngine, MotionStyles } from "./engine";
@@ -215,6 +223,19 @@ export function useSelectedStyles(
     );
     return useComponentState(name, variants, state, tokens);
 }
+
+/** A user's style for a component's root, applied over its own. A root that keeps its own size
+ *  (the preset's `OWN_SIZE`: `width: "fit-content"`) stretches across its parent with
+ *  `width: "100%"`; `alignSelf: "stretch"` alone doesn't stretch it, as the width wins. */
+export interface RootStyleProps {
+    readonly style?: StyleProp<ViewStyle> | undefined;
+}
+
+/** A root's style with the user's `style` over it. */
+export const withUserStyle = <S extends object>(
+    root: S,
+    style: StyleProp<ViewStyle> | undefined,
+): S => (style ? { ...root, ...StyleSheet.flatten(style) } : root);
 
 /** A root the web draws `inline-flex`, as it flows here: React Native has no inline flow, so a
  *  view would stretch across a column where the web's hugs its content. It keeps its own size at

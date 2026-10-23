@@ -586,10 +586,12 @@ export const roundIconButton = (
 
 /** A root that keeps its own size where its parent would stretch it. The web's `inline-flex`
  *  root hugs its content and keeps its parent's alignment (a row's `center`); React Native has
- *  no inline flow, and a view in a column stretches across it, so there it sits at the start,
- *  as the badge does. */
+ *  no inline flow, and a view in a column stretches across it, so there it is `fit-content`
+ *  wide (Yoga's, React Native 0.88), which leaves its parent's `alignItems` to place it. Spread
+ *  it before a root's own `width`. A user stretches it with `width: "100%"`, not with
+ *  `alignSelf: "stretch"` alone. */
 export const OWN_SIZE = {
-    alignSelf: platform({ css: literal("auto") }, start),
+    width: platform({ css: literal("auto") }, literal("fit-content")),
 } satisfies StyleMap;
 
 /** The root every pressable component shares: the focus ring (reading `token`, the
