@@ -39,8 +39,13 @@ describe("@pureform/machines", () => {
         ]);
     });
 
-    it("re-exports Zag's splitter unchanged, with the parts the preset draws", () => {
-        expect(machines.splitter.machine).toBe(zagSplitter.machine);
+    it("re-exports Zag's splitter, measuring only when something changed, with the parts the preset draws", () => {
+        expect(machines.splitter.machine.states).toBe(
+            zagSplitter.machine.states,
+        );
+        expect(
+            machines.splitter.machine.implementations?.actions?.["syncSize"],
+        ).not.toBe(zagSplitter.machine.implementations?.actions?.["syncSize"]);
         expect(machines.splitter.connect).toBe(zagSplitter.connect);
         expect(machines.splitter.anatomy.keys()).toEqual([
             "root",
