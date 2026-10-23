@@ -951,6 +951,41 @@ describe("the sheets", () => {
         expect(box(root).top).toBe(start);
     });
 
+    it("rests a tall bottom sheet partly open, and moves it between partly and fully open", async () => {
+        const expanded: boolean[] = [];
+        const tall = window.innerHeight;
+        await render(
+            <View style={{ height: tall }}>
+                <BottomSheet
+                    modal={false}
+                    open
+                    partiallyExpandable
+                    onExpandedChange={(details) =>
+                        expanded.push(details.expanded)
+                    }
+                >
+                    <View style={{ height: tall }} />
+                </BottomSheet>
+            </View>,
+        );
+        const root = sheet("bottom-sheet")!;
+        const frame = root.parentElement!.parentElement!;
+        await laidOut(root);
+        const partial = box(root).height - tall / 2;
+        await until(
+            () => Math.abs(box(root).top - box(frame).top - partial) < 2,
+        );
+        expect(expanded).toEqual([false]);
+        await press("Expand sheet");
+        await until(() => Math.abs(box(root).top - box(frame).top) < 1);
+        expect(expanded).toEqual([false, true]);
+        await press("Collapse sheet");
+        await until(
+            () => Math.abs(box(root).top - box(frame).top - partial) < 2,
+        );
+        expect(expanded).toEqual([false, true, false]);
+    });
+
     it("holds a dragged bottom sheet until onClose answers, then springs back or leaves", async () => {
         const asked: boolean[] = [];
         let answer: (yes: boolean) => void = () => {};

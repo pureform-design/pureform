@@ -5,7 +5,10 @@
 // drag handle, Escape, or the back button closes it, and so does a drag down on the handle past a
 // quarter of the sheet's height. The sheet follows the drag down; a shorter drag lets it settle
 // back on the theme's default spatial spring, carrying the release's velocity (at once under
-// reduced motion), as Compose's sheets do. Given `onClose`, every way it closes by itself asks it
+// reduced motion), as Compose's sheets do. Given `partiallyExpandable`, a sheet taller than half
+// the window opens with its top at half the window, and a drag (or a press on the handle) moves it
+// between partly and fully open (`sheetRelease`); a drag down from partly open closes it. The
+// content scrolls in its own `ScrollView` either way. Given `onClose`, every way it closes by itself asks it
 // first (Escape, the back button, the scrim, a press on the handle, a drag); a dismissing drag
 // holds where it was let go until the answer, then leaves or settles back. Its `Modal` holds a
 // portal host of its own, so menus, tooltips, and selects opened inside draw over it.
@@ -15,9 +18,14 @@ import type { PartName, TestIdOverride } from "@pureform/anatomy";
 import {
     bottomSheetSelection,
     closeAsker,
+    sheetDragHandleLabel,
     sheetModal,
+    sheetPartialOffset,
+    sheetRelease,
 } from "@pureform/binding-core";
 import type {
+    BottomSheetRestProps,
+    SheetRest,
     OverlayCloseProps,
     CloseAsker,
     BottomSheetVariantProps,
@@ -27,7 +35,13 @@ import { settle } from "@pureform/rn-adapter/animated";
 import { useReducedMotion, useTokens } from "@pureform/rn-adapter/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { Animated, PanResponder, ScrollView, StyleSheet } from "react-native";
+import {
+    Animated,
+    PanResponder,
+    ScrollView,
+    StyleSheet,
+    useWindowDimensions,
+} from "react-native";
 import type { LayoutChangeEvent } from "react-native";
 
 import { Button } from "../button/button";
@@ -49,12 +63,13 @@ export interface BottomSheetTriggerProps {
 }
 
 export interface BottomSheetProps
-    extends BottomSheetVariantProps, OverlayCloseProps {
+    extends BottomSheetVariantProps, OverlayCloseProps, BottomSheetRestProps {
     /** The content, scrolling under the drag handle. */
     readonly children?: ReactNode;
     /** Whether it shows the drag handle at its top edge. @default true */
     readonly dragHandle?: boolean | undefined;
-    /** The drag handle's name: a press on it closes the sheet. @default "Close sheet" */
+    /** The drag handle's name. @default for what a press does: "Close sheet", or on a sheet
+     *  moving between partly and fully open, "Expand sheet" or "Collapse sheet" */
     readonly dragHandleLabel?: string | undefined;
     /** What opens it, rendered in place: a label, for a `Button`, or a function rendering your
      *  own trigger with the `onPress` it's given. Given it (or `onOpenChange`, or
@@ -117,6 +132,28 @@ function BottomSheetImpl(
     const tokens = useTokens();
     const reducedMotion = useReducedMotion();
     const { timeScale } = usePureform();
+    const screen = useWindowDimensions();
+    // How far down it rests partly open, or `undefined` when it can't (or is too short).
+    const latestPartial = useStableCallback(() => {
+        if (props.partiallyExpandable !== true) return undefined;
+        const offset = sheetPartialOffset(height.current, screen.height);
+        return offset > 0 ? offset : undefined;
+    });
+    // Where it rests, and whether it can move between partly and fully open.
+    const [rest, setRestState] = useState<{
+        readonly rest: SheetRest;
+        readonly movable: boolean;
+    }>({ rest: "expanded", movable: false });
+    const restAt = useRef<SheetRest>("expanded");
+    const latestSetRest = useStableCallback((next: SheetRest) => {
+        if (next !== restAt.current)
+            props.onExpandedChange?.({ expanded: next === "expanded" });
+        restAt.current = next;
+        setRestState({ rest: next, movable: latestPartial() !== undefined });
+    });
+    const latestRestOffset = useStableCallback(() =>
+        restAt.current === "partial" ? (latestPartial() ?? 0) : 0,
+    );
     const stopSettle = useRef<() => void>(() => {});
     const latestSettle = useStableCallback((velocity: number) => {
         stopSettle.current = settle(
@@ -125,15 +162,25 @@ function BottomSheetImpl(
             reducedMotion
                 ? undefined
                 : themeSpring("spatialDefault", tokens, timeScale),
+            latestRestOffset(),
         );
     });
     // Whether it's still open: the modal's state, or as a surface, its `open`.
     const shown = useRef(true);
     shown.current = (props.shown ?? props.open) !== false;
-    // Each time it opens, it starts where it rests.
+    // Each time it opens, it starts where it rests: partly open when it can, once it's laid out.
+    const placing = useRef(false);
+    const latestPlace = useStableCallback(() => {
+        placing.current = false;
+        latestSetRest(latestPartial() === undefined ? "expanded" : "partial");
+        drag.setValue(latestRestOffset());
+    });
     useEffect(() => {
-        if (shown.current) drag.setValue(0);
-    }, [props.shown, props.open, drag]);
+        if (!shown.current) return;
+        drag.setValue(0);
+        if (height.current > 0) latestPlace();
+        else placing.current = true;
+    }, [props.shown, props.open, drag, latestPlace]);
     // After a drag asked it to close: once that render has committed, a sheet that stays (one
     // the app keeps open, or one that can't close) settles back.
     const [left, setLeft] = useState<{ readonly velocity: number }>();
@@ -162,30 +209,60 @@ function BottomSheetImpl(
         },
         [ownAsker],
     );
-    // A drag down on the handle past a quarter of the sheet's height closes it; it leaves from
-    // where the drag left it.
+    // A drag down on the handle past a quarter of the sheet's height (below where it rests
+    // partly open, if it can) closes it, leaving from where the drag left it; otherwise it goes
+    // to the nearer place it rests, or the next one on a flick.
+    const from = useRef(0);
     const pan = useMemo(
         () =>
             PanResponder.create({
                 onMoveShouldSetPanResponder: (_, gesture) =>
-                    gesture.dy > 4 &&
+                    Math.abs(gesture.dy) > 4 &&
                     Math.abs(gesture.dy) > Math.abs(gesture.dx),
                 onPanResponderGrant: () => {
                     asker.cancel();
                     stopSettle.current();
+                    from.current = latestRestOffset();
                 },
                 onPanResponderMove: (_, gesture) =>
-                    drag.setValue(Math.max(0, gesture.dy)),
+                    drag.setValue(Math.max(0, from.current + gesture.dy)),
                 onPanResponderRelease: (_, gesture) => {
-                    if (height.current > 0 && gesture.dy > height.current / 4)
-                        latestDismiss(gesture.vy);
-                    else latestSettle(gesture.vy);
+                    const to = sheetRelease({
+                        offset: Math.max(0, from.current + gesture.dy),
+                        velocity: gesture.vy,
+                        height: height.current,
+                        partial: latestPartial(),
+                    });
+                    if (to === "closed") latestDismiss(gesture.vy);
+                    else {
+                        latestSetRest(to);
+                        latestSettle(gesture.vy);
+                    }
                 },
                 onPanResponderTerminate: (_, gesture) =>
                     latestSettle(gesture.vy),
             }),
-        [latestDismiss, latestSettle, drag, asker],
+        [
+            latestDismiss,
+            latestSettle,
+            latestSetRest,
+            latestRestOffset,
+            latestPartial,
+            drag,
+            asker,
+        ],
     );
+    // A press on the handle of a sheet that can rest partly open moves it between partly and
+    // fully open; otherwise it asks to close.
+    const pressHandle = useStableCallback(() => {
+        if (latestPartial() === undefined) {
+            requestClose();
+            return;
+        }
+        stopSettle.current();
+        latestSetRest(restAt.current === "partial" ? "expanded" : "partial");
+        latestSettle(0);
+    });
     const id = (part: Part) => testIdOf(bottomSheetAnatomy, part, props.testId);
     if (!presence.present) return null;
     const Root = props.open === undefined ? v.root : engine;
@@ -203,6 +280,7 @@ function BottomSheetImpl(
                     : { "aria-label": props["aria-label"] })}
                 onLayout={(event: LayoutChangeEvent) => {
                     height.current = event.nativeEvent.layout.height;
+                    if (placing.current) latestPlace();
                     (
                         presence.props.onLayout as
                             | ((event: LayoutChangeEvent) => void)
@@ -219,8 +297,11 @@ function BottomSheetImpl(
                         testID={id("dragHandle")}
                     >
                         <DragHandle
-                            aria-label={props.dragHandleLabel ?? "Close sheet"}
-                            onPress={requestClose}
+                            aria-label={
+                                props.dragHandleLabel ??
+                                sheetDragHandleLabel(rest.rest, rest.movable)
+                            }
+                            onPress={pressHandle}
                         />
                     </v.dragHandle.View>
                 )}
