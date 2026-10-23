@@ -1520,11 +1520,11 @@ fileUpload[color=info].icon: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301
     dragged: color oklch(0.3911 0.0701 217.604)
 fileUpload[color=info].headline: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline none
     dragged: color oklch(0.3911 0.0701 217.604)
-fileUpload[invalid=true].dropzone: bg oklch(0.9844 0.0084 325.895) | color oklch(0.2245 0.0059 301.135) | outline none
+fileUpload[error=true].dropzone: bg oklch(0.9844 0.0084 325.895) | color oklch(0.2245 0.0059 301.135) | outline none
     dragged: bg oklch(0.9175 0.0474 301.568) | color oklch(0.4095 0.1323 292.97)
-fileUpload[invalid=true].icon: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline none
+fileUpload[error=true].icon: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline none
     dragged: color oklch(0.4095 0.1323 292.97)
-fileUpload[invalid=true].headline: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline none
+fileUpload[error=true].headline: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline none
     dragged: color oklch(0.4095 0.1323 292.97)
 rating.item: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline none
     focused: outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
