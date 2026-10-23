@@ -37,6 +37,7 @@ import {
 
 import { Button } from "../button";
 import { useControllable } from "../controllable";
+import { renderErrorSupportingText } from "../error-supporting-text";
 import { useFieldsetDisabled, useFormReset } from "../form";
 import { CloseIcon, FileIcon, UploadIcon } from "../glyphs";
 import { IconButton } from "../icon-button";
@@ -214,16 +215,9 @@ function Headline({ unstyled, ...props }: FileUploadPartProps): ReactNode {
 
 /** The drop zone's supporting text: the accepted types and limits. While Root has an `error`, it
  *  shows the error instead. */
-function SupportingText({
-    unstyled,
-    ...props
-}: FileUploadPartProps): ReactNode {
+function SupportingText(props: FileUploadPartProps): ReactNode {
     const { scope, props: root } = context.use("SupportingText");
-    return scope.render("supportingText", {
-        element: "span",
-        unstyled,
-        props: { ...props, children: root.error ?? props.children },
-    });
+    return renderErrorSupportingText(scope, root.error, props);
 }
 
 /** The trigger: a Button that opens the file dialog. Its props are the Button's. */

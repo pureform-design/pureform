@@ -116,7 +116,9 @@ exports[`file upload > compiles to a stable Panda slot recipe 1`] = `
           "--components-fileUpload-onAccentContainer": "token(colors.onInfoContainer)",
         },
       },
-      "primary": {},
+      "primary": {
+        "root": {},
+      },
       "secondary": {
         "root": {
           "--components-fileUpload-accent": "token(colors.secondary)",

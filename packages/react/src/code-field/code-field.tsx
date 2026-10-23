@@ -22,6 +22,7 @@ import type { PropTypes } from "@zag-js/react";
 import { type ElementType, type ReactNode, useId, useState } from "react";
 
 import { useControllable } from "../controllable";
+import { renderErrorSupportingText } from "../error-supporting-text";
 import { useFieldsetDisabled } from "../form";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
@@ -146,13 +147,9 @@ function Input({ unstyled, index, ...props }: CodeFieldInputProps): ReactNode {
 }
 
 /** Helper text under the cells. While Root has an `error`, it shows the error instead. */
-function SupportingText({ unstyled, ...props }: CodeFieldPartProps): ReactNode {
+function SupportingText(props: CodeFieldPartProps): ReactNode {
     const { scope, error } = context.use("SupportingText");
-    return scope.render("supportingText", {
-        element: "span",
-        unstyled,
-        props: { ...props, children: error ?? props.children },
-    });
+    return renderErrorSupportingText(scope, error, props);
 }
 
 /** The ready-made code field's props: Root's, with `className`, `style`, and `slotProps` keyed by

@@ -1382,6 +1382,12 @@ describe("c8c: splitter", () => {
             '[data-testid="pf-splitter-panel"]',
         ),
     ];
+    // The splitter takes its room from `onLayout`, which can land a frame after the panes are
+    // laid out; a drag before it moves nothing. Under load (the whole file), that frame is late.
+    const measured = async () => {
+        for (let frame = 0; frame < 2; frame++)
+            await new Promise(requestAnimationFrame);
+    };
 
     it("draws a string pane as text, and fills its parent when stacked", async () => {
         await render(
@@ -1444,6 +1450,7 @@ describe("c8c: splitter", () => {
         );
         const trigger = byTestId("pf-splitter-resize-trigger");
         await until(() => expect(width(panels()[0]!)).toBeCloseTo(300, 0));
+        await measured();
         const release = await drag(trigger, [
             [50, 0],
             [100, 0],
@@ -1479,10 +1486,7 @@ describe("c8c: splitter", () => {
         );
         const trigger = byTestId("pf-splitter-resize-trigger");
         await until(() => expect(width(panels()[0]!)).toBeCloseTo(300, 0));
-        // The splitter takes its room from `onLayout`, which can land a frame after the panes
-        // are laid out; a drag before it moves nothing.
-        for (let frame = 0; frame < 2; frame++)
-            await new Promise(requestAnimationFrame);
+        await measured();
         await (
             await drag(trigger, [
                 [50, 0],
@@ -1516,6 +1520,7 @@ describe("c8c: splitter", () => {
         );
         const trigger = byTestId("pf-splitter-resize-trigger");
         await until(() => expect(width(panels()[0]!)).toBeCloseTo(300, 0));
+        await measured();
         await (
             await drag(trigger, [
                 [50, 0],

@@ -42,6 +42,7 @@ import {
 import { Button } from "../button";
 import type { ButtonProps } from "../button";
 import { useControllable } from "../controllable";
+import { renderErrorSupportingText } from "../error-supporting-text";
 import { useFieldsetDisabled, useFormReset } from "../form";
 import { CloseIcon, FileIcon, UploadIcon } from "../glyphs";
 import { IconButton } from "../icon-button";
@@ -226,15 +227,7 @@ function Headline(props: FileUploadPartProps): JSX.Element {
  *  shows the error instead. */
 function SupportingText(props: FileUploadPartProps): JSX.Element {
     const { scope, props: root } = context.use("SupportingText");
-    return scope.render("supportingText", {
-        element: "span",
-        unstyled: () => props.unstyled,
-        props: merge(omit(props, "unstyled"), {
-            get children() {
-                return root.error ?? props.children;
-            },
-        }),
-    });
+    return renderErrorSupportingText(scope, () => root.error, props);
 }
 
 /** The trigger: a Button that opens the file dialog. Its props are the Button's. */

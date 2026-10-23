@@ -25,12 +25,12 @@ import {
     type Accessor,
     createMemo,
     createUniqueId,
-    merge,
     omit,
     Show,
 } from "solid-js";
 
 import { useControllable } from "../controllable";
+import { renderErrorSupportingText } from "../error-supporting-text";
 import { AddIcon, RemoveIcon } from "../glyphs";
 import { useMachineButton } from "../interaction";
 import type { MachineButtonProps } from "../interaction";
@@ -229,15 +229,7 @@ function IncrementTrigger(props: NumberFieldTriggerProps): JSX.Element {
 /** Helper text under the field. While Root has an `error`, it shows the error instead. */
 function SupportingText(props: NumberFieldPartProps): JSX.Element {
     const { scope, error } = context.use("SupportingText");
-    return scope.render("supportingText", {
-        element: "span",
-        unstyled: () => props.unstyled,
-        props: merge(omit(props, "unstyled"), {
-            get children() {
-                return error() ?? props.children;
-            },
-        }),
-    });
+    return renderErrorSupportingText(scope, error, props);
 }
 
 /** The ready-made number field's props: Root's, with `class`, `style`, and `slotProps` keyed by

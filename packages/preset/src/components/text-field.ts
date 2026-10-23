@@ -27,8 +27,7 @@
 // the text.
 
 import { typed } from "@pureform/core";
-import { pointer, px, transparent } from "@pureform/core/ast";
-import { radius } from "@pureform/theme";
+import { transparent } from "@pureform/core/ast";
 import type { MaterialDensity } from "@pureform/theme";
 
 import { themeIndication } from "../state-layer";
@@ -44,7 +43,7 @@ import {
     fieldTokens,
 } from "./field";
 import {
-    focusRing,
+    bareRoundButton,
     DEFAULT_GROUP,
     defaultDensities,
     defaultGroups,
@@ -61,15 +60,8 @@ const counter = counterParts(ref);
 // The secure field's trailing icon is a button that shows or hides the text: no button chrome,
 // and a focus ring around the icon.
 const visibilityToggle = {
-    cursor: pointer,
+    ...bareRoundButton(themeIndication),
     backgroundColor: transparent,
-    borderWidth: px(0),
-    paddingInlineStart: px(0),
-    paddingInlineEnd: px(0),
-    paddingBlockStart: px(0),
-    paddingBlockEnd: px(0),
-    borderRadius: radius("full"),
-    ...focusRing(themeIndication),
 };
 
 const pf = typed();

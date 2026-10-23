@@ -45,6 +45,7 @@ import { INDICATION_TOKENS } from "../state-layer";
 import type { IndicationRef } from "../state-layer";
 import {
     DEFAULT_GROUP,
+    colorTokenVariants,
     componentTokens,
     defaultGroups,
     disabledColor,
@@ -186,20 +187,9 @@ export const createRating = <const G extends string = ColorGroup>(
                 },
                 variants: {
                     // The default group's accent is the base's.
-                    color: Object.fromEntries(
-                        groups.map((group) => [
-                            group,
-                            group === DEFAULT_GROUP
-                                ? { root: {} }
-                                : {
-                                      root: {
-                                          tokens: {
-                                              accent: groupTokens(group).accent,
-                                          },
-                                      },
-                                  },
-                        ]),
-                    ),
+                    color: colorTokenVariants(groups, (group) => ({
+                        accent: groupTokens(group).accent,
+                    })),
                     size: Object.fromEntries(
                         entriesOf(RATING_SIZES).map(([name, icon]) => [
                             name,

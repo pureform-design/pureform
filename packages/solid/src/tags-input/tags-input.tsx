@@ -34,6 +34,7 @@ import {
 } from "solid-js";
 
 import { useControllable } from "../controllable";
+import { renderErrorSupportingText } from "../error-supporting-text";
 import { useFieldsetDisabled } from "../form";
 import { CloseIcon } from "../glyphs";
 import {
@@ -221,15 +222,7 @@ const TrailingIcon = icon("trailingIcon", "TrailingIcon");
 /** Helper text under the field. While Root has an `error`, it shows the error instead. */
 function SupportingText(props: TagsInputPartProps): JSX.Element {
     const { scope, error } = context.use("SupportingText");
-    return scope.render("supportingText", {
-        element: "span",
-        unstyled: () => props.unstyled,
-        props: merge(omit(props, "unstyled"), {
-            get children() {
-                return error() ?? props.children;
-            },
-        }),
-    });
+    return renderErrorSupportingText(scope, error, props);
 }
 
 /** An input chip for one value: the machine's tag, which the arrow keys and Backspace highlight

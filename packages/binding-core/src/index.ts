@@ -221,6 +221,7 @@ export {
     COLOR_PICKER_THUMB_CENTRE,
     colorPickerFraction,
     colorPickerHex,
+    colorPickerHexOf,
     colorPickerHexText,
     colorPickerSelection,
     colorPickerSwatchLabel,
@@ -228,6 +229,7 @@ export {
 } from "./components/color-picker";
 export type {
     ColorPickerChannel,
+    ColorPickerColorLike,
     ColorPickerContentProps,
     ColorPickerPart,
     ColorPickerRootOwnProps,
