@@ -379,6 +379,14 @@ describe("compileStyleMap resize", () => {
     });
 });
 
+describe("compileStyleMap appearance", () => {
+    it("passes the appearance keyword through", () => {
+        expect(compileStyleMap({ appearance: none }, ctx())).toEqual({
+            appearance: "none",
+        });
+    });
+});
+
 describe("compileStyleMap layout and interaction properties", () => {
     it("lowers each property to its Panda key and CSS value", () => {
         expect(

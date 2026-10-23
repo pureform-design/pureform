@@ -1,0 +1,112 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`nativeSelect > compiles to a stable Panda slot recipe 1`] = `
+{
+  "base": {
+    "group": {
+      "backgroundColor": "var(--components-nativeSelect-listContainer, token(colors.surfaceContainer))",
+      "color": "var(--components-nativeSelect-listColor, token(colors.onSurface))",
+    },
+    "icon": {
+      "_rtl": {
+        "&[data-pf-mirror]": {
+          "transform": "translateY(-50%) scaleX(-1)",
+        },
+      },
+      "alignItems": "center",
+      "color": {
+        ".nativeSelect__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        ".nativeSelect__root:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])) &": "var(--components-nativeSelect-errorColor, token(colors.error))",
+        "base": "var(--components-nativeSelect-iconColor, token(colors.onSurfaceVariant))",
+      },
+      "display": "inline-flex",
+      "fontSize": "var(--components-nativeSelect-iconSize, token(sizes.iconMedium))",
+      "fontVariationSettings": ""FILL" 0",
+      "height": "var(--components-nativeSelect-iconSize, token(sizes.iconMedium))",
+      "insetInlineEnd": "var(--components-nativeSelect-iconInset, token(spacing.3))",
+      "justifyContent": "center",
+      "lineHeight": "1",
+      "minWidth": "var(--components-nativeSelect-iconSize, token(sizes.iconMedium))",
+      "pointerEvents": "none",
+      "position": "absolute",
+      "top": "50%",
+      "transform": "translateY(-50%)",
+      "width": "var(--components-nativeSelect-iconSize, token(sizes.iconMedium))",
+    },
+    "option": {
+      "backgroundColor": "var(--components-nativeSelect-listContainer, token(colors.surfaceContainer))",
+      "color": "var(--components-nativeSelect-listColor, token(colors.onSurface))",
+    },
+    "root": {
+      "--components-nativeSelect-focusIndicatorColor": "token(colors.secondary)",
+      "--components-nativeSelect-focusIndicatorOuterOffset": "token(sizes.focusIndicatorOuterOffset)",
+      "--components-nativeSelect-focusIndicatorThickness": "token(sizes.focusIndicatorThickness)",
+      "--components-nativeSelect-stateDraggedOpacity": "token(opacity.stateDragged)",
+      "--components-nativeSelect-stateFocusOpacity": "token(opacity.stateFocus)",
+      "--components-nativeSelect-stateHoverOpacity": "token(opacity.stateHover)",
+      "--components-nativeSelect-statePressedOpacity": "token(opacity.statePressed)",
+      "alignItems": "center",
+      "backgroundColor": {
+        "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "color-mix(in srgb, var(--components-nativeSelect-container, transparent), var(--components-nativeSelect-hoverColor, token(colors.onSurface)) var(--components-nativeSelect-statePressedOpacity, token(opacity.statePressed)))",
+        "&:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true])": "var(--components-nativeSelect-container, transparent)",
+        "&:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible))": "color-mix(in srgb, var(--components-nativeSelect-container, transparent), var(--components-nativeSelect-hoverColor, token(colors.onSurface)) var(--components-nativeSelect-stateFocusOpacity, token(opacity.stateFocus)))",
+        "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, var(--components-nativeSelect-container, transparent), var(--components-nativeSelect-hoverColor, token(colors.onSurface)) var(--components-nativeSelect-stateHoverOpacity, token(opacity.stateHover)))",
+        "base": "var(--components-nativeSelect-container, transparent)",
+      },
+      "borderRadius": "var(--components-nativeSelect-radius, token(radii.extraSmall))",
+      "display": "inline-flex",
+      "position": "relative",
+    },
+    "select": {
+      "&:is(:disabled, [aria-disabled=true])": {
+        "borderColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+        "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        "cursor": "not-allowed",
+      },
+      "&:is(:hover, [data-pf-hover])": {
+        "borderColor": "var(--components-nativeSelect-hoverColor, token(colors.onSurface))",
+      },
+      "&:is(:invalid, [aria-invalid=true])": {
+        "borderColor": "var(--components-nativeSelect-errorColor, token(colors.error))",
+      },
+      "appearance": "none",
+      "backgroundColor": "transparent",
+      "borderColor": "var(--components-nativeSelect-outlineColor, token(colors.outline))",
+      "borderRadius": "var(--components-nativeSelect-radius, token(radii.extraSmall))",
+      "borderStyle": "solid",
+      "borderWidth": "var(--components-nativeSelect-outlineWidth, 1px)",
+      "color": "var(--components-nativeSelect-textColor, token(colors.onSurface))",
+      "cursor": "pointer",
+      "height": "calc(var(--components-nativeSelect-height, 40px) + var(--components-nativeSelect-densityOffset, token(sizes.densityOffset)))",
+      "outlineColor": "var(--components-nativeSelect-focusIndicatorColor, token(colors.secondary))",
+      "outlineOffset": "var(--components-nativeSelect-focusIndicatorOuterOffset, token(sizes.focusIndicatorOuterOffset))",
+      "outlineStyle": {
+        "&:focus-visible": "solid",
+        "base": "none",
+      },
+      "outlineWidth": "var(--components-nativeSelect-focusIndicatorThickness, token(sizes.focusIndicatorThickness))",
+      "paddingBlockEnd": "0px",
+      "paddingBlockStart": "0px",
+      "paddingInlineEnd": "calc(calc(var(--components-nativeSelect-iconInset, token(spacing.3)) + var(--components-nativeSelect-iconSize, token(sizes.iconMedium))) + token(spacing.2))",
+      "paddingInlineStart": "var(--components-nativeSelect-paddingInline, token(spacing.3))",
+      "textStyle": "bodyLarge",
+      "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
+      "width": "100%",
+    },
+  },
+  "className": "nativeSelect",
+  "compoundVariants": [],
+  "defaultVariants": {},
+  "jsx": [
+    "NativeSelect",
+  ],
+  "slots": [
+    "root",
+    "select",
+    "icon",
+    "group",
+    "option",
+  ],
+  "variants": {},
+}
+`;

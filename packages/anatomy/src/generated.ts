@@ -1854,6 +1854,69 @@ export const selectAnatomy = {
     },
 } as const satisfies ComponentAnatomy;
 
+export const nativeSelectAnatomy = {
+    name: "nativeSelect",
+    scope: "native-select",
+    root: "root",
+    partNames: ["root", "select", "icon", "group", "option"],
+    parts: {
+        root: {
+            name: "root",
+            attribute: "root",
+            testId: "pf-native-select-root",
+            parent: null,
+            children: ["select", "icon"],
+            styled: true,
+            mirror: false,
+        },
+        select: {
+            name: "select",
+            attribute: "select",
+            testId: "pf-native-select-select",
+            parent: "root",
+            children: ["group", "option"],
+            styled: true,
+            mirror: false,
+        },
+        icon: {
+            name: "icon",
+            attribute: "icon",
+            testId: "pf-native-select-icon",
+            parent: "root",
+            children: [],
+            styled: true,
+            mirror: true,
+        },
+        group: {
+            name: "group",
+            attribute: "group",
+            testId: "pf-native-select-group",
+            parent: "select",
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+        option: {
+            name: "option",
+            attribute: "option",
+            testId: "pf-native-select-option",
+            parent: "select",
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+    },
+    indication: [
+        {
+            trigger: "select",
+            surface: "root",
+            centered: false,
+            focus: "select",
+        },
+    ],
+    variants: {},
+} as const satisfies ComponentAnatomy;
+
 export const autocompleteAnatomy = {
     name: "autocomplete",
     scope: "autocomplete",
@@ -6355,6 +6418,7 @@ export const anatomy = {
     searchBar: searchBarAnatomy,
     searchView: searchViewAnatomy,
     select: selectAnatomy,
+    nativeSelect: nativeSelectAnatomy,
     autocomplete: autocompleteAnatomy,
     calendarCell: calendarCellAnatomy,
     datePicker: datePickerAnatomy,
@@ -6566,6 +6630,13 @@ export const testIds = {
         trailingIcon: "pf-select-trailing-icon",
         supportingText: "pf-select-supporting-text",
         hiddenSelect: "pf-select-hidden-select",
+    },
+    nativeSelect: {
+        root: "pf-native-select-root",
+        select: "pf-native-select-select",
+        icon: "pf-native-select-icon",
+        group: "pf-native-select-group",
+        option: "pf-native-select-option",
     },
     autocomplete: {
         root: "pf-autocomplete-root",
