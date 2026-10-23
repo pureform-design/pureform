@@ -796,6 +796,7 @@ export {
     numberFieldCanStep,
     numberFieldClamp,
     numberFieldFormat,
+    numberFieldLocale,
     numberFieldMachineProps,
     numberFieldOutOfRange,
     numberFieldParse,

@@ -495,11 +495,12 @@ tagsInputMachineProps(props); tagsInputFilled(count, text); tagsInputChipTestId(
 type InputChipPart; interface InputChipVariantProps; inputChipSelection(props);
 
 // Number field (pureform's own, c9a): Zag's number input; `value` is text in the locale, its
-// change details `{ value, valueAsNumber }`. Always formats (NUMBER_FIELD_FORMAT, NUMBER_FIELD_LOCALE)
+// change details `{ value, valueAsNumber }`. Always formats (NUMBER_FIELD_FORMAT), in `locale`, else
+// the browser's or platform's (numberFieldLocale; NUMBER_FIELD_LOCALE "en-US" where there's none)
 type NumberFieldPart; interface NumberFieldRootOwnProps // variant, color, density, leadingIcon,
 // prefixText, suffixText, tokens, min, max, step, largeStep, locale, formatOptions, error, …
 NUMBER_FIELD_ROOT_PROPS; NUMBER_FIELD_CONTENT_PROPS; numberFieldSelection(props);
-numberFieldMachineProps(props); numberFieldPlaceholder(placeholder);
+numberFieldMachineProps(props); numberFieldLocale(props); numberFieldPlaceholder(placeholder);
 // React Native's arithmetic: numberFieldRange, numberFieldParse, numberFieldFormat,
 // numberFieldStep, numberFieldClamp, numberFieldCanStep, numberFieldOutOfRange,
 // NUMBER_FIELD_SPIN_DELAY (300), NUMBER_FIELD_SPIN_INTERVAL (50), NUMBER_FIELD_LABELS

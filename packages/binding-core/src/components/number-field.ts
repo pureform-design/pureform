@@ -65,7 +65,8 @@ export interface NumberFieldBehaviorProps extends Controllable<
     readonly allowMouseWheel?: boolean | undefined;
     /** Repeat while a button is held (after 300ms, every 50ms). @default true */
     readonly spinOnPress?: boolean | undefined;
-    /** The locale the value is formatted and parsed in. @default "en-US" */
+    /** The locale the value is formatted and parsed in. @default the browser's or platform's,
+     *  else "en-US" */
     readonly locale?: string | undefined;
     /** How the value is formatted: `Intl.NumberFormat`'s options (a currency, a percent, the
      *  fraction digits). @default `{ maximumFractionDigits: 20 }`, grouped in the locale.
@@ -192,9 +193,27 @@ export const numberFieldSelection = (
     tokens: props.tokens,
 });
 
-/** The locale a number field formats and parses in unless given one: Zag's. A fixed default
- *  rather than the browser's, so the server renders what the client hydrates. */
+/** The locale a number field falls back to where the environment names none: Zag's. */
 export const NUMBER_FIELD_LOCALE = "en-US";
+
+/** The locale a number field formats and parses in: its own, else the environment's (the
+ *  browser's language, or the platform's `Intl` locale on React Native and the server), else
+ *  `NUMBER_FIELD_LOCALE`. */
+export const numberFieldLocale = (
+    props: { readonly locale?: string | undefined } = {},
+): string => {
+    if (props.locale) return props.locale;
+    if (typeof navigator !== "undefined" && navigator.language)
+        return navigator.language;
+    try {
+        return (
+            new Intl.NumberFormat().resolvedOptions().locale ||
+            NUMBER_FIELD_LOCALE
+        );
+    } catch {
+        return NUMBER_FIELD_LOCALE;
+    }
+};
 
 /** How a number field formats unless given options: in the locale (its grouping and decimal
  *  separator), keeping every fraction digit typed. Zag formats and parses in the locale only
@@ -213,7 +232,7 @@ export const numberFieldMachineProps = (props: NumberFieldBehaviorProps) => ({
     allowOverflow: props.allowOverflow,
     allowMouseWheel: props.allowMouseWheel,
     spinOnPress: props.spinOnPress,
-    locale: props.locale ?? NUMBER_FIELD_LOCALE,
+    locale: numberFieldLocale(props),
     formatOptions: props.formatOptions ?? NUMBER_FIELD_FORMAT,
     disabled: props.disabled,
     invalid: props.error !== undefined ? true : props.invalid,
@@ -307,7 +326,7 @@ export const numberFieldCanStep = (
 /** `value` in `locale` with `options`; empty for `NaN`. */
 export const numberFieldFormat = (
     value: number,
-    locale = NUMBER_FIELD_LOCALE,
+    locale = numberFieldLocale(),
     options: Intl.NumberFormatOptions = NUMBER_FIELD_FORMAT,
 ): string =>
     Number.isNaN(value)
@@ -320,7 +339,7 @@ export const numberFieldFormat = (
  *  number in it. */
 export const numberFieldParse = (
     text: string,
-    locale = NUMBER_FIELD_LOCALE,
+    locale = numberFieldLocale(),
     options?: Intl.NumberFormatOptions,
 ): number => {
     const parts = new Intl.NumberFormat(locale, {
