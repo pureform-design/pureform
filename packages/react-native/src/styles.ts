@@ -21,7 +21,7 @@ import {
 import type { ComponentName, Selection } from "@pureform/styling";
 import { use, useMemo } from "react";
 import type { ComponentType } from "react";
-import { Pressable, Text, TextInput, View } from "react-native";
+import { Platform, Pressable, Text, TextInput, View } from "react-native";
 
 import { pressNow } from "./engine";
 import type { MotionEngine, MotionStyles } from "./engine";
@@ -218,10 +218,17 @@ export function useSelectedStyles(
 
 /** A root the web draws `inline-flex`, as it flows here: React Native has no inline flow, so a
  *  view would stretch across a column where the web's hugs its content. It keeps its own size at
- *  the start instead, unless its style places it itself. */
+ *  the start instead, unless its style places it itself. On React Native Web, whose parent may
+ *  be a page's block rather than a view, it's `inline-flex` too, as the web's. */
 export const inFlowInline = <S extends Readonly<Record<string, unknown>>>(
     style: S,
 ): S =>
     style["alignSelf"] === undefined
-        ? { ...style, alignSelf: "flex-start" }
+        ? {
+              ...style,
+              alignSelf: "flex-start",
+              ...(Platform.OS === "web" && style["display"] !== "none"
+                  ? { display: "inline-flex" }
+                  : {}),
+          }
         : style;
