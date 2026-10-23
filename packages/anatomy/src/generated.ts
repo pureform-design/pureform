@@ -1854,6 +1854,69 @@ export const selectAnatomy = {
     },
 } as const satisfies ComponentAnatomy;
 
+export const nativeSelectAnatomy = {
+    name: "nativeSelect",
+    scope: "native-select",
+    root: "root",
+    partNames: ["root", "select", "icon", "group", "option"],
+    parts: {
+        root: {
+            name: "root",
+            attribute: "root",
+            testId: "pf-native-select-root",
+            parent: null,
+            children: ["select", "icon"],
+            styled: true,
+            mirror: false,
+        },
+        select: {
+            name: "select",
+            attribute: "select",
+            testId: "pf-native-select-select",
+            parent: "root",
+            children: ["group", "option"],
+            styled: true,
+            mirror: false,
+        },
+        icon: {
+            name: "icon",
+            attribute: "icon",
+            testId: "pf-native-select-icon",
+            parent: "root",
+            children: [],
+            styled: true,
+            mirror: true,
+        },
+        group: {
+            name: "group",
+            attribute: "group",
+            testId: "pf-native-select-group",
+            parent: "select",
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+        option: {
+            name: "option",
+            attribute: "option",
+            testId: "pf-native-select-option",
+            parent: "select",
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+    },
+    indication: [
+        {
+            trigger: "select",
+            surface: "root",
+            centered: false,
+            focus: "select",
+        },
+    ],
+    variants: {},
+} as const satisfies ComponentAnatomy;
+
 export const autocompleteAnatomy = {
     name: "autocomplete",
     scope: "autocomplete",
@@ -3355,6 +3418,129 @@ export const separatorAnatomy = {
         inset: ["none", "start", "middle"],
         orientation: ["horizontal", "vertical"],
     },
+} as const satisfies ComponentAnatomy;
+
+export const fieldAnatomy = {
+    name: "field",
+    scope: "field",
+    root: "root",
+    partNames: ["root"],
+    parts: {
+        root: {
+            name: "root",
+            attribute: "root",
+            testId: "pf-field-root",
+            parent: null,
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+    },
+    variants: {},
+} as const satisfies ComponentAnatomy;
+
+export const labelAnatomy = {
+    name: "label",
+    scope: "label",
+    root: "root",
+    partNames: ["root", "requiredIndicator"],
+    parts: {
+        root: {
+            name: "root",
+            attribute: "root",
+            testId: "pf-label-root",
+            parent: null,
+            children: ["requiredIndicator"],
+            styled: true,
+            mirror: false,
+        },
+        requiredIndicator: {
+            name: "requiredIndicator",
+            attribute: "required-indicator",
+            testId: "pf-label-required-indicator",
+            parent: "root",
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+    },
+    variants: {},
+} as const satisfies ComponentAnatomy;
+
+export const inputAnatomy = {
+    name: "input",
+    scope: "input",
+    root: "root",
+    partNames: ["root"],
+    parts: {
+        root: {
+            name: "root",
+            attribute: "root",
+            testId: "pf-input-root",
+            parent: null,
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+    },
+    variants: {},
+} as const satisfies ComponentAnatomy;
+
+export const plainTextareaAnatomy = {
+    name: "plainTextarea",
+    scope: "plain-textarea",
+    root: "root",
+    partNames: ["root"],
+    parts: {
+        root: {
+            name: "root",
+            attribute: "root",
+            testId: "pf-plain-textarea-root",
+            parent: null,
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+    },
+    variants: {},
+} as const satisfies ComponentAnatomy;
+
+export const descriptionAnatomy = {
+    name: "description",
+    scope: "description",
+    root: "root",
+    partNames: ["root"],
+    parts: {
+        root: {
+            name: "root",
+            attribute: "root",
+            testId: "pf-description-root",
+            parent: null,
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+    },
+    variants: {},
+} as const satisfies ComponentAnatomy;
+
+export const errorTextAnatomy = {
+    name: "errorText",
+    scope: "error-text",
+    root: "root",
+    partNames: ["root"],
+    parts: {
+        root: {
+            name: "root",
+            attribute: "root",
+            testId: "pf-error-text-root",
+            parent: null,
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+    },
+    variants: {},
 } as const satisfies ComponentAnatomy;
 
 export const listAnatomy = {
@@ -6355,6 +6541,7 @@ export const anatomy = {
     searchBar: searchBarAnatomy,
     searchView: searchViewAnatomy,
     select: selectAnatomy,
+    nativeSelect: nativeSelectAnatomy,
     autocomplete: autocompleteAnatomy,
     calendarCell: calendarCellAnatomy,
     datePicker: datePickerAnatomy,
@@ -6369,6 +6556,12 @@ export const anatomy = {
     circularProgress: circularProgressAnatomy,
     loadingIndicator: loadingIndicatorAnatomy,
     separator: separatorAnatomy,
+    field: fieldAnatomy,
+    label: labelAnatomy,
+    input: inputAnatomy,
+    plainTextarea: plainTextareaAnatomy,
+    description: descriptionAnatomy,
+    errorText: errorTextAnatomy,
     list: listAnatomy,
     listItem: listItemAnatomy,
     menu: menuAnatomy,
@@ -6567,6 +6760,13 @@ export const testIds = {
         supportingText: "pf-select-supporting-text",
         hiddenSelect: "pf-select-hidden-select",
     },
+    nativeSelect: {
+        root: "pf-native-select-root",
+        select: "pf-native-select-select",
+        icon: "pf-native-select-icon",
+        group: "pf-native-select-group",
+        option: "pf-native-select-option",
+    },
     autocomplete: {
         root: "pf-autocomplete-root",
         container: "pf-autocomplete-container",
@@ -6705,6 +6905,15 @@ export const testIds = {
         indicator: "pf-loading-indicator-indicator",
     },
     separator: { root: "pf-separator-root" },
+    field: { root: "pf-field-root" },
+    label: {
+        root: "pf-label-root",
+        requiredIndicator: "pf-label-required-indicator",
+    },
+    input: { root: "pf-input-root" },
+    plainTextarea: { root: "pf-plain-textarea-root" },
+    description: { root: "pf-description-root" },
+    errorText: { root: "pf-error-text-root" },
     list: { root: "pf-list-root", item: "pf-list-item" },
     listItem: {
         root: "pf-list-item-root",

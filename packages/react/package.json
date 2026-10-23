@@ -229,6 +229,13 @@
                 "default": "./dist/file-upload.mjs"
             }
         },
+        "./native-select": {
+            "types": "./dist/native-select/index.d.ts",
+            "import": {
+                "development": "./src/native-select/index.ts",
+                "default": "./dist/native-select.mjs"
+            }
+        },
         "./rating": {
             "types": "./dist/rating/index.d.ts",
             "import": {
@@ -500,6 +507,48 @@
             "import": {
                 "development": "./src/slider/index.ts",
                 "default": "./dist/slider.mjs"
+            }
+        },
+        "./field": {
+            "types": "./dist/field/index.d.ts",
+            "import": {
+                "development": "./src/field/index.ts",
+                "default": "./dist/field.mjs"
+            }
+        },
+        "./label": {
+            "types": "./dist/label/index.d.ts",
+            "import": {
+                "development": "./src/label/index.ts",
+                "default": "./dist/label.mjs"
+            }
+        },
+        "./input": {
+            "types": "./dist/input/index.d.ts",
+            "import": {
+                "development": "./src/input/index.ts",
+                "default": "./dist/input.mjs"
+            }
+        },
+        "./textarea": {
+            "types": "./dist/textarea/index.d.ts",
+            "import": {
+                "development": "./src/textarea/index.ts",
+                "default": "./dist/textarea.mjs"
+            }
+        },
+        "./description": {
+            "types": "./dist/description/index.d.ts",
+            "import": {
+                "development": "./src/description/index.ts",
+                "default": "./dist/description.mjs"
+            }
+        },
+        "./error-text": {
+            "types": "./dist/error-text/index.d.ts",
+            "import": {
+                "development": "./src/error-text/index.ts",
+                "default": "./dist/error-text.mjs"
             }
         },
         "./supporting-text": {

@@ -22,6 +22,16 @@ const same = <const G extends readonly string[]>(
         readonly [K in G[number]]: K;
     };
 
+// The field's subpath, which renders the ready-made pieces and re-exports every one.
+const FORM_PRIMITIVES = {
+    field: {},
+    label: {},
+    input: {},
+    plainTextarea: {},
+    description: {},
+    errorText: {},
+} as const;
+
 /** Every component, by subpath. */
 export const COMPONENT_USAGE = {
     // `leadingIcon` follows the icon content and `trailingIcon` is always set; the list is a
@@ -312,6 +322,14 @@ export const COMPONENT_USAGE = {
         },
     },
     "supporting-text": { entries: { supportingText: same("tone") } },
+    // The plain form primitives: one look each, no variants. Each piece's subpath re-exports
+    // it from the field's module, which holds them all.
+    field: { entries: FORM_PRIMITIVES },
+    label: { entries: { label: {} } },
+    input: { entries: { input: {} } },
+    textarea: { entries: { plainTextarea: {} } },
+    description: { entries: { description: {} } },
+    "error-text": { entries: { errorText: {} } },
     // `transition` moves a row's content in a shared axis or a fade through.
     stepper: {
         entries: {
@@ -362,6 +380,9 @@ export const COMPONENT_USAGE = {
         entries: { codeField: same("variant", "color", "density") },
     },
     rating: { entries: { rating: same("color", "size") } },
+    // One look: no variant groups. The select draws no ripple (only a state layer); React Native
+    // opens the Material menu, whose items ripple, where the platform's isn't installed.
+    "native-select": { entries: { nativeSelect: {}, menu: {}, ripple: {} } },
     text: { entries: { text: { style: "textStyle" } } },
     // The icons, prefix and suffix follow their content.
     "text-area": {

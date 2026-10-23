@@ -631,6 +631,12 @@ export const displayRegistry = () =>
         separator: named("separator", ["root"]),
         scrim: named("scrim", ["root"]),
         supportingText: named("supporting-text", ["root"]),
+        field: named("field", ["root"]),
+        label: named("label", ["root", "requiredIndicator"]),
+        input: named("input", ["root"]),
+        plainTextarea: named("plain-textarea", ["root"]),
+        description: named("description", ["root"]),
+        errorText: named("error-text", ["root"]),
         text: named("text", ["root"]),
         icon: named("icon", ["root"]),
         touchTarget: named("touch-target", ["root"]),
@@ -871,4 +877,20 @@ export const ratingRegistry = () =>
             "fill",
             "halfFill",
         ]),
+    });
+
+/** The native select's fake factory: its parts, and the plain field's pieces around it. */
+export const nativeSelectRegistry = () =>
+    createRegistry({
+        nativeSelect: named("nativeSelect", [
+            "root",
+            "select",
+            "icon",
+            "group",
+            "option",
+        ]),
+        field: named("field", ["root"]),
+        label: named("label", ["root", "requiredIndicator"]),
+        description: named("description", ["root"]),
+        errorText: named("error-text", ["root"]),
     });

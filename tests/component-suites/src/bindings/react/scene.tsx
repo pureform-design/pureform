@@ -22,6 +22,7 @@ import { Checkbox } from "@pureform/react/checkbox";
 import { Chip } from "@pureform/react/chip";
 import { ChipSet } from "@pureform/react/chip-set";
 import { CircularProgress } from "@pureform/react/circular-progress";
+import { CodeField } from "@pureform/react/code-field";
 import { ColorPicker } from "@pureform/react/color-picker";
 import { CopyButton } from "@pureform/react/copy-button";
 import { DateInput } from "@pureform/react/date-input";
@@ -32,6 +33,15 @@ import { DragHandle } from "@pureform/react/drag-handle";
 import { Fab } from "@pureform/react/fab";
 import { FabMenu } from "@pureform/react/fab-menu";
 import { FadeThrough } from "@pureform/react/fade-through";
+import {
+    Description,
+    ErrorText,
+    Field,
+    Input,
+    Label,
+    Textarea,
+} from "@pureform/react/field";
+import { FileUpload } from "@pureform/react/file-upload";
 import { FullscreenDialog } from "@pureform/react/fullscreen-dialog";
 import { GridList } from "@pureform/react/grid-list";
 import { Icon } from "@pureform/react/icon";
@@ -42,8 +52,10 @@ import { ListItem } from "@pureform/react/list-item";
 import { LoadingIndicator } from "@pureform/react/loading-indicator";
 import { Media } from "@pureform/react/media";
 import { Menu } from "@pureform/react/menu";
+import { NativeSelect } from "@pureform/react/native-select";
 import { NavigationBar } from "@pureform/react/navigation-bar";
 import { NavigationRail } from "@pureform/react/navigation-rail";
+import { NumberField } from "@pureform/react/number-field";
 import { Paginator } from "@pureform/react/paginator";
 import { Popover } from "@pureform/react/popover";
 import { RadioGroup } from "@pureform/react/radio-group";
@@ -66,10 +78,7 @@ import { SupportingText } from "@pureform/react/supporting-text";
 import { Switch } from "@pureform/react/switch";
 import { Table } from "@pureform/react/table";
 import { Tabs } from "@pureform/react/tabs";
-import { FileUpload } from "@pureform/react/file-upload";
 import { TagsInput } from "@pureform/react/tags-input";
-import { NumberField } from "@pureform/react/number-field";
-import { CodeField } from "@pureform/react/code-field";
 import { Text } from "@pureform/react/text";
 import { TextArea } from "@pureform/react/text-area";
 import { TextField } from "@pureform/react/text-field";
@@ -197,6 +206,7 @@ export const components: Record<ComponentName, ComponentType<never>> = {
     ListItem,
     Media,
     Menu,
+    NativeSelect,
     NavigationBar,
     NavigationRail,
     RadioGroup,
@@ -224,6 +234,12 @@ export const components: Record<ComponentName, ComponentType<never>> = {
     SplitButton,
     Stepper,
     SupportingText,
+    Field,
+    Label,
+    Input,
+    Textarea,
+    Description,
+    ErrorText,
     Switch,
     Tabs,
     TagsInput,

@@ -68,6 +68,32 @@ export default defineStories({
         // children; the plays check it is drawn.
         Toast: { hooks: ["./src/stages/toast.ts"] },
         GridList: { hooks: ["./src/stages/grid-list.ts"] },
+        // The plain form primitives, in a group of their own: the Textarea's name differs from
+        // Material's TextArea only in case, which Storybook's ids ignore.
+        Field: { title: "Plain form/Field" },
+        Label: { title: "Plain form/Label" },
+        Textarea: { title: "Plain form/Textarea" },
+        Description: { title: "Plain form/Description" },
+        ErrorText: { title: "Plain form/ErrorText" },
+        Input: {
+            title: "Plain form/Input",
+            // A DOM prop, so the props give it no control; the date and time types open the
+            // browser's own pickers.
+            argTypes: {
+                type: {
+                    control: "select",
+                    options: [
+                        "text",
+                        "email",
+                        "password",
+                        "number",
+                        "date",
+                        "time",
+                        "datetime-local",
+                    ],
+                },
+            },
+        },
         TextField: {
             // React Native Web: the disabled field's input is `disabled` now (not `readonly`)
             // and passes, but its label is a plain text element, not the input's `<label>`, so

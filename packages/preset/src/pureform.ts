@@ -67,6 +67,14 @@ import { dragHandle } from "./components/drag-handle";
 import { createFab } from "./components/fab";
 import { createFabMenu } from "./components/fab-menu";
 import { FADE_THROUGH_KEYFRAMES, fadeThrough } from "./components/fade-through";
+import {
+    description,
+    errorText,
+    field,
+    input,
+    label,
+    plainTextarea,
+} from "./components/field-primitives";
 import { createFileUpload } from "./components/file-upload";
 import { fullscreenDialog } from "./components/fullscreen-dialog";
 import { gridList } from "./components/grid-list";
@@ -87,6 +95,7 @@ import { createMedia } from "./components/media";
 import { createMenu } from "./components/menu";
 import { createNavigationBar } from "./components/navigation-bar";
 import { createNavigationRail } from "./components/navigation-rail";
+import { nativeSelect } from "./components/native-select";
 import { createNumberField } from "./components/number-field";
 import { OVERLAY_KEYFRAMES } from "./components/overlay";
 import { createPaginator } from "./components/paginator";
@@ -97,6 +106,7 @@ import {
     createLinearProgress,
 } from "./components/progress";
 import { createRadio } from "./components/radio";
+import { createRating } from "./components/rating";
 import { richTooltip } from "./components/rich-tooltip";
 import { ripple } from "./components/ripple";
 import { scrim } from "./components/scrim";
@@ -118,7 +128,6 @@ import { createSupportingText } from "./components/supporting-text";
 import { createSwitch } from "./components/switch";
 import { createTable } from "./components/table";
 import { createTabs } from "./components/tabs";
-import { createRating } from "./components/rating";
 import { createTagsInput } from "./components/tags-input";
 import { createText } from "./components/text";
 import { createTextArea } from "./components/text-area";
@@ -334,6 +343,7 @@ const defaultComponents = <G extends string>(
         searchBar,
         searchView,
         select: createSelect<G, Step>(theme.color.groups, densities),
+        nativeSelect,
         autocomplete: createAutocomplete<G, Step>(
             theme.color.groups,
             densities,
@@ -354,6 +364,12 @@ const defaultComponents = <G extends string>(
         circularProgress: createCircularProgress(theme.color.groups),
         loadingIndicator: createLoadingIndicator(theme.color.groups),
         separator,
+        field,
+        label,
+        input,
+        plainTextarea,
+        description,
+        errorText,
         list,
         listItem: createListItem<G, Step>(theme.color.groups, densities),
         menu: createMenu<G, Step>(theme.color.groups, densities),

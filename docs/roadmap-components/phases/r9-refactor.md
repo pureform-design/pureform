@@ -47,6 +47,8 @@ One pass over everything since r8: m3 (Material transitions), c8 (Material gaps 
   and shrinks.
 - **Side sheet drag everywhere:** the coplanar side sheet and React Native's non-modal side sheet
   drag too.
+- **NativeSelect follow-ups:** its own `aria-describedby` joins the Field's ids instead of
+  replacing them; React and React Native type the value by `multiple`, as Solid does.
 
 ## Done when
 

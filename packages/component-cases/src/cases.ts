@@ -20,6 +20,14 @@ import { accordionCase, treeCase } from "./cases/expandable";
 import { fab } from "./cases/fab";
 import { fabMenu, fabMenuItems } from "./cases/fab-menu";
 import { fadeThrough } from "./cases/fade-through";
+import {
+    description,
+    errorText,
+    field,
+    input,
+    label,
+    textarea,
+} from "./cases/field-primitives";
 import { fileUpload } from "./cases/file-upload";
 import { fullscreenDialog } from "./cases/fullscreen-dialog";
 import { gridList } from "./cases/grid-list";
@@ -27,6 +35,7 @@ import { iconButton } from "./cases/icon-button";
 import { expandableListItem, list, listItem } from "./cases/list";
 import { loadingIndicator } from "./cases/loading-indicator";
 import { menu } from "./cases/menu";
+import { nativeSelect, nativeSelectMultiple } from "./cases/native-select";
 import { navigationBar, navigationRail } from "./cases/navigation";
 import { numberField } from "./cases/number-field";
 import { paginator } from "./cases/paginator";
@@ -118,6 +127,8 @@ export const COMPONENTS: readonly ComponentCase[] = [
     searchBar,
     searchView,
     select,
+    nativeSelect,
+    nativeSelectMultiple,
     selectionList,
     autocomplete,
     datePicker,
@@ -130,6 +141,12 @@ export const COMPONENTS: readonly ComponentCase[] = [
     stepper,
     splitButton,
     supportingText,
+    field,
+    label,
+    input,
+    textarea,
+    description,
+    errorText,
     switchControl,
     tabsCase,
     table,

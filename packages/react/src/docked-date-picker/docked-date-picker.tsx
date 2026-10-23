@@ -53,13 +53,13 @@ import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import type { PartContext } from "../part-context";
 import { plainParts, useComponent, useSlotProps } from "../parts";
-import { affixFieldParts } from "../select-field-parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { usePresence } from "../presence";
 import type { Presence } from "../presence";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
+import { affixFieldParts } from "../select-field-parts";
 
 type Anatomy = typeof dockedDatePickerOverlayAnatomy;
 

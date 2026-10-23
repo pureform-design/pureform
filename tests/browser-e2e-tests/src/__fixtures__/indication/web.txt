@@ -1592,6 +1592,16 @@ select[color=error].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.7
 select[color=info].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
     focused: color oklch(0.4771 0.0852 217.083)
     focused-checked: color oklch(0.4771 0.0852 217.083)
+nativeSelect.root: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline none
+    hovered: bg color(srgb 0.1098 0.1059 0.1176 / 0.08)
+    focused: bg color(srgb 0.1098 0.1059 0.1176 / 0.1)
+    pressed: bg color(srgb 0.1098 0.1059 0.1176 / 0.1)
+    hovered-selected: bg color(srgb 0.1098 0.1059 0.1176 / 0.08)
+    pressed-checked: bg color(srgb 0.1098 0.1059 0.1176 / 0.1)
+    focused-checked: bg color(srgb 0.1098 0.1059 0.1176 / 0.1)
+nativeSelect.select: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline none
+    focused: outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    focused-checked: outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
 autocomplete.label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
     focused: color oklch(0.4955 0.1304 293.718)
     focused-checked: color oklch(0.4955 0.1304 293.718)
@@ -2147,6 +2157,22 @@ slider[color=info].stateLayer: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 3
     hovered-selected: bg color(srgb -0.0003 0.4079 0.4863 / 0.08)
     pressed-checked: bg color(srgb -0.0003 0.4079 0.4863 / 0.1)
     focused-checked: bg color(srgb -0.0003 0.4079 0.4863 / 0.1)
+input.root: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline none
+    hovered: bg color(srgb 0.1098 0.1059 0.1176 / 0.08)
+    focused: bg color(srgb 0.1098 0.1059 0.1176 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    pressed: bg color(srgb 0.1098 0.1059 0.1176 / 0.1)
+    dragged: bg color(srgb 0.1098 0.1059 0.1176 / 0.16)
+    hovered-selected: bg color(srgb 0.1098 0.1059 0.1176 / 0.08)
+    pressed-checked: bg color(srgb 0.1098 0.1059 0.1176 / 0.1)
+    focused-checked: bg color(srgb 0.1098 0.1059 0.1176 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+plainTextarea.root: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline none
+    hovered: bg color(srgb 0.1098 0.1059 0.1176 / 0.08)
+    focused: bg color(srgb 0.1098 0.1059 0.1176 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    pressed: bg color(srgb 0.1098 0.1059 0.1176 / 0.1)
+    dragged: bg color(srgb 0.1098 0.1059 0.1176 / 0.16)
+    hovered-selected: bg color(srgb 0.1098 0.1059 0.1176 / 0.08)
+    pressed-checked: bg color(srgb 0.1098 0.1059 0.1176 / 0.1)
+    focused-checked: bg color(srgb 0.1098 0.1059 0.1176 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
 listItem.root: bg oklch(0.9844 0.0084 325.895) | color oklch(0.2245 0.0059 301.135) | outline none
     hovered-selected: bg oklch(0.9163 0.0365 303.153) | color oklch(0.4005 0.034 298.613)
 listItem.leading: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none

@@ -623,12 +623,14 @@
       "peerDependencies": {
         "@pureform/rn-adapter": "workspace:^",
         "@pureform/styling": "workspace:^",
+        "@react-native-menu/menu": ">=1.0.0",
         "react": "^19.0.0",
         "react-native": "catalog:",
         "react-native-reanimated": "catalog:",
         "react-native-svg": "catalog:",
       },
       "optionalPeers": [
+        "@react-native-menu/menu",
         "react-native-reanimated",
         "react-native-svg",
       ],

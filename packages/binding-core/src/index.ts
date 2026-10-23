@@ -876,6 +876,26 @@ export type {
     CopyButtonVariantProps,
 } from "./components/copy-button";
 export {
+    NATIVE_SELECT_ATTRIBUTE_PROPS,
+    NATIVE_SELECT_CONTENT_PROPS,
+    NATIVE_SELECT_ROOT_PROPS,
+    nativeSelectGroups,
+    nativeSelectProps,
+    nativeSelectSelection,
+    nativeSelectValue,
+    nativeSelectValues,
+    sameNativeSelectValue,
+} from "./components/native-select";
+export type {
+    NativeSelectBehaviorProps,
+    NativeSelectContentProps,
+    NativeSelectItem,
+    NativeSelectPart,
+    NativeSelectRootOwnProps,
+    NativeSelectValue,
+    NativeSelectVariantProps,
+} from "./components/native-select";
+export {
     RATING_CONTENT_PROPS,
     RATING_ROOT_PROPS,
     ratingMachineProps,
@@ -1310,6 +1330,45 @@ export type {
     SliderValue,
     SliderVariantProps,
 } from "./components/slider";
+export {
+    DESCRIPTION_ROOT_PROPS,
+    ERROR_TEXT_ROOT_PROPS,
+    FIELD_ROOT_PROPS,
+    fieldControlProps,
+    fieldIds,
+    fieldLabelProps,
+    fieldLabelState,
+    fieldState,
+    INPUT_ROOT_PROPS,
+    LABEL_ROOT_PROPS,
+    fieldSelection,
+    labelSelection,
+    inputSelection,
+    plainTextareaSelection,
+    descriptionSelection,
+    errorTextSelection,
+    REQUIRED_MARK,
+    TEXTAREA_ROOT_PROPS,
+} from "./components/field-primitives";
+export type {
+    DescriptionPart,
+    DescriptionRootOwnProps,
+    ErrorTextPart,
+    ErrorTextRootOwnProps,
+    FieldContentProps,
+    FieldIds,
+    FieldPart,
+    FieldRootOwnProps,
+    FieldState,
+    FieldStateProps,
+    InputPart,
+    InputRootOwnProps,
+    LabelPart,
+    LabelRootOwnProps,
+    PlainTextProps,
+    TextareaPart,
+    TextareaRootOwnProps,
+} from "./components/field-primitives";
 export {
     SUPPORTING_TEXT_ROOT_PROPS,
     supportingTextSelection,

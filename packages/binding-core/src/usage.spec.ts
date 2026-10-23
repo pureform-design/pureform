@@ -106,6 +106,14 @@ const NATIVE_SHARED: Readonly<Record<string, readonly string[]>> = {
     ],
 };
 
+// Entries only React Native's component draws: the native select opens the Material menu (and its
+// items' ripple) where the
+// platform's isn't installed. The web bindings don't draw them, but the list keeps them for React
+// Native's pruning.
+const NATIVE_ONLY: Readonly<Record<string, readonly string[]>> = {
+    "native-select": ["menu", "ripple"],
+};
+
 const sharedFiles = (binding: Binding) =>
     binding === "react-native" ? NATIVE_SHARED : SHARED;
 
@@ -114,14 +122,20 @@ const sharedSources = (binding: Binding, subpath: string) =>
         .filter(([, users]) => users.includes(subpath))
         .map(([file]) => SOURCES[`../../${binding}/src/${file}`]!);
 
+// Components whose indication is a state layer and a focus ring, no ripple: a `<select>` has no
+// layer to hold one.
+const STATE_LAYER_ONLY: ReadonlySet<string> = new Set(["nativeSelect"]);
+
 // The entries a component's sources draw by the anatomies they name.
 const anatomiesIn = (text: string): Set<string> => {
     const drawn = new Set<string>();
     for (const [, key] of text.matchAll(/\b(\w+Anatomy)\b/g)) {
         const found = anatomyNames.get(key!);
         if (found?.styled) drawn.add(found.name);
-        // A surface that shows indication holds the ripple's layer.
-        if (found?.indicated) drawn.add("ripple");
+        // A surface that shows indication holds the ripple's layer, unless it shows only a state
+        // layer.
+        if (found?.indicated && !STATE_LAYER_ONLY.has(found.name))
+            drawn.add("ripple");
     }
     return drawn;
 };
@@ -132,10 +146,19 @@ const anatomiesIn = (text: string): Set<string> => {
 const drawnBy = (binding: Binding, text: string): Set<string> => {
     const drawn = anatomiesIn(text);
     if (/\bas=\{Button\}/.test(text)) drawn.add("button").add("ripple");
-    for (const [, subpath] of text.matchAll(
-        /^import \{[^}]*\} from "\.\.\/([a-z-]+)(?:\/[a-z-]+)?";$/gm,
+    for (const [, subpath, file] of text.matchAll(
+        /^(?:import|export) \{[^}]*\} from "\.\.?\/([a-z-]+)(?:\/([a-z-]+))?";$/gm,
     )) {
-        for (const entry of anatomiesIn(sources(binding, subpath!).join("\n")))
+        // A named module draws only its own; a folder draws all of its sources.
+        const module = file
+            ? [
+                  SOURCES[`../../${binding}/src/${subpath}/${file}.tsx`] ??
+                      SOURCES[`../../${binding}/src/${subpath}/${file}.ts`],
+              ].filter((source) => source !== undefined)
+            : [];
+        for (const entry of anatomiesIn(
+            (module.length ? module : sources(binding, subpath!)).join("\n"),
+        ))
             drawn.add(entry);
     }
     return drawn;
@@ -282,7 +305,9 @@ describe("COMPONENT_USAGE", () => {
                                 : []),
                         ].join("\n"),
                     );
-                    const own = Object.keys(entries);
+                    const own = Object.keys(entries).filter(
+                        (entry) => !NATIVE_ONLY[subpath]?.includes(entry),
+                    );
                     expect(own.sort(), subpath).toEqual([...drawn].sort());
                 }
             });

@@ -104,8 +104,7 @@ export function affixFieldParts(use: (name: string) => AffixFieldContext) {
         unstyled,
         ...props
     }: SelectFieldPartProps): ReactNode {
-        const { scope, supportingTextId, errorText } =
-            use("SupportingText");
+        const { scope, supportingTextId, errorText } = use("SupportingText");
         return scope.render("supportingText", {
             element: "span",
             machine: { id: supportingTextId },

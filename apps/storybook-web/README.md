@@ -82,7 +82,9 @@ false` when the story has the arg, so Storybook doesn't infer one; left out
       through `storybook/test`'s `userEvent` (`createCases(userEvent)`, `src/renderers/plays.ts`).
     - **`stories.config.ts`**, overrides only: renderers (`casePlays`, `tests`, `scenes`), `include`,
       `skip` (by component, with the reason), `schemes` for every component, `overlayHeight`,
-      and `controls` (the renderer whose exports give the props), and per component `args`,
+      and `controls` (the renderer whose exports give the props), and per component `title`
+      (a group, `Plain form/Input`, or a name apart from one differing only in case; the
+      generated file takes it, `/` and spaces as `-`), `args`,
       `argTypes`, `controls.exclude` (props to give no control, over the rules above; none
       needed today), `parameters`, `schemes`, `scheme`, `height`,
       `hooks`, and `stories` (fields by export name; `tags` are written into the file, where

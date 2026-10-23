@@ -2,6 +2,12 @@
 // visual suite in `tests/browser-e2e-tests` screenshots each section.
 
 import {
+    description as plainDescription,
+    errorText as plainErrorText,
+    field as plainField,
+    input as plainInput,
+    label as plainLabel,
+    plainTextarea,
     appBar,
     timeInput,
     timePicker,
@@ -26,6 +32,7 @@ import {
     searchBar,
     searchView,
     select,
+    nativeSelect,
     autocomplete,
     slider,
     snackbar,
@@ -94,6 +101,8 @@ const CARD_FILLS = ["elevated", "filled", "outlined"] as const;
 const GLYPHS = {
     star: "m12 17.27 4.15 2.51c.76.46 1.69-.22 1.49-1.08l-1.1-4.72 3.67-3.18c.67-.58.31-1.68-.57-1.75l-4.83-.41-1.89-4.46c-.34-.81-1.5-.81-1.84 0L9.19 8.63l-4.83.41c-.88.07-1.24 1.17-.57 1.75l3.67 3.18-1.1 4.72c-.2.86.73 1.54 1.49 1.08z",
     copy: "M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2m0 16H8V7h11z",
+    // Material's drop-down arrow: the native select's chevron.
+    dropDown: "M7 10l5 5 5-5z",
     check: "M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z",
 } as const;
 
@@ -1166,6 +1175,147 @@ export function Page() {
                                     </span>
                                 </span>
                             </button>
+                        );
+                    }}
+                </For>
+            </section>
+            <section
+                data-section="plain-fields"
+                style={{ ...row, "align-items": "flex-start" }}
+            >
+                <div class={plainField().root} style={{ width: "200px" }}>
+                    <label class={plainLabel().root} for="plain-name">
+                        Name
+                        <span
+                            class={plainLabel().requiredIndicator}
+                            aria-hidden="true"
+                        >
+                            *
+                        </span>
+                    </label>
+                    <input
+                        class={plainInput().root}
+                        id="plain-name"
+                        placeholder="Ada Lovelace"
+                        required
+                    />
+                    <span class={plainDescription().root}>
+                        As on your passport
+                    </span>
+                </div>
+                <div class={plainField().root} style={{ width: "200px" }}>
+                    <label class={plainLabel().root} for="plain-email">
+                        Email
+                    </label>
+                    <input
+                        class={plainInput().root}
+                        id="plain-email"
+                        value="ada@"
+                        aria-invalid="true"
+                    />
+                    <span class={plainErrorText().root}>
+                        Enter a whole address
+                    </span>
+                </div>
+                <div class={plainField().root} style={{ width: "200px" }}>
+                    <label
+                        class={plainLabel().root}
+                        for="plain-locked"
+                        aria-disabled="true"
+                    >
+                        Locked
+                    </label>
+                    <input
+                        class={plainInput().root}
+                        id="plain-locked"
+                        value="Ada"
+                        disabled
+                    />
+                </div>
+                <div class={plainField().root} style={{ width: "200px" }}>
+                    <label class={plainLabel().root} for="plain-day">
+                        Day
+                    </label>
+                    <input
+                        class={plainInput().root}
+                        id="plain-day"
+                        type="date"
+                        value="1815-12-10"
+                    />
+                    <input
+                        class={plainInput().root}
+                        aria-label="Time"
+                        type="time"
+                        value="09:30"
+                    />
+                </div>
+                <div class={plainField().root} style={{ width: "240px" }}>
+                    <label class={plainLabel().root} for="plain-bio">
+                        Bio
+                    </label>
+                    <textarea class={plainTextarea().root} id="plain-bio">
+                        Ada
+                    </textarea>
+                </div>
+            </section>
+            <section
+                data-section="native-selects"
+                style={{ ...row, "align-items": "flex-start" }}
+            >
+                <For
+                    each={
+                        [
+                            { label: "Rest", value: "m" },
+                            { label: "Invalid", value: "m", invalid: true },
+                            { label: "Disabled", value: "m", disabled: true },
+                            { label: "Groups", value: "xl", groups: true },
+                        ] as const
+                    }
+                >
+                    {(item) => {
+                        const t = nativeSelect();
+                        return (
+                            <span class={t.root} style={{ width: "200px" }}>
+                                <select
+                                    class={t.select}
+                                    aria-label={item.label}
+                                    aria-invalid={
+                                        "invalid" in item ? "true" : undefined
+                                    }
+                                    disabled={"disabled" in item}
+                                >
+                                    {"groups" in item ? (
+                                        <>
+                                            <optgroup
+                                                class={t.group}
+                                                label="Everyday"
+                                            >
+                                                <option class={t.option}>
+                                                    Medium
+                                                </option>
+                                            </optgroup>
+                                            <optgroup
+                                                class={t.group}
+                                                label="Tall"
+                                            >
+                                                <option
+                                                    class={t.option}
+                                                    selected
+                                                >
+                                                    Extra large
+                                                </option>
+                                            </optgroup>
+                                        </>
+                                    ) : (
+                                        <option class={t.option} selected>
+                                            Medium
+                                        </option>
+                                    )}
+                                </select>
+                                <span class={t.icon} aria-hidden="true">
+                                    <Glyph glyph="dropDown" />
+                                </span>
+                            </span>
                         );
                     }}
                 </For>
