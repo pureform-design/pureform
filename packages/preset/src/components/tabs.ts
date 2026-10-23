@@ -60,6 +60,7 @@ import {
     colorVariant,
     componentTokens,
     defaultGroups,
+    disabledColor,
     iconBox,
     iconFill,
     INDICATION_ROOT,
@@ -78,6 +79,7 @@ const { tokens, ref } = componentTokens("tabs", {
     container: sys("surface"),
     dividerColor: sys("outlineVariant"),
     content: sys("onSurfaceVariant"),
+    disabledContent: disabledColor("disabledContent"),
     activeColor: sys("primary"),
     secondaryActiveColor: sys("onSurface"),
     indicatorColor: sys("primary"),
@@ -121,6 +123,9 @@ const tabColors = (active: ColorValue) => ({
             }),
             color: active,
         },
+        // MDC-Android's `m3_tabs_text_color` and `m3_tabs_icon_color`: on-surface at the
+        // disabled content opacity (38%), selected or not.
+        disabled: { color: ref("disabledContent") },
     },
 });
 
@@ -175,6 +180,11 @@ export const createTabs = <const G extends string = ColorGroup>(
                         states: {
                             ...pressable.states,
                             ...tabColors(ref("activeColor")).states,
+                            disabled: {
+                                ...pressable.states.disabled,
+                                ...tabColors(ref("activeColor")).states
+                                    .disabled,
+                            },
                         },
                         // The content fills the tab's height, so the indicator sits on its edge.
                         alignItems: stretch,
