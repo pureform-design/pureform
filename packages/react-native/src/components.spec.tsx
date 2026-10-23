@@ -1500,3 +1500,35 @@ describe("media", () => {
         expect(box("square").height).toBe(200);
     });
 });
+
+describe("standard bottom sheet", () => {
+    it("draws its trigger and its body, open in place, and a drag handle press closes it", async () => {
+        await render(
+            <View style={{ width: 400, height: 400 }}>
+                <BottomSheet
+                    modal={false}
+                    defaultOpen
+                    trigger="Share"
+                    aria-label="Share"
+                    body="Send it to a friend."
+                />
+            </View>,
+        );
+        expect(byTestId("pf-button-root").textContent).toBe("Share");
+        expect(byTestId("pf-bottom-sheet-content").textContent).toBe(
+            "Send it to a friend.",
+        );
+        await interact(() => userEvent.click(byTestId("pf-drag-handle-root")));
+        await until(() =>
+            expect(
+                document.querySelector('[data-testid="pf-bottom-sheet-root"]'),
+            ).toBeNull(),
+        );
+        await interact(() => userEvent.click(byTestId("pf-button-root")));
+        await until(() =>
+            expect(
+                document.querySelector('[data-testid="pf-bottom-sheet-root"]'),
+            ).not.toBeNull(),
+        );
+    });
+});

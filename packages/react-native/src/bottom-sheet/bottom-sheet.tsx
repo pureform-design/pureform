@@ -1,6 +1,7 @@
 // The bottom sheet: its surface (the drag handle over the scrolling content), and, given a
 // trigger, `onOpenChange`, or `defaultOpen`, the whole modal sheet. Without them, or with
-// `modal={false}`, showing it is the app's, and given `open`, it enters and leaves in place. A
+// `modal={false}`, showing it is the app's, and given `open`, it enters and leaves in place; a
+// standard sheet (`modal={false}`) given a trigger or `defaultOpen` keeps its own open state. A
 // modal sheet opens in a `Modal` over a scrim, against the bottom edge: a press on the scrim, the
 // drag handle, Escape, or the back button closes it, and so does a drag down on the handle past
 // Compose's thresholds (`sheetRelease`: 56px past where it rested, or a flick). The sheet follows the drag down; a shorter
@@ -50,7 +51,12 @@ import type { LayoutChangeEvent } from "react-native";
 import { Button } from "../button/button";
 import { DragHandle } from "../drag-handle/drag-handle";
 import { ModalScrimLayer, ModalWindow, useModalOverlay } from "../modal";
-import { testIdOf, useStableCallback, withEngine } from "../parts";
+import {
+    testIdOf,
+    useControllable,
+    useStableCallback,
+    withEngine,
+} from "../parts";
 import { themeSpring, useOverlayPresence } from "../presence";
 import { useEngine, usePureform } from "../provider";
 import { useComponentSlots } from "../styles";
@@ -69,6 +75,9 @@ export interface BottomSheetProps
     extends BottomSheetVariantProps, OverlayCloseProps, BottomSheetRestProps {
     /** The content, scrolling under the drag handle. */
     readonly children?: ReactNode;
+    /** The content, as the web's ready-made sheet takes it; `children` wins when both are
+     *  given. */
+    readonly body?: ReactNode;
     /** Whether it shows the drag handle at its top edge. @default true */
     readonly dragHandle?: boolean | undefined;
     /** The drag handle's name. @default for what a press does: "Close sheet", or on a sheet
@@ -76,7 +85,8 @@ export interface BottomSheetProps
     readonly dragHandleLabel?: string | undefined;
     /** What opens it, rendered in place: a label, for a `Button`, or a function rendering your
      *  own trigger with the `onPress` it's given. Given it (or `onOpenChange`, or
-     *  `defaultOpen`), a modal sheet opens over the page; without, it's the surface alone. */
+     *  `defaultOpen`), a modal sheet opens over the page; without, it's the surface alone. A
+     *  standard sheet (`modal={false}`) given it, or `defaultOpen`, opens in place after it. */
     readonly trigger?:
         | ReactNode
         | ((trigger: BottomSheetTriggerProps) => ReactNode);
@@ -320,6 +330,7 @@ function BottomSheetImpl(
     // and exit on the surface itself. The view takes the surface's place in its parent's layout
     // (its size, margins, position and layer), and the surface fills it.
     const [placed, own] = placement(s.root ?? {});
+    const content = props.children ?? props.body;
     return (
         <Animated.View style={[placed, { transform: [{ translateY: drag }] }]}>
             <Root.View
@@ -357,13 +368,13 @@ function BottomSheetImpl(
                         />
                     </v.dragHandle.View>
                 )}
-                {typeof props.children === "string" ? (
+                {typeof content === "string" ? (
                     <v.content.Text style={s.content} testID={id("content")}>
-                        {props.children}
+                        {content}
                     </v.content.Text>
                 ) : (
                     <v.content.View style={s.content} testID={id("content")}>
-                        <ScrollView>{props.children}</ScrollView>
+                        <ScrollView>{content}</ScrollView>
                     </v.content.View>
                 )}
             </Root.View>
@@ -413,6 +424,47 @@ function ModalBottomSheet(props: BottomSheetProps): ReactNode {
                     />
                 </ModalScrimLayer>
             </ModalWindow>
+        </>
+    );
+}
+
+// A standard sheet with its own trigger or open state: the trigger, then the surface in place,
+// entering and leaving as it opens and closes. It sits beside the page's content rather than over
+// it (Material's standard bottom sheet; Compose's `BottomSheetScaffold`), so where it sits is the
+// app's layout.
+function StandardBottomSheet(props: BottomSheetProps): ReactNode {
+    const {
+        trigger,
+        open: _open,
+        defaultOpen: _defaultOpen,
+        onOpenChange: _onOpenChange,
+        ...surface
+    } = props;
+    const [open, setOpen] = useControllable(
+        "BottomSheet",
+        "open",
+        props.open,
+        props.defaultOpen,
+        props.onOpenChange,
+        false,
+    );
+    const show = () => setOpen(true);
+    const given: BottomSheetTriggerProps = {
+        onPress: show,
+        "aria-haspopup": "dialog",
+    };
+    return (
+        <>
+            {trigger === undefined ? null : typeof trigger === "function" ? (
+                trigger(given)
+            ) : (
+                <Button label={trigger} onPress={show} />
+            )}
+            <Surface
+                {...surface}
+                open={open}
+                onOpenChange={({ open: next }) => setOpen(next)}
+            />
         </>
     );
 }
@@ -478,13 +530,20 @@ const styles = StyleSheet.create({
 });
 
 /** Material's bottom sheet. Given a trigger, `onOpenChange`, or `defaultOpen`, the modal sheet:
- *  `<BottomSheet trigger="Share">…</BottomSheet>`; without, or with `modal={false}`, its
- *  surface: `<BottomSheet modal={false} open={open}>…</BottomSheet>`. */
+ *  `<BottomSheet trigger="Share">…</BottomSheet>`; without, its surface: `<BottomSheet
+ *  modal={false} open={open}>…</BottomSheet>`. A standard sheet (`modal={false}`) given a
+ *  trigger or `defaultOpen` opens in place after its trigger. */
 export function BottomSheet(props: BottomSheetProps): ReactNode {
-    return !sheetModal(props) ||
-        (props.trigger === undefined &&
-            props.onOpenChange === undefined &&
-            props.defaultOpen === undefined) ? (
+    if (!sheetModal(props))
+        return props.trigger === undefined &&
+            props.defaultOpen === undefined ? (
+            <Surface {...props} />
+        ) : (
+            <StandardBottomSheet {...props} />
+        );
+    return props.trigger === undefined &&
+        props.onOpenChange === undefined &&
+        props.defaultOpen === undefined ? (
         <Surface {...props} />
     ) : (
         <ModalBottomSheet {...props} />
