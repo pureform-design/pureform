@@ -7,6 +7,7 @@ import { horizontalSharedAxisAnatomy } from "@pureform/anatomy";
 import {
     HORIZONTAL_SHARED_AXIS_ROOT_PROPS,
     horizontalSharedAxisSelection,
+    pageRootProps,
     sharedAxisChange,
     sharedAxisPageProps,
     sharedAxisScrimProps,
@@ -85,6 +86,7 @@ function Root(props: HorizontalSharedAxisProps): ReactNode {
     return scope.render("root", {
         element: "div",
         as,
+        machine: pageRootProps(pages, true),
         props: { ...rest, children },
     });
 }

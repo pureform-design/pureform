@@ -248,6 +248,46 @@ describe("time picker machine", () => {
         expect(api().getDialTrackProps().style).toMatchObject({
             transform: "rotate(360deg)",
         });
+        // The handle goes round its path with the track, from 11 o'clock on past 12, rather than
+        // jumping to the value: the path starts at 3 o'clock.
+        expect(api().getDialHandleProps().style).toMatchObject({
+            offsetPath: "circle(39% at 50% 50%)",
+            offsetDistance: "75%",
+            offsetRotate: "0deg",
+        });
+        stop();
+    });
+
+    it("moves the handle at once with a dragging pointer, as the track", async () => {
+        const { api, dial, stop } = picker({ defaultValue: "02:00" });
+        const box = dial.getBoundingClientRect();
+        dial.dispatchEvent(
+            new PointerEvent("pointerdown", {
+                bubbles: true,
+                button: 0,
+                pointerId: 1,
+                clientX: box.left + box.width * 0.9,
+                clientY: box.top + box.height * 0.5,
+            }),
+        );
+        await settle();
+        document.dispatchEvent(
+            new PointerEvent("pointermove", {
+                bubbles: true,
+                pointerId: 1,
+                clientX: box.left + box.width * 0.9,
+                clientY: box.top + box.height * 0.6,
+            }),
+        );
+        await settle();
+        const handle = api().getDialHandleProps().style as Record<
+            string,
+            string
+        >;
+        expect(handle["transition"]).toBe("none");
+        expect(api().getDialTrackProps().style).toMatchObject({
+            transition: "none",
+        });
         stop();
     });
 

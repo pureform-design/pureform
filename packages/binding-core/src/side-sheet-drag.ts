@@ -23,7 +23,8 @@ const SLOP = 8;
  *  app kept it), which settles it back. Given `onClose`, it asks first, through `asker`: the
  *  sheet holds where it was let go until the answer, then leaves on `true` and settles back on
  *  `false` (or a rejection). While `draggable()` is false (a coplanar sheet), a drag doesn't
- *  start. Returns what stops it. */
+ *  start. `spring` is the var of the spring it settles on (`springRoleVar(registry,
+ *  "spatialDefault")`), so a settle samples it exactly. Returns what stops it. */
 export const sideSheetDragToDismiss = (
     sheet: HTMLElement,
     rtl: () => boolean,
@@ -31,6 +32,7 @@ export const sideSheetDragToDismiss = (
     onClose?: CloseQuestion,
     asker: CloseAsker = closeAsker(),
     draggable: () => boolean = () => true,
+    spring?: string,
 ): (() => void) => {
     // Where the pointer went down, and whether it's dragging the sheet yet (`undefined` while
     // it hasn't moved past the slop either way).
@@ -52,7 +54,13 @@ export const sideSheetDragToDismiss = (
         stopSettle?.();
         sheet.style.removeProperty("transition");
         // Back is inward: a release moving out still settles from its speed, the other way.
-        stopSettle = settleTransition(sheet, "translate", -offset, -velocity);
+        stopSettle = settleTransition(
+            sheet,
+            "translate",
+            -offset,
+            -velocity,
+            spring,
+        );
         offset = 0;
         place(0);
     };

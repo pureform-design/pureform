@@ -77,6 +77,10 @@ describe("HorizontalSharedAxis", () => {
             ["Page 2", "entering", "forward"],
         ]);
         // The leaving page can't be reached while it goes.
+        // The root clips while the pages move, and not at rest.
+        expect(
+            pages()[0]!.parentElement!.hasAttribute("data-transitioning"),
+        ).toBe(true);
         expect(pages()[0]!.inert).toBe(true);
         expect(pages()[0]!.getAttribute("aria-hidden")).toBe("true");
         await finish();
@@ -88,6 +92,9 @@ describe("HorizontalSharedAxis", () => {
                 ]),
             ).toEqual([["Page 2", "current"]]),
         );
+        expect(
+            pages()[0]!.parentElement!.hasAttribute("data-transitioning"),
+        ).toBe(false);
         // Let the browser see the page at rest, as a frame would, so its next animation is a new
         // one rather than the finished one with the same name.
         for (const page of pages()) void getComputedStyle(page).animationName;

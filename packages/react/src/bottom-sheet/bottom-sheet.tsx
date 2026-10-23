@@ -38,6 +38,7 @@ import type {
 import {
     dragToDismiss,
     focusableWhileOverflowing,
+    springRoleVar,
 } from "@pureform/binding-core/dom";
 import type { SheetDrag } from "@pureform/binding-core/dom";
 import { mergeProps, normalizeProps } from "@zag-js/react";
@@ -54,6 +55,7 @@ import { Button } from "../button";
 import { dialogParts } from "../dialog-parts";
 import { DragHandle as DragHandleComponent } from "../drag-handle";
 import { useSlotProps } from "../parts";
+import { useComponentState } from "../provider";
 import type { SlotKeyedProps } from "../parts";
 import type { PartProps } from "../props";
 
@@ -156,6 +158,10 @@ function DragHandle({
         props: rootProps,
     } = context.use("DragHandle");
     const latestRoot = useRef(rootProps);
+    const spring = springRoleVar(
+        useComponentState().registry,
+        "spatialDefault",
+    );
     latestRoot.current = rootProps;
     // Where it rests, and whether it can move between partly and fully open.
     const [rest, setRest] = useState<{
@@ -193,6 +199,7 @@ function DragHandle({
                 {
                     partial: () => sheetPartiallyExpandable(latestRoot.current),
                     opening: () => sheetOpeningRest(latestRoot.current),
+                    spring,
                     onRest: (next, movable) => {
                         if (lastRest.current !== next)
                             latestRoot.current.onExpandedChange?.({

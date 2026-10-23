@@ -76,6 +76,10 @@ describe("HorizontalSharedAxis", () => {
             ["Page 0", "leaving", "forward"],
             ["Page 2", "entering", "forward"],
         ]);
+        // The root clips while the pages move, and not at rest.
+        expect(
+            pages()[0]!.parentElement!.hasAttribute("data-transitioning"),
+        ).toBe(true);
         expect(pages()[0]!.inert).toBe(true);
         expect(pages()[0]!.getAttribute("aria-hidden")).toBe("true");
         await finish();
@@ -87,6 +91,9 @@ describe("HorizontalSharedAxis", () => {
                 ]),
             ).toEqual([["Page 2", "current"]]),
         );
+        expect(
+            pages()[0]!.parentElement!.hasAttribute("data-transitioning"),
+        ).toBe(false);
         setIndex(1);
         await settle();
         expect(pages().map((page) => page.dataset["direction"])).toEqual([

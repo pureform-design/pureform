@@ -90,6 +90,15 @@ const progressMarkup =
         </div>`;
     };
 
+// The track hides while indeterminate, so it has no box to mirror.
+const circularMarkup = (classes: Classes): string => {
+    const c = classes("circularProgress", { indeterminate: "true" });
+    return `<div data-root class="${c.root}" role="progressbar">
+        <span data-part="endHalf" class="${c.endHalf}"><span data-part="endArc" class="${c.endArc}"></span></span>
+        <span data-part="startHalf" class="${c.startHalf}"><span data-part="startArc" class="${c.startArc}"></span></span>
+    </div>`;
+};
+
 /** Pause every animation under `root` at `time` milliseconds, so both directions measure the
  *  same frame. */
 const pauseAt = (time: number) => (root: HTMLElement) => {
@@ -114,6 +123,16 @@ const FIXTURES: Fixture[] = [
         name: "indeterminate linear progress, midway",
         markup: progressMarkup(true),
         prepare: pauseAt(900),
+    },
+    {
+        name: "indeterminate circular progress, growing",
+        markup: circularMarkup,
+        prepare: pauseAt(700),
+    },
+    {
+        name: "indeterminate circular progress, shrinking",
+        markup: circularMarkup,
+        prepare: pauseAt(2200),
     },
 ];
 

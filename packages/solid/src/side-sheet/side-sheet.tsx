@@ -28,7 +28,10 @@ import type {
     SideSheetRootOwnProps,
     Unstyled,
 } from "@pureform/binding-core";
-import { sideSheetDragToDismiss } from "@pureform/binding-core/dom";
+import {
+    sideSheetDragToDismiss,
+    springRoleVar,
+} from "@pureform/binding-core/dom";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import { omit, onSettled, Show } from "solid-js";
 
@@ -39,7 +42,7 @@ import { IconButton } from "../icon-button";
 import { createSlotProps } from "../parts";
 import type { SlotKeyedProps } from "../parts";
 import type { PartProps } from "../props";
-import { useDirection } from "../provider";
+import { useDirection, usePureform } from "../provider";
 
 type Anatomy = typeof sideSheetOverlayAnatomy;
 
@@ -115,6 +118,7 @@ function Content(props: SideSheetPartProps): JSX.Element {
         props: root,
     } = context.use("Content");
     const dir = useDirection();
+    const state = usePureform();
     onSettled(() => {
         const element = surface();
         if (!element) return;
@@ -131,6 +135,7 @@ function Content(props: SideSheetPartProps): JSX.Element {
             () => onClose()?.() ?? true,
             asker,
             () => sideSheetSelection(root).coplanar !== true,
+            springRoleVar(state().registry, "spatialDefault"),
         );
     });
     return <Surface {...props} />;

@@ -39,22 +39,27 @@ const shifted = (
  *  box's start, ending at the box's end (a longer box ends flat), between `top` and `bottom` (the
  *  band's edges at the wave's middle, from the box's top) and moving up and down by `amplitude`.
  *  The lengths may read tokens, so the band follows them. Points past the box's end fold onto
- *  it, so the band ends where the box does. */
+ *  it, so the band ends where the box does. `shift` moves the wave along (a length that may read
+ *  a token, so an animation of it makes the wave travel); the band then starts that far in, so
+ *  shift it by at most a wavelength back and start a wave early (`waves` one more). */
 export const waveBand = ({
     waves,
     wavelength,
     top,
     bottom,
     amplitude,
+    shift,
 }: {
     waves: number;
     wavelength: number;
     top: NumericValue;
     bottom: NumericValue;
     amplitude: NumericValue;
+    shift?: NumericValue | undefined;
 }): ShapeNode => {
     const end = waves * wavelength;
-    const x = (length: number) => min(px(round(length)), pct(100));
+    const x = (length: number) =>
+        min(shift ? add(px(round(length)), shift) : px(round(length)), pct(100));
     const point =
         (middle: NumericValue) =>
         (t: number, s: number): ShapePoint => [

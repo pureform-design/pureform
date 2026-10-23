@@ -131,3 +131,30 @@ describe("TimeInput", () => {
         expect(all(testIds.timeInput.period)).toHaveLength(2);
     });
 });
+
+describe("TimePicker's dial handle", () => {
+    it("sits at the hand's tip, on a path round the centre the transition moves it along", async () => {
+        // The preset's geometry: a 256px dial, a 48px handle centred by its own size.
+        const style = document.createElement("style");
+        style.textContent = `
+            [data-testid="${ids.dial}"] { position: relative; width: 256px; height: 256px; }
+            [data-testid="${ids.dialHandle}"] {
+                position: absolute; width: 48px; height: 48px;
+                transform: translate(-24px, -24px);
+            }`;
+        document.head.append(style);
+        try {
+            withRegistry(<TimePicker defaultValue="02:00" hourCycle={12} />);
+            await settle();
+            const dial = byTestId(ids.dial).getBoundingClientRect();
+            const handle = byTestId(ids.dialHandle).getBoundingClientRect();
+            // Two o'clock: a sixth of a turn, 39% of the dial out from its centre.
+            const r = 0.39 * 256;
+            const turn = (2 / 12) * 2 * Math.PI;
+            expect(handle.x + 24 - dial.x).toBeCloseTo(128 + r * Math.sin(turn), 0);
+            expect(handle.y + 24 - dial.y).toBeCloseTo(128 - r * Math.cos(turn), 0);
+        } finally {
+            style.remove();
+        }
+    });
+});

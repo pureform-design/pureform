@@ -10,6 +10,7 @@ import { horizontalSharedAxisAnatomy } from "@pureform/anatomy";
 import type { TestIdOverride } from "@pureform/anatomy";
 import {
     horizontalSharedAxisSelection,
+    pagesMoving,
     SHARED_AXIS_FADE,
     SHARED_AXIS_SLIDE_FRACTION,
     sharedAxisChange,
@@ -49,6 +50,9 @@ export interface HorizontalSharedAxisProps extends HorizontalSharedAxisVariantPr
     readonly children?: ReactNode;
     readonly testId?: TestIdOverride<HorizontalSharedAxisPart> | undefined;
 }
+
+// The root clips the pages only while they move, so focus rings and shadows show at rest.
+const CLIP: ViewStyle = { overflow: "hidden" };
 
 const FILL: ViewStyle = {
     position: "absolute",
@@ -279,7 +283,7 @@ export function HorizontalSharedAxis(
     const Root = v.root.View;
     return (
         <Root
-            style={s.root}
+            style={[s.root, pagesMoving(changed) ? CLIP : null]}
             testID={id("root")}
             onLayout={(event: LayoutChangeEvent) =>
                 setWidth(event.nativeEvent.layout.width)

@@ -1,7 +1,8 @@
 // A swipeable list item's state and gesture: how far the row has slid, whether its action is
 // revealed (controlled by `revealed`, or kept from `defaultRevealed`), the pointer drag that
 // slides it and the keys that open and close it. Built only for a row that is swipeable, when it
-// is made, so the rows that aren't pay nothing.
+// is made, so the rows that aren't pay nothing. Let go, the row settles from the drag's speed
+// (`createSwipeSettle`).
 
 import {
     LIST_ITEM_SWIPE_SLOP,
@@ -13,10 +14,13 @@ import {
     swipeTokens,
 } from "@pureform/binding-core";
 import type { ListItemSwipeProps } from "@pureform/binding-core";
-import { swallowNextClick } from "@pureform/binding-core/dom";
+import {
+    createSwipeSettle,
+    swallowNextClick,
+} from "@pureform/binding-core/dom";
 import { type Accessor, createSignal, untrack } from "solid-js";
 
-import { useDirection } from "../provider";
+import { useDirection, usePureform } from "../provider";
 
 // A press on these is theirs, not the start of a swipe.
 const OWN_GESTURES = "button, a, input, select, textarea, [role='button']";
@@ -56,6 +60,8 @@ export function createSwipe(props: ListItemSwipeProps): Swipe {
     // expandable row's): a capturing listener on the row swallows it. The next press takes the
     // listener back if no click came.
     let swallow: (() => void) | undefined;
+    const state = usePureform();
+    const settle = createSwipeSettle(() => state().registry);
     const rootProps = (interactive: boolean) => ({
         style: { "touch-action": "pan-y" },
         tabIndex: interactive ? undefined : 0,
@@ -70,6 +76,11 @@ export function createSwipe(props: ListItemSwipeProps): Swipe {
                 offset: offset(),
                 moved: false,
             };
+            settle.start(
+                event.currentTarget as HTMLElement,
+                offset(),
+                event.timeStamp,
+            );
         },
         onPointerMove: (event: PointerEvent) => {
             if (!gesture) return;
@@ -91,6 +102,7 @@ export function createSwipe(props: ListItemSwipeProps): Swipe {
                 width(),
                 direction() === "rtl",
             );
+            settle.move(gesture.offset, event.timeStamp);
             setDrag(gesture.offset);
         },
         onPointerUp: (event: PointerEvent) => {
@@ -98,7 +110,13 @@ export function createSwipe(props: ListItemSwipeProps): Swipe {
             gesture = undefined;
             if (!held?.moved) return;
             swallow = swallowNextClick(event.currentTarget as Element);
-            setRevealed(swipeSettlesOpen(held.offset, width()));
+            const open = swipeSettlesOpen(held.offset, width());
+            settle.release(
+                event.currentTarget as HTMLElement,
+                held.offset,
+                swipeRestOffset(open, width()),
+            );
+            setRevealed(open);
             setDrag(undefined);
         },
         onPointerCancel: () => {

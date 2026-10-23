@@ -173,6 +173,42 @@ describe("progress", () => {
             "--components-circularProgress-rotationDuration",
         );
         expect(spin).toContain("1500ms");
+        // A cycle is two turns.
+        expect(spin).toContain("* 2");
+    });
+
+    it("grows and shrinks the indeterminate circular arc while it turns, as Compose's", () => {
+        const recipes = compilePreset(configWith(circularProgress)).theme
+            ?.slotRecipes;
+        const indeterminate =
+            recipes?.circularProgress?.variants?.indeterminate?.true;
+        // The determinate arcs draw it: only the track hides.
+        expect(indeterminate?.track).toEqual({ display: "none" });
+        expect(indeterminate?.endHalf).toBeUndefined();
+        expect(JSON.stringify(indeterminate?.root?.animation)).toContain(
+            "circularProgressArc",
+        );
+        const frames = pureform().keyframes?.["circularProgressArc"];
+        const value = (stop: string) =>
+            JSON.stringify(frames?.[stop]?.tokens ?? {});
+        expect(value("0%")).toContain('"value":10');
+        expect(value("50%")).toContain('"value":87');
+        expect(value("100%")).toContain('"value":10');
+        // The tail catches up as the arc shrinks, two turns a cycle.
+        expect(JSON.stringify(frames?.["50%"]?.transform)).toContain("221.4");
+        expect(JSON.stringify(frames?.["100%"]?.transform)).toContain("720");
+    });
+
+    it("moves the indeterminate linear wave along the track, not with the bar", () => {
+        const css = compilePreset(configWith(linearProgress)).theme?.slotRecipes
+            ?.linearProgress;
+        const compound = JSON.stringify(css?.compoundVariants);
+        expect(compound).toContain('"shape":"wavy"');
+        expect(compound).toContain("linearProgressWave");
+        // The root clips to the travelling wave, which reads how far it has travelled.
+        expect(compound).toContain("--components-linearProgress-waveDrift");
+        const frames = pureform().keyframes?.["linearProgressWave"];
+        expect(JSON.stringify(frames?.["to"]?.tokens)).toContain("40");
     });
 
     it("turns each half of the circular arc through its share of the value", () => {
@@ -230,7 +266,10 @@ describe("progress", () => {
             expect.arrayContaining([
                 "linearProgressSlide",
                 "linearProgressSlideRtl",
-                "circularProgressSpin",
+                "linearProgressWave",
+                "linearProgressWaveRtl",
+                "circularProgressArc",
+                "circularProgressArcRtl",
             ]),
         );
     });

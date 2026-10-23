@@ -107,8 +107,11 @@ describe("wave paths", () => {
         for (const compound of circularProgress.recipe.compoundVariants ?? []) {
             expect(compound.match).not.toHaveProperty("thickness");
         }
-        expect(linearProgress.recipe.compoundVariants ?? []).toHaveLength(0);
-        expect(circularProgress.recipe.compoundVariants).toHaveLength(1);
+        // Only the indeterminate line's travelling wave, which no thickness changes.
+        expect(
+            linearProgress.recipe.compoundVariants?.map((c) => c.match),
+        ).toEqual([{ shape: "wavy", indeterminate: "true" }]);
+        expect(circularProgress.recipe.compoundVariants ?? []).toHaveLength(0);
     });
 });
 
@@ -194,8 +197,13 @@ describe("wavy progress", () => {
         const wavy = linearProgress.recipe.variants?.shape?.wavy;
         expect(wavy?.indicator?.clipPath).toMatchObject({ type: "shape" });
         expect(JSON.stringify(wavy?.indicator?.top)).toContain("clipShape");
-        // The wave reads the height, so a thick bar needs no compound.
-        expect(linearProgress.recipe.compoundVariants ?? []).toHaveLength(0);
+        // The wave reads the height, so a thick bar needs no compound; the indeterminate
+        // line's wave travels along the track, clipping the root rather than the bar.
+        expect(linearProgress.recipe.compoundVariants).toEqual([
+            expect.objectContaining({
+                match: { shape: "wavy", indeterminate: "true" },
+            }),
+        ]);
     });
 
     it("clips the circular arcs to a wavy ring, the spinner too while indeterminate", () => {
@@ -205,11 +213,7 @@ describe("wavy progress", () => {
             fillRule: "evenodd",
         });
         expect(wavy?.startArc?.clipPath).toEqual(wavy?.endArc?.clipPath);
-        // Only the spinner's: the ring reads the thickness.
-        expect(circularProgress.recipe.compoundVariants).toEqual([
-            expect.objectContaining({
-                match: { shape: "wavy", indeterminate: "true" },
-            }),
-        ]);
+        // The ring reads the thickness, and the spinner draws with the same arcs.
+        expect(circularProgress.recipe.compoundVariants ?? []).toHaveLength(0);
     });
 });

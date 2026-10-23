@@ -467,7 +467,11 @@ import { RichTooltip } from "@pureform/react/rich-tooltip";
   or the arrow keys resize the panes (Shift moves 10%, Home and End to the limits). When a drag
   lets go, the divider snaps to the nearest anchor, or the next one the way it was flung past
   200px/s, as Compose's pane expansion: `SPLITTER_ANCHORS` (either edge, 240px from either edge,
-  half) by default, `anchors={[]}` to rest where it's let go. A pane's content scrolls natively.
+  half) by default, `anchors={[]}` to rest where it's let go. The snap runs on Compose's spring
+  (`SPLITTER_SETTLE`) from the release's speed, as an inline `transition` on the two panes'
+  `flex-grow`: while it runs, a pane's own `transition` (from its `style` or a class) gives way
+  to it, and an inline one is put back once the snap ends. Put a pane's transitions on an element
+  inside it to keep them running during a snap. A pane's content scrolls natively.
   The ready-made takes `panes` (each with its `content`) and `resizeLabel`. Import it from
   `@pureform/react/splitter`.
 - **The search view** runs Zag's dialog (modal: focus stays in it and goes back to the search bar

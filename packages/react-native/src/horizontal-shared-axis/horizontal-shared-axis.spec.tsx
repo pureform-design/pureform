@@ -80,6 +80,10 @@ describe("HorizontalSharedAxis on React Native", () => {
         ]);
         expect(shown()).toEqual(["Page 1"]);
         expect(scrim()).not.toBeNull();
+        // The root clips the moving pages, and not at rest.
+        expect(getComputedStyle(pages()[0]!.parentElement!).overflow).toBe(
+            "hidden",
+        );
         // Under left to right the leaving page moves left, the entering one comes from the right.
         expect(translateOf(pages()[0]!)).toBeLessThan(0);
         expect(translateOf(pages()[1]!)).toBeGreaterThan(0);
@@ -91,6 +95,9 @@ describe("HorizontalSharedAxis on React Native", () => {
             30_000,
         );
         expect(scrim()).toBeNull();
+        expect(getComputedStyle(pages()[0]!.parentElement!).overflow).not.toBe(
+            "hidden",
+        );
     });
 
     it("mirrors the slide under right to left", async () => {

@@ -98,11 +98,15 @@ export const LEAVING_PAGE_PROPS = {
     "aria-hidden": "true",
 } as const;
 
-/** The root's attributes while a page leaves: `data-transitioning`, which clips the root. */
+/** The root's attributes while a page leaves (or, with `whileMoving`, while any page moves, for
+ *  a transition whose entering page slides too): `data-transitioning`, which clips the root. */
 export const pageRootProps = (
     pages: readonly TransitionPage[],
+    whileMoving = false,
 ): Readonly<Record<string, string>> =>
-    pagesLeaving(pages) ? { "data-transitioning": "" } : {};
+    (whileMoving ? pagesMoving(pages) : pagesLeaving(pages))
+        ? { "data-transitioning": "" }
+        : {};
 
 /** How a component with pages (the ready-made tabs, a horizontal stepper) moves between them. */
 export interface PageTransitionProps {

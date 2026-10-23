@@ -468,6 +468,41 @@ describe("a swipeable ListItem", () => {
         expect(byTestId(ids.action).hasAttribute("inert")).toBe(true);
     });
 
+    it("settles from the release's speed on the theme's exact spring", async () => {
+        // As the preset's stylesheet would: the row's offset on the fast spatial spring.
+        const style = document.createElement("style");
+        style.textContent = `
+            :root {
+                --springs-spatial-fast-stiffness: 1400;
+                --springs-spatial-fast-damping: 0.9;
+                --springs-spatial-fast-mass: 1;
+            }
+            .list-item--swipeable-true {
+                transition: --components-listItem-swipeOffset 350ms linear(0, 0.6 20%, 0.95 50%, 1);
+            }`;
+        document.head.append(style);
+        try {
+            withRegistry(() => (
+                <ListItem
+                    headline="Message"
+                    swipeAction={<button type="button">Delete</button>}
+                />
+            ));
+            await settle();
+            const root = byTestId(ids.root);
+            pointer(root, "pointerdown", 200);
+            pointer(root, "pointermove", 180);
+            pointer(root, "pointermove", 140);
+            pointer(root, "pointerup", 140);
+            expect(root.style.transition).toMatch(
+                /^--components-listItem-swipeOffset \d+ms linear\(/,
+            );
+            await settle();
+        } finally {
+            style.remove();
+        }
+    });
+
     it("stays closed when the drag falls short of half", async () => {
         const onRevealedChange = vi.fn();
         withRegistry(() => (

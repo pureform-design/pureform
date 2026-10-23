@@ -28,6 +28,8 @@ export { themeVars } from "./runtime";
 export {
     compileSpring,
     isSpringValue,
+    compileSpringParams,
+    SPRING_PARAMS,
     springTokenVars,
     springVarNames,
     springTokenEntries,

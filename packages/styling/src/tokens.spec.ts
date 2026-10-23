@@ -29,6 +29,9 @@ describe("tokenStyle", () => {
             "--components-tabs-indicatorSpring-duration": `${duration}ms`,
             "--components-tabs-indicatorSpring-easing":
                 formatLinearEasing(points),
+            "--components-tabs-indicatorSpring-stiffness": "800",
+            "--components-tabs-indicatorSpring-damping": "0.6",
+            "--components-tabs-indicatorSpring-mass": "1",
         });
     });
 
@@ -47,6 +50,12 @@ describe("tokenStyle", () => {
                 "var(--pf-springs-spatial-slow-duration)",
             "--components-tabs-indicatorSpring-easing":
                 "var(--pf-springs-spatial-slow-easing)",
+            "--components-tabs-indicatorSpring-stiffness":
+                "var(--pf-springs-spatial-slow-stiffness)",
+            "--components-tabs-indicatorSpring-damping":
+                "var(--pf-springs-spatial-slow-damping)",
+            "--components-tabs-indicatorSpring-mass":
+                "var(--pf-springs-spatial-slow-mass)",
             "--components-tabs-accent": "red",
         });
     });

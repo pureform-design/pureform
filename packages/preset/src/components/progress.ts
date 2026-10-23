@@ -54,7 +54,7 @@ import {
     unitless,
     when,
 } from "@pureform/core/ast";
-import type { StyleMap } from "@pureform/core/ast";
+import type { ShapeNode, StyleMap } from "@pureform/core/ast";
 import { easing, radius } from "@pureform/theme";
 
 import { waveBand, wavyRing } from "./shape-paths";
@@ -72,6 +72,42 @@ import type { ColorGroup, ColorGroups } from "./shared";
 
 const pf = typed();
 
+// One wave of the wavy line, in px: Compose's `WavyProgressIndicatorDefaults` 40dp wavelength.
+const WAVELENGTH = 40;
+const WAVE_DRIFT = "components.linearProgress.waveDrift";
+const CIRCULAR_VALUE = "components.circularProgress.value";
+
+// Compose's indeterminate circular arc grows from a tenth of the circle to 87% and shrinks back
+// (`CircularIndeterminateMinProgress`, `CircularIndeterminateMaxProgress`) while the whole turns.
+// Here a cycle is two turns: as the arc grows, its tail turns 221.4°; as it shrinks, the tail
+// catches up by the 277.2° the arc gave up as well, so the head keeps going round and a cycle
+// ends two turns on, where the next begins. Mirrored under right to left, where the arcs are.
+const ARC_MIN = 10;
+const ARC_MAX = 87;
+const CATCH_UP = (ARC_MAX - ARC_MIN) * 3.6;
+const HALFWAY = (720 - CATCH_UP) / 2;
+
+function circularArcKeyframes(): Record<string, Record<string, StyleMap>> {
+    const frames = (sign: 1 | -1) => ({
+        "0%": {
+            transform: transform(rotate(numeric(0, "deg"))),
+            tokens: { [CIRCULAR_VALUE]: unitless(ARC_MIN) },
+        },
+        "50%": {
+            transform: transform(rotate(numeric(sign * HALFWAY, "deg"))),
+            tokens: { [CIRCULAR_VALUE]: unitless(ARC_MAX) },
+        },
+        "100%": {
+            transform: transform(rotate(numeric(sign * 720, "deg"))),
+            tokens: { [CIRCULAR_VALUE]: unitless(ARC_MIN) },
+        },
+    });
+    return {
+        circularProgressArc: frames(1),
+        circularProgressArcRtl: frames(-1),
+    };
+}
+
 /** The keyframes the progress indicators animate with; `pureform()` adds them to the
  *  config. */
 export const PROGRESS_KEYFRAMES: Record<string, Record<string, StyleMap>> = {
@@ -86,10 +122,16 @@ export const PROGRESS_KEYFRAMES: Record<string, Record<string, StyleMap>> = {
         from: { transform: transform(translateX(pct(100))) },
         to: { transform: transform(translateX(pct(-250))) },
     },
-    circularProgressSpin: {
-        from: { transform: transform(rotate(numeric(0, "deg"))) },
-        to: { transform: transform(rotate(numeric(360, "deg"))) },
+    // A wavy line's wave travels along its track, a wavelength each cycle, toward the end.
+    linearProgressWave: {
+        from: { tokens: { [WAVE_DRIFT]: px(0) } },
+        to: { tokens: { [WAVE_DRIFT]: px(WAVELENGTH) } },
     },
+    linearProgressWaveRtl: {
+        from: { tokens: { [WAVE_DRIFT]: px(WAVELENGTH) } },
+        to: { tokens: { [WAVE_DRIFT]: px(0) } },
+    },
+    ...circularArcKeyframes(),
 };
 
 const linear = componentTokens("linearProgress", {
@@ -105,7 +147,12 @@ const linear = componentTokens("linearProgress", {
     amplitude: px(3),
     // One indeterminate cycle: Compose's `LinearAnimationDuration`, 1750ms.
     indeterminateDuration: numeric(1750, "ms"),
-});
+    // How long the wave takes to travel a wavelength: Compose's `waveSpeed`, a wavelength a
+    // second.
+    waveDuration: numeric(1000, "ms"),
+    // How far the wave has travelled, which the indeterminate wave animates.
+    waveDrift: px(0),
+}, { waveDrift: "length" });
 
 // The linear wave: 40px long, as many as cover a 960px bar (a longer one ends flat), in a box as
 // tall as the track and the wave's amplitude above and below it, from the tokens, so it follows
@@ -117,6 +164,44 @@ const linearWave = waveBand({
     bottom: add(linear.ref("amplitude"), linear.ref("height")),
     amplitude: linear.ref("amplitude"),
 });
+
+// The indeterminate wave: the same band, anchored to the track rather than the sliding bar, a
+// wave longer so it can travel a wavelength. The root clips to it and to the flat track's band,
+// so the bar, wherever it is, shows the wave where it is on the track.
+const travellingWave = (): ShapeNode => {
+    const band = waveBand({
+        waves: 25,
+        wavelength: WAVELENGTH,
+        top: linear.ref("amplitude"),
+        bottom: add(linear.ref("amplitude"), linear.ref("height")),
+        amplitude: linear.ref("amplitude"),
+        shift: sub(linear.ref("waveDrift"), px(WAVELENGTH)),
+    });
+    const top = linear.ref("amplitude");
+    const bottom = add(linear.ref("amplitude"), linear.ref("height"));
+    return {
+        ...band,
+        contours: [
+            ...band.contours,
+            {
+                from: [px(0), top],
+                segments: [
+                    { op: "line", to: [pct(100), top] },
+                    { op: "line", to: [pct(100), bottom] },
+                    { op: "line", to: [px(0), bottom] },
+                ],
+            },
+        ],
+    };
+};
+
+const travel = (name: string) =>
+    animation({
+        name,
+        duration: linear.ref("waveDuration"),
+        easing: easing("linear"),
+        iterations: "infinite",
+    });
 
 const slide = (name: string) =>
     animation({
@@ -264,6 +349,41 @@ export const createLinearProgress = <const G extends string = ColorGroup>(
                         stopIndicator: { backgroundColor: g.main },
                     })),
                 },
+                // The indeterminate wave travels along the track, not with the bar (Compose's
+                // `LinearWavyProgressIndicator`): on the web the root clips to it and the bar
+                // fills its height. React Native keeps the bar's own wave.
+                compoundVariants: [
+                    {
+                        match: { shape: "wavy", indeterminate: "true" },
+                        style: {
+                            root: {
+                                rawRules: {
+                                    css: {
+                                        "&": {
+                                            clipPath: travellingWave(),
+                                            animation: when(
+                                                "rtl",
+                                                travel("linearProgressWaveRtl"),
+                                                travel("linearProgressWave"),
+                                            ),
+                                        },
+                                    },
+                                },
+                            },
+                            indicator: {
+                                rawRules: {
+                                    css: {
+                                        "&": {
+                                            clipPath: none,
+                                            top: px(0),
+                                            height: pct(100),
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                ],
                 defaultVariants: {
                     indeterminate: "false",
                     thickness: "default",
@@ -354,6 +474,15 @@ export const createCircularProgress = <const G extends string = ColorGroup>(
             opacity: clamp(unitless(0), sweep, unitless(1)),
         };
     };
+
+    // A cycle of the indeterminate arc: two turns.
+    const spin = (name: string) =>
+        animation({
+            name,
+            duration: mul(ref("rotationDuration"), unitless(2)),
+            easing: easing("standard"),
+            iterations: "infinite",
+        });
 
     // A ring as wide as the wave, clipped to it.
     const wavyArc: StyleMap = {
@@ -456,25 +585,20 @@ export const createCircularProgress = <const G extends string = ColorGroup>(
                 ),
             },
             variants: {
-                // Two colored quarters of a bordered circle, turning; the halves stay hidden.
+                // The determinate arcs, turning, their length growing from a tenth of the
+                // circle to 87% and back (`circularProgressArc`, which animates `value`; a
+                // target that can't animate a token keeps half the circle).
                 indeterminate: {
                     true: {
                         root: {
-                            borderStyle: solid,
-                            borderWidth: ref("thickness"),
-                            borderColor: transparent,
-                            borderBlockStartColor: ref("activeColor"),
-                            borderInlineEndColor: ref("activeColor"),
-                            animation: animation({
-                                name: "circularProgressSpin",
-                                duration: ref("rotationDuration"),
-                                easing: easing("linear"),
-                                iterations: "infinite",
-                            }),
+                            tokens: { value: unitless(50) },
+                            animation: when(
+                                "rtl",
+                                spin("circularProgressArcRtl"),
+                                spin("circularProgressArc"),
+                            ),
                         },
                         track: { display: none },
-                        endHalf: { display: none },
-                        startHalf: { display: none },
                     },
                     false: {},
                 },
@@ -517,14 +641,6 @@ export const createCircularProgress = <const G extends string = ColorGroup>(
                     },
                 })),
             },
-            // The wave on the spinning ring, only while indeterminate: a determinate root
-            // can't take the clip, whose troughs would cut its flat track.
-            compoundVariants: [
-                {
-                    match: { shape: "wavy", indeterminate: "true" },
-                    style: { root: wavyArc },
-                },
-            ],
             defaultVariants: {
                 indeterminate: "false",
                 thickness: "default",
