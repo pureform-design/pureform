@@ -26,23 +26,20 @@ import {
     mul,
     px,
     slot,
-    solid,
-    transparent,
     unitless,
     vertical,
     when,
 } from "@pureform/core/ast";
 import type { AliasNode, StyleMap } from "@pureform/core/ast";
-import { radius, size as sizeToken, spacing, textStyle } from "@pureform/theme";
+import { size as sizeToken, spacing, textStyle } from "@pureform/theme";
 
-import { INDICATION_TOKENS, stateLayer } from "../state-layer";
-import type { IndicationToken } from "../state-layer";
+import { stateLayer } from "../state-layer";
+import { PLAIN_BOX_TOKENS, plainBoxStyle } from "./plain-box";
+import type { PlainBoxToken } from "./plain-box";
 import {
     componentTokens,
     disabledColor,
-    focusRing,
     INDICATION_ROOT,
-    stateTransition,
     sys,
     THEME_DENSITY,
 } from "./shared";
@@ -128,22 +125,8 @@ const indicator = (path: string): StyleMap => ({
     clipPath: literal(`path(evenodd, "${path}")`),
 });
 
-/** The tokens Input's and Textarea's box reads. */
-type BoxToken =
-    | "container"
-    | "inputColor"
-    | "outlineColor"
-    | "hoverOutlineColor"
-    | "errorColor"
-    | "outlineWidth"
-    | "radius"
-    | "paddingInline"
-    | "paddingBlock"
-    | IndicationToken;
-
-/** The box Input and Textarea share: the theme's shape, an outline in the outline color (the
- *  error color while invalid), the body text, a state layer of the text color on hover and
- *  press, and the focus ring. */
+// The outline's width comes out of the block padding, so the box is the text plus the padding;
+// the theme's density takes half its offset off each side.
 const blockPadding = (ref: (token: BoxToken) => AliasNode) =>
     add(
         ref("paddingBlock"),
@@ -151,54 +134,38 @@ const blockPadding = (ref: (token: BoxToken) => AliasNode) =>
         mul(THEME_DENSITY, unitless(0.5)),
     );
 
+type BoxToken = PlainBoxToken | "paddingBlock";
+
+/** Input's and Textarea's box: the plain box, with the state layer of the text color on hover
+ *  and press. */
 const boxStyle = (ref: (token: BoxToken) => AliasNode): StyleMap => ({
     ...INDICATION_ROOT,
-    ...focusRing(ref, "focusVisible"),
-    transition: stateTransition,
-    textStyle: textStyle("bodyLarge"),
+    ...plainBoxStyle(ref, {
+        hover: slot("root", "hover"),
+        invalid: ROOT_INVALID,
+        disabled: ROOT_DISABLED,
+    }),
     minWidth: px(0),
     marginBlockStart: px(0),
     marginBlockEnd: px(0),
     marginInlineStart: px(0),
     marginInlineEnd: px(0),
-    borderStyle: solid,
-    borderWidth: ref("outlineWidth"),
-    borderRadius: ref("radius"),
-    borderColor: when()
-        .on(slot("root", "hover"), ref("hoverOutlineColor"))
-        .on(ROOT_INVALID, ref("errorColor"))
-        .on(ROOT_DISABLED, disabledColor("disabledContainer"))
-        .else(ref("outlineColor")),
-    // The outline's width comes out of the padding, so the box is the text plus the padding;
-    // the theme's density takes half its offset off each side.
     paddingBlockStart: blockPadding(ref),
     paddingBlockEnd: blockPadding(ref),
-    paddingInlineStart: ref("paddingInline"),
     paddingInlineEnd: ref("paddingInline"),
     backgroundColor: stateLayer(ref, {
         base: ref("container"),
         content: ref("inputColor"),
     }),
-    color: when()
-        .on(ROOT_DISABLED, disabledColor("disabledContent"))
-        .else(ref("inputColor")),
 });
 
 const inputTokens = componentTokens("input", {
-    container: transparent,
-    inputColor: sys("onSurface"),
+    ...PLAIN_BOX_TOKENS,
     placeholderColor: sys("onSurfaceVariant"),
-    outlineColor: sys("outline"),
-    hoverOutlineColor: sys("onSurface"),
-    errorColor: sys("error"),
     // The date and time pickers' indicator.
     indicatorColor: sys("onSurfaceVariant"),
     indicatorSize: sizeToken("iconMedium"),
-    outlineWidth: px(1),
-    radius: radius("extraSmall"),
-    paddingInline: spacing("3"),
     paddingBlock: spacing("2"),
-    ...INDICATION_TOKENS,
 });
 
 export const input = pf.slotComponent({
@@ -250,19 +217,11 @@ export const input = pf.slotComponent({
 });
 
 const plainTextareaTokens = componentTokens("plainTextarea", {
-    container: transparent,
-    inputColor: sys("onSurface"),
+    ...PLAIN_BOX_TOKENS,
     placeholderColor: sys("onSurfaceVariant"),
-    outlineColor: sys("outline"),
-    hoverOutlineColor: sys("onSurface"),
-    errorColor: sys("error"),
-    outlineWidth: px(1),
-    radius: radius("extraSmall"),
-    paddingInline: spacing("3"),
     paddingBlock: spacing("2"),
     // Three lines of the body text, and the padding.
     minHeight: px(88),
-    ...INDICATION_TOKENS,
 });
 
 export const plainTextarea = pf.slotComponent({

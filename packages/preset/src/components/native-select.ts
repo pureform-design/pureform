@@ -3,7 +3,7 @@
 // there is nothing to open, position or close. Material 3 has no such control (its select is the
 // field with a menu, `select`), so the design is pureform's own: one box, no variants.
 //
-// The box is the plain input's: an outline in the theme's outline color, the theme's extra small
+// The box is the plain input's (`plain-box.ts`): an outline in the theme's outline color, the theme's extra small
 // radius, the body type, a state layer on hover and focus (on the root, following the select, under
 // its transparent box), and the focus ring through the indication tokens. An invalid select
 // (`aria-invalid`) takes the error color, and a disabled one the disabled colors. The chevron is a
@@ -33,45 +33,30 @@ import {
     px,
     relative,
     slot,
-    solid,
     translateY,
     transparent,
     unitless,
     when,
 } from "@pureform/core/ast";
 import type { StyleMap } from "@pureform/core/ast";
-import {
-    colorRole,
-    radius,
-    size as sizeToken,
-    spacing,
-    textStyle,
-} from "@pureform/theme";
+import { size as sizeToken, spacing } from "@pureform/theme";
 
-import { INDICATION_TOKENS } from "../state-layer";
+import type { IndicationToken } from "../state-layer";
+import { PLAIN_BOX_TOKENS, plainBoxStyle } from "./plain-box";
 import {
     componentTokens,
     DENSITY_TOKEN,
     disabledColor,
-    focusRing,
     iconBox,
     iconFill,
     INDICATION_ROOT,
     slotStateLayer,
-    stateTransition,
     sys,
 } from "./shared";
 
 const { tokens, ref } = componentTokens("nativeSelect", {
+    ...PLAIN_BOX_TOKENS,
     height: px(40),
-    radius: radius("extraSmall"),
-    paddingInline: spacing("3"),
-    outlineWidth: px(1),
-    outlineColor: sys("outline"),
-    hoverColor: sys("onSurface"),
-    errorColor: colorRole("error"),
-    container: transparent,
-    textColor: sys("onSurface"),
     iconColor: sys("onSurfaceVariant"),
     iconSize: sizeToken("iconMedium"),
     iconInset: spacing("3"),
@@ -79,10 +64,9 @@ const { tokens, ref } = componentTokens("nativeSelect", {
     listContainer: sys("surfaceContainer"),
     listColor: sys("onSurface"),
     ...DENSITY_TOKEN,
-    ...INDICATION_TOKENS,
 });
 
-const FOCUS = (token: keyof typeof INDICATION_TOKENS) => ref(token);
+const FOCUS = (token: IndicationToken) => ref(token);
 
 const pf = typed();
 
@@ -120,25 +104,22 @@ export const createNativeSelect = () =>
                     borderRadius: ref("radius"),
                     backgroundColor: slotStateLayer(FOCUS, "select", {
                         base: ref("container"),
-                        content: ref("hoverColor"),
+                        content: ref("inputColor"),
                         disabled: ref("container"),
                     }),
                 },
                 select: {
-                    ...focusRing(FOCUS),
-                    transition: stateTransition,
+                    // The select's own states: `:has(:disabled)` would match a disabled option.
+                    ...plainBoxStyle(ref, {
+                        hover: "hover",
+                        invalid: slot("select", "invalid"),
+                        disabled: "disabled",
+                    }),
                     appearance: none,
-                    cursor: pointer,
+                    cursor: when().on("disabled", notAllowed).else(pointer),
                     width: pct(100),
                     height: add(ref("height"), ref("densityOffset")),
-                    textStyle: textStyle("bodyLarge"),
-                    color: ref("textColor"),
                     backgroundColor: transparent,
-                    borderStyle: solid,
-                    borderWidth: ref("outlineWidth"),
-                    borderColor: ref("outlineColor"),
-                    borderRadius: ref("radius"),
-                    paddingInlineStart: ref("paddingInline"),
                     // Clear of the chevron.
                     paddingInlineEnd: add(
                         add(ref("iconInset"), ref("iconSize")),
@@ -146,15 +127,6 @@ export const createNativeSelect = () =>
                     ),
                     paddingBlockStart: px(0),
                     paddingBlockEnd: px(0),
-                    states: {
-                        hover: { borderColor: ref("hoverColor") },
-                        invalid: { borderColor: ref("errorColor") },
-                        disabled: {
-                            color: disabledColor("disabledContent"),
-                            borderColor: disabledColor("disabledContainer"),
-                            cursor: notAllowed,
-                        },
-                    },
                 } satisfies StyleMap,
                 icon: {
                     position: absolute,
