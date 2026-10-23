@@ -77,7 +77,7 @@ export const input: ComponentCase = {
     ...control(testIds.input.root),
 };
 
-export const plainTextarea: ComponentCase = {
+export const textarea: ComponentCase = {
     component: "Textarea",
     props: { "aria-label": "Bio" },
     root: testIds.plainTextarea.root,
