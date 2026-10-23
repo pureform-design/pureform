@@ -13,18 +13,30 @@ export default defineStories({
             adapter: "./src/solid/adapter.ts",
             export: "solidAdapter",
             hooks: "@pureform/solid/storybook",
+            scenes: {
+                module: "./src/solid/scenes.ts",
+                components: ["Toast", "GridList"],
+            },
         },
         react: {
             package: "@pureform/react",
             adapter: "./src/react/adapter.ts",
             export: "reactAdapter",
             hooks: "@pureform/react/storybook",
+            scenes: {
+                module: "./src/react/scenes.ts",
+                components: ["Toast", "GridList"],
+            },
         },
         native: {
             package: "@pureform/react-native",
             adapter: "./src/native/adapter.ts",
             export: "nativeAdapter",
             hooks: "@pureform/react-native/storybook",
+            scenes: {
+                module: "./src/native/scenes.ts",
+                components: ["Toast", "GridList"],
+            },
             // React Native skipped for now; needs renderer-neutral readers. The cases read the
             // web bindings' DOM (a button's `aria-pressed`, the switch's native input, the
             // field's `data-pf-filled`), which React Native Web doesn't draw, so its stories
@@ -34,15 +46,6 @@ export default defineStories({
             tests: false,
         },
     },
-    skip: {
-        // Its case renders a toaster from `toasts` data (`createToaster` + `Toaster`, the
-        // suites' `ToastScene`); the binding exports no `Toast` that takes it.
-        Toast: "needs a toaster scene: the case's `toasts` aren't props of an export",
-        // Its case's `tiles` are data the suites' `GridListScene` turns into
-        // `GridList.Tile` children; `GridList` itself takes children, not `tiles`.
-        GridList:
-            "needs a tiles scene: the case's `tiles` aren't props of `GridList`",
-    },
     schemes: ["light", "dark"],
     // Floating and modal overlays open into the canvas; this keeps room for them.
     overlayHeight: 480,
@@ -50,6 +53,10 @@ export default defineStories({
         // Both act on what's around them: a surface to press, and content to dim.
         Ripple: { hooks: ["./src/stages/ripple.ts"] },
         Scrim: { hooks: ["./src/stages/scrim.ts"] },
+        // Their cases carry data (`toasts`, `tiles`) that each renderer's scenes turn into
+        // children; the plays check it is drawn.
+        Toast: { hooks: ["./src/stages/toast.ts"] },
+        GridList: { hooks: ["./src/stages/grid-list.ts"] },
         TextField: {
             // React Native Web: the disabled field's input is `disabled` now (not `readonly`)
             // and passes, but its label is a plain text element, not the input's `<label>`, so
