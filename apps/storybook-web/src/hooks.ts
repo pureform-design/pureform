@@ -21,17 +21,20 @@ const withScheme: Decorator = (story, context) => {
 /** Room for an overlay: `parameters.pureform.height` (set by the codegen for a component whose
  *  case opens one) gives the canvas a minimum height, so a menu or a dialog opens inside it.
  *  `parameters.pureform.place: "bottom-end"` puts the story at the canvas's bottom end corner, as
- *  an app places a FAB menu, whose list opens above it. */
+ *  an app places a FAB menu, whose list opens above it. `parameters.pureform.width` fixes the
+ *  canvas's width, for a component that sizes itself from it (the carousel), at the component
+ *  suites' page width, so it lays out as it does there. */
 const withHeight: Decorator = (story, context) => {
-    const { height, place } =
+    const { height, width, place } =
         (context.parameters["pureform"] as
-            | { height?: number; place?: "bottom-end" }
+            | { height?: number; width?: number; place?: "bottom-end" }
             | undefined) ?? {};
     const el = story() as HTMLElement;
-    if (!height && !place) return el;
+    if (!height && !width && !place) return el;
     const frame = document.createElement("div");
     frame.dataset["pfCanvas"] = "";
     if (height) frame.style.minHeight = `${height}px`;
+    if (width) frame.style.width = `${width}px`;
     if (place === "bottom-end") {
         Object.assign(frame.style, {
             display: "flex",
