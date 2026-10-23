@@ -316,7 +316,15 @@ function ModalSideSheet(props: SideSheetProps): ReactNode {
             ) : (
                 <Button label={trigger} onPress={show} />
             )}
-            <ModalWindow visible={presence.present}>
+            <ModalWindow
+                visible={presence.present}
+                label={
+                    props["aria-label"] ??
+                    (typeof props.headline === "string"
+                        ? props.headline
+                        : undefined)
+                }
+            >
                 <ModalScrimLayer
                     open={open}
                     presence={presence}

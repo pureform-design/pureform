@@ -77,8 +77,15 @@ export function useModalOverlay(
  *  gives it back. It holds a portal host of its own. */
 export function ModalWindow(props: {
     readonly visible: boolean;
+    /** The window's name. React Native Web draws the `Modal` as a `role="dialog"`, which needs
+     *  one (axe's `aria-dialog-name`): the surface's own. */
+    readonly label?: string | undefined;
     readonly children: ReactNode;
 }): ReactNode {
+    const named =
+        Platform.OS === "web" && props.label !== undefined
+            ? ({ "aria-label": props.label } as object)
+            : {};
     return (
         <Modal
             transparent
@@ -89,6 +96,7 @@ export function ModalWindow(props: {
             onRequestClose={() => {
                 dismissTopOverlay();
             }}
+            {...named}
         >
             <PortalHost>{props.children}</PortalHost>
         </Modal>
