@@ -767,6 +767,55 @@ export type {
     TabsVariantProps,
 } from "./components/tabs";
 export {
+    NUMBER_FIELD_CONTENT_PROPS,
+    NUMBER_FIELD_LABELS,
+    NUMBER_FIELD_ROOT_PROPS,
+    NUMBER_FIELD_SPIN_DELAY,
+    NUMBER_FIELD_SPIN_INTERVAL,
+    numberFieldCanStep,
+    numberFieldClamp,
+    numberFieldFormat,
+    numberFieldMachineProps,
+    numberFieldOutOfRange,
+    numberFieldParse,
+    numberFieldPlaceholder,
+    numberFieldRange,
+    numberFieldSelection,
+    numberFieldStep,
+} from "./components/number-field";
+export type {
+    NumberFieldBehaviorProps,
+    NumberFieldContentProps,
+    NumberFieldPart,
+    NumberFieldRange,
+    NumberFieldRootOwnProps,
+    NumberFieldValueDetails,
+    NumberFieldVariantProps,
+} from "./components/number-field";
+export {
+    CODE_FIELD_CONTENT_PROPS,
+    CODE_FIELD_LENGTH,
+    CODE_FIELD_ROOT_PROPS,
+    codeFieldAccepts,
+    codeFieldBackspace,
+    codeFieldCellLabel,
+    codeFieldCells,
+    codeFieldComplete,
+    codeFieldEnter,
+    codeFieldMachineProps,
+    codeFieldSelection,
+    codeFieldString,
+} from "./components/code-field";
+export type {
+    CodeFieldBehaviorProps,
+    CodeFieldContentProps,
+    CodeFieldPart,
+    CodeFieldRootOwnProps,
+    CodeFieldType,
+    CodeFieldValueDetails,
+    CodeFieldVariantProps,
+} from "./components/code-field";
+export {
     TAGS_INPUT_CONTENT_PROPS,
     TAGS_INPUT_ROOT_PROPS,
     tagsInputChipTestId,

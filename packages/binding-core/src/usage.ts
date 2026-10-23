@@ -325,6 +325,16 @@ export const COMPONENT_USAGE = {
             ripple: {},
         },
     },
+    // The icon and affixes follow their content; the buttons show indication.
+    "number-field": {
+        entries: {
+            numberField: same("variant", "color", "density"),
+            ripple: {},
+        },
+    },
+    "code-field": {
+        entries: { codeField: same("variant", "color", "density") },
+    },
     text: { entries: { text: { style: "textStyle" } } },
     // The icons, prefix and suffix follow their content.
     "text-area": {

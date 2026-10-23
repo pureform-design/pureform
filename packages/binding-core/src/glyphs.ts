@@ -14,6 +14,10 @@ export const GLYPH_PATHS = {
     /** A chevron pointing down, which an expand indicator turns over: an accordion's headers
      *  and a tree's branches. */
     expand: "M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z",
+    /** A minus: a number field's decrement button. */
+    remove: "M19 13H5v-2h14v2z",
+    /** A plus: a number field's increment button. */
+    add: "M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z",
     /** Three dots in a column: a toolbar's overflow button. */
     more: "M12 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4m0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4m0 6a2 2 0 1 0 0 4 2 2 0 0 0 0-4",
     /** A chevron pointing toward the start: a calendar's previous button (mirror it under right
