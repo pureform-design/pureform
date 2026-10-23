@@ -4,7 +4,12 @@ import { fileURLToPath } from "node:url";
 import ts from "@typescript/typescript6";
 import { describe, expect, it } from "vitest";
 
-import { argTypeFor, propControls, propsTypeOf } from "./prop-controls.ts";
+import {
+    argTypeFor,
+    controlFor,
+    propControls,
+    propsTypeOf,
+} from "./prop-controls.ts";
 
 const FIXTURES = join(
     dirname(fileURLToPath(import.meta.url)),
@@ -50,6 +55,21 @@ describe("prop controls", () => {
         expect(byName.get("size")).toMatchObject({
             control: "select",
             options: ["small", "large"],
+        });
+    });
+
+    it("reads the @control radio and select tags", () => {
+        expect(byName.get("scale")).toMatchObject({
+            control: "select",
+            options: ["xs", "s", "m", "l"],
+        });
+        expect(byName.get("wide")).toMatchObject({
+            control: "radio",
+            tagged: true,
+        });
+        expect(byName.get("pair")).toMatchObject({
+            control: "select",
+            tagged: true,
         });
     });
 
@@ -123,7 +143,7 @@ describe("arg types", () => {
                 { name: "textStyle", control: "none", variant: "style" },
                 variants,
             ),
-        ).toEqual({ control: "select", options: ["body", "title"] });
+        ).toEqual({ control: "radio", options: ["body", "title"] });
         expect(
             argTypeFor(
                 { name: "scrolled", control: "none", variant: "scrolled" },
@@ -144,10 +164,39 @@ describe("arg types", () => {
                 variants,
             ),
         ).toEqual({
-            control: "select",
+            control: "radio",
             options: ["true", "false", "indeterminate"],
             mapping: { true: true, false: false },
         });
+    });
+
+    it("draws a select of more than 3 options as a select, and a tag decides", () => {
+        const four = ["xs", "s", "m", "l"];
+        expect(
+            argTypeFor(
+                { name: "scale", control: "select", options: four },
+                variants,
+            ),
+        ).toEqual({ control: "select", options: four });
+        expect(
+            argTypeFor(
+                { name: "wide", control: "radio", options: four, tagged: true },
+                variants,
+            ),
+        ).toEqual({ control: "radio", options: four });
+        expect(
+            argTypeFor(
+                {
+                    name: "pair",
+                    control: "select",
+                    options: ["a", "b"],
+                    tagged: true,
+                },
+                variants,
+            ),
+        ).toEqual({ control: "select", options: ["a", "b"] });
+        expect(controlFor(["a", "b", "c"]).control).toBe("radio");
+        expect(controlFor(four).control).toBe("select");
     });
 
     it("follows the type, or a tag over the anatomy", () => {
@@ -156,7 +205,7 @@ describe("arg types", () => {
                 { name: "size", control: "select", options: ["s", "l"] },
                 variants,
             ),
-        ).toEqual({ control: "select", options: ["s", "l"] });
+        ).toEqual({ control: "radio", options: ["s", "l"] });
         expect(
             argTypeFor(
                 {
