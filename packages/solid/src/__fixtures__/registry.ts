@@ -634,7 +634,7 @@ export const displayRegistry = () =>
         field: named("field", ["root"]),
         label: named("label", ["root", "requiredIndicator"]),
         input: named("input", ["root"]),
-        textarea: named("textarea", ["root"]),
+        plainTextarea: named("plain-textarea", ["root"]),
         description: named("description", ["root"]),
         errorText: named("error-text", ["root"]),
         text: named("text", ["root"]),

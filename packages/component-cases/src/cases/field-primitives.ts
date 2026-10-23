@@ -77,10 +77,10 @@ export const input: ComponentCase = {
     ...control(testIds.input.root),
 };
 
-export const textarea: ComponentCase = {
+export const plainTextarea: ComponentCase = {
     component: "Textarea",
     props: { "aria-label": "Bio" },
-    root: testIds.textarea.root,
+    root: testIds.plainTextarea.root,
     examples: {
         empty: {},
         filled: { defaultValue: "Ada\nLovelace" },
@@ -88,7 +88,7 @@ export const textarea: ComponentCase = {
         invalid: { invalid: true },
         disabled: { disabled: true, defaultValue: "Ada" },
     },
-    ...control(testIds.textarea.root),
+    ...control(testIds.plainTextarea.root),
 };
 
 export const label: ComponentCase = {

@@ -59,7 +59,7 @@ describe("Field", () => {
                 <Textarea />
             </Field>,
         );
-        const textarea = byTestId<HTMLTextAreaElement>(testIds.textarea.root);
+        const textarea = byTestId<HTMLTextAreaElement>(testIds.plainTextarea.root);
         expect(textarea.tagName).toBe("TEXTAREA");
         expect(textarea.disabled).toBe(true);
         expect(textarea.labels?.length).toBe(1);

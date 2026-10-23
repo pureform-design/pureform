@@ -67,6 +67,14 @@ import { dragHandle } from "./components/drag-handle";
 import { createFab } from "./components/fab";
 import { createFabMenu } from "./components/fab-menu";
 import { FADE_THROUGH_KEYFRAMES, fadeThrough } from "./components/fade-through";
+import {
+    description,
+    errorText,
+    field,
+    input,
+    label,
+    plainTextarea,
+} from "./components/field-primitives";
 import { createFileUpload } from "./components/file-upload";
 import { fullscreenDialog } from "./components/fullscreen-dialog";
 import { gridList } from "./components/grid-list";
@@ -97,6 +105,7 @@ import {
     createLinearProgress,
 } from "./components/progress";
 import { createRadio } from "./components/radio";
+import { createRating } from "./components/rating";
 import { richTooltip } from "./components/rich-tooltip";
 import { ripple } from "./components/ripple";
 import { scrim } from "./components/scrim";
@@ -104,14 +113,6 @@ import { searchBar } from "./components/search-bar";
 import { SEARCH_VIEW_KEYFRAMES, searchView } from "./components/search-view";
 import { createSelect } from "./components/select";
 import { separator } from "./components/separator";
-import {
-    description,
-    errorText,
-    field,
-    input,
-    label,
-    textarea,
-} from "./components/field-primitives";
 import { DEFAULT_SHAPES } from "./components/shaped";
 import type { Shapes } from "./components/shaped";
 import type { Densities } from "./components/shared";
@@ -126,7 +127,6 @@ import { createSupportingText } from "./components/supporting-text";
 import { createSwitch } from "./components/switch";
 import { createTable } from "./components/table";
 import { createTabs } from "./components/tabs";
-import { createRating } from "./components/rating";
 import { createTagsInput } from "./components/tags-input";
 import { createText } from "./components/text";
 import { createTextArea } from "./components/text-area";
@@ -365,7 +365,7 @@ const defaultComponents = <G extends string>(
         field,
         label,
         input,
-        textarea,
+        plainTextarea,
         description,
         errorText,
         list,

@@ -1322,7 +1322,7 @@ export {
     fieldSelection,
     labelSelection,
     inputSelection,
-    textareaSelection,
+    plainTextareaSelection,
     descriptionSelection,
     errorTextSelection,
     REQUIRED_MARK,

@@ -7,7 +7,7 @@ import {
     field as plainField,
     input as plainInput,
     label as plainLabel,
-    textarea as plainTextarea,
+    plainTextarea,
     appBar,
     timeInput,
     timePicker,

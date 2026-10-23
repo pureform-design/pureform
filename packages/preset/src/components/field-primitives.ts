@@ -241,7 +241,7 @@ export const input = pf.slotComponent({
     },
 });
 
-const textareaTokens = componentTokens("textarea", {
+const plainTextareaTokens = componentTokens("plainTextarea", {
     container: transparent,
     inputColor: sys("onSurface"),
     placeholderColor: sys("onSurfaceVariant"),
@@ -257,18 +257,18 @@ const textareaTokens = componentTokens("textarea", {
     ...INDICATION_TOKENS,
 });
 
-export const textarea = pf.slotComponent({
-    name: "textarea",
+export const plainTextarea = pf.slotComponent({
+    name: "plainTextarea",
     $meta: {
         description:
             "Plain textarea: Input's box over several lines, resizing vertically.",
     },
-    tokens: textareaTokens.tokens,
+    tokens: plainTextareaTokens.tokens,
     slots: ["root"],
     structure: { root: [] },
     variants: {},
     recipe: () => {
-        const ref = textareaTokens.ref;
+        const ref = plainTextareaTokens.ref;
         return {
             base: {
                 root: {

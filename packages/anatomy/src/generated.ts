@@ -3423,16 +3423,16 @@ export const inputAnatomy = {
     variants: {},
 } as const satisfies ComponentAnatomy;
 
-export const textareaAnatomy = {
-    name: "textarea",
-    scope: "textarea",
+export const plainTextareaAnatomy = {
+    name: "plainTextarea",
+    scope: "plain-textarea",
     root: "root",
     partNames: ["root"],
     parts: {
         root: {
             name: "root",
             attribute: "root",
-            testId: "pf-textarea-root",
+            testId: "pf-plain-textarea-root",
             parent: null,
             children: [],
             styled: true,
@@ -6495,7 +6495,7 @@ export const anatomy = {
     field: fieldAnatomy,
     label: labelAnatomy,
     input: inputAnatomy,
-    textarea: textareaAnatomy,
+    plainTextarea: plainTextareaAnatomy,
     description: descriptionAnatomy,
     errorText: errorTextAnatomy,
     list: listAnatomy,
@@ -6840,7 +6840,7 @@ export const testIds = {
         requiredIndicator: "pf-label-required-indicator",
     },
     input: { root: "pf-input-root" },
-    textarea: { root: "pf-textarea-root" },
+    plainTextarea: { root: "pf-plain-textarea-root" },
     description: { root: "pf-description-root" },
     errorText: { root: "pf-error-text-root" },
     list: { root: "pf-list-root", item: "pf-list-item" },

@@ -15,7 +15,7 @@ beforeAll(async () => {
         "field",
         "label",
         "input",
-        "textarea",
+        "plainTextarea",
         "description",
         "errorText",
     ]);
@@ -58,11 +58,11 @@ describe("Field", () => {
                 <Textarea />
             </Field>,
         );
-        const textarea = byTestId("pf-textarea-root") as HTMLTextAreaElement;
+        const textarea = byTestId("pf-plain-textarea-root") as HTMLTextAreaElement;
         expect(textarea.tagName).toBe("TEXTAREA");
         expect(textarea.disabled).toBe(true);
         expect(computed("pf-label-root").color).not.toBe(
-            computed("pf-textarea-root").borderTopColor,
+            computed("pf-plain-textarea-root").borderTopColor,
         );
     });
 

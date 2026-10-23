@@ -34,7 +34,7 @@ export const RN_COMPONENTS = [
     "field",
     "label",
     "input",
-    "textarea",
+    "plainTextarea",
     "description",
     "errorText",
     "media",

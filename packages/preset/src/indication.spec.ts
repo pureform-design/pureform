@@ -43,7 +43,7 @@ const drawsStateLayer = (spec: SlottedComponentSpec) =>
 // Draws a state layer, but its field draws its own active indicator (the search bar), or it's
 // the native input itself, hovered through CSS with no ripple (the plain input and textarea):
 // no indication.
-const WITHOUT_INDICATION = new Set(["searchBar", "input", "textarea"]);
+const WITHOUT_INDICATION = new Set(["searchBar", "input", "plainTextarea"]);
 
 const declaring = slotted.filter((spec) => spec.indication);
 

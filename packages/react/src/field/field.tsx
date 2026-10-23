@@ -10,7 +10,7 @@ import {
     fieldAnatomy,
     inputAnatomy,
     labelAnatomy,
-    textareaAnatomy,
+    plainTextareaAnatomy,
 } from "@pureform/anatomy";
 import {
     DESCRIPTION_ROOT_PROPS,
@@ -31,7 +31,7 @@ import {
     labelSelection,
     REQUIRED_MARK,
     TEXTAREA_ROOT_PROPS,
-    textareaSelection,
+    plainTextareaSelection,
 } from "@pureform/binding-core";
 import type {
     DescriptionRootOwnProps,
@@ -236,14 +236,14 @@ export interface TextareaProps
 /** A plain textarea in Input's box, resizing vertically. */
 export function Textarea(props: TextareaProps): ReactNode {
     const field = useField();
-    const scope = useComponent(textareaAnatomy, {
-        selection: textareaSelection(props),
+    const scope = useComponent(plainTextareaAnatomy, {
+        selection: plainTextareaSelection(props),
         testId: props.testId,
         unstyled: props.unstyled,
     });
     const { as, ...rest } = omitProps(props, TEXTAREA_ROOT_PROPS);
     return scope.render("root", {
-        element: "textarea",
+        element: "plainTextarea",
         as,
         props: { ...rest, ...fieldControlProps(field?.state, props) },
     });

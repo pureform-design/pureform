@@ -11,7 +11,7 @@ import {
     fieldAnatomy,
     inputAnatomy,
     labelAnatomy,
-    textareaAnatomy,
+    plainTextareaAnatomy,
 } from "@pureform/anatomy";
 import type { TestIdOverride } from "@pureform/anatomy";
 import {
@@ -26,7 +26,7 @@ import {
     isPresent,
     labelSelection,
     REQUIRED_MARK,
-    textareaSelection,
+    plainTextareaSelection,
 } from "@pureform/binding-core";
 import type {
     DescriptionPart,
@@ -166,7 +166,7 @@ export type TextareaProps = ControlProps<TextareaPart> &
 
 /** The control both draw: a `TextInput` in the theme's box, labelled by the field's label. */
 function useControl(
-    name: "input" | "textarea",
+    name: "input" | "plainTextarea",
     props: InputProps | TextareaProps,
     selection: Record<string, unknown>,
     testID: string,
@@ -230,15 +230,15 @@ export const Input = withEngine(InputImpl, "Input");
 
 function TextareaImpl(props: TextareaProps): ReactNode {
     return useControl(
-        "textarea",
+        "plainTextarea",
         {
             multiline: true,
             numberOfLines: 3,
             textAlignVertical: "top",
             ...props,
         },
-        textareaSelection(props),
-        testIdOf(textareaAnatomy, "root", props.testId),
+        plainTextareaSelection(props),
+        testIdOf(plainTextareaAnatomy, "root", props.testId),
     );
 }
 

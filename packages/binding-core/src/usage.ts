@@ -318,7 +318,7 @@ export const COMPONENT_USAGE = {
             field: {},
             label: {},
             input: {},
-            textarea: {},
+            plainTextarea: {},
             description: {},
             errorText: {},
         },

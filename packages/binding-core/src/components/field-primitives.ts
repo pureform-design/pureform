@@ -12,7 +12,7 @@ import type {
     labelAnatomy,
     PartName,
     TestIdOverride,
-    textareaAnatomy,
+    plainTextareaAnatomy,
 } from "@pureform/anatomy";
 import type { InstanceTokens, Selection } from "@pureform/styling";
 
@@ -25,7 +25,7 @@ export type LabelPart = PartName<typeof labelAnatomy>;
 /** The input's parts: `"root"`. */
 export type InputPart = PartName<typeof inputAnatomy>;
 /** The textarea's parts: `"root"`. */
-export type TextareaPart = PartName<typeof textareaAnatomy>;
+export type TextareaPart = PartName<typeof plainTextareaAnatomy>;
 /** The description's parts: `"root"`. */
 export type DescriptionPart = PartName<typeof descriptionAnatomy>;
 /** The error text's parts: `"root"`. */
@@ -36,7 +36,7 @@ type Piece =
     | "field"
     | "label"
     | "input"
-    | "textarea"
+    | "plainTextarea"
     | "description"
     | "errorText";
 
@@ -115,7 +115,7 @@ export interface InputRootOwnProps
     extends FieldStateProps, PieceOwnProps<"input", InputPart> {}
 
 export interface TextareaRootOwnProps
-    extends FieldStateProps, PieceOwnProps<"textarea", TextareaPart> {}
+    extends FieldStateProps, PieceOwnProps<"plainTextarea", TextareaPart> {}
 
 export const INPUT_ROOT_PROPS = [
     ...PIECE_PROPS,
@@ -147,7 +147,7 @@ const pieceSelection =
 export const fieldSelection = pieceSelection<"field">();
 export const labelSelection = pieceSelection<"label">();
 export const inputSelection = pieceSelection<"input">();
-export const textareaSelection = pieceSelection<"textarea">();
+export const plainTextareaSelection = pieceSelection<"plainTextarea">();
 export const descriptionSelection = pieceSelection<"description">();
 export const errorTextSelection = pieceSelection<"errorText">();
 

@@ -8,10 +8,17 @@ import {
     field,
     input,
     label,
-    textarea,
+    plainTextarea,
 } from "./field-primitives";
 
-const PIECES = { field, label, input, textarea, description, errorText };
+const PIECES = {
+    field,
+    label,
+    input,
+    plainTextarea,
+    description,
+    errorText,
+};
 
 const recipe = (name: keyof typeof PIECES) =>
     (compilePreset(configWith(PIECES[name])).theme?.slotRecipes ?? {})[name];
@@ -31,7 +38,7 @@ describe.each(Object.keys(PIECES) as (keyof typeof PIECES)[])("%s", (name) => {
 });
 
 describe("the plain box", () => {
-    it.each(["input", "textarea"] as const)(
+    it.each(["input", "plainTextarea"] as const)(
         "%s draws the error color while invalid, and the focus ring",
         (name) => {
             const root = JSON.stringify(recipe(name)?.base?.root);
@@ -49,7 +56,7 @@ describe("the plain box", () => {
     });
 
     it("lets the textarea resize vertically only", () => {
-        expect(recipe("textarea")?.base?.root).toMatchObject({
+        expect(recipe("plainTextarea")?.base?.root).toMatchObject({
             resize: "vertical",
         });
     });
