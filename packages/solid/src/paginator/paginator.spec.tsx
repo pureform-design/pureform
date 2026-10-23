@@ -43,6 +43,11 @@ describe("Paginator, ready-made", () => {
         expect(prev.getAttribute("aria-label")).toBe("Previous page");
         expect(prev.disabled).toBe(true);
         expect(next.disabled).toBe(false);
+        for (const button of [prev, next]) {
+            expect(
+                button.querySelector('[data-pf-part="icon"] svg'),
+            ).not.toBeNull();
+        }
         expect(
             document.querySelector(`[data-testid="${ids.firstTrigger}"]`),
         ).toBeNull();
@@ -193,6 +198,12 @@ describe("Paginator, composed", () => {
         expect(byTestId(ids.root).getAttribute("aria-label")).toBe("Rows");
         expect(range()).toBe("1 – 10 of 30");
         expect(byTestId(ids.nextTrigger).className).toContain("icon-button");
+        // The glyph goes in the icon button's icon part (it draws `icon`, not children).
+        expect(
+            byTestId(ids.nextTrigger).querySelector(
+                '[data-pf-part="icon"] svg',
+            ),
+        ).not.toBeNull();
         await userEvent.click(byTestId(ids.nextTrigger));
         await settle();
         expect(range()).toBe("11 – 20 of 30");

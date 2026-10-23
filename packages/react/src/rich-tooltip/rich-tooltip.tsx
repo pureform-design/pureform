@@ -34,6 +34,7 @@ import type { Presence } from "../presence";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
+import { useTooltipLongPress } from "../tooltip/long-press";
 
 type Anatomy = typeof richTooltipOverlayAnatomy;
 
@@ -110,9 +111,11 @@ function Trigger({
     as,
     ...props
 }: RichTooltipTriggerProps): ReactNode {
-    const { scope, api } = context.use("Trigger");
+    const { scope, api, interactive } = context.use("Trigger");
+    const longPress = useTooltipLongPress(api.setOpen, interactive);
     return scope.render("trigger", {
         element: "button",
+        ref: longPress,
         as: as as ElementType | undefined,
         machine: api.getTriggerProps(),
         unstyled,

@@ -3,7 +3,8 @@
 // animations end, then hides; under reduced motion it fades without moving (design doc §5.8).
 
 import { compositeTestIds, testIds } from "@pureform/anatomy";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import { userEvent } from "vitest/browser";
 
 import { COMPONENTS, menu as menuCase, toastCase } from "./components";
 import type { ComponentCase, OverlayCase } from "./components";
@@ -449,6 +450,41 @@ describe("FabMenu", () => {
         const { entering, leaving } = await run("reduce");
         expect([...entering, ...leaving].every((delay) => delay === 0)).toBe(
             true,
+        );
+    });
+
+    // Each enabled item is a stop of its own for Tab (Compose's are), and the FAB follows the
+    // last; Enter presses the item that has focus (fix-storybook-5a).
+    it("takes Tab through its enabled items one by one, then to the FAB", async () => {
+        const host = hostIn(`<div><div data-host></div></div>`);
+        const onSelect = vi.fn();
+        mountCase(
+            fabMenuCase,
+            { ...fabMenuCase.overlay!.props, defaultOpen: true, onSelect },
+            { host },
+        );
+        fabMenuCase.overlay!.place?.(host);
+        await settlePlaced();
+        await animationsDone();
+        const focused = () =>
+            (document.activeElement as HTMLElement | null)?.textContent;
+        host.querySelector<HTMLElement>(
+            `[data-testid="${testIds.fabMenu.list}"]`,
+        )!.focus();
+        await userEvent.tab();
+        expect(focused()).toContain("Message");
+        await userEvent.tab();
+        expect(focused()).toContain("Call");
+        // The third item is disabled: Tab goes on to the FAB.
+        await userEvent.tab();
+        expect(document.activeElement?.getAttribute("data-testid")).toBe(
+            testIds.fabMenu.closeTrigger,
+        );
+        await userEvent.tab({ shift: true });
+        expect(focused()).toContain("Call");
+        await userEvent.keyboard("{Enter}");
+        expect(onSelect).toHaveBeenCalledWith(
+            expect.objectContaining({ value: "call" }),
         );
     });
 });

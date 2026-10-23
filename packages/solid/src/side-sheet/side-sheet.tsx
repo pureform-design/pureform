@@ -18,6 +18,7 @@ import {
     sideSheetPositionerLayout,
     sideSheetSelection,
     isPresent,
+    sideSheetBodyLayout,
     sideSheetContentLayout,
     sheetMachineProps,
     sheetModal,
@@ -39,6 +40,7 @@ import { Button } from "../button";
 import { dialogParts } from "../dialog-parts";
 import { BackIcon, CloseIcon } from "../glyphs";
 import { IconButton } from "../icon-button";
+import { normalizeProps } from "../internal/zag";
 import { createSlotProps } from "../parts";
 import type { SlotKeyedProps } from "../parts";
 import type { PartProps } from "../props";
@@ -176,7 +178,10 @@ const Body: (props: SideSheetPartProps) => JSX.Element = chrome.part(
     "body",
     "Body",
     "div",
-    (api) => api.getDescriptionProps(),
+    (api) => ({
+        ...api.getDescriptionProps(),
+        ...normalizeProps.element(sideSheetBodyLayout),
+    }),
 );
 
 /** The buttons under the content, over a divider: the main one first. */

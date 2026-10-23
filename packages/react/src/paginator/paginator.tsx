@@ -190,6 +190,7 @@ const trigger = (kind: TriggerKind) =>
     }: PaginatorTriggerProps): ReactNode {
         const { part, label } = TRIGGERS[kind];
         const { scope, api, props: root } = context.use(label);
+        const content = children ?? GLYPHS[kind]();
         const zag = {
             first: api.getFirstTriggerProps,
             prev: api.getPrevTriggerProps,
@@ -202,7 +203,11 @@ const trigger = (kind: TriggerKind) =>
             machine: paginatorTriggerProps(zag, root.disabled),
             states: { mirrored: mirror ?? true },
             unstyled,
-            props: { ...props, children: children ?? GLYPHS[kind]() },
+            // The ready-made icon button draws its `icon`, not children.
+            props:
+                as === IconButton
+                    ? { ...props, icon: content }
+                    : { ...props, children: content },
         });
     };
 

@@ -494,6 +494,13 @@ export const sideSheetContentLayout = {
     style: { pointerEvents: "auto", touchAction: "pan-y" } as const,
 };
 
+/** What a side sheet's body adds to Zag's props. The body scrolls, and a scroll container
+ *  doesn't take its touch actions from the sheet around it: without its own `pan-y`, the
+ *  browser takes a sideways touch on it and the sheet only drags by its header. */
+export const sideSheetBodyLayout = {
+    style: { touchAction: "pan-y" } as const,
+};
+
 /** What a bottom sheet's drag handle adds to Zag's props: touch moves on it drag the sheet rather
  *  than scroll the page. It's rendered on the server too, so hydration changes nothing. */
 export const sheetDragHandleLayout = {

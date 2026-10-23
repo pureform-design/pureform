@@ -404,7 +404,8 @@ import { RichTooltip } from "@pureform/solid/rich-tooltip";
   that goes back, headed by the item's label; `onSelect` hears only the leaves), or `auto`, the
   default: cascading in a window at least `MENU_CASCADE_MIN_WIDTH` (600) wide, read once mounted
   so a server's render cascades, else drilling. Composed menus cascade.
-- **The tooltip** opens on hover after `openDelay` (400 ms) and on keyboard focus, and points the
+- **The tooltip** opens on hover after `openDelay` (400 ms), on keyboard focus, and on a touch held
+  on the trigger (500 ms, as React Native's long press; a plain one goes 1.5 s after), and points the
   trigger's `aria-describedby` at itself. The ready-made renders `supportingText` in its part, and
   a `Caret` with `caret`. `RichTooltip` is the rich one (it replaces `variant="rich"`): `subhead`,
   `supportingText`, and `actions` in their parts, `interactive` unless told otherwise. Unless it's
@@ -504,7 +505,8 @@ import { RichTooltip } from "@pureform/solid/rich-tooltip";
   `toaster.success({ title, description, action: { label, onClick } })` (`info`, `warning`,
   `error`, `loading`, `create`, `promise`, `dismiss`) adds one. Each shows its type's icon in the
   type's color (the theme's `success`, `warning`, `error` and `info` groups), its title and
-  description, an action, and a close button unless `closable: false`. Zag times, pauses (hover,
+  description, an action, and a close button unless `closable: false`. Swiping one sideways past
+  half its width (or flicking it) dismisses it, unless `closable: false`. Zag times, pauses (hover,
   focus) and stacks them; the region sits at the theme's snackbar layer. Compose with
   `Toast.Group` (children: `(toast, index) => …`) and `Toast.Root` and its parts. Import from
   `@pureform/solid/toast`.

@@ -5,3 +5,15 @@ export interface SceneTile {
     readonly footer?: string;
     readonly subhead?: string;
 }
+
+/** The label of the toast scenes' button, which adds a toast each press. */
+export const ADD_TOAST_LABEL = "Add a toast";
+
+const TOAST_TYPES = ["info", "success", "warning", "error"] as const;
+
+/** The `count`th toast the scenes' button adds: each type in turn, closing on its own timer. */
+export const addedToast = (count: number) => ({
+    type: TOAST_TYPES[(count - 1) % TOAST_TYPES.length],
+    title: `Toast ${count}`,
+    description: "It closes on its own after a few seconds.",
+});

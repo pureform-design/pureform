@@ -98,7 +98,14 @@ export const multiRender =
         const el = document.createElement("div");
         el.dataset["renderer"] = renderer;
         if (impl.component === undefined) {
-            el.textContent = `${context.title} isn't implemented in ${impl.adapter.title}.`;
+            const absent = (
+                context.parameters?.["pureform"] as
+                    | { absent?: Readonly<Record<string, string>> }
+                    | undefined
+            )?.absent?.[renderer];
+            el.textContent =
+                absent ??
+                `${context.title} isn't implemented in ${impl.adapter.title}.`;
             return el;
         }
         const handle = impl.adapter.mount(el, impl.component, props, mount);

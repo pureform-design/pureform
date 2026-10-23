@@ -105,3 +105,51 @@ export const fabMenuItemProps = (item: FabMenuItem) => ({
     disabled: item.disabled,
     interactionSource: item.interactionSource,
 });
+
+/** An item's own props (React's names), which make each item a stop of its own for Tab, as
+ *  Compose's FAB menu items are: tabbable unless disabled, and highlighted while focused, so
+ *  Enter and Space press the item that has focus. */
+export const fabMenuItemFocusProps = (
+    disabled: boolean | undefined,
+    highlight: () => void,
+) => ({
+    tabIndex: disabled ? -1 : 0,
+    onFocus: highlight,
+});
+
+/** The keyboard event the list's Tab handling reads, in any binding. */
+interface FabMenuTabEvent {
+    readonly key: string;
+    readonly shiftKey: boolean;
+    readonly target: EventTarget | null;
+    readonly currentTarget: EventTarget | null;
+    readonly defaultPrevented: boolean;
+    preventDefault(): void;
+}
+
+/** The list's (the menu content's) props, with Tab from its last item going on to the FAB. Zag's
+ *  menu keeps Tab inside its content at the last tabbable item; the FAB follows the list. */
+export const fabMenuListProps = <P extends object>(
+    content: P,
+    getFab: () => HTMLElement | null | undefined,
+): P => ({
+    ...content,
+    onKeyDown(event: FabMenuTabEvent) {
+        if (event.key === "Tab" && !event.shiftKey && !event.defaultPrevented) {
+            const list = event.currentTarget as HTMLElement | null;
+            const items = list?.querySelectorAll<HTMLElement>(
+                '[role^="menuitem"]:not([tabindex="-1"])',
+            );
+            const last = items?.[items.length - 1];
+            const fab = getFab();
+            if (fab && (last === undefined || event.target === last)) {
+                event.preventDefault();
+                fab.focus();
+                return;
+            }
+        }
+        (
+            content as { onKeyDown?: (event: FabMenuTabEvent) => void }
+        ).onKeyDown?.(event);
+    },
+});

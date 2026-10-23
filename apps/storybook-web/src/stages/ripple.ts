@@ -47,10 +47,40 @@ export const extendStory: NonNullable<StoryHooks["extendStory"]> = (
                   });
                   // The layer fills the surface the press is read on.
                   await expect(args.getSurfaceEl(layer)).toBe(frame);
-                  const surface = frame!.getBoundingClientRect();
+                  const area = frame!.getBoundingClientRect();
                   const filled = layer.getBoundingClientRect();
-                  await expect(filled.width).toBe(surface.width - 2);
-                  await expect(filled.height).toBe(surface.height - 2);
+                  await expect(filled.width).toBe(area.width - 2);
+                  await expect(filled.height).toBe(area.height - 2);
+                  // A press anywhere on the frame draws a ripple in the layer.
+                  const x = area.left + 40;
+                  const y = area.top + 40;
+                  const hit = document.elementFromPoint(x, y)!;
+                  await expect(frame!.contains(hit)).toBe(true);
+                  hit.dispatchEvent(
+                      new PointerEvent("pointerdown", {
+                          bubbles: true,
+                          clientX: x,
+                          clientY: y,
+                          pointerId: 1,
+                          isPrimary: true,
+                          button: 0,
+                          buttons: 1,
+                      }),
+                  );
+                  await waitFor(() =>
+                      expect(
+                          layer.querySelector("[data-ripple]"),
+                      ).not.toBeNull(),
+                  );
+                  hit.dispatchEvent(
+                      new PointerEvent("pointerup", {
+                          bubbles: true,
+                          clientX: x,
+                          clientY: y,
+                          pointerId: 1,
+                          isPrimary: true,
+                      }),
+                  );
               },
           }
         : story;
