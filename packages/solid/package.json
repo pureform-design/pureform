@@ -236,6 +236,17 @@
                 "default": "./dist/rich-tooltip.jsx"
             }
         },
+        "./popover": {
+            "types": "./dist/popover/index.d.ts",
+            "solid": {
+                "development": "./src/popover/index.ts",
+                "default": "./dist/popover.jsx"
+            },
+            "import": {
+                "development": "./src/popover/index.ts",
+                "default": "./dist/popover.jsx"
+            }
+        },
         "./carousel": {
             "types": "./dist/carousel/index.d.ts",
             "solid": {

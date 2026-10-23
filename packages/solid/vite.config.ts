@@ -43,6 +43,7 @@ export default createConfig({
                     splitter: "src/splitter/index.ts",
                     tooltip: "src/tooltip/index.ts",
                     "rich-tooltip": "src/rich-tooltip/index.ts",
+                    popover: "src/popover/index.ts",
                     snackbar: "src/snackbar/index.ts",
                     toast: "src/toast/index.ts",
                     toolbar: "src/toolbar/index.ts",
