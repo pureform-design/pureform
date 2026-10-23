@@ -40,8 +40,10 @@ const reads = (spec: SlottedComponentSpec, slot: string, token: string) =>
 const drawsStateLayer = (spec: SlottedComponentSpec) =>
     spec.slots.some((slot) => reads(spec, slot, "stateHoverOpacity"));
 
-// Draws a state layer, but its field draws its own active indicator: no indication.
-const WITHOUT_INDICATION = new Set(["searchBar"]);
+// Draws a state layer, but its field draws its own active indicator (the search bar), or it's
+// the native input itself, hovered through CSS with no ripple (the plain input and textarea):
+// no indication.
+const WITHOUT_INDICATION = new Set(["searchBar", "input", "textarea"]);
 
 const declaring = slotted.filter((spec) => spec.indication);
 

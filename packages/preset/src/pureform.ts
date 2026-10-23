@@ -104,6 +104,14 @@ import { searchBar } from "./components/search-bar";
 import { SEARCH_VIEW_KEYFRAMES, searchView } from "./components/search-view";
 import { createSelect } from "./components/select";
 import { separator } from "./components/separator";
+import {
+    description,
+    errorText,
+    field,
+    input,
+    label,
+    textarea,
+} from "./components/field-primitives";
 import { DEFAULT_SHAPES } from "./components/shaped";
 import type { Shapes } from "./components/shaped";
 import type { Densities } from "./components/shared";
@@ -354,6 +362,12 @@ const defaultComponents = <G extends string>(
         circularProgress: createCircularProgress(theme.color.groups),
         loadingIndicator: createLoadingIndicator(theme.color.groups),
         separator,
+        field,
+        label,
+        input,
+        textarea,
+        description,
+        errorText,
         list,
         listItem: createListItem<G, Step>(theme.color.groups, densities),
         menu: createMenu<G, Step>(theme.color.groups, densities),

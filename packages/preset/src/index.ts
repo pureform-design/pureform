@@ -74,6 +74,7 @@ export * from "./components/supporting-text";
 export * from "./components/switch";
 export * from "./components/text";
 export * from "./components/field";
+export * from "./components/field-primitives";
 export * from "./components/media";
 export * from "./components/text-area";
 export * from "./components/text-field";
