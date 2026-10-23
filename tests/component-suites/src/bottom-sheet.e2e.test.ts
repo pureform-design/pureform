@@ -76,9 +76,7 @@ describe("BottomSheet, partly open", () => {
         at("pointerup", y - 40);
         // A quick flick up: on to fully open, from the release's speed.
         expect(content.style.translate).toBe("");
-        expect(content.style.transition).toMatch(
-            /^translate \d+ms linear\(/,
-        );
+        expect(content.style.transition).toMatch(/^translate \d+ms linear\(/);
         await harness.settle();
     });
 });
