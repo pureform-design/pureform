@@ -393,11 +393,16 @@ describe("compilePreset (spring component tokens)", () => {
         );
     });
 
-    it("writes a theme's override of the token as the role's two vars", () => {
+    it("writes a theme's override of the token as the role's vars, its exact spring too", () => {
         expect(obj(preset.globalCss)["[data-panda-theme=slow]"]).toEqual({
+            "--components-box-move-damping":
+                "token(springs.spatialSlow.damping)",
             "--components-box-move-duration":
                 "token(springs.spatialSlow.duration)",
             "--components-box-move-easing": "token(springs.spatialSlow.easing)",
+            "--components-box-move-mass": "token(springs.spatialSlow.mass)",
+            "--components-box-move-stiffness":
+                "token(springs.spatialSlow.stiffness)",
         });
     });
 });
