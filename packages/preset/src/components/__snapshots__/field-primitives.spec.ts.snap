@@ -163,10 +163,12 @@ exports[`label > compiles to a stable Panda recipe 1`] = `
       "marginInlineStart": "token(spacing.1)",
     },
     "root": {
+      "alignItems": "baseline",
       "color": {
         "&:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
         "base": "var(--components-label-color, token(colors.onSurface))",
       },
+      "display": "inline-flex",
       "textStyle": "labelLarge",
     },
   },

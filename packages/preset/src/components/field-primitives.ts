@@ -18,8 +18,10 @@
 import { typed } from "@pureform/core";
 import {
     add,
+    baseline,
     column,
     flex,
+    inlineFlex,
     literal,
     mul,
     px,
@@ -93,7 +95,10 @@ export const label = pf.slotComponent({
     variants: {},
     recipe: () => ({
         base: {
+            // A row, so the required mark follows the text in either direction.
             root: {
+                display: inlineFlex,
+                alignItems: baseline,
                 textStyle: textStyle("labelLarge"),
                 color: when()
                     .on(ROOT_DISABLED, disabledColor("disabledContent"))

@@ -34,7 +34,8 @@ const control = (id: string): { form: FormCase; keyboard: KeyboardCase } => {
     return {
         form: {
             control: element,
-            disabled: (host) => element(host).disabled,
+            // Its own `disabled`, or a disabled fieldset's.
+            disabled: (host) => element(host).matches(":disabled"),
             submits: {
                 props: { name: "name", defaultValue: "Ada" },
                 entries: [["name", "Ada"]],
@@ -114,4 +115,6 @@ export const errorText: ComponentCase = {
     props: { children: "Required" },
     root: testIds.errorText.root,
     examples: { error: {} },
+    // The error color is the same in every theme the suite has.
+    themed: false,
 };
