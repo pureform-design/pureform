@@ -14,6 +14,7 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Controllable } from "../controllable";
 import type { Unstyled } from "../parts";
+import type { CloseQuestion } from "./sheet";
 
 /** The dialog's parts: `"root" | "trigger" | "positioner" | "content"` (the surface) `| "icon" |
  *  "headline" | "body" | "actions" | "closeTrigger"`, and `"backdrop"`. */
@@ -63,9 +64,19 @@ export interface DialogBehaviorProps extends Controllable<"open", boolean> {
     readonly ids?: DialogElementIds | undefined;
 }
 
+/** What a dialog asks before it closes. */
+export interface DialogCloseProps {
+    /** Asked whenever the dialog would close by itself: Escape (or the back button), a press on
+     *  the scrim, or a close trigger. `true` closes it, `false` keeps it open. Given a promise,
+     *  it stays open until the promise settles (a rejection keeps it open). Without, each of
+     *  these closes it. Closing it through a controlled `open` doesn't ask, by design (as in
+     *  Radix and MUI): the app has already decided. */
+    readonly onClose?: CloseQuestion | undefined;
+}
+
 /** Everything Root takes for itself, besides the element's own props and `as`. */
 export interface DialogRootOwnProps
-    extends DialogVariantProps, DialogBehaviorProps {
+    extends DialogVariantProps, DialogBehaviorProps, DialogCloseProps {
     /** A prefix for every part's test id (`discard` → `discard-trigger`, `discard-content`), or
      *  ids by part. */
     readonly testId?: TestIdOverride<DialogPart> | undefined;
@@ -96,6 +107,7 @@ export const DIALOG_ROOT_PROPS = [
     "tokens",
     "modal",
     "role",
+    "onClose",
     ...DIALOG_BEHAVIOR_PROPS,
 ] as const satisfies readonly (keyof DialogRootOwnProps)[];
 

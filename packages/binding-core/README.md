@@ -260,7 +260,7 @@ richTooltipSelection(props); isInteractiveRichTooltip(props); richTooltipMachine
 
 // Dialog: Zag's dialog; dialogOverlayAnatomy, and dialogBackdropAnatomy (the scrim)
 type DialogPart                          // the overlay's parts, and "backdrop"
-interface DialogRootOwnProps             // icon (the variant), tokens, modal, role,
+interface DialogRootOwnProps             // icon (the variant), tokens, modal, role, onClose (DialogCloseProps),
                                          // closeOnInteractOutside, closeOnEscape, restoreFocus,
                                          // initialFocusEl, finalFocusEl, aria-label, ids (headline,
                                          // body: Zag's title and description), open, defaultOpen,
@@ -273,7 +273,7 @@ dialogBackdropLayout(present);           // hidden once gone; the scrim fixed ov
 // Full-screen dialog: the same Zag dialog machine (`dialogMachineProps`); fullscreenDialogOverlayAnatomy,
 // no backdrop and no variants
 type FullscreenDialogPart                // the overlay's parts
-interface FullscreenDialogRootOwnProps   // tokens, and the dialog's behavior props, testId, unstyled
+interface FullscreenDialogRootOwnProps   // tokens, onClose, and the dialog's behavior props, testId, unstyled
 FULLSCREEN_DIALOG_ROOT_PROPS; FULLSCREEN_DIALOG_CONTENT_PROPS; // trigger, closeLabel, closeIcon,
                                          // headline, confirmAction, body
 fullscreenDialogSelection(props);
@@ -285,7 +285,7 @@ interface BottomSheetRootOwnProps        // modal, tokens, onClose, the dialog's
 interface BottomSheetCloseProps          // onClose: asked before any close of its own (Escape, scrim, handle press, drag): a boolean, or a promise; a controlled `open` closing it doesn't ask, by design
 closeAsker();                            // asks an overlay's onClose for every way it closes; a later question makes an earlier answer moot
 askingDismissProps(onClose, props, asker, close); // Zag dialog props: Escape and a press outside ask onClose first
-interface SideSheetRootOwnProps          // modal, coplanar, tokens, and the same
+interface SideSheetRootOwnProps          // modal, coplanar, tokens, onClose (SideSheetCloseProps), and the same
 BOTTOM_SHEET_ROOT_PROPS; BOTTOM_SHEET_CONTENT_PROPS; // trigger, dragHandle, dragHandleLabel, body
 SIDE_SHEET_ROOT_PROPS; SIDE_SHEET_CONTENT_PROPS;     // trigger, headline, onBack, backLabel, backIcon,
                                          // closeLabel, closeIcon, body, actions

@@ -66,6 +66,7 @@ const chrome = dialogParts({
     selection: (props: DialogRootProps) => dialogSelection(props),
     machineProps: dialogMachineProps,
     positionerLayout: (present) => dialogPositionerLayout(present),
+    onClose: (props) => props.onClose,
 });
 
 const { context } = chrome;
@@ -125,11 +126,8 @@ const Actions: (props: DialogPartProps) => JSX.Element = chrome.part(
 
 /** A button that closes the dialog, such as Cancel: `as={Button}` draws it as one. The registry
  *  doesn't style it. */
-const CloseTrigger: (props: DialogTriggerProps) => JSX.Element = chrome.trigger(
-    "closeTrigger",
-    "CloseTrigger",
-    (api) => api.getCloseTriggerProps(),
-);
+const CloseTrigger: (props: DialogTriggerProps) => JSX.Element =
+    chrome.closeTrigger("closeTrigger", "CloseTrigger");
 
 /** The ready-made dialog's props: Root's, with `class`, `style`, and `slotProps` keyed by part,
  *  the trigger's label, and the icon, headline, body, and actions as content. */

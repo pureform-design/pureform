@@ -394,6 +394,13 @@ import { RichTooltip } from "@pureform/react/rich-tooltip";
   settles back), and a promise keeps it open (a dragged sheet holding where it was let go) until
   it settles (resolved `true` leaves). Closing it through a controlled `open` (the app's own `setOpen(false)`) doesn't ask: by design, as in Radix and MUI, the app already decided. The ready-made takes `trigger`, `dragHandle`, `dragHandleLabel`
   and `body`. Import it from `@pureform/react/bottom-sheet`.
+- **`onClose` on the dialog, the full-screen dialog and the side sheet.** Root's `onClose` is asked,
+  as the bottom sheet's, before any close of their own: Escape, a press on the scrim (the dialog and
+  the side sheet; an `alertdialog` or `closeOnInteractOutside={false}` doesn't close on one), and
+  their `CloseTrigger`s, through binding-core's `closeAsker`. `true` closes, `false` keeps it open, a
+  promise keeps it open until it settles (a rejection keeps it open). Closing it through a controlled
+  `open` doesn't ask, by design. A `BackButton` and the full-screen dialog's `ConfirmAction` don't close
+  by themselves, so they don't ask.
 - **The side sheet** sits against the end edge of the viewport (`coplanar` puts a standard sheet
   in the page's layout). Its `Header` holds a `BackButton`, the `Headline` and the
   `CloseTrigger`; `Body` and `Actions` follow. The ready-made takes `trigger`, `headline`,

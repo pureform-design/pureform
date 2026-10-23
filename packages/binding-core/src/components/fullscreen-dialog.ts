@@ -14,7 +14,7 @@ import type {
 import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Unstyled } from "../parts";
-import type { DialogBehaviorProps } from "./dialog";
+import type { DialogBehaviorProps, DialogCloseProps } from "./dialog";
 import { DIALOG_BEHAVIOR_PROPS } from "./dialog";
 
 /** The full-screen dialog's parts: `"root" | "trigger" | "positioner" | "content"` (the surface)
@@ -30,7 +30,10 @@ export interface FullscreenDialogVariantProps {
 
 /** Everything Root takes for itself, besides the element's own props and `as`. */
 export interface FullscreenDialogRootOwnProps
-    extends FullscreenDialogVariantProps, DialogBehaviorProps {
+    extends
+        FullscreenDialogVariantProps,
+        DialogBehaviorProps,
+        DialogCloseProps {
     /** A prefix for every part's test id (`event` → `event-trigger`, `event-content`), or ids by
      *  part. */
     readonly testId?: TestIdOverride<FullscreenDialogPart> | undefined;
@@ -43,6 +46,7 @@ export const FULLSCREEN_DIALOG_ROOT_PROPS = [
     "tokens",
     "modal",
     "role",
+    "onClose",
     ...DIALOG_BEHAVIOR_PROPS,
 ] as const satisfies readonly (keyof FullscreenDialogRootOwnProps)[];
 

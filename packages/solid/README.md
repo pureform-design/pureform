@@ -388,6 +388,13 @@ import { RichTooltip } from "@pureform/solid/rich-tooltip";
   and the `ConfirmAction` (a text button); the `Body` scrolls. Zag focuses the first focusable
   element, the close trigger. The ready-made takes `trigger`, `closeLabel`, `closeIcon`,
   `headline`, `confirmAction` and `body`. Import it from `@pureform/solid/fullscreen-dialog`.
+- **`onClose` on the dialog, the full-screen dialog and the side sheet.** Root's `onClose` is asked,
+  as the bottom sheet's, before any close of their own: Escape, a press on the scrim (the dialog and
+  the side sheet; an `alertdialog` or `closeOnInteractOutside={false}` doesn't close on one), and
+  their `CloseTrigger`s, through binding-core's `closeAsker`. `true` closes, `false` keeps it open, a
+  promise keeps it open until it settles (a rejection keeps it open). Closing it through a controlled
+  `open` doesn't ask, by design. A `BackButton` and the full-screen dialog's `ConfirmAction` don't close
+  by themselves, so they don't ask.
 - **The sheets** run on the same Zag machine. `BottomSheet` sits at the bottom of the viewport and
   `SideSheet` against its end edge. Both are modal by default (a backdrop, focus kept inside and
   given back to the trigger, a click outside closes it); `modal={false}` is a standard sheet that

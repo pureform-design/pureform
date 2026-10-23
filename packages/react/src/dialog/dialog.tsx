@@ -64,6 +64,7 @@ const chrome = dialogParts({
     selection: (props: DialogRootProps) => dialogSelection(props),
     machineProps: dialogMachineProps,
     positionerLayout: (present) => dialogPositionerLayout(present),
+    onClose: (props) => props.onClose,
 });
 
 const { context } = chrome;
@@ -111,11 +112,8 @@ const Actions: (props: DialogPartProps) => ReactNode = chrome.part(
 
 /** A button that closes the dialog, such as Cancel: `as={Button}` draws it as one. The registry
  *  doesn't style it. */
-const CloseTrigger: (props: DialogTriggerProps) => ReactNode = chrome.trigger(
-    "closeTrigger",
-    "CloseTrigger",
-    (api) => api.getCloseTriggerProps(),
-);
+const CloseTrigger: (props: DialogTriggerProps) => ReactNode =
+    chrome.closeTrigger("closeTrigger", "CloseTrigger");
 
 /** An icon above the headline, hidden from assistive technology. Turn on Root's `icon` with it. */
 function Icon({ unstyled, mirror, ...props }: DialogIconProps): ReactNode {

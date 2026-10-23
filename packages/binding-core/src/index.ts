@@ -121,6 +121,7 @@ export {
 } from "./components/dialog";
 export type {
     DialogBehaviorProps,
+    DialogCloseProps,
     DialogContentProps,
     DialogElementIds,
     DialogPart,
@@ -157,6 +158,7 @@ export {
 } from "./components/sheet";
 export type {
     BottomSheetCloseProps,
+    SideSheetCloseProps,
     CloseAsker,
     CloseQuestion,
     BottomSheetContentProps,

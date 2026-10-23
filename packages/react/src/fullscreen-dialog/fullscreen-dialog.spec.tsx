@@ -1,5 +1,6 @@
 import { compositeTestIds } from "@pureform/anatomy";
 import { screen } from "@testing-library/react";
+import { useState } from "react";
 import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
@@ -143,5 +144,59 @@ describe("FullscreenDialog, compound", () => {
             "fullscreen-dialog__closeTrigger",
         );
         expect(byTestId(ids.confirmAction).className).toContain("button");
+    });
+});
+
+describe("FullscreenDialog, onClose", () => {
+    it("asks onClose before Escape or its close trigger closes it, refused and then allowed", async () => {
+        const onOpenChange = vi.fn();
+        let answer = false;
+        const onClose = vi.fn(() => answer);
+        withRegistry(
+            <FullscreenDialog
+                defaultOpen
+                aria-label="Event"
+                headline="New event"
+                onOpenChange={onOpenChange}
+                onClose={onClose}
+            />,
+        );
+        await frames();
+        await interact(() => userEvent.keyboard("{Escape}"));
+        await interact(() => userEvent.click(byTestId(ids.closeTrigger)));
+        await frames();
+        expect(onClose).toHaveBeenCalledTimes(2);
+        expect(onOpenChange).not.toHaveBeenCalled();
+        expect(byTestId(ids.positioner).hidden).toBe(false);
+        answer = true;
+        await interact(() => userEvent.click(byTestId(ids.closeTrigger)));
+        await frames();
+        expect(onClose).toHaveBeenCalledTimes(3);
+        expect(onOpenChange).toHaveBeenLastCalledWith({ open: false });
+    });
+
+    it("doesn't ask onClose when a controlled open closes it", async () => {
+        const onClose = vi.fn(() => false);
+        let setOpen: (open: boolean) => void = () => {};
+        function App() {
+            const [open, setOpenState] = useState(true);
+            setOpen = setOpenState;
+            return (
+                <>
+                    <FullscreenDialog
+                        aria-label="Event"
+                        headline="New event"
+                        open={open}
+                        onClose={onClose}
+                    />
+                </>
+            );
+        }
+        withRegistry(<App />);
+        await frames();
+        await interact(async () => setOpen(false));
+        await frames();
+        expect(byTestId(ids.positioner).hidden).toBe(true);
+        expect(onClose).not.toHaveBeenCalled();
     });
 });
