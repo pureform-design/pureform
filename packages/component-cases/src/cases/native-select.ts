@@ -91,3 +91,54 @@ export const nativeSelect: ComponentCase = {
     },
     indication: ownSource(nativeSelectAnatomy),
 };
+
+/** Every chosen option's value, in the options' order. */
+const readAll = (host: HTMLElement): string[] =>
+    [...select(host).selectedOptions].map((option) => option.value);
+
+/** `multiple`: a list box choosing several options, the value an array, every chosen value
+ *  submitted under the name. Choosing adds to what's chosen. */
+export const nativeSelectMultiple: ComponentCase = {
+    component: "NativeSelect",
+    props: { "aria-label": "Sizes", items: ITEMS, multiple: true },
+    root: ids.root,
+    examples: {
+        "multiple: none": {},
+        "multiple: chosen": { defaultValue: ["s", "l"] },
+        "multiple: disabled": { disabled: true, defaultValue: ["m"] },
+    },
+    state: {
+        prop: "value",
+        from: ["m"],
+        to: ["m", "l"],
+        act: async (host, options = {}) => {
+            if (select(host).disabled && options.force) {
+                await userEvent.click(select(host), options);
+                return;
+            }
+            const chosen = readAll(host);
+            await userEvent.selectOptions(select(host), [...chosen, "l"]);
+        },
+        read: readAll,
+    },
+    form: {
+        control: select,
+        disabled: (host) => select(host).disabled,
+        submits: {
+            props: { name: "sizes", defaultValue: ["s", "l"] },
+            entries: [
+                ["sizes", "s"],
+                ["sizes", "l"],
+            ],
+        },
+        omits: { name: "sizes" },
+        resets: true,
+        required: {
+            props: { name: "sizes", required: true },
+            satisfy: async (host) => {
+                await userEvent.selectOptions(select(host), ["l"]);
+            },
+        },
+        invalid: { props: { invalid: true } },
+    },
+};

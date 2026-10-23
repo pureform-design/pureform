@@ -1,11 +1,16 @@
 // The plain form primitives: Field (ready-made, from `label`, `description` and `error`), the
 // Input and Textarea on their own, and the Label, Description and ErrorText. The Input and the
-// Textarea are the native elements: they submit, disable, and validate as the browser does, and
-// they keep their value themselves (no controllable state of pureform's).
+// Textarea are the native elements: they submit, disable, and validate as the browser does; their
+// text is pureform's controllable `value` (and the element's own `onChange`/`onInput` still works).
 
 import { testIds } from "@pureform/anatomy";
 
-import type { ComponentCase, FormCase, KeyboardCase } from "../types";
+import type {
+    ComponentCase,
+    FormCase,
+    KeyboardCase,
+    StateCase,
+} from "../types";
 import { byTestId } from "../types";
 import { userEvent } from "../user-event";
 
@@ -28,10 +33,22 @@ export const field: ComponentCase = {
 };
 
 /** What the input's and the textarea's cases share, from the control's test id. */
-const control = (id: string): { form: FormCase; keyboard: KeyboardCase } => {
+const control = (
+    id: string,
+): { state: StateCase<string>; form: FormCase; keyboard: KeyboardCase } => {
     const element = (host: HTMLElement) =>
         byTestId<HTMLInputElement | HTMLTextAreaElement>(host, id);
     return {
+        // Typing one character at the end.
+        state: {
+            prop: "value",
+            from: "Ada",
+            to: "Ada!",
+            act: async (host, options) => {
+                await userEvent.type(element(host), "!", options);
+            },
+            read: (host) => element(host).value,
+        },
         form: {
             control: element,
             // Its own `disabled`, or a disabled fieldset's.
@@ -47,6 +64,7 @@ const control = (id: string): { form: FormCase; keyboard: KeyboardCase } => {
                     await userEvent.keyboard("a");
                 },
             },
+            resets: true,
             invalid: { props: { invalid: true } },
         },
         keyboard: {
