@@ -68,6 +68,13 @@ describe("accordion", () => {
         expect(indicator).toContain("_motionReduce");
     });
 
+    it("grows its content open on the default spatial spring, at once under reduced motion", () => {
+        const content = JSON.stringify(recipe("accordion").base.content);
+        expect(content).toContain("height");
+        expect(content).toContain("springs.spatialDefault");
+        expect(content).toContain("_motionReduce");
+    });
+
     it("draws from a named theme's colors and a runtime seed's", () => {
         for (const config of [
             pureform(),
@@ -125,6 +132,8 @@ describe("tree", () => {
         const group = recipe("tree").base.group!;
         expect(JSON.stringify(group)).toContain("--components-tree-indent");
         expect(Object.keys(group)).not.toContain("display");
+        // It grows open and shrinks shut on the default spatial spring.
+        expect(JSON.stringify(group.transition)).toContain("height");
         expect(JSON.stringify(group)).not.toMatch(/padding-?[lL]eft/);
     });
 

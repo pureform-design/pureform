@@ -55,7 +55,7 @@ import {
     when,
 } from "@pureform/core/ast";
 import type { StyleMap } from "@pureform/core/ast";
-import { duration, easing, radius } from "@pureform/theme";
+import { easing, radius } from "@pureform/theme";
 
 import { waveBand, wavyRing } from "./shape-paths";
 import {
@@ -103,6 +103,8 @@ const linear = componentTokens("linearProgress", {
     stopSize: px(4),
     // How far a wavy indicator's wave moves above and below the track's line.
     amplitude: px(3),
+    // One indeterminate cycle: Compose's `LinearAnimationDuration`, 1750ms.
+    indeterminateDuration: numeric(1750, "ms"),
 });
 
 // The linear wave: 40px long, as many as cover a 960px bar (a longer one ends flat), in a box as
@@ -119,7 +121,7 @@ const linearWave = waveBand({
 const slide = (name: string) =>
     animation({
         name,
-        duration: duration("extraLong4"),
+        duration: linear.ref("indeterminateDuration"),
         easing: easing("standard"),
         iterations: "infinite",
     });
@@ -289,6 +291,10 @@ const circular = componentTokens(
         gap: unitless(3),
         // How far a wavy indicator's wave moves in and out of its circle.
         amplitude: px(1.5),
+        // One indeterminate turn: Compose's indicator turns 1080° in its 6000ms cycle and
+        // steps another 360° (`CircularGlobalRotationDegreesTarget`,
+        // `CircularAdditionalRotationDegreesTarget`), 1500ms a turn on average.
+        rotationDuration: numeric(1500, "ms"),
     },
     { value: "number" },
 );
@@ -461,7 +467,7 @@ export const createCircularProgress = <const G extends string = ColorGroup>(
                             borderInlineEndColor: ref("activeColor"),
                             animation: animation({
                                 name: "circularProgressSpin",
-                                duration: duration("long2"),
+                                duration: ref("rotationDuration"),
                                 easing: easing("linear"),
                                 iterations: "infinite",
                             }),

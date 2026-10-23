@@ -36,6 +36,7 @@ import { HorizontalSharedAxis } from "../horizontal-shared-axis/horizontal-share
 import { useItemInteractionSources } from "../interaction";
 import type { ItemInteractionSources } from "../interaction";
 import { useMachine } from "../machine";
+import { collapsible } from "../motion";
 import { useTransitionPage } from "../page-transition";
 import { createPartContext } from "../part-context";
 import { plainParts, useComponent, useSlotProps } from "../parts";
@@ -248,6 +249,7 @@ function Content({
     const leaving = useTransitionPage() === "leaving";
     return scope.render("content", {
         element: "div",
+        ref: collapsible,
         machine: leaving
             ? { ...api.getContentProps({ index: at }), hidden: false }
             : api.getContentProps({ index: at }),

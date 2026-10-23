@@ -153,6 +153,28 @@ describe("navigation", () => {
 });
 
 describe("progress", () => {
+    it("runs indeterminate at Compose's pace: a 1750ms linear cycle and a 1500ms turn", () => {
+        const recipes = compilePreset(
+            configWith(linearProgress, circularProgress),
+        ).theme?.slotRecipes;
+        const slide = JSON.stringify(
+            recipes?.linearProgress?.variants?.indeterminate?.true?.indicator
+                ?.animation,
+        );
+        expect(slide).toContain(
+            "--components-linearProgress-indeterminateDuration",
+        );
+        expect(slide).toContain("1750ms");
+        const spin = JSON.stringify(
+            recipes?.circularProgress?.variants?.indeterminate?.true?.root
+                ?.animation,
+        );
+        expect(spin).toContain(
+            "--components-circularProgress-rotationDuration",
+        );
+        expect(spin).toContain("1500ms");
+    });
+
     it("turns each half of the circular arc through its share of the value", () => {
         const base = compilePreset(configWith(circularProgress)).theme
             ?.slotRecipes?.circularProgress?.base;

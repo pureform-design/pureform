@@ -6,6 +6,7 @@
 import { resolveReducedMotion } from "@pureform/binding-core";
 import {
     subscribeReducedMotion,
+    watchCollapse,
     systemReducedMotion,
 } from "@pureform/binding-core/dom";
 import { useSyncExternalStore } from "react";
@@ -27,3 +28,8 @@ export function useReducedMotion(): boolean {
     );
     return resolveReducedMotion(motion, system);
 }
+
+/** A ref for a part that expands and collapses with `hidden` (an accordion's content, a tree's
+ *  group): its height grows and shrinks on the part's own transition (`watchCollapse`). */
+export const collapsible = (element: HTMLElement | null) =>
+    element ? watchCollapse(element) : undefined;

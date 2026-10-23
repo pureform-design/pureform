@@ -256,9 +256,9 @@ describe("movingSlots", () => {
         const styles = precompute(pureform(), {
             components: ["listItem", "dialog", "linearProgress"],
         });
-        // An expandable item's indicator turns over.
+        // An expandable item's indicator turns over, and its region grows open.
         expect(nativeFactory("listItem", styles).moving).toEqual(
-            new Set(["root", "indicator"]),
+            new Set(["root", "indicator", "region"]),
         );
         expect(nativeFactory("dialog", styles).moving).toEqual(new Set());
         expect(nativeFactory("linearProgress", styles).moving).toEqual(

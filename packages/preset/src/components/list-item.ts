@@ -65,6 +65,7 @@ import type { MaterialDensity } from "@pureform/theme";
 import { expandIndicator, rowParts, rowTokens } from "./list";
 import {
     DEFAULT_GROUP,
+    collapseTransition,
     colorVariant,
     disabledColor,
     on,
@@ -268,8 +269,12 @@ export const createListItem = <
                         parts.trailing,
                         slot("root", "expanded"),
                     ),
-                    // Its display is left to the `hidden` attribute that collapses it.
-                    region: { paddingInlineStart: ref("regionIndent") },
+                    // Its display is left to the `hidden` attribute that collapses it; it grows
+                    // open and shrinks shut as that changes.
+                    region: {
+                        paddingInlineStart: ref("regionIndent"),
+                        transition: collapseTransition,
+                    },
                     // A swipeable item's frame: the action and the row, clipped to it. It
                     // isolates them, so the row stacks only against its action.
                     frame: {

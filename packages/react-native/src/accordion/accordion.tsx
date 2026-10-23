@@ -15,6 +15,7 @@ import type {
 } from "@pureform/binding-core";
 import type { ReactNode } from "react";
 
+import { useExpandMotion } from "../expand";
 import { iconParts, ownText } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
@@ -123,7 +124,9 @@ function AccordionImpl(props: AccordionProps): ReactNode {
         accordionSelection(props),
     );
     const collapsible = props.collapsible ?? true;
+    const expandMotion = useExpandMotion();
     const toggle = (item: string) => {
+        expandMotion();
         if (value.includes(item)) {
             if (collapsible || value.length > 1)
                 setValue(value.filter((open) => open !== item));

@@ -221,6 +221,7 @@ export {
 } from "./sheet-drag";
 export type { SheetDrag, SheetDragOptions } from "./sheet-drag";
 export { focusableWhileOverflowing } from "./scroll-focus";
+export { transitionTiming, watchCollapse } from "./collapse";
 export { settleOnSpring, settleTransition } from "./settle";
 export { markMenuGroupEdges } from "./menu-groups";
 export { revealInRow } from "./reveal";

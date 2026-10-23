@@ -160,7 +160,8 @@ describe("drawings", () => {
         };
         const off = pick(false);
         expect(off.drawings).toEqual({});
-        expect(off.styles.container!.borderRadius).toBe(9999);
+        // A full corner is half the button's height (40px), so the press morph shows.
+        expect(off.styles.container!.borderRadius).toBe(20);
         expect(off.styles.outline!.borderWidth).toBe(1);
 
         const on = pick(true);

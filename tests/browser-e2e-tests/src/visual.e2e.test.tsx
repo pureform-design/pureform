@@ -188,8 +188,14 @@ it("a standard group's button widens while pressed, and a connected group square
         const cs = getComputedStyle(el);
         return [cs.borderStartStartRadius, cs.borderStartEndRadius];
     };
-    expect(corners(first!)).toEqual(["9999px", "8px"]);
-    expect(corners(last!)).toEqual(["8px", "9999px"]);
+    // A full corner is half the 40px button, so a corner morphing from it moves where it shows.
+    expect(corners(first!)).toEqual(["20px", "8px"]);
+    expect(corners(last!)).toEqual(["8px", "20px"]);
+    // Pressed, the run's outside stays full and its inside narrows (Compose's
+    // `connectedLeadingButtonPressShape`).
+    first!.setAttribute("data-pf-active", "");
+    expect(corners(first!)).toEqual(["20px", "4px"]);
+    first!.removeAttribute("data-pf-active");
 });
 
 it("a floating toolbar is a 64px pill hugging its buttons, a docked one fills its row square", () => {

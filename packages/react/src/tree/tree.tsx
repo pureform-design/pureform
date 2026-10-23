@@ -30,6 +30,7 @@ import { ExpandIcon } from "../glyphs";
 import { useItemInteractionSources } from "../interaction";
 import type { ItemInteractionSources } from "../interaction";
 import { useMachine } from "../machine";
+import { collapsible } from "../motion";
 import { createPartContext } from "../part-context";
 import { useComponent, useSlotProps } from "../parts";
 import type { ComponentScope, PlainPartProps, SlotKeyedProps } from "../parts";
@@ -240,6 +241,7 @@ function Group({ unstyled, ...props }: TreePartProps): ReactNode {
     const { ref } = nodeContext.use("Group");
     return scope.render("group", {
         element: "div",
+        ref: collapsible,
         machine: api.getBranchContentProps(ref),
         unstyled,
         props,

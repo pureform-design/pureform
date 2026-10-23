@@ -38,6 +38,7 @@ import type { MaterialDensity } from "@pureform/theme";
 
 import { expandIndicator, rowParts, rowTokens } from "./list";
 import {
+    collapseTransition,
     defaultDensities,
     DENSITY_TOKEN,
     densitySteps,
@@ -159,7 +160,9 @@ export const createAccordion = <D extends string = MaterialDensity>(
                     title: { textStyle: textStyle("titleMedium") },
                     description: parts.supportingText,
                     indicator: expandIndicator(parts.trailing, EXPANDED),
+                    // It grows open and shrinks shut as Zag's `hidden` changes.
                     content: {
+                        transition: collapseTransition,
                         textStyle: textStyle("bodyMedium"),
                         color: ref("contentColor"),
                         paddingInlineStart: ref("paddingInline"),

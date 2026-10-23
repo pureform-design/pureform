@@ -64,6 +64,31 @@ describe("buttonGroup", () => {
         }
     });
 
+    it("keeps a connected run's outside corners while pressed and rounds a selected button fully", () => {
+        const recipe = slotRecipe(button, "button");
+        const first = recipe?.variants?.position?.first?.root ?? {};
+        const outer = first.borderStartStartRadius as Record<string, string>;
+        const pressed = Object.entries(outer).find(([key]) =>
+            key.includes(":active"),
+        )?.[1];
+        const selected = Object.entries(outer).find(([key]) =>
+            key.includes("aria-pressed"),
+        )?.[1];
+        // Compose's connected leading shape keeps `CornerFull` outside while pressed.
+        expect(pressed).toBe(outer.base);
+        expect(pressed).not.toContain("components-button-pressedRadius");
+        // `connectedButtonCheckedShape` is `CornerFull` on every corner: the outside blends to
+        // the round radius by the toggle flag, never to the square one.
+        expect(selected).toContain("components-button-toggles");
+        expect(selected).toMatch(
+            /calc\(var\(--components-button-radius[^)]*\)\) - calc\(var\(--components-button-radius/,
+        );
+        const inner = first.borderStartEndRadius as Record<string, string>;
+        expect(
+            Object.entries(inner).find(([key]) => key.includes(":active"))?.[1],
+        ).toContain("components-button-pressedInnerRadius");
+    });
+
     it("widens a single button in a standard group while pressed", () => {
         const recipe = slotRecipe(button, "button");
         expect(recipe?.variants?.position?.single?.root).toMatchObject({

@@ -348,8 +348,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
             "base": "var(--components-button-innerRadius, token(radii.small))",
           },
           "borderEndStartRadius": {
-            "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "var(--components-button-pressedRadius, token(radii.small))",
-            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": "calc(calc(var(--components-button-radius, token(radii.full)) + calc(calc(var(--components-button-squareRadius, token(radii.medium)) - var(--components-button-radius, token(radii.full))) * var(--components-button-square, 0))) + calc(calc(calc(var(--components-button-squareRadius, token(radii.medium)) + calc(calc(var(--components-button-radius, token(radii.full)) - var(--components-button-squareRadius, token(radii.medium))) * var(--components-button-square, 0))) - calc(var(--components-button-radius, token(radii.full)) + calc(calc(var(--components-button-squareRadius, token(radii.medium)) - var(--components-button-radius, token(radii.full))) * var(--components-button-square, 0)))) * var(--components-button-toggles, 0)))",
+            "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "calc(var(--components-button-radius, token(radii.full)) + calc(calc(var(--components-button-squareRadius, token(radii.medium)) - var(--components-button-radius, token(radii.full))) * var(--components-button-square, 0)))",
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": "calc(calc(var(--components-button-radius, token(radii.full)) + calc(calc(var(--components-button-squareRadius, token(radii.medium)) - var(--components-button-radius, token(radii.full))) * var(--components-button-square, 0))) + calc(calc(var(--components-button-radius, token(radii.full)) - calc(var(--components-button-radius, token(radii.full)) + calc(calc(var(--components-button-squareRadius, token(radii.medium)) - var(--components-button-radius, token(radii.full))) * var(--components-button-square, 0)))) * var(--components-button-toggles, 0)))",
             "base": "calc(var(--components-button-radius, token(radii.full)) + calc(calc(var(--components-button-squareRadius, token(radii.medium)) - var(--components-button-radius, token(radii.full))) * var(--components-button-square, 0)))",
           },
           "borderStartEndRadius": {
@@ -358,8 +358,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
             "base": "var(--components-button-innerRadius, token(radii.small))",
           },
           "borderStartStartRadius": {
-            "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "var(--components-button-pressedRadius, token(radii.small))",
-            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": "calc(calc(var(--components-button-radius, token(radii.full)) + calc(calc(var(--components-button-squareRadius, token(radii.medium)) - var(--components-button-radius, token(radii.full))) * var(--components-button-square, 0))) + calc(calc(calc(var(--components-button-squareRadius, token(radii.medium)) + calc(calc(var(--components-button-radius, token(radii.full)) - var(--components-button-squareRadius, token(radii.medium))) * var(--components-button-square, 0))) - calc(var(--components-button-radius, token(radii.full)) + calc(calc(var(--components-button-squareRadius, token(radii.medium)) - var(--components-button-radius, token(radii.full))) * var(--components-button-square, 0)))) * var(--components-button-toggles, 0)))",
+            "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "calc(var(--components-button-radius, token(radii.full)) + calc(calc(var(--components-button-squareRadius, token(radii.medium)) - var(--components-button-radius, token(radii.full))) * var(--components-button-square, 0)))",
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": "calc(calc(var(--components-button-radius, token(radii.full)) + calc(calc(var(--components-button-squareRadius, token(radii.medium)) - var(--components-button-radius, token(radii.full))) * var(--components-button-square, 0))) + calc(calc(var(--components-button-radius, token(radii.full)) - calc(var(--components-button-radius, token(radii.full)) + calc(calc(var(--components-button-squareRadius, token(radii.medium)) - var(--components-button-radius, token(radii.full))) * var(--components-button-square, 0)))) * var(--components-button-toggles, 0)))",
             "base": "calc(var(--components-button-radius, token(radii.full)) + calc(calc(var(--components-button-squareRadius, token(radii.medium)) - var(--components-button-radius, token(radii.full))) * var(--components-button-square, 0)))",
           },
         },
@@ -367,8 +367,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
       "last": {
         "root": {
           "borderEndEndRadius": {
-            "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "var(--components-button-pressedRadius, token(radii.small))",
-            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": "calc(calc(var(--components-button-radius, token(radii.full)) + calc(calc(var(--components-button-squareRadius, token(radii.medium)) - var(--components-button-radius, token(radii.full))) * var(--components-button-square, 0))) + calc(calc(calc(var(--components-button-squareRadius, token(radii.medium)) + calc(calc(var(--components-button-radius, token(radii.full)) - var(--components-button-squareRadius, token(radii.medium))) * var(--components-button-square, 0))) - calc(var(--components-button-radius, token(radii.full)) + calc(calc(var(--components-button-squareRadius, token(radii.medium)) - var(--components-button-radius, token(radii.full))) * var(--components-button-square, 0)))) * var(--components-button-toggles, 0)))",
+            "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "calc(var(--components-button-radius, token(radii.full)) + calc(calc(var(--components-button-squareRadius, token(radii.medium)) - var(--components-button-radius, token(radii.full))) * var(--components-button-square, 0)))",
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": "calc(calc(var(--components-button-radius, token(radii.full)) + calc(calc(var(--components-button-squareRadius, token(radii.medium)) - var(--components-button-radius, token(radii.full))) * var(--components-button-square, 0))) + calc(calc(var(--components-button-radius, token(radii.full)) - calc(var(--components-button-radius, token(radii.full)) + calc(calc(var(--components-button-squareRadius, token(radii.medium)) - var(--components-button-radius, token(radii.full))) * var(--components-button-square, 0)))) * var(--components-button-toggles, 0)))",
             "base": "calc(var(--components-button-radius, token(radii.full)) + calc(calc(var(--components-button-squareRadius, token(radii.medium)) - var(--components-button-radius, token(radii.full))) * var(--components-button-square, 0)))",
           },
           "borderEndStartRadius": {
@@ -377,8 +377,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
             "base": "var(--components-button-innerRadius, token(radii.small))",
           },
           "borderStartEndRadius": {
-            "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "var(--components-button-pressedRadius, token(radii.small))",
-            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": "calc(calc(var(--components-button-radius, token(radii.full)) + calc(calc(var(--components-button-squareRadius, token(radii.medium)) - var(--components-button-radius, token(radii.full))) * var(--components-button-square, 0))) + calc(calc(calc(var(--components-button-squareRadius, token(radii.medium)) + calc(calc(var(--components-button-radius, token(radii.full)) - var(--components-button-squareRadius, token(radii.medium))) * var(--components-button-square, 0))) - calc(var(--components-button-radius, token(radii.full)) + calc(calc(var(--components-button-squareRadius, token(radii.medium)) - var(--components-button-radius, token(radii.full))) * var(--components-button-square, 0)))) * var(--components-button-toggles, 0)))",
+            "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "calc(var(--components-button-radius, token(radii.full)) + calc(calc(var(--components-button-squareRadius, token(radii.medium)) - var(--components-button-radius, token(radii.full))) * var(--components-button-square, 0)))",
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": "calc(calc(var(--components-button-radius, token(radii.full)) + calc(calc(var(--components-button-squareRadius, token(radii.medium)) - var(--components-button-radius, token(radii.full))) * var(--components-button-square, 0))) + calc(calc(var(--components-button-radius, token(radii.full)) - calc(var(--components-button-radius, token(radii.full)) + calc(calc(var(--components-button-squareRadius, token(radii.medium)) - var(--components-button-radius, token(radii.full))) * var(--components-button-square, 0)))) * var(--components-button-toggles, 0)))",
             "base": "calc(var(--components-button-radius, token(radii.full)) + calc(calc(var(--components-button-squareRadius, token(radii.medium)) - var(--components-button-radius, token(radii.full))) * var(--components-button-square, 0)))",
           },
           "borderStartStartRadius": {
@@ -443,6 +443,7 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
           "--components-button-outlineWidth": "1px",
           "--components-button-pressedInnerRadius": "token(radii.extraSmall)",
           "--components-button-pressedRadius": "token(radii.small)",
+          "--components-button-radius": "min(token(radii.full), calc(calc(var(--components-button-heightCompact, token(sizes.controlLarge)) + var(--components-button-densityOffset, token(sizes.densityOffset))) * 0.5))",
           "--components-button-secondaryIconSize": "token(sizes.iconSmall)",
           "--components-button-squareRadius": "token(radii.medium)",
           "height": "calc(var(--components-button-heightCompact, token(sizes.controlLarge)) + var(--components-button-densityOffset, token(sizes.densityOffset)))",
@@ -467,6 +468,7 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
           "--components-button-outlineWidth": "2px",
           "--components-button-pressedInnerRadius": "token(radii.medium)",
           "--components-button-pressedRadius": "token(radii.large)",
+          "--components-button-radius": "min(token(radii.full), calc(calc(var(--components-button-heightLarge, 96px) + var(--components-button-densityOffset, token(sizes.densityOffset))) * 0.5))",
           "--components-button-secondaryIconSize": "32px",
           "--components-button-squareRadius": "token(radii.extraLarge)",
           "height": "calc(var(--components-button-heightLarge, 96px) + var(--components-button-densityOffset, token(sizes.densityOffset)))",
@@ -491,6 +493,7 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
           "--components-button-outlineWidth": "1px",
           "--components-button-pressedInnerRadius": "token(radii.extraSmall)",
           "--components-button-pressedRadius": "token(radii.medium)",
+          "--components-button-radius": "min(token(radii.full), calc(calc(var(--components-button-heightMedium, 56px) + var(--components-button-densityOffset, token(sizes.densityOffset))) * 0.5))",
           "--components-button-secondaryIconSize": "24px",
           "--components-button-squareRadius": "token(radii.large)",
           "height": "calc(var(--components-button-heightMedium, 56px) + var(--components-button-densityOffset, token(sizes.densityOffset)))",
@@ -515,6 +518,7 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
           "--components-button-outlineWidth": "1px",
           "--components-button-pressedInnerRadius": "token(radii.extraSmall)",
           "--components-button-pressedRadius": "token(radii.small)",
+          "--components-button-radius": "min(token(radii.full), calc(calc(var(--components-button-heightSmall, token(sizes.controlMedium)) + var(--components-button-densityOffset, token(sizes.densityOffset))) * 0.5))",
           "--components-button-secondaryIconSize": "20px",
           "--components-button-squareRadius": "token(radii.medium)",
           "height": "calc(var(--components-button-heightSmall, token(sizes.controlMedium)) + var(--components-button-densityOffset, token(sizes.densityOffset)))",
@@ -539,6 +543,7 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
           "--components-button-outlineWidth": "3px",
           "--components-button-pressedInnerRadius": "token(radii.large)",
           "--components-button-pressedRadius": "token(radii.large)",
+          "--components-button-radius": "min(token(radii.full), calc(calc(var(--components-button-heightXlarge, 136px) + var(--components-button-densityOffset, token(sizes.densityOffset))) * 0.5))",
           "--components-button-secondaryIconSize": "40px",
           "--components-button-squareRadius": "token(radii.extraLarge)",
           "height": "calc(var(--components-button-heightXlarge, 136px) + var(--components-button-densityOffset, token(sizes.densityOffset)))",
@@ -563,6 +568,7 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
           "--components-button-outlineWidth": "1px",
           "--components-button-pressedInnerRadius": "calc(token(radii.extraSmall) * 0.5)",
           "--components-button-pressedRadius": "token(radii.small)",
+          "--components-button-radius": "min(token(radii.full), calc(calc(var(--components-button-heightXsmall, token(sizes.controlSmall)) + var(--components-button-densityOffset, token(sizes.densityOffset))) * 0.5))",
           "--components-button-secondaryIconSize": "20px",
           "--components-button-squareRadius": "token(radii.medium)",
           "height": "calc(var(--components-button-heightXsmall, token(sizes.controlSmall)) + var(--components-button-densityOffset, token(sizes.densityOffset)))",

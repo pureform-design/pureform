@@ -60,6 +60,20 @@ describe("button", () => {
     });
 });
 
+describe("button corners", () => {
+    it("rounds fully at half its height, so the press morph runs over the corners that show", () => {
+        const small = (recipe().variants?.size?.small?.root ?? {}) as Record<
+            string,
+            unknown
+        >;
+        const radius = String(small["--components-button-radius"]);
+        expect(radius).toMatch(/^min\(/);
+        expect(radius).toContain("token(radii.full)");
+        expect(radius).toContain("--components-button-heightSmall");
+        expect(radius).toContain("0.5");
+    });
+});
+
 describe("button secondary icon", () => {
     it("sizes the secondary icon like the icon, per size, with its own spacing token", () => {
         const r = recipe();

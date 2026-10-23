@@ -253,7 +253,7 @@ exports[`circularProgress > compiles to a stable Panda slot recipe 1`] = `
           "display": "none",
         },
         "root": {
-          "animation": "token(durations.long2) token(easings.linear) infinite circularProgressSpin",
+          "animation": "var(--components-circularProgress-rotationDuration, 1500ms) token(easings.linear) infinite circularProgressSpin",
           "borderBlockStartColor": "var(--components-circularProgress-activeColor, token(colors.primary))",
           "borderColor": "transparent",
           "borderInlineEndColor": "var(--components-circularProgress-activeColor, token(colors.primary))",
@@ -613,8 +613,8 @@ exports[`linearProgress > compiles to a stable Panda slot recipe 1`] = `
       "true": {
         "indicator": {
           "animation": {
-            "_rtl": "token(durations.extraLong4) token(easings.standard) infinite linearProgressSlideRtl",
-            "base": "token(durations.extraLong4) token(easings.standard) infinite linearProgressSlide",
+            "_rtl": "var(--components-linearProgress-indeterminateDuration, 1750ms) token(easings.standard) infinite linearProgressSlideRtl",
+            "base": "var(--components-linearProgress-indeterminateDuration, 1750ms) token(easings.standard) infinite linearProgressSlide",
           },
           "width": "var(--components-linearProgress-indeterminateWidth, 40%)",
         },
@@ -806,6 +806,10 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
     },
     "region": {
       "paddingInlineStart": "var(--components-listItem-regionIndent, token(spacing.4))",
+      "transition": {
+        "_motionReduce": "none",
+        "base": "height token(springs.spatialDefault.duration) token(springs.spatialDefault.easing)",
+      },
     },
     "root": {
       "&:is(:disabled, [aria-disabled=true])": {

@@ -42,6 +42,7 @@ import type { MaterialDensity } from "@pureform/theme";
 
 import { expandIndicator, rowParts, rowTokens } from "./list";
 import {
+    collapseTransition,
     colorVariant,
     DEFAULT_GROUP,
     defaultDensities,
@@ -154,8 +155,11 @@ export const createTree = <
                         slot("node", "expanded"),
                     ),
                     // A branch's children, indented from the start. No display of its own, so
-                    // Zag's `hidden` hides it.
-                    group: { paddingInlineStart: ref("indent") },
+                    // Zag's `hidden` hides it; it grows open and shrinks shut as that changes.
+                    group: {
+                        paddingInlineStart: ref("indent"),
+                        transition: collapseTransition,
+                    },
                 },
                 variants: {
                     density: densityTokenVariant(densities),

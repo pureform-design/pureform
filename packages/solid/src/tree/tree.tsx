@@ -39,6 +39,7 @@ import { itemInteractionSources } from "../interaction";
 import type { ItemInteractionSources } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
+import { collapsible } from "../motion";
 import { createPartContext } from "../part-context";
 import {
     createSlotProps,
@@ -243,6 +244,7 @@ function Group(props: TreePartProps): JSX.Element {
     const { ref } = nodeContext.use("Group");
     return scope.render("group", {
         element: "div",
+        ref: collapsible,
         machine: () => api().getBranchContentProps(ref()),
         unstyled: () => props.unstyled,
         props: omit(props, "unstyled"),
