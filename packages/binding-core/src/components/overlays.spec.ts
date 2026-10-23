@@ -34,6 +34,7 @@ import {
     overlayPresent,
     presentProps,
 } from "./overlay";
+import { popoverMachineProps, popoverSelection } from "./popover";
 import {
     isInteractiveRichTooltip,
     RICH_TOOLTIP_ROOT_PROPS,
@@ -153,6 +154,27 @@ describe("overlays", () => {
         });
         expect(tooltipSelection({})).toEqual({ tokens: undefined });
         expect(richTooltipSelection({})).toEqual({ tokens: undefined });
+    });
+
+    it("map the popover's props onto Zag's: in place, bottom by default, body as the description", () => {
+        const props = popoverMachineProps({
+            modal: true,
+            ids: { title: "t", body: "b", caret: "c" },
+        });
+        expect(props.modal).toBe(true);
+        expect(props.portalled).toBe(false);
+        expect(props.positioning).toEqual({ placement: "bottom" });
+        expect(props.ids).toMatchObject({
+            title: "t",
+            description: "b",
+            arrow: "c",
+        });
+        expect(popoverMachineProps({}).modal).toBeUndefined();
+        expect(popoverSelection({})).toEqual({ tokens: undefined });
+        expect(
+            popoverMachineProps({ positioning: { placement: "top" } })
+                .positioning,
+        ).toEqual({ placement: "top" });
     });
 
     it("name the dialog's headline and body as Zag's title and description", () => {

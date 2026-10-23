@@ -257,6 +257,9 @@ CARET_STYLE;                             // `--arrow-background: currentColor`, 
 // Rich tooltip: Zag's tooltip, interactive; richTooltipOverlayAnatomy
 RichTooltipRootOwnProps; RICH_TOOLTIP_ROOT_PROPS; RICH_TOOLTIP_CONTENT_PROPS; // + subhead, actions
 richTooltipSelection(props); isInteractiveRichTooltip(props); richTooltipMachineProps(props);
+// Popover: Zag's popover, rendered in place; popoverOverlayAnatomy
+PopoverRootOwnProps; POPOVER_ROOT_PROPS; POPOVER_CONTENT_PROPS; // heading, body, actions, caret
+popoverSelection(props); popoverMachineProps(props);
 
 // Dialog: Zag's dialog; dialogOverlayAnatomy, and dialogBackdropAnatomy (the scrim)
 type DialogPart                          // the overlay's parts, and "backdrop"
