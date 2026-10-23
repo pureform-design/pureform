@@ -104,7 +104,16 @@ export const composeStories = (input: ComposeInput) => {
             decorators,
             parameters: {
                 ...input.parameters,
-                ...(input.height ? { pureform: { height: input.height } } : {}),
+                ...(input.height
+                    ? {
+                          pureform: {
+                              ...(input.parameters?.["pureform"] as
+                                  | object
+                                  | undefined),
+                              height: input.height,
+                          },
+                      }
+                    : {}),
             },
             ...(input.scheme ? { globals: { scheme: input.scheme } } : {}),
         },
