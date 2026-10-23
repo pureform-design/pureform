@@ -542,6 +542,12 @@ trigger shows their labels joined by ", " (the placeholder when none):
   `PanResponder`): a drag past the slop takes the touch from the row, so its `onPress` (or an
   expandable item's expanding) fires on a tap only; the action is hidden from assistive technology until revealed. `Avatar` takes a `src` that shows once loaded
   (`onStatusChange`), its children the fallback.
+- **Media:** `Media` takes the web's `src`, or a `source` as React Native's `Image` takes it
+  (`ImageSourcePropType`): a `require()`d asset (its proportions from
+  `Image.resolveAssetSource`), `{ uri, headers, cache }` (measured with
+  `Image.getSizeWithHeaders`; React Native Web measures without the headers), or an array of
+  resolutions. `source` wins over `src`, and development warns when both are set. A shaped
+  picture draws with the whole source.
 - **Button groups:** `ButtonGroup` renders a `Button` per labelled entry of `items` and an
   `IconButton` per icon-only one, in its `size` and the buttons' `color`, `variant`, `corner` and
   `density`, each with its `position` (`single`, or its place in the run when `connected`).

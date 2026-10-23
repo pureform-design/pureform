@@ -1,7 +1,7 @@
 import { act } from "@testing-library/react";
 import { useState } from "react";
 import type { ReactNode } from "react";
-import { Linking, View } from "react-native";
+import { Image, Linking, View } from "react-native";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
@@ -1541,6 +1541,140 @@ describe("media", () => {
         await until(() => expect(box("auto").height).toBeCloseTo(150, 0));
         expect(box("auto").width).toBe(200);
         expect(box("square").height).toBe(200);
+    });
+
+    const box = (id: string) => byTestId(`${id}-root`).getBoundingClientRect();
+
+    it("takes a source's own size and an array's first, without loading it", async () => {
+        const getSize = vi.spyOn(Image, "getSize");
+        await render(
+            <View style={{ width: 200 }}>
+                <Media
+                    source={{ uri: PICTURE, width: 40, height: 20 }}
+                    testId="sized"
+                />
+                <Media
+                    source={[
+                        { uri: PICTURE, width: 40, height: 10 },
+                        { uri: PICTURE, width: 80, height: 20 },
+                    ]}
+                    testId="resolutions"
+                />
+            </View>,
+        );
+        expect(box("sized").height).toBeCloseTo(100, 0);
+        expect(box("resolutions").height).toBeCloseTo(50, 0);
+        expect(getSize).not.toHaveBeenCalled();
+        getSize.mockRestore();
+    });
+
+    it("measures a remote source with its headers where React Native can", async () => {
+        const headers = { Authorization: "Bearer token" };
+        const withHeaders = vi.fn(
+            (
+                _uri: string,
+                _headers: Record<string, string>,
+                done: (width: number, height: number) => void,
+            ) => done(40, 10),
+        );
+        const statics = Image as unknown as {
+            getSizeWithHeaders?: typeof withHeaders | undefined;
+        };
+        const before = statics.getSizeWithHeaders;
+        statics.getSizeWithHeaders = withHeaders;
+        try {
+            await render(
+                <View style={{ width: 200 }}>
+                    <Media
+                        source={{ uri: PICTURE, headers, cache: "reload" }}
+                        testId="remote"
+                    />
+                </View>,
+            );
+            await until(() => expect(box("remote").height).toBeCloseTo(50, 0));
+            expect(withHeaders).toHaveBeenCalledWith(
+                PICTURE,
+                headers,
+                expect.any(Function),
+                expect.any(Function),
+            );
+        } finally {
+            statics.getSizeWithHeaders = before;
+        }
+    });
+
+    it("takes a bundled asset's size from the bundler", async () => {
+        const statics = Image as unknown as {
+            resolveAssetSource?: ((source: number) => object) | undefined;
+        };
+        const before = statics.resolveAssetSource;
+        statics.resolveAssetSource = () => ({
+            uri: PICTURE,
+            width: 40,
+            height: 40,
+        });
+        try {
+            // React Native Web's registry, which a bundler's `require()` of a picture fills.
+            const assets = (globalThis as Record<symbol, object[]>)[
+                Symbol.for("react-native-web.AssetRegistry")
+            ]!;
+            const id = assets.push({
+                httpServerLocation: "/assets",
+                name: "picture",
+                type: "png",
+                width: 40,
+                height: 40,
+                scales: [1],
+            });
+            await render(
+                <View style={{ width: 200 }}>
+                    <Media source={id} testId="asset" />
+                </View>,
+            );
+            expect(box("asset").height).toBeCloseTo(200, 0);
+        } finally {
+            statics.resolveAssetSource = before;
+        }
+    });
+
+    it("draws a shaped picture from the whole source", async () => {
+        await mount(
+            <PureformProvider registry={registry} engine={animatedSvg}>
+                <View style={{ width: 200 }}>
+                    <Media
+                        source={{ uri: PICTURE, width: 40, height: 40 }}
+                        shape="cookie4Sided"
+                        testId="shaped"
+                    />
+                </View>
+            </PureformProvider>,
+        );
+        await until(() =>
+            expect(
+                byTestId("shaped-root")
+                    .querySelector("image")
+                    ?.getAttribute("href"),
+            ).toBe(PICTURE),
+        );
+        expect(box("shaped").height).toBeCloseTo(200, 0);
+    });
+
+    it("prefers `source` over `src`, and warns in development", async () => {
+        const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+        await render(
+            <View style={{ width: 200 }}>
+                <Media
+                    src="data:,"
+                    source={{ uri: PICTURE, width: 40, height: 10 }}
+                    testId="both"
+                />
+            </View>,
+        );
+        expect(box("both").height).toBeCloseTo(50, 0);
+        expect(warn).toHaveBeenCalledWith(
+            expect.stringContaining("`source` wins"),
+        );
+        warn.mockRestore();
     });
 });
 

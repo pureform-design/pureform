@@ -40,8 +40,15 @@ import { useTokens } from "@pureform/rn-adapter/react";
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { Image, Text as NativeText, View } from "react-native";
-import type { ImageStyle, StyleProp, TextStyle, ViewStyle } from "react-native";
+import type {
+    ImageSourcePropType,
+    ImageStyle,
+    StyleProp,
+    TextStyle,
+    ViewStyle,
+} from "react-native";
 
+import { isDev } from "./env";
 import { IconSlot, ownText } from "./icon-style";
 import { testIdOf, withEngine } from "./parts";
 import { useOverlayPresence } from "./presence";
@@ -307,12 +314,49 @@ export function Scrim(props: ScrimProps): ReactNode {
 export interface MediaProps extends MediaVariantProps {
     /** The picture's address, as the web's `src` and the avatar's. */
     readonly src?: string | undefined;
-    /** The picture, as React Native's `Image` takes it; `src` wins when both are given. */
-    readonly source?: { readonly uri: string } | undefined;
+    /** The picture, as React Native's `Image` takes it: a `require()`d asset, `{ uri, headers,
+     *  cache }`, or an array of resolutions. It wins over `src`; development warns when both are
+     *  given. */
+    readonly source?: ImageSourcePropType | undefined;
     /** What it shows, for assistive technology; empty when decorative. */
     readonly alt?: string | undefined;
     readonly testId?: TestIdOverride<Root> | undefined;
 }
+
+type Sized = { width?: number; height?: number; uri?: string };
+
+// The proportions a source gives without loading it: an asset's, from the bundler, or the
+// width and height a remote source names.
+const knownRatio = (source: ImageSourcePropType): number | undefined => {
+    const sized = (s: Sized | null | undefined) =>
+        s?.width && s.height ? s.width / s.height : undefined;
+    if (typeof source === "number") {
+        const resolve = (
+            Image as { resolveAssetSource?: (s: number) => Sized | null }
+        ).resolveAssetSource;
+        return resolve ? sized(resolve(source)) : undefined;
+    }
+    if (Array.isArray(source))
+        return source.map((s) => sized(s as Sized)).find(Boolean);
+    return sized(source as Sized);
+};
+
+// The remote picture a source names, for measuring: its address and request headers. An array
+// measures its first resolution, since they share proportions.
+const remoteOf = (
+    source: ImageSourcePropType,
+): { uri: string; headers?: Record<string, string> } | undefined => {
+    const one = (Array.isArray(source) ? source[0] : source) as
+        | { uri?: string; headers?: Record<string, string> }
+        | number
+        | undefined;
+    if (typeof one !== "object" || !one?.uri) return undefined;
+    return one.headers
+        ? { uri: one.uri, headers: one.headers }
+        : { uri: one.uri };
+};
+
+let warnedBoth = false;
 
 function MediaImpl(props: MediaProps): ReactNode {
     const engine = useEngine();
@@ -322,28 +366,46 @@ function MediaImpl(props: MediaProps): ReactNode {
     const drawing = rootDrawing(selected);
     const testID = testIdOf(mediaAnatomy, "root", props.testId);
     const Drawing = engine.Drawing;
-    const uri = props.src ?? props.source?.uri ?? "";
+    if (isDev && !warnedBoth && props.source != null && props.src != null) {
+        warnedBoth = true;
+        console.warn("Media: both `source` and `src` are set; `source` wins.");
+    }
+    const source: ImageSourcePropType = props.source ?? {
+        uri: props.src ?? "",
+    };
     // At `auto`, the web's picture takes its own proportions at the container's width. A React
     // Native image has none until it's measured, so it would draw with no height.
     const auto = style.aspectRatio === undefined;
-    const [ratio, setRatio] = useState<{ uri: string; ratio: number }>();
+    const known = auto ? knownRatio(source) : undefined;
+    const remote = auto && known === undefined ? remoteOf(source) : undefined;
+    const key = remote ? JSON.stringify(remote) : "";
+    const [ratio, setRatio] = useState<{ key: string; ratio: number }>();
     useEffect(() => {
-        if (!auto || uri === "") return undefined;
+        if (!remote) return undefined;
         let current = true;
-        Image.getSize(
-            uri,
-            (width, height) =>
-                current &&
-                width > 0 &&
-                height > 0 &&
-                setRatio({ uri, ratio: width / height }),
-            () => {},
-        );
+        const done = (width: number, height: number) =>
+            current &&
+            width > 0 &&
+            height > 0 &&
+            setRatio({ key, ratio: width / height });
+        // React Native Web has no `getSizeWithHeaders`: it measures without them.
+        if (remote.headers && typeof Image.getSizeWithHeaders === "function")
+            Image.getSizeWithHeaders(
+                remote.uri,
+                remote.headers,
+                done,
+                () => {},
+            );
+        else Image.getSize(remote.uri, done, () => {});
         return () => {
             current = false;
         };
-    }, [auto, uri]);
-    if (auto && ratio?.uri === uri) style.aspectRatio = ratio.ratio;
+        // `key` stands for `remote`, a new object each render.
+    }, [key]);
+    // A source's own width and height size an `Image` whose style doesn't: the aspect sizes it.
+    if (style.height === undefined) style.height = "auto";
+    if (known !== undefined) style.aspectRatio = known;
+    else if (remote && ratio?.key === key) style.aspectRatio = ratio.ratio;
     // A shaped picture is drawn clipped to its shape; React Native's Image can't clip to one.
     if (drawing && Drawing) {
         return (
@@ -353,13 +415,13 @@ function MediaImpl(props: MediaProps): ReactNode {
                 style={style as ViewStyle}
                 testID={testID}
             >
-                <Drawing drawing={drawing} image={{ uri, fit }} />
+                <Drawing drawing={drawing} image={{ source, fit }} />
             </View>
         );
     }
     return (
         <Image
-            source={{ uri }}
+            source={source}
             accessibilityLabel={props.alt ?? ""}
             resizeMode={fit}
             style={style as ImageStyle}
