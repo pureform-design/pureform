@@ -186,3 +186,10 @@ main untouched.
   Native's own do?
 - `PressableHandlers` gained `onLayout`; a component that spreads the handlers and sets its own
   `onLayout` after keeps its own (the tabs do), so its source isn't located.
+
+## User decisions (for the fix-batch merge)
+
+- Keep 24px top padding without a drag handle.
+- Side sheet on the web drags with touch and pen only; mouse users keep the close button and Escape.
+- React Native Button, Chip, IconButton and FAB keep their own size in a column, the way Badge does (merge does it).
+- Coplanar side sheet and React Native non-modal side sheet drag: r9.
