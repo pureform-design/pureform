@@ -5,7 +5,8 @@
 // renders in place, inside Root: while a modal sheet is open, Zag keeps focus inside it, hides the
 // rest of the page from assistive technology, and stops the page scrolling. A standard sheet
 // (`modal={false}`) leaves the page usable. The drag handle closes the sheet on a press, and on a
-// drag down past a quarter of its height.
+// drag down past a quarter of its height; a sheet that can rest partly open
+// (`partiallyExpandable`) moves between partly and fully open instead.
 
 import {
     bottomSheetBackdropAnatomy,
@@ -19,6 +20,7 @@ import {
     closeTriggerProps,
     isPresent,
     sheetContentLayout,
+    sheetDragHandleLabel,
     sheetDragHandleLayout,
     sheetMachineProps,
     sheetModal,
@@ -27,6 +29,7 @@ import type {
     BottomSheetContentProps,
     BottomSheetPart,
     BottomSheetRootOwnProps,
+    SheetRest,
     Unstyled,
 } from "@pureform/binding-core";
 import { dragToDismiss } from "@pureform/binding-core/dom";
@@ -36,6 +39,7 @@ import {
     type ReactNode,
     useCallback,
     useEffect,
+    useRef,
     useState,
 } from "react";
 
@@ -114,15 +118,33 @@ const Body: (props: BottomSheetPartProps) => ReactNode = chrome.part(
 );
 
 /** The drag handle at the top edge: a press closes the sheet, and so does a drag down past a
- *  quarter of its height. Name it with `aria-label`. It renders the drag handle component; give
- *  `as` to render another. */
+ *  quarter of its height. On a sheet that can rest partly open (`partiallyExpandable`), a drag
+ *  or a press moves it between partly and fully open, and a drag down from partly open closes
+ *  it. Without `aria-label`, it's named for what a press does. It renders the drag handle
+ *  component; give `as` to render another. */
 function DragHandle({
     unstyled,
     as,
     ...props
 }: BottomSheetTriggerProps): ReactNode {
-    const { scope, api, latestApi, surface, asker, requestClose, onClose } =
-        context.use("DragHandle");
+    const {
+        scope,
+        api,
+        latestApi,
+        surface,
+        asker,
+        requestClose,
+        onClose,
+        props: rootProps,
+    } = context.use("DragHandle");
+    const latestRoot = useRef(rootProps);
+    latestRoot.current = rootProps;
+    // Where it rests, and whether it can move between partly and fully open.
+    const [rest, setRest] = useState<{
+        readonly rest: SheetRest;
+        readonly movable: boolean;
+    }>({ rest: "expanded", movable: false });
+    const lastRest = useRef<SheetRest>("expanded");
     // After a drag closed it: once that render has committed, a sheet still open (one the app
     // kept open) settles back.
     const [left, setLeft] = useState<{ readonly kept: () => void }>();
@@ -141,6 +163,18 @@ function DragHandle({
                       },
                       () => onClose()?.() ?? true,
                       asker,
+                      {
+                          partial: () =>
+                              latestRoot.current.partiallyExpandable === true,
+                          onRest: (next, movable) => {
+                              if (lastRest.current !== next)
+                                  latestRoot.current.onExpandedChange?.({
+                                      expanded: next === "expanded",
+                                  });
+                              lastRest.current = next;
+                              setRest({ rest: next, movable });
+                          },
+                      },
                   )
                 : undefined,
         [surface, latestApi, asker, onClose],
@@ -156,7 +190,10 @@ function DragHandle({
             normalizeProps.element(sheetDragHandleLayout),
         ),
         unstyled,
-        props,
+        props: {
+            "aria-label": sheetDragHandleLabel(rest.rest, rest.movable),
+            ...props,
+        },
     });
 }
 
@@ -195,7 +232,9 @@ function ReadyMade(props: BottomSheetProps): ReactNode {
                 <Content {...slot("content")}>
                     {dragHandle !== false ? (
                         <DragHandle
-                            aria-label={dragHandleLabel ?? "Close sheet"}
+                            {...(dragHandleLabel === undefined
+                                ? {}
+                                : { "aria-label": dragHandleLabel })}
                             {...(slot("dragHandle") as object)}
                         />
                     ) : null}

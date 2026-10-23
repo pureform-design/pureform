@@ -108,6 +108,15 @@ export const sheetRelease = (release: {
     return offset > partial / 2 ? "partial" : "expanded";
 };
 
+/** The drag handle's name when the app gives none, for what a press does: on a sheet that can
+ *  move between partly and fully open, it expands or collapses it; otherwise it closes it. */
+export const sheetDragHandleLabel = (rest: SheetRest, movable: boolean) =>
+    !movable
+        ? "Close sheet"
+        : rest === "partial"
+          ? "Expand sheet"
+          : "Collapse sheet";
+
 /** Asks an overlay's `onClose` and acts on the answer, `yes` or `no`, once it comes. */
 export interface CloseAsker {
     /** Asks `onClose` (without one, the answer is yes). A boolean answers at once; a promise
@@ -258,8 +267,8 @@ export interface BottomSheetContentProps<Node> {
     readonly trigger?: Node;
     /** Whether it shows the drag handle at its top edge. @default true */
     readonly dragHandle?: boolean | undefined;
-    /** The drag handle's accessible name: a press on it closes the sheet.
-     *  @default "Close sheet" */
+    /** The drag handle's accessible name. @default for what a press does: "Close sheet", or on a
+     *  sheet moving between partly and fully open, "Expand sheet" or "Collapse sheet" */
     readonly dragHandleLabel?: string | undefined;
     /** The content. */
     readonly body?: Node;
