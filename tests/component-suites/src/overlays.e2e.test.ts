@@ -487,6 +487,43 @@ describe("FabMenu", () => {
             expect.objectContaining({ value: "call" }),
         );
     });
+
+    // One focus model: the arrow keys move focus along with the highlight, so Tab carries on from
+    // where the arrows left it (r10).
+    it("moves focus with the highlight on the arrow keys, and Tab goes on from there", async () => {
+        const host = hostIn(`<div><div data-host></div></div>`);
+        mountCase(
+            fabMenuCase,
+            { ...fabMenuCase.overlay!.props, defaultOpen: true },
+            { host },
+        );
+        fabMenuCase.overlay!.place?.(host);
+        await settlePlaced();
+        await animationsDone();
+        const focused = () =>
+            (document.activeElement as HTMLElement | null)?.textContent;
+        const highlighted = () =>
+            host.querySelector<HTMLElement>(
+                `[data-testid="${testIds.fabMenu.item}"][data-highlighted]`,
+            );
+        host.querySelector<HTMLElement>(
+            `[data-testid="${testIds.fabMenu.list}"]`,
+        )!.focus();
+        await userEvent.tab();
+        expect(focused()).toContain("Message");
+        await userEvent.keyboard("{ArrowDown}");
+        await expect.poll(focused).toContain("Call");
+        expect(document.activeElement).toBe(highlighted());
+        await userEvent.keyboard("{ArrowUp}");
+        await expect.poll(focused).toContain("Message");
+        expect(document.activeElement).toBe(highlighted());
+        await userEvent.tab();
+        expect(focused()).toContain("Call");
+        await userEvent.tab();
+        expect(document.activeElement?.getAttribute("data-testid")).toBe(
+            testIds.fabMenu.closeTrigger,
+        );
+    });
 });
 
 describe("Overlays inside a dialog or a sheet", () => {

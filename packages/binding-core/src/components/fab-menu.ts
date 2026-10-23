@@ -127,8 +127,13 @@ interface FabMenuTabEvent {
     preventDefault(): void;
 }
 
-/** The list's (the menu content's) props, with Tab from its last item going on to the FAB. Zag's
- *  menu keeps Tab inside its content at the last tabbable item; the FAB follows the list. */
+// The keys Zag's menu moves its highlight with.
+const HIGHLIGHT_KEYS = new Set(["ArrowDown", "ArrowUp", "Home", "End"]);
+
+/** The list's (the menu content's) props, with Tab from its last item going on to the FAB (Zag's
+ *  menu keeps Tab inside its content at the last tabbable item; the FAB follows the list), and
+ *  focus following the highlight: an arrow key (or Home, End) that moves Zag's highlight moves
+ *  focus to the highlighted item, so arrows and Tab move one focus. */
 export const fabMenuListProps = <P extends object>(
     content: P,
     getFab: () => HTMLElement | null | undefined,
@@ -151,5 +156,17 @@ export const fabMenuListProps = <P extends object>(
         (
             content as { onKeyDown?: (event: FabMenuTabEvent) => void }
         ).onKeyDown?.(event);
+        if (HIGHLIGHT_KEYS.has(event.key)) {
+            const list = event.currentTarget as HTMLElement | null;
+            // Once the binding has drawn the new highlight.
+            requestAnimationFrame(() => {
+                const item = list?.querySelector<HTMLElement>(
+                    '[role^="menuitem"][data-highlighted]',
+                );
+                if (item && item !== document.activeElement) {
+                    item.focus({ preventScroll: true });
+                }
+            });
+        }
     },
 });
