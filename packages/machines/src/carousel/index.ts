@@ -121,8 +121,24 @@ const zagActions = zag.implementations?.actions as Record<string, Action>;
 // first measure, so soon after the machine starts): the page that scrolls the item to the row's
 // start, or the closest one for an item past the last (Zag's gives those no page, -1).
 function setMatchingPage(params: ZagParams) {
-    const { context, scope, prop, event } = params;
-    zagActions["setSnapPoints"]!(params);
+    const { scope, prop, event } = params;
+    // What this action writes, read back as written: a binding's context may show a write only
+    // later (Solid's signals, until their next flush), and the old snap points (measured before
+    // the items were sized) would pick the wrong page.
+    const written = new Map<string, unknown>();
+    const context = {
+        ...params.context,
+        set(key: string, value: unknown) {
+            written.set(key, value);
+            params.context.set(key as never, value as never);
+        },
+        get(key: string) {
+            return written.has(key)
+                ? written.get(key)
+                : params.context.get(key as never);
+        },
+    } as ZagParams["context"];
+    zagActions["setSnapPoints"]!({ ...params, context });
     const group = scope.getById(
         prop("ids")?.itemGroup ?? `carousel:${scope.id}:item-group`,
     );

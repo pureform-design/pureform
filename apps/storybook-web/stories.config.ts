@@ -113,15 +113,6 @@ export default defineStories({
                     defaultViewport: "suites",
                 },
             },
-            // The pinned copies' state play still reads page 2 for 1 in Solid (React passes): once
-            // measured, Solid's multi-browse items differ in size (React's stay equal), and the
-            // page Solid's carousel picks for the second item is 2. A binding bug, not the
-            // canvas's; the component suites act before the items are measured, so they miss it
-            // (see docs/roadmap-components/context/fix-storybook-4.md).
-            stories: {
-                Light: { tags: ["!test"] },
-                Dark: { tags: ["!test"] },
-            },
         },
     },
     hooks: ["./src/hooks.ts"],
