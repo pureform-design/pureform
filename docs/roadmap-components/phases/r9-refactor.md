@@ -40,6 +40,9 @@ One pass over everything since r8: m3 (Material transitions), c8 (Material gaps 
   breaks React Native's splitter drag spec, then export it there (c9d).
 - **c9's declined refactors:** the secure field's visibility toggle against `roundIconButton`, a
   `holdRepeat` once a second user exists, the code field's per-cell field styles (`context/c9.md`).
+- **Forms suite and files:** the forms suite learns file entries, and FileUpload gets a form case.
+- **Server-rendered number fields:** the READMEs say to pass `locale` when server rendering, so
+  number fields don't reformat on load.
 
 ## Done when
 
