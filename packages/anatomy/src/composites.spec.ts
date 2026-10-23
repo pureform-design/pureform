@@ -20,6 +20,7 @@ import {
     sideSheetBackdropAnatomy,
     sideSheetOverlayAnatomy,
     tabsCompositeAnatomy,
+    popoverOverlayAnatomy,
     richTooltipOverlayAnatomy,
     tooltipOverlayAnatomy,
 } from "./composites";
@@ -31,6 +32,7 @@ import {
     dialogAnatomy,
     fullscreenDialogAnatomy,
     menuAnatomy,
+    popoverAnatomy,
     richTooltipAnatomy,
     searchViewAnatomy,
     sideSheetAnatomy,
@@ -98,6 +100,12 @@ describe("composites", () => {
             richTooltipOverlayAnatomy,
             richTooltipAnatomy,
             compositeTestIds.richTooltip,
+        ],
+        [
+            "popover",
+            popoverOverlayAnatomy,
+            popoverAnatomy,
+            compositeTestIds.popover,
         ],
         [
             "dialog",
