@@ -75,7 +75,7 @@ export interface PopoverProps extends PopoverVariantProps {
         | undefined;
     /** With a trigger, whether a press outside closes it. Default true. */
     readonly closeOnInteractOutside?: boolean | undefined;
-    /** With a trigger, where it opens against it. Default `{ placement: "bottom", gutter: 8,
+    /** With a trigger, where it opens against it. Default `{ placement: "bottom-start", gutter: 8,
      *  flip: true }`. */
     readonly positioning?: OverlayPositioning | undefined;
     readonly "aria-label"?: string | undefined;
@@ -172,7 +172,7 @@ function PopoverOverlay(props: PopoverProps): ReactNode {
                     <Anchored
                         anchor={measured.rect}
                         positioning={positioning}
-                        placement="bottom"
+                        placement="bottom-start"
                         gutter={8}
                         onPressOutside={
                             closeOnInteractOutside ? close : undefined

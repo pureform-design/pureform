@@ -56,7 +56,7 @@ export interface PopoverBehaviorProps extends Controllable<"open", boolean> {
     readonly initialFocusEl?: (() => HTMLElement | null | false) | undefined;
     /** The element that takes focus once it closes. @default the trigger */
     readonly finalFocusEl?: (() => HTMLElement | null) | undefined;
-    /** Where it opens. @default `{ placement: "bottom" }` */
+    /** Where it opens. @default `{ placement: "bottom-start" }` */
     readonly positioning?: OverlayPositioning | undefined;
     readonly ids?: PopoverElementIds | undefined;
 }
@@ -129,7 +129,7 @@ export const popoverMachineProps = (props: PopoverBehaviorProps) => ({
     restoreFocus: props.restoreFocus,
     initialFocusEl: props.initialFocusEl,
     finalFocusEl: props.finalFocusEl,
-    positioning: { placement: "bottom" as const, ...props.positioning },
+    positioning: { placement: "bottom-start" as const, ...props.positioning },
     ids: {
         trigger: props.ids?.trigger,
         positioner: props.ids?.positioner,
