@@ -1,5 +1,5 @@
 // The components whose cases carry data, not props of one export: `Toast`'s `toasts` go into a
-// toaster, `GridList`'s `tiles` become its tile children (the suites' `ToastScene` and
+// toaster (with a button that adds more), `GridList`'s `tiles` become its tile children (the suites' `ToastScene` and
 // `GridListScene`). No JSX, like the adapter; Solid's compiler still reads this folder.
 
 import {
@@ -10,15 +10,17 @@ import {
 } from "solid-js";
 import type { JSX } from "@solidjs/web";
 
+import { Button } from "@pureform/solid/button";
 import { GridList as SolidGridList } from "@pureform/solid/grid-list";
 import { createToaster, Toaster } from "@pureform/solid/toast";
 import type { ToastData } from "@pureform/solid/toast";
 
+import { ADD_TOAST_LABEL, addedToast } from "../renderers/scenes";
 import type { SceneTile } from "../renderers/scenes";
 
 type Props = Record<string, unknown>;
 
-/** The toaster with the `toasts` in it, each staying until closed. */
+/** The toaster with the `toasts` in it, each staying until closed, and a button that adds one. */
 export function Toast(
     props: { readonly toasts?: readonly Partial<ToastData>[] } & Props,
 ): JSX.Element {
@@ -26,10 +28,17 @@ export function Toast(
     for (const toast of untrack(() => props.toasts) ?? []) {
         toaster.create({ duration: Infinity, ...toast });
     }
-    return createComponent(Toaster, {
-        toaster,
-        ...(omit(props, "toasts") as object),
-    } as never);
+    let added = 0;
+    return [
+        createComponent(Button, {
+            onClick: () => toaster.create(addedToast(++added)),
+            label: ADD_TOAST_LABEL,
+        } as never),
+        createComponent(Toaster, {
+            toaster,
+            ...(omit(props, "toasts") as object),
+        } as never),
+    ] as unknown as JSX.Element;
 }
 
 /** The grid list with the `tiles` in it. */
