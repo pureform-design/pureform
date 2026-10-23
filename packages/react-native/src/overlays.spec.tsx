@@ -231,6 +231,31 @@ describe.each([animated, reanimated])("the menu with $name", (engine) => {
         expect(menu()).toBeNull();
         expect(document.activeElement).toBe(byTestId("pf-button-root"));
     });
+
+    it("opens against its trigger with defaultOpen, before any interaction", async () => {
+        await render(
+            <View style={{ paddingTop: 120, paddingLeft: 200 }}>
+                <Menu defaultOpen trigger="Edit" items={ITEMS} />
+            </View>,
+            engine,
+        );
+        await until(() => {
+            const surface = menu();
+            return (
+                surface !== null &&
+                Math.abs(
+                    box(surface).top -
+                        box(byTestId("pf-button-root")).bottom,
+                ) < 16
+            );
+        });
+        const trigger = box(byTestId("pf-button-root"));
+        const surface = box(menu()!);
+        // Below the trigger, at its start, as a menu opened by a press.
+        expect(surface.top).toBeGreaterThanOrEqual(trigger.bottom);
+        expect(surface.top - trigger.bottom).toBeLessThan(16);
+        expect(Math.abs(surface.left - trigger.left)).toBeLessThan(1);
+    });
 });
 
 describe.each([animated, reanimated])(

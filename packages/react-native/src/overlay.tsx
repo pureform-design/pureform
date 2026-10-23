@@ -23,7 +23,11 @@ import {
 } from "react-native";
 import type { LayoutChangeEvent } from "react-native";
 
-import { useInteractionSource } from "./interaction";
+import {
+    locatedView,
+    subscribeLocated,
+    useInteractionSource,
+} from "./interaction";
 import { useControllable, useStableCallback } from "./parts";
 import { useHostBounds, usePortalHost } from "./portal-host";
 import type { EdgeInsets, WindowRect } from "./portal-host";
@@ -169,7 +173,8 @@ const isMeasurable = (value: unknown): value is Measurable =>
 /** A trigger, from its interactions. */
 export interface TriggerAnchor {
     /** Calls back with the trigger's box in the window: the view it was last pressed, hovered,
-     *  or focused on, else the point it was last pressed at, else `undefined`. */
+     *  or focused on, else the point it was last pressed at, else the view it was laid out on
+     *  (an overlay open from the start), else `undefined`. */
     measure(done: (anchor: WindowRect | undefined) => void): void;
     /** Focuses the trigger's view, where it can take focus (the web). */
     focus(): void;
@@ -198,8 +203,14 @@ export function useAnchor(source: InteractionSource): TriggerAnchor {
         () => ({
             measure(done) {
                 const { view, point } = last.current;
-                if (view) {
-                    view.measureInWindow((x, y, width, height) =>
+                const laid = locatedView(source);
+                const measurable =
+                    view ??
+                    (point === undefined && isMeasurable(laid)
+                        ? laid
+                        : undefined);
+                if (measurable) {
+                    measurable.measureInWindow((x, y, width, height) =>
                         done({ x, y, width, height }),
                     );
                 } else {
@@ -213,8 +224,48 @@ export function useAnchor(source: InteractionSource): TriggerAnchor {
                 view?.focus?.();
             },
         }),
-        [],
+        [source],
     );
+}
+
+/** The trigger's box while an overlay is `open` (pending while it's measured; `undefined` once
+ *  closed and gone, by `present`): measured as it opens, and again once the trigger is laid out
+ *  if it wasn't found then (an overlay open from the start, before its trigger's first layout). */
+export function useMeasuredAnchor(
+    open: boolean,
+    present: boolean,
+    source: InteractionSource,
+    anchor: TriggerAnchor,
+): { readonly rect: WindowRect | undefined } | undefined {
+    const [measured, setMeasured] = useState<
+        { readonly rect: WindowRect | undefined } | undefined
+    >();
+    useLayoutEffect(() => {
+        if (!open) return;
+        let current = true;
+        anchor.measure((rect) => current && setMeasured({ rect }));
+        return () => {
+            current = false;
+        };
+    }, [open, anchor]);
+    const lost = open && measured !== undefined && measured.rect === undefined;
+    useEffect(() => {
+        if (!lost) return undefined;
+        let current = true;
+        const remeasure = () =>
+            anchor.measure(
+                (rect) => current && rect && setMeasured({ rect }),
+            );
+        const stop = subscribeLocated(source, remeasure);
+        // It may have been laid out since it was measured.
+        remeasure();
+        return () => {
+            current = false;
+            stop();
+        };
+    }, [lost, source, anchor]);
+    if (!present && measured) setMeasured(undefined);
+    return measured;
 }
 
 // The overlays Android's back button or Escape would close, the topmost last.
@@ -392,19 +443,8 @@ export function useAnchoredOverlay(
     );
     const source = useInteractionSource();
     const anchor = useAnchor(source);
-    const [measured, setMeasured] = useState<
-        { readonly rect: WindowRect | undefined } | undefined
-    >();
     const presence = usePresence(open, motion, delay);
-    useLayoutEffect(() => {
-        if (!open) return;
-        let current = true;
-        anchor.measure((rect) => current && setMeasured({ rect }));
-        return () => {
-            current = false;
-        };
-    }, [open, anchor]);
-    if (!presence.present && measured) setMeasured(undefined);
+    const measured = useMeasuredAnchor(open, presence.present, source, anchor);
     const close = useStableCallback(() => {
         if (!open) return;
         setOpen(false);
