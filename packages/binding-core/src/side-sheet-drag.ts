@@ -83,7 +83,11 @@ export const sideSheetDragToDismiss = (
             // Mostly up or down: the content's native scroll, not a drag.
             start.dragging = Math.abs(dx) > Math.abs(dy);
             if (!start.dragging) return;
-            sheet.setPointerCapture?.(event.pointerId);
+            // A pointer no longer active (or a synthetic one) can't be captured; the drag
+            // still follows the moves the sheet hears.
+            try {
+                sheet.setPointerCapture?.(event.pointerId);
+            } catch {}
             stopSettle?.();
         }
         speed.add(event.clientX * outward(), event.timeStamp);
@@ -132,9 +136,10 @@ export const sideSheetDragToDismiss = (
         attributeFilter: ["data-state"],
         attributeOldValue: true,
     });
+    // Sideways moves are the sheet's; up and down still scroll natively. The bindings render it
+    // (`sideSheetContentLayout`), so a hydrated sheet doesn't change.
     const touchAction = sheet.style.touchAction;
-    // Sideways moves are the sheet's; up and down still scroll natively.
-    sheet.style.touchAction = "pan-y";
+    if (touchAction !== "pan-y") sheet.style.touchAction = "pan-y";
     sheet.addEventListener("pointerdown", onDown);
     sheet.addEventListener("pointermove", onMove);
     sheet.addEventListener("pointerup", onUp);
@@ -145,7 +150,7 @@ export const sideSheetDragToDismiss = (
         sheet.removeEventListener("pointerup", onUp);
         sheet.removeEventListener("pointercancel", onCancel);
         opens.disconnect();
-        sheet.style.touchAction = touchAction;
+        if (touchAction !== "pan-y") sheet.style.touchAction = touchAction;
         stopSettle?.();
         swallow?.();
         asker.cancel();

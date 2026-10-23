@@ -153,6 +153,7 @@ export {
     SIDE_SHEET_CONTENT_PROPS,
     SIDE_SHEET_ROOT_PROPS,
     sheetContentLayout,
+    sideSheetContentLayout,
     sheetDragHandleLabel,
     sheetDragHandleLayout,
     sheetMachineProps,

@@ -14,7 +14,7 @@ import {
 import type { TestIdOverride } from "@pureform/anatomy";
 import {
     isPresent,
-    sheetContentLayout,
+    sideSheetContentLayout,
     sheetMachineProps,
     sheetModal,
     SIDE_SHEET_ROOT_PROPS,
@@ -84,7 +84,7 @@ const chrome = dialogParts({
             sheetModal(props),
             sideSheetSelection(props).coplanar === true,
         ),
-    contentLayout: sheetContentLayout,
+    contentLayout: sideSheetContentLayout,
     onClose: (props) => props.onClose,
 });
 

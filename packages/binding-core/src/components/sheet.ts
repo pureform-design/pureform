@@ -486,6 +486,13 @@ export const sideSheetPositionerLayout = (
  *  sheet's positioner that lets them through. */
 export const sheetContentLayout = { style: { pointerEvents: "auto" } as const };
 
+/** What a side sheet's surface adds to Zag's props: `sheetContentLayout`'s, and sideways touch
+ *  moves on it drag the sheet (`sideSheetDragToDismiss`) while up and down still scroll natively.
+ *  It's rendered on the server too, so hydration changes nothing. */
+export const sideSheetContentLayout = {
+    style: { pointerEvents: "auto", touchAction: "pan-y" } as const,
+};
+
 /** What a bottom sheet's drag handle adds to Zag's props: touch moves on it drag the sheet rather
  *  than scroll the page. It's rendered on the server too, so hydration changes nothing. */
 export const sheetDragHandleLayout = {
