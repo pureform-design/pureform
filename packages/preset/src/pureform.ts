@@ -62,6 +62,7 @@ import { datePicker } from "./components/date-picker";
 import { dialog } from "./components/dialog";
 import { createDockedDatePicker } from "./components/docked-date-picker";
 import { dragHandle } from "./components/drag-handle";
+import { splitter } from "./components/splitter";
 import { createFab } from "./components/fab";
 import { createFabMenu } from "./components/fab-menu";
 import { FADE_THROUGH_KEYFRAMES, fadeThrough } from "./components/fade-through";
@@ -357,6 +358,7 @@ const defaultComponents = <G extends string>(
         bottomSheet,
         sideSheet,
         dragHandle,
+        splitter,
         snackbar,
         toast,
         toolbar,

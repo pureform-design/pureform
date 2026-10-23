@@ -1,0 +1,100 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`splitter > compiles to a stable Panda slot recipe 1`] = `
+{
+  "base": {
+    "panel": {
+      "minHeight": "0px",
+      "minWidth": "0px",
+      "overflow": "auto",
+    },
+    "resizeTrigger": {
+      "alignItems": "center",
+      "backgroundColor": "transparent",
+      "borderRadius": "token(radii.full)",
+      "display": "flex",
+      "flexShrink": "0",
+      "justifyContent": "center",
+      "outlineColor": "token(colors.secondary)",
+      "outlineOffset": "token(sizes.focusIndicatorOuterOffset)",
+      "outlineStyle": {
+        "&:focus-visible": "solid",
+        "base": "none",
+      },
+      "outlineWidth": "token(sizes.focusIndicatorThickness)",
+    },
+    "resizeTriggerIndicator": {
+      "backgroundColor": {
+        ".splitter__resizeTrigger:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "var(--components-splitter-handleActiveColor, token(colors.onSurface))",
+        "base": "var(--components-splitter-handleColor, token(colors.outline))",
+      },
+      "borderRadius": {
+        ".splitter__resizeTrigger:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "var(--components-splitter-handleActiveRadius, token(radii.medium))",
+        "base": "var(--components-splitter-handleRadius, token(radii.full))",
+      },
+      "flexShrink": "0",
+    },
+    "root": {
+      "display": "flex",
+      "minHeight": "0px",
+      "minWidth": "0px",
+    },
+  },
+  "className": "splitter",
+  "compoundVariants": [],
+  "defaultVariants": {
+    "orientation": "horizontal",
+  },
+  "jsx": [
+    "Splitter",
+  ],
+  "slots": [
+    "root",
+    "panel",
+    "resizeTrigger",
+    "resizeTriggerIndicator",
+  ],
+  "variants": {
+    "orientation": {
+      "horizontal": {
+        "resizeTrigger": {
+          "minHeight": "var(--components-splitter-target, token(sizes.touchTarget))",
+          "width": "var(--components-splitter-handleContainer, 24px)",
+        },
+        "resizeTriggerIndicator": {
+          "height": {
+            ".splitter__resizeTrigger:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "var(--components-splitter-handleActiveLength, 52px)",
+            "base": "var(--components-splitter-handleLength, 48px)",
+          },
+          "width": {
+            ".splitter__resizeTrigger:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "var(--components-splitter-handleActiveThickness, 12px)",
+            "base": "var(--components-splitter-handleThickness, 4px)",
+          },
+        },
+        "root": {
+          "flexDirection": "row",
+        },
+      },
+      "vertical": {
+        "resizeTrigger": {
+          "height": "var(--components-splitter-handleContainer, 24px)",
+          "minWidth": "var(--components-splitter-target, token(sizes.touchTarget))",
+        },
+        "resizeTriggerIndicator": {
+          "height": {
+            ".splitter__resizeTrigger:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "var(--components-splitter-handleActiveThickness, 12px)",
+            "base": "var(--components-splitter-handleThickness, 4px)",
+          },
+          "width": {
+            ".splitter__resizeTrigger:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "var(--components-splitter-handleActiveLength, 52px)",
+            "base": "var(--components-splitter-handleLength, 48px)",
+          },
+        },
+        "root": {
+          "flexDirection": "column",
+        },
+      },
+    },
+  },
+}
+`;

@@ -201,6 +201,13 @@
                 "default": "./dist/accordion.mjs"
             }
         },
+        "./splitter": {
+            "types": "./dist/splitter/index.d.ts",
+            "import": {
+                "development": "./src/splitter/index.ts",
+                "default": "./dist/splitter.mjs"
+            }
+        },
         "./avatar": {
             "types": "./dist/avatar/index.d.ts",
             "import": {
@@ -244,6 +251,7 @@
         "@zag-js/accordion": "catalog:",
         "@zag-js/anatomy": "catalog:",
         "@zag-js/avatar": "catalog:",
+        "@zag-js/splitter": "catalog:",
         "@zag-js/carousel": "catalog:",
         "@zag-js/checkbox": "catalog:",
         "@zag-js/collection": "catalog:",

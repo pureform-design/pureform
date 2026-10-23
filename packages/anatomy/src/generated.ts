@@ -4205,6 +4205,52 @@ export const dragHandleAnatomy = {
     variants: { orientation: ["horizontal", "vertical"] },
 } as const satisfies ComponentAnatomy;
 
+export const splitterAnatomy = {
+    name: "splitter",
+    scope: "splitter",
+    root: "root",
+    partNames: ["root", "panel", "resizeTrigger", "resizeTriggerIndicator"],
+    parts: {
+        root: {
+            name: "root",
+            attribute: "root",
+            testId: "pf-splitter-root",
+            parent: null,
+            children: ["panel", "resizeTrigger"],
+            styled: true,
+            mirror: false,
+        },
+        panel: {
+            name: "panel",
+            attribute: "panel",
+            testId: "pf-splitter-panel",
+            parent: "root",
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+        resizeTrigger: {
+            name: "resizeTrigger",
+            attribute: "resize-trigger",
+            testId: "pf-splitter-resize-trigger",
+            parent: "root",
+            children: ["resizeTriggerIndicator"],
+            styled: true,
+            mirror: false,
+        },
+        resizeTriggerIndicator: {
+            name: "resizeTriggerIndicator",
+            attribute: "resize-trigger-indicator",
+            testId: "pf-splitter-resize-trigger-indicator",
+            parent: "resizeTrigger",
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+    },
+    variants: { orientation: ["horizontal", "vertical"] },
+} as const satisfies ComponentAnatomy;
+
 export const snackbarAnatomy = {
     name: "snackbar",
     scope: "snackbar",
@@ -5693,6 +5739,7 @@ export const anatomy = {
     bottomSheet: bottomSheetAnatomy,
     sideSheet: sideSheetAnatomy,
     dragHandle: dragHandleAnatomy,
+    splitter: splitterAnatomy,
     snackbar: snackbarAnatomy,
     toast: toastAnatomy,
     toolbar: toolbarAnatomy,
@@ -6095,6 +6142,12 @@ export const testIds = {
     dragHandle: {
         root: "pf-drag-handle-root",
         handle: "pf-drag-handle-handle",
+    },
+    splitter: {
+        root: "pf-splitter-root",
+        panel: "pf-splitter-panel",
+        resizeTrigger: "pf-splitter-resize-trigger",
+        resizeTriggerIndicator: "pf-splitter-resize-trigger-indicator",
     },
     snackbar: {
         root: "pf-snackbar-root",

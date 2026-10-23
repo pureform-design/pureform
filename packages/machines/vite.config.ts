@@ -35,6 +35,7 @@ export default createConfig({
                     carousel: "src/carousel/index.ts",
                     accordion: "src/accordion/index.ts",
                     avatar: "src/avatar/index.ts",
+                    splitter: "src/splitter/index.ts",
                     "tree-view": "src/tree-view/index.ts",
                     paginator: "src/paginator/index.ts",
                     combobox: "src/combobox/index.ts",

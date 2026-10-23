@@ -18,6 +18,7 @@ import {
     paginatorAnatomy,
     searchViewAnatomy,
     sliderAnatomy,
+    splitterAnatomy,
     snackbarAnatomy,
     stepperAnatomy,
     dataTableAnatomy,
@@ -49,6 +50,7 @@ import {
 import { anatomy as navigation } from "./navigation/navigation.anatomy";
 import { anatomy as paginator } from "./paginator/paginator.anatomy";
 import { anatomy as slider } from "./slider/slider.anatomy";
+import { anatomy as splitter } from "./splitter/splitter.anatomy";
 import { anatomy as snackbar } from "./snackbar/snackbar.anatomy";
 import { anatomy as stepper } from "./stepper/stepper.anatomy";
 import { anatomy as table } from "./table/table.anatomy";
@@ -73,6 +75,7 @@ const pairs: Record<string, Pair> = {
     accordion: { machine: accordion, preset: accordionAnatomy },
     autocomplete: { machine: autocomplete, preset: autocompleteAnatomy },
     avatar: { machine: avatar, preset: avatarAnatomy },
+    splitter: { machine: splitter, preset: splitterAnatomy },
     button: { machine: button, preset: buttonAnatomy },
     buttonGroup: { machine: buttonGroup, preset: buttonGroupAnatomy },
     chipSet: { machine: buttonGroup, preset: chipSetAnatomy },
