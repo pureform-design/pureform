@@ -1,6 +1,7 @@
 // The menu: `open`, by a click on its trigger (drawn as a button); Enter, Space, and the arrow
 // keys up and down open it from the trigger and move focus into it. It isn't a form control, and
-// has no disabled state of its own. Open, it's placed against the trigger in the browser, so its
+// has no disabled state of its own. A `contextTrigger` area opens it at a right-click, a touch held
+// down, or the context menu key (Shift+F10). Open, it's placed against the trigger in the browser, so its
 // open renderings are client-only.
 
 import { compositeTestIds, menuOverlayAnatomy } from "@pureform/anatomy";
@@ -29,6 +30,11 @@ export const menu: ComponentCase = {
         closed: {},
         "secondary color": { color: "secondary" },
         compact: { density: "compact" },
+        "with a context trigger": { contextTrigger: "Right-click here" },
+        "with only a context trigger": {
+            trigger: undefined,
+            contextTrigger: "Right-click here",
+        },
     },
     opened: {
         plain: { defaultOpen: true },

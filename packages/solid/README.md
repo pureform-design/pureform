@@ -155,6 +155,7 @@ import { RichTooltip } from "@pureform/solid/rich-tooltip";
         </Menu.Content>
     </Menu.Positioner>
 </Menu.Root>
+<Menu contextTrigger={<Canvas />} items={[{ value: "paste", label: "Paste" }]} /> // opens at a right-click, a long press, or the context menu key / Shift+F10
 
 <Checkbox.Root ids={{ input: "terms" }} color="error" invalid>
     <Checkbox.TouchTarget />

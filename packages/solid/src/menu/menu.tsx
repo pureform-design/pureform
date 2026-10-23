@@ -256,6 +256,20 @@ function Trigger(props: MenuTriggerProps): JSX.Element {
     });
 }
 
+/** An area that opens the menu at the pointer: a right-click, a touch held down, or the context
+ *  menu key or Shift+F10 pressed in it. The menu opens where the pointer was, and what's inside
+ *  keeps its own behaviour. The registry doesn't style it. */
+function ContextTrigger(props: MenuTriggerProps): JSX.Element {
+    const { scope, api } = context.use("ContextTrigger");
+    return scope.render("contextTrigger", {
+        element: "div",
+        as: () => props.as,
+        machine: () => api().getContextTriggerProps(),
+        unstyled: () => props.unstyled,
+        props: omit(props, "unstyled", "as"),
+    });
+}
+
 /** Places the menu under the trigger; hidden once it's closed and its exit animation is over. The
  *  registry doesn't style it. */
 function Positioner(props: MenuPartProps): JSX.Element {
@@ -578,6 +592,7 @@ function ReadyMade(props: MenuProps): JSX.Element {
     const own = omit(props, ...READY_MADE_PROPS) as MenuRootProps;
     const root = slots("root") as object;
     const trigger = slots("trigger") as object;
+    const contextTrigger = slots("contextTrigger") as object;
     const positioner = slots("positioner");
     const content = slots("content");
     const itemGroup = slots("itemGroup");
@@ -586,6 +601,11 @@ function ReadyMade(props: MenuProps): JSX.Element {
         <Root {...own} grouped={menuGrouped(props) || props.grouped} {...root}>
             <Show when={isPresent(props.trigger)}>
                 <Trigger as={Button} label={props.trigger} {...trigger} />
+            </Show>
+            <Show when={isPresent(props.contextTrigger)}>
+                <ContextTrigger {...contextTrigger}>
+                    {props.contextTrigger}
+                </ContextTrigger>
             </Show>
             <Positioner {...positioner}>
                 <Content {...content}>
@@ -616,7 +636,8 @@ function ReadyMade(props: MenuProps): JSX.Element {
 
 /** Material's menu. Use it ready-made, `<Menu trigger="Edit" items={[{ value: "cut", label:
  *  "Cut" }, …]} onSelect={…} />`, or compose its parts under `Menu.Root`: `Trigger` (`as={Button}`
- *  draws it as a button), then `Positioner` holding `Content`, with an `Item` per entry holding
+ *  draws it as a button) and, to open it at a right-click or long press, a `ContextTrigger` around
+ *  the area, then `Positioner` holding `Content`, with an `Item` per entry holding
  *  `ItemLeading`, `ItemContent` (holding `ItemLabel` and `ItemSupportingText`), `ItemTrailing`,
  *  and `ItemTrailingText`. Items can sit in an `ItemGroup`, named by an `ItemGroupLabel`. A
  *  `Submenu` in the content holds its `TriggerItem` (the parent's item that opens it, an arrow in
@@ -626,6 +647,7 @@ export const Menu = Object.assign(ReadyMade, {
     Root,
     Submenu,
     Trigger,
+    ContextTrigger,
     Positioner,
     Content,
     ItemGroup,

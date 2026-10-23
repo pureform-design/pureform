@@ -7,7 +7,7 @@
 // submenu in its place, drilling in rather than cascading beside it (React Native has no nested
 // popup here): the submenu's items under a row that goes back, headed by the item's label.
 
-import { menuAnatomy } from "@pureform/anatomy";
+import { menuAnatomy, menuOverlayAnatomy } from "@pureform/anatomy";
 import type { PartName, TestIdOverride } from "@pureform/anatomy";
 import {
     hasSubmenu,
@@ -29,7 +29,7 @@ import type { MutableInteractionSource } from "@pureform/binding-core/interactio
 import type { Selection } from "@pureform/styling";
 import { memo, useEffect, useRef, useState } from "react";
 import type { ComponentRef, ReactNode } from "react";
-import { Platform, View } from "react-native";
+import { Platform, Pressable, View } from "react-native";
 
 import { Button } from "../button/button";
 import { iconParts } from "../icon-style";
@@ -79,6 +79,11 @@ export interface MenuProps extends MenuVariantProps, IndicationProps {
               trigger: MenuTriggerProps,
               state: { readonly open: boolean },
           ) => ReactNode);
+    /** An area that opens the menu where it's held: a long press opens it at the touch point (on
+     *  the web also a right-click, and the context menu key or Shift+F10 pressed in it), over the
+     *  page like a trigger's menu. It works with or without a `trigger`. A pressable inside it
+     *  takes its own touches, so a long press on one doesn't reach the area. */
+    readonly contextTrigger?: ReactNode;
     /** Whether it shows. With a trigger, the open state, controlled when defined. Without one:
      *  it grows in when this turns true and fades out when it turns false, rendering nothing
      *  once it's gone; without it either, the surface is always shown, still. */
@@ -375,9 +380,81 @@ function Popup(props: {
     );
 }
 
+interface WindowPoint {
+    readonly x: number;
+    readonly y: number;
+    readonly width: 0;
+    readonly height: 0;
+}
+
+const pointAt = (x: number, y: number): WindowPoint => ({
+    x,
+    y,
+    width: 0,
+    height: 0,
+});
+
+// The area a long press (and on the web a right-click, the context menu key, or Shift+F10) opens
+// the menu from, at the touch point. It reads the press's position; it doesn't take over any
+// scrolling, which stays the surrounding `ScrollView`'s.
+function ContextTrigger(props: {
+    readonly onOpen: (at: WindowPoint) => void;
+    readonly testID: string;
+    readonly children: ReactNode;
+}): ReactNode {
+    const web = Platform.OS === "web";
+    const webProps = web
+        ? {
+              onContextMenu: (event: {
+                  clientX: number;
+                  clientY: number;
+                  preventDefault(): void;
+              }) => {
+                  event.preventDefault();
+                  props.onOpen(pointAt(event.clientX, event.clientY));
+              },
+              onKeyDown: (event: {
+                  nativeEvent: { key: string; shiftKey?: boolean };
+                  target: unknown;
+                  preventDefault(): void;
+              }) => {
+                  const { key, shiftKey } = event.nativeEvent;
+                  if (key !== "ContextMenu" && !(key === "F10" && shiftKey))
+                      return;
+                  const rect = (
+                      event.target as {
+                          getBoundingClientRect?: () => {
+                              left: number;
+                              bottom: number;
+                          };
+                      } | null
+                  )?.getBoundingClientRect?.();
+                  event.preventDefault();
+                  props.onOpen(pointAt(rect?.left ?? 0, rect?.bottom ?? 0));
+              },
+          }
+        : {};
+    return (
+        <Pressable
+            accessible={false}
+            focusable={false}
+            onLongPress={(event) =>
+                props.onOpen(
+                    pointAt(event.nativeEvent.pageX, event.nativeEvent.pageY),
+                )
+            }
+            testID={props.testID}
+            {...(webProps as object)}
+        >
+            {props.children}
+        </Pressable>
+    );
+}
+
 function MenuOverlay(props: MenuProps): ReactNode {
     const {
         trigger,
+        contextTrigger,
         open: _open,
         defaultOpen,
         onOpenChange,
@@ -393,6 +470,12 @@ function MenuOverlay(props: MenuProps): ReactNode {
             defaultOpen,
             onOpenChange,
         });
+    // Where the context trigger was held; a button's own box wins when the menu opens from it.
+    const [point, setPoint] = useState<WindowPoint>();
+    const opened = (at: WindowPoint) => {
+        setPoint(at);
+        if (!open) toggle();
+    };
     const select = (details: MenuSelectDetails) => {
         onSelect?.(details);
         const item = [
@@ -402,26 +485,43 @@ function MenuOverlay(props: MenuProps): ReactNode {
         if (item?.closeOnSelect ?? closeOnSelect ?? true) close();
     };
     const given: MenuTriggerProps = {
-        onPress: toggle,
+        onPress: () => {
+            setPoint(undefined);
+            toggle();
+        },
         interactionSource: source,
         "aria-haspopup": "menu",
         "aria-expanded": open,
     };
     return (
         <>
-            {typeof trigger === "function" ? (
+            {trigger === undefined ? null : typeof trigger === "function" ? (
                 trigger(given, { open })
             ) : (
                 <Button
                     label={trigger}
-                    onPress={toggle}
+                    onPress={given.onPress}
                     interactionSource={source}
                 />
+            )}
+            {contextTrigger === undefined ? null : (
+                <ContextTrigger
+                    onOpen={opened}
+                    testID={testIdOf(
+                        menuOverlayAnatomy,
+                        "contextTrigger",
+                        props.testId as TestIdOverride<
+                            PartName<typeof menuOverlayAnatomy>
+                        >,
+                    )}
+                >
+                    {contextTrigger}
+                </ContextTrigger>
             )}
             {presence.present && measured ? (
                 <Portal layer="menu">
                     <Anchored
-                        anchor={measured.rect}
+                        anchor={point ?? measured.rect}
                         positioning={positioning}
                         placement="bottom-start"
                         gutter={8}
@@ -458,7 +558,7 @@ function MenuOverlay(props: MenuProps): ReactNode {
  *  `<Menu trigger={(t) => <IconButton {...t} aria-label="More" icon="⋮" />} items={…} onSelect={…} />`;
  *  without, its surface: `<Menu items={[{ value: "cut", label: "Cut" }]} onSelect={…} />`. */
 export function Menu(props: MenuProps): ReactNode {
-    return props.trigger === undefined ? (
+    return props.trigger === undefined && props.contextTrigger === undefined ? (
         <Surface {...props} />
     ) : (
         <MenuOverlay {...props} />

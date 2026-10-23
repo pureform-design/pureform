@@ -2,7 +2,7 @@
 // the theme's stacking scale; it animates in as it opens, and as it closes it stays until its exit
 // animations end, then hides; under reduced motion it fades without moving (design doc §5.8).
 
-import { testIds } from "@pureform/anatomy";
+import { compositeTestIds, testIds } from "@pureform/anatomy";
 import { describe, expect, it } from "vitest";
 
 import { COMPONENTS, menu as menuCase, toastCase } from "./components";
@@ -255,6 +255,127 @@ describe("Menu", () => {
         expect(getComputedStyle(group).borderBottomRightRadius).toBe(
             getComputedStyle(parent!).borderBottomRightRadius,
         );
+    });
+});
+
+// The menu's context trigger opens it at the pointer: a right-click, a touch held down, or the
+// context menu key and Shift+F10 beside the focused element.
+describe("Menu context trigger", () => {
+    const mountContext = () => {
+        const host = hostIn(
+            `<div style="padding: 120px"><div data-host></div></div>`,
+        );
+        mountCase(
+            menuCase,
+            { contextTrigger: "Right-click here", trigger: undefined },
+            { host },
+        );
+        const area = host.querySelector<HTMLElement>(
+            `[data-testid="${compositeTestIds.menu.contextTrigger}"]`,
+        )!;
+        const content = () =>
+            host.querySelector<HTMLElement>(
+                `[data-testid="${compositeTestIds.menu.content}"]`,
+            )!;
+        const shown = () => {
+            const surface = content();
+            return (
+                !!surface &&
+                !surface.hidden &&
+                !surface.parentElement!.hidden &&
+                surface.dataset.state !== "closed"
+            );
+        };
+        return { host, area, content, shown };
+    };
+
+    const opens = async (shown: () => boolean) => {
+        for (let i = 0; i < 20 && !shown(); i++) await frame();
+        await settlePlaced();
+        expect(shown()).toBe(true);
+    };
+
+    it("opens at a right-click, where the pointer is", async () => {
+        const { area, content, shown } = mountContext();
+        expect(shown()).toBe(false);
+        const at = { clientX: 260, clientY: 190 };
+        const event = new MouseEvent("contextmenu", {
+            bubbles: true,
+            cancelable: true,
+            button: 2,
+            ...at,
+        });
+        area.dispatchEvent(event);
+        expect(event.defaultPrevented).toBe(true);
+        await opens(shown);
+        const box = content().getBoundingClientRect();
+        expect(Math.abs(box.left - at.clientX)).toBeLessThan(24);
+        expect(Math.abs(box.top - at.clientY)).toBeLessThan(24);
+    });
+
+    it("opens at a touch held down, where it is", async () => {
+        const { area, content, shown } = mountContext();
+        const at = { clientX: 240, clientY: 200 };
+        area.dispatchEvent(
+            new PointerEvent("pointerdown", {
+                bubbles: true,
+                pointerType: "touch",
+                ...at,
+            }),
+        );
+        await new Promise((resolve) => setTimeout(resolve, 900));
+        await opens(shown);
+        const box = content().getBoundingClientRect();
+        expect(Math.abs(box.left - at.clientX)).toBeLessThan(24);
+        expect(Math.abs(box.top - at.clientY)).toBeLessThan(24);
+    });
+
+    it("doesn't open when the touch lifts first", async () => {
+        const { area, shown } = mountContext();
+        area.dispatchEvent(
+            new PointerEvent("pointerdown", {
+                bubbles: true,
+                pointerType: "touch",
+                clientX: 240,
+                clientY: 200,
+            }),
+        );
+        area.dispatchEvent(
+            new PointerEvent("pointerup", {
+                bubbles: true,
+                pointerType: "touch",
+            }),
+        );
+        await new Promise((resolve) => setTimeout(resolve, 900));
+        expect(shown()).toBe(false);
+    });
+
+    it.each([
+        ["the context menu key", { key: "ContextMenu" }],
+        ["Shift+F10", { key: "F10", shiftKey: true }],
+    ])("opens from %s", async (_, init) => {
+        const { area, content, shown } = mountContext();
+        const event = new KeyboardEvent("keydown", {
+            bubbles: true,
+            cancelable: true,
+            ...init,
+        });
+        area.dispatchEvent(event);
+        expect(event.defaultPrevented).toBe(true);
+        await opens(shown);
+        const anchor = area.getBoundingClientRect();
+        const box = content().getBoundingClientRect();
+        expect(Math.abs(box.left - anchor.left)).toBeLessThan(24);
+        expect(box.top).toBeGreaterThanOrEqual(anchor.bottom - 1);
+    });
+
+    it("ignores other keys", async () => {
+        const { area, shown } = mountContext();
+        area.dispatchEvent(
+            new KeyboardEvent("keydown", { bubbles: true, key: "F10" }),
+        );
+        await frames(5);
+        expect(shown()).toBe(false);
     });
 });
 
