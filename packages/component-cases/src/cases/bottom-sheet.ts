@@ -1,7 +1,8 @@
 // The bottom sheet: `open`, by a click on its trigger (drawn as a button); Enter and Space open it
 // from the trigger and move focus into it, to its drag handle. Like the dialog it isn't a form
 // control and has no disabled state, and its open renderings are client-only. A modal sheet's
-// backdrop, drawn by the scrim, comes and goes with it.
+// backdrop, drawn by the scrim, comes and goes with it. With `partiallyExpandable`, a sheet taller
+// than half the screen opens partly, and its drag handle moves it between partly and fully open.
 
 import { compositeTestIds } from "@pureform/anatomy";
 
@@ -27,6 +28,12 @@ export const bottomSheet: ComponentCase = {
     opened: {
         plain: { defaultOpen: true },
         standard: { defaultOpen: true, modal: false },
+        // Taller than half the screen, so it opens with its top at half the screen.
+        "partly open": {
+            defaultOpen: true,
+            partiallyExpandable: true,
+            body: "Send it to a friend, or copy the link. ".repeat(120),
+        },
     },
     state: { prop: "open", from: false, to: true, act: click, read },
     overlay: overlay({
