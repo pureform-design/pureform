@@ -15,6 +15,7 @@ import type {
 } from "@pureform/anatomy";
 import type { InstanceTokens, Selection } from "@pureform/styling";
 
+import type { ChangeDetails } from "../controllable";
 import type { Unstyled } from "../parts";
 import type {
     CloseQuestion,
@@ -58,6 +59,54 @@ export interface SideSheetVariantProps {
     readonly coplanar?: boolean | undefined;
     readonly tokens?: InstanceTokens<"sideSheet"> | undefined;
 }
+
+/** Where a bottom sheet rests while open: fully open, or partly (Compose's `SheetValue`
+ *  `Expanded` and `PartiallyExpanded`). */
+export type SheetRest = "expanded" | "partial";
+
+/** How far down, as a share of the sheet's height (below where it rests partly open, if it
+ *  can), a drag closes it. */
+export const SHEET_DISMISS_SHARE = 0.25;
+/** How fast, in pixels per millisecond, a flick moves the sheet on to the next place it rests
+ *  (or away) however short. */
+export const SHEET_FLICK_SPEED = 0.5;
+/** How much of the screen's height a sheet resting partly open shows, as Compose's
+ *  `PartiallyExpanded` anchor (half the layout's height). */
+export const SHEET_PARTIAL_SHARE = 0.5;
+
+/** How far down a sheet `height` tall rests partly open on a screen `container` tall: where its
+ *  top is at half the screen. 0 when it's no taller than that, so it rests fully open. */
+export const sheetPartialOffset = (height: number, container: number) =>
+    Math.max(0, Math.round(height - container * SHEET_PARTIAL_SHARE));
+
+/** Where a dragged bottom sheet goes once let go `offset` pixels down from fully open at
+ *  `velocity` (pixels per millisecond, down), given its `height` and, if it can rest partly
+ *  open, that `partial` offset. A flick goes on to the next place in its direction; otherwise it
+ *  closes past a quarter of the way from partly (or fully) open to gone, and goes to the nearer
+ *  of fully and partly open. */
+export const sheetRelease = (release: {
+    readonly offset: number;
+    readonly velocity: number;
+    readonly height: number;
+    readonly partial?: number | undefined;
+}): SheetRest | "closed" => {
+    const { offset, velocity, height } = release;
+    const partial =
+        release.partial !== undefined && release.partial > 0
+            ? release.partial
+            : undefined;
+    if (velocity > SHEET_FLICK_SPEED)
+        return partial !== undefined && offset < partial ? "partial" : "closed";
+    if (velocity < -SHEET_FLICK_SPEED)
+        return partial !== undefined && offset > partial
+            ? "partial"
+            : "expanded";
+    const lowest = partial ?? 0;
+    if (height > 0 && offset > lowest + (height - lowest) * SHEET_DISMISS_SHARE)
+        return "closed";
+    if (partial === undefined) return "expanded";
+    return offset > partial / 2 ? "partial" : "expanded";
+};
 
 /** Asks an overlay's `onClose` and acts on the answer, `yes` or `no`, once it comes. */
 export interface CloseAsker {
@@ -142,7 +191,11 @@ export const askingDismissProps = (
 /** Everything the bottom sheet's Root takes for itself, besides the element's own props and
  *  `as`. */
 export interface BottomSheetRootOwnProps
-    extends BottomSheetVariantProps, SheetBehaviorProps, OverlayCloseProps {
+    extends
+        BottomSheetVariantProps,
+        SheetBehaviorProps,
+        OverlayCloseProps,
+        BottomSheetRestProps {
     /** A prefix for every part's test id (`share` → `share-trigger`, `share-content`), or ids by
      *  part. */
     readonly testId?: TestIdOverride<BottomSheetPart> | undefined;
@@ -161,11 +214,31 @@ export interface SideSheetRootOwnProps
     readonly unstyled?: Unstyled<SideSheetPart> | undefined;
 }
 
+/** Whether a bottom sheet can rest partly open, and what hears where it rests. */
+export interface BottomSheetRestProps {
+    /** Whether it can rest partly open, as Compose's sheet without `skipPartiallyExpanded`: a
+     *  sheet taller than half the screen opens with its top at half the screen, and a drag (or a
+     *  press on the drag handle) moves it between partly and fully open; a drag down from partly
+     *  open closes it. Content scrolls natively either way. @default false */
+    readonly partiallyExpandable?: boolean | undefined;
+    /** Called when it comes to rest partly open (`expanded: false`) or fully open (`true`). */
+    readonly onExpandedChange?:
+        | ((details: ChangeDetails<"expanded", boolean>) => void)
+        | undefined;
+}
+
+/** The keys of `BottomSheetRestProps`. */
+export const BOTTOM_SHEET_REST_PROPS = [
+    "partiallyExpandable",
+    "onExpandedChange",
+] as const satisfies readonly (keyof BottomSheetRestProps)[];
+
 /** The keys of `BottomSheetRootOwnProps`, which Root keeps off its element. */
 export const BOTTOM_SHEET_ROOT_PROPS = [
     "modal",
     "tokens",
     "onClose",
+    ...BOTTOM_SHEET_REST_PROPS,
     ...DIALOG_BEHAVIOR_PROPS,
 ] as const satisfies readonly (keyof BottomSheetRootOwnProps)[];
 

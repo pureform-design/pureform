@@ -1,6 +1,12 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { askingDismissProps, closeAsker } from "./components/sheet";
+import {
+    askingDismissProps,
+    closeAsker,
+    sheetPartialOffset,
+    sheetRelease,
+} from "./components/sheet";
+import { settleTransition } from "./settle";
 import { dragToDismiss } from "./sheet-drag";
 
 const pointer = (
@@ -141,6 +147,8 @@ describe("dragToDismiss", () => {
         expect(sheet.style.translate).toBe("");
 
         sheet.setAttribute("data-state", "open");
+        // Opening places it where it rests, once the change is seen.
+        await nextChange();
         dismiss.mockImplementation(() =>
             sheet.setAttribute("data-state", "closed"),
         );
@@ -207,6 +215,149 @@ describe("dragToDismiss", () => {
         expect(dismiss).not.toHaveBeenCalled();
         expect(click).toHaveBeenCalledTimes(1);
         document.removeEventListener("click", click);
+    });
+});
+
+describe("a sheet that rests partly open", () => {
+    let stop: (() => void) | undefined;
+    afterEach(() => {
+        stop?.();
+        document.body.replaceChildren();
+    });
+    const frame = () =>
+        new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+
+    const setup = async (tall: boolean) => {
+        const viewport = document.documentElement.clientHeight;
+        const sheet = document.createElement("div");
+        sheet.style.height = `${tall ? viewport - 20 : viewport / 4}px`;
+        const handle = document.createElement("button");
+        sheet.append(handle);
+        document.body.append(sheet);
+        const dismiss = vi.fn();
+        const rests: string[] = [];
+        stop = dragToDismiss(
+            handle,
+            () => sheet,
+            dismiss,
+            undefined,
+            closeAsker(),
+            {
+                partial: () => true,
+                onRest: (rest) => rests.push(rest),
+            },
+        );
+        sheet.setAttribute("data-state", "open");
+        await frame();
+        const partial = sheetPartialOffset(
+            sheet.getBoundingClientRect().height,
+            viewport,
+        );
+        return { sheet, handle, dismiss, rests, partial };
+    };
+    const drag = (handle: HTMLElement, by: number, ms = 1000) => {
+        handle.dispatchEvent(pointer("pointerdown", 300, 0));
+        handle.dispatchEvent(pointer("pointermove", 300 + by / 2, ms / 2));
+        handle.dispatchEvent(pointer("pointermove", 300 + by, ms));
+        handle.dispatchEvent(pointer("pointerup", 300 + by, ms + 1));
+    };
+
+    it("opens with its top at half the screen, and drags between partly and fully open", async () => {
+        const { sheet, handle, dismiss, rests, partial } = await setup(true);
+        expect(partial).toBeGreaterThan(0);
+        expect(sheet.style.translate).toBe(`0px ${partial}px`);
+        expect(rests).toEqual(["partial"]);
+        drag(handle, -partial);
+        expect(sheet.style.translate).toBe("");
+        expect(rests).toEqual(["partial", "expanded"]);
+        drag(handle, partial * 0.8);
+        expect(sheet.style.translate).toBe(`0px ${partial}px`);
+        expect(dismiss).not.toHaveBeenCalled();
+        // From partly open, a drag a quarter of the rest of the way down closes it.
+        drag(handle, (sheet.getBoundingClientRect().height - partial) * 0.3);
+        expect(dismiss).toHaveBeenCalledTimes(1);
+    });
+
+    it("moves on to the next place with a flick, and a press toggles it", async () => {
+        const { sheet, handle, dismiss, partial } = await setup(true);
+        drag(handle, -20, 20);
+        expect(sheet.style.translate).toBe("");
+        drag(handle, 20, 20);
+        expect(sheet.style.translate).toBe(`0px ${partial}px`);
+        expect(dismiss).not.toHaveBeenCalled();
+        const click = vi.fn();
+        sheet.addEventListener("click", click);
+        // A press: the drag's own click came and went.
+        const press = () => {
+            handle.dispatchEvent(pointer("pointerdown", 300, 0));
+            handle.dispatchEvent(pointer("pointerup", 300, 50));
+            handle.click();
+        };
+        press();
+        expect(sheet.style.translate).toBe("");
+        press();
+        expect(sheet.style.translate).toBe(`0px ${partial}px`);
+        // The press moved it rather than closing it.
+        expect(click).not.toHaveBeenCalled();
+    });
+
+    it("rests fully open when it's no taller than half the screen", async () => {
+        const { sheet, handle, rests } = await setup(false);
+        expect(sheet.style.translate).toBe("");
+        expect(rests).toEqual([]);
+        const click = vi.fn();
+        sheet.addEventListener("click", click);
+        handle.click();
+        expect(click).toHaveBeenCalledTimes(1);
+    });
+});
+
+describe("sheetRelease", () => {
+    const at = (offset: number, velocity = 0, partial?: number) =>
+        sheetRelease({ offset, velocity, height: 800, partial });
+
+    it("closes past a quarter of the height without a partly open place", () => {
+        expect(at(150)).toBe("expanded");
+        expect(at(250)).toBe("closed");
+        expect(at(10, 0.6)).toBe("closed");
+    });
+
+    it("goes to the nearer place, or the next one on a flick", () => {
+        expect(at(150, 0, 400)).toBe("expanded");
+        expect(at(250, 0, 400)).toBe("partial");
+        expect(at(450, 0, 400)).toBe("partial");
+        expect(at(550, 0, 400)).toBe("closed");
+        expect(at(50, 0.6, 400)).toBe("partial");
+        expect(at(420, 0.6, 400)).toBe("closed");
+        expect(at(380, -0.6, 400)).toBe("expanded");
+        expect(at(500, -0.6, 400)).toBe("partial");
+    });
+});
+
+describe("settleTransition", () => {
+    afterEach(() => document.body.replaceChildren());
+
+    it("starts a spring transition at the release's speed, and leaves others alone", () => {
+        const element = document.createElement("div");
+        document.body.append(element);
+        element.style.transition =
+            "translate 400ms linear(0, 0.4 10%, 0.8 25%, 0.97 50%, 1)";
+        const curve = getComputedStyle(element).transitionTimingFunction;
+        element.style.cssText = "";
+        const sheet = document.createElement("style");
+        sheet.textContent = `.settling { transition: translate 400ms ${curve}; }`;
+        document.head.append(sheet);
+        element.className = "settling";
+        const drop = settleTransition(element, "translate", 100, 2);
+        expect(element.style.transition).toMatch(/^translate \d+ms linear\(/);
+        drop();
+        expect(element.style.transition).toBe("");
+        element.className = "";
+        expect(
+            settleTransition(element, "translate", 100, 2)(),
+        ).toBeUndefined();
+        expect(element.style.transition).toBe("");
+        sheet.remove();
     });
 });
 
