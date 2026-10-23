@@ -1,5 +1,5 @@
 import { testIds } from "@pureform/anatomy";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { CopyButton } from ".";
@@ -15,6 +15,11 @@ const withRegistry = (view: () => unknown) =>
             {view() as never}
         </PureformProvider>
     ));
+
+// Headless Chromium denies the clipboard write; the machine still goes to copied.
+beforeEach(() => {
+    vi.spyOn(navigator.clipboard, "writeText").mockResolvedValue(undefined);
+});
 
 describe("CopyButton", () => {
     it("is a named icon button showing the copy icon", async () => {
@@ -50,13 +55,16 @@ describe("CopyButton", () => {
 
     it("goes back to idle after its timeout", async () => {
         withRegistry(() => (
-            <CopyButton value="x" icon="C" copiedIcon="OK" timeout={50} />
+            <CopyButton value="x" icon="C" copiedIcon="OK" timeout={1500} />
         ));
         await settle();
         await userEvent.click(byTestId(ids.root));
-        expect(byTestId(ids.icon).textContent).toBe("OK");
         await vi.waitFor(() =>
-            expect(byTestId(ids.icon).textContent).toBe("C"),
+            expect(byTestId(ids.icon).textContent).toBe("OK"),
+        );
+        await vi.waitFor(
+            () => expect(byTestId(ids.icon).textContent).toBe("C"),
+            { timeout: 4000 },
         );
     });
 });

@@ -61,6 +61,9 @@ describe("Rating, ready-made", () => {
         await userEvent.click(items()[2] as HTMLElement);
         expect(onValueChange).toHaveBeenLastCalledWith({ value: 3 });
         expect(count(ids.fill)).toBe(3);
+        // Zag takes the arrow keys while the pointer is off the group.
+        await userEvent.unhover(items()[2] as HTMLElement);
+        (items()[2] as HTMLElement).focus();
         await userEvent.keyboard("{ArrowRight}");
         expect(onValueChange).toHaveBeenLastCalledWith({ value: 4 });
         expect(count(ids.fill)).toBe(4);

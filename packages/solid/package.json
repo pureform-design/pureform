@@ -88,6 +88,11 @@
                 "development": "./src/copy-button/index.ts",
                 "default": "./dist/copy-button.jsx"
             },
+            "import": {
+                "development": "./src/copy-button/index.ts",
+                "default": "./dist/copy-button.jsx"
+            }
+        },
         "./icon-button": {
             "types": "./dist/icon-button/index.d.ts",
             "solid": {
@@ -314,6 +319,11 @@
                 "development": "./src/rating/index.ts",
                 "default": "./dist/rating.jsx"
             },
+            "import": {
+                "development": "./src/rating/index.ts",
+                "default": "./dist/rating.jsx"
+            }
+        },
         "./tags-input": {
             "types": "./dist/tags-input/index.d.ts",
             "solid": {
