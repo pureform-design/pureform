@@ -858,3 +858,17 @@ export const colorPickerRegistry = () =>
         ]),
         ripple: named("ripple", ["root", "ripple"]),
     });
+
+/** The rating's fake factory: its parts, with the root's selected variants in its class. */
+export const ratingRegistry = () =>
+    createRegistry({
+        rating: named("rating", [
+            "root",
+            "label",
+            "control",
+            "item",
+            "icon",
+            "fill",
+            "halfFill",
+        ]),
+    });

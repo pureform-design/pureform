@@ -3,6 +3,7 @@ import * as zagAvatar from "@zag-js/avatar";
 import * as zagCarousel from "@zag-js/carousel";
 import * as zagCheckbox from "@zag-js/checkbox";
 import * as zagColorPicker from "@zag-js/color-picker";
+import * as zagClipboard from "@zag-js/clipboard";
 import * as zagCombobox from "@zag-js/combobox";
 import * as zagDateInput from "@zag-js/date-input";
 import * as zagDatePicker from "@zag-js/date-picker";
@@ -13,6 +14,7 @@ import * as zagMenu from "@zag-js/menu";
 import * as zagNumberInput from "@zag-js/number-input";
 import * as zagPinInput from "@zag-js/pin-input";
 import * as zagRadioGroup from "@zag-js/radio-group";
+import * as zagRatingGroup from "@zag-js/rating-group";
 import * as zagSelect from "@zag-js/select";
 import * as zagSplitter from "@zag-js/splitter";
 import * as zagSteps from "@zag-js/steps";
@@ -40,6 +42,28 @@ describe("@pureform/machines", () => {
         expect(machines.fileUpload.anatomy.keys()).toEqual(
             expect.arrayContaining(["root", "dropzone", "icon", "error"]),
         );
+    });
+
+    it("re-exports Zag's clipboard with a copy that never rejects, and its rating group with the fieldset rule and the parts the preset draws", () => {
+        expect(machines.clipboard.machine.states).toBe(
+            zagClipboard.machine.states,
+        );
+        expect(machines.clipboard.machine).not.toBe(zagClipboard.machine);
+        expect(machines.clipboard.connect).toBe(zagClipboard.connect);
+        expect(machines.ratingGroup.machine.states).toBe(
+            zagRatingGroup.machine.states,
+        );
+        expect(machines.ratingGroup.machine).not.toBe(zagRatingGroup.machine);
+        expect(machines.ratingGroup.connect).toBe(zagRatingGroup.connect);
+        expect(machines.ratingGroup.anatomy.keys()).toEqual([
+            "root",
+            "label",
+            "item",
+            "control",
+            "icon",
+            "fill",
+            "halfFill",
+        ]);
     });
 
     it("re-exports Zag's avatar unchanged, with the parts the preset draws", () => {

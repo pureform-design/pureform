@@ -12,6 +12,7 @@ import { chip } from "./cases/chip";
 import { chipSet } from "./cases/chip-set";
 import { codeField } from "./cases/code-field";
 import { colorPicker } from "./cases/color-picker";
+import { copyButton } from "./cases/copy-button";
 import { dateInput, datePicker, dockedDatePicker } from "./cases/date-pickers";
 import { dialog } from "./cases/dialog";
 import { dragHandle } from "./cases/drag-handle";
@@ -32,6 +33,7 @@ import { paginator } from "./cases/paginator";
 import { popover } from "./cases/popover";
 import { circularProgress, linearProgress } from "./cases/progress";
 import { radioGroup } from "./cases/radio-group";
+import { rating } from "./cases/rating";
 import { richTooltip } from "./cases/rich-tooltip";
 import { searchBar } from "./cases/search-bar";
 import { searchView } from "./cases/search-view";
@@ -135,6 +137,8 @@ export const COMPONENTS: readonly ComponentCase[] = [
     numberField,
     codeField,
     fileUpload,
+    copyButton,
+    rating,
     text,
     textArea,
     textField,

@@ -79,7 +79,7 @@ fixtures (additions only).
   `fade-through.spec.tsx` "drops the old page at once…", React Native `components.spec.tsx`
   "c8c: splitter … snaps the divider").
 - Component suites (after `omni run generate prepare -p @pureform/panda-fixture -p
-  @pureform/component-suites`), `-t "NumberField|CodeField"` on solid/panda, react/css,
+@pureform/component-suites`), `-t "NumberField|CodeField"` on solid/panda, react/css,
   react/tailwind: controllable, forms, keyboard, accessibility, direction, server-rendering,
   themes: 678 passed. Indication: no case (see open questions).
 - Browser suite: visual `-t number-and-code-fields` (new screenshot, reviewed), indication
@@ -97,7 +97,7 @@ fixtures (additions only).
   `field.ts`'s `fieldParts` for a slot that is its own container. A `fieldParts` option for the
   state slot (`container` or the input itself) would share it. The number field's round
   `trigger` style is the input chip's `remove` at another size; a `roundIconButtonPart(ref,
-  size)` in `shared.ts` could serve both (and the secure field's visibility toggle).
+size)` in `shared.ts` could serve both (and the secure field's visibility toggle).
 - **Code that looks like a sibling's:** the React and Solid number fields copy the text input's
   icon and affix parts (`text-input.tsx`'s `icon`/`affix`), and the tags input's Root shape;
   React Native's number field restates the field's container/label/affix rendering from

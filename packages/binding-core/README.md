@@ -490,6 +490,8 @@ type TagsInputPart; interface TagsInputRootOwnProps // variant, color, density, 
 // value (string[]), max, maxLength, delimiter, validate, removeLabel, error, …
 TAGS_INPUT_ROOT_PROPS; TAGS_INPUT_CONTENT_PROPS; tagsInputSelection(props);
 tagsInputMachineProps(props); tagsInputFilled(count, text); tagsInputChipTestId(testId);
+// Copy button: CopyButtonBehaviorProps, CopyButtonContentProps, COPY_BUTTON_OWN_PROPS, copyButtonMachineProps(props), COPY_LABEL, COPIED_LABEL.
+// Rating: RatingRootOwnProps, RatingBehaviorProps, RATING_ROOT_PROPS, ratingSelection(props), ratingMachineProps(props), starFill(itemState).
 type InputChipPart; interface InputChipVariantProps; inputChipSelection(props);
 
 // Number field (pureform's own, c9a): Zag's number input; `value` is text in the locale, its

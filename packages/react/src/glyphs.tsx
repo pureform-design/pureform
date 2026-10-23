@@ -101,3 +101,12 @@ export const ColorizeIcon = (): ReactNode => (
 export const ArrowDownwardIcon = (): ReactNode => (
     <Glyph path={GLYPH_PATHS.arrowDownward} />
 );
+
+/** Two sheets: the copy button's icon. */
+export const CopyIcon = (): ReactNode => <Glyph path={GLYPH_PATHS.copy} />;
+
+/** A check: the copy button's icon once copied. */
+export const CheckIcon = (): ReactNode => <Glyph path={GLYPH_PATHS.check} />;
+
+/** A filled star: the rating's icon. */
+export const StarIcon = (): ReactNode => <Glyph path={GLYPH_PATHS.star} />;

@@ -17,6 +17,8 @@ export * as paginator from "./paginator";
 export * as presence from "./presence";
 export * as radioGroup from "./radio-group";
 export * as ripple from "./ripple";
+export * as clipboard from "./clipboard";
+export * as ratingGroup from "./rating-group";
 export * as select from "./select";
 export * as selectionList from "./selection-list";
 export * as slider from "./slider";

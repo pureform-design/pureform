@@ -48,6 +48,12 @@ export const GLYPH_PATHS = {
         "M20.71 5.63 18.37 3.29a1 1 0 0 0-1.41 0l-3.12 3.12-1.93-1.91-1.41 1.41 1.42 1.42L3 16.25V21h4.75l8.92-8.92 1.42 1.42 1.41-1.41-1.92-1.92 3.12-3.12a1 1 0 0 0 0-1.42M6.92 19 5 17.08l8.06-8.06 1.92 1.92z",
     /** An arrow pointing down: a table's sort arrow, descending. */
     arrowDownward: "M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8z",
+    /** Two sheets: a copy button's icon. */
+    copy: "M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2m0 16H8V7h11z",
+    /** A check: a copy button's icon once copied. */
+    check: "M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z",
+    /** A filled star: a rating's icon. */
+    star: "m12 17.27 4.15 2.51c.76.46 1.69-.22 1.49-1.08l-1.1-4.72 3.67-3.18c.67-.58.31-1.68-.57-1.75l-4.83-.41-1.89-4.46c-.34-.81-1.5-.81-1.84 0L9.19 8.63l-4.83.41c-.88.07-1.24 1.17-.57 1.75l3.67 3.18-1.1 4.72c-.2.86.73 1.54 1.49 1.08z",
 } as const;
 
 /** Each toast type's icon: a check, a warning triangle, an error or info disc, or a partial ring

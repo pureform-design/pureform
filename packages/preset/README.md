@@ -525,6 +525,8 @@ themselves to Material's insets (4, 8 and 8) with negative margins, so no varian
 rendered. The remove button is its own indication surface. The chip has no `variant`: input chips
 are only outlined.
 
+`rating` is a row of star icons (`item` holds the empty `icon` and the `fill` or `halfFill` over it; `color`, `size`), pureform's own: M3 has none. The copy button has no recipe; it is the `iconButton`.
+
 `tagsInput` is the text field (filled or outlined, `leadingIcon`, `trailingIcon`, `color`,
 `density`) whose container is a wrapping row: an `inputChip` per value, then the input, which
 grows to fill the line. Mark the container filled (`data-pf-filled`) while it holds a chip so the
@@ -558,11 +560,26 @@ read as disabled). `codeField` (pureform's own) is a `label` over a `control` ro
 ```html
 <div class="{numberField.root}">
     <div class="{numberField.container}">
-        <input class="{numberField.input}" id="qty" role="spinbutton" placeholder=" " />
+        <input
+            class="{numberField.input}"
+            id="qty"
+            role="spinbutton"
+            placeholder=" "
+        />
         <label class="{numberField.label}" for="qty">Quantity</label>
         <div class="{numberField.control}" role="group">
-            <button class="{numberField.decrementTrigger}" aria-label="decrease value">−</button>
-            <button class="{numberField.incrementTrigger}" aria-label="increment value">+</button>
+            <button
+                class="{numberField.decrementTrigger}"
+                aria-label="decrease value"
+            >
+                −
+            </button>
+            <button
+                class="{numberField.incrementTrigger}"
+                aria-label="increment value"
+            >
+                +
+            </button>
         </div>
     </div>
 </div>
@@ -1012,11 +1029,19 @@ variants, no compounds.
     <div class="{colorPicker.content}">
         <div class="{colorPicker.area}">
             <div class="{colorPicker.areaBackground}"></div>
-            <div class="{colorPicker.areaThumb}" role="slider" tabindex="0"></div>
+            <div
+                class="{colorPicker.areaThumb}"
+                role="slider"
+                tabindex="0"
+            ></div>
         </div>
         <div class="{colorPicker.channelSlider}">
             <div class="{colorPicker.channelSliderTrack}"></div>
-            <div class="{colorPicker.channelSliderThumb}" role="slider" tabindex="0"></div>
+            <div
+                class="{colorPicker.channelSliderThumb}"
+                role="slider"
+                tabindex="0"
+            ></div>
         </div>
         <div class="{colorPicker.control}">
             <div class="{colorPicker.valueSwatch}"></div>

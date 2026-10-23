@@ -22,6 +22,7 @@ import { Chip } from "@pureform/solid/chip";
 import { ChipSet } from "@pureform/solid/chip-set";
 import { CircularProgress } from "@pureform/solid/circular-progress";
 import { ColorPicker } from "@pureform/solid/color-picker";
+import { CopyButton } from "@pureform/solid/copy-button";
 import { DateInput } from "@pureform/solid/date-input";
 import { DatePicker } from "@pureform/solid/date-picker";
 import { Dialog } from "@pureform/solid/dialog";
@@ -45,6 +46,7 @@ import { NavigationRail } from "@pureform/solid/navigation-rail";
 import { Paginator } from "@pureform/solid/paginator";
 import { Popover } from "@pureform/solid/popover";
 import { RadioGroup } from "@pureform/solid/radio-group";
+import { Rating } from "@pureform/solid/rating";
 import { RichTooltip } from "@pureform/solid/rich-tooltip";
 import { Ripple } from "@pureform/solid/ripple";
 import { Scrim } from "@pureform/solid/scrim";
@@ -218,6 +220,8 @@ export const components: Record<ComponentName, ValidComponent> = {
     NumberField,
     CodeField,
     FileUpload,
+    CopyButton,
+    Rating,
     Text,
     TextArea,
     TextField,

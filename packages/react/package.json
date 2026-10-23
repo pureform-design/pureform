@@ -54,6 +54,13 @@
                 "default": "./dist/split-button.mjs"
             }
         },
+        "./copy-button": {
+            "types": "./dist/copy-button/index.d.ts",
+            "import": {
+                "development": "./src/copy-button/index.ts",
+                "default": "./dist/copy-button.mjs"
+            }
+        },
         "./icon-button": {
             "types": "./dist/icon-button/index.d.ts",
             "import": {
@@ -220,6 +227,13 @@
             "import": {
                 "development": "./src/file-upload/index.ts",
                 "default": "./dist/file-upload.mjs"
+            }
+        },
+        "./rating": {
+            "types": "./dist/rating/index.d.ts",
+            "import": {
+                "development": "./src/rating/index.ts",
+                "default": "./dist/rating.mjs"
             }
         },
         "./tags-input": {

@@ -118,6 +118,7 @@ import { createSupportingText } from "./components/supporting-text";
 import { createSwitch } from "./components/switch";
 import { createTable } from "./components/table";
 import { createTabs } from "./components/tabs";
+import { createRating } from "./components/rating";
 import { createTagsInput } from "./components/tags-input";
 import { createText } from "./components/text";
 import { createTextArea } from "./components/text-area";
@@ -329,6 +330,7 @@ const defaultComponents = <G extends string>(
         numberField: createNumberField<G, Step>(theme.color.groups, densities),
         codeField: createCodeField<G, Step>(theme.color.groups, densities),
         fileUpload: createFileUpload<G>(theme.color.groups),
+        rating: createRating<G>(theme.color.groups),
         searchBar,
         searchView,
         select: createSelect<G, Step>(theme.color.groups, densities),

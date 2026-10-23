@@ -155,6 +155,13 @@ export const COMPONENT_USAGE = {
             ripple: {},
         },
     },
+    // The copy button is an icon button; no color group, shape or toggle of its own.
+    "copy-button": {
+        entries: {
+            iconButton: same("color", "variant", "shape", "size", "density"),
+            ripple: {},
+        },
+    },
     "linear-progress": {
         entries: { linearProgress: same("color", "shape") },
     },
@@ -354,6 +361,7 @@ export const COMPONENT_USAGE = {
     "code-field": {
         entries: { codeField: same("variant", "color", "density") },
     },
+    rating: { entries: { rating: same("color", "size") } },
     text: { entries: { text: { style: "textStyle" } } },
     // The icons, prefix and suffix follow their content.
     "text-area": {

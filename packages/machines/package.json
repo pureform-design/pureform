@@ -33,6 +33,20 @@
                 "default": "./dist/switch.mjs"
             }
         },
+        "./clipboard": {
+            "types": "./dist/clipboard.d.ts",
+            "import": {
+                "development": "./src/clipboard.ts",
+                "default": "./dist/clipboard.mjs"
+            }
+        },
+        "./rating-group": {
+            "types": "./dist/rating-group.d.ts",
+            "import": {
+                "development": "./src/rating-group.ts",
+                "default": "./dist/rating-group.mjs"
+            }
+        },
         "./radio-group": {
             "types": "./dist/radio-group.d.ts",
             "import": {
@@ -288,6 +302,7 @@
         "@zag-js/avatar": "catalog:",
         "@zag-js/carousel": "catalog:",
         "@zag-js/checkbox": "catalog:",
+        "@zag-js/clipboard": "catalog:",
         "@zag-js/collection": "catalog:",
         "@zag-js/color-picker": "catalog:",
         "@zag-js/combobox": "catalog:",
@@ -305,6 +320,7 @@
         "@zag-js/popover": "catalog:",
         "@zag-js/presence": "catalog:",
         "@zag-js/radio-group": "catalog:",
+        "@zag-js/rating-group": "catalog:",
         "@zag-js/select": "catalog:",
         "@zag-js/slider": "catalog:",
         "@zag-js/splitter": "catalog:",
