@@ -3032,6 +3032,12 @@ navigationRail[modal=true].label: bg none | color rgba(73, 69, 78, 1) | outline 
 dragHandle.root: bg transparent | color none | outline none
     focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
     focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+splitter.resizeTrigger: bg transparent | color none | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+splitter.resizeTriggerIndicator: bg rgba(122, 117, 127, 1) | color none | outline none
+    pressed: bg rgba(28, 27, 30, 1)
+    pressed-checked: bg rgba(28, 27, 30, 1)
 snackbar.action: bg transparent | color rgba(207, 188, 255, 1) | outline none
     hovered: bg rgba(207, 188, 255, 0.08)
     focused: bg rgba(207, 188, 255, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2

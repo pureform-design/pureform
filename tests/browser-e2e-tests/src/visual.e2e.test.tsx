@@ -29,6 +29,7 @@ const SECTIONS = [
     "scrim",
     "fullscreen-dialog",
     "sheets",
+    "panes",
     "media",
     "grid-lists",
     "carousels",

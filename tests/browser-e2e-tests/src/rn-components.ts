@@ -56,6 +56,7 @@ export const RN_COMPONENTS = [
     "bottomSheet",
     "sideSheet",
     "dragHandle",
+    "splitter",
     "snackbar",
     "toast",
     "toolbar",

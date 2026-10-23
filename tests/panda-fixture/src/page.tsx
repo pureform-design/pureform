@@ -45,6 +45,7 @@ import {
     bottomSheet,
     sideSheet,
     dragHandle,
+    splitter,
     fabMenu,
     splitButton,
     stepper,
@@ -3358,6 +3359,46 @@ export function Page() {
                         );
                     })()}
                 </div>
+            </section>
+
+            <section data-section="panes" style={row}>
+                {(["horizontal", "vertical"] as const).map((orientation) => {
+                    const s = splitter({ orientation });
+                    const horizontal = orientation === "horizontal";
+                    const pane = (label: string, grow: number) => (
+                        <div class={s.panel} style={{ flex: `${grow} 1 0px` }}>
+                            {label}
+                        </div>
+                    );
+                    const divider = (pressed: boolean) => (
+                        <div
+                            class={s.resizeTrigger}
+                            role="separator"
+                            aria-label="Resize panes"
+                            aria-orientation={orientation}
+                            tabindex="0"
+                            {...(pressed ? { "data-pf-active": "" } : {})}
+                        >
+                            <div class={s.resizeTriggerIndicator} />
+                        </div>
+                    );
+                    return (
+                        <div
+                            class={s.root}
+                            style={{
+                                width: horizontal ? "420px" : "200px",
+                                height: horizontal ? "120px" : "260px",
+                                outline: "1px solid currentColor",
+                            }}
+                        >
+                            {pane("List", 30)}
+                            {divider(false)}
+                            {pane("Detail", 50)}
+                            {divider(true)}
+                            {pane("Extra", 20)}
+                        </div>
+                    );
+                })}
             </section>
 
             <section
