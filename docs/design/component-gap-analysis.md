@@ -736,3 +736,11 @@ Compose's `MaterialTransitions.FadeThrough` (androidx-main 62637abaa5): the outg
 (`short2`, linear) as it grows to 105%, the incoming fades in (`short4` after `short2`) as it grows
 from 80% on `spatialDefault`; reduced motion keeps the fades. React, Solid and React Native; it
 replaces nothing, so nothing deprecated is removed.
+
+The m3 merge put both transitions on one page model (binding-core `page-transition.ts`):
+`transition: "fadeThrough" | "sharedAxis"` on the ready-made tabs and a row stepper, the fade
+through's root clipping while a page leaves, the shared axis's scrim opt-in (Compose draws it only
+behind predictive back). The FAB menu's items stagger 25ms a step (Compose's
+`FloatingActionButtonMenu` runs its stagger on the `SlowEffects` spring) and the list holds for
+the `itemCount` the bindings set. The dialog, full-screen dialog, side sheet and bottom sheet share
+one `OverlayCloseProps`. Nothing deprecated was removed.
