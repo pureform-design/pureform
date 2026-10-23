@@ -41,7 +41,7 @@ export interface ColorPickerRootOwnProps extends ColorPickerVariantProps {
      *  @control color */
     readonly value?: string | undefined;
     /** The color to start with. @default "#6750a4"
-     *  @control color */
+     *  @control none */
     readonly defaultValue?: string | undefined;
     /** Called as the color changes, while dragging too. */
     readonly onValueChange?:

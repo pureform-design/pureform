@@ -424,6 +424,17 @@ import { RichTooltip } from "@pureform/react/rich-tooltip";
   from `@pureform/react/side-sheet`.
 - **The drag handle** is a `<button>` holding the pill (`orientation="vertical"` for a pane
   divider); name it with `aria-label`. Import it from `@pureform/react/drag-handle`.
+- **The color picker** runs Zag's color picker, inline: `ColorPicker.Root` takes `value`/
+  `defaultValue`/`onValueChange` (any CSS color in; hex out, `#rrggbb` or `#rrggbbaa` when not
+  opaque; the default is `#6750a4`), `onValueChangeEnd`, `disabled`, `readOnly` and `name` (its
+  hidden input submits the hex). Inside it, `Label` and `Content` hold the `Area` (saturation and
+  brightness, HSB), a `ChannelSlider` per `channel` (`hue`, `alpha` over a transparency grid),
+  `Control` with the `ValueSwatch`, the `HexField` (an outlined text field: Enter or leaving it
+  sets the color, other text marks it invalid until left) and the `EyeDropperTrigger` (an icon
+  button, rendered once mounted where the browser has `EyeDropper`), and the `SwatchGroup` of
+  `SwatchTrigger`s (`value`; `aria-pressed` while it's the value). The ready-made takes `label`,
+  `area` (default on), `alpha`, `swatches`, `inputLabel`, `eyeDropper` and `eyeDropperLabel`.
+  Import it from `@pureform/react/color-picker`.
 - **The splitter** runs Zag's splitter: `Splitter.Root` takes the `panels` (`id`, `minSize`,
   `maxSize`, in percent or `"240px"`), `size`/`defaultSize`/`onSizeChange` (percent, the default
   read once; without either the panes share the room from the first render), `anchors`,

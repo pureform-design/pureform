@@ -331,6 +331,15 @@ splitterSnap({ sizes, index, room, anchors, limits, velocity }); // the sizes on
 splitterMoveBy(sizes, index, delta, limits); splitterLimits(panels, room); splitterPercent(size, room, fallback);
 splitterInitialSizes(panels, sizes, room); splitterTriggerId(before, after); splitterTriggerProps({ label, dragging });
 
+// Color picker: colorPickerAnatomy (Zag's color picker, with valueSwatch)
+interface ColorPickerRootOwnProps        // tokens, value/defaultValue/onValueChange, onValueChangeEnd, disabled, readOnly, name, id, testId, unstyled
+interface ColorPickerContentProps<Node>  // label, area, alpha, swatches, inputLabel, eyeDropper, eyeDropperLabel
+COLOR_PICKER_ROOT_PROPS; colorPickerSelection(props); COLOR_PICKER_DEFAULT; // "#6750a4", Material's baseline seed
+colorPickerHex(text);                    // "#rrggbb" (or "#rrggbbaa" when not opaque) from 3, 4, 6 or 8 hex digits, else undefined
+colorPickerHexText(hex); colorPickerSwatchLabel(color); colorPickerFraction(at, length, rtl);
+COLOR_PICKER_THUMB_CENTRE;               // centres a slider thumb on the point Zag places it at (web)
+hasEyeDropper();                         // Chromium's EyeDropper; read it once mounted
+
 // Snackbar: pureform's snackbar machine; the generated snackbarAnatomy
 interface SnackbarRootOwnProps           // layout, tokens, duration, onAction, id, ids, open, defaultOpen,
                                          // onOpenChange ({ open, reason }), testId, unstyled

@@ -935,6 +935,45 @@ only draws.
 </div>
 ```
 
+## Color picker
+
+`colorPicker` is an inline color picker on Zag's color picker. M3 has none, so the design is
+pureform's own, from Material's roles and shapes. Its parts are Zag's, and `valueSwatch` (the
+value's preview): `root`, `label`, `content` (the sections, `gap` apart), the `area`
+(`areaBackground`, the gradient Zag sets inline, with `medium` corners, and the `areaThumb`),
+each `channelSlider` (hue, or alpha over its `transparencyGrid`) with a 16-high
+`channelSliderTrack` (the M3 Expressive slider's extra-small track, fully rounded) and its
+`channelSliderThumb`, the `control` row (the `valueSwatch`, then the bindings' text field for hex
+and the eye dropper's icon button, which have no slot here), and the `swatchGroup` of
+`swatchTrigger`s, each holding a round `swatch`; the selected one (`aria-pressed`) is ringed in
+`onSurface`. Thumbs are 24 discs ringed in `surface` at elevation level 1, with the focus ring.
+The area is Zag's HSB (saturation across, brightness up), not M3's HCT tone and chroma. No
+variants, no compounds.
+
+```html
+<div class="{colorPicker.root}">
+    <label class="{colorPicker.label}">Seed color</label>
+    <div class="{colorPicker.content}">
+        <div class="{colorPicker.area}">
+            <div class="{colorPicker.areaBackground}"></div>
+            <div class="{colorPicker.areaThumb}" role="slider" tabindex="0"></div>
+        </div>
+        <div class="{colorPicker.channelSlider}">
+            <div class="{colorPicker.channelSliderTrack}"></div>
+            <div class="{colorPicker.channelSliderThumb}" role="slider" tabindex="0"></div>
+        </div>
+        <div class="{colorPicker.control}">
+            <div class="{colorPicker.valueSwatch}"></div>
+        </div>
+        <div class="{colorPicker.swatchGroup}">
+            <button class="{colorPicker.swatchTrigger}" aria-pressed="true">
+                <div class="{colorPicker.swatch}"></div>
+            </button>
+        </div>
+    </div>
+</div>
+```
+
 ## Snackbar and tooltip
 
 Both sit on the inverse surface. Placing, showing, and dismissing them is the app's job; placed,

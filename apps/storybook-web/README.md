@@ -63,8 +63,8 @@ false` when the story has the arg, so Storybook doesn't infer one; left out
           `style`, a `true`/`false` group a boolean;
         - a select of **3 options or fewer is a `radio` control** (`argTypeFor`, for variant
           groups too); more stay a select;
-        - a **`@control none | select | radio | boolean | text | number`** JSDoc tag on the prop in
-          binding-core overrides the type (`@control select` keeps a select of few options; `@control none` on ids, form names, submit values
+        - a **`@control none | select | radio | boolean | text | number | color`** JSDoc tag on the prop in
+          binding-core overrides the type (`@control color` is Storybook's color picker, on a CSS color string such as the color picker's `value`; `@control select` keeps a select of few options; `@control none` on ids, form names, submit values
           and every `default*` prop; `Controllable`'s mapped `default*` props take the tag
           from the mapped type's JSDoc).
 
