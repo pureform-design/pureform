@@ -3216,25 +3216,47 @@ export function Page() {
                                         </div>
                                     );
                                 })()}
-                                <div
-                                    class={
-                                        circularProgress({
-                                            indeterminate: true,
-                                        }).root
-                                    }
-                                    role="progressbar"
-                                    aria-label="Loading"
-                                />
-                                <div
-                                    class={
-                                        circularProgress({
-                                            indeterminate: true,
-                                            color: "success",
-                                        }).root
-                                    }
-                                    role="progressbar"
-                                    aria-label="Loading"
-                                />
+                                {(() => {
+                                    const c = circularProgress({
+                                        indeterminate: true,
+                                    });
+                                    return (
+                                        <div
+                                            class={c.root}
+                                            role="progressbar"
+                                            aria-label="Loading"
+                                        >
+                                            <span class={c.track} />
+                                            <span class={c.endHalf}>
+                                                <span class={c.endArc} />
+                                            </span>
+                                            <span class={c.startHalf}>
+                                                <span class={c.startArc} />
+                                            </span>
+                                        </div>
+                                    );
+                                })()}
+                                {(() => {
+                                    const c = circularProgress({
+                                        indeterminate: true,
+                                        color: "success",
+                                    });
+                                    return (
+                                        <div
+                                            class={c.root}
+                                            role="progressbar"
+                                            aria-label="Loading"
+                                        >
+                                            <span class={c.track} />
+                                            <span class={c.endHalf}>
+                                                <span class={c.endArc} />
+                                            </span>
+                                            <span class={c.startHalf}>
+                                                <span class={c.startArc} />
+                                            </span>
+                                        </div>
+                                    );
+                                })()}
                                 <div
                                     class={slider({ color: "error" }).root}
                                     style={{
@@ -3505,6 +3527,22 @@ export function Page() {
                         );
                     }}
                 </For>
+                {(() => {
+                    const p = linearProgress({
+                        shape: "wavy",
+                        indeterminate: true,
+                    });
+                    return (
+                        <div
+                            class={p.root}
+                            role="progressbar"
+                            aria-label="Loading"
+                        >
+                            <div class={p.track} />
+                            <div class={p.indicator} />
+                        </div>
+                    );
+                })()}
                 <div style={row}>
                     <For
                         each={
