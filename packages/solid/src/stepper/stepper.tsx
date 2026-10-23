@@ -17,6 +17,8 @@ import {
 } from "@pureform/binding-core";
 import type {
     InteractionSourceProps,
+    PageKey,
+    PageTransitionProps,
     StepperContentProps,
     StepperItem,
     StepperRootOwnProps,
@@ -35,10 +37,9 @@ import {
 
 import { useControllable } from "../controllable";
 import { ToastIcon } from "../glyphs";
-import {
-    HorizontalSharedAxis,
-    useSharedAxisPage,
-} from "../horizontal-shared-axis/horizontal-shared-axis";
+import { FadeThrough } from "../fade-through/fade-through";
+import { HorizontalSharedAxis } from "../horizontal-shared-axis/horizontal-shared-axis";
+import { useTransitionPage } from "../page-transition";
 import { itemInteractionSources } from "../interaction";
 import type { ItemInteractionSources } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
@@ -250,8 +251,8 @@ function Content(props: StepperContentPartProps): JSX.Element {
     // Whether it names its step is fixed: a row's content is outside the items.
     const named = untrack(() => props.index !== undefined);
     const index = named ? () => props.index! : itemContext.use("Content").index;
-    // A step's content leaving in a shared axis stays drawn while it goes.
-    const page = useSharedAxisPage();
+    // A step's content leaving in a page transition stays drawn while it goes.
+    const page = useTransitionPage();
     return scope.render("content", {
         element: "div",
         machine: () =>
@@ -390,6 +391,9 @@ function ReadyMade(props: StepperProps): JSX.Element {
         content: slots("content") as object,
     };
     const vertical = () => props.orientation === "vertical";
+    const moving = () =>
+        props.transition === "sharedAxis" ||
+        props.transition === "fadeThrough";
     return (
         <Root {...own} count={items().length} {...root}>
             <List
@@ -439,7 +443,7 @@ function ReadyMade(props: StepperProps): JSX.Element {
                     )}
                 </For>
             </List>
-            <Show when={!vertical() && props.transition !== "sharedAxis"}>
+            <Show when={!vertical() && !moving()}>
                 <For each={items()} keyed={false}>
                     {(entry: Accessor<StepperItem<JSX.Element>>, index) => (
                         <StepContent
@@ -450,9 +454,10 @@ function ReadyMade(props: StepperProps): JSX.Element {
                     )}
                 </For>
             </Show>
-            <Show when={!vertical() && props.transition === "sharedAxis"}>
-                <SharedAxisSteps
+            <Show when={!vertical() && moving()}>
+                <TransitionSteps
                     items={items}
+                    transition={() => props.transition}
                     scrim={() => props.transitionScrim}
                     slot={part.content}
                 />
@@ -462,26 +467,40 @@ function ReadyMade(props: StepperProps): JSX.Element {
 }
 
 // A row's current step's content in a horizontal shared axis, which slides between the steps in
-// their order.
-function SharedAxisSteps(props: {
+// their order, or a fade through.
+function TransitionSteps(props: {
     readonly items: Accessor<readonly StepperItem<JSX.Element>[]>;
+    readonly transition: Accessor<PageTransitionProps["transition"]>;
     readonly scrim: Accessor<boolean | undefined>;
     readonly slot: object;
 }): JSX.Element {
     const { api } = context.use("Content");
+    const step = (at: PageKey) => {
+        const entry = untrack(() => props.items()[Number(at)]);
+        return entry ? (
+            <StepContent
+                entry={() => entry}
+                index={Number(at)}
+                slot={props.slot}
+            />
+        ) : null;
+    };
     return (
-        <HorizontalSharedAxis index={api().value} scrim={props.scrim()}>
-            {(at: number) => {
-                const entry = untrack(() => props.items()[at]);
-                return entry ? (
-                    <StepContent
-                        entry={() => entry}
-                        index={at}
-                        slot={props.slot}
-                    />
-                ) : null;
-            }}
-        </HorizontalSharedAxis>
+        <Show
+            when={props.transition() === "fadeThrough"}
+            fallback={
+                <HorizontalSharedAxis
+                    index={api().value}
+                    scrim={props.scrim()}
+                >
+                    {(at: number) => step(at)}
+                </HorizontalSharedAxis>
+            }
+        >
+            <FadeThrough value={api().value}>
+                {(at: PageKey) => step(at)}
+            </FadeThrough>
+        </Show>
     );
 }
 

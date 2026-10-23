@@ -7,28 +7,22 @@
 
 import { fadeThroughAnatomy } from "@pureform/anatomy";
 import {
-    dropPage,
+    changePages,
     FADE_THROUGH_ROOT_PROPS,
+    fadeThroughPageProps,
     fadeThroughSelection,
-    pageStateProps,
-    showPage,
+    pageRootProps,
 } from "@pureform/binding-core";
 import type {
-    FadeThroughPage,
     FadeThroughRootOwnProps,
     FadeThroughValue,
+    PageKey,
+    TransitionPage,
 } from "@pureform/binding-core";
-import { whenAnimationsEnd } from "@pureform/binding-core/dom";
 import type { JSX, ValidComponent } from "@solidjs/web";
-import {
-    createEffect,
-    createSignal,
-    For,
-    merge,
-    omit,
-    untrack,
-} from "solid-js";
+import { For, merge, omit } from "solid-js";
 
+import { createTransitionPages, TransitionPageView } from "../page-transition";
 import { useComponent } from "../parts";
 import type { PartProps } from "../props";
 
@@ -48,7 +42,9 @@ export interface FadeThroughProps
         | ((value: FadeThroughValue) => JSX.Element);
 }
 
-type Page = FadeThroughPage<null>;
+// Quick switches keep every page still leaving until its own exit ends.
+const change = (pages: readonly TransitionPage[], key: PageKey) =>
+    changePages(pages, key, { keepLeaving: true });
 
 /** Material's fade through: `<FadeThrough value={destination()}>{(value) => <Page of={value}
  *  />}</FadeThrough>`, with the navigation bar's or rail's `value`. */
@@ -58,49 +54,17 @@ export function FadeThrough(props: FadeThroughProps): JSX.Element {
         testId: () => props.testId,
         unstyled: () => props.unstyled,
     });
-    const [pages, setPages] = createSignal<readonly Page[]>(
-        showPage<null>(
-            [],
-            untrack(() => props.value),
-            null,
-        ),
-    );
-    createEffect(
-        () => props.value,
-        (value) => {
-            setPages((current) => showPage(current, value, null));
-        },
-    );
-    const page = (entry: () => Page) => {
-        const { value } = untrack(entry);
-        const content = untrack(() => {
-            const given = props.children;
-            return typeof given === "function" && given.length > 0
-                ? (given as (value: FadeThroughValue) => JSX.Element)(value)
-                : (given as JSX.Element);
-        });
-        let element: HTMLElement | undefined;
-        createEffect(
-            () => entry().state,
-            (state) =>
-                state === "closed" && element
-                    ? whenAnimationsEnd(element, () =>
-                          setPages((current) => dropPage(current, value)),
-                      )
-                    : undefined,
-        );
-        return scope.render("page", {
-            element: "div",
-            ref: (node) => {
-                element = node;
-            },
-            machine: () => pageStateProps(entry().state),
-            props: { children: content },
-        });
+    const { pages, settle } = createTransitionPages(() => props.value, change);
+    const content = (value: PageKey): JSX.Element => {
+        const given = props.children;
+        return typeof given === "function" && given.length > 0
+            ? (given as (value: PageKey) => JSX.Element)(value)
+            : (given as JSX.Element);
     };
     return scope.render("root", {
         element: "div",
         as: () => props.as,
+        machine: () => pageRootProps(pages()),
         props: merge(
             omit(props, "as", "children", ...FADE_THROUGH_ROOT_PROPS),
             {
@@ -108,9 +72,28 @@ export function FadeThrough(props: FadeThroughProps): JSX.Element {
                     return (
                         <For
                             each={pages()}
-                            keyed={(entry: Page) => entry.value}
+                            keyed={(page: TransitionPage) => page.key}
                         >
-                            {page}
+                            {(page) => (
+                                <TransitionPageView
+                                    page={page}
+                                    settle={settle}
+                                    content={content}
+                                    render={(ref, shown) =>
+                                        scope.render("page", {
+                                            element: "div",
+                                            ref,
+                                            machine: () =>
+                                                fadeThroughPageProps(page()),
+                                            props: {
+                                                get children() {
+                                                    return shown;
+                                                },
+                                            },
+                                        })
+                                    }
+                                />
+                            )}
                         </For>
                     );
                 },

@@ -2,6 +2,6 @@
 
 export {
     HorizontalSharedAxis,
-    useSharedAxisPage,
 } from "./horizontal-shared-axis";
+export { useTransitionPage } from "../page-transition";
 export type { HorizontalSharedAxisProps } from "./horizontal-shared-axis";

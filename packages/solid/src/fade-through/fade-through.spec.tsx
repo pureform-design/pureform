@@ -1,10 +1,12 @@
 import { testIds } from "@pureform/anatomy";
 import { createSignal, flush } from "solid-js";
 import { afterEach, describe, expect, it } from "vitest";
+import { userEvent } from "vitest/browser";
 
 import { FadeThrough } from ".";
 import { PureformProvider } from "..";
 import { navigationRegistry } from "../__fixtures__/registry";
+import { Tabs } from "../tabs";
 import { byTestId, mount, settle, until } from "../testing/mount";
 
 const ids = testIds.fadeThrough;
@@ -80,8 +82,15 @@ describe("FadeThrough", () => {
         expect(out!.inert).toBe(true);
         expect(into!.textContent).toBe("mail");
         expect(into!.dataset.state).toBe("open");
+        // The root clips while a page leaves, so a taller one doesn't spill.
+        expect(byTestId(ids.root).hasAttribute("data-transitioning")).toBe(
+            true,
+        );
         await until(() => expect(pages()).toHaveLength(1));
         expect(pages()[0]).toBe(into);
+        expect(byTestId(ids.root).hasAttribute("data-transitioning")).toBe(
+            false,
+        );
     });
 
     it("drops the old page at once when nothing animates it (unstyled)", async () => {
@@ -106,5 +115,45 @@ describe("FadeThrough", () => {
         ]);
         await until(() => expect(pages()).toHaveLength(1));
         expect(pages()[0]!.textContent).toBe("home");
+    });
+});
+
+describe("Tabs with transition=fadeThrough", () => {
+    it("fades the selected panel through, keeping the old one drawn while it leaves", async () => {
+        leaving(400);
+        mount(() => (
+            <PureformProvider registry={navigationRegistry()}>
+                <Tabs
+                    aria-label="Trips"
+                    transition="fadeThrough"
+                    items={[
+                        { value: "a", label: "A", content: "Panel A" },
+                        { value: "b", label: "B", content: "Panel B" },
+                    ]}
+                />
+            </PureformProvider>
+        ));
+        await settle();
+        await userEvent.click(
+            document.querySelectorAll<HTMLElement>('[role="tab"]')[1]!,
+        );
+        await settle();
+        expect(
+            [
+                ...document.querySelectorAll<HTMLElement>('[role="tabpanel"]'),
+            ].map((panel) => [panel.textContent, panel.hidden]),
+        ).toEqual([
+            ["Panel A", false],
+            ["Panel B", false],
+        ]);
+        await until(() =>
+            expect(
+                [
+                    ...document.querySelectorAll<HTMLElement>(
+                        '[role="tabpanel"]',
+                    ),
+                ].map((panel) => panel.textContent),
+            ).toEqual(["Panel B"]),
+        );
     });
 });

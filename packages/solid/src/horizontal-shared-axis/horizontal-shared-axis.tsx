@@ -10,34 +10,18 @@ import {
     sharedAxisChange,
     sharedAxisPageProps,
     sharedAxisScrimProps,
-    sharedAxisSettle,
-    sharedAxisStart,
 } from "@pureform/binding-core";
 import type {
     HorizontalSharedAxisRootOwnProps,
-    SharedAxisPage,
-    SharedAxisPageState,
+    PageKey,
+    TransitionPage,
 } from "@pureform/binding-core";
 import type { JSX, ValidComponent } from "@solidjs/web";
-import {
-    type Accessor,
-    createContext,
-    createEffect,
-    createMemo,
-    createSignal,
-    For,
-    merge,
-    omit,
-    Show,
-    untrack,
-    useContext,
-} from "solid-js";
+import { createMemo, For, merge, omit, Show } from "solid-js";
 
+import { createTransitionPages, TransitionPageView } from "../page-transition";
 import { useComponent } from "../parts";
-import type { ComponentScope } from "../parts";
 import type { PartProps } from "../props";
-
-type Anatomy = typeof horizontalSharedAxisAnatomy;
 
 /** The shared axis's props: its own (`index`, `scrim`, tokens, `testId`, `unstyled`), `as`, and
  *  the root element's own props. Its children are the page `index` names, or a function from a
@@ -52,70 +36,8 @@ export interface HorizontalSharedAxisProps
     readonly children?: JSX.Element | ((index: number) => JSX.Element);
 }
 
-const PageContext = createContext<Accessor<SharedAxisPageState>>(
-    () => "current",
-);
-
-/** Where the page around the caller is: `"current"`, `"entering"`, or `"leaving"` (still
- *  drawn while it goes; a part that hides itself when it isn't selected, such as a tab's
- *  panel, stays shown). `"current"` outside a shared axis. */
-export const useSharedAxisPage = (): Accessor<SharedAxisPageState> =>
-    useContext(PageContext);
-
-// Waits for the element's own animations, then reports that its page settled. An element with
-// none (unstyled, or no animation support) settles at once.
-function Page(props: {
-    readonly scope: ComponentScope<Anatomy>;
-    readonly page: Accessor<SharedAxisPage>;
-    readonly onSettle: (page: SharedAxisPage) => void;
-    readonly content: (index: number) => JSX.Element;
-}): JSX.Element {
-    let element: HTMLElement | undefined;
-    createEffect(
-        () => props.page(),
-        (page) => {
-            if (page.state === "current") return;
-            let live = true;
-            // A frame on, once the page is in the document with its new state's styles.
-            const frame = requestAnimationFrame(() => {
-                const animations = element?.getAnimations?.() ?? [];
-                Promise.all(
-                    animations.map((animation) => animation.finished),
-                ).then(
-                    () => live && props.onSettle(page),
-                    () => undefined,
-                );
-            });
-            return () => {
-                live = false;
-                cancelAnimationFrame(frame);
-            };
-        },
-    );
-    const state = () => props.page().state;
-    return (
-        <PageContext value={state}>
-            {(() => {
-                // Built once, under the page's context: a leaving page keeps what it showed.
-                const content = untrack(() =>
-                    props.content(props.page().index),
-                );
-                return props.scope.render("page", {
-                    element: "div",
-                    ref: (el) => {
-                        element = el;
-                    },
-                    machine: () => sharedAxisPageProps(props.page()),
-                    props: {
-                        get children() {
-                            return content;
-                        },
-                    },
-                });
-            })()}
-        </PageContext>
-    );
-}
+const change = (pages: readonly TransitionPage[], key: PageKey) =>
+    sharedAxisChange(pages, Number(key));
 
 function Root(props: HorizontalSharedAxisProps): JSX.Element {
     const scope = useComponent(horizontalSharedAxisAnatomy, {
@@ -123,22 +45,12 @@ function Root(props: HorizontalSharedAxisProps): JSX.Element {
         testId: () => props.testId,
         unstyled: () => props.unstyled,
     });
-    const [pages, setPages] = createSignal<readonly SharedAxisPage[]>(
-        untrack(() => sharedAxisStart(props.index)),
-    );
-    createEffect(
-        () => props.index,
-        (index) => {
-            setPages((now) => sharedAxisChange(now, index));
-        },
-    );
-    const onSettle = (page: SharedAxisPage) =>
-        setPages((now) => sharedAxisSettle(now, page.index, page.state));
-    const content = (index: number): JSX.Element => {
+    const { pages, settle } = createTransitionPages(() => props.index, change);
+    const content = (index: PageKey): JSX.Element => {
         const children = props.children;
-        return typeof children === "function"
-            ? (children as (index: number) => JSX.Element)(index)
-            : children;
+        return typeof children === "function" && children.length > 0
+            ? (children as (index: number) => JSX.Element)(Number(index))
+            : (children as JSX.Element);
     };
     const scrimDirection = createMemo(() => {
         const now = pages();
@@ -157,14 +69,26 @@ function Root(props: HorizontalSharedAxisProps): JSX.Element {
                         <>
                             <For
                                 each={pages()}
-                                keyed={(page: SharedAxisPage) => page.index}
+                                keyed={(page: TransitionPage) => page.key}
                             >
                                 {(page) => (
-                                    <Page
-                                        scope={scope}
+                                    <TransitionPageView
                                         page={page}
-                                        onSettle={onSettle}
+                                        settle={settle}
                                         content={content}
+                                        render={(ref, shown) =>
+                                            scope.render("page", {
+                                                element: "div",
+                                                ref,
+                                                machine: () =>
+                                                    sharedAxisPageProps(page()),
+                                                props: {
+                                                    get children() {
+                                                        return shown;
+                                                    },
+                                                },
+                                            })
+                                        }
                                     />
                                 )}
                             </For>
@@ -188,8 +112,8 @@ function Root(props: HorizontalSharedAxisProps): JSX.Element {
 
 /** Material's horizontal shared axis, for spatially related pages (tabs, steps, onboarding):
  *  `<HorizontalSharedAxis index={step()}>{(at) => pages[at]}</HorizontalSharedAxis>`. A higher
- *  `index` slides forward, a lower one backward; `scrim` veils the page underneath while they
- *  move. */
+ *  `index` slides forward, a lower one backward; `scrim` (off by default: Compose draws it only
+ *  behind predictive back) veils the page underneath while they move. */
 export const HorizontalSharedAxis: ((
     props: HorizontalSharedAxisProps,
 ) => JSX.Element) & {

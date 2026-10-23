@@ -20,6 +20,8 @@ import {
 } from "@pureform/binding-core";
 import type {
     InteractionSourceProps,
+    PageKey,
+    PageTransitionProps,
     TabsContentProps,
     TabsItem,
     TabsRootOwnProps,
@@ -41,10 +43,9 @@ import {
 } from "solid-js";
 
 import { useControllable } from "../controllable";
-import {
-    HorizontalSharedAxis,
-    useSharedAxisPage,
-} from "../horizontal-shared-axis/horizontal-shared-axis";
+import { FadeThrough } from "../fade-through/fade-through";
+import { HorizontalSharedAxis } from "../horizontal-shared-axis/horizontal-shared-axis";
+import { useTransitionPage } from "../page-transition";
 import { itemInteractionSources } from "../interaction";
 import type { ItemInteractionSources } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
@@ -290,8 +291,8 @@ function Indicator(props: TabsPartProps): JSX.Element {
 /** A tab's panel, hidden while its tab isn't selected. The registry doesn't style it. */
 function Content(props: TabsContentPartProps): JSX.Element {
     const { scope, api } = context.use("Content");
-    // A panel leaving in a shared axis stays drawn while it goes.
-    const page = useSharedAxisPage();
+    // A panel leaving in a page transition stays drawn while it goes.
+    const page = useTransitionPage();
     return scope.render("content", {
         element: "div",
         machine: () =>
@@ -381,7 +382,10 @@ function ReadyMade(props: TabsProps): JSX.Element {
                 </For>
             </List>
             <Show
-                when={props.transition === "sharedAxis"}
+                when={
+                    props.transition === "sharedAxis" ||
+                    props.transition === "fadeThrough"
+                }
                 fallback={
                     <For
                         each={items().filter((item) => isPresent(item.content))}
@@ -395,8 +399,9 @@ function ReadyMade(props: TabsProps): JSX.Element {
                     </For>
                 }
             >
-                <SharedAxisPanels
+                <TransitionPanels
                     items={items}
+                    transition={() => props.transition}
                     scrim={() => props.transitionScrim}
                     slot={content}
                 />
@@ -406,9 +411,10 @@ function ReadyMade(props: TabsProps): JSX.Element {
 }
 
 // The selected tab's panel in a horizontal shared axis, which slides between the panels in the
-// tabs' order.
-function SharedAxisPanels(props: {
+// tabs' order, or a fade through.
+function TransitionPanels(props: {
     readonly items: Accessor<readonly TabsItem<JSX.Element>[]>;
+    readonly transition: Accessor<PageTransitionProps["transition"]>;
     readonly scrim: Accessor<boolean | undefined>;
     readonly slot: object;
 }): JSX.Element {
@@ -416,17 +422,27 @@ function SharedAxisPanels(props: {
     const index = createMemo(() =>
         props.items().findIndex((item) => item.value === api().value),
     );
+    const panel = (at: PageKey) => {
+        const item = untrack(() => props.items()[Number(at)]);
+        return item && isPresent(item.content) ? (
+            <Content value={item.value} {...props.slot}>
+                {item.content}
+            </Content>
+        ) : null;
+    };
     return (
-        <HorizontalSharedAxis index={index()} scrim={props.scrim()}>
-            {(at: number) => {
-                const item = untrack(() => props.items()[at]);
-                return item && isPresent(item.content) ? (
-                    <Content value={item.value} {...props.slot}>
-                        {item.content}
-                    </Content>
-                ) : null;
-            }}
-        </HorizontalSharedAxis>
+        <Show
+            when={props.transition() === "fadeThrough"}
+            fallback={
+                <HorizontalSharedAxis index={index()} scrim={props.scrim()}>
+                    {(at: number) => panel(at)}
+                </HorizontalSharedAxis>
+            }
+        >
+            <FadeThrough value={index()}>
+                {(at: PageKey) => panel(at)}
+            </FadeThrough>
+        </Show>
     );
 }
 
