@@ -136,21 +136,29 @@ describe.each(Object.keys(STYLINGS) as (keyof typeof STYLINGS)[])(
                 <div class="${c.indicator}"></div>
             </div>`);
             const indicator = root.lastElementChild as HTMLElement;
-            // The root clips to the wave; the bar fills its height under it.
-            expect(getComputedStyle(root).clipPath).toMatch(/^shape\(/);
-            expect(getComputedStyle(indicator).clipPath).toBe("none");
+            // The bar clips to the wave; the flat track and the root don't.
+            expect(getComputedStyle(root).clipPath).toBe("none");
+            expect(getComputedStyle(indicator).clipPath).toMatch(/^shape\(/);
             const drift = () =>
                 getComputedStyle(root).getPropertyValue(
                     "--pf-components-linearProgress-waveDrift",
                 );
+            const slide = () =>
+                Number(
+                    getComputedStyle(indicator).getPropertyValue(
+                        "--pf-components-linearProgress-slide",
+                    ),
+                );
             pauseAt(root, 0);
             expect(drift()).toBe("0px");
+            expect(slide()).toBe(-1);
             pauseAt(root, 500);
             expect(drift()).toBe("20px");
-            const clip = getComputedStyle(root).clipPath;
+            // The bar has slid; its clip undoes that, so the wave stays on the track.
+            expect(slide()).toBeGreaterThan(-1);
+            const clip = getComputedStyle(indicator).clipPath;
             pauseAt(root, 750);
-            // The clip follows it; the bar slides on its own.
-            expect(getComputedStyle(root).clipPath).not.toBe(clip);
+            expect(getComputedStyle(indicator).clipPath).not.toBe(clip);
         });
     },
 );

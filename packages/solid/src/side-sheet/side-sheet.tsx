@@ -33,7 +33,7 @@ import {
     springRoleVar,
 } from "@pureform/binding-core/dom";
 import type { JSX, ValidComponent } from "@solidjs/web";
-import { omit, onSettled, Show } from "solid-js";
+import { omit, onSettled, Show, untrack } from "solid-js";
 
 import { Button } from "../button";
 import { dialogParts } from "../dialog-parts";
@@ -140,7 +140,7 @@ function Content(props: SideSheetPartProps): JSX.Element {
                 sideSheetSelection(root).coplanar === true
                     ? element.parentElement
                     : undefined,
-            springRoleVar(state().registry, "spatialDefault"),
+            untrack(() => springRoleVar(state().registry, "spatialDefault")),
         );
     });
     return <Surface {...props} />;

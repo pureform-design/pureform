@@ -572,7 +572,7 @@ describe("generate with the CSS target", () => {
                         tokenVars(name, spec, options.prefix),
                     )) {
                         if (springs.has(token)) {
-                            // A spring token takes a role's name, as the role's two vars.
+                            // A spring token takes a role's name, as the role's vars: its curve and its exact parameters.
                             expect(
                                 factory({ tokens: { [token]: "spatialSlow" } })
                                     .root!.style,
@@ -581,6 +581,12 @@ describe("generate with the CSS target", () => {
                                     "var(--springs-spatial-slow-duration)",
                                 [`${cssVar}-easing`]:
                                     "var(--springs-spatial-slow-easing)",
+                                [`${cssVar}-stiffness`]:
+                                    "var(--springs-spatial-slow-stiffness)",
+                                [`${cssVar}-damping`]:
+                                    "var(--springs-spatial-slow-damping)",
+                                [`${cssVar}-mass`]:
+                                    "var(--springs-spatial-slow-mass)",
                             });
                             expect(css).toContain(
                                 "--springs-spatial-slow-duration:",

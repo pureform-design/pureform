@@ -57,9 +57,9 @@ import { dialogParts } from "../dialog-parts";
 import { DragHandle as DragHandleComponent } from "../drag-handle";
 import { mergeProps, normalizeProps } from "../internal/zag";
 import { createSlotProps } from "../parts";
-import { usePureform } from "../provider";
 import type { SlotKeyedProps } from "../parts";
 import type { PartProps } from "../props";
+import { usePureform } from "../provider";
 
 type Anatomy = typeof bottomSheetOverlayAnatomy;
 
@@ -175,7 +175,9 @@ function DragHandle(props: BottomSheetTriggerProps): JSX.Element {
                 {
                     partial: () => sheetPartiallyExpandable(root),
                     opening: () => sheetOpeningRest(root),
-                    spring: springRoleVar(state().registry, "spatialDefault"),
+                    spring: untrack(() =>
+                        springRoleVar(state().registry, "spatialDefault"),
+                    ),
                     onRest: (next, movable, byUser) => {
                         // Only the user's drag or press reports, not an opening at another
                         // rest (an uncontrolled sheet reopening partly open).

@@ -75,6 +75,7 @@ const pf = typed();
 // One wave of the wavy line, in px: Compose's `WavyProgressIndicatorDefaults` 40dp wavelength.
 const WAVELENGTH = 40;
 const WAVE_DRIFT = "components.linearProgress.waveDrift";
+const SLIDE = "components.linearProgress.slide";
 const CIRCULAR_VALUE = "components.circularProgress.value";
 
 // Compose's indeterminate circular arc grows from a tenth of the circle to 87% and shrinks back
@@ -114,13 +115,26 @@ export const PROGRESS_KEYFRAMES: Record<string, Record<string, StyleMap>> = {
     // The indicator enters from the start and leaves past the end; translate is relative to
     // its own width, a fraction of the track's. Translation is physical, so right to left
     // runs the other way.
+    // `slide` says the same in the indicator's widths, so a wavy indicator's clip can undo it.
     linearProgressSlide: {
-        from: { transform: transform(translateX(pct(-100))) },
-        to: { transform: transform(translateX(pct(250))) },
+        from: {
+            transform: transform(translateX(pct(-100))),
+            tokens: { [SLIDE]: unitless(-1) },
+        },
+        to: {
+            transform: transform(translateX(pct(250))),
+            tokens: { [SLIDE]: unitless(2.5) },
+        },
     },
     linearProgressSlideRtl: {
-        from: { transform: transform(translateX(pct(100))) },
-        to: { transform: transform(translateX(pct(-250))) },
+        from: {
+            transform: transform(translateX(pct(100))),
+            tokens: { [SLIDE]: unitless(1) },
+        },
+        to: {
+            transform: transform(translateX(pct(-250))),
+            tokens: { [SLIDE]: unitless(-2.5) },
+        },
     },
     // A wavy line's wave travels along its track, a wavelength each cycle, toward the end.
     linearProgressWave: {
@@ -134,25 +148,31 @@ export const PROGRESS_KEYFRAMES: Record<string, Record<string, StyleMap>> = {
     ...circularArcKeyframes(),
 };
 
-const linear = componentTokens("linearProgress", {
-    activeColor: sys("primary"),
-    trackColor: sys("secondaryContainer"),
-    height: px(4),
-    thickHeight: px(8),
-    value: unitless(0),
-    indeterminateWidth: pct(40),
-    gap: px(4),
-    stopSize: px(4),
-    // How far a wavy indicator's wave moves above and below the track's line.
-    amplitude: px(3),
-    // One indeterminate cycle: Compose's `LinearAnimationDuration`, 1750ms.
-    indeterminateDuration: numeric(1750, "ms"),
-    // How long the wave takes to travel a wavelength: Compose's `waveSpeed`, a wavelength a
-    // second.
-    waveDuration: numeric(1000, "ms"),
-    // How far the wave has travelled, which the indeterminate wave animates.
-    waveDrift: px(0),
-}, { waveDrift: "length" });
+const linear = componentTokens(
+    "linearProgress",
+    {
+        activeColor: sys("primary"),
+        trackColor: sys("secondaryContainer"),
+        height: px(4),
+        thickHeight: px(8),
+        value: unitless(0),
+        indeterminateWidth: pct(40),
+        gap: px(4),
+        stopSize: px(4),
+        // How far a wavy indicator's wave moves above and below the track's line.
+        amplitude: px(3),
+        // One indeterminate cycle: Compose's `LinearAnimationDuration`, 1750ms.
+        indeterminateDuration: numeric(1750, "ms"),
+        // How long the wave takes to travel a wavelength: Compose's `waveSpeed`, a wavelength a
+        // second.
+        waveDuration: numeric(1000, "ms"),
+        // How far the wave has travelled, which the indeterminate wave animates.
+        waveDrift: px(0),
+        // How far the indeterminate indicator has slid, in its own widths.
+        slide: unitless(0),
+    },
+    { waveDrift: "length", slide: "number" },
+);
 
 // The linear wave: 40px long, as many as cover a 960px bar (a longer one ends flat), in a box as
 // tall as the track and the wave's amplitude above and below it, from the tokens, so it follows
@@ -166,34 +186,21 @@ const linearWave = waveBand({
 });
 
 // The indeterminate wave: the same band, anchored to the track rather than the sliding bar, a
-// wave longer so it can travel a wavelength. The root clips to it and to the flat track's band,
-// so the bar, wherever it is, shows the wave where it is on the track.
-const travellingWave = (): ShapeNode => {
-    const band = waveBand({
+// wave longer so it can travel a wavelength. The indicator clips to it, shifted back by however
+// far it has slid (`slide` of its own widths), so the wave stays where it is on the track while
+// the bar moves under it, and the flat track isn't clipped.
+const travellingWave = (): ShapeNode =>
+    waveBand({
         waves: 25,
         wavelength: WAVELENGTH,
         top: linear.ref("amplitude"),
         bottom: add(linear.ref("amplitude"), linear.ref("height")),
         amplitude: linear.ref("amplitude"),
-        shift: sub(linear.ref("waveDrift"), px(WAVELENGTH)),
+        shift: sub(
+            sub(linear.ref("waveDrift"), px(WAVELENGTH)),
+            mul(linear.ref("slide"), pct(100)),
+        ),
     });
-    const top = linear.ref("amplitude");
-    const bottom = add(linear.ref("amplitude"), linear.ref("height"));
-    return {
-        ...band,
-        contours: [
-            ...band.contours,
-            {
-                from: [px(0), top],
-                segments: [
-                    { op: "line", to: [pct(100), top] },
-                    { op: "line", to: [pct(100), bottom] },
-                    { op: "line", to: [px(0), bottom] },
-                ],
-            },
-        ],
-    };
-};
 
 const travel = (name: string) =>
     animation({
@@ -350,8 +357,8 @@ export const createLinearProgress = <const G extends string = ColorGroup>(
                     })),
                 },
                 // The indeterminate wave travels along the track, not with the bar (Compose's
-                // `LinearWavyProgressIndicator`): on the web the root clips to it and the bar
-                // fills its height. React Native keeps the bar's own wave.
+                // `LinearWavyProgressIndicator`): on the web the root animates the wave's drift
+                // and the bar, filling its height, clips to the wave where it is on the track. React Native keeps the bar's own wave.
                 compoundVariants: [
                     {
                         match: { shape: "wavy", indeterminate: "true" },
@@ -360,7 +367,6 @@ export const createLinearProgress = <const G extends string = ColorGroup>(
                                 rawRules: {
                                     css: {
                                         "&": {
-                                            clipPath: travellingWave(),
                                             animation: when(
                                                 "rtl",
                                                 travel("linearProgressWaveRtl"),
@@ -374,7 +380,7 @@ export const createLinearProgress = <const G extends string = ColorGroup>(
                                 rawRules: {
                                     css: {
                                         "&": {
-                                            clipPath: none,
+                                            clipPath: travellingWave(),
                                             top: px(0),
                                             height: pct(100),
                                         },

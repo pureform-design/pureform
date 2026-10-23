@@ -115,7 +115,7 @@ describe("compileTailwind", () => {
         );
     });
 
-    it("writes each spring as a duration var and a linear() easing var", () => {
+    it("writes each spring as a duration var, a linear() easing var and its exact parameters' vars", () => {
         const springs = [...css.matchAll(/(--springs-[a-z-]+): ([^;]+);/g)].map(
             ([, name, value]) => [name, value],
         );
@@ -130,6 +130,9 @@ describe("compileTailwind", () => {
             ].flatMap((role) => [
                 `--springs-${role}-duration`,
                 `--springs-${role}-easing`,
+                `--springs-${role}-stiffness`,
+                `--springs-${role}-damping`,
+                `--springs-${role}-mass`,
             ]),
         );
         expect(Object.fromEntries(springs)).toMatchSnapshot();

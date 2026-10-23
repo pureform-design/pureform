@@ -265,7 +265,7 @@ describe.each(NAMES)("the %s factory", (name) => {
                 fallback?.type === "spring" ||
                 (fallback?.type === "alias" && fallback.path?.[0] === "springs")
             ) {
-                // A spring token takes a role's name, as the role's two vars.
+                // A spring token takes a role's name, as the role's vars: its curve and its exact parameters.
                 expect(
                     factory({ tokens: { [token]: "spatialSlow" } }).root.style,
                     token,
@@ -274,6 +274,12 @@ describe.each(NAMES)("the %s factory", (name) => {
                         "var(--springs-spatial-slow-duration)",
                     [`${variable}-easing`]:
                         "var(--springs-spatial-slow-easing)",
+                    [`${variable}-stiffness`]:
+                        "var(--springs-spatial-slow-stiffness)",
+                    [`${variable}-damping`]:
+                        "var(--springs-spatial-slow-damping)",
+                    [`${variable}-mass`]:
+                        "var(--springs-spatial-slow-mass)",
                 });
                 continue;
             }

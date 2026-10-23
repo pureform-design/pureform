@@ -332,6 +332,9 @@ describe("the React Native adapter matches the CSS adapter", () => {
             `<!doctype html><html${scenario.scheme === "dark" ? ' class="dark"' : ""}><head><style>${css}</style></head><body>${cssMarkup(list, resolved, scenario)}</body></html>`,
         );
         doc.close();
+        // At rest: the indeterminate indicators' animations (which animate tokens such as the
+        // circular arc's value) don't run in React Native's precomputed styles.
+        for (const animation of doc.getAnimations()) animation.cancel();
         if (scenario.pseudoClasses) {
             await forcePseudoClasses(
                 frame,
