@@ -380,9 +380,9 @@ export const COMPONENT_USAGE = {
         entries: { codeField: same("variant", "color", "density") },
     },
     rating: { entries: { rating: same("color", "size") } },
-    // One look: no variant groups. React Native opens the Material menu where the platform's isn't
-    // installed.
-    "native-select": { entries: { nativeSelect: {}, menu: {} } },
+    // One look: no variant groups. The select draws no ripple (only a state layer); React Native
+    // opens the Material menu, whose items ripple, where the platform's isn't installed.
+    "native-select": { entries: { nativeSelect: {}, menu: {}, ripple: {} } },
     text: { entries: { text: { style: "textStyle" } } },
     // The icons, prefix and suffix follow their content.
     "text-area": {
