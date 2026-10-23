@@ -204,6 +204,36 @@ label's `nativeID`) and gives it `disabled`, `invalid` and `required`. React Nat
 has no date or time input: for a date or a time, use Material's `DatePicker` and `TimePicker`.
 `Input` and `Textarea` take `TextInput`'s props; the box shows focus, not hover.
 
+Each piece is its own module (`label/`, `input/`, `textarea/`, `description/`, `error-text/`,
+with `field/field.tsx` for `Field`), so a subpath like `@pureform/react-native/input` pulls in
+only its own styles; `field/` re-exports all six. A mounted `ErrorText` marks the field invalid
+unless `Field`'s `invalid` says otherwise. The field's context is exported as `FieldContext` and
+`useField()` (`{ state, register }`), so other controls can read the id, states and label;
+`NativeSelect` does.
+
+`Input` and `Textarea` also take pureform's controllable value: `value` / `defaultValue` /
+`onValueChange({ value })`, once per change, alongside `onChangeText`. Uncontrolled, they keep
+their own text; controlled, the `TextInput` shows `value` and only moves when the owner does.
+React Native has no form reset, so nothing restores `defaultValue`.
+
+### NativeSelect in a Field, and `multiple`
+
+Inside a `Field`, `NativeSelect` takes the field's id, `disabled`, `required` and `invalid`
+states and `aria-describedby`, its own props winning, and is labelled by the field's label
+(`aria-labelledby`, the label's `nativeID`) unless it has an `aria-label`.
+
+With `multiple`, the value is an array of the chosen values, in the options' order, and the
+trigger shows their labels joined by ", " (the placeholder when none):
+
+- Web: a real `<select multiple>`; the value is read from `selectedOptions`, and a form submits
+  each value under `name`.
+- iOS and Android with `@react-native-menu/menu` (checked against 2.0.0's `MenuAction` types):
+  each action's `state` is `"on"` or `"off"` (the package documents `state` as iOS 14+ only), the
+  pressed action toggles in the value, and the menu stays open between presses through
+  `attributes.keepsMenuPresented` (iOS 16+ only; elsewhere it closes after each press).
+  Unverified on a device.
+- The Material `Menu` fallback: checkbox items (`menuitemcheckbox`) that toggle without closing.
+
 ## Build and test
 
 - `build`: Vite library build into `dist/`, one bundle per entry (the root and the components

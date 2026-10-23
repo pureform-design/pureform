@@ -1,6 +1,6 @@
 // `@pureform/react-native/label`: the plain Label, also in the field's subpath with the other form primitives.
 
-import { Label } from "../field/field";
+import { Label } from "./label";
 
 export { Label };
-export type { LabelProps } from "../field/field";
+export type { LabelProps } from "./label";

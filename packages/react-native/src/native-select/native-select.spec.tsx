@@ -1,21 +1,35 @@
 import { testIds } from "@pureform/anatomy";
+import { Platform } from "react-native";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
-import { Platform } from "react-native";
 
 import { NativeSelect } from ".";
-import { MISSING_MENU_MESSAGE } from "./native-select";
 import { PureformProvider } from "..";
+import { Description, ErrorText, Field, Label } from "../field";
 import { presetRegistry } from "../testing/registry";
 import type { TestRegistry } from "../testing/registry";
 import { byTestId, interact, mount } from "../testing/render";
+import { MISSING_MENU_MESSAGE } from "./native-select";
 
 const ids = testIds.nativeSelect;
 
 let registry: TestRegistry;
 
 beforeAll(async () => {
-    registry = await presetRegistry(["nativeSelect", "menu", "ripple", "button", "iconButton", "list", "listItem", "scrim"]);
+    registry = await presetRegistry([
+        "nativeSelect",
+        "menu",
+        "ripple",
+        "button",
+        "iconButton",
+        "list",
+        "listItem",
+        "scrim",
+        "field",
+        "label",
+        "description",
+        "errorText",
+    ]);
 });
 
 afterEach(() => {
@@ -95,6 +109,91 @@ describe("NativeSelect on React Native", () => {
         expect(option).toBeDefined();
         await interact(() => userEvent.click(option as HTMLElement));
         expect(onValueChange).toHaveBeenLastCalledWith({ value: "m" });
+        warn.mockRestore();
+    });
+
+    it("takes the Field's id, states and descriptions, its own props winning", async () => {
+        await withRegistry(
+            <Field required controlId="size">
+                <Label>Size</Label>
+                <NativeSelect items={ITEMS} />
+                <Description>Pick one</Description>
+                <ErrorText>Required</ErrorText>
+            </Field>,
+        );
+        const select = byTestId(ids.select) as HTMLSelectElement;
+        expect(select.id).toBe("size");
+        expect(select.required).toBe(true);
+        expect(select.getAttribute("aria-invalid")).toBe("true");
+        expect(select.getAttribute("aria-labelledby")).toBe(
+            byTestId("pf-label-root").id,
+        );
+        const describedBy = select.getAttribute("aria-describedby")!.split(" ");
+        expect(describedBy).toEqual([
+            byTestId("pf-description-root").id,
+            byTestId("pf-error-text-root").id,
+        ]);
+    });
+
+    it("lets its own props win inside a Field", async () => {
+        await withRegistry(
+            <Field disabled>
+                <NativeSelect items={ITEMS} disabled={false} id="own" />
+            </Field>,
+        );
+        const select = byTestId(ids.select) as HTMLSelectElement;
+        expect(select.id).toBe("own");
+        expect(select.disabled).toBe(false);
+    });
+
+    it("chooses several on the web with multiple", async () => {
+        const onValueChange = vi.fn();
+        await withRegistry(
+            <NativeSelect
+                aria-label="Size"
+                items={ITEMS}
+                multiple
+                name="size"
+                onValueChange={onValueChange}
+            />,
+        );
+        const select = byTestId(ids.select) as HTMLSelectElement;
+        expect(select.multiple).toBe(true);
+        await interact(() => userEvent.selectOptions(select, ["s", "m"]));
+        expect(onValueChange).toHaveBeenLastCalledWith({ value: ["s", "m"] });
+        expect(
+            [...select.selectedOptions].map((option) => option.value),
+        ).toEqual(["s", "m"]);
+    });
+
+    it("toggles checkbox items in the Material menu with multiple, staying open", async () => {
+        Platform.OS = "ios";
+        const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+        const onValueChange = vi.fn();
+        await withRegistry(
+            <NativeSelect
+                aria-label="Size"
+                items={[...ITEMS, { value: "x", label: "Huge" }]}
+                multiple
+                placeholder="None"
+                onValueChange={onValueChange}
+            />,
+        );
+        const trigger = byTestId(ids.select);
+        expect(trigger.textContent).toBe("None");
+        await interact(() => userEvent.click(trigger));
+        const item = (label: string) =>
+            [...document.querySelectorAll('[role="menuitemcheckbox"]')].find(
+                (entry) => entry.textContent === label,
+            ) as HTMLElement;
+        await interact(() => userEvent.click(item("Huge")));
+        expect(onValueChange).toHaveBeenLastCalledWith({ value: ["x"] });
+        await interact(() => userEvent.click(item("Small")));
+        expect(onValueChange).toHaveBeenLastCalledWith({ value: ["s", "x"] });
+        expect(item("Small").getAttribute("aria-checked")).toBe("true");
+        expect(trigger.textContent).toBe("Small, Huge");
+        await interact(() => userEvent.click(item("Huge")));
+        expect(onValueChange).toHaveBeenLastCalledWith({ value: ["s"] });
         warn.mockRestore();
     });
 });
