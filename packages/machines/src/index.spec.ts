@@ -6,6 +6,7 @@ import * as zagCombobox from "@zag-js/combobox";
 import * as zagDateInput from "@zag-js/date-input";
 import * as zagDatePicker from "@zag-js/date-picker";
 import * as zagDialog from "@zag-js/dialog";
+import * as zagFileUpload from "@zag-js/file-upload";
 import * as zagListbox from "@zag-js/listbox";
 import * as zagMenu from "@zag-js/menu";
 import * as zagRadioGroup from "@zag-js/radio-group";
@@ -27,6 +28,14 @@ describe("@pureform/machines", () => {
         expect(machines.dialog.connect).toBe(zagDialog.connect);
         expect(machines.tooltip.machine).toBe(zagTooltip.machine);
         expect(machines.tooltip.connect).toBe(zagTooltip.connect);
+    });
+
+    it("re-exports Zag's file upload unchanged, with the parts the preset draws", () => {
+        expect(machines.fileUpload.machine).toBe(zagFileUpload.machine);
+        expect(machines.fileUpload.connect).toBe(zagFileUpload.connect);
+        expect(machines.fileUpload.anatomy.keys()).toEqual(
+            expect.arrayContaining(["root", "dropzone", "icon", "error"]),
+        );
     });
 
     it("re-exports Zag's avatar unchanged, with the parts the preset draws", () => {

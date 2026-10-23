@@ -18,6 +18,7 @@ export default mergeConfig(mergeConfig(baseConfig, unitTestConfig), {
             "@zag-js/collection",
             "@zag-js/combobox",
             "@zag-js/dialog",
+            "@zag-js/file-upload",
             "@zag-js/menu",
             "@zag-js/pagination",
             "@zag-js/presence",

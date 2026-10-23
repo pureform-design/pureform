@@ -16,6 +16,7 @@ import { createSlider } from "./slider";
 import { createSupportingText } from "./supporting-text";
 import { createSwitch } from "./switch";
 import { createTabs } from "./tabs";
+import { createFileUpload } from "./file-upload";
 import { createTagsInput } from "./tags-input";
 import { createTextArea } from "./text-area";
 import { createTextField } from "./text-field";
@@ -31,6 +32,7 @@ describe.each([
     ["textField", createTextField],
     ["textArea", createTextArea],
     ["tagsInput", createTagsInput],
+    ["fileUpload", createFileUpload],
     ["select", createSelect],
     ["autocomplete", createAutocomplete],
     ["listItem", createListItem],

@@ -173,6 +173,13 @@
                 "default": "./dist/date-input.mjs"
             }
         },
+        "./file-upload": {
+            "types": "./dist/file-upload/index.d.ts",
+            "import": {
+                "development": "./src/file-upload/index.ts",
+                "default": "./dist/file-upload.mjs"
+            }
+        },
         "./tags-input": {
             "types": "./dist/tags-input/index.d.ts",
             "import": {
@@ -259,6 +266,7 @@
         "@zag-js/date-input": "catalog:",
         "@zag-js/date-picker": "catalog:",
         "@zag-js/dialog": "catalog:",
+        "@zag-js/file-upload": "catalog:",
         "@zag-js/dom-query": "catalog:",
         "@zag-js/listbox": "catalog:",
         "@zag-js/menu": "catalog:",

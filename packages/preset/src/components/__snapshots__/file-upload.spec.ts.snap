@@ -1,0 +1,194 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`file upload > compiles to a stable Panda slot recipe 1`] = `
+{
+  "base": {
+    "dropzone": {
+      "&:is(:disabled, [aria-disabled=true])": {
+        "backgroundColor": "transparent",
+        "borderColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+        "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        "pointerEvents": "none",
+      },
+      "&[data-pf-dragging][data-pf-dragging]": {
+        "backgroundColor": {
+          "&:focus-visible": "color-mix(in srgb, var(--components-fileUpload-accentContainer, token(colors.primaryContainer)), var(--components-fileUpload-onAccentContainer, token(colors.onPrimaryContainer)) var(--components-fileUpload-stateFocusOpacity, token(opacity.stateFocus)))",
+          "&:is(:active, [data-pf-active])": "color-mix(in srgb, var(--components-fileUpload-accentContainer, token(colors.primaryContainer)), var(--components-fileUpload-onAccentContainer, token(colors.onPrimaryContainer)) var(--components-fileUpload-statePressedOpacity, token(opacity.statePressed)))",
+          "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, var(--components-fileUpload-accentContainer, token(colors.primaryContainer)), var(--components-fileUpload-onAccentContainer, token(colors.onPrimaryContainer)) var(--components-fileUpload-stateHoverOpacity, token(opacity.stateHover)))",
+          "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, var(--components-fileUpload-accentContainer, token(colors.primaryContainer)), var(--components-fileUpload-onAccentContainer, token(colors.onPrimaryContainer)) var(--components-fileUpload-stateDraggedOpacity, token(opacity.stateDragged)))",
+          "base": "var(--components-fileUpload-accentContainer, token(colors.primaryContainer))",
+        },
+        "borderColor": "var(--components-fileUpload-accent, token(colors.primary))",
+        "borderStyle": "solid",
+        "color": "var(--components-fileUpload-onAccentContainer, token(colors.onPrimaryContainer))",
+      },
+      "alignItems": "center",
+      "backgroundColor": {
+        "&:focus-visible": "color-mix(in srgb, var(--components-fileUpload-container, token(colors.surface)), var(--components-fileUpload-content, token(colors.onSurface)) var(--components-fileUpload-stateFocusOpacity, token(opacity.stateFocus)))",
+        "&:is(:active, [data-pf-active])": "color-mix(in srgb, var(--components-fileUpload-container, token(colors.surface)), var(--components-fileUpload-content, token(colors.onSurface)) var(--components-fileUpload-statePressedOpacity, token(opacity.statePressed)))",
+        "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, var(--components-fileUpload-container, token(colors.surface)), var(--components-fileUpload-content, token(colors.onSurface)) var(--components-fileUpload-stateHoverOpacity, token(opacity.stateHover)))",
+        "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, var(--components-fileUpload-container, token(colors.surface)), var(--components-fileUpload-content, token(colors.onSurface)) var(--components-fileUpload-stateDraggedOpacity, token(opacity.stateDragged)))",
+        "base": "var(--components-fileUpload-container, token(colors.surface))",
+      },
+      "borderColor": "var(--components-fileUpload-outlineColor, token(colors.outline))",
+      "borderRadius": "var(--components-fileUpload-radius, token(radii.medium))",
+      "borderStyle": "dashed",
+      "borderWidth": "var(--components-fileUpload-outlineWidth, 1px)",
+      "color": "var(--components-fileUpload-content, token(colors.onSurface))",
+      "cursor": "pointer",
+      "display": "flex",
+      "flexDirection": "column",
+      "gap": "var(--components-fileUpload-gap, token(spacing.2))",
+      "outlineColor": "var(--components-fileUpload-focusIndicatorColor, token(colors.secondary))",
+      "outlineOffset": "var(--components-fileUpload-focusIndicatorOuterOffset, token(sizes.focusIndicatorOuterOffset))",
+      "outlineStyle": {
+        "&:focus-visible": "solid",
+        "base": "none",
+      },
+      "outlineWidth": "var(--components-fileUpload-focusIndicatorThickness, token(sizes.focusIndicatorThickness))",
+      "paddingBlockEnd": "var(--components-fileUpload-padding, token(spacing.6))",
+      "paddingBlockStart": "var(--components-fileUpload-padding, token(spacing.6))",
+      "paddingInlineEnd": "var(--components-fileUpload-padding, token(spacing.6))",
+      "paddingInlineStart": "var(--components-fileUpload-padding, token(spacing.6))",
+      "position": "relative",
+      "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
+    },
+    "error": {
+      "color": "var(--components-fileUpload-errorColor, token(colors.error))",
+      "textStyle": "bodyMedium",
+    },
+    "headline": {
+      "textStyle": "titleMedium",
+    },
+    "icon": {
+      "_rtl": {
+        "&[data-pf-mirror]": {
+          "transform": "scaleX(-1)",
+        },
+      },
+      "alignItems": "center",
+      "display": "inline-flex",
+      "fontSize": "var(--components-fileUpload-iconSize, token(sizes.iconMedium))",
+      "height": "var(--components-fileUpload-iconSize, token(sizes.iconMedium))",
+      "justifyContent": "center",
+      "lineHeight": "1",
+      "minWidth": "var(--components-fileUpload-iconSize, token(sizes.iconMedium))",
+      "width": "var(--components-fileUpload-iconSize, token(sizes.iconMedium))",
+    },
+    "item": {
+      "alignItems": "stretch",
+      "display": "flex",
+      "flexDirection": "column",
+    },
+    "itemGroup": {
+      "display": "flex",
+      "flexDirection": "column",
+      "gap": "var(--components-fileUpload-listGap, token(spacing.2))",
+    },
+    "label": {
+      "textStyle": "labelLarge",
+    },
+    "root": {
+      "--components-fileUpload-focusIndicatorColor": "token(colors.secondary)",
+      "--components-fileUpload-focusIndicatorOuterOffset": "token(sizes.focusIndicatorOuterOffset)",
+      "--components-fileUpload-focusIndicatorThickness": "token(sizes.focusIndicatorThickness)",
+      "--components-fileUpload-stateDraggedOpacity": "token(opacity.stateDragged)",
+      "--components-fileUpload-stateFocusOpacity": "token(opacity.stateFocus)",
+      "--components-fileUpload-stateHoverOpacity": "token(opacity.stateHover)",
+      "--components-fileUpload-statePressedOpacity": "token(opacity.statePressed)",
+      "color": "var(--components-fileUpload-content, token(colors.onSurface))",
+      "display": "flex",
+      "flexDirection": "column",
+      "gap": "var(--components-fileUpload-gap, token(spacing.2))",
+    },
+    "supportingText": {
+      "color": "var(--components-fileUpload-supportingColor, token(colors.onSurfaceVariant))",
+      "textStyle": "bodyMedium",
+    },
+  },
+  "className": "fileUpload",
+  "compoundVariants": [],
+  "defaultVariants": {
+    "color": "primary",
+    "invalid": false,
+  },
+  "jsx": [
+    "FileUpload",
+  ],
+  "slots": [
+    "root",
+    "label",
+    "dropzone",
+    "icon",
+    "headline",
+    "supportingText",
+    "itemGroup",
+    "item",
+    "error",
+  ],
+  "variants": {
+    "color": {
+      "error": {
+        "root": {
+          "--components-fileUpload-accent": "token(colors.error)",
+          "--components-fileUpload-accentContainer": "token(colors.errorContainer)",
+          "--components-fileUpload-onAccent": "token(colors.onError)",
+          "--components-fileUpload-onAccentContainer": "token(colors.onErrorContainer)",
+        },
+      },
+      "info": {
+        "root": {
+          "--components-fileUpload-accent": "token(colors.info)",
+          "--components-fileUpload-accentContainer": "token(colors.infoContainer)",
+          "--components-fileUpload-onAccent": "token(colors.onInfo)",
+          "--components-fileUpload-onAccentContainer": "token(colors.onInfoContainer)",
+        },
+      },
+      "primary": {},
+      "secondary": {
+        "root": {
+          "--components-fileUpload-accent": "token(colors.secondary)",
+          "--components-fileUpload-accentContainer": "token(colors.secondaryContainer)",
+          "--components-fileUpload-onAccent": "token(colors.onSecondary)",
+          "--components-fileUpload-onAccentContainer": "token(colors.onSecondaryContainer)",
+        },
+      },
+      "success": {
+        "root": {
+          "--components-fileUpload-accent": "token(colors.success)",
+          "--components-fileUpload-accentContainer": "token(colors.successContainer)",
+          "--components-fileUpload-onAccent": "token(colors.onSuccess)",
+          "--components-fileUpload-onAccentContainer": "token(colors.onSuccessContainer)",
+        },
+      },
+      "tertiary": {
+        "root": {
+          "--components-fileUpload-accent": "token(colors.tertiary)",
+          "--components-fileUpload-accentContainer": "token(colors.tertiaryContainer)",
+          "--components-fileUpload-onAccent": "token(colors.onTertiary)",
+          "--components-fileUpload-onAccentContainer": "token(colors.onTertiaryContainer)",
+        },
+      },
+      "warning": {
+        "root": {
+          "--components-fileUpload-accent": "token(colors.warning)",
+          "--components-fileUpload-accentContainer": "token(colors.warningContainer)",
+          "--components-fileUpload-onAccent": "token(colors.onWarning)",
+          "--components-fileUpload-onAccentContainer": "token(colors.onWarningContainer)",
+        },
+      },
+    },
+    "invalid": {
+      "false": {},
+      "true": {
+        "dropzone": {
+          "borderColor": "var(--components-fileUpload-errorColor, token(colors.error))",
+        },
+        "supportingText": {
+          "color": "var(--components-fileUpload-errorColor, token(colors.error))",
+        },
+      },
+    },
+  },
+}
+`;

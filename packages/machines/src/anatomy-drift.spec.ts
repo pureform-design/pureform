@@ -12,6 +12,7 @@ import {
     dateInputAnatomy,
     datePickerAnatomy,
     dockedDatePickerAnatomy,
+    fileUploadAnatomy,
     inputChipAnatomy,
     navigationBarAnatomy,
     navigationRailAnatomy,
@@ -47,6 +48,7 @@ import {
     cellAnatomy as calendarCell,
     dockedAnatomy as dockedDatePicker,
 } from "./date-picker/date-picker.anatomy";
+import { anatomy as fileUpload } from "./file-upload/file-upload.anatomy";
 import { anatomy as navigation } from "./navigation/navigation.anatomy";
 import { anatomy as paginator } from "./paginator/paginator.anatomy";
 import { anatomy as slider } from "./slider/slider.anatomy";
@@ -75,6 +77,7 @@ const pairs: Record<string, Pair> = {
     accordion: { machine: accordion, preset: accordionAnatomy },
     autocomplete: { machine: autocomplete, preset: autocompleteAnatomy },
     avatar: { machine: avatar, preset: avatarAnatomy },
+    fileUpload: { machine: fileUpload, preset: fileUploadAnatomy },
     splitter: { machine: splitter, preset: splitterAnatomy },
     button: { machine: button, preset: buttonAnatomy },
     buttonGroup: { machine: buttonGroup, preset: buttonGroupAnatomy },

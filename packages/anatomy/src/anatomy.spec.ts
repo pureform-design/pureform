@@ -23,6 +23,7 @@ const ICON_PARTS: Record<string, string[]> = {
     dialog: ["icon"],
     fab: ["icon"],
     fabMenu: ["itemIcon"],
+    fileUpload: ["icon"],
     icon: ["root"],
     iconButton: ["icon"],
     inputChip: ["icon", "remove"],
@@ -82,6 +83,8 @@ const INDICATION: Record<string, IndicationAnatomy[]> = {
         at("closeTrigger", "closeTrigger", false),
     ],
     iconButton: [at("root", "container", true)],
+    // The dropzone, a button that takes drops.
+    fileUpload: [at("dropzone", "dropzone", false)],
     fab: [at("root", "container", false)],
     // The FAB that opens and closes it, and each item.
     fabMenu: [

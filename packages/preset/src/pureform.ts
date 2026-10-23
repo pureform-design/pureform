@@ -64,6 +64,7 @@ import { createDockedDatePicker } from "./components/docked-date-picker";
 import { dragHandle } from "./components/drag-handle";
 import { createFab } from "./components/fab";
 import { createFabMenu } from "./components/fab-menu";
+import { createFileUpload } from "./components/file-upload";
 import { FADE_THROUGH_KEYFRAMES, fadeThrough } from "./components/fade-through";
 import { fullscreenDialog } from "./components/fullscreen-dialog";
 import { gridList } from "./components/grid-list";
@@ -321,6 +322,7 @@ const defaultComponents = <G extends string>(
         textField: createTextField<G, Step>(theme.color.groups, densities),
         textArea: createTextArea<G, Step>(theme.color.groups, densities),
         tagsInput: createTagsInput<G, Step>(theme.color.groups, densities),
+        fileUpload: createFileUpload<G>(theme.color.groups),
         searchBar,
         searchView,
         select: createSelect<G, Step>(theme.color.groups, densities),
