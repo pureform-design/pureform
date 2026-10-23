@@ -27,12 +27,13 @@ import type {
     SplitterVariantProps,
 } from "@pureform/binding-core";
 import { settle, slowSpring } from "@pureform/rn-adapter/animated";
-import { useReducedMotion } from "@pureform/rn-adapter/react";
+import { useReducedMotion, useTokens } from "@pureform/rn-adapter/react";
 import { Fragment, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Animated, PanResponder } from "react-native";
 import type { LayoutChangeEvent } from "react-native";
 
+import { ownText } from "../icon-style";
 import { testIdOf, unselectable, withEngine } from "../parts";
 import { useDirection, usePureform } from "../provider";
 import { useComponentSlots } from "../styles";
@@ -224,6 +225,7 @@ function SplitterImpl(props: SplitterProps): ReactNode {
     );
     const horizontal = splitterOrientation(props) === "horizontal";
     const rtl = useDirection() === "rtl";
+    const tokens = useTokens();
     const [length, setLength] = useState(0);
     const [triggers, setTriggers] = useState(0);
     const room = Math.max(0, length - triggers);
@@ -318,7 +320,13 @@ function SplitterImpl(props: SplitterProps): ReactNode {
     };
     const id = (part: Part) => testIdOf(splitterAnatomy, part, props.testId);
     return (
-        <v.root.View style={s.root} onLayout={onLayout} testID={id("root")}>
+        <v.root.View
+            // It fills its parent, as the web's root does (Zag sizes it 100% both ways): a
+            // stacked splitter has no height of its own to divide.
+            style={{ flexGrow: 1, ...s.root }}
+            onLayout={onLayout}
+            testID={id("root")}
+        >
             {props.panes.map((pane, index) => (
                 <Fragment key={pane.id}>
                     <Animated.View
@@ -337,7 +345,23 @@ function SplitterImpl(props: SplitterProps): ReactNode {
                             }}
                             testID={id("panel")}
                         >
-                            {pane.content}
+                            {typeof pane.content === "string" ||
+                            typeof pane.content === "number" ? (
+                                // A View can't hold a string.
+                                <v.panel.Text
+                                    style={{
+                                        // Nothing inherits on React Native.
+                                        color: String(
+                                            tokens["colors.onSurface"],
+                                        ),
+                                        ...ownText(s.panel),
+                                    }}
+                                >
+                                    {pane.content}
+                                </v.panel.Text>
+                            ) : (
+                                pane.content
+                            )}
                         </v.panel.View>
                     </Animated.View>
                     {index < props.panes.length - 1 ? (

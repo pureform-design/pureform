@@ -42,7 +42,9 @@ exports[`badge > compiles to a stable Panda recipe 1`] = `
       "anchored": {
         "position": "absolute",
       },
-      "flow": {},
+      "flow": {
+        "alignSelf": "auto",
+      },
     },
     "size": {
       "large": {

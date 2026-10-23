@@ -1376,6 +1376,35 @@ describe("c8c: splitter", () => {
         ),
     ];
 
+    it("draws a string pane as text, and fills its parent when stacked", async () => {
+        await render(
+            <View style={{ width: 400, height: 300 }}>
+                <Splitter
+                    orientation="vertical"
+                    panes={[
+                        { id: "list", content: "List" },
+                        { id: "detail", content: "Detail" },
+                    ]}
+                />
+            </View>,
+        );
+        await until(() =>
+            expect(
+                byTestId("pf-splitter-root").getBoundingClientRect().height,
+            ).toBe(300),
+        );
+        expect(panels().map((panel) => panel.textContent)).toEqual([
+            "List",
+            "Detail",
+        ]);
+        const height = (element: HTMLElement) =>
+            element.getBoundingClientRect().height;
+        await until(() =>
+            expect(height(panels()[0]!)).toBeCloseTo(height(panels()[1]!), 0),
+        );
+        expect(height(panels()[0]!)).toBeGreaterThan(100);
+    });
+
     it("lays its panes out with a 24px divider holding Compose's 4×48 pill", async () => {
         await render(
             <View style={{ width: 1024, height: 200 }}>
@@ -1494,5 +1523,70 @@ describe("c8c: splitter", () => {
             ])
         )();
         await until(() => expect(width(panels()[0]!)).toBeCloseTo(200, 0));
+    });
+});
+
+describe("media", () => {
+    const PICTURE = `data:image/svg+xml,${encodeURIComponent(
+        "<svg xmlns='http://www.w3.org/2000/svg' width='40' height='30'><rect width='40' height='30' fill='teal'/></svg>",
+    )}`;
+
+    it("takes `src` as the web does, at its own proportions at `auto` and the aspect's otherwise", async () => {
+        await render(
+            <View style={{ width: 200 }}>
+                <Media src={PICTURE} alt="A teal square" testId="auto" />
+                <Media src={PICTURE} aspect="square" testId="square" />
+            </View>,
+        );
+        const box = (id: string) =>
+            byTestId(`${id}-root`).getBoundingClientRect();
+        await until(() => expect(box("auto").height).toBeCloseTo(150, 0));
+        expect(box("auto").width).toBe(200);
+        expect(box("square").height).toBe(200);
+    });
+});
+
+describe("standard bottom sheet", () => {
+    it("draws its trigger and its body, open in place, and a drag handle press closes it", async () => {
+        await render(
+            <View style={{ width: 400, height: 400 }}>
+                <BottomSheet
+                    modal={false}
+                    defaultOpen
+                    trigger="Share"
+                    aria-label="Share"
+                    body="Send it to a friend."
+                />
+            </View>,
+        );
+        expect(byTestId("pf-button-root").textContent).toBe("Share");
+        expect(byTestId("pf-bottom-sheet-content").textContent).toBe(
+            "Send it to a friend.",
+        );
+        await interact(() => userEvent.click(byTestId("pf-drag-handle-root")));
+        await until(() =>
+            expect(
+                document.querySelector('[data-testid="pf-bottom-sheet-root"]'),
+            ).toBeNull(),
+        );
+        await interact(() => userEvent.click(byTestId("pf-button-root")));
+        await until(() =>
+            expect(
+                document.querySelector('[data-testid="pf-bottom-sheet-root"]'),
+            ).not.toBeNull(),
+        );
+    });
+});
+
+describe("badge in flow", () => {
+    it("keeps its own width in a column", async () => {
+        await render(
+            <View style={{ width: 400 }}>
+                <Badge testId="count">999+</Badge>
+            </View>,
+        );
+        const box = byTestId("count-root").getBoundingClientRect();
+        expect(box.width).toBeLessThan(48);
+        expect(box.height).toBe(16);
     });
 });

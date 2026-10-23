@@ -103,6 +103,20 @@ const centered = when(
     transform(translate(pct(-50), pct(-50))),
 );
 
+// The handle's size: larger while pressed, except when disabled. A disabled switch's root (a
+// label) still matches `:active`, where an Android view that is disabled never enters the
+// pressed state, so MDC-Android's `MaterialSwitch` thumb never grows.
+const handleSize = (unchecked = ref("handleSize")) =>
+    when()
+        .on(CONTROL_CHECKED, ref("handleSizeChecked"))
+        .on(CONTROL_PRESSED, ref("handleSizePressed"))
+        .on([CONTROL_PRESSED, CONTROL_DISABLED], unchecked)
+        .on(
+            [CONTROL_CHECKED, CONTROL_PRESSED, CONTROL_DISABLED],
+            ref("handleSizeChecked"),
+        )
+        .else(unchecked);
+
 /** The colors a switch takes from its color group. */
 interface SwitchColors {
     track: ColorValue;
@@ -234,14 +248,8 @@ export const createSwitch = <const G extends string = ColorGroup>(
                             justifyContent: center,
                             borderRadius: radius("full"),
                             pointerEvents: none,
-                            width: when()
-                                .on(CONTROL_CHECKED, ref("handleSizeChecked"))
-                                .on(CONTROL_PRESSED, ref("handleSizePressed"))
-                                .else(ref("handleSize")),
-                            height: when()
-                                .on(CONTROL_CHECKED, ref("handleSizeChecked"))
-                                .on(CONTROL_PRESSED, ref("handleSizePressed"))
-                                .else(ref("handleSize")),
+                            width: handleSize(),
+                            height: handleSize(),
                             transition: springTweens(
                                 "spatialFast",
                                 ["insetInlineStart", "width", "height"],
@@ -279,18 +287,8 @@ export const createSwitch = <const G extends string = ColorGroup>(
                         selected: {},
                         both: {
                             handle: {
-                                width: when()
-                                    .on(
-                                        CONTROL_PRESSED,
-                                        ref("handleSizePressed"),
-                                    )
-                                    .else(ref("handleSizeChecked")),
-                                height: when()
-                                    .on(
-                                        CONTROL_PRESSED,
-                                        ref("handleSizePressed"),
-                                    )
-                                    .else(ref("handleSizeChecked")),
+                                width: handleSize(ref("handleSizeChecked")),
+                                height: handleSize(ref("handleSizeChecked")),
                             },
                             icon: { opacity: unitless(1) },
                         },

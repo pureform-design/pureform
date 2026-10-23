@@ -56,6 +56,11 @@ export default defineStories({
             parameters: { pureform: { place: "bottom-end" } },
             hooks: ["./src/fab-menu.hooks.ts"],
         },
+        // They fill their parent, so they draw in a frame of a set size.
+        Splitter: { hooks: ["./src/stages/splitter.ts"] },
+        Media: { hooks: ["./src/stages/media.ts"] },
+        Switch: { hooks: ["./src/checks/switch.ts"] },
+        Badge: { hooks: ["./src/checks/badge.ts"] },
         TextField: {
             // React Native Web: the disabled field's input is `disabled` now (not `readonly`)
             // and passes, but its label is a plain text element, not the input's `<label>`, so

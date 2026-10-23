@@ -768,7 +768,9 @@ exports[`switchControl > compiles to a stable Panda slot recipe 1`] = `
       "display": "inline-flex",
       "height": {
         ".switchControl__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "var(--components-switchControl-handleSizePressed, 28px)",
+        ".switchControl__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "var(--components-switchControl-handleSize, 16px)",
         ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true]) &": "var(--components-switchControl-handleSizeChecked, 24px)",
+        ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true]):is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "var(--components-switchControl-handleSizeChecked, 24px)",
         "base": "var(--components-switchControl-handleSize, 16px)",
       },
       "insetInlineStart": {
@@ -789,7 +791,9 @@ exports[`switchControl > compiles to a stable Panda slot recipe 1`] = `
       },
       "width": {
         ".switchControl__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "var(--components-switchControl-handleSizePressed, 28px)",
+        ".switchControl__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "var(--components-switchControl-handleSize, 16px)",
         ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true]) &": "var(--components-switchControl-handleSizeChecked, 24px)",
+        ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true]):is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "var(--components-switchControl-handleSizeChecked, 24px)",
         "base": "var(--components-switchControl-handleSize, 16px)",
       },
     },
@@ -1183,10 +1187,16 @@ exports[`switchControl > compiles to a stable Panda slot recipe 1`] = `
         "handle": {
           "height": {
             ".switchControl__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "var(--components-switchControl-handleSizePressed, 28px)",
+            ".switchControl__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "var(--components-switchControl-handleSizeChecked, 24px)",
+            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true]) &": "var(--components-switchControl-handleSizeChecked, 24px)",
+            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true]):is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "var(--components-switchControl-handleSizeChecked, 24px)",
             "base": "var(--components-switchControl-handleSizeChecked, 24px)",
           },
           "width": {
             ".switchControl__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "var(--components-switchControl-handleSizePressed, 28px)",
+            ".switchControl__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "var(--components-switchControl-handleSizeChecked, 24px)",
+            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true]) &": "var(--components-switchControl-handleSizeChecked, 24px)",
+            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true]):is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "var(--components-switchControl-handleSizeChecked, 24px)",
             "base": "var(--components-switchControl-handleSizeChecked, 24px)",
           },
         },

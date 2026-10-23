@@ -7,7 +7,16 @@
 //   <span class={badge({ size: "small", placement: "anchored" })} aria-hidden="true"></span>
 
 import { typed } from "@pureform/core";
-import { absolute, center, inlineFlex, px, unitless } from "@pureform/core/ast";
+import {
+    absolute,
+    center,
+    inlineFlex,
+    literal,
+    platform,
+    px,
+    start,
+    unitless,
+} from "@pureform/core/ast";
 import type { StyleMap } from "@pureform/core/ast";
 import { radius, spacing, textStyle } from "@pureform/theme";
 
@@ -65,7 +74,12 @@ export const badge = pf.component({
                 } satisfies StyleMap,
             },
             placement: {
-                flow: {},
+                // A badge keeps its own size. On the web it flows inline; React Native has no
+                // inline flow, and every view is a flex column that would stretch it across.
+                // The web keeps its parent's alignment (a row's `center`).
+                flow: {
+                    alignSelf: platform({ css: literal("auto") }, start),
+                } satisfies StyleMap,
                 anchored: { position: absolute } satisfies StyleMap,
             },
         },

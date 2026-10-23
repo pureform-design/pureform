@@ -81,6 +81,22 @@ describe("switchControl", () => {
         );
     });
 
+    it("doesn't grow the handle on a press while disabled", () => {
+        const width = (
+            slotRecipe(switchControl).base.handle as Record<
+                string,
+                Record<string, string>
+            >
+        ).width!;
+        const disabledPressed = Object.entries(width).filter(
+            ([key]) => key.includes(":active") && key.includes(":disabled"),
+        );
+        expect(disabledPressed.map(([, value]) => value)).toEqual([
+            expect.stringContaining("handleSize,"),
+            expect.stringContaining("handleSizeChecked"),
+        ]);
+    });
+
     it("centers the handle and state layer on their inline start, flipped under rtl", () => {
         const { base } = slotRecipe(switchControl);
         for (const slot of ["handle", "stateLayer"]) {

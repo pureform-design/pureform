@@ -103,6 +103,44 @@ describe("Splitter", () => {
         expect(trigger.getAttribute("aria-valuenow")).toBe("41");
     });
 
+    it("stacked, resizes by the arrow keys up and down, and ignores them with no room", async () => {
+        const errors: unknown[] = [];
+        const onError = (event: ErrorEvent) => errors.push(event.error);
+        window.addEventListener("error", onError);
+        const onSizeChange = vi.fn();
+        mount(() => (
+            <PureformProvider registry={displayRegistry()}>
+                <div style={{ width: "400px", height: "200px" }}>
+                    <Splitter
+                        panes={panes}
+                        orientation="vertical"
+                        onSizeChange={onSizeChange}
+                    />
+                </div>
+                {/* A stacked splitter in a parent with no height: Zag has no sizes. */}
+                <div style={{ width: "400px", height: "0px" }}>
+                    <Splitter panes={panes} orientation="vertical" />
+                </div>
+            </PureformProvider>
+        ));
+        await settle();
+        const [sized, empty] = all(testIds.splitter.resizeTrigger);
+        sized!.focus();
+        await userEvent.keyboard("{ArrowDown}");
+        await until(() =>
+            expect(onSizeChange).toHaveBeenLastCalledWith({ size: [51, 49] }),
+        );
+        await userEvent.keyboard("{ArrowUp}{ArrowUp}");
+        await until(() =>
+            expect(onSizeChange).toHaveBeenLastCalledWith({ size: [49, 51] }),
+        );
+        empty!.focus();
+        await userEvent.keyboard("{ArrowUp}{ArrowDown}");
+        await settle();
+        window.removeEventListener("error", onError);
+        expect(errors).toEqual([]);
+    });
+
     it("snaps a dragged divider to the nearest anchor when let go", async () => {
         const onSizeChange = vi.fn();
         withRegistry(() => (
