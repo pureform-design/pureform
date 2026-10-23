@@ -32,8 +32,11 @@ describe("badge", () => {
         });
     });
 
-    it("flows inline unless anchored, then absolute at the top end corner", () => {
-        expect(compiled()?.variants?.placement?.flow).toEqual({});
+    it("flows at its own size unless anchored, then absolute at the top end corner", () => {
+        // Not stretched across a flex column, such as any React Native view.
+        expect(compiled()?.variants?.placement?.flow).toEqual({
+            alignSelf: "start",
+        });
         expect(compiled()?.variants?.placement?.anchored).toMatchObject({
             position: "absolute",
         });

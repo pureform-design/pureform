@@ -7,7 +7,7 @@
 //   <span class={badge({ size: "small", placement: "anchored" })} aria-hidden="true"></span>
 
 import { typed } from "@pureform/core";
-import { absolute, center, inlineFlex, px, unitless } from "@pureform/core/ast";
+import { absolute, center, inlineFlex, px, start, unitless } from "@pureform/core/ast";
 import type { StyleMap } from "@pureform/core/ast";
 import { radius, spacing, textStyle } from "@pureform/theme";
 
@@ -65,7 +65,9 @@ export const badge = pf.component({
                 } satisfies StyleMap,
             },
             placement: {
-                flow: {},
+                // A badge keeps its own size: in a flex column (every React Native view, or a web
+                // flex parent) it would otherwise stretch across it.
+                flow: { alignSelf: start } satisfies StyleMap,
                 anchored: { position: absolute } satisfies StyleMap,
             },
         },
