@@ -12,10 +12,14 @@ import {
     nativeSelectGroups,
     nativeSelectProps,
     nativeSelectSelection,
+    nativeSelectValue,
+    nativeSelectValues,
+    sameNativeSelectValue,
 } from "@pureform/binding-core";
 import type {
     NativeSelectContentProps,
     NativeSelectRootOwnProps,
+    NativeSelectValue,
 } from "@pureform/binding-core";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {
@@ -30,6 +34,7 @@ import {
 } from "solid-js";
 
 import { useControllable } from "../controllable";
+import { useField } from "../field/context";
 import { useFieldsetDisabled, useFormReset } from "../form";
 import { DropDownArrow } from "../glyphs";
 import {
@@ -49,7 +54,7 @@ interface NativeSelectContextValue {
     readonly scope: ComponentScope<Anatomy>;
     readonly setSelect: (select: HTMLSelectElement) => void;
     /** The chosen value, if any: the options mark theirs `selected`, which the server renders. */
-    readonly chosen: Accessor<string | undefined>;
+    readonly chosen: Accessor<NativeSelectValue | undefined>;
     /** The `<select>`'s own props: its id, name, validity and the handlers that emit its
      *  interactions. */
     readonly selectProps: Accessor<Readonly<Record<string, unknown>>>;
@@ -57,16 +62,45 @@ interface NativeSelectContextValue {
 
 const context = createPartContext<NativeSelectContextValue>("NativeSelect");
 
-/** Root's props: the instance tokens, the value (`value`, `defaultValue`, `onValueChange`),
- *  `disabled`, `invalid`, `required`, `name`, `form`, `id` (the select's), `testId` and `unstyled`
- *  for every part, `as`, and the element's own props. */
-export interface NativeSelectRootProps
-    extends
-        Omit<PartProps, keyof NativeSelectRootOwnProps>,
-        NativeSelectRootOwnProps {
-    /** Another element or component to render instead of `<span>`. */
-    readonly as?: ValidComponent | undefined;
-}
+/** The value props, typed by `multiple`: a string for one option, an array of strings for
+ *  several. */
+export type NativeSelectValueProps =
+    | {
+          readonly multiple?: false | undefined;
+          readonly value?: string | undefined;
+          readonly defaultValue?: string | undefined;
+          readonly onValueChange?:
+              | ((details: {
+                    readonly value: string;
+                    readonly reason?: "reset" | undefined;
+                }) => void)
+              | undefined;
+      }
+    | {
+          readonly multiple: true;
+          readonly value?: readonly string[] | undefined;
+          readonly defaultValue?: readonly string[] | undefined;
+          readonly onValueChange?:
+              | ((details: {
+                    readonly value: readonly string[];
+                    readonly reason?: "reset" | undefined;
+                }) => void)
+              | undefined;
+      };
+
+type ValueKeys = "multiple" | "value" | "defaultValue" | "onValueChange";
+
+/** Root's props: the instance tokens, the value (`value`, `defaultValue`, `onValueChange`; arrays
+ *  with `multiple`), `disabled`, `invalid`, `required`, `name`, `form`, `id` (the select's),
+ *  `testId` and `unstyled` for every part, `as`, and the element's own props. Inside a Field, the
+ *  field's id, states and descriptions apply, its own props winning. */
+export type NativeSelectRootProps = RootBaseProps & NativeSelectValueProps;
+
+type RootBaseProps = Omit<PartProps, keyof NativeSelectRootOwnProps> &
+    Omit<NativeSelectRootOwnProps, ValueKeys> & {
+        /** Another element or component to render instead of `<span>`. */
+        readonly as?: ValidComponent | undefined;
+    };
 
 /** A part's props: the element's own, and the part's `unstyled`. */
 export interface NativeSelectPartProps extends PartProps {
@@ -96,10 +130,35 @@ export interface NativeSelectOptionProps extends NativeSelectPartProps {
 const firstValue = (select: HTMLSelectElement) =>
     select.options.length > 0 ? select.options[0]!.value : "";
 
+/** The value the select shows: its chosen options', in their order. */
+const readValue = (select: HTMLSelectElement, multiple: boolean) =>
+    multiple
+        ? nativeSelectValue(
+              [...select.selectedOptions].map((option) => option.value),
+              true,
+          )
+        : select.value;
+
+/** Shows `value` on the select. */
+const showValue = (select: HTMLSelectElement, value: NativeSelectValue) => {
+    if (typeof value === "string") {
+        if (select.value !== value) select.value = value;
+        return;
+    }
+    for (const option of select.options)
+        option.selected = value.includes(option.value);
+};
+
 /** The select's root: a `<span>` around the `<select>` and the chevron. It draws the state layer. */
 function Root(props: NativeSelectRootProps): JSX.Element {
     const id = createUniqueId();
-    const value = useControllable("NativeSelect", "value", props);
+    const field = useField();
+    const value = useControllable<"value", NativeSelectValue>(
+        "NativeSelect",
+        "value",
+        props as NativeSelectRootOwnProps,
+    );
+    const multiple = () => !!props.multiple;
     const [select, setSelect] = createSignal<HTMLSelectElement | undefined>(
         undefined,
         { ownedWrite: true },
@@ -113,7 +172,7 @@ function Root(props: NativeSelectRootProps): JSX.Element {
     });
     const chosen = () => value.value() ?? own();
     let shown = untrack(chosen);
-    const report = (next: string) => {
+    const report = (next: NativeSelectValue) => {
         shown = next;
         setOwn(next);
         untrack(value.machineProps).onValueChange?.({ value: next });
@@ -126,10 +185,12 @@ function Root(props: NativeSelectRootProps): JSX.Element {
             if (!element) return;
             // The browser has put an uncontrolled select back; a controlled one keeps its value
             // until the owner takes the default we report.
+            const many = untrack(multiple);
             const next = untrack(value.controlled)
-                ? (value.defaultValue ?? firstValue(element))
-                : element.value;
-            if (next !== shown) value.reset(() => report(next));
+                ? (value.defaultValue ?? (many ? [] : firstValue(element)))
+                : readValue(element, many);
+            if (!sameNativeSelectValue(next, shown))
+                value.reset(() => report(next));
         },
     });
     const scope = useComponent(nativeSelectAnatomy, {
@@ -143,25 +204,27 @@ function Root(props: NativeSelectRootProps): JSX.Element {
         combinePartProps([
             nativeSelectProps(
                 {
-                    id: props.id ?? id,
+                    id: props.id ?? (field ? undefined : id),
                     name: props.name,
                     form: props.form,
                     required: props.required,
                     disabled: props.disabled,
                     invalid: props.invalid,
+                    multiple: props.multiple,
                 },
                 fieldsetDisabled(),
+                field?.state(),
             ),
             {
                 onChange: (event: Event) => {
                     const element = event.currentTarget as HTMLSelectElement;
-                    report(element.value);
+                    report(readValue(element, untrack(multiple)));
                     // A controlled select the owner didn't move goes back to its value.
                     queueMicrotask(() => {
                         flush();
                         const controlled = untrack(value.value);
                         if (controlled !== undefined)
-                            element.value = controlled;
+                            showValue(element, controlled);
                     });
                 },
             },
@@ -218,9 +281,16 @@ function Option(props: NativeSelectOptionProps): JSX.Element {
     const { scope, chosen } = context.use("Option");
     return scope.render("option", {
         element: "option",
-        machine: () => ({
-            selected: props.value !== undefined && chosen() === props.value,
-        }),
+        machine: () => {
+            const current = chosen();
+            return {
+                selected:
+                    props.value !== undefined &&
+                    (typeof current === "string"
+                        ? current === props.value
+                        : nativeSelectValues(current).includes(props.value)),
+            };
+        },
         unstyled: () => props.unstyled,
         props: omit(props, "unstyled"),
     });
@@ -230,18 +300,20 @@ function Option(props: NativeSelectOptionProps): JSX.Element {
  *  part, the options as `items`, a `placeholder` and the `icon`, and the select's attributes
  *  (`aria-label`, `autocomplete`, …), which go on it. Option elements as `children` come after
  *  the items. */
-export interface NativeSelectProps
-    extends
-        Omit<NativeSelectRootProps, keyof SlotKeyedProps<Anatomy>>,
-        SlotKeyedProps<Anatomy>,
-        NativeSelectContentProps<JSX.Element>,
-        Pick<
-            JSX.SelectHTMLAttributes<HTMLSelectElement>,
-            | (typeof NATIVE_SELECT_ATTRIBUTE_PROPS)[number]
-            | "autocomplete"
-            | "autofocus"
-            | "size"
-        > {}
+export type NativeSelectProps = Omit<
+    RootBaseProps,
+    keyof SlotKeyedProps<Anatomy>
+> &
+    SlotKeyedProps<Anatomy> &
+    NativeSelectContentProps<JSX.Element> &
+    Pick<
+        JSX.SelectHTMLAttributes<HTMLSelectElement>,
+        | (typeof NATIVE_SELECT_ATTRIBUTE_PROPS)[number]
+        | "autocomplete"
+        | "autofocus"
+        | "size"
+    > &
+    NativeSelectValueProps;
 
 const SELECT_PROPS = [
     ...NATIVE_SELECT_ATTRIBUTE_PROPS,

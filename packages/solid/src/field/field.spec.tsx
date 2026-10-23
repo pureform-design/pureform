@@ -52,7 +52,9 @@ describe("Field", () => {
                 <Textarea />
             </Field>
         ));
-        const textarea = byTestId<HTMLTextAreaElement>(testIds.plainTextarea.root);
+        const textarea = byTestId<HTMLTextAreaElement>(
+            testIds.plainTextarea.root,
+        );
         expect(textarea.tagName).toBe("TEXTAREA");
         expect(textarea.disabled).toBe(true);
         expect(textarea.labels?.length).toBe(1);
@@ -106,5 +108,23 @@ describe("Field", () => {
         expect(input.type).toBe("date");
         expect(input.getAttribute("aria-invalid")).toBe("true");
         expect(input.className).toBe("input");
+    });
+
+    it("is marked invalid by a mounted ErrorText, unless invalid says otherwise", async () => {
+        await withRegistry(() => (
+            <>
+                <Field controlId="a">
+                    <Input data-testid="a" />
+                    <ErrorText>Taken</ErrorText>
+                </Field>
+                <Field controlId="b" invalid={false}>
+                    <Input data-testid="b" />
+                    <ErrorText>Taken</ErrorText>
+                </Field>
+            </>
+        ));
+        expect(byTestId("a").getAttribute("aria-invalid")).toBe("true");
+        expect(byTestId("a").getAttribute("aria-describedby")).toBe("a-error");
+        expect(byTestId("b").hasAttribute("aria-invalid")).toBe(false);
     });
 });

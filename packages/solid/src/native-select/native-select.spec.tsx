@@ -5,6 +5,7 @@ import { userEvent } from "vitest/browser";
 import { NativeSelect } from ".";
 import { PureformProvider } from "..";
 import { nativeSelectRegistry } from "../__fixtures__/registry";
+import { Description, ErrorText, Field, Label } from "../field";
 import { byTestId, mount, settle } from "../testing/mount";
 
 const ids = testIds.nativeSelect;
@@ -134,5 +135,120 @@ describe("NativeSelect, ready-made", () => {
         await settle();
         expect(byTestId<HTMLSelectElement>(ids.select).value).toBe("m");
         expect(byTestId(ids.icon).textContent).toBe("▾");
+    });
+});
+
+describe("NativeSelect, multiple", () => {
+    const COLORS = [
+        { value: "r", label: "Red" },
+        { value: "g", label: "Green" },
+        { value: "b", label: "Blue" },
+    ];
+
+    it("chooses several, reports an array, submits each, and resets to its default", async () => {
+        const onValueChange = vi.fn();
+        withRegistry(() => (
+            <form data-testid="form">
+                <NativeSelect
+                    aria-label="Colors"
+                    name="colors"
+                    items={COLORS}
+                    multiple
+                    defaultValue={["b"]}
+                    onValueChange={onValueChange}
+                />
+            </form>
+        ));
+        await settle();
+        const select = byTestId<HTMLSelectElement>(ids.select);
+        expect(select.multiple).toBe(true);
+        expect(select.options[2]?.selected).toBe(true);
+        await userEvent.selectOptions(select, ["r", "g"]);
+        expect(onValueChange).toHaveBeenLastCalledWith({ value: ["r", "g"] });
+        const form = byTestId<HTMLFormElement>("form");
+        expect(new FormData(form).getAll("colors")).toEqual(["r", "g"]);
+        form.reset();
+        await vi.waitFor(() =>
+            expect(
+                [...select.selectedOptions].map((option) => option.value),
+            ).toEqual(["b"]),
+        );
+        await vi.waitFor(() =>
+            expect(onValueChange).toHaveBeenLastCalledWith({
+                value: ["b"],
+                reason: "reset",
+            }),
+        );
+    });
+
+    it("goes back to the owner's value when controlled, and reports the default on a reset", async () => {
+        const onValueChange = vi.fn();
+        withRegistry(() => (
+            <form data-testid="form">
+                <NativeSelect
+                    aria-label="Colors"
+                    items={COLORS}
+                    multiple
+                    value={["g"]}
+                    defaultValue={["r"]}
+                    onValueChange={onValueChange}
+                />
+            </form>
+        ));
+        await settle();
+        const select = byTestId<HTMLSelectElement>(ids.select);
+        const chosen = () =>
+            [...select.selectedOptions].map((option) => option.value);
+        expect(chosen()).toEqual(["g"]);
+        await userEvent.selectOptions(select, ["r", "b"]);
+        expect(onValueChange).toHaveBeenLastCalledWith({ value: ["r", "b"] });
+        await vi.waitFor(() => expect(chosen()).toEqual(["g"]));
+        byTestId<HTMLFormElement>("form").reset();
+        await vi.waitFor(() =>
+            expect(onValueChange).toHaveBeenLastCalledWith({
+                value: ["r"],
+                reason: "reset",
+            }),
+        );
+    });
+});
+
+describe("NativeSelect, in a Field", () => {
+    it("connects a NativeSelect inside it, its own props winning", async () => {
+        withRegistry(() => (
+            <>
+                <Field controlId="size" required>
+                    <Label>Size</Label>
+                    <NativeSelect
+                        testId="size"
+                        items={[{ value: "s", label: "Small" }]}
+                    />
+                    <Description>Pick one</Description>
+                    <ErrorText>Required</ErrorText>
+                </Field>
+                <Field controlId="other" disabled>
+                    <NativeSelect
+                        testId="other"
+                        id="mine"
+                        disabled={false}
+                        items={[{ value: "s", label: "Small" }]}
+                    />
+                </Field>
+            </>
+        ));
+        await settle();
+        const select = byTestId<HTMLSelectElement>("size-select");
+        const label = byTestId<HTMLLabelElement>(testIds.label.root);
+        expect(select.id).toBe("size");
+        expect(label.htmlFor).toBe("size");
+        expect(select.labels?.[0]).toBe(label);
+        expect(select.required).toBe(true);
+        expect(select.getAttribute("aria-invalid")).toBe("true");
+        expect(select.getAttribute("aria-describedby")).toBe(
+            "size-description size-error",
+        );
+        const other = byTestId<HTMLSelectElement>("other-select");
+        expect(other.id).toBe("mine");
+        expect(other.disabled).toBe(false);
     });
 });

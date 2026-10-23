@@ -874,7 +874,7 @@ export const ratingRegistry = () =>
         ]),
     });
 
-/** The native select's fake factory: its parts. */
+/** The native select's fake factory: its parts, and the field's pieces around it. */
 export const nativeSelectRegistry = () =>
     createRegistry({
         nativeSelect: named("nativeSelect", [
@@ -884,4 +884,8 @@ export const nativeSelectRegistry = () =>
             "group",
             "option",
         ]),
+        field: named("field", ["root"]),
+        label: named("label", ["root", "requiredIndicator"]),
+        description: named("description", ["root"]),
+        errorText: named("error-text", ["root"]),
     });
