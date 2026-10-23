@@ -703,3 +703,89 @@ export const formatDateText = (value: string, locale: string): string =>
         month: "2-digit",
         day: "2-digit",
     });
+
+/** One of a date's editable segments as React Native's date input draws it, in the locale's
+ *  order (the web's come from Zag's date input). */
+export type DateSegmentKind = "month" | "day" | "year";
+
+/** A segment of a locale's numeric date: an editable one, with its placeholder and its digits,
+ *  or the text between them. */
+export type DateTextSegment =
+    | {
+          readonly kind: DateSegmentKind;
+          readonly placeholder: string;
+          readonly length: number;
+      }
+    | { readonly kind: "literal"; readonly text: string };
+
+const SEGMENT: Record<
+    DateSegmentKind,
+    { readonly placeholder: string; readonly length: number }
+> = {
+    month: { placeholder: "mm", length: 2 },
+    day: { placeholder: "dd", length: 2 },
+    year: { placeholder: "yyyy", length: 4 },
+};
+
+/** A locale's numeric date as segments, in its order: `en-US` gives month, "/", day, "/", year. */
+export const dateTextSegments = (locale: string): DateTextSegment[] =>
+    new Intl.DateTimeFormat(locale, {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        timeZone: "UTC",
+    })
+        .formatToParts(new Date(Date.UTC(2026, 0, 1)))
+        .map((part): DateTextSegment =>
+            part.type === "year" || part.type === "month" || part.type === "day"
+                ? { kind: part.type, ...SEGMENT[part.type] }
+                : { kind: "literal", text: part.value },
+        );
+
+/** The segments' digits of an ISO date (empty without one). */
+export const dateSegmentTexts = (
+    value: string | undefined,
+): Record<DateSegmentKind, string> => {
+    const parts = value ? parseIsoDate(value) : null;
+    return parts
+        ? {
+              month: pad(parts.month, 2),
+              day: pad(parts.day, 2),
+              year: pad(parts.year, 4),
+          }
+        : { month: "", day: "", year: "" };
+};
+
+/** The ISO date the segments' digits make, or `null` until they're a whole, real date. */
+export const dateFromSegments = (
+    texts: Readonly<Record<DateSegmentKind, string>>,
+): string | null => {
+    if (texts.year.length !== 4 || !texts.month || !texts.day) return null;
+    const iso = isoDate({
+        year: Number(texts.year),
+        month: Number(texts.month),
+        day: Number(texts.day),
+    });
+    return Number(texts.year) >= 1000 && parseIsoDate(iso) ? iso : null;
+};
+
+/** A segment's digits one step up (`1`) or down (`-1`), as the arrow keys step it: a month
+ *  goes round 1–12, a day 1–31, a year by one; an empty one starts at the first (up) or last
+ *  (down), an empty year at `thisYear`. */
+export const dateSegmentStep = (
+    kind: DateSegmentKind,
+    text: string,
+    delta: 1 | -1,
+    thisYear: number,
+): string => {
+    if (kind === "year")
+        return pad(text === "" ? thisYear : Number(text) + delta, 4);
+    const max = kind === "month" ? 12 : 31;
+    const next =
+        text === ""
+            ? delta > 0
+                ? 1
+                : max
+            : ((Number(text) - 1 + delta + max) % max) + 1;
+    return pad(next, 2);
+};

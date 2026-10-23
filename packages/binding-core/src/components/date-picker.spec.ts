@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 import {
+    dateFromSegments,
+    dateSegmentStep,
+    dateSegmentTexts,
+    dateTextSegments,
     addDays,
     addMonths,
     calendarCellSelection,
@@ -179,5 +183,51 @@ describe("the local date", () => {
         // 00:30 on the 15th in Manila is still the 14th in UTC.
         expect(todayIso(new Date("2026-08-14T16:30:00Z"))).toBe("2026-08-15");
         expect(dateMachineProps({}, (v) => v).timeZone).toBe("Asia/Manila");
+    });
+});
+
+describe("date segments", () => {
+    it("follows the locale's order, with the text between", () => {
+        expect(
+            dateTextSegments("en-US").map((segment) =>
+                segment.kind === "literal" ? segment.text : segment.kind,
+            ),
+        ).toEqual(["month", "/", "day", "/", "year"]);
+        expect(
+            dateTextSegments("en-GB")
+                .filter((segment) => segment.kind !== "literal")
+                .map((segment) => segment.kind),
+        ).toEqual(["day", "month", "year"]);
+    });
+
+    it("splits a date into digits, and makes one only from a whole, real date", () => {
+        expect(dateSegmentTexts("2026-08-07")).toEqual({
+            month: "08",
+            day: "07",
+            year: "2026",
+        });
+        expect(dateSegmentTexts(undefined)).toEqual({
+            month: "",
+            day: "",
+            year: "",
+        });
+        expect(dateFromSegments({ month: "8", day: "17", year: "2026" })).toBe(
+            "2026-08-17",
+        );
+        expect(dateFromSegments({ month: "02", day: "30", year: "2026" })).toBe(
+            null,
+        );
+        expect(dateFromSegments({ month: "08", day: "17", year: "202" })).toBe(
+            null,
+        );
+    });
+
+    it("steps a segment round its range, starting an empty one at an end", () => {
+        expect(dateSegmentStep("month", "12", 1, 2026)).toBe("01");
+        expect(dateSegmentStep("month", "01", -1, 2026)).toBe("12");
+        expect(dateSegmentStep("day", "", 1, 2026)).toBe("01");
+        expect(dateSegmentStep("day", "", -1, 2026)).toBe("31");
+        expect(dateSegmentStep("year", "", 1, 2026)).toBe("2026");
+        expect(dateSegmentStep("year", "2026", -1, 2026)).toBe("2025");
     });
 });

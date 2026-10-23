@@ -237,7 +237,63 @@ describe("DockedDatePicker", () => {
     });
 });
 
+const segments = () =>
+    all('[data-testid="pf-date-input-segment"]') as HTMLInputElement[];
+
 describe("DateInput", () => {
+    it("draws its input as the locale's segments, each a spin button with its placeholder", async () => {
+        await render(
+            <DateInput locale="en-GB" defaultValue={["2026-08-17"]} />,
+        );
+        const input = byTestId("pf-date-input-input");
+        expect(input.getAttribute("role")).toBe("group");
+        expect(
+            segments().map((segment) => [
+                segment.getAttribute("role"),
+                segment.getAttribute("aria-label"),
+                segment.value,
+            ]),
+        ).toEqual([
+            ["spinbutton", "day", "17"],
+            ["spinbutton", "month", "08"],
+            ["spinbutton", "year", "2026"],
+        ]);
+        document.body.innerHTML = "";
+        await render(<DateInput locale="en-US" />);
+        expect(segments().map((segment) => segment.placeholder)).toEqual([
+            "mm",
+            "dd",
+            "yyyy",
+        ]);
+        // The label stays floated over the placeholders, as the web's.
+        const label = byTestId("pf-date-input-label").getBoundingClientRect();
+        expect(label.bottom).toBeLessThanOrEqual(
+            segments()[0]!.getBoundingClientRect().top + 1,
+        );
+    });
+
+    it("moves on from a full segment, back from an empty one, and along the row and up and down with the arrow keys", async () => {
+        const onValueChange = vi.fn();
+        await render(
+            <DateInput locale="en-US" onValueChange={onValueChange} />,
+        );
+        const [month, day, year] = segments();
+        await interact(() => userEvent.click(month!));
+        await interact(() => userEvent.keyboard("12"));
+        expect(document.activeElement).toBe(day);
+        await interact(() => userEvent.keyboard("{Backspace}"));
+        expect(document.activeElement).toBe(month);
+        await interact(() => userEvent.keyboard("{ArrowUp}"));
+        expect(month!.value).toBe("01");
+        await interact(() => userEvent.keyboard("{ArrowRight}{ArrowRight}"));
+        expect(document.activeElement).toBe(year);
+        await interact(() => userEvent.keyboard("2026{ArrowLeft}{ArrowDown}"));
+        expect(day!.value).toBe("31");
+        expect(onValueChange).toHaveBeenLastCalledWith({
+            value: ["2026-01-31"],
+        });
+    });
+
     it("draws the icons and affixes only when given", async () => {
         await render(
             <DateInput
@@ -301,9 +357,8 @@ describe("DateInput", () => {
             "Enter date",
         );
         expect(byTestId("pf-date-input-label").textContent).toBe("Date");
-        await interact(() =>
-            userEvent.fill(byTestId("pf-date-input-input"), "08/17/2026"),
-        );
+        await interact(() => userEvent.click(segments()[0]!));
+        await interact(() => userEvent.keyboard("08172026"));
         expect(byTestId("pf-date-input-selected-date").textContent).toBe(
             "Mon, Aug 17",
         );
@@ -316,9 +371,8 @@ describe("DateInput", () => {
     it("has no date while the text isn't a whole one", async () => {
         const onConfirm = vi.fn();
         await render(<DateInput locale="en-US" onConfirm={onConfirm} />);
-        await interact(() =>
-            userEvent.fill(byTestId("pf-date-input-input"), "08/17"),
-        );
+        await interact(() => userEvent.click(segments()[0]!));
+        await interact(() => userEvent.keyboard("0817"));
         await interact(() => userEvent.click(button("OK")));
         expect(onConfirm).toHaveBeenCalledWith([]);
     });
