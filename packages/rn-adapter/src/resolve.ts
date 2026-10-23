@@ -329,11 +329,28 @@ export const withSetTokens = (
         tokens?: Overrides;
     },
 ): Selected => {
-    if (Object.keys(selected.tokens).length === 0) return selected;
-    const again = resolvedWith(where.styles, where.key, {
-        ...where.overrides,
-        ...overridesFor(selected.tokens, where.scheme),
-        ...overridesFor(where.tokens, where.scheme),
-    })[where.name];
-    return again ? selectFrom(again) : selected;
+    // A token one variant sets may read one another sets (a size's corner reads the density's
+    // offset), so it's resolved again until the tokens it sets settle.
+    let current = selected;
+    for (let pass = 0; pass < 4; pass++) {
+        if (Object.keys(current.tokens).length === 0) return current;
+        const again = resolvedWith(where.styles, where.key, {
+            ...where.overrides,
+            ...overridesFor(current.tokens, where.scheme),
+            ...overridesFor(where.tokens, where.scheme),
+        })[where.name];
+        if (!again) return current;
+        const next = selectFrom(again);
+        if (sameValues(next.tokens, current.tokens)) return next;
+        current = next;
+    }
+    return current;
+};
+
+const sameValues = (a: ThemeValues, b: ThemeValues) => {
+    const keys = Object.keys(a);
+    return (
+        keys.length === Object.keys(b).length &&
+        keys.every((key) => Object.is(a[key], b[key]))
+    );
 };
