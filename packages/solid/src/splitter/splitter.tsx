@@ -64,6 +64,9 @@ interface SplitterContextValue {
     readonly api: Accessor<splitter.Api<PropTypes>>;
     readonly drag: Drag;
     readonly along: (event: { clientX: number; clientY: number }) => number;
+    /** Measures the panes if the machine hasn't yet: it has no sizes until it has measured the
+     *  root, which its resize observer may not have done when a divider is first used. */
+    readonly measure: () => void;
 }
 
 const context = createPartContext<SplitterContextValue>("Splitter");
@@ -164,6 +167,10 @@ function Root(props: SplitterRootProps): JSX.Element {
         testId: () => props.testId,
         unstyled: () => props.unstyled,
     });
+    const measure = () => {
+        if (service.context.get("size").length === 0)
+            service.send({ type: "ROOT.RESIZE" });
+    };
     const along = (event: { clientX: number; clientY: number }) =>
         horizontal()
             ? dir() === "rtl"
@@ -171,7 +178,7 @@ function Root(props: SplitterRootProps): JSX.Element {
                 : event.clientX
             : event.clientY;
     return (
-        <context.Provider value={{ scope, api, drag, along }}>
+        <context.Provider value={{ scope, api, drag, along, measure }}>
             {scope.render("root", {
                 element: "div",
                 as: () => props.as,
@@ -198,12 +205,17 @@ function Panel(props: SplitterPanelProps): JSX.Element {
 
 /** The divider between two panes, holding Material's drag handle pill. */
 function ResizeTrigger(props: SplitterResizeTriggerProps): JSX.Element {
-    const { scope, api, drag, along } = context.use("ResizeTrigger");
+    const { scope, api, drag, along, measure } = context.use("ResizeTrigger");
     const trigger = () => ({ id: props.id, disabled: props.disabled });
     return scope.render("resizeTrigger", {
         element: "div",
         machine: () =>
             combinePartProps([
+                {
+                    onFocus: measure,
+                    onKeyDown: measure,
+                    onPointerDown: measure,
+                },
                 api().getResizeTriggerProps(trigger()),
                 splitterTriggerProps({
                     label: props.label,

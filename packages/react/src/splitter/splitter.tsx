@@ -56,6 +56,9 @@ interface SplitterContextValue {
     readonly api: splitter.Api<PropTypes>;
     readonly drag: Drag;
     readonly along: (event: { clientX: number; clientY: number }) => number;
+    /** Measures the panes if the machine hasn't yet: it has no sizes until it has measured the
+     *  root, which its resize observer may not have done when a divider is first used. */
+    readonly measure: () => void;
 }
 
 const context = createPartContext<SplitterContextValue>("Splitter");
@@ -159,6 +162,10 @@ function Root(props: SplitterRootProps): ReactNode {
         testId: props.testId,
         unstyled: props.unstyled,
     });
+    const measure = () => {
+        if (service.context.get("size").length === 0)
+            service.send({ type: "ROOT.RESIZE" });
+    };
     const along = (event: { clientX: number; clientY: number }) =>
         horizontal
             ? dir === "rtl"
@@ -167,7 +174,7 @@ function Root(props: SplitterRootProps): ReactNode {
             : event.clientY;
     const { as, ...rest } = omitProps(props, SPLITTER_ROOT_PROPS);
     return (
-        <context.Provider value={{ scope, api, drag, along }}>
+        <context.Provider value={{ scope, api, drag, along, measure }}>
             {scope.render("root", {
                 element: "div",
                 as,
@@ -198,11 +205,12 @@ function ResizeTrigger({
     unstyled,
     ...props
 }: SplitterResizeTriggerProps): ReactNode {
-    const { scope, api, drag, along } = context.use("ResizeTrigger");
+    const { scope, api, drag, along, measure } = context.use("ResizeTrigger");
     const state = api.getResizeTriggerState({ id, disabled });
     return scope.render("resizeTrigger", {
         element: "div",
         machine: combinePartProps([
+            { onFocus: measure, onKeyDown: measure, onPointerDown: measure },
             api.getResizeTriggerProps({ id, disabled }),
             splitterTriggerProps({ label, dragging: state.dragging }),
             {
