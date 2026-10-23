@@ -51,8 +51,21 @@ export default defineStories({
     overlayHeight: 480,
     components: {
         // Both act on what's around them: a surface to press, and content to dim.
-        Ripple: { hooks: ["./src/stages/ripple.ts"] },
+        Ripple: {
+            hooks: ["./src/stages/ripple.ts"],
+            // React Native has no ripple layer to place: its pressable components draw their
+            // own ripple.
+            parameters: {
+                pureform: {
+                    absent: {
+                        native: "React Native's pressable components draw their own ripple; there's no separate layer to place.",
+                    },
+                },
+            },
+        },
         Scrim: { hooks: ["./src/stages/scrim.ts"] },
+        // Invisible on its own: drawn in a small element, its area outlined.
+        TouchTarget: { hooks: ["./src/stages/touch-target.ts"] },
         FabMenu: {
             // An app places it at the screen's bottom end, and its list opens above it: at the
             // canvas's top, the list would open off the top of the frame.
