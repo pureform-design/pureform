@@ -480,6 +480,25 @@ TAGS_INPUT_ROOT_PROPS; TAGS_INPUT_CONTENT_PROPS; tagsInputSelection(props);
 tagsInputMachineProps(props); tagsInputFilled(count, text); tagsInputChipTestId(testId);
 type InputChipPart; interface InputChipVariantProps; inputChipSelection(props);
 
+// Number field (pureform's own, c9a): Zag's number input; `value` is text in the locale, its
+// change details `{ value, valueAsNumber }`. Always formats (NUMBER_FIELD_FORMAT, NUMBER_FIELD_LOCALE)
+type NumberFieldPart; interface NumberFieldRootOwnProps // variant, color, density, leadingIcon,
+// prefixText, suffixText, tokens, min, max, step, largeStep, locale, formatOptions, error, …
+NUMBER_FIELD_ROOT_PROPS; NUMBER_FIELD_CONTENT_PROPS; numberFieldSelection(props);
+numberFieldMachineProps(props); numberFieldPlaceholder(placeholder);
+// React Native's arithmetic: numberFieldRange, numberFieldParse, numberFieldFormat,
+// numberFieldStep, numberFieldClamp, numberFieldCanStep, numberFieldOutOfRange,
+// NUMBER_FIELD_SPIN_DELAY (300), NUMBER_FIELD_SPIN_INTERVAL (50), NUMBER_FIELD_LABELS
+
+// Code field (pureform's own, c9a): Zag's pin input; `value` is a character per cell, its change
+// details `{ value, valueAsString }`
+type CodeFieldPart; interface CodeFieldRootOwnProps // variant, color, density, tokens, length,
+// type, otp, mask, onValueComplete, placeholder, cellLabel, error, …
+CODE_FIELD_ROOT_PROPS; CODE_FIELD_CONTENT_PROPS; CODE_FIELD_LENGTH; codeFieldSelection(props);
+codeFieldMachineProps(props);
+// React Native's arithmetic: codeFieldCells, codeFieldEnter, codeFieldBackspace, codeFieldString,
+// codeFieldComplete, codeFieldAccepts, codeFieldCellLabel
+
 // Slider: Zag's slider machine; a value is a number or a range's numbers (SliderValue)
 type SliderPart; interface SliderRootOwnProps<V> // color, handleShape, size, orientation, tokens,
                                          // min, max, step, largeStep, minStepsBetweenThumbs,

@@ -547,6 +547,34 @@ label floats; the bindings do. Tags aren't edited in place.
 </div>
 ```
 
+`numberField` (pureform's own, not M3) is the text field (filled or outlined, `leadingIcon`,
+`prefixText`, `suffixText`, `color`, `density`) with a `control` at its end in place of the
+trailing icon: round 40px `decrementTrigger` and `incrementTrigger` buttons with a state layer.
+Mark a button at its limit `aria-disabled="true"` (a native `disabled` would make the container
+read as disabled). `codeField` (pureform's own) is a `label` over a `control` row of single-character
+`input` cells, each a 48×56 filled or outlined text field container with its own states, and
+`supportingText`.
+
+```html
+<div class="{numberField.root}">
+    <div class="{numberField.container}">
+        <input class="{numberField.input}" id="qty" role="spinbutton" placeholder=" " />
+        <label class="{numberField.label}" for="qty">Quantity</label>
+        <div class="{numberField.control}" role="group">
+            <button class="{numberField.decrementTrigger}" aria-label="decrease value">−</button>
+            <button class="{numberField.incrementTrigger}" aria-label="increment value">+</button>
+        </div>
+    </div>
+</div>
+<div class="{codeField.root}">
+    <label class="{codeField.label}">Code</label>
+    <div class="{codeField.control}">
+        <input class="{codeField.input}" aria-label="Digit 1" />
+        <input class="{codeField.input}" aria-label="Digit 2" />
+    </div>
+</div>
+```
+
 ## Text field and text area
 
 The input needs a placeholder (a single space when none should show) so CSS can tell when it
