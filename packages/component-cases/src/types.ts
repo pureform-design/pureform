@@ -136,8 +136,13 @@ export interface IndicationCase {
     /** For a composite: props that give the first item `source` and disable it alone. */
     itemDisabled?(source: MutableInteractionSource): SceneProps;
     /** Keyboard focus reaching the checked surface's trigger, when Tab alone doesn't: a menu's
-     *  item, which a highlight shows as hovered. */
-    focus?(host: HTMLElement): Promise<void>;
+     *  item, which a highlight shows as hovered. `trigger` is the checked entry's, for a
+     *  component with several (the number field's two buttons). */
+    focus?(host: HTMLElement, trigger: HTMLElement): Promise<void>;
+    /** Whether `focus` moves real keyboard focus to the trigger (a button out of the tab order),
+     *  rather than a highlight: the focus indicator and the source's focus are checked as they
+     *  are after Tab. */
+    readonly focusMoves?: boolean | undefined;
     /** Whether a drag tints the surface (the slider). */
     readonly drags?: boolean | undefined;
     /** Whether the surface is in a modal (the search view), which keeps the pointer off the rest

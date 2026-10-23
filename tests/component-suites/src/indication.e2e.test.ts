@@ -259,7 +259,7 @@ const focusByKeyboard = async (
     parts: () => Parts,
 ): Promise<void> => {
     if (component.indication.focus) {
-        await component.indication.focus(host);
+        await component.indication.focus(host, parts().trigger);
     } else {
         (document.activeElement as HTMLElement | null)?.blur();
         for (
@@ -316,7 +316,8 @@ describe.each(INDICATED)("$component", (component) => {
             expectDiffers(shown.focused, shown.rest, "focused");
             expect(shown.before).toBe("none");
             // A highlighted item isn't focused: the menu keeps focus.
-            if (!indication.focus) expect(shown.indicator).not.toBe("none");
+            if (!indication.focus || indication.focusMoves)
+                expect(shown.indicator).not.toBe("none");
         });
 
         it.runIf(indication.drags)(
@@ -518,7 +519,7 @@ describe.each(INDICATED)("$component", (component) => {
             const button = other.host.querySelector<HTMLElement>("button")!;
             const before = outline(button);
             await focusByKeyboard(component, mounted.host, parts);
-            if (!indication.focus) {
+            if (!indication.focus || indication.focusMoves) {
                 expect(observed.state()).toMatchObject({
                     focused: true,
                     focusVisible: true,

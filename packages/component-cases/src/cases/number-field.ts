@@ -1,9 +1,9 @@
 // The number field: `value`, the text of a number, which the increment button and the arrow keys
 // step; a native input (a `spinbutton`) that submits it. The left and right arrows move the
-// caret, not the value. Its buttons' indication isn't cased: Zag keeps them out of the tab order,
-// so keyboard focus never reaches them.
+// caret, not the value. Its two buttons each show indication; Zag keeps them out of the tab
+// order, so the case moves keyboard focus to the checked one itself.
 
-import { testIds } from "@pureform/anatomy";
+import { numberFieldAnatomy, testIds } from "@pureform/anatomy";
 
 import type { ActOptions, ComponentCase } from "../types";
 import { byTestId } from "../types";
@@ -32,6 +32,13 @@ const caret = [
     { key: "{ArrowUp}", does: "change", to: "3" },
     { key: "{ArrowDown}", does: "change", to: "1" },
 ] as const;
+
+/** Keyboard focus on a button out of the tab order: a key first, so the browser shows it as the
+ *  keyboard's (`:focus-visible`). */
+const focusButton = async (_host: HTMLElement, trigger: HTMLElement) => {
+    await userEvent.keyboard("{Shift}");
+    trigger.focus({ focusVisible: true } as FocusOptions);
+};
 
 export const numberField: ComponentCase = {
     component: "NumberField",
@@ -86,5 +93,10 @@ export const numberField: ComponentCase = {
         focusable: input,
         keys: [{ key: "{Enter}", does: "nothing" }],
         arrows: { ltr: caret, rtl: caret },
+    },
+    indication: {
+        anatomy: numberFieldAnatomy,
+        focus: focusButton,
+        focusMoves: true,
     },
 };
