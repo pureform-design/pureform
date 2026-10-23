@@ -245,20 +245,32 @@ export const dialLabels = (
 };
 
 /** Where the hand points for a view's value: the turn (0 at the top, clockwise, 1 a full
- *  circle) and the ring's radius. */
+ *  circle) and the ring's radius. A drag gives `turn`, the pointer's own, which the hand follows
+ *  exactly on the value's ring, as Compose's dial does (`AnalogTimePickerState.rotateTo` snaps
+ *  to the finger's angle while dragging). */
 export const dialHand = (
     time: Time,
     view: TimeView,
     cycle: HourCycle,
+    turn?: number,
 ): { readonly turn: number; readonly radius: number } => {
     if (view === "minute")
-        return { turn: time.minute / 60, radius: DIAL_OUTER_RADIUS };
+        return { turn: turn ?? time.minute / 60, radius: DIAL_OUTER_RADIUS };
     const inner = cycle === 24 && time.hour >= 12;
     return {
-        turn: wrap(time.hour, 12) / 12,
+        turn: turn ?? wrap(time.hour, 12) / 12,
         radius: inner ? DIAL_INNER_RADIUS : DIAL_OUTER_RADIUS,
     };
 };
+
+/** `turn`, a whole number of turns away, nearest `from`: the hand turns the short way round. */
+export const nearestTurn = (turn: number, from: number): number =>
+    turn + Math.round(from - turn);
+
+/** The turn of a point on the dial, given in percent of its box from the top left: 0 at the
+ *  top, clockwise, under 1. */
+export const dialTurnAt = (x: number, y: number): number =>
+    wrap(Math.atan2(x - 50, 50 - y) / (2 * Math.PI), 1);
 
 /** The value under a point on the dial, given in percent of its box from the top left, for a
  *  pointer pressing or dragging it. Hours snap to the nearest hour, keeping a 12-hour period;
@@ -272,7 +284,7 @@ export const timeAtPoint = (
 ): Time => {
     const dx = x - 50;
     const dy = y - 50;
-    const turn = wrap(Math.atan2(dx, -dy) / (2 * Math.PI), 1);
+    const turn = dialTurnAt(x, y);
     if (view === "minute")
         return { ...time, minute: wrap(Math.round(turn * 60), 60) };
     const shown = wrap(Math.round(turn * 12), 12);

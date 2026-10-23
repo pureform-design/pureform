@@ -84,6 +84,10 @@ export interface TimePickerSchema {
         /** What the user is typing in the time input's fields, until it's a time. */
         hourText: string | null;
         minuteText: string | null;
+        /** The turn of the pointer dragging the dial, once it has moved; `null` otherwise. */
+        dragTurn: number | null;
+        /** Where the hand points, in turns, not wrapped: each move takes the short way round. */
+        handTurn: number;
     };
     computed: {
         hourCycle: HourCycle;

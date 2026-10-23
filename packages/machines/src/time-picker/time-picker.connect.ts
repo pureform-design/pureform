@@ -119,7 +119,10 @@ export function connect<T extends PropTypes>(
             selected: dialLabelSelected(label, time, view, cycle),
         }),
     );
-    const hand = dialHand(time, view, cycle);
+    // A moving pointer turns the hand itself, at once; otherwise it turns to the value the short
+    // way round, over the track's transition.
+    const following = dragging && context.get("dragTurn") !== null;
+    const hand = dialHand(time, view, cycle, context.get("handTurn"));
     const handAngle = hand.turn * 2 * Math.PI;
     const handPoint = {
         x: 50 + hand.radius * Math.sin(handAngle),
@@ -307,6 +310,7 @@ export function connect<T extends PropTypes>(
                     height: pct(hand.radius),
                     transformOrigin: "bottom",
                     transform: `rotate(${hand.turn * 360}deg)`,
+                    ...(following ? { transition: "none" } : {}),
                 },
             });
         },

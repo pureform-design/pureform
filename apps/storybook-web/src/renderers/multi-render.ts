@@ -55,6 +55,23 @@ export const storyTheme = (
     };
 };
 
+/** The args without those the story's example leaves out (`parameters.pureform.unset`, from
+ *  an `as: undefined` over the component's `as: "button"`), unless a control changed them. */
+export const withoutUnset = (
+    args: Args,
+    component: Args,
+    parameters: Readonly<Record<string, unknown>> | undefined,
+): Args => {
+    const unset = (parameters?.["pureform"] as { unset?: readonly string[] })
+        ?.unset;
+    if (!unset?.length) return args;
+    const out = { ...args };
+    for (const key of unset) {
+        if (out[key] === component[key]) delete out[key];
+    }
+    return out;
+};
+
 export const multiRender =
     (impls: Impls, levels: ArgLevels) =>
     (args: Args, context: StoryContext): HTMLElement => {
@@ -62,7 +79,7 @@ export const multiRender =
         const impl = impls[renderer] ?? Object.values(impls)[0]!;
         const props = rendererArgs(
             impl.hooks,
-            args,
+            withoutUnset(args, levels.component, context.parameters),
             levels.shared,
             levels.component,
         );

@@ -44,6 +44,7 @@ import {
     outside,
     pointerAway,
     settle,
+    until,
 } from "./testing/render";
 import { Text } from "./text";
 
@@ -404,6 +405,22 @@ describe("the provider's default", () => {
             await interact(() => userEvent.click(byTestId(press)));
             expect(drawn(), surface).toBe(1);
         }
+    });
+
+    it("grows and fades a ripple with the browser's animations, not a style per frame", async () => {
+        await render(<Button label="Save" />);
+        const layer = layerOf("pf-button-root")!;
+        await interact(() => userEvent.click(byTestId("pf-button-root")));
+        await until(() => expect(layer.childElementCount).toBe(1));
+        const disc = layer.firstElementChild as HTMLElement;
+        const writes = new MutationObserver(() => {});
+        writes.observe(disc, { attributes: true });
+        // The grow and fade run off the main thread, and nothing steps the disc's style.
+        expect(disc.getAnimations().length).toBeGreaterThan(0);
+        await settle(100);
+        expect(writes.takeRecords()).toHaveLength(0);
+        writes.disconnect();
+        await until(() => expect(layer.childElementCount).toBe(0));
     });
 
     it("draws no ripple under reduced motion, and no layer on a card that doesn't act", async () => {

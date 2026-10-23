@@ -13,6 +13,7 @@ import {
     absolute,
     add,
     center,
+    colorMix,
     column,
     flex,
     start,
@@ -36,6 +37,7 @@ import type {
 import {
     duration,
     easing,
+    opacity,
     radius,
     size as sizeToken,
     spacing,
@@ -66,6 +68,19 @@ export const NAV_TOKENS = {
     // label sits on the pill with the icon.
     horizontalActiveLabelColor: sys("onSecondaryContainer"),
     labelColor: sys("onSurfaceVariant"),
+    // A disabled destination's icon and label: the inactive ones at Material's disabled content
+    // opacity, 38% (Compose's `NavigationBarItemDefaults.colors` and `NavigationRailItemDefaults`:
+    // `InactiveIconColor.copy(alpha = DisabledAlpha)`), current or not.
+    disabledIconColor: colorMix(
+        transparent,
+        sys("onSurfaceVariant"),
+        opacity("disabledContent"),
+    ),
+    disabledLabelColor: colorMix(
+        transparent,
+        sys("onSurfaceVariant"),
+        opacity("disabledContent"),
+    ),
     stateLayerColor: sys("onSurface"),
     iconSize: sizeToken("iconMedium"),
     // Material draws the current destination's icon filled.
@@ -119,6 +134,7 @@ export const NAV_INDICATION: IndicationDeclaration<
 ];
 
 const CURRENT = slot("item", "selected");
+const DISABLED = slot("item", "disabled");
 
 /** The colors a current destination takes. */
 export interface NavActive {
@@ -133,7 +149,10 @@ export const navColors = (
     active: NavActive,
 ) => ({
     indicator: {
-        color: when().on(CURRENT, active.icon).else(ref("iconColor")),
+        color: when()
+            .on(CURRENT, active.icon)
+            .on(DISABLED, ref("disabledIconColor"))
+            .else(ref("iconColor")),
     },
     // The fill carries the state layer once current, over the pill's own.
     activeIndicator: {
@@ -193,6 +212,10 @@ export const navParts = (
             states: {
                 ...pressable.states,
                 selected: { color: ref("activeLabelColor") },
+                disabled: {
+                    ...pressable.states.disabled,
+                    color: ref("disabledLabelColor"),
+                },
             },
         } satisfies StyleMap,
         indicator: {
@@ -261,7 +284,10 @@ export const navHorizontalParts = (
         paddingBlockEnd: px(0),
         gap: px(0),
         borderRadius: radius("full"),
-        states: { selected: { color: ref("horizontalActiveLabelColor") } },
+        states: {
+            selected: { color: ref("horizontalActiveLabelColor") },
+            disabled: { color: ref("disabledLabelColor") },
+        },
     } satisfies StyleMap,
     indicator: {
         position: absolute,

@@ -2,10 +2,13 @@ import { createMachine } from "@zag-js/core";
 
 import * as dom from "./time-picker.dom";
 import {
+    dialHand,
+    dialTurnAt,
     formatTime,
     localeHourCycle,
     localePeriods,
     MIDNIGHT,
+    nearestTurn,
     parseField,
     parseTime,
     periodOf,
@@ -20,8 +23,8 @@ const sameTime = (a: Time, b: Time | undefined) =>
 // Material's time picker and time input, pureform's own machine: no Zag machine covers them. It
 // holds the time (hours 0 to 23 and minutes) with Zag's controllable semantics, what the dial
 // sets (the hour or the minute), and what the user is typing into the input's fields until it
-// reads as a time. A pointer on the dial picks the value under it as it drags; letting go of an
-// hour moves on to the minutes, as Material's dial does.
+// reads as a time. A pointer on the dial picks the value under it as it drags, the hand following
+// the pointer itself; letting go of an hour moves on to the minutes, as Material's dial does.
 export const machine = createMachine<TimePickerSchema>({
     props({ props }) {
         return {
@@ -57,6 +60,15 @@ export const machine = createMachine<TimePickerSchema>({
             })),
             hourText: bindable<string | null>(() => ({ defaultValue: null })),
             minuteText: bindable<string | null>(() => ({ defaultValue: null })),
+            dragTurn: bindable<number | null>(() => ({ defaultValue: null })),
+            handTurn: bindable<number>(() => ({
+                defaultValue: dialHand(
+                    parseTime(prop("value") ?? prop("defaultValue")) ??
+                        MIDNIGHT,
+                    prop("view") ?? prop("defaultView"),
+                    prop("hourCycle") ?? localeHourCycle(prop("locale")),
+                ).turn,
+            })),
         };
     },
 
@@ -83,6 +95,18 @@ export const machine = createMachine<TimePickerSchema>({
         "FIELD.BLUR": { actions: ["clearField"] },
     },
 
+    // The hand turns to each new value or view the short way round, unless a pointer turns it.
+    watch({ track, action, context }) {
+        track(
+            [
+                () => formatTime(context.get("value")),
+                () => context.get("view"),
+                () => context.get("dragTurn"),
+            ],
+            () => action(["turnHandToValue"]),
+        );
+    },
+
     states: {
         idle: {
             on: {
@@ -97,12 +121,15 @@ export const machine = createMachine<TimePickerSchema>({
         dragging: {
             effects: ["trackPointerMove"],
             on: {
-                "DIAL.POINTER_MOVE": { actions: ["setValue"] },
+                "DIAL.POINTER_MOVE": { actions: ["setValue", "setDragTurn"] },
                 "DIAL.POINTER_UP": {
                     target: "idle",
-                    actions: ["setValue", "moveToMinutes"],
+                    actions: ["setValue", "clearDragTurn", "moveToMinutes"],
                 },
-                "DIAL.POINTER_CANCEL": { target: "idle" },
+                "DIAL.POINTER_CANCEL": {
+                    target: "idle",
+                    actions: ["clearDragTurn"],
+                },
             },
         },
     },
@@ -165,6 +192,35 @@ export const machine = createMachine<TimePickerSchema>({
                         point,
                     ),
                 );
+            },
+            // The hand follows a moving pointer exactly; a press, a release, or a key moves it to
+            // the value, animated.
+            setDragTurn({ context, event }) {
+                const point = event["point"] as
+                    | { x: number; y: number }
+                    | undefined;
+                if (!point) return;
+                const turn = dialTurnAt(point.x, point.y);
+                context.set("dragTurn", turn);
+                context.set(
+                    "handTurn",
+                    nearestTurn(turn, context.get("handTurn")),
+                );
+            },
+            turnHandToValue({ context, computed }) {
+                if (context.get("dragTurn") !== null) return;
+                const { turn } = dialHand(
+                    context.get("value"),
+                    context.get("view"),
+                    computed("hourCycle"),
+                );
+                context.set(
+                    "handTurn",
+                    nearestTurn(turn, context.get("handTurn")),
+                );
+            },
+            clearDragTurn({ context }) {
+                context.set("dragTurn", null);
             },
             setView({ context, event }) {
                 context.set("view", event["view"] as TimeView);

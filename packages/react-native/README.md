@@ -477,7 +477,7 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
   them its `density`, `color`, `tokens`, and `leadingType` (`icon`, `avatar`, `thumbnail`,
   `video`) unless an item sets its own. `variant="segmented"` sets the items apart as tiles, each
   item rounded by its `position` (`first`, `middle`, `last`, `single`), which a `ListItem` outside
-  a `List` can take too. An item's `href` isn't followed; give it `onPress`. An item with a
+  a `List` can take too. An item's `href` makes it an interactive `link`, which a press opens with `Linking.openURL` (after its `onPress`, if any). An item with a
   `region` is expandable: a button whose `⌄` indicator turns over, showing the region under it
   while `expanded` (`defaultExpanded`, `onExpandedChange`), React state rather than Zag's
   accordion. A `swipeAction`

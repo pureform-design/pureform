@@ -15,11 +15,12 @@ import {
     createElement,
     useEffect,
     useImperativeHandle,
+    useLayoutEffect,
     useRef,
     useState,
 } from "react";
 import type { ComponentType, ReactElement, ReactNode, Ref } from "react";
-import { Animated, Easing } from "react-native";
+import { Animated, Easing, Platform, View } from "react-native";
 
 import { animatable, blend } from "../motion";
 import { useReducedMotion, useComponentState, useTokens } from "../react";
@@ -90,21 +91,15 @@ export const useRippleMotion = (
 };
 
 // A disc, placed at the press point and moved by transforms alone, which the native driver
-// can run on a device. Its edge is hard: a soft one needs SVG.
-const Disc = (props: RippleProps) => {
+// runs on a device's UI thread. Its edge is hard: a soft one needs SVG.
+const NativeDisc = (props: RippleProps) => {
     const { grow, fade } = useRippleMotion(props, true);
     const { size, scale, start, end } = props.ripple.geometry;
     const along = (from: number, to: number) =>
         grow.interpolate({ inputRange: [0, 1], outputRange: [from, to] });
     return createElement(Animated.View, {
         style: {
-            position: "absolute",
-            left: start.x,
-            top: start.y,
-            width: size,
-            height: size,
-            borderRadius: size / 2,
-            backgroundColor: props.color,
+            ...discStyle(props),
             opacity: fade,
             transform: [
                 { translateX: along(0, end.x - start.x) },
@@ -114,6 +109,71 @@ const Disc = (props: RippleProps) => {
         },
     });
 };
+
+const discStyle = ({ ripple, color }: RippleProps) => ({
+    position: "absolute" as const,
+    left: ripple.geometry.start.x,
+    top: ripple.geometry.start.y,
+    width: ripple.geometry.size,
+    height: ripple.geometry.size,
+    borderRadius: ripple.geometry.size / 2,
+    backgroundColor: color,
+});
+
+type Animatable = {
+    animate?: (
+        keyframes: Keyframe[],
+        options: KeyframeAnimationOptions,
+    ) => { finished: Promise<unknown> };
+};
+
+// On the web, the same disc grown and faded by the browser's own animations of its transform and
+// opacity, which run off the main thread: Animated would step them from JavaScript each frame,
+// so a surface's re-render (its pressed state) stalls the ripple. Each starts before the disc is
+// first painted.
+const WebDisc = (props: RippleProps) => {
+    const node = useRef<Animatable | null>(null);
+    const latest = useRef(props.done);
+    latest.current = props.done;
+    const { size: _size, scale, start, end } = props.ripple.geometry;
+    const { timing } = props;
+    useLayoutEffect(() => {
+        node.current?.animate?.(
+            [
+                { transform: "translate(0px, 0px) scale(1)" },
+                {
+                    transform: `translate(${end.x - start.x}px, ${end.y - start.y}px) scale(${scale})`,
+                },
+            ],
+            { duration: timing.grow, easing: timing.easing, fill: "forwards" },
+        );
+    }, []);
+    const release = props.ripple.release;
+    useLayoutEffect(() => {
+        if (release === undefined) return;
+        const fade = node.current?.animate?.([{ opacity: 1 }, { opacity: 0 }], {
+            duration: timing.fade,
+            delay: release,
+            easing: "linear",
+            fill: "forwards",
+        });
+        if (!fade) {
+            latest.current();
+            return;
+        }
+        let live = true;
+        fade.finished.then(
+            () => live && latest.current(),
+            () => {},
+        );
+        return () => {
+            live = false;
+        };
+    }, [release]);
+    return createElement(View, { ref: node as never, style: discStyle(props) });
+};
+
+const Disc = Platform.OS === "web" ? WebDisc : NativeDisc;
 
 export const DISCS: RippleDrawing = { Ripple: Disc };
 

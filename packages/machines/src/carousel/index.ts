@@ -56,7 +56,8 @@ export interface MaskProps {
 
 /** Zag's API with the preset's parts. */
 export interface Api<T extends PropTypes = PropTypes> extends CarouselApi<T> {
-    /** An item's mask: focusable (only the current page's takes focus from Tab), pressable. */
+    /** An item's mask: focusable (each takes focus from Tab, as Material's carousel says; the
+     *  current page's is marked `data-current`), pressable. */
     getMaskProps(props: MaskProps): T["element"];
     /** An item's content, at the item's full size inside the mask. */
     getContentProps(props: MaskProps): T["element"];
@@ -205,6 +206,13 @@ export function connect<T extends PropTypes>(
                 style,
             } as T["element"];
         },
+        // Every item is a tab stop, so none is hidden from assistive technology: Zag hides
+        // those out of view, and Tab brings one into view (the browser's own scroll).
+        getItemProps(props) {
+            const item = api.getItemProps(props) as Record<string, unknown>;
+            const { "aria-hidden": _hidden, ...rest } = item;
+            return rest as T["element"];
+        },
         getMaskProps: ({ index, disabled = false }) =>
             pressableItemProps(
                 normalize.element({
@@ -212,7 +220,8 @@ export function connect<T extends PropTypes>(
                     "data-index": index,
                     "data-disabled": disabled ? "" : undefined,
                     "aria-disabled": disabled || undefined,
-                    tabIndex: index === api.page ? 0 : -1,
+                    "data-current": index === api.page ? "" : undefined,
+                    tabIndex: disabled ? -1 : 0,
                 }),
                 emitters.item(String(index)),
                 disabled,

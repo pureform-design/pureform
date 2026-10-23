@@ -1,7 +1,7 @@
 import { act } from "@testing-library/react";
 import { useState } from "react";
 import type { ReactNode } from "react";
-import { View } from "react-native";
+import { Linking, View } from "react-native";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
@@ -705,6 +705,26 @@ describe("lists, menus, and selects", () => {
         expect(middleTop).toBe(firstBottom);
         expect(lastBottom).toBe(firstTop);
         expect(lastTop).toBe(middleTop);
+    });
+
+    it("makes an item with an href an interactive link, which a press opens", async () => {
+        const open = vi.spyOn(Linking, "openURL").mockResolvedValue(undefined);
+        await render(
+            <List
+                items={[
+                    { headline: "Inbox", href: "#inbox" },
+                    { headline: "Sent" },
+                ]}
+            />,
+        );
+        const [link, row] = document.querySelectorAll<HTMLElement>(
+            '[data-testid="pf-list-item-root"]',
+        );
+        expect(link!.getAttribute("role")).toBe("link");
+        expect(row!.getAttribute("role")).toBe("listitem");
+        await userEvent.click(link!);
+        expect(open).toHaveBeenCalledWith("#inbox");
+        open.mockRestore();
     });
 
     it("leaves a standard list's items square", async () => {
