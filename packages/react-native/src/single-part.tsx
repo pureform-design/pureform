@@ -352,10 +352,7 @@ function MediaImpl(props: MediaProps): ReactNode {
                 style={style as ViewStyle}
                 testID={testID}
             >
-                <Drawing
-                    drawing={drawing}
-                    image={{ uri, fit }}
-                />
+                <Drawing drawing={drawing} image={{ uri, fit }} />
             </View>
         );
     }
