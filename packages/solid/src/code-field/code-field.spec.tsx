@@ -1,6 +1,6 @@
 import { testIds } from "@pureform/anatomy";
-import { describe, expect, it, vi } from "vitest";
 import { flush, createSignal } from "solid-js";
+import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { CodeField } from ".";

@@ -533,17 +533,26 @@ describe("Menu, submenus", () => {
         expect(labels()).toEqual(["Cut", "Share"]);
     });
 
-    it("cascades by default in a wide window and drills in a compact one", async () => {
+    it("cascades by default when a submenu fits beside the open menu, and drills when its container is narrow", async () => {
         try {
             await page.viewport(1000, 800);
             withRegistry(() => <Menu trigger="Edit" items={NESTED} />);
-            await frames();
+            await userEvent.click(byTestId(ids.trigger));
+            await frames(6);
             expect(contents()).toHaveLength(2);
-            document.body.innerHTML = "";
-            await page.viewport(400, 800);
-            withRegistry(() => <Menu trigger="Edit" items={NESTED} />);
+            await userEvent.keyboard("{Escape}");
             await frames();
+            document.body.innerHTML = "";
+            // A wide window, but the menu sits in a narrow panel that clips it.
+            withRegistry(() => (
+                <div style={{ width: "70px", overflow: "hidden" }}>
+                    <Menu trigger="Edit" items={NESTED} />
+                </div>
+            ));
+            await userEvent.click(byTestId(ids.trigger));
+            await frames(6);
             expect(contents()).toHaveLength(1);
+            expect(items()[1]!.getAttribute("aria-haspopup")).toBe("menu");
         } finally {
             await page.viewport(414, 896);
         }

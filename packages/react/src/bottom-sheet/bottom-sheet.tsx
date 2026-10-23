@@ -55,9 +55,9 @@ import { Button } from "../button";
 import { dialogParts } from "../dialog-parts";
 import { DragHandle as DragHandleComponent } from "../drag-handle";
 import { useSlotProps } from "../parts";
-import { useComponentState } from "../provider";
 import type { SlotKeyedProps } from "../parts";
 import type { PartProps } from "../props";
+import { useComponentState } from "../provider";
 
 type Anatomy = typeof bottomSheetOverlayAnatomy;
 

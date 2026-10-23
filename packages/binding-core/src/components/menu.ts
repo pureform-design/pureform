@@ -146,19 +146,33 @@ export const submenuPositioning = (
  *  cascading when there's room beside the menu, else drilling. */
 export type MenuSubmenu = "cascade" | "drill" | "auto";
 
-/** The narrowest window `auto` cascades in: Material's compact windows (under 600dp) have no room
- *  for a 280dp-wide menu beside another, so their submenus drill. */
-export const MENU_CASCADE_MIN_WIDTH = 600;
+/** The room a cascading submenu has: the widest side beside the open menu (px, to the edge of
+ *  what bounds it: its container, or the window), and what a submenu needs there (the menu's own
+ *  width; Material's submenus are menus alike). */
+export interface MenuSubmenuRoom {
+    readonly beside: number;
+    readonly needed: number;
+}
 
-/** What `submenu` comes to in a window `width` wide (`undefined` before it's known, as when
- *  rendering on a server: cascading, the default's in a wide window). */
+/** The room beside a `menu` box inside a `boundary` box (both along the screen's x axis). */
+export const menuSubmenuRoomOf = (
+    menu: { readonly left: number; readonly right: number },
+    boundary: { readonly left: number; readonly right: number },
+): MenuSubmenuRoom => ({
+    beside: Math.max(boundary.right - menu.right, menu.left - boundary.left, 0),
+    needed: menu.right - menu.left,
+});
+
+/** What `submenu` comes to given the `room` the open menu has (`undefined` before it's measured,
+ *  as when rendering on a server: cascading). `auto` cascades when a submenu fits beside the
+ *  menu, on either side, and drills when it doesn't. */
 export const menuSubmenuMode = (
     submenu: MenuSubmenu | undefined,
-    width: number | undefined,
+    room: MenuSubmenuRoom | undefined,
 ): "cascade" | "drill" =>
     submenu === "cascade" || submenu === "drill"
         ? submenu
-        : width !== undefined && width < MENU_CASCADE_MIN_WIDTH
+        : room !== undefined && room.beside < room.needed
           ? "drill"
           : "cascade";
 
@@ -218,8 +232,8 @@ export interface MenuContentProps<Node> {
     /** Groups of items, after `items`; the menu is `grouped` unless told otherwise. */
     readonly groups?: readonly MenuGroup<Node>[] | undefined;
     /** How an item with `items` opens its submenu: `cascade` beside it, `drill` in the menu's
-     *  place under a row that goes back, `auto` cascading in a window at least
-     *  `MENU_CASCADE_MIN_WIDTH` wide, else drilling. @default "auto" */
+     *  place under a row that goes back, `auto` cascading when a submenu fits beside the
+     *  open menu (within its container and the window), else drilling. @default "auto" */
     readonly submenu?: MenuSubmenu | undefined;
 }
 

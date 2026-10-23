@@ -99,8 +99,7 @@ export function affixFieldParts(use: (name: string) => AffixFieldContext) {
         };
 
     function SupportingText(props: SelectFieldPartProps): JSX.Element {
-        const { scope, supportingTextId, errorText } =
-            use("SupportingText");
+        const { scope, supportingTextId, errorText } = use("SupportingText");
         const children = {
             get children() {
                 return errorText() ?? props.children;

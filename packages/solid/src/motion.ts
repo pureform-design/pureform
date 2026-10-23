@@ -8,12 +8,7 @@ import {
     subscribeReducedMotion,
     watchCollapse,
 } from "@pureform/binding-core/dom";
-import {
-    type Accessor,
-    createMemo,
-    createSignal,
-    onSettled,
-} from "solid-js";
+import { type Accessor, createMemo, createSignal, onSettled } from "solid-js";
 
 import { usePureform } from "./provider";
 

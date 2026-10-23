@@ -31,9 +31,13 @@ import type {
     MenuItemBehaviorProps,
     MenuRootOwnProps,
     MenuSelectDetails,
+    MenuSubmenuRoom,
     MenuVariantProps,
 } from "@pureform/binding-core";
-import { markMenuGroupEdges } from "@pureform/binding-core/dom";
+import {
+    markMenuGroupEdges,
+    watchMenuSubmenuRoom,
+} from "@pureform/binding-core/dom";
 import * as menu from "@pureform/machines/menu";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";
@@ -567,18 +571,24 @@ function ItemParts({
     );
 }
 
-/** The window's width, once mounted (so a server's render and the first client render agree),
- *  following its resizes; `undefined` while `track` is off. */
-function useWindowWidth(track: boolean): number | undefined {
-    const [width, setWidth] = useState<number>();
+/** Measures the room beside the open menu for `submenu="auto"` (after mounting, so a server's
+ *  render and the first client render agree: cascading). */
+function MeasureSubmenuRoom(props: {
+    readonly onRoom: (room: MenuSubmenuRoom) => void;
+}): null {
+    const { api } = context.use("Content");
+    const { onRoom } = props;
     useEffect(() => {
-        if (!track) return undefined;
-        const read = () => setWidth(window.innerWidth);
-        read();
-        window.addEventListener("resize", read);
-        return () => window.removeEventListener("resize", read);
-    }, [track]);
-    return width;
+        if (!api.open) return undefined;
+        const byId = (id: string | undefined) =>
+            id ? document.getElementById(id) : null;
+        return watchMenuSubmenuRoom(
+            () => byId(api.getContentProps().id),
+            () => byId(api.getTriggerProps().id),
+            onRoom,
+        );
+    }, [api.open]);
+    return null;
 }
 
 /** A drilled-in level's first row, highlighted as the level comes in, so the keys go on from
@@ -619,11 +629,9 @@ function ReadyMade(props: MenuProps): ReactNode {
         ...rootProps
     } = props;
     const slot = useSlotProps(props);
-    const drill =
-        menuSubmenuMode(
-            submenuProp,
-            useWindowWidth(submenuProp === undefined || submenuProp === "auto"),
-        ) === "drill";
+    const auto = submenuProp === undefined || submenuProp === "auto";
+    const [room, setRoom] = useState<MenuSubmenuRoom>();
+    const drill = menuSubmenuMode(submenuProp, room) === "drill";
     // The submenu items drilled into, outermost first.
     const [path, setPath] = useState<readonly string[]>([]);
     const level = menuDrillLevel(allItems, allGroups, drill ? path : []);
@@ -666,6 +674,7 @@ function ReadyMade(props: MenuProps): ReactNode {
             ) : null}
             <Positioner {...slot("positioner")}>
                 <Content {...slot("content")}>
+                    {auto ? <MeasureSubmenuRoom onRoom={setRoom} /> : null}
                     {drill ? (
                         <HighlightOnDrill
                             level={path.join("\u0000")}

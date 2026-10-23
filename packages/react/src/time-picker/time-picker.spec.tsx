@@ -151,8 +151,14 @@ describe("TimePicker's dial handle", () => {
             // Two o'clock: a sixth of a turn, 39% of the dial out from its centre.
             const r = 0.39 * 256;
             const turn = (2 / 12) * 2 * Math.PI;
-            expect(handle.x + 24 - dial.x).toBeCloseTo(128 + r * Math.sin(turn), 0);
-            expect(handle.y + 24 - dial.y).toBeCloseTo(128 - r * Math.cos(turn), 0);
+            expect(handle.x + 24 - dial.x).toBeCloseTo(
+                128 + r * Math.sin(turn),
+                0,
+            );
+            expect(handle.y + 24 - dial.y).toBeCloseTo(
+                128 - r * Math.cos(turn),
+                0,
+            );
         } finally {
             style.remove();
         }

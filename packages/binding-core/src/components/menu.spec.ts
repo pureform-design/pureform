@@ -1,22 +1,37 @@
 import { describe, expect, it } from "vitest";
 
-import {
-    MENU_CASCADE_MIN_WIDTH,
-    menuDrillLevel,
-    menuSubmenuMode,
-} from "./menu";
+import { menuDrillLevel, menuSubmenuMode, menuSubmenuRoomOf } from "./menu";
 
 describe("menuSubmenuMode", () => {
-    it("keeps cascade and drill, and makes auto cascade in a wide window and drill in a compact one", () => {
-        expect(menuSubmenuMode("cascade", 320)).toBe("cascade");
-        expect(menuSubmenuMode("drill", 1280)).toBe("drill");
-        expect(menuSubmenuMode(undefined, 1280)).toBe("cascade");
-        expect(menuSubmenuMode("auto", MENU_CASCADE_MIN_WIDTH)).toBe("cascade");
-        expect(menuSubmenuMode("auto", MENU_CASCADE_MIN_WIDTH - 1)).toBe(
-            "drill",
-        );
-        // Before the window is known (a server's render): cascade.
+    it("keeps cascade and drill, and makes auto cascade when a submenu fits beside the menu", () => {
+        const tight = { beside: 100, needed: 200 };
+        const roomy = { beside: 200, needed: 200 };
+        expect(menuSubmenuMode("cascade", tight)).toBe("cascade");
+        expect(menuSubmenuMode("drill", roomy)).toBe("drill");
+        expect(menuSubmenuMode(undefined, roomy)).toBe("cascade");
+        expect(menuSubmenuMode("auto", roomy)).toBe("cascade");
+        expect(menuSubmenuMode("auto", tight)).toBe("drill");
+        // Before the menu is measured (a server's render): cascade.
         expect(menuSubmenuMode("auto", undefined)).toBe("cascade");
+    });
+});
+
+describe("menuSubmenuRoomOf", () => {
+    it("takes the wider side beside the menu, inside its boundary", () => {
+        const boundary = { left: 0, right: 1000 };
+        expect(menuSubmenuRoomOf({ left: 100, right: 300 }, boundary)).toEqual({
+            beside: 700,
+            needed: 200,
+        });
+        expect(menuSubmenuRoomOf({ left: 750, right: 950 }, boundary)).toEqual({
+            beside: 750,
+            needed: 200,
+        });
+        // A menu filling a narrow container (a side panel) in a wide window has no room.
+        expect(
+            menuSubmenuRoomOf({ left: 20, right: 300 }, { left: 0, right: 320 })
+                .beside,
+        ).toBe(20);
     });
 });
 

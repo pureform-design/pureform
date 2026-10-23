@@ -577,7 +577,9 @@ trigger shows their labels joined by ", " (the placeholder when none):
   `items` opens a submenu, an arrow (`›`) at its end, as `submenu` says on every renderer:
   `cascade` beside the item (React Native: over the page through the portal host, against the
   item's row), `drill` in the menu's place under a row that goes back, and `auto` (the default)
-  cascading in a window at least `MENU_CASCADE_MIN_WIDTH` (600) wide, else drilling.
+  cascading when a submenu (as wide as the menu) fits beside the open menu in the window, measured
+  once it's laid out, else drilling (it replaces the window-width rule; `MENU_CASCADE_MIN_WIDTH` is
+  gone).
 - **Navigation rail:** destinations with the same `section` sit together under one heading with
   its text, shown only while the rail is `expanded`, in the order the sections first appear (like
   a select's `group`). The bar ignores `section`. It replaces the removed `sectionLabel`.

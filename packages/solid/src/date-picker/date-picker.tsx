@@ -249,7 +249,10 @@ const Headline: (props: DatePickerPartProps) => JSX.Element = chrome.part(
 );
 
 /** The chosen date, or a placeholder. */
-const SelectedDate = inline<DatePickerPartProps>("selectedDate", "SelectedDate");
+const SelectedDate = inline<DatePickerPartProps>(
+    "selectedDate",
+    "SelectedDate",
+);
 
 /** The button that switches to the date input: `as={IconButton}` draws it as one. */
 const ModeToggle: (props: DatePickerTriggerProps) => JSX.Element =

@@ -6,8 +6,8 @@
 // a press outside, the back button or Escape, or picking an item. An item with `items` opens a
 // submenu as `submenu` says: beside it (`cascade`, over the page against the item's row, as a
 // trigger's menu is against its trigger), or in its place (`drill`: the submenu's items under a
-// row that goes back, headed by the item's label); `auto` cascades in a window at least
-// `MENU_CASCADE_MIN_WIDTH` wide, else drills.
+// row that goes back, headed by the item's label); `auto` cascades when a submenu fits beside the
+// open menu in the window (measured once it's laid out), else drills.
 
 import { menuAnatomy, menuOverlayAnatomy } from "@pureform/anatomy";
 import type { PartName, TestIdOverride } from "@pureform/anatomy";
@@ -19,6 +19,7 @@ import {
     menuGrouped,
     menuSelection,
     menuSubmenuMode,
+    menuSubmenuRoomOf,
     submenuPositioning,
 } from "@pureform/binding-core";
 import type {
@@ -28,6 +29,7 @@ import type {
     MenuItem,
     MenuSelectDetails,
     MenuSubmenu,
+    MenuSubmenuRoom,
     MenuVariantProps,
     OverlayPositioning,
 } from "@pureform/binding-core";
@@ -37,6 +39,7 @@ import type { Selection } from "@pureform/styling";
 import { memo, useEffect, useRef, useState } from "react";
 import type { ComponentRef, ReactNode } from "react";
 import { Platform, Pressable, useWindowDimensions, View } from "react-native";
+import type { LayoutChangeEvent } from "react-native";
 
 import { Button } from "../button/button";
 import { iconParts } from "../icon-style";
@@ -113,8 +116,8 @@ export interface MenuProps extends MenuVariantProps, IndicationProps {
     /** An item was picked. */
     readonly onSelect?: ((details: MenuSelectDetails) => void) | undefined;
     /** How an item with `items` opens its submenu: `cascade` beside it, `drill` in the menu's
-     *  place under a row that goes back, `auto` cascading in a window at least
-     *  `MENU_CASCADE_MIN_WIDTH` wide, else drilling. @default "auto" */
+     *  place under a row that goes back, `auto` cascading when a submenu fits beside the
+     *  open menu in the window, else drilling. @default "auto" */
     readonly submenu?: MenuSubmenu | undefined;
     readonly "aria-label"?: string | undefined;
     readonly testId?: TestIdOverride<Part> | undefined;
@@ -238,8 +241,21 @@ function MenuImpl(
 ): ReactNode {
     const engine = useEngine();
     const rtl = useDirection() === "rtl";
-    const drill =
-        menuSubmenuMode(props.submenu, useWindowDimensions().width) === "drill";
+    const windowWidth = useWindowDimensions().width;
+    const auto = props.submenu === undefined || props.submenu === "auto";
+    const [room, setRoom] = useState<MenuSubmenuRoom>();
+    const surface = useRef<ComponentRef<typeof View>>(null);
+    const measureRoom = () =>
+        surface.current?.measureInWindow((x, _y, width) => {
+            if (width > 0)
+                setRoom(
+                    menuSubmenuRoomOf(
+                        { left: x, right: x + width },
+                        { left: 0, right: windowWidth },
+                    ),
+                );
+        });
+    const drill = menuSubmenuMode(props.submenu, room) === "drill";
     // The submenu items drilled into, outermost first.
     const [path, setPath] = useState<readonly string[]>([]);
     // The submenu cascading beside its item's row.
@@ -308,6 +324,19 @@ function MenuImpl(
     return (
         <Root.View
             {...presence.props}
+            {...(auto
+                ? {
+                      ref: surface,
+                      onLayout: (event: LayoutChangeEvent) => {
+                          (
+                              presence.props.onLayout as
+                                  | ((event: LayoutChangeEvent) => void)
+                                  | undefined
+                          )?.(event);
+                          measureRoom();
+                      },
+                  }
+                : {})}
             role="menu"
             {...(props["aria-label"] === undefined
                 ? {}

@@ -239,6 +239,7 @@ export {
     transitionSpring,
 } from "./settle";
 export { markMenuGroupEdges } from "./menu-groups";
+export { menuSubmenuRoom, watchMenuSubmenuRoom } from "./menu-submenu-room";
 export { revealInRow } from "./reveal";
 export { slideIndicator, slideTransform, transformTiming } from "./slide";
 export { moveToolbarFocus, watchOverflow } from "./toolbar-dom";

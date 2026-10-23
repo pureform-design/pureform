@@ -33,9 +33,13 @@ import type {
     MenuItemBehaviorProps,
     MenuRootOwnProps,
     MenuSelectDetails,
+    MenuSubmenuRoom,
     MenuVariantProps,
 } from "@pureform/binding-core";
-import { markMenuGroupEdges } from "@pureform/binding-core/dom";
+import {
+    markMenuGroupEdges,
+    watchMenuSubmenuRoom,
+} from "@pureform/binding-core/dom";
 import * as menu from "@pureform/machines/menu";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {
@@ -611,17 +615,30 @@ const READY_MADE_PROPS = [
     ...MENU_CONTENT_PROPS,
 ] as const;
 
-/** The window's width once mounted (so a server's render and the first client render agree),
- *  following its resizes. */
-function windowWidth(): Accessor<number | undefined> {
-    const [width, setWidth] = createSignal<number>();
-    onSettled(() => {
-        const read = () => setWidth(window.innerWidth);
-        read();
-        window.addEventListener("resize", read);
-        return () => window.removeEventListener("resize", read);
-    });
-    return width;
+/** Measures the room beside the open menu for `submenu="auto"` (once settled, so a server's
+ *  render and hydration agree: cascading). */
+function MeasureSubmenuRoom(props: {
+    readonly onRoom: (room: MenuSubmenuRoom) => void;
+}): JSX.Element {
+    const { api } = context.use("Content");
+    let stop: (() => void) | undefined;
+    createEffect(
+        () => api().open,
+        (open) => {
+            stop?.();
+            stop = undefined;
+            if (!open) return;
+            const byId = (id: unknown) =>
+                typeof id === "string" ? document.getElementById(id) : null;
+            stop = watchMenuSubmenuRoom(
+                () => byId(untrack(api).getContentProps().id),
+                () => byId(untrack(api).getTriggerProps().id),
+                props.onRoom,
+            );
+        },
+    );
+    onCleanup(() => stop?.());
+    return null;
 }
 
 /** A drilled-in level's first row, highlighted as the level comes in, so the keys go on from
@@ -645,14 +662,9 @@ function HighlightOnDrill(props: {
  *  item per entry of `items`, then a group per entry of `groups`; an entry with `items` opens
  *  its submenu as `submenu` says. */
 function ReadyMade(props: MenuProps): JSX.Element {
-    const width = windowWidth();
-    const drill = () =>
-        menuSubmenuMode(
-            props.submenu,
-            props.submenu === undefined || props.submenu === "auto"
-                ? width()
-                : undefined,
-        ) === "drill";
+    const auto = () => props.submenu === undefined || props.submenu === "auto";
+    const [room, setRoom] = createSignal<MenuSubmenuRoom>();
+    const drill = () => menuSubmenuMode(props.submenu, room()) === "drill";
     // The submenu items drilled into, outermost first.
     const [path, setPath] = createSignal<readonly string[]>([]);
     const level = createMemo(() =>
@@ -728,6 +740,9 @@ function ReadyMade(props: MenuProps): JSX.Element {
             </Show>
             <Positioner {...positioner}>
                 <Content {...content}>
+                    <Show when={auto()}>
+                        <MeasureSubmenuRoom onRoom={setRoom} />
+                    </Show>
                     <Show when={drill()}>
                         <HighlightOnDrill
                             level={path().join("\u0000")}

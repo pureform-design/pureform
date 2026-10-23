@@ -1,7 +1,7 @@
 import { act } from "@testing-library/react";
 import { useState } from "react";
 import type { ReactNode } from "react";
-import { Image, Linking, View } from "react-native";
+import { Dimensions, Image, Linking, View } from "react-native";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
 
@@ -1211,31 +1211,37 @@ describe("nested rows", () => {
         await until(() => expect(menuLabels()).toEqual(["Cut", "Share›"]));
     });
 
-    it("cascades by default in a wide window and drills in a compact one", async () => {
-        try {
-            await page.viewport(1000, 800);
-            await render(<Menu items={SHARE} />);
-            await interact(() =>
+    it("cascades by default when a submenu fits beside the menu, and drills when it doesn't", async () => {
+        const centered = (
+            <View style={{ alignItems: "center" }}>
+                <Menu items={SHARE} />
+            </View>
+        );
+        const openShare = () =>
+            interact(() =>
                 userEvent.click(
                     document.querySelectorAll<HTMLElement>(
                         '[role="menuitem"]',
                     )[1]!,
                 ),
             );
+        try {
+            await page.viewport(1000, 800);
+            await render(centered);
+            await settle(100);
+            await openShare();
             await until(() =>
                 expect(menuLabels()).toEqual(["Cut", "Share›", "Mail"]),
             );
             document.body.innerHTML = "";
-            await page.viewport(400, 800);
-            await render(<Menu items={SHARE} />);
-            await interact(() =>
-                userEvent.click(
-                    document.querySelectorAll<HTMLElement>(
-                        '[role="menuitem"]',
-                    )[1]!,
-                ),
-            );
-            expect(menuLabels()).toEqual(["‹Share", "Mail"]);
+            // A centred menu at least 112 wide in a 320-wide window: less than its width either side.
+            await page.viewport(320, 800);
+            // React Native Web hears the window's resize a moment later.
+            await until(() => expect(Dimensions.get("window").width).toBe(320));
+            await render(centered);
+            await settle(100);
+            await openShare();
+            await until(() => expect(menuLabels()).toEqual(["‹Share", "Mail"]));
         } finally {
             await page.viewport(414, 896);
         }
