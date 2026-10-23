@@ -30,13 +30,7 @@ import { settle } from "@pureform/rn-adapter/animated";
 import { useReducedMotion, useTokens } from "@pureform/rn-adapter/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import {
-    Animated,
-    PanResponder,
-    ScrollView,
-    StyleSheet,
-    View,
-} from "react-native";
+import { Animated, ScrollView, StyleSheet, View } from "react-native";
 
 import { Button } from "../button/button";
 import { IconButton } from "../icon-button/icon-button";
@@ -44,6 +38,7 @@ import { ModalScrimLayer, ModalWindow, useModalOverlay } from "../modal";
 import { testIdOf, useStableCallback, withEngine } from "../parts";
 import { themeSpring, useOverlayPresence } from "../presence";
 import { useDirection, useEngine, usePureform } from "../provider";
+import { useSidewaysPan } from "../sideways-pan";
 import { useComponentSlots } from "../styles";
 
 /** The sheet's parts this binding renders. */
@@ -244,42 +239,32 @@ function SideSheetDrag(props: {
         now = false;
     });
     useEffect(() => () => stopSettle.current(), []);
-    const pan = useMemo(
-        () =>
-            PanResponder.create({
-                // Mostly sideways: a drag of the sheet; mostly up or down: its content's scroll.
-                onMoveShouldSetPanResponderCapture: (_, gesture) =>
-                    Math.abs(gesture.dx) > SLOP &&
-                    Math.abs(gesture.dx) > Math.abs(gesture.dy),
-                onPanResponderGrant: () => {
-                    props.asker.cancel();
-                    stopSettle.current();
-                },
-                onPanResponderMove: (_, gesture) => {
-                    offset.current = Math.max(
-                        0,
-                        gesture.dx * latestOutward.current,
-                    );
-                    drag.setValue(offset.current * latestOutward.current);
-                },
-                onPanResponderRelease: (_, gesture) => {
-                    // In pixels per millisecond, toward the edge.
-                    const velocity = gesture.vx * latestOutward.current;
-                    const to = sideSheetRelease({
-                        offset: offset.current,
-                        velocity,
-                        width: width.current,
-                    });
-                    if (to === "closed") latestDismiss(velocity);
-                    else latestSettle(velocity);
-                },
-                onPanResponderTerminate: () => latestSettle(0),
-            }),
-        [drag, props.asker, latestDismiss, latestSettle],
-    );
+    const pan = useSidewaysPan({
+        slop: SLOP,
+        start: () => {
+            props.asker.cancel();
+            stopSettle.current();
+        },
+        move: (dx) => {
+            offset.current = Math.max(0, dx * latestOutward.current);
+            drag.setValue(offset.current * latestOutward.current);
+        },
+        release: (_dx, vx) => {
+            // In pixels per millisecond, toward the edge.
+            const velocity = vx * latestOutward.current;
+            const to = sideSheetRelease({
+                offset: offset.current,
+                velocity,
+                width: width.current,
+            });
+            if (to === "closed") latestDismiss(velocity);
+            else latestSettle(velocity);
+        },
+        cancel: () => latestSettle(0),
+    });
     return (
         <Animated.View
-            {...pan.panHandlers}
+            {...pan}
             onLayout={(event) => {
                 width.current = event.nativeEvent.layout.width;
             }}

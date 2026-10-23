@@ -4,13 +4,13 @@
 // page's to scroll (`touch-action: pan-y`). A press on its buttons (the action, the close button)
 // isn't a drag, and a toast that can't be closed doesn't move. Its timer waits while it's held.
 
-import { createDragVelocity } from "./drag";
-import { swallowNextClick } from "./drag-click";
+import { toastSwipeRelease } from "./components/toast";
+import { sidewaysDrag } from "./sideways-drag";
+
+export { TOAST_SWIPE_VELOCITY_THRESHOLD } from "./components/toast";
 
 // Moves shorter than this are a press, not a swipe.
 const SLOP = 8;
-/** A flick this fast (px/ms) or faster dismisses however short the swipe. */
-export const TOAST_SWIPE_VELOCITY_THRESHOLD = 0.5;
 /** How long the toast takes to settle back, or to leave once let go. */
 const SETTLE_MS = 200;
 const EASING = "cubic-bezier(0.2, 0, 0, 1)";
@@ -30,12 +30,8 @@ export const toastSwipeToDismiss = (
     toast: HTMLElement,
     options: ToastSwipeOptions,
 ): (() => void) => {
-    let start:
-        | { x: number; y: number; id: number; dragging?: boolean }
-        | undefined;
     let offset = 0;
     let settling: Animation | undefined;
-    const speed = createDragVelocity();
     const place = (at: number) => {
         offset = at;
         if (at === 0) {
@@ -69,76 +65,40 @@ export const toastSwipeToDismiss = (
             done();
         };
     };
-    const onDown = (event: PointerEvent) => {
-        if (!event.isPrimary || event.button !== 0) return;
-        if (!options.closable()) return;
-        if ((event.target as Element | null)?.closest?.("button, a, input"))
-            return;
-        settling?.cancel();
-        settling = undefined;
-        start = { x: event.clientX, y: event.clientY, id: event.pointerId };
-        speed.reset();
-        speed.add(0, event.timeStamp);
-    };
-    const onMove = (event: PointerEvent) => {
-        if (!start || event.pointerId !== start.id) return;
-        const dx = event.clientX - start.x;
-        const dy = event.clientY - start.y;
-        if (start.dragging === undefined) {
-            if (Math.hypot(dx, dy) < SLOP) return;
-            start.dragging = Math.abs(dx) > Math.abs(dy);
-            if (!start.dragging) {
-                start = undefined;
+    const stop = sidewaysDrag(toast, {
+        slop: SLOP,
+        accepts: (event) =>
+            event.isPrimary &&
+            event.button === 0 &&
+            options.closable() &&
+            !(event.target as Element | null)?.closest?.("button, a, input"),
+        down: () => {
+            settling?.cancel();
+            settling = undefined;
+        },
+        start: () => options.pause(),
+        move: (dx) => place(dx),
+        release: (_dx, velocity, cancelled) => {
+            const width = toast.offsetWidth;
+            if (
+                !cancelled &&
+                toastSwipeRelease({ offset, velocity, width }) === "dismissed"
+            ) {
+                const to = (Math.sign(offset) || 1) * width;
+                animate(to, () => {
+                    place(to);
+                    options.dismiss();
+                });
                 return;
             }
-            // Keeps the drag when the pointer leaves the toast; a synthetic event has no pointer
-            // to capture.
-            try {
-                toast.setPointerCapture(event.pointerId);
-            } catch {
-                // Not an active pointer.
-            }
-            options.pause();
-        }
-        event.preventDefault();
-        speed.add(dx, event.timeStamp);
-        place(dx);
-    };
-    const end = (event: PointerEvent, cancelled: boolean) => {
-        if (!start || event.pointerId !== start.id) return;
-        const dragging = start.dragging;
-        start = undefined;
-        if (!dragging) return;
-        swallowNextClick(toast);
-        const velocity = speed.velocity() / 1000;
-        const width = toast.offsetWidth;
-        const fling =
-            Math.abs(velocity) >= TOAST_SWIPE_VELOCITY_THRESHOLD &&
-            Math.sign(velocity) === Math.sign(offset);
-        if (!cancelled && (Math.abs(offset) >= width / 2 || fling)) {
-            const to = (Math.sign(offset) || 1) * width;
-            animate(to, () => {
-                place(to);
-                options.dismiss();
-            });
-            return;
-        }
-        animate(0, () => place(0));
-        options.resume();
-    };
-    const onUp = (event: PointerEvent) => end(event, false);
-    const onCancel = (event: PointerEvent) => end(event, true);
+            animate(0, () => place(0));
+            options.resume();
+        },
+    });
     const touchAction = toast.style.touchAction;
     toast.style.touchAction = "pan-y";
-    toast.addEventListener("pointerdown", onDown);
-    toast.addEventListener("pointermove", onMove);
-    toast.addEventListener("pointerup", onUp);
-    toast.addEventListener("pointercancel", onCancel);
     return () => {
-        toast.removeEventListener("pointerdown", onDown);
-        toast.removeEventListener("pointermove", onMove);
-        toast.removeEventListener("pointerup", onUp);
-        toast.removeEventListener("pointercancel", onCancel);
+        stop();
         toast.style.touchAction = touchAction;
         settling?.cancel();
     };

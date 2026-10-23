@@ -157,3 +157,24 @@ export const toastGroupStyle = <S extends object>(style: S | undefined): S => {
         ...(right === undefined ? {} : { right }),
     } as S;
 };
+
+/** A flick this fast (px/ms) or faster dismisses a swiped toast however short the swipe. */
+export const TOAST_SWIPE_VELOCITY_THRESHOLD = 0.5;
+
+/** Where a toast swiped sideways goes once let go, on every renderer: `offset` is how far it
+ *  moved (px, either way), `velocity` its speed along the screen (px/ms). Past half its `width`,
+ *  or on a flick the way it moved, it leaves (`dismissed`); short of that, it settles back. */
+export const toastSwipeRelease = (release: {
+    readonly offset: number;
+    readonly velocity: number;
+    readonly width: number;
+}): "dismissed" | "settled" => {
+    const { offset, velocity, width } = release;
+    if (offset === 0) return "settled";
+    const fling =
+        Math.abs(velocity) >= TOAST_SWIPE_VELOCITY_THRESHOLD &&
+        Math.sign(velocity) === Math.sign(offset);
+    return (width > 0 && Math.abs(offset) >= width / 2) || fling
+        ? "dismissed"
+        : "settled";
+};

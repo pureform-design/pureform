@@ -23,12 +23,18 @@ const square = (inset: number) => ({
         {
             from: [inset, inset] as [number, number],
             segments: [
-                { op: "line" as const, to: [100 - inset, inset] as [number, number] },
+                {
+                    op: "line" as const,
+                    to: [100 - inset, inset] as [number, number],
+                },
                 {
                     op: "line" as const,
                     to: [100 - inset, 100 - inset] as [number, number],
                 },
-                { op: "line" as const, to: [inset, 100 - inset] as [number, number] },
+                {
+                    op: "line" as const,
+                    to: [inset, 100 - inset] as [number, number],
+                },
             ],
         },
     ],
@@ -53,7 +59,9 @@ describe("the Animated SVG engine on the web", () => {
                         <SvgDrawing
                             drawing={{
                                 shape: square(changed ? 20 : 0),
-                                fill: changed ? "rgb(0, 0, 255)" : "rgb(255, 0, 0)",
+                                fill: changed
+                                    ? "rgb(0, 0, 255)"
+                                    : "rgb(255, 0, 0)",
                                 transitions,
                             }}
                         />

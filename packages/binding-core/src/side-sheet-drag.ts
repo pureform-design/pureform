@@ -12,9 +12,8 @@
 import type { CloseQuestion } from "./components/dialog";
 import { closeAsker, sideSheetRelease } from "./components/sheet";
 import type { CloseAsker } from "./components/sheet";
-import { createDragVelocity } from "./drag";
-import { swallowNextClick } from "./drag-click";
 import { settleTransition } from "./settle";
+import { sidewaysDrag } from "./sideways-drag";
 
 // Moves shorter than this are a press, not a drag.
 const SLOP = 8;
@@ -37,15 +36,8 @@ export const sideSheetDragToDismiss = (
     layout: () => HTMLElement | null | undefined = () => undefined,
     spring?: string,
 ): (() => void) => {
-    // Where the pointer went down, and whether it's dragging the sheet yet (`undefined` while
-    // it hasn't moved past the slop either way).
-    let start:
-        | { x: number; y: number; id: number; dragging?: boolean }
-        | undefined;
-    const speed = createDragVelocity();
     // How far toward its edge it is, in pixels.
     let offset = 0;
-    let swallow: (() => void) | undefined;
     let stopSettle: (() => void) | undefined;
     // Toward the edge: right, or left under right to left.
     const outward = () => (rtl() ? -1 : 1);
@@ -107,62 +99,42 @@ export const sideSheetDragToDismiss = (
             () => settleBack(velocity),
         );
 
-    const onDown = (event: PointerEvent) => {
-        if (event.button !== 0 || event.pointerType === "mouse") return;
-        if (sheet.getAttribute("data-state") !== "open") return;
-        asker.cancel();
-        swallow?.();
-        start = { x: event.clientX, y: event.clientY, id: event.pointerId };
-        speed.reset();
-        speed.add(event.clientX * outward(), event.timeStamp);
-        offset = 0;
-    };
-    const onMove = (event: PointerEvent) => {
-        if (start?.id !== event.pointerId || start.dragging === false) return;
-        const dx = (event.clientX - start.x) * outward();
-        const dy = event.clientY - start.y;
-        if (start.dragging === undefined) {
-            if (Math.max(Math.abs(dx), Math.abs(dy)) < SLOP) return;
-            // Mostly up or down: the content's native scroll, not a drag.
-            start.dragging = Math.abs(dx) > Math.abs(dy);
-            if (!start.dragging) return;
-            // A pointer no longer active (or a synthetic one) can't be captured; the drag
-            // still follows the moves the sheet hears.
-            try {
-                sheet.setPointerCapture?.(event.pointerId);
-            } catch {}
+    const stopDrag = sidewaysDrag(sheet, {
+        slop: SLOP,
+        accepts: (event) =>
+            event.button === 0 &&
+            event.pointerType !== "mouse" &&
+            sheet.getAttribute("data-state") === "open",
+        down: () => {
+            asker.cancel();
+            offset = 0;
+        },
+        start: () => {
             stopSettle?.();
             holder = layout() ?? undefined;
             if (holder) holder.style.transition = "none";
-        }
-        speed.add(event.clientX * outward(), event.timeStamp);
-        offset = Math.max(0, dx);
-        sheet.style.transition = "none";
-        place(offset);
-    };
-    const onUp = (event: PointerEvent) => {
-        if (start?.id !== event.pointerId) return;
-        const dragging = start.dragging === true;
-        start = undefined;
-        if (!dragging) return;
-        speed.add(event.clientX * outward(), event.timeStamp);
-        // In pixels per millisecond, toward the edge.
-        const velocity = speed.velocity() / 1000;
-        swallow = swallowNextClick(sheet);
-        const to = sideSheetRelease({
-            offset,
-            velocity,
-            width: sheet.getBoundingClientRect().width,
-        });
-        if (to === "closed") leave(velocity);
-        else settleBack(velocity);
-    };
-    const onCancel = (event: PointerEvent) => {
-        if (start?.id !== event.pointerId) return;
-        const dragging = start.dragging === true;
-        start = undefined;
-        if (dragging) settleBack(0);
-    };
+        },
+        move: (dx) => {
+            offset = Math.max(0, dx * outward());
+            sheet.style.transition = "none";
+            place(offset);
+        },
+        release: (_dx, alongScreen, cancelled) => {
+            if (cancelled) {
+                settleBack(0);
+                return;
+            }
+            // In pixels per millisecond, toward the edge.
+            const velocity = alongScreen * outward();
+            const to = sideSheetRelease({
+                offset,
+                velocity,
+                width: sheet.getBoundingClientRect().width,
+            });
+            if (to === "closed") leave(velocity);
+            else settleBack(velocity);
+        },
+    });
 
     // Each time it opens again, it starts open, wherever a drag let it go last time.
     const opens = new MutationObserver((records) => {
@@ -187,19 +159,11 @@ export const sideSheetDragToDismiss = (
     // (`sideSheetContentLayout`), so a hydrated sheet doesn't change.
     const touchAction = sheet.style.touchAction;
     if (touchAction !== "pan-y") sheet.style.touchAction = "pan-y";
-    sheet.addEventListener("pointerdown", onDown);
-    sheet.addEventListener("pointermove", onMove);
-    sheet.addEventListener("pointerup", onUp);
-    sheet.addEventListener("pointercancel", onCancel);
     return () => {
-        sheet.removeEventListener("pointerdown", onDown);
-        sheet.removeEventListener("pointermove", onMove);
-        sheet.removeEventListener("pointerup", onUp);
-        sheet.removeEventListener("pointercancel", onCancel);
+        stopDrag();
         opens.disconnect();
         if (touchAction !== "pan-y") sheet.style.touchAction = touchAction;
         stopSettle?.();
-        swallow?.();
         asker.cancel();
         sheet.style.removeProperty("translate");
         sheet.style.removeProperty("transition");

@@ -41,8 +41,7 @@ const onSpring = (property: string, vars = true) => {
 
 afterEach(() => {
     document.body.replaceChildren();
-    for (const style of document.head.querySelectorAll("style"))
-        style.remove();
+    for (const style of document.head.querySelectorAll("style")) style.remove();
 });
 
 describe("exact springs on the web", () => {

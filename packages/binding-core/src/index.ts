@@ -689,6 +689,7 @@ export {
     toasterOptions,
     toastGroupStyle,
     toastSelection,
+    toastSwipeRelease,
 } from "./components/toast";
 export type {
     ToastAction,

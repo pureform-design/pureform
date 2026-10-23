@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { toastSwipeRelease } from "./components/toast";
 import { toastSwipeToDismiss } from "./toast-swipe";
 
 describe("toastSwipeToDismiss", () => {
@@ -86,5 +87,19 @@ describe("toastSwipeToDismiss", () => {
         swipe(b.toast, 200);
         expect(b.pause).not.toHaveBeenCalled();
         expect(b.dismiss).not.toHaveBeenCalled();
+    });
+});
+
+describe("toastSwipeRelease", () => {
+    it("dismisses past half the width or on a flick its way, else settles", () => {
+        const at = (offset: number, velocity = 0) =>
+            toastSwipeRelease({ offset, velocity, width: 300 });
+        expect(at(150)).toBe("dismissed");
+        expect(at(-160)).toBe("dismissed");
+        expect(at(100)).toBe("settled");
+        expect(at(40, 0.6)).toBe("dismissed");
+        expect(at(-40, -0.6)).toBe("dismissed");
+        expect(at(40, -0.6)).toBe("settled");
+        expect(at(0, 2)).toBe("settled");
     });
 });

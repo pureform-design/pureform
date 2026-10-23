@@ -520,6 +520,90 @@ describe.each([animated, reanimated])("the toaster with $name", (engine) => {
             expect.stringContaining("Uploading"),
         ]);
     });
+
+    // Drags the toast's root sideways by `moves` (px from where it went down), then lets go.
+    const swipe = async (root: HTMLElement, moves: readonly number[]) => {
+        const from = box(root);
+        const at = (dx: number) => ({
+            bubbles: true,
+            button: 0,
+            buttons: 1,
+            clientX: from.left + from.width / 2 + dx,
+            clientY: from.top + from.height / 2,
+        });
+        await interact(() => {
+            root.dispatchEvent(new MouseEvent("mousedown", at(0)));
+        });
+        for (const dx of moves) {
+            await settle(120);
+            await interact(() => {
+                root.dispatchEvent(new MouseEvent("mousemove", at(dx)));
+            });
+        }
+        return {
+            from,
+            release: () =>
+                interact(() => {
+                    root.dispatchEvent(
+                        new MouseEvent("mouseup", at(moves.at(-1)!)),
+                    );
+                }),
+        };
+    };
+
+    it("swipes a toast away sideways past half its width, holding its timer meanwhile", async () => {
+        const toaster = createToaster();
+        await render(<Toaster toaster={toaster} />, engine);
+        await interact(() => {
+            toaster.info({ title: "Archived", duration: 600 });
+        });
+        await settle(100);
+        const root = roots()[0]!;
+        const width = box(root).width;
+        const { from, release } = await swipe(root, [
+            20,
+            width * 0.3,
+            width * 0.6,
+        ]);
+        expect(box(root).left).toBeGreaterThan(from.left + width * 0.4);
+        // Held past its duration: still there.
+        await settle(700);
+        expect(roots()).toHaveLength(1);
+        await release();
+        await until(() => roots().length === 0, 2000);
+    });
+
+    it("settles a short swipe back, and doesn't move a toast that can't be closed", async () => {
+        const toaster = createToaster();
+        await render(<Toaster toaster={toaster} />, engine);
+        await interact(() => {
+            toaster.info({ title: "Kept", duration: Infinity });
+        });
+        await settle(100);
+        let root = roots()[0]!;
+        const short = await swipe(root, [20, -40]);
+        expect(box(root).left).toBeLessThan(short.from.left - 20);
+        await short.release();
+        await until(() => Math.abs(box(root).left - short.from.left) < 1);
+        expect(roots()).toHaveLength(1);
+
+        await interact(() => toaster.dismiss());
+        await until(() => roots().length === 0, 2000);
+        await interact(() => {
+            toaster.info({
+                title: "Stuck",
+                duration: Infinity,
+                closable: false,
+            });
+        });
+        await settle(100);
+        root = roots()[0]!;
+        const stuck = await swipe(root, [20, 200]);
+        expect(box(root).left).toBe(stuck.from.left);
+        await stuck.release();
+        await settle(300);
+        expect(roots()).toHaveLength(1);
+    });
 });
 
 // A pointer press on an element, held until `release` is called.

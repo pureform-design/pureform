@@ -507,10 +507,11 @@ export function useHeldTimeout(
     open: boolean,
     duration: number | null,
     onTimeout: () => void,
+    alsoHeld = false,
 ) {
     const [hovered, setHovered] = useState(false);
     const [pressed, setPressed] = useState(false);
-    const held = hovered || pressed;
+    const held = hovered || pressed || alsoHeld;
     const timeout = useStableCallback(onTimeout);
     useEffect(() => {
         if (!open || held || duration === null || !Number.isFinite(duration)) {

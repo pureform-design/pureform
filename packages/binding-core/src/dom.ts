@@ -221,6 +221,8 @@ export {
 } from "./sheet-drag";
 export type { SheetDrag, SheetDragOptions } from "./sheet-drag";
 export { sideSheetDragToDismiss } from "./side-sheet-drag";
+export { sidewaysDrag } from "./sideways-drag";
+export type { SidewaysDragHooks } from "./sideways-drag";
 export { splitterRelease, splitterRoom } from "./splitter-release";
 export {
     createSwipeSettle,

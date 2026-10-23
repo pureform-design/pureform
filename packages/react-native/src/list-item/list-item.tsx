@@ -30,13 +30,14 @@ import type {
 } from "@pureform/binding-core";
 import { createContext, use, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { Linking, PanResponder } from "react-native";
+import { Linking } from "react-native";
 
 import { Expanding } from "../expand";
 import { iconParts } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
 import { useDirection } from "../provider";
+import { useSidewaysPan } from "../sideways-pan";
 import { useComponentSlots } from "../styles";
 
 const [INDICATION] = listItemAnatomy.indication!;
@@ -101,42 +102,36 @@ function ListItemImpl(props: ListItemProps): ReactNode {
     const latest = useRef({ offset, width, rtl, setRevealed });
     latest.current = { offset, width, rtl, setRevealed };
     const start = useRef(0);
-    const pan = useRef(
-        PanResponder.create({
-            // Asked on the way down, so a horizontal drag is the frame's even over a pressable
-            // (expandable) row.
-            onMoveShouldSetPanResponderCapture: (_event, gesture) =>
-                Math.abs(gesture.dx) > LIST_ITEM_SWIPE_SLOP &&
-                Math.abs(gesture.dx) > Math.abs(gesture.dy),
-            onPanResponderGrant: () => {
-                start.current = latest.current.offset;
-            },
-            onPanResponderMove: (_event, gesture) =>
-                setDrag(
-                    swipeOffsetOf(
-                        start.current,
-                        0,
-                        gesture.dx,
-                        latest.current.width,
-                        latest.current.rtl,
-                    ),
+    const pan = useSidewaysPan({
+        slop: LIST_ITEM_SWIPE_SLOP,
+        start: () => {
+            start.current = latest.current.offset;
+        },
+        move: (dx) =>
+            setDrag(
+                swipeOffsetOf(
+                    start.current,
+                    0,
+                    dx,
+                    latest.current.width,
+                    latest.current.rtl,
                 ),
-            onPanResponderRelease: (_event, gesture) => {
-                const { width, rtl, setRevealed } = latest.current;
-                // `vx` is in pixels per millisecond, along the screen; the offset grows toward
-                // the inline start.
-                setFling(gesture.vx * 1000 * (rtl ? 1 : -1));
-                setRevealed(
-                    swipeSettlesOpen(
-                        swipeOffsetOf(start.current, 0, gesture.dx, width, rtl),
-                        width,
-                    ),
-                );
-                setDrag(undefined);
-            },
-            onPanResponderTerminate: () => setDrag(undefined),
-        }),
-    ).current;
+            ),
+        release: (dx, vx) => {
+            const { width, rtl, setRevealed } = latest.current;
+            // `vx` is in pixels per millisecond, along the screen; the offset grows toward the
+            // inline start.
+            setFling(vx * 1000 * (rtl ? 1 : -1));
+            setRevealed(
+                swipeSettlesOpen(
+                    swipeOffsetOf(start.current, 0, dx, width, rtl),
+                    width,
+                ),
+            );
+            setDrag(undefined);
+        },
+        cancel: () => setDrag(undefined),
+    });
     const indication = useSurfaceIndication(INDICATION!, {
         indication: props.indication,
         interactionSource: props.interactionSource,
@@ -227,11 +222,7 @@ function ListItemImpl(props: ListItemProps): ReactNode {
     // comes after the row in the accessibility order), drawn under the row.
     const framed = (row: ReactNode) =>
         swipeable ? (
-            <v.frame.View
-                {...pan.panHandlers}
-                style={s.frame}
-                testID={id("frame")}
-            >
+            <v.frame.View {...pan} style={s.frame} testID={id("frame")}>
                 {row}
                 {action}
             </v.frame.View>

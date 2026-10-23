@@ -4,8 +4,8 @@
 
 import type { AnyRegistry } from "@pureform/binding-core";
 import { createElement } from "react";
-import { View } from "react-native";
 import type { ReactNode } from "react";
+import { View } from "react-native";
 
 import { PureformProvider } from "../provider";
 

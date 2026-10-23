@@ -2,7 +2,9 @@
 // `<Toaster toaster={…} />` shows its toasts in a column at the toaster's placement, over the page
 // (put it last in the app's root, inside the provider). Each toast closes after its duration (held
 // while it's pressed or the pointer is over it; a `loading` toast stays), by its action, its close
-// button, or the store's `dismiss`, then fades out. Zag's machines need the DOM, so this times the
+// button, the store's `dismiss`, or a sideways swipe (as on the web: past half its width or a
+// flick, it leaves that way; short of that, it settles back; a toast that can't be closed doesn't
+// move), then fades out. Zag's machines need the DOM, so this times the
 // toasts itself, from the store's data.
 
 import { toastAnatomy } from "@pureform/anatomy";
@@ -13,6 +15,7 @@ import {
     TOAST_GLYPHS,
     toasterOptions,
     toastSelection,
+    toastSwipeRelease,
 } from "@pureform/binding-core";
 import type {
     IndicationProps,
@@ -21,16 +24,19 @@ import type {
     ToastVariantProps,
 } from "@pureform/binding-core";
 import * as toast from "@pureform/machines/toast";
-import { useTokens } from "@pureform/rn-adapter/react";
-import { useEffect, useLayoutEffect, useState } from "react";
+import { NATIVE_DRIVER } from "@pureform/rn-adapter/animated";
+import { useReducedMotion, useTokens } from "@pureform/rn-adapter/react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { Pressable } from "react-native";
+import { Animated, Easing, Pressable } from "react-native";
+import type { LayoutChangeEvent } from "react-native";
 
 import { useHeldTimeout } from "../overlay";
 import { testIdOf, withEngine } from "../parts";
 import { usePortalHost } from "../portal-host";
 import { usePresence } from "../presence";
 import { useEngine } from "../provider";
+import { useSidewaysPan } from "../sideways-pan";
 import { useComponentSlots } from "../styles";
 import { SurfaceButton } from "../surface-button";
 
@@ -105,6 +111,77 @@ function ToastButtonImpl(props: {
 
 const ToastButton = withEngine(ToastButtonImpl, "ToastButton");
 
+// Moves shorter than this are a press, not a swipe (the web's toast swipe's).
+const SWIPE_SLOP = 8;
+// How long a let-go toast takes to settle back or leave, and on what curve (the web's).
+const SWIPE_SETTLE_MS = 200;
+const SWIPE_EASING = Easing.bezier(0.2, 0, 0, 1);
+
+// A toast's sideways swipe: where it is (`x`), how faded, whether a drag holds it, and the pan
+// handlers. `dismiss` runs once a swipe has carried it out.
+function useToastSwipe(closable: boolean, dismiss: () => void) {
+    const [x] = useState(() => new Animated.Value(0));
+    const [width, setWidth] = useState(0);
+    const latestWidth = useRef(0);
+    latestWidth.current = width;
+    const [held, setHeld] = useState(false);
+    const reducedMotion = useReducedMotion();
+    const to = (value: number, done?: () => void) => {
+        if (reducedMotion) {
+            x.setValue(value);
+            done?.();
+            return;
+        }
+        Animated.timing(x, {
+            toValue: value,
+            duration: SWIPE_SETTLE_MS,
+            easing: SWIPE_EASING,
+            useNativeDriver: NATIVE_DRIVER,
+        }).start(({ finished }) => {
+            if (finished) done?.();
+        });
+    };
+    const handlers = useSidewaysPan({
+        slop: SWIPE_SLOP,
+        enabled: () => closable,
+        start: () => {
+            x.stopAnimation();
+            setHeld(true);
+        },
+        move: (dx) => x.setValue(dx),
+        release: (dx, vx) => {
+            setHeld(false);
+            const away = latestWidth.current;
+            if (
+                toastSwipeRelease({ offset: dx, velocity: vx, width: away }) ===
+                "dismissed"
+            ) {
+                to((Math.sign(dx) || 1) * away, dismiss);
+            } else to(0);
+        },
+        cancel: () => {
+            setHeld(false);
+            to(0);
+        },
+    });
+    const away = Math.max(width, 1);
+    return {
+        held,
+        handlers,
+        onLayout: (event: LayoutChangeEvent) =>
+            setWidth(event.nativeEvent.layout.width),
+        style: {
+            transform: [{ translateX: x }],
+            // Fades as it goes, gone at its own width.
+            opacity: x.interpolate({
+                inputRange: [-away, 0, away],
+                outputRange: [0, 1, 0],
+                extrapolate: "clamp",
+            }),
+        },
+    };
+}
+
 function ToastItem(props: {
     readonly item: Shown;
     readonly toaster: ToasterProps;
@@ -123,9 +200,9 @@ function ToastItem(props: {
         item.type === "loading"
             ? Infinity
             : (item.duration ?? store.attrs.duration);
-    const { holdProps } = useHeldTimeout(open, duration, () =>
-        store.dismiss(item.id),
-    );
+    const dismiss = () => store.dismiss(item.id);
+    const swipe = useToastSwipe(open && item.closable !== false, dismiss);
+    const { holdProps } = useHeldTimeout(open, duration, dismiss, swipe.held);
     useLayoutEffect(() => {
         if (!presence.present) store.remove(item.id);
     }, [presence.present, store, item.id]);
@@ -142,56 +219,66 @@ function ToastItem(props: {
                 ...presence.style,
             }}
         >
-            <Pressable {...holdProps}>
-                <v.root.View
-                    role="status"
-                    aria-live="polite"
-                    style={{ ...s.root, maxWidth: "100%" }}
-                    testID={id("root")}
-                >
-                    <v.icon.Text aria-hidden style={s.icon} testID={id("icon")}>
-                        {TOAST_GLYPHS[type]}
-                    </v.icon.Text>
-                    {isPresent(item.title) ? (
-                        <v.title.Text style={s.title} testID={id("title")}>
-                            {item.title}
-                        </v.title.Text>
-                    ) : null}
-                    {isPresent(item.description) ? (
-                        <v.description.Text
-                            style={s.description}
-                            testID={id("description")}
+            <Animated.View
+                {...swipe.handlers}
+                onLayout={swipe.onLayout}
+                style={swipe.style}
+            >
+                <Pressable {...holdProps}>
+                    <v.root.View
+                        role="status"
+                        aria-live="polite"
+                        style={{ ...s.root, maxWidth: "100%" }}
+                        testID={id("root")}
+                    >
+                        <v.icon.Text
+                            aria-hidden
+                            style={s.icon}
+                            testID={id("icon")}
                         >
-                            {item.description}
-                        </v.description.Text>
-                    ) : null}
-                    {item.action ? (
-                        <ToastButton
-                            toaster={toaster}
-                            type={item.type}
-                            part="actionTrigger"
-                            label={item.action.label}
-                            onPress={() => {
-                                item.action?.onClick();
-                                store.dismiss(item.id);
-                            }}
-                        >
-                            {item.action.label}
-                        </ToastButton>
-                    ) : null}
-                    {item.closable !== false ? (
-                        <ToastButton
-                            toaster={toaster}
-                            type={item.type}
-                            part="closeTrigger"
-                            label={toaster.closeLabel ?? "Dismiss"}
-                            onPress={() => store.dismiss(item.id)}
-                        >
-                            ×
-                        </ToastButton>
-                    ) : null}
-                </v.root.View>
-            </Pressable>
+                            {TOAST_GLYPHS[type]}
+                        </v.icon.Text>
+                        {isPresent(item.title) ? (
+                            <v.title.Text style={s.title} testID={id("title")}>
+                                {item.title}
+                            </v.title.Text>
+                        ) : null}
+                        {isPresent(item.description) ? (
+                            <v.description.Text
+                                style={s.description}
+                                testID={id("description")}
+                            >
+                                {item.description}
+                            </v.description.Text>
+                        ) : null}
+                        {item.action ? (
+                            <ToastButton
+                                toaster={toaster}
+                                type={item.type}
+                                part="actionTrigger"
+                                label={item.action.label}
+                                onPress={() => {
+                                    item.action?.onClick();
+                                    store.dismiss(item.id);
+                                }}
+                            >
+                                {item.action.label}
+                            </ToastButton>
+                        ) : null}
+                        {item.closable !== false ? (
+                            <ToastButton
+                                toaster={toaster}
+                                type={item.type}
+                                part="closeTrigger"
+                                label={toaster.closeLabel ?? "Dismiss"}
+                                onPress={() => store.dismiss(item.id)}
+                            >
+                                ×
+                            </ToastButton>
+                        ) : null}
+                    </v.root.View>
+                </Pressable>
+            </Animated.View>
         </engine.View>
     );
 }
