@@ -320,7 +320,8 @@ describe("FabMenu", () => {
         expect(leaving[0]).toBe(0);
         expect(leaving[1]).toBeGreaterThan(0);
         expect(leaving[2]).toBeGreaterThan(leaving[1]!);
-        expect(holding).toBeGreaterThan(leaving[2]!);
+        // The list holds exactly as long as its last item waits: the bindings set its count.
+        expect(holding).toBeCloseTo(leaving[2]!, 0);
     });
 
     it("drops the stagger under reduced motion", async () => {

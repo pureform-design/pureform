@@ -21,8 +21,10 @@ import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";
 import {
     Children,
+    createContext,
     type ElementType,
     type ReactNode,
+    useContext,
     useId,
     useLayoutEffect,
     useState,
@@ -55,6 +57,10 @@ interface FabMenuContextValue {
 }
 
 const context = createPartContext<FabMenuContextValue>("FabMenu");
+
+// The ready-made's item count, which Root starts from, so the server renders the list's
+// `itemCount` and hydration changes nothing; composed parts count once the list renders.
+const ReadyMadeItemCount = createContext<number | undefined>(undefined);
 
 /** Root's props: the variants and tokens, the menu machine's props (`open`, `onSelect`,
  *  `positioning`, …), `testId` and `unstyled` for every part, `as`, and the element's own props. */
@@ -101,7 +107,7 @@ function Root(props: FabMenuRootProps): ReactNode {
     });
     const api = menu.connect(service, normalizeProps);
     const presence = usePresence(api.open);
-    const [itemCount, setItemCount] = useState<number>();
+    const [itemCount, setItemCount] = useState(useContext(ReadyMadeItemCount));
     const scope = useComponent(fabMenuAnatomy, {
         selection: fabMenuSelection(props, itemCount),
         testId: props.testId,
@@ -218,32 +224,34 @@ function ReadyMade(props: FabMenuProps): ReactNode {
     } = props;
     const slot = useSlotProps(props);
     return (
-        <Root {...rootProps} {...(slot("root") as object)}>
-            <List {...slot("list")}>
-                {items.map((item) => (
-                    <Item
-                        key={item.value}
-                        {...fabMenuItemProps(item)}
-                        {...slot("item")}
-                    >
-                        {isPresent(item.icon) ? (
-                            <ItemIcon
-                                mirror={item.mirrorIcon}
-                                {...slot("itemIcon")}
-                            >
-                                {item.icon}
-                            </ItemIcon>
-                        ) : null}
-                        <ItemLabel {...slot("itemLabel")}>
-                            {item.label}
-                        </ItemLabel>
-                    </Item>
-                ))}
-            </List>
-            <CloseTrigger aria-label={fabLabel} {...slot("closeTrigger")}>
-                <FabIcon icon={icon} closeIcon={closeIcon} />
-            </CloseTrigger>
-        </Root>
+        <ReadyMadeItemCount.Provider value={items.length}>
+            <Root {...rootProps} {...(slot("root") as object)}>
+                <List {...slot("list")}>
+                    {items.map((item) => (
+                        <Item
+                            key={item.value}
+                            {...fabMenuItemProps(item)}
+                            {...slot("item")}
+                        >
+                            {isPresent(item.icon) ? (
+                                <ItemIcon
+                                    mirror={item.mirrorIcon}
+                                    {...slot("itemIcon")}
+                                >
+                                    {item.icon}
+                                </ItemIcon>
+                            ) : null}
+                            <ItemLabel {...slot("itemLabel")}>
+                                {item.label}
+                            </ItemLabel>
+                        </Item>
+                    ))}
+                </List>
+                <CloseTrigger aria-label={fabLabel} {...slot("closeTrigger")}>
+                    <FabIcon icon={icon} closeIcon={closeIcon} />
+                </CloseTrigger>
+            </Root>
+        </ReadyMadeItemCount.Provider>
     );
 }
 

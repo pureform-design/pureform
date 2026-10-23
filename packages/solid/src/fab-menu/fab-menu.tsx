@@ -22,6 +22,7 @@ import * as menu from "@pureform/machines/menu";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {
     type Accessor,
+    createContext,
     createMemo,
     createSignal,
     createUniqueId,
@@ -29,6 +30,7 @@ import {
     omit,
     onSettled,
     Show,
+    useContext,
 } from "solid-js";
 
 import { useControllable } from "../controllable";
@@ -58,6 +60,12 @@ interface FabMenuContextValue {
 }
 
 const context = createPartContext<FabMenuContextValue>("FabMenu");
+
+// The ready-made's item count, which Root reads until the list has counted its own, so the
+// server renders the list's `itemCount` and hydration changes nothing.
+const ReadyMadeItemCount = createContext<Accessor<number | undefined>>(
+    () => undefined,
+);
 
 /** Root's props: the variants and tokens, the menu machine's props (`open`, `onSelect`,
  *  `positioning`, …), `testId` and `unstyled` for every part, `as`, and the element's own props. */
@@ -105,8 +113,9 @@ function Root(props: FabMenuRootProps): JSX.Element {
     const api = createMemo(() => menu.connect(service, normalizeProps));
     const presence = usePresence(() => api().open);
     const [itemCount, setItemCount] = createSignal<number>();
+    const given = useContext(ReadyMadeItemCount);
     const scope = useComponent(fabMenuAnatomy, {
-        selection: () => fabMenuSelection(props, itemCount()),
+        selection: () => fabMenuSelection(props, itemCount() ?? given()),
         testId: () => props.testId,
         unstyled: () => props.unstyled,
         indication: () => props.indication,
@@ -242,31 +251,35 @@ function ReadyMade(props: FabMenuProps): JSX.Element {
     const itemLabel = slots("itemLabel");
     const closeTrigger = slots("closeTrigger");
     return (
-        <Root {...own} {...root}>
-            <List {...list}>
-                <For
-                    each={props.items ?? []}
-                    keyed={(item: FabMenuItem<JSX.Element>) => item.value}
-                >
-                    {(item) => (
-                        <Item {...fabMenuItemProps(item())} {...itemSlot}>
-                            <Show when={isPresent(item().icon)}>
-                                <ItemIcon
-                                    mirror={item().mirrorIcon}
-                                    {...itemIcon}
-                                >
-                                    {item().icon}
-                                </ItemIcon>
-                            </Show>
-                            <ItemLabel {...itemLabel}>{item().label}</ItemLabel>
-                        </Item>
-                    )}
-                </For>
-            </List>
-            <CloseTrigger aria-label={props.fabLabel} {...closeTrigger}>
-                <FabIcon icon={props.icon} closeIcon={props.closeIcon} />
-            </CloseTrigger>
-        </Root>
+        <ReadyMadeItemCount value={() => (props.items ?? []).length}>
+            <Root {...own} {...root}>
+                <List {...list}>
+                    <For
+                        each={props.items ?? []}
+                        keyed={(item: FabMenuItem<JSX.Element>) => item.value}
+                    >
+                        {(item) => (
+                            <Item {...fabMenuItemProps(item())} {...itemSlot}>
+                                <Show when={isPresent(item().icon)}>
+                                    <ItemIcon
+                                        mirror={item().mirrorIcon}
+                                        {...itemIcon}
+                                    >
+                                        {item().icon}
+                                    </ItemIcon>
+                                </Show>
+                                <ItemLabel {...itemLabel}>
+                                    {item().label}
+                                </ItemLabel>
+                            </Item>
+                        )}
+                    </For>
+                </List>
+                <CloseTrigger aria-label={props.fabLabel} {...closeTrigger}>
+                    <FabIcon icon={props.icon} closeIcon={props.closeIcon} />
+                </CloseTrigger>
+            </Root>
+        </ReadyMadeItemCount>
     );
 }
 
