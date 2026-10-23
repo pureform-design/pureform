@@ -43,6 +43,8 @@ One pass over everything since r8: m3 (Material transitions), c8 (Material gaps 
 - **Forms suite and files:** the forms suite learns file entries, and FileUpload gets a form case.
 - **Server-rendered number fields:** the READMEs say to pass `locale` when server rendering, so
   number fields don't reformat on load.
+- **Wavy progress like Compose:** the linear wave travels along the track; the circular arc grows
+  and shrinks.
 
 ## Done when
 
