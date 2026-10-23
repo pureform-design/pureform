@@ -1,7 +1,7 @@
 // The components whose cases carry data, not props of one export: `Toast`'s `toasts` go into a
-// toaster (with a button that adds more), `GridList`'s `tiles` become its tile children (the suites' `ToastScene` and
-// `GridListScene`). React Native Web's scenes are these over the React Native components
-// (`../native/scenes.ts`).
+// toaster (with a button that adds more), `GridList`'s `tiles` become its tile children (the
+// suites' `ToastScene` and `GridListScene`). React Native Web's scenes are these over the React
+// Native components (`../native/scenes.ts`).
 
 import { createElement, Fragment, useRef, useState } from "react";
 import type { ComponentType, ReactNode } from "react";
@@ -72,7 +72,11 @@ export const gridListScene = (GridList: GridListBinding): ComponentType<any> =>
                         {},
                         part("Media", { src: tile.src, alt: "" }),
                         tile.header
-                            ? part("Header", {}, part("Headline", {}, tile.header))
+                            ? part(
+                                  "Header",
+                                  {},
+                                  part("Headline", {}, tile.header),
+                              )
                             : null,
                         tile.footer
                             ? part(

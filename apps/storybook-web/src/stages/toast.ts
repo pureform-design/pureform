@@ -30,7 +30,8 @@ const swipe = (element: HTMLElement, by: number) => {
             }),
         );
     at("pointerdown", x);
-    for (let step = 1; step <= 6; step++) at("pointermove", x + (by * step) / 6);
+    for (let step = 1; step <= 6; step++)
+        at("pointermove", x + (by * step) / 6);
     at("pointerup", x + by);
 };
 
@@ -59,7 +60,9 @@ export const extendStory: NonNullable<StoryHooks["extendStory"]> = (
                     const { canvasElement } = context;
                     const open = () =>
                         [
-                            ...canvasElement.querySelectorAll<HTMLElement>(ROOT),
+                            ...canvasElement.querySelectorAll<HTMLElement>(
+                                ROOT,
+                            ),
                         ].filter(
                             (toast) =>
                                 toast.getAttribute("data-state") === "open",

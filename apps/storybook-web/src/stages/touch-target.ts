@@ -80,9 +80,7 @@ export const extendStory: NonNullable<StoryHooks["extendStory"]> = (
                 dot.left + dot.width / 2,
                 0,
             );
-            void expect(getComputedStyle(target!).outlineStyle).toBe(
-                "dashed",
-            );
+            void expect(getComputedStyle(target!).outlineStyle).toBe("dashed");
         });
     },
 });
