@@ -109,7 +109,8 @@ const Surface: (props: SideSheetPartProps) => ReactNode = chrome.Content;
 
 /** The sheet's surface. It stays while its exit animation runs. A touch or a pen dragging it
  *  sideways toward its edge moves it, and it settles back or closes once let go (asking
- *  `onClose` first), as MDC-Android's side sheet; a coplanar sheet doesn't drag. */
+ *  `onClose` first), as MDC-Android's side sheet. A coplanar sheet gives its room in the
+ *  page's layout up as it moves, so the content beside it widens. */
 function Content(props: SideSheetPartProps): ReactNode {
     const {
         surface,
@@ -141,7 +142,8 @@ function Content(props: SideSheetPartProps): ReactNode {
             },
             () => onClose()?.() ?? true,
             asker,
-            () => !coplanar.current,
+            // A coplanar sheet's positioner holds its place in the page's layout.
+            () => (coplanar.current ? element.parentElement : undefined),
         );
     }, [surface, latestApi, asker, onClose]);
     return <Surface {...props} />;

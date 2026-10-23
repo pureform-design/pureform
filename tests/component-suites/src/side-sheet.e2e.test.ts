@@ -1,6 +1,6 @@
 // The side sheet's drag to dismiss, as MDC-Android's `SideSheetBehavior`: a touch dragging the
 // sheet sideways toward its edge moves it, and let go past halfway (or on a flick) it closes;
-// short of that, it settles back. A coplanar sheet doesn't drag.
+// short of that, it settles back. A coplanar sheet drags too, giving its room in the layout up.
 
 import { compositeTestIds } from "@pureform/anatomy";
 import { describe, expect, it } from "vitest";
@@ -73,13 +73,19 @@ describe("SideSheet, dragged", () => {
         host.remove();
     });
 
-    it("doesn't drag a coplanar sheet", async () => {
+    it("drags a coplanar sheet, its place in the layout giving the room up", async () => {
         const { host, content } = await mount({
             ...sheetCase.opened!.standard!,
             coplanar: true,
         });
-        drag(content, 60)();
+        const positioner = content.parentElement!;
+        const release = drag(content, 60, 4, 2000);
+        expect(content.style.translate).toBe("60px");
+        expect(positioner.style.marginInlineEnd).toBe("-60px");
+        release();
+        await harness.settle();
         expect(content.style.translate).toBe("");
+        expect(positioner.style.marginInlineEnd).toBe("");
         expect(content.getAttribute("data-state")).toBe("open");
         host.remove();
     });

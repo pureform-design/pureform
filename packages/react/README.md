@@ -432,7 +432,7 @@ import { RichTooltip } from "@pureform/react/rich-tooltip";
   a pen dragging `Content` sideways toward its edge moves it; let go at least halfway out or on a
   flick (`SIDE_SHEET_VELOCITY_THRESHOLD`, 500px/s) it closes, asking `onClose` first, else it settles
   back on its spring. Vertical moves stay the content's native scroll (`touch-action: pan-y`); a
-  mouse selects text as ever; a coplanar sheet doesn't drag. The bottom sheet's `dragHandle={false}`
+  mouse selects text as ever; a coplanar sheet drags too, its positioner giving its room in the layout up as it moves (so the content beside it widens). The bottom sheet's `dragHandle={false}`
   (now a Root prop too) gives its body the top padding the handle gave it.
 - **`onClose` on the dialog, the full-screen dialog and the side sheet.** Root's `onClose` is asked,
   as the bottom sheet's, before any close of their own: Escape, a press on the scrim (the dialog and

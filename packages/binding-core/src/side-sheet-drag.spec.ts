@@ -145,4 +145,27 @@ describe("sideSheetDragToDismiss", () => {
         await Promise.resolve();
         expect(sheet.style.translate).toBe("");
     });
+
+    it("moves a coplanar sheet's place in the layout with it, and gives it back", () => {
+        const holder = document.createElement("div");
+        const sheet = document.createElement("div");
+        sheet.style.width = "400px";
+        sheet.setAttribute("data-state", "open");
+        holder.append(sheet);
+        document.body.append(holder);
+        stop = sideSheetDragToDismiss(
+            sheet,
+            () => false,
+            () => {},
+            undefined,
+            closeAsker(),
+            () => holder,
+        );
+        sheet.dispatchEvent(pointer("pointerdown", 100, 100, 0));
+        sheet.dispatchEvent(pointer("pointermove", 160, 104, 400));
+        expect(sheet.style.translate).toBe("60px");
+        expect(holder.style.marginInlineEnd).toBe("-60px");
+        sheet.dispatchEvent(pointer("pointerup", 160, 104, 800));
+        expect(holder.style.marginInlineEnd).toBe("");
+    });
 });
