@@ -50,6 +50,7 @@ import {
     omit,
     onCleanup,
     Show,
+    untrack,
 } from "solid-js";
 
 import { Button } from "../button";
