@@ -10,6 +10,7 @@ import * as zagListbox from "@zag-js/listbox";
 import * as zagMenu from "@zag-js/menu";
 import * as zagRadioGroup from "@zag-js/radio-group";
 import * as zagSelect from "@zag-js/select";
+import * as zagSplitter from "@zag-js/splitter";
 import * as zagSteps from "@zag-js/steps";
 import * as zagSwitch from "@zag-js/switch";
 import * as zagTabs from "@zag-js/tabs";
@@ -35,6 +36,17 @@ describe("@pureform/machines", () => {
             "root",
             "image",
             "fallback",
+        ]);
+    });
+
+    it("re-exports Zag's splitter unchanged, with the parts the preset draws", () => {
+        expect(machines.splitter.machine).toBe(zagSplitter.machine);
+        expect(machines.splitter.connect).toBe(zagSplitter.connect);
+        expect(machines.splitter.anatomy.keys()).toEqual([
+            "root",
+            "panel",
+            "resizeTrigger",
+            "resizeTriggerIndicator",
         ]);
     });
 

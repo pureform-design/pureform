@@ -107,6 +107,7 @@ import { sideSheet } from "./components/side-sheet";
 import { createSlider } from "./components/slider";
 import { snackbar } from "./components/snackbar";
 import { createSplitButton } from "./components/split-button";
+import { splitter } from "./components/splitter";
 import { createStepper } from "./components/stepper";
 import { createSupportingText } from "./components/supporting-text";
 import { createSwitch } from "./components/switch";
@@ -357,6 +358,7 @@ const defaultComponents = <G extends string>(
         bottomSheet,
         sideSheet,
         dragHandle,
+        splitter,
         snackbar,
         toast,
         toolbar,

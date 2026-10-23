@@ -135,6 +135,7 @@ export const COMPONENT_USAGE = {
         },
     },
     "drag-handle": { entries: { dragHandle: same("orientation") } },
+    splitter: { entries: { splitter: same("orientation") } },
     // `extended` follows the label.
     fab: {
         entries: { fab: same("color", "variant", "size", "shape"), ripple: {} },

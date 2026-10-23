@@ -201,6 +201,13 @@
                 "default": "./dist/accordion.mjs"
             }
         },
+        "./splitter": {
+            "types": "./dist/splitter/index.d.ts",
+            "import": {
+                "development": "./src/splitter/index.ts",
+                "default": "./dist/splitter.mjs"
+            }
+        },
         "./avatar": {
             "types": "./dist/avatar/index.d.ts",
             "import": {
@@ -260,6 +267,7 @@
         "@zag-js/radio-group": "catalog:",
         "@zag-js/select": "catalog:",
         "@zag-js/slider": "catalog:",
+        "@zag-js/splitter": "catalog:",
         "@zag-js/steps": "catalog:",
         "@zag-js/switch": "catalog:",
         "@zag-js/tabs": "catalog:",

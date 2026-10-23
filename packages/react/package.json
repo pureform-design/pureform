@@ -131,6 +131,13 @@
                 "default": "./dist/side-sheet.mjs"
             }
         },
+        "./splitter": {
+            "types": "./dist/splitter/index.d.ts",
+            "import": {
+                "development": "./src/splitter/index.ts",
+                "default": "./dist/splitter.mjs"
+            }
+        },
         "./drag-handle": {
             "types": "./dist/drag-handle/index.d.ts",
             "import": {

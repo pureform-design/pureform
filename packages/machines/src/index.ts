@@ -21,6 +21,7 @@ export * as select from "./select";
 export * as selectionList from "./selection-list";
 export * as slider from "./slider";
 export * as snackbar from "./snackbar";
+export * as splitter from "./splitter";
 export * as stepper from "./stepper";
 export * as switchControl from "./switch";
 export * as tabs from "./tabs";

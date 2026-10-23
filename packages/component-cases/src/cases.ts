@@ -36,6 +36,7 @@ import { sideSheet } from "./cases/side-sheet";
 import { slider } from "./cases/slider";
 import { snackbar } from "./cases/snackbar";
 import { splitButton } from "./cases/split-button";
+import { splitter } from "./cases/splitter";
 import {
     avatar,
     badge,
@@ -80,6 +81,7 @@ export const COMPONENTS: readonly ComponentCase[] = [
     loadingIndicator,
     dialog,
     dragHandle,
+    splitter,
     fab,
     fadeThrough,
     fullscreenDialog,

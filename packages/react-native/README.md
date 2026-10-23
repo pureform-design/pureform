@@ -316,6 +316,14 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
       surface, which the app places. The drag handle is a component of its own, a pressable
       pill. Import them from `@pureform/react-native/bottom-sheet`, `/side-sheet`, and
       `/drag-handle`.
+    - **The splitter** (`@pureform/react-native/splitter`) takes `panes` (each an `id`, its
+      `content`, and `minSize`/`maxSize` in percent or `"240px"`), `size`/`defaultSize`/
+      `onSizeChange` (percent), `anchors`, `keyboardResizeBy`, `orientation` and `resizeLabel`.
+      A drag on a divider (a `PanResponder`) resizes the two panes beside it, and when it lets
+      go, the divider snaps to the nearest anchor, or the next one the way it was flung, as on
+      the web; the pill grows while it's held. Assistive technology adjusts a divider
+      (increment, decrement), and on the web the arrow keys move it. It lays the panes out with
+      `flexGrow`; a pane that scrolls is the app's own `ScrollView`.
     - **The toolbar** (`@pureform/react-native/toolbar`) takes its elements as `items`, as on
       the web: an icon button per element with an icon, a text button per element without.
       With `overflow`, it sits in a row as wide as its parent (centered in it: React Native

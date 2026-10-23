@@ -161,6 +161,10 @@ export const COMPONENT_CONTRAST: Record<string, ContrastPair[]> = {
     dragHandle: [
         pair(token("color"), role("surfaceContainerLow"), UI_CONTRAST),
     ],
+    splitter: [
+        pair(token("handleColor"), role("surface"), UI_CONTRAST),
+        pair(token("handleActiveColor"), role("surface"), UI_CONTRAST),
+    ],
     bottomSheet: [pair(token("content"), token("container"), TEXT_CONTRAST)],
     sideSheet: [
         pair(token("headlineColor"), token("container"), TEXT_CONTRAST),
