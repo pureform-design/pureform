@@ -860,8 +860,10 @@ export type {
 } from "./components/file-upload";
 export {
     COPIED_LABEL,
+    COPY_ANNOUNCEMENT_STYLE,
     COPY_BUTTON_OWN_PROPS,
     COPY_LABEL,
+    copyAnnouncement,
     copyButtonMachineProps,
 } from "./components/copy-button";
 export type {

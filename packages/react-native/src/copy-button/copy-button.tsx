@@ -1,7 +1,8 @@
 // The copy button: an icon button that copies `value` and shows it did. React Native has no
 // clipboard of its own, so the app passes `copy` (`Clipboard.setString` from
 // `@react-native-clipboard/clipboard`, or expo's `setStringAsync`); without one, React Native Web's
-// `navigator.clipboard` is used. For `timeout` ms the icon is a check and the name says copied.
+// `navigator.clipboard` is used. Once written, for `timeout` ms the icon is a check, the name says
+// copied, and the screen reader announces it; a `copy` that throws or rejects calls `onCopyError`.
 
 import type { TestIdOverride } from "@pureform/anatomy";
 import { COPIED_LABEL, COPY_LABEL, warnOnce } from "@pureform/binding-core";
@@ -14,6 +15,7 @@ import type {
 } from "@pureform/binding-core";
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
+import { AccessibilityInfo } from "react-native";
 
 import { IconButton } from "../icon-button";
 import { Glyph } from "../icon-style";
@@ -40,10 +42,13 @@ const webClipboard = (value: string): void | Promise<void> => {
         warnOnce(
             "pureform: CopyButton has no clipboard. Pass `copy`, for example `Clipboard.setString` from @react-native-clipboard/clipboard.",
         );
-        return;
+        throw new Error("no clipboard");
     }
     return clipboard.writeText(value);
 };
+
+const asError = (cause: unknown): Error =>
+    cause instanceof Error ? cause : new Error(String(cause));
 
 /** An icon button that copies `value` and confirms it:
  *  `<CopyButton value={token} copy={Clipboard.setString} />`. */
@@ -52,6 +57,7 @@ export function CopyButton(props: CopyButtonProps): ReactNode {
         value,
         timeout = DEFAULT_TIMEOUT,
         onCopy,
+        onCopyError,
         label = COPY_LABEL,
         copiedLabel = COPIED_LABEL,
         icon,
@@ -62,7 +68,14 @@ export function CopyButton(props: CopyButtonProps): ReactNode {
     } = props;
     const [copied, setCopied] = useState(false);
     const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-    useEffect(() => () => clearTimeout(timer.current), []);
+    const mounted = useRef(true);
+    useEffect(() => {
+        mounted.current = true;
+        return () => {
+            mounted.current = false;
+            clearTimeout(timer.current);
+        };
+    }, []);
     return (
         <IconButton
             {...rest}
@@ -74,12 +87,26 @@ export function CopyButton(props: CopyButtonProps): ReactNode {
             }
             onPress={() => {
                 onPress?.();
-                // The copy can fail (a denied permission); the button still confirms, as Zag's does.
-                Promise.resolve(copy(value)).catch(() => {});
-                setCopied(true);
-                onCopy?.(value);
-                clearTimeout(timer.current);
-                timer.current = setTimeout(() => setCopied(false), timeout);
+                const written = () => {
+                    if (!mounted.current) return;
+                    setCopied(true);
+                    onCopy?.(value);
+                    AccessibilityInfo.announceForAccessibility(copiedLabel);
+                    clearTimeout(timer.current);
+                    timer.current = setTimeout(() => setCopied(false), timeout);
+                };
+                const denied = (cause: unknown) =>
+                    onCopyError?.({ value, error: asError(cause) });
+                let pending: void | Promise<void>;
+                try {
+                    pending = copy(value);
+                } catch (cause) {
+                    denied(cause);
+                    return;
+                }
+                // A synchronous copy (`Clipboard.setString`) shows at once.
+                if (pending instanceof Promise) pending.then(written, denied);
+                else written();
             }}
         />
     );

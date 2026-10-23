@@ -47,4 +47,29 @@ describe("CopyButton on React Native", () => {
         expect(byTestId(ids.icon).textContent).toBe("OK");
         expect(byTestId(ids.root).getAttribute("aria-label")).toBe("Done");
     });
+
+    it("shows nothing and calls onCopyError when the copy is denied", async () => {
+        const copy = vi.fn(() => Promise.reject(new Error("denied")));
+        const onCopy = vi.fn();
+        const onCopyError = vi.fn();
+        await withRegistry(
+            <CopyButton
+                value="secret"
+                copy={copy}
+                onCopy={onCopy}
+                onCopyError={onCopyError}
+                icon="C"
+                copiedIcon="OK"
+            />,
+        );
+        await interact(() => userEvent.click(byTestId(ids.root)));
+        await vi.waitFor(() =>
+            expect(onCopyError).toHaveBeenCalledWith({
+                value: "secret",
+                error: expect.objectContaining({ message: "denied" }),
+            }),
+        );
+        expect(onCopy).not.toHaveBeenCalled();
+        expect(byTestId(ids.icon).textContent).toBe("C");
+    });
 });

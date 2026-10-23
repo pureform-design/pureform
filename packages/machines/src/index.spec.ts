@@ -2,8 +2,8 @@ import * as zagAccordion from "@zag-js/accordion";
 import * as zagAvatar from "@zag-js/avatar";
 import * as zagCarousel from "@zag-js/carousel";
 import * as zagCheckbox from "@zag-js/checkbox";
-import * as zagColorPicker from "@zag-js/color-picker";
 import * as zagClipboard from "@zag-js/clipboard";
+import * as zagColorPicker from "@zag-js/color-picker";
 import * as zagCombobox from "@zag-js/combobox";
 import * as zagDateInput from "@zag-js/date-input";
 import * as zagDatePicker from "@zag-js/date-picker";
@@ -44,10 +44,23 @@ describe("@pureform/machines", () => {
         );
     });
 
-    it("re-exports Zag's clipboard with a copy that never rejects, and its rating group with the fieldset rule and the parts the preset draws", () => {
-        expect(machines.clipboard.machine.states).toBe(
-            zagClipboard.machine.states,
+    it("re-exports Zag's clipboard with a copy that never rejects and shows copied once written, and its rating group with the fieldset rule and the parts the preset draws", () => {
+        expect(machines.clipboard.machine.states.idle).toBe(
+            zagClipboard.machine.states.idle,
         );
+        expect(
+            (machines.clipboard.machine.on as Record<string, unknown>)["COPY"],
+        ).toEqual({
+            actions: ["copyToClipboard"],
+        });
+        expect(
+            (machines.clipboard.machine.on as Record<string, unknown>)[
+                "COPY.WRITTEN"
+            ],
+        ).toEqual({
+            target: "copied",
+            actions: ["invokeOnCopy"],
+        });
         expect(machines.clipboard.machine).not.toBe(zagClipboard.machine);
         expect(machines.clipboard.connect).toBe(zagClipboard.connect);
         expect(machines.ratingGroup.machine.states).toBe(

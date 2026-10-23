@@ -1,10 +1,13 @@
 // The copy button: the ready-made icon button, running Zag's clipboard machine beside it. A press
-// copies `value`; for `timeout` ms the icon is a check and the accessible name says it copied.
-// It's drawn by the `iconButton` registry entry.
+// copies `value`; once written, for `timeout` ms the icon is a check, the accessible name says it
+// copied, and a hidden live region beside the button announces it. A denied write calls
+// `onCopyError` instead. It's drawn by the `iconButton` registry entry.
 
 import {
+    COPY_ANNOUNCEMENT_STYLE,
     COPY_BUTTON_OWN_PROPS,
     COPY_LABEL,
+    copyAnnouncement,
     copyButtonMachineProps,
 } from "@pureform/binding-core";
 import type {
@@ -47,26 +50,35 @@ export function CopyButton(props: CopyButtonProps): JSX.Element {
     const api = createMemo(() => clipboard.connect(service, normalizeProps));
     const rest = omit(props, ...COPY_BUTTON_OWN_PROPS, "onClick");
     return (
-        <IconButton
-            {...(merge(rest, {
-                get "aria-label"() {
-                    return api().getTriggerProps()["aria-label"] ?? COPY_LABEL;
-                },
-                get "data-copied"() {
-                    return api().copied ? "" : undefined;
-                },
-                get icon() {
-                    return api().copied
-                        ? (props.copiedIcon ?? <CheckIcon />)
-                        : (props.icon ?? <CopyIcon />);
-                },
-                onClick: (event: MouseEvent) => {
-                    (props.onClick as ((e: MouseEvent) => void) | undefined)?.(
-                        event,
-                    );
-                    if (!event.defaultPrevented) api().copy();
-                },
-            }) as IconButtonProps)}
-        />
+        <>
+            <IconButton
+                {...(merge(rest, {
+                    get "aria-label"() {
+                        return (
+                            api().getTriggerProps()["aria-label"] ?? COPY_LABEL
+                        );
+                    },
+                    get "data-copied"() {
+                        return api().copied ? "" : undefined;
+                    },
+                    get icon() {
+                        return api().copied
+                            ? (props.copiedIcon ?? <CheckIcon />)
+                            : (props.icon ?? <CopyIcon />);
+                    },
+                    onClick: (event: MouseEvent) => {
+                        (
+                            props.onClick as
+                                | ((e: MouseEvent) => void)
+                                | undefined
+                        )?.(event);
+                        if (!event.defaultPrevented) api().copy();
+                    },
+                }) as IconButtonProps)}
+            />
+            <span role="status" style={COPY_ANNOUNCEMENT_STYLE}>
+                {copyAnnouncement(props, api().copied)}
+            </span>
+        </>
     );
 }

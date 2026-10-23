@@ -1,10 +1,13 @@
 // The copy button: the ready-made icon button, running Zag's clipboard machine beside it. A press
-// copies `value`; for `timeout` ms the icon is a check and the accessible name says it copied.
-// It's drawn by the `iconButton` registry entry.
+// copies `value`; once written, for `timeout` ms the icon is a check, the accessible name says it
+// copied, and a hidden live region beside the button announces it. A denied write calls
+// `onCopyError` instead. It's drawn by the `iconButton` registry entry.
 
 import {
+    COPY_ANNOUNCEMENT_STYLE,
     COPY_BUTTON_OWN_PROPS,
     COPY_LABEL,
+    copyAnnouncement,
     copyButtonMachineProps,
 } from "@pureform/binding-core";
 import type {
@@ -49,19 +52,24 @@ export function CopyButton(props: CopyButtonProps): ReactNode {
     const { onClick, ...rest } = omitProps(props, COPY_BUTTON_OWN_PROPS);
     const trigger = api.getTriggerProps();
     return (
-        <IconButton
-            {...rest}
-            aria-label={trigger["aria-label"] ?? COPY_LABEL}
-            data-copied={api.copied ? "" : undefined}
-            icon={
-                api.copied
-                    ? (props.copiedIcon ?? <CheckIcon />)
-                    : (props.icon ?? <CopyIcon />)
-            }
-            onClick={(event) => {
-                onClick?.(event);
-                if (!event.defaultPrevented) api.copy();
-            }}
-        />
+        <>
+            <IconButton
+                {...rest}
+                aria-label={trigger["aria-label"] ?? COPY_LABEL}
+                data-copied={api.copied ? "" : undefined}
+                icon={
+                    api.copied
+                        ? (props.copiedIcon ?? <CheckIcon />)
+                        : (props.icon ?? <CopyIcon />)
+                }
+                onClick={(event) => {
+                    onClick?.(event);
+                    if (!event.defaultPrevented) api.copy();
+                }}
+            />
+            <span role="status" style={COPY_ANNOUNCEMENT_STYLE}>
+                {copyAnnouncement(props, api.copied)}
+            </span>
+        </>
     );
 }

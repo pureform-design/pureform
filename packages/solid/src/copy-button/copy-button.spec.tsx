@@ -1,5 +1,5 @@
 import { testIds } from "@pureform/anatomy";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { CopyButton } from ".";
@@ -16,9 +16,13 @@ const withRegistry = (view: () => unknown) =>
         </PureformProvider>
     ));
 
-// Headless Chromium denies the clipboard write; the machine still goes to copied.
+// Headless Chromium denies the clipboard write, which a test of its own covers.
 beforeEach(() => {
     vi.spyOn(navigator.clipboard, "writeText").mockResolvedValue(undefined);
+});
+
+afterEach(() => {
+    vi.restoreAllMocks();
 });
 
 describe("CopyButton", () => {
@@ -47,7 +51,7 @@ describe("CopyButton", () => {
         await settle();
         expect(byTestId(ids.icon).textContent).toBe("C");
         await userEvent.click(byTestId(ids.root));
-        expect(onCopy).toHaveBeenCalledWith("secret");
+        await vi.waitFor(() => expect(onCopy).toHaveBeenCalledWith("secret"));
         expect(byTestId(ids.icon).textContent).toBe("OK");
         expect(byTestId(ids.root).getAttribute("aria-label")).toBe("Done");
         expect(byTestId(ids.root).hasAttribute("data-copied")).toBe(true);
@@ -66,5 +70,46 @@ describe("CopyButton", () => {
             () => expect(byTestId(ids.icon).textContent).toBe("C"),
             { timeout: 4000 },
         );
+    });
+
+    it("announces the copy in a polite live region beside the button", async () => {
+        withRegistry(<CopyButton value="x" copiedLabel="Token copied" />);
+        await settle();
+        const status = document.querySelector<HTMLElement>('[role="status"]')!;
+        expect(status.textContent).toBe("");
+        await userEvent.click(byTestId(ids.root));
+        await vi.waitFor(() => expect(status.textContent).toBe("Token copied"));
+    });
+
+    it("doesn't show copied when the write is denied, and calls onCopyError", async () => {
+        vi.spyOn(navigator.clipboard, "writeText").mockRejectedValue(
+            new Error("denied"),
+        );
+        vi.spyOn(document, "execCommand").mockReturnValue(false);
+        const onCopy = vi.fn();
+        const onCopyError = vi.fn();
+        withRegistry(
+            <CopyButton
+                value="secret"
+                icon="C"
+                copiedIcon="OK"
+                onCopy={onCopy}
+                onCopyError={onCopyError}
+            />,
+        );
+        await settle();
+        await userEvent.click(byTestId(ids.root));
+        await vi.waitFor(() =>
+            expect(onCopyError).toHaveBeenCalledWith({
+                value: "secret",
+                error: expect.objectContaining({ message: "denied" }),
+            }),
+        );
+        expect(onCopy).not.toHaveBeenCalled();
+        expect(byTestId(ids.icon).textContent).toBe("C");
+        expect(byTestId(ids.root).hasAttribute("data-copied")).toBe(false);
+        expect(
+            document.querySelector<HTMLElement>('[role="status"]')!.textContent,
+        ).toBe("");
     });
 });
