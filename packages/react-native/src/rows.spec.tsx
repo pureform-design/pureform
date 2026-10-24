@@ -200,4 +200,22 @@ describe("a composite's rows", () => {
         await interact(() => userEvent.click(items[2]!));
         expect(picked).toEqual(["chat@0", "meet@1"]);
     });
+
+    it("keyed style and slotProps the app keeps don't render rows again", async () => {
+        const style = {
+            item: { minHeight: 52 },
+            itemLabel: { fontWeight: "600" },
+        } as const;
+        const slotProps = { item: { onPressIn: () => {} } };
+        const menu = await mountUnder("mail", (value) => (
+            <Menu
+                items={ITEMS}
+                value={value}
+                onSelect={() => {}}
+                style={style}
+                slotProps={slotProps}
+            />
+        ));
+        expect(await menu.rerender()).toEqual([]);
+    });
 });

@@ -57,6 +57,7 @@ export interface DialogHosts {
     readonly headline: "Text";
     readonly body: "Text";
     readonly actions: "View";
+    readonly backdrop: "View";
 }
 
 export interface DialogProps
