@@ -35,7 +35,7 @@ to prune builds.
 | `provider.ts`            | `ProviderOptions`, `ProviderState`, `resolveProvider` (nesting), `providerAttributes`, `themeAttributes`, `requireRegistry`                                                                                                                                          |
 | `selection.ts`           | `withDefaults`: a selection over the provider's defaults; `selectionSignature` to memoize on one                                                                                                                                                                     |
 | `entries.ts`             | `classEntry` (the provider registry's entry), and the class hooks' errors about lazy entries                                                                                                                                                                         |
-| `parts.ts`               | `partSources` (a part's props, in merge order), `stateAttributes`, `partClasses`, `forSlot`, `isUnstyled`, `isIconPart`, `InnerProps`, `overDefaults`                                                                                                                |
+| `parts.ts`               | `partSources` (a part's props, in merge order), `stateAttributes`, `partClasses`, `forSlot`, `isUnstyled`, `isIconPart`, `InnerProps`, `overDefaults`, `PerInstance`, `forInstance`, `isPerInstance`, `ItemInstance`                                                 |
 | `props.ts`               | `combineProps`: one part's props from several sources, with the binding's rules for classes and styles                                                                                                                                                               |
 | `class-names.ts`         | `cx`: a `clsx`-compatible class joiner, for bindings whose class prop is a string (React)                                                                                                                                                                            |
 | `controllable.ts`        | `Controllable<N, T>`, the controlled/uncontrolled warning, and `reason: "reset"` tracking                                                                                                                                                                            |
@@ -91,6 +91,8 @@ cx("a", ["b", { c: true }]);             // "a b c", as clsx joins
 forSlot(slotKeyed, slot); isUnstyled(unstyled, part); isIconPart(anatomy, part);
 overDefaults(listItemProps, item);      // a child's own over its container's defaults: classes join,
                                         // style/slotProps/tokens merge per part; either as-is when the other is empty
+forInstance(className.row, row);        // a repeated part's value for one copy (PerInstance<V, I>)
+isPerInstance([className, style], "row"); // whether any keyed value of the part is a function of the copy
 combineProps(sources, rules): Record<string, unknown>;
 outsideRootMessage("Button", "Label");   // the error for a compound part outside its Root
 

@@ -221,6 +221,12 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
   (`overDefaults`, the child's own wins). Overlays key their parts as the web does
   (`overlayKeys`): the surface is `content` (`pf-dialog-content`), a sheet's body `body`, a
   search view's surface `surface`, and the scrim of a dialog, sheet or date picker `backdrop`.
+  Repeated parts (calendar cells, table rows and cells, steps, stars, slides, menu and list
+  items, slider thumbs, toasts, files) take a value or a function of the copy in `style` and
+  `slotProps` (`PerInstance`, `NativeSlotProps<Hosts, Instances>`); the component builds the copy
+  only when `slot.each(part)` says one was passed. An overlay's `Button` trigger (dialog, sheets,
+  popover, menu, date picker) takes the `trigger` key on its root, and a string `testId` gives it
+  `<prefix>-trigger`; the menu's `contextTrigger` takes its own key.
 
 ### Plain form primitives
 

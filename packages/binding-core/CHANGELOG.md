@@ -18,6 +18,9 @@ All notable changes to this project will be documented in this file. See [conven
 
 #### Features
 
+- `PerInstance<V, I>`, `SlotKeyedEach`, `PartInstances`, `ItemInstance<T>`, `forInstance`,
+  `isPerInstance`; `Unstyled<P, I>` takes per-copy functions; `overDefaults` merges them per copy.
+  Each component's instance types and `<X>Instances` maps (slot-e).
 - `InnerProps<C>` and `overDefaults(defaults, own)`: a drawn component's customize props, and a
   child's own over its container's defaults (classes join; `style`, `slotProps`, `tokens` merge per
   part; either side as-is when the other is empty).

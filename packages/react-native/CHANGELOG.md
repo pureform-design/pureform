@@ -8,6 +8,8 @@ All notable changes to this project will be documented in this file. See [conven
 
 #### Breaking changes
 
+- A string `testId` on Dialog, FullscreenDialog, BottomSheet, SideSheet, Popover or Menu now
+  names its label `Button` trigger `<prefix>-trigger` (was the button's default id).
 - `AppBar`: `searchBar` -> `searchBarProps` (slot-c).
 - `List`, `SelectionList`: `tokens` are the list's own (they were every item's); items' tokens and
   test ids go in `listItemProps`.
@@ -29,6 +31,15 @@ All notable changes to this project will be documented in this file. See [conven
 
 #### Features
 
+- Repeated parts take a value or a function of the copy in `style` and `slotProps` (slot-e,
+  `PerInstance`): calendar cells, weeks and weekdays, time picker dial labels and scroll items,
+  table rows and cells, steps, slides, accordion items, tree nodes, rating stars, menu items,
+  FabMenu items, slider thumbs and markers, CodeField inputs, ColorPicker swatches, list items,
+  navigation destinations, files, toasts. `PartSlots` methods take the copy; `slot.each(part)`.
+- Overlay `Button` triggers (Dialog, FullscreenDialog, BottomSheet, SideSheet, Popover, Menu,
+  DatePicker) take the `trigger` key on the button's root; Menu's `contextTrigger` takes its key.
+- ColorPicker: `onBlur`/`onSubmitEditing` in `textFieldProps.slotProps.input` compose after the
+  picker's. TagsInput reads `chipProps.testId`. NavigationRail `scrim`/`dialog` keys.
 - Every ready-made takes `style` and `slotProps` keyed by its parts (`<X>Hosts` says what each
   part renders as); handlers compose, the component's first; merged values are cached by
   identity (`nativeSlots`).

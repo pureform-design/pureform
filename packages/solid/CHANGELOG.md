@@ -28,6 +28,25 @@ All notable changes to this project will be documented in this file. See [conven
 
 #### Features
 
+- Repeated parts take a value or a function of the copy (slot-e, `PerInstance<V, I>`) in
+  `class`, `style`, `slotProps` and `unstyled`: calendar `cell`/`week`/`weekday` (DatePicker,
+  DockedDatePicker), time picker `dialLabel`/`scrollItem`, Table `row`/`alternateRow`/`cell`/header
+  and footer cells, Stepper steps, Tabs, Carousel slides, Accordion items, Tree nodes, Rating stars,
+  Menu items (and Select/Autocomplete/SearchView `menuProps`), FabMenu items, Slider thumbs and
+  markers, CodeField inputs, ColorPicker swatches and channel sliders, NativeSelect options, List/
+  SelectionList items, NavigationBar/Rail destinations, FileUpload files, toasts. Instance types
+  are exported (`TableRowInstance`, `CalendarCellInstance`, `ItemInstance<T>`, …).
+- Dead parts wired (slot-e): Table `sortLabel`/`sortIndicator` (`SortHeader` `labelProps`/
+  `indicatorProps`), Splitter `resizeTriggerIndicator` (`ResizeTrigger` `indicatorProps`),
+  calendar `weekdays`/`grid`/`weekday`/`week`, DateInput `segment`, TimeInput `input`/`fieldLabel`,
+  TimePicker dial parts, ColorPicker area, thumb, transparency grid, channel slider track/thumb and
+  swatch, FileUpload `error` (`Item` `errorProps`), Label `requiredIndicator`, DragHandle `handle`
+  (`slotProps`), ListItem `frame`/`action`/`region` `unstyled`, NavigationRail `scrim`/`dialog`.
+- Stepper and Tabs take `fadeThroughProps` and `horizontalSharedAxisProps`.
+- ColorPicker: handlers in `textFieldProps.slotProps.input` compose after the picker's own.
+- Submenus inherit the menu's `testId` and `unstyled`.
+- Avatar always draws its `Fallback` part; Toolbar keeps a string `menuProps.style.root` while
+  the menu is hidden.
 - Ready-mades take props for the components they draw (slot-c): `menuProps` (Select,
   Autocomplete, SearchView, SplitButton, Toolbar's overflow menu), `searchBarProps`,
   `backButtonProps`, `clearButtonProps` (SearchView), `cancelButtonProps`/`confirmButtonProps`

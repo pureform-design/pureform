@@ -960,6 +960,14 @@ function Icon({ unstyled, mirror, ...props }: ButtonIconProps) {
   props from them together, once per change of the three: `slot("label")` is the label's, and a
   part none of them names gets one shared empty object. `slotPartProps(props, part)` gives one
   part's.
+- **Repeated parts** (a calendar's `cell`, a table's `row` and `cell`, a stepper's steps, a
+  rating's stars, slides, tabs, menu and list items, slider thumbs, toasts, files) take a value or
+  a function of the copy (`PerInstance<V, I>`) in `className`, `style`, `slotProps` and
+  `unstyled`: `<Table className={{ row: (row) => (row.selected ? "picked" : undefined) }} />`.
+  Each ready-made exports its instance types (`TableRowInstance`, `CalendarCellInstance`,
+  `RatingStarInstance`, `ItemInstance<T>` = `{ index, item }`, …). The function runs once per
+  copy per render, only when passed; `slot("row", row)` resolves it, and `slot.each("row")` says
+  whether to build the copy at all.
 
 ### Controllable state and forms
 

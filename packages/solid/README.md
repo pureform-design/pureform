@@ -754,16 +754,16 @@ names it), states and descriptions, its own props winning.
 
 ```tsx
 <PureformProvider
-  registry={registry} // from .pureform, or a fake one in tests
-  dir="rtl" // written on its element, passed to machines; "ltr" at the root
-  motion="reduce" // "system" | "reduce" | "full"; writes data-pf-motion unless "system"
-  defaults={{ button: { variant: "tonal" } }}
-  slotProps={{ button: { label: { class: "caps" } } }}
-  theme="teal" // a named theme, or a runtime one: seedTheme({ seed: "#006A60" })
-  overrides={{ "colors.primary": "#006a60" }} // token vars in its element's style
-  hydrate="reuse" // or "regenerate": how the client gets a server-rendered runtime theme
+    registry={registry} // from .pureform, or a fake one in tests
+    dir="rtl" // written on its element, passed to machines; "ltr" at the root
+    motion="reduce" // "system" | "reduce" | "full"; writes data-pf-motion unless "system"
+    defaults={{ button: { variant: "tonal" } }}
+    slotProps={{ button: { label: { class: "caps" } } }}
+    theme="teal" // a named theme, or a runtime one: seedTheme({ seed: "#006A60" })
+    overrides={{ "colors.primary": "#006a60" }} // token vars in its element's style
+    hydrate="reuse" // or "regenerate": how the client gets a server-rendered runtime theme
 >
-  <App />
+    <App />
 </PureformProvider>
 ```
 
@@ -816,29 +816,29 @@ draws in a layer element inside each surface.
 
 ```tsx
 import {
-  defineIndication,
-  materialIndication,
-  noIndication,
+    defineIndication,
+    materialIndication,
+    noIndication,
 } from "@pureform/solid";
 
 <PureformProvider registry={registry} indication={noIndication}>
-  {" "}
-  {/* every component under it */}
-  <Button
-    label="Save"
-    indication={materialIndication({ ripple: "ink-sparkle" })}
-  />
+    {" "}
+    {/* every component under it */}
+    <Button
+        label="Save"
+        indication={materialIndication({ ripple: "ink-sparkle" })}
+    />
 </PureformProvider>;
 
 // An app's own: a softer hover, a thicker focus ring, and a press that scales the surface.
 const soft = defineIndication({
-  name: "app:soft",
-  tokens: { stateHoverOpacity: 0.04, focusIndicatorThickness: 4 },
-  web(target, source) {
-    return source.subscribe((_, state) => {
-      target.surface.style.scale = state.pressed ? "0.98" : "";
-    });
-  },
+    name: "app:soft",
+    tokens: { stateHoverOpacity: 0.04, focusIndicatorThickness: 4 },
+    web(target, source) {
+        return source.subscribe((_, state) => {
+            target.surface.style.scale = state.pressed ? "0.98" : "";
+        });
+    },
 });
 ```
 
@@ -873,14 +873,14 @@ const soft = defineIndication({
 
 ```tsx
 function Tile() {
-  const source = createInteractionSource();
-  const indication = useIndication(source, { centered: false });
-  return (
-    <div class="tile" {...indication.surface}>
-      {indication.layer}
-      Open
-    </div>
-  );
+    const source = createInteractionSource();
+    const indication = useIndication(source, { centered: false });
+    return (
+        <div class="tile" {...indication.surface}>
+            {indication.layer}
+            Open
+        </div>
+    );
 }
 ```
 
@@ -960,6 +960,12 @@ slots("label")`, then `{...label}`; a call inside a spread makes a memo of its o
   three are literals the compiler passed as is (or absent), each part's props are a plain object;
   otherwise a live view of one memo, so a later change still reaches every part.
   `slotPartProps(props, part)` gives one part's, with a memo of its own.
+- **Repeated parts** (a calendar's `cell`, a table's `row` and `cell`, steps, stars, slides, tabs,
+  menu and list items, slider thumbs, toasts, files) take a value or a function of the copy
+  (`PerInstance<V, I>`) in `class`, `style`, `slotProps` and `unstyled`:
+  `<Table class={{ row: (row) => (row.selected ? "picked" : undefined) }} />`. A part's copy is
+  passed as an accessor, `slots("row", () => row)`; the function runs in a memo of that copy's,
+  again when the copy changes. Plain values keep the plain path.
 - `optionalPart(props, key, Part, WhenPresent)` picks the part a ready-made renders for an optional
   content prop: none for an absent literal, `Part` for a present one (no `Show`), else
   `WhenPresent`. An icon slot's `WhenPresent` renders with `optional: true`, which builds the
@@ -980,16 +986,16 @@ holds that budget.
 const checked = useControllable("Checkbox", "checked", props);
 // checked.machineProps(): { checked, defaultChecked (read once), onCheckedChange }
 useFormReset(inputElement, {
-  resetsTo: () => checked.resetsTo() === true, // controlled value, else the default
-  onBeforeReset: checked.beforeReset,
-  onReset: () =>
-    checked.reset(() =>
-      service.send({
-        type: "CHECKED.SET",
-        checked: checked.defaultValue ?? false,
-        isTrusted: true,
-      }),
-    ),
+    resetsTo: () => checked.resetsTo() === true, // controlled value, else the default
+    onBeforeReset: checked.beforeReset,
+    onReset: () =>
+        checked.reset(() =>
+            service.send({
+                type: "CHECKED.SET",
+                checked: checked.defaultValue ?? false,
+                isTrusted: true,
+            }),
+        ),
 });
 const fieldsetDisabled = useFieldsetDisabled(inputElement); // OR it into the machine's disabled
 ```
