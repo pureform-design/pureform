@@ -39,11 +39,11 @@ describe("withPureform", () => {
             { target: fakeAdapter(), watch: false },
         );
         expect(config.transformer).toEqual({ keep: true });
-        expect(outputFile(root, "web/chip.ts")).toContain('"chip"');
+        expect(outputFile(root, "fake/full/web/chip.ts")).toContain('"chip"');
         const resolve = config.resolver!.resolveRequest!;
         expect(resolve(context(root), REGISTRY_ID, "ios")).toEqual({
             type: "sourceFile",
-            filePath: join(root, ".pureform/index.ts"),
+            filePath: join(root, ".pureform/fake/full/index.ts"),
         });
         expect(resolve(context(root), "react", "ios")).toEqual({
             type: "context",
@@ -106,7 +106,60 @@ describe("withPureform", () => {
             configSource("chip", "badge"),
         );
         await eventually(() =>
-            existsSync(join(root, ".pureform/web/badge.ts")),
+            existsSync(join(root, ".pureform/fake/full/web/badge.ts")),
+        );
+    });
+});
+
+describe("withPureform with several targets", () => {
+    it("resolves the registry and .pureform/'s entries to the native target", async () => {
+        const root = tempApp("chip");
+        const config = await withPureform(
+            { projectRoot: root },
+            {
+                targets: {
+                    web: { target: fakeAdapter() },
+                    native: { target: fakeAdapter("native") },
+                },
+                watch: false,
+            },
+        );
+        const resolve = config.resolver!.resolveRequest!;
+        expect(resolve(context(root), REGISTRY_ID, "ios")).toEqual({
+            type: "sourceFile",
+            filePath: join(root, ".pureform/native/full/index.ts"),
+        });
+        const entry: MetroResolutionContext = {
+            originModulePath: join(root, "App.tsx"),
+            resolveRequest: () => ({
+                type: "sourceFile",
+                filePath: join(root, ".pureform/index.ts"),
+            }),
+        };
+        expect(resolve(entry, "./.pureform", "ios")).toEqual({
+            type: "sourceFile",
+            filePath: join(root, ".pureform/native/full/index.ts"),
+        });
+    });
+
+    it("resolves to the pruned output with prune", async () => {
+        const root = tempApp("chip", "divider");
+        writeTree(root, {
+            "main.ts": `import { registry } from "virtual:pureform/registry";\nexport const names = registry.names;\nexport const classes = [];\nexport const themes = [];\n`,
+            "src/ui.tsx": `import { Chip } from "@pureform/solid/chip";\nexport const ui = <Chip variant="assist" />;\n`,
+        });
+        const config = await withPureform(
+            { projectRoot: root },
+            { target: fakeAdapter("native"), watch: false, prune: true },
+        );
+        expect(
+            config.resolver!.resolveRequest!(context(root), REGISTRY_ID, "ios"),
+        ).toEqual({
+            type: "sourceFile",
+            filePath: join(root, ".pureform/fake/pruned/index.ts"),
+        });
+        expect(outputFile(root, "fake/pruned/index.ts")).not.toContain(
+            '"divider"',
         );
     });
 });

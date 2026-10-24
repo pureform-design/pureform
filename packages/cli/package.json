@@ -21,6 +21,7 @@
         }
     },
     "dependencies": {
+        "@pureform/bundler": "workspace:^",
         "@pureform/generate": "workspace:^",
         "jiti": "catalog:"
     },

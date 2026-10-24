@@ -1,14 +1,18 @@
-// `pureform generate [--watch] [--check]`: `generate` from @pureform/generate once, checking
+// `pureform generate [--watch] [--check] [--prune]`: `generateTargets` from @pureform/generate once, checking
 // instead of writing, or again on every change, with what it did printed.
 
 import { watch } from "node:fs";
 import type { FSWatcher } from "node:fs";
 import { basename, dirname, relative, resolve, sep } from "node:path";
 
-import { generate, isGenerateError, watchGenerate } from "@pureform/generate";
+import {
+    generateTargets,
+    isGenerateError,
+    watchGenerate,
+} from "@pureform/generate";
 import type {
     FileResult,
-    GenerateResult,
+    GenerateTargetsResult as GenerateResult,
     GenerateWatcher,
 } from "@pureform/generate";
 
@@ -121,8 +125,12 @@ export const runGenerate = async (
     const report = reporter(io);
     if (flags.watch) return runWatch(flags, io, report);
     try {
-        const { options } = await resolveCodegenOptions(flags, io.cwd);
-        const result = await generate(options);
+        const { options, warnings } = await resolveCodegenOptions(
+            flags,
+            io.cwd,
+        );
+        for (const line of warnings) io.stderr(line);
+        const result = await generateTargets(options);
         if (flags.check) report.checked(result);
         else report.written(result);
         return result.ok ? 0 : 1;
@@ -140,6 +148,7 @@ const runWatch = async (
     let resolved: ResolvedCodegenOptions;
     try {
         resolved = await resolveCodegenOptions(flags, io.cwd);
+        for (const line of resolved.warnings) io.stderr(line);
     } catch (error) {
         io.stderr(describeError(error));
         return 1;

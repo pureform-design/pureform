@@ -12,13 +12,18 @@ import { join, relative, resolve } from "node:path";
 
 import {
     DEFAULT_OUT_DIR,
+    entryFile,
     GenerateError,
+    generateTargets,
     INDEX_FILE,
     missingOutputMessage,
     watchGenerate,
-    generate,
 } from "@pureform/generate";
-import type { CodegenAdapter, Target } from "@pureform/generate";
+import type {
+    CodegenAdapter,
+    GenerateTargetsResult,
+    Target,
+} from "@pureform/generate";
 
 import {
     describeResult,
@@ -33,7 +38,8 @@ import { findUsage } from "./prune";
 export interface PureformMetroOptions<
     Options = Record<string, unknown>,
 > extends Omit<PureformPluginOptions<Options>, "target"> {
-    /** The target. Default `"native"`. */
+    /** The target, when `targets` isn't given. Default `"native"`. Metro resolves `.pureform/`
+     *  to the first native target of several. */
     readonly target?: Target | CodegenAdapter<Options>;
 }
 
@@ -76,7 +82,8 @@ export type MetroConfigWithPureform<C extends MetroConfig> = Omit<
 };
 
 /** A Metro config that generates `.pureform/` first, regenerates on changes (unless `watch`
- *  is `false`), and resolves `virtual:pureform/registry`. Fails like a build when the first
+ *  is `false`), and resolves `virtual:pureform/registry` and `.pureform/`'s entries to the
+ *  native target's output (`pruned/` with `prune`, `full/` otherwise). Fails like a build when the first
  *  generation does. */
 export const withPureform = async <C extends MetroConfig>(
     config: C,
@@ -95,12 +102,17 @@ export const withPureform = async <C extends MetroConfig>(
         : undefined;
     for (const line of pruning?.warnings ?? []) console.warn(line);
     const settings = generateOptions(
-        { ...options, target: options.target ?? "native" },
+        options.targets
+            ? options
+            : { ...options, target: options.target ?? "native" },
         root,
+        prune !== undefined,
         pruning?.usage,
     );
+    let latest: () => GenerateTargetsResult | undefined;
     if (options.watch === false) {
-        await generate(settings);
+        const result = await generateTargets(settings);
+        latest = () => result;
     } else {
         let failure: unknown;
         let started = false;
@@ -126,12 +138,21 @@ export const withPureform = async <C extends MetroConfig>(
             throw failure;
         }
         started = true;
+        latest = () => watcher.runner.last ?? first;
     }
 
-    const index = join(
-        resolve(root, options.outDir ?? DEFAULT_OUT_DIR),
-        INDEX_FILE,
-    );
+    const outDir = resolve(root, options.outDir ?? DEFAULT_OUT_DIR);
+    const kind = prune ? "pruned" : "full";
+    // The file an entry of `.pureform/` stands for, in the native target's output.
+    const redirect = (path: string): string | undefined => {
+        const result = latest();
+        if (!result) return undefined;
+        const target =
+            result.targets.find((item) => item.platform === "native")?.name ??
+            result.defaultTarget;
+        return entryFile(result, path, target, kind);
+    };
+    const index = join(outDir, INDEX_FILE);
     const upstream = config.resolver?.resolveRequest ?? undefined;
     const resolveRequest: MetroResolveRequest = (
         context,
@@ -151,11 +172,19 @@ export const withPureform = async <C extends MetroConfig>(
                     ),
                 );
             }
-            return { type: "sourceFile", filePath: index };
+            return {
+                type: "sourceFile",
+                filePath: redirect(outDir) ?? index,
+            };
         }
-        return upstream
+        const resolved = upstream
             ? upstream(context, moduleName, platform)
             : context.resolveRequest(context, moduleName, platform);
+        if (resolved.type === "sourceFile" && "filePath" in resolved) {
+            const file = redirect(String(resolved.filePath));
+            if (file) return { type: "sourceFile", filePath: file };
+        }
+        return resolved;
     };
     return {
         ...config,

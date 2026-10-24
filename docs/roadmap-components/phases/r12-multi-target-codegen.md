@@ -26,3 +26,19 @@ generated styles like a real app.
 
 ## Gate
 Every demo in dev and build; Storybook dev and build; full gate.
+
+## Types and editor (added, user-approved)
+- Declarations live only at the top of `.pureform/` (`registry.d.ts`), generated from the full
+  output (a superset of pruned), so the editor and `tsc` never depend on dev vs build. `full/` and
+  `pruned/` hold no `.d.ts` augmenting `@pureform/styling` (an app's `.pureform/**/*.*` include
+  would otherwise merge two `ComponentRegistry` declarations). That include keeps working as is.
+- Top-level `.ts` entries (`index.ts`, `panda.ts`, ...) re-export `full/`, so TypeScript resolves
+  real files; the bundler's `resolveId` redirects to `pruned/` in builds. No tsconfig `paths`.
+- One augmentation for all targets: the config is shared, so variants, slots and tokens agree;
+  native-only fields (`states`) aren't declared.
+- Several targets also get per-target entries (`.pureform/web.ts`, `.pureform/native.ts`, named
+  after the `targets` keys) with their factory types. Single-target apps keep importing
+  `.pureform/`; multi-target code imports the per-target entry, or the plain entry resolved per
+  import (typed from the default target; documented).
+- Tests: `tsc` on a demo after build and after dev gives the same result; a multi-target fixture
+  type-checks; nothing in `full/` or `pruned/` declares the module.

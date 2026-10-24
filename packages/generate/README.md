@@ -22,7 +22,11 @@ Design: [§4 config](../../docs/design/component-architecture.md#4-pureformconfi
 ## Architecture
 
 ```
-generate(options)
+generateTargets(options)          one config, several targets, full and pruned output apart
+  ├─ generate(…) per target and output kind, into .pureform/<target>/<full|pruned>/
+  └─ the top of .pureform/: entries re-exporting the default target's full/, registry.d.ts
+
+generate(options)                 one target into one folder
   ├─ train.ts           installed core-train packages share one version? bindings' peers agree?
   ├─ config.ts          loadConfig: jiti, fresh each call
   │    └─ imports.ts    import rules: only pureform packages and relative data files
@@ -37,7 +41,8 @@ generate(options)
 | ------------------- | -------------------------------------------------------------------------------------------------------- |
 | `adapter.ts`        | The codegen interface: `CodegenAdapter`, `CodegenContext`, `CodegenOutput`, …                            |
 | `shape.ts`          | `componentShape(spec, config?)`: groups, defaults, slots, tokens, and `springs` (core's `isSpringToken`) |
-| `generate.ts`       | `generate(options)`: the whole step                                                                      |
+| `generate.ts`       | `generate(options)`: one target into one folder                                                          |
+| `targets.ts`        | `generateTargets(options)`, `entryFile`, `targetsOf`, `OUTPUT_ENV`: several targets and the layout       |
 | `config.ts`         | `loadConfig(path, options)`                                                                              |
 | `imports.ts`        | `scanConfigImports(entry, options)`, `formatImportViolations`, `resolveRelative`                         |
 | `usage.ts`          | Pruning's input: `Usage`, `VariantUsage`, `normalizeVariants`, `narrowConfig`                            |
@@ -49,10 +54,66 @@ generate(options)
 | `missing.ts`        | `missingOutputMessage`, `assertGenerated`                                                                |
 | `errors.ts`         | `GenerateError` with a `code`, `isGenerateError`                                                         |
 | `load-adapter.ts`   | `loadAdapter(target, root)`                                                                              |
-| `runner.ts`         | `createGenerateRunner(options)`, `findConfigFile(root)`, `CONFIG_FILES`                                  |
-| `watch.ts`          | `watchGenerate(options, watching)`: generate on every change, without a bundler                          |
+| `runner.ts`         | `createGenerateRunner(options)` over `generateTargets`, `findConfigFile(root)`, `CONFIG_FILES`           |
+| `watch.ts`          | `watchGenerate(options, watching)`: `generateTargets` on every change, without a bundler                 |
 
 ## Public API
+
+### `generateTargets`: what the plugin, Metro and the CLI run
+
+```ts
+import { entryFile, generateTargets } from "@pureform/generate";
+
+const result = await generateTargets({
+    root: process.cwd(),
+    config: "pureform.config.ts",
+    // Several targets by name, or `target`, `options`, `components`, `lazy` for one (named
+    // after the target: `target: "panda"` writes `.pureform/panda/`).
+    targets: {
+        web: { target: "panda", options: { prefix: "pf" } },
+        native: { target: "native", components: ["button"] },
+    },
+    pruned: true, // write pruned/ too (builds), for `usage`; full/ is always written
+    usage: { components: ["button"] }, // one scan serves every target
+    check: false,
+});
+result.defaultTarget; // "web": the first web target, else the first
+result.targets; // [{ name, platform, full: GenerateResult, pruned?: GenerateResult }]
+result.entries; // { "index.ts": { target: undefined, file: "index.ts" }, "panda.ts": …, "native.ts": … }
+entryFile(result, "/app/.pureform", "native", "pruned"); // "/app/.pureform/native/pruned/index.ts"
+```
+
+The layout:
+
+```
+.pureform/
+  web/full/…           ← every allowed component and variant: dev servers, the editor
+  web/pruned/…         ← what the app uses: builds (kept when a later run writes full only)
+  native/full/…
+  index.ts             ← export * from "./web/full/index"  (bundlers redirect it per import)
+  panda.ts             ← the default target's other root files, re-exported (styles.css: @import)
+  web.ts, native.ts    ← with several targets: one entry per target
+  registry.d.ts        ← the only declarations, from the default target's full output
+```
+
+- **Dev and build never overwrite each other.** A dev run writes `full/`; a build writes
+  `full/` (unchanged when the inputs are) and `pruned/`. The entries and declarations come from
+  `full/`, so the editor and `tsc` see the same thing after either.
+- **One augmentation.** Only the top-level `registry.d.ts` declares `@pureform/styling`'s
+  `ComponentRegistry`, from the default target's full output (a superset of pruned); the
+  folders under it have none, so a tsconfig including `.pureform/**/*.*` doesn't merge two.
+  The config is shared, so variants, slots and tokens agree across targets; native-only fields
+  (`states`) aren't declared when a web target is the default.
+- **Entries.** `index.ts` stands for whichever target an import gets (`entry.target` is
+  `undefined`); a per-target entry (`native.ts`) and the other root files (`panda.ts`,
+  `styles.css`) stand for their own. Types of the plain entry come from the default target;
+  import `.pureform/<target>` for another target's.
+- **Scripts loaded outside the bundler.** A root `.ts` file other than the index (Panda's
+  `panda.ts`, read by Panda's own config loader) re-exports `full/`, or `pruned/` when the
+  process sets `OUTPUT_ENV` (`PUREFORM_OUTPUT=pruned`, as a pruned Vite build does) and
+  `pruned/` exists.
+- **Clean-up.** Generated files at the top that no entry wants, and folders of an older layout,
+  are removed; `<target>/full/` and `<target>/pruned/` are left to their own runs.
 
 ### `generate`
 
@@ -79,7 +140,12 @@ result.files; // [{ path: "web/button.ts", status: "written" | "unchanged" | "re
 result.ok; // check mode: up to date
 result.dependencies; // the config and the files it imports: what to watch
 result.hints; // e.g. add ".pureform/**/*" to the tsconfig's include
+result.platform; // the adapter's
+result.declarations; // registry.d.ts's source, written unless `declarations: false`
 ```
+
+`generate` writes one target into one folder; `generateTargets` calls it per target and output
+with `declarations: false`, and writes the declarations once at the top.
 
 Errors are `GenerateError`s with a `code`: `config-not-found`, `config-load`,
 `config-export`, `config-imports`, `adapter-not-found`, `adapter-invalid`,
@@ -113,7 +179,10 @@ variants)` gives the config with only those components and the values in use (th
 - The hash covers `variants` only when they narrow something, so a registry made with a usage that
   narrows nothing equals an unpruned one.
 
-### What it writes
+### What `generate` writes
+
+Into its `outDir` (`generateTargets` gives it `.pureform/<target>/<full|pruned>/`, without
+`registry.d.ts`):
 
 ```
 .pureform/
@@ -249,7 +318,7 @@ findConfigFile(root); // the first pureform.config.{ts,mts,cts,js,mjs,cjs}, else
 const runner = createGenerateRunner({
     root,
     config: "pureform.config.ts",
-    target: "panda",
+    target: "panda", // or `targets`, and `pruned` with `usage`: generateTargets' options
 });
 await runner.run(); // calls during a run share one more run after it
 runner.dependencies; // the config and its relative imports (the config alone until a run reads them)

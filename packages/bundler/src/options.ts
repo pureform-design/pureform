@@ -1,16 +1,17 @@
 // What the bundler plugin and the Metro wrapper share: their options, how they become
 // `generate`'s, and how a run is reported.
 
-import { relative, sep } from "node:path";
+import { isAbsolute, relative, sep } from "node:path";
 
 import type { CoreConfig } from "@pureform/core/types";
 import { findConfigFile } from "@pureform/generate";
 import type {
     CodegenAdapter,
-    GenerateOptions,
-    GenerateResult,
+    GenerateTargetsOptions,
+    GenerateTargetsResult,
     ImportRuleOptions,
     Target,
+    TargetOptions,
     Usage,
 } from "@pureform/generate";
 
@@ -21,13 +22,18 @@ export interface PureformPluginOptions<Options = Record<string, unknown>> {
     /** The config: a path relative to the root, or the config itself. Default: the first
      *  `pureform.config.{ts,mts,cts,js,mjs,cjs}` in the root. */
     readonly config?: string | CoreConfig;
-    /** The target, `"panda"`, `"css"`, `"tailwind"`, or `"native"`, or an adapter. */
-    readonly target: Target | CodegenAdapter<Options>;
-    /** The adapter's build options, such as the Panda adapter's `prefix`. */
+    /** Several targets, by name: each writes `.pureform/<name>/`, and an import of
+     *  `.pureform/` gets the one its file or bundler environment wants (see `PluginTarget`). */
+    readonly targets?: Readonly<Record<string, PluginTarget<Options>>>;
+    /** One target, `"panda"`, `"css"`, `"tailwind"`, or `"native"`, or an adapter: the
+     *  shorthand for `targets: { [target]: { target, options, components, lazy } }`. */
+    readonly target?: Target | CodegenAdapter<Options>;
+    /** The single target's build options, such as the Panda adapter's `prefix`. */
     readonly options?: Options;
-    /** The allow-list: generate only these components. Default: every component. */
+    /** The single target's allow-list: generate only these components. Default: every
+     *  component. */
     readonly components?: readonly string[];
-    /** Components whose registry entries load on demand. */
+    /** The single target's components whose registry entries load on demand. */
     readonly lazy?: readonly string[];
     /** The app's root. Default: the bundler's root (Vite's `root`), or the working directory. */
     readonly root?: string;
@@ -46,6 +52,18 @@ export interface PureformPluginOptions<Options = Record<string, unknown>> {
     readonly prune?: boolean | PruneOptions;
 }
 
+/** A target of several, with the files that get it. */
+export interface PluginTarget<
+    Options = Record<string, unknown>,
+> extends TargetOptions<Options> {
+    /** The files whose imports of `.pureform/` get this target: paths relative to the root
+     *  (a folder takes everything under it) or patterns over the absolute path. When any
+     *  target has `include`, a file none matches gets the default target (the first web
+     *  one); otherwise a bundler environment that maps `react-native` to `react-native-web`
+     *  (and Metro) gets the first native target. */
+    readonly include?: readonly (string | RegExp)[];
+}
+
 /** How pruning scans the app, and what it keeps whatever it finds. */
 export interface PruneOptions {
     /** Files and folders to scan, relative to the root, and what they import by relative
@@ -61,21 +79,70 @@ export interface PruneOptions {
     readonly variants?: boolean;
 }
 
-/** The options `generate` gets from the plugin's, for a root, and what pruning found. */
+/** The options `generateTargets` gets from the plugin's, for a root: `pruned` writes the
+ *  pruned output too, for what pruning found. */
 export const generateOptions = <Options>(
     options: PureformPluginOptions<Options>,
     root: string,
+    pruned = false,
     usage?: Usage,
-): GenerateOptions<Options> => {
-    const { watch: _, prune: __, config, ...rest } = options;
+): GenerateTargetsOptions<Options> => {
+    const { watch: _, prune: __, config, targets, ...rest } = options;
     return Object.fromEntries(
         Object.entries({
             ...rest,
+            targets:
+                targets &&
+                Object.fromEntries(
+                    Object.entries(targets).map(
+                        ([name, { include: _include, ...target }]) => [
+                            name,
+                            target,
+                        ],
+                    ),
+                ),
             config: config ?? findConfigFile(root),
             root,
+            pruned: pruned || undefined,
             usage,
         }).filter(([, value]) => value !== undefined),
-    ) as unknown as GenerateOptions<Options>;
+    ) as unknown as GenerateTargetsOptions<Options>;
+};
+
+/** Whether a file is one a target's `include` names. */
+export const includes = (
+    patterns: readonly (string | RegExp)[],
+    root: string,
+    file: string,
+): boolean => {
+    const path = toPosix(file);
+    const local = toPosix(relative(root, file));
+    return patterns.some((pattern) => {
+        if (typeof pattern !== "string") return pattern.test(path);
+        const prefix = toPosix(pattern).replace(/^\.\//, "").replace(/\/$/, "");
+        return (
+            !isAbsolute(local) &&
+            !local.startsWith("../") &&
+            (local === prefix || local.startsWith(`${prefix}/`))
+        );
+    });
+};
+
+/** Whether a bundler's aliases map `react-native` to `react-native-web`. */
+export const aliasesReactNativeWeb = (alias: unknown): boolean => {
+    const list = Array.isArray(alias)
+        ? (alias as { find: unknown; replacement: unknown }[])
+        : Object.entries((alias ?? {}) as Record<string, unknown>).map(
+              ([find, replacement]) => ({ find, replacement }),
+          );
+    return list.some(
+        ({ find, replacement }) =>
+            (find instanceof RegExp
+                ? find.test("react-native")
+                : find === "react-native") &&
+            typeof replacement === "string" &&
+            replacement.includes("react-native-web"),
+    );
 };
 
 /** The pruning options, or `undefined` when pruning is off. */
@@ -92,7 +159,9 @@ export const toPosix = (path: string) => path.split(sep).join("/");
 
 /** One line saying what a run changed, or `undefined` when nothing did. Names the files when
  *  there are a few, and counts them by status otherwise. */
-export const describeResult = (result: GenerateResult): string | undefined => {
+export const describeResult = (
+    result: Pick<GenerateTargetsResult, "root" | "outDir" | "files">,
+): string | undefined => {
     const changed = result.files.filter((file) => file.status !== "unchanged");
     if (changed.length === 0) return undefined;
     const folder = toPosix(relative(result.root, result.outDir)) || ".";

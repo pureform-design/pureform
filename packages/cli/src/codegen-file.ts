@@ -6,8 +6,14 @@ import { existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
-import { findConfigFile, TARGET_PACKAGES } from "@pureform/generate";
-import type { GenerateOptions, Target } from "@pureform/generate";
+import { findUsage, pruneOptions } from "@pureform/bundler";
+import type { PruneOptions } from "@pureform/bundler";
+import {
+    DEFAULT_OUT_DIR,
+    findConfigFile,
+    TARGET_PACKAGES,
+} from "@pureform/generate";
+import type { GenerateTargetsOptions, Target } from "@pureform/generate";
 import { createJiti } from "jiti";
 
 import { CliError } from "./errors";
@@ -25,17 +31,21 @@ export const CODEGEN_FILES = [
 /** The targets `--target` takes. */
 export const TARGETS = Object.keys(TARGET_PACKAGES) as readonly Target[];
 
-/** What a codegen file exports as `codegen`, or as its default export: `generate`'s options, as the
- *  bundler plugin takes them. Keys the command doesn't know, such as the plugin's `watch`,
- *  are left alone. `root`, when set, is relative to the codegen file's folder. */
+/** What a codegen file exports as `codegen`, or as its default export: `generateTargets`'
+ *  options, as the bundler plugin takes them (one `target`, or several `targets`), with the
+ *  plugin's `prune` for `--prune`. Keys the command doesn't know, such as the plugin's
+ *  `watch` or a target's `include`, are left alone. `root`, when set, is relative to the
+ *  codegen file's folder. */
 export type CodegenFileOptions<Options = Record<string, unknown>> = Partial<
-    Omit<GenerateOptions<Options>, "check">
->;
+    Omit<GenerateTargetsOptions<Options>, "check" | "pruned" | "usage">
+> & { readonly prune?: boolean | PruneOptions };
 
 /** The flags of `pureform generate`, as parsed. */
 export interface GenerateFlags {
     readonly check?: boolean;
     readonly watch?: boolean;
+    /** Write each target's pruned output too, from a scan of the app's source. */
+    readonly prune?: boolean;
     readonly root?: string;
     readonly config?: string;
     readonly codegen?: string;
@@ -115,8 +125,10 @@ const parseOptions = (json: string): Record<string, unknown> => {
 
 /** The options to generate with, and the codegen file they came from, if any. */
 export interface ResolvedCodegenOptions {
-    readonly options: GenerateOptions;
+    readonly options: GenerateTargetsOptions;
     readonly file: string | undefined;
+    /** Lines to print: why pruning kept everything. */
+    readonly warnings: readonly string[];
 }
 
 /** Settles the options: the flags, then the codegen file (`--codegen`, or the first of
@@ -140,7 +152,19 @@ export const resolveCodegenOptions = async (
             ? resolve(dirname(file), codegen.root)
             : start;
     const target = flags.target ?? codegen.target;
-    if (target === undefined) {
+    // `--target` replaces the codegen file's targets with one.
+    const targets = flags.target === undefined ? codegen.targets : undefined;
+    if (
+        targets !== undefined &&
+        (flags.options !== undefined ||
+            flags.components !== undefined ||
+            flags.lazy !== undefined)
+    ) {
+        throw new CliError(
+            "pureform: --options, --components and --lazy set a single target's; the codegen file names several `targets`. Pass --target too, or edit the codegen file.",
+        );
+    }
+    if (target === undefined && targets === undefined) {
         throw new CliError(
             `pureform: no target to generate for. Pass --target (${TARGETS.join(", ")}), or export the options as \`codegen\` from ${CODEGEN_FILES[0]}, such as \`export const codegen = { target: "panda" }\`.`,
         );
@@ -150,9 +174,22 @@ export const resolveCodegenOptions = async (
             ? codegen.options
             : { ...codegen.options, ...parseOptions(flags.options) };
 
-    const options: GenerateOptions = {
+    const outDir = flags.outDir ?? codegen.outDir;
+    const warnings: string[] = [];
+    let usage;
+    if (flags.prune) {
+        const pruning = findUsage(
+            root,
+            resolve(root, outDir ?? DEFAULT_OUT_DIR),
+            pruneOptions(codegen.prune, true) ?? {},
+        );
+        usage = pruning.usage;
+        warnings.push(...pruning.warnings);
+    }
+
+    const options: GenerateTargetsOptions = {
         config: flags.config ?? codegen.config ?? findConfigFile(root),
-        target,
+        ...(targets === undefined ? { target: target! } : { targets }),
         root,
         ...(adapterOptions === undefined ? {} : { options: adapterOptions }),
         ...optional(
@@ -160,15 +197,17 @@ export const resolveCodegenOptions = async (
             names(flags.components) ?? codegen.components,
         ),
         ...optional("lazy", names(flags.lazy) ?? codegen.lazy),
-        ...optional("outDir", flags.outDir ?? codegen.outDir),
+        ...optional("outDir", outDir),
         ...optional(
             "trainCheck",
             flags.trainCheck === false ? false : codegen.trainCheck,
         ),
         ...optional("imports", codegen.imports),
         ...(flags.check ? { check: true } : {}),
+        ...(flags.prune ? { pruned: true } : {}),
+        ...optional("usage", usage),
     };
-    return { options, file };
+    return { options, file, warnings };
 };
 
 const optional = <Key extends string, Value>(

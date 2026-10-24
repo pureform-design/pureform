@@ -33,9 +33,10 @@ What a platform can't do is a narrow skip in `stories.config.ts`, with its reaso
   renderer does. A renderer without a component shows "isn't implemented" in the canvas.
 - **One Vite build** (`.storybook/main.ts`) compiles all of them. Solid's plugin takes
   `src/solid/**` and every package that ships Solid JSX (the `SOLID` list); React's takes the
-  rest. Solid and React draw with the Panda registry in `.pureform/`, React Native with
-  rn-adapter's runtime styles from `virtual:pureform-rn`. `pureform.codegen.ts`'s
-  `COMPONENTS` is every anatomy in `@pureform/anatomy`, for both.
+  rest. `pureform.codegen.ts` declares two targets: Solid and React draw with the Panda
+  registry (`web`), React Native with the generated React Native one (`native`), which the
+  bundler plugin gives to `src/native/**` by the target's `include`. `COMPONENTS` is every
+  anatomy in `@pureform/anatomy`, for both.
 - **Stories are generated** by `scripts/generate-stories.ts` (the omni `generate:stories`
   task, before `dev`, `build` and the tests) into `src/stories/generated/<Component>.stories.ts`
   (ignored by git), from data the components already have:
