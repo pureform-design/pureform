@@ -5,7 +5,7 @@
 import { springState, valueTypeMoves } from "@pureform/core";
 
 import { formatColor, mixSrgb, parseColor } from "./rgba";
-import { TOKEN } from "./values";
+import { SHAPE, TOKEN } from "./values";
 import type { Concrete, Spring, ThemeValues, Transition } from "./values";
 
 /** A transition's curve as Bézier points, or `linear` (also for a `linear(...)` curve, whose
@@ -128,6 +128,8 @@ export const channels = (
     const properties = new Set(frames.flatMap((f) => Object.keys(f.style)));
     const out: Channel[] = [];
     for (const property of properties) {
+        // A frame's shape is the drawing's to morph, not a style's.
+        if (property === SHAPE) continue;
         const at = (f: Frame) => f.style[property] ?? base[property];
         if (property === "transform") {
             const lists = all.map(

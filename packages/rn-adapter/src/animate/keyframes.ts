@@ -1,5 +1,6 @@
 // Keyframe animations: each slot's animation drives a looped Animated value, and each value
-// and transform step its frames move interpolates through their offsets.
+// and transform step its frames move interpolates through their offsets, the animation's curve
+// easing each step between two frames, as CSS's timing function does.
 
 import { useEffect, useLayoutEffect, useRef } from "react";
 import { Animated } from "react-native";
@@ -32,7 +33,8 @@ const run = (
         Animated.timing(progress, {
             toValue: to,
             duration: animation.duration,
-            easing: curve(animation.easing),
+            // Linear here: the curve eases each step between two frames, as CSS's does.
+            easing: (t: number) => t,
             useNativeDriver: false,
         });
     const once = alternate
@@ -110,6 +112,7 @@ export const useKeyframes = () => {
             const value = loop.progress.interpolate({
                 inputRange: channel.inputRange,
                 outputRange: channel.outputRange as unknown as number[],
+                easing: curve(loop.animation.easing),
             });
             if (channel.step) {
                 const [index, name] = channel.step;
