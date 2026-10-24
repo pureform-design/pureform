@@ -19,12 +19,7 @@ export type { LoadConfigOptions, LoadedConfig } from "./config";
 export { GenerateError, isGenerateError } from "./errors";
 export type { GenerateErrorCode } from "./errors";
 export { DEFAULT_OUT_DIR, generate } from "./generate";
-export {
-    entryFile,
-    generateTargets,
-    OUTPUT_ENV,
-    targetsOf,
-} from "./targets";
+export { entryFile, generateTargets, OUTPUT_ENV, targetsOf } from "./targets";
 export type {
     CodegenTargets,
     EntryTarget,

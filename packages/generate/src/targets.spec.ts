@@ -16,11 +16,13 @@ const body = (contents: string) => contents.split("\n").slice(3).join("\n");
 // Every file under a folder, relative to it.
 const tree = (dir: string): string[] =>
     existsSync(dir)
-        ? (readdirSync(dir, { recursive: true, withFileTypes: true }) as {
-              isFile(): boolean;
-              parentPath: string;
-              name: string;
-          }[])
+        ? (
+              readdirSync(dir, { recursive: true, withFileTypes: true }) as {
+                  isFile(): boolean;
+                  parentPath: string;
+                  name: string;
+              }[]
+          )
               .filter((entry) => entry.isFile())
               .map((entry) =>
                   join(entry.parentPath, entry.name).slice(dir.length + 1),
@@ -173,9 +175,9 @@ describe("generateTargets", () => {
         expect(entryFile(result, join(out, "native.ts"), "web", "full")).toBe(
             join(out, "native/full/index.ts"),
         );
-        expect(entryFile(result, join(out, "fake.css"), "native", "pruned")).toBe(
-            join(out, "web/pruned/fake.css"),
-        );
+        expect(
+            entryFile(result, join(out, "fake.css"), "native", "pruned"),
+        ).toBe(join(out, "web/pruned/fake.css"));
         expect(
             entryFile(result, join(out, "web/full/index.ts"), "web", "full"),
         ).toBeUndefined();
@@ -201,7 +203,11 @@ describe("generateTargets", () => {
     it("removes generated files of an older layout", async () => {
         const root = tempRoot();
         const { generate } = await import("./generate");
-        await generate({ root, config: fixtureConfig(), target: fakeAdapter() });
+        await generate({
+            root,
+            config: fixtureConfig(),
+            target: fakeAdapter(),
+        });
         expect(existsSync(join(root, ".pureform/web/button.ts"))).toBe(true);
         await generateTargets({
             root,

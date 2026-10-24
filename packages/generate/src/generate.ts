@@ -227,7 +227,10 @@ const importPath = (
 
 // The tsconfig hint: TypeScript's globs skip dot folders, so the declarations are invisible
 // unless the folder is included by name.
-export const tsconfigHint = (root: string, outDir: string): string | undefined => {
+export const tsconfigHint = (
+    root: string,
+    outDir: string,
+): string | undefined => {
     const file = join(root, "tsconfig.json");
     if (!existsSync(file)) return undefined;
     const folder = toPosix(relative(root, outDir));

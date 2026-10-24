@@ -6,9 +6,9 @@ import { watch } from "node:fs";
 import type { FSWatcher } from "node:fs";
 import { basename, dirname, join } from "node:path";
 
-import type { GenerateTargetsOptions, GenerateTargetsResult } from "./targets";
 import { createGenerateRunner } from "./runner";
 import type { GenerateRunner } from "./runner";
+import type { GenerateTargetsOptions, GenerateTargetsResult } from "./targets";
 
 export interface WatchGenerateOptions {
     /** Called after every successful run, the first included. */

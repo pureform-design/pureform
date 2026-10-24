@@ -56,8 +56,9 @@ export interface CodegenTargets<Options = Record<string, unknown>> {
     readonly lazy?: readonly string[];
 }
 
-export interface GenerateTargetsOptions<Options = Record<string, unknown>>
-    extends CodegenTargets<Options> {
+export interface GenerateTargetsOptions<
+    Options = Record<string, unknown>,
+> extends CodegenTargets<Options> {
     /** The config: a path (loaded with jiti, relative to `root`), or the config itself. */
     readonly config: string | CoreConfig;
     /** The app's root. Default: the working directory. */
@@ -211,7 +212,9 @@ const entryContents = (
         "",
         ...values.map((name) => `export const ${name} = chosen.${name};`),
         ...(types.length > 0
-            ? [`export type { ${types.join(", ")} } from "${toSpecifier(full)}";`]
+            ? [
+                  `export type { ${types.join(", ")} } from "${toSpecifier(full)}";`,
+              ]
             : []),
         "",
     ].join("\n");
@@ -341,9 +344,7 @@ export const generateTargets = async <Options = Record<string, unknown>>(
     const names = new Set(targets.map((target) => target.name));
     const keep = (path: string) => {
         const [folder, kind] = path.split("/");
-        return (
-            names.has(folder!) && (kind === "full" || kind === "pruned")
-        );
+        return names.has(folder!) && (kind === "full" || kind === "pruned");
     };
     const top = options.check
         ? await compareFiles(outDir, planned, hash, keep)
@@ -378,7 +379,10 @@ export const entryFile = (
     const { outDir } = result;
     let name: string | undefined;
     if (path === outDir) name = INDEX_FILE;
-    else if (path.startsWith(outDir) && !path.slice(outDir.length + 1).match(/[\\/]/)) {
+    else if (
+        path.startsWith(outDir) &&
+        !path.slice(outDir.length + 1).match(/[\\/]/)
+    ) {
         const base = path.slice(outDir.length + 1);
         name =
             base in result.entries
