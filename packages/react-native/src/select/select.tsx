@@ -27,7 +27,7 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Modal, Platform, Pressable, StyleSheet, View } from "react-native";
 
-import { MenuKeys, MenuListbox } from "../menu/menu";
+import { isTypedKey, MenuKeys, MenuListbox, typeahead } from "../menu/menu";
 import { useControllable } from "../parts";
 import { usePresence } from "../presence";
 import { useDirection, useEngine } from "../provider";
@@ -129,16 +129,33 @@ export function Select(props: SelectProps): ReactNode {
         const next = choosable[at(index)];
         if (next && next.value !== value) setValue(next.value);
     };
+    // Typed on the field: the list opens on the first option starting with it (WAI-ARIA APG's
+    // select-only combobox).
+    const [search, setSearch] = useState<string>();
+    const typed = useRef(typeahead());
     const onFieldKey = (event: {
-        nativeEvent: { key: string };
+        nativeEvent: {
+            key: string;
+            altKey?: boolean;
+            ctrlKey?: boolean;
+            metaKey?: boolean;
+        };
         preventDefault(): void;
     }) => {
         if (props.disabled || expanded) return;
         const { key } = event.nativeEvent;
+        if (isTypedKey(event.nativeEvent)) {
+            event.preventDefault();
+            setSearch(typed.current(key));
+            open();
+            return;
+        }
         const forward = rtl ? "ArrowLeft" : "ArrowRight";
         const back = rtl ? "ArrowRight" : "ArrowLeft";
-        if (key === " " || key === "ArrowDown" || key === "ArrowUp") open();
-        else if (key === forward)
+        if (key === " " || key === "ArrowDown" || key === "ArrowUp") {
+            setSearch(undefined);
+            open();
+        } else if (key === forward)
             chooseAt((index) => Math.min(index + 1, choosable.length - 1));
         else if (key === back) chooseAt((index) => Math.max(index - 1, 0));
         else if (key === "Home") chooseAt(() => 0);
@@ -201,7 +218,10 @@ export function Select(props: SelectProps): ReactNode {
                     ? { "aria-controls": listId }
                     : {})}
                 disabled={props.disabled}
-                onPress={open}
+                onPress={() => {
+                    setSearch(undefined);
+                    open();
+                }}
                 {...(Platform.OS === "web"
                     ? ({ onKeyDown: onFieldKey } as object)
                     : {})}
@@ -233,6 +253,7 @@ export function Select(props: SelectProps): ReactNode {
                     >
                         <MenuKeys
                             autoFocus
+                            search={search}
                             onKey={(key) => {
                                 if (key === "Tab") close();
                                 return false;

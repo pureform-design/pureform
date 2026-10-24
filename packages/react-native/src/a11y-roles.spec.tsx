@@ -136,6 +136,48 @@ describe.each(ENGINES)("with $name", (engine) => {
         });
     });
 
+    describe("the select's type-to-find", () => {
+        const combobox = () => one('[role="combobox"]')!;
+        const SHIRTS = [
+            { value: "s", label: "Small" },
+            { value: "m", label: "Medium" },
+            { value: "ml", label: "Medium large" },
+            { value: "l", label: "Large" },
+            { value: "xl", label: "Extra large" },
+        ];
+
+        it("opens on the first option starting with what's typed on the field, and goes on typing in the list", async () => {
+            const change = vi.fn();
+            await render(
+                <Select
+                    label="Size"
+                    items={SHIRTS}
+                    defaultValue="s"
+                    onValueChange={change}
+                />,
+                engine,
+            );
+            combobox().focus();
+            await interact(() => userEvent.keyboard("l"));
+            await until(() =>
+                expect(document.activeElement?.textContent).toBe("Large"),
+            );
+            expect(combobox().getAttribute("aria-expanded")).toBe("true");
+            // Nothing is chosen by typing.
+            expect(change).not.toHaveBeenCalled();
+            // The same letter again goes round those starting with it; a word goes to it.
+            await interact(() => userEvent.keyboard("m"));
+            expect(document.activeElement?.textContent).toBe("Medium");
+            await interact(() => userEvent.keyboard("m"));
+            expect(document.activeElement?.textContent).toBe("Medium large");
+            await new Promise((done) => setTimeout(done, 600));
+            await interact(() => userEvent.keyboard("ex"));
+            expect(document.activeElement?.textContent).toBe("Extra large");
+            await interact(() => userEvent.keyboard("{Enter}"));
+            expect(change).toHaveBeenLastCalledWith({ value: "xl" });
+        });
+    });
+
     describe("the autocomplete, a combobox with list autocomplete", () => {
         const CITIES = [
             { value: "par", label: "Paris" },
@@ -371,5 +413,22 @@ describe("a tree row on iOS and Android", () => {
             accessibilityLabel: "index.ts, level 2",
             accessibilityState: { selected: true, disabled: false },
         });
+    });
+});
+
+describe("type-to-find's typed text", () => {
+    it("adds keys within half a second, starts again after, and keeps one letter typed again", async () => {
+        const { typeahead } = await import("./menu/menu");
+        let now = 0;
+        const typed = typeahead(() => now);
+        expect(typed("M")).toBe("m");
+        now = 100;
+        expect(typed("e")).toBe("me");
+        now = 700;
+        expect(typed("l")).toBe("l");
+        now = 800;
+        expect(typed("l")).toBe("l");
+        now = 900;
+        expect(typed("a")).toBe("lla");
     });
 });

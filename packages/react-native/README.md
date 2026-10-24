@@ -273,8 +273,12 @@ trigger shows their labels joined by ", " (the placeholder when none):
   tooltip describes its trigger while it shows); a combobox names its open list
   (`aria-controls`); a calendar's days are gridcells with `aria-selected`; a list's items are its
   `listitem`s; the carousel's current item says `aria-current`. On the web, checkboxes, switches
-  and radios check on Space and not Enter, tabs take the arrow keys, Home and End, a tree row
-  takes Space, and the time picker's selectors and the time input's fields take the web's step
+  and radios check on Space and not Enter, tabs take the arrow keys, Home and End, the tree is one
+  tab stop whose rows are its `treeitem`s (a branch's row owning its group, `aria-owns`) taking
+  the arrow keys, Home, End, Enter, Space and type-to-find (WAI-ARIA APG's tree; on iOS and
+  Android a row's label carries its level, in the tree's `translations.level`), menus and the
+  select's list take type-to-find (typing on a closed select opens it on the first option
+  starting with the text), and the time picker's selectors and the time input's fields take the web's step
   keys.
 - **Engines change hooks**, so each component starts over (`withEngine`, keyed by the engine's
   name) when the provider's engine changes: the app's state stays, a press in progress doesn't.
@@ -429,7 +433,11 @@ trigger shows their labels joined by ", " (the placeholder when none):
       editable input: typing opens the suggestions `filter` keeps (`autocompleteMatches`) under
       it, through the portal host rather than a `Modal`, so the input keeps the keyboard; the
       trailing arrow opens or closes it. Choosing one sets `value` and the text (`inputValue`) to
-      its label; a press outside, Escape, and back close it.
+      its label; a press outside, Escape, and back close it. The input is a combobox controlling a
+      listbox of the suggestions as options (WAI-ARIA APG's list autocomplete): focus stays in the
+      input, the down and up arrows highlight an option (`aria-activedescendant`, the option
+      saying `aria-selected`), opening the list first, Enter chooses it, and Alt with the arrows
+      opens or closes the list.
     - **The date pickers** have no date machine: their state and calendar come from
       binding-core's ISO-date helpers (`monthWeeks`, `weekdayLabels`, `chooseDate`, …), so the
       weeks match the web's for a locale. Each day is its own `calendarCell`. The modal

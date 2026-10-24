@@ -901,6 +901,7 @@ export function MenuListbox(
 // The items' elements on the web, where the keyboard moves between them.
 interface WebElement {
     focus(): void;
+    readonly textContent: string | null;
     querySelectorAll(selector: string): ArrayLike<WebElement>;
     getAttribute(name: string): string | null;
 }
@@ -910,14 +911,19 @@ const ITEM = ["menuitem", "menuitemcheckbox", "menuitemradio", "option"]
     .join(", ");
 
 // A menu's items on the web: it takes focus on its chosen option or else its first item (given
-// `autoFocus`), and the arrow keys, Home, and End move it; `onKey` hears the other keys first, and takes those it returns
-// true for. A cascaded submenu is another portal entry, so it has its own.
+// `autoFocus`; given `search` too, on the first item whose text starts with it), and the arrow
+// keys, Home, and End move it, and typing goes to the next item starting with what's typed (a
+// moment's pause starts again; one letter again and again goes round those starting with it), as
+// WAI-ARIA APG's menus and listboxes do. `onKey` hears the other keys first, and takes those it
+// returns true for. A cascaded submenu is another portal entry, so it has its own.
 export function MenuKeys(props: {
     readonly autoFocus: boolean;
+    readonly search?: string | undefined;
     readonly onKey?: ((key: string) => boolean) | undefined;
     readonly children: ReactNode;
 }): ReactNode {
     const root = useRef<ComponentRef<typeof View>>(null);
+    const typed = useRef(typeahead());
     const items = () =>
         Array.from(
             (root.current as unknown as WebElement | null)?.querySelectorAll(
@@ -928,12 +934,18 @@ export function MenuKeys(props: {
         if (Platform.OS !== "web" || !props.autoFocus) return;
         const all = items();
         (
+            (props.search ? findTyped(all, -1, props.search) : undefined) ??
             all.find((item) => item.getAttribute("aria-selected") === "true") ??
             all[0]
         )?.focus();
     }, []);
     const onKeyDown = (event: {
-        nativeEvent: { key: string };
+        nativeEvent: {
+            key: string;
+            altKey?: boolean;
+            ctrlKey?: boolean;
+            metaKey?: boolean;
+        };
         preventDefault(): void;
         stopPropagation(): void;
     }) => {
@@ -961,6 +973,12 @@ export function MenuKeys(props: {
             case "End":
                 return go(-1);
         }
+        if (!isTypedKey(event.nativeEvent)) return;
+        const search = typed.current(key);
+        const found = findTyped(all, search.length > 1 ? at - 1 : at, search);
+        if (!found) return;
+        event.preventDefault();
+        found.focus();
     };
     return (
         <View ref={root} {...(Platform.OS === "web" ? { onKeyDown } : {})}>
@@ -968,6 +986,56 @@ export function MenuKeys(props: {
         </View>
     );
 }
+
+/** Whether a key types a character (no modifier but Shift), for type-to-find. */
+export const isTypedKey = (key: {
+    key: string;
+    altKey?: boolean;
+    ctrlKey?: boolean;
+    metaKey?: boolean;
+}): boolean =>
+    key.key.length === 1 &&
+    key.key !== " " &&
+    !key.altKey &&
+    !key.ctrlKey &&
+    !key.metaKey;
+
+/** What's been typed for type-to-find: each key added within half a second of the last, else
+ *  starting again; one letter typed again and again stays that letter, to go round the items
+ *  starting with it. */
+export const typeahead = (now: () => number = () => Date.now()) => {
+    let text = "";
+    let at = -Infinity;
+    return (key: string): string => {
+        const time = now();
+        text = time - at > 500 ? key : text + key;
+        at = time;
+        const lower = text.toLocaleLowerCase();
+        return [...lower].every((letter) => letter === lower[0])
+            ? lower[0]!
+            : lower;
+    };
+};
+
+// An item's text for type-to-find: its words, without the icons before them.
+const textOf = (item: WebElement): string =>
+    (item.textContent ?? "")
+        .replace(/^[^\p{L}\p{N}]+/u, "")
+        .toLocaleLowerCase();
+
+/** The first of `all` after index `from` (going round) whose text starts with `search`. */
+const findTyped = (
+    all: readonly WebElement[],
+    from: number,
+    search: string,
+): WebElement | undefined => {
+    const lower = search.toLocaleLowerCase();
+    for (let step = 1; step <= all.length; step++) {
+        const item = all[(from + step + all.length) % all.length]!;
+        if (textOf(item).startsWith(lower)) return item;
+    }
+    return undefined;
+};
 
 // The open menu, placed: on the web it takes focus on its first item, the keys move it, and Tab
 // closes it.
