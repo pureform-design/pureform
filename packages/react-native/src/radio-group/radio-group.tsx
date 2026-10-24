@@ -30,6 +30,7 @@ import {
 } from "../parts";
 import { useComponentSlots, withUserStyle } from "../styles";
 import type { RootStyleProps } from "../styles";
+import { touchTargetSlopOf } from "../touch-target/touch-target";
 
 const [INDICATION] = radioAnatomy.indication!;
 
@@ -92,8 +93,10 @@ function RadioImpl(props: RadioProps): ReactNode {
         disabled,
         indication.handlers.onPressIn,
     );
+    const slop = touchTargetSlopOf(s.root ?? {}, s.touchTarget);
     return (
         <v.root.Pressable
+            hitSlop={slop}
             {...indication.handlers}
             {...keys}
             role="radio"

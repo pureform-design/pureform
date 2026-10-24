@@ -17,6 +17,7 @@ import { useSurfaceIndication } from "../indication";
 import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
 import { useComponentSlots, withUserStyle } from "../styles";
 import type { RootStyleProps } from "../styles";
+import { touchTargetSlopOf } from "../touch-target/touch-target";
 
 const [INDICATION] = switchControlAnatomy.indication!;
 
@@ -75,8 +76,10 @@ function SwitchImpl(props: SwitchProps): ReactNode {
         props.disabled,
         indication.handlers.onPressIn,
     );
+    const slop = touchTargetSlopOf(s.root ?? {}, s.touchTarget);
     return (
         <v.root.Pressable
+            hitSlop={slop}
             {...indication.handlers}
             {...keys}
             role="switch"

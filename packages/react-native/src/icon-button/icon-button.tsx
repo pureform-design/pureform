@@ -21,6 +21,7 @@ import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
 import { useEngine } from "../provider";
 import { useComponentSlots, withUserStyle } from "../styles";
 import type { RootStyleProps } from "../styles";
+import { touchTargetSlopOf } from "../touch-target/touch-target";
 
 const [INDICATION] = iconButtonAnatomy.indication!;
 
@@ -79,8 +80,10 @@ function IconButtonImpl(props: IconButtonProps): ReactNode {
     const Drawing = engine.Drawing;
     const id = (part: IconButtonPart) =>
         testIdOf(iconButtonAnatomy, part, props.testId);
+    const slop = touchTargetSlopOf(s.root ?? {}, s.touchTarget);
     return (
         <v.root.Pressable
+            hitSlop={slop}
             {...indication.handlers}
             role="button"
             aria-label={props["aria-label"]}

@@ -571,7 +571,9 @@ trigger shows their labels joined by ", " (the placeholder when none):
   small `Pressable`; it grows the press area to the theme's minimum (48), centred, hidden from
   assistive technology, as the web's does. On Android a child's touches outside its parent count
   only where nothing clips them, so `useTouchTargetSlop(width, height)` gives the same area as a
-  `hitSlop` for a pressable that takes one.
+  `hitSlop` for a pressable that takes one. The small pressables (checkbox, radio, switch, icon
+  button, chip) take theirs (`touchTargetSlopOf(root, touchTarget)`: their size and their
+  `touchTarget` slot's minimum; a chip's label-set width gets none).
 - **Media:** `Media` takes the web's `src`, or a `source` as React Native's `Image` takes it
   (`ImageSourcePropType`): a `require()`d asset (its proportions from
   `Image.resolveAssetSource`), `{ uri, headers, cache }` (measured with
