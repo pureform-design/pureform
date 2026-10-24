@@ -5,16 +5,27 @@
 
 import { compositeTestIds, searchViewMenuAnatomy } from "@pureform/anatomy";
 
+import { allByRole } from "../aria";
 import type { ComponentCase } from "../types";
 import { byTestId, itemSources } from "../types";
 import { userEvent } from "../user-event";
-import { overlayParts } from "./overlay";
+import { leavingOnWeb, overlayParts } from "./overlay";
 
 const ids = compositeTestIds.searchView;
-const { trigger, read, click, shown, overlay, placed } = overlayParts({
-    trigger: ids.trigger,
-    content: ids.surface,
-});
+const { trigger, read, click, shown, overlay, placed } = overlayParts(
+    {
+        trigger: ids.trigger,
+        content: ids.surface,
+    },
+    {
+        role: "dialog",
+        trigger: (host) => byTestId(host, ids.trigger),
+        // The web's bar is a plain element around the search bar, so nothing says the view is
+        // open but the view itself.
+        expands: false,
+        leaving: leavingOnWeb,
+    },
+);
 
 const ITEMS = [
     { value: "inbox", label: "Inbox", supportingText: "Mail" },
@@ -25,8 +36,12 @@ const ITEMS = [
 const input = (host: HTMLElement) =>
     byTestId<HTMLInputElement>(host, ids.input);
 
-// The search bar's input, inside the trigger.
-const bar = (host: HTMLElement) => trigger(host).querySelector("input")!;
+// What takes focus in the trigger: the search bar's input, or a button over it that opens the
+// view (React Native's, whose bar isn't editable).
+const bar = (host: HTMLElement): HTMLElement =>
+    allByRole(trigger(host), "button").find((element) =>
+        element.hasAttribute("aria-haspopup"),
+    ) ?? trigger(host).querySelector("input")!;
 
 export const searchView: ComponentCase = {
     component: "SearchView",

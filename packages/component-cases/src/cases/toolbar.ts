@@ -5,6 +5,7 @@
 
 import { iconButtonAnatomy, testIds } from "@pureform/anatomy";
 
+import { allByRole } from "../aria";
 import type { ComponentCase, KeyCase } from "../types";
 import { itemSources } from "../types";
 
@@ -15,9 +16,8 @@ const ITEMS = [
     { value: "done", label: "Done" },
 ];
 
-const elements = (host: HTMLElement) => [
-    ...host.querySelectorAll<HTMLButtonElement>("[data-pf-toolbar-item]"),
-];
+/** The bar's elements: its buttons, by role. */
+const elements = (host: HTMLElement) => allByRole(host, "button");
 const first = (host: HTMLElement) => elements(host)[0]!;
 const second = (host: HTMLElement) => elements(host)[1]!;
 const last = (host: HTMLElement) => elements(host).at(-1)!;

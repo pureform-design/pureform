@@ -21,9 +21,9 @@ export interface RendererConfig {
         readonly module: string;
         readonly components: readonly string[];
     };
-    /** `false` where the cases' readers can't read the renderer's DOM (they read the web
-     *  bindings' native elements, ARIA and data attributes): its stories run without the
-     *  generated play tests. The a11y checks still run. */
+    /** `false` leaves its stories without the generated play tests (the a11y checks still run).
+     *  The cases read through ARIA, which every renderer draws, so none sets it; a renderer whose
+     *  ARIA the plays can't read yet would. */
     readonly casePlays?: boolean;
     /** `false` leaves the renderer out of the story tests (`vitest.config.storybook.ts`); its
      *  stories still draw in Storybook. */
@@ -53,6 +53,9 @@ export interface ComponentConfig {
     /** Parameters for every story of the component (the meta's), plain data:
      *  `{ a11y: { test: "todo" } }`. */
     readonly parameters?: Readonly<Record<string, unknown>>;
+    /** Globals for every story of the component (the meta's), plain data:
+     *  `{ viewport: { value: "suites", isRotated: false } }`. */
+    readonly globals?: Readonly<Record<string, unknown>>;
     /** Pins every story of the component to a scheme (the meta's `globals`). */
     readonly scheme?: "light" | "dark";
     /** Story fields by export name, merged into the generated story (plain data):

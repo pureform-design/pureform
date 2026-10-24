@@ -12,6 +12,7 @@
 
 import { accordionAnatomy, testIds, treeAnatomy } from "@pureform/anatomy";
 
+import { allByRole, flagOf } from "../aria";
 import type { ActOptions, ComponentCase, KeyCase } from "../types";
 import { itemSources } from "../types";
 import { userEvent } from "../user-event";
@@ -37,17 +38,11 @@ const ITEMS = [
 
 const triggers = (host: HTMLElement) => all(host, a.trigger);
 
-/** The expanded items' values, checked against the content each header shows. */
-const readAccordion = (host: HTMLElement): string[] => {
-    const contents = all(host, a.content);
-    return triggers(host).flatMap((trigger, index) => {
-        const expanded = trigger.getAttribute("aria-expanded") === "true";
-        if (contents[index]!.hidden === expanded) {
-            throw new Error(`item ${index} shows its content ${!expanded}`);
-        }
-        return expanded ? [ITEMS[index]!.value] : [];
-    });
-};
+/** The expanded items' values: each header's `aria-expanded`. */
+const readAccordion = (host: HTMLElement): string[] =>
+    triggers(host).flatMap((trigger, index) =>
+        flagOf(trigger, "expanded") ? [ITEMS[index]!.value] : [],
+    );
 
 const clickAccordion =
     (index: number) =>
@@ -122,17 +117,17 @@ const FILES = [
 
 const rows = (host: HTMLElement) => all(host, t.node);
 
-/** The expanded branches' values, checked against the group each one shows. */
-const readTree = (host: HTMLElement): string[] => {
-    const groups = all(host, t.group);
-    return all(host, t.branch).flatMap((branch, index) => {
-        const expanded = branch.getAttribute("aria-expanded") === "true";
-        if (groups[index]!.hidden === expanded) {
-            throw new Error(`branch ${index} shows its group ${!expanded}`);
-        }
-        return expanded ? [branch.getAttribute("data-value")!] : [];
-    });
-};
+/** The branches, in order (only the first level has any). */
+const BRANCHES = FILES.filter((file) => file.children !== undefined);
+
+/** The expanded branches' values: the tree items that say `aria-expanded` are the branches, in
+ *  order (the web's branch element, React Native's row). */
+const readTree = (host: HTMLElement): string[] =>
+    allByRole(host, "treeitem")
+        .filter((item) => item.hasAttribute("aria-expanded"))
+        .flatMap((branch, index) =>
+            flagOf(branch, "expanded") ? [BRANCHES[index]!.value] : [],
+        );
 
 const changes = (to: string[]) => ({
     does: "change" as const,

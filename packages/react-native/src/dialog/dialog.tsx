@@ -39,6 +39,8 @@ export interface DialogTriggerProps {
     /** Opens the dialog. */
     readonly onPress: () => void;
     readonly "aria-haspopup": "dialog";
+    /** Whether it's open. */
+    readonly "aria-expanded": boolean;
 }
 
 const NO_ACTIONS: DialogActions = { close: () => {} };
@@ -155,13 +157,14 @@ function ModalDialog(props: DialogProps): ReactNode {
     const given: DialogTriggerProps = {
         onPress: show,
         "aria-haspopup": "dialog",
+        "aria-expanded": open,
     };
     return (
         <>
             {trigger === undefined ? null : typeof trigger === "function" ? (
                 trigger(given)
             ) : (
-                <Button label={trigger} onPress={show} />
+                <Button label={trigger} {...given} />
             )}
             <ModalWindow
                 visible={presence.present}

@@ -66,6 +66,8 @@ export interface TimeButtonProps<A extends ComponentAnatomy> {
     readonly selected: boolean;
     readonly disabled?: boolean | undefined;
     readonly onPress: () => void;
+    /** A key pressed on it, on the web: `true` when it took the key. */
+    readonly onKey?: ((key: string) => boolean) | undefined;
     /** Its text's slot, drawn inside it. */
     readonly children: ReactNode;
 }
@@ -103,6 +105,17 @@ function TimeButtonImpl<A extends ComponentAnatomy>(
                 ? {}
                 : { "aria-label": props.label })}
             onPress={props.disabled ? undefined : props.onPress}
+            {...(props.onKey
+                ? ({
+                      onKeyDown: (event: {
+                          nativeEvent: { key: string };
+                          preventDefault?(): void;
+                      }) => {
+                          if (props.onKey!(event.nativeEvent.key))
+                              event.preventDefault?.();
+                      },
+                  } as object)
+                : {})}
             style={{ ...style, ...unselectable }}
             testID={testIdOf(props.anatomy, props.part, props.testId)}
         >

@@ -9,7 +9,11 @@ import {
     LOADING_INDICATOR_SHAPES,
     loadingIndicator,
 } from "./loading-indicator";
-import { circularProgress, linearProgress } from "./progress";
+import {
+    PROGRESS_KEYFRAMES,
+    circularProgress,
+    linearProgress,
+} from "./progress";
 import { morphSequence, waveBand, wavyRing } from "./shape-paths";
 
 const slotRecipe = (
@@ -85,6 +89,28 @@ describe("wave paths", () => {
         expect(ring.contours).toHaveLength(2);
     });
 
+    it("rings a half's box with its share of the circle, in the circle's frame", () => {
+        const options = { waves: 9, thickness: px(4), amplitude: px(1.5) };
+        const xs = (half?: "left" | "right") =>
+            wavyRing({ ...options, half }).contours[0]!.segments.map((s) =>
+                JSON.stringify((s as { readonly to: readonly unknown[] }).to[0]),
+            );
+        const ys = (half?: "left" | "right") =>
+            wavyRing({ ...options, half }).contours[0]!.segments.map((s) =>
+                JSON.stringify((s as { readonly to: readonly unknown[] }).to[1]),
+            );
+        // The top of the circle (its first point) is the left half's right edge and the right
+        // half's left edge; heights are the circle's.
+        const first = (half?: "left" | "right") =>
+            JSON.stringify(wavyRing({ ...options, half }).contours[0]!.from[0]);
+        expect(first()).toContain('"value":50');
+        expect(first("left")).toContain('"value":100');
+        expect(first("right")).toContain('"value":0');
+        expect(ys("left")).toEqual(ys());
+        expect(ys("right")).toEqual(ys());
+        expect(xs("left")).not.toEqual(xs("right"));
+    });
+
     it("draws the waves from the progress tokens, with no compound per thickness", () => {
         const clips = [
             [
@@ -93,7 +119,8 @@ describe("wave paths", () => {
                 ["linearProgress", "height", "amplitude"],
             ],
             [
-                circularProgress.recipe.variants?.shape?.wavy?.endArc?.clipPath,
+                circularProgress.recipe.variants?.shape?.wavy?.endHalf
+                    ?.clipPath,
                 ["circularProgress", "thickness", "amplitude"],
             ],
         ] as const;
@@ -182,6 +209,37 @@ describe("loadingIndicator", () => {
     });
 });
 
+describe("indeterminate progress tracks", () => {
+    it("keeps the circular track while indeterminate, turning with the arc's value", () => {
+        const indeterminate =
+            circularProgress.recipe.variants?.indeterminate?.true;
+        expect(indeterminate).not.toHaveProperty("track");
+        expect(JSON.stringify(circularProgress.recipe.base?.track)).toContain(
+            '"path":["components","circularProgress","value"]',
+        );
+    });
+
+    it("leaves a gap on each side of the sliding linear indicator, on the web", () => {
+        const track = linearProgress.recipe.variants?.indeterminate?.true
+            ?.track as { rawRules?: { css?: Record<string, unknown> } };
+        const css = JSON.stringify(track.rawRules?.css?.["&"]);
+        // The track's color, less the indicator's width and a gap each side, at `slide`, which
+        // the track animates in step with the indicator.
+        expect(css).toContain('"type":"gradient"');
+        expect(css).toContain('"path":["components","linearProgress","slide"]');
+        expect(css).toContain('"path":["components","linearProgress","gap"]');
+        expect(css).toContain(
+            '"path":["components","linearProgress","indeterminateWidth"]',
+        );
+        expect(css).toContain("linearProgressTrackGap");
+        expect(css).toContain("linearProgressTrackGapRtl");
+        expect(PROGRESS_KEYFRAMES["linearProgressTrackGap"]).toEqual({
+            from: { tokens: { "components.linearProgress.slide": expect.anything() } },
+            to: { tokens: { "components.linearProgress.slide": expect.anything() } },
+        });
+    });
+});
+
 describe("wavy progress", () => {
     it("adds shape flat and wavy, flat by default, to both indicators", () => {
         for (const progress of [linearProgress, circularProgress]) {
@@ -206,13 +264,27 @@ describe("wavy progress", () => {
         ]);
     });
 
-    it("clips the circular arcs to a wavy ring, the spinner too while indeterminate", () => {
+    it("clips the circular halves to one wavy ring, the spinner too while indeterminate", () => {
         const wavy = circularProgress.recipe.variants?.shape?.wavy;
-        expect(wavy?.endArc?.clipPath).toMatchObject({
+        // The halves clip, not the turning arcs, so the wave stays put in the circle and the
+        // two halves' waves meet at the seam whatever the arcs' turns.
+        expect(wavy?.endArc).not.toHaveProperty("clipPath");
+        expect(wavy?.startArc).not.toHaveProperty("clipPath");
+        const clip = (half: "endHalf" | "startHalf") =>
+            wavy?.[half]?.clipPath as unknown as {
+                type: string;
+                base: { type: string; fillRule: string };
+                cases: { value: unknown }[];
+            };
+        expect(clip("endHalf").type).toBe("conditional");
+        expect(clip("endHalf").base).toMatchObject({
             type: "shape",
             fillRule: "evenodd",
         });
-        expect(wavy?.startArc?.clipPath).toEqual(wavy?.endArc?.clipPath);
+        // The end half is the right one (left under right to left), the start half the other.
+        expect(clip("endHalf").base).toEqual(clip("startHalf").cases[0]!.value);
+        expect(clip("startHalf").base).toEqual(clip("endHalf").cases[0]!.value);
+        expect(clip("endHalf").base).not.toEqual(clip("startHalf").base);
         // The ring reads the thickness, and the spinner draws with the same arcs.
         expect(circularProgress.recipe.compoundVariants ?? []).toHaveLength(0);
     });

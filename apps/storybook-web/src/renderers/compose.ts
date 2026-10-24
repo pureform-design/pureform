@@ -10,6 +10,19 @@ import { type Impls, multiRender } from "./multi-render";
 import { caseFor, defaultProp, keyPlay, statePlay } from "./plays";
 import type { Args } from "./types";
 
+/** A renderer's narrow exceptions for one story, from the component's
+ *  `parameters.pureform.skip[renderer][story]` (`story` is the export name, or `"*"` for every
+ *  story), each with its reason: `play` skips the story's play test there, and `a11y` turns off
+ *  those axe rules there. For what a platform can't do, never to hide a bug. */
+export interface RendererSkip {
+    readonly play?: string;
+    readonly a11y?: Readonly<Record<string, string>>;
+}
+
+type Skips = Readonly<
+    Record<string, Readonly<Record<string, RendererSkip>> | undefined>
+>;
+
 /** The play test a story gets from the case: the state's, or the key's at that index. */
 export type PlayKind = "state" | { readonly key: number };
 
@@ -30,6 +43,8 @@ export interface ComposeInput {
     readonly height?: number | undefined;
     /** The component's parameters from `stories.config.ts`. */
     readonly parameters?: Readonly<Record<string, unknown>> | undefined;
+    /** The component's globals from `stories.config.ts` (a viewport). */
+    readonly globals?: Readonly<Record<string, unknown>> | undefined;
 }
 
 export const composeStories = (input: ComposeInput) => {
@@ -106,6 +121,59 @@ export const composeStories = (input: ComposeInput) => {
             play: skipping(key ? keyPlay(c, key, clicks) : statePlay(c)),
         };
     };
+    const skips = (
+        input.parameters?.["pureform"] as { skip?: Skips } | undefined
+    )?.skip;
+    const skipOf = (renderer: string, story: string): RendererSkip => ({
+        ...skips?.[renderer]?.["*"],
+        ...skips?.[renderer]?.[story],
+        a11y: {
+            ...skips?.[renderer]?.["*"]?.a11y,
+            ...skips?.[renderer]?.[story]?.a11y,
+        },
+    });
+    /** The story with its renderer exceptions: no play where the renderer has no such component
+     *  (it draws "not implemented") or the config skips it, and the config's axe rules off. */
+    const excepted = (story: string, base: StoryObj): StoryObj => {
+        const play = base.play;
+        return {
+            ...base,
+            ...(play
+                ? {
+                      play: (context) => {
+                          const renderer = String(context.globals["renderer"]);
+                          if (
+                              input.renderers[renderer]?.component === undefined
+                          )
+                              return undefined;
+                          if (skipOf(renderer, story).play) return undefined;
+                          return play(context);
+                      },
+                  }
+                : {}),
+            beforeEach: (context) => {
+                const rules = Object.keys(
+                    skipOf(String(context.globals["renderer"]), story).a11y ??
+                        {},
+                );
+                if (rules.length === 0) return;
+                // The a11y addon reads this after the play, from the same context.
+                const a11y = (context.parameters["a11y"] ?? {}) as {
+                    config?: { rules?: readonly object[] };
+                };
+                context.parameters["a11y"] = {
+                    ...a11y,
+                    config: {
+                        ...a11y.config,
+                        rules: [
+                            ...(a11y.config?.rules ?? []),
+                            ...rules.map((id) => ({ id, enabled: false })),
+                        ],
+                    },
+                };
+            },
+        };
+    };
     const decorators: Decorator[] = [...input.shared, ...input.hooks].flatMap(
         (h) => h.decorators ?? [],
     );
@@ -133,7 +201,14 @@ export const composeStories = (input: ComposeInput) => {
                       }
                     : {}),
             },
-            ...(input.scheme ? { globals: { scheme: input.scheme } } : {}),
+            ...(input.scheme || input.globals
+                ? {
+                      globals: {
+                          ...input.globals,
+                          ...(input.scheme ? { scheme: input.scheme } : {}),
+                      },
+                  }
+                : {}),
         },
         /** A story; `base.globals.scheme` pins its scheme over the toolbar's, and `play` gives
          *  it a play test from the case. */
@@ -143,7 +218,7 @@ export const composeStories = (input: ComposeInput) => {
             play?: PlayKind,
         ): StoryObj => {
             const scheme = base.globals?.["scheme"];
-            return extend(
+            const extended = extend(
                 {
                     component: input.component,
                     story,
@@ -154,6 +229,7 @@ export const composeStories = (input: ComposeInput) => {
                 },
                 withPlay(base, play),
             );
+            return excepted(story, extended);
         },
     };
 };

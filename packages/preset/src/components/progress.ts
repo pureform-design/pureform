@@ -37,6 +37,7 @@ import {
     clamp,
     div,
     hidden,
+    linearGradient,
     max,
     min,
     mul,
@@ -47,6 +48,7 @@ import {
     relative,
     rotate,
     solid,
+    stop,
     sub,
     transform,
     translateX,
@@ -136,6 +138,16 @@ export const PROGRESS_KEYFRAMES: Record<string, Record<string, StyleMap>> = {
             tokens: { [SLIDE]: unitless(-2.5) },
         },
     },
+    // The track follows the sliding indicator to leave a gap around it: the same `slide`,
+    // without moving.
+    linearProgressTrackGap: {
+        from: { tokens: { [SLIDE]: unitless(-1) } },
+        to: { tokens: { [SLIDE]: unitless(2.5) } },
+    },
+    linearProgressTrackGapRtl: {
+        from: { tokens: { [SLIDE]: unitless(1) } },
+        to: { tokens: { [SLIDE]: unitless(-2.5) } },
+    },
     // A wavy line's wave travels along its track, a wavelength each cycle, toward the end.
     linearProgressWave: {
         from: { tokens: { [WAVE_DRIFT]: px(0) } },
@@ -201,6 +213,34 @@ const travellingWave = (): ShapeNode =>
             mul(linear.ref("slide"), pct(100)),
         ),
     });
+
+// The indeterminate track: its color, less a gap on each side of the sliding indicator (Compose
+// draws the track only outside the indicator and its gaps). The track spans the root then, so
+// the indicator's start is `slide` of its widths from the track's start; under right to left
+// it slides the other way, from the right.
+const trackWithGap = (sign: 1 | -1) => {
+    const start = mul(
+        linear.ref("slide"),
+        unitless(sign),
+        linear.ref("indeterminateWidth"),
+    );
+    const color = linear.ref("trackColor");
+    return linearGradient(
+        [
+            stop(color, sub(start, linear.ref("gap"))),
+            stop(transparent, sub(start, linear.ref("gap"))),
+            stop(
+                transparent,
+                add(start, linear.ref("indeterminateWidth"), linear.ref("gap")),
+            ),
+            stop(
+                color,
+                add(start, linear.ref("indeterminateWidth"), linear.ref("gap")),
+            ),
+        ],
+        numeric(sign === 1 ? 90 : 270, "deg"),
+    );
+};
 
 const travel = (name: string) =>
     animation({
@@ -289,7 +329,28 @@ export const createLinearProgress = <const G extends string = ColorGroup>(
                 variants: {
                     indeterminate: {
                         true: {
-                            track: { insetInlineStart: px(0) },
+                            // On the web the track leaves a gap around the indicator as it
+                            // slides; React Native draws the whole track under it.
+                            track: {
+                                insetInlineStart: px(0),
+                                rawRules: {
+                                    css: {
+                                        "&": {
+                                            backgroundColor: transparent,
+                                            backgroundImage: when(
+                                                "rtl",
+                                                trackWithGap(-1),
+                                                trackWithGap(1),
+                                            ),
+                                            animation: when(
+                                                "rtl",
+                                                slide("linearProgressTrackGapRtl"),
+                                                slide("linearProgressTrackGap"),
+                                            ),
+                                        },
+                                    },
+                                },
+                            },
                             stopIndicator: { display: none },
                             indicator: {
                                 width: ref("indeterminateWidth"),
@@ -350,8 +411,10 @@ export const createLinearProgress = <const G extends string = ColorGroup>(
                             },
                         },
                     },
+                    // The track's color through its token, which the indeterminate track's
+                    // gradient reads too.
                     color: colorVariant(groups, (g) => ({
-                        track: { backgroundColor: g.container },
+                        root: { tokens: { trackColor: g.container } },
                         indicator: { backgroundColor: g.main },
                         stopIndicator: { backgroundColor: g.main },
                     })),
@@ -426,12 +489,15 @@ const circular = componentTokens(
 );
 
 // The circular wave: nine waves around the circle, from the tokens, so it follows the thickness
-// and the amplitude.
-const circularWave = wavyRing({
-    waves: 9,
-    thickness: circular.ref("thickness"),
-    amplitude: circular.ref("amplitude"),
-});
+// and the amplitude. Each half clips to its share of one wave fixed in the circle's frame, so the
+// halves' waves meet at the seam however far their arcs have turned.
+const circularWave = (half: "left" | "right") =>
+    wavyRing({
+        waves: 9,
+        thickness: circular.ref("thickness"),
+        amplitude: circular.ref("amplitude"),
+        half,
+    });
 
 const DEG_PER_PERCENT = numeric(3.6, "deg");
 
@@ -490,11 +556,18 @@ export const createCircularProgress = <const G extends string = ColorGroup>(
             iterations: "infinite",
         });
 
-    // A ring as wide as the wave, clipped to it.
+    // A ring as wide as the wave; its half clips it to the wave. The half on the end side is the
+    // right one, or the left one under right to left.
     const wavyArc: StyleMap = {
         borderWidth: add(ref("thickness"), mul(ref("amplitude"), unitless(2))),
-        clipPath: circularWave,
     };
+    const wavyHalf = (side: "Start" | "End"): StyleMap => ({
+        clipPath: when(
+            "rtl",
+            circularWave(side === "End" ? "left" : "right"),
+            circularWave(side === "End" ? "right" : "left"),
+        ),
+    });
 
     // The track is the same two-half ring, turned to where the gap after the indicator ends and
     // drawing what is left of the circle less a gap at each end (in percent of the circle).
@@ -593,7 +666,8 @@ export const createCircularProgress = <const G extends string = ColorGroup>(
             variants: {
                 // The determinate arcs, turning, their length growing from a tenth of the
                 // circle to 87% and back (`circularProgressArc`, which animates `value`; a
-                // target that can't animate a token keeps half the circle).
+                // target that can't animate a token keeps half the circle). The track turns
+                // with them and follows `value`, so it keeps its gaps to the arc.
                 indeterminate: {
                     true: {
                         root: {
@@ -604,7 +678,6 @@ export const createCircularProgress = <const G extends string = ColorGroup>(
                                 spin("circularProgressArc"),
                             ),
                         },
-                        track: { display: none },
                     },
                     false: {},
                 },
@@ -632,6 +705,8 @@ export const createCircularProgress = <const G extends string = ColorGroup>(
                                 mul(ref("amplitude"), unitless(2)),
                             ),
                         },
+                        endHalf: wavyHalf("End"),
+                        startHalf: wavyHalf("Start"),
                         endArc: wavyArc,
                         startArc: wavyArc,
                     },

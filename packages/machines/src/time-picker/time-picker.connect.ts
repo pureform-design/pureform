@@ -14,6 +14,7 @@ import {
     spokenTime,
     stepTime,
     timeAtEdge,
+    timeKeyStep,
     viewRange,
     viewValue,
 } from "./time-picker.time";
@@ -29,33 +30,6 @@ interface KeyEventLike {
     key: string;
     preventDefault(): void;
 }
-
-/** How far a key moves the view's value: arrows one step, Page Up and Down five minutes or three
- *  hours, Home and End to the ends. `undefined` for any other key. */
-const keyStep = (
-    key: string,
-    view: TimeView,
-): number | "start" | "end" | undefined => {
-    const page = view === "minute" ? 5 : 3;
-    switch (key) {
-        case "ArrowUp":
-        case "ArrowRight":
-            return 1;
-        case "ArrowDown":
-        case "ArrowLeft":
-            return -1;
-        case "PageUp":
-            return page;
-        case "PageDown":
-            return -page;
-        case "Home":
-            return "start";
-        case "End":
-            return "end";
-        default:
-            return undefined;
-    }
-};
 
 const pct = (value: number) => `${value}%`;
 
@@ -88,7 +62,7 @@ export function connect<T extends PropTypes>(
                 : dir === "rtl" && event.key === "ArrowRight"
                   ? "ArrowLeft"
                   : event.key;
-        const step = keyStep(key, of);
+        const step = timeKeyStep(key, of);
         if (step === undefined) return false;
         event.preventDefault();
         if (!interactive) return true;

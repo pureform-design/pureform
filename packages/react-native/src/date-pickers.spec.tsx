@@ -72,8 +72,11 @@ describe("DatePicker", () => {
         expect(byTestId("pf-date-picker-view-trigger").textContent).toContain(
             "August 2026",
         );
+        // The day's cell (a gridcell) is the selected one, as the web's.
         expect(
-            day("Monday, August 17, 2026").getAttribute("aria-selected"),
+            day("Monday, August 17, 2026")
+                .closest('[role="gridcell"]')!
+                .getAttribute("aria-selected"),
         ).toBe("true");
         expect(all('[data-testid="pf-date-picker-mode-toggle"]')).toHaveLength(
             0,
@@ -174,8 +177,12 @@ describe("DatePicker", () => {
         expect(band(12)).not.toBe(band(13));
         expect(fill(10)).not.toBe(fill(11));
         expect(fill(12)).toBe(fill(10));
-        expect(cell(11).getAttribute("aria-selected")).toBe("true");
-        expect(cell(13).getAttribute("aria-selected")).toBe("false");
+        const selected = (date: number) =>
+            cell(date)
+                .closest('[role="gridcell"]')!
+                .getAttribute("aria-selected");
+        expect(selected(11)).toBe("true");
+        expect(selected(13)).toBe("false");
     });
 });
 

@@ -383,6 +383,9 @@ const generate = async () => {
             ...(options.parameters
                 ? [`    parameters: ${JSON.stringify(options.parameters)},`]
                 : []),
+            ...(options.globals
+                ? [`    globals: ${JSON.stringify(options.globals)},`]
+                : []),
             "});",
             "",
             `export default { title: ${JSON.stringify(title)}, ...stories.meta } satisfies Meta;`,

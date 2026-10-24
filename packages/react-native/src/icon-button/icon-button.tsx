@@ -13,6 +13,7 @@ import type {
     InteractiveProps,
 } from "@pureform/binding-core";
 import type { ReactNode } from "react";
+import type { GestureResponderEvent } from "react-native";
 
 import { IconSlot, iconSlot } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
@@ -38,7 +39,7 @@ export interface IconButtonProps
     readonly onSelectedChange?:
         | ((details: ChangeDetails<"selected", boolean>) => void)
         | undefined;
-    readonly onPress?: (() => void) | undefined;
+    readonly onPress?: ((event: GestureResponderEvent) => void) | undefined;
     /** A long press: given it, a long press calls it rather than pressing (a tooltip's trigger
      *  shows its tooltip so). */
     readonly onLongPress?: (() => void) | undefined;
@@ -83,12 +84,12 @@ function IconButtonImpl(props: IconButtonProps): ReactNode {
             {...indication.handlers}
             role="button"
             aria-label={props["aria-label"]}
-            {...(toggle ? { "aria-checked": selected } : {})}
+            {...(toggle ? { "aria-pressed": selected } : {})}
             disabled={props.disabled}
             onLongPress={props.onLongPress}
-            onPress={() => {
+            onPress={(event: GestureResponderEvent) => {
                 if (toggle) setSelected(!selected);
-                props.onPress?.();
+                props.onPress?.(event);
             }}
             style={withUserStyle({ ...s.root, ...unselectable }, props.style)}
             testID={id("root")}

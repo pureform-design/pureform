@@ -29,7 +29,9 @@ import {
     periodOf,
     spokenTime,
     stepTime,
+    timeAtEdge,
     timeAtPoint,
+    timeKeyStep,
     viewValue,
     withPeriod,
 } from "@pureform/machines/time-picker";
@@ -47,7 +49,7 @@ import type { GestureResponderEvent, LayoutChangeEvent } from "react-native";
 
 import { testIdOf, withEngine } from "../parts";
 import { themeSpring } from "../presence";
-import { usePureform } from "../provider";
+import { useDirection, usePureform } from "../provider";
 import { inFlowInline, useComponentSlots } from "../styles";
 import { TimeButton, timeLocale, useTime } from "../time";
 
@@ -76,6 +78,7 @@ const ADJUST = [{ name: "increment" }, { name: "decrement" }] as const;
 
 function TimePickerImpl(props: TimePickerProps): ReactNode {
     const [time, setTime] = useTime(props);
+    const rtl = useDirection() === "rtl";
     const { cycle, periods } = timeLocale(props);
     const [ownView, setOwnView] = useState(props.defaultView ?? "hour");
     const view = props.view ?? ownView;
@@ -107,12 +110,32 @@ function TimePickerImpl(props: TimePickerProps): ReactNode {
         "aria-valuetext": spoken,
     });
 
+    // The web's keys on a selector: the arrows a step (the left arrow forward right to left),
+    // Page Up and Down three hours or five minutes, Home and End to the ends.
+    const stepByKey = (of: TimePickerView, key: string): boolean => {
+        const swapped =
+            rtl && key === "ArrowLeft"
+                ? "ArrowRight"
+                : rtl && key === "ArrowRight"
+                  ? "ArrowLeft"
+                  : key;
+        const step = timeKeyStep(swapped, of);
+        if (step === undefined) return false;
+        if (props.disabled || props.readOnly) return true;
+        setTime(
+            typeof step === "number"
+                ? stepTime(time, of, step, cycle)
+                : timeAtEdge(time, of, step, cycle),
+        );
+        return true;
+    };
     const button = (
         part: TimePickerPart,
         label: string | undefined,
         selected: boolean,
         onPress: () => void,
         text: string,
+        onKey?: (key: string) => boolean,
     ) => (
         <TimeButton
             anatomy={timePickerAnatomy}
@@ -125,6 +148,7 @@ function TimePickerImpl(props: TimePickerProps): ReactNode {
             selected={selected}
             disabled={props.disabled}
             onPress={onPress}
+            onKey={onKey}
         >
             {text}
         </TimeButton>
@@ -169,6 +193,7 @@ function TimePickerImpl(props: TimePickerProps): ReactNode {
                   view === of,
                   () => setView(of),
                   displayValue(time, of, cycle),
+                  (key) => stepByKey(of, key),
               );
 
     return (

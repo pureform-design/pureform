@@ -237,6 +237,7 @@ export function connect<T extends PropTypes>(
                     "data-disabled": disabled ? "" : undefined,
                     "aria-disabled": disabled || undefined,
                     "data-current": index === api.page ? "" : undefined,
+                    "aria-current": index === api.page ? "true" : undefined,
                     tabIndex: disabled ? -1 : 0,
                 }),
                 emitters.item(String(index)),

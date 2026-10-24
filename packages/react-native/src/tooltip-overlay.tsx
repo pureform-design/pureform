@@ -6,7 +6,7 @@
 
 import type { ChangeDetails, OverlayPositioning } from "@pureform/binding-core";
 import type { MutableInteractionSource } from "@pureform/binding-core/interaction";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import type { ComponentType, ReactNode } from "react";
 import { Pressable } from "react-native";
 
@@ -28,6 +28,8 @@ export interface TooltipTriggerProps {
     /** Shows the tooltip: give it to the trigger's `onLongPress`, so that a long press shows it
      *  rather than pressing the trigger. */
     readonly onLongPress: () => void;
+    /** While it shows, the tooltip's `nativeID`, which describes the trigger. */
+    readonly "aria-describedby"?: string | undefined;
 }
 
 /** How long a tooltip shown by a long press stays after the press ends, in milliseconds. */
@@ -168,13 +170,17 @@ function TooltipOverlay<S extends object>({
         show("longPress");
     });
     useDismiss(open && closeOnEscape, () => hide());
+    const id = useId();
+    const shown = open && presence.present && measured !== undefined;
     const given: TooltipTriggerProps = {
         interactionSource: source,
         onLongPress,
+        ...(shown ? { "aria-describedby": id } : {}),
     };
     const content = (placed: Placed | undefined) => (
         <engine.View
             {...presence.props}
+            nativeID={id}
             style={{
                 pointerEvents: open && interactive ? "auto" : "none",
                 ...(placed ? { transformOrigin: placed.transformOrigin } : {}),
@@ -193,6 +199,7 @@ function TooltipOverlay<S extends object>({
                     label={trigger}
                     interactionSource={source}
                     onLongPress={onLongPress}
+                    aria-describedby={given["aria-describedby"]}
                 />
             )}
             {presence.present && measured ? (

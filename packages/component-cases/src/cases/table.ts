@@ -5,6 +5,7 @@
 
 import { dataTableAnatomy, testIds } from "@pureform/anatomy";
 
+import { allByRole, byRole, optionalFlagOf } from "../aria";
 import type { ActOptions, ComponentCase } from "../types";
 import { userEvent } from "../user-event";
 
@@ -22,11 +23,15 @@ const COLUMNS = [
     { id: "symbol", header: "Symbol" },
 ];
 
-/** The chosen rows' values, from their `aria-selected`. */
+/** The body's rows, which say `aria-selected` when they can be chosen. */
+const rows = (host: HTMLElement) =>
+    allByRole(host, "row").filter((row) => row.hasAttribute("aria-selected"));
+
+/** The chosen rows' values (by their place), from their `aria-selected`. */
 const read = (host: HTMLElement): string[] =>
-    [...host.querySelectorAll<HTMLElement>('[role="row"][aria-selected]')]
-        .filter((row) => row.getAttribute("aria-selected") === "true")
-        .map((row) => row.dataset["value"]!);
+    rows(host).flatMap((row, index) =>
+        optionalFlagOf(row, "selected") ? [ROWS[index]!.id] : [],
+    );
 
 export const table: ComponentCase = {
     component: "Table",
@@ -56,10 +61,7 @@ export const table: ComponentCase = {
         to: ["h"],
         props: { selectionMode: "multiple" },
         act: async (host, options: ActOptions = {}) => {
-            const first = host.querySelector<HTMLElement>(
-                `[data-testid="${ids.row}"] input[type="checkbox"]`,
-            )!;
-            await userEvent.click(first, options);
+            await userEvent.click(byRole(rows(host)[0]!, "checkbox"), options);
         },
         read,
     },

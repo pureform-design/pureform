@@ -9,9 +9,11 @@ import {
     testIds,
 } from "@pureform/anatomy";
 
+import { choiceNamed, flagOf, textValueOf } from "../aria";
 import type { ActOptions, ComponentCase } from "../types";
 import { byTestId, itemSources } from "../types";
 import { userEvent } from "../user-event";
+import { drawn, expandingTrigger } from "./overlay";
 
 const ids = testIds.autocomplete;
 const menu = compositeTestIds.autocompleteMenu;
@@ -27,12 +29,13 @@ const input = (host: HTMLElement) =>
 
 const content = (host: HTMLElement) => byTestId(host, menu.root);
 
-const isOpen = (host: HTMLElement) =>
-    !content(host).hidden && content(host).dataset.state !== "closed";
+// Open: the combobox says so.
+const isOpen = (host: HTMLElement) => flagOf(input(host), "expanded");
 
 /** The chosen suggestion's value, or `null`: the text the field shows, if it's a label. */
 const read = (host: HTMLElement): string | null =>
-    ITEMS.find((item) => item.label === input(host).value)?.value ?? null;
+    ITEMS.find((item) => item.label === textValueOf(input(host)))?.value ??
+    null;
 
 const frame = () => new Promise((resolve) => requestAnimationFrame(resolve));
 
@@ -49,19 +52,17 @@ const opened = async (host: HTMLElement): Promise<boolean> => {
     return false;
 };
 
-/** Opens the list with the arrow and chooses the suggestion with `value`. */
+/** Opens the list with the arrow (the button saying `aria-expanded`) and chooses the suggestion with `value`. */
 const choose =
     (value: string) =>
     async (host: HTMLElement, options: ActOptions = {}) => {
-        await userEvent.click(byTestId(host, ids.trailingIcon), options);
+        await userEvent.click(expandingTrigger(host), options);
         if (!(await opened(host))) return;
-        const item = [
-            ...host.querySelectorAll<HTMLElement>(
-                `[data-testid="${menu.item}"]`,
-            ),
-        ].find((element) => element.dataset.value === value);
-        if (!item) throw new Error(`no suggestion with the value ${value}`);
-        await userEvent.click(item, options);
+        const label = ITEMS.find((item) => item.value === value)!.label;
+        await userEvent.click(
+            await drawn(() => choiceNamed(host, label)),
+            options,
+        );
     };
 
 // Typing a city's first letters fills the field.

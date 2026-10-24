@@ -149,8 +149,8 @@ the demos):
       `schemes` and `overlayHeight` for every component, and per component extra
       `args`/`argTypes`/`parameters`, `controls.exclude`, `schemes`, `height`, hooks, and story fields by export
       name. A renderer whose DOM the cases can't read sets `casePlays: false`, and `tests: false`
-      leaves it out of the story tests (React Native Web, for now: **skipped until the cases get
-      renderer-neutral readers**).
+      leaves it out of the story tests (React Native Web was, until the cases got
+      renderer-neutral readers; it runs every play now, with narrow per-story skips).
     - **Overlays** get room rather than hand-written stories: their `opened` renderings are
       stories, and a component whose case has `overlay` or `opened` gets a canvas at least
       `overlayHeight` (480px) tall from the shared hook.
@@ -229,7 +229,7 @@ codegen hooks (`transformSource`) run in the script.
    React Native hook (`@pureform/react-native/storybook`) without the web adapters? Report the
    setup cost (Metro config, the app to host it, story format differences).
 
-## After r9: renderer-neutral case readers
+## After r9: renderer-neutral case readers (done, [context.md](context.md#round-6-renderer-neutral-case-readers-branch-neutral-readers), [neutral-readers.md](../roadmap-components/context/neutral-readers.md))
 
 The shared cases read state only through ARIA (`role` with `aria-checked`, `aria-valuenow`,
 `aria-selected`, `aria-expanded`, accessible names, and the input's value where a textbox is the

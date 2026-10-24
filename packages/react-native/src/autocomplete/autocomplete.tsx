@@ -21,6 +21,7 @@ import type {
     IndicationProps,
     TextFieldAffixProps,
 } from "@pureform/binding-core";
+import { useId, useState } from "react";
 import type { ReactNode } from "react";
 import { Pressable, View } from "react-native";
 
@@ -129,8 +130,14 @@ export function Autocomplete(props: AutocompleteProps): ReactNode {
         open,
         setOpen,
     );
-    const matches = autocompleteMatches(items, text, filter);
+    // The list filters by what the user typed only, as the web's does: the text starting as the
+    // chosen suggestion's label, or set to one, shows every suggestion.
+    const [typed, setTyped] = useState("");
+    const matches = autocompleteMatches(items, typed, filter);
     const disabled = props.disabled || props.readOnly;
+    // The list the combobox controls, while it shows.
+    const listId = useId();
+    const listShown = open && presence.present && anchor !== undefined;
     return (
         <View>
             <Field
@@ -149,12 +156,15 @@ export function Autocomplete(props: AutocompleteProps): ReactNode {
                 trailingIcon={props.trailingIcon ?? "▾"}
                 inputProps={{
                     role: "combobox",
-                    "aria-expanded": open,
+                    // Expanded once the list shows, which then names it.
+                    "aria-expanded": listShown,
+                    ...(listShown ? { "aria-controls": listId } : {}),
                     ...props.inputProps,
                 }}
                 value={text}
                 onValueChange={(details) => {
                     setText(details.value);
+                    setTyped(details.value);
                     show();
                 }}
                 expanded={open}
@@ -182,6 +192,7 @@ export function Autocomplete(props: AutocompleteProps): ReactNode {
                         {() => (
                             <engine.View
                                 {...presence.props}
+                                nativeID={listId}
                                 style={{
                                     // A closing list takes no more presses.
                                     pointerEvents: open ? "auto" : "none",
@@ -210,6 +221,7 @@ export function Autocomplete(props: AutocompleteProps): ReactNode {
                                                 setValue(details.value);
                                             if (item && item.label !== text)
                                                 setText(item.label);
+                                            setTyped("");
                                             close();
                                         }}
                                     />

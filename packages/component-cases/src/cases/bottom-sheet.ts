@@ -11,7 +11,10 @@ import { byTestId } from "../types";
 import { overlayParts } from "./overlay";
 
 const ids = compositeTestIds.bottomSheet;
-const { trigger, read, click, shown, overlay } = overlayParts(ids);
+const { trigger, read, click, shown, overlay } = overlayParts(ids, {
+    role: "dialog",
+    name: "Share",
+});
 
 export const bottomSheet: ComponentCase = {
     component: "BottomSheet",

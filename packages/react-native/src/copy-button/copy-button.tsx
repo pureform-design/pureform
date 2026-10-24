@@ -16,6 +16,7 @@ import type {
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { AccessibilityInfo } from "react-native";
+import type { GestureResponderEvent } from "react-native";
 
 import { IconButton } from "../icon-button";
 import { Glyph } from "../icon-style";
@@ -29,7 +30,7 @@ export interface CopyButtonProps
     /** Puts the text on the platform's clipboard. */
     readonly copy?: ((value: string) => void | Promise<void>) | undefined;
     readonly disabled?: boolean | undefined;
-    readonly onPress?: (() => void) | undefined;
+    readonly onPress?: ((event: GestureResponderEvent) => void) | undefined;
     readonly testId?: TestIdOverride<IconButtonPart> | undefined;
 }
 
@@ -85,8 +86,8 @@ export function CopyButton(props: CopyButtonProps): ReactNode {
                     ? (copiedIcon ?? <Glyph glyph="✓" />)
                     : (icon ?? <Glyph glyph="⧉" />)
             }
-            onPress={() => {
-                onPress?.();
+            onPress={(event: GestureResponderEvent) => {
+                onPress?.(event);
                 const written = () => {
                     if (!mounted.current) return;
                     setCopied(true);

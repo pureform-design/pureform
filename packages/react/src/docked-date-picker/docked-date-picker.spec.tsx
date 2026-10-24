@@ -43,6 +43,11 @@ describe("DockedDatePicker, ready-made", () => {
             "Open calendar",
         );
         expect(byTestId(ids.supportingText).textContent).toBe("mm/dd/yyyy");
+        // The input's placeholder is the format too, as React Native's (the preset shows it once
+        // the field is focused and the label has floated).
+        expect(byTestId<HTMLInputElement>(ids.input).placeholder).toBe(
+            "mm/dd/yyyy",
+        );
         expect(byTestId(ids.input).getAttribute("aria-describedby")).toBe(
             byTestId(ids.supportingText).id,
         );

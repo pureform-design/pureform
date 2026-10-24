@@ -48,6 +48,7 @@ function ListImpl(props: ListProps): ReactNode {
                 {items.map(({ value, ...item }, index) => (
                     <v.item.View
                         key={value ?? index}
+                        role="listitem"
                         style={s.item}
                         testID={id("item")}
                     >

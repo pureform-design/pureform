@@ -18,9 +18,9 @@ import type {
     SelectVariantProps,
     TextFieldAffixProps,
 } from "@pureform/binding-core";
-import { useMemo, useRef, useState } from "react";
+import { useId, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { Modal, Pressable, StyleSheet, View } from "react-native";
+import { Modal, Platform, Pressable, StyleSheet, View } from "react-native";
 
 import { Menu } from "../menu/menu";
 import { useControllable } from "../parts";
@@ -122,6 +122,13 @@ export function Select(props: SelectProps): ReactNode {
         [items],
     );
     const grouped = groups.some((run) => run.label !== undefined);
+    // The list the combobox controls, while it shows.
+    const listId = useId();
+    // React Native Web draws the `Modal` as a `role="dialog"`, which needs a name.
+    const windowName =
+        Platform.OS === "web" && typeof props.label === "string"
+            ? ({ "aria-label": props.label } as object)
+            : {};
     return (
         <View>
             <Field
@@ -146,6 +153,9 @@ export function Select(props: SelectProps): ReactNode {
                     ? { "aria-label": props.label }
                     : {})}
                 aria-expanded={expanded}
+                {...(expanded && presence.present && menu
+                    ? { "aria-controls": listId }
+                    : {})}
                 disabled={props.disabled}
                 onPress={open}
                 style={StyleSheet.absoluteFill}
@@ -154,15 +164,18 @@ export function Select(props: SelectProps): ReactNode {
                 transparent
                 visible={presence.present && menu !== undefined}
                 onRequestClose={close}
+                {...windowName}
             >
                 <Pressable
-                    aria-label="Close"
+                    accessible={false}
+                    focusable={false}
                     style={StyleSheet.absoluteFill}
                     onPress={close}
                 />
                 {presence.present && menu ? (
                     <engine.View
                         {...presence.props}
+                        nativeID={listId}
                         style={{
                             position: "absolute",
                             ...menu,

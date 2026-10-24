@@ -31,7 +31,14 @@ import type { SlideMotion } from "@pureform/rn-adapter/animated";
 import type { Selection } from "@pureform/styling";
 import { Fragment, memo, useEffect, useRef } from "react";
 import type { ReactNode } from "react";
-import { Modal, Pressable, ScrollView, StyleSheet, View } from "react-native";
+import {
+    Modal,
+    Platform,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    View,
+} from "react-native";
 import type { LayoutChangeEvent, ScrollViewInstance } from "react-native";
 
 import { IconSlot, iconSlot } from "./icon-style";
@@ -47,7 +54,7 @@ import {
     withEngine,
 } from "./parts";
 import { PortalHost } from "./portal-host";
-import { useEngine } from "./provider";
+import { useDirection, useEngine } from "./provider";
 import { Scrim } from "./single-part";
 import { useComponentSlots } from "./styles";
 import { omitSpring, useIndicatorSlides } from "./tab-indicator";
@@ -232,8 +239,38 @@ function TabsImpl(props: TabsProps): ReactNode {
         },
     );
     useEffect(() => reveal(true), [value, reveal]);
+    const rtl = useDirection() === "rtl";
+    // On the web, as the web's tabs: the arrow keys across (by direction) select the tab before
+    // or after, going round, and Home and End the first and last; focus moves with it.
+    const onKeyDown = (event: {
+        readonly key: string;
+        readonly currentTarget: HTMLElement;
+        preventDefault(): void;
+    }) => {
+        const enabled = props.items.filter((item) => !item.disabled);
+        const at = enabled.findIndex((item) => item.value === value);
+        const forward = rtl ? "ArrowLeft" : "ArrowRight";
+        const backward = rtl ? "ArrowRight" : "ArrowLeft";
+        const next =
+            event.key === forward
+                ? enabled[(at + 1) % enabled.length]
+                : event.key === backward
+                  ? enabled[(at - 1 + enabled.length) % enabled.length]
+                  : event.key === "Home"
+                    ? enabled[0]
+                    : event.key === "End"
+                      ? enabled.at(-1)
+                      : undefined;
+        if (!next) return;
+        event.preventDefault();
+        pick(next.value);
+        const tabs =
+            event.currentTarget.querySelectorAll<HTMLElement>('[role="tab"]');
+        tabs[props.items.indexOf(next)]?.focus();
+    };
     const list = (
         <v.root.View
+            {...(Platform.OS === "web" ? ({ onKeyDown } as object) : {})}
             role="tablist"
             {...(props["aria-label"] === undefined
                 ? {}
@@ -348,7 +385,8 @@ function DestinationImpl(props: DestinationProps): ReactNode {
     return (
         <v.item.Pressable
             {...indication.handlers}
-            role="link"
+            // A button, as the web's destination without an `href`: React Native's have none.
+            role="button"
             aria-current={props.selected ? "page" : undefined}
             disabled={disabled}
             onPress={() => props.onPick(item.value)}

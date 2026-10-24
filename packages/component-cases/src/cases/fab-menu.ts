@@ -8,13 +8,16 @@ import { fabMenuAnatomy, testIds } from "@pureform/anatomy";
 import type { ComponentCase, KeyCase } from "../types";
 import { byTestId, itemSources } from "../types";
 import { userEvent } from "../user-event";
-import { overlayParts } from "./overlay";
+import { expandingTrigger, overlayParts } from "./overlay";
 
 const ids = testIds.fabMenu;
-const { content, trigger, read, click, shown, overlay } = overlayParts({
-    trigger: ids.closeTrigger,
-    content: ids.list,
-});
+const { content, trigger, read, click, shown, overlay } = overlayParts(
+    {
+        trigger: ids.closeTrigger,
+        content: ids.list,
+    },
+    { role: "menu", trigger: expandingTrigger },
+);
 
 const ITEMS = [
     { value: "message", label: "Message", icon: "✉" },

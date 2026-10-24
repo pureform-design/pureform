@@ -90,10 +90,11 @@ const progressMarkup =
         </div>`;
     };
 
-// The track hides while indeterminate, so it has no box to mirror.
+// The track turns with the arc while indeterminate, a gap past its head.
 const circularMarkup = (classes: Classes): string => {
     const c = classes("circularProgress", { indeterminate: "true" });
     return `<div data-root class="${c.root}" role="progressbar">
+        <span data-part="track" class="${c.track}"></span>
         <span data-part="endHalf" class="${c.endHalf}"><span data-part="endArc" class="${c.endArc}"></span></span>
         <span data-part="startHalf" class="${c.startHalf}"><span data-part="startArc" class="${c.startArc}"></span></span>
     </div>`;

@@ -69,6 +69,8 @@ export interface BottomSheetTriggerProps {
     /** Opens the sheet. */
     readonly onPress: () => void;
     readonly "aria-haspopup": "dialog";
+    /** Whether it's open. */
+    readonly "aria-expanded": boolean;
 }
 
 export interface BottomSheetProps
@@ -401,13 +403,14 @@ function ModalBottomSheet(props: BottomSheetProps): ReactNode {
     const given: BottomSheetTriggerProps = {
         onPress: show,
         "aria-haspopup": "dialog",
+        "aria-expanded": open,
     };
     return (
         <>
             {trigger === undefined ? null : typeof trigger === "function" ? (
                 trigger(given)
             ) : (
-                <Button label={trigger} onPress={show} />
+                <Button label={trigger} {...given} />
             )}
             <ModalWindow visible={presence.present} label={props["aria-label"]}>
                 <ModalScrimLayer
@@ -452,13 +455,14 @@ function StandardBottomSheet(props: BottomSheetProps): ReactNode {
     const given: BottomSheetTriggerProps = {
         onPress: show,
         "aria-haspopup": "dialog",
+        "aria-expanded": open,
     };
     return (
         <>
             {trigger === undefined ? null : typeof trigger === "function" ? (
                 trigger(given)
             ) : (
-                <Button label={trigger} onPress={show} />
+                <Button label={trigger} {...given} />
             )}
             <Surface
                 {...surface}

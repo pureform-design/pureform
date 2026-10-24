@@ -30,6 +30,7 @@ import type {
 } from "@pureform/binding-core";
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
+import { Platform } from "react-native";
 import type { TextInputProps } from "react-native";
 
 import { IconSlot, iconSlot } from "../icon-style";
@@ -41,6 +42,10 @@ import {
     withEngine,
 } from "../parts";
 import { useComponentSlots } from "../styles";
+
+/** React Native Web draws a field that isn't editable as `readonly`; a disabled one is `disabled`
+ *  there instead, as the web bindings draw it. */
+const WEB = Platform.OS === "web";
 
 const INDICATIONS = Object.fromEntries(
     numberFieldAnatomy.indication.map((entry) => [entry.trigger, entry]),
@@ -271,7 +276,10 @@ function NumberFieldImpl(props: NumberFieldProps): ReactNode {
                                 : numberFieldClamp(parsed, range),
                         );
                     }}
-                    editable={editable}
+                    editable={editable || (WEB && !!props.disabled)}
+                    {...(WEB && props.disabled
+                        ? ({ disabled: true } as object)
+                        : {})}
                     placeholder={numberFieldPlaceholder(props.placeholder)}
                     role="spinbutton"
                     aria-valuemin={props.min}

@@ -12,13 +12,10 @@ import config from "./stories.config";
 
 const executablePath = process.env["CHROMIUM_PATH"];
 
-// The renderers in `stories.config.ts` but those with `tests: false` (React Native, for now:
-// skipped until the cases get renderer-neutral readers). `SB_RENDERERS=native` runs one anyway.
-const RENDERERS = process.env["SB_RENDERERS"]
-    ? process.env["SB_RENDERERS"].split(",")
-    : Object.entries(config.renderers)
-          .filter(([, renderer]) => renderer.tests !== false)
-          .map(([name]) => name);
+// The renderers in `stories.config.ts` but those with `tests: false`.
+const RENDERERS = Object.entries(config.renderers)
+    .filter(([, renderer]) => renderer.tests !== false)
+    .map(([name]) => name);
 
 export default defineConfig({
     test: {

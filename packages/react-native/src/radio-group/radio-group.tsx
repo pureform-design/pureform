@@ -2,7 +2,7 @@
 // which holds the dot, and ripples from its center. In a `RadioGroup`, a radio is checked when its
 // value is the group's, and a press picks it; on its own, it takes `checked` and `onPress`.
 
-import { radioAnatomy } from "@pureform/anatomy";
+import { compositeTestIds, radioAnatomy } from "@pureform/anatomy";
 import type { TestIdOverride } from "@pureform/anatomy";
 import { radioSelection } from "@pureform/binding-core";
 import type {
@@ -18,6 +18,7 @@ import type { ReactNode } from "react";
 import { View } from "react-native";
 import type { StyleProp, ViewStyle } from "react-native";
 
+import { useCheckKeys } from "../check-keys";
 import { useSurfaceIndication } from "../indication";
 import {
     testIdOf,
@@ -83,19 +84,24 @@ function RadioImpl(props: RadioProps): ReactNode {
         }),
     );
     const id = (part: RadioPart) => testIdOf(radioAnatomy, part, props.testId);
+    const keys = useCheckKeys(
+        () => {
+            if (group && props.value !== undefined) group.pick(props.value);
+            props.onPress?.();
+        },
+        disabled,
+        indication.handlers.onPressIn,
+    );
     return (
         <v.root.Pressable
             {...indication.handlers}
+            {...keys}
             role="radio"
             aria-checked={checked}
             {...(props["aria-label"] === undefined
                 ? {}
                 : { "aria-label": props["aria-label"] })}
             disabled={disabled || undefined}
-            onPress={() => {
-                if (group && props.value !== undefined) group.pick(props.value);
-                props.onPress?.();
-            }}
             style={withUserStyle({ ...s.root, ...unselectable }, props.style)}
             testID={id("root")}
         >
@@ -174,6 +180,7 @@ export function RadioGroup(props: RadioGroupProps): ReactNode {
                 ? {}
                 : { "aria-label": props["aria-label"] })}
             style={props.style}
+            testID={compositeTestIds.radioGroup.root}
         >
             <RadioGroupContext value={context}>
                 {props.items?.map((item) => (

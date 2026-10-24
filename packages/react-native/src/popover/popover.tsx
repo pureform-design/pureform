@@ -94,6 +94,10 @@ function PopoverSurface(
     );
     const presence = useOverlayPresence(props.open, "popup");
     const id = (part: Part) => testIdOf(popoverAnatomy, part, props.testId);
+    // Named by its heading, as the web's is (`aria-labelledby`), unless given a name.
+    const label =
+        props["aria-label"] ??
+        (typeof props.heading === "string" ? props.heading : undefined);
     if (!presence.present) return null;
     // The engine's view where it enters and leaves, the slot's own while it's still.
     const Root = props.open === undefined ? v.root : engine;
@@ -101,9 +105,7 @@ function PopoverSurface(
         <Root.View
             {...presence.props}
             role="dialog"
-            {...(props["aria-label"] === undefined
-                ? {}
-                : { "aria-label": props["aria-label"] })}
+            {...(label === undefined ? {} : { "aria-label": label })}
             style={{ ...s.root, ...presence.style }}
             testID={id("root")}
         >
@@ -165,6 +167,8 @@ function PopoverOverlay(props: PopoverProps): ReactNode {
                     label={trigger}
                     onPress={given.onPress}
                     interactionSource={source}
+                    aria-haspopup={given["aria-haspopup"]}
+                    aria-expanded={given["aria-expanded"]}
                 />
             )}
             {presence.present && measured ? (

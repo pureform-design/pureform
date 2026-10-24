@@ -182,8 +182,8 @@ describe("progress", () => {
             ?.slotRecipes;
         const indeterminate =
             recipes?.circularProgress?.variants?.indeterminate?.true;
-        // The determinate arcs draw it: only the track hides.
-        expect(indeterminate?.track).toEqual({ display: "none" });
+        // The determinate arcs draw it, and the track turns with them, keeping its gaps.
+        expect(indeterminate?.track).toBeUndefined();
         expect(indeterminate?.endHalf).toBeUndefined();
         expect(JSON.stringify(indeterminate?.root?.animation)).toContain(
             "circularProgressArc",
@@ -249,7 +249,7 @@ describe("progress", () => {
         );
     });
 
-    it("starts the linear track after the indicator and a gap, and hides it and the stop dot while indeterminate", () => {
+    it("starts the linear track after the indicator and a gap, and while indeterminate spans the bar less a gap around the indicator, without the stop dot", () => {
         const css = compilePreset(configWith(linearProgress)).theme?.slotRecipes
             ?.linearProgress;
         expect(css?.base?.track?.insetInlineStart).toContain(
@@ -258,7 +258,14 @@ describe("progress", () => {
         expect(css?.base?.stopIndicator?.width).toContain("stopSize");
         const indeterminate = css?.variants?.indeterminate?.true;
         expect(indeterminate?.stopIndicator).toEqual({ display: "none" });
-        expect(indeterminate?.track).toEqual({ insetInlineStart: "0px" });
+        expect(indeterminate?.track?.insetInlineStart).toBe("0px");
+        const gap = (indeterminate?.track as Record<string, unknown>)["&"] as
+            | { backgroundImage?: { base?: string; _rtl?: string } }
+            | undefined;
+        expect(gap?.backgroundImage?.base).toMatch(
+            /^linear-gradient\(90deg, var\(--components-linearProgress-trackColor/,
+        );
+        expect(gap?.backgroundImage?._rtl).toMatch(/^linear-gradient\(270deg/);
     });
 
     it("adds its keyframes to the pureform config", () => {

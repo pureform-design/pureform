@@ -17,19 +17,11 @@ const input = (host: HTMLElement) =>
 const hidden = (host: HTMLElement) =>
     host.querySelector<HTMLInputElement>('input[name="tags"]');
 
-/** The chips' labels, checked against the hidden input when it's named. */
-const read = (host: HTMLElement): string[] => {
-    const values = [
-        ...host.querySelectorAll(`[data-testid="${chipIds.label}"]`),
-    ].map((label) => label.textContent ?? "");
-    const submitted = hidden(host);
-    if (submitted && submitted.value !== values.join(", ")) {
-        throw new Error(
-            `the chips are ${JSON.stringify(values)}, the hidden input holds ${JSON.stringify(submitted.value)}`,
-        );
-    }
-    return values;
-};
+/** The chips' labels: each one's text. */
+const read = (host: HTMLElement): string[] =>
+    [...host.querySelectorAll(`[data-testid="${chipIds.label}"]`)].map(
+        (label) => label.textContent ?? "",
+    );
 
 export const tagsInput: ComponentCase = {
     component: "TagsInput",

@@ -308,7 +308,16 @@ function DateInputImpl(props: DateInputProps): ReactNode {
         );
     };
     return (
-        <v.root.View role="dialog" style={s.root} testID={id("root")}>
+        <v.root.View
+            role="dialog"
+            aria-label={
+                typeof props.headline === "string"
+                    ? props.headline
+                    : "Select date"
+            }
+            style={s.root}
+            testID={id("root")}
+        >
             <v.header.View style={s.header} testID={id("header")}>
                 <v.headline.Text style={s.headline} testID={id("headline")}>
                     {props.headline ?? "Select date"}

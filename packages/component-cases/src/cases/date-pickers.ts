@@ -10,10 +10,11 @@ import {
     testIds,
 } from "@pureform/anatomy";
 
+import { byRole, flagOf, textValueOf } from "../aria";
 import type { ActOptions, ComponentCase } from "../types";
 import { byTestId } from "../types";
 import { userEvent } from "../user-event";
-import { overlayParts } from "./overlay";
+import { drawn, expandingTrigger, overlayParts } from "./overlay";
 
 const modal = compositeTestIds.datePicker;
 const docked = compositeTestIds.dockedDatePicker;
@@ -24,18 +25,10 @@ const DATE = ["2026-02-11"];
 
 const frame = () => new Promise((resolve) => requestAnimationFrame(resolve));
 
-/** The day cell's trigger for an ISO date. */
-const day = (host: HTMLElement, value: string) => {
-    const found = [
-        ...host.querySelectorAll<HTMLElement>(
-            `[data-testid="${cell.trigger}"]`,
-        ),
-    ].find((element) => element.dataset.value?.startsWith(value));
-    if (!found) throw new Error(`no day ${value}`);
-    return found;
-};
-
-const modalParts = overlayParts(modal);
+const modalParts = overlayParts(modal, {
+    role: "dialog",
+    trigger: (host) => byTestId(host, modal.trigger),
+});
 
 /** The day the arrow keys start from: the one in the tab order. */
 const focusedDay = (host: HTMLElement) => {
@@ -103,9 +96,20 @@ export const datePicker: ComponentCase = {
 const dockedInput = (host: HTMLElement) =>
     byTestId<HTMLInputElement>(host, docked.input);
 
-const dockedOpen = (host: HTMLElement) => {
-    const content = byTestId(host, docked.content);
-    return !content.hidden && content.dataset.state !== "closed";
+// Open: the calendar's button says so.
+const dockedOpen = (host: HTMLElement) =>
+    flagOf(expandingTrigger(host), "expanded");
+
+/** A day's button, by its name, the long date (`en-US`). */
+const dayNamed = (host: HTMLElement, value: string) => {
+    const [year, month, date] = value.split("-").map(Number);
+    const long = new Date(year!, month! - 1, date!).toLocaleDateString(
+        "en-US",
+        { month: "long", day: "numeric", year: "numeric" },
+    );
+    return byRole(host.ownerDocument.body, "button", {
+        name: new RegExp(`\\b${long}$`),
+    });
 };
 
 /** Waits for the calendar to open and be placed under the field. */
@@ -121,18 +125,24 @@ const placed = async (host: HTMLElement) => {
     return false;
 };
 
-/** Opens the calendar with its button and chooses a day. */
+/** Opens the calendar with its button (the one saying `aria-expanded`) and chooses a day by its
+ *  name. */
 const choose =
     (value: string) =>
     async (host: HTMLElement, options: ActOptions = {}) => {
-        await userEvent.click(byTestId(host, docked.trailingIcon), options);
+        await userEvent.click(expandingTrigger(host), options);
         if (!(await placed(host))) return;
-        await userEvent.click(day(host, value), options);
+        await userEvent.click(
+            await drawn(() => dayNamed(host, value)),
+            options,
+        );
     };
 
 /** The date the field shows, as an ISO date (`en-US`'s `mm/dd/yyyy`). */
 const readDocked = (host: HTMLElement): string => {
-    const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(dockedInput(host).value);
+    const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(
+        textValueOf(dockedInput(host)),
+    );
     return match ? `${match[3]}-${match[1]}-${match[2]}` : "";
 };
 

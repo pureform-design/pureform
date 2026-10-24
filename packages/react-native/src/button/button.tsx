@@ -3,18 +3,20 @@
 
 import { buttonAnatomy } from "@pureform/anatomy";
 import type { TestIdOverride } from "@pureform/anatomy";
-import { buttonSelection } from "@pureform/binding-core";
+import { buttonSelection, isToggle } from "@pureform/binding-core";
 import type {
     ButtonContentProps,
     ButtonPart,
     ButtonVariantProps,
+    ChangeDetails,
     InteractiveProps,
 } from "@pureform/binding-core";
 import type { ReactNode } from "react";
+import type { GestureResponderEvent } from "react-native";
 
 import { IconSlot, iconSlot } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
-import { testIdOf, unselectable, withEngine } from "../parts";
+import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
 import { useComponentSlots, withUserStyle } from "../styles";
 import type { RootStyleProps } from "../styles";
 
@@ -27,19 +29,55 @@ export interface ButtonProps
         InteractiveProps,
         RootStyleProps {
     readonly disabled?: boolean | undefined;
-    /** Whether a toggle is on, as a selectable button group sets it. Giving it makes the button
-     *  a toggle; its owner flips it from `onPress`. */
+    /** Whether a toggle is on, as a selectable button group sets it. Giving it, or
+     *  `defaultSelected`, makes the button a toggle: a press flips it, reported with
+     *  `aria-pressed`. */
     readonly selected?: boolean | undefined;
-    readonly onPress?: (() => void) | undefined;
+    readonly defaultSelected?: boolean | undefined;
+    readonly onSelectedChange?:
+        | ((details: ChangeDetails<"selected", boolean>) => void)
+        | undefined;
+    readonly onPress?: ((event: GestureResponderEvent) => void) | undefined;
     /** A long press: given it, a long press calls it rather than pressing (a tooltip's trigger
      *  shows its tooltip so). */
     readonly onLongPress?: (() => void) | undefined;
+    /** What a press opens, as an overlay's trigger says: `menu`, `dialog`, … */
+    readonly "aria-haspopup"?: "menu" | "dialog" | "listbox" | true | undefined;
+    /** Whether what it opens is open. */
+    readonly "aria-expanded"?: boolean | undefined;
+    /** The element that describes it, by `nativeID`: a tooltip showing for it. */
+    readonly "aria-describedby"?: string | undefined;
     /** A prefix for every part's test id (`save` → `save-root`), or ids by part. */
     readonly testId?: TestIdOverride<ButtonPart> | undefined;
 }
 
+const TRIGGER_ARIA = [
+    "aria-haspopup",
+    "aria-expanded",
+    "aria-describedby",
+] as const;
+
+const pick = <P extends object, K extends keyof P>(
+    props: P,
+    keys: readonly K[],
+): Partial<Pick<P, K>> =>
+    Object.fromEntries(
+        keys
+            .filter((key) => props[key] !== undefined)
+            .map((key) => [key, props[key]]),
+    ) as Partial<Pick<P, K>>;
+
 function ButtonImpl(props: ButtonProps): ReactNode {
     const disabled = props.disabled ?? false;
+    const toggle = isToggle(props);
+    const [on, setOn] = useControllable(
+        "Button",
+        "selected",
+        props.selected,
+        props.defaultSelected,
+        props.onSelectedChange,
+        false,
+    );
     const indication = useSurfaceIndication(INDICATION!, {
         indication: props.indication,
         interactionSource: props.interactionSource,
@@ -54,9 +92,7 @@ function ButtonImpl(props: ButtonProps): ReactNode {
         indication.select(buttonSelection(props)),
         indication.states({
             disabled,
-            ...(props.selected === undefined
-                ? {}
-                : { selected: props.selected }),
+            ...(toggle ? { selected: on } : {}),
             ...(props.mirrorIcon ? { mirrored: true } : {}),
         }),
     );
@@ -81,12 +117,14 @@ function ButtonImpl(props: ButtonProps): ReactNode {
         <v.root.Pressable
             {...indication.handlers}
             role="button"
-            {...(props.selected === undefined
-                ? {}
-                : { "aria-checked": props.selected })}
+            {...(toggle ? { "aria-pressed": on } : {})}
+            {...pick(props, TRIGGER_ARIA)}
             disabled={props.disabled}
             onLongPress={props.onLongPress}
-            onPress={props.onPress}
+            onPress={(event: GestureResponderEvent) => {
+                if (toggle) setOn(!on);
+                props.onPress?.(event);
+            }}
             style={withUserStyle({ ...s.root, ...unselectable }, props.style)}
             testID={id("root")}
         >

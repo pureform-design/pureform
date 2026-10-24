@@ -78,11 +78,12 @@ export const buttonGroup: ComponentCase = {
         read,
     },
     keyboard: {
-        // A selectable group's arrow keys move focus between its buttons (Zag marks the focused
-        // one with `data-focus`), and change nothing.
+        // A selectable group's arrow keys move focus between its buttons (the one in the tab order
+        // takes focus), and change nothing.
         focusable: (host) =>
-            buttons(host).find((button) => button.hasAttribute("data-focus")) ??
-            buttons(host)[0]!,
+            buttons(host).find(
+                (one) => one.getAttribute("tabindex") !== "-1",
+            ) ?? buttons(host)[0]!,
         keys: [
             { key: "{Enter}", does: "click" },
             { key: " ", does: "click" },

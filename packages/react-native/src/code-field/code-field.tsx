@@ -25,6 +25,7 @@ import type {
 } from "@pureform/binding-core";
 import { useRef, useState } from "react";
 import type { ReactNode } from "react";
+import { Platform } from "react-native";
 import type { TextInputKeyPressEvent, TextInputProps } from "react-native";
 
 import { testIdOf, withEngine } from "../parts";
@@ -73,12 +74,18 @@ interface CellOptions {
     readonly length: number;
     readonly value: string;
     readonly invalid: boolean;
+    /** Whether Tab reaches it: the focused cell, else the first empty one. */
+    readonly tabStop: boolean;
     readonly inputRef: (input: Focusable | null) => void;
     readonly onText: (text: string) => void;
     readonly onBackspace: () => void;
     readonly onFocus: () => void;
     readonly onBlur: () => void;
 }
+
+/** On the web, one cell is in the tab order (as the web's code field), and a disabled cell is
+ *  `disabled` rather than `readonly` (React Native Web forwards it). */
+const WEB = Platform.OS === "web";
 
 // One cell, with its own states: the filled indicator and stroke follow its focus.
 function CellImpl(options: CellOptions): ReactNode {
@@ -126,7 +133,13 @@ function CellImpl(options: CellOptions): ReactNode {
                 setFocused(false);
                 options.onBlur();
             }}
-            editable={!props.disabled && !props.readOnly}
+            editable={!(props.disabled && !WEB) && !props.readOnly}
+            {...(WEB
+                ? ({
+                      tabIndex: options.tabStop ? 0 : -1,
+                      ...(props.disabled ? { disabled: true } : {}),
+                  } as object)
+                : {})}
             keyboardType={numeric ? "number-pad" : "default"}
             autoCapitalize="none"
             autoCorrect={false}
@@ -162,6 +175,10 @@ function CodeFieldImpl(props: CodeFieldProps): ReactNode {
     const cells = codeFieldCells(controlled ? props.value : own, length);
     const inputs = useRef<(Focusable | null)[]>([]);
     const [focusedCount, setFocusedCount] = useState(0);
+    const [focusedAt, setFocusedAt] = useState<number>();
+    const firstEmpty = cells.indexOf("");
+    const tabStop =
+        focusedAt ?? (firstEmpty === -1 ? cells.length - 1 : firstEmpty);
     const invalid = (props.invalid ?? false) || props.error !== undefined;
 
     const change = (next: string[], focus: number) => {
@@ -210,6 +227,7 @@ function CodeFieldImpl(props: CodeFieldProps): ReactNode {
                         length={length}
                         value={cell}
                         invalid={invalid}
+                        tabStop={index === tabStop}
                         inputRef={(input) => {
                             inputs.current[index] = input;
                         }}
@@ -226,10 +244,16 @@ function CodeFieldImpl(props: CodeFieldProps): ReactNode {
                             const next = codeFieldBackspace(cells, index);
                             change(next.cells, next.focus);
                         }}
-                        onFocus={() => setFocusedCount((n) => n + 1)}
-                        onBlur={() =>
-                            setFocusedCount((n) => Math.max(0, n - 1))
-                        }
+                        onFocus={() => {
+                            setFocusedCount((n) => n + 1);
+                            setFocusedAt(index);
+                        }}
+                        onBlur={() => {
+                            setFocusedCount((n) => Math.max(0, n - 1));
+                            setFocusedAt((at) =>
+                                at === index ? undefined : at,
+                            );
+                        }}
                     />
                 ))}
             </v.control.View>
