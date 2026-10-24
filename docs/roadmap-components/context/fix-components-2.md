@@ -106,7 +106,7 @@ main at `4a948474`. Each was reproduced in the dev Storybook with Playwright (pr
 ## Checks run
 
 - `omni run build test -p @pureform/core -p @pureform/preset -p @pureform/machines -p
-  @pureform/solid -p @pureform/react-native`: all pass but known flakes under load: Solid
+@pureform/solid -p @pureform/react-native`: all pass but known flakes under load: Solid
   `fade-through.spec.tsx` "drops the old page at once … (unstyled)" fails on the
   fix-storybook-2 worktree too (pre-existing); RN date-pickers/snackbar/toaster/FAB stagger and
   c8c drag tests timed out under load and pass when rerun alone.

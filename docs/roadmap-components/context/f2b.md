@@ -31,17 +31,17 @@ This file is the last commit.
   (half the bar handle's 4px and Compose's 6px gap) replaces `handleGap`, which only fed it.
   `CLEARANCE = bar × handleClearance`. Same computed output. Snapshot: `new-components` (slider).
 - **Bindings read it** (binding-core `components/slider.ts`, `dom.ts`):
-  - `SliderInsetIconMeasures` gains `clearance`; `sliderInsetIconOverflows` uses it.
-  - `sliderClearanceOf(offset, endGap)`: the clearance from how far the inactive track starts past
-    the active track's end.
-  - Web `readSliderInsetIcon` reads it from the inactive track sibling
-    (`[data-pf-part="track"]`), only while that track has no running animation; otherwise it
-    keeps `last` (new option), then the default. React and Solid pass `last`.
-  - React Native `sliderInsetIconMeasuresOfStyle({ insetIcon, track }, …)` (was a single style)
-    reads the track's start margin (selection moves the pixel part of an inset there).
-  - `sameSliderInsetIcon(a, b)` replaces the three hand-written size/padding comparisons.
-  - A round handle (`bar` 0) now reads a clearance of 0, which is what its styles draw; before,
-    the bindings assumed 8.
+    - `SliderInsetIconMeasures` gains `clearance`; `sliderInsetIconOverflows` uses it.
+    - `sliderClearanceOf(offset, endGap)`: the clearance from how far the inactive track starts past
+      the active track's end.
+    - Web `readSliderInsetIcon` reads it from the inactive track sibling
+      (`[data-pf-part="track"]`), only while that track has no running animation; otherwise it
+      keeps `last` (new option), then the default. React and Solid pass `last`.
+    - React Native `sliderInsetIconMeasuresOfStyle({ insetIcon, track }, …)` (was a single style)
+      reads the track's start margin (selection moves the pixel part of an inset there).
+    - `sameSliderInsetIcon(a, b)` replaces the three hand-written size/padding comparisons.
+    - A round handle (`bar` 0) now reads a clearance of 0, which is what its styles draw; before,
+      the bindings assumed 8.
 - **Toolbar** (binding-core `components/toolbar.ts`, React and Solid `toolbar.tsx`):
   `unstyledToolbarProvidedTokens(props, defaults)` decides vibrant from
   `withDefaults(defaults.toolbar, toolbarSelection(props)).color`, so a provider's

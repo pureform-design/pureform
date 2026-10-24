@@ -59,7 +59,10 @@ export const waveBand = ({
 }): ShapeNode => {
     const end = waves * wavelength;
     const x = (length: number) =>
-        min(shift ? add(px(round(length)), shift) : px(round(length)), pct(100));
+        min(
+            shift ? add(px(round(length)), shift) : px(round(length)),
+            pct(100),
+        );
     const point =
         (middle: NumericValue) =>
         (t: number, s: number): ShapePoint => [

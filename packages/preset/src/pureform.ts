@@ -93,9 +93,9 @@ import {
 } from "./components/loading-indicator";
 import { createMedia } from "./components/media";
 import { createMenu } from "./components/menu";
+import { nativeSelect } from "./components/native-select";
 import { createNavigationBar } from "./components/navigation-bar";
 import { createNavigationRail } from "./components/navigation-rail";
-import { nativeSelect } from "./components/native-select";
 import { createNumberField } from "./components/number-field";
 import { OVERLAY_KEYFRAMES } from "./components/overlay";
 import { createPaginator } from "./components/paginator";

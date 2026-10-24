@@ -36,24 +36,24 @@ This file is the last commit. The README is not ticked; the orchestrator ticks i
   Tests: `rn-adapter/src/own-size.spec.ts` and `react-native/src/components.spec.tsx` cover a
   default column, a centred column, a centred row and a user width.
 - **Media `source`.** It is typed as `ImageSourcePropType`:
-  - A `require()` asset takes its ratio from `Image.resolveAssetSource`.
-  - A source with a width and height gives the ratio without loading.
-  - `{ uri, headers }` is measured with `Image.getSizeWithHeaders`, or with `getSize` on React
-    Native Web, which doesn't have it.
-  - An array uses its first resolution.
-  - `cache` passes through.
+    - A `require()` asset takes its ratio from `Image.resolveAssetSource`.
+    - A source with a width and height gives the ratio without loading.
+    - `{ uri, headers }` is measured with `Image.getSizeWithHeaders`, or with `getSize` on React
+      Native Web, which doesn't have it.
+    - An array uses its first resolution.
+    - `cache` passes through.
 
-  `source` wins over `src`, and development warns once when both are set. The clipped `Drawing`
-  path (`rn-adapter/src/svg-parts.ts`) takes the whole source.
-  Tests: five new cases in the `media` block of `components.spec.tsx`.
+    `source` wins over `src`, and development warns once when both are set. The clipped `Drawing`
+    path (`rn-adapter/src/svg-parts.ts`) takes the whole source.
+    Tests: five new cases in the `media` block of `components.spec.tsx`.
 
 ## Checks
 
 - `omni run build test -p @pureform/rn-adapter -p @pureform/preset -p @pureform/react-native`:
-  - Builds pass.
-  - preset and rn-adapter unit tests pass.
-  - react-native: 619/621 pass. The 2 failures are timing tests: the splitter's "rests where
-    it's let go" and the presence "staggers the FAB menu's items". See open questions.
+    - Builds pass.
+    - preset and rn-adapter unit tests pass.
+    - react-native: 619/621 pass. The 2 failures are timing tests: the splitter's "rests where
+      it's let go" and the presence "staggers the FAB menu's items". See open questions.
 - `bunx tsc --noEmit -p tsconfig.json` is clean in rn-adapter, preset and react-native.
 - `omni run build -p @pureform/storybook-web` passes.
 - e2e in `tests/component-suites` after `generate prepare -p @pureform/panda-fixture`, narrowed
@@ -65,10 +65,10 @@ This file is the last commit. The README is not ticked; the orchestrator ticks i
 ## Refactoring hints
 
 - **Helpers that look generic:**
-  - `withUserStyle`/`RootStyleProps` (`react-native/src/styles.ts`). Every React Native root
-    that keeps its own size should use them. Single-part components still hand-merge styles.
-  - `knownRatio`/`remoteOf` in `react-native/src/single-part.tsx`. Avatar's image could reuse
-    them if it starts taking `source`.
+    - `withUserStyle`/`RootStyleProps` (`react-native/src/styles.ts`). Every React Native root
+      that keeps its own size should use them. Single-part components still hand-merge styles.
+    - `knownRatio`/`remoteOf` in `react-native/src/single-part.tsx`. Avatar's image could reuse
+      them if it starts taking `source`.
 - **Code that looks like a sibling's:** none.
 - **Suggested home:** keep these where they are until a second user appears.
 - **What must not change:** the preset snapshots, `pill-radius.spec.ts`, `own-size.spec.ts`,
@@ -80,12 +80,12 @@ parity and geometry output identical.
 ## Open questions
 
 - **Flaky timing tests in `@pureform/react-native`, not caused by r9a:**
-  - "staggers the FAB menu's items" (presence) also fails on main's sources under the same
-    load.
-  - The splitter's "rests where it's let go" fails only while Vitest's type check runs in the
-    same process under high load (load average 20–30). It passes at HEAD with
-    `--typecheck.enabled=false` (2/2) and passed at each earlier commit.
-  - Worth a retry, or a less load-sensitive wait in r9d's "known flakes".
+    - "staggers the FAB menu's items" (presence) also fails on main's sources under the same
+      load.
+    - The splitter's "rests where it's let go" fails only while Vitest's type check runs in the
+      same process under high load (load average 20–30). It passes at HEAD with
+      `--typecheck.enabled=false` (2/2) and passed at each earlier commit.
+    - Worth a retry, or a less load-sensitive wait in r9d's "known flakes".
 - `alignSelf: "stretch"` alone doesn't stretch an own-size root, because the `fit-content` width
   wins. It is documented rather than handled. Mapping it to `width: "100%"` in `withUserStyle`
   is an option.

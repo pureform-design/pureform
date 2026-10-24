@@ -78,18 +78,14 @@ function Segment(options: SegmentOptions): ReactNode {
         styles: s,
         selected,
         views: v,
-    } = useComponentSlots<DateInputPart>(
-        "dateInput",
-        options.selection,
-        {
-            focus: focused,
-            focusVisible: focused,
-            filled: true,
-            invalid: options.invalid,
-            disabled: options.disabled,
-            ...(options.readOnly ? { readOnly: true } : {}),
-        },
-    );
+    } = useComponentSlots<DateInputPart>("dateInput", options.selection, {
+        focus: focused,
+        focusVisible: focused,
+        filled: true,
+        invalid: options.invalid,
+        disabled: options.disabled,
+        ...(options.readOnly ? { readOnly: true } : {}),
+    });
     const value = options.text === "" ? undefined : Number(options.text);
     const text = ownText(s.input);
     const look = { ...text, ...s.segment };

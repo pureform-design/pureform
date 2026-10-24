@@ -40,7 +40,7 @@ Branch `f2d-sort-arrow`, from main `fdbae596`. Commits: `git log fdbae596..f2d-s
   passed each; `direction` and `themes` `-t Table` on `solid/css`: 17 passed.
 - Browser suite `reduced-motion` and `state-matching` files: 162 passed.
 - Setup note: the component suites need `omni run build -p` the three adapters and `omni run
-  generate -p @pureform/panda-fixture` first.
+generate -p @pureform/panda-fixture` first.
 
 ## Refactoring hints
 

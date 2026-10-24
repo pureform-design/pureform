@@ -114,7 +114,7 @@ Solid, React and, where it applies, React Native. Not pushed.
 ## Checks
 
 - `omni run build test -p @pureform/preset -p @pureform/react -p @pureform/solid
-  -p @pureform/rn-adapter -p @pureform/react-native`: React's `snackbar.spec.tsx` "closes itself
+-p @pureform/rn-adapter -p @pureform/react-native`: React's `snackbar.spec.tsx` "closes itself
   after its duration" failed once (timing, untouched); `-f failed` passed.
 - `bunx tsc --noEmit -p tsconfig.json`: clean in preset, react, solid, storybook-web,
   browser-e2e-tests.

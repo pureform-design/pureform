@@ -1,11 +1,11 @@
 {
-  "version": "1.0.0",
-  "generators": {
-    "ts-package": {
-      "targets": {},
-      "inputs": {
-        "scope_name": "pureform"
-      }
+    "version": "1.0.0",
+    "generators": {
+        "ts-package": {
+            "targets": {},
+            "inputs": {
+                "scope_name": "pureform"
+            }
+        }
     }
-  }
 }

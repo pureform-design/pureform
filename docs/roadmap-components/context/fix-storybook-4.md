@@ -14,17 +14,17 @@ Storybook fixes (`apps/storybook-web`) on branch `fix-storybook-4`. Follows
   `innerWidth` and the row all 1280px now.
 - **Not done (Light/Dark tests stay `!test`):** the width wasn't the cause. With the frame
   matching, Solid's state play still reads page 2 for 1 (React passes). Logged in the play:
-  - Solid, once measured, gives the multi-browse masks different sizes
-    (`198, 198, 198, 198, 198, 186, 56, 56`), and on `ArrowRight` from item 1 its
-    `data-current` jumps to index 2 at the first scroll event (scrollLeft 3, ending at 206).
-  - React's masks all stay 186px (no measured multi-browse sizes) and the page goes to 1.
-  - The component suites' `controllable` Carousel tests pass in `solid/panda`: they act right
-    after mounting, before the row is measured, so they miss it.
-  That is a binding/machine question (`packages/solid/src/carousel/carousel.tsx`, React's
-  carousel, `setMatchingPage` in `packages/machines/src/carousel/index.ts`), outside this batch.
-  The config comment says so.
+    - Solid, once measured, gives the multi-browse masks different sizes
+      (`198, 198, 198, 198, 198, 186, 56, 56`), and on `ArrowRight` from item 1 its
+      `data-current` jumps to index 2 at the first scroll event (scrollLeft 3, ending at 206).
+    - React's masks all stay 186px (no measured multi-browse sizes) and the page goes to 1.
+    - The component suites' `controllable` Carousel tests pass in `solid/panda`: they act right
+      after mounting, before the row is measured, so they miss it.
+      That is a binding/machine question (`packages/solid/src/carousel/carousel.tsx`, React's
+      carousel, `setMatchingPage` in `packages/machines/src/carousel/index.ts`), outside this batch.
+      The config comment says so.
 - **Tests:** `bunx vitest run -c vitest.config.storybook.ts --project storybook/solid --project
-  storybook/react src/stories/generated/Carousel.stories.ts`: 20 passed (Light/Dark enabled:
+storybook/react src/stories/generated/Carousel.stories.ts`: 20 passed (Light/Dark enabled:
   React passes, Solid fails `expected 2 to deeply equal 1`; reduced motion made no difference).
 
 ## 2. React Native menu drawn mid-canvas
@@ -42,7 +42,7 @@ Storybook fixes (`apps/storybook-web`) on branch `fix-storybook-4`. Follows
   `pageX/Y`, `offsetX/Y`, `screenX/Y`), so pointer, mouse and click events carry a position.
 - **Done (Actions):** the click spy (`compose.ts`, `mockName("onClick")`) records
   `summarizeEvent(event)` (`src/renderers/event-summary.ts`): `{ type, key?, button?, target: {
-  role?, name? } }`, the target being the nearest element with a role (explicit or implicit),
+role?, name? } }`, the target being the nearest element with a role (explicit or implicit),
   the name `aria-label`, `aria-labelledby`'s text or the text, cut to 80 characters. A React
   Native press event gives `type: "press"`. The key plays check the call is a `click` summary
   and that the calls don't reach `window`; the preview's reaches-window `afterEach` check stays.

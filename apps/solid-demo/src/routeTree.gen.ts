@@ -8,139 +8,143 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as BudgetRouteImport } from './routes/budget'
-import { Route as BudgetIndexRouteImport } from './routes/budget.index'
-import { Route as BudgetCategoriesRouteImport } from './routes/budget.categories'
-import { Route as BudgetTransactionsRouteImport } from './routes/budget.transactions'
+import { Route as rootRouteImport } from "./routes/__root";
+import { Route as BudgetRouteImport } from "./routes/budget";
+import { Route as BudgetCategoriesRouteImport } from "./routes/budget.categories";
+import { Route as BudgetIndexRouteImport } from "./routes/budget.index";
+import { Route as BudgetTransactionsRouteImport } from "./routes/budget.transactions";
+import { Route as IndexRouteImport } from "./routes/index";
 
 const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
+    id: "/",
+    path: "/",
+    getParentRoute: () => rootRouteImport,
+} as any);
 const BudgetRoute = BudgetRouteImport.update({
-  id: '/budget',
-  path: '/budget',
-  getParentRoute: () => rootRouteImport,
-} as any)
+    id: "/budget",
+    path: "/budget",
+    getParentRoute: () => rootRouteImport,
+} as any);
 const BudgetIndexRoute = BudgetIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => BudgetRoute,
-} as any)
+    id: "/",
+    path: "/",
+    getParentRoute: () => BudgetRoute,
+} as any);
 const BudgetCategoriesRoute = BudgetCategoriesRouteImport.update({
-  id: '/categories',
-  path: '/categories',
-  getParentRoute: () => BudgetRoute,
-} as any)
+    id: "/categories",
+    path: "/categories",
+    getParentRoute: () => BudgetRoute,
+} as any);
 const BudgetTransactionsRoute = BudgetTransactionsRouteImport.update({
-  id: '/transactions',
-  path: '/transactions',
-  getParentRoute: () => BudgetRoute,
-} as any)
+    id: "/transactions",
+    path: "/transactions",
+    getParentRoute: () => BudgetRoute,
+} as any);
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/budget': typeof BudgetRouteWithChildren
-  '/budget/categories': typeof BudgetCategoriesRoute
-  '/budget/transactions': typeof BudgetTransactionsRoute
-  '/budget/': typeof BudgetIndexRoute
+    "/": typeof IndexRoute;
+    "/budget": typeof BudgetRouteWithChildren;
+    "/budget/categories": typeof BudgetCategoriesRoute;
+    "/budget/transactions": typeof BudgetTransactionsRoute;
+    "/budget/": typeof BudgetIndexRoute;
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/budget/categories': typeof BudgetCategoriesRoute
-  '/budget/transactions': typeof BudgetTransactionsRoute
-  '/budget': typeof BudgetIndexRoute
+    "/": typeof IndexRoute;
+    "/budget/categories": typeof BudgetCategoriesRoute;
+    "/budget/transactions": typeof BudgetTransactionsRoute;
+    "/budget": typeof BudgetIndexRoute;
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/budget': typeof BudgetRouteWithChildren
-  '/budget/categories': typeof BudgetCategoriesRoute
-  '/budget/transactions': typeof BudgetTransactionsRoute
-  '/budget/': typeof BudgetIndexRoute
+    __root__: typeof rootRouteImport;
+    "/": typeof IndexRoute;
+    "/budget": typeof BudgetRouteWithChildren;
+    "/budget/categories": typeof BudgetCategoriesRoute;
+    "/budget/transactions": typeof BudgetTransactionsRoute;
+    "/budget/": typeof BudgetIndexRoute;
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    '/' | '/budget' | '/budget/categories' | '/budget/transactions' | '/budget/'
-  fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/budget/categories' | '/budget/transactions' | '/budget'
-  id:
-    | '__root__'
-    | '/'
-    | '/budget'
-    | '/budget/categories'
-    | '/budget/transactions'
-    | '/budget/'
-  fileRoutesById: FileRoutesById
+    fileRoutesByFullPath: FileRoutesByFullPath;
+    fullPaths:
+        | "/"
+        | "/budget"
+        | "/budget/categories"
+        | "/budget/transactions"
+        | "/budget/";
+    fileRoutesByTo: FileRoutesByTo;
+    to: "/" | "/budget/categories" | "/budget/transactions" | "/budget";
+    id:
+        | "__root__"
+        | "/"
+        | "/budget"
+        | "/budget/categories"
+        | "/budget/transactions"
+        | "/budget/";
+    fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  BudgetRoute: typeof BudgetRouteWithChildren
+    IndexRoute: typeof IndexRoute;
+    BudgetRoute: typeof BudgetRouteWithChildren;
 }
 
-declare module '@tanstack/solid-router' {
-  interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+declare module "@tanstack/solid-router" {
+    interface FileRoutesByPath {
+        "/": {
+            id: "/";
+            path: "/";
+            fullPath: "/";
+            preLoaderRoute: typeof IndexRouteImport;
+            parentRoute: typeof rootRouteImport;
+        };
+        "/budget": {
+            id: "/budget";
+            path: "/budget";
+            fullPath: "/budget";
+            preLoaderRoute: typeof BudgetRouteImport;
+            parentRoute: typeof rootRouteImport;
+        };
+        "/budget/": {
+            id: "/budget/";
+            path: "/";
+            fullPath: "/budget/";
+            preLoaderRoute: typeof BudgetIndexRouteImport;
+            parentRoute: typeof BudgetRoute;
+        };
+        "/budget/categories": {
+            id: "/budget/categories";
+            path: "/categories";
+            fullPath: "/budget/categories";
+            preLoaderRoute: typeof BudgetCategoriesRouteImport;
+            parentRoute: typeof BudgetRoute;
+        };
+        "/budget/transactions": {
+            id: "/budget/transactions";
+            path: "/transactions";
+            fullPath: "/budget/transactions";
+            preLoaderRoute: typeof BudgetTransactionsRouteImport;
+            parentRoute: typeof BudgetRoute;
+        };
     }
-    '/budget': {
-      id: '/budget'
-      path: '/budget'
-      fullPath: '/budget'
-      preLoaderRoute: typeof BudgetRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/budget/': {
-      id: '/budget/'
-      path: '/'
-      fullPath: '/budget/'
-      preLoaderRoute: typeof BudgetIndexRouteImport
-      parentRoute: typeof BudgetRoute
-    }
-    '/budget/categories': {
-      id: '/budget/categories'
-      path: '/categories'
-      fullPath: '/budget/categories'
-      preLoaderRoute: typeof BudgetCategoriesRouteImport
-      parentRoute: typeof BudgetRoute
-    }
-    '/budget/transactions': {
-      id: '/budget/transactions'
-      path: '/transactions'
-      fullPath: '/budget/transactions'
-      preLoaderRoute: typeof BudgetTransactionsRouteImport
-      parentRoute: typeof BudgetRoute
-    }
-  }
 }
 
 interface BudgetRouteChildren {
-  BudgetCategoriesRoute: typeof BudgetCategoriesRoute
-  BudgetTransactionsRoute: typeof BudgetTransactionsRoute
-  BudgetIndexRoute: typeof BudgetIndexRoute
+    BudgetCategoriesRoute: typeof BudgetCategoriesRoute;
+    BudgetTransactionsRoute: typeof BudgetTransactionsRoute;
+    BudgetIndexRoute: typeof BudgetIndexRoute;
 }
 
 const BudgetRouteChildren: BudgetRouteChildren = {
-  BudgetCategoriesRoute: BudgetCategoriesRoute,
-  BudgetTransactionsRoute: BudgetTransactionsRoute,
-  BudgetIndexRoute: BudgetIndexRoute,
-}
+    BudgetCategoriesRoute: BudgetCategoriesRoute,
+    BudgetTransactionsRoute: BudgetTransactionsRoute,
+    BudgetIndexRoute: BudgetIndexRoute,
+};
 
 const BudgetRouteWithChildren =
-  BudgetRoute._addFileChildren(BudgetRouteChildren)
+    BudgetRoute._addFileChildren(BudgetRouteChildren);
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  BudgetRoute: BudgetRouteWithChildren,
-}
+    IndexRoute: IndexRoute,
+    BudgetRoute: BudgetRouteWithChildren,
+};
 export const routeTree = rootRouteImport
-  ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+    ._addFileChildren(rootRouteChildren)
+    ._addFileTypes<FileRouteTypes>();

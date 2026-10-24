@@ -344,7 +344,9 @@ export const createLinearProgress = <const G extends string = ColorGroup>(
                                             ),
                                             animation: when(
                                                 "rtl",
-                                                slide("linearProgressTrackGapRtl"),
+                                                slide(
+                                                    "linearProgressTrackGapRtl",
+                                                ),
                                                 slide("linearProgressTrackGap"),
                                             ),
                                         },

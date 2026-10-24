@@ -130,7 +130,7 @@ describe.each(Object.keys(STYLINGS) as (keyof typeof STYLINGS)[])(
             };
             // At 2250ms the arc is about halfway between its sizes; the track turns past it by
             // the gap (3% of the circle), so it follows the arc's value.
-            const expected = ((value() + 3) * 3.6 + 180) % 360 - 180;
+            const expected = (((value() + 3) * 3.6 + 180) % 360) - 180;
             expect(angle()).toBeCloseTo(expected, 0);
         });
 
@@ -147,10 +147,14 @@ describe.each(Object.keys(STYLINGS) as (keyof typeof STYLINGS)[])(
             // The halves clip; the arcs, which turn, don't, so their wave doesn't turn with them.
             expect(getComputedStyle(end!).clipPath).toMatch(/^shape\(/);
             expect(getComputedStyle(start!).clipPath).toMatch(/^shape\(/);
-            expect(getComputedStyle(end!.firstElementChild!).clipPath).toBe("none");
+            expect(getComputedStyle(end!.firstElementChild!).clipPath).toBe(
+                "none",
+            );
             // Each half is clipped to its share of one ring: their first points (the top of the
             // circle) sit on the seam, the end half's left edge and the start half's right one.
-            expect(getComputedStyle(end!).clipPath).toMatch(/^shape\(evenodd from 0%/);
+            expect(getComputedStyle(end!).clipPath).toMatch(
+                /^shape\(evenodd from 0%/,
+            );
             expect(getComputedStyle(start!).clipPath).toMatch(
                 /^shape\(evenodd from 100%/,
             );

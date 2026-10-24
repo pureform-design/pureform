@@ -44,7 +44,7 @@ Commits: eea83d6..d978a90, plus the `docs(roadmap)` commit that adds this file.
     ```
 
     `iconBox` now always adds `states.rtl.states.mirrored.transform = transform(...transform,
-  scaleX(-1))`, and `transform(...transform)` as the base when given (field icons pass
+scaleX(-1))`, and `transform(...transform)` as the base when given (field icons pass
     `[translateY(-50%)]`). `slotStateLayer`'s `selected` takes an optional `disabled`
     (case `[selected, disabled]`), and `shapedColors(fill, rest, selected?)` (in
     `shaped.ts`, with the exported `ShapedFill` type) draws selected colors.

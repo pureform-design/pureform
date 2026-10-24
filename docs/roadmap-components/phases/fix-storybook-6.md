@@ -4,6 +4,7 @@ Findings from Storybook on main after r10. For each, first decide whether it's a
 bug or a component bug, and fix it at the right layer.
 
 ## 6a: progress and web
+
 - CircularProgress loses its track in indeterminate mode.
 - Wavy CircularProgress, indeterminate: the seam between the two halves is visible and
   misaligned at points in the animation.
@@ -17,6 +18,7 @@ bug or a component bug, and fix it at the right layer.
   the web doesn't. Make them match (web shows the format hint the way M3 does).
 
 ## 6b: React Native and menus
+
 - React Native submenus don't transition in like the first menu.
 - React Native shaped Media isn't shaped and LoadingIndicator doesn't animate: is the story's
   SVG engine off, or a bug? Fix whichever.

@@ -7,6 +7,7 @@ A duplication and cleanup pass over what r9 and fix-storybook-5 added, under the
 otherwise).
 
 ## Look for
+
 - Duplication groups r9 left open or declined (context/r9.md, r9d.md).
 - The menu's cascade and drill submenus against other nested popups and back-navigation.
 - React Native height animations (expanders) against the sheets' and other measured sizes.
@@ -16,6 +17,7 @@ otherwise).
 - Remaining known flakes and timing-only tests.
 
 ## Decided work
+
 - **React Native toast swipe:** sideways swipe-to-dismiss like the web (past half the width or a
   flick; settles back otherwise; timer pauses while held; non-closable toasts don't move), built
   on a shared drag skeleton with the side sheet, list item swipe and the web toast if the refactor
@@ -32,5 +34,6 @@ otherwise).
   losing focus mid-typing).
 
 ## Done when
+
 Each candidate is extracted or declined with its failed check in context/r10.md; full gate
 green.

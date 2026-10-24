@@ -104,7 +104,7 @@ Branch `fix-storybook-5b` from main `c89ab31b` (r9 merged), the "5b" items of
 ## Checks run
 
 - `omni run build test -p @pureform/binding-core -p @pureform/machines -p @pureform/react
-  -p @pureform/solid -p @pureform/react-native -p @pureform/component-cases`: React Native's
+-p @pureform/solid -p @pureform/react-native -p @pureform/component-cases`: React Native's
   `indication.spec.tsx` ripple and `presence.spec.tsx` FAB stagger failed once (timing, under
   load); `-f failed` passed.
 - `omni run generate prepare -p @pureform/panda-fixture`, then component suites:

@@ -278,8 +278,7 @@ describe.each(NAMES)("the %s factory", (name) => {
                         "var(--springs-spatial-slow-stiffness)",
                     [`${variable}-damping`]:
                         "var(--springs-spatial-slow-damping)",
-                    [`${variable}-mass`]:
-                        "var(--springs-spatial-slow-mass)",
+                    [`${variable}-mass`]: "var(--springs-spatial-slow-mass)",
                 });
                 continue;
             }

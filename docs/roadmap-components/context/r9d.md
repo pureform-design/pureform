@@ -56,7 +56,7 @@ duplication list, c9's declined refactors, the machines root export, known flake
 ## Tests
 
 - `omni run build test -p @pureform/binding-core -p @pureform/react -p @pureform/solid -p
-  @pureform/react-native`, then `-f failed`: all pass except rn-adapter's codegen sampling timeout
+@pureform/react-native`, then `-f failed`: all pass except rn-adapter's codegen sampling timeout
   above (untouched by this batch).
 - `bunx tsc --noEmit -p tsconfig.json` clean in binding-core, react, solid, react-native.
 - `omni run build -p @pureform/storybook-web` passes.

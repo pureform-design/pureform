@@ -103,9 +103,7 @@ export const factoryModule = ({
         ...(named.length > 0 || springs.length > 0
             ? [named.length > 0 ? "    tokens," : "    {},"]
             : []),
-        ...(springs.length > 0
-            ? [`    ${JSON.stringify(springs)},`]
-            : []),
+        ...(springs.length > 0 ? [`    ${JSON.stringify(springs)},`] : []),
         ");",
         "",
     ].join("\n");

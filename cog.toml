@@ -102,8 +102,6 @@ include = ["packages/react/**"]
 
 [monorepo.packages."@pureform/react-native"]
 path = "packages/react-native"
-include = [
-    "packages/react-native/**",
-]
+include = ["packages/react-native/**"]
 
 #@anchor:new-typescript-package

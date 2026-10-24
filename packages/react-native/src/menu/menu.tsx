@@ -13,49 +13,49 @@
 import { menuAnatomy, menuOverlayAnatomy } from "@pureform/anatomy";
 import type { PartName, TestIdOverride } from "@pureform/anatomy";
 import {
-  hasSubmenu,
-  isPresent,
-  MENU_BACK_VALUE,
-  menuDrillLevel,
-  menuDrillPick,
-  menuGrouped,
-  menuSelection,
-  menuSubmenuMode,
-  menuSubmenuRoomOf,
-  submenuPositioning,
+    hasSubmenu,
+    isPresent,
+    MENU_BACK_VALUE,
+    menuDrillLevel,
+    menuDrillPick,
+    menuGrouped,
+    menuSelection,
+    menuSubmenuMode,
+    menuSubmenuRoomOf,
+    submenuPositioning,
 } from "@pureform/binding-core";
 import type {
-  ChangeDetails,
-  IndicationProps,
-  MenuGroup,
-  MenuItem,
-  MenuSelectDetails,
-  MenuSubmenu,
-  MenuSubmenuRoom,
-  MenuVariantProps,
-  OverlayPositioning,
+    ChangeDetails,
+    IndicationProps,
+    MenuGroup,
+    MenuItem,
+    MenuSelectDetails,
+    MenuSubmenu,
+    MenuSubmenuRoom,
+    MenuVariantProps,
+    OverlayPositioning,
 } from "@pureform/binding-core";
 import type { Indication } from "@pureform/binding-core/indication";
 import type { MutableInteractionSource } from "@pureform/binding-core/interaction";
 import {
-  useContainerFrame,
-  useMeasureContainer,
-  useReducedMotion,
-  useTokens,
+    useContainerFrame,
+    useMeasureContainer,
+    useReducedMotion,
+    useTokens,
 } from "@pureform/rn-adapter/react";
 import type {
-  ContainerFrame,
-  MeasureContainer,
+    ContainerFrame,
+    MeasureContainer,
 } from "@pureform/rn-adapter/react";
 import type { Selection } from "@pureform/styling";
 import { memo, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { ComponentRef, ReactNode } from "react";
 import {
-  Animated,
-  Platform,
-  Pressable,
-  useWindowDimensions,
-  View,
+    Animated,
+    Platform,
+    Pressable,
+    useWindowDimensions,
+    View,
 } from "react-native";
 import type { LayoutChangeEvent } from "react-native";
 
@@ -64,11 +64,11 @@ import { iconParts } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { Anchored, useAnchoredOverlay } from "../overlay";
 import {
-  testIdOf,
-  unselectable,
-  useStableCallback,
-  useStableSelection,
-  withEngine,
+    testIdOf,
+    unselectable,
+    useStableCallback,
+    useStableSelection,
+    withEngine,
 } from "../parts";
 import { Portal } from "../portal";
 import type { WindowRect } from "../portal-host";
@@ -83,90 +83,91 @@ const [INDICATION] = menuAnatomy.indication!;
 
 /** What a menu gives the trigger it renders. */
 export interface MenuTriggerProps {
-  /** Opens the menu, or closes it while it's open. */
-  readonly onPress: () => void;
-  /** Where the trigger is: the menu measures the view its interactions happen on. Give it to a
-   *  pureform component's `interactionSource`, or emit to it from your own `Pressable`
-   *  (`useIndication`); without it, the menu opens where the trigger was pressed. */
-  readonly interactionSource: MutableInteractionSource;
-  readonly "aria-haspopup": "menu";
-  readonly "aria-expanded": boolean;
+    /** Opens the menu, or closes it while it's open. */
+    readonly onPress: () => void;
+    /** Where the trigger is: the menu measures the view its interactions happen on. Give it to a
+     *  pureform component's `interactionSource`, or emit to it from your own `Pressable`
+     *  (`useIndication`); without it, the menu opens where the trigger was pressed. */
+    readonly interactionSource: MutableInteractionSource;
+    readonly "aria-haspopup": "menu";
+    readonly "aria-expanded": boolean;
 }
 
 export interface MenuProps extends MenuVariantProps, IndicationProps {
-  readonly items?: readonly MenuItem<ReactNode>[] | undefined;
-  /** Groups of items, after `items`, each with an optional label. The menu is `grouped` unless
-   *  told otherwise. */
-  readonly groups?: readonly MenuGroup<ReactNode>[] | undefined;
-  /** What opens it, rendered in place: a label, for a `Button`, or a function rendering your
-   *  own trigger with the props it's given (`(trigger) => <IconButton {...trigger} … />`).
-   *  Given it, the menu opens over the page against the trigger and closes itself; without
-   *  it, the menu is its surface alone. */
-  readonly trigger?:
-    | ReactNode
-    | ((
-        trigger: MenuTriggerProps,
-        state: { readonly open: boolean },
-      ) => ReactNode);
-  /** An area that opens the menu where it's held: a long press opens it at the touch point (on
-   *  the web also a right-click, and the context menu key or Shift+F10 pressed in it), over the
-   *  page like a trigger's menu. It works with or without a `trigger`. A pressable inside it
-   *  takes its own touches, so a long press on one doesn't reach the area. */
-  readonly contextTrigger?: ReactNode;
-  /** Whether it shows. With a trigger, the open state, controlled when defined. Without one:
-   *  it grows in when this turns true and fades out when it turns false, rendering nothing
-   *  once it's gone; without it either, the surface is always shown, still. */
-  readonly open?: boolean | undefined;
-  /** With a trigger, whether it starts open. */
-  readonly defaultOpen?: boolean | undefined;
-  /** With a trigger, called when it asks to open or close. */
-  readonly onOpenChange?:
-    ((details: ChangeDetails<"open", boolean>) => void) | undefined;
-  /** With a trigger, whether picking an item closes it; an item's own `closeOnSelect` wins.
-   *  Default true. */
-  readonly closeOnSelect?: boolean | undefined;
-  /** With a trigger, where it opens against it. Default `{ placement: "bottom-start",
-   *  gutter: 8, flip: true }`. */
-  readonly positioning?: OverlayPositioning | undefined;
-  /** The item shown selected, such as a select's value. */
-  readonly value?: string | null | undefined;
-  /** An item was picked. */
-  readonly onSelect?: ((details: MenuSelectDetails) => void) | undefined;
-  /** How an item with `items` opens its submenu: `cascade` beside it, `drill` in the menu's
-   *  place under a row that goes back, `auto` cascading when a submenu fits beside the
-   *  open menu in the window, else drilling. @default "auto" */
-  readonly submenu?: MenuSubmenu | undefined;
-  readonly "aria-label"?: string | undefined;
-  readonly testId?: TestIdOverride<Part> | undefined;
+    readonly items?: readonly MenuItem<ReactNode>[] | undefined;
+    /** Groups of items, after `items`, each with an optional label. The menu is `grouped` unless
+     *  told otherwise. */
+    readonly groups?: readonly MenuGroup<ReactNode>[] | undefined;
+    /** What opens it, rendered in place: a label, for a `Button`, or a function rendering your
+     *  own trigger with the props it's given (`(trigger) => <IconButton {...trigger} … />`).
+     *  Given it, the menu opens over the page against the trigger and closes itself; without
+     *  it, the menu is its surface alone. */
+    readonly trigger?:
+        | ReactNode
+        | ((
+              trigger: MenuTriggerProps,
+              state: { readonly open: boolean },
+          ) => ReactNode);
+    /** An area that opens the menu where it's held: a long press opens it at the touch point (on
+     *  the web also a right-click, and the context menu key or Shift+F10 pressed in it), over the
+     *  page like a trigger's menu. It works with or without a `trigger`. A pressable inside it
+     *  takes its own touches, so a long press on one doesn't reach the area. */
+    readonly contextTrigger?: ReactNode;
+    /** Whether it shows. With a trigger, the open state, controlled when defined. Without one:
+     *  it grows in when this turns true and fades out when it turns false, rendering nothing
+     *  once it's gone; without it either, the surface is always shown, still. */
+    readonly open?: boolean | undefined;
+    /** With a trigger, whether it starts open. */
+    readonly defaultOpen?: boolean | undefined;
+    /** With a trigger, called when it asks to open or close. */
+    readonly onOpenChange?:
+        | ((details: ChangeDetails<"open", boolean>) => void)
+        | undefined;
+    /** With a trigger, whether picking an item closes it; an item's own `closeOnSelect` wins.
+     *  Default true. */
+    readonly closeOnSelect?: boolean | undefined;
+    /** With a trigger, where it opens against it. Default `{ placement: "bottom-start",
+     *  gutter: 8, flip: true }`. */
+    readonly positioning?: OverlayPositioning | undefined;
+    /** The item shown selected, such as a select's value. */
+    readonly value?: string | null | undefined;
+    /** An item was picked. */
+    readonly onSelect?: ((details: MenuSelectDetails) => void) | undefined;
+    /** How an item with `items` opens its submenu: `cascade` beside it, `drill` in the menu's
+     *  place under a row that goes back, `auto` cascading when a submenu fits beside the
+     *  open menu in the window, else drilling. @default "auto" */
+    readonly submenu?: MenuSubmenu | undefined;
+    readonly "aria-label"?: string | undefined;
+    readonly testId?: TestIdOverride<Part> | undefined;
 }
 
 // An item gets only what it reads, each stable while the menu renders with the same props, so an
 // item renders again when it or its selection changes, not with every render of the menu.
 interface ItemProps {
-  readonly item: MenuItem<ReactNode>;
-  readonly selection: Selection<"menu">;
-  readonly indication: Indication | undefined;
-  readonly testId: TestIdOverride<Part> | undefined;
-  readonly selected: boolean;
-  readonly onSelect: (
-    value: string,
-    row: Measurable | null,
-    how?: SelectHow,
-  ) => void;
-  /** The key that opens its submenu on the web: the arrow toward the inline end. */
-  readonly openKey: string;
-  /** An option of a listbox (the select's), saying whether it's chosen, rather than a menu
-   *  item. */
-  readonly option: boolean;
+    readonly item: MenuItem<ReactNode>;
+    readonly selection: Selection<"menu">;
+    readonly indication: Indication | undefined;
+    readonly testId: TestIdOverride<Part> | undefined;
+    readonly selected: boolean;
+    readonly onSelect: (
+        value: string,
+        row: Measurable | null,
+        how?: SelectHow,
+    ) => void;
+    /** The key that opens its submenu on the web: the arrow toward the inline end. */
+    readonly openKey: string;
+    /** An option of a listbox (the select's), saying whether it's chosen, rather than a menu
+     *  item. */
+    readonly option: boolean;
 }
 
 // An item's row, measured for where a cascading submenu opens beside it.
 interface Measurable {
-  measureInWindow(
-    done: (x: number, y: number, width: number, height: number) => void,
-  ): void;
-  /** On the web, where the keys move focus. */
-  focus?(): void;
+    measureInWindow(
+        done: (x: number, y: number, width: number, height: number) => void,
+    ): void;
+    /** On the web, where the keys move focus. */
+    focus?(): void;
 }
 
 // How an item asks for its submenu: by a press, or on the web by the key that opens it (which
@@ -174,533 +175,566 @@ interface Measurable {
 type SelectHow = "press" | "key";
 
 function MenuItemImpl(props: ItemProps): ReactNode {
-  const { item } = props;
-  const indication = useSurfaceIndication(INDICATION!, {
-    indication: props.indication,
-    interactionSource: item.interactionSource,
-    disabled: item.disabled,
-  });
-  const slots = useComponentSlots<Part>(
-    "menu",
-    indication.select(props.selection),
-    indication.states({
-      selected: props.selected,
-      ...(item.type === undefined ? {} : { checked: item.checked ?? false }),
-      disabled: item.disabled ?? false,
-      ...(item.mirrorLeadingIcon || item.mirrorTrailingIcon || hasSubmenu(item)
-        ? { mirrored: true }
-        : {}),
-    }),
-  );
-  const { styles: s, selected, views: v } = slots;
-  const id = (part: Part) => testIdOf(menuAnatomy, part, props.testId);
-  const icon = iconParts(slots, id);
-  const row = useRef<Measurable>(null);
-  return (
-    <v.item.Pressable
-      ref={row as never}
-      {...indication.handlers}
-      role={
-        props.option
-          ? "option"
-          : item.type === undefined
-            ? "menuitem"
-            : `menuitem${item.type}`
-      }
-      {...(props.option ? { "aria-selected": props.selected } : {})}
-      {...(hasSubmenu(item) ? { "aria-haspopup": "menu" as const } : {})}
-      {...(item.type === undefined || props.option
-        ? {}
-        : { "aria-checked": item.checked ?? false })}
-      disabled={item.disabled}
-      onPress={() => {
-        if (item.type !== undefined)
-          item.onCheckedChange?.(item.type === "radio" || !item.checked);
-        props.onSelect(item.value, row.current);
-      }}
-      {...(Platform.OS === "web" && props.option
-        ? {
-            // React Native Web presses only a button on Space; an option takes it too.
-            onKeyDown: (event: {
-              nativeEvent: { key: string };
-              preventDefault(): void;
-            }) => {
-              if (event.nativeEvent.key !== " " || item.disabled) return;
-              event.preventDefault();
-              props.onSelect(item.value, row.current);
-            },
-          }
-        : {})}
-      {...(Platform.OS === "web" && hasSubmenu(item)
-        ? {
-            onKeyDown: (event: {
-              nativeEvent: { key: string };
-              preventDefault(): void;
-            }) => {
-              if (event.nativeEvent.key !== props.openKey) return;
-              event.preventDefault();
-              props.onSelect(item.value, row.current, "key");
-            },
-          }
-        : {})}
-      style={{ ...s.item, ...unselectable }}
-      testID={id("item")}
-    >
-      {icon("itemLeading", item.leadingIcon)}
-      <v.itemContent.View style={s.itemContent} testID={id("itemContent")}>
-        <v.itemLabel.Text
-          selectable={false}
-          style={s.itemLabel}
-          testID={id("itemLabel")}
+    const { item } = props;
+    const indication = useSurfaceIndication(INDICATION!, {
+        indication: props.indication,
+        interactionSource: item.interactionSource,
+        disabled: item.disabled,
+    });
+    const slots = useComponentSlots<Part>(
+        "menu",
+        indication.select(props.selection),
+        indication.states({
+            selected: props.selected,
+            ...(item.type === undefined
+                ? {}
+                : { checked: item.checked ?? false }),
+            disabled: item.disabled ?? false,
+            ...(item.mirrorLeadingIcon ||
+            item.mirrorTrailingIcon ||
+            hasSubmenu(item)
+                ? { mirrored: true }
+                : {}),
+        }),
+    );
+    const { styles: s, selected, views: v } = slots;
+    const id = (part: Part) => testIdOf(menuAnatomy, part, props.testId);
+    const icon = iconParts(slots, id);
+    const row = useRef<Measurable>(null);
+    return (
+        <v.item.Pressable
+            ref={row as never}
+            {...indication.handlers}
+            role={
+                props.option
+                    ? "option"
+                    : item.type === undefined
+                      ? "menuitem"
+                      : `menuitem${item.type}`
+            }
+            {...(props.option ? { "aria-selected": props.selected } : {})}
+            {...(hasSubmenu(item) ? { "aria-haspopup": "menu" as const } : {})}
+            {...(item.type === undefined || props.option
+                ? {}
+                : { "aria-checked": item.checked ?? false })}
+            disabled={item.disabled}
+            onPress={() => {
+                if (item.type !== undefined)
+                    item.onCheckedChange?.(
+                        item.type === "radio" || !item.checked,
+                    );
+                props.onSelect(item.value, row.current);
+            }}
+            {...(Platform.OS === "web" && props.option
+                ? {
+                      // React Native Web presses only a button on Space; an option takes it too.
+                      onKeyDown: (event: {
+                          nativeEvent: { key: string };
+                          preventDefault(): void;
+                      }) => {
+                          if (event.nativeEvent.key !== " " || item.disabled)
+                              return;
+                          event.preventDefault();
+                          props.onSelect(item.value, row.current);
+                      },
+                  }
+                : {})}
+            {...(Platform.OS === "web" && hasSubmenu(item)
+                ? {
+                      onKeyDown: (event: {
+                          nativeEvent: { key: string };
+                          preventDefault(): void;
+                      }) => {
+                          if (event.nativeEvent.key !== props.openKey) return;
+                          event.preventDefault();
+                          props.onSelect(item.value, row.current, "key");
+                      },
+                  }
+                : {})}
+            style={{ ...s.item, ...unselectable }}
+            testID={id("item")}
         >
-          {item.label}
-        </v.itemLabel.Text>
-        {isPresent(item.supportingText) ? (
-          <v.itemSupportingText.Text
-            selectable={false}
-            style={s.itemSupportingText}
-            testID={id("itemSupportingText")}
-          >
-            {item.supportingText}
-          </v.itemSupportingText.Text>
-        ) : null}
-      </v.itemContent.View>
-      {icon(
-        "itemTrailing",
-        hasSubmenu(item) && !isPresent(item.trailingIcon)
-          ? "›"
-          : item.trailingIcon,
-      )}
-      {isPresent(item.trailingText) ? (
-        <v.itemTrailingText.Text
-          selectable={false}
-          style={s.itemTrailingText}
-          testID={id("itemTrailingText")}
-        >
-          {item.trailingText}
-        </v.itemTrailingText.Text>
-      ) : null}
-      {indication.layer(selected)}
-    </v.item.Pressable>
-  );
+            {icon("itemLeading", item.leadingIcon)}
+            <v.itemContent.View
+                style={s.itemContent}
+                testID={id("itemContent")}
+            >
+                <v.itemLabel.Text
+                    selectable={false}
+                    style={s.itemLabel}
+                    testID={id("itemLabel")}
+                >
+                    {item.label}
+                </v.itemLabel.Text>
+                {isPresent(item.supportingText) ? (
+                    <v.itemSupportingText.Text
+                        selectable={false}
+                        style={s.itemSupportingText}
+                        testID={id("itemSupportingText")}
+                    >
+                        {item.supportingText}
+                    </v.itemSupportingText.Text>
+                ) : null}
+            </v.itemContent.View>
+            {icon(
+                "itemTrailing",
+                hasSubmenu(item) && !isPresent(item.trailingIcon)
+                    ? "›"
+                    : item.trailingIcon,
+            )}
+            {isPresent(item.trailingText) ? (
+                <v.itemTrailingText.Text
+                    selectable={false}
+                    style={s.itemTrailingText}
+                    testID={id("itemTrailingText")}
+                >
+                    {item.trailingText}
+                </v.itemTrailingText.Text>
+            ) : null}
+            {indication.layer(selected)}
+        </v.item.Pressable>
+    );
 }
 
 const Item = memo(withEngine(MenuItemImpl, "MenuItem"));
 
 // The theme's default spatial spring, or none under reduced motion.
 function useSpatialSpring() {
-  const tokens = useTokens();
-  const reducedMotion = useReducedMotion();
-  const { timeScale } = usePureform();
-  return reducedMotion
-    ? undefined
-    : themeSpring("spatialDefault", tokens, timeScale);
+    const tokens = useTokens();
+    const reducedMotion = useReducedMotion();
+    const { timeScale } = usePureform();
+    return reducedMotion
+        ? undefined
+        : themeSpring("spatialDefault", tokens, timeScale);
 }
 
 const springing = (
-  value: Animated.Value | Animated.ValueXY,
-  to: number | { x: number; y: number },
-  spring: NonNullable<ReturnType<typeof themeSpring>>,
+    value: Animated.Value | Animated.ValueXY,
+    to: number | { x: number; y: number },
+    spring: NonNullable<ReturnType<typeof themeSpring>>,
 ) =>
-  Animated.spring(value, {
-    toValue: to as never,
-    stiffness: spring.stiffness,
-    damping: spring.damping,
-    mass: spring.mass,
-    overshootClamping: true,
-    useNativeDriver: false,
-  });
+    Animated.spring(value, {
+        toValue: to as never,
+        stiffness: spring.stiffness,
+        damping: spring.damping,
+        mass: spring.mass,
+        overshootClamping: true,
+        useNativeDriver: false,
+    });
 
 // A drilled menu's rows: a new level springs the menu's height from the last level's to its
 // own, clipped meanwhile, as the web's does; at rest it has no height of its own.
 function DrillSize(props: {
-  readonly level: string;
-  readonly children: ReactNode;
+    readonly level: string;
+    readonly children: ReactNode;
 }): ReactNode {
-  const spring = useSpatialSpring();
-  const height = useRef(new Animated.Value(0)).current;
-  const natural = useRef(0);
-  const pending = useRef(false);
-  const [moving, setMoving] = useState(false);
-  const first = useRef(true);
-  useLayoutEffect(() => {
-    if (first.current) {
-      first.current = false;
-      return;
-    }
-    if (!spring || natural.current <= 0) return;
-    height.stopAnimation();
-    height.setValue(natural.current);
-    pending.current = true;
-    setMoving(true);
-  }, [props.level]);
-  useEffect(() => () => height.stopAnimation(), [height]);
-  return (
-    <Animated.View style={moving ? { height, overflow: "hidden" } : undefined}>
-      <View
-        collapsable={false}
-        onLayout={(event: LayoutChangeEvent) => {
-          const measured = event.nativeEvent.layout.height;
-          natural.current = measured;
-          if (!pending.current || !spring) return;
-          pending.current = false;
-          springing(height, measured, spring).start(({ finished }) => {
-            if (finished) setMoving(false);
-          });
-        }}
-      >
-        {props.children}
-      </View>
-    </Animated.View>
-  );
+    const spring = useSpatialSpring();
+    const height = useRef(new Animated.Value(0)).current;
+    const natural = useRef(0);
+    const pending = useRef(false);
+    const [moving, setMoving] = useState(false);
+    const first = useRef(true);
+    useLayoutEffect(() => {
+        if (first.current) {
+            first.current = false;
+            return;
+        }
+        if (!spring || natural.current <= 0) return;
+        height.stopAnimation();
+        height.setValue(natural.current);
+        pending.current = true;
+        setMoving(true);
+    }, [props.level]);
+    useEffect(() => () => height.stopAnimation(), [height]);
+    return (
+        <Animated.View
+            style={moving ? { height, overflow: "hidden" } : undefined}
+        >
+            <View
+                collapsable={false}
+                onLayout={(event: LayoutChangeEvent) => {
+                    const measured = event.nativeEvent.layout.height;
+                    natural.current = measured;
+                    if (!pending.current || !spring) return;
+                    pending.current = false;
+                    springing(height, measured, spring).start(
+                        ({ finished }) => {
+                            if (finished) setMoving(false);
+                        },
+                    );
+                }}
+            >
+                {props.children}
+            </View>
+        </Animated.View>
+    );
 }
 
 // Where a drill step's moving row was, in the window: the pressed item going in (it moves into
 // the header), the header going out (it moves into the submenu's item).
 interface DrillFlip {
-  readonly x: number;
-  readonly y: number;
-  /** The row it moves into, by value. */
-  readonly to: string;
+    readonly x: number;
+    readonly y: number;
+    /** The row it moves into, by value. */
+    readonly to: string;
 }
 
 // The row a drill step moves into: it starts where the moving row was and springs into its
 // place (hidden until it's measured, so it doesn't show there first).
 function Flip(props: {
-  readonly from: DrillFlip;
-  readonly children: ReactNode;
+    readonly from: DrillFlip;
+    readonly children: ReactNode;
 }): ReactNode {
-  const spring = useSpatialSpring();
-  const view = useRef<ComponentRef<typeof View>>(null);
-  const offset = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
-  const [placed, setPlaced] = useState(!spring);
-  useLayoutEffect(() => {
-    if (!spring) return;
-    view.current?.measureInWindow((x, y) => {
-      offset.setValue({ x: props.from.x - x, y: props.from.y - y });
-      setPlaced(true);
-      springing(offset, { x: 0, y: 0 }, spring).start();
-    });
-    return () => offset.stopAnimation();
-  }, [props.from]);
-  return (
-    <Animated.View
-      ref={view}
-      style={{
-        opacity: placed ? 1 : 0,
-        transform: offset.getTranslateTransform(),
-      }}
-    >
-      {props.children}
-    </Animated.View>
-  );
+    const spring = useSpatialSpring();
+    const view = useRef<ComponentRef<typeof View>>(null);
+    const offset = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
+    const [placed, setPlaced] = useState(!spring);
+    useLayoutEffect(() => {
+        if (!spring) return;
+        view.current?.measureInWindow((x, y) => {
+            offset.setValue({ x: props.from.x - x, y: props.from.y - y });
+            setPlaced(true);
+            springing(offset, { x: 0, y: 0 }, spring).start();
+        });
+        return () => offset.stopAnimation();
+    }, [props.from]);
+    return (
+        <Animated.View
+            ref={view}
+            style={{
+                opacity: placed ? 1 : 0,
+                transform: offset.getTranslateTransform(),
+            }}
+        >
+            {props.children}
+        </Animated.View>
+    );
 }
 
 function MenuImpl(
-  props: MenuProps & {
-    /** Its items alone, without the surface (container, elevation, width), for a view that
-     *  draws its own, as the search view's content does. */
-    readonly bare?: boolean;
-    /** The nearest container's frame, for a menu rendered through the portal host, which
-     *  doesn't carry the container's context. */
-    readonly container?: ContainerFrame;
-    /** Measures that container when the menu opens, as it may have moved since. */
-    readonly measureContainer?: MeasureContainer;
-    /** A listbox of options (the select's), with this id, rather than a menu. */
-    readonly listbox?: { readonly id: string };
-  },
-): ReactNode {
-  const engine = useEngine();
-  const rtl = useDirection() === "rtl";
-  const windowWidth = useWindowDimensions().width;
-  const auto = props.submenu === undefined || props.submenu === "auto";
-  const inherited = useContainerFrame();
-  const inheritedMeasure = useMeasureContainer();
-  const measureContainer = props.measureContainer ?? inheritedMeasure;
-  const surface = useRef<ComponentRef<typeof View>>(null);
-  // The last menu box and container frame seen, which stand in when a measure at the press
-  // fails; they're kept in refs, so caching them renders nothing.
-  const box = useRef<{ left: number; right: number } | undefined>(undefined);
-  const cachedFrame = useRef(props.container ?? inherited);
-  cachedFrame.current = props.container ?? inherited;
-  const cacheBox = () =>
-    surface.current?.measureInWindow((x, _y, width) => {
-      if (width > 0) box.current = { left: x, right: x + width };
-    });
-  // The room beside the menu as of now, within the window and the nearest container: measured
-  // when a submenu opens, so the mode is decided once and doesn't change while it's shown.
-  const roomNow = async (): Promise<MenuSubmenuRoom | undefined> => {
-    const [menu, frame] = await Promise.all([
-      new Promise<{ left: number; right: number } | undefined>((done) =>
-        surface.current
-          ? surface.current.measureInWindow((x, _y, width) =>
-              done(width > 0 ? { left: x, right: x + width } : undefined),
-            )
-          : done(undefined),
-      ),
-      measureContainer
-        ? measureContainer().catch(() => undefined)
-        : Promise.resolve(undefined),
-    ]);
-    const within = frame ?? cachedFrame.current;
-    const at = menu ?? box.current;
-    return (
-      at &&
-      menuSubmenuRoomOf(at, {
-        left: Math.max(0, within?.x ?? 0),
-        right: Math.min(
-          windowWidth,
-          within ? within.x + within.width : windowWidth,
-        ),
-      })
-    );
-  };
-  // The submenu items drilled into, outermost first.
-  const [path, setPath] = useState<readonly string[]>([]);
-  // The submenu cascading beside its item's row.
-  const [beside, setBeside] = useState<{
-    readonly item: MenuItem<ReactNode>;
-    readonly row: WindowRect;
-    // The row's element, which focus goes back to; set when the key opened it.
-    readonly from?: Measurable;
-  }>();
-  // The drill step under way: where its moving row was.
-  const [flip, setFlip] = useState<DrillFlip>();
-  // Into a level or out of one: the moving row (the pressed item, or the back row) is noted
-  // where it is, then the level changes.
-  const drillTo = (
-    next: readonly string[],
-    value: string,
-    row: Measurable | null,
-  ) => {
-    const to = next.length > path.length ? MENU_BACK_VALUE : path.at(-1)!;
-    if (!row) {
-      setFlip(undefined);
-      return setPath(next);
-    }
-    row.measureInWindow((x, y) => {
-      setFlip({ x, y, to });
-      setPath(next);
-    });
-  };
-  const level = menuDrillLevel(props.items ?? [], props.groups ?? [], path);
-  const { submenu } = level;
-  const shown = [
-    ...level.items,
-    ...level.groups.flatMap((group) => group.items),
-  ];
-  const selection = useStableSelection(
-    menuSelection({
-      ...props,
-      grouped: submenu ? false : menuGrouped(props),
-    }),
-  );
-  const select = useStableCallback(
-    (value: string, row: Measurable | null, how: SelectHow = "press") => {
-      // Once drilled into, it stays a drill; a cascade or `auto` is decided as a submenu
-      // opens.
-      const pick = () =>
-        menuDrillPick(props.items ?? [], props.groups ?? [], path, value);
-      if (props.submenu === "drill" || path.length > 0) {
-        const next = pick();
-        if (next) return drillTo(next, value, row);
-      }
-      const chosen = shown.find((entry) => entry.value === value);
-      if (chosen && hasSubmenu(chosen)) {
-        if (beside?.item.value === value)
-          return how === "press" ? setBeside(undefined) : undefined;
-        if (!row) return undefined;
-        const room = auto ? roomNow() : Promise.resolve(undefined);
-        return row.measureInWindow((x, y, width, height) => {
-          void room.then((room) => {
-            if (menuSubmenuMode(props.submenu, room) === "drill") {
-              const next = pick();
-              if (next) return drillTo(next, value, row);
-            }
-            setBeside({
-              item: chosen,
-              row: { x, y, width, height },
-              ...(how === "key" ? { from: row } : {}),
-            });
-          });
-        });
-      }
-      setBeside(undefined);
-      props.onSelect?.({ value });
+    props: MenuProps & {
+        /** Its items alone, without the surface (container, elevation, width), for a view that
+         *  draws its own, as the search view's content does. */
+        readonly bare?: boolean;
+        /** The nearest container's frame, for a menu rendered through the portal host, which
+         *  doesn't carry the container's context. */
+        readonly container?: ContainerFrame;
+        /** Measures that container when the menu opens, as it may have moved since. */
+        readonly measureContainer?: MeasureContainer;
+        /** A listbox of options (the select's), with this id, rather than a menu. */
+        readonly listbox?: { readonly id: string };
     },
-  );
-  // Out of any submenu once it closes.
-  useEffect(() => {
-    if (props.open === false) {
-      setPath([]);
-      setFlip(undefined);
-      setBeside(undefined);
-    }
-  }, [props.open]);
-  const { styles: s, views: v } = useComponentSlots<Part>("menu", selection);
-  const presence = useOverlayPresence(props.open, "popup");
-  // The cascaded submenu grows in and fades out as the menu does: the last one shown stays
-  // while it goes.
-  const lastBeside = useRef(beside);
-  if (beside) lastBeside.current = beside;
-  const cascade = useOverlayPresence(beside !== undefined, "popup");
-  if (!presence.present) return null;
-  const id = (part: Part) => testIdOf(menuAnatomy, part, props.testId);
-  const shownBeside = lastBeside.current;
-  const item = (entry: MenuItem<ReactNode>) =>
-    flip?.to === entry.value ? (
-      <Flip key={entry.value} from={flip}>
-        {row(entry)}
-      </Flip>
-    ) : (
-      row(entry)
+): ReactNode {
+    const engine = useEngine();
+    const rtl = useDirection() === "rtl";
+    const windowWidth = useWindowDimensions().width;
+    const auto = props.submenu === undefined || props.submenu === "auto";
+    const inherited = useContainerFrame();
+    const inheritedMeasure = useMeasureContainer();
+    const measureContainer = props.measureContainer ?? inheritedMeasure;
+    const surface = useRef<ComponentRef<typeof View>>(null);
+    // The last menu box and container frame seen, which stand in when a measure at the press
+    // fails; they're kept in refs, so caching them renders nothing.
+    const box = useRef<{ left: number; right: number } | undefined>(undefined);
+    const cachedFrame = useRef(props.container ?? inherited);
+    cachedFrame.current = props.container ?? inherited;
+    const cacheBox = () =>
+        surface.current?.measureInWindow((x, _y, width) => {
+            if (width > 0) box.current = { left: x, right: x + width };
+        });
+    // The room beside the menu as of now, within the window and the nearest container: measured
+    // when a submenu opens, so the mode is decided once and doesn't change while it's shown.
+    const roomNow = async (): Promise<MenuSubmenuRoom | undefined> => {
+        const [menu, frame] = await Promise.all([
+            new Promise<{ left: number; right: number } | undefined>((done) =>
+                surface.current
+                    ? surface.current.measureInWindow((x, _y, width) =>
+                          done(
+                              width > 0
+                                  ? { left: x, right: x + width }
+                                  : undefined,
+                          ),
+                      )
+                    : done(undefined),
+            ),
+            measureContainer
+                ? measureContainer().catch(() => undefined)
+                : Promise.resolve(undefined),
+        ]);
+        const within = frame ?? cachedFrame.current;
+        const at = menu ?? box.current;
+        return (
+            at &&
+            menuSubmenuRoomOf(at, {
+                left: Math.max(0, within?.x ?? 0),
+                right: Math.min(
+                    windowWidth,
+                    within ? within.x + within.width : windowWidth,
+                ),
+            })
+        );
+    };
+    // The submenu items drilled into, outermost first.
+    const [path, setPath] = useState<readonly string[]>([]);
+    // The submenu cascading beside its item's row.
+    const [beside, setBeside] = useState<{
+        readonly item: MenuItem<ReactNode>;
+        readonly row: WindowRect;
+        // The row's element, which focus goes back to; set when the key opened it.
+        readonly from?: Measurable;
+    }>();
+    // The drill step under way: where its moving row was.
+    const [flip, setFlip] = useState<DrillFlip>();
+    // Into a level or out of one: the moving row (the pressed item, or the back row) is noted
+    // where it is, then the level changes.
+    const drillTo = (
+        next: readonly string[],
+        value: string,
+        row: Measurable | null,
+    ) => {
+        const to = next.length > path.length ? MENU_BACK_VALUE : path.at(-1)!;
+        if (!row) {
+            setFlip(undefined);
+            return setPath(next);
+        }
+        row.measureInWindow((x, y) => {
+            setFlip({ x, y, to });
+            setPath(next);
+        });
+    };
+    const level = menuDrillLevel(props.items ?? [], props.groups ?? [], path);
+    const { submenu } = level;
+    const shown = [
+        ...level.items,
+        ...level.groups.flatMap((group) => group.items),
+    ];
+    const selection = useStableSelection(
+        menuSelection({
+            ...props,
+            grouped: submenu ? false : menuGrouped(props),
+        }),
     );
-  const row = (entry: MenuItem<ReactNode>) => (
-    <Item
-      key={entry.value}
-      item={entry}
-      selection={selection}
-      indication={props.indication}
-      testId={props.testId}
-      selected={props.value === entry.value}
-      onSelect={select}
-      openKey={rtl ? "ArrowLeft" : "ArrowRight"}
-      option={props.listbox !== undefined}
-    />
-  );
-  // A menu that may drill springs its height from level to level.
-  const drills = (rows: ReactNode) =>
-    props.bare || props.submenu === "cascade" ? (
-      rows
-    ) : (
-      <DrillSize level={path.join("\u0000")}>{rows}</DrillSize>
+    const select = useStableCallback(
+        (value: string, row: Measurable | null, how: SelectHow = "press") => {
+            // Once drilled into, it stays a drill; a cascade or `auto` is decided as a submenu
+            // opens.
+            const pick = () =>
+                menuDrillPick(
+                    props.items ?? [],
+                    props.groups ?? [],
+                    path,
+                    value,
+                );
+            if (props.submenu === "drill" || path.length > 0) {
+                const next = pick();
+                if (next) return drillTo(next, value, row);
+            }
+            const chosen = shown.find((entry) => entry.value === value);
+            if (chosen && hasSubmenu(chosen)) {
+                if (beside?.item.value === value)
+                    return how === "press" ? setBeside(undefined) : undefined;
+                if (!row) return undefined;
+                const room = auto ? roomNow() : Promise.resolve(undefined);
+                return row.measureInWindow((x, y, width, height) => {
+                    void room.then((room) => {
+                        if (menuSubmenuMode(props.submenu, room) === "drill") {
+                            const next = pick();
+                            if (next) return drillTo(next, value, row);
+                        }
+                        setBeside({
+                            item: chosen,
+                            row: { x, y, width, height },
+                            ...(how === "key" ? { from: row } : {}),
+                        });
+                    });
+                });
+            }
+            setBeside(undefined);
+            props.onSelect?.({ value });
+        },
     );
-  // The engine's view where it enters and leaves, the slot's own while it's still.
-  const Root = props.open === undefined ? v.root : engine;
-  return (
-    <Root.View
-      {...presence.props}
-      {...(auto
-        ? {
-            ref: surface,
-            onLayout: (event: LayoutChangeEvent) => {
-              (
-                presence.props.onLayout as
-                  ((event: LayoutChangeEvent) => void) | undefined
-              )?.(event);
-              cacheBox();
-            },
-          }
-        : {})}
-      role={props.listbox ? "listbox" : "menu"}
-      {...(props.listbox ? { nativeID: props.listbox.id } : {})}
-      {...(props["aria-label"] === undefined
-        ? {}
-        : { "aria-label": props["aria-label"] })}
-      style={props.bare ? presence.style : { ...s.root, ...presence.style }}
-      testID={id("root")}
-    >
-      {drills(
-        <>
-          {submenu ? (
-            <>
-              {item({
-                value: MENU_BACK_VALUE,
-                label: submenu.label,
-                leadingIcon: "‹",
-                mirrorLeadingIcon: true,
-                closeOnSelect: false,
-              })}
-              {level.items.map(item)}
-            </>
-          ) : null}
-          {submenu ? null : level.items.map(item)}
-          {level.groups.map((group) => (
-            <v.itemGroup.View
-              key={group.id}
-              role="group"
-              {...(typeof group.label === "string"
-                ? { "aria-label": group.label }
+    // Out of any submenu once it closes.
+    useEffect(() => {
+        if (props.open === false) {
+            setPath([]);
+            setFlip(undefined);
+            setBeside(undefined);
+        }
+    }, [props.open]);
+    const { styles: s, views: v } = useComponentSlots<Part>("menu", selection);
+    const presence = useOverlayPresence(props.open, "popup");
+    // The cascaded submenu grows in and fades out as the menu does: the last one shown stays
+    // while it goes.
+    const lastBeside = useRef(beside);
+    if (beside) lastBeside.current = beside;
+    const cascade = useOverlayPresence(beside !== undefined, "popup");
+    if (!presence.present) return null;
+    const id = (part: Part) => testIdOf(menuAnatomy, part, props.testId);
+    const shownBeside = lastBeside.current;
+    const item = (entry: MenuItem<ReactNode>) =>
+        flip?.to === entry.value ? (
+            <Flip key={entry.value} from={flip}>
+                {row(entry)}
+            </Flip>
+        ) : (
+            row(entry)
+        );
+    const row = (entry: MenuItem<ReactNode>) => (
+        <Item
+            key={entry.value}
+            item={entry}
+            selection={selection}
+            indication={props.indication}
+            testId={props.testId}
+            selected={props.value === entry.value}
+            onSelect={select}
+            openKey={rtl ? "ArrowLeft" : "ArrowRight"}
+            option={props.listbox !== undefined}
+        />
+    );
+    // A menu that may drill springs its height from level to level.
+    const drills = (rows: ReactNode) =>
+        props.bare || props.submenu === "cascade" ? (
+            rows
+        ) : (
+            <DrillSize level={path.join("\u0000")}>{rows}</DrillSize>
+        );
+    // The engine's view where it enters and leaves, the slot's own while it's still.
+    const Root = props.open === undefined ? v.root : engine;
+    return (
+        <Root.View
+            {...presence.props}
+            {...(auto
+                ? {
+                      ref: surface,
+                      onLayout: (event: LayoutChangeEvent) => {
+                          (
+                              presence.props.onLayout as
+                                  | ((event: LayoutChangeEvent) => void)
+                                  | undefined
+                          )?.(event);
+                          cacheBox();
+                      },
+                  }
                 : {})}
-              style={s.itemGroup}
-              testID={id("itemGroup")}
-            >
-              {isPresent(group.label) ? (
-                <v.itemGroupLabel.Text
-                  selectable={false}
-                  style={s.itemGroupLabel}
-                  testID={id("itemGroupLabel")}
-                >
-                  {group.label}
-                </v.itemGroupLabel.Text>
-              ) : null}
-              {group.items.map(item)}
-            </v.itemGroup.View>
-          ))}
-        </>,
-      )}
-      {cascade.present && shownBeside ? (
-        // Beside its item, over the page; the menu's own layer under it takes a press
-        // outside both.
-        <Portal layer="menu">
-          <Anchored
-            anchor={shownBeside.row}
-            positioning={submenuPositioning(rtl ? "rtl" : "ltr")}
-            placement="right-start"
-            gutter={0}
-          >
-            {(placed) => (
-              <engine.View
-                {...cascade.props}
-                style={{
-                  // A closing submenu takes no more presses.
-                  pointerEvents: beside ? "auto" : "none",
-                  ...(placed
-                    ? { transformOrigin: placed.transformOrigin }
-                    : {}),
-                  ...cascade.style,
-                }}
-              >
-                <MenuKeys
-                  autoFocus={shownBeside.from !== undefined}
-                  onKey={(key) => {
-                    // Back out to the item: the arrow toward the inline start,
-                    // or Tab.
-                    if (
-                      key !== (rtl ? "ArrowRight" : "ArrowLeft") &&
-                      key !== "Tab"
-                    )
-                      return false;
-                    const from = shownBeside.from;
-                    setBeside(undefined);
-                    from?.focus?.();
-                    return true;
-                  }}
-                >
-                  <Surface
-                    {...props}
-                    items={shownBeside.item.items}
-                    groups={undefined}
-                    grouped={false}
-                    open={undefined}
-                    onSelect={(details) => {
-                      setBeside(undefined);
-                      props.onSelect?.(details);
-                    }}
-                    aria-label={
-                      typeof shownBeside.item.label === "string"
-                        ? shownBeside.item.label
-                        : undefined
-                    }
-                  />
-                </MenuKeys>
-              </engine.View>
+            role={props.listbox ? "listbox" : "menu"}
+            {...(props.listbox ? { nativeID: props.listbox.id } : {})}
+            {...(props["aria-label"] === undefined
+                ? {}
+                : { "aria-label": props["aria-label"] })}
+            style={
+                props.bare ? presence.style : { ...s.root, ...presence.style }
+            }
+            testID={id("root")}
+        >
+            {drills(
+                <>
+                    {submenu ? (
+                        <>
+                            {item({
+                                value: MENU_BACK_VALUE,
+                                label: submenu.label,
+                                leadingIcon: "‹",
+                                mirrorLeadingIcon: true,
+                                closeOnSelect: false,
+                            })}
+                            {level.items.map(item)}
+                        </>
+                    ) : null}
+                    {submenu ? null : level.items.map(item)}
+                    {level.groups.map((group) => (
+                        <v.itemGroup.View
+                            key={group.id}
+                            role="group"
+                            {...(typeof group.label === "string"
+                                ? { "aria-label": group.label }
+                                : {})}
+                            style={s.itemGroup}
+                            testID={id("itemGroup")}
+                        >
+                            {isPresent(group.label) ? (
+                                <v.itemGroupLabel.Text
+                                    selectable={false}
+                                    style={s.itemGroupLabel}
+                                    testID={id("itemGroupLabel")}
+                                >
+                                    {group.label}
+                                </v.itemGroupLabel.Text>
+                            ) : null}
+                            {group.items.map(item)}
+                        </v.itemGroup.View>
+                    ))}
+                </>,
             )}
-          </Anchored>
-        </Portal>
-      ) : null}
-    </Root.View>
-  );
+            {cascade.present && shownBeside ? (
+                // Beside its item, over the page; the menu's own layer under it takes a press
+                // outside both.
+                <Portal layer="menu">
+                    <Anchored
+                        anchor={shownBeside.row}
+                        positioning={submenuPositioning(rtl ? "rtl" : "ltr")}
+                        placement="right-start"
+                        gutter={0}
+                    >
+                        {(placed) => (
+                            <engine.View
+                                {...cascade.props}
+                                style={{
+                                    // A closing submenu takes no more presses.
+                                    pointerEvents: beside ? "auto" : "none",
+                                    ...(placed
+                                        ? {
+                                              transformOrigin:
+                                                  placed.transformOrigin,
+                                          }
+                                        : {}),
+                                    ...cascade.style,
+                                }}
+                            >
+                                <MenuKeys
+                                    autoFocus={shownBeside.from !== undefined}
+                                    onKey={(key) => {
+                                        // Back out to the item: the arrow toward the inline start,
+                                        // or Tab.
+                                        if (
+                                            key !==
+                                                (rtl
+                                                    ? "ArrowRight"
+                                                    : "ArrowLeft") &&
+                                            key !== "Tab"
+                                        )
+                                            return false;
+                                        const from = shownBeside.from;
+                                        setBeside(undefined);
+                                        from?.focus?.();
+                                        return true;
+                                    }}
+                                >
+                                    <Surface
+                                        {...props}
+                                        items={shownBeside.item.items}
+                                        groups={undefined}
+                                        grouped={false}
+                                        open={undefined}
+                                        onSelect={(details) => {
+                                            setBeside(undefined);
+                                            props.onSelect?.(details);
+                                        }}
+                                        aria-label={
+                                            typeof shownBeside.item.label ===
+                                            "string"
+                                                ? shownBeside.item.label
+                                                : undefined
+                                        }
+                                    />
+                                </MenuKeys>
+                            </engine.View>
+                        )}
+                    </Anchored>
+                </Portal>
+            ) : null}
+        </Root.View>
+    );
 }
 
 const Surface = withEngine(MenuImpl, "Menu");
@@ -708,294 +742,303 @@ const Surface = withEngine(MenuImpl, "Menu");
 /** The menu's items without its surface, filling the view they're in (the search view's
  *  suggestions). */
 export function MenuItems(
-  props: Omit<MenuProps, "trigger" | "contextTrigger">,
+    props: Omit<MenuProps, "trigger" | "contextTrigger">,
 ): ReactNode {
-  return <Surface {...props} bare />;
+    return <Surface {...props} bare />;
 }
 
 /** The menu's surface as a listbox of options with this id, each saying whether it's the
  *  `value` (`aria-selected`): the select's list. */
 export function MenuListbox(
-  props: Omit<MenuProps, "trigger" | "contextTrigger"> & {
-    readonly listbox: { readonly id: string };
-  },
+    props: Omit<MenuProps, "trigger" | "contextTrigger"> & {
+        readonly listbox: { readonly id: string };
+    },
 ): ReactNode {
-  return <Surface {...props} />;
+    return <Surface {...props} />;
 }
 
 // The items' elements on the web, where the keyboard moves between them.
 interface WebElement {
-  focus(): void;
-  querySelectorAll(selector: string): ArrayLike<WebElement>;
-  getAttribute(name: string): string | null;
+    focus(): void;
+    querySelectorAll(selector: string): ArrayLike<WebElement>;
+    getAttribute(name: string): string | null;
 }
 
 const ITEM = ["menuitem", "menuitemcheckbox", "menuitemradio", "option"]
-  .map((role) => `[role="${role}"]:not([aria-disabled="true"])`)
-  .join(", ");
+    .map((role) => `[role="${role}"]:not([aria-disabled="true"])`)
+    .join(", ");
 
 // A menu's items on the web: it takes focus on its chosen option or else its first item (given
 // `autoFocus`), and the arrow keys, Home, and End move it; `onKey` hears the other keys first, and takes those it returns
 // true for. A cascaded submenu is another portal entry, so it has its own.
 export function MenuKeys(props: {
-  readonly autoFocus: boolean;
-  readonly onKey?: ((key: string) => boolean) | undefined;
-  readonly children: ReactNode;
+    readonly autoFocus: boolean;
+    readonly onKey?: ((key: string) => boolean) | undefined;
+    readonly children: ReactNode;
 }): ReactNode {
-  const root = useRef<ComponentRef<typeof View>>(null);
-  const items = () =>
-    Array.from(
-      (root.current as unknown as WebElement | null)?.querySelectorAll(ITEM) ??
-        [],
-    );
-  useEffect(() => {
-    if (Platform.OS !== "web" || !props.autoFocus) return;
-    const all = items();
-    (
-      all.find((item) => item.getAttribute("aria-selected") === "true") ??
-      all[0]
-    )?.focus();
-  }, []);
-  const onKeyDown = (event: {
-    nativeEvent: { key: string };
-    preventDefault(): void;
-    stopPropagation(): void;
-  }) => {
-    const all = items();
-    const at = all.indexOf(
-      globalThis.document?.activeElement as unknown as WebElement,
-    );
-    const go = (index: number) => {
-      event.preventDefault();
-      all[(index + all.length) % all.length]?.focus();
+    const root = useRef<ComponentRef<typeof View>>(null);
+    const items = () =>
+        Array.from(
+            (root.current as unknown as WebElement | null)?.querySelectorAll(
+                ITEM,
+            ) ?? [],
+        );
+    useEffect(() => {
+        if (Platform.OS !== "web" || !props.autoFocus) return;
+        const all = items();
+        (
+            all.find((item) => item.getAttribute("aria-selected") === "true") ??
+            all[0]
+        )?.focus();
+    }, []);
+    const onKeyDown = (event: {
+        nativeEvent: { key: string };
+        preventDefault(): void;
+        stopPropagation(): void;
+    }) => {
+        const all = items();
+        const at = all.indexOf(
+            globalThis.document?.activeElement as unknown as WebElement,
+        );
+        const go = (index: number) => {
+            event.preventDefault();
+            all[(index + all.length) % all.length]?.focus();
+        };
+        const { key } = event.nativeEvent;
+        if (props.onKey?.(key)) {
+            event.preventDefault();
+            event.stopPropagation();
+            return;
+        }
+        switch (key) {
+            case "ArrowDown":
+                return go(at + 1);
+            case "ArrowUp":
+                return go(at < 0 ? -1 : at - 1);
+            case "Home":
+                return go(0);
+            case "End":
+                return go(-1);
+        }
     };
-    const { key } = event.nativeEvent;
-    if (props.onKey?.(key)) {
-      event.preventDefault();
-      event.stopPropagation();
-      return;
-    }
-    switch (key) {
-      case "ArrowDown":
-        return go(at + 1);
-      case "ArrowUp":
-        return go(at < 0 ? -1 : at - 1);
-      case "Home":
-        return go(0);
-      case "End":
-        return go(-1);
-    }
-  };
-  return (
-    <View ref={root} {...(Platform.OS === "web" ? { onKeyDown } : {})}>
-      {props.children}
-    </View>
-  );
+    return (
+        <View ref={root} {...(Platform.OS === "web" ? { onKeyDown } : {})}>
+            {props.children}
+        </View>
+    );
 }
 
 // The open menu, placed: on the web it takes focus on its first item, the keys move it, and Tab
 // closes it.
 function Popup(props: {
-  readonly onClose: () => void;
-  readonly children: ReactNode;
+    readonly onClose: () => void;
+    readonly children: ReactNode;
 }): ReactNode {
-  return (
-    <MenuKeys
-      autoFocus
-      onKey={(key) => {
-        if (key === "Tab") props.onClose();
-        return false;
-      }}
-    >
-      {props.children}
-    </MenuKeys>
-  );
+    return (
+        <MenuKeys
+            autoFocus
+            onKey={(key) => {
+                if (key === "Tab") props.onClose();
+                return false;
+            }}
+        >
+            {props.children}
+        </MenuKeys>
+    );
 }
 
 interface WindowPoint {
-  readonly x: number;
-  readonly y: number;
-  readonly width: 0;
-  readonly height: 0;
+    readonly x: number;
+    readonly y: number;
+    readonly width: 0;
+    readonly height: 0;
 }
 
 const pointAt = (x: number, y: number): WindowPoint => ({
-  x,
-  y,
-  width: 0,
-  height: 0,
+    x,
+    y,
+    width: 0,
+    height: 0,
 });
 
 // The area a long press (and on the web a right-click, the context menu key, or Shift+F10) opens
 // the menu from, at the touch point. It reads the press's position; it doesn't take over any
 // scrolling, which stays the surrounding `ScrollView`'s.
 function ContextTrigger(props: {
-  readonly onOpen: (at: WindowPoint) => void;
-  readonly testID: string;
-  readonly children: ReactNode;
+    readonly onOpen: (at: WindowPoint) => void;
+    readonly testID: string;
+    readonly children: ReactNode;
 }): ReactNode {
-  const web = Platform.OS === "web";
-  const webProps = web
-    ? {
-        onContextMenu: (event: {
-          clientX: number;
-          clientY: number;
-          preventDefault(): void;
-        }) => {
-          event.preventDefault();
-          props.onOpen(pointAt(event.clientX, event.clientY));
-        },
-        onKeyDown: (event: {
-          nativeEvent: { key: string; shiftKey?: boolean };
-          target: unknown;
-          preventDefault(): void;
-        }) => {
-          const { key, shiftKey } = event.nativeEvent;
-          if (key !== "ContextMenu" && !(key === "F10" && shiftKey)) return;
-          const rect = (
-            event.target as {
-              getBoundingClientRect?: () => {
-                left: number;
-                bottom: number;
-              };
-            } | null
-          )?.getBoundingClientRect?.();
-          event.preventDefault();
-          props.onOpen(pointAt(rect?.left ?? 0, rect?.bottom ?? 0));
-        },
-      }
-    : {};
-  return (
-    <Pressable
-      accessible={false}
-      focusable={false}
-      onLongPress={(event) =>
-        props.onOpen(pointAt(event.nativeEvent.pageX, event.nativeEvent.pageY))
-      }
-      testID={props.testID}
-      {...(webProps as object)}
-    >
-      {props.children}
-    </Pressable>
-  );
+    const web = Platform.OS === "web";
+    const webProps = web
+        ? {
+              onContextMenu: (event: {
+                  clientX: number;
+                  clientY: number;
+                  preventDefault(): void;
+              }) => {
+                  event.preventDefault();
+                  props.onOpen(pointAt(event.clientX, event.clientY));
+              },
+              onKeyDown: (event: {
+                  nativeEvent: { key: string; shiftKey?: boolean };
+                  target: unknown;
+                  preventDefault(): void;
+              }) => {
+                  const { key, shiftKey } = event.nativeEvent;
+                  if (key !== "ContextMenu" && !(key === "F10" && shiftKey))
+                      return;
+                  const rect = (
+                      event.target as {
+                          getBoundingClientRect?: () => {
+                              left: number;
+                              bottom: number;
+                          };
+                      } | null
+                  )?.getBoundingClientRect?.();
+                  event.preventDefault();
+                  props.onOpen(pointAt(rect?.left ?? 0, rect?.bottom ?? 0));
+              },
+          }
+        : {};
+    return (
+        <Pressable
+            accessible={false}
+            focusable={false}
+            onLongPress={(event) =>
+                props.onOpen(
+                    pointAt(event.nativeEvent.pageX, event.nativeEvent.pageY),
+                )
+            }
+            testID={props.testID}
+            {...(webProps as object)}
+        >
+            {props.children}
+        </Pressable>
+    );
 }
 
 function MenuOverlay(props: MenuProps): ReactNode {
-  const {
-    trigger,
-    contextTrigger,
-    open: _open,
-    defaultOpen,
-    onOpenChange,
-    closeOnSelect,
-    positioning,
-    onSelect,
-    ...surface
-  } = props;
-  const engine = useEngine();
-  const container = useContainerFrame();
-  const measureContainer = useMeasureContainer();
-  const { open, source, measured, presence, close, toggle } =
-    useAnchoredOverlay("Menu", {
-      open: props.open,
-      defaultOpen,
-      onOpenChange,
-    });
-  // Where the context trigger was held; a button's own box wins when the menu opens from it.
-  const [point, setPoint] = useState<WindowPoint>();
-  const opened = (at: WindowPoint) => {
-    setPoint(at);
-    if (!open) toggle();
-  };
-  const select = (details: MenuSelectDetails) => {
-    onSelect?.(details);
-    const item = [
-      ...(props.items ?? []),
-      ...(props.groups ?? []).flatMap((group) => group.items),
-    ].find((entry) => entry.value === details.value);
-    if (item?.closeOnSelect ?? closeOnSelect ?? true) close();
-  };
-  const given: MenuTriggerProps = {
-    onPress: () => {
-      setPoint(undefined);
-      toggle();
-    },
-    interactionSource: source,
-    "aria-haspopup": "menu",
-    "aria-expanded": open,
-  };
-  return (
-    <>
-      {trigger === undefined ? null : typeof trigger === "function" ? (
-        trigger(given, { open })
-      ) : (
-        <Button
-          label={trigger}
-          onPress={given.onPress}
-          interactionSource={source}
-          aria-haspopup={given["aria-haspopup"]}
-          aria-expanded={given["aria-expanded"]}
-        />
-      )}
-      {contextTrigger === undefined ? null : (
-        <ContextTrigger
-          onOpen={opened}
-          testID={testIdOf(
-            menuOverlayAnatomy,
-            "contextTrigger",
-            props.testId as TestIdOverride<PartName<typeof menuOverlayAnatomy>>,
-          )}
-        >
-          {contextTrigger}
-        </ContextTrigger>
-      )}
-      {presence.present && measured ? (
-        <Portal layer="menu">
-          <Anchored
-            anchor={point ?? measured.rect}
-            positioning={positioning}
-            placement="bottom-start"
-            gutter={8}
-            onPressOutside={close}
-          >
-            {(placed) => (
-              <engine.View
-                {...presence.props}
-                style={{
-                  // A closing menu takes no more presses.
-                  pointerEvents: open ? "auto" : "none",
-                  ...(placed
-                    ? {
-                        transformOrigin: placed.transformOrigin,
-                      }
-                    : {}),
-                  ...presence.style,
-                }}
-              >
-                <Popup onClose={close}>
-                  <Surface
-                    {...surface}
-                    {...(container ? { container } : {})}
-                    {...(measureContainer ? { measureContainer } : {})}
-                    onSelect={select}
-                  />
-                </Popup>
-              </engine.View>
+    const {
+        trigger,
+        contextTrigger,
+        open: _open,
+        defaultOpen,
+        onOpenChange,
+        closeOnSelect,
+        positioning,
+        onSelect,
+        ...surface
+    } = props;
+    const engine = useEngine();
+    const container = useContainerFrame();
+    const measureContainer = useMeasureContainer();
+    const { open, source, measured, presence, close, toggle } =
+        useAnchoredOverlay("Menu", {
+            open: props.open,
+            defaultOpen,
+            onOpenChange,
+        });
+    // Where the context trigger was held; a button's own box wins when the menu opens from it.
+    const [point, setPoint] = useState<WindowPoint>();
+    const opened = (at: WindowPoint) => {
+        setPoint(at);
+        if (!open) toggle();
+    };
+    const select = (details: MenuSelectDetails) => {
+        onSelect?.(details);
+        const item = [
+            ...(props.items ?? []),
+            ...(props.groups ?? []).flatMap((group) => group.items),
+        ].find((entry) => entry.value === details.value);
+        if (item?.closeOnSelect ?? closeOnSelect ?? true) close();
+    };
+    const given: MenuTriggerProps = {
+        onPress: () => {
+            setPoint(undefined);
+            toggle();
+        },
+        interactionSource: source,
+        "aria-haspopup": "menu",
+        "aria-expanded": open,
+    };
+    return (
+        <>
+            {trigger === undefined ? null : typeof trigger === "function" ? (
+                trigger(given, { open })
+            ) : (
+                <Button
+                    label={trigger}
+                    onPress={given.onPress}
+                    interactionSource={source}
+                    aria-haspopup={given["aria-haspopup"]}
+                    aria-expanded={given["aria-expanded"]}
+                />
             )}
-          </Anchored>
-        </Portal>
-      ) : null}
-    </>
-  );
+            {contextTrigger === undefined ? null : (
+                <ContextTrigger
+                    onOpen={opened}
+                    testID={testIdOf(
+                        menuOverlayAnatomy,
+                        "contextTrigger",
+                        props.testId as TestIdOverride<
+                            PartName<typeof menuOverlayAnatomy>
+                        >,
+                    )}
+                >
+                    {contextTrigger}
+                </ContextTrigger>
+            )}
+            {presence.present && measured ? (
+                <Portal layer="menu">
+                    <Anchored
+                        anchor={point ?? measured.rect}
+                        positioning={positioning}
+                        placement="bottom-start"
+                        gutter={8}
+                        onPressOutside={close}
+                    >
+                        {(placed) => (
+                            <engine.View
+                                {...presence.props}
+                                style={{
+                                    // A closing menu takes no more presses.
+                                    pointerEvents: open ? "auto" : "none",
+                                    ...(placed
+                                        ? {
+                                              transformOrigin:
+                                                  placed.transformOrigin,
+                                          }
+                                        : {}),
+                                    ...presence.style,
+                                }}
+                            >
+                                <Popup onClose={close}>
+                                    <Surface
+                                        {...surface}
+                                        {...(container ? { container } : {})}
+                                        {...(measureContainer
+                                            ? { measureContainer }
+                                            : {})}
+                                        onSelect={select}
+                                    />
+                                </Popup>
+                            </engine.View>
+                        )}
+                    </Anchored>
+                </Portal>
+            ) : null}
+        </>
+    );
 }
 
 /** Material's menu. With a trigger, the whole overlay:
  *  `<Menu trigger={(t) => <IconButton {...t} aria-label="More" icon="⋮" />} items={…} onSelect={…} />`;
  *  without, its surface: `<Menu items={[{ value: "cut", label: "Cut" }]} onSelect={…} />`. */
 export function Menu(props: MenuProps): ReactNode {
-  return props.trigger === undefined && props.contextTrigger === undefined ? (
-    <Surface {...props} />
-  ) : (
-    <MenuOverlay {...props} />
-  );
+    return props.trigger === undefined && props.contextTrigger === undefined ? (
+        <Surface {...props} />
+    ) : (
+        <MenuOverlay {...props} />
+    );
 }

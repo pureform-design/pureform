@@ -34,7 +34,9 @@ export const extendStory: NonNullable<StoryHooks["extendStory"]> = (
                   // The panes share the frame's room along the axis (the case's play may have
                   // moved the divider a little).
                   await waitFor(() => {
-                      void expect(panels(canvasElement).length).toBeGreaterThan(1);
+                      void expect(panels(canvasElement).length).toBeGreaterThan(
+                          1,
+                      );
                       for (const panel of panels(canvasElement))
                           void expect(length(panel)).toBeGreaterThan(80);
                   });
@@ -47,9 +49,9 @@ export const extendStory: NonNullable<StoryHooks["extendStory"]> = (
                       .focus();
                   await userEvent.keyboard("{ArrowDown}");
                   await waitFor(() =>
-                      expect(
-                          length(panels(canvasElement)[0]!),
-                      ).toBeGreaterThan(before),
+                      expect(length(panels(canvasElement)[0]!)).toBeGreaterThan(
+                          before,
+                      ),
                   );
               },
           }

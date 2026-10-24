@@ -9,7 +9,7 @@ main untouched.
 
 - **Cause (component, all targets):** the preset's `content` slot had inline and bottom padding
   only; its top room came from the 48px drag handle. With `dragHandle={false}` the body sat
-  against the rounded top edge. The case's "without a drag handle" example was a *closed*
+  against the rounded top edge. The case's "without a drag handle" example was a _closed_
   example, so Storybook only showed it after a click. On React Native the stories showed no body
   at all, with or without the handle: the case passes `body`, and React Native's sheets and
   dialogs take `children` (story/renderer cause).
@@ -22,7 +22,7 @@ main untouched.
   `"without a drag handle"` rendering. `@pureform/react-native/storybook`'s `args` give `body` as
   `children` when no children are given.
 - **Spec:** Compose `ModalBottomSheet(dragHandle: (@Composable () -> Unit)? =
-  { BottomSheetDefaults.DragHandle() })` (androidx `material3/ModalBottomSheet.kt`): the handle is
+{ BottomSheetDefaults.DragHandle() })` (androidx `material3/ModalBottomSheet.kt`): the handle is
   optional and the sheet adds no padding of its own; pureform's ready-made body has its own
   padding, so it takes the top padding too.
 - **Tests:** preset `sheets.spec.ts` (variant, defaults, snapshot), binding-core
@@ -65,10 +65,10 @@ main untouched.
   `ModalNavigationDrawer` drags to close too).
 - **Fix:** binding-core `sideSheetRelease({ offset, velocity, width })` and
   `SIDE_SHEET_VELOCITY_THRESHOLD` (`components/sheet.ts`), after `SideSheetBehavior.
-  calculateTargetStateOnViewReleased`: moving back in stays open; moving out closes once faster
+calculateTargetStateOnViewReleased`: moving back in stays open; moving out closes once faster
   than `SIGNIFICANT_VEL_THRESHOLD` (500px/s) or at least halfway out (`isReleasedCloseToInnerEdge`),
   else settles back; still, the nearer. `/dom`'s `sideSheetDragToDismiss(sheet, rtl, dismiss,
-  onClose?, asker?, draggable?)` (`side-sheet-drag.ts`) uses `createDragVelocity`,
+onClose?, asker?, draggable?)` (`side-sheet-drag.ts`) uses `createDragVelocity`,
   `swallowNextClick` and `settleTransition`, like `dragToDismiss`. Touch and pen only, mostly
   sideways past 8px; `touch-action: pan-y` keeps vertical scrolling native; each open resets the
   offset; `onClose` is asked through the overlay's asker. The preset's side sheet root gets
@@ -135,19 +135,19 @@ main untouched.
 ## How to verify
 
 - `omni run build test -p @pureform/binding-core -p @pureform/preset -p @pureform/react
-  -p @pureform/solid -p @pureform/react-native -p @pureform/component-cases -p @pureform/anatomy`
+-p @pureform/solid -p @pureform/react-native -p @pureform/component-cases -p @pureform/anatomy`
 - From `tests/component-suites` (after `omni run generate prepare -p @pureform/panda-fixture`):
   `bunx vitest run -c vitest.config.e2e.ts src/side-sheet.e2e.test.ts
-  src/bottom-sheet.e2e.test.ts --project "solid/panda" --project "react/css"`, and
+src/bottom-sheet.e2e.test.ts --project "solid/panda" --project "react/css"`, and
   `src/accessibility.e2e.test.ts src/direction.e2e.test.ts src/overlays.e2e.test.ts` with
   `-t "BottomSheet|SideSheet|ListItem|TimePicker|TimeInput|FabMenu"` on `solid/panda`,
   `react/css`, `react/tailwind` (447 pass).
 - From `tests/browser-e2e-tests`: `bunx vitest run -c vitest.config.e2e.ts
-  src/visual.e2e.test.tsx -t "(lists|time-pickers|sheets|badges|split-buttons-and-fab-menus|nested-rows|row-colors|expandables|density) looks"`
+src/visual.e2e.test.tsx -t "(lists|time-pickers|sheets|badges|split-buttons-and-fab-menus|nested-rows|row-colors|expandables|density) looks"`
   (no screenshot changed; none re-recorded).
 - `omni run build -p @pureform/storybook-web`; story tests:
   `bunx vitest --config ./vitest.config.storybook.ts run src/stories/generated/FabMenu.stories.ts
-  src/stories/generated/BottomSheet.stories.ts`.
+src/stories/generated/BottomSheet.stories.ts`.
 
 ## Notes for the next phases
 

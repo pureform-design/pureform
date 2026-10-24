@@ -6,10 +6,10 @@
     "type": "module",
     "devDependencies": {
         "@fontsource/jetbrains-mono": "catalog:",
-        "@fontsource/roboto": "catalog:",
         "@fontsource/noto-sans-math": "catalog:",
         "@fontsource/noto-sans-symbols": "catalog:",
         "@fontsource/noto-sans-symbols-2": "catalog:",
+        "@fontsource/roboto": "catalog:",
         "@pandacss/vite": "catalog:",
         "@pureform/anatomy": "workspace:^",
         "@pureform/core": "workspace:^",

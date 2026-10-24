@@ -93,11 +93,15 @@ describe("wave paths", () => {
         const options = { waves: 9, thickness: px(4), amplitude: px(1.5) };
         const xs = (half?: "left" | "right") =>
             wavyRing({ ...options, half }).contours[0]!.segments.map((s) =>
-                JSON.stringify((s as { readonly to: readonly unknown[] }).to[0]),
+                JSON.stringify(
+                    (s as { readonly to: readonly unknown[] }).to[0],
+                ),
             );
         const ys = (half?: "left" | "right") =>
             wavyRing({ ...options, half }).contours[0]!.segments.map((s) =>
-                JSON.stringify((s as { readonly to: readonly unknown[] }).to[1]),
+                JSON.stringify(
+                    (s as { readonly to: readonly unknown[] }).to[1],
+                ),
             );
         // The top of the circle (its first point) is the left half's right edge and the right
         // half's left edge; heights are the circle's.
@@ -234,8 +238,16 @@ describe("indeterminate progress tracks", () => {
         expect(css).toContain("linearProgressTrackGap");
         expect(css).toContain("linearProgressTrackGapRtl");
         expect(PROGRESS_KEYFRAMES["linearProgressTrackGap"]).toEqual({
-            from: { tokens: { "components.linearProgress.slide": expect.anything() } },
-            to: { tokens: { "components.linearProgress.slide": expect.anything() } },
+            from: {
+                tokens: {
+                    "components.linearProgress.slide": expect.anything(),
+                },
+            },
+            to: {
+                tokens: {
+                    "components.linearProgress.slide": expect.anything(),
+                },
+            },
         });
     });
 });
