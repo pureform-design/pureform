@@ -27,12 +27,35 @@ import { IconButton } from "../icon-button/icon-button";
 import { testIdOf, useControllable, withEngine } from "../parts";
 import { ProvidedTokens } from "../provided-tokens";
 import { Select } from "../select/select";
+import type { SelectProps } from "../select/select";
+import { nativeSlots } from "../slot-props";
+import type { InnerPropsOf, NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
-export interface PaginatorProps extends Omit<
-    PaginatorRootOwnProps,
-    "id" | "unstyled"
-> {
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface PaginatorHosts {
+    readonly firstTrigger: "View";
+    readonly prevTrigger: "View";
+    readonly nextTrigger: "View";
+    readonly lastTrigger: "View";
+    readonly root: "View";
+    readonly pageSize: "View";
+    readonly pageSizeLabel: "Text";
+    readonly pageSizeSelect: "View";
+    readonly rangeLabel: "Text";
+    readonly actions: "View";
+}
+
+export interface PaginatorProps
+    extends
+        Omit<PaginatorRootOwnProps, "id" | "unstyled">,
+        NativeSlotProps<PaginatorHosts> {
+    /** The page size select's `style`, `slotProps`, `tokens`, `testId` and `menuProps`. */
+    readonly selectProps?:
+        | (InnerPropsOf<SelectProps> & {
+              readonly menuProps?: SelectProps["menuProps"];
+          })
+        | undefined;
     readonly "aria-label"?: string | undefined;
 }
 
@@ -75,6 +98,7 @@ function PaginatorImpl(props: PaginatorProps): ReactNode {
     const pages = paginatorTotalPages(count, pageSize);
     const id = (part: PaginatorPart) =>
         testIdOf(paginatorAnatomy, part, props.testId);
+    const slot = nativeSlots(props);
     const words = props.translations;
     const go = (next: number) => {
         const target = paginatorClampPage(next, count, pageSize);
@@ -99,7 +123,11 @@ function PaginatorImpl(props: PaginatorProps): ReactNode {
     ) => {
         const Slot = v[part];
         return (
-            <Slot.View style={s[part]} testID={id(part)}>
+            <Slot.View
+                {...slot.props(part)}
+                style={slot.style(part, s[part])}
+                testID={id(part)}
+            >
                 <IconButton
                     aria-label={name}
                     icon={glyph}
@@ -113,21 +141,28 @@ function PaginatorImpl(props: PaginatorProps): ReactNode {
     };
     return (
         <v.root.View
+            {...slot.props("root")}
             role="group"
             aria-label={props["aria-label"] ?? words?.rootLabel ?? "Pagination"}
-            style={s.root}
+            style={slot.style("root", s.root)}
             testID={id("root")}
         >
             {props.hidePageSize ? null : (
-                <v.pageSize.View style={s.pageSize} testID={id("pageSize")}>
+                <v.pageSize.View
+                    {...slot.props("pageSize")}
+                    style={slot.style("pageSize", s.pageSize)}
+                    testID={id("pageSize")}
+                >
                     <v.pageSizeLabel.Text
-                        style={s.pageSizeLabel}
+                        {...slot.props("pageSizeLabel")}
+                        style={slot.style("pageSizeLabel", s.pageSizeLabel)}
                         testID={id("pageSizeLabel")}
                     >
                         {label}
                     </v.pageSizeLabel.Text>
                     <v.pageSizeSelect.View
-                        style={s.pageSizeSelect}
+                        {...slot.props("pageSizeSelect")}
+                        style={slot.style("pageSizeSelect", s.pageSizeSelect)}
                         testID={id("pageSizeSelect")}
                     >
                         <ProvidedTokens
@@ -136,6 +171,7 @@ function PaginatorImpl(props: PaginatorProps): ReactNode {
                             )}
                         >
                             <Select
+                                {...props.selectProps}
                                 variant="outlined"
                                 density={props.density}
                                 label={label}
@@ -157,8 +193,9 @@ function PaginatorImpl(props: PaginatorProps): ReactNode {
                 </v.pageSize.View>
             )}
             <v.rangeLabel.Text
+                {...slot.props("rangeLabel")}
                 aria-live="polite"
-                style={s.rangeLabel}
+                style={slot.style("rangeLabel", s.rangeLabel)}
                 testID={id("rangeLabel")}
             >
                 {paginatorRangeLabel(
@@ -166,7 +203,11 @@ function PaginatorImpl(props: PaginatorProps): ReactNode {
                     words,
                 )}
             </v.rangeLabel.Text>
-            <v.actions.View style={s.actions} testID={id("actions")}>
+            <v.actions.View
+                {...slot.props("actions")}
+                style={slot.style("actions", s.actions)}
+                testID={id("actions")}
+            >
                 <ProvidedTokens
                     tokens={providedTokensFromPaths(
                         selected.providedTokens["actions"],

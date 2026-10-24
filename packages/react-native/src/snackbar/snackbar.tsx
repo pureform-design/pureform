@@ -16,10 +16,25 @@ import type { ReactNode } from "react";
 import { testIdOf, useControllable, withEngine } from "../parts";
 import { useOverlayPresence } from "../presence";
 import { useEngine } from "../provider";
+import { nativeSlots } from "../slot-props";
+import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 import { SurfaceButton } from "../surface-button";
 
-export interface SnackbarProps extends SnackbarVariantProps, IndicationProps {
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface SnackbarHosts {
+    readonly root: "View";
+    readonly supportingText: "Text";
+    readonly actions: "View";
+    readonly action: "Pressable";
+    readonly close: "Pressable";
+}
+
+export interface SnackbarProps
+    extends
+        SnackbarVariantProps,
+        IndicationProps,
+        NativeSlotProps<SnackbarHosts> {
     /** The message. */
     readonly supportingText?: ReactNode;
     /** The action's label. */
@@ -58,6 +73,7 @@ function SnackbarButtonImpl(props: {
             selection={snackbarSelection(props.snackbar)}
             indication={props.snackbar.indication}
             testId={props.snackbar.testId}
+            slot={nativeSlots(props.snackbar)}
             label={props.label}
             onPress={props.onPress}
         >
@@ -90,6 +106,7 @@ function SnackbarImpl(props: SnackbarProps): ReactNode {
     };
     const id = (part: SnackbarPart) =>
         testIdOf(snackbarAnatomy, part, props.testId);
+    const slot = nativeSlots(props);
     if (!presence.present) return null;
     // The engine's view where it enters and leaves, the slot's own while it's still.
     const Root = open === undefined ? v.root : engine;
@@ -99,20 +116,26 @@ function SnackbarImpl(props: SnackbarProps): ReactNode {
     };
     return (
         <Root.View
-            {...presence.props}
+            {...slot.props("root")}
+            {...slot.with("root", presence.props)}
             {...({ onKeyDown } as object)}
             role="status"
             aria-live="polite"
-            style={{ ...s.root, ...presence.style }}
+            style={slot.style("root", { ...s.root, ...presence.style })}
             testID={id("root")}
         >
             <v.supportingText.Text
-                style={s.supportingText}
+                {...slot.props("supportingText")}
+                style={slot.style("supportingText", s.supportingText)}
                 testID={id("supportingText")}
             >
                 {props.supportingText}
             </v.supportingText.Text>
-            <v.actions.View style={s.actions} testID={id("actions")}>
+            <v.actions.View
+                {...slot.props("actions")}
+                style={slot.style("actions", s.actions)}
+                testID={id("actions")}
+            >
                 {isPresent(props.action) ? (
                     <SnackbarButton
                         snackbar={props}

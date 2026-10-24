@@ -19,14 +19,17 @@ import { AccessibilityInfo } from "react-native";
 import type { GestureResponderEvent } from "react-native";
 
 import { IconButton } from "../icon-button";
+import type { IconButtonHosts } from "../icon-button/icon-button";
 import { Glyph } from "../icon-style";
+import type { NativeSlotProps } from "../slot-props";
 
 export interface CopyButtonProps
     extends
         CopyButtonVariantProps,
         CopyButtonBehaviorProps,
         CopyButtonContentProps<ReactNode>,
-        InteractiveProps {
+        InteractiveProps,
+        NativeSlotProps<IconButtonHosts> {
     /** Puts the text on the platform's clipboard. */
     readonly copy?: ((value: string) => void | Promise<void>) | undefined;
     readonly disabled?: boolean | undefined;

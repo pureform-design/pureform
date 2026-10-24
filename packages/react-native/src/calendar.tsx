@@ -27,7 +27,9 @@ import { ScrollView } from "react-native";
 import type { MotionStyles } from "./engine";
 import { IconSlot, iconSlot } from "./icon-style";
 import { useSurfaceIndication } from "./indication";
-import { testIdOf, unselectable, withEngine } from "./parts";
+import { testIdOf, withEngine } from "./parts";
+import { nativeSlots, withUnselectable } from "./slot-props";
+import type { NativeSlots } from "./slot-props";
 import { useComponentSlots } from "./styles";
 import type { SlotViewsBySlot } from "./styles";
 
@@ -48,6 +50,7 @@ export interface CalendarCellProps {
 }
 
 function CalendarCellImpl(props: CalendarCellProps): ReactNode {
+    const slot = nativeSlots(undefined);
     const indication = useSurfaceIndication(INDICATION, {
         disabled: props.disabled,
     });
@@ -75,22 +78,24 @@ function CalendarCellImpl(props: CalendarCellProps): ReactNode {
     const chosen = props.selection !== "none";
     return (
         <v.root.View
+            {...slot.props("root")}
             {...(day
                 ? { role: "gridcell" as const, "aria-selected": chosen }
                 : {})}
-            style={s.root}
+            style={slot.style("root", s.root)}
             testID={id("root")}
         >
             <v.trigger.Pressable
-                {...indication.handlers}
+                {...slot.props("trigger")}
+                {...slot.with("trigger", indication.handlers)}
                 role="button"
                 {...(day ? {} : { "aria-pressed": chosen })}
                 aria-disabled={props.disabled}
                 aria-label={props.label}
                 {...(props.today ? { "aria-current": "date" } : {})}
                 disabled={props.disabled}
-                onPress={props.onPress}
-                style={{ ...s.trigger, ...unselectable }}
+                onPress={slot.on("trigger", "onPress", props.onPress)}
+                style={slot.style("trigger", withUnselectable(s.trigger))}
                 testID={id("trigger")}
             >
                 <IconSlot {...iconSlot(selected, "trigger")} motion={s.trigger}>
@@ -116,6 +121,8 @@ export interface CalendarSlots<S extends string> {
     readonly styles: MotionStyles;
     readonly views: SlotViewsBySlot<S>;
     readonly id: (part: S) => string;
+    /** The picker's per-part props. */
+    readonly slot?: NativeSlots | undefined;
 }
 
 /** What the day grid takes. */
@@ -142,30 +149,42 @@ const LONG_DATE = {
 
 /** The weekday row and the month's weeks of day cells. */
 export function DayGrid(props: DayGridProps): ReactNode {
+    const slot = props.slots.slot ?? nativeSlots(undefined);
     const { styles: s, views: v, id } = props.slots;
     const shown = parseIsoDate(props.month)!;
     const today = todayIso();
     return (
         <>
-            <v.weekdays.View style={s.weekdays} testID={id("weekdays")}>
+            <v.weekdays.View
+                {...slot.props("weekdays")}
+                style={slot.style("weekdays", s.weekdays)}
+                testID={id("weekdays")}
+            >
                 {weekdayLabels(props.locale, props.firstDay).map((label) => (
                     <v.weekday.Text
+                        {...slot.props("weekday")}
                         key={label.long}
                         aria-label={label.long}
                         selectable={false}
-                        style={s.weekday}
+                        style={slot.style("weekday", s.weekday)}
                         testID={id("weekday")}
                     >
                         {label.narrow}
                     </v.weekday.Text>
                 ))}
             </v.weekdays.View>
-            <v.grid.View role="grid" style={s.grid} testID={id("grid")}>
+            <v.grid.View
+                {...slot.props("grid")}
+                role="grid"
+                style={slot.style("grid", s.grid)}
+                testID={id("grid")}
+            >
                 {monthWeeks(shown, props.firstDay).map((week) => (
                     <v.week.View
+                        {...slot.props("week")}
                         key={week[0]}
                         role="row"
-                        style={s.week}
+                        style={slot.style("week", s.week)}
                         testID={id("week")}
                     >
                         {week.map((day) => {
@@ -228,6 +247,7 @@ export interface CellListProps<L extends ListSlot> {
 export function CellList<L extends ListSlot>(
     props: CellListProps<L>,
 ): ReactNode {
+    const slot = props.slots.slot ?? nativeSlots(undefined);
     const { styles: s, id } = props.slots;
     const {
         height,
@@ -236,7 +256,8 @@ export function CellList<L extends ListSlot>(
     } = (s[props.part] ?? {}) as Record<string, unknown>;
     return (
         <ScrollView
-            style={{ height: height as number }}
+            {...slot.props(props.part)}
+            style={slot.style(props.part, { height: height as number })}
             contentContainerStyle={content as never}
             testID={id(props.part)}
         >

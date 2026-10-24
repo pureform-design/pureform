@@ -26,16 +26,24 @@ import { ErrorText } from "../error-text/error-text";
 import { Input } from "../input/input";
 import { Label } from "../label/label";
 import { testIdOf, withEngine } from "../parts";
+import { nativeSlots } from "../slot-props";
+import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 import { FieldContext } from "./context";
 import type { FieldContextValue } from "./context";
 
 /** Field's props: its states, the control's id, the ready-made content, its tokens and
  *  `testId`. */
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface FieldHosts {
+    readonly root: "View";
+}
+
 export interface FieldProps
     extends
         Omit<FieldRootOwnProps, "unstyled" | "testId">,
-        FieldContentProps<ReactNode> {
+        FieldContentProps<ReactNode>,
+        NativeSlotProps<FieldHosts> {
     /** The pieces: a Label, an Input or a Textarea, a Description and an ErrorText. Left out,
      *  Field renders them from `label`, `description` and `error`. */
     readonly children?: ReactNode;
@@ -43,6 +51,7 @@ export interface FieldProps
 }
 
 function FieldImpl(props: FieldProps): ReactNode {
+    const slot = nativeSlots(props);
     const generated = useId();
     const ids = useMemo(
         () => fieldIds(props.controlId ?? `${generated}-control`),
@@ -77,7 +86,8 @@ function FieldImpl(props: FieldProps): ReactNode {
     return (
         <FieldContext value={value}>
             <v.root.View
-                style={s.root}
+                {...slot.props("root")}
+                style={slot.style("root", s.root)}
                 testID={testIdOf(fieldAnatomy, "root", props.testId)}
             >
                 {props.children ?? (

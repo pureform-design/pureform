@@ -94,10 +94,10 @@ describe("useLayer", () => {
 
     it("lifts an overlay over the page from its wrapper, where the surface's own layer can't", async () => {
         await render(<Page layered={false} />);
-        expect(computed("pf-menu-root").zIndex).toBe("200");
+        expect(computed("pf-menu-content").zIndex).toBe("200");
         expect(byTestId("cover").contains(onTop())).toBe(true);
         cleanup();
         await render(<Page layered />);
-        expect(byTestId("pf-menu-root").contains(onTop())).toBe(true);
+        expect(byTestId("pf-menu-content").contains(onTop())).toBe(true);
     });
 });

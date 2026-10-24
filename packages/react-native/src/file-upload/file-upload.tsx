@@ -25,14 +25,33 @@ import type { ReactNode } from "react";
 import { Image } from "react-native";
 
 import { Button } from "../button";
+import type { ButtonProps } from "../button/button";
 import { IconButton } from "../icon-button";
+import type { IconButtonProps } from "../icon-button/icon-button";
 import { IconSlot, iconSlot } from "../icon-style";
 import { LinearProgress } from "../linear-progress";
 import { ListItem } from "../list-item";
+import type { ListItemProps } from "../list-item/list-item";
 import { testIdOf, withEngine } from "../parts";
+import type { LinearProgressProps } from "../progress";
+import { nativeSlots } from "../slot-props";
+import type { InnerPropsOf, NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
 export type { FileUploadEntry } from "@pureform/binding-core";
+
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface FileUploadHosts {
+    readonly root: "View";
+    readonly label: "Text";
+    readonly dropzone: "View";
+    readonly icon: "View";
+    readonly headline: "Text";
+    readonly supportingText: "Text";
+    readonly itemGroup: "View";
+    readonly item: "View";
+    readonly error: "Text";
+}
 
 export interface FileUploadProps
     extends
@@ -41,7 +60,18 @@ export interface FileUploadProps
         Pick<
             FileUploadBehaviorProps,
             "disabled" | "readOnly" | "invalid" | "error"
-        > {
+        >,
+        NativeSlotProps<FileUploadHosts> {
+    /** Every upload's progress bar's `style`, `slotProps`, `tokens` and `testId`. */
+    readonly linearProgressProps?:
+        | InnerPropsOf<LinearProgressProps>
+        | undefined;
+    /** Every remove button's `style`, `slotProps`, `tokens` and `testId`. */
+    readonly iconButtonProps?: InnerPropsOf<IconButtonProps> | undefined;
+    /** Every file's list item's `style`, `slotProps`, `tokens` and `testId`. */
+    readonly listItemProps?: InnerPropsOf<ListItemProps> | undefined;
+    /** The choose button's `style`, `slotProps`, `tokens` and `testId`. */
+    readonly buttonProps?: InnerPropsOf<ButtonProps> | undefined;
     /** The files listed, as the app keeps them. */
     readonly files?: readonly FileUploadEntry[] | undefined;
     /** Opens the app's file picker: the trigger calls it. Without it there's no trigger. */
@@ -78,24 +108,35 @@ function FileUploadImpl(props: FileUploadProps): ReactNode {
     );
     const id = (part: FileUploadPart) =>
         testIdOf(fileUploadAnatomy, part, props.testId);
+    const slot = nativeSlots(props);
     const files = props.files ?? [];
     const supporting = props.error ?? props.supportingText;
     const itemTestId = fileUploadItemTestId(props.testId);
     return (
-        <v.root.View style={s.root} testID={id("root")}>
+        <v.root.View
+            {...slot.props("root")}
+            style={slot.style("root", s.root)}
+            testID={id("root")}
+        >
             {isPresent(props.label) ? (
                 <v.label.Text
+                    {...slot.props("label")}
                     selectable={false}
-                    style={s.label}
+                    style={slot.style("label", s.label)}
                     testID={id("label")}
                 >
                     {props.label}
                 </v.label.Text>
             ) : null}
-            <v.dropzone.View style={s.dropzone} testID={id("dropzone")}>
+            <v.dropzone.View
+                {...slot.props("dropzone")}
+                style={slot.style("dropzone", s.dropzone)}
+                testID={id("dropzone")}
+            >
                 <v.icon.View
+                    {...slot.props("icon")}
                     pointerEvents="none"
-                    style={s.icon}
+                    style={slot.style("icon", s.icon)}
                     testID={id("icon")}
                 >
                     <IconSlot {...iconSlot(selected, "icon")} motion={s.icon}>
@@ -103,16 +144,18 @@ function FileUploadImpl(props: FileUploadProps): ReactNode {
                     </IconSlot>
                 </v.icon.View>
                 <v.headline.Text
+                    {...slot.props("headline")}
                     selectable={false}
-                    style={s.headline}
+                    style={slot.style("headline", s.headline)}
                     testID={id("headline")}
                 >
                     {props.headline ?? "Drop files here"}
                 </v.headline.Text>
                 {isPresent(supporting) ? (
                     <v.supportingText.Text
+                        {...slot.props("supportingText")}
                         selectable={false}
-                        style={s.supportingText}
+                        style={slot.style("supportingText", s.supportingText)}
                         testID={id("supportingText")}
                     >
                         {supporting}
@@ -120,6 +163,7 @@ function FileUploadImpl(props: FileUploadProps): ReactNode {
                 ) : null}
                 {props.onPick && props.trigger !== null ? (
                     <Button
+                        {...props.buttonProps}
                         variant="outlined"
                         label={props.trigger ?? "Choose files"}
                         disabled={props.disabled || props.readOnly}
@@ -129,8 +173,9 @@ function FileUploadImpl(props: FileUploadProps): ReactNode {
             </v.dropzone.View>
             {files.length > 0 ? (
                 <v.itemGroup.View
+                    {...slot.props("itemGroup")}
                     role="list"
-                    style={s.itemGroup}
+                    style={slot.style("itemGroup", s.itemGroup)}
                     testID={id("itemGroup")}
                 >
                     {files.map((file, index) => {
@@ -142,11 +187,13 @@ function FileUploadImpl(props: FileUploadProps): ReactNode {
                         const shown = file.progress !== undefined;
                         return (
                             <v.item.View
+                                {...slot.props("item")}
                                 key={`${index}:${file.uri ?? file.name}`}
-                                style={s.item}
+                                style={slot.style("item", s.item)}
                                 testID={id("item")}
                             >
                                 <ListItem
+                                    {...props.listItemProps}
                                     leadingType={image ? "thumbnail" : "icon"}
                                     {...(itemTestId === undefined
                                         ? {}
@@ -171,8 +218,12 @@ function FileUploadImpl(props: FileUploadProps): ReactNode {
                                     supportingText={
                                         rejected ? (
                                             <v.error.Text
+                                                {...slot.props("error")}
                                                 selectable={false}
-                                                style={s.error}
+                                                style={slot.style(
+                                                    "error",
+                                                    s.error,
+                                                )}
                                                 testID={id("error")}
                                             >
                                                 {fileUploadErrorText(
@@ -188,6 +239,7 @@ function FileUploadImpl(props: FileUploadProps): ReactNode {
                                     trailing={
                                         props.onRemove ? (
                                             <IconButton
+                                                {...props.iconButtonProps}
                                                 aria-label={
                                                     props.removeLabel?.(file) ??
                                                     `Remove ${file.name}`
@@ -206,6 +258,7 @@ function FileUploadImpl(props: FileUploadProps): ReactNode {
                                 />
                                 {shown ? (
                                     <LinearProgress
+                                        {...props.linearProgressProps}
                                         aria-label={`Uploading ${file.name}`}
                                         value={file.progress ?? null}
                                     />

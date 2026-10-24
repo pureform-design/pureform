@@ -56,6 +56,9 @@ import {
 import { PortalHost } from "./portal-host";
 import { useDirection, useEngine } from "./provider";
 import { Scrim } from "./single-part";
+import { nativeSlots, withUnselectable } from "./slot-props";
+import type { NativeSlots } from "./slot-props";
+import type { NativeSlotProps } from "./slot-props";
 import { useComponentSlots } from "./styles";
 import { omitSpring, useIndicatorSlides } from "./tab-indicator";
 import type { IndicatorSlides } from "./tab-indicator";
@@ -69,8 +72,21 @@ type RailPart = PartName<typeof navigationRailAnatomy>;
 
 const [TAB_INDICATION] = tabsAnatomy.indication!;
 
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface TabsHosts {
+    readonly root: "View";
+    readonly tab: "Pressable";
+    readonly tabContent: "View";
+    readonly icon: "View";
+    readonly label: "Text";
+    readonly indicator: "View";
+}
+
 export interface TabsProps
-    extends Omit<TabsVariantProps, "icon">, IndicationProps {
+    extends
+        Omit<TabsVariantProps, "icon">,
+        IndicationProps,
+        NativeSlotProps<TabsHosts> {
     readonly items: readonly TabsItem<ReactNode>[];
     /** The selected tab's value. Controlled when defined. */
     readonly value?: string | undefined;
@@ -85,6 +101,8 @@ export interface TabsProps
 // A row gets only what it reads, each stable while the tabs render with the same props, so a row
 // renders again when its item or selection changes, not with every render of the tabs.
 interface TabProps {
+    /** The tabs' per-part props. */
+    readonly slot: NativeSlots;
     readonly item: TabsItem<ReactNode>;
     readonly selection: Selection<"tabs">;
     readonly indication: Indication | undefined;
@@ -123,36 +141,43 @@ function TabImpl(props: TabProps): ReactNode {
         }),
     );
     const id = (part: TabsPart) => testIdOf(tabsAnatomy, part, props.testId);
+    const slot = props.slot;
     return (
         <v.tab.Pressable
-            {...indication.handlers}
+            {...slot.props("tab")}
+            {...slot.with("tab", indication.handlers)}
             role="tab"
             aria-selected={props.selected}
             {...(item["aria-label"] === undefined
                 ? {}
                 : { "aria-label": item["aria-label"] })}
             disabled={item.disabled}
-            onPress={() => props.onPick(item.value)}
+            onPress={slot.on("tab", "onPress", () => props.onPick(item.value))}
             onLayout={(event: LayoutChangeEvent) =>
                 props.onLayout(item.value, "tab", spanOf(event))
             }
             // A sliding indicator crosses the tabs after its own: its tab draws over them.
-            style={{
+            style={slot.style("tab", {
                 ...s.tab,
                 ...unselectable,
                 ...(props.slide ? { zIndex: 1 } : {}),
-            }}
+            })}
             testID={id("tab")}
         >
             <v.tabContent.View
+                {...slot.props("tabContent")}
                 onLayout={(event: LayoutChangeEvent) =>
                     props.onLayout(item.value, "tabContent", spanOf(event))
                 }
-                style={s.tabContent}
+                style={slot.style("tabContent", s.tabContent)}
                 testID={id("tabContent")}
             >
                 {isPresent(item.icon) ? (
-                    <v.icon.View style={s.icon} testID={id("icon")}>
+                    <v.icon.View
+                        {...slot.props("icon")}
+                        style={slot.style("icon", s.icon)}
+                        testID={id("icon")}
+                    >
                         <IconSlot
                             {...iconSlot(selected, "icon")}
                             motion={s.icon}
@@ -163,19 +188,24 @@ function TabImpl(props: TabProps): ReactNode {
                 ) : null}
                 {isPresent(item.label) ? (
                     <v.label.Text
+                        {...slot.props("label")}
                         selectable={false}
-                        style={s.label}
+                        style={slot.style("label", s.label)}
                         testID={id("label")}
                     >
                         {item.label}
                     </v.label.Text>
                 ) : null}
                 <v.indicator.View
+                    {...slot.props("indicator")}
                     pointerEvents="none"
                     onLayout={(event: LayoutChangeEvent) =>
                         props.onLayout(item.value, "indicator", spanOf(event))
                     }
-                    style={slid ? { ...s.indicator, ...slid } : s.indicator}
+                    style={slot.style(
+                        "indicator",
+                        slid ? { ...s.indicator, ...slid } : s.indicator,
+                    )}
                     testID={id("indicator")}
                 />
             </v.tabContent.View>
@@ -187,6 +217,7 @@ function TabImpl(props: TabProps): ReactNode {
 const Tab = memo(withEngine(TabImpl, "Tab"));
 
 function TabsImpl(props: TabsProps): ReactNode {
+    const slot = nativeSlots(props);
     const icon = tabsHaveIcons(props.items);
     const [value, setValue] = useControllable(
         "Tabs",
@@ -270,16 +301,18 @@ function TabsImpl(props: TabsProps): ReactNode {
     };
     const list = (
         <v.root.View
+            {...slot.props("root")}
             {...(Platform.OS === "web" ? ({ onKeyDown } as object) : {})}
             role="tablist"
             {...(props["aria-label"] === undefined
                 ? {}
                 : { "aria-label": props["aria-label"] })}
-            style={s.root}
+            style={slot.style("root", s.root)}
             testID={testIdOf(tabsAnatomy, "root", props.testId)}
         >
             {props.items.map((item) => (
                 <Tab
+                    slot={slot}
                     key={item.value}
                     item={item}
                     selection={selection}
@@ -295,6 +328,7 @@ function TabsImpl(props: TabsProps): ReactNode {
     );
     return scrollable ? (
         <ScrollView
+            {...slot.props("root")}
             ref={scroller}
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -320,8 +354,24 @@ const scrollStyles = StyleSheet.create({
  *  Panels are the app's: render the one for the value. */
 export const Tabs = withEngine(TabsImpl, "Tabs");
 
+/** What each part of a navigation bar or rail renders as, for its keyed `style` and
+ *  `slotProps`. */
+export interface NavigationHosts {
+    readonly root: "View";
+    readonly header: "View";
+    readonly item: "Pressable";
+    readonly activeIndicator: "View";
+    readonly icon: "View";
+    readonly label: "Text";
+    readonly sectionLabel: "Text";
+}
+
 export interface NavigationProps<C extends NavigationComponent>
-    extends NavigationVariantProps<C>, NavigationModalProps, IndicationProps {
+    extends
+        NavigationVariantProps<C>,
+        NavigationModalProps,
+        IndicationProps,
+        NativeSlotProps<NavigationHosts> {
     readonly items: readonly NavigationItem<ReactNode>[];
     /** The rail's header, above the destinations: a menu button and a FAB, say. */
     readonly header?: ReactNode;
@@ -344,6 +394,8 @@ const ANATOMIES = {
 
 // A destination gets only what it reads, as a tab does.
 interface DestinationProps {
+    /** The bar's or rail's per-part props. */
+    readonly slot: NativeSlots;
     readonly name: NavigationComponent;
     readonly item: NavigationItem<ReactNode>;
     readonly selection: Record<string, unknown>;
@@ -382,24 +434,35 @@ function DestinationImpl(props: DestinationProps): ReactNode {
             part as PartName<typeof navigationBarAnatomy>,
             props.testId,
         );
+    const slot = props.slot;
     return (
         <v.item.Pressable
-            {...indication.handlers}
+            {...slot.props("item")}
+            {...slot.with("item", indication.handlers)}
             // A button, as the web's destination without an `href`: React Native's have none.
             role="button"
             aria-current={props.selected ? "page" : undefined}
             disabled={disabled}
-            onPress={() => props.onPick(item.value)}
-            style={{ ...s.item, ...unselectable }}
+            onPress={slot.on("item", "onPress", () => props.onPick(item.value))}
+            style={slot.style("item", withUnselectable(s.item))}
             testID={id("item")}
         >
-            <v.indicator.View style={s.indicator} testID={id("indicator")}>
+            <v.indicator.View
+                {...slot.props("indicator")}
+                style={slot.style("indicator", s.indicator)}
+                testID={id("indicator")}
+            >
                 <v.activeIndicator.View
+                    {...slot.props("activeIndicator")}
                     pointerEvents="none"
-                    style={s.activeIndicator}
+                    style={slot.style("activeIndicator", s.activeIndicator)}
                     testID={id("activeIndicator")}
                 />
-                <v.icon.View style={s.icon} testID={id("icon")}>
+                <v.icon.View
+                    {...slot.props("icon")}
+                    style={slot.style("icon", s.icon)}
+                    testID={id("icon")}
+                >
                     <IconSlot {...iconSlot(selected, "icon")} motion={s.icon}>
                         {item.icon}
                     </IconSlot>
@@ -407,8 +470,9 @@ function DestinationImpl(props: DestinationProps): ReactNode {
                 {indication.layer(selected)}
             </v.indicator.View>
             <v.label.Text
+                {...slot.props("label")}
                 selectable={false}
-                style={s.label}
+                style={slot.style("label", s.label)}
                 testID={id("label")}
             >
                 {item.label}
@@ -422,6 +486,7 @@ const Destination = memo(withEngine(DestinationImpl, "NavigationDestination"));
 function NavigationImpl<C extends NavigationComponent>(
     props: NavigationProps<C> & { readonly name: C },
 ): ReactNode {
+    const slot = nativeSlots(props);
     const [value, setValue] = useControllable(
         props.name,
         "value",
@@ -444,11 +509,12 @@ function NavigationImpl<C extends NavigationComponent>(
     );
     return (
         <v.root.View
+            {...slot.props("root")}
             role="navigation"
             {...(props["aria-label"] === undefined
                 ? {}
                 : { "aria-label": props["aria-label"] })}
-            style={s.root}
+            style={slot.style("root", s.root)}
             testID={testIdOf(
                 ANATOMIES[props.name] as typeof navigationBarAnatomy,
                 "root",
@@ -457,7 +523,8 @@ function NavigationImpl<C extends NavigationComponent>(
         >
             {props.name === "navigationRail" && isPresent(props.header) ? (
                 <v.header.View
-                    style={s.header}
+                    {...slot.props("header")}
+                    style={slot.style("header", s.header)}
                     testID={testIdOf(
                         navigationRailAnatomy,
                         "header",
@@ -474,8 +541,9 @@ function NavigationImpl<C extends NavigationComponent>(
                 <Fragment key={section.group ?? `#${index}`}>
                     {section.group === undefined ? null : (
                         <v.sectionLabel.Text
+                            {...slot.props("sectionLabel")}
                             selectable={false}
-                            style={s.sectionLabel}
+                            style={slot.style("sectionLabel", s.sectionLabel)}
                             testID={testIdOf(
                                 navigationRailAnatomy,
                                 "sectionLabel",
@@ -487,6 +555,7 @@ function NavigationImpl<C extends NavigationComponent>(
                     )}
                     {section.items.map((item) => (
                         <Destination
+                            slot={slot}
                             key={item.value}
                             name={props.name}
                             item={item}

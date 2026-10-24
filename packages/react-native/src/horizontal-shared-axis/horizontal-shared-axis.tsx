@@ -38,9 +38,21 @@ import { useTransitionPages } from "../page-transition";
 import { testIdOf } from "../parts";
 import { themeSpring } from "../presence";
 import { useDirection, usePureform } from "../provider";
+import { nativeSlots } from "../slot-props";
+import type { NativeSlotProps, NativeSlots } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
-export interface HorizontalSharedAxisProps extends HorizontalSharedAxisVariantProps {
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface HorizontalSharedAxisHosts {
+    readonly root: "View";
+    readonly page: "View";
+    readonly scrim: "View";
+}
+
+export interface HorizontalSharedAxisProps
+    extends
+        HorizontalSharedAxisVariantProps,
+        NativeSlotProps<HorizontalSharedAxisHosts> {
     /** The page's place in the order: a change to a higher index slides forward, to a lower one
      *  backward. A change of `index` is a change of page. */
     readonly index: number;
@@ -81,6 +93,7 @@ function Page(props: {
     readonly page: TransitionPage;
     readonly motion: Motion;
     readonly style: StyleProp<ViewStyle>;
+    readonly slot: NativeSlots;
     readonly testID: string | undefined;
     readonly onSettle: (page: TransitionPage) => void;
     readonly children: ReactNode;
@@ -128,6 +141,7 @@ function Page(props: {
     }
     return (
         <Animated.View
+            {...props.slot.props("page")}
             style={[
                 props.style,
                 ...style,
@@ -172,6 +186,7 @@ function Scrim(props: {
     readonly direction: SharedAxisDirection;
     readonly timing: AnimatedTiming | undefined;
     readonly style: StyleProp<ViewStyle>;
+    readonly slot: NativeSlots;
     readonly testID: string | undefined;
 }): ReactNode {
     const [shown] = useState(() => new Animated.Value(0));
@@ -186,6 +201,7 @@ function Scrim(props: {
     }, [props.direction]);
     return (
         <Animated.View
+            {...props.slot.props("scrim")}
             aria-hidden
             pointerEvents="none"
             style={[
@@ -278,12 +294,17 @@ export function HorizontalSharedAxis(
     };
     const id = (part: HorizontalSharedAxisPart) =>
         testIdOf(horizontalSharedAxisAnatomy, part, props.testId);
+    const slot = nativeSlots(props);
     const entering = changed.find((page) => page.state === "entering");
     const leaving = changed.some((page) => page.state === "leaving");
     const Root = v.root.View;
     return (
         <Root
-            style={[s.root, pagesMoving(changed) ? CLIP : null]}
+            {...slot.props("root")}
+            style={[
+                slot.style("root", s.root),
+                pagesMoving(changed) ? CLIP : null,
+            ]}
             testID={id("root")}
             onLayout={(event: LayoutChangeEvent) =>
                 setWidth(event.nativeEvent.layout.width)
@@ -294,7 +315,8 @@ export function HorizontalSharedAxis(
                     key={page.key}
                     page={page}
                     motion={motion}
-                    style={s.page as StyleProp<ViewStyle>}
+                    style={slot.style("page", s.page) as StyleProp<ViewStyle>}
+                    slot={slot}
                     testID={id("page")}
                     onSettle={onSettle}
                 >
@@ -305,7 +327,8 @@ export function HorizontalSharedAxis(
                 <Scrim
                     direction={entering.direction}
                     timing={slide}
-                    style={s.scrim as StyleProp<ViewStyle>}
+                    style={slot.style("scrim", s.scrim) as StyleProp<ViewStyle>}
+                    slot={slot}
                     testID={id("scrim")}
                 />
             ) : null}

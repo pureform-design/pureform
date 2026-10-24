@@ -10,7 +10,6 @@ import type {
     InteractiveProps,
     RadioGroupItem,
     RadioPart,
-    InnerProps,
     RadioGroupVariantProps,
     RadioVariantProps,
 } from "@pureform/binding-core";
@@ -18,20 +17,19 @@ import type { Indication } from "@pureform/binding-core/indication";
 import { createContext, memo, useContext, useMemo } from "react";
 import type { ReactNode } from "react";
 import { View } from "react-native";
-import type { StyleProp, ViewStyle } from "react-native";
 
 import { useCheckKeys } from "../check-keys";
 import { useSurfaceIndication } from "../indication";
 import {
     testIdOf,
-    unselectable,
     useControllable,
     useStableCallback,
     useStableSelection,
     withEngine,
 } from "../parts";
-import { useComponentSlots, withUserStyle } from "../styles";
-import type { RootStyleProps } from "../styles";
+import { nativeSlots, withUnselectable } from "../slot-props";
+import type { InnerPropsOf, NativeSlotProps } from "../slot-props";
+import { useComponentSlots } from "../styles";
 import { touchTargetSlopOf } from "../touch-slop";
 
 const [INDICATION] = radioAnatomy.indication!;
@@ -46,8 +44,16 @@ interface GroupContext extends RadioGroupVariantProps {
 
 const RadioGroupContext = createContext<GroupContext | undefined>(undefined);
 
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface RadioHosts {
+    readonly root: "Pressable";
+    readonly touchTarget: "View";
+    readonly ring: "View";
+    readonly dot: "View";
+}
+
 export interface RadioProps
-    extends RadioVariantProps, InteractiveProps, RootStyleProps {
+    extends RadioVariantProps, InteractiveProps, NativeSlotProps<RadioHosts> {
     /** The radio's value in its group. */
     readonly value?: string | undefined;
     /** Whether it's checked, outside a group. */
@@ -87,6 +93,7 @@ function RadioImpl(props: RadioProps): ReactNode {
         }),
     );
     const id = (part: RadioPart) => testIdOf(radioAnatomy, part, props.testId);
+    const slot = nativeSlots(props);
     const keys = useCheckKeys(
         () => {
             if (group && props.value !== undefined) group.pick(props.value);
@@ -98,25 +105,35 @@ function RadioImpl(props: RadioProps): ReactNode {
     const slop = touchTargetSlopOf(s.root ?? {}, s.touchTarget);
     return (
         <v.root.Pressable
+            {...slot.props("root")}
             hitSlop={slop}
-            {...indication.handlers}
-            {...keys}
+            {...slot.with("root", indication.handlers)}
+            {...slot.with("root", keys)}
             role="radio"
             aria-checked={checked}
             {...(props["aria-label"] === undefined
                 ? {}
                 : { "aria-label": props["aria-label"] })}
             disabled={disabled || undefined}
-            style={withUserStyle({ ...s.root, ...unselectable }, props.style)}
+            style={slot.style("root", withUnselectable(s.root))}
             testID={id("root")}
         >
             <v.touchTarget.View
+                {...slot.props("touchTarget")}
                 pointerEvents="none"
-                style={s.touchTarget}
+                style={slot.style("touchTarget", s.touchTarget)}
                 testID={id("touchTarget")}
             />
-            <v.ring.View style={s.ring} testID={id("ring")}>
-                <v.dot.View style={s.dot} testID={id("dot")} />
+            <v.ring.View
+                {...slot.props("ring")}
+                style={slot.style("ring", s.ring)}
+                testID={id("ring")}
+            >
+                <v.dot.View
+                    {...slot.props("dot")}
+                    style={slot.style("dot", s.dot)}
+                    testID={id("dot")}
+                />
             </v.ring.View>
             {indication.layer(selected)}
         </v.root.Pressable>
@@ -127,11 +144,16 @@ function RadioImpl(props: RadioProps): ReactNode {
  *  again only when its props, its group, or the provider change. */
 export const Radio = memo(withEngine(RadioImpl, "Radio"));
 
-export interface RadioGroupProps extends RadioGroupVariantProps {
-    /** Every ready-made radio's `tokens` and `testId`; an item's own `testId` wins. */
-    readonly radioProps?:
-        | InnerProps<Pick<RadioProps, "tokens" | "testId">>
-        | undefined;
+/** What each part of the group renders as, for its keyed `style` and `slotProps`. */
+export interface RadioGroupHosts {
+    readonly root: "View";
+}
+
+export interface RadioGroupProps
+    extends RadioGroupVariantProps, NativeSlotProps<RadioGroupHosts> {
+    /** Every ready-made radio's `style`, `slotProps`, `tokens` and `testId`; an item's own
+     *  `testId` wins. */
+    readonly radioProps?: InnerPropsOf<RadioProps> | undefined;
     /** The radios' indication, over the provider's; a radio's own `indication` goes over it. */
     readonly indication?: Indication | undefined;
     /** The checked radio's value, `null` for none. Controlled when defined. */
@@ -145,7 +167,6 @@ export interface RadioGroupProps extends RadioGroupVariantProps {
     /** Radios to render, each named by its label; or give `Radio`s as children. */
     readonly items?: readonly RadioGroupItem[] | undefined;
     readonly "aria-label"?: string | undefined;
-    readonly style?: StyleProp<ViewStyle>;
     readonly children?: ReactNode;
 }
 
@@ -185,13 +206,15 @@ export function RadioGroup(props: RadioGroupProps): ReactNode {
         }),
         [variants, value, disabled, invalid, props.indication, pick],
     );
+    const slot = nativeSlots(props);
     return (
         <View
+            {...slot.props("root")}
             role="radiogroup"
             {...(props["aria-label"] === undefined
                 ? {}
                 : { "aria-label": props["aria-label"] })}
-            style={props.style}
+            style={slot.style("root", undefined)}
             testID={compositeTestIds.radioGroup.root}
         >
             <RadioGroupContext value={context}>
@@ -208,6 +231,12 @@ export function RadioGroup(props: RadioGroupProps): ReactNode {
                         {...(radioTokens === undefined
                             ? {}
                             : { tokens: radioTokens })}
+                        {...(props.radioProps?.style === undefined
+                            ? {}
+                            : { style: props.radioProps.style })}
+                        {...(props.radioProps?.slotProps === undefined
+                            ? {}
+                            : { slotProps: props.radioProps.slotProps })}
                         {...((item.testId ?? props.radioProps?.testId) ===
                         undefined
                             ? {}

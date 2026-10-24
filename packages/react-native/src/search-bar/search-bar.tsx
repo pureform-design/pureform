@@ -13,15 +13,27 @@ import type {
     SearchBarVariantProps,
 } from "@pureform/binding-core";
 import type { ReactNode } from "react";
-import type { TextInputProps } from "react-native";
 
 import { iconParts } from "../icon-style";
 import { interactionStates, useInteraction } from "../interaction";
-import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
+import { testIdOf, useControllable, withEngine } from "../parts";
+import { nativeSlots, withUnselectable } from "../slot-props";
+import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface SearchBarHosts {
+    readonly trailing: "View";
+    readonly leading: "View";
+    readonly root: "Pressable";
+    readonly input: "TextInput";
+}
+
 export interface SearchBarProps
-    extends SearchBarVariantProps, SearchBarContentProps<ReactNode> {
+    extends
+        SearchBarVariantProps,
+        SearchBarContentProps<ReactNode>,
+        NativeSlotProps<SearchBarHosts> {
     /** The text. Controlled when defined. */
     readonly value?: string | undefined;
     readonly defaultValue?: string | undefined;
@@ -31,7 +43,6 @@ export interface SearchBarProps
     /** What shows while it's empty, and its name for assistive technology. Default "Search". */
     readonly placeholder?: string | undefined;
     readonly disabled?: boolean | undefined;
-    readonly inputProps?: TextInputProps | undefined;
     readonly testId?: TestIdOverride<SearchBarPart> | undefined;
 }
 
@@ -67,21 +78,27 @@ function SearchBarImpl(props: SearchBarProps): ReactNode {
     const placeholder = props.placeholder ?? "Search";
     const id = (part: SearchBarPart) =>
         testIdOf(searchBarAnatomy, part, props.testId);
-    const icon = iconParts(slots, id);
+    const slot = nativeSlots(props);
+    const icon = iconParts(slots, id, slot);
     return (
         <v.root.Pressable
-            {...handlers}
+            {...slot.props("root")}
+            {...slot.with("root", handlers)}
             disabled={props.disabled}
-            style={{ ...s.root, ...unselectable }}
+            style={slot.style("root", withUnselectable(s.root))}
             testID={id("root")}
         >
             {icon("leading", props.leading)}
             <v.input.TextInput
-                {...props.inputProps}
+                {...slot.props("input")}
                 value={value}
-                onChangeText={setValue}
-                onFocus={() => interaction.emitter.focus(true)}
-                onBlur={() => interaction.emitter.blur()}
+                onChangeText={slot.on("input", "onChangeText", setValue)}
+                onFocus={slot.on("input", "onFocus", () =>
+                    interaction.emitter.focus(true),
+                )}
+                onBlur={slot.on("input", "onBlur", () =>
+                    interaction.emitter.blur(),
+                )}
                 editable={!props.disabled}
                 placeholder={placeholder}
                 // A placeholder's color is a prop, so it takes the plain value.
@@ -89,7 +106,7 @@ function SearchBarImpl(props: SearchBarProps): ReactNode {
                     selected.styles.input?.color ?? "",
                 )}
                 aria-label={placeholder}
-                style={s.input}
+                style={slot.style("input", s.input)}
                 testID={id("input")}
             />
             {icon("trailing", props.trailing)}

@@ -8,15 +8,23 @@ import type { ReactNode } from "react";
 
 import { useField, useFieldPiece } from "../field/context";
 import { testIdOf, withEngine } from "../parts";
+import { nativeSlots } from "../slot-props";
+import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
-export interface DescriptionProps {
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface DescriptionHosts {
+    readonly root: "Text";
+}
+
+export interface DescriptionProps extends NativeSlotProps<DescriptionHosts> {
     readonly children?: ReactNode;
     readonly tokens?: Parameters<typeof descriptionSelection>[0]["tokens"];
     readonly testId?: TestIdOverride<DescriptionPart> | undefined;
 }
 
 function DescriptionImpl(props: DescriptionProps): ReactNode {
+    const slot = nativeSlots(props);
     const field = useField();
     useFieldPiece(field, "description");
     const { styles: s, views: v } = useComponentSlots<"root">(
@@ -25,8 +33,9 @@ function DescriptionImpl(props: DescriptionProps): ReactNode {
     );
     return (
         <v.root.Text
+            {...slot.props("root")}
             nativeID={field?.state.ids.description}
-            style={s.root}
+            style={slot.style("root", s.root)}
             testID={testIdOf(descriptionAnatomy, "root", props.testId)}
         >
             {props.children}

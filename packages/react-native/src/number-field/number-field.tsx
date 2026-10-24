@@ -31,16 +31,12 @@ import type {
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Platform } from "react-native";
-import type { TextInputProps } from "react-native";
 
 import { IconSlot, iconSlot } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
-import {
-    testIdOf,
-    unselectable,
-    useStableCallback,
-    withEngine,
-} from "../parts";
+import { testIdOf, useStableCallback, withEngine } from "../parts";
+import { nativeSlots, withUnselectable } from "../slot-props";
+import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
 /** React Native Web draws a field that isn't editable as `readonly`; a disabled one is `disabled`
@@ -50,6 +46,22 @@ const WEB = Platform.OS === "web";
 const INDICATIONS = Object.fromEntries(
     numberFieldAnatomy.indication.map((entry) => [entry.trigger, entry]),
 );
+
+/** What each part renders as, for its keyed `style` and `slotProps`; React Native's own
+ *  `TextInput` props go in `slotProps.input`. */
+export interface NumberFieldHosts {
+    readonly root: "View";
+    readonly container: "View";
+    readonly leadingIcon: "View";
+    readonly prefixText: "Text";
+    readonly suffixText: "Text";
+    readonly input: "TextInput";
+    readonly label: "Text";
+    readonly control: "View";
+    readonly decrementTrigger: "Pressable";
+    readonly incrementTrigger: "Pressable";
+    readonly supportingText: "Text";
+}
 
 export interface NumberFieldProps
     extends
@@ -78,9 +90,8 @@ export interface NumberFieldProps
             | "incrementLabel"
         >,
         NumberFieldContentProps<ReactNode>,
-        IndicationProps {
-    /** React Native's own `TextInput` props, such as `returnKeyType`. */
-    readonly inputProps?: TextInputProps | undefined;
+        IndicationProps,
+        NativeSlotProps<NumberFieldHosts> {
     /** A prefix for every part's test id (`qty` → `qty-input`), or ids by part. */
     readonly testId?: TestIdOverride<NumberFieldPart> | undefined;
 }
@@ -99,6 +110,7 @@ const id = (part: NumberFieldPart, props: NumberFieldProps) =>
 // One button: a press steps once, and holding it keeps stepping until it's let go or disabled.
 function TriggerImpl(options: TriggerOptions): ReactNode {
     const { props, part, disabled } = options;
+    const slot = nativeSlots(props);
     const indication = useSurfaceIndication(INDICATIONS[part]!, {
         indication: props.indication,
         disabled,
@@ -133,7 +145,8 @@ function TriggerImpl(options: TriggerOptions): ReactNode {
     const Slot = v[part];
     return (
         <Slot.Pressable
-            {...indication.handlers}
+            {...slot.props(part)}
+            {...slot.with(part, indication.handlers)}
             role="button"
             aria-label={
                 part === "decrementTrigger"
@@ -141,7 +154,7 @@ function TriggerImpl(options: TriggerOptions): ReactNode {
                     : (props.incrementLabel ?? NUMBER_FIELD_LABELS.increment)
             }
             disabled={disabled}
-            onPressIn={(event: unknown) => {
+            onPressIn={slot.on(part, "onPressIn", (event: unknown) => {
                 indication.handlers.onPressIn?.(event as never);
                 if (disabled) return;
                 step();
@@ -152,12 +165,12 @@ function TriggerImpl(options: TriggerOptions): ReactNode {
                         NUMBER_FIELD_SPIN_INTERVAL,
                     );
                 }, NUMBER_FIELD_SPIN_DELAY);
-            }}
-            onPressOut={(event: unknown) => {
+            })}
+            onPressOut={slot.on(part, "onPressOut", (event: unknown) => {
                 indication.handlers.onPressOut?.(event as never);
                 stop();
-            }}
-            style={{ ...s[part], ...unselectable }}
+            })}
+            style={slot.style(part, withUnselectable(s[part]))}
             testID={id(part, props)}
         >
             <IconSlot {...iconSlot(selected, part)} motion={s[part]}>
@@ -226,13 +239,15 @@ function NumberFieldImpl(props: NumberFieldProps): ReactNode {
             ...(props.mirrorLeadingIcon ? { mirrored: true } : {}),
         },
     );
+    const slot = nativeSlots(props);
     const affix = (part: "prefixText" | "suffixText", node: ReactNode) => {
         if (!isPresent(node)) return null;
         const Slot = v[part];
         return (
             <Slot.Text
+                {...slot.props(part)}
                 selectable={false}
-                style={s[part]}
+                style={slot.style(part, s[part])}
                 testID={id(part, props)}
             >
                 {node}
@@ -241,14 +256,20 @@ function NumberFieldImpl(props: NumberFieldProps): ReactNode {
     };
     const supporting = props.error ?? props.supportingText;
     return (
-        <v.root.View style={s.root} testID={id("root", props)}>
+        <v.root.View
+            {...slot.props("root")}
+            style={slot.style("root", s.root)}
+            testID={id("root", props)}
+        >
             <v.container.View
-                style={s.container}
+                {...slot.props("container")}
+                style={slot.style("container", s.container)}
                 testID={id("container", props)}
             >
                 {isPresent(props.leadingIcon) ? (
                     <v.leadingIcon.View
-                        style={s.leadingIcon}
+                        {...slot.props("leadingIcon")}
+                        style={slot.style("leadingIcon", s.leadingIcon)}
                         testID={id("leadingIcon", props)}
                     >
                         <IconSlot
@@ -261,12 +282,14 @@ function NumberFieldImpl(props: NumberFieldProps): ReactNode {
                 ) : null}
                 {affix("prefixText", props.prefixText)}
                 <v.input.TextInput
+                    {...slot.props("input")}
                     keyboardType="decimal-pad"
-                    {...props.inputProps}
                     value={shown}
-                    onChangeText={setText}
-                    onFocus={() => setFocused(true)}
-                    onBlur={() => {
+                    onChangeText={slot.on("input", "onChangeText", setText)}
+                    onFocus={slot.on("input", "onFocus", () =>
+                        setFocused(true),
+                    )}
+                    onBlur={slot.on("input", "onBlur", () => {
                         setFocused(false);
                         if (text === undefined) return;
                         const parsed = numberFieldParse(text, locale, options);
@@ -275,7 +298,7 @@ function NumberFieldImpl(props: NumberFieldProps): ReactNode {
                                 ? parsed
                                 : numberFieldClamp(parsed, range),
                         );
-                    }}
+                    })}
                     editable={editable || (WEB && !!props.disabled)}
                     {...(WEB && props.disabled
                         ? ({ disabled: true } as object)
@@ -289,21 +312,23 @@ function NumberFieldImpl(props: NumberFieldProps): ReactNode {
                         ? { "aria-label": props.label }
                         : {})}
                     aria-invalid={invalid}
-                    style={s.input}
+                    style={slot.style("input", s.input)}
                     testID={id("input", props)}
                 />
                 {affix("suffixText", props.suffixText)}
                 <v.label.Text
+                    {...slot.props("label")}
                     selectable={false}
                     pointerEvents="none"
-                    style={s.label}
+                    style={slot.style("label", s.label)}
                     testID={id("label", props)}
                 >
                     {props.label}
                 </v.label.Text>
                 <v.control.View
+                    {...slot.props("control")}
                     role="group"
-                    style={s.control}
+                    style={slot.style("control", s.control)}
                     testID={id("control", props)}
                 >
                     <Trigger
@@ -334,7 +359,8 @@ function NumberFieldImpl(props: NumberFieldProps): ReactNode {
             </v.container.View>
             {isPresent(supporting) ? (
                 <v.supportingText.Text
-                    style={s.supportingText}
+                    {...slot.props("supportingText")}
+                    style={slot.style("supportingText", s.supportingText)}
                     testID={id("supportingText", props)}
                 >
                     {supporting}

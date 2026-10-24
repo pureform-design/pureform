@@ -105,7 +105,7 @@ describe("DatePicker", () => {
             />,
         );
         await interact(() => userEvent.click(button("Pick a date")));
-        await until(() => byTestId("pf-date-picker-root"));
+        await until(() => byTestId("pf-date-picker-content"));
         await interact(() => userEvent.click(day("Thursday, August 20, 2026")));
         expect(byTestId("pf-date-picker-selected-date").textContent).toBe(
             "Thu, Aug 20",
@@ -113,11 +113,11 @@ describe("DatePicker", () => {
         await interact(() => userEvent.click(button("Cancel")));
         expect(onValueChange).not.toHaveBeenCalled();
         await until(() =>
-            expect(all('[data-testid="pf-date-picker-root"]')).toHaveLength(0),
+            expect(all('[data-testid="pf-date-picker-content"]')).toHaveLength(0),
         );
 
         await interact(() => userEvent.click(button("Pick a date")));
-        await until(() => byTestId("pf-date-picker-root"));
+        await until(() => byTestId("pf-date-picker-content"));
         expect(byTestId("pf-date-picker-selected-date").textContent).toBe(
             "Mon, Aug 17",
         );
@@ -125,7 +125,7 @@ describe("DatePicker", () => {
         await interact(() => userEvent.click(button("OK")));
         expect(onValueChange).toHaveBeenCalledWith({ value: ["2026-08-20"] });
         await until(() =>
-            expect(all('[data-testid="pf-date-picker-root"]')).toHaveLength(0),
+            expect(all('[data-testid="pf-date-picker-content"]')).toHaveLength(0),
         );
     });
 

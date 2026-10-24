@@ -34,13 +34,26 @@ import { testIdOf, withEngine } from "../parts";
 import { ProvidedTokens } from "../provided-tokens";
 import { SearchBar } from "../search-bar";
 import type { SearchBarProps } from "../search-bar";
+import { nativeSlots } from "../slot-props";
+import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
+
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface AppBarHosts {
+    readonly headline: "Text";
+    readonly subtitle: "Text";
+    readonly content: "View";
+    readonly root: "View";
+    readonly leading: "View";
+    readonly trailing: "View";
+}
 
 export interface AppBarProps
     extends
         AppBarVariantProps,
         AppBarScrollProps,
-        AppBarContentProps<ReactNode, SearchBarProps> {
+        AppBarContentProps<ReactNode, SearchBarProps>,
+        NativeSlotProps<AppBarHosts> {
     readonly testId?: TestIdOverride<AppBarPart> | undefined;
 }
 
@@ -73,13 +86,15 @@ function AppBarImpl(props: AppBarProps): ReactNode {
     );
     const id = (part: AppBarPart) =>
         testIdOf(appBarAnatomy, part, props.testId);
+    const slot = nativeSlots(props);
     const text = (part: "headline" | "subtitle", node: ReactNode) => {
         if (!isPresent(node)) return null;
         const Slot = v[part];
         return (
             <Slot.Text
+                {...slot.props(part)}
                 accessibilityRole={part === "headline" ? "header" : undefined}
-                style={s[part]}
+                style={slot.style(part, s[part])}
                 testID={id(part)}
             >
                 {node}
@@ -87,7 +102,11 @@ function AppBarImpl(props: AppBarProps): ReactNode {
         );
     };
     const content = (
-        <v.content.View style={s.content} testID={id("content")}>
+        <v.content.View
+            {...slot.props("content")}
+            style={slot.style("content", s.content)}
+            testID={id("content")}
+        >
             {search ? (
                 <SearchBar
                     centered
@@ -108,17 +127,26 @@ function AppBarImpl(props: AppBarProps): ReactNode {
     const last = appBarContentLast({ size: props.size, search }, state);
     return (
         <v.root.View
+            {...slot.props("root")}
             accessibilityRole="header"
-            style={s.root}
+            style={slot.style("root", s.root)}
             testID={id("root")}
         >
-            <v.leading.View style={s.leading} testID={id("leading")}>
+            <v.leading.View
+                {...slot.props("leading")}
+                style={slot.style("leading", s.leading)}
+                testID={id("leading")}
+            >
                 <ProvidedTokens tokens={provided("leading")}>
                     {props.leading}
                 </ProvidedTokens>
             </v.leading.View>
             {last ? null : content}
-            <v.trailing.View style={s.trailing} testID={id("trailing")}>
+            <v.trailing.View
+                {...slot.props("trailing")}
+                style={slot.style("trailing", s.trailing)}
+                testID={id("trailing")}
+            >
                 <ProvidedTokens tokens={provided("trailing")}>
                     {props.trailing}
                 </ProvidedTokens>

@@ -13,7 +13,9 @@ import type { ReactNode } from "react";
 
 import { IconSlot, iconSlot } from "./icon-style";
 import { useSurfaceIndication } from "./indication";
-import { testIdOf, unselectable } from "./parts";
+import { testIdOf } from "./parts";
+import { nativeSlots, withUnselectable } from "./slot-props";
+import type { NativeSlots } from "./slot-props";
 import { useComponentSlots } from "./styles";
 
 /** What `SurfaceButton` takes. */
@@ -26,6 +28,8 @@ export interface SurfaceButtonProps<A extends ComponentAnatomy> {
     readonly selection: Record<string, unknown>;
     readonly indication: Indication | undefined;
     readonly testId: TestIdOverride<PartName<A>> | undefined;
+    /** The owner's per-part props, when it customizes this part. */
+    readonly slot?: NativeSlots | undefined;
     /** Its name for assistive technology. */
     readonly label: string | undefined;
     readonly onPress: (() => void) | undefined;
@@ -36,6 +40,7 @@ export interface SurfaceButtonProps<A extends ComponentAnatomy> {
 export function SurfaceButton<A extends ComponentAnatomy>(
     props: SurfaceButtonProps<A>,
 ): ReactNode {
+    const slot = props.slot ?? nativeSlots(undefined);
     const indication = useSurfaceIndication(
         props.anatomy.indication!.findLast(
             (entry: IndicationAnatomy) => entry.trigger === props.part,
@@ -54,13 +59,14 @@ export function SurfaceButton<A extends ComponentAnatomy>(
     const Surface = v[props.part];
     return (
         <Surface.Pressable
-            {...indication.handlers}
+            {...slot.props(props.part)}
+            {...slot.with(props.part, indication.handlers)}
             role="button"
             {...(props.label === undefined
                 ? {}
                 : { "aria-label": props.label })}
-            onPress={props.onPress}
-            style={{ ...s[props.part], ...unselectable }}
+            onPress={slot.on(props.part, "onPress", props.onPress)}
+            style={slot.style(props.part, withUnselectable(s[props.part]))}
             testID={testIdOf(props.anatomy, props.part, props.testId)}
         >
             <IconSlot

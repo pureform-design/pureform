@@ -17,9 +17,22 @@ import type { ReactNode } from "react";
 import type { GestureResponderEvent, LayoutChangeEvent } from "react-native";
 
 import { Glyph, IconSlot, iconSlot } from "../icon-style";
-import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
+import { testIdOf, useControllable, withEngine } from "../parts";
 import { useDirection } from "../provider";
+import { nativeSlots, withUnselectable } from "../slot-props";
+import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
+
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface RatingHosts {
+    readonly root: "View";
+    readonly label: "Text";
+    readonly control: "View";
+    readonly item: "Pressable";
+    readonly icon: "View";
+    readonly fill: "View";
+    readonly halfFill: "View";
+}
 
 export interface RatingProps
     extends
@@ -35,7 +48,8 @@ export interface RatingProps
             | "disabled"
             | "valueText"
         >,
-        RatingContentProps<ReactNode> {
+        RatingContentProps<ReactNode>,
+        NativeSlotProps<RatingHosts> {
     /** A prefix for every part's test id (`quality` → `quality-item`), or ids by part. */
     readonly testId?: TestIdOverride<RatingPart> | undefined;
 }
@@ -66,6 +80,7 @@ function RatingImpl(props: RatingProps): ReactNode {
     );
     const id = (part: RatingPart) =>
         testIdOf(ratingAnatomy, part, props.testId);
+    const slot = nativeSlots(props);
     const text = props.valueText ?? defaultText;
     const star = props.icon ?? <Glyph glyph="★" />;
     const pick = (index: number, event: GestureResponderEvent) => {
@@ -82,22 +97,28 @@ function RatingImpl(props: RatingProps): ReactNode {
         setValue(next === value ? 0 : next);
     };
     return (
-        <v.root.View style={s.root} testID={id("root")}>
+        <v.root.View
+            {...slot.props("root")}
+            style={slot.style("root", s.root)}
+            testID={id("root")}
+        >
             {isPresent(props.label) ? (
                 <v.label.Text
+                    {...slot.props("label")}
                     selectable={false}
-                    style={s.label}
+                    style={slot.style("label", s.label)}
                     testID={id("label")}
                 >
                     {props.label}
                 </v.label.Text>
             ) : null}
             <v.control.View
+                {...slot.props("control")}
                 accessibilityLabel={
                     typeof props.label === "string" ? props.label : undefined
                 }
                 role="radiogroup"
-                style={s.control}
+                style={slot.style("control", s.control)}
                 testID={id("control")}
             >
                 {Array.from({ length: count }, (_, at) => at + 1).map(
@@ -107,6 +128,7 @@ function RatingImpl(props: RatingProps): ReactNode {
                         const full = index <= value || (reached && !half);
                         return (
                             <v.item.Pressable
+                                {...slot.props("item")}
                                 key={index}
                                 aria-checked={
                                     reached || (value <= 0 && index === 1)
@@ -118,14 +140,24 @@ function RatingImpl(props: RatingProps): ReactNode {
                                     widths.current[index] =
                                         event.nativeEvent.layout.width;
                                 }}
-                                onPress={(event: GestureResponderEvent) =>
-                                    pick(index, event)
-                                }
+                                onPress={slot.on(
+                                    "item",
+                                    "onPress",
+                                    (event: GestureResponderEvent) =>
+                                        pick(index, event),
+                                )}
                                 role="radio"
-                                style={{ ...s.item, ...unselectable }}
+                                style={slot.style(
+                                    "item",
+                                    withUnselectable(s.item),
+                                )}
                                 testID={id("item")}
                             >
-                                <v.icon.View style={s.icon} testID={id("icon")}>
+                                <v.icon.View
+                                    {...slot.props("icon")}
+                                    style={slot.style("icon", s.icon)}
+                                    testID={id("icon")}
+                                >
                                     <IconSlot
                                         {...iconSlot(slots, "icon")}
                                         motion={s.icon}
@@ -135,8 +167,9 @@ function RatingImpl(props: RatingProps): ReactNode {
                                 </v.icon.View>
                                 {full ? (
                                     <v.fill.View
+                                        {...slot.props("fill")}
                                         pointerEvents="none"
-                                        style={s.fill}
+                                        style={slot.style("fill", s.fill)}
                                         testID={id("fill")}
                                     >
                                         <IconSlot
@@ -149,8 +182,12 @@ function RatingImpl(props: RatingProps): ReactNode {
                                 ) : null}
                                 {half ? (
                                     <v.halfFill.View
+                                        {...slot.props("halfFill")}
                                         pointerEvents="none"
-                                        style={s.halfFill}
+                                        style={slot.style(
+                                            "halfFill",
+                                            s.halfFill,
+                                        )}
                                         testID={id("halfFill")}
                                     >
                                         <IconSlot

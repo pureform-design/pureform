@@ -3,13 +3,14 @@
 // surface alone. The calendar holds a draft: OK commits it and closes, Cancel drops it. The view
 // trigger switches between the month's days and the years.
 
-import { datePickerAnatomy } from "@pureform/anatomy";
+import { datePickerAnatomy, datePickerOverlayAnatomy } from "@pureform/anatomy";
 import type { PartName } from "@pureform/anatomy";
 import {
     addMonths,
     chooseDate,
     datePickerSelection,
     isPresent,
+    partAsRoot,
     pickerLocale,
     pickerWeekStart,
     selectedDateText,
@@ -23,6 +24,7 @@ import type { ReactNode } from "react";
 import { StyleSheet } from "react-native";
 
 import { Button } from "../button/button";
+import type { ButtonProps } from "../button/button";
 import {
     CellList,
     DayGrid,
@@ -33,18 +35,53 @@ import {
 import { IconButton } from "../icon-button/icon-button";
 import { IconSlot, iconSlot } from "../icon-style";
 import { ModalScrimLayer, ModalWindow, useModalOverlay } from "../modal";
-import { unselectable, useControllable, withEngine } from "../parts";
+import { useControllable, withEngine } from "../parts";
+import {
+    backdropKeys,
+    nativeSlots,
+    overlayKeys,
+    withUnselectable,
+} from "../slot-props";
+import type { InnerPropsOf, NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 import { partId } from "../text-input";
 
 type Part = PartName<typeof datePickerAnatomy>;
+const KEYS = overlayKeys(datePickerOverlayAnatomy);
 
 const NONE: readonly string[] = [];
+
+/** What each part renders as, for its keyed `style` and `slotProps`: the web's parts. */
+export interface DatePickerHosts {
+    readonly content: "View";
+    readonly header: "View";
+    readonly headline: "Text";
+    readonly selectedDate: "Text";
+    readonly modeToggle: "View";
+    readonly divider: "View";
+    readonly controls: "View";
+    readonly viewTrigger: "Pressable";
+    readonly prev: "View";
+    readonly next: "View";
+    readonly actions: "View";
+    readonly weekdays: "View";
+    readonly weekday: "Text";
+    readonly grid: "View";
+    readonly week: "View";
+    readonly yearList: "ScrollView";
+    readonly backdrop: "View";
+}
 
 export interface DatePickerProps
     extends
         Omit<DatePickerRootOwnProps, "unstyled" | "restoreFocus">,
-        DatePickerContentProps<ReactNode> {}
+        DatePickerContentProps<ReactNode>,
+        NativeSlotProps<DatePickerHosts> {
+    /** The cancel button's `style`, `slotProps`, `tokens` and `testId`. */
+    readonly cancelButtonProps?: InnerPropsOf<ButtonProps> | undefined;
+    /** The confirm button's `style`, `slotProps`, `tokens` and `testId`. */
+    readonly confirmButtonProps?: InnerPropsOf<ButtonProps> | undefined;
+}
 
 interface SurfaceProps extends DatePickerProps {
     readonly committed: readonly string[];
@@ -63,34 +100,47 @@ function SurfaceImpl(props: SurfaceProps): ReactNode {
         selected,
         views: v,
     } = useComponentSlots<Part>("datePicker", datePickerSelection(props));
-    const id = (part: Part) => partId(datePickerAnatomy, part, props.testId);
+    const id = (part: Part) =>
+        partId(datePickerOverlayAnatomy, KEYS(part), props.testId);
+    const slot = nativeSlots(props, KEYS);
     const year = Number(month.slice(0, 4));
     const title = monthTitle(month, locale);
     const shownDate = selectedDateText(draft, locale);
     return (
         <v.root.View
+            {...slot.props("root")}
             role="dialog"
             aria-label={
                 typeof props.headline === "string"
                     ? props.headline
                     : "Select date"
             }
-            style={s.root}
+            style={slot.style("root", s.root)}
             testID={id("root")}
         >
-            <v.header.View style={s.header} testID={id("header")}>
-                <v.headline.Text style={s.headline} testID={id("headline")}>
+            <v.header.View
+                {...slot.props("header")}
+                style={slot.style("header", s.header)}
+                testID={id("header")}
+            >
+                <v.headline.Text
+                    {...slot.props("headline")}
+                    style={slot.style("headline", s.headline)}
+                    testID={id("headline")}
+                >
                     {props.headline ?? "Select date"}
                 </v.headline.Text>
                 <v.selectedDate.Text
-                    style={s.selectedDate}
+                    {...slot.props("selectedDate")}
+                    style={slot.style("selectedDate", s.selectedDate)}
                     testID={id("selectedDate")}
                 >
                     {shownDate ?? props.placeholder ?? "Selected date"}
                 </v.selectedDate.Text>
                 {props.onModeToggle ? (
                     <v.modeToggle.View
-                        style={s.modeToggle}
+                        {...slot.props("modeToggle")}
+                        style={slot.style("modeToggle", s.modeToggle)}
                         testID={id("modeToggle")}
                     >
                         <IconButton
@@ -103,9 +153,18 @@ function SurfaceImpl(props: SurfaceProps): ReactNode {
                     </v.modeToggle.View>
                 ) : null}
             </v.header.View>
-            <v.divider.View style={s.divider} testID={id("divider")} />
-            <v.controls.View style={s.controls} testID={id("controls")}>
+            <v.divider.View
+                {...slot.props("divider")}
+                style={slot.style("divider", s.divider)}
+                testID={id("divider")}
+            />
+            <v.controls.View
+                {...slot.props("controls")}
+                style={slot.style("controls", s.controls)}
+                testID={id("controls")}
+            >
                 <v.viewTrigger.Pressable
+                    {...slot.props("viewTrigger")}
                     role="button"
                     aria-label={
                         view === "day"
@@ -113,8 +172,13 @@ function SurfaceImpl(props: SurfaceProps): ReactNode {
                             : `${title}, choose day`
                     }
                     disabled={props.disabled}
-                    onPress={() => setView(view === "day" ? "year" : "day")}
-                    style={{ ...s.viewTrigger, ...unselectable }}
+                    onPress={slot.on("viewTrigger", "onPress", () =>
+                        setView(view === "day" ? "year" : "day"),
+                    )}
+                    style={slot.style(
+                        "viewTrigger",
+                        withUnselectable(s.viewTrigger),
+                    )}
                     testID={id("viewTrigger")}
                 >
                     <IconSlot
@@ -126,7 +190,11 @@ function SurfaceImpl(props: SurfaceProps): ReactNode {
                 </v.viewTrigger.Pressable>
                 {view === "day" ? (
                     <>
-                        <v.prev.View style={s.prev} testID={id("prev")}>
+                        <v.prev.View
+                            {...slot.props("prev")}
+                            style={slot.style("prev", s.prev)}
+                            testID={id("prev")}
+                        >
                             <IconButton
                                 aria-label="Previous month"
                                 icon="‹"
@@ -135,7 +203,11 @@ function SurfaceImpl(props: SurfaceProps): ReactNode {
                                 onPress={() => setMonth(addMonths(month, -1))}
                             />
                         </v.prev.View>
-                        <v.next.View style={s.next} testID={id("next")}>
+                        <v.next.View
+                            {...slot.props("next")}
+                            style={slot.style("next", s.next)}
+                            testID={id("next")}
+                        >
                             <IconButton
                                 aria-label="Next month"
                                 icon="›"
@@ -149,7 +221,7 @@ function SurfaceImpl(props: SurfaceProps): ReactNode {
             </v.controls.View>
             {view === "day" ? (
                 <DayGrid
-                    slots={{ styles: s, views: v, id }}
+                    slots={{ styles: s, views: v, id, slot }}
                     month={month}
                     selected={draft}
                     mode={mode}
@@ -163,7 +235,7 @@ function SurfaceImpl(props: SurfaceProps): ReactNode {
                 />
             ) : (
                 <CellList
-                    slots={{ styles: s, views: v, id }}
+                    slots={{ styles: s, views: v, id, slot }}
                     part="yearList"
                     view="year"
                     cells={yearsOf(year, props).map((each) => ({
@@ -181,8 +253,13 @@ function SurfaceImpl(props: SurfaceProps): ReactNode {
                     }}
                 />
             )}
-            <v.actions.View style={s.actions} testID={id("actions")}>
+            <v.actions.View
+                {...slot.props("actions")}
+                style={slot.style("actions", s.actions)}
+                testID={id("actions")}
+            >
                 <Button
+                    {...props.cancelButtonProps}
                     variant="text"
                     label={props.cancelLabel ?? "Cancel"}
                     onPress={() => {
@@ -191,6 +268,7 @@ function SurfaceImpl(props: SurfaceProps): ReactNode {
                     }}
                 />
                 <Button
+                    {...props.confirmButtonProps}
                     variant="text"
                     label={props.confirmLabel ?? "OK"}
                     disabled={props.disabled || props.readOnly}
@@ -241,7 +319,13 @@ function ModalDatePicker(props: DatePickerProps): ReactNode {
                     onPress={show}
                     aria-haspopup="dialog"
                     aria-expanded={open}
-                    testId={{ root: "pf-date-picker-trigger" }}
+                    testId={{
+                        root: partId(
+                            datePickerOverlayAnatomy,
+                            "trigger",
+                            props.testId,
+                        ),
+                    }}
                 />
             ) : null}
             <ModalWindow
@@ -253,6 +337,8 @@ function ModalDatePicker(props: DatePickerProps): ReactNode {
                 }
             >
                 <ModalScrimLayer
+                    scrimTestId={partAsRoot<string>(props.testId, "backdrop")}
+                    scrimSlot={nativeSlots(props, backdropKeys)}
                     open={open}
                     presence={presence}
                     onPressOutside={

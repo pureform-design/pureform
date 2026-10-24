@@ -360,13 +360,13 @@ describe.each(ENGINES)("with $name", (engine) => {
             </open.Holder>,
             engine,
         );
-        await until(() => expect(frame(byTestId("m-root"))).toEqual(REST));
+        await until(() => expect(frame(byTestId("m-content"))).toEqual(REST));
         await open.set(false);
         await until(() =>
-            expect(frame(byTestId("m-root")).opacity).toBeLessThan(1),
+            expect(frame(byTestId("m-content")).opacity).toBeLessThan(1),
         );
         await open.set(true);
-        await until(() => expect(frame(byTestId("m-root"))).toEqual(REST));
+        await until(() => expect(frame(byTestId("m-content"))).toEqual(REST));
     });
 
     it(
@@ -453,7 +453,7 @@ describe.each(ENGINES)("with $name", (engine) => {
             </open.Holder>,
             engine,
         );
-        const dialog = () => byId("pf-dialog-root");
+        const dialog = () => byId("pf-dialog-content");
         const scrim = () => byId("pf-scrim-root");
         expect(document.querySelector('[role="dialog"]')).toBeNull();
         expect(scrim()).toBeNull();
@@ -493,7 +493,7 @@ describe.each(ENGINES)("with $name", (engine) => {
             </open.Holder>,
             engine,
         );
-        const root = () => byId("pf-bottom-sheet-root");
+        const root = () => byId("pf-bottom-sheet-content");
         const entering = record(root);
         await open.set(true);
         await until(() => expect(frame(root()!)).toEqual(REST));
@@ -509,7 +509,7 @@ describe.each(ENGINES)("with $name", (engine) => {
     it("shows and hides a snackbar and a tooltip", async () => {
         const open = outside(true);
         const snackbar = () => byId("pf-snackbar-root");
-        const tooltip = () => byId("pf-tooltip-root");
+        const tooltip = () => byId("pf-tooltip-content");
         const snackbarEntering = record(snackbar);
         const tooltipEntering = record(tooltip);
         await render(

@@ -12,6 +12,8 @@ import { createContext, useContext, useMemo } from "react";
 import type { ComponentType, ReactNode } from "react";
 import { Animated, Text } from "react-native";
 
+import { nativeSlots } from "./slot-props";
+import type { NativeSlots } from "./slot-props";
 import type { ComponentSlots } from "./styles";
 
 interface IconPart {
@@ -99,13 +101,21 @@ export const iconSlot = (selected: Selected, slot: string) => ({
  *  holding `node` in its icon slot, or nothing without a node. A row's leading, trailing and
  *  expand icons. */
 export const iconParts =
-    <P extends string>(slots: ComponentSlots<P>, id: (part: P) => string) =>
+    <P extends string>(
+        slots: ComponentSlots<P>,
+        id: (part: P) => string,
+        slot: NativeSlots = nativeSlots(undefined),
+    ) =>
     (part: P, node: ReactNode): ReactNode => {
         if (!isPresent(node)) return null;
         const Slot = slots.views[part];
         const style = slots.styles[part];
         return (
-            <Slot.View style={style} testID={id(part)}>
+            <Slot.View
+                {...slot.props(part)}
+                style={slot.style(part, style)}
+                testID={id(part)}
+            >
                 <IconSlot {...iconSlot(slots.selected, part)} motion={style}>
                     {node}
                 </IconSlot>

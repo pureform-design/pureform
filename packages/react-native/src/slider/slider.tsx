@@ -35,14 +35,31 @@ import { Text } from "react-native";
 
 import { IconSlot, iconSlot } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
-import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
+import { testIdOf, useControllable, withEngine } from "../parts";
 import { useDirection } from "../provider";
+import { nativeSlots, withUnselectable } from "../slot-props";
+import type { NativeSlots } from "../slot-props";
+import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
 const [INDICATION] = sliderAnatomy.indication!;
 
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface SliderHosts {
+    readonly handle: "View";
+    readonly stateLayer: "View";
+    readonly valueIndicator: "View";
+    readonly root: "View";
+    readonly startTrack: "View";
+    readonly track: "View";
+    readonly activeTrack: "View";
+    readonly insetIcon: "View";
+    readonly markerGroup: "View";
+    readonly marker: "View";
+}
+
 export interface SliderProps<V extends SliderValue = SliderValue>
-    extends SliderVariantProps, InteractiveProps {
+    extends SliderVariantProps, InteractiveProps, NativeSlotProps<SliderHosts> {
     /** The value, or a range's two. Controlled when defined. */
     readonly value?: V | undefined;
     readonly defaultValue?: V | undefined;
@@ -125,7 +142,9 @@ function Thumb(props: {
     readonly showValue: boolean;
     readonly layer: ((selected: Slots["selected"]) => ReactNode) | undefined;
     readonly id: (part: SliderPart) => string | undefined;
+    readonly slot: NativeSlots;
 }): ReactNode {
+    const slot = props.slot;
     const selection = props.selection as { tokens?: object };
     const {
         styles: s,
@@ -145,13 +164,15 @@ function Thumb(props: {
     return (
         <>
             <v.handle.View
+                {...slot.props("handle")}
                 pointerEvents="none"
-                style={s.handle}
+                style={slot.style("handle", s.handle)}
                 testID={props.id("handle")}
             >
                 <v.stateLayer.View
+                    {...slot.props("stateLayer")}
                     pointerEvents="none"
-                    style={s.stateLayer}
+                    style={slot.style("stateLayer", s.stateLayer)}
                     testID={props.id("stateLayer")}
                 >
                     {props.layer?.(selected)}
@@ -159,8 +180,9 @@ function Thumb(props: {
             </v.handle.View>
             {props.showValue && (
                 <v.valueIndicator.View
+                    {...slot.props("valueIndicator")}
                     pointerEvents="none"
-                    style={s.valueIndicator}
+                    style={slot.style("valueIndicator", s.valueIndicator)}
                     testID={props.id("valueIndicator")}
                 >
                     <Text style={textOf(s.valueIndicator)}>{props.value}</Text>
@@ -177,7 +199,9 @@ function Marker(props: {
     readonly percent: number;
     readonly active: boolean;
     readonly testID: string | undefined;
+    readonly slot: NativeSlots;
 }): ReactNode {
+    const slot = props.slot;
     const selection = props.selection as { tokens?: object };
     const { styles: s, views: v } = useComponentSlots<SliderPart>(
         "slider",
@@ -192,8 +216,9 @@ function Marker(props: {
     );
     return (
         <v.marker.View
+            {...slot.props("marker")}
             pointerEvents="none"
-            style={s.marker}
+            style={slot.style("marker", s.marker)}
             testID={props.testID}
         />
     );
@@ -306,6 +331,7 @@ function SliderImpl(props: SliderProps): ReactNode {
     };
     const id = (part: SliderPart) =>
         testIdOf(sliderAnatomy, part, props.testId);
+    const slot = nativeSlots(props);
     // The keys a range input takes: a step by the arrows (sideways by direction), the ends by
     // Home and End.
     const forward = rtl ? "ArrowLeft" : "ArrowRight";
@@ -323,6 +349,7 @@ function SliderImpl(props: SliderProps): ReactNode {
     const stops = sliderStops(props.stops, props);
     return (
         <v.root.View
+            {...slot.props("root")}
             ref={root as never}
             role="slider"
             {...(props["aria-label"] === undefined
@@ -335,53 +362,90 @@ function SliderImpl(props: SliderProps): ReactNode {
             aria-orientation={vertical ? "vertical" : "horizontal"}
             focusable={!props.disabled}
             accessibilityActions={ADJUSTABLE}
-            onAccessibilityAction={(event: {
-                nativeEvent: { actionName: string };
-            }) => stepBy(event.nativeEvent.actionName === "increment" ? 1 : -1)}
+            onAccessibilityAction={slot.on(
+                "root",
+                "onAccessibilityAction",
+                (event: { nativeEvent: { actionName: string } }) =>
+                    stepBy(
+                        event.nativeEvent.actionName === "increment" ? 1 : -1,
+                    ),
+            )}
             {...({ onKeyDown } as object)}
-            onFocus={interaction.handlers.onFocus}
-            onBlur={interaction.handlers.onBlur}
-            onPointerEnter={interaction.handlers.onHoverIn}
-            onPointerLeave={interaction.handlers.onHoverOut}
-            onStartShouldSetResponder={() => !props.disabled}
-            onMoveShouldSetResponder={() => !props.disabled}
-            onResponderGrant={(event: GestureResponderEvent) => {
-                interaction.press(event);
-                interaction.dragStart();
-                const { pageX, pageY } = event.nativeEvent;
-                const start = (from: number, length: number) => {
-                    track.current = { start: from, length };
-                    const at = {
-                        nativeEvent: { pageX, pageY },
-                    } as GestureResponderEvent;
-                    const point = pointValue(at);
-                    if (point === undefined) return;
-                    // The thumb nearest the point moves.
-                    let nearest = 0;
-                    values.forEach((thumb, index) => {
-                        if (
-                            Math.abs(thumb - point) <=
-                            Math.abs(values[nearest]! - point)
-                        )
-                            nearest = index;
-                    });
-                    setActive(nearest);
-                    move(at, nearest);
-                };
-                // At once from the DOM on the web, so the first moves don't wait on measure,
-                // which answers a turn later; through measure on a device.
-                const rect = root.current?.getBoundingClientRect?.();
-                if (rect) {
-                    if (vertical) start(rect.top + window.scrollY, rect.height);
-                    else start(rect.left + window.scrollX, rect.width);
-                } else
-                    root.current?.measure((_x, _y, width, height, left, top) =>
-                        vertical ? start(top, height) : start(left, width),
-                    );
-            }}
-            onResponderMove={(event: GestureResponderEvent) => move(event)}
-            onResponderRelease={() => end(false)}
-            onResponderTerminate={() => end(true)}
+            onFocus={slot.on("root", "onFocus", interaction.handlers.onFocus)}
+            onBlur={slot.on("root", "onBlur", interaction.handlers.onBlur)}
+            onPointerEnter={slot.on(
+                "root",
+                "onPointerEnter",
+                interaction.handlers.onHoverIn,
+            )}
+            onPointerLeave={slot.on(
+                "root",
+                "onPointerLeave",
+                interaction.handlers.onHoverOut,
+            )}
+            onStartShouldSetResponder={slot.on(
+                "root",
+                "onStartShouldSetResponder",
+                () => !props.disabled,
+            )}
+            onMoveShouldSetResponder={slot.on(
+                "root",
+                "onMoveShouldSetResponder",
+                () => !props.disabled,
+            )}
+            onResponderGrant={slot.on(
+                "root",
+                "onResponderGrant",
+                (event: GestureResponderEvent) => {
+                    interaction.press(event);
+                    interaction.dragStart();
+                    const { pageX, pageY } = event.nativeEvent;
+                    const start = (from: number, length: number) => {
+                        track.current = { start: from, length };
+                        const at = {
+                            nativeEvent: { pageX, pageY },
+                        } as GestureResponderEvent;
+                        const point = pointValue(at);
+                        if (point === undefined) return;
+                        // The thumb nearest the point moves.
+                        let nearest = 0;
+                        values.forEach((thumb, index) => {
+                            if (
+                                Math.abs(thumb - point) <=
+                                Math.abs(values[nearest]! - point)
+                            )
+                                nearest = index;
+                        });
+                        setActive(nearest);
+                        move(at, nearest);
+                    };
+                    // At once from the DOM on the web, so the first moves don't wait on measure,
+                    // which answers a turn later; through measure on a device.
+                    const rect = root.current?.getBoundingClientRect?.();
+                    if (rect) {
+                        if (vertical)
+                            start(rect.top + window.scrollY, rect.height);
+                        else start(rect.left + window.scrollX, rect.width);
+                    } else
+                        root.current?.measure(
+                            (_x, _y, width, height, left, top) =>
+                                vertical
+                                    ? start(top, height)
+                                    : start(left, width),
+                        );
+                },
+            )}
+            onResponderMove={slot.on(
+                "root",
+                "onResponderMove",
+                (event: GestureResponderEvent) => move(event),
+            )}
+            onResponderRelease={slot.on("root", "onResponderRelease", () =>
+                end(false),
+            )}
+            onResponderTerminate={slot.on("root", "onResponderTerminate", () =>
+                end(true),
+            )}
             {...(isPresent(props.insetIcon)
                 ? {
                       onLayout: (event: LayoutChangeEvent) => {
@@ -390,28 +454,32 @@ function SliderImpl(props: SliderProps): ReactNode {
                       },
                   }
                 : {})}
-            style={{ ...s.root, ...unselectable }}
+            style={slot.style("root", withUnselectable(s.root))}
             testID={id("root")}
         >
             <v.startTrack.View
+                {...slot.props("startTrack")}
                 pointerEvents="none"
-                style={s.startTrack}
+                style={slot.style("startTrack", s.startTrack)}
                 testID={id("startTrack")}
             />
             <v.track.View
+                {...slot.props("track")}
                 pointerEvents="none"
-                style={s.track}
+                style={slot.style("track", s.track)}
                 testID={id("track")}
             />
             <v.activeTrack.View
+                {...slot.props("activeTrack")}
                 pointerEvents="none"
-                style={s.activeTrack}
+                style={slot.style("activeTrack", s.activeTrack)}
                 testID={id("activeTrack")}
             />
             {isPresent(props.insetIcon) && (
                 <v.insetIcon.View
+                    {...slot.props("insetIcon")}
                     pointerEvents="none"
-                    style={s.insetIcon}
+                    style={slot.style("insetIcon", s.insetIcon)}
                     testID={id("insetIcon")}
                 >
                     <IconSlot
@@ -424,8 +492,9 @@ function SliderImpl(props: SliderProps): ReactNode {
             )}
             {stops.length > 0 && (
                 <v.markerGroup.View
+                    {...slot.props("markerGroup")}
                     pointerEvents="none"
-                    style={s.markerGroup}
+                    style={slot.style("markerGroup", s.markerGroup)}
                     testID={id("markerGroup")}
                 >
                     {stops.map((stop) => (
@@ -436,6 +505,7 @@ function SliderImpl(props: SliderProps): ReactNode {
                             percent={percentOf(stop)}
                             active={sliderStopActive(stop, values, props)}
                             testID={id("marker")}
+                            slot={slot}
                         />
                     ))}
                 </v.markerGroup.View>
@@ -443,6 +513,7 @@ function SliderImpl(props: SliderProps): ReactNode {
             {values.map((thumb, index) => (
                 <Thumb
                     key={index}
+                    slot={slot}
                     selection={selection}
                     state={state}
                     percent={percents[index]!}

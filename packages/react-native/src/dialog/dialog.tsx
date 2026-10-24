@@ -6,7 +6,7 @@
 // The `Modal` holds a portal host of its own, so menus, tooltips, and selects opened inside draw
 // over the dialog.
 
-import { dialogAnatomy } from "@pureform/anatomy";
+import { dialogAnatomy, dialogOverlayAnatomy } from "@pureform/anatomy";
 import type { PartName, TestIdOverride } from "@pureform/anatomy";
 import { dialogSelection, isPresent, partAsRoot } from "@pureform/binding-core";
 import type {
@@ -23,10 +23,15 @@ import { ModalScrimLayer, ModalWindow, useModalOverlay } from "../modal";
 import { testIdOf, withEngine } from "../parts";
 import { useOverlayPresence } from "../presence";
 import { useEngine } from "../provider";
+import { backdropKeys, nativeSlots, overlayKeys } from "../slot-props";
+import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
 /** The dialog's parts this binding renders. */
 type Part = PartName<typeof dialogAnatomy>;
+/** The parts as the web names them, which `style`, `slotProps` and `testId` take. */
+type Key = PartName<typeof dialogOverlayAnatomy>;
+const KEYS = overlayKeys(dialogOverlayAnatomy);
 
 /** What a function given as a modal dialog's `actions` is given. */
 export interface DialogActions {
@@ -45,8 +50,20 @@ export interface DialogTriggerProps {
 
 const NO_ACTIONS: DialogActions = { close: () => {} };
 
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface DialogHosts {
+    readonly content: "View";
+    readonly icon: "View";
+    readonly headline: "Text";
+    readonly body: "Text";
+    readonly actions: "View";
+}
+
 export interface DialogProps
-    extends Omit<DialogVariantProps, "icon">, OverlayCloseProps {
+    extends
+        Omit<DialogVariantProps, "icon">,
+        OverlayCloseProps,
+        NativeSlotProps<DialogHosts> {
     /** An icon over the headline, which centers it. */
     readonly icon?: ReactNode;
     readonly mirrorIcon?: boolean | undefined;
@@ -80,7 +97,7 @@ export interface DialogProps
     readonly closeOnEscape?: boolean | undefined;
     /** Its name, when it has no headline. */
     readonly "aria-label"?: string | undefined;
-    readonly testId?: TestIdOverride<Part | "backdrop"> | undefined;
+    readonly testId?: TestIdOverride<Key | "backdrop"> | undefined;
 }
 
 function DialogImpl(props: DialogProps): ReactNode {
@@ -95,7 +112,9 @@ function DialogImpl(props: DialogProps): ReactNode {
         props.mirrorIcon ? { mirrored: true } : {},
     );
     const presence = useOverlayPresence(props.open, "dialog");
-    const id = (part: Part) => testIdOf(dialogAnatomy, part, props.testId);
+    const id = (part: Part) =>
+        testIdOf(dialogOverlayAnatomy, KEYS(part) as Key, props.testId);
+    const slot = nativeSlots(props, KEYS);
     if (!presence.present) return null;
     // The engine's view where it enters and leaves, the slot's own while it's still.
     const Root = props.open === undefined ? v.root : engine;
@@ -108,29 +127,46 @@ function DialogImpl(props: DialogProps): ReactNode {
             : props.actions;
     return (
         <Root.View
-            {...presence.props}
+            {...slot.props("root")}
+            {...slot.with("root", presence.props)}
             role={props.role ?? "dialog"}
             {...(label === undefined ? {} : { "aria-label": label })}
-            style={{ ...s.root, ...presence.style }}
+            style={slot.style("root", { ...s.root, ...presence.style })}
             testID={id("root")}
         >
             {isPresent(props.icon) ? (
-                <v.icon.View style={s.icon} testID={id("icon")}>
+                <v.icon.View
+                    {...slot.props("icon")}
+                    style={slot.style("icon", s.icon)}
+                    testID={id("icon")}
+                >
                     <IconSlot {...iconSlot(selected, "icon")} motion={s.icon}>
                         {props.icon}
                     </IconSlot>
                 </v.icon.View>
             ) : null}
             {isPresent(props.headline) ? (
-                <v.headline.Text style={s.headline} testID={id("headline")}>
+                <v.headline.Text
+                    {...slot.props("headline")}
+                    style={slot.style("headline", s.headline)}
+                    testID={id("headline")}
+                >
                     {props.headline}
                 </v.headline.Text>
             ) : null}
-            <v.body.Text style={s.body} testID={id("body")}>
+            <v.body.Text
+                {...slot.props("body")}
+                style={slot.style("body", s.body)}
+                testID={id("body")}
+            >
                 {props.children}
             </v.body.Text>
             {isPresent(actions) ? (
-                <v.actions.View style={s.actions} testID={id("actions")}>
+                <v.actions.View
+                    {...slot.props("actions")}
+                    style={slot.style("actions", s.actions)}
+                    testID={id("actions")}
+                >
                     {actions}
                 </v.actions.View>
             ) : null}
@@ -177,6 +213,7 @@ function ModalDialog(props: DialogProps): ReactNode {
             >
                 <ModalScrimLayer
                     scrimTestId={partAsRoot<string>(props.testId, "backdrop")}
+                    scrimSlot={nativeSlots(props, backdropKeys)}
                     open={open}
                     presence={presence}
                     onPressOutside={outside ? close : undefined}

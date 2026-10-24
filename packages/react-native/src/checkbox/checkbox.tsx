@@ -16,15 +16,28 @@ import type { ReactNode } from "react";
 
 import { useCheckKeys } from "../check-keys";
 import { useSurfaceIndication } from "../indication";
-import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
-import { useComponentSlots, withUserStyle } from "../styles";
-import type { RootStyleProps } from "../styles";
+import { testIdOf, useControllable, withEngine } from "../parts";
+import { nativeSlots, withUnselectable } from "../slot-props";
+import type { NativeSlotProps } from "../slot-props";
+import { useComponentSlots } from "../styles";
 import { touchTargetSlopOf } from "../touch-slop";
 
 const [INDICATION] = checkboxAnatomy.indication!;
 
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface CheckboxHosts {
+    readonly root: "Pressable";
+    readonly touchTarget: "View";
+    readonly box: "View";
+    readonly checkIcon: "View";
+    readonly indeterminateIcon: "View";
+}
+
 export interface CheckboxProps
-    extends CheckboxVariantProps, InteractiveProps, RootStyleProps {
+    extends
+        CheckboxVariantProps,
+        InteractiveProps,
+        NativeSlotProps<CheckboxHosts> {
     /** Whether it's checked, or `"indeterminate"`. Controlled when defined. */
     readonly checked?: CheckedState | undefined;
     readonly defaultChecked?: CheckedState | undefined;
@@ -72,6 +85,7 @@ function CheckboxImpl(props: CheckboxProps): ReactNode {
     );
     const id = (part: CheckboxPart) =>
         testIdOf(checkboxAnatomy, part, props.testId);
+    const slot = nativeSlots(props);
     const keys = useCheckKeys(
         () => {
             if (!props.readOnly) setChecked(checked !== true);
@@ -82,30 +96,38 @@ function CheckboxImpl(props: CheckboxProps): ReactNode {
     const slop = touchTargetSlopOf(s.root ?? {}, s.touchTarget);
     return (
         <v.root.Pressable
+            {...slot.props("root")}
             hitSlop={slop}
-            {...indication.handlers}
-            {...keys}
+            {...slot.with("root", indication.handlers)}
+            {...slot.with("root", keys)}
             role="checkbox"
             aria-checked={indeterminate ? "mixed" : checked}
             {...(props["aria-label"] === undefined
                 ? {}
                 : { "aria-label": props["aria-label"] })}
             disabled={props.disabled}
-            style={withUserStyle({ ...s.root, ...unselectable }, props.style)}
+            style={slot.style("root", withUnselectable(s.root))}
             testID={id("root")}
         >
             <v.touchTarget.View
+                {...slot.props("touchTarget")}
                 pointerEvents="none"
-                style={s.touchTarget}
+                style={slot.style("touchTarget", s.touchTarget)}
                 testID={id("touchTarget")}
             />
-            <v.box.View style={s.box} testID={id("box")}>
+            <v.box.View
+                {...slot.props("box")}
+                style={slot.style("box", s.box)}
+                testID={id("box")}
+            >
                 <v.checkIcon.View
-                    style={s.checkIcon}
+                    {...slot.props("checkIcon")}
+                    style={slot.style("checkIcon", s.checkIcon)}
                     testID={id("checkIcon")}
                 />
                 <v.indeterminateIcon.View
-                    style={s.indeterminateIcon}
+                    {...slot.props("indeterminateIcon")}
+                    style={slot.style("indeterminateIcon", s.indeterminateIcon)}
                     testID={id("indeterminateIcon")}
                 />
             </v.box.View>

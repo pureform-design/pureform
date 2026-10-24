@@ -30,9 +30,11 @@ import { CellList, DayGrid, startMonth, yearsOf } from "../calendar";
 import { IconButton } from "../icon-button/icon-button";
 import { IconSlot, iconSlot } from "../icon-style";
 import { Anchored, useFieldPopup } from "../overlay";
-import { unselectable, useControllable } from "../parts";
+import { useControllable } from "../parts";
 import { Portal } from "../portal";
 import { useEngine } from "../provider";
+import { nativeSlots, withUnselectable } from "../slot-props";
+import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 import { Field, partId } from "../text-input";
 
@@ -42,13 +44,39 @@ const NONE: readonly string[] = [];
 const POSITIONING = {} as const;
 const POPUP_ORIGIN = { transformOrigin: "top left" } as const;
 
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface DockedDatePickerHosts {
+    readonly root: "View";
+    readonly container: "View";
+    readonly leadingIcon: "View";
+    readonly prefixText: "Text";
+    readonly input: "TextInput";
+    readonly suffixText: "Text";
+    readonly label: "Text";
+    readonly trailingIcon: "View";
+    readonly supportingText: "Text";
+    readonly content: "View";
+    readonly controls: "View";
+    readonly prev: "Pressable";
+    readonly monthButton: "Pressable";
+    readonly next: "Pressable";
+    readonly yearButton: "Pressable";
+    readonly weekdays: "View";
+    readonly weekday: "Text";
+    readonly grid: "View";
+    readonly week: "View";
+    readonly monthList: "ScrollView";
+    readonly yearList: "ScrollView";
+}
+
 export interface DockedDatePickerProps
     extends
         Omit<
             DockedDatePickerRootOwnProps,
             "unstyled" | "leadingIcon" | "prefixText" | "suffixText"
         >,
-        DockedDatePickerContentProps<ReactNode> {}
+        DockedDatePickerContentProps<ReactNode>,
+        NativeSlotProps<DockedDatePickerHosts> {}
 
 type CalendarView = "day" | "month" | "year";
 
@@ -76,9 +104,10 @@ function Popup(
     );
     const id = (part: Part) =>
         partId(dockedDatePickerAnatomy, part, props.testId);
+    const slot = nativeSlots(props);
     const year = Number(month.slice(0, 4));
     const monthNumber = Number(month.slice(5, 7));
-    const slots = { styles: s, views: v, id };
+    const slots = { styles: s, views: v, id, slot };
     const toggle = (
         part: "monthButton" | "yearButton",
         target: CalendarView,
@@ -87,11 +116,14 @@ function Popup(
         const Slot = v[part];
         return (
             <Slot.Pressable
+                {...slot.props(part)}
                 role="button"
                 aria-expanded={view === target}
                 disabled={props.disabled}
-                onPress={() => setView(view === target ? "day" : target)}
-                style={{ ...s[part], ...unselectable }}
+                onPress={slot.on(part, "onPress", () =>
+                    setView(view === target ? "day" : target),
+                )}
+                style={slot.style(part, withUnselectable(s[part]))}
                 testID={id(part)}
             >
                 <IconSlot {...iconSlot(selected, part)} motion={s[part]}>
@@ -123,8 +155,17 @@ function Popup(
         );
     };
     return (
-        <v.content.View role="dialog" style={s.content} testID={id("content")}>
-            <v.controls.View style={s.controls} testID={id("controls")}>
+        <v.content.View
+            {...slot.props("content")}
+            role="dialog"
+            style={slot.style("content", s.content)}
+            testID={id("content")}
+        >
+            <v.controls.View
+                {...slot.props("controls")}
+                style={slot.style("controls", s.controls)}
+                testID={id("controls")}
+            >
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                     {arrow("prev", "Previous month", -1, true)}
                     {toggle(
@@ -261,6 +302,8 @@ export function DockedDatePicker(props: DockedDatePickerProps): ReactNode {
                 disabled={props.disabled}
                 readOnly={props.readOnly}
                 name="dockedDatePicker"
+                style={props.style}
+                slotProps={props.slotProps}
                 selection={dockedDatePickerSelection({
                     ...props,
                     leadingIcon: isPresent(props.leadingIcon),

@@ -31,19 +31,35 @@ import { Platform } from "react-native";
 import { Expanding } from "../expand";
 import { iconParts } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
-import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
+import { testIdOf, useControllable, withEngine } from "../parts";
 import { useDirection } from "../provider";
+import { nativeSlots, withUnselectable } from "../slot-props";
+import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
 const [INDICATION] = treeAnatomy.indication!;
 
 type Node = TreeNode<ReactNode>;
 
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface TreeHosts {
+    readonly leading: "View";
+    readonly indicator: "View";
+    readonly node: "Pressable";
+    readonly text: "Text";
+    readonly branch: "View";
+    readonly group: "View";
+    readonly root: "View";
+    readonly label: "Text";
+    readonly tree: "View";
+}
+
 export interface TreeProps
     extends
         TreeVariantProps,
         Omit<TreeBehaviorProps, "id" | "expandOnClick">,
-        IndicationProps {
+        IndicationProps,
+        NativeSlotProps<TreeHosts> {
     readonly items: readonly Node[];
     /** A label over the tree, which names it. */
     readonly label?: ReactNode;
@@ -126,7 +142,8 @@ function Row(props: {
     const { styles: s, selected, views: v } = slots;
     const id = (part: TreePart) =>
         testIdOf(treeAnatomy, part, tree.props.testId);
-    const icon = iconParts(slots, id);
+    const slot = nativeSlots(tree.props);
+    const icon = iconParts(slots, id, slot);
     const textId = useId();
     const web = Platform.OS === "web";
     // The tree item's own ARIA: on a leaf's row, or a branch's view around its row and group.
@@ -167,6 +184,7 @@ function Row(props: {
     };
     const row = (
         <v.node.Pressable
+            {...slot.props("node")}
             {...(web && branch ? pointer : indication.handlers)}
             {...(web
                 ? branch
@@ -187,7 +205,7 @@ function Row(props: {
                       { expanded, selected: selectedNode },
                       tree.props.translations,
                   ))}
-            onPress={press}
+            onPress={slot.on("node", "onPress", press)}
             // React Native Web presses a tree item on Enter only; Space acts too, as the web's
             // tree.
             {...(web && !branch
@@ -203,14 +221,15 @@ function Row(props: {
                   } as object)
                 : {})}
             disabled={disabled}
-            style={{ ...s.node, ...unselectable }}
+            style={slot.style("node", withUnselectable(s.node))}
             testID={id("node")}
         >
             {icon("leading", node.leading)}
             <v.text.Text
+                {...slot.props("text")}
                 nativeID={textId}
                 selectable={false}
-                style={s.text}
+                style={slot.style("text", s.text)}
                 testID={id("text")}
             >
                 {node.label}
@@ -222,6 +241,7 @@ function Row(props: {
     if (!branch) return row;
     return (
         <v.branch.View
+            {...slot.props("branch")}
             {...(web
                 ? ({
                       ...focusable,
@@ -241,12 +261,17 @@ function Row(props: {
                       },
                   } as object)
                 : {})}
-            style={s.branch}
+            style={slot.style("branch", s.branch)}
             testID={id("branch")}
         >
             {row}
             <Expanding open={expanded}>
-                <v.group.View style={s.group} role="group" testID={id("group")}>
+                <v.group.View
+                    {...slot.props("group")}
+                    style={slot.style("group", s.group)}
+                    role="group"
+                    testID={id("group")}
+                >
                     {(node.children ?? []).map((child, index, all) => (
                         <Row
                             key={child.value}
@@ -341,6 +366,7 @@ function TreeImpl(props: TreeProps): ReactNode {
             ),
     };
     const id = (part: TreePart) => testIdOf(treeAnatomy, part, props.testId);
+    const slot = nativeSlots(props);
     const go = (value: string | undefined) => {
         if (value === undefined) return;
         setFocused(value);
@@ -408,18 +434,24 @@ function TreeImpl(props: TreeProps): ReactNode {
         return undefined;
     };
     return (
-        <v.root.View style={s.root} testID={id("root")}>
+        <v.root.View
+            {...slot.props("root")}
+            style={slot.style("root", s.root)}
+            testID={id("root")}
+        >
             {isPresent(props.label) ? (
                 <v.label.Text
+                    {...slot.props("label")}
                     selectable={false}
-                    style={s.label}
+                    style={slot.style("label", s.label)}
                     testID={id("label")}
                 >
                     {props.label}
                 </v.label.Text>
             ) : null}
             <v.tree.View
-                style={s.tree}
+                {...slot.props("tree")}
+                style={slot.style("tree", s.tree)}
                 role="tree"
                 aria-label={props["aria-label"]}
                 {...(Platform.OS === "web" ? ({ onKeyDown } as object) : {})}

@@ -21,14 +21,23 @@ import { ListDefaults, ListItem } from "../list-item/list-item";
 import type { ListItemProps } from "../list-item/list-item";
 import type { ListItemDefaults } from "../list/list";
 import { testIdOf, useControllable, withEngine } from "../parts";
+import { nativeSlots } from "../slot-props";
+import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
+
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface SelectionListHosts {
+    readonly root: "View";
+    readonly item: "View";
+}
 
 export interface SelectionListProps
     extends
         Omit<SelectionListRootOwnProps, "unstyled">,
-        SelectionListContentProps<ReactNode> {
+        SelectionListContentProps<ReactNode>,
+        NativeSlotProps<SelectionListHosts> {
     readonly "aria-label"?: string | undefined;
-    /** Every option's `tokens` and `testId`, under the option's own. */
+    /** Every option's `style`, `slotProps`, `tokens` and `testId`, under the option's own. */
     readonly listItemProps?: ListItemDefaults | undefined;
 }
 
@@ -61,15 +70,17 @@ function SelectionListImpl(props: SelectionListProps): ReactNode {
     const items = props.items ?? [];
     const segmented = props.variant === "segmented";
     const id = (part: ListPart) => testIdOf(listAnatomy, part, props.testId);
+    const slot = nativeSlots(props);
     return (
         <ListDefaults value={defaults}>
             <v.root.View
+                {...slot.props("root")}
                 role="listbox"
                 aria-multiselectable={selectionMode === "multiple"}
                 {...(props["aria-label"] === undefined
                     ? {}
                     : { "aria-label": props["aria-label"] })}
-                style={s.root}
+                style={slot.style("root", s.root)}
                 testID={id("root")}
             >
                 {items.map(
@@ -83,8 +94,9 @@ function SelectionListImpl(props: SelectionListProps): ReactNode {
                         index,
                     ) => (
                         <v.item.View
+                            {...slot.props("item")}
                             key={key}
-                            style={s.item}
+                            style={slot.style("item", s.item)}
                             testID={id("item")}
                         >
                             <ListItem

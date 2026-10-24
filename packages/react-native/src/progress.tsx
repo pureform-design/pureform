@@ -19,22 +19,54 @@ import type { ReactNode } from "react";
 
 import { testIdOf, withEngine } from "./parts";
 import { useEngine } from "./provider";
+import { nativeSlots } from "./slot-props";
+import type { NativeSlotProps } from "./slot-props";
 import { useComponentSlots } from "./styles";
+
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface LinearProgressHosts {
+    readonly root: "View";
+    readonly track: "View";
+    readonly trackBefore: "View";
+    readonly trackAfter: "View";
+    readonly indicator: "View";
+    readonly stopIndicator: "View";
+}
 
 export interface LinearProgressProps
     extends
         ProgressVariantProps<"linearProgress">,
         ProgressValueProps,
-        ProgressReadyMadeProps {
+        ProgressReadyMadeProps,
+        NativeSlotProps<LinearProgressHosts> {
     readonly "aria-label"?: string | undefined;
     readonly testId?: TestIdOverride<LinearProgressPart> | undefined;
+}
+
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface CircularProgressHosts {
+    readonly root: "View";
+    readonly track: "View";
+    readonly trackEndHalf: "View";
+    readonly trackEndArc: "View";
+    readonly trackStartHalf: "View";
+    readonly trackStartArc: "View";
+    readonly trackTailCap: "View";
+    readonly trackHeadCap: "View";
+    readonly endHalf: "View";
+    readonly endArc: "View";
+    readonly startHalf: "View";
+    readonly startArc: "View";
+    readonly tailCap: "View";
+    readonly headCap: "View";
 }
 
 export interface CircularProgressProps
     extends
         ProgressVariantProps<"circularProgress">,
         ProgressValueProps,
-        ProgressReadyMadeProps {
+        ProgressReadyMadeProps,
+        NativeSlotProps<CircularProgressHosts> {
     readonly "aria-label"?: string | undefined;
     readonly testId?: TestIdOverride<CircularProgressPart> | undefined;
 }
@@ -63,21 +95,37 @@ function LinearProgressImpl(props: LinearProgressProps): ReactNode {
     );
     const id = (part: LinearProgressPart) =>
         testIdOf(linearProgressAnatomy, part, props.testId);
+    const slot = nativeSlots(props);
     return (
-        <v.root.View {...valueProps(props)} style={s.root} testID={id("root")}>
+        <v.root.View
+            {...slot.props("root")}
+            {...valueProps(props)}
+            style={slot.style("root", s.root)}
+            testID={id("root")}
+        >
             {props.track === false ? null : (
-                <v.track.View style={s.track} testID={id("track")}>
+                <v.track.View
+                    {...slot.props("track")}
+                    style={slot.style("track", s.track)}
+                    testID={id("track")}
+                >
                     <v.trackBefore.View
-                        style={s.trackBefore}
+                        {...slot.props("trackBefore")}
+                        style={slot.style("trackBefore", s.trackBefore)}
                         testID={id("trackBefore")}
                     />
                     <v.trackAfter.View
-                        style={s.trackAfter}
+                        {...slot.props("trackAfter")}
+                        style={slot.style("trackAfter", s.trackAfter)}
                         testID={id("trackAfter")}
                     />
                 </v.track.View>
             )}
-            <v.indicator.View style={s.indicator} testID={id("indicator")}>
+            <v.indicator.View
+                {...slot.props("indicator")}
+                style={slot.style("indicator", s.indicator)}
+                testID={id("indicator")}
+            >
                 {/* A wavy indicator is drawn in its wave with an SVG engine. */}
                 {engine.Drawing ? (
                     <engine.Drawing drawing={selected.drawings.indicator} />
@@ -85,7 +133,8 @@ function LinearProgressImpl(props: LinearProgressProps): ReactNode {
             </v.indicator.View>
             {props.track === false ? null : (
                 <v.stopIndicator.View
-                    style={s.stopIndicator}
+                    {...slot.props("stopIndicator")}
+                    style={slot.style("stopIndicator", s.stopIndicator)}
                     testID={id("stopIndicator")}
                 />
             )}
@@ -104,46 +153,86 @@ function CircularProgressImpl(props: CircularProgressProps): ReactNode {
     );
     const id = (part: CircularProgressPart) =>
         testIdOf(circularProgressAnatomy, part, props.testId);
+    const slot = nativeSlots(props);
     return (
-        <v.root.View {...valueProps(props)} style={s.root} testID={id("root")}>
+        <v.root.View
+            {...slot.props("root")}
+            {...valueProps(props)}
+            style={slot.style("root", s.root)}
+            testID={id("root")}
+        >
             {props.track === false ? null : (
-                <v.track.View style={s.track} testID={id("track")}>
+                <v.track.View
+                    {...slot.props("track")}
+                    style={slot.style("track", s.track)}
+                    testID={id("track")}
+                >
                     <v.trackEndHalf.View
-                        style={s.trackEndHalf}
+                        {...slot.props("trackEndHalf")}
+                        style={slot.style("trackEndHalf", s.trackEndHalf)}
                         testID={id("trackEndHalf")}
                     >
                         <v.trackEndArc.View
-                            style={s.trackEndArc}
+                            {...slot.props("trackEndArc")}
+                            style={slot.style("trackEndArc", s.trackEndArc)}
                             testID={id("trackEndArc")}
                         />
                     </v.trackEndHalf.View>
                     <v.trackStartHalf.View
-                        style={s.trackStartHalf}
+                        {...slot.props("trackStartHalf")}
+                        style={slot.style("trackStartHalf", s.trackStartHalf)}
                         testID={id("trackStartHalf")}
                     >
                         <v.trackStartArc.View
-                            style={s.trackStartArc}
+                            {...slot.props("trackStartArc")}
+                            style={slot.style("trackStartArc", s.trackStartArc)}
                             testID={id("trackStartArc")}
                         />
                     </v.trackStartHalf.View>
                     <v.trackTailCap.View
-                        style={s.trackTailCap}
+                        {...slot.props("trackTailCap")}
+                        style={slot.style("trackTailCap", s.trackTailCap)}
                         testID={id("trackTailCap")}
                     />
                     <v.trackHeadCap.View
-                        style={s.trackHeadCap}
+                        {...slot.props("trackHeadCap")}
+                        style={slot.style("trackHeadCap", s.trackHeadCap)}
                         testID={id("trackHeadCap")}
                     />
                 </v.track.View>
             )}
-            <v.endHalf.View style={s.endHalf} testID={id("endHalf")}>
-                <v.endArc.View style={s.endArc} testID={id("endArc")} />
+            <v.endHalf.View
+                {...slot.props("endHalf")}
+                style={slot.style("endHalf", s.endHalf)}
+                testID={id("endHalf")}
+            >
+                <v.endArc.View
+                    {...slot.props("endArc")}
+                    style={slot.style("endArc", s.endArc)}
+                    testID={id("endArc")}
+                />
             </v.endHalf.View>
-            <v.startHalf.View style={s.startHalf} testID={id("startHalf")}>
-                <v.startArc.View style={s.startArc} testID={id("startArc")} />
+            <v.startHalf.View
+                {...slot.props("startHalf")}
+                style={slot.style("startHalf", s.startHalf)}
+                testID={id("startHalf")}
+            >
+                <v.startArc.View
+                    {...slot.props("startArc")}
+                    style={slot.style("startArc", s.startArc)}
+                    testID={id("startArc")}
+                />
             </v.startHalf.View>
-            <v.tailCap.View style={s.tailCap} testID={id("tailCap")} />
-            <v.headCap.View style={s.headCap} testID={id("headCap")} />
+            <v.tailCap.View
+                {...slot.props("tailCap")}
+                style={slot.style("tailCap", s.tailCap)}
+                testID={id("tailCap")}
+            />
+            <v.headCap.View
+                {...slot.props("headCap")}
+                style={slot.style("headCap", s.headCap)}
+                testID={id("headCap")}
+            />
         </v.root.View>
     );
 }

@@ -45,6 +45,8 @@ import { IconSlot, iconSlot } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { Menu } from "../menu/menu";
 import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
+import { nativeSlots, withUnselectable } from "../slot-props";
+import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots, useSelectedStyles } from "../styles";
 
 const [INDICATION] = nativeSelectAnatomy.indication!;
@@ -95,6 +97,13 @@ const nativeMenu = (): ComponentType<MenuViewProps> | null => {
 export const MISSING_MENU_MESSAGE =
     "pureform: NativeSelect uses the platform's menu through `@react-native-menu/menu`, which isn't installed, so it opens the Material menu instead. Install it (`npm i @react-native-menu/menu`) for the native list.";
 
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface NativeSelectHosts {
+    readonly root: "View";
+    readonly select: "Pressable";
+    readonly icon: "View";
+}
+
 interface NativeSelectBaseProps
     extends
         NativeSelectVariantProps,
@@ -102,7 +111,8 @@ interface NativeSelectBaseProps
         Pick<
             NativeSelectBehaviorProps,
             "disabled" | "invalid" | "required" | "name" | "form" | "id"
-        > {
+        >,
+        NativeSlotProps<NativeSelectHosts> {
     /** The options. */
     readonly items?: readonly NativeSelectItem[] | undefined;
     /** What shows while no option with a value is chosen; also the first option, with no value. */
@@ -242,6 +252,7 @@ function NativeSelectImpl(props: NativeSelectProps): ReactNode {
     const plain = useSelectedStyles("nativeSelect", selection, state).styles;
     const id = (part: NativeSelectPart) =>
         testIdOf(nativeSelectAnatomy, part, props.testId);
+    const slot = nativeSlots(props);
     const labels = items
         .filter((item) => chosen.includes(item.value))
         .map((item) => item.label);
@@ -252,7 +263,12 @@ function NativeSelectImpl(props: NativeSelectProps): ReactNode {
                 : labels[0]
             : (props.placeholder ?? "");
     const icon = (
-        <v.icon.View pointerEvents="none" style={s.icon} testID={id("icon")}>
+        <v.icon.View
+            {...slot.props("icon")}
+            pointerEvents="none"
+            style={slot.style("icon", s.icon)}
+            testID={id("icon")}
+        >
             <IconSlot {...iconSlot(selected, "icon")} motion={s.icon}>
                 {props.icon ?? "▾"}
             </IconSlot>
@@ -279,7 +295,11 @@ function NativeSelectImpl(props: NativeSelectProps): ReactNode {
                 ),
             );
         return (
-            <v.root.View style={s.root} testID={id("root")}>
+            <v.root.View
+                {...slot.props("root")}
+                style={slot.style("root", s.root)}
+                testID={id("root")}
+            >
                 {webElement("select", {
                     value: multiple ? chosen : value,
                     onChange: (event: {
@@ -339,6 +359,7 @@ function NativeSelectImpl(props: NativeSelectProps): ReactNode {
     if (!NativeMenu && isDev) warnOnce(MISSING_MENU_MESSAGE);
     const box = (onPress?: () => void, expanded?: boolean) => (
         <Pressable
+            {...slot.props("select")}
             {...(onPress ? indication.handlers : {})}
             role="combobox"
             {...(label ? { "aria-label": label } : {})}
@@ -349,8 +370,11 @@ function NativeSelectImpl(props: NativeSelectProps): ReactNode {
             aria-required={control.required}
             aria-disabled={disabled || undefined}
             disabled={disabled}
-            onPress={onPress}
-            style={[plain.select, unselectable] as never}
+            onPress={slot.on("select", "onPress", onPress)}
+            style={slot.style(
+                "select",
+                withUnselectable(plain.select) as never,
+            )}
             testID={id("select")}
         >
             <Text
@@ -364,7 +388,11 @@ function NativeSelectImpl(props: NativeSelectProps): ReactNode {
     );
     if (NativeMenu) {
         return (
-            <v.root.View style={s.root} testID={id("root")}>
+            <v.root.View
+                {...slot.props("root")}
+                style={slot.style("root", s.root)}
+                testID={id("root")}
+            >
                 <NativeMenu
                     actions={menuActions(items, chosen, multiple)}
                     onPressAction={({ nativeEvent }) =>
@@ -395,7 +423,11 @@ function NativeSelectImpl(props: NativeSelectProps): ReactNode {
         })),
     }));
     return (
-        <v.root.View style={s.root} testID={id("root")}>
+        <v.root.View
+            {...slot.props("root")}
+            style={slot.style("root", s.root)}
+            testID={id("root")}
+        >
             <Menu
                 groups={groups}
                 grouped={groups.some((run) => run.label !== undefined)}

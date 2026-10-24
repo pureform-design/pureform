@@ -14,19 +14,29 @@ import type { ReactNode } from "react";
 
 import { IconSlot, iconSlot } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
-import { testIdOf, unselectable, withEngine } from "../parts";
+import { testIdOf, withEngine } from "../parts";
 import { useEngine } from "../provider";
-import { useComponentSlots, withUserStyle } from "../styles";
-import type { RootStyleProps } from "../styles";
+import { nativeSlots, withUnselectable } from "../slot-props";
+import type { NativeSlotProps } from "../slot-props";
+import { useComponentSlots } from "../styles";
 
 const [INDICATION] = fabAnatomy.indication!;
+
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface FabHosts {
+    readonly root: "Pressable";
+    readonly touchTarget: "View";
+    readonly container: "View";
+    readonly icon: "View";
+    readonly label: "Text";
+}
 
 export interface FabProps
     extends
         FabVariantProps,
         FabContentProps<ReactNode>,
         InteractiveProps,
-        RootStyleProps {
+        NativeSlotProps<FabHosts> {
     /** What the button does, for assistive technology; the label's text by default. */
     readonly "aria-label"?: string | undefined;
     readonly disabled?: boolean | undefined;
@@ -65,38 +75,50 @@ function FabImpl(props: FabProps): ReactNode {
     );
     const Drawing = engine.Drawing;
     const id = (part: FabPart) => testIdOf(fabAnatomy, part, props.testId);
+    const slot = nativeSlots(props);
     const label =
         props["aria-label"] ??
         (typeof props.label === "string" ? props.label : undefined);
     return (
         <v.root.Pressable
-            {...indication.handlers}
+            {...slot.props("root")}
+            {...slot.with("root", indication.handlers)}
             role="button"
             {...(label === undefined ? {} : { "aria-label": label })}
             disabled={props.disabled}
-            onLongPress={props.onLongPress}
-            onPress={props.onPress}
-            style={withUserStyle({ ...s.root, ...unselectable }, props.style)}
+            onLongPress={slot.on("root", "onLongPress", props.onLongPress)}
+            onPress={slot.on("root", "onPress", props.onPress)}
+            style={slot.style("root", withUnselectable(s.root))}
             testID={id("root")}
         >
             <v.touchTarget.View
+                {...slot.props("touchTarget")}
                 pointerEvents="none"
-                style={s.touchTarget}
+                style={slot.style("touchTarget", s.touchTarget)}
                 testID={id("touchTarget")}
             />
-            <v.container.View style={s.container} testID={id("container")}>
+            <v.container.View
+                {...slot.props("container")}
+                style={slot.style("container", s.container)}
+                testID={id("container")}
+            >
                 {Drawing ? (
                     <Drawing drawing={selected.drawings.container} />
                 ) : null}
-                <v.icon.View style={s.icon} testID={id("icon")}>
+                <v.icon.View
+                    {...slot.props("icon")}
+                    style={slot.style("icon", s.icon)}
+                    testID={id("icon")}
+                >
                     <IconSlot {...iconSlot(selected, "icon")} motion={s.icon}>
                         {props.icon}
                     </IconSlot>
                 </v.icon.View>
                 {present(props.label) ? (
                     <v.label.Text
+                        {...slot.props("label")}
                         selectable={false}
-                        style={s.label}
+                        style={slot.style("label", s.label)}
                         testID={id("label")}
                     >
                         {props.label}

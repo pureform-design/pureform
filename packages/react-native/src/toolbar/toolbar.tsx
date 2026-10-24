@@ -26,17 +26,36 @@ import type { LayoutChangeEvent, ViewStyle } from "react-native";
 import { View } from "react-native";
 
 import { Button } from "../button/button";
+import type { ButtonProps } from "../button/button";
 import { IconButton } from "../icon-button/icon-button";
+import type { IconButtonProps } from "../icon-button/icon-button";
 import { Menu } from "../menu";
-import type { MenuTriggerProps } from "../menu";
+import type { MenuProps, MenuTriggerProps } from "../menu";
 import { testIdOf, withEngine } from "../parts";
 import { ProvidedTokens } from "../provided-tokens";
+import { nativeSlots } from "../slot-props";
+import type { InnerPropsOf, NativeSlotProps } from "../slot-props";
 import { inFlowInline, useComponentSlots } from "../styles";
 
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface ToolbarHosts {
+    readonly root: "View";
+}
+
 export interface ToolbarProps
-    extends ToolbarRootOwnProps, ToolbarContentProps<ReactNode> {
+    extends
+        ToolbarRootOwnProps,
+        ToolbarContentProps<ReactNode>,
+        NativeSlotProps<ToolbarHosts> {
     /** The toolbar's name, for assistive technology. */
     readonly "aria-label"?: string | undefined;
+    /** Every text button's `style`, `slotProps`, `tokens` and `testId`; an item's own `testId`
+     *  wins. */
+    readonly buttonProps?: InnerPropsOf<ButtonProps> | undefined;
+    /** The same for every icon button. */
+    readonly iconButtonProps?: InnerPropsOf<IconButtonProps> | undefined;
+    /** The overflow menu's `style`, `slotProps`, `tokens` and `testId`. */
+    readonly menuProps?: InnerPropsOf<MenuProps> | undefined;
 }
 
 const HIDDEN: ViewStyle = { display: "none" };
@@ -81,11 +100,10 @@ const spacing = (
 };
 
 // One element: an icon button named by its label, or a text button.
-const element = (item: ToolbarItem<ReactNode>) => {
+const element = (item: ToolbarItem<ReactNode>, props: ToolbarProps) => {
     const shared = {
         disabled: item.disabled,
         onPress: item.onClick,
-        testId: item.testId,
         interactionSource: item.interactionSource,
         ...(item.selected === undefined
             ? {}
@@ -95,9 +113,21 @@ const element = (item: ToolbarItem<ReactNode>) => {
               }),
     };
     return isPresent(item.icon) ? (
-        <IconButton {...shared} aria-label={item.label} icon={item.icon} />
+        <IconButton
+            {...props.iconButtonProps}
+            {...shared}
+            testId={item.testId ?? props.iconButtonProps?.testId}
+            aria-label={item.label}
+            icon={item.icon}
+        />
     ) : (
-        <Button {...shared} variant="text" label={item.label} />
+        <Button
+            {...props.buttonProps}
+            {...shared}
+            testId={item.testId ?? props.buttonProps?.testId}
+            variant="text"
+            label={item.label}
+        />
     );
 };
 
@@ -136,6 +166,7 @@ function ToolbarImpl(props: ToolbarProps): ReactNode {
         overflow && (room === undefined || count < items.length);
     const id = (part: ToolbarPart) =>
         testIdOf(toolbarAnatomy, part, props.testId);
+    const slot = nativeSlots(props);
     const overflowButton = (given: MenuTriggerProps) => (
         <View
             style={overflowing ? undefined : HIDDEN}
@@ -157,6 +188,7 @@ function ToolbarImpl(props: ToolbarProps): ReactNode {
     );
     const bar = (
         <v.root.View
+            {...slot.props("root")}
             role="toolbar"
             aria-orientation={vertical ? "vertical" : "horizontal"}
             {...(props["aria-label"] === undefined
@@ -164,11 +196,12 @@ function ToolbarImpl(props: ToolbarProps): ReactNode {
                 : { "aria-label": props["aria-label"] })}
             // A floating bar hugs its elements as the web's `inline-flex` one does; a docked one
             // fills its edge.
-            style={
+            style={slot.style(
+                "root",
                 props.placement === "docked"
                     ? s.root
-                    : inFlowInline(s.root ?? {})
-            }
+                    : inFlowInline(s.root ?? {}),
+            )}
             testID={id("root")}
         >
             {items.map((item, index) =>
@@ -184,14 +217,15 @@ function ToolbarImpl(props: ToolbarProps): ReactNode {
                             setMeasured((n) => n + 1);
                         }}
                     >
-                        {element(item)}
+                        {element(item, props)}
                     </View>
                 ) : (
-                    <Fragment key={item.value}>{element(item)}</Fragment>
+                    <Fragment key={item.value}>{element(item, props)}</Fragment>
                 ),
             )}
             {overflow ? (
                 <Menu
+                    {...props.menuProps}
                     items={toolbarMenuItems(items, count)}
                     trigger={overflowButton}
                     positioning={toolbarMenuPositioning(props.orientation)}

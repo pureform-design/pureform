@@ -37,6 +37,8 @@ import { usePortalHost } from "../portal-host";
 import { usePresence } from "../presence";
 import { useEngine } from "../provider";
 import { useSidewaysPan } from "../sideways-pan";
+import { nativeSlots } from "../slot-props";
+import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 import { SurfaceButton } from "../surface-button";
 
@@ -51,7 +53,19 @@ export type ToastData = toast.Props<ReactNode>;
 export const createToaster = (options?: ToasterOptions): ToastStore =>
     toast.createStore(toasterOptions(options));
 
-export interface ToasterProps extends ToastVariantProps, IndicationProps {
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface ToasterHosts {
+    readonly root: "View";
+    readonly icon: "Text";
+    readonly title: "Text";
+    readonly description: "Text";
+    readonly group: "View";
+    readonly actionTrigger: "Pressable";
+    readonly closeTrigger: "Pressable";
+}
+
+export interface ToasterProps
+    extends ToastVariantProps, IndicationProps, NativeSlotProps<ToasterHosts> {
     readonly toaster: ToastStore;
     /** The close buttons' name for assistive technology. Default "Dismiss". */
     readonly closeLabel?: string | undefined;
@@ -101,6 +115,7 @@ function ToastButtonImpl(props: {
             selection={toastSelection(props.type, props.toaster)}
             indication={props.toaster.indication}
             testId={props.toaster.testId}
+            slot={nativeSlots(props.toaster)}
             label={props.label}
             onPress={props.onPress}
         >
@@ -187,6 +202,7 @@ function ToastItem(props: {
     readonly toaster: ToasterProps;
     readonly zIndex: number;
 }): ReactNode {
+    const slot = nativeSlots(props.toaster);
     const { item, toaster } = props;
     const store = toaster.toaster;
     const engine = useEngine();
@@ -226,26 +242,36 @@ function ToastItem(props: {
             >
                 <Pressable {...holdProps}>
                     <v.root.View
+                        {...slot.props("root")}
                         role="status"
                         aria-live="polite"
-                        style={{ ...s.root, maxWidth: "100%" }}
+                        style={slot.style("root", {
+                            ...s.root,
+                            maxWidth: "100%",
+                        })}
                         testID={id("root")}
                     >
                         <v.icon.Text
+                            {...slot.props("icon")}
                             aria-hidden
-                            style={s.icon}
+                            style={slot.style("icon", s.icon)}
                             testID={id("icon")}
                         >
                             {TOAST_GLYPHS[type]}
                         </v.icon.Text>
                         {isPresent(item.title) ? (
-                            <v.title.Text style={s.title} testID={id("title")}>
+                            <v.title.Text
+                                {...slot.props("title")}
+                                style={slot.style("title", s.title)}
+                                testID={id("title")}
+                            >
                                 {item.title}
                             </v.title.Text>
                         ) : null}
                         {isPresent(item.description) ? (
                             <v.description.Text
-                                style={s.description}
+                                {...slot.props("description")}
+                                style={slot.style("description", s.description)}
                                 testID={id("description")}
                             >
                                 {item.description}
@@ -284,6 +310,7 @@ function ToastItem(props: {
 }
 
 function ToasterImpl(props: ToasterProps): ReactNode {
+    const slot = nativeSlots(props);
     const toasts = useToasts(props.toaster);
     const host = usePortalHost();
     const insets = host?.insets ?? { top: 0, right: 0, bottom: 0, left: 0 };
@@ -297,10 +324,11 @@ function ToasterImpl(props: ToasterProps): ReactNode {
     const top = side === "top";
     return (
         <v.group.View
+            {...slot.props("group")}
             pointerEvents="box-none"
             role="region"
             aria-label="Notifications"
-            style={{
+            style={slot.style("group", {
                 ...s.group,
                 position: "absolute",
                 ...(top
@@ -317,7 +345,7 @@ function ToasterImpl(props: ToasterProps): ReactNode {
                           ? "flex-end"
                           : "center",
                 gap,
-            }}
+            })}
             testID={testIdOf(toastAnatomy, "group", props.testId)}
         >
             {toasts.map((item, index) => (

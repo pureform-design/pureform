@@ -17,20 +17,30 @@ import type { GestureResponderEvent } from "react-native";
 
 import { IconSlot, iconSlot } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
-import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
+import { testIdOf, useControllable, withEngine } from "../parts";
 import { useEngine } from "../provider";
-import { useComponentSlots, withUserStyle } from "../styles";
-import type { RootStyleProps } from "../styles";
+import { nativeSlots, withUnselectable } from "../slot-props";
+import type { NativeSlotProps } from "../slot-props";
+import { useComponentSlots } from "../styles";
 import { touchTargetSlopOf } from "../touch-slop";
 
 const [INDICATION] = iconButtonAnatomy.indication!;
+
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface IconButtonHosts {
+    readonly root: "Pressable";
+    readonly touchTarget: "View";
+    readonly container: "View";
+    readonly icon: "View";
+    readonly outline: "View";
+}
 
 export interface IconButtonProps
     extends
         IconButtonVariantProps,
         IconButtonContentProps<ReactNode>,
         InteractiveProps,
-        RootStyleProps {
+        NativeSlotProps<IconButtonHosts> {
     /** What the button does, for assistive technology: an icon alone says nothing. */
     readonly "aria-label": string;
     readonly disabled?: boolean | undefined;
@@ -80,33 +90,48 @@ function IconButtonImpl(props: IconButtonProps): ReactNode {
     const Drawing = engine.Drawing;
     const id = (part: IconButtonPart) =>
         testIdOf(iconButtonAnatomy, part, props.testId);
+    const slot = nativeSlots(props);
     const slop = touchTargetSlopOf(s.root ?? {}, s.touchTarget);
     return (
         <v.root.Pressable
+            {...slot.props("root")}
             hitSlop={slop}
-            {...indication.handlers}
+            {...slot.with("root", indication.handlers)}
             role="button"
             aria-label={props["aria-label"]}
             {...(toggle ? { "aria-pressed": selected } : {})}
             disabled={props.disabled}
-            onLongPress={props.onLongPress}
-            onPress={(event: GestureResponderEvent) => {
-                if (toggle) setSelected(!selected);
-                props.onPress?.(event);
-            }}
-            style={withUserStyle({ ...s.root, ...unselectable }, props.style)}
+            onLongPress={slot.on("root", "onLongPress", props.onLongPress)}
+            onPress={slot.on(
+                "root",
+                "onPress",
+                (event: GestureResponderEvent) => {
+                    if (toggle) setSelected(!selected);
+                    props.onPress?.(event);
+                },
+            )}
+            style={slot.style("root", withUnselectable(s.root))}
             testID={id("root")}
         >
             <v.touchTarget.View
+                {...slot.props("touchTarget")}
                 pointerEvents="none"
-                style={s.touchTarget}
+                style={slot.style("touchTarget", s.touchTarget)}
                 testID={id("touchTarget")}
             />
-            <v.container.View style={s.container} testID={id("container")}>
+            <v.container.View
+                {...slot.props("container")}
+                style={slot.style("container", s.container)}
+                testID={id("container")}
+            >
                 {Drawing ? (
                     <Drawing drawing={slots.drawings.container} />
                 ) : null}
-                <v.icon.View style={s.icon} testID={id("icon")}>
+                <v.icon.View
+                    {...slot.props("icon")}
+                    style={slot.style("icon", s.icon)}
+                    testID={id("icon")}
+                >
                     <IconSlot {...iconSlot(slots, "icon")} motion={s.icon}>
                         {props.icon}
                     </IconSlot>
@@ -115,8 +140,9 @@ function IconButtonImpl(props: IconButtonProps): ReactNode {
             </v.container.View>
             {props.variant === "outlined" ? (
                 <v.outline.View
+                    {...slot.props("outline")}
                     pointerEvents="none"
-                    style={s.outline}
+                    style={slot.style("outline", s.outline)}
                     testID={id("outline")}
                 >
                     {Drawing ? (

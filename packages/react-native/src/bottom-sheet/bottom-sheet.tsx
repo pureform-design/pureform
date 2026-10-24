@@ -15,7 +15,10 @@
 // holds where it was let go until the answer, then leaves or settles back. Its `Modal` holds a
 // portal host of its own, so menus, tooltips, and selects opened inside draw over it.
 
-import { bottomSheetAnatomy } from "@pureform/anatomy";
+import {
+    bottomSheetAnatomy,
+    bottomSheetOverlayAnatomy,
+} from "@pureform/anatomy";
 import type { PartName, TestIdOverride } from "@pureform/anatomy";
 import {
     bottomSheetSelection,
@@ -60,10 +63,15 @@ import {
 } from "../parts";
 import { themeSpring, useOverlayPresence } from "../presence";
 import { useEngine, usePureform } from "../provider";
+import { backdropKeys, nativeSlots, overlayKeys } from "../slot-props";
+import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
 /** The sheet's parts this binding renders. */
 type Part = PartName<typeof bottomSheetAnatomy>;
+/** The parts as the web names them, which `style`, `slotProps` and `testId` take. */
+type Key = PartName<typeof bottomSheetOverlayAnatomy>;
+const KEYS = overlayKeys(bottomSheetOverlayAnatomy);
 
 /** What a modal sheet gives the trigger it renders. */
 export interface BottomSheetTriggerProps {
@@ -74,8 +82,20 @@ export interface BottomSheetTriggerProps {
     readonly "aria-expanded": boolean;
 }
 
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface BottomSheetHosts {
+    readonly content: "View";
+    readonly dragHandle: "View";
+    readonly body: "View";
+    readonly backdrop: "View";
+}
+
 export interface BottomSheetProps
-    extends BottomSheetVariantProps, OverlayCloseProps, BottomSheetRestProps {
+    extends
+        BottomSheetVariantProps,
+        OverlayCloseProps,
+        BottomSheetRestProps,
+        NativeSlotProps<BottomSheetHosts> {
     /** The content, scrolling under the drag handle. */
     readonly children?: ReactNode;
     /** The content, as the web's ready-made sheet takes it; `children` wins when both are
@@ -108,7 +128,7 @@ export interface BottomSheetProps
     readonly closeOnEscape?: boolean | undefined;
     /** Its name, for assistive technology. */
     readonly "aria-label"?: string | undefined;
-    readonly testId?: TestIdOverride<Part | "backdrop"> | undefined;
+    readonly testId?: TestIdOverride<Key | "backdrop"> | undefined;
 }
 
 const NEEDS_CLOSE: () => void = () => {};
@@ -326,7 +346,9 @@ function BottomSheetImpl(
         latestSetRest(restAt.current === "partial" ? "expanded" : "partial");
         latestSettle(0);
     });
-    const id = (part: Part) => testIdOf(bottomSheetAnatomy, part, props.testId);
+    const id = (part: Part) =>
+        testIdOf(bottomSheetOverlayAnatomy, KEYS(part) as Key, props.testId);
+    const slot = nativeSlots(props, KEYS);
     if (!presence.present) return null;
     const Root = props.open === undefined ? v.root : engine;
     // The drag moves a plain Animated view around the surface, apart from the engine's enter
@@ -337,7 +359,8 @@ function BottomSheetImpl(
     return (
         <Animated.View style={[placed, { transform: [{ translateY: drag }] }]}>
             <Root.View
-                {...presence.props}
+                {...slot.props("root")}
+                {...slot.with("root", presence.props)}
                 role="dialog"
                 {...(props["aria-label"] === undefined
                     ? {}
@@ -353,13 +376,14 @@ function BottomSheetImpl(
                             | undefined
                     )?.(event);
                 }}
-                style={{ ...own, ...presence.style }}
+                style={slot.style("root", { ...own, ...presence.style })}
                 testID={id("root")}
             >
                 {props.dragHandle === false ? null : (
                     <v.dragHandle.View
-                        {...pan.panHandlers}
-                        style={s.dragHandle}
+                        {...slot.props("dragHandle")}
+                        {...slot.with("dragHandle", pan.panHandlers)}
+                        style={slot.style("dragHandle", s.dragHandle)}
                         testID={id("dragHandle")}
                     >
                         <DragHandle
@@ -372,11 +396,19 @@ function BottomSheetImpl(
                     </v.dragHandle.View>
                 )}
                 {typeof content === "string" ? (
-                    <v.content.Text style={s.content} testID={id("content")}>
+                    <v.content.Text
+                        {...slot.props("content")}
+                        style={slot.style("content", s.content)}
+                        testID={id("content")}
+                    >
                         {content}
                     </v.content.Text>
                 ) : (
-                    <v.content.View style={s.content} testID={id("content")}>
+                    <v.content.View
+                        {...slot.props("content")}
+                        style={slot.style("content", s.content)}
+                        testID={id("content")}
+                    >
                         <ScrollView>{content}</ScrollView>
                     </v.content.View>
                 )}
@@ -416,6 +448,7 @@ function ModalBottomSheet(props: BottomSheetProps): ReactNode {
             <ModalWindow visible={presence.present} label={props["aria-label"]}>
                 <ModalScrimLayer
                     scrimTestId={partAsRoot<string>(props.testId, "backdrop")}
+                    scrimSlot={nativeSlots(props, backdropKeys)}
                     open={open}
                     presence={presence}
                     onPressOutside={close}

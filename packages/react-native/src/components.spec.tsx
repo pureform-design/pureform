@@ -249,19 +249,19 @@ describe("every component", () => {
             "pf-fullscreen-dialog-close-trigger",
             "pf-fullscreen-dialog-confirm-action",
             "pf-fullscreen-dialog-body",
-            "pf-bottom-sheet-root",
-            "pf-bottom-sheet-drag-handle",
             "pf-bottom-sheet-content",
+            "pf-bottom-sheet-drag-handle",
+            "pf-bottom-sheet-body",
             "pf-side-sheet-header",
             "pf-side-sheet-back-button",
             "pf-side-sheet-headline",
             "pf-side-sheet-close-trigger",
-            "pf-side-sheet-content",
+            "pf-side-sheet-body",
             "pf-side-sheet-actions",
             "pf-drag-handle-root",
             "pf-drag-handle-handle",
             "pf-snackbar-close",
-            "pf-tooltip-root",
+            "pf-tooltip-content",
             "pf-rich-tooltip-subhead",
         ]) {
             expect(
@@ -947,8 +947,8 @@ describe("lists, menus, and selects", () => {
                 />
             </>,
         );
-        expect(computed("vibrant-root").backgroundColor).not.toBe(
-            computed("plain-root").backgroundColor,
+        expect(computed("vibrant-content").backgroundColor).not.toBe(
+            computed("plain-content").backgroundColor,
         );
     });
 
@@ -1037,7 +1037,7 @@ describe("lists, menus, and selects", () => {
             ),
         );
         await until(() => expect(view()).not.toBeNull());
-        expect(byTestId("pf-search-view-root")).toBeTruthy();
+        expect(byTestId("pf-search-view-surface")).toBeTruthy();
         const input = byTestId("pf-search-view-input") as HTMLInputElement;
         await interact(() => userEvent.type(input, "be"));
         const shown = () =>
@@ -1959,19 +1959,19 @@ describe("standard bottom sheet", () => {
             </View>,
         );
         expect(byTestId("pf-button-root").textContent).toBe("Share");
-        expect(byTestId("pf-bottom-sheet-content").textContent).toBe(
+        expect(byTestId("pf-bottom-sheet-body").textContent).toBe(
             "Send it to a friend.",
         );
         await interact(() => userEvent.click(byTestId("pf-drag-handle-root")));
         await until(() =>
             expect(
-                document.querySelector('[data-testid="pf-bottom-sheet-root"]'),
+                document.querySelector('[data-testid="pf-bottom-sheet-content"]'),
             ).toBeNull(),
         );
         await interact(() => userEvent.click(byTestId("pf-button-root")));
         await until(() =>
             expect(
-                document.querySelector('[data-testid="pf-bottom-sheet-root"]'),
+                document.querySelector('[data-testid="pf-bottom-sheet-content"]'),
             ).not.toBeNull(),
         );
     });
@@ -1995,24 +1995,44 @@ describe("inline roots in flow", () => {
     // `alignItems` places it, as the web's `inline-flex` root.
     const roots = (style?: { width?: string; alignSelf?: "stretch" }) => (
         <>
-            <Button label="Save" style={style} testId="button" />
+            <Button
+                label="Save"
+                style={style && { root: style }}
+                testId="button"
+            />
             <IconButton
                 aria-label="Edit"
                 icon={<Glyph glyph="✎" />}
-                style={style}
+                style={style && { root: style }}
                 testId="icon"
             />
             <Fab
                 icon={<Glyph glyph="+" />}
                 label="Compose"
-                style={style}
+                style={style && { root: style }}
                 testId="fab"
             />
-            <Chip label="Nearby" style={style} testId="chip" />
-            <Checkbox aria-label="Agree" style={style} testId="checkbox" />
-            <Switch aria-label="Wi-Fi" style={style} testId="switch" />
-            <Radio aria-label="On" style={style} testId="radio" />
-            <Badge style={style} testId="badge">
+            <Chip
+                label="Nearby"
+                style={style && { root: style }}
+                testId="chip"
+            />
+            <Checkbox
+                aria-label="Agree"
+                style={style && { root: style }}
+                testId="checkbox"
+            />
+            <Switch
+                aria-label="Wi-Fi"
+                style={style && { root: style }}
+                testId="switch"
+            />
+            <Radio
+                aria-label="On"
+                style={style && { root: style }}
+                testId="radio"
+            />
+            <Badge style={style && { root: style }} testId="badge">
                 3
             </Badge>
         </>

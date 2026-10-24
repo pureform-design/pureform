@@ -43,7 +43,6 @@ import { Image, Text as NativeText, View } from "react-native";
 import type {
     ImageSourcePropType,
     ImageStyle,
-    StyleProp,
     TextStyle,
     ViewStyle,
 } from "react-native";
@@ -53,8 +52,9 @@ import { IconSlot, ownText } from "./icon-style";
 import { testIdOf, withEngine } from "./parts";
 import { useOverlayPresence } from "./presence";
 import { useEngine } from "./provider";
-import { useSelectedStyles, withUserStyle } from "./styles";
-import type { RootStyleProps } from "./styles";
+import { nativeSlots } from "./slot-props";
+import type { NativeSlotProps, NativeSlots } from "./slot-props";
+import { useSelectedStyles } from "./styles";
 
 // The one style of a component: under `root` where it has slots, else `""`.
 const rootOf = (selected: Selected): Style =>
@@ -64,24 +64,30 @@ const rootDrawing = (selected: Selected) =>
 
 type Root = "root";
 
-export interface TextProps extends TextVariantProps {
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface TextHosts {
+    readonly root: "Text";
+}
+
+export interface TextProps
+    extends TextVariantProps, NativeSlotProps<TextHosts> {
     readonly children?: ReactNode;
-    readonly style?: StyleProp<TextStyle>;
     readonly testId?: TestIdOverride<Root> | undefined;
 }
 
 /** Text in a type style: `<Text textStyle="titleLarge">Inbox</Text>`. Nothing inherits on React
  *  Native, so it takes the surface's text color unless its style says otherwise. */
 export function Text(props: TextProps): ReactNode {
+    const slot = nativeSlots(props);
     const selected = useSelectedStyles("text", textSelection(props));
     const tokens = useTokens();
     return (
         <NativeText
-            style={[
+            {...slot.props("root")}
+            style={slot.style("root", [
                 { color: String(tokens["colors.onSurface"]) },
                 rootOf(selected) as TextStyle,
-                props.style,
-            ]}
+            ])}
             testID={testIdOf(textAnatomy, "root", props.testId)}
         >
             {props.children}
@@ -89,7 +95,15 @@ export function Text(props: TextProps): ReactNode {
     );
 }
 
-export interface AvatarProps extends AvatarVariantProps {
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface AvatarHosts {
+    readonly root: "View";
+    readonly image: "Image";
+    readonly fallback: "Text";
+}
+
+export interface AvatarProps
+    extends AvatarVariantProps, NativeSlotProps<AvatarHosts> {
     /** Who it stands for, for assistive technology. */
     readonly label?: string | undefined;
     /** The picture. It shows once it has loaded; until then, and if it fails, the children do. */
@@ -112,6 +126,7 @@ const HIDDEN = {
 } as const;
 
 function AvatarImpl(props: AvatarProps): ReactNode {
+    const slot = nativeSlots(props);
     const engine = useEngine();
     const selected = useSelectedStyles("avatar", avatarSelection(props));
     const style = rootOf(selected);
@@ -129,30 +144,33 @@ function AvatarImpl(props: AvatarProps): ReactNode {
     return (
         <View
             // Named by `label` as an image, like the web's root; without one it's decorative.
+            {...slot.props("root")}
             {...(props.label === undefined
                 ? { "aria-hidden": true }
                 : { role: "img" as const, "aria-label": props.label })}
-            style={style as ViewStyle}
+            style={slot.style("root", style as ViewStyle)}
             testID={testIdOf(avatarAnatomy, "root", props.testId)}
         >
             {Drawing ? <Drawing drawing={rootDrawing(selected)} /> : null}
             {props.src !== undefined && (
                 <Image
+                    {...slot.props("image")}
                     accessibilityElementsHidden
                     alt=""
-                    onError={() => settle("error")}
-                    onLoad={() => settle("loaded")}
+                    onError={slot.on("image", "onError", () => settle("error"))}
+                    onLoad={slot.on("image", "onLoad", () => settle("loaded"))}
                     source={{ uri: props.src }}
-                    style={[
+                    style={slot.style("image", [
                         selected.styles.image as ImageStyle,
                         loaded ? null : HIDDEN,
-                    ]}
+                    ])}
                     testID={testIdOf(avatarAnatomy, "image", props.testId)}
                 />
             )}
             {loaded ? null : (
                 <NativeText
-                    style={ownText(style) as TextStyle}
+                    {...slot.props("fallback")}
+                    style={slot.style("fallback", ownText(style) as TextStyle)}
                     testID={testIdOf(avatarAnatomy, "fallback", props.testId)}
                 >
                     {props.children}
@@ -165,7 +183,13 @@ function AvatarImpl(props: AvatarProps): ReactNode {
 /** Material's avatar, in its shape: `<Avatar label="Ada Lovelace">AL</Avatar>`. */
 export const Avatar = withEngine(AvatarImpl, "Avatar");
 
-export interface BadgeProps extends BadgeVariantProps, RootStyleProps {
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface BadgeHosts {
+    readonly root: "View";
+}
+
+export interface BadgeProps
+    extends BadgeVariantProps, NativeSlotProps<BadgeHosts> {
     /** What it says for assistive technology ("3 unread"). */
     readonly label?: string | undefined;
     /** The count or short label of a large badge. */
@@ -174,6 +198,7 @@ export interface BadgeProps extends BadgeVariantProps, RootStyleProps {
 }
 
 function BadgeImpl(props: BadgeProps): ReactNode {
+    const slot = nativeSlots(props);
     const engine = useEngine();
     const selected = useSelectedStyles("badge", badgeSelection(props));
     const style = rootOf(selected);
@@ -181,11 +206,12 @@ function BadgeImpl(props: BadgeProps): ReactNode {
     const hidden = props.label === undefined && props.size === "small";
     return (
         <View
+            {...slot.props("root")}
             {...(props.label === undefined
                 ? {}
                 : { role: "img" as const, "aria-label": props.label })}
             aria-hidden={hidden ? true : undefined}
-            style={withUserStyle(style as ViewStyle, props.style)}
+            style={slot.style("root", style as ViewStyle)}
             testID={testIdOf(badgeAnatomy, "root", props.testId)}
         >
             {Drawing ? <Drawing drawing={rootDrawing(selected)} /> : null}
@@ -201,7 +227,13 @@ function BadgeImpl(props: BadgeProps): ReactNode {
 /** Material's badge: `<Badge>3</Badge>`, or a dot, `<Badge size="small" />`. */
 export const Badge = withEngine(BadgeImpl, "Badge");
 
-export interface IconProps extends IconVariantProps {
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface IconHosts {
+    readonly root: "View";
+}
+
+export interface IconProps
+    extends IconVariantProps, NativeSlotProps<IconHosts> {
     /** The icon's name for assistive technology; without it, the icon is decorative. */
     readonly label?: string | undefined;
     /** Flips a pointing icon under right to left. */
@@ -214,6 +246,7 @@ export interface IconProps extends IconVariantProps {
 /** A standalone icon in Material's sizes and colors: `<Icon label="Star"><Glyph glyph="★" />
  *  </Icon>`. Without a color, it takes the surface's text color. */
 export function Icon(props: IconProps): ReactNode {
+    const slot = nativeSlots(props);
     const selected = useSelectedStyles(
         "icon",
         iconSelection(props),
@@ -224,10 +257,11 @@ export function Icon(props: IconProps): ReactNode {
     const style = { color: String(tokens["colors.onSurface"]), ...own };
     return (
         <View
+            {...slot.props("root")}
             {...(props.label === undefined
                 ? { "aria-hidden": true }
                 : { role: "img", "aria-label": props.label })}
-            style={own as ViewStyle}
+            style={slot.style("root", own as ViewStyle)}
             testID={testIdOf(iconAnatomy, "root", props.testId)}
         >
             <IconSlot
@@ -241,36 +275,52 @@ export function Icon(props: IconProps): ReactNode {
     );
 }
 
-export interface SeparatorProps extends SeparatorVariantProps {
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface SeparatorHosts {
+    readonly root: "View";
+}
+
+export interface SeparatorProps
+    extends SeparatorVariantProps, NativeSlotProps<SeparatorHosts> {
     readonly testId?: TestIdOverride<Root> | undefined;
 }
 
 /** Material's divider: `<Separator inset="start" />`. */
 export function Separator(props: SeparatorProps): ReactNode {
+    const slot = nativeSlots(props);
     const selected = useSelectedStyles("separator", separatorSelection(props));
     return (
         <View
+            {...slot.props("root")}
             role="separator"
-            style={rootOf(selected) as ViewStyle}
+            style={slot.style("root", rootOf(selected) as ViewStyle)}
             testID={testIdOf(separatorAnatomy, "root", props.testId)}
         />
     );
 }
 
-export interface SupportingTextProps extends SupportingTextVariantProps {
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface SupportingTextHosts {
+    readonly root: "Text";
+}
+
+export interface SupportingTextProps
+    extends SupportingTextVariantProps, NativeSlotProps<SupportingTextHosts> {
     readonly children?: ReactNode;
     readonly testId?: TestIdOverride<Root> | undefined;
 }
 
 /** Text under a control, in a tone: `<SupportingText tone="error">…</SupportingText>`. */
 export function SupportingText(props: SupportingTextProps): ReactNode {
+    const slot = nativeSlots(props);
     const selected = useSelectedStyles(
         "supportingText",
         supportingTextSelection(props),
     );
     return (
         <NativeText
-            style={rootOf(selected) as TextStyle}
+            {...slot.props("root")}
+            style={slot.style("root", rootOf(selected) as TextStyle)}
             testID={testIdOf(supportingTextAnatomy, "root", props.testId)}
         >
             {props.children}
@@ -278,11 +328,19 @@ export function SupportingText(props: SupportingTextProps): ReactNode {
     );
 }
 
-export interface ScrimProps extends ScrimVariantProps {
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface ScrimHosts {
+    readonly root: "View";
+}
+
+export interface ScrimProps
+    extends ScrimVariantProps, NativeSlotProps<ScrimHosts> {
     /** Whether it shows: it fades in when this turns true and out when it turns false,
      *  rendering nothing once it's gone. Without it, the scrim is always shown, still. */
     readonly open?: boolean | undefined;
     readonly testId?: TestIdOverride<Root> | undefined;
+    /** The owner's per-part props in its place (a dialog's `backdrop`), for its own scrim. */
+    readonly slot?: NativeSlots | undefined;
 }
 
 /** A layer dimming what sits behind it, over the whole of its parent. */
@@ -292,26 +350,38 @@ export function Scrim(props: ScrimProps): ReactNode {
     const presence = useOverlayPresence(props.open, "scrim");
     if (!presence.present) return null;
     const testID = testIdOf(scrimAnatomy, "root", props.testId);
+    const slot = props.slot ?? nativeSlots(props);
     if (props.open === undefined) {
         return (
             <View
+                {...slot.props("root")}
                 pointerEvents="none"
-                style={rootOf(selected) as ViewStyle}
+                style={slot.style("root", rootOf(selected) as ViewStyle)}
                 testID={testID}
             />
         );
     }
     return (
         <engine.View
-            {...presence.props}
+            {...slot.props("root")}
+            {...slot.with("root", presence.props)}
             pointerEvents="none"
-            style={{ ...rootOf(selected), ...presence.style }}
+            style={slot.style("root", {
+                ...rootOf(selected),
+                ...presence.style,
+            })}
             testID={testID}
         />
     );
 }
 
-export interface MediaProps extends MediaVariantProps {
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface MediaHosts {
+    readonly root: "Image";
+}
+
+export interface MediaProps
+    extends MediaVariantProps, NativeSlotProps<MediaHosts> {
     /** The picture's address, as the web's `src` and the avatar's. */
     readonly src?: string | undefined;
     /** The picture, as React Native's `Image` takes it: a `require()`d asset, `{ uri, headers,
@@ -365,6 +435,7 @@ function MediaImpl(props: MediaProps): ReactNode {
     const fit = objectFit === "contain" ? "contain" : "cover";
     const drawing = rootDrawing(selected);
     const testID = testIdOf(mediaAnatomy, "root", props.testId);
+    const slot = nativeSlots(props);
     const Drawing = engine.Drawing;
     if (isDev && !warnedBoth && props.source != null && props.src != null) {
         warnedBoth = true;
@@ -410,9 +481,10 @@ function MediaImpl(props: MediaProps): ReactNode {
     if (drawing && Drawing) {
         return (
             <View
+                {...(slot.props("root") as object)}
                 role="img"
                 aria-label={props.alt ?? ""}
-                style={style as ViewStyle}
+                style={slot.style("root", style as ViewStyle)}
                 testID={testID}
             >
                 <Drawing drawing={drawing} image={{ source, fit }} />
@@ -421,10 +493,11 @@ function MediaImpl(props: MediaProps): ReactNode {
     }
     return (
         <Image
+            {...slot.props("root")}
             source={source}
             accessibilityLabel={props.alt ?? ""}
             resizeMode={fit}
-            style={style as ImageStyle}
+            style={slot.style("root", style as ImageStyle)}
             testID={testID}
         />
     );

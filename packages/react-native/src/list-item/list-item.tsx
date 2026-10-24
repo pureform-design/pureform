@@ -35,12 +35,30 @@ import { Linking } from "react-native";
 import { Expanding } from "../expand";
 import { iconParts } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
-import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
+import { testIdOf, useControllable, withEngine } from "../parts";
 import { useDirection } from "../provider";
 import { useSidewaysPan } from "../sideways-pan";
+import { nativeSlots, withUnselectable } from "../slot-props";
+import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
 const [INDICATION] = listItemAnatomy.indication!;
+
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface ListItemHosts {
+    readonly overline: "Text";
+    readonly headline: "Text";
+    readonly supportingText: "Text";
+    readonly trailingText: "Text";
+    readonly trailing: "View";
+    readonly leading: "View";
+    readonly indicator: "View";
+    readonly action: "View";
+    readonly content: "View";
+    readonly frame: "View";
+    readonly root: "View";
+    readonly region: "View";
+}
 
 export interface ListItemProps
     extends
@@ -48,7 +66,8 @@ export interface ListItemProps
         ListItemContentProps<ReactNode>,
         ListItemExpandProps,
         ListItemSwipeProps,
-        InteractiveProps {
+        InteractiveProps,
+        NativeSlotProps<ListItemHosts> {
     /** The current item, such as the page a navigation list is on. */
     readonly selected?: boolean | undefined;
     readonly disabled?: boolean | undefined;
@@ -178,23 +197,30 @@ function ListItemImpl(props: ListItemProps): ReactNode {
     const { styles: s, selected, views: v } = slots;
     const id = (part: ListItemPart) =>
         testIdOf(listItemAnatomy, part, props.testId);
+    const slot = nativeSlots(props);
     const line = (part: ListItemPart, value: ReactNode) => {
         const Slot = v[part];
         return isPresent(value) ? (
-            <Slot.Text selectable={false} style={s[part]} testID={id(part)}>
+            <Slot.Text
+                {...slot.props(part)}
+                selectable={false}
+                style={slot.style(part, s[part])}
+                testID={id(part)}
+            >
                 {value}
             </Slot.Text>
         ) : null;
     };
-    const icon = iconParts(slots, id);
+    const icon = iconParts(slots, id, slot);
     const action = isPresent(props.swipeAction) ? (
         <v.action.View
+            {...slot.props("action")}
             aria-hidden={revealed ? undefined : true}
             importantForAccessibility={
                 revealed ? "auto" : "no-hide-descendants"
             }
             pointerEvents={revealed ? "auto" : "none"}
-            style={s.action}
+            style={slot.style("action", s.action)}
             testID={id("action")}
         >
             {props.swipeAction}
@@ -203,7 +229,11 @@ function ListItemImpl(props: ListItemProps): ReactNode {
     const content = (
         <>
             {icon("leading", props.leading)}
-            <v.content.View style={s.content} testID={id("content")}>
+            <v.content.View
+                {...slot.props("content")}
+                style={slot.style("content", s.content)}
+                testID={id("content")}
+            >
                 {line("overline", props.overline)}
                 {line("headline", props.headline)}
                 {line("supportingText", props.supportingText)}
@@ -225,7 +255,12 @@ function ListItemImpl(props: ListItemProps): ReactNode {
     // comes after the row in the accessibility order), drawn under the row.
     const framed = (row: ReactNode) =>
         swipeable ? (
-            <v.frame.View {...pan} style={s.frame} testID={id("frame")}>
+            <v.frame.View
+                {...slot.props("frame")}
+                {...slot.with("frame", pan)}
+                style={slot.style("frame", s.frame)}
+                testID={id("frame")}
+            >
                 {row}
                 {action}
             </v.frame.View>
@@ -237,10 +272,11 @@ function ListItemImpl(props: ListItemProps): ReactNode {
     if (swipeable && !interactive)
         return framed(
             <v.root.View
-                {...keys}
+                {...slot.props("root")}
+                {...slot.with("root", keys)}
                 focusable
                 {...(plainRole ? { role: plainRole } : {})}
-                style={{ ...s.root, ...unselectable }}
+                style={slot.style("root", withUnselectable(s.root))}
                 testID={id("root")}
             >
                 {content}
@@ -259,6 +295,7 @@ function ListItemImpl(props: ListItemProps): ReactNode {
           : props.onPress;
     const row = (
         <v.root.Pressable
+            {...slot.props("root")}
             {...(interactive ? indication.handlers : {})}
             role={
                 interactive
@@ -272,8 +309,8 @@ function ListItemImpl(props: ListItemProps): ReactNode {
             {...(interactive
                 ? { onPress, disabled: props.disabled }
                 : { disabled: true })}
-            {...keys}
-            style={{ ...s.root, ...unselectable }}
+            {...slot.with("root", keys)}
+            style={slot.style("root", withUnselectable(s.root))}
             testID={id("root")}
         >
             {content}
@@ -287,7 +324,11 @@ function ListItemImpl(props: ListItemProps): ReactNode {
             {framed(row)}
             {expandable ? (
                 <Expanding open={expanded}>
-                    <v.region.View style={s.region} testID={id("region")}>
+                    <v.region.View
+                        {...slot.props("region")}
+                        style={slot.style("region", s.region)}
+                        testID={id("region")}
+                    >
                         {props.region}
                     </v.region.View>
                 </Expanding>

@@ -32,18 +32,45 @@ import {
 import type { ReactNode } from "react";
 
 import { Checkbox } from "../checkbox";
+import type { CheckboxProps } from "../checkbox";
 import { Glyph, IconSlot, iconSlot } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
-import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
+import { testIdOf, useControllable, withEngine } from "../parts";
+import { nativeSlots, withUnselectable } from "../slot-props";
+import type { NativeSlots } from "../slot-props";
+import type { InnerPropsOf, NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
 const [INDICATION] = dataTableAnatomy.indication!;
 
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface TableHosts {
+    readonly sortHeader: "Pressable";
+    readonly sortLabel: "Text";
+    readonly sortIndicator: "View";
+    readonly selectionCell: "View";
+    readonly root: "View";
+    readonly header: "View";
+    readonly headerRow: "View";
+    readonly headerCell: "Text";
+    readonly row: "View";
+    readonly alternateRow: "View";
+    readonly cell: "Text";
+    readonly footerCell: "Text";
+    readonly body: "View";
+    readonly footer: "View";
+    readonly footerRow: "View";
+}
+
 export interface TableProps<Row = Record<string, unknown>>
     extends
         Omit<TableRootOwnProps, "unstyled" | "rowValues">,
-        TableContentProps<Row, ReactNode> {
+        TableContentProps<Row, ReactNode>,
+        NativeSlotProps<TableHosts> {
     readonly "aria-label"?: string | undefined;
+    /** The selection checkboxes' (select-all and each row's) `style`, `slotProps`, `tokens`
+     *  and `testId`. */
+    readonly checkboxProps?: InnerPropsOf<CheckboxProps> | undefined;
 }
 
 type Selection = ReturnType<typeof tableSelection>;
@@ -56,8 +83,10 @@ function CellContent(props: {
     readonly styles: Record<string, unknown>;
     readonly views: Record<string, { Text: never; View: never }>;
     readonly id: Id;
+    readonly slot: NativeSlots;
     readonly children: ReactNode;
 }): ReactNode {
+    const slot = props.slot;
     const Slot = props.views[props.part] as unknown as {
         Text: React.ComponentType<Record<string, unknown>>;
         View: React.ComponentType<Record<string, unknown>>;
@@ -68,8 +97,9 @@ function CellContent(props: {
     const Element = text ? Slot.Text : Slot.View;
     return (
         <Element
+            {...slot.props(props.part)}
             role={props.role}
-            style={props.styles[props.part]}
+            style={slot.style(props.part, props.styles[props.part])}
             testID={props.id(props.part)}
         >
             {props.children}
@@ -87,7 +117,9 @@ function SortHeader(props: {
     readonly onPress: () => void;
     readonly indication: TableProps["indication"];
     readonly id: Id;
+    readonly slot: NativeSlots;
 }): ReactNode {
+    const slot = props.slot;
     const indication = useSurfaceIndication(INDICATION!, {
         indication: props.indication,
     });
@@ -109,7 +141,8 @@ function SortHeader(props: {
     );
     return (
         <v.sortHeader.Pressable
-            {...indication.handlers}
+            {...slot.props("sortHeader")}
+            {...slot.with("sortHeader", indication.handlers)}
             role="button"
             {...(typeof props.label === "string"
                 ? {
@@ -118,19 +151,21 @@ function SortHeader(props: {
                           : props.label,
                   }
                 : {})}
-            onPress={props.onPress}
-            style={{ ...s.sortHeader, ...unselectable }}
+            onPress={slot.on("sortHeader", "onPress", props.onPress)}
+            style={slot.style("sortHeader", withUnselectable(s.sortHeader))}
             testID={props.id("sortHeader")}
         >
             <v.sortLabel.Text
-                style={s.sortLabel}
+                {...slot.props("sortLabel")}
+                style={slot.style("sortLabel", s.sortLabel)}
                 testID={props.id("sortLabel")}
             >
                 {props.label}
             </v.sortLabel.Text>
             <v.sortIndicator.View
+                {...slot.props("sortIndicator")}
                 aria-hidden
-                style={s.sortIndicator}
+                style={slot.style("sortIndicator", s.sortIndicator)}
                 testID={props.id("sortIndicator")}
             >
                 <IconSlot
@@ -157,7 +192,10 @@ function BodyRow<Row>(props: {
     readonly onToggle: () => void;
     readonly columns: readonly TableColumn<Row, ReactNode>[];
     readonly id: Id;
+    readonly slot: NativeSlots;
+    readonly checkboxProps: InnerPropsOf<CheckboxProps> | undefined;
 }): ReactNode {
+    const slot = props.slot;
     const { styles: s, views: v } = useComponentSlots<TablePart>(
         "dataTable",
         props.selection,
@@ -167,18 +205,21 @@ function BodyRow<Row>(props: {
     const RowView = v[part].View;
     return (
         <RowView
+            {...slot.props(part)}
             role="row"
             {...(props.selectable ? { "aria-selected": props.selected } : {})}
-            style={s[part]}
+            style={slot.style(part, s[part])}
             testID={props.id(part)}
         >
             {props.selectable ? (
                 <v.selectionCell.View
+                    {...slot.props("selectionCell")}
                     role="cell"
-                    style={s.selectionCell}
+                    style={slot.style("selectionCell", s.selectionCell)}
                     testID={props.id("selectionCell")}
                 >
                     <Checkbox
+                        {...props.checkboxProps}
                         aria-label={props.selectLabel}
                         checked={props.selected}
                         onCheckedChange={props.onToggle}
@@ -190,6 +231,7 @@ function BodyRow<Row>(props: {
                     key={column.id}
                     part="cell"
                     role="cell"
+                    slot={slot}
                     styles={s as Record<string, unknown>}
                     views={v as never}
                     id={props.id}
@@ -233,6 +275,7 @@ function TableImpl<Row>(props: TableProps<Row>): ReactNode {
         registry,
     );
     const id: Id = (part) => testIdOf(dataTableAnatomy, part, props.testId);
+    const slot = nativeSlots(props);
     const columns = props.columns ?? [];
     const selectable = props.selectionMode !== undefined;
     const entries = (props.rows ?? []).map((row, index) => ({
@@ -262,41 +305,47 @@ function TableImpl<Row>(props: TableProps<Row>): ReactNode {
             styles={s as Record<string, unknown>}
             views={v as never}
             id={id}
+            slot={slot}
         >
             {children}
         </CellContent>
     );
     return (
         <v.root.View
+            {...slot.props("root")}
             role="table"
             {...(props["aria-label"] === undefined
                 ? {}
                 : { "aria-label": props["aria-label"] })}
-            style={s.root}
+            style={slot.style("root", s.root)}
             testID={id("root")}
         >
             <v.header.View
+                {...slot.props("header")}
                 role="rowgroup"
-                style={s.header}
+                style={slot.style("header", s.header)}
                 testID={id("header")}
             >
                 <v.headerRow.View
+                    {...slot.props("headerRow")}
                     role="row"
-                    style={s.headerRow}
+                    style={slot.style("headerRow", s.headerRow)}
                     testID={id("headerRow")}
                 >
                     {selectable ? (
                         <v.selectionCell.View
+                            {...slot.props("selectionCell")}
                             role={
                                 props.selectionMode === "multiple"
                                     ? "columnheader"
                                     : "cell"
                             }
-                            style={s.selectionCell}
+                            style={slot.style("selectionCell", s.selectionCell)}
                             testID={id("selectionCell")}
                         >
                             {props.selectionMode === "multiple" ? (
                                 <Checkbox
+                                    {...props.checkboxProps}
                                     aria-label={selectAll}
                                     checked={selectAllState(selection, values)}
                                     onCheckedChange={() =>
@@ -311,9 +360,10 @@ function TableImpl<Row>(props: TableProps<Row>): ReactNode {
                     {columns.map((column) =>
                         column.sortable ? (
                             <v.headerCell.View
+                                {...slot.props("headerCell")}
                                 key={column.id}
                                 role="columnheader"
-                                style={s.headerCell}
+                                style={slot.style("headerCell", s.headerCell)}
                                 testID={id("headerCell")}
                             >
                                 <SortHeader
@@ -323,6 +373,7 @@ function TableImpl<Row>(props: TableProps<Row>): ReactNode {
                                     label={column.header ?? column.id}
                                     indication={props.indication}
                                     id={id}
+                                    slot={slot}
                                     start={props.sortStart}
                                     onPress={() =>
                                         setSort(
@@ -348,10 +399,16 @@ function TableImpl<Row>(props: TableProps<Row>): ReactNode {
                     )}
                 </v.headerRow.View>
             </v.header.View>
-            <v.body.View role="rowgroup" style={s.body} testID={id("body")}>
+            <v.body.View
+                {...slot.props("body")}
+                role="rowgroup"
+                style={slot.style("body", s.body)}
+                testID={id("body")}
+            >
                 {rows.map((entry, index) => (
                     <BodyRow
                         key={entry.value}
+                        checkboxProps={props.checkboxProps}
                         selection={registry}
                         row={entry.row}
                         index={index}
@@ -370,18 +427,21 @@ function TableImpl<Row>(props: TableProps<Row>): ReactNode {
                         }
                         columns={columns}
                         id={id}
+                        slot={slot}
                     />
                 ))}
             </v.body.View>
             {hasFooter ? (
                 <v.footer.View
+                    {...slot.props("footer")}
                     role="rowgroup"
-                    style={s.footer}
+                    style={slot.style("footer", s.footer)}
                     testID={id("footer")}
                 >
                     <v.footerRow.View
+                        {...slot.props("footerRow")}
                         role="row"
-                        style={s.footerRow}
+                        style={slot.style("footerRow", s.footerRow)}
                         testID={id("footerRow")}
                     >
                         {selectable

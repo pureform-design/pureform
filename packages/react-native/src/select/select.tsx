@@ -28,9 +28,11 @@ import type { ReactNode } from "react";
 import { Modal, Platform, Pressable, StyleSheet, View } from "react-native";
 
 import { isTypedKey, MenuKeys, MenuListbox, typeahead } from "../menu/menu";
+import type { MenuProps } from "../menu/menu";
 import { useControllable } from "../parts";
 import { usePresence } from "../presence";
 import { useDirection, useEngine } from "../provider";
+import type { InnerPropsOf } from "../slot-props";
 import { Field, partId } from "../text-input";
 import type { FieldProps } from "../text-input";
 
@@ -68,6 +70,8 @@ export interface SelectProps
             FieldProps,
             "value" | "defaultValue" | "onValueChange" | "inputProps"
         > {
+    /** The menu's `style`, `slotProps`, `tokens` and `testId`. */
+    readonly menuProps?: InnerPropsOf<MenuProps> | undefined;
     readonly items: readonly SelectItem[];
     /** The picked item's value, `null` for none. Controlled when defined. */
     readonly value?: string | null | undefined;
@@ -90,6 +94,7 @@ export function Select(props: SelectProps): ReactNode {
         onValueChange,
         testId,
         indication,
+        menuProps,
         ...field
     } = props;
     const [value, setValue] = useControllable<"value", string | null>(
@@ -268,6 +273,7 @@ export function Select(props: SelectProps): ReactNode {
                             }}
                         >
                             <MenuListbox
+                                {...menuProps}
                                 listbox={{ id: listId }}
                                 {...(typeof props.label === "string"
                                     ? { "aria-label": props.label }

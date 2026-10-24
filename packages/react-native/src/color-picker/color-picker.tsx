@@ -16,6 +16,7 @@ import {
     colorPickerSelection,
     colorPickerSwatchLabel,
     hasEyeDropper,
+    overDefaults,
 } from "@pureform/binding-core";
 import type {
     ColorPickerContentProps,
@@ -29,11 +30,15 @@ import { PanResponder, Platform, View } from "react-native";
 import type { GestureResponderEvent, LayoutChangeEvent } from "react-native";
 
 import { IconButton } from "../icon-button";
+import type { IconButtonProps } from "../icon-button/icon-button";
 import { Glyph } from "../icon-style";
-import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
+import { testIdOf, useControllable, withEngine } from "../parts";
 import { useDirection } from "../provider";
+import { nativeSlots, withUnselectable } from "../slot-props";
+import type { InnerPropsOf, NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 import { TextField } from "../text-field";
+import type { TextFieldProps } from "../text-input";
 
 type Part = PartName<typeof colorPickerAnatomy>;
 type Color = colorPicker.Color;
@@ -44,8 +49,34 @@ const ADJUSTABLE = [{ name: "increment" }, { name: "decrement" }];
 /** The eye dropper's glyph. */
 const COLORIZE = "⊙";
 
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface ColorPickerHosts {
+    readonly area: "View";
+    readonly areaBackground: "View";
+    readonly areaThumb: "View";
+    readonly channelSlider: "View";
+    readonly transparencyGrid: "View";
+    readonly channelSliderTrack: "View";
+    readonly channelSliderThumb: "View";
+    readonly swatchTrigger: "Pressable";
+    readonly swatch: "View";
+    readonly root: "View";
+    readonly label: "Text";
+    readonly content: "View";
+    readonly control: "View";
+    readonly valueSwatch: "View";
+    readonly swatchGroup: "View";
+}
+
 export interface ColorPickerProps
-    extends ColorPickerVariantProps, ColorPickerContentProps<ReactNode> {
+    extends
+        ColorPickerVariantProps,
+        ColorPickerContentProps<ReactNode>,
+        NativeSlotProps<ColorPickerHosts> {
+    /** The eye dropper button's `style`, `slotProps`, `tokens` and `testId`. */
+    readonly iconButtonProps?: InnerPropsOf<IconButtonProps> | undefined;
+    /** The hex field's `style`, `slotProps`, `tokens` and `testId`. */
+    readonly textFieldProps?: InnerPropsOf<TextFieldProps> | undefined;
     /** The color, controlled: any CSS color (`#6750a4`, `rgb(…)`, `hsl(…)`). */
     readonly value?: string | undefined;
     /** The color to start with. @default "#6750a4" */
@@ -135,6 +166,7 @@ interface PartsProps {
 }
 
 function Area(props: PartsProps): ReactNode {
+    const slot = nativeSlots(props.picker);
     const { picker, color, rtl } = props;
     const { styles: s, views: v } = useComponentSlots<Part>(
         "colorPicker",
@@ -184,41 +216,44 @@ function Area(props: PartsProps): ReactNode {
     };
     return (
         <v.area.View
+            {...slot.props("area")}
             ref={drag.ref}
             onLayout={(event: LayoutChangeEvent) => {
                 drag.onLayout(event);
                 setSize(event.nativeEvent.layout);
             }}
-            {...drag.pan.panHandlers}
-            style={{ ...s.area, ...unselectable }}
+            {...slot.with("area", drag.pan.panHandlers)}
+            style={slot.style("area", withUnselectable(s.area))}
             testID={id("area")}
         >
             <v.areaBackground.View
+                {...slot.props("areaBackground")}
                 pointerEvents="none"
-                style={{
+                style={slot.style("areaBackground", {
                     ...s.areaBackground,
                     backgroundColor: `hsl(${hue}, 100%, 50%)`,
                     ...gradient(
                         `linear-gradient(to top, #000, transparent), linear-gradient(to ${rtl ? "left" : "right"}, #fff, transparent)`,
                     ),
-                }}
+                })}
                 testID={id("areaBackground")}
             />
             <v.areaThumb.View
+                {...slot.props("areaThumb")}
                 pointerEvents="none"
                 role="adjustable"
                 aria-label="saturation and brightness"
                 focusable={interactive}
                 {...({ onKeyDown } as object)}
                 aria-valuetext={`saturation ${Math.round(saturation * 100)}, brightness ${Math.round(brightness * 100)}`}
-                style={{
+                style={slot.style("areaThumb", {
                     ...s.areaThumb,
                     left: x - thumb / 2,
                     top: (1 - brightness) * size.height - thumb / 2,
                     backgroundColor: color
                         .withChannelValue("alpha", 1)
                         .toString("css"),
-                }}
+                })}
                 testID={id("areaThumb")}
             />
         </v.area.View>
@@ -253,6 +288,7 @@ function Grid(props: { readonly width: number; readonly height: number }) {
 }
 
 function ChannelSlider(props: PartsProps & { readonly channel: Channel }) {
+    const slot = nativeSlots(props.picker);
     const { picker, color, rtl, channel } = props;
     const { styles: s, views: v } = useComponentSlots<Part>(
         "colorPicker",
@@ -300,30 +336,43 @@ function ChannelSlider(props: PartsProps & { readonly channel: Channel }) {
         Number((s.channelSliderTrack as { height?: unknown }).height) || 16;
     return (
         <v.channelSlider.View
+            {...slot.props("channelSlider")}
             ref={drag.ref}
             onLayout={(event: LayoutChangeEvent) => {
                 drag.onLayout(event);
                 setWidth(event.nativeEvent.layout.width);
             }}
-            {...drag.pan.panHandlers}
-            style={{ ...s.channelSlider, ...unselectable }}
+            {...slot.with("channelSlider", drag.pan.panHandlers)}
+            style={slot.style(
+                "channelSlider",
+                withUnselectable(s.channelSlider),
+            )}
             testID={id("channelSlider")}
         >
             {channel === "alpha" ? (
                 <v.transparencyGrid.View
+                    {...slot.props("transparencyGrid")}
                     pointerEvents="none"
-                    style={{ ...s.transparencyGrid, backgroundColor: "#fff" }}
+                    style={slot.style("transparencyGrid", {
+                        ...s.transparencyGrid,
+                        backgroundColor: "#fff",
+                    })}
                     testID={id("transparencyGrid")}
                 >
                     <Grid width={width} height={trackHeight} />
                 </v.transparencyGrid.View>
             ) : null}
             <v.channelSliderTrack.View
+                {...slot.props("channelSliderTrack")}
                 pointerEvents="none"
-                style={{ ...s.channelSliderTrack, ...gradient(track) }}
+                style={slot.style("channelSliderTrack", {
+                    ...s.channelSliderTrack,
+                    ...gradient(track),
+                })}
                 testID={id("channelSliderTrack")}
             />
             <v.channelSliderThumb.View
+                {...slot.props("channelSliderThumb")}
                 role="adjustable"
                 aria-label={channel}
                 aria-valuenow={Math.round(channel === "hue" ? now : now * 100)}
@@ -332,24 +381,25 @@ function ChannelSlider(props: PartsProps & { readonly channel: Channel }) {
                 aria-disabled={picker.disabled || undefined}
                 focusable={interactive}
                 accessibilityActions={ADJUSTABLE}
-                onAccessibilityAction={(event: {
-                    nativeEvent: { actionName: string };
-                }) =>
-                    adjust(
-                        (event.nativeEvent.actionName === "increment"
-                            ? 1
-                            : -1) * step,
-                    )
-                }
+                onAccessibilityAction={slot.on(
+                    "channelSliderThumb",
+                    "onAccessibilityAction",
+                    (event: { nativeEvent: { actionName: string } }) =>
+                        adjust(
+                            (event.nativeEvent.actionName === "increment"
+                                ? 1
+                                : -1) * step,
+                        ),
+                )}
                 {...({ onKeyDown } as object)}
-                style={{
+                style={slot.style("channelSliderThumb", {
                     ...s.channelSliderThumb,
                     left: (rtl ? 1 - fraction : fraction) * width - thumb / 2,
                     backgroundColor:
                         channel === "hue"
                             ? `hsl(${now}, 100%, 50%)`
                             : color.toString("css"),
-                }}
+                })}
                 testID={id("channelSliderThumb")}
             />
         </v.channelSlider.View>
@@ -362,6 +412,7 @@ function SwatchTrigger(props: {
     readonly checked: boolean;
     readonly pick: (value: string) => void;
 }): ReactNode {
+    const slot = nativeSlots(props.picker);
     const { picker, value, checked } = props;
     const { styles: s, views: v } = useComponentSlots<Part>(
         "colorPicker",
@@ -372,16 +423,23 @@ function SwatchTrigger(props: {
         testIdOf(colorPickerAnatomy, part, picker.testId);
     return (
         <v.swatchTrigger.Pressable
+            {...slot.props("swatchTrigger")}
             role="button"
             aria-label={colorPickerSwatchLabel(value)}
             aria-pressed={checked}
             disabled={picker.disabled || picker.readOnly}
-            onPress={() => props.pick(value)}
-            style={s.swatchTrigger}
+            onPress={slot.on("swatchTrigger", "onPress", () =>
+                props.pick(value),
+            )}
+            style={slot.style("swatchTrigger", s.swatchTrigger)}
             testID={id("swatchTrigger")}
         >
             <v.swatch.View
-                style={{ ...s.swatch, backgroundColor: value }}
+                {...slot.props("swatch")}
+                style={slot.style("swatch", {
+                    ...s.swatch,
+                    backgroundColor: value,
+                })}
                 testID={id("swatch")}
             />
         </v.swatchTrigger.Pressable>
@@ -450,28 +508,60 @@ function ColorPickerImpl(props: ColorPickerProps): ReactNode {
     };
     const parts: PartsProps = { picker: props, color, rtl, set, end };
     const id = (part: Part) => testIdOf(colorPickerAnatomy, part, props.testId);
+    const slot = nativeSlots(props);
     const current = colorPickerHexOf(color);
     return (
-        <v.root.View style={s.root} testID={id("root")}>
+        <v.root.View
+            {...slot.props("root")}
+            style={slot.style("root", s.root)}
+            testID={id("root")}
+        >
             {props.label === undefined ? null : (
-                <v.label.Text style={s.label} testID={id("label")}>
+                <v.label.Text
+                    {...slot.props("label")}
+                    style={slot.style("label", s.label)}
+                    testID={id("label")}
+                >
                     {props.label}
                 </v.label.Text>
             )}
-            <v.content.View style={s.content} testID={id("content")}>
+            <v.content.View
+                {...slot.props("content")}
+                style={slot.style("content", s.content)}
+                testID={id("content")}
+            >
                 {props.area === false ? null : <Area {...parts} />}
                 <ChannelSlider {...parts} channel="hue" />
                 {props.alpha ? (
                     <ChannelSlider {...parts} channel="alpha" />
                 ) : null}
-                <v.control.View style={s.control} testID={id("control")}>
+                <v.control.View
+                    {...slot.props("control")}
+                    style={slot.style("control", s.control)}
+                    testID={id("control")}
+                >
                     <v.valueSwatch.View
+                        {...slot.props("valueSwatch")}
                         aria-hidden
-                        style={{ ...s.valueSwatch, backgroundColor: current }}
+                        style={slot.style("valueSwatch", {
+                            ...s.valueSwatch,
+                            backgroundColor: current,
+                        })}
                         testID={id("valueSwatch")}
                     />
                     <View style={{ flexGrow: 1, flexShrink: 1 }}>
                         <TextField
+                            {...overDefaults(props.textFieldProps, {
+                                slotProps: {
+                                    input: {
+                                        autoCapitalize: "characters",
+                                        autoCorrect: false,
+                                        maxLength: 8,
+                                        onBlur: commit,
+                                        onSubmitEditing: commit,
+                                    },
+                                },
+                            })}
                             variant="outlined"
                             label={props.inputLabel ?? "Hex"}
                             prefixText="#"
@@ -483,17 +573,11 @@ function ColorPickerImpl(props: ColorPickerProps): ReactNode {
                             }
                             value={draft ?? colorPickerHexText(current)}
                             onValueChange={({ value }) => setDraft(value)}
-                            inputProps={{
-                                autoCapitalize: "characters",
-                                autoCorrect: false,
-                                maxLength: 8,
-                                onBlur: commit,
-                                onSubmitEditing: commit,
-                            }}
                         />
                     </View>
                     {dropper && props.eyeDropper !== false ? (
                         <IconButton
+                            {...props.iconButtonProps}
                             icon={<Glyph glyph={COLORIZE} />}
                             aria-label={
                                 props.eyeDropperLabel ??
@@ -506,8 +590,9 @@ function ColorPickerImpl(props: ColorPickerProps): ReactNode {
                 </v.control.View>
                 {props.swatches && props.swatches.length > 0 ? (
                     <v.swatchGroup.View
+                        {...slot.props("swatchGroup")}
                         role="group"
-                        style={s.swatchGroup}
+                        style={slot.style("swatchGroup", s.swatchGroup)}
                         testID={id("swatchGroup")}
                     >
                         {props.swatches.map((swatch) => (

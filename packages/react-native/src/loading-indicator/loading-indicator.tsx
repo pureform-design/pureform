@@ -14,9 +14,21 @@ import type { ReactNode } from "react";
 
 import { testIdOf, withEngine } from "../parts";
 import { useEngine } from "../provider";
+import { nativeSlots } from "../slot-props";
+import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
-export interface LoadingIndicatorProps extends LoadingIndicatorVariantProps {
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface LoadingIndicatorHosts {
+    readonly root: "View";
+    readonly container: "View";
+    readonly indicator: "View";
+}
+
+export interface LoadingIndicatorProps
+    extends
+        LoadingIndicatorVariantProps,
+        NativeSlotProps<LoadingIndicatorHosts> {
     readonly "aria-label"?: string | undefined;
     readonly testId?: TestIdOverride<LoadingIndicatorPart> | undefined;
 }
@@ -34,17 +46,27 @@ function LoadingIndicatorImpl(props: LoadingIndicatorProps): ReactNode {
     const Drawing = engine.Drawing;
     const id = (part: LoadingIndicatorPart) =>
         testIdOf(loadingIndicatorAnatomy, part, props.testId);
+    const slot = nativeSlots(props);
     return (
         <v.root.View
+            {...slot.props("root")}
             role="progressbar"
             {...(props["aria-label"] === undefined
                 ? {}
                 : { "aria-label": props["aria-label"] })}
-            style={s.root}
+            style={slot.style("root", s.root)}
             testID={id("root")}
         >
-            <v.container.View style={s.container} testID={id("container")}>
-                <v.indicator.View style={s.indicator} testID={id("indicator")}>
+            <v.container.View
+                {...slot.props("container")}
+                style={slot.style("container", s.container)}
+                testID={id("container")}
+            >
+                <v.indicator.View
+                    {...slot.props("indicator")}
+                    style={slot.style("indicator", s.indicator)}
+                    testID={id("indicator")}
+                >
                     {Drawing ? (
                         <Drawing drawing={selected.drawings.indicator} />
                     ) : null}

@@ -15,15 +15,25 @@ import type { GestureResponderEvent } from "react-native";
 
 import { IconSlot, iconSlot } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
-import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
-import { useComponentSlots, withUserStyle } from "../styles";
-import type { RootStyleProps } from "../styles";
+import { testIdOf, useControllable, withEngine } from "../parts";
+import { nativeSlots, withUnselectable } from "../slot-props";
+import type { NativeSlotProps } from "../slot-props";
+import { useComponentSlots } from "../styles";
 import { touchTargetSlopOf } from "../touch-slop";
 
 const [INDICATION] = chipAnatomy.indication!;
 
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface ChipHosts {
+    readonly root: "Pressable";
+    readonly touchTarget: "View";
+    readonly icon: "View";
+    readonly label: "Text";
+    readonly trailingIcon: "View";
+}
+
 export interface ChipProps
-    extends ChipVariantProps, InteractiveProps, RootStyleProps {
+    extends ChipVariantProps, InteractiveProps, NativeSlotProps<ChipHosts> {
     readonly label?: ReactNode;
     /** An icon before the label. */
     readonly icon?: ReactNode;
@@ -75,44 +85,57 @@ function ChipImpl(props: ChipProps): ReactNode {
         }),
     );
     const id = (part: ChipPart) => testIdOf(chipAnatomy, part, props.testId);
+    const slot = nativeSlots(props);
     const slop = touchTargetSlopOf(s.root ?? {}, s.touchTarget);
     return (
         <v.root.Pressable
+            {...slot.props("root")}
             hitSlop={slop}
-            {...indication.handlers}
+            {...slot.with("root", indication.handlers)}
             role="button"
             {...(toggle ? { "aria-pressed": on } : {})}
             disabled={props.disabled}
-            onLongPress={props.onLongPress}
-            onPress={(event: GestureResponderEvent) => {
-                if (toggle) setOn(!on);
-                props.onPress?.(event);
-            }}
-            style={withUserStyle({ ...s.root, ...unselectable }, props.style)}
+            onLongPress={slot.on("root", "onLongPress", props.onLongPress)}
+            onPress={slot.on(
+                "root",
+                "onPress",
+                (event: GestureResponderEvent) => {
+                    if (toggle) setOn(!on);
+                    props.onPress?.(event);
+                },
+            )}
+            style={slot.style("root", withUnselectable(s.root))}
             testID={id("root")}
         >
             <v.touchTarget.View
+                {...slot.props("touchTarget")}
                 pointerEvents="none"
-                style={s.touchTarget}
+                style={slot.style("touchTarget", s.touchTarget)}
                 testID={id("touchTarget")}
             />
             {props.icon != null && props.icon !== false ? (
-                <v.icon.View style={s.icon} testID={id("icon")}>
+                <v.icon.View
+                    {...slot.props("icon")}
+                    style={slot.style("icon", s.icon)}
+                    testID={id("icon")}
+                >
                     <IconSlot {...iconSlot(selected, "icon")} motion={s.icon}>
                         {props.icon}
                     </IconSlot>
                 </v.icon.View>
             ) : null}
             <v.label.Text
+                {...slot.props("label")}
                 selectable={false}
-                style={s.label}
+                style={slot.style("label", s.label)}
                 testID={id("label")}
             >
                 {props.label}
             </v.label.Text>
             {props.trailingIcon != null && props.trailingIcon !== false ? (
                 <v.trailingIcon.View
-                    style={s.trailingIcon}
+                    {...slot.props("trailingIcon")}
+                    style={slot.style("trailingIcon", s.trailingIcon)}
                     testID={id("trailingIcon")}
                 >
                     <IconSlot

@@ -34,8 +34,10 @@ import { Animated, PanResponder } from "react-native";
 import type { LayoutChangeEvent } from "react-native";
 
 import { ownText } from "../icon-style";
-import { testIdOf, unselectable, withEngine } from "../parts";
+import { testIdOf, withEngine } from "../parts";
 import { useDirection, usePureform } from "../provider";
+import { nativeSlots, withUnselectable } from "../slot-props";
+import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
 /** The splitter's parts: `"root" | "panel" | "resizeTrigger" | "resizeTriggerIndicator"`. */
@@ -43,8 +45,19 @@ type Part = PartName<typeof splitterAnatomy>;
 
 const ADJUSTABLE = [{ name: "increment" }, { name: "decrement" }];
 
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface SplitterHosts {
+    readonly resizeTrigger: "View";
+    readonly resizeTriggerIndicator: "View";
+    readonly root: "View";
+    readonly panel: "View";
+}
+
 export interface SplitterProps
-    extends SplitterVariantProps, SplitterContentProps<ReactNode> {
+    extends
+        SplitterVariantProps,
+        SplitterContentProps<ReactNode>,
+        NativeSlotProps<SplitterHosts> {
     /** Each pane's size, controlled. */
     readonly size?: readonly SplitterSize[] | undefined;
     /** Each pane's size to start with. Left out, they share the room. */
@@ -92,6 +105,7 @@ interface Settling {
 
 /** The divider after pane `index`: it takes the drag, the adjustments and the keys. */
 function ResizeTrigger(props: TriggerProps): ReactNode {
+    const slot = nativeSlots(props.splitter);
     const { splitter, index } = props;
     const [dragging, setDragging] = useState(false);
     const { styles: s, views: v } = useComponentSlots<Part>(
@@ -189,6 +203,7 @@ function ResizeTrigger(props: TriggerProps): ReactNode {
     const id = (part: Part) => testIdOf(splitterAnatomy, part, splitter.testId);
     return (
         <v.resizeTrigger.View
+            {...slot.props("resizeTrigger")}
             role="adjustable"
             aria-label={splitter.resizeLabel ?? "Resize panes"}
             aria-valuenow={Math.round(now)}
@@ -197,21 +212,31 @@ function ResizeTrigger(props: TriggerProps): ReactNode {
             aria-orientation={props.horizontal ? "vertical" : "horizontal"}
             focusable
             accessibilityActions={ADJUSTABLE}
-            onAccessibilityAction={(event: {
-                nativeEvent: { actionName: string };
-            }) =>
-                moveBy(event.nativeEvent.actionName === "increment" ? by : -by)
-            }
+            onAccessibilityAction={slot.on(
+                "resizeTrigger",
+                "onAccessibilityAction",
+                (event: { nativeEvent: { actionName: string } }) =>
+                    moveBy(
+                        event.nativeEvent.actionName === "increment" ? by : -by,
+                    ),
+            )}
             {...({ onKeyDown } as object)}
-            {...pan.panHandlers}
+            {...slot.with("resizeTrigger", pan.panHandlers)}
             {...(props.onLayout === undefined
                 ? {}
                 : { onLayout: props.onLayout })}
-            style={{ ...s.resizeTrigger, ...unselectable }}
+            style={slot.style(
+                "resizeTrigger",
+                withUnselectable(s.resizeTrigger),
+            )}
             testID={id("resizeTrigger")}
         >
             <v.resizeTriggerIndicator.View
-                style={s.resizeTriggerIndicator}
+                {...slot.props("resizeTriggerIndicator")}
+                style={slot.style(
+                    "resizeTriggerIndicator",
+                    s.resizeTriggerIndicator,
+                )}
                 testID={id("resizeTriggerIndicator")}
             />
         </v.resizeTrigger.View>
@@ -319,11 +344,13 @@ function SplitterImpl(props: SplitterProps): ReactNode {
         setTriggers(across * Math.max(0, props.panes.length - 1));
     };
     const id = (part: Part) => testIdOf(splitterAnatomy, part, props.testId);
+    const slot = nativeSlots(props);
     return (
         <v.root.View
             // It fills its parent, as the web's root does (Zag sizes it 100% both ways): a
             // stacked splitter has no height of its own to divide.
-            style={{ flexGrow: 1, ...s.root }}
+            {...slot.props("root")}
+            style={slot.style("root", { flexGrow: 1, ...s.root })}
             onLayout={onLayout}
             testID={id("root")}
         >
@@ -337,12 +364,13 @@ function SplitterImpl(props: SplitterProps): ReactNode {
                         }}
                     >
                         <v.panel.View
-                            style={{
+                            {...slot.props("panel")}
+                            style={slot.style("panel", {
                                 ...s.panel,
                                 flexGrow: 1,
                                 flexShrink: 1,
                                 flexBasis: 0,
-                            }}
+                            })}
                             testID={id("panel")}
                         >
                             {typeof pane.content === "string" ||

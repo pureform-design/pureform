@@ -15,6 +15,9 @@ import { Image } from "react-native";
 import type { ImageStyle } from "react-native";
 
 import { testIdOf, withEngine } from "../parts";
+import { nativeSlots } from "../slot-props";
+import type { NativeSlots } from "../slot-props";
+import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 import type { ComponentSlots } from "../styles";
 
@@ -22,6 +25,7 @@ import type { ComponentSlots } from "../styles";
 interface GridListContextValue {
     readonly slots: ComponentSlots<GridListPart>;
     readonly testId: TestIdOverride<GridListPart> | undefined;
+    readonly slot: NativeSlots;
 }
 
 const GridListContext = createContext<GridListContextValue | undefined>(
@@ -34,7 +38,20 @@ const useGridList = (part: string): GridListContextValue => {
     return list;
 };
 
-export interface GridListRootProps extends GridListVariantProps {
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface GridListRootHosts {
+    readonly root: "View";
+    readonly tile: "View";
+    readonly content: "View";
+    readonly header: "View";
+    readonly footer: "View";
+    readonly headline: "Text";
+    readonly subhead: "Text";
+    readonly media: "Image";
+}
+
+export interface GridListRootProps
+    extends GridListVariantProps, NativeSlotProps<GridListRootHosts> {
     readonly children?: ReactNode;
     /** Name for assistive technology. */
     readonly "aria-label"?: string | undefined;
@@ -43,19 +60,21 @@ export interface GridListRootProps extends GridListVariantProps {
 
 /** The grid list's root: a wrapping row of tiles, a list for assistive technology. */
 function Root(props: GridListRootProps): ReactNode {
+    const slot = nativeSlots(props);
     const slots = useComponentSlots<GridListPart>(
         "gridList",
         gridListSelection(props),
     );
     const { styles: s, views: v } = slots;
     return (
-        <GridListContext value={{ slots, testId: props.testId }}>
+        <GridListContext value={{ slots, testId: props.testId, slot }}>
             <v.root.View
+                {...slot.props("root")}
                 role="list"
                 {...(props["aria-label"] === undefined
                     ? {}
                     : { "aria-label": props["aria-label"] })}
-                style={s.root}
+                style={slot.style("root", s.root)}
                 testID={testIdOf(gridListAnatomy, "root", props.testId)}
             >
                 {props.children}
@@ -73,12 +92,14 @@ export interface GridListPartProps {
 const viewPart = (name: GridListPart, label: string, role?: "listitem") =>
     function GridListViewPart(props: GridListPartProps): ReactNode {
         const list = useGridList(label);
+        const slot = list.slot;
         const { styles: s, views: v } = list.slots;
         const Slot = v[name];
         return (
             <Slot.View
+                {...slot.props(name)}
                 {...(role ? { role } : {})}
-                style={s[name]}
+                style={slot.style(name, s[name])}
                 testID={testIdOf(gridListAnatomy, name, list.testId)}
             >
                 {props.children}
@@ -90,12 +111,14 @@ const viewPart = (name: GridListPart, label: string, role?: "listitem") =>
 const textPart = (name: GridListPart, label: string) =>
     function GridListTextPart(props: GridListPartProps): ReactNode {
         const list = useGridList(label);
+        const slot = list.slot;
         const { styles: s, views: v } = list.slots;
         const Slot = v[name];
         return (
             <Slot.Text
+                {...slot.props(name)}
                 selectable={false}
-                style={s[name]}
+                style={slot.style(name, s[name])}
                 testID={testIdOf(gridListAnatomy, name, list.testId)}
             >
                 {props.children}
@@ -128,15 +151,17 @@ export interface GridListMediaProps {
 /** The tile's picture: fills the tile and crops to cover. */
 function Media(props: GridListMediaProps): ReactNode {
     const list = useGridList("Media");
+    const slot = list.slot;
     const { objectFit, ...style } = list.slots.styles.media as ImageStyle & {
         objectFit?: string;
     };
     return (
         <Image
+            {...slot.props("media")}
             accessibilityLabel={props.alt ?? ""}
             resizeMode={objectFit === "contain" ? "contain" : "cover"}
             source={props.source}
-            style={style}
+            style={slot.style("media", style)}
             testID={testIdOf(gridListAnatomy, "media", list.testId)}
         />
     );

@@ -14,15 +14,26 @@ import type { ReactNode } from "react";
 
 import { useCheckKeys } from "../check-keys";
 import { useSurfaceIndication } from "../indication";
-import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
-import { useComponentSlots, withUserStyle } from "../styles";
-import type { RootStyleProps } from "../styles";
+import { testIdOf, useControllable, withEngine } from "../parts";
+import { nativeSlots, withUnselectable } from "../slot-props";
+import type { NativeSlotProps } from "../slot-props";
+import { useComponentSlots } from "../styles";
 import { touchTargetSlopOf } from "../touch-slop";
 
 const [INDICATION] = switchControlAnatomy.indication!;
 
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface SwitchHosts {
+    readonly root: "Pressable";
+    readonly touchTarget: "View";
+    readonly track: "View";
+    readonly stateLayer: "View";
+    readonly handle: "View";
+    readonly icon: "Text";
+}
+
 export interface SwitchProps
-    extends SwitchVariantProps, InteractiveProps, RootStyleProps {
+    extends SwitchVariantProps, InteractiveProps, NativeSlotProps<SwitchHosts> {
     /** Whether it's on. Controlled when defined. */
     readonly checked?: boolean | undefined;
     readonly defaultChecked?: boolean | undefined;
@@ -69,6 +80,7 @@ function SwitchImpl(props: SwitchProps): ReactNode {
     );
     const id = (part: SwitchPart) =>
         testIdOf(switchControlAnatomy, part, props.testId);
+    const slot = nativeSlots(props);
     const keys = useCheckKeys(
         () => {
             if (!props.readOnly) setChecked(!checked);
@@ -79,34 +91,46 @@ function SwitchImpl(props: SwitchProps): ReactNode {
     const slop = touchTargetSlopOf(s.root ?? {}, s.touchTarget);
     return (
         <v.root.Pressable
+            {...slot.props("root")}
             hitSlop={slop}
-            {...indication.handlers}
-            {...keys}
+            {...slot.with("root", indication.handlers)}
+            {...slot.with("root", keys)}
             role="switch"
             aria-checked={checked}
             {...(props["aria-label"] === undefined
                 ? {}
                 : { "aria-label": props["aria-label"] })}
             disabled={props.disabled}
-            style={withUserStyle({ ...s.root, ...unselectable }, props.style)}
+            style={slot.style("root", withUnselectable(s.root))}
             testID={id("root")}
         >
             <v.touchTarget.View
+                {...slot.props("touchTarget")}
                 pointerEvents="none"
-                style={s.touchTarget}
+                style={slot.style("touchTarget", s.touchTarget)}
                 testID={id("touchTarget")}
             />
-            <v.track.View style={s.track} testID={id("track")}>
+            <v.track.View
+                {...slot.props("track")}
+                style={slot.style("track", s.track)}
+                testID={id("track")}
+            >
                 <v.stateLayer.View
-                    style={s.stateLayer}
+                    {...slot.props("stateLayer")}
+                    style={slot.style("stateLayer", s.stateLayer)}
                     testID={id("stateLayer")}
                 >
                     {indication.layer(selected)}
                 </v.stateLayer.View>
-                <v.handle.View style={s.handle} testID={id("handle")}>
+                <v.handle.View
+                    {...slot.props("handle")}
+                    style={slot.style("handle", s.handle)}
+                    testID={id("handle")}
+                >
                     <v.icon.Text
+                        {...slot.props("icon")}
                         selectable={false}
-                        style={s.icon}
+                        style={slot.style("icon", s.icon)}
                         testID={id("icon")}
                     >
                         {checked ? (props.checkedIcon ?? "✓") : ""}

@@ -28,15 +28,13 @@ import { IconSlot, iconSlot } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { useInteractionSource } from "../interaction";
 import { Anchored, useAnchoredOverlay } from "../overlay";
-import {
-    testIdOf,
-    unselectable,
-    useStableCallback,
-    withEngine,
-} from "../parts";
+import { testIdOf, useStableCallback, withEngine } from "../parts";
 import { Portal } from "../portal";
 import { useOverlayPresence } from "../presence";
 import { useEngine } from "../provider";
+import { nativeSlots, withUnselectable } from "../slot-props";
+import type { NativeSlots } from "../slot-props";
+import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
 // The FAB's and each item's.
@@ -44,11 +42,22 @@ const INDICATIONS = Object.fromEntries(
     fabMenuAnatomy.indication!.map((entry) => [entry.trigger, entry]),
 );
 
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface FabMenuHosts {
+    readonly item: "Pressable";
+    readonly itemIcon: "View";
+    readonly itemLabel: "Text";
+    readonly closeTrigger: "Pressable";
+    readonly root: "View";
+    readonly list: "View";
+}
+
 export interface FabMenuProps
     extends
         FabMenuVariantProps,
         FabMenuContentProps<ReactNode>,
-        IndicationProps {
+        IndicationProps,
+        NativeSlotProps<FabMenuHosts> {
     /** Whether the menu is open, controlled when defined. */
     readonly open?: boolean | undefined;
     readonly defaultOpen?: boolean | undefined;
@@ -82,6 +91,7 @@ function FabMenuItemImpl(props: {
     readonly selection: Selection<"fabMenu">;
     readonly indication: Indication | undefined;
     readonly testId: TestIdOverride<FabMenuPart> | undefined;
+    readonly slot: NativeSlots;
     readonly onSelect: (value: string) => void;
 }): ReactNode {
     const { item } = props;
@@ -104,6 +114,7 @@ function FabMenuItemImpl(props: {
     );
     const id = (part: FabMenuPart) =>
         testIdOf(fabMenuAnatomy, part, props.testId);
+    const slot = props.slot;
     const engine = useEngine();
     const wait = (steps: number) => Math.min(steps, STAGGERED - 1) * STAGGER;
     // The item nearest the FAB (the last) enters first, the farthest leaves first.
@@ -114,15 +125,22 @@ function FabMenuItemImpl(props: {
     return (
         <engine.View {...presence.props} style={presence.style}>
             <v.item.Pressable
-                {...indication.handlers}
+                {...slot.props("item")}
+                {...slot.with("item", indication.handlers)}
                 role="menuitem"
                 disabled={item.disabled}
-                onPress={() => props.onSelect(item.value)}
-                style={{ ...s.item, ...unselectable }}
+                onPress={slot.on("item", "onPress", () =>
+                    props.onSelect(item.value),
+                )}
+                style={slot.style("item", withUnselectable(s.item))}
                 testID={id("item")}
             >
                 {isPresent(item.icon) ? (
-                    <v.itemIcon.View style={s.itemIcon} testID={id("itemIcon")}>
+                    <v.itemIcon.View
+                        {...slot.props("itemIcon")}
+                        style={slot.style("itemIcon", s.itemIcon)}
+                        testID={id("itemIcon")}
+                    >
                         <IconSlot
                             {...iconSlot(selected, "itemIcon")}
                             motion={s.itemIcon}
@@ -132,8 +150,9 @@ function FabMenuItemImpl(props: {
                     </v.itemIcon.View>
                 ) : null}
                 <v.itemLabel.Text
+                    {...slot.props("itemLabel")}
                     selectable={false}
-                    style={s.itemLabel}
+                    style={slot.style("itemLabel", s.itemLabel)}
                     testID={id("itemLabel")}
                 >
                     {item.label}
@@ -152,6 +171,7 @@ function CloseTriggerImpl(props: {
     readonly source: ReturnType<typeof useInteractionSource>;
     readonly onPress: () => void;
 }): ReactNode {
+    const slot = nativeSlots(props.menu);
     const indication = useSurfaceIndication(INDICATIONS.closeTrigger!, {
         indication: props.menu.indication,
         interactionSource: props.source,
@@ -172,15 +192,16 @@ function CloseTriggerImpl(props: {
         : props.menu.icon;
     return (
         <v.closeTrigger.Pressable
-            {...indication.handlers}
+            {...slot.props("closeTrigger")}
+            {...slot.with("closeTrigger", indication.handlers)}
             role="button"
             {...(props.menu.fabLabel === undefined
                 ? {}
                 : { "aria-label": props.menu.fabLabel })}
             aria-haspopup="menu"
             aria-expanded={props.open}
-            onPress={props.onPress}
-            style={{ ...s.closeTrigger, ...unselectable }}
+            onPress={slot.on("closeTrigger", "onPress", props.onPress)}
+            style={slot.style("closeTrigger", withUnselectable(s.closeTrigger))}
             testID={testIdOf(fabMenuAnatomy, "closeTrigger", props.menu.testId)}
         >
             <IconSlot
@@ -227,8 +248,13 @@ function FabMenuImpl(props: FabMenuProps): ReactNode {
     });
     const id = (part: FabMenuPart) =>
         testIdOf(fabMenuAnatomy, part, props.testId);
+    const slot = nativeSlots(props);
     return (
-        <v.root.View style={s.root} testID={id("root")}>
+        <v.root.View
+            {...slot.props("root")}
+            style={slot.style("root", s.root)}
+            testID={id("root")}
+        >
             {presence.present && measured ? (
                 <Portal layer="menu">
                     <Anchored
@@ -240,12 +266,13 @@ function FabMenuImpl(props: FabMenuProps): ReactNode {
                     >
                         {(placed) => (
                             <engine.View
-                                {...presence.props}
+                                {...slot.props("list")}
+                                {...slot.with("list", presence.props)}
                                 role="menu"
                                 {...(props["aria-label"] === undefined
                                     ? {}
                                     : { "aria-label": props["aria-label"] })}
-                                style={{
+                                style={slot.style("list", {
                                     ...inFlow(s.list),
                                     pointerEvents: open ? "auto" : "none",
                                     ...(placed
@@ -255,7 +282,7 @@ function FabMenuImpl(props: FabMenuProps): ReactNode {
                                           }
                                         : {}),
                                     ...presence.style,
-                                }}
+                                })}
                                 testID={id("list")}
                             >
                                 {items.map((item, index) => (
@@ -268,6 +295,7 @@ function FabMenuImpl(props: FabMenuProps): ReactNode {
                                         selection={selection}
                                         indication={props.indication}
                                         testId={props.testId}
+                                        slot={slot}
                                         onSelect={select}
                                     />
                                 ))}

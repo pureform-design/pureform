@@ -34,6 +34,8 @@ import type { TextInputProps } from "react-native";
 
 import { IconSlot, iconSlot } from "./icon-style";
 import { useControllable, withEngine } from "./parts";
+import { nativeSlots } from "./slot-props";
+import type { NativeSlotProps } from "./slot-props";
 import { useComponentSlots } from "./styles";
 
 /** React Native Web draws a field that isn't editable as `readonly`; a disabled one is
@@ -41,7 +43,8 @@ import { useComponentSlots } from "./styles";
 const WEB_DISABLED = Platform.OS === "web";
 
 /** What every text input takes. */
-export interface FieldProps extends TextFieldContentProps<ReactNode> {
+export interface FieldProps
+    extends TextFieldContentProps<ReactNode>, NativeSlotProps<FieldHosts> {
     /** The text. Controlled when defined. */
     readonly value?: string | undefined;
     readonly defaultValue?: string | undefined;
@@ -54,11 +57,24 @@ export interface FieldProps extends TextFieldContentProps<ReactNode> {
     /** The most characters the counter allows: it shows `count / counterMax`, and a longer
      *  value marks the field invalid. */
     readonly counterMax?: number | undefined;
-    /** React Native's own `TextInput` props, such as `keyboardType` or `placeholder`. */
-    readonly inputProps?: TextInputProps | undefined;
 }
 
 type FieldPart = TextFieldPart | TextAreaPart;
+
+/** What each part of a text input renders as, for its keyed `style` and `slotProps`; React
+ *  Native's own `TextInput` props (`keyboardType`, `autoCapitalize`) go in `slotProps.input`. */
+export interface FieldHosts {
+    readonly root: "View";
+    readonly container: "View";
+    readonly leadingIcon: "View";
+    readonly trailingIcon: "View";
+    readonly prefixText: "Text";
+    readonly suffixText: "Text";
+    readonly input: "TextInput";
+    readonly label: "Text";
+    readonly supportingText: "Text";
+    readonly counter: "Text";
+}
 
 /** The field the text field, text area, and select render. */
 export interface FieldOptions
@@ -81,6 +97,8 @@ export interface FieldOptions
     readonly secure?: boolean | undefined;
     /** The visibility toggle's accessible name. @default "Show password" */
     readonly revealLabel?: string | undefined;
+    /** The component's own `TextInput` props, which win over the user's `slotProps.input`. */
+    readonly inputProps?: TextInputProps | undefined;
 }
 
 function FieldImpl(props: FieldOptions): ReactNode {
@@ -123,18 +141,22 @@ function FieldImpl(props: FieldOptions): ReactNode {
         ...(mirrored ? { mirrored: true } : {}),
     });
     const id = props.testId;
+    const slot = nativeSlots(props);
     const icon = (part: "leadingIcon" | "trailingIcon", node: ReactNode) => {
         const Slot = v[part];
         // A secure field's trailing icon is the button that shows or hides the text.
         if (part === "trailingIcon" && props.secure)
             return (
                 <Pressable
+                    {...slot.props(part)}
                     role="button"
                     aria-label={props.revealLabel ?? "Show password"}
                     aria-pressed={revealed}
                     disabled={props.disabled}
-                    onPress={() => setRevealed(!revealed)}
-                    style={s[part]}
+                    onPress={slot.on(part, "onPress", () =>
+                        setRevealed(!revealed),
+                    )}
+                    style={slot.style(part, s[part])}
                     testID={id(part)}
                 >
                     <IconSlot {...iconSlot(selected, part)} motion={s[part]}>
@@ -144,8 +166,9 @@ function FieldImpl(props: FieldOptions): ReactNode {
             );
         return isPresent(node) ? (
             <Slot.View
+                {...slot.props(part)}
                 {...(part === "trailingIcon" ? { pointerEvents: "none" } : {})}
-                style={s[part]}
+                style={slot.style(part, s[part])}
                 testID={id(part)}
             >
                 <IconSlot {...iconSlot(selected, part)} motion={s[part]}>
@@ -158,37 +181,51 @@ function FieldImpl(props: FieldOptions): ReactNode {
         if (props.name === "textArea" || !isPresent(node)) return null;
         const Slot = v[part];
         return (
-            <Slot.Text selectable={false} style={s[part]} testID={id(part)}>
+            <Slot.Text
+                {...slot.props(part)}
+                selectable={false}
+                style={slot.style(part, s[part])}
+                testID={id(part)}
+            >
                 {node}
             </Slot.Text>
         );
     };
     const supporting = isPresent(props.supportingText) ? (
         <v.supportingText.Text
-            style={s.supportingText}
+            {...slot.props("supportingText")}
+            style={slot.style("supportingText", s.supportingText)}
             testID={id("supportingText")}
         >
             {props.supportingText}
         </v.supportingText.Text>
     ) : null;
     return (
-        <v.root.View style={s.root} testID={id("root")}>
+        <v.root.View
+            {...slot.props("root")}
+            style={slot.style("root", s.root)}
+            testID={id("root")}
+        >
             <v.container.View
+                {...slot.props("container")}
                 ref={props.container as never}
-                style={s.container}
+                style={slot.style("container", s.container)}
                 testID={id("container")}
             >
                 {icon("leadingIcon", props.leadingIcon)}
                 {affix("prefixText", props.prefixText)}
                 <v.input.TextInput
-                    {...props.inputProps}
+                    {...slot.props("input")}
+                    {...slot.with("input", props.inputProps)}
                     value={value}
-                    onChangeText={setValue}
-                    onFocus={() => setFocused(true)}
-                    onBlur={(event: unknown) => {
+                    onChangeText={slot.on("input", "onChangeText", setValue)}
+                    onFocus={slot.on("input", "onFocus", () =>
+                        setFocused(true),
+                    )}
+                    onBlur={slot.on("input", "onBlur", (event: unknown) => {
                         setFocused(false);
                         props.inputProps?.onBlur?.(event as never);
-                    }}
+                    })}
                     editable={
                         !(props.disabled && !WEB_DISABLED) &&
                         !props.readOnly &&
@@ -210,15 +247,16 @@ function FieldImpl(props: FieldOptions): ReactNode {
                         : {})}
                     multiline={props.name === "textArea"}
                     numberOfLines={props.lines}
-                    style={s.input}
+                    style={slot.style("input", s.input)}
                     testID={id("input")}
                 />
                 {affix("suffixText", props.suffixText)}
                 <v.label.Text
+                    {...slot.props("label")}
                     {...(labelled ? { nativeID: labelId } : {})}
                     selectable={false}
                     pointerEvents="none"
-                    style={s.label}
+                    style={slot.style("label", s.label)}
                     testID={id("label")}
                 >
                     {props.label}
@@ -227,7 +265,11 @@ function FieldImpl(props: FieldOptions): ReactNode {
             </v.container.View>
             {supporting}
             {counterText !== undefined ? (
-                <v.counter.Text style={s.counter} testID={id("counter")}>
+                <v.counter.Text
+                    {...slot.props("counter")}
+                    style={slot.style("counter", s.counter)}
+                    testID={id("counter")}
+                >
                     {counterText}
                 </v.counter.Text>
             ) : null}

@@ -10,7 +10,7 @@
 // A standard sheet (coplanar too) drags once the app can hide it (`onOpenChange`). A drag mostly
 // up or down is its content's native scroll.
 
-import { sideSheetAnatomy } from "@pureform/anatomy";
+import { sideSheetAnatomy, sideSheetOverlayAnatomy } from "@pureform/anatomy";
 import type { PartName, TestIdOverride } from "@pureform/anatomy";
 import {
     closeAsker,
@@ -40,10 +40,15 @@ import { testIdOf, useStableCallback, withEngine } from "../parts";
 import { themeSpring, useOverlayPresence } from "../presence";
 import { useDirection, useEngine, usePureform } from "../provider";
 import { useSidewaysPan } from "../sideways-pan";
+import { backdropKeys, nativeSlots, overlayKeys } from "../slot-props";
+import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
 /** The sheet's parts this binding renders. */
 type Part = PartName<typeof sideSheetAnatomy>;
+/** The parts as the web names them, which `style`, `slotProps` and `testId` take. */
+type Key = PartName<typeof sideSheetOverlayAnatomy>;
+const KEYS = overlayKeys(sideSheetOverlayAnatomy);
 
 /** What a modal sheet gives the trigger it renders. */
 export interface SideSheetTriggerProps {
@@ -54,8 +59,23 @@ export interface SideSheetTriggerProps {
     readonly "aria-expanded": boolean;
 }
 
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface SideSheetHosts {
+    readonly content: "View";
+    readonly header: "View";
+    readonly backButton: "View";
+    readonly headline: "Text";
+    readonly closeTrigger: "View";
+    readonly body: "View";
+    readonly actions: "View";
+    readonly backdrop: "View";
+}
+
 export interface SideSheetProps
-    extends SideSheetVariantProps, OverlayCloseProps {
+    extends
+        SideSheetVariantProps,
+        OverlayCloseProps,
+        NativeSlotProps<SideSheetHosts> {
     /** The title, which names the sheet. */
     readonly headline?: ReactNode;
     /** The content, in the scrolling body. */
@@ -93,7 +113,7 @@ export interface SideSheetProps
     readonly closeOnEscape?: boolean | undefined;
     /** Its name, when it has no headline. */
     readonly "aria-label"?: string | undefined;
-    readonly testId?: TestIdOverride<Part | "backdrop"> | undefined;
+    readonly testId?: TestIdOverride<Key | "backdrop"> | undefined;
 }
 
 const NEEDS_CLOSE: () => void = () => {};
@@ -107,7 +127,9 @@ function SideSheetImpl(
         sideSheetSelection(props),
     );
     const presence = useOverlayPresence(props.open, "sideSheet");
-    const id = (part: Part) => testIdOf(sideSheetAnatomy, part, props.testId);
+    const id = (part: Part) =>
+        testIdOf(sideSheetOverlayAnatomy, KEYS(part) as Key, props.testId);
+    const slot = nativeSlots(props, KEYS);
     if (!presence.present) return null;
     const Root = props.open === undefined ? v.root : engine;
     const label =
@@ -121,16 +143,22 @@ function SideSheetImpl(
             : () => props.onOpenChange?.({ open: false }));
     return (
         <Root.View
-            {...presence.props}
+            {...slot.props("root")}
+            {...slot.with("root", presence.props)}
             role="dialog"
             {...(label === undefined ? {} : { "aria-label": label })}
-            style={{ ...s.root, ...presence.style }}
+            style={slot.style("root", { ...s.root, ...presence.style })}
             testID={id("root")}
         >
-            <v.header.View style={s.header} testID={id("header")}>
+            <v.header.View
+                {...slot.props("header")}
+                style={slot.style("header", s.header)}
+                testID={id("header")}
+            >
                 {props.onBack === undefined ? null : (
                     <v.backButton.View
-                        style={s.backButton}
+                        {...slot.props("backButton")}
+                        style={slot.style("backButton", s.backButton)}
                         testID={id("backButton")}
                     >
                         <IconButton
@@ -142,14 +170,19 @@ function SideSheetImpl(
                     </v.backButton.View>
                 )}
                 {isPresent(props.headline) ? (
-                    <v.headline.Text style={s.headline} testID={id("headline")}>
+                    <v.headline.Text
+                        {...slot.props("headline")}
+                        style={slot.style("headline", s.headline)}
+                        testID={id("headline")}
+                    >
                         {props.headline}
                     </v.headline.Text>
                 ) : (
                     <View style={{ flexGrow: 1 }} />
                 )}
                 <v.closeTrigger.View
-                    style={s.closeTrigger}
+                    {...slot.props("closeTrigger")}
+                    style={slot.style("closeTrigger", s.closeTrigger)}
                     testID={id("closeTrigger")}
                 >
                     <IconButton
@@ -160,16 +193,28 @@ function SideSheetImpl(
                 </v.closeTrigger.View>
             </v.header.View>
             {typeof props.children === "string" ? (
-                <v.content.Text style={s.content} testID={id("content")}>
+                <v.content.Text
+                    {...slot.props("content")}
+                    style={slot.style("content", s.content)}
+                    testID={id("content")}
+                >
                     {props.children}
                 </v.content.Text>
             ) : (
-                <v.content.View style={s.content} testID={id("content")}>
+                <v.content.View
+                    {...slot.props("content")}
+                    style={slot.style("content", s.content)}
+                    testID={id("content")}
+                >
                     <ScrollView>{props.children}</ScrollView>
                 </v.content.View>
             )}
             {isPresent(props.actions) ? (
-                <v.actions.View style={s.actions} testID={id("actions")}>
+                <v.actions.View
+                    {...slot.props("actions")}
+                    style={slot.style("actions", s.actions)}
+                    testID={id("actions")}
+                >
                     {props.actions}
                 </v.actions.View>
             ) : null}
@@ -316,6 +361,7 @@ function ModalSideSheet(props: SideSheetProps): ReactNode {
             >
                 <ModalScrimLayer
                     scrimTestId={partAsRoot<string>(props.testId, "backdrop")}
+                    scrimSlot={nativeSlots(props, backdropKeys)}
                     open={open}
                     presence={presence}
                     onPressOutside={close}

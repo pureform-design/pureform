@@ -31,10 +31,12 @@ import type { ReactNode } from "react";
 import { Pressable, View } from "react-native";
 
 import { MenuListbox } from "../menu/menu";
+import type { MenuProps } from "../menu/menu";
 import { Anchored, useFieldPopup } from "../overlay";
 import { useControllable } from "../parts";
 import { Portal } from "../portal";
 import { useEngine } from "../provider";
+import type { InnerPropsOf } from "../slot-props";
 import { Field, partId } from "../text-input";
 import type { FieldProps } from "../text-input";
 
@@ -47,6 +49,8 @@ export interface AutocompleteProps
         TextFieldAffixProps<ReactNode>,
         IndicationProps,
         Omit<FieldProps, "value" | "defaultValue" | "onValueChange"> {
+    /** The menu's `style`, `slotProps`, `tokens` and `testId`. */
+    readonly menuProps?: InnerPropsOf<MenuProps> | undefined;
     readonly items: readonly AutocompleteItem[];
     /** The chosen suggestion's value, `null` for none. Controlled when defined. */
     readonly value?: string | null | undefined;
@@ -103,6 +107,7 @@ export function Autocomplete(props: AutocompleteProps): ReactNode {
         color: _color,
         density: _density,
         tokens: _tokens,
+        menuProps,
         ...field
     } = props;
     const [value, setValue] = useControllable<"value", string | null>(
@@ -216,7 +221,6 @@ export function Autocomplete(props: AutocompleteProps): ReactNode {
                         ? {}
                         : { "aria-activedescendant": optionId(active) }),
                     onKeyPress,
-                    ...props.inputProps,
                 }}
                 value={text}
                 onValueChange={(details) => {
@@ -259,6 +263,7 @@ export function Autocomplete(props: AutocompleteProps): ReactNode {
                             >
                                 {matches.length > 0 ? (
                                     <MenuListbox
+                                        {...menuProps}
                                         {...autocompleteMenuSelection({
                                             color: props.color,
                                             density: props.density,

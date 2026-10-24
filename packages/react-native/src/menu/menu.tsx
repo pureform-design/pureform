@@ -65,7 +65,6 @@ import { useSurfaceIndication } from "../indication";
 import { Anchored, useAnchoredOverlay } from "../overlay";
 import {
     testIdOf,
-    unselectable,
     useStableCallback,
     useStableSelection,
     withEngine,
@@ -74,10 +73,15 @@ import { Portal } from "../portal";
 import type { WindowRect } from "../portal-host";
 import { themeSpring, useOverlayPresence } from "../presence";
 import { useDirection, useEngine, usePureform } from "../provider";
+import { nativeSlots, withUnselectable, overlayKeys } from "../slot-props";
+import type { NativeSlotProps, NativeSlots } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
 /** The menu's parts this binding renders. */
 type Part = PartName<typeof menuAnatomy>;
+/** The parts as the web names them, which `style`, `slotProps` and `testId` take. */
+type Key = PartName<typeof menuOverlayAnatomy>;
+const KEYS = overlayKeys(menuOverlayAnatomy);
 
 const [INDICATION] = menuAnatomy.indication!;
 
@@ -93,7 +97,8 @@ export interface MenuTriggerProps {
     readonly "aria-expanded": boolean;
 }
 
-export interface MenuProps extends MenuVariantProps, IndicationProps {
+export interface MenuProps
+    extends MenuVariantProps, IndicationProps, NativeSlotProps<MenuHosts> {
     readonly items?: readonly MenuItem<ReactNode>[] | undefined;
     /** Groups of items, after `items`, each with an optional label. The menu is `grouped` unless
      *  told otherwise. */
@@ -142,16 +147,32 @@ export interface MenuProps extends MenuVariantProps, IndicationProps {
      *  the nearest. */
     readonly container?: string | undefined;
     readonly "aria-label"?: string | undefined;
-    readonly testId?: TestIdOverride<Part> | undefined;
+    readonly testId?: TestIdOverride<Key> | undefined;
+}
+
+/** What each part renders as, for its keyed `style` and `slotProps`: the web's parts. */
+export interface MenuHosts {
+    readonly itemLeading: "View";
+    readonly itemLabel: "Text";
+    readonly item: "Pressable";
+    readonly itemContent: "View";
+    readonly itemSupportingText: "Text";
+    readonly itemTrailingText: "Text";
+    readonly content: "View";
+    readonly itemGroup: "View";
+    readonly itemGroupLabel: "Text";
+    readonly itemTrailing: "View";
 }
 
 // An item gets only what it reads, each stable while the menu renders with the same props, so an
 // item renders again when it or its selection changes, not with every render of the menu.
 interface ItemProps {
+    /** The menu's per-part props: the same while its `style` and `slotProps` are. */
+    readonly slot: NativeSlots;
     readonly item: MenuItem<ReactNode>;
     readonly selection: Selection<"menu">;
     readonly indication: Indication | undefined;
-    readonly testId: TestIdOverride<Part> | undefined;
+    readonly testId: TestIdOverride<Key> | undefined;
     readonly selected: boolean;
     readonly onSelect: (
         value: string,
@@ -224,15 +245,18 @@ function MenuItemImpl(props: ItemProps): ReactNode {
         },
     );
     const { styles: s, selected, views: v } = slots;
-    const id = (part: Part) => testIdOf(menuAnatomy, part, props.testId);
-    const icon = iconParts(slots, id);
+    const id = (part: Part) =>
+        testIdOf(menuOverlayAnatomy, KEYS(part) as Key, props.testId);
+    const { slot } = props;
+    const icon = iconParts(slots, id, slot);
     const row = useRef<Measurable>(null);
     const labelRef = useRef<Measurable>(null);
     const label = (
         <v.itemLabel.Text
+            {...slot.props("itemLabel")}
             ref={labelRef as never}
             selectable={false}
-            style={s.itemLabel}
+            style={slot.style("itemLabel", s.itemLabel)}
             testID={id("itemLabel")}
         >
             {item.label}
@@ -240,8 +264,9 @@ function MenuItemImpl(props: ItemProps): ReactNode {
     );
     return (
         <v.item.Pressable
+            {...slot.props("item")}
             ref={row as never}
-            {...indication.handlers}
+            {...slot.with("item", indication.handlers)}
             role={
                 props.measuring
                     ? undefined
@@ -266,7 +291,7 @@ function MenuItemImpl(props: ItemProps): ReactNode {
                 ? {}
                 : { "aria-checked": item.checked ?? false })}
             disabled={item.disabled}
-            onPress={() => {
+            onPress={slot.on("item", "onPress", () => {
                 if (item.type !== undefined)
                     item.onCheckedChange?.(
                         item.type === "radio" || !item.checked,
@@ -277,7 +302,7 @@ function MenuItemImpl(props: ItemProps): ReactNode {
                     "press",
                     labelRef.current,
                 );
-            }}
+            })}
             {...(Platform.OS === "web" && props.option
                 ? {
                       // React Native Web presses only a button on Space; an option takes it too.
@@ -309,19 +334,24 @@ function MenuItemImpl(props: ItemProps): ReactNode {
                       },
                   }
                 : {})}
-            style={{ ...s.item, ...unselectable }}
+            style={slot.style("item", withUnselectable(s.item))}
             testID={id("item")}
         >
             {icon("itemLeading", item.leadingIcon)}
             <v.itemContent.View
-                style={s.itemContent}
+                {...slot.props("itemContent")}
+                style={slot.style("itemContent", s.itemContent)}
                 testID={id("itemContent")}
             >
                 {props.flip ? <Flip from={props.flip}>{label}</Flip> : label}
                 {isPresent(item.supportingText) ? (
                     <v.itemSupportingText.Text
+                        {...slot.props("itemSupportingText")}
                         selectable={false}
-                        style={s.itemSupportingText}
+                        style={slot.style(
+                            "itemSupportingText",
+                            s.itemSupportingText,
+                        )}
                         testID={id("itemSupportingText")}
                     >
                         {item.supportingText}
@@ -336,8 +366,9 @@ function MenuItemImpl(props: ItemProps): ReactNode {
             )}
             {isPresent(item.trailingText) ? (
                 <v.itemTrailingText.Text
+                    {...slot.props("itemTrailingText")}
                     selectable={false}
-                    style={s.itemTrailingText}
+                    style={slot.style("itemTrailingText", s.itemTrailingText)}
                     testID={id("itemTrailingText")}
                 >
                     {item.trailingText}
@@ -719,7 +750,9 @@ function MenuImpl(
     if (beside) lastBeside.current = beside;
     const cascade = useOverlayPresence(beside !== undefined, "popup");
     if (!presence.present) return null;
-    const id = (part: Part) => testIdOf(menuAnatomy, part, props.testId);
+    const id = (part: Part) =>
+        testIdOf(menuOverlayAnatomy, KEYS(part) as Key, props.testId);
+    const slot = nativeSlots(props, KEYS);
     const shownBeside = lastBeside.current;
     // During a drill step, the row its label moves into takes it (`flip`), and the others fade
     // in (`FadeIn`, remounted for each step's level).
@@ -735,6 +768,7 @@ function MenuImpl(
     const row = (entry: MenuItem<ReactNode>) => (
         <Item
             key={entry.value}
+            slot={slot}
             item={entry}
             flip={flip?.to === entry.value ? flip : undefined}
             selection={selection}
@@ -767,7 +801,8 @@ function MenuImpl(
     const Root = props.open === undefined ? v.root : engine;
     return (
         <Root.View
-            {...presence.props}
+            {...slot.props("root")}
+            {...slot.with("root", presence.props)}
             {...(auto
                 ? {
                       ref: surface,
@@ -788,9 +823,10 @@ function MenuImpl(
             {...(props["aria-label"] === undefined
                 ? {}
                 : { "aria-label": props["aria-label"] })}
-            style={
-                props.bare ? presence.style : { ...s.root, ...presence.style }
-            }
+            style={slot.style(
+                "root",
+                props.bare ? presence.style : { ...s.root, ...presence.style },
+            )}
             testID={id("root")}
         >
             {drills(
@@ -810,20 +846,25 @@ function MenuImpl(
                     {submenu ? null : level.items.map(item)}
                     {level.groups.map((group) => (
                         <v.itemGroup.View
+                            {...slot.props("itemGroup")}
                             key={group.id}
                             role="group"
                             {...(typeof group.label === "string"
                                 ? { "aria-label": group.label }
                                 : {})}
-                            style={s.itemGroup}
+                            style={slot.style("itemGroup", s.itemGroup)}
                             testID={id("itemGroup")}
                         >
                             {isPresent(group.label)
                                 ? fadeIn(
                                       `${group.id}\u0000label`,
                                       <v.itemGroupLabel.Text
+                                          {...slot.props("itemGroupLabel")}
                                           selectable={false}
-                                          style={s.itemGroupLabel}
+                                          style={slot.style(
+                                              "itemGroupLabel",
+                                              s.itemGroupLabel,
+                                          )}
                                           testID={id("itemGroupLabel")}
                                       >
                                           {group.label}

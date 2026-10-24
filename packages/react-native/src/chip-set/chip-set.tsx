@@ -10,7 +10,6 @@ import {
     toggleSelection,
 } from "@pureform/binding-core";
 import type {
-    InnerProps,
     ChipSetContentProps,
     ChipSetPart,
     ChipSetRootOwnProps,
@@ -21,20 +20,27 @@ import { ScrollView } from "react-native";
 import { Chip } from "../chip/chip";
 import type { ChipProps } from "../chip/chip";
 import { testIdOf, useControllable, withEngine } from "../parts";
+import { nativeSlots } from "../slot-props";
+import type { InnerPropsOf, NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
+
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface ChipSetHosts {
+    readonly root: "View";
+}
 
 export interface ChipSetProps
     extends
         Omit<ChipSetRootOwnProps, "unstyled">,
-        ChipSetContentProps<ReactNode> {
+        ChipSetContentProps<ReactNode>,
+        NativeSlotProps<ChipSetHosts> {
     readonly "aria-label"?: string | undefined;
-    /** Every chip's `tokens` and `testId`; an item's own `testId` wins. */
-    readonly chipProps?:
-        | InnerProps<Pick<ChipProps, "tokens" | "testId">>
-        | undefined;
+    /** Every chip's `style`, `slotProps`, `tokens` and `testId`; an item's own `testId` wins. */
+    readonly chipProps?: InnerPropsOf<ChipProps> | undefined;
 }
 
 function ChipSetImpl(props: ChipSetProps): ReactNode {
+    const slot = nativeSlots(props);
     const { styles: s, views: v } = useComponentSlots<ChipSetPart>(
         "chipSet",
         chipSetSelection(props),
@@ -52,11 +58,12 @@ function ChipSetImpl(props: ChipSetProps): ReactNode {
     const selectable = props.selectable !== undefined;
     const row = (
         <v.root.View
+            {...slot.props("root")}
             role="group"
             {...(props["aria-label"] === undefined
                 ? {}
                 : { "aria-label": props["aria-label"] })}
-            style={s.root}
+            style={slot.style("root", s.root)}
             testID={testIdOf(chipSetAnatomy, "root", props.testId)}
         >
             {items.map((item, index) => {

@@ -18,21 +18,39 @@ import type { ReactNode } from "react";
 import { Expanding } from "../expand";
 import { iconParts, ownText } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
-import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
+import { testIdOf, useControllable, withEngine } from "../parts";
+import { nativeSlots, withUnselectable } from "../slot-props";
+import type { NativeSlotProps, NativeSlots } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
 const [INDICATION] = accordionAnatomy.indication!;
+
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface AccordionHosts {
+    readonly leading: "View";
+    readonly indicator: "View";
+    readonly item: "View";
+    readonly trigger: "Pressable";
+    readonly text: "View";
+    readonly title: "Text";
+    readonly description: "Text";
+    readonly content: "View";
+    readonly root: "View";
+}
 
 export interface AccordionProps
     extends
         AccordionVariantProps,
         Omit<AccordionBehaviorProps, "id" | "ids">,
-        IndicationProps {
+        IndicationProps,
+        NativeSlotProps<AccordionHosts> {
     readonly items: readonly AccordionItem<ReactNode>[];
     readonly testId?: TestIdOverride<AccordionPart> | undefined;
 }
 
 interface ItemProps {
+    /** The accordion's per-part props. */
+    readonly slot: NativeSlots;
     readonly item: AccordionItem<ReactNode>;
     readonly selection: AccordionVariantProps;
     readonly expanded: boolean;
@@ -61,31 +79,43 @@ function Item(props: ItemProps): ReactNode {
     const { styles: s, selected, views: v } = slots;
     const id = (part: AccordionPart) =>
         testIdOf(accordionAnatomy, part, props.testId);
-    const icon = iconParts(slots, id);
+    const slot = props.slot;
+    const icon = iconParts(slots, id, slot);
     return (
-        <v.item.View style={s.item} testID={id("item")}>
+        <v.item.View
+            {...slot.props("item")}
+            style={slot.style("item", s.item)}
+            testID={id("item")}
+        >
             <v.trigger.Pressable
-                {...indication.handlers}
+                {...slot.props("trigger")}
+                {...slot.with("trigger", indication.handlers)}
                 role="button"
                 aria-expanded={props.expanded}
-                onPress={props.onToggle}
+                onPress={slot.on("trigger", "onPress", props.onToggle)}
                 disabled={props.disabled}
-                style={{ ...s.trigger, ...unselectable }}
+                style={slot.style("trigger", withUnselectable(s.trigger))}
                 testID={id("trigger")}
             >
                 {icon("leading", item.leading)}
-                <v.text.View style={s.text} testID={id("text")}>
+                <v.text.View
+                    {...slot.props("text")}
+                    style={slot.style("text", s.text)}
+                    testID={id("text")}
+                >
                     <v.title.Text
+                        {...slot.props("title")}
                         selectable={false}
-                        style={s.title}
+                        style={slot.style("title", s.title)}
                         testID={id("title")}
                     >
                         {item.title}
                     </v.title.Text>
                     {isPresent(item.description) ? (
                         <v.description.Text
+                            {...slot.props("description")}
                             selectable={false}
-                            style={s.description}
+                            style={slot.style("description", s.description)}
                             testID={id("description")}
                         >
                             {item.description}
@@ -96,7 +126,11 @@ function Item(props: ItemProps): ReactNode {
                 {indication.layer(selected)}
             </v.trigger.Pressable>
             <Expanding open={props.expanded}>
-                <v.content.View style={s.content} testID={id("content")}>
+                <v.content.View
+                    {...slot.props("content")}
+                    style={slot.style("content", s.content)}
+                    testID={id("content")}
+                >
                     {typeof item.content === "string" ? (
                         <v.content.Text style={ownText(s.content)}>
                             {item.content}
@@ -111,6 +145,7 @@ function Item(props: ItemProps): ReactNode {
 }
 
 function AccordionImpl(props: AccordionProps): ReactNode {
+    const slot = nativeSlots(props);
     const [value, setValue] = useControllable<"value", string[]>(
         "Accordion",
         "value",
@@ -134,11 +169,13 @@ function AccordionImpl(props: AccordionProps): ReactNode {
     };
     return (
         <v.root.View
-            style={s.root}
+            {...slot.props("root")}
+            style={slot.style("root", s.root)}
             testID={testIdOf(accordionAnatomy, "root", props.testId)}
         >
             {props.items.map((item) => (
                 <Item
+                    slot={slot}
                     key={item.value}
                     item={item}
                     selection={props}

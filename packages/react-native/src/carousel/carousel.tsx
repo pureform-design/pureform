@@ -33,12 +33,24 @@ import type {
 
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
+import { nativeSlots } from "../slot-props";
+import type { NativeSlotProps, NativeSlots } from "../slot-props";
 import { useComponentSlots } from "../styles";
 import type { ComponentSlots } from "../styles";
 
 const MASK_INDICATION = carouselAnatomy.indication![0] as IndicationAnatomy;
 
-export interface CarouselProps extends CarouselVariantProps {
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface CarouselHosts {
+    readonly item: "View";
+    readonly mask: "Pressable";
+    readonly content: "View";
+    readonly root: "View";
+    readonly itemGroup: "ScrollView";
+}
+
+export interface CarouselProps
+    extends CarouselVariantProps, NativeSlotProps<CarouselHosts> {
     /** The items, in order. */
     readonly items: readonly CarouselItem<ReactNode>[];
     /** Its name, for assistive technology. */
@@ -70,6 +82,7 @@ interface ItemProps {
     readonly indication: Indication | undefined;
     readonly onPress: ((index: number) => void) | undefined;
     readonly testId: TestIdOverride<CarouselPart> | undefined;
+    readonly slot: NativeSlots;
 }
 
 function ItemImpl({
@@ -81,6 +94,7 @@ function ItemImpl({
     indication: given,
     onPress,
     testId,
+    slot,
 }: ItemProps): ReactNode {
     const indication = useSurfaceIndication(MASK_INDICATION, {
         indication: given,
@@ -99,28 +113,38 @@ function ItemImpl({
     const id = (part: CarouselPart) => testIdOf(carouselAnatomy, part, testId);
     return (
         <v.item.View
-            style={{ ...s.item, width: size.slot }}
+            {...slot.props("item")}
+            style={slot.style("item", { ...s.item, width: size.slot })}
             testID={id("item")}
         >
             <v.mask.Pressable
-                {...indication.handlers}
+                {...slot.props("mask")}
+                {...slot.with("mask", indication.handlers)}
                 role="button"
                 {...(item["aria-label"] === undefined
                     ? {}
                     : { "aria-label": item["aria-label"] })}
                 {...(current ? { "aria-current": true } : {})}
                 disabled={item.disabled}
-                {...(onPress ? { onPress: () => onPress(index) } : {})}
-                style={{
+                onPress={slot.on(
+                    "mask",
+                    "onPress",
+                    onPress ? () => onPress(index) : undefined,
+                )}
+                style={slot.style("mask", {
                     ...s.mask,
                     ...unselectable,
                     width: size.mask,
                     marginStart: size.offset,
-                }}
+                })}
                 testID={id("mask")}
             >
                 <v.content.View
-                    style={{ ...s.content, width: size.slot }}
+                    {...slot.props("content")}
+                    style={slot.style("content", {
+                        ...s.content,
+                        width: size.slot,
+                    })}
                     testID={id("content")}
                 >
                     {item.content}
@@ -153,6 +177,7 @@ function CarouselImpl(props: CarouselProps): ReactNode {
     const row = useRef<ScrollViewInstance>(null);
     const id = (part: CarouselPart) =>
         testIdOf(carouselAnatomy, part, props.testId);
+    const slot = nativeSlots(props);
     const {
         gap: rawGap,
         paddingStart,
@@ -236,31 +261,41 @@ function CarouselImpl(props: CarouselProps): ReactNode {
     };
     return (
         <v.root.View
+            {...slot.props("root")}
             role="region"
             aria-roledescription="carousel"
             {...(props["aria-label"] === undefined
                 ? {}
                 : { "aria-label": props["aria-label"] })}
-            style={s.root}
+            style={slot.style("root", s.root)}
             testID={id("root")}
         >
             <ScrollView
+                {...slot.props("itemGroup")}
                 ref={row}
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 snapToOffsets={offsets}
                 decelerationRate="fast"
                 scrollEventThrottle={16}
-                onScroll={onScroll}
-                onMomentumScrollEnd={onSettle}
-                onScrollEndDrag={onSettle}
+                onScroll={slot.on("itemGroup", "onScroll", onScroll)}
+                onMomentumScrollEnd={slot.on(
+                    "itemGroup",
+                    "onMomentumScrollEnd",
+                    onSettle,
+                )}
+                onScrollEndDrag={slot.on(
+                    "itemGroup",
+                    "onScrollEndDrag",
+                    onSettle,
+                )}
                 onLayout={(event: LayoutChangeEvent) =>
                     setBox({
                         width: event.nativeEvent.layout.width,
                         height: event.nativeEvent.layout.height,
                     })
                 }
-                style={rowStyle}
+                style={slot.style("itemGroup", rowStyle)}
                 contentContainerStyle={{
                     flexDirection: "row",
                     gap,
@@ -283,6 +318,7 @@ function CarouselImpl(props: CarouselProps): ReactNode {
                         indication={props.indication}
                         onPress={props.onItemPress}
                         testId={props.testId}
+                        slot={slot}
                     />
                 ))}
             </ScrollView>

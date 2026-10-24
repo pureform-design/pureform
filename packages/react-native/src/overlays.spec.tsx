@@ -985,7 +985,7 @@ describe.each([animated, reanimated])(
     (engine) => {
         const dialog = () =>
             document.querySelector<HTMLElement>(
-                '[data-testid="pf-dialog-root"]',
+                '[data-testid="pf-dialog-content"]',
             );
         const scrim = () =>
             document.querySelector<HTMLElement>(
@@ -1225,7 +1225,7 @@ describe.each([animated, reanimated])(
     (engine) => {
         const dialog = () =>
             document.querySelector<HTMLElement>(
-                '[data-testid="pf-fullscreen-dialog-root"]',
+                '[data-testid="pf-fullscreen-dialog-content"]',
             );
         const press = (name: string) =>
             interact(() =>
@@ -1309,7 +1309,7 @@ describe("the sheets", () => {
             { x: 4, y: 4 },
         );
     const sheet = (scope: string) =>
-        document.querySelector<HTMLElement>(`[data-testid="pf-${scope}-root"]`);
+        document.querySelector<HTMLElement>(`[data-testid="pf-${scope}-content"]`);
     const press = (name: string) =>
         interact(() =>
             userEvent.click(
@@ -1869,7 +1869,7 @@ describe("onClose on the dialog, the full-screen dialog and the side sheet", () 
     const cases = [
         {
             name: "dialog",
-            testId: "pf-dialog-root",
+            testId: "pf-dialog-content",
             scrim: true,
             closer: "Cancel",
             view: (props: {
@@ -1890,7 +1890,7 @@ describe("onClose on the dialog, the full-screen dialog and the side sheet", () 
         },
         {
             name: "full-screen dialog",
-            testId: "pf-fullscreen-dialog-root",
+            testId: "pf-fullscreen-dialog-content",
             scrim: false,
             closer: "Close",
             view: (props: {
@@ -1908,7 +1908,7 @@ describe("onClose on the dialog, the full-screen dialog and the side sheet", () 
         },
         {
             name: "side sheet",
-            testId: "pf-side-sheet-root",
+            testId: "pf-side-sheet-content",
             scrim: true,
             closer: "Close",
             view: (props: {

@@ -8,10 +8,15 @@
 // contained view moves its icons outward as it opens, by keyframes; React Native draws no motion
 // there.
 
-import { compositeTestIds, searchViewAnatomy } from "@pureform/anatomy";
+import {
+    compositeTestIds,
+    searchViewAnatomy,
+    searchViewOverlayAnatomy,
+} from "@pureform/anatomy";
 import type { PartName, TestIdOverride } from "@pureform/anatomy";
 import {
     isPresent,
+    overDefaults,
     opensSearchView,
     searchViewCarriedKey,
     searchViewLabel,
@@ -34,15 +39,22 @@ import type { ReactNode } from "react";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 
 import { IconButton } from "../icon-button/icon-button";
+import type { IconButtonProps } from "../icon-button/icon-button";
 import { MenuItems } from "../menu/menu";
 import { ModalWindow, modalViewProps, useModalOverlay } from "../modal";
 import { testIdOf, useControllable, useStableCallback } from "../parts";
 import { useEngine } from "../provider";
 import { SearchBar } from "../search-bar/search-bar";
+import type { SearchBarProps } from "../search-bar/search-bar";
+import { nativeSlots, overlayKeys } from "../slot-props";
+import type { InnerPropsOf, NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
 /** The view's parts this binding renders. */
 type Part = PartName<typeof searchViewAnatomy>;
+/** The parts as the web names them, which `style`, `slotProps` and `testId` take. */
+type Key = PartName<typeof searchViewOverlayAnatomy>;
+const KEYS = overlayKeys(searchViewOverlayAnatomy);
 
 // A view, read for where it sits on screen.
 interface Measurable {
@@ -67,11 +79,29 @@ export interface SearchViewTriggerProps {
     readonly value: string;
 }
 
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface SearchViewHosts {
+    readonly surface: "View";
+    readonly header: "View";
+    readonly leading: "View";
+    readonly input: "TextInput";
+    readonly trailing: "View";
+    readonly divider: "View";
+    readonly content: "View";
+}
+
 export interface SearchViewProps
     extends
         SearchViewVariantProps,
         IndicationProps,
-        Omit<SearchViewContentProps<ReactNode>, "trigger"> {
+        Omit<SearchViewContentProps<ReactNode>, "trigger">,
+        NativeSlotProps<SearchViewHosts> {
+    /** The clear button's `style`, `slotProps`, `tokens` and `testId`. */
+    readonly clearButtonProps?: InnerPropsOf<IconButtonProps> | undefined;
+    /** The back button's `style`, `slotProps`, `tokens` and `testId`. */
+    readonly backButtonProps?: InnerPropsOf<IconButtonProps> | undefined;
+    /** The search bar under the trigger's `style`, `slotProps`, `tokens` and `testId`. */
+    readonly searchBarProps?: InnerPropsOf<SearchBarProps> | undefined;
     /** What opens it, rendered in place. @default a read-only `SearchBar` showing the query */
     readonly trigger?:
         | ReactNode
@@ -107,11 +137,17 @@ export interface SearchViewProps
     /** The view's name. @default the placeholder, else "Search" */
     readonly "aria-label"?: string | undefined;
     readonly disabled?: boolean | undefined;
-    readonly testId?: TestIdOverride<Part> | undefined;
+    readonly testId?: TestIdOverride<Key> | undefined;
 }
 
 /** Material's search view:
  *  `<SearchView placeholder="Search mail" items={…} onSelect={…} onSubmit={…} />`. */
+
+// The search bar under the trigger's button, which takes focus and presses instead.
+const COVERED_INPUT = {
+    slotProps: { input: { editable: false, focusable: false } },
+} as const;
+
 export function SearchView(props: SearchViewProps): ReactNode {
     const engine = useEngine();
     const { open, setOpen, presence, close } = useModalOverlay(
@@ -147,7 +183,9 @@ export function SearchView(props: SearchViewProps): ReactNode {
         "searchView",
         searchViewSelection(props),
     );
-    const id = (part: Part) => testIdOf(searchViewAnatomy, part, props.testId);
+    const id = (part: Part) =>
+        testIdOf(searchViewOverlayAnatomy, KEYS(part) as Key, props.testId);
+    const slot = nativeSlots(props, KEYS);
     const label = searchViewLabel(props);
     // The suggestions the view's combobox controls.
     const listId = useId();
@@ -192,13 +230,18 @@ export function SearchView(props: SearchViewProps): ReactNode {
                 {props.trigger === undefined ? (
                     <View>
                         <SearchBar
+                            {...overDefaults(
+                                props.searchBarProps as
+                                    | typeof COVERED_INPUT
+                                    | undefined,
+                                COVERED_INPUT,
+                            )}
                             value={query}
                             {...(props.placeholder === undefined
                                 ? {}
                                 : { placeholder: props.placeholder })}
                             disabled={props.disabled}
                             // The button over it takes focus and presses.
-                            inputProps={{ editable: false, focusable: false }}
                         />
                         <Pressable
                             role="button"
@@ -239,61 +282,83 @@ export function SearchView(props: SearchViewProps): ReactNode {
                         }}
                     >
                         <v.root.View
+                            {...slot.props("root")}
                             role="dialog"
                             aria-label={label}
-                            style={{
+                            style={slot.style("root", {
                                 ...s.root,
                                 ...(anchored ? {} : { flex: 1 }),
-                            }}
+                            })}
                             testID={id("root")}
                         >
                             <v.header.View
-                                style={s.header}
+                                {...slot.props("header")}
+                                style={slot.style("header", s.header)}
                                 testID={id("header")}
                             >
                                 <v.leading.View
-                                    style={s.leading}
+                                    {...slot.props("leading")}
+                                    style={slot.style("leading", s.leading)}
                                     testID={id("leading")}
                                 >
                                     <IconButton
+                                        {...props.backButtonProps}
                                         aria-label={props.backLabel ?? "Back"}
                                         icon={props.leading ?? "←"}
                                         onPress={close}
                                     />
                                 </v.leading.View>
                                 <v.input.TextInput
+                                    {...slot.props("input")}
                                     autoFocus
                                     value={query}
-                                    onChangeText={setQuery}
-                                    onSubmitEditing={() => {
-                                        props.onSubmit?.({
-                                            inputValue: query,
-                                        });
-                                        if (props.closeOnSelect ?? true)
-                                            close();
-                                    }}
+                                    onChangeText={slot.on(
+                                        "input",
+                                        "onChangeText",
+                                        setQuery,
+                                    )}
+                                    onSubmitEditing={slot.on(
+                                        "input",
+                                        "onSubmitEditing",
+                                        () => {
+                                            props.onSubmit?.({
+                                                inputValue: query,
+                                            });
+                                            if (props.closeOnSelect ?? true)
+                                                close();
+                                        },
+                                    )}
                                     editable={!props.disabled}
                                     placeholder={props.placeholder ?? ""}
                                     role="combobox"
                                     aria-label={label}
                                     aria-expanded
                                     aria-controls={listId}
-                                    style={s.input}
+                                    style={slot.style("input", s.input)}
                                     testID={id("input")}
                                 />
                                 {isPresent(props.trailing) ? (
                                     <v.trailing.View
-                                        style={s.trailing}
+                                        {...slot.props("trailing")}
+                                        style={slot.style(
+                                            "trailing",
+                                            s.trailing,
+                                        )}
                                         testID={id("trailing")}
                                     >
                                         {props.trailing}
                                     </v.trailing.View>
                                 ) : query !== "" ? (
                                     <v.trailing.View
-                                        style={s.trailing}
+                                        {...slot.props("trailing")}
+                                        style={slot.style(
+                                            "trailing",
+                                            s.trailing,
+                                        )}
                                         testID={id("trailing")}
                                     >
                                         <IconButton
+                                            {...props.clearButtonProps}
                                             aria-label={
                                                 props.clearLabel ?? "Clear"
                                             }
@@ -304,12 +369,14 @@ export function SearchView(props: SearchViewProps): ReactNode {
                                 ) : null}
                             </v.header.View>
                             <v.divider.View
-                                style={s.divider}
+                                {...slot.props("divider")}
+                                style={slot.style("divider", s.divider)}
                                 testID={id("divider")}
                             />
                             <v.content.View
+                                {...slot.props("content")}
                                 nativeID={listId}
-                                style={s.content}
+                                style={slot.style("content", s.content)}
                                 testID={id("content")}
                             >
                                 <ScrollView keyboardShouldPersistTaps="handled">

@@ -23,17 +23,40 @@ import type {
 import type { InstanceTokens } from "@pureform/styling";
 import { useState } from "react";
 import type { ReactNode } from "react";
-import type { TextInputKeyPressEvent, TextInputProps } from "react-native";
+import type { TextInputKeyPressEvent } from "react-native";
 
 import { IconSlot, iconSlot } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
-import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
+import { testIdOf, useControllable, withEngine } from "../parts";
+import { nativeSlots, withUnselectable } from "../slot-props";
+import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
 // The chip's and its remove button's.
 const INDICATIONS = Object.fromEntries(
     inputChipAnatomy.indication.map((entry) => [entry.trigger, entry]),
 );
+
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface TagsInputHosts {
+    readonly root: "View";
+    readonly container: "View";
+    readonly leadingIcon: "View";
+    readonly trailingIcon: "View";
+    readonly input: "TextInput";
+    readonly label: "Text";
+    readonly supportingText: "Text";
+}
+
+/** What each part of a chip renders as. */
+export interface InputChipHosts {
+    readonly root: "Pressable";
+    readonly touchTarget: "View";
+    readonly avatar: "View";
+    readonly icon: "View";
+    readonly label: "Text";
+    readonly remove: "Pressable";
+}
 
 export interface TagsInputProps
     extends
@@ -56,13 +79,16 @@ export interface TagsInputProps
             | "removeLabel"
         >,
         TagsInputContentProps<ReactNode>,
-        IndicationProps {
-    /** Every chip's `tokens`. */
+        IndicationProps,
+        NativeSlotProps<TagsInputHosts> {
+    /** Every chip's `tokens`, keyed `style` and `slotProps`. */
     readonly chipProps?:
-        | InnerProps<{ readonly tokens?: InstanceTokens<"inputChip"> }>
+        | InnerProps<
+              {
+                  readonly tokens?: InstanceTokens<"inputChip">;
+              } & NativeSlotProps<InputChipHosts>
+          >
         | undefined;
-    /** React Native's own `TextInput` props, such as `autoCapitalize`. */
-    readonly inputProps?: TextInputProps | undefined;
     /** A prefix for every part's test id (`tags` → `tags-input`), or ids by part. The chips'
      *  parts take the prefix too (`tags-chip-label`). */
     readonly testId?: TestIdOverride<TagsInputPart> | undefined;
@@ -79,6 +105,7 @@ const chipId = (part: InputChipPart, props: TagsInputProps) =>
 
 function RemoveImpl(options: ChipOptions): ReactNode {
     const { props, value } = options;
+    const slot = nativeSlots(props.chipProps);
     const indication = useSurfaceIndication(INDICATIONS["remove"]!, {
         indication: props.indication,
         disabled: props.disabled || props.readOnly,
@@ -97,12 +124,13 @@ function RemoveImpl(options: ChipOptions): ReactNode {
     );
     return (
         <v.remove.Pressable
-            {...indication.handlers}
+            {...slot.props("remove")}
+            {...slot.with("remove", indication.handlers)}
             role="button"
             aria-label={props.removeLabel?.(value) ?? `Delete tag ${value}`}
             disabled={props.disabled || props.readOnly}
-            onPress={options.onRemove}
-            style={{ ...s.remove, ...unselectable }}
+            onPress={slot.on("remove", "onPress", options.onRemove)}
+            style={slot.style("remove", withUnselectable(s.remove))}
             testID={chipId("remove", props)}
         >
             <IconSlot {...iconSlot(selected, "remove")} motion={s.remove}>
@@ -117,6 +145,7 @@ const Remove = withEngine(RemoveImpl, "TagsInputChipRemove");
 
 function ChipImpl(options: ChipOptions): ReactNode {
     const { props, value } = options;
+    const slot = nativeSlots(props.chipProps);
     const indication = useSurfaceIndication(INDICATIONS["root"]!, {
         indication: props.indication,
         disabled: props.disabled,
@@ -137,33 +166,41 @@ function ChipImpl(options: ChipOptions): ReactNode {
     const icon = props.chipIcon?.(value);
     return (
         <v.root.Pressable
-            {...indication.handlers}
+            {...slot.props("root")}
+            {...slot.with("root", indication.handlers)}
             disabled={props.disabled}
-            style={{ ...s.root, ...unselectable }}
+            style={slot.style("root", withUnselectable(s.root))}
             testID={chipId("root", props)}
         >
             <v.touchTarget.View
+                {...slot.props("touchTarget")}
                 pointerEvents="none"
-                style={s.touchTarget}
+                style={slot.style("touchTarget", s.touchTarget)}
                 testID={chipId("touchTarget", props)}
             />
             {isPresent(avatar) ? (
                 <v.avatar.View
-                    style={s.avatar}
+                    {...slot.props("avatar")}
+                    style={slot.style("avatar", s.avatar)}
                     testID={chipId("avatar", props)}
                 >
                     {avatar}
                 </v.avatar.View>
             ) : isPresent(icon) ? (
-                <v.icon.View style={s.icon} testID={chipId("icon", props)}>
+                <v.icon.View
+                    {...slot.props("icon")}
+                    style={slot.style("icon", s.icon)}
+                    testID={chipId("icon", props)}
+                >
                     <IconSlot {...iconSlot(selected, "icon")} motion={s.icon}>
                         {icon}
                     </IconSlot>
                 </v.icon.View>
             ) : null}
             <v.label.Text
+                {...slot.props("label")}
                 selectable={false}
-                style={s.label}
+                style={slot.style("label", s.label)}
                 testID={chipId("label", props)}
             >
                 {value}
@@ -211,6 +248,7 @@ function TagsInputImpl(props: TagsInputProps): ReactNode {
     );
     const id = (part: TagsInputPart) =>
         testIdOf(tagsInputAnatomy, part, props.testId);
+    const slot = nativeSlots(props);
 
     // The values with each of `entries` added that may be, or `current` when none may.
     const added = (current: string[], entries: readonly string[]) => {
@@ -247,8 +285,9 @@ function TagsInputImpl(props: TagsInputProps): ReactNode {
         const Slot = v[part];
         return isPresent(node) ? (
             <Slot.View
+                {...slot.props(part)}
                 {...(part === "trailingIcon" ? { pointerEvents: "none" } : {})}
-                style={s[part]}
+                style={slot.style(part, s[part])}
                 testID={id(part)}
             >
                 <IconSlot {...iconSlot(selected, part)} motion={s[part]}>
@@ -259,8 +298,16 @@ function TagsInputImpl(props: TagsInputProps): ReactNode {
     };
     const supporting = props.error ?? props.supportingText;
     return (
-        <v.root.View style={s.root} testID={id("root")}>
-            <v.container.View style={s.container} testID={id("container")}>
+        <v.root.View
+            {...slot.props("root")}
+            style={slot.style("root", s.root)}
+            testID={id("root")}
+        >
+            <v.container.View
+                {...slot.props("container")}
+                style={slot.style("container", s.container)}
+                testID={id("container")}
+            >
                 {icon("leadingIcon", props.leadingIcon)}
                 {values.map((value, index) => (
                     <Chip
@@ -272,22 +319,34 @@ function TagsInputImpl(props: TagsInputProps): ReactNode {
                     />
                 ))}
                 <v.input.TextInput
-                    {...props.inputProps}
+                    {...slot.props("input")}
                     value={text}
-                    onChangeText={onChangeText}
-                    onSubmitEditing={() => commit([text], "")}
+                    onChangeText={slot.on(
+                        "input",
+                        "onChangeText",
+                        onChangeText,
+                    )}
+                    onSubmitEditing={slot.on("input", "onSubmitEditing", () =>
+                        commit([text], ""),
+                    )}
                     submitBehavior="submit"
                     blurOnSubmit={false}
-                    onKeyPress={(event: TextInputKeyPressEvent) => {
-                        if (
-                            event.nativeEvent.key === "Backspace" &&
-                            text === "" &&
-                            values.length > 0
-                        )
-                            remove(values.length - 1);
-                    }}
-                    onFocus={() => setFocused(true)}
-                    onBlur={() => setFocused(false)}
+                    onKeyPress={slot.on(
+                        "input",
+                        "onKeyPress",
+                        (event: TextInputKeyPressEvent) => {
+                            if (
+                                event.nativeEvent.key === "Backspace" &&
+                                text === "" &&
+                                values.length > 0
+                            )
+                                remove(values.length - 1);
+                        },
+                    )}
+                    onFocus={slot.on("input", "onFocus", () =>
+                        setFocused(true),
+                    )}
+                    onBlur={slot.on("input", "onBlur", () => setFocused(false))}
                     editable={editable}
                     placeholder={props.placeholder ?? " "}
                     maxLength={props.maxLength}
@@ -295,13 +354,14 @@ function TagsInputImpl(props: TagsInputProps): ReactNode {
                         ? { "aria-label": props.label }
                         : {})}
                     aria-invalid={invalid}
-                    style={s.input}
+                    style={slot.style("input", s.input)}
                     testID={id("input")}
                 />
                 <v.label.Text
+                    {...slot.props("label")}
                     selectable={false}
                     pointerEvents="none"
-                    style={s.label}
+                    style={slot.style("label", s.label)}
                     testID={id("label")}
                 >
                     {props.label}
@@ -310,7 +370,8 @@ function TagsInputImpl(props: TagsInputProps): ReactNode {
             </v.container.View>
             {isPresent(supporting) ? (
                 <v.supportingText.Text
-                    style={s.supportingText}
+                    {...slot.props("supportingText")}
+                    style={slot.style("supportingText", s.supportingText)}
                     testID={id("supportingText")}
                 >
                     {supporting}

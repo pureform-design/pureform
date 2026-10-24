@@ -21,7 +21,9 @@ import type { HourCycle, Time } from "@pureform/machines/time-picker";
 import { type ReactNode, useState } from "react";
 
 import { useSurfaceIndication } from "./indication";
-import { testIdOf, unselectable, withEngine } from "./parts";
+import { testIdOf, withEngine } from "./parts";
+import { nativeSlots, withUnselectable } from "./slot-props";
+import type { NativeSlots } from "./slot-props";
 import { useComponentSlots } from "./styles";
 
 /** The time from `value` when given, else the component's own from `defaultValue`. */
@@ -62,6 +64,8 @@ export interface TimeButtonProps<A extends ComponentAnatomy> {
     readonly selection: Record<string, unknown>;
     readonly indication: Indication | undefined;
     readonly testId: TestIdOverride<PartName<A>> | undefined;
+    /** The owner's per-part props, when it customizes this part. */
+    readonly slot?: NativeSlots | undefined;
     readonly label?: string | undefined;
     readonly selected: boolean;
     readonly disabled?: boolean | undefined;
@@ -75,6 +79,7 @@ export interface TimeButtonProps<A extends ComponentAnatomy> {
 function TimeButtonImpl<A extends ComponentAnatomy>(
     props: TimeButtonProps<A>,
 ): ReactNode {
+    const slot = props.slot ?? nativeSlots(undefined);
     const indication = useSurfaceIndication(
         props.anatomy.indication!.find(
             (entry: IndicationAnatomy) => entry.trigger === props.part,
@@ -97,14 +102,19 @@ function TimeButtonImpl<A extends ComponentAnatomy>(
     const style = s[props.part] as Record<string, unknown>;
     return (
         <Surface.Pressable
-            {...indication.handlers}
+            {...slot.props(props.part)}
+            {...slot.with(props.part, indication.handlers)}
             role="button"
             aria-pressed={props.selected}
             aria-disabled={props.disabled}
             {...(props.label === undefined
                 ? {}
                 : { "aria-label": props.label })}
-            onPress={props.disabled ? undefined : props.onPress}
+            onPress={slot.on(
+                props.part,
+                "onPress",
+                props.disabled ? undefined : props.onPress,
+            )}
             {...(props.onKey
                 ? ({
                       onKeyDown: (event: {
@@ -116,7 +126,7 @@ function TimeButtonImpl<A extends ComponentAnatomy>(
                       },
                   } as object)
                 : {})}
-            style={{ ...style, ...unselectable }}
+            style={slot.style(props.part, withUnselectable(style))}
             testID={testIdOf(props.anatomy, props.part, props.testId)}
         >
             <Surface.Text

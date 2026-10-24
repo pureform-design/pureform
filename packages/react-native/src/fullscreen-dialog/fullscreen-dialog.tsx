@@ -7,7 +7,10 @@
 // behind it, so there's no scrim, and its `Modal` holds a portal host of its own, so menus,
 // tooltips, and selects opened inside draw over it.
 
-import { fullscreenDialogAnatomy } from "@pureform/anatomy";
+import {
+    fullscreenDialogAnatomy,
+    fullscreenDialogOverlayAnatomy,
+} from "@pureform/anatomy";
 import type { PartName, TestIdOverride } from "@pureform/anatomy";
 import { fullscreenDialogSelection, isPresent } from "@pureform/binding-core";
 import type {
@@ -24,10 +27,15 @@ import { ModalWindow, modalViewProps, useModalOverlay } from "../modal";
 import { testIdOf, withEngine } from "../parts";
 import { useOverlayPresence } from "../presence";
 import { useEngine } from "../provider";
+import { nativeSlots, overlayKeys } from "../slot-props";
+import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
 /** The dialog's parts this binding renders. */
 type Part = PartName<typeof fullscreenDialogAnatomy>;
+/** The parts as the web names them, which `style`, `slotProps` and `testId` take. */
+type Key = PartName<typeof fullscreenDialogOverlayAnatomy>;
+const KEYS = overlayKeys(fullscreenDialogOverlayAnatomy);
 
 /** What a function given as a modal dialog's `confirmAction` is given. */
 export interface FullscreenDialogActions {
@@ -44,8 +52,21 @@ export interface FullscreenDialogTriggerProps {
     readonly "aria-expanded": boolean;
 }
 
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface FullscreenDialogHosts {
+    readonly content: "View";
+    readonly header: "View";
+    readonly closeTrigger: "View";
+    readonly headline: "Text";
+    readonly confirmAction: "View";
+    readonly body: "View";
+}
+
 export interface FullscreenDialogProps
-    extends FullscreenDialogVariantProps, OverlayCloseProps {
+    extends
+        FullscreenDialogVariantProps,
+        OverlayCloseProps,
+        NativeSlotProps<FullscreenDialogHosts> {
     readonly headline?: ReactNode;
     /** The content, in the scrolling body. */
     readonly children?: ReactNode;
@@ -80,7 +101,7 @@ export interface FullscreenDialogProps
     readonly closeOnEscape?: boolean | undefined;
     /** Its name, when it has no headline. */
     readonly "aria-label"?: string | undefined;
-    readonly testId?: TestIdOverride<Part> | undefined;
+    readonly testId?: TestIdOverride<Key> | undefined;
 }
 
 const NEEDS_CLOSE: () => void = () => {};
@@ -97,7 +118,12 @@ function FullscreenDialogImpl(
     );
     const presence = useOverlayPresence(props.open, "dialog");
     const id = (part: Part) =>
-        testIdOf(fullscreenDialogAnatomy, part, props.testId);
+        testIdOf(
+            fullscreenDialogOverlayAnatomy,
+            KEYS(part) as Key,
+            props.testId,
+        );
+    const slot = nativeSlots(props, KEYS);
     if (!presence.present) return null;
     // The engine's view where it enters and leaves, the slot's own while it's still.
     const Root = props.open === undefined ? v.root : engine;
@@ -111,15 +137,21 @@ function FullscreenDialogImpl(
             : props.confirmAction;
     return (
         <Root.View
-            {...presence.props}
+            {...slot.props("root")}
+            {...slot.with("root", presence.props)}
             role="dialog"
             {...(label === undefined ? {} : { "aria-label": label })}
-            style={{ ...s.root, ...presence.style }}
+            style={slot.style("root", { ...s.root, ...presence.style })}
             testID={id("root")}
         >
-            <v.header.View style={s.header} testID={id("header")}>
+            <v.header.View
+                {...slot.props("header")}
+                style={slot.style("header", s.header)}
+                testID={id("header")}
+            >
                 <v.closeTrigger.View
-                    style={s.closeTrigger}
+                    {...slot.props("closeTrigger")}
+                    style={slot.style("closeTrigger", s.closeTrigger)}
                     testID={id("closeTrigger")}
                 >
                     <IconButton
@@ -129,7 +161,11 @@ function FullscreenDialogImpl(
                     />
                 </v.closeTrigger.View>
                 {isPresent(props.headline) ? (
-                    <v.headline.Text style={s.headline} testID={id("headline")}>
+                    <v.headline.Text
+                        {...slot.props("headline")}
+                        style={slot.style("headline", s.headline)}
+                        testID={id("headline")}
+                    >
                         {props.headline}
                     </v.headline.Text>
                 ) : (
@@ -137,7 +173,8 @@ function FullscreenDialogImpl(
                 )}
                 {isPresent(confirm) ? (
                     <v.confirmAction.View
-                        style={s.confirmAction}
+                        {...slot.props("confirmAction")}
+                        style={slot.style("confirmAction", s.confirmAction)}
                         testID={id("confirmAction")}
                     >
                         {confirm}
@@ -145,11 +182,19 @@ function FullscreenDialogImpl(
                 ) : null}
             </v.header.View>
             {typeof props.children === "string" ? (
-                <v.body.Text style={s.body} testID={id("body")}>
+                <v.body.Text
+                    {...slot.props("body")}
+                    style={slot.style("body", s.body)}
+                    testID={id("body")}
+                >
                     {props.children}
                 </v.body.Text>
             ) : (
-                <v.body.View style={s.body} testID={id("body")}>
+                <v.body.View
+                    {...slot.props("body")}
+                    style={slot.style("body", s.body)}
+                    testID={id("body")}
+                >
                     <ScrollView>{props.children}</ScrollView>
                 </v.body.View>
             )}

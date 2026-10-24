@@ -9,7 +9,6 @@ import {
     overDefaults,
 } from "@pureform/binding-core";
 import type {
-    InnerProps,
     ListContentProps,
     ListPart,
     ListRootOwnProps,
@@ -20,17 +19,27 @@ import type { ReactNode } from "react";
 import { ListDefaults, ListItem } from "../list-item/list-item";
 import type { ListItemProps } from "../list-item/list-item";
 import { testIdOf, withEngine } from "../parts";
+import { nativeSlots } from "../slot-props";
+import type { InnerPropsOf, NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
-/** What the list gives every list item under the item's own: its `tokens` and `testId`. */
-export type ListItemDefaults = InnerProps<
-    Pick<ListItemProps, "tokens" | "testId">
->;
+/** What the list gives every list item under the item's own: its keyed `style` and
+ *  `slotProps`, `tokens` and `testId`. */
+export type ListItemDefaults = InnerPropsOf<ListItemProps>;
+
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface ListHosts {
+    readonly root: "View";
+    readonly item: "View";
+}
 
 export interface ListProps
-    extends Omit<ListRootOwnProps, "unstyled">, ListContentProps<ReactNode> {
+    extends
+        Omit<ListRootOwnProps, "unstyled">,
+        ListContentProps<ReactNode>,
+        NativeSlotProps<ListHosts> {
     readonly "aria-label"?: string | undefined;
-    /** Every list item's `tokens` and `testId`, under the item's own. */
+    /** Every list item's `style`, `slotProps`, `tokens` and `testId`, under the item's own. */
     readonly listItemProps?: ListItemDefaults | undefined;
 }
 
@@ -47,21 +56,24 @@ function ListImpl(props: ListProps): ReactNode {
     const items = props.items ?? [];
     const segmented = props.variant === "segmented";
     const id = (part: ListPart) => testIdOf(listAnatomy, part, props.testId);
+    const slot = nativeSlots(props);
     return (
         <ListDefaults value={defaults}>
             <v.root.View
+                {...slot.props("root")}
                 role="list"
                 {...(props["aria-label"] === undefined
                     ? {}
                     : { "aria-label": props["aria-label"] })}
-                style={s.root}
+                style={slot.style("root", s.root)}
                 testID={id("root")}
             >
                 {items.map(({ value, ...item }, index) => (
                     <v.item.View
+                        {...slot.props("item")}
                         key={value ?? index}
                         role="listitem"
-                        style={s.item}
+                        style={slot.style("item", s.item)}
                         testID={id("item")}
                     >
                         <ListItem

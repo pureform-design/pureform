@@ -7,13 +7,22 @@ import { dragHandleSelection } from "@pureform/binding-core";
 import type { DragHandleVariantProps } from "@pureform/binding-core";
 import type { ReactNode } from "react";
 
-import { testIdOf, unselectable, withEngine } from "../parts";
+import { testIdOf, withEngine } from "../parts";
+import { nativeSlots, withUnselectable } from "../slot-props";
+import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
 /** The drag handle's parts: `"root" | "handle"`. */
 type Part = PartName<typeof dragHandleAnatomy>;
 
-export interface DragHandleProps extends DragHandleVariantProps {
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface DragHandleHosts {
+    readonly root: "Pressable";
+    readonly handle: "View";
+}
+
+export interface DragHandleProps
+    extends DragHandleVariantProps, NativeSlotProps<DragHandleHosts> {
     /** Its name, for assistive technology: what a press does. */
     readonly "aria-label"?: string | undefined;
     readonly onPress?: (() => void) | undefined;
@@ -26,17 +35,23 @@ function DragHandleImpl(props: DragHandleProps): ReactNode {
         dragHandleSelection(props),
     );
     const id = (part: Part) => testIdOf(dragHandleAnatomy, part, props.testId);
+    const slot = nativeSlots(props);
     return (
         <v.root.Pressable
+            {...slot.props("root")}
             role="button"
             {...(props["aria-label"] === undefined
                 ? {}
                 : { "aria-label": props["aria-label"] })}
             {...(props.onPress === undefined ? {} : { onPress: props.onPress })}
-            style={{ ...s.root, ...unselectable }}
+            style={slot.style("root", withUnselectable(s.root))}
             testID={id("root")}
         >
-            <v.handle.View style={s.handle} testID={id("handle")} />
+            <v.handle.View
+                {...slot.props("handle")}
+                style={slot.style("handle", s.handle)}
+                testID={id("handle")}
+            />
         </v.root.Pressable>
     );
 }

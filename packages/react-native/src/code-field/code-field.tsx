@@ -26,10 +26,22 @@ import type {
 import { useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Platform } from "react-native";
-import type { TextInputKeyPressEvent, TextInputProps } from "react-native";
+import type { TextInputKeyPressEvent } from "react-native";
 
 import { testIdOf, withEngine } from "../parts";
+import { nativeSlots } from "../slot-props";
+import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
+
+/** What each part renders as, for its keyed `style` and `slotProps`; React Native's own
+ *  `TextInput` props for every cell go in `slotProps.input`. */
+export interface CodeFieldHosts {
+    readonly root: "View";
+    readonly label: "Text";
+    readonly control: "View";
+    readonly input: "TextInput";
+    readonly supportingText: "Text";
+}
 
 export interface CodeFieldProps
     extends
@@ -52,9 +64,8 @@ export interface CodeFieldProps
             | "readOnly"
             | "cellLabel"
         >,
-        CodeFieldContentProps<ReactNode> {
-    /** React Native's own `TextInput` props for every cell. */
-    readonly inputProps?: TextInputProps | undefined;
+        CodeFieldContentProps<ReactNode>,
+        NativeSlotProps<CodeFieldHosts> {
     /** A prefix for every part's test id (`otp` → `otp-input`), or ids by part. */
     readonly testId?: TestIdOverride<CodeFieldPart> | undefined;
 }
@@ -90,6 +101,7 @@ const WEB = Platform.OS === "web";
 // One cell, with its own states: the filled indicator and stroke follow its focus.
 function CellImpl(options: CellOptions): ReactNode {
     const { props, index } = options;
+    const slot = nativeSlots(props);
     const [focused, setFocused] = useState(false);
     const { styles: s, views: v } = useComponentSlots<CodeFieldPart>(
         "codeField",
@@ -106,10 +118,10 @@ function CellImpl(options: CellOptions): ReactNode {
     const numeric = (props.type ?? "numeric") === "numeric";
     return (
         <v.input.TextInput
-            {...props.inputProps}
+            {...slot.props("input")}
             ref={options.inputRef}
             value={options.value}
-            onChangeText={(text: string) => {
+            onChangeText={slot.on("input", "onChangeText", (text: string) => {
                 // The new character is what the cell didn't hold.
                 const typed =
                     text.length > 1 && text.startsWith(options.value)
@@ -117,22 +129,26 @@ function CellImpl(options: CellOptions): ReactNode {
                         : text;
                 if (typed === "") options.onBackspace();
                 else options.onText(typed);
-            }}
-            onKeyPress={(event: TextInputKeyPressEvent) => {
-                if (
-                    event.nativeEvent.key === "Backspace" &&
-                    options.value === ""
-                )
-                    options.onBackspace();
-            }}
-            onFocus={() => {
+            })}
+            onKeyPress={slot.on(
+                "input",
+                "onKeyPress",
+                (event: TextInputKeyPressEvent) => {
+                    if (
+                        event.nativeEvent.key === "Backspace" &&
+                        options.value === ""
+                    )
+                        options.onBackspace();
+                },
+            )}
+            onFocus={slot.on("input", "onFocus", () => {
                 setFocused(true);
                 options.onFocus();
-            }}
-            onBlur={() => {
+            })}
+            onBlur={slot.on("input", "onBlur", () => {
                 setFocused(false);
                 options.onBlur();
-            }}
+            })}
             editable={!(props.disabled && !WEB) && !props.readOnly}
             {...(WEB
                 ? ({
@@ -157,7 +173,7 @@ function CellImpl(options: CellOptions): ReactNode {
                 options.length,
             )}
             aria-invalid={options.invalid}
-            style={s.input}
+            style={slot.style("input", s.input)}
             testID={id("input", props)}
         />
     );
@@ -206,19 +222,29 @@ function CodeFieldImpl(props: CodeFieldProps): ReactNode {
             disabled: props.disabled ?? false,
         },
     );
+    const slot = nativeSlots(props);
     const supporting = props.error ?? props.supportingText;
     return (
-        <v.root.View style={s.root} testID={id("root", props)}>
+        <v.root.View
+            {...slot.props("root")}
+            style={slot.style("root", s.root)}
+            testID={id("root", props)}
+        >
             {isPresent(props.label) ? (
                 <v.label.Text
+                    {...slot.props("label")}
                     selectable={false}
-                    style={s.label}
+                    style={slot.style("label", s.label)}
                     testID={id("label", props)}
                 >
                     {props.label}
                 </v.label.Text>
             ) : null}
-            <v.control.View style={s.control} testID={id("control", props)}>
+            <v.control.View
+                {...slot.props("control")}
+                style={slot.style("control", s.control)}
+                testID={id("control", props)}
+            >
                 {cells.map((cell, index) => (
                     <Cell
                         key={index}
@@ -259,7 +285,8 @@ function CodeFieldImpl(props: CodeFieldProps): ReactNode {
             </v.control.View>
             {isPresent(supporting) ? (
                 <v.supportingText.Text
-                    style={s.supportingText}
+                    {...slot.props("supportingText")}
+                    style={slot.style("supportingText", s.supportingText)}
                     testID={id("supportingText", props)}
                 >
                     {supporting}

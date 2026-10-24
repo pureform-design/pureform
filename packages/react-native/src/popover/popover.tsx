@@ -6,7 +6,7 @@
 // this binding draws none. `modal` has no counterpart: a press outside only closes it, and the
 // page behind stays as the app left it.
 
-import { popoverAnatomy } from "@pureform/anatomy";
+import { popoverAnatomy, popoverOverlayAnatomy } from "@pureform/anatomy";
 import type { PartName, TestIdOverride } from "@pureform/anatomy";
 import { isPresent, popoverSelection } from "@pureform/binding-core";
 import type {
@@ -23,10 +23,15 @@ import { testIdOf, withEngine } from "../parts";
 import { Portal } from "../portal";
 import { useOverlayPresence } from "../presence";
 import { useEngine } from "../provider";
+import { nativeSlots, overlayKeys } from "../slot-props";
+import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
 /** The popover's parts this binding renders. */
 type Part = PartName<typeof popoverAnatomy>;
+/** The parts as the web names them, which `style`, `slotProps` and `testId` take. */
+type Key = PartName<typeof popoverOverlayAnatomy>;
+const KEYS = overlayKeys(popoverOverlayAnatomy);
 
 /** What a popover gives the trigger it renders. */
 export interface PopoverTriggerProps {
@@ -46,7 +51,17 @@ export interface PopoverActions {
     readonly close: () => void;
 }
 
-export interface PopoverProps extends PopoverVariantProps {
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface PopoverHosts {
+    readonly content: "View";
+    readonly caret: "View";
+    readonly title: "Text";
+    readonly body: "View";
+    readonly actions: "View";
+}
+
+export interface PopoverProps
+    extends PopoverVariantProps, NativeSlotProps<PopoverHosts> {
     /** What opens it, rendered in place: a label, for a `Button`, or a function rendering your
      *  own trigger with the props it's given (`(trigger) => <IconButton {...trigger} … />`).
      *  Given it, the popover opens over the page against the trigger and closes itself; without
@@ -79,7 +94,7 @@ export interface PopoverProps extends PopoverVariantProps {
      *  flip: true }`. */
     readonly positioning?: OverlayPositioning | undefined;
     readonly "aria-label"?: string | undefined;
-    readonly testId?: TestIdOverride<Part> | undefined;
+    readonly testId?: TestIdOverride<Key> | undefined;
 }
 
 function PopoverSurface(
@@ -93,7 +108,9 @@ function PopoverSurface(
         popoverSelection(props),
     );
     const presence = useOverlayPresence(props.open, "popup");
-    const id = (part: Part) => testIdOf(popoverAnatomy, part, props.testId);
+    const id = (part: Part) =>
+        testIdOf(popoverOverlayAnatomy, KEYS(part) as Key, props.testId);
+    const slot = nativeSlots(props, KEYS);
     // Named by its heading, as the web's is (`aria-labelledby`), unless given a name.
     const label =
         props["aria-label"] ??
@@ -103,28 +120,38 @@ function PopoverSurface(
     const Root = props.open === undefined ? v.root : engine;
     return (
         <Root.View
-            {...presence.props}
+            {...slot.props("root")}
+            {...slot.with("root", presence.props)}
             role="dialog"
             {...(label === undefined ? {} : { "aria-label": label })}
-            style={{ ...s.root, ...presence.style }}
+            style={slot.style("root", { ...s.root, ...presence.style })}
             testID={id("root")}
         >
             {isPresent(props.heading) ? (
                 <v.title.Text
+                    {...slot.props("title")}
                     role="heading"
-                    style={s.title}
+                    style={slot.style("title", s.title)}
                     testID={id("title")}
                 >
                     {props.heading}
                 </v.title.Text>
             ) : null}
             {isPresent(props.body) ? (
-                <v.body.View style={s.body} testID={id("body")}>
+                <v.body.View
+                    {...slot.props("body")}
+                    style={slot.style("body", s.body)}
+                    testID={id("body")}
+                >
                     {props.body}
                 </v.body.View>
             ) : null}
             {isPresent(props.actions) ? (
-                <v.actions.View style={s.actions} testID={id("actions")}>
+                <v.actions.View
+                    {...slot.props("actions")}
+                    style={slot.style("actions", s.actions)}
+                    testID={id("actions")}
+                >
                     {props.actions}
                 </v.actions.View>
             ) : null}

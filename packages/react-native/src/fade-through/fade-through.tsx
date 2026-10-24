@@ -27,16 +27,23 @@ import { useTransitionPages } from "../page-transition";
 import { testIdOf } from "../parts";
 import { useOverlayPresence } from "../presence";
 import { useEngine } from "../provider";
+import { nativeSlots } from "../slot-props";
+import type { NativeSlotProps, NativeSlots } from "../slot-props";
 import { useSelectedStyles } from "../styles";
 
 /** The fade through's props. */
-export interface FadeThroughProps {
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface FadeThroughHosts {
+    readonly root: "View";
+    readonly page: "View";
+}
+
+export interface FadeThroughProps extends NativeSlotProps<FadeThroughHosts> {
     /** What the content shows, such as the selected navigation destination's value; a new value
      *  fades through to the content given with it. */
     readonly value: FadeThroughValue;
     /** The content `value` shows, or a function of the value giving it. */
     readonly children?: ReactNode | ((value: FadeThroughValue) => ReactNode);
-    readonly style?: StyleProp<ViewStyle>;
     readonly testId?: TestIdOverride<FadeThroughPart> | undefined;
 }
 
@@ -45,10 +52,18 @@ interface PageProps {
     readonly gone: (page: TransitionPage) => void;
     readonly style: StyleProp<ViewStyle>;
     readonly testID: string;
+    readonly slot: NativeSlots;
     readonly children: ReactNode;
 }
 
-function Page({ page, gone, style, testID, children }: PageProps): ReactNode {
+function Page({
+    page,
+    gone,
+    style,
+    testID,
+    slot,
+    children,
+}: PageProps): ReactNode {
     const engine = useEngine();
     // The first page is still; the others enter, and leave once closed. An entered page stays
     // `entering` (it doesn't settle), so its presence stays open.
@@ -64,12 +79,13 @@ function Page({ page, gone, style, testID, children }: PageProps): ReactNode {
     const leaving = page.state === "leaving";
     return (
         <engine.View
-            {...presence.props}
+            {...slot.props("page")}
+            {...slot.with("page", presence.props)}
             pointerEvents={leaving ? "none" : "auto"}
             aria-hidden={leaving}
             importantForAccessibility={leaving ? "no-hide-descendants" : "auto"}
             style={[
-                style,
+                slot.style("page", style),
                 leaving ? StyleSheet.absoluteFill : null,
                 presence.style,
             ]}
@@ -87,6 +103,7 @@ const change = (pages: readonly TransitionPage[], key: PageKey) =>
 /** Material's fade through: `<FadeThrough value={destination}>{page}</FadeThrough>`, with the
  *  navigation bar's or rail's `value`. */
 export function FadeThrough(props: FadeThroughProps): ReactNode {
+    const slot = nativeSlots(props);
     const selected = useSelectedStyles("fadeThrough", fadeThroughSelection());
     const given = props.children;
     const { pages, contents, settle } = useTransitionPages(
@@ -97,12 +114,12 @@ export function FadeThrough(props: FadeThroughProps): ReactNode {
     const pageTestId = testIdOf(fadeThroughAnatomy, "page", props.testId);
     return (
         <View
-            style={[
+            {...slot.props("root")}
+            style={slot.style("root", [
                 selected.styles.root as ViewStyle,
                 // While a page leaves, clip to the incoming one, so a taller page doesn't spill.
                 pagesLeaving(pages) ? CLIP : null,
-                props.style,
-            ]}
+            ])}
             testID={testIdOf(fadeThroughAnatomy, "root", props.testId)}
         >
             {pages.map((page) => (
@@ -112,6 +129,7 @@ export function FadeThrough(props: FadeThroughProps): ReactNode {
                     gone={settle}
                     style={selected.styles.page as ViewStyle}
                     testID={pageTestId}
+                    slot={slot}
                 >
                     {contents.get(page.key)}
                 </Page>

@@ -34,10 +34,13 @@ import { StyleSheet, Text, View } from "react-native";
 import type { TextInputKeyPressEvent } from "react-native";
 
 import { Button } from "../button/button";
+import type { ButtonProps } from "../button/button";
 import { IconButton } from "../icon-button/icon-button";
 import { IconSlot, iconSlot, ownText } from "../icon-style";
 import { useControllable, withEngine } from "../parts";
 import { useDirection } from "../provider";
+import { nativeSlots } from "../slot-props";
+import type { InnerPropsOf, NativeSlotProps, NativeSlots } from "../slot-props";
 import { useComponentSlots } from "../styles";
 import { partId } from "../text-input";
 
@@ -64,6 +67,7 @@ interface SegmentOptions {
     readonly disabled: boolean;
     readonly readOnly: boolean;
     readonly testID: string;
+    readonly slot: NativeSlots;
     readonly inputRef: (input: Focusable | null) => void;
     readonly onText: (text: string) => void;
     readonly onKey: (key: string) => boolean;
@@ -72,6 +76,7 @@ interface SegmentOptions {
 
 // One segment, with its own focus: the focused one shows the focus color behind its digits.
 function Segment(options: SegmentOptions): ReactNode {
+    const { slot } = options;
     const [focused, setFocused] = useState(false);
     const tokens = useTokens();
     const {
@@ -97,33 +102,42 @@ function Segment(options: SegmentOptions): ReactNode {
                 {options.text === "" ? options.placeholder : options.text}
             </Text>
             <v.segment.TextInput
+                {...slot.props("segment")}
                 ref={options.inputRef}
                 value={options.text}
-                onChangeText={(text: string) => {
-                    const digits = text.replace(/\D/g, "");
-                    // Typing into a full segment starts it over with the new digits.
-                    options.onText(
-                        (digits.length > options.length &&
-                        digits.startsWith(options.text)
-                            ? digits.slice(options.text.length)
-                            : digits
-                        ).slice(0, options.length),
-                    );
-                }}
-                onKeyPress={(event: TextInputKeyPressEvent) => {
-                    if (options.onKey(event.nativeEvent.key))
-                        (
-                            event as { preventDefault?: () => void }
-                        ).preventDefault?.();
-                }}
-                onFocus={() => {
+                onChangeText={slot.on(
+                    "segment",
+                    "onChangeText",
+                    (text: string) => {
+                        const digits = text.replace(/\D/g, "");
+                        // Typing into a full segment starts it over with the new digits.
+                        options.onText(
+                            (digits.length > options.length &&
+                            digits.startsWith(options.text)
+                                ? digits.slice(options.text.length)
+                                : digits
+                            ).slice(0, options.length),
+                        );
+                    },
+                )}
+                onKeyPress={slot.on(
+                    "segment",
+                    "onKeyPress",
+                    (event: TextInputKeyPressEvent) => {
+                        if (options.onKey(event.nativeEvent.key))
+                            (
+                                event as { preventDefault?: () => void }
+                            ).preventDefault?.();
+                    },
+                )}
+                onFocus={slot.on("segment", "onFocus", () => {
                     setFocused(true);
                     options.onFocus(true);
-                }}
-                onBlur={() => {
+                })}
+                onBlur={slot.on("segment", "onBlur", () => {
                     setFocused(false);
                     options.onFocus(false);
-                }}
+                })}
                 editable={!options.disabled && !options.readOnly}
                 inputMode="numeric"
                 keyboardType="number-pad"
@@ -148,15 +162,36 @@ function Segment(options: SegmentOptions): ReactNode {
                     ? { "aria-valuetext": "Empty" }
                     : { "aria-valuenow": value })}
                 aria-invalid={options.invalid}
-                style={{
+                style={slot.style("segment", {
                     ...look,
                     ...(StyleSheet.absoluteFill as object),
                     textAlign: "center",
-                }}
+                })}
                 testID={options.testID}
             />
         </View>
     );
+}
+
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface DateInputHosts {
+    readonly root: "View";
+    readonly header: "View";
+    readonly headline: "Text";
+    readonly selectedDate: "Text";
+    readonly modeToggle: "View";
+    readonly divider: "View";
+    readonly field: "View";
+    readonly container: "View";
+    readonly input: "View";
+    readonly segment: "TextInput";
+    readonly leadingIcon: "View";
+    readonly trailingIcon: "View";
+    readonly prefixText: "Text";
+    readonly suffixText: "Text";
+    readonly label: "Text";
+    readonly supportingText: "Text";
+    readonly actions: "View";
 }
 
 export interface DateInputProps
@@ -169,7 +204,13 @@ export interface DateInputProps
             | "prefixText"
             | "suffixText"
         >,
-        DateInputContentProps<ReactNode> {}
+        DateInputContentProps<ReactNode>,
+        NativeSlotProps<DateInputHosts> {
+    /** The cancel button's `style`, `slotProps`, `tokens` and `testId`. */
+    readonly cancelButtonProps?: InnerPropsOf<ButtonProps> | undefined;
+    /** The confirm button's `style`, `slotProps`, `tokens` and `testId`. */
+    readonly confirmButtonProps?: InnerPropsOf<ButtonProps> | undefined;
+}
 
 function DateInputImpl(props: DateInputProps): ReactNode {
     const locale = pickerLocale(props);
@@ -230,6 +271,7 @@ function DateInputImpl(props: DateInputProps): ReactNode {
     );
     const id = (part: DateInputPart) =>
         partId(dateInputAnatomy, part, props.testId);
+    const slot = nativeSlots(props);
     const update = (
         kind: DateSegmentKind,
         digits: (texts: Record<DateSegmentKind, string>) => string,
@@ -284,8 +326,9 @@ function DateInputImpl(props: DateInputProps): ReactNode {
         const Slot = v[part];
         return (
             <Slot.View
+                {...slot.props(part)}
                 {...(part === "trailingIcon" ? { pointerEvents: "none" } : {})}
-                style={s[part]}
+                style={slot.style(part, s[part])}
                 testID={id(part)}
             >
                 <IconSlot {...iconSlot(selected, part)} motion={s[part]}>
@@ -298,28 +341,43 @@ function DateInputImpl(props: DateInputProps): ReactNode {
         if (!isPresent(node)) return null;
         const Slot = v[part];
         return (
-            <Slot.Text selectable={false} style={s[part]} testID={id(part)}>
+            <Slot.Text
+                {...slot.props(part)}
+                selectable={false}
+                style={slot.style(part, s[part])}
+                testID={id(part)}
+            >
                 {node}
             </Slot.Text>
         );
     };
     return (
         <v.root.View
+            {...slot.props("root")}
             role="dialog"
             aria-label={
                 typeof props.headline === "string"
                     ? props.headline
                     : "Select date"
             }
-            style={s.root}
+            style={slot.style("root", s.root)}
             testID={id("root")}
         >
-            <v.header.View style={s.header} testID={id("header")}>
-                <v.headline.Text style={s.headline} testID={id("headline")}>
+            <v.header.View
+                {...slot.props("header")}
+                style={slot.style("header", s.header)}
+                testID={id("header")}
+            >
+                <v.headline.Text
+                    {...slot.props("headline")}
+                    style={slot.style("headline", s.headline)}
+                    testID={id("headline")}
+                >
                     {props.headline ?? "Select date"}
                 </v.headline.Text>
                 <v.selectedDate.Text
-                    style={s.selectedDate}
+                    {...slot.props("selectedDate")}
+                    style={slot.style("selectedDate", s.selectedDate)}
                     testID={id("selectedDate")}
                 >
                     {selectedDateText(value, locale) ??
@@ -328,7 +386,8 @@ function DateInputImpl(props: DateInputProps): ReactNode {
                 </v.selectedDate.Text>
                 {props.onModeToggle ? (
                     <v.modeToggle.View
-                        style={s.modeToggle}
+                        {...slot.props("modeToggle")}
+                        style={slot.style("modeToggle", s.modeToggle)}
                         testID={id("modeToggle")}
                     >
                         <IconButton
@@ -341,15 +400,28 @@ function DateInputImpl(props: DateInputProps): ReactNode {
                     </v.modeToggle.View>
                 ) : null}
             </v.header.View>
-            <v.divider.View style={s.divider} testID={id("divider")} />
-            <v.field.View style={s.field} testID={id("field")}>
-                <v.container.View style={s.container} testID={id("container")}>
+            <v.divider.View
+                {...slot.props("divider")}
+                style={slot.style("divider", s.divider)}
+                testID={id("divider")}
+            />
+            <v.field.View
+                {...slot.props("field")}
+                style={slot.style("field", s.field)}
+                testID={id("field")}
+            >
+                <v.container.View
+                    {...slot.props("container")}
+                    style={slot.style("container", s.container)}
+                    testID={id("container")}
+                >
                     {icon("leadingIcon", props.leadingIcon)}
                     {affix("prefixText", props.prefixText)}
                     <v.input.View
+                        {...slot.props("input")}
                         role="group"
                         aria-label={label}
-                        style={s.input}
+                        style={slot.style("input", s.input)}
                         testID={id("input")}
                     >
                         {segments.map((segment, index) =>
@@ -380,6 +452,7 @@ function DateInputImpl(props: DateInputProps): ReactNode {
                                     disabled={props.disabled ?? false}
                                     readOnly={props.readOnly ?? false}
                                     testID={id("segment")}
+                                    slot={slot}
                                     inputRef={(input) => {
                                         if (input)
                                             inputs.current.set(
@@ -402,9 +475,10 @@ function DateInputImpl(props: DateInputProps): ReactNode {
                     </v.input.View>
                     {affix("suffixText", props.suffixText)}
                     <v.label.Text
+                        {...slot.props("label")}
                         selectable={false}
                         pointerEvents="none"
-                        style={s.label}
+                        style={slot.style("label", s.label)}
                         testID={id("label")}
                     >
                         {props.label ?? "Date"}
@@ -412,19 +486,26 @@ function DateInputImpl(props: DateInputProps): ReactNode {
                     {icon("trailingIcon", props.trailingIcon)}
                 </v.container.View>
                 <v.supportingText.Text
-                    style={s.supportingText}
+                    {...slot.props("supportingText")}
+                    style={slot.style("supportingText", s.supportingText)}
                     testID={id("supportingText")}
                 >
                     {props.error ?? props.supportingText ?? hint}
                 </v.supportingText.Text>
             </v.field.View>
-            <v.actions.View style={s.actions} testID={id("actions")}>
+            <v.actions.View
+                {...slot.props("actions")}
+                style={slot.style("actions", s.actions)}
+                testID={id("actions")}
+            >
                 <Button
+                    {...props.cancelButtonProps}
                     variant="text"
                     label={props.cancelLabel ?? "Cancel"}
                     onPress={() => props.onCancel?.()}
                 />
                 <Button
+                    {...props.confirmButtonProps}
                     variant="text"
                     label={props.confirmLabel ?? "OK"}
                     disabled={props.disabled || props.readOnly}

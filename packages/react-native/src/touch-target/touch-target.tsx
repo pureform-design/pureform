@@ -12,12 +12,19 @@ import { StyleSheet, View } from "react-native";
 import type { Insets, ViewStyle } from "react-native";
 
 import { testIdOf } from "../parts";
+import { nativeSlots } from "../slot-props";
+import type { NativeSlotProps } from "../slot-props";
 import { useSelectedStyles } from "../styles";
 
-export interface TouchTargetProps extends Omit<
-    TouchTargetRootOwnProps,
-    "unstyled"
-> {}
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface TouchTargetHosts {
+    readonly root: "View";
+}
+
+export interface TouchTargetProps
+    extends
+        Omit<TouchTargetRootOwnProps, "unstyled">,
+        NativeSlotProps<TouchTargetHosts> {}
 
 // The theme's minimum target, as the preset's style gives it.
 const minimumOf = (style: ViewStyle): number =>
@@ -31,6 +38,7 @@ const useOwnStyle = (name: string, selection: Record<string, unknown>) => {
 /** Grows a small pressable's hit area to the theme's minimum: `<Pressable style={{ width: 24,
  *  height: 24 }}><TouchTarget />…</Pressable>`. */
 export function TouchTarget(props: TouchTargetProps): ReactNode {
+    const slot = nativeSlots(props);
     const minimum = minimumOf(useOwnStyle("touchTarget", {}));
     // Centred by a layer over the parent rather than the web's percentage translate, which
     // React Native's transforms don't take everywhere: the target is the parent's size, at
@@ -47,12 +55,13 @@ export function TouchTarget(props: TouchTargetProps): ReactNode {
             }}
         >
             <View
-                style={{
+                {...slot.props("root")}
+                style={slot.style("root", {
                     minWidth: minimum,
                     minHeight: minimum,
                     width: "100%",
                     height: "100%",
-                }}
+                })}
                 testID={testIdOf(touchTargetAnatomy, "root", props.testId)}
             />
         </View>

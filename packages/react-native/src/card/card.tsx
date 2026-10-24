@@ -19,7 +19,10 @@ import { Text } from "react-native";
 
 import { useSurfaceIndication } from "../indication";
 import type { SurfaceIndicationScope } from "../indication";
-import { testIdOf, unselectable, withEngine } from "../parts";
+import { testIdOf, withEngine } from "../parts";
+import { nativeSlots, withUnselectable } from "../slot-props";
+import type { NativeSlots } from "../slot-props";
+import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 import type { ComponentSlots } from "../styles";
 
@@ -34,6 +37,7 @@ interface CardContextValue {
     readonly indication: SurfaceIndicationScope;
     readonly disabled: boolean;
     readonly testId: TestIdOverride<CardPart> | undefined;
+    readonly slot: NativeSlots;
     /** Tells Root an action area is there, while it's mounted. */
     readonly hasActionArea: (present: boolean) => void;
 }
@@ -46,7 +50,26 @@ const useCard = (part: string): CardContextValue => {
     return card;
 };
 
-export interface CardRootProps extends CardVariantProps, InteractiveProps {
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface CardRootHosts {
+    readonly root: "View";
+    readonly touchTarget: "View";
+    readonly actionArea: "Pressable";
+    readonly media: "View";
+    readonly header: "View";
+    readonly avatar: "View";
+    readonly headerText: "View";
+    readonly headline: "Text";
+    readonly subhead: "Text";
+    readonly headerAction: "View";
+    readonly content: "View";
+    readonly supportingText: "Text";
+    readonly actions: "View";
+    readonly footer: "View";
+}
+
+export interface CardRootProps
+    extends CardVariantProps, InteractiveProps, NativeSlotProps<CardRootHosts> {
     readonly children?: ReactNode;
     /** Makes the whole card act: one button, its text its label. Use the action area instead
      *  when the card has other controls. */
@@ -77,18 +100,24 @@ function Root(props: CardRootProps): ReactNode {
     );
     const { styles: s, selected, views: v } = slots;
     const id = (part: CardPart) => testIdOf(cardAnatomy, part, props.testId);
+    const slot = nativeSlots(props);
     const value: CardContextValue = {
         slots,
         indication,
         disabled: !!props.disabled,
         testId: props.testId,
+        slot,
         hasActionArea: setHasArea,
     };
     if (!acts) {
         // Not a grouping element: what's inside stays reachable on its own.
         return (
             <CardContext value={value}>
-                <v.root.View style={s.root} testID={id("root")}>
+                <v.root.View
+                    {...slot.props("root")}
+                    style={slot.style("root", s.root)}
+                    testID={id("root")}
+                >
                     {props.children}
                     {hasArea ? indication.layer(selected) : null}
                 </v.root.View>
@@ -98,16 +127,18 @@ function Root(props: CardRootProps): ReactNode {
     return (
         <CardContext value={value}>
             <v.root.Pressable
-                {...indication.handlers}
+                {...slot.props("root")}
+                {...slot.with("root", indication.handlers)}
                 role="button"
                 disabled={props.disabled}
-                onPress={props.onPress}
-                style={{ ...s.root, ...unselectable }}
+                onPress={slot.on("root", "onPress", props.onPress)}
+                style={slot.style("root", withUnselectable(s.root))}
                 testID={id("root")}
             >
                 <v.touchTarget.View
+                    {...slot.props("touchTarget")}
                     pointerEvents="none"
-                    style={s.touchTarget}
+                    style={slot.style("touchTarget", s.touchTarget)}
                     testID={id("touchTarget")}
                 />
                 {props.children}
@@ -133,6 +164,7 @@ export interface CardActionAreaProps {
  *  outside it. The container shows its hover, press, and focus, and its ripple. */
 function ActionArea(props: CardActionAreaProps): ReactNode {
     const card = useCard("ActionArea");
+    const slot = card.slot;
     const { hasActionArea } = card;
     useLayoutEffect(() => {
         hasActionArea(true);
@@ -142,14 +174,15 @@ function ActionArea(props: CardActionAreaProps): ReactNode {
     const disabled = props.disabled ?? card.disabled;
     return (
         <v.actionArea.Pressable
-            {...card.indication.handlers}
+            {...slot.props("actionArea")}
+            {...slot.with("actionArea", card.indication.handlers)}
             role={props.role ?? "button"}
             {...(props["aria-label"] === undefined
                 ? {}
                 : { "aria-label": props["aria-label"] })}
             disabled={disabled}
-            onPress={props.onPress}
-            style={{ ...s.actionArea, ...unselectable }}
+            onPress={slot.on("actionArea", "onPress", props.onPress)}
+            style={slot.style("actionArea", withUnselectable(s.actionArea))}
             testID={testIdOf(cardAnatomy, "actionArea", card.testId)}
         >
             {props.children}
@@ -166,6 +199,7 @@ export interface CardPartProps {
 const viewPart = (name: CardPart, label: string, text?: CardPart) =>
     function CardViewPart(props: CardPartProps): ReactNode {
         const card = useCard(label);
+        const slot = card.slot;
         const { styles: s, views: v } = card.slots;
         const Slot = v[name];
         const children =
@@ -177,7 +211,8 @@ const viewPart = (name: CardPart, label: string, text?: CardPart) =>
             );
         return (
             <Slot.View
-                style={s[name]}
+                {...slot.props(name)}
+                style={slot.style(name, s[name])}
                 testID={testIdOf(cardAnatomy, name, card.testId)}
             >
                 {children}
@@ -188,12 +223,14 @@ const viewPart = (name: CardPart, label: string, text?: CardPart) =>
 const textPart = (name: CardPart, label: string) =>
     function CardTextPart(props: CardPartProps): ReactNode {
         const card = useCard(label);
+        const slot = card.slot;
         const { styles: s, views: v } = card.slots;
         const Slot = v[name];
         return (
             <Slot.Text
+                {...slot.props(name)}
                 selectable={false}
-                style={s[name]}
+                style={slot.style(name, s[name])}
                 testID={testIdOf(cardAnatomy, name, card.testId)}
             >
                 {props.children}
@@ -282,6 +319,8 @@ function CardImpl(props: CardProps): ReactNode {
         indication: props.indication,
         interactionSource: props.interactionSource,
         testId: props.testId,
+        style: props.style,
+        slotProps: props.slotProps,
     };
     if (!layout.actionArea) {
         return (

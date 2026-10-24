@@ -28,8 +28,10 @@ import { Text } from "react-native";
 import { IconSlot, iconSlot, ownText } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { Menu } from "../menu";
-import type { MenuTriggerProps } from "../menu";
-import { testIdOf, unselectable, withEngine } from "../parts";
+import type { MenuProps, MenuTriggerProps } from "../menu";
+import { testIdOf, withEngine } from "../parts";
+import { nativeSlots, withUnselectable } from "../slot-props";
+import type { InnerPropsOf, NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
 // The leading button's and the trailing button's.
@@ -37,11 +39,22 @@ const INDICATIONS = Object.fromEntries(
     splitButtonAnatomy.indication!.map((entry) => [entry.trigger, entry]),
 );
 
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface SplitButtonHosts {
+    readonly root: "View";
+    readonly leadingButton: "Pressable";
+    readonly trailingButton: "Pressable";
+    readonly trailingIcon: "View";
+}
+
 export interface SplitButtonProps
     extends
         SplitButtonVariantProps,
         SplitButtonContentProps<ReactNode>,
-        IndicationProps {
+        IndicationProps,
+        NativeSlotProps<SplitButtonHosts> {
+    /** The menu's `style`, `slotProps`, `tokens` and `testId`. */
+    readonly menuProps?: InnerPropsOf<MenuProps> | undefined;
     /** Disables both buttons. */
     readonly disabled?: boolean | undefined;
     /** Whether the menu is open, controlled when defined. */
@@ -72,6 +85,7 @@ function SplitButtonButtonImpl(props: {
     readonly icon?: ReactNode;
     readonly children: ReactNode;
 }): ReactNode {
+    const slot = nativeSlots(props.split);
     const disabled = props.split.disabled ?? false;
     const indication = useSurfaceIndication(INDICATIONS[props.part]!, {
         indication: props.split.indication,
@@ -95,7 +109,8 @@ function SplitButtonButtonImpl(props: {
         testIdOf(splitButtonAnatomy, part, props.split.testId);
     return (
         <Surface.Pressable
-            {...indication.handlers}
+            {...slot.props(props.part)}
+            {...slot.with(props.part, indication.handlers)}
             role="button"
             {...(props.label === undefined
                 ? {}
@@ -107,14 +122,15 @@ function SplitButtonButtonImpl(props: {
                   }
                 : {})}
             disabled={disabled}
-            onPress={props.onPress}
-            style={{ ...s[props.part], ...unselectable }}
+            onPress={slot.on(props.part, "onPress", props.onPress)}
+            style={slot.style(props.part, withUnselectable(s[props.part]))}
             testID={id(props.part)}
         >
             {props.icon}
             {props.part === "trailingButton" ? (
                 <v.trailingIcon.View
-                    style={s.trailingIcon}
+                    {...slot.props("trailingIcon")}
+                    style={slot.style("trailingIcon", s.trailingIcon)}
                     testID={id("trailingIcon")}
                 >
                     <IconSlot
@@ -142,13 +158,15 @@ const SplitButtonButton = withEngine(
 );
 
 function SplitButtonImpl(props: SplitButtonProps): ReactNode {
+    const slot = nativeSlots(props);
     const { styles: s, views: v } = useComponentSlots<SplitButtonPart>(
         "splitButton",
         splitButtonSelection(props),
     );
     const trigger = (given: MenuTriggerProps, state: { open: boolean }) => (
         <v.root.View
-            style={s.root}
+            {...slot.props("root")}
+            style={slot.style("root", s.root)}
             testID={testIdOf(splitButtonAnatomy, "root", props.testId)}
         >
             <SplitButtonButton
@@ -173,6 +191,7 @@ function SplitButtonImpl(props: SplitButtonProps): ReactNode {
     );
     return (
         <Menu
+            {...props.menuProps}
             items={props.items as readonly MenuItem<ReactNode>[] | undefined}
             trigger={trigger}
             open={props.open}

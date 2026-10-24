@@ -50,14 +50,37 @@ import type { GestureResponderEvent, LayoutChangeEvent } from "react-native";
 import { testIdOf, withEngine } from "../parts";
 import { themeSpring } from "../presence";
 import { useDirection, usePureform } from "../provider";
+import { nativeSlots } from "../slot-props";
+import type { NativeSlots } from "../slot-props";
+import type { NativeSlotProps } from "../slot-props";
 import { inFlowInline, useComponentSlots } from "../styles";
 import { TimeButton, timeLocale, useTime } from "../time";
+
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface TimePickerHosts {
+    readonly scrollItem: "Text";
+    readonly root: "View";
+    readonly headline: "Text";
+    readonly body: "View";
+    readonly separator: "Text";
+    readonly periodSelector: "View";
+    readonly actions: "View";
+    readonly dial: "View";
+    readonly dialTrack: "View";
+    readonly dialHandle: "View";
+    readonly dialCenter: "View";
+    readonly dialLabel: "Text";
+    readonly hourSelector: "Pressable";
+    readonly minuteSelector: "Pressable";
+    readonly period: "Pressable";
+}
 
 export interface TimePickerProps
     extends
         TimeBehaviorProps,
         TimePickerVariantProps,
-        TimeContentProps<ReactNode> {
+        TimeContentProps<ReactNode>,
+        NativeSlotProps<TimePickerHosts> {
     /** The controlled view: what the dial sets. */
     readonly view?: TimePickerView | undefined;
     /** @default "hour" */
@@ -93,6 +116,7 @@ function TimePickerImpl(props: TimePickerProps): ReactNode {
     );
     const id = (part: TimePickerPart) =>
         testIdOf(timePickerAnatomy, part, props.testId);
+    const slot = nativeSlots(props);
     const scroll = props.mode === "scroll";
     const names = {
         hour: props.translations?.hour ?? "Hour",
@@ -138,6 +162,7 @@ function TimePickerImpl(props: TimePickerProps): ReactNode {
         onKey?: (key: string) => boolean,
     ) => (
         <TimeButton
+            slot={slot}
             anatomy={timePickerAnatomy}
             component="timePicker"
             part={part}
@@ -159,21 +184,25 @@ function TimePickerImpl(props: TimePickerProps): ReactNode {
         const Field = v[part];
         return (
             <Field.View
+                {...slot.props(part)}
                 role="adjustable"
                 aria-label={names[of]}
                 {...adjust(of)}
-                style={s[part]}
+                style={slot.style(part, s[part])}
                 testID={id(part)}
             >
                 {([-1, 0, 1] as const).map((offset) => {
                     const at = stepTime(time, of, offset, cycle);
                     return (
                         <v.scrollItem.Text
+                            {...slot.props("scrollItem")}
                             key={offset}
                             aria-hidden
                             aria-selected={offset === 0}
-                            onPress={() => setTime(at)}
-                            style={s.scrollItem}
+                            onPress={slot.on("scrollItem", "onPress", () =>
+                                setTime(at),
+                            )}
+                            style={slot.style("scrollItem", s.scrollItem)}
                             testID={id("scrollItem")}
                         >
                             {displayValue(at, of, cycle)}
@@ -198,25 +227,35 @@ function TimePickerImpl(props: TimePickerProps): ReactNode {
 
     return (
         <v.root.View
+            {...slot.props("root")}
             role="group"
             aria-label={
                 typeof props.headline === "string"
                     ? props.headline
                     : TIME_PICKER_HEADLINE
             }
-            style={inFlowInline(s.root ?? {})}
+            style={slot.style("root", inFlowInline(s.root ?? {}))}
             testID={id("root")}
         >
-            <v.headline.Text style={s.headline} testID={id("headline")}>
+            <v.headline.Text
+                {...slot.props("headline")}
+                style={slot.style("headline", s.headline)}
+                testID={id("headline")}
+            >
                 {isPresent(props.headline)
                     ? props.headline
                     : TIME_PICKER_HEADLINE}
             </v.headline.Text>
-            <v.body.View style={s.body} testID={id("body")}>
+            <v.body.View
+                {...slot.props("body")}
+                style={slot.style("body", s.body)}
+                testID={id("body")}
+            >
                 {selector("hour")}
                 <v.separator.Text
+                    {...slot.props("separator")}
                     aria-hidden
-                    style={s.separator}
+                    style={slot.style("separator", s.separator)}
                     testID={id("separator")}
                 >
                     :
@@ -224,9 +263,10 @@ function TimePickerImpl(props: TimePickerProps): ReactNode {
                 {selector("minute")}
                 {cycle === 12 ? (
                     <v.periodSelector.View
+                        {...slot.props("periodSelector")}
                         role="group"
                         aria-label={names.period}
-                        style={s.periodSelector}
+                        style={slot.style("periodSelector", s.periodSelector)}
                         testID={id("periodSelector")}
                     >
                         {(["am", "pm"] as const).map((period) => (
@@ -248,6 +288,7 @@ function TimePickerImpl(props: TimePickerProps): ReactNode {
                     styles={s}
                     views={v}
                     id={id}
+                    slot={slot}
                     time={time}
                     view={view}
                     cycle={cycle}
@@ -261,7 +302,11 @@ function TimePickerImpl(props: TimePickerProps): ReactNode {
                 />
             )}
             {isPresent(props.actions) ? (
-                <v.actions.View style={s.actions} testID={id("actions")}>
+                <v.actions.View
+                    {...slot.props("actions")}
+                    style={slot.style("actions", s.actions)}
+                    testID={id("actions")}
+                >
                     {props.actions}
                 </v.actions.View>
             ) : null}
@@ -277,6 +322,7 @@ function Dial(props: {
     readonly styles: Slots["styles"];
     readonly views: Slots["views"];
     readonly id: (part: TimePickerPart) => string;
+    readonly slot: NativeSlots;
     readonly time: ReturnType<typeof useTime>[0];
     readonly view: TimePickerView;
     readonly cycle: 12 | 24;
@@ -286,6 +332,7 @@ function Dial(props: {
     readonly onTime: (time: ReturnType<typeof useTime>[0]) => void;
     readonly onRelease: () => void;
 }): ReactNode {
+    const { slot } = props;
     const { styles: s, views: v, id, time, view, cycle } = props;
     const size = useRef({ width: 0, height: 0 });
     // The turn of a moving touch, which the hand follows exactly, as Compose's dial does; a
@@ -331,42 +378,61 @@ function Dial(props: {
     const reach = (hand.radius / 100) * width;
     return (
         <v.dial.View
+            {...slot.props("dial")}
             role="adjustable"
             aria-label={props.label}
-            {...props.adjust}
+            {...slot.with("dial", props.adjust)}
             onLayout={(event: LayoutChangeEvent) => {
                 size.current = event.nativeEvent.layout;
                 setWidth(event.nativeEvent.layout.width);
             }}
-            onStartShouldSetResponder={() => true}
-            onMoveShouldSetResponder={() => true}
-            onResponderGrant={(event: GestureResponderEvent) =>
-                at(event, false)
-            }
-            onResponderMove={(event: GestureResponderEvent) => at(event, true)}
-            onResponderRelease={() => {
+            onStartShouldSetResponder={slot.on(
+                "dial",
+                "onStartShouldSetResponder",
+                () => true,
+            )}
+            onMoveShouldSetResponder={slot.on(
+                "dial",
+                "onMoveShouldSetResponder",
+                () => true,
+            )}
+            onResponderGrant={slot.on(
+                "dial",
+                "onResponderGrant",
+                (event: GestureResponderEvent) => at(event, false),
+            )}
+            onResponderMove={slot.on(
+                "dial",
+                "onResponderMove",
+                (event: GestureResponderEvent) => at(event, true),
+            )}
+            onResponderRelease={slot.on("dial", "onResponderRelease", () => {
                 setDragTurn(undefined);
                 props.onRelease();
-            }}
-            onResponderTerminate={() => setDragTurn(undefined)}
-            style={s.dial}
+            })}
+            onResponderTerminate={slot.on("dial", "onResponderTerminate", () =>
+                setDragTurn(undefined),
+            )}
+            style={slot.style("dial", s.dial)}
             testID={id("dial")}
         >
             <Animated.View
+                {...slot.props("dialTrack")}
                 pointerEvents="none"
-                style={{
+                style={slot.style("dialTrack", {
                     ...s.dialTrack,
                     left: "50%",
                     bottom: "50%",
                     height: pct(hand.radius),
                     transformOrigin: "bottom",
                     transform: [{ rotate }],
-                }}
+                })}
                 testID={id("dialTrack")}
             />
             <Animated.View
+                {...slot.props("dialHandle")}
                 pointerEvents="none"
-                style={{
+                style={slot.style("dialHandle", {
                     ...s.dialHandle,
                     left: "50%",
                     top: "50%",
@@ -375,12 +441,17 @@ function Dial(props: {
                         { rotate },
                         { translateY: -reach },
                     ],
-                }}
+                })}
                 testID={id("dialHandle")}
             />
             <v.dialCenter.View
+                {...slot.props("dialCenter")}
                 pointerEvents="none"
-                style={{ ...s.dialCenter, left: "50%", top: "50%" }}
+                style={slot.style("dialCenter", {
+                    ...s.dialCenter,
+                    left: "50%",
+                    top: "50%",
+                })}
                 testID={id("dialCenter")}
             />
             {dialLabels(view, cycle).map((label) => (
@@ -392,6 +463,7 @@ function Dial(props: {
                     selected={dialLabelSelected(label, time, view, cycle)}
                     selection={props.selection}
                     testId={id("dialLabel")}
+                    slot={slot}
                 />
             ))}
         </v.dial.View>
@@ -412,7 +484,9 @@ function DialLabelImpl(props: {
     readonly selected: boolean;
     readonly selection: Record<string, unknown>;
     readonly testId: string;
+    readonly slot: NativeSlots;
 }): ReactNode {
+    const { slot } = props;
     const { styles: s, views: v } = useComponentSlots<TimePickerPart>(
         "timePicker",
         props.selection,
@@ -420,10 +494,15 @@ function DialLabelImpl(props: {
     );
     return (
         <v.dialLabel.Text
+            {...slot.props("dialLabel")}
             aria-hidden
             pointerEvents="none"
             selectable={false}
-            style={{ ...s.dialLabel, left: pct(props.x), top: pct(props.y) }}
+            style={slot.style("dialLabel", {
+                ...s.dialLabel,
+                left: pct(props.x),
+                top: pct(props.y),
+            })}
             testID={props.testId}
         >
             {props.text}

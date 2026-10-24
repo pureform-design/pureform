@@ -28,13 +28,33 @@ import { FadeThrough } from "../fade-through/fade-through";
 import { HorizontalSharedAxis } from "../horizontal-shared-axis/horizontal-shared-axis";
 import { IconSlot, iconSlot } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
-import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
+import { testIdOf, useControllable, withEngine } from "../parts";
+import { nativeSlots, withUnselectable } from "../slot-props";
+import type { NativeSlots } from "../slot-props";
+import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 import type { ComponentSlots } from "../styles";
 
 const TRIGGER_INDICATION = stepperAnatomy.indication![0] as IndicationAnatomy;
 
-export interface StepperProps extends StepperVariantProps, PageTransitionProps {
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface StepperHosts {
+    readonly item: "View";
+    readonly trigger: "Pressable";
+    readonly indicator: "View";
+    readonly label: "Text";
+    readonly caption: "Text";
+    readonly separator: "View";
+    readonly content: "View";
+    readonly root: "View";
+    readonly list: "View";
+}
+
+export interface StepperProps
+    extends
+        StepperVariantProps,
+        PageTransitionProps,
+        NativeSlotProps<StepperHosts> {
     /** The steps, in order. */
     readonly items: readonly StepperItem<ReactNode>[];
     /** The current step: its index, or the number of steps once every one is done. */
@@ -62,6 +82,7 @@ interface StepProps {
     readonly indication: Indication | undefined;
     readonly onPress: (index: number) => void;
     readonly testId: TestIdOverride<StepperPart> | undefined;
+    readonly slot: NativeSlots;
 }
 
 function StepImpl({
@@ -75,6 +96,7 @@ function StepImpl({
     indication: given,
     onPress,
     testId,
+    slot,
 }: StepProps): ReactNode {
     const current = index === step;
     const completed = index < step;
@@ -113,12 +135,14 @@ function StepImpl({
                 : String(index + 1);
     return (
         <v.item.View
+            {...slot.props("item")}
             role={vertical ? "listitem" : "presentation"}
-            style={s.item}
+            style={slot.style("item", s.item)}
             testID={id("item")}
         >
             <v.trigger.Pressable
-                {...indication.handlers}
+                {...slot.props("trigger")}
+                {...slot.with("trigger", indication.handlers)}
                 {...(vertical
                     ? {
                           role: "button" as const,
@@ -132,13 +156,14 @@ function StepImpl({
                     ? {}
                     : { "aria-label": item["aria-label"] })}
                 disabled={disabled}
-                onPress={() => onPress(index)}
-                style={{ ...s.trigger, ...unselectable }}
+                onPress={slot.on("trigger", "onPress", () => onPress(index))}
+                style={slot.style("trigger", withUnselectable(s.trigger))}
                 testID={id("trigger")}
             >
                 <v.indicator.View
+                    {...slot.props("indicator")}
                     aria-hidden
-                    style={s.indicator}
+                    style={slot.style("indicator", s.indicator)}
                     testID={id("indicator")}
                 >
                     <IconSlot
@@ -150,8 +175,9 @@ function StepImpl({
                 </v.indicator.View>
                 {isPresent(item.label) ? (
                     <v.label.Text
+                        {...slot.props("label")}
                         selectable={false}
-                        style={s.label}
+                        style={slot.style("label", s.label)}
                         testID={id("label")}
                     >
                         {item.label}
@@ -159,8 +185,9 @@ function StepImpl({
                 ) : null}
                 {isPresent(item.caption) ? (
                     <v.caption.Text
+                        {...slot.props("caption")}
                         selectable={false}
-                        style={s.caption}
+                        style={slot.style("caption", s.caption)}
                         testID={id("caption")}
                     >
                         {item.caption}
@@ -170,13 +197,18 @@ function StepImpl({
             </v.trigger.Pressable>
             {index < count - 1 ? (
                 <v.separator.View
-                    style={s.separator}
+                    {...slot.props("separator")}
+                    style={slot.style("separator", s.separator)}
                     testID={id("separator")}
                 />
             ) : null}
             {vertical && isPresent(item.content) ? (
                 <Expanding open={current}>
-                    <v.content.View style={s.content} testID={id("content")}>
+                    <v.content.View
+                        {...slot.props("content")}
+                        style={slot.style("content", s.content)}
+                        testID={id("content")}
+                    >
                         {item.content}
                     </v.content.View>
                 </Expanding>
@@ -203,16 +235,22 @@ function StepperImpl(props: StepperProps): ReactNode {
     );
     const id = (part: StepperPart) =>
         testIdOf(stepperAnatomy, part, props.testId);
+    const slot = nativeSlots(props);
     const vertical = props.orientation === "vertical";
     const content = props.items[step]?.content;
     return (
-        <v.root.View style={s.root} testID={id("root")}>
+        <v.root.View
+            {...slot.props("root")}
+            style={slot.style("root", s.root)}
+            testID={id("root")}
+        >
             <v.list.View
+                {...slot.props("list")}
                 role={vertical ? "list" : "tablist"}
                 {...(props["aria-label"] === undefined
                     ? {}
                     : { "aria-label": props["aria-label"] })}
-                style={s.list}
+                style={slot.style("list", s.list)}
                 testID={id("list")}
             >
                 {props.items.map((item, index) => (
@@ -228,6 +266,7 @@ function StepperImpl(props: StepperProps): ReactNode {
                         indication={props.indication}
                         onPress={setStep}
                         testId={props.testId}
+                        slot={slot}
                     />
                 ))}
             </v.list.View>
@@ -238,7 +277,8 @@ function StepperImpl(props: StepperProps): ReactNode {
                 (() => {
                     const page = isPresent(content) ? (
                         <v.content.View
-                            style={s.content}
+                            {...slot.props("content")}
+                            style={slot.style("content", s.content)}
                             testID={id("content")}
                         >
                             {content}
@@ -256,7 +296,11 @@ function StepperImpl(props: StepperProps): ReactNode {
                     );
                 })()
             ) : !vertical && isPresent(content) ? (
-                <v.content.View style={s.content} testID={id("content")}>
+                <v.content.View
+                    {...slot.props("content")}
+                    style={slot.style("content", s.content)}
+                    testID={id("content")}
+                >
                     {content}
                 </v.content.View>
             ) : null}

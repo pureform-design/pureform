@@ -117,7 +117,7 @@ describe("rn-web-demo", () => {
             "pf-menu-item",
             "pf-dialog-headline",
             "pf-snackbar-action",
-            "pf-tooltip-root",
+            "pf-tooltip-content",
             "pf-rich-tooltip-subhead",
             "pf-card-root",
         ]) {
@@ -283,7 +283,7 @@ describe("rn-web-demo", () => {
         const menus = count("[role=menu]");
         const tooltips = count("[role=tooltip]");
         const statuses = count("[role=status]");
-        const dialogs = count('[data-testid="pf-dialog-root"]');
+        const dialogs = count('[data-testid="pf-dialog-content"]');
 
         // The menu opens under its trigger, over what follows it, and picking an item closes it.
         await press(named("Edit"));
@@ -329,11 +329,11 @@ describe("rn-web-demo", () => {
 
         // The dialog opens modal over a scrim; Escape closes it, and so does Cancel.
         await press(named("Discard"));
-        expect(count('[data-testid="pf-dialog-root"]')).toBe(dialogs + 1);
+        expect(count('[data-testid="pf-dialog-content"]')).toBe(dialogs + 1);
         expect(count('[aria-modal="true"]')).toBeGreaterThan(0);
         await userEvent.keyboard("{Escape}");
         await wait(800);
-        expect(count('[data-testid="pf-dialog-root"]')).toBe(dialogs);
+        expect(count('[data-testid="pf-dialog-content"]')).toBe(dialogs);
         await press(named("Discard"));
         await wait(300);
         const cancel = [
@@ -343,7 +343,7 @@ describe("rn-web-demo", () => {
         ].find((button) => button.textContent === "Cancel")!;
         await press(cancel);
         await wait(300);
-        expect(count('[data-testid="pf-dialog-root"]')).toBe(dialogs);
+        expect(count('[data-testid="pf-dialog-content"]')).toBe(dialogs);
     });
 
     it("fills the current destination's icon", () => {

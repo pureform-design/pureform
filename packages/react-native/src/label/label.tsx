@@ -13,17 +13,26 @@ import type { ReactNode } from "react";
 
 import { useField } from "../field/context";
 import { testIdOf, withEngine } from "../parts";
+import { nativeSlots } from "../slot-props";
+import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
-export interface LabelProps extends Omit<
-    LabelRootOwnProps,
-    "unstyled" | "testId"
-> {
+/** What each part renders as, for its keyed `style` and `slotProps`. */
+export interface LabelHosts {
+    readonly root: "Text";
+    readonly requiredIndicator: "Text";
+}
+
+export interface LabelProps
+    extends
+        Omit<LabelRootOwnProps, "unstyled" | "testId">,
+        NativeSlotProps<LabelHosts> {
     readonly children?: ReactNode;
     readonly testId?: TestIdOverride<LabelPart> | undefined;
 }
 
 function LabelImpl(props: LabelProps): ReactNode {
+    const slot = nativeSlots(props);
     const field = useField()?.state;
     const state = fieldLabelState(field, props);
     const { styles: s, views: v } = useComponentSlots<LabelPart>(
@@ -33,16 +42,18 @@ function LabelImpl(props: LabelProps): ReactNode {
     );
     return (
         <v.root.Text
+            {...slot.props("root")}
             nativeID={field?.ids.label}
             aria-disabled={state.disabled || undefined}
-            style={s.root}
+            style={slot.style("root", s.root)}
             testID={testIdOf(labelAnatomy, "root", props.testId)}
         >
             {props.children}
             {state.required ? (
                 <v.requiredIndicator.Text
+                    {...slot.props("requiredIndicator")}
                     aria-hidden
-                    style={s.requiredIndicator}
+                    style={slot.style("requiredIndicator", s.requiredIndicator)}
                     testID={testIdOf(
                         labelAnatomy,
                         "requiredIndicator",
