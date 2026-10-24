@@ -56,3 +56,48 @@ describe("the progress indicators' track", () => {
         expect(has("d-end-arc")).toBe(true);
     });
 });
+
+describe("the indeterminate linear track", () => {
+    it("leaves a gap either side of the sliding indicator, drawn in two rounded parts moving with it", async () => {
+        await render(
+            <div style={{ width: 200 }}>
+                <LinearProgress testId="p" />
+            </div>,
+        );
+        await settle(300);
+        const box = (part: string) =>
+            document
+                .querySelector(`[data-testid="p-${part}"]`)!
+                .getBoundingClientRect();
+        const indicator = box("indicator");
+        const before = box("track-before");
+        const after = box("track-after");
+        // Mid-slide, each part is 4px (the gap) from the indicator.
+        expect(indicator.left).toBeGreaterThan(0);
+        expect(before.right).toBeCloseTo(indicator.left - 4, 0);
+        expect(after.left).toBeCloseTo(indicator.right + 4, 0);
+        for (const part of ["track-before", "track-after"]) {
+            const style = getComputedStyle(
+                document.querySelector(`[data-testid="p-${part}"]`)!,
+            );
+            expect(style.borderTopRightRadius).toBe("9999px");
+            expect(style.borderTopLeftRadius).toBe("9999px");
+        }
+        // The track itself only clips them.
+        const track = getComputedStyle(
+            document.querySelector('[data-testid="p-track"]')!,
+        );
+        expect(track.backgroundColor).toBe("rgba(0, 0, 0, 0)");
+        expect(track.overflow).toBe("hidden");
+    });
+
+    it("draws no parts while determinate", async () => {
+        await render(<LinearProgress testId="p" value={40} />);
+        for (const part of ["track-before", "track-after"])
+            expect(
+                getComputedStyle(
+                    document.querySelector(`[data-testid="p-${part}"]`)!,
+                ).display,
+            ).toBe("none");
+    });
+});

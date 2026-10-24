@@ -68,8 +68,13 @@ function Root(props: LinearProgressRootProps): ReactNode {
 
 const part = plainParts(context.use, "div");
 
-/** The track: the rest of the bar, after the indicator and a gap. Empty. */
+/** The track: the rest of the bar, after the indicator and a gap. While indeterminate it only
+ *  clips its two parts, `TrackBefore` and `TrackAfter`, which it holds. */
 const Track = part("track", "Track");
+/** The indeterminate track's part before the sliding indicator and its gap. Empty. */
+const TrackBefore = part("trackBefore", "TrackBefore");
+/** The indeterminate track's part after the sliding indicator and its gap. Empty. */
+const TrackAfter = part("trackAfter", "TrackAfter");
 /** The bar that shows the amount done, or slides while indeterminate. Empty. */
 const Indicator = part("indicator", "Indicator");
 /** The dot at the end of a determinate track. Empty. */
@@ -98,7 +103,12 @@ function ReadyMade(props: LinearProgressProps): ReactNode {
     } = props;
     return (
         <Root {...rootProps} {...(slot("root") as object)}>
-            {track ? <Track {...slot("track")} /> : null}
+            {track ? (
+                <Track {...slot("track")}>
+                    <TrackBefore {...slot("trackBefore")} />
+                    <TrackAfter {...slot("trackAfter")} />
+                </Track>
+            ) : null}
             <Indicator {...slot("indicator")} />
             <StopIndicator {...slot("stopIndicator")} />
         </Root>
@@ -107,10 +117,13 @@ function ReadyMade(props: LinearProgressProps): ReactNode {
 
 /** Material's linear progress indicator. Use it ready-made, `<LinearProgress value={40}
  *  aria-label="Uploading" />` (leave `value` out while the amount is unknown), or compose
- *  `LinearProgress.Root` around `Track`, `Indicator` and `StopIndicator`. */
+ *  `LinearProgress.Root` around `Track` (holding `TrackBefore` and `TrackAfter`), `Indicator`
+ *  and `StopIndicator`. */
 export const LinearProgress = Object.assign(ReadyMade, {
     Root,
     Track,
+    TrackBefore,
+    TrackAfter,
     Indicator,
     StopIndicator,
 });

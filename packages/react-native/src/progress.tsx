@@ -66,7 +66,16 @@ function LinearProgressImpl(props: LinearProgressProps): ReactNode {
     return (
         <v.root.View {...valueProps(props)} style={s.root} testID={id("root")}>
             {props.track === false ? null : (
-                <v.track.View style={s.track} testID={id("track")} />
+                <v.track.View style={s.track} testID={id("track")}>
+                    <v.trackBefore.View
+                        style={s.trackBefore}
+                        testID={id("trackBefore")}
+                    />
+                    <v.trackAfter.View
+                        style={s.trackAfter}
+                        testID={id("trackAfter")}
+                    />
+                </v.track.View>
             )}
             <v.indicator.View style={s.indicator} testID={id("indicator")}>
                 {/* A wavy indicator is drawn in its wave with an SVG engine. */}

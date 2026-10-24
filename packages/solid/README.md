@@ -607,7 +607,7 @@ mirrorIcon?, disabled?, content? }`; a tab without a label shows only its icon, 
   props, so a list made again from data keeps its rows), and `slotProps` and `unstyled` keyed by
   the list item's parts, applied to every item. A `ListItem` alone isn't in a list; put it in `List.Item`, or give it `as="li"` in
   your own `<ul>`.
-- **Progress indicators** (`LinearProgress`: `Track`, `Indicator`, `StopIndicator`; `CircularProgress`: `Track` with its two halves and arcs, then the indicator's) have no machine: Root is a
+- **Progress indicators** (`LinearProgress`: `Track` (holding `TrackBefore` and `TrackAfter`, the indeterminate track's rounded parts either side of the sliding indicator and its gaps), `Indicator`, `StopIndicator`; `CircularProgress`: `Track` with its two halves and arcs, then the indicator's) have no machine: Root is a
   `role="progressbar"` with `aria-valuemin`, `aria-valuemax`, and `aria-valuenow`, and `value`
   (from `min` to `max`, 0 to 100 by default) sets the preset's `value` token as a percentage.
   Without a value (or with `indeterminate`) it's indeterminate: no `aria-valuenow`, and the preset

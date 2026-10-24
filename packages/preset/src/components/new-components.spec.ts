@@ -249,7 +249,7 @@ describe("progress", () => {
         );
     });
 
-    it("starts the linear track after the indicator and a gap, and while indeterminate spans the bar less a gap around the indicator, without the stop dot", () => {
+    it("starts the linear track after the indicator and a gap, and while indeterminate draws it in two parts around the indicator, without the stop dot", () => {
         const css = compilePreset(configWith(linearProgress)).theme?.slotRecipes
             ?.linearProgress;
         expect(css?.base?.track?.insetInlineStart).toContain(
@@ -259,14 +259,14 @@ describe("progress", () => {
         const indeterminate = css?.variants?.indeterminate?.true;
         expect(indeterminate?.stopIndicator).toEqual({ display: "none" });
         expect(indeterminate?.track?.insetInlineStart).toBe("0px");
-        const track = indeterminate?.track as Record<string, unknown>;
-        const gap = track["&"] as
-            | { backgroundImage?: { base?: string; _rtl?: string } }
-            | undefined;
-        expect(gap?.backgroundImage?.base).toMatch(
-            /^linear-gradient\(90deg, var\(--components-linearProgress-trackColor/,
+        expect(indeterminate?.track?.backgroundColor).toBe("transparent");
+        expect(String(indeterminate?.trackBefore?.insetInlineStart)).toMatch(
+            /^calc\(-100% - var\(--components-linearProgress-gap/,
         );
-        expect(gap?.backgroundImage?._rtl).toMatch(/^linear-gradient\(270deg/);
+        expect(String(indeterminate?.trackAfter?.insetInlineStart)).toContain(
+            "var(--components-linearProgress-indeterminateWidth",
+        );
+        expect(indeterminate?.trackAfter?.borderRadius).toBeDefined();
     });
 
     it("adds its keyframes to the pureform config", () => {
@@ -276,6 +276,8 @@ describe("progress", () => {
                 "linearProgressSlideRtl",
                 "linearProgressWave",
                 "linearProgressWaveRtl",
+                "linearProgressTrack",
+                "linearProgressTrackRtl",
                 "circularProgressArc",
                 "circularProgressArcRtl",
             ]),

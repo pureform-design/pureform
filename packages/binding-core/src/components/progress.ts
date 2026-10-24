@@ -14,7 +14,8 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 import type { Unstyled } from "../parts";
 import type { VariantProp } from "./variants";
 
-/** The linear progress indicator's parts: `"root" | "track" | "indicator" | "stopIndicator"`. */
+/** The linear progress indicator's parts: `"root" | "track" | "trackBefore" | "trackAfter" | "indicator" |
+ *  "stopIndicator"`. */
 export type LinearProgressPart = PartName<typeof linearProgressAnatomy>;
 
 /** The circular progress indicator's parts: `"root"`, the track's `"track" | "trackEndHalf" |
