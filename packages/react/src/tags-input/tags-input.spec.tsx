@@ -153,3 +153,17 @@ describe("TagsInput, ready-made", () => {
         expect(byTestId("tags-chip-label").textContent).toBe("a");
     });
 });
+
+describe("TagsInput, chipProps", () => {
+    it("reaches every chip's parts", async () => {
+        withRegistry(
+            <TagsInput
+                label="Tags"
+                defaultValue={["red"]}
+                chipProps={{ className: { label: "caps" }, testId: "tag" }}
+            />,
+        );
+        await settle();
+        expect(byTestId("tag-label").className).toContain("caps");
+    });
+});

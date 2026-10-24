@@ -3,9 +3,11 @@
 // `overflow` moves those that don't fit into the menu component behind an overflow button.
 
 import { toolbarAnatomy } from "@pureform/anatomy";
+import type { buttonAnatomy, iconButtonAnatomy } from "@pureform/anatomy";
 import {
     isPresent,
     isUnstyled,
+    overDefaults,
     TOOLBAR_OVERFLOW_LABEL,
     TOOLBAR_ROOT_PROPS,
     toolbarMenuItems,
@@ -37,7 +39,8 @@ import { MoreIcon } from "../glyphs";
 import { IconButton } from "../icon-button";
 import type { IconButtonProps } from "../icon-button";
 import { Menu } from "../menu";
-import { useComponent } from "../parts";
+import { useComponent, useSlotProps } from "../parts";
+import type { InnerPropsOf, SlotKeyedProps } from "../parts";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
 import { ProvidedTokens } from "../provided-tokens";
@@ -102,11 +105,24 @@ function Root(props: ToolbarRootProps): ReactNode {
     });
 }
 
-/** The ready-made toolbar's props: Root's and the elements as data. */
+type Keyed = SlotKeyedProps<typeof toolbarAnatomy>;
+type ButtonDefaults = InnerPropsOf<typeof buttonAnatomy>;
+type IconButtonDefaults = InnerPropsOf<typeof iconButtonAnatomy>;
+
+/** The ready-made toolbar's props: Root's, with `className`, `style` and `slotProps` keyed by the
+ *  toolbar's own part (`root`), the elements as data, and the defaults of the buttons it draws:
+ *  `iconButtonProps` for elements with an icon, `buttonProps` for text ones. */
 export interface ToolbarProps
     extends
-        Omit<ToolbarRootProps, "children">,
-        ToolbarContentProps<ReactNode> {}
+        Omit<ToolbarRootProps, keyof Keyed | "children">,
+        Keyed,
+        ToolbarContentProps<ReactNode> {
+    /** Every text button's `className`, `style`, `slotProps`, `unstyled`, `testId` and `tokens`,
+     *  keyed by the button's parts. An element's own `testId` wins. */
+    readonly buttonProps?: ButtonDefaults | undefined;
+    /** The same for every icon button, keyed by the icon button's parts. */
+    readonly iconButtonProps?: IconButtonDefaults | undefined;
+}
 
 const ITEM = "data-pf-toolbar-item";
 const OVERFLOW = "data-pf-toolbar-overflow";
@@ -115,10 +131,15 @@ const OVERFLOW = "data-pf-toolbar-overflow";
 function Element({
     item,
     hidden,
+    buttonProps,
+    iconButtonProps,
 }: {
     readonly item: ToolbarItem<ReactNode>;
     readonly hidden: boolean;
+    readonly buttonProps: ButtonDefaults | undefined;
+    readonly iconButtonProps: IconButtonDefaults | undefined;
 }): ReactNode {
+    const icon = isPresent(item.icon);
     const shared = {
         [ITEM]: "",
         disabled: item.disabled,
@@ -134,14 +155,18 @@ function Element({
                   onSelectedChange: item.onSelectedChange,
               }),
     };
-    return isPresent(item.icon) ? (
+    const own = overDefaults(
+        (icon ? iconButtonProps : buttonProps) as typeof shared | undefined,
+        shared,
+    );
+    return icon ? (
         <IconButton
-            {...(shared as object)}
+            {...(own as object)}
             aria-label={item.label}
             icon={item.icon}
         />
     ) : (
-        <Button {...(shared as object)} variant="text" label={item.label} />
+        <Button {...(own as object)} variant="text" label={item.label} />
     );
 }
 
@@ -158,7 +183,18 @@ function OverflowButton({
 /** The ready-made toolbar: an icon button per element with an icon, a text button per element
  *  without, and with `overflow`, the overflow button opening a menu of those that don't fit. */
 function ReadyMade(props: ToolbarProps): ReactNode {
-    const { items = [], overflowLabel, overflowIcon, ...rootProps } = props;
+    const {
+        items = [],
+        overflowLabel,
+        overflowIcon,
+        className: _className,
+        style: _style,
+        slotProps: _slotProps,
+        buttonProps,
+        iconButtonProps,
+        ...rootProps
+    } = props;
+    const slot = useSlotProps(props);
     const root = useRef<HTMLElement>(null);
     // How many elements stay in the row; all of them, with the overflow button, until measured.
     const [count, setCount] = useState<number>();
@@ -183,11 +219,13 @@ function ReadyMade(props: ToolbarProps): ReactNode {
     const overflowing =
         overflow && (count === undefined || shown < items.length);
     return (
-        <Root {...rootProps} ref={root}>
+        <Root {...rootProps} {...(slot("root") as object)} ref={root}>
             {items.map((item, index) => (
                 <Element
                     key={item.value}
                     item={item}
+                    buttonProps={buttonProps}
+                    iconButtonProps={iconButtonProps}
                     hidden={overflow && index >= shown}
                 />
             ))}

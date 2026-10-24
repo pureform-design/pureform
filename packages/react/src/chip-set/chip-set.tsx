@@ -3,6 +3,7 @@
 // ready-made ChipSet over them.
 
 import { chipSetAnatomy } from "@pureform/anatomy";
+import type { chipAnatomy } from "@pureform/anatomy";
 import {
     buttonGroupRootProps,
     toggleGroupItemProps,
@@ -26,7 +27,8 @@ import type { ChipProps } from "../chip/chip";
 import { useControllable } from "../controllable";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
-import { useComponent } from "../parts";
+import { useComponent, useSlotProps } from "../parts";
+import type { InnerPropsOf, SlotKeyedProps } from "../parts";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
@@ -39,7 +41,7 @@ interface ChipSetContextValue {
 
 const context = createPartContext<ChipSetContextValue>("ChipSet");
 
-/** Root's props: the set's `singleLine` and `setTokens`, the chips' variants, the selection
+/** Root's props: the set's `singleLine` and own `tokens`, the chips' variants, the selection
  *  (`selectable`, `value`, …), `testId`, `as`, and the element's own props. Name the set with
  *  `aria-label` or `aria-labelledby`. */
 export interface ChipSetRootProps
@@ -68,6 +70,7 @@ function Root(props: ChipSetRootProps): ReactNode {
     const scope = useComponent(chipSetAnatomy, {
         selection: chipSetSelection(props),
         testId: props.testId,
+        unstyled: props.unstyled,
     });
     const { as, ...rest } = omitProps(props, CHIP_SET_ROOT_PROPS);
     return (
@@ -92,6 +95,7 @@ function SetChip({ value, ...props }: ChipSetChipProps): ReactNode {
         ...props,
         ...chipSetChipVariants(set, props),
         disabled: props.disabled || set.disabled,
+        indication: props.indication ?? set.indication,
     };
     if (!set.selectable || value === undefined) {
         return <Chip {...(own as ChipProps)} />;
@@ -105,14 +109,31 @@ function SetChip({ value, ...props }: ChipSetChipProps): ReactNode {
     );
 }
 
-/** The ready-made set's props: Root's and the chips as data. */
+type Keyed = SlotKeyedProps<typeof chipSetAnatomy>;
+
+/** The ready-made set's props: Root's, with `className`, `style` and `slotProps` keyed by the
+ *  set's own part (`root`), the chips as data, and `chipProps`, every chip's defaults. */
 export interface ChipSetProps
     extends
-        Omit<ChipSetRootProps, "children">,
-        ChipSetContentProps<ReactNode> {}
+        Omit<ChipSetRootProps, keyof Keyed | "children">,
+        Keyed,
+        ChipSetContentProps<ReactNode> {
+    /** Every chip's `className`, `style`, `slotProps`, `unstyled`, `testId` and `tokens`, keyed
+     *  by the chip's parts. An item's own `testId` wins. */
+    readonly chipProps?: InnerPropsOf<typeof chipAnatomy> | undefined;
+}
 
 /** The ready-made set: a chip per item, a filter chip in a selectable set. */
-function ReadyMade({ items = [], ...props }: ChipSetProps): ReactNode {
+function ReadyMade(props: ChipSetProps): ReactNode {
+    const {
+        items = [],
+        className: _className,
+        style: _style,
+        slotProps: _slotProps,
+        chipProps,
+        ...rootProps
+    } = props;
+    const slot = useSlotProps(props);
     const one = (item: ChipSetItem<ReactNode>, index: number) => ({
         value: item.value ?? (props.selectable ? String(index) : undefined),
         label: item.label,
@@ -120,14 +141,15 @@ function ReadyMade({ items = [], ...props }: ChipSetProps): ReactNode {
         trailingIcon: item.trailingIcon,
         disabled: item.disabled,
         onClick: item.onClick,
-        testId: item.testId,
+        testId: item.testId ?? chipProps?.testId,
         interactionSource: item.interactionSource,
     });
     return (
-        <Root {...props}>
+        <Root {...rootProps} {...(slot("root") as object)}>
             {items.map((item, index) => (
                 <SetChip
                     key={item.value ?? index}
+                    {...(chipProps as object)}
                     {...(one(item, index) as object)}
                 />
             ))}

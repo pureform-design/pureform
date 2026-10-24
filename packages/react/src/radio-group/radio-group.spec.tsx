@@ -121,3 +121,22 @@ describe("RadioGroup, ready-made", () => {
         );
     });
 });
+
+describe("RadioGroup, radioProps", () => {
+    it("gives every radio radioProps, an item's own testId winning", async () => {
+        withRegistry(
+            <RadioGroup
+                aria-label="Size"
+                name="size"
+                items={[
+                    { value: "s", label: "Small" },
+                    { value: "m", label: "Medium", testId: "own" },
+                ]}
+                radioProps={{ className: { dot: "big" }, testId: "r" }}
+            />,
+        );
+        await settle();
+        expect(byTestId("r-dot").className).toContain("big");
+        expect(byTestId("own-dot").className).toContain("big");
+    });
+});

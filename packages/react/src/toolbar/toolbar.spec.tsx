@@ -269,3 +269,24 @@ describe("Toolbar, overflow", () => {
         ).toBe("none");
     });
 });
+
+describe("Toolbar, slot props", () => {
+    it("keys its own parts flat and gives its buttons buttonProps and iconButtonProps", async () => {
+        withRegistry(() => (
+            <Toolbar
+                aria-label="Edit"
+                className={{ root: "edit" }}
+                buttonProps={{ className: { label: "caps" } }}
+                iconButtonProps={{ className: { root: "round" } }}
+                items={[
+                    { value: "a", label: "Undo", testId: "text" },
+                    { value: "b", label: "Bold", icon: "B", testId: "icon" },
+                ]}
+            />
+        ));
+        await settle();
+        expect(byTestId(testIds.toolbar.root).className).toContain("edit");
+        expect(byTestId("text-label").className).toContain("caps");
+        expect(byTestId("icon-root").className).toContain("round");
+    });
+});

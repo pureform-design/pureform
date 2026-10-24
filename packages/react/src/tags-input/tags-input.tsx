@@ -33,7 +33,7 @@ import type { ItemInteractionSources } from "../interaction";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import { useComponent, useSlotProps } from "../parts";
-import type { ComponentScope, SlotKeyedProps } from "../parts";
+import type { ComponentScope, InnerPropsOf, SlotKeyedProps } from "../parts";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
@@ -59,7 +59,8 @@ interface ChipContextValue {
 
 const chipContext = createPartContext<ChipContextValue>("TagsInput", "Chip");
 
-/** Root's props: the variants and tokens (the chips' in `chip`), the machine's props (`value`,
+/** Root's props: the variants and tokens (the chips' variants in `chip`, the rest of their
+ *  customization in `chipProps`), the machine's props (`value`,
  *  `max`, `delimiter`, …), `testId` and `unstyled` for every part, `as`, and the element's own
  *  props. */
 export interface TagsInputRootProps
@@ -68,6 +69,9 @@ export interface TagsInputRootProps
         TagsInputRootOwnProps {
     /** Another element or component to render instead of `<div>`. */
     readonly as?: ElementType | undefined;
+    /** Every chip's `className`, `style`, `slotProps`, `unstyled`, `testId` and `tokens`, keyed
+     *  by the input chip's parts. `testId` replaces the prefix the chips take from Root's. */
+    readonly chipProps?: InnerPropsOf<typeof inputChipAnatomy> | undefined;
 }
 
 /** A part's props: the element's own, and the part's `unstyled`. */
@@ -119,12 +123,22 @@ function Root(props: TagsInputRootProps): ReactNode {
         testId: props.testId,
         unstyled: props.unstyled,
     });
+    const { chipProps } = props;
     const chips = useComponent(inputChipAnatomy, {
-        selection: inputChipSelection(props.chip),
-        testId: tagsInputChipTestId(props.testId),
+        selection: {
+            ...inputChipSelection(props.chip),
+            tokens: chipProps?.tokens,
+        },
+        testId: chipProps?.testId ?? tagsInputChipTestId(props.testId),
+        unstyled: chipProps?.unstyled,
         indication: props.indication,
     });
-    const { as, children, ...rest } = omitProps(props, TAGS_INPUT_ROOT_PROPS);
+    const {
+        as,
+        children,
+        chipProps: _chipProps,
+        ...rest
+    } = omitProps(props, TAGS_INPUT_ROOT_PROPS);
     return (
         <context.Provider
             value={{ scope, chips, api, sources, error: props.error }}
@@ -319,6 +333,8 @@ export interface TagsInputProps
         SlotKeyedProps<Anatomy>,
         TagsInputContentProps<ReactNode> {}
 
+const NO_CHIP_PROPS: InnerPropsOf<typeof inputChipAnatomy> = {};
+
 // Inside Root, so it can read the values and whether an error shows.
 function ReadyMadeContent({
     own,
@@ -327,6 +343,7 @@ function ReadyMadeContent({
 }): ReactNode {
     const { api, error } = context.use("Root");
     const slot = useSlotProps(own);
+    const chip = useSlotProps(own.chipProps ?? NO_CHIP_PROPS);
     return (
         <>
             <Container {...slot("container")}>
@@ -341,17 +358,22 @@ function ReadyMadeContent({
                     return (
                         <Chip
                             key={`${index}-${value}`}
+                            {...chip("root")}
                             value={value}
                             index={index}
                         >
-                            <ChipTouchTarget />
+                            <ChipTouchTarget {...chip("touchTarget")} />
                             {isPresent(avatar) ? (
-                                <ChipAvatar>{avatar}</ChipAvatar>
+                                <ChipAvatar {...chip("avatar")}>
+                                    {avatar}
+                                </ChipAvatar>
                             ) : isPresent(chipIcon) ? (
-                                <ChipIcon>{chipIcon}</ChipIcon>
+                                <ChipIcon {...chip("icon")}>
+                                    {chipIcon}
+                                </ChipIcon>
                             ) : null}
-                            <ChipLabel />
-                            <ChipRemove>
+                            <ChipLabel {...chip("label")} />
+                            <ChipRemove {...chip("remove")}>
                                 {isPresent(own.removeIcon) ? (
                                     own.removeIcon
                                 ) : (

@@ -3,6 +3,7 @@
 // the ready-made ButtonGroup over them, which places each button by its index.
 
 import { buttonGroupAnatomy } from "@pureform/anatomy";
+import type { buttonAnatomy, iconButtonAnatomy } from "@pureform/anatomy";
 import {
     BUTTON_GROUP_ROOT_PROPS,
     buttonGroupMachineProps,
@@ -30,7 +31,8 @@ import { IconButton } from "../icon-button/icon-button";
 import type { IconButtonProps } from "../icon-button/icon-button";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
-import { useComponent } from "../parts";
+import { useComponent, useSlotProps } from "../parts";
+import type { InnerPropsOf, SlotKeyedProps } from "../parts";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
@@ -89,6 +91,7 @@ function Root(props: ButtonGroupRootProps): ReactNode {
     const scope = useComponent(buttonGroupAnatomy, {
         selection: buttonGroupSelection(props),
         testId: props.testId,
+        unstyled: props.unstyled,
     });
     const { as, ...rest } = omitProps(props, BUTTON_GROUP_ROOT_PROPS);
     return (
@@ -121,6 +124,8 @@ const useGrouped = <
         ...variants,
         variant: fill(variants.variant),
         disabled: props.disabled || group.disabled,
+        indication:
+            (props as { indication?: unknown }).indication ?? group.indication,
     };
     if (!group.selectable || value === undefined) return own;
     const item = { value, disabled: props.disabled };
@@ -146,38 +151,64 @@ function GroupIconButton(props: ButtonGroupIconButtonProps): ReactNode {
     return <IconButton {...(grouped as IconButtonProps)} />;
 }
 
-/** The ready-made group's props: Root's and the buttons as data. */
+type Keyed = SlotKeyedProps<typeof buttonGroupAnatomy>;
+
+/** The ready-made group's props: Root's, with `className`, `style` and `slotProps` keyed by the
+ *  group's own part (`root`), the buttons as data, and the defaults of the buttons it draws:
+ *  `buttonProps` for those with a label, `iconButtonProps` for icon-only ones. */
 export interface ButtonGroupProps
     extends
-        Omit<ButtonGroupRootProps, "children">,
-        ButtonGroupContentProps<ReactNode> {}
+        Omit<ButtonGroupRootProps, keyof Keyed | "children">,
+        Keyed,
+        ButtonGroupContentProps<ReactNode> {
+    /** Every labelled button's `className`, `style`, `slotProps`, `unstyled`, `testId` and
+     *  `tokens`, keyed by the button's parts. An item's own `testId` wins. */
+    readonly buttonProps?: InnerPropsOf<typeof buttonAnatomy> | undefined;
+    /** The same for every icon-only button, keyed by the icon button's parts. */
+    readonly iconButtonProps?:
+        | InnerPropsOf<typeof iconButtonAnatomy>
+        | undefined;
+}
 
 /** The ready-made group: a button per item with a label, an icon button per icon-only item, each
  *  placed by its index. */
-function ReadyMade({ items = [], ...props }: ButtonGroupProps): ReactNode {
+function ReadyMade(props: ButtonGroupProps): ReactNode {
+    const {
+        items = [],
+        className: _className,
+        style: _style,
+        slotProps: _slotProps,
+        buttonProps,
+        iconButtonProps,
+        ...rootProps
+    } = props;
+    const slot = useSlotProps(props);
     const one = (item: ButtonGroupItem<ReactNode>, index: number) => ({
         value: item.value ?? (props.selectable ? String(index) : undefined),
         position: buttonGroupPosition(index, items.length, props.connected),
         disabled: item.disabled,
         onClick: item.onClick,
         "aria-label": item["aria-label"],
-        testId: item.testId,
         interactionSource: item.interactionSource,
     });
     return (
-        <Root {...props}>
+        <Root {...rootProps} {...(slot("root") as object)}>
             {items.map((item, index) =>
                 item.label === undefined ? (
                     <GroupIconButton
                         key={item.value ?? index}
+                        {...(iconButtonProps as object)}
                         {...(one(item, index) as object)}
+                        testId={item.testId ?? iconButtonProps?.testId}
                         icon={item.icon}
                         width={item.width}
                     />
                 ) : (
                     <GroupButton
                         key={item.value ?? index}
+                        {...(buttonProps as object)}
                         {...(one(item, index) as object)}
+                        testId={item.testId ?? buttonProps?.testId}
                         label={item.label}
                         icon={item.icon}
                     />
