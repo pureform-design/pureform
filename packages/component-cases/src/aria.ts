@@ -67,6 +67,9 @@ export const nameOf = (element: Element): string => {
 export interface RoleQuery {
     /** The accessible name: exactly this string, or matching this pattern. */
     readonly name?: string | RegExp | undefined;
+    /** Include elements hidden from assistive technology (`aria-hidden`): a modal's trigger,
+     *  which the open modal hides with the rest of the page. */
+    readonly hidden?: boolean | undefined;
 }
 
 const named = (element: Element, name: RoleQuery["name"]) =>
@@ -80,7 +83,8 @@ const ariaHidden = (element: Element) =>
     element.closest('[aria-hidden="true"]') !== null;
 
 /** Every element inside `host` (and `host` itself) with the role, in document order, leaving
- *  out those hidden from assistive technology (`aria-hidden`: a select's native element). */
+ *  out those hidden from assistive technology (`aria-hidden`: a select's native element) unless
+ *  `query.hidden`. */
 export const allByRole = <E extends HTMLElement = HTMLElement>(
     host: HTMLElement,
     role: string,
@@ -89,7 +93,7 @@ export const allByRole = <E extends HTMLElement = HTMLElement>(
     [host, ...host.querySelectorAll<HTMLElement>("*")].filter(
         (element) =>
             roleOf(element) === role &&
-            !ariaHidden(element) &&
+            (query.hidden || !ariaHidden(element)) &&
             named(element, query.name),
     ) as E[];
 

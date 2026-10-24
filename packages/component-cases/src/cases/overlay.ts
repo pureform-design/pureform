@@ -31,8 +31,8 @@ export interface OverlayAria {
 /** The button inside `host` that says whether what it opens is open (`aria-expanded`): a FAB
  *  menu's FAB, a split button's trailing button; among several, the one with `aria-haspopup`. */
 export const expandingTrigger = (host: HTMLElement): HTMLElement => {
-    const expanding = allByRole(host, "button").filter((element) =>
-        element.hasAttribute("aria-expanded"),
+    const expanding = allByRole(host, "button", { hidden: true }).filter(
+        (element) => element.hasAttribute("aria-expanded"),
     );
     // Among several (a calendar's month and year buttons), the one that opens a popup.
     const found =
@@ -82,7 +82,7 @@ export const overlayParts = (
     const trigger = (host: HTMLElement): HTMLElement =>
         aria.trigger
             ? aria.trigger(host)
-            : byRole(host, "button", { name: aria.name });
+            : byRole(host, "button", { name: aria.name, hidden: true });
     const content = (host: HTMLElement) => byTestId(host, ids.content);
     /** The surfaces with the overlay's role that are drawn. */
     const surfaces = (host: HTMLElement) =>
