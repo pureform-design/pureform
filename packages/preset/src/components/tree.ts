@@ -2,44 +2,55 @@
 // has no tree; its parts come from Angular's tree tokens (a node's container, its text and its
 // height) and Zag's tree view (root, label, tree, branch, branch control, item, branch content).
 //
-// Markup: an optional label over the tree. Each node is a row (a leaf, or a branch's control)
-// with an optional leading icon and its text; a branch's row ends in the expand indicator, which
-// turns over while it's expanded, and the branch holds its children in a group indented from the
-// start, which Zag hides while it's collapsed.
+// Markup: an optional label over the tree. Each node is a row with an optional leading icon and
+// its text; a branch's row ends in the expand indicator, which turns over while it's expanded,
+// and the branch holds its children in a group indented from the start, which Zag hides while
+// it's collapsed. Every node is a `treeitem` holding what's below it (WAI-ARIA APG's tree, as
+// Safari needs): a leaf's row is its treeitem, and a branch's element is, around its row and its
+// group, named from the row's text.
 //
 //   <div class={root}>
 //     <span class={label}>Files</span>
 //     <div class={tree} role="tree">
-//       <div class={branch}>
-//         <div class={node} role="treeitem" aria-expanded="true" aria-owns="src-group">
+//       <div class={branch} role="treeitem" aria-expanded="true" aria-labelledby="src-text" tabindex="0">
+//         <div class={node}>
 //           <span class={leading}>📁</span>
-//           <span class={text}>src</span>
+//           <span class={text} id="src-text">src</span>
 //           <span class={indicator}>⌄</span>
 //         </div>
-//         <div class={group} role="group" id="src-group">
+//         <div class={group} role="group">
 //           <div class={node} role="treeitem"><span class={text}>index.ts</span></div>
 //         </div>
 //       </div>
 //     </div>
 //   </div>
 //
-// Mark a node's row selected with `aria-selected` or `aria-current`, and a branch's row
-// `aria-expanded` while it's expanded.
+// Mark a leaf's row, or a branch's element, selected with `aria-selected` or `aria-current`,
+// disabled with `aria-disabled`, and a branch's element `aria-expanded` while it's expanded. A
+// branch's row reads its state from the branch's element, its parent; a leaf's row reads its own.
 
 import { typed } from "@pureform/core";
 import {
     add,
+    colorMix,
     column,
     flex,
     hidden,
+    none,
+    numeric,
     px,
+    rotate,
     slot,
+    solid,
+    transform,
     transparent,
     unitless,
 } from "@pureform/core/ast";
+import type { ColorValue, StyleMap } from "@pureform/core/ast";
 import { radius, spacing, textStyle } from "@pureform/theme";
 import type { MaterialDensity } from "@pureform/theme";
 
+import { stateLayer } from "../state-layer";
 import { expandIndicator, rowParts, rowTokens } from "./list";
 import {
     collapseTransition,
@@ -49,6 +60,7 @@ import {
     defaultGroups,
     DENSITY_TOKEN,
     densitySteps,
+    disabledColor,
     densityTokenVariant,
     INDICATION_ROOT,
     variantsOf,
@@ -69,6 +81,50 @@ const { tokens, ref } = rowTokens("tree", {
 });
 
 const parts = rowParts(ref, "node");
+
+// A branch's row and its parts take the branch's state from the branch's element, the treeitem
+// they sit in (`below` the row, for a part), as a leaf's row takes its own: selected, focused by
+// keyboard (the ring and the focus tint on the row, never around the group), disabled, and
+// expanded. Only through the element they sit in directly, so a branch's children never take it.
+const ofBranch = (state: string, below = "") =>
+    `[role=treeitem]${state} > ${below}&`;
+const SELECTED =
+    ":is([aria-selected=true], [aria-current]:not([aria-current=false]))";
+const DISABLED = "[aria-disabled=true]";
+
+const focusTint = (base: ColorValue, content: ColorValue) =>
+    colorMix(base, content, ref("stateFocusOpacity"));
+
+const branchRow: Record<string, StyleMap> = {
+    [ofBranch(SELECTED)]: {
+        backgroundColor: stateLayer(ref, {
+            base: ref("selectedContainer"),
+            content: ref("selectedContent"),
+        }),
+        color: ref("selectedContent"),
+    },
+    [ofBranch(":focus-visible")]: {
+        outlineStyle: solid,
+        backgroundColor: focusTint(ref("container"), ref("content")),
+    },
+    [ofBranch(`${SELECTED}:focus-visible`)]: {
+        backgroundColor: focusTint(
+            ref("selectedContainer"),
+            ref("selectedContent"),
+        ),
+    },
+    [ofBranch(DISABLED)]: {
+        pointerEvents: none,
+        color: disabledColor("disabledContent"),
+    },
+};
+
+const branchPart: Record<string, StyleMap> = {
+    [ofBranch(SELECTED, "* > ")]: { color: ref("selectedContent") },
+    [ofBranch(DISABLED, "* > ")]: {
+        color: disabledColor("disabledContent"),
+    },
+};
 
 /** Build the tree with a `color` variant per group in `groups`, which colors the selected node,
  *  and a `density` step per entry of `densities`. */
@@ -133,7 +189,12 @@ export const createTree = <
                         paddingInlineEnd: ref("paddingInline"),
                     },
                     tree: { display: flex, flexDirection: column },
-                    branch: { display: flex, flexDirection: column },
+                    // The treeitem's own outline gives way to its row's focus ring.
+                    branch: {
+                        display: flex,
+                        flexDirection: column,
+                        outlineStyle: none,
+                    },
                     node: {
                         ...parts.row,
                         ...parts.interactive,
@@ -142,18 +203,34 @@ export const createTree = <
                         paddingInlineStart: ref("paddingInline"),
                         paddingInlineEnd: ref("paddingInline"),
                         borderRadius: ref("nodeRadius"),
+                        rawRules: { css: branchRow },
                     },
-                    leading: parts.leading,
+                    leading: {
+                        ...parts.leading,
+                        rawRules: { css: branchPart },
+                    },
                     text: {
                         textStyle: textStyle("bodyLarge"),
                         flexGrow: unitless(1),
                         minWidth: px(0),
                         overflow: hidden,
                     },
-                    indicator: expandIndicator(
-                        parts.trailing,
-                        slot("node", "expanded"),
-                    ),
+                    indicator: {
+                        ...expandIndicator(
+                            parts.trailing,
+                            slot("node", "expanded"),
+                        ),
+                        rawRules: {
+                            css: {
+                                ...branchPart,
+                                [ofBranch("[aria-expanded=true]", "* > ")]: {
+                                    transform: transform(
+                                        rotate(numeric(180, "deg")),
+                                    ),
+                                },
+                            },
+                        },
+                    },
                     // A branch's children, indented from the start. No display of its own, so
                     // Zag's `hidden` hides it; it grows open and shrinks shut as that changes.
                     group: {

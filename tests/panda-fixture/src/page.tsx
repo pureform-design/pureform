@@ -4310,12 +4310,9 @@ export function Page() {
                                             class={t.branch}
                                             role="treeitem"
                                             aria-expanded="true"
+                                            tabindex="0"
                                         >
-                                            <div
-                                                class={t.node}
-                                                tabindex="0"
-                                                aria-expanded="true"
-                                            >
+                                            <div class={t.node}>
                                                 <span class={t.leading}>▤</span>
                                                 <span class={t.text}>src</span>
                                                 <span class={t.indicator}>
@@ -4349,12 +4346,9 @@ export function Page() {
                                             class={t.branch}
                                             role="treeitem"
                                             aria-expanded="false"
+                                            tabindex="-1"
                                         >
-                                            <div
-                                                class={t.node}
-                                                tabindex="-1"
-                                                aria-expanded="false"
-                                            >
+                                            <div class={t.node}>
                                                 <span class={t.leading}>▤</span>
                                                 <span class={t.text}>docs</span>
                                                 <span class={t.indicator}>

@@ -199,6 +199,9 @@ export interface ComponentCase {
     readonly measured?: true | undefined;
     /** How it comes and goes, for an overlay. */
     readonly overlay?: OverlayCase | undefined;
+    /** axe rules the accessibility suite leaves out for it, each with why: a heuristic that
+     *  misreads what the component does on purpose. */
+    readonly axeExceptions?: Readonly<Record<string, string>> | undefined;
 }
 
 /** How an overlay comes and goes, for the overlays suite: it opens and closes with its `open`
