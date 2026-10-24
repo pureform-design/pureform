@@ -119,8 +119,9 @@ function Root(props: DockedDatePickerRootProps): ReactNode {
         dir,
         ...dateMachineProps(props, parseIso),
         invalid: props.invalid || isPresent(props.error) || undefined,
-        // The label stands in for the format, which the supporting text shows.
-        placeholder: " ",
+        // The format, as the supporting text shows it: the preset shows it once the
+        // field is focused and the label has floated (Material's hint).
+        placeholder: dateFormatHint(pickerLocale(props)),
         closeOnSelect: props.closeOnSelect ?? true,
         ...value,
         ...open.machineProps,
