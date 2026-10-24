@@ -100,6 +100,19 @@ contexts exist.
 | [x]  | [r11 binding-dom split](phases/r11-binding-dom.md) ([r11](context/r11.md)) | | binding-core platform-neutral; DOM code in binding-dom | |
 | [ ]  | [r12 multi-target codegen](phases/r12-multi-target-codegen.md) | | several targets per setup; pruned and full output apart | |
 
+## Slot-props batches
+
+Implement the [slot-props standard](../design/slot-props-sketch.md). Independent of the phases
+above; each batch is one branch (`slot-a` … `slot-e`), output in `context/slot-<x>.md`.
+
+| Batch  | Delivers                                                                                          |
+| ------ | ------------------------------------------------------------------------------------------------- |
+| slot-a | Standard written into the docs; `className`/`style` reach Button/IconButton parts; styleable backdrop |
+| slot-b | Containers (List, ChipSet, ButtonGroup, Toolbar, RadioGroup, SelectionList) and tokens: `overDefaults`, `<component>Props` |
+| slot-c | Drawn components (Select/Autocomplete menus, DatePicker buttons, TagsInput chips, …)              |
+| slot-d | React Native: keyed `style`, `slotProps`, `testId`, `tokens` with the override rule               |
+| slot-e | Dead parts wired up; per-instance functions for repeated parts                                    |
+
 ## Rules that apply to every phase
 
 - Read the [conventions](conventions.md) and the [component recipe](component-recipe.md)

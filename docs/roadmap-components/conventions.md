@@ -108,6 +108,16 @@ gap analysis updated. Also:
   equivalent for (name the replacement in the gap analysis and READMEs, and update their tests
   and fixtures); those without one still work, and a test says so.
 
+## Slot props
+
+Follow the [slot-props standard](../design/component-architecture.md#93-configurability)
+(sketch: [slot-props-sketch.md](../design/slot-props-sketch.md)): own parts take flat
+`SlotKeyedProps`; a drawn component gets one `<component>Props` (`InnerProps<C>`, never
+`itemProps`; a role name only when drawn more than once); containers merge defaults with
+`overDefaults` (child's own wins); variants stay flat; React Native takes keyed
+`style`/`slotProps`/`testId`/`tokens`; repeated parts take per-instance functions. New
+ready-mades declare what they draw this way, and `tokens` is the component's own only.
+
 ## Native scrolling
 
 Never replace or drive native scrolling, on any platform: no springs, no custom scroll or snap
