@@ -15,6 +15,7 @@ import {
 } from "@pureform/core/ast";
 import { buttonConfig } from "@pureform/core/fixtures/button";
 import type { CoreConfig } from "@pureform/core/types";
+import { narrowConfig } from "@pureform/generate";
 import { materialShape } from "@pureform/material";
 import { pureform } from "@pureform/preset";
 import { describe, expect, it } from "vitest";
@@ -279,5 +280,20 @@ describe("compileCss (spring component tokens)", () => {
         expect(slow).toContain(
             "--components-tabs-indicatorSpring-easing: var(--springs-spatial-slow-easing);",
         );
+    });
+});
+
+describe("compileCss (pruned full config)", () => {
+    it("builds without the progress components, and drops their keyframes", () => {
+        const narrowed = narrowConfig(pureform(), ["button"]);
+        expect(Object.keys(narrowed.keyframes ?? {})).not.toContain(
+            "linearProgressTrack",
+        );
+        expect(() => compileCss(narrowed)).not.toThrow();
+        const kept = narrowConfig(pureform(), ["button", "linearProgress"]);
+        expect(Object.keys(kept.keyframes ?? {})).toContain(
+            "linearProgressTrack",
+        );
+        expect(() => compileCss(kept)).not.toThrow();
     });
 });

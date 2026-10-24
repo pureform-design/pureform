@@ -4,7 +4,7 @@ import type { NormalizeProps, PropTypes } from "@zag-js/types";
 
 import { ariaSort, arrowDirection, nextSort } from "./table.logic";
 import type { Sort } from "./table.logic";
-import type { TableApi, TableSchema } from "./table.types";
+import type { HeaderCellProps, TableApi, TableSchema } from "./table.types";
 
 export function connect<T extends PropTypes>(
     service: Service<TableSchema>,
@@ -80,7 +80,7 @@ export function connect<T extends PropTypes>(
         getFooterRowProps() {
             return normalize.element({ role: "row" });
         },
-        getHeaderCellProps({ column, sortable } = {}) {
+        getHeaderCellProps({ column, sortable }: HeaderCellProps = {}) {
             return normalize.element({
                 role: "columnheader",
                 "data-column": column,

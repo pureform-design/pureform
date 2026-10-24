@@ -1,7 +1,8 @@
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import ts from "@typescript/typescript6";
+import { ScriptTarget } from "typescript/ast";
+import { API, ModuleKind, ModuleResolutionKind } from "typescript/sync";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -18,24 +19,29 @@ const FIXTURES = join(
 
 const controls = () => {
     const entry = join(FIXTURES, "component.ts");
-    const program = ts.createProgram([entry], {
-        noEmit: true,
-        strict: true,
-        module: ts.ModuleKind.ESNext,
-        moduleResolution: ts.ModuleResolutionKind.Bundler,
-        target: ts.ScriptTarget.ESNext,
-    });
-    const checker = program.getTypeChecker();
-    const module = checker.getSymbolAtLocation(program.getSourceFile(entry)!)!;
-    const fixture = checker
-        .getExportsOfModule(module)
-        .find((s) => s.name === "Fixture")!;
-    const props = propsTypeOf(checker, fixture)!;
-    return new Map(
-        propControls(checker, props, (file) =>
-            file.includes("/binding-core/"),
-        ).map((p) => [p.name, p]),
-    );
+    const api = new API({ cwd: FIXTURES });
+    try {
+        const program = api.createProgram([entry], {
+            noEmit: true,
+            strict: true,
+            module: ModuleKind.ESNext,
+            moduleResolution: ModuleResolutionKind.Bundler,
+            target: ScriptTarget.ESNext,
+        });
+        const checker = program.getProject().checker;
+        const module = checker.getSymbolOfSourceFile(entry)!;
+        const fixture = checker
+            .getExportsOfModule(module)
+            .find((s) => s.name === "Fixture")!;
+        const props = propsTypeOf(checker, fixture)!;
+        return new Map(
+            propControls(checker, props, (file) =>
+                file.includes("/binding-core/"),
+            ).map((p) => [p.name, p]),
+        );
+    } finally {
+        api.close();
+    }
 };
 
 describe("prop controls", () => {

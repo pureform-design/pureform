@@ -58,6 +58,8 @@ flowchart LR
     c10 --> r9[r9 refactor]
     r9 --> fs5[fix-storybook-5]
     fs5 --> r10[r10 refactor]
+    r10 --> r11[r11 binding-dom split]
+    r10 --> r12[r12 multi-target codegen]
 ```
 
 A phase depends on the one before it unless its file says it needs only a specific earlier
@@ -95,6 +97,8 @@ contexts exist.
 | [x]  | [c10 Plain form primitives](phases/c10-plain-form.md) ([a](context/c10a.md), [b](context/c10b.md), [c10](context/c10.md))                                                                                          | c10a Field, Label, Input, Textarea, Description, ErrorText; c10b NativeSelect                                                         | Themed form pieces without Material's field design                 |                  |
 | [x]  | [r9 Refactor after m3 to c10](phases/r9-refactor.md) ([r9](context/r9.md))                                                                                                                                         | r9a, r9b, r9c, r9d                                                                                                                    | Duplication pass over m3, c8, c9 and c10                           |                  |
 | [x]  | [r10 Refactor after r9 and fix-storybook-5](phases/r10-refactor.md) ([r10](context/r10.md))                                                                                                                        |                                                                                                                                       | Duplication pass over r9 and fix-storybook-5                       |                  |
+| [ ]  | [r11 binding-dom split](phases/r11-binding-dom.md) | | binding-core platform-neutral; DOM code in binding-dom | |
+| [ ]  | [r12 multi-target codegen](phases/r12-multi-target-codegen.md) | | several targets per setup; pruned and full output apart | |
 
 ## Rules that apply to every phase
 
