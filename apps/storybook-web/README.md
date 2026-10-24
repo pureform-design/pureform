@@ -43,7 +43,7 @@ What a platform can't do is a narrow skip in `stories.config.ts`, with its reaso
       hand-written composites', such as the radio group's), and each variant group's values,
       which a variant prop's control lists.
     - **The components' resolved props** (`scripts/prop-controls.ts`): at generate time the
-      TypeScript checker (`@typescript/typescript6`; TypeScript 7 has no JS API yet) reads the
+      TypeScript checker (TypeScript 7's JS API, `typescript/sync`) reads the
       export each story renders, from the binding's built declarations (the `controls`
       renderer, React; Solid's props agree, all 61), with the app's `.pureform/registry.d.ts`,
       and resolves its props type (the call signature's first parameter). Then:
