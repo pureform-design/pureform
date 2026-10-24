@@ -36,6 +36,21 @@ export type { StackingLayer } from "./layer";
 export { dismissTopOverlay, placeOverlay, useDismiss } from "./overlay";
 export type { PlaceOptions, Placed } from "./overlay";
 export { testIdOf, unselectable, useControllable, withEngine } from "./parts";
+export {
+    backdropKeys,
+    nativeSlots,
+    overlayKeys,
+    withUnselectable,
+} from "./slot-props";
+export type {
+    InnerPropsOf,
+    NativeHost,
+    NativePartProps,
+    NativePartStyle,
+    NativeSlotProps,
+    PartSlots,
+    PartHosts,
+} from "./slot-props";
 export { Portal } from "./portal";
 export { ProvidedTokens, useProvidedTokens } from "./provided-tokens";
 export type { PortalProps } from "./portal";

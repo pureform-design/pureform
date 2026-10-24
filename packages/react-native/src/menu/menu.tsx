@@ -74,7 +74,7 @@ import type { WindowRect } from "../portal-host";
 import { themeSpring, useOverlayPresence } from "../presence";
 import { useDirection, useEngine, usePureform } from "../provider";
 import { nativeSlots, withUnselectable, overlayKeys } from "../slot-props";
-import type { NativeSlotProps, NativeSlots } from "../slot-props";
+import type { NativeSlotProps, PartSlots } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
 /** The menu's parts this binding renders. */
@@ -168,7 +168,7 @@ export interface MenuHosts {
 // item renders again when it or its selection changes, not with every render of the menu.
 interface ItemProps {
     /** The menu's per-part props: the same while its `style` and `slotProps` are. */
-    readonly slot: NativeSlots;
+    readonly slot: PartSlots;
     readonly item: MenuItem<ReactNode>;
     readonly selection: Selection<"menu">;
     readonly indication: Indication | undefined;

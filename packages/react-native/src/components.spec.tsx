@@ -1965,13 +1965,17 @@ describe("standard bottom sheet", () => {
         await interact(() => userEvent.click(byTestId("pf-drag-handle-root")));
         await until(() =>
             expect(
-                document.querySelector('[data-testid="pf-bottom-sheet-content"]'),
+                document.querySelector(
+                    '[data-testid="pf-bottom-sheet-content"]',
+                ),
             ).toBeNull(),
         );
         await interact(() => userEvent.click(byTestId("pf-button-root")));
         await until(() =>
             expect(
-                document.querySelector('[data-testid="pf-bottom-sheet-content"]'),
+                document.querySelector(
+                    '[data-testid="pf-bottom-sheet-content"]',
+                ),
             ).not.toBeNull(),
         );
     });

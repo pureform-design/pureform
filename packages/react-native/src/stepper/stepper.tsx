@@ -30,7 +30,7 @@ import { IconSlot, iconSlot } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, useControllable, withEngine } from "../parts";
 import { nativeSlots, withUnselectable } from "../slot-props";
-import type { NativeSlots } from "../slot-props";
+import type { PartSlots } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 import type { ComponentSlots } from "../styles";
@@ -82,7 +82,7 @@ interface StepProps {
     readonly indication: Indication | undefined;
     readonly onPress: (index: number) => void;
     readonly testId: TestIdOverride<StepperPart> | undefined;
-    readonly slot: NativeSlots;
+    readonly slot: PartSlots;
 }
 
 function StepImpl({

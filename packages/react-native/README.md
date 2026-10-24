@@ -202,6 +202,25 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
   content props too where it has them (`label`, `icon`, `mirrorIcon`, `leadingIcon`, …).
   Controlled state follows Zag's shape: `checked` / `defaultChecked` / `onCheckedChange({ checked })`.
   Test ids are the anatomy's (`pf-button-root`), or `testId` as a prefix or per part.
+- **Per-part props** (`slot-props.ts`, the web's slot-props standard): every ready-made takes
+  `style` and `slotProps` keyed by its parts, besides `testId` and `tokens`:
+  `<Button style={{ root: { marginTop: 8 }, label: { fontWeight: "600" } }} />`. Each component
+  declares what each part renders as (`ButtonHosts`: `root: "Pressable"`, `label: "Text"`, …),
+  which picks the part's style type (`ViewStyle`, `TextStyle`) and its `slotProps` (the host's
+  own props: `ViewProps`, `TextProps`, `PressableProps`, `TextInputProps`). A part's user props
+  are spread first, so the component wins for what it sets (state, accessibility, `ref`, its
+  measuring `onLayout`, an overlay's `pointerEvents`); handlers it sets compose with the user's,
+  its own first, and the compose is built only when one is given. `nativeSlots(props)` (`PartSlots`) caches by
+  identity: while `style` and `slotProps` stay the same objects, nothing is built again (a
+  memoized row stays memoized). A text input's own `TextInput` props go in `slotProps.input`
+  (there's no `inputProps`). Components a ready-made draws take `<component>Props`
+  (`InnerPropsOf<ListItemProps>`: their `style`, `slotProps`, `tokens`, `testId`):
+  `listItemProps`, `radioProps`, `buttonProps`/`iconButtonProps`, `chipProps`, `menuProps`,
+  `searchBarProps`, `cancelButtonProps`/`confirmButtonProps`, `selectProps`, `checkboxProps`,
+  `textFieldProps`, `linearProgressProps`; a container's are each child's defaults
+  (`overDefaults`, the child's own wins). Overlays key their parts as the web does
+  (`overlayKeys`): the surface is `content` (`pf-dialog-content`), a sheet's body `body`, a
+  search view's surface `surface`, and the scrim of a dialog, sheet or date picker `backdrop`.
 
 ### Plain form primitives
 
@@ -365,7 +384,7 @@ trigger shows their labels joined by ", " (the placeholder when none):
     - **Own size:** the button, icon button, FAB, chips, checkbox, switch, radio and badge keep
       their own size, as the web's `inline-flex` roots do: the preset's `OWN_SIZE` makes them
       `width: "fit-content"` (Yoga's, React Native 0.88), so a parent's `alignItems` (a centred
-      column or row) still places them. Each takes a `style` over its root (`RootStyleProps`):
+      column or row) still places them. Each takes a style over its root (`style={{ root }}`):
       `width: "100%"` stretches one across its parent, and `alignSelf` places it; note that
       `alignSelf: "stretch"` alone doesn't stretch it, since its width wins.
     - **Inline roots** (the time picker and time input) keep their own size the older way:
@@ -562,7 +581,7 @@ trigger shows their labels joined by ", " (the placeholder when none):
     - a card laid out in sections clips its content to its corners (`overflow: hidden`); that the
       `boxShadow` of an elevated card survives the clip on iOS and Android hasn't been checked on a
       device;
-    - no `class`, `style`, or `slotProps` per part (React Native's components take none).
+    - no `class` per part; `style` and `slotProps` are keyed by part, as everywhere.
 - **Lists:** `List` renders a `ListItem` per entry of `items`, each in an `item` view, and gives
   them its `density`, `color`, `tokens`, and `leadingType` (`icon`, `avatar`, `thumbnail`,
   `video`) unless an item sets its own. `variant="segmented"` sets the items apart as tiles, each

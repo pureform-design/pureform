@@ -28,7 +28,7 @@ import { testIdOf } from "../parts";
 import { useOverlayPresence } from "../presence";
 import { useEngine } from "../provider";
 import { nativeSlots } from "../slot-props";
-import type { NativeSlotProps, NativeSlots } from "../slot-props";
+import type { NativeSlotProps, PartSlots } from "../slot-props";
 import { useSelectedStyles } from "../styles";
 
 /** The fade through's props. */
@@ -52,7 +52,7 @@ interface PageProps {
     readonly gone: (page: TransitionPage) => void;
     readonly style: StyleProp<ViewStyle>;
     readonly testID: string;
-    readonly slot: NativeSlots;
+    readonly slot: PartSlots;
     readonly children: ReactNode;
 }
 

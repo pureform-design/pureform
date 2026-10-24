@@ -1309,7 +1309,9 @@ describe("the sheets", () => {
             { x: 4, y: 4 },
         );
     const sheet = (scope: string) =>
-        document.querySelector<HTMLElement>(`[data-testid="pf-${scope}-content"]`);
+        document.querySelector<HTMLElement>(
+            `[data-testid="pf-${scope}-content"]`,
+        );
     const press = (name: string) =>
         interact(() =>
             userEvent.click(

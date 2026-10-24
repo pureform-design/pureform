@@ -177,7 +177,8 @@ export type PerInstance<V, I> = V | ((instance: I) => V | undefined);
 - TagsInput's `chip.tokens` -> `chipProps.tokens`.
 - List, SelectionList and RadioGroup's `slotProps` / `unstyled` keyed by the child's parts ->
   `listItemProps` / `radioProps`.
-- AppBar's `searchBar` -> `searchBarProps`. React Native's `inputProps` already fits and stays.
+- AppBar's `searchBar` -> `searchBarProps`. React Native's `inputProps` -> `slotProps.input` (the
+  input part's host props, `TextInputProps`).
 - React Native's root-only `style` -> keyed `style` (`style={{ root: … }}`).
 
 ## 7. Cost

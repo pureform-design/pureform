@@ -23,7 +23,7 @@ import { type ReactNode, useState } from "react";
 import { useSurfaceIndication } from "./indication";
 import { testIdOf, withEngine } from "./parts";
 import { nativeSlots, withUnselectable } from "./slot-props";
-import type { NativeSlots } from "./slot-props";
+import type { PartSlots } from "./slot-props";
 import { useComponentSlots } from "./styles";
 
 /** The time from `value` when given, else the component's own from `defaultValue`. */
@@ -65,7 +65,7 @@ export interface TimeButtonProps<A extends ComponentAnatomy> {
     readonly indication: Indication | undefined;
     readonly testId: TestIdOverride<PartName<A>> | undefined;
     /** The owner's per-part props, when it customizes this part. */
-    readonly slot?: NativeSlots | undefined;
+    readonly slot?: PartSlots | undefined;
     readonly label?: string | undefined;
     readonly selected: boolean;
     readonly disabled?: boolean | undefined;

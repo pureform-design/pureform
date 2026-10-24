@@ -40,7 +40,7 @@ import { IconSlot, iconSlot, ownText } from "../icon-style";
 import { useControllable, withEngine } from "../parts";
 import { useDirection } from "../provider";
 import { nativeSlots } from "../slot-props";
-import type { InnerPropsOf, NativeSlotProps, NativeSlots } from "../slot-props";
+import type { InnerPropsOf, NativeSlotProps, PartSlots } from "../slot-props";
 import { useComponentSlots } from "../styles";
 import { partId } from "../text-input";
 
@@ -67,7 +67,7 @@ interface SegmentOptions {
     readonly disabled: boolean;
     readonly readOnly: boolean;
     readonly testID: string;
-    readonly slot: NativeSlots;
+    readonly slot: PartSlots;
     readonly inputRef: (input: Focusable | null) => void;
     readonly onText: (text: string) => void;
     readonly onKey: (key: string) => boolean;

@@ -29,7 +29,7 @@ import { IconSlot, iconSlot } from "./icon-style";
 import { useSurfaceIndication } from "./indication";
 import { testIdOf, withEngine } from "./parts";
 import { nativeSlots, withUnselectable } from "./slot-props";
-import type { NativeSlots } from "./slot-props";
+import type { PartSlots } from "./slot-props";
 import { useComponentSlots } from "./styles";
 import type { SlotViewsBySlot } from "./styles";
 
@@ -122,7 +122,7 @@ export interface CalendarSlots<S extends string> {
     readonly views: SlotViewsBySlot<S>;
     readonly id: (part: S) => string;
     /** The picker's per-part props. */
-    readonly slot?: NativeSlots | undefined;
+    readonly slot?: PartSlots | undefined;
 }
 
 /** What the day grid takes. */

@@ -38,7 +38,7 @@ import { useSurfaceIndication } from "../indication";
 import { testIdOf, useControllable, withEngine } from "../parts";
 import { useDirection } from "../provider";
 import { nativeSlots, withUnselectable } from "../slot-props";
-import type { NativeSlots } from "../slot-props";
+import type { PartSlots } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
@@ -142,7 +142,7 @@ function Thumb(props: {
     readonly showValue: boolean;
     readonly layer: ((selected: Slots["selected"]) => ReactNode) | undefined;
     readonly id: (part: SliderPart) => string | undefined;
-    readonly slot: NativeSlots;
+    readonly slot: PartSlots;
 }): ReactNode {
     const slot = props.slot;
     const selection = props.selection as { tokens?: object };
@@ -199,7 +199,7 @@ function Marker(props: {
     readonly percent: number;
     readonly active: boolean;
     readonly testID: string | undefined;
-    readonly slot: NativeSlots;
+    readonly slot: PartSlots;
 }): ReactNode {
     const slot = props.slot;
     const selection = props.selection as { tokens?: object };

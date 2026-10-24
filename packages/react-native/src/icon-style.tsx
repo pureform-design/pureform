@@ -13,7 +13,7 @@ import type { ComponentType, ReactNode } from "react";
 import { Animated, Text } from "react-native";
 
 import { nativeSlots } from "./slot-props";
-import type { NativeSlots } from "./slot-props";
+import type { PartSlots } from "./slot-props";
 import type { ComponentSlots } from "./styles";
 
 interface IconPart {
@@ -104,7 +104,7 @@ export const iconParts =
     <P extends string>(
         slots: ComponentSlots<P>,
         id: (part: P) => string,
-        slot: NativeSlots = nativeSlots(undefined),
+        slot: PartSlots = nativeSlots(undefined),
     ) =>
     (part: P, node: ReactNode): ReactNode => {
         if (!isPresent(node)) return null;

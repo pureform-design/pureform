@@ -37,7 +37,7 @@ import { Glyph, IconSlot, iconSlot } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, useControllable, withEngine } from "../parts";
 import { nativeSlots, withUnselectable } from "../slot-props";
-import type { NativeSlots } from "../slot-props";
+import type { PartSlots } from "../slot-props";
 import type { InnerPropsOf, NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
@@ -83,7 +83,7 @@ function CellContent(props: {
     readonly styles: Record<string, unknown>;
     readonly views: Record<string, { Text: never; View: never }>;
     readonly id: Id;
-    readonly slot: NativeSlots;
+    readonly slot: PartSlots;
     readonly children: ReactNode;
 }): ReactNode {
     const slot = props.slot;
@@ -117,7 +117,7 @@ function SortHeader(props: {
     readonly onPress: () => void;
     readonly indication: TableProps["indication"];
     readonly id: Id;
-    readonly slot: NativeSlots;
+    readonly slot: PartSlots;
 }): ReactNode {
     const slot = props.slot;
     const indication = useSurfaceIndication(INDICATION!, {
@@ -192,7 +192,7 @@ function BodyRow<Row>(props: {
     readonly onToggle: () => void;
     readonly columns: readonly TableColumn<Row, ReactNode>[];
     readonly id: Id;
-    readonly slot: NativeSlots;
+    readonly slot: PartSlots;
     readonly checkboxProps: InnerPropsOf<CheckboxProps> | undefined;
 }): ReactNode {
     const slot = props.slot;

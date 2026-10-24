@@ -51,7 +51,7 @@ import { testIdOf, withEngine } from "../parts";
 import { themeSpring } from "../presence";
 import { useDirection, usePureform } from "../provider";
 import { nativeSlots } from "../slot-props";
-import type { NativeSlots } from "../slot-props";
+import type { PartSlots } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { inFlowInline, useComponentSlots } from "../styles";
 import { TimeButton, timeLocale, useTime } from "../time";
@@ -322,7 +322,7 @@ function Dial(props: {
     readonly styles: Slots["styles"];
     readonly views: Slots["views"];
     readonly id: (part: TimePickerPart) => string;
-    readonly slot: NativeSlots;
+    readonly slot: PartSlots;
     readonly time: ReturnType<typeof useTime>[0];
     readonly view: TimePickerView;
     readonly cycle: 12 | 24;
@@ -484,7 +484,7 @@ function DialLabelImpl(props: {
     readonly selected: boolean;
     readonly selection: Record<string, unknown>;
     readonly testId: string;
-    readonly slot: NativeSlots;
+    readonly slot: PartSlots;
 }): ReactNode {
     const { slot } = props;
     const { styles: s, views: v } = useComponentSlots<TimePickerPart>(

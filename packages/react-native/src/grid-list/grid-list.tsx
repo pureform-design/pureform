@@ -16,7 +16,7 @@ import type { ImageStyle } from "react-native";
 
 import { testIdOf, withEngine } from "../parts";
 import { nativeSlots } from "../slot-props";
-import type { NativeSlots } from "../slot-props";
+import type { PartSlots } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 import type { ComponentSlots } from "../styles";
@@ -25,7 +25,7 @@ import type { ComponentSlots } from "../styles";
 interface GridListContextValue {
     readonly slots: ComponentSlots<GridListPart>;
     readonly testId: TestIdOverride<GridListPart> | undefined;
-    readonly slot: NativeSlots;
+    readonly slot: PartSlots;
 }
 
 const GridListContext = createContext<GridListContextValue | undefined>(

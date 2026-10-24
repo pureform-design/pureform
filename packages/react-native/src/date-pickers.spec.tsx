@@ -113,7 +113,9 @@ describe("DatePicker", () => {
         await interact(() => userEvent.click(button("Cancel")));
         expect(onValueChange).not.toHaveBeenCalled();
         await until(() =>
-            expect(all('[data-testid="pf-date-picker-content"]')).toHaveLength(0),
+            expect(all('[data-testid="pf-date-picker-content"]')).toHaveLength(
+                0,
+            ),
         );
 
         await interact(() => userEvent.click(button("Pick a date")));
@@ -125,7 +127,9 @@ describe("DatePicker", () => {
         await interact(() => userEvent.click(button("OK")));
         expect(onValueChange).toHaveBeenCalledWith({ value: ["2026-08-20"] });
         await until(() =>
-            expect(all('[data-testid="pf-date-picker-content"]')).toHaveLength(0),
+            expect(all('[data-testid="pf-date-picker-content"]')).toHaveLength(
+                0,
+            ),
         );
     });
 

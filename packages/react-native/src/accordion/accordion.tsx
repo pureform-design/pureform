@@ -20,7 +20,7 @@ import { iconParts, ownText } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, useControllable, withEngine } from "../parts";
 import { nativeSlots, withUnselectable } from "../slot-props";
-import type { NativeSlotProps, NativeSlots } from "../slot-props";
+import type { NativeSlotProps, PartSlots } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
 const [INDICATION] = accordionAnatomy.indication!;
@@ -50,7 +50,7 @@ export interface AccordionProps
 
 interface ItemProps {
     /** The accordion's per-part props. */
-    readonly slot: NativeSlots;
+    readonly slot: PartSlots;
     readonly item: AccordionItem<ReactNode>;
     readonly selection: AccordionVariantProps;
     readonly expanded: boolean;

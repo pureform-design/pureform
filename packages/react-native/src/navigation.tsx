@@ -57,7 +57,7 @@ import { PortalHost } from "./portal-host";
 import { useDirection, useEngine } from "./provider";
 import { Scrim } from "./single-part";
 import { nativeSlots, withUnselectable } from "./slot-props";
-import type { NativeSlots } from "./slot-props";
+import type { PartSlots } from "./slot-props";
 import type { NativeSlotProps } from "./slot-props";
 import { useComponentSlots } from "./styles";
 import { omitSpring, useIndicatorSlides } from "./tab-indicator";
@@ -102,7 +102,7 @@ export interface TabsProps
 // renders again when its item or selection changes, not with every render of the tabs.
 interface TabProps {
     /** The tabs' per-part props. */
-    readonly slot: NativeSlots;
+    readonly slot: PartSlots;
     readonly item: TabsItem<ReactNode>;
     readonly selection: Selection<"tabs">;
     readonly indication: Indication | undefined;
@@ -395,7 +395,7 @@ const ANATOMIES = {
 // A destination gets only what it reads, as a tab does.
 interface DestinationProps {
     /** The bar's or rail's per-part props. */
-    readonly slot: NativeSlots;
+    readonly slot: PartSlots;
     readonly name: NavigationComponent;
     readonly item: NavigationItem<ReactNode>;
     readonly selection: Record<string, unknown>;

@@ -19,7 +19,7 @@ import { usePresence } from "./presence";
 import type { OverlayMotionName, Presence } from "./presence";
 import { useEngine } from "./provider";
 import { Scrim } from "./single-part";
-import type { NativeSlots } from "./slot-props";
+import type { PartSlots } from "./slot-props";
 
 /** What `useModalOverlay` takes: the overlay's controllable `open`, and whether Escape and the
  *  back button close it. */
@@ -124,7 +124,7 @@ export interface ModalScrimLayerProps {
     /** The scrim's test id, as the scrim's own `testId` takes it. */
     readonly scrimTestId?: TestIdOverride<"root"> | undefined;
     /** The owner's per-part props for the scrim, under `backdrop`. */
-    readonly scrimSlot?: NativeSlots | undefined;
+    readonly scrimSlot?: PartSlots | undefined;
     readonly children: ReactNode;
 }
 

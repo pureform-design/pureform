@@ -119,7 +119,7 @@ const compose = (own: Handler, user: Handler): Handler =>
     });
 
 /** A component's parts, customized by the user's keyed `style` and `slotProps`. */
-export interface NativeSlots {
+export interface PartSlots {
     /** The user's props for `part`, to spread first on its element, so what the component sets
      *  after wins. The same object while `slotProps` is. */
     props(part: string): object;
@@ -134,7 +134,7 @@ export interface NativeSlots {
     with<O>(part: string, own: O): O;
 }
 
-const plain: NativeSlots = {
+const plain: PartSlots = {
     props: () => EMPTY,
     style: (_part, own) => own,
     on: (_part, _name, own) => own,
@@ -147,7 +147,7 @@ const build = (
     style: Dict,
     slotProps: Dict,
     keyOf: (part: string) => string,
-): NativeSlots => {
+): PartSlots => {
     const userProps = (part: string) =>
         (slotProps[keyOf(part)] as Dict | undefined) ?? EMPTY;
     return {
@@ -194,12 +194,12 @@ const build = (
                 return merged;
             }) as typeof own;
         },
-    } satisfies NativeSlots as NativeSlots;
+    } satisfies PartSlots as PartSlots;
 };
 
 const built = new WeakMap<
     (part: string) => string,
-    WeakMap<object, WeakMap<object, NativeSlots>>
+    WeakMap<object, WeakMap<object, PartSlots>>
 >();
 
 /** A ready-made's parts customized by its `style` and `slotProps`: the same object while they
@@ -213,12 +213,12 @@ export const nativeSlots = (
           }
         | undefined,
     keyOf: (part: string) => string = same,
-): NativeSlots => {
+): PartSlots => {
     const style = props?.style as Dict | undefined;
     const slotProps = props?.slotProps as Dict | undefined;
     if (!style && !slotProps) return plain;
     let cache = built.get(keyOf);
-    if (!cache) built.set(keyOf, (cache = pairCache<NativeSlots>()));
+    if (!cache) built.set(keyOf, (cache = pairCache<PartSlots>()));
     return cached(cache, style ?? EMPTY, slotProps ?? EMPTY, () =>
         build(style ?? EMPTY, slotProps ?? EMPTY, keyOf),
     );

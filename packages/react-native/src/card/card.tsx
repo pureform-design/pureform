@@ -21,7 +21,7 @@ import { useSurfaceIndication } from "../indication";
 import type { SurfaceIndicationScope } from "../indication";
 import { testIdOf, withEngine } from "../parts";
 import { nativeSlots, withUnselectable } from "../slot-props";
-import type { NativeSlots } from "../slot-props";
+import type { PartSlots } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 import type { ComponentSlots } from "../styles";
@@ -37,7 +37,7 @@ interface CardContextValue {
     readonly indication: SurfaceIndicationScope;
     readonly disabled: boolean;
     readonly testId: TestIdOverride<CardPart> | undefined;
-    readonly slot: NativeSlots;
+    readonly slot: PartSlots;
     /** Tells Root an action area is there, while it's mounted. */
     readonly hasActionArea: (present: boolean) => void;
 }

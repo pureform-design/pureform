@@ -34,7 +34,7 @@ import type {
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
 import { nativeSlots } from "../slot-props";
-import type { NativeSlotProps, NativeSlots } from "../slot-props";
+import type { NativeSlotProps, PartSlots } from "../slot-props";
 import { useComponentSlots } from "../styles";
 import type { ComponentSlots } from "../styles";
 
@@ -82,7 +82,7 @@ interface ItemProps {
     readonly indication: Indication | undefined;
     readonly onPress: ((index: number) => void) | undefined;
     readonly testId: TestIdOverride<CarouselPart> | undefined;
-    readonly slot: NativeSlots;
+    readonly slot: PartSlots;
 }
 
 function ItemImpl({

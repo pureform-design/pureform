@@ -53,7 +53,7 @@ import { testIdOf, withEngine } from "./parts";
 import { useOverlayPresence } from "./presence";
 import { useEngine } from "./provider";
 import { nativeSlots } from "./slot-props";
-import type { NativeSlotProps, NativeSlots } from "./slot-props";
+import type { NativeSlotProps, PartSlots } from "./slot-props";
 import { useSelectedStyles } from "./styles";
 
 // The one style of a component: under `root` where it has slots, else `""`.
@@ -340,7 +340,7 @@ export interface ScrimProps
     readonly open?: boolean | undefined;
     readonly testId?: TestIdOverride<Root> | undefined;
     /** The owner's per-part props in its place (a dialog's `backdrop`), for its own scrim. */
-    readonly slot?: NativeSlots | undefined;
+    readonly slot?: PartSlots | undefined;
 }
 
 /** A layer dimming what sits behind it, over the whole of its parent. */

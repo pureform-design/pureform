@@ -1633,6 +1633,9 @@ Agreed in [slot-props-sketch.md](slot-props-sketch.md); batches in the
   and `tokens` (no `className`/`unstyled`). `slotProps` follows the web override rule: the
   component wins for state and accessibility props and for what it depends on (`ref`, measuring
   `onLayout`, overlay `pointerEvents`); handlers compose, the component's first.
+  Overlays key their parts by the web's names (the surface is `content`, the scrim `backdrop`), so
+  one key reaches the same element on every renderer; a text input's `TextInput` props are
+  `slotProps.input`.
 - **Repeated parts** (cells, steps, rows, stars, slides) take a value or a function of the
   instance (`PerInstance<V, I>`), called once per copy only when passed.
 - **A part drawn as `Button`/`IconButton`** (trigger, close, prev/next, Cancel/Confirm) passes its

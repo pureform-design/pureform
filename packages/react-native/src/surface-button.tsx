@@ -15,7 +15,7 @@ import { IconSlot, iconSlot } from "./icon-style";
 import { useSurfaceIndication } from "./indication";
 import { testIdOf } from "./parts";
 import { nativeSlots, withUnselectable } from "./slot-props";
-import type { NativeSlots } from "./slot-props";
+import type { PartSlots } from "./slot-props";
 import { useComponentSlots } from "./styles";
 
 /** What `SurfaceButton` takes. */
@@ -29,7 +29,7 @@ export interface SurfaceButtonProps<A extends ComponentAnatomy> {
     readonly indication: Indication | undefined;
     readonly testId: TestIdOverride<PartName<A>> | undefined;
     /** The owner's per-part props, when it customizes this part. */
-    readonly slot?: NativeSlots | undefined;
+    readonly slot?: PartSlots | undefined;
     /** Its name for assistive technology. */
     readonly label: string | undefined;
     readonly onPress: (() => void) | undefined;

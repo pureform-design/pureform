@@ -33,7 +33,7 @@ import { Portal } from "../portal";
 import { useOverlayPresence } from "../presence";
 import { useEngine } from "../provider";
 import { nativeSlots, withUnselectable } from "../slot-props";
-import type { NativeSlots } from "../slot-props";
+import type { PartSlots } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
@@ -91,7 +91,7 @@ function FabMenuItemImpl(props: {
     readonly selection: Selection<"fabMenu">;
     readonly indication: Indication | undefined;
     readonly testId: TestIdOverride<FabMenuPart> | undefined;
-    readonly slot: NativeSlots;
+    readonly slot: PartSlots;
     readonly onSelect: (value: string) => void;
 }): ReactNode {
     const { item } = props;

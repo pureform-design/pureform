@@ -39,7 +39,7 @@ import { testIdOf } from "../parts";
 import { themeSpring } from "../presence";
 import { useDirection, usePureform } from "../provider";
 import { nativeSlots } from "../slot-props";
-import type { NativeSlotProps, NativeSlots } from "../slot-props";
+import type { NativeSlotProps, PartSlots } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
 /** What each part renders as, for its keyed `style` and `slotProps`. */
@@ -93,7 +93,7 @@ function Page(props: {
     readonly page: TransitionPage;
     readonly motion: Motion;
     readonly style: StyleProp<ViewStyle>;
-    readonly slot: NativeSlots;
+    readonly slot: PartSlots;
     readonly testID: string | undefined;
     readonly onSettle: (page: TransitionPage) => void;
     readonly children: ReactNode;
@@ -186,7 +186,7 @@ function Scrim(props: {
     readonly direction: SharedAxisDirection;
     readonly timing: AnimatedTiming | undefined;
     readonly style: StyleProp<ViewStyle>;
-    readonly slot: NativeSlots;
+    readonly slot: PartSlots;
     readonly testID: string | undefined;
 }): ReactNode {
     const [shown] = useState(() => new Animated.Value(0));

@@ -30,7 +30,7 @@ import type { TextInputKeyPressEvent } from "react-native";
 
 import { testIdOf, withEngine } from "../parts";
 import { nativeSlots } from "../slot-props";
-import type { NativeSlots } from "../slot-props";
+import type { PartSlots } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { inFlowInline, useComponentSlots } from "../styles";
 import { TimeButton, timeLocale, useTime } from "../time";
@@ -178,7 +178,7 @@ function FieldImpl(props: {
     readonly editable: boolean;
     readonly onTime: (time: Time) => void;
     readonly id: (part: TimeInputPart) => string;
-    readonly slot: NativeSlots;
+    readonly slot: PartSlots;
 }): ReactNode {
     const slot = props.slot;
     const { of, time, cycle } = props;
