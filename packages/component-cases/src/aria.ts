@@ -97,8 +97,7 @@ export const allByRole = <E extends HTMLElement = HTMLElement>(
             named(element, query.name),
     ) as E[];
 
-/** The roles a list's choice has: a listbox's option, or a menu's item (React Native's
- *  autocomplete lists its suggestions in a menu). */
+/** The roles a list's choice has: a listbox's option, or a menu's item. */
 export const CHOICE_ROLES = [
     "option",
     "menuitemradio",

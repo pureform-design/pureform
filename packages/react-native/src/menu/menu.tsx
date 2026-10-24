@@ -165,6 +165,9 @@ interface ItemProps {
     readonly option: boolean;
     /** Laid out unseen to be measured: no role, nothing to press. */
     readonly measuring: boolean;
+    /** An option of a listbox whose focus stays in its combobox (`aria-activedescendant`): its
+     *  id, and whether it's the highlighted one, which says `aria-selected` and shows hovered. */
+    readonly active?: { readonly id: string; readonly highlighted: boolean };
 }
 
 // An item's row, measured for where a cascading submenu opens beside it.
@@ -201,18 +204,21 @@ function MenuItemImpl(props: ItemProps): ReactNode {
     const slots = useComponentSlots<Part>(
         "menu",
         indication.select(props.selection),
-        indication.states({
-            selected: props.selected,
-            ...(item.type === undefined
-                ? {}
-                : { checked: item.checked ?? false }),
-            disabled: item.disabled ?? false,
-            ...(item.mirrorLeadingIcon ||
-            item.mirrorTrailingIcon ||
-            hasSubmenu(item)
-                ? { mirrored: true }
-                : {}),
-        }),
+        {
+            ...indication.states({
+                selected: props.selected,
+                ...(item.type === undefined
+                    ? {}
+                    : { checked: item.checked ?? false }),
+                disabled: item.disabled ?? false,
+                ...(item.mirrorLeadingIcon ||
+                item.mirrorTrailingIcon ||
+                hasSubmenu(item)
+                    ? { mirrored: true }
+                    : {}),
+            }),
+            ...(props.active?.highlighted ? { hover: true } : {}),
+        },
     );
     const { styles: s, selected, views: v } = slots;
     const id = (part: Part) => testIdOf(menuAnatomy, part, props.testId);
@@ -231,7 +237,16 @@ function MenuItemImpl(props: ItemProps): ReactNode {
                         ? "menuitem"
                         : `menuitem${item.type}`
             }
-            {...(props.option ? { "aria-selected": props.selected } : {})}
+            {...(props.option
+                ? {
+                      "aria-selected": props.active
+                          ? props.active.highlighted
+                          : props.selected,
+                  }
+                : {})}
+            {...(props.active
+                ? { nativeID: props.active.id, focusable: false }
+                : {})}
             {...(hasSubmenu(item) ? { "aria-haspopup": "menu" as const } : {})}
             {...(item.type === undefined || props.option
                 ? {}
@@ -443,7 +458,7 @@ function MenuImpl(
         /** Measures that container when the menu opens, as it may have moved since. */
         readonly measureContainer?: MeasureContainer;
         /** A listbox of options (the select's), with this id, rather than a menu. */
-        readonly listbox?: { readonly id: string };
+        readonly listbox?: MenuListboxOptions;
     },
 ): ReactNode {
     const engine = useEngine();
@@ -663,6 +678,15 @@ function MenuImpl(
             openKey={rtl ? "ArrowLeft" : "ArrowRight"}
             option={props.listbox !== undefined}
             measuring={props.measuring ?? false}
+            {...(props.listbox?.active
+                ? {
+                      active: {
+                          id: props.listbox.active.idOf(entry.value),
+                          highlighted:
+                              props.listbox.active.value === entry.value,
+                      },
+                  }
+                : {})}
         />
     );
     // A menu that may drill springs its height from level to level.
@@ -852,11 +876,23 @@ export function MenuItems(
     return <Surface {...props} bare />;
 }
 
+/** A listbox's id, and, for one whose focus stays in its combobox (an autocomplete's), the
+ *  option highlighted there (`aria-activedescendant`) and each option's id. */
+export interface MenuListboxOptions {
+    readonly id: string;
+    readonly active?: {
+        readonly value: string | undefined;
+        readonly idOf: (value: string) => string;
+    };
+}
+
 /** The menu's surface as a listbox of options with this id, each saying whether it's the
- *  `value` (`aria-selected`): the select's list. */
+ *  `value` (`aria-selected`): the select's list. Given `listbox.active`, an option says
+ *  `aria-selected` while it's the highlighted one instead, and takes no focus (the
+ *  autocomplete's, as WAI-ARIA APG's list autocomplete). */
 export function MenuListbox(
     props: Omit<MenuProps, "trigger" | "contextTrigger"> & {
-        readonly listbox: { readonly id: string };
+        readonly listbox: MenuListboxOptions;
     },
 ): ReactNode {
     return <Surface {...props} />;

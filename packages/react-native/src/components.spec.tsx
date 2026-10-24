@@ -993,13 +993,13 @@ describe("lists, menus, and selects", () => {
         await interact(() => userEvent.type(input, "pr"));
         await settle(50);
         const shown = () =>
-            [...document.querySelectorAll('[role="menuitem"]')].map(
+            [...document.querySelectorAll('[role="option"]')].map(
                 (item) => item.textContent,
             );
         expect(shown()).toEqual(["Prague"]);
         expect(input.getAttribute("aria-expanded")).toBe("true");
         await interact(() =>
-            userEvent.click(document.querySelector('[role="menuitem"]')!),
+            userEvent.click(document.querySelector('[role="option"]')!),
         );
         await settle(50);
         expect(change).toHaveBeenCalledExactlyOnceWith({ value: "pra" });

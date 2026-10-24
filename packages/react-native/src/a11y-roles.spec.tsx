@@ -3,6 +3,7 @@ import { beforeAll, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { PureformProvider } from ".";
+import { Autocomplete } from "./autocomplete";
 import { animated } from "./engine";
 import type { MotionEngine } from "./engine";
 import { reanimated } from "./engines/reanimated";
@@ -18,6 +19,7 @@ let registry: TestRegistry;
 beforeAll(async () => {
     registry = await presetRegistry([
         "select",
+        "autocomplete",
         "menu",
         "tree",
         "searchView",
@@ -131,6 +133,80 @@ describe.each(ENGINES)("with $name", (engine) => {
                 expect(combobox().getAttribute("aria-expanded")).toBe("false"),
             );
             await until(() => expect(document.activeElement).toBe(combobox()));
+        });
+    });
+
+    describe("the autocomplete, a combobox with list autocomplete", () => {
+        const CITIES = [
+            { value: "par", label: "Paris" },
+            { value: "pra", label: "Prague" },
+            { value: "rom", label: "Rome" },
+        ];
+
+        it("lists its suggestions as options of a listbox the input controls", async () => {
+            await render(<Autocomplete label="City" items={CITIES} />, engine);
+            const input = one('[role="combobox"]') as HTMLInputElement;
+            expect(input.getAttribute("aria-autocomplete")).toBe("list");
+            await interact(() => userEvent.type(input, "p"));
+            await until(() => expect(one('[role="listbox"]')).not.toBeNull());
+            const listbox = one('[role="listbox"]')!;
+            expect(input.getAttribute("aria-controls")).toBe(listbox.id);
+            expect(listbox.getAttribute("aria-label")).toBe("City");
+            expect(one('[role="menu"], [role="menuitem"]')).toBeNull();
+            expect(all('[role="option"]').map((o) => o.textContent)).toEqual([
+                "Paris",
+                "Prague",
+            ]);
+        });
+
+        it("keeps focus in the input, highlighting options with the arrows and choosing with Enter", async () => {
+            const change = vi.fn();
+            await render(
+                <Autocomplete
+                    label="City"
+                    items={CITIES}
+                    onValueChange={change}
+                />,
+                engine,
+            );
+            const input = one('[role="combobox"]') as HTMLInputElement;
+            input.focus();
+            const highlighted = () =>
+                document.getElementById(
+                    input.getAttribute("aria-activedescendant") ?? "",
+                );
+            // The down arrow opens the list on its first option.
+            await interact(() => userEvent.keyboard("{ArrowDown}"));
+            await until(() => expect(highlighted()?.textContent).toBe("Paris"));
+            expect(highlighted()!.getAttribute("role")).toBe("option");
+            expect(highlighted()!.getAttribute("aria-selected")).toBe("true");
+            expect(
+                all('[role="option"]').filter(
+                    (o) => o.getAttribute("aria-selected") === "true",
+                ),
+            ).toHaveLength(1);
+            expect(document.activeElement).toBe(input);
+            await interact(() => userEvent.keyboard("{ArrowDown}{ArrowDown}"));
+            expect(highlighted()?.textContent).toBe("Rome");
+            // It wraps round.
+            await interact(() => userEvent.keyboard("{ArrowDown}"));
+            expect(highlighted()?.textContent).toBe("Paris");
+            await interact(() => userEvent.keyboard("{ArrowUp}"));
+            expect(highlighted()?.textContent).toBe("Rome");
+            await interact(() => userEvent.keyboard("{Enter}"));
+            expect(change).toHaveBeenCalledExactlyOnceWith({ value: "rom" });
+            expect(input.value).toBe("Rome");
+            await until(() =>
+                expect(input.getAttribute("aria-expanded")).toBe("false"),
+            );
+            expect(input.hasAttribute("aria-activedescendant")).toBe(false);
+            expect(document.activeElement).toBe(input);
+            // Alt with the down arrow opens it with nothing highlighted; typing clears it.
+            await interact(() => userEvent.keyboard("{Alt>}{ArrowDown}{/Alt}"));
+            await until(() =>
+                expect(input.getAttribute("aria-expanded")).toBe("true"),
+            );
+            expect(highlighted()).toBeNull();
         });
     });
 

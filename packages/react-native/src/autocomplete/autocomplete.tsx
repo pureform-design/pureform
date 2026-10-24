@@ -2,7 +2,12 @@
 // its list is open. Typing opens the list of the suggestions its text matches, under the field,
 // over the page through the portal host (not a `Modal`, which would take the keyboard's focus
 // from the input); pressing the arrow opens or closes it. Choosing one sets the value and the
-// text to its label and closes it, as do a press outside, the back button, and Escape.
+// text to its label and closes it, as do a press outside, the back button, and Escape. As WAI-ARIA
+// APG's list autocomplete, the input is a combobox controlling a listbox of the suggestions as
+// options; focus stays in the input, and on a keyboard the down and up arrows open the list and
+// highlight the next or previous option (the input's `aria-activedescendant`, the option saying
+// `aria-selected`), Enter chooses the highlighted one, Alt with the down arrow opens the list and
+// with the up arrow closes it.
 
 import { autocompleteAnatomy } from "@pureform/anatomy";
 import type { TestIdOverride } from "@pureform/anatomy";
@@ -25,7 +30,7 @@ import { useId, useState } from "react";
 import type { ReactNode } from "react";
 import { Pressable, View } from "react-native";
 
-import { Menu } from "../menu/menu";
+import { MenuListbox } from "../menu/menu";
 import { Anchored, useFieldPopup } from "../overlay";
 import { useControllable } from "../parts";
 import { Portal } from "../portal";
@@ -138,6 +143,52 @@ export function Autocomplete(props: AutocompleteProps): ReactNode {
     // The list the combobox controls, while it shows.
     const listId = useId();
     const listShown = open && presence.present && anchor !== undefined;
+    // The option the keys highlight, while the list shows.
+    const [highlighted, setHighlighted] = useState<string>();
+    const active = listShown
+        ? matches.find((item) => item.value === highlighted)?.value
+        : undefined;
+    const optionId = (value: string) =>
+        `${listId}-${matches.findIndex((item) => item.value === value)}`;
+    const choose = (chosen: string) => {
+        const item = items.find((entry) => entry.value === chosen);
+        if (chosen !== value) setValue(chosen);
+        if (item && item.label !== text) setText(item.label);
+        setTyped("");
+        setHighlighted(undefined);
+        close();
+    };
+    const step = (by: 1 | -1) => {
+        if (matches.length === 0) return;
+        const at = matches.findIndex((item) => item.value === active);
+        const next =
+            at < 0
+                ? by === 1
+                    ? 0
+                    : matches.length - 1
+                : (at + by + matches.length) % matches.length;
+        setHighlighted(matches[next]!.value);
+    };
+    const onKeyPress = (event: {
+        nativeEvent: { key: string; altKey?: boolean };
+        preventDefault?(): void;
+    }) => {
+        const { key, altKey } = event.nativeEvent;
+        if (disabled) return;
+        if (key === "ArrowDown" || key === "ArrowUp") {
+            event.preventDefault?.();
+            if (altKey) {
+                if (key === "ArrowDown") show();
+                else close();
+                return;
+            }
+            if (!open) show();
+            step(key === "ArrowDown" ? 1 : -1);
+        } else if (key === "Enter" && active !== undefined) {
+            event.preventDefault?.();
+            choose(active);
+        }
+    };
     return (
         <View>
             <Field
@@ -158,13 +209,20 @@ export function Autocomplete(props: AutocompleteProps): ReactNode {
                     role: "combobox",
                     // Expanded once the list shows, which then names it.
                     "aria-expanded": listShown,
+                    // React Native Web writes these; React Native's types leave them out.
+                    ...({ "aria-autocomplete": "list" } as object),
                     ...(listShown ? { "aria-controls": listId } : {}),
+                    ...(active === undefined
+                        ? {}
+                        : { "aria-activedescendant": optionId(active) }),
+                    onKeyPress,
                     ...props.inputProps,
                 }}
                 value={text}
                 onValueChange={(details) => {
                     setText(details.value);
                     setTyped(details.value);
+                    setHighlighted(undefined);
                     show();
                 }}
                 expanded={open}
@@ -192,7 +250,6 @@ export function Autocomplete(props: AutocompleteProps): ReactNode {
                         {() => (
                             <engine.View
                                 {...presence.props}
-                                nativeID={listId}
                                 style={{
                                     // A closing list takes no more presses.
                                     pointerEvents: open ? "auto" : "none",
@@ -201,29 +258,29 @@ export function Autocomplete(props: AutocompleteProps): ReactNode {
                                 }}
                             >
                                 {matches.length > 0 ? (
-                                    <Menu
+                                    <MenuListbox
                                         {...autocompleteMenuSelection({
                                             color: props.color,
                                             density: props.density,
                                         })}
+                                        listbox={{
+                                            id: listId,
+                                            active: {
+                                                value: active,
+                                                idOf: optionId,
+                                            },
+                                        }}
+                                        {...(typeof props.label === "string"
+                                            ? { "aria-label": props.label }
+                                            : {})}
                                         items={matches}
                                         {...(indication === undefined
                                             ? {}
                                             : { indication })}
                                         value={value}
-                                        onSelect={(details) => {
-                                            const item = items.find(
-                                                (entry) =>
-                                                    entry.value ===
-                                                    details.value,
-                                            );
-                                            if (details.value !== value)
-                                                setValue(details.value);
-                                            if (item && item.label !== text)
-                                                setText(item.label);
-                                            setTyped("");
-                                            close();
-                                        }}
+                                        onSelect={(details) =>
+                                            choose(details.value)
+                                        }
                                     />
                                 ) : null}
                             </engine.View>
