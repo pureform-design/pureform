@@ -16,7 +16,6 @@ import {
     isolate,
     literal,
     platform,
-    start,
     unitless,
     alias,
     colorMix,

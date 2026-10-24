@@ -259,7 +259,8 @@ describe("progress", () => {
         const indeterminate = css?.variants?.indeterminate?.true;
         expect(indeterminate?.stopIndicator).toEqual({ display: "none" });
         expect(indeterminate?.track?.insetInlineStart).toBe("0px");
-        const gap = (indeterminate?.track as Record<string, unknown>)["&"] as
+        const track = indeterminate?.track as Record<string, unknown>;
+        const gap = track["&"] as
             | { backgroundImage?: { base?: string; _rtl?: string } }
             | undefined;
         expect(gap?.backgroundImage?.base).toMatch(

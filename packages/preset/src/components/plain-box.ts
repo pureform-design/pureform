@@ -3,7 +3,7 @@
 // body text, the inline padding and the focus ring. Each component keeps its own tokens (tokens
 // are per component), declared from `PLAIN_BOX_TOKENS`, and places its own state layer.
 
-import { px, slot, solid, transparent, when } from "@pureform/core/ast";
+import { px, solid, transparent, when } from "@pureform/core/ast";
 import type { AliasNode, Condition, StyleMap } from "@pureform/core/ast";
 import { radius, spacing, textStyle } from "@pureform/theme";
 

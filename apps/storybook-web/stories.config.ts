@@ -109,7 +109,6 @@ export default defineStories({
         // They fill their parent, so they draw in a frame of a set size.
         Splitter: { hooks: ["./src/stages/splitter.ts"] },
         Media: { hooks: ["./src/stages/media.ts"] },
-        FileUpload: { hooks: ["./src/stages/file-upload.ts"] },
         Switch: { hooks: ["./src/checks/switch.ts"] },
         Badge: { hooks: ["./src/checks/badge.ts"] },
         Slider: { hooks: ["./src/checks/slider.ts"] },

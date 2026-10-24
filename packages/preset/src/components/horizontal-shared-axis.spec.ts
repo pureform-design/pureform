@@ -22,9 +22,8 @@ describe("horizontal shared axis", () => {
     });
 
     it("clips the root only while the pages move", () => {
-        const root = (
-            recipe()?.base as Record<string, Record<string, unknown>>
-        )["root"]!;
+        const base = recipe()?.base as Record<string, Record<string, unknown>>;
+        const root = base["root"]!;
         expect(root["overflow"]).toBeUndefined();
         expect(root["&[data-transitioning]"]).toEqual({ overflow: "clip" });
     });

@@ -34,7 +34,7 @@ import type {
     NativeSelectValueProps,
     NativeSelectVariantProps,
 } from "@pureform/binding-core";
-import { createElement, useRef, useState } from "react";
+import { createElement, useState } from "react";
 import type { ComponentType, ReactNode } from "react";
 import * as ReactNative from "react-native";
 import { Platform, Pressable, Text } from "react-native";

@@ -94,7 +94,7 @@ export const useRippleMotion = (
 // runs on a device's UI thread. Its edge is hard: a soft one needs SVG.
 const NativeDisc = (props: RippleProps) => {
     const { grow, fade } = useRippleMotion(props, true);
-    const { size, scale, start, end } = props.ripple.geometry;
+    const { scale, start, end } = props.ripple.geometry;
     const along = (from: number, to: number) =>
         grow.interpolate({ inputRange: [0, 1], outputRange: [from, to] });
     return createElement(Animated.View, {
