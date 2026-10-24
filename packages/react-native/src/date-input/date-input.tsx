@@ -74,7 +74,11 @@ interface SegmentOptions {
 function Segment(options: SegmentOptions): ReactNode {
     const [focused, setFocused] = useState(false);
     const tokens = useTokens();
-    const { styles: s, views: v } = useComponentSlots<DateInputPart>(
+    const {
+        styles: s,
+        selected,
+        views: v,
+    } = useComponentSlots<DateInputPart>(
         "dateInput",
         options.selection,
         {
@@ -128,7 +132,12 @@ function Segment(options: SegmentOptions): ReactNode {
                 inputMode="numeric"
                 keyboardType="number-pad"
                 placeholder={options.placeholder}
-                placeholderTextColor={String(tokens["colors.onSurfaceVariant"])}
+                // In the segment's own color, as the web's: the focused empty segment's
+                // placeholder reads on the focus color.
+                placeholderTextColor={String(
+                    selected.styles.segment?.color ??
+                        tokens["colors.onSurfaceVariant"],
+                )}
                 role="spinbutton"
                 aria-label={SEGMENT_LABEL[options.kind]}
                 aria-valuemin={1}

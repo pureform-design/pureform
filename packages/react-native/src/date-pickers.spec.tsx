@@ -369,6 +369,21 @@ describe("DateInput", () => {
         expect(onCancel).toHaveBeenCalled();
     });
 
+    it("draws its placeholders in the segment's color, the focused empty one on the focus color", async () => {
+        await render(<DateInput locale="en-US" />);
+        const [month, day] = segments();
+        const placeholder = (segment: HTMLElement) =>
+            getComputedStyle(segment, "::placeholder").color;
+        expect(placeholder(month!)).toBe(getComputedStyle(month!).color);
+        await interact(() => userEvent.click(month!));
+        expect(placeholder(month!)).toBe(getComputedStyle(month!).color);
+        // Readable on the focus color: not the resting placeholder's.
+        expect(placeholder(month!)).not.toBe(placeholder(day!));
+        expect(getComputedStyle(month!).backgroundColor).not.toBe(
+            "rgba(0, 0, 0, 0)",
+        );
+    });
+
     it("has no date while the text isn't a whole one", async () => {
         const onConfirm = vi.fn();
         await render(<DateInput locale="en-US" onConfirm={onConfirm} />);
