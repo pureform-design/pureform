@@ -6,8 +6,10 @@ import {
 import { describe, expect, expectTypeOf, it, vi } from "vitest";
 
 import {
+    forInstance,
     forSlot,
     isIconPart,
+    isPerInstance,
     isUnstyled,
     outsideRootMessage,
     overDefaults,
@@ -402,5 +404,50 @@ describe("overDefaults", () => {
             slotProps: { headline: { title: "b", id: "x" } },
             tokens: { height: "64px", gap: "4px" },
         });
+    });
+});
+
+describe("per-instance values", () => {
+    it("resolves a function of the copy, and passes a plain value through", () => {
+        const fn = vi.fn((cell: { index: number }) =>
+            cell.index > 0 ? "late" : undefined,
+        );
+        expect(forInstance(fn, { index: 1 })).toBe("late");
+        expect(forInstance(fn, { index: 0 })).toBeUndefined();
+        expect(fn).toHaveBeenCalledTimes(2);
+        const plain = { color: "red" };
+        expect(forInstance(plain, { index: 1 })).toBe(plain);
+    });
+
+    it("tells whether any keyed value of a part is a function", () => {
+        const className = { cell: () => "x", root: "y" };
+        expect(isPerInstance([undefined, className], "cell")).toBe(true);
+        expect(isPerInstance([undefined, className], "root")).toBe(false);
+        expect(isPerInstance([undefined, true], "cell")).toBe(false);
+    });
+
+    it("merges a container's per-copy defaults with a child's own, per copy", () => {
+        const merged = overDefaults<{
+            className?: object;
+            style?: object;
+        }>(
+            {
+                className: { row: (row: { index: number }) => `r${row.index}` },
+                style: { row: { color: "red" } },
+            },
+            {
+                className: { row: "own" },
+                style: {
+                    row: (row: { index: number }) => ({ order: row.index }),
+                },
+            },
+        );
+        const className = (merged.className as Record<string, unknown>)
+            .row as (row: { index: number }) => unknown;
+        const style = (merged.style as Record<string, unknown>).row as (row: {
+            index: number;
+        }) => unknown;
+        expect(className({ index: 2 })).toBe("r2 own");
+        expect(style({ index: 3 })).toEqual({ color: "red", order: 3 });
     });
 });
