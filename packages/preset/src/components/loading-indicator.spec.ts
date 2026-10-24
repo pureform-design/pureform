@@ -1,4 +1,12 @@
-import { flex, hidden, none, pct, px, transparent } from "@pureform/core/ast";
+import {
+    alias,
+    flex,
+    hidden,
+    none,
+    pct,
+    px,
+    transparent,
+} from "@pureform/core/ast";
 import { compilePreset } from "@pureform/panda-adapter";
 import { radius } from "@pureform/theme";
 import { describe, expect, it } from "vitest";
@@ -114,6 +122,24 @@ describe("wave paths", () => {
         expect(ys("left")).toEqual(ys());
         expect(ys("right")).toEqual(ys());
         expect(xs("left")).not.toEqual(xs("right"));
+    });
+
+    it("mirrors the ring left to right for right to left, its waves running the other way", () => {
+        const options = { waves: 9, thickness: px(4), amplitude: px(1.5) };
+        const points = (mirrored: boolean) =>
+            wavyRing({ ...options, mirrored }).contours[0]!.segments.map(
+                (s) => (s as { readonly to: readonly unknown[] }).to,
+            );
+        const [ltr, rtl] = [points(false), points(true)];
+        // Each point's height is the same; across, it sits as far the other side of the middle.
+        expect(rtl.map((p) => JSON.stringify(p[1]))).toEqual(
+            ltr.map((p) => JSON.stringify(p[1])),
+        );
+        const share = (p: readonly unknown[]) =>
+            JSON.stringify(p[0]).match(/"value":(-?[\d.]+),"unit":"%"/)![1];
+        expect(
+            rtl.map((p) => 100 - Number(share(p))).map((n) => +n.toFixed(3)),
+        ).toEqual(ltr.map((p) => +Number(share(p)).toFixed(3)));
     });
 
     it("draws the waves from the progress tokens, with no compound per thickness", () => {
@@ -308,9 +334,28 @@ describe("wavy progress", () => {
             type: "shape",
             fillRule: "evenodd",
         });
-        // The end half is the right one (left under right to left), the start half the other.
-        expect(clip("endHalf").base).toEqual(clip("startHalf").cases[0]!.value);
-        expect(clip("startHalf").base).toEqual(clip("endHalf").cases[0]!.value);
+        // The end half is the right one (left under right to left, where the ring is mirrored),
+        // the start half the other.
+        expect(clip("endHalf").base).toEqual(
+            wavyRing({
+                waves: 9,
+                thickness: alias("components", "circularProgress", "thickness"),
+                amplitude: alias("components", "circularProgress", "amplitude"),
+                half: "right",
+            }),
+        );
+        expect(clip("endHalf").cases[0]!.value).toEqual(
+            wavyRing({
+                waves: 9,
+                thickness: alias("components", "circularProgress", "thickness"),
+                amplitude: alias("components", "circularProgress", "amplitude"),
+                half: "left",
+                mirrored: true,
+            }),
+        );
+        expect(clip("startHalf").cases[0]!.value).not.toEqual(
+            clip("endHalf").base,
+        );
         expect(clip("endHalf").base).not.toEqual(clip("startHalf").base);
         // The ring reads the thickness, and the spinner draws with the same arcs.
         expect(circularProgress.recipe.compoundVariants ?? []).toHaveLength(0);

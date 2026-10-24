@@ -249,7 +249,7 @@ describe("progress", () => {
         );
     });
 
-    it("rounds every circular arc's ends with a dot, the track kept a gap and a dot's reach away", () => {
+    it("rounds every circular arc's ends with a dot, the track's angle worked out from the size, thickness and gap", () => {
         const recipe = compilePreset(configWith(circularProgress)).theme
             ?.slotRecipes?.circularProgress;
         const base = recipe?.base;
@@ -270,21 +270,90 @@ describe("progress", () => {
         expect(JSON.stringify(base?.headCap?.transform)).toContain(
             "var(--components-circularProgress-value",
         );
-        expect(JSON.stringify(base?.track?.transform)).toContain(
-            "var(--components-circularProgress-cap",
-        );
-        // The default ring and the thick one: half the thickness along the middle line.
-        expect(circularProgress.tokens?.cap).toMatchObject({
-            default: { value: 1.45 },
+        // No token to set by hand: the ends' angle follows size, thickness and gap.
+        expect(circularProgress.tokens).not.toHaveProperty("cap");
+        expect(circularProgress.tokens?.gap).toMatchObject({
+            default: { value: 4, unit: "px" },
         });
-        expect(
-            JSON.stringify(recipe?.variants?.thickness?.thick?.root),
-        ).toContain("3.18");
-        // A wavy indicator's ends follow its wave.
-        expect(recipe?.variants?.shape?.wavy?.headCap).toEqual({
-            display: "none",
-        });
+        // A wavy indicator's ends ride its wave.
+        const wavy = recipe?.variants?.shape?.wavy;
+        expect(JSON.stringify(wavy?.headCap?.transform)).toContain("sin(");
+        expect(wavy?.headCap?.display).toBeUndefined();
     });
+
+    // The CSS a part's transform compiles to, worked out for some tokens: lengths in px, angles
+    // in degrees.
+    const evaluateCss = (css: string, tokens: Record<string, number>) => {
+        const deg = Math.PI / 180;
+        const js = css
+            .replace(
+                /var\(--components-circularProgress-(\w+)(?:, [^()]*)?\)/g,
+                (_, name: string) => {
+                    if (!(name in tokens)) throw new Error(`no ${name}`);
+                    return String(tokens[name]);
+                },
+            )
+            .replace(/(-?\d*\.?\d+)(px|deg)/g, "$1")
+            .replace(/\bcalc\(/g, "(")
+            .replace(/\b(min|max|clamp|sin|tan|asin|atan2)\(/g, "f.$1(");
+        const f = {
+            min: Math.min,
+            max: Math.max,
+            clamp: (lo: number, v: number, hi: number) =>
+                Math.min(Math.max(v, lo), hi),
+            sin: (a: number) => Math.sin(a * deg),
+            tan: (a: number) => Math.tan(a * deg),
+            asin: (n: number) => Math.asin(n) / deg,
+            atan2: (y: number, x: number) => Math.atan2(y, x) / deg,
+        };
+        return new Function("f", `return ${js};`)(f) as number;
+    };
+    const rotation = (transform: unknown) =>
+        /^rotate\((.*)\)$/.exec((transform as { base: string }).base)![1]!;
+
+    it.each([
+        [48, 4, 0],
+        [48, 8, 0],
+        [24, 4, 0],
+        [96, 4, 0],
+        [96, 12, 0],
+        [48, 4, 1.5],
+        [64, 8, 1.5],
+    ])(
+        "keeps the gap between the circular ends at %ipx, %ipx thick (amplitude %d)",
+        (size, thickness, amplitude) => {
+            const recipe = compilePreset(configWith(circularProgress)).theme!
+                .slotRecipes!.circularProgress!;
+            const parts = amplitude
+                ? { ...recipe.base, ...recipe.variants!.shape!.wavy }
+                : recipe.base;
+            const tokens = { size, thickness, amplitude, gap: 4, value: 40 };
+            // A dot's angle: its rotate, before it moves out to the ring.
+            const at = (part: "trackHeadCap" | "headCap") => {
+                const css = (parts![part]!.transform as { base: string }).base;
+                return evaluateCss(
+                    css.slice("rotate(".length, css.indexOf(") translateY(")),
+                    tokens,
+                );
+            };
+            // The track's tail sits where it is turned to; the indicator's head at the value.
+            const headAt = 40 * 3.6;
+            const trackTail = evaluateCss(
+                rotation(parts?.track?.transform),
+                tokens,
+            );
+            // The middle line the track's ends are on.
+            const radius = (size - thickness) / 2 - amplitude;
+            const chord = (a: number) =>
+                2 * radius * Math.sin(((a / 2) * Math.PI) / 180);
+            // Centres `gap + thickness` apart, so the dots' edges are `gap` apart.
+            expect(chord(trackTail - headAt) - thickness).toBeCloseTo(4, 6);
+            // And the same before the indicator's tail, at the track's other end.
+            const trackHead = trackTail + at("trackHeadCap");
+            expect(chord(360 - trackHead) - thickness).toBeCloseTo(4, 6);
+            expect(at("headCap")).toBeCloseTo(headAt, 6);
+        },
+    );
 
     it("starts the linear track after the indicator and a gap, and while indeterminate draws it in two parts around the indicator, without the stop dot", () => {
         const css = compilePreset(configWith(linearProgress)).theme?.slotRecipes

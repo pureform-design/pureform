@@ -1285,8 +1285,8 @@ Expressive has no equivalent.
   `indeterminate` when the amount is unknown: the dot goes and the track spans the bar, less a
   `gap` on each side of the sliding indicator (on the web; React Native draws the whole track).
 - `circularProgress`: a `track` (the same two-half ring in `trackColor`, turned past the
-  indicator and drawing the rest of the circle less a `gap` at each end, a percent of the
-  circle, 3 by default) under a ring drawn by two halves, each turning through its share of the
+  indicator and drawing the rest of the circle less a `gap` at each end, a length, 4px by
+  default) under a ring drawn by two halves, each turning through its share of the
   value. The arcs draw from their own tokens, not the radius roles, so they stay round under
   a theme whose radii are all 0 (nothing to allow-list: the circle is `50%`, not a fixed px). Turn on `indeterminate` for a spinner: the arc grows and shrinks as it turns, and the
   track turns with it, keeping its gaps.
@@ -1344,11 +1344,15 @@ clip, so with an SVG engine it turns in its first shape without morphing.
 </div>
 ```
 
-Every arc ends rounded, as Compose's stroke caps: a dot as wide as the ring on each end
-(`trackTailCap`, `trackHeadCap`, `tailCap`, `headCap`), reaching past it by the `cap` token (a
-share of the circle, set for the default size and each thickness; set it with `size` or
-`thickness`), and the track keeps that much further away so the gap stays `gap`. A wavy
-indicator's ends follow its wave and have no dots.
+Every arc ends rounded, as Compose's stroke caps: a dot as wide as the ring centred on each end
+(`trackTailCap`, `trackHeadCap`, `tailCap`, `headCap`). The track keeps its ends' centres
+`gap + thickness` from the indicator's along the ring, an angle the recipe works out from
+`size`, `thickness` and `gap` (`2 × asin((gap + thickness) / (size − thickness))`, with CSS
+`asin()`, `tan()` and `atan2()`, as React Native does), so the space between the ends stays `gap`
+at any size and thickness an app or instance sets, with nothing else to set. (The `cap` token is
+gone: it was a share of the circle set by hand for each size and thickness.) A wavy indicator's
+ends ride its wave: each dot sits on the wave's middle line at its angle, and the wavy track,
+smaller by `amplitude` all round, keeps the same gap.
 
 ## Surfaces
 

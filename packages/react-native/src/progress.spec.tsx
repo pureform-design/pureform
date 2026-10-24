@@ -6,6 +6,8 @@ import { CircularProgress } from "./circular-progress";
 import { animated } from "./engine";
 import type { MotionEngine } from "./engine";
 import { reanimated } from "./engines/reanimated";
+import { reanimatedSvg } from "./engines/reanimated-svg";
+import { animatedSvg } from "./engines/svg";
 import { LinearProgress } from "./linear-progress";
 import { presetRegistry } from "./testing/registry";
 import type { TestRegistry } from "./testing/registry";
@@ -64,40 +66,100 @@ describe("the progress indicators' track", () => {
     });
 });
 
-describe.each([animated, reanimated])(
+describe.each([animated, reanimated, animatedSvg, reanimatedSvg])(
     "the circular arcs' ends, with $name",
     (engine) => {
-        it("are rounded, the track kept the gap away from the indicator's", async () => {
-            await render(<CircularProgress testId="c" value={40} />, engine);
-            await settle(600);
+        // A part's centre from the circle's.
+        const centre = (id: string, part: string) => {
             const root = document
-                .querySelector('[data-testid="c-root"]')!
+                .querySelector(`[data-testid="${id}-root"]`)!
                 .getBoundingClientRect();
-            const center = (part: string) => {
-                const el = document.querySelector(`[data-testid="c-${part}"]`)!;
-                const r = el.getBoundingClientRect();
-                expect((el as HTMLElement).offsetWidth).toBe(4);
-                expect(getComputedStyle(el).borderTopLeftRadius).not.toBe(
-                    "0px",
+            const el = document.querySelector(`[data-testid="${id}-${part}"]`)!;
+            const r = el.getBoundingClientRect();
+            const x = r.left + r.width / 2 - (root.left + root.width / 2);
+            const y = r.top + r.height / 2 - (root.top + root.height / 2);
+            return { x, y, el: el as HTMLElement };
+        };
+        const distance = (
+            a: { x: number; y: number },
+            b: { x: number; y: number },
+        ) => Math.hypot(a.x - b.x, a.y - b.y);
+
+        it.each([
+            [48, 4],
+            [48, 8],
+            [24, 4],
+            [96, 12],
+        ])(
+            "are rounded and keep the gap at %ipx, %ipx thick, with no other token set",
+            async (size, thickness) => {
+                await render(
+                    <CircularProgress
+                        testId="c"
+                        value={40}
+                        tokens={{ size, thickness }}
+                    />,
+                    engine,
                 );
-                return [
-                    r.left + r.width / 2 - (root.left + root.width / 2),
-                    r.top + r.height / 2 - (root.top + root.height / 2),
-                ] as const;
-            };
-            // Clockwise from the top, on the ring's middle line, 22px out.
-            const at = (percent: number) => {
-                const a = (percent * 3.6 * Math.PI) / 180;
-                return [22 * Math.sin(a), -22 * Math.cos(a)];
-            };
-            const near = (p: readonly number[], q: readonly number[]) => {
-                expect(p[0]).toBeCloseTo(q[0]!, 0);
-                expect(p[1]).toBeCloseTo(q[1]!, 0);
-            };
-            near(center("tail-cap"), at(0));
-            near(center("head-cap"), at(40));
-            near(center("track-tail-cap"), at(40 + 3 + 2.9));
-            near(center("track-head-cap"), at(100 - 3 - 2.9));
+                await settle(600);
+                const radius = (size - thickness) / 2;
+                const at = (percent: number) => {
+                    const a = (percent * 3.6 * Math.PI) / 180;
+                    return {
+                        x: radius * Math.sin(a),
+                        y: -radius * Math.cos(a),
+                    };
+                };
+                const parts = Object.fromEntries(
+                    [
+                        "tail-cap",
+                        "head-cap",
+                        "track-tail-cap",
+                        "track-head-cap",
+                    ].map((part) => [part, centre("c", part)]),
+                );
+                for (const { el, x, y } of Object.values(parts)) {
+                    expect(el.offsetWidth).toBe(thickness);
+                    expect(getComputedStyle(el).borderTopLeftRadius).not.toBe(
+                        "0px",
+                    );
+                    expect(Math.hypot(x, y)).toBeCloseTo(radius, 0);
+                }
+                expect(distance(parts["tail-cap"]!, at(0))).toBeLessThan(0.6);
+                expect(distance(parts["head-cap"]!, at(40))).toBeLessThan(0.6);
+                // The space between neighbouring dots' edges is the gap, 4px.
+                const gap = (a: string, b: string) =>
+                    distance(parts[a]!, parts[b]!) - thickness;
+                expect(gap("head-cap", "track-tail-cap")).toBeCloseTo(4, 0);
+                expect(gap("track-head-cap", "tail-cap")).toBeCloseTo(4, 0);
+            },
+        );
+
+        it("rides the wavy indicator's ends on its wave, the track keeping the gap", async () => {
+            await render(
+                <CircularProgress testId="w" value={40} shape="wavy" />,
+                engine,
+            );
+            await settle(600);
+            // Nine waves around, 1.5px each way: at 40% the wave is sin(9 × 144°) out.
+            const wave = 1.5 * Math.sin((9 * 144 * Math.PI) / 180);
+            const head = centre("w", "head-cap");
+            const tail = centre("w", "tail-cap");
+            expect(Math.hypot(head.x, head.y)).toBeCloseTo(20.5 + wave, 0);
+            expect(Math.hypot(tail.x, tail.y)).toBeCloseTo(20.5, 0);
+            // The track's ends on its middle line, smaller by the amplitude.
+            const trackTail = centre("w", "track-tail-cap");
+            const trackHead = centre("w", "track-head-cap");
+            expect(Math.hypot(trackTail.x, trackTail.y)).toBeCloseTo(20.5, 0);
+            expect(Math.hypot(trackHead.x, trackHead.y)).toBeCloseTo(20.5, 0);
+            // The gap as on the flat circle: 4px between the track's ends and the indicator's
+            // on the middle line.
+            expect(distance(trackHead, tail) - 4).toBeCloseTo(4, 0);
+            const angle = (p: { x: number; y: number }) =>
+                Math.atan2(p.x, -p.y);
+            const chord =
+                2 * 20.5 * Math.sin((angle(trackTail) - angle(head)) / 2);
+            expect(chord - 4).toBeCloseTo(4, 0);
         });
     },
 );

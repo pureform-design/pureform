@@ -105,6 +105,7 @@ export const wavyRing = ({
     thickness,
     amplitude,
     half,
+    mirrored = false,
 }: {
     waves: number;
     thickness: NumericValue;
@@ -112,6 +113,9 @@ export const wavyRing = ({
     /** Drawn for a box that is the circle's left or right half (as wide as half the circle,
      *  as tall as it), so the wave stays put in the circle's frame. Omitted: the whole circle. */
     half?: "left" | "right" | undefined;
+    /** The ring mirrored left to right (its waves running anticlockwise), as right to left
+     *  mirrors a circle. */
+    mirrored?: boolean;
 }): ShapeNode => {
     // A point at `angle` on a circle of radius 50% less (1 - s) amplitudes, and less the
     // thickness on the inner edge: 50% + cos × (50% − (1 − s) × amplitude [− thickness]). In a
@@ -140,7 +144,12 @@ export const wavyRing = ({
             const angle = (t / waves) * 2 * Math.PI - Math.PI / 2;
             const s = Math.sin(t * 2 * Math.PI);
             return [
-                coordinate(Math.cos(angle), s, inner, true),
+                coordinate(
+                    (mirrored ? -1 : 1) * Math.cos(angle),
+                    s,
+                    inner,
+                    true,
+                ),
                 coordinate(Math.sin(angle), s, inner, false),
             ];
         });
