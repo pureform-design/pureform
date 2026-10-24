@@ -65,6 +65,8 @@ export type {
     PartOptions,
     PartScope,
     RenderOptions,
+    CustomizeProps,
+    InnerPropsOf,
     SlotKeyedProps,
     UnstyledComponentOptions,
 } from "./parts";

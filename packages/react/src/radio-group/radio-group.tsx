@@ -18,11 +18,8 @@ import {
 import type {
     RadioGroupContentProps,
     RadioGroupRootOwnProps,
+    RadioGroupVariantProps,
     RadioOwnProps,
-    RadioPart,
-    RadioVariantProps,
-    SlotKeyed,
-    Unstyled,
 } from "@pureform/binding-core";
 import {
     radioInputs,
@@ -49,8 +46,8 @@ import { useItemInteractionSources } from "../interaction";
 import type { ItemInteractionSources } from "../interaction";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
-import { useComponent, useUnstyledComponent } from "../parts";
-import type { ComponentScope } from "../parts";
+import { useComponent, useSlotProps, useUnstyledComponent } from "../parts";
+import type { ComponentScope, InnerPropsOf, SlotKeyedProps } from "../parts";
 import { combinePartProps, omitProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
@@ -59,7 +56,7 @@ import { useDirection } from "../provider";
 interface RadioGroupContextValue {
     readonly api: radioGroup.Api<PropTypes>;
     /** The group's variants, every radio's defaults. */
-    readonly variants: RadioVariantProps;
+    readonly variants: RadioGroupVariantProps;
     /** Puts the radios back to the controlled value after a click; see `ItemInput`. Stable. */
     readonly restoreInputs: () => void;
     readonly sources: ItemInteractionSources;
@@ -76,7 +73,7 @@ interface RadioContextValue {
 const groupContext = createPartContext<RadioGroupContextValue>("RadioGroup");
 const itemContext = createPartContext<RadioContextValue>("RadioGroup", "Item");
 
-/** Root's props: the radios' variants and tokens, the machine's props (`value`, `name`,
+/** Root's props: the radios' variants, the machine's props (`value`, `name`,
  *  `disabled`, …), `testId`, `as`, and the element's own props. Name the group with `aria-label`
  *  or `aria-labelledby`. */
 export interface RadioGroupRootProps
@@ -170,7 +167,6 @@ function Root(props: RadioGroupRootProps): ReactNode {
                 variants: {
                     color: props.color,
                     density: props.density,
-                    tokens: props.tokens,
                 },
                 restoreInputs,
                 sources,
@@ -267,23 +263,39 @@ function ItemDot({ unstyled, ...props }: RadioGroupPartProps): ReactNode {
     return scope.render("dot", { element: "span", unstyled, props });
 }
 
-/** The ready-made radio group's props: Root's (`className` and `style` are the group element's),
- *  the radios as `items`, and props for every radio's parts, keyed by part. */
+type GroupKeyed = Omit<SlotKeyedProps<typeof radioGroupAnatomy>, "unstyled">;
+
+/** The ready-made radio group's props: Root's, with `className`, `style` and `slotProps` keyed by
+ *  the group's own part (`root`), the radios as `items`, and `radioProps`, every radio's
+ *  defaults. */
 export interface RadioGroupProps
-    extends Omit<RadioGroupRootProps, "children">, RadioGroupContentProps {
-    /** Every radio's parts' props, by part: `{ input: { className: "…" } }`. */
-    readonly slotProps?: SlotKeyed<RadioPart, RadioGroupPartProps> | undefined;
-    /** Every radio's parts, or some, without the registry's styles. */
-    readonly unstyled?: Unstyled<RadioPart> | undefined;
+    extends
+        Omit<RadioGroupRootProps, keyof GroupKeyed | "children">,
+        GroupKeyed,
+        RadioGroupContentProps {
+    /** Every radio's `className`, `style`, `slotProps`, `unstyled`, `testId` and `tokens`, keyed
+     *  by the radio's parts: `{ className: { input: "…" }, tokens: { … } }`. An item's own
+     *  `testId` wins. */
+    readonly radioProps?: InnerPropsOf<typeof radioAnatomy> | undefined;
 }
+
+const NO_RADIO_PROPS: InnerPropsOf<typeof radioAnatomy> = {};
 
 /** The ready-made radio group: a radio per item, each with every part in the preset's
  *  structure, named by its item's `label`. */
 function ReadyMade(props: RadioGroupProps): ReactNode {
-    const { slotProps, unstyled, items, ...rootProps } = props;
-    const slot = (part: RadioPart) => slotProps?.[part] ?? {};
+    const {
+        className: _className,
+        style: _style,
+        slotProps: _slotProps,
+        radioProps = NO_RADIO_PROPS,
+        items,
+        ...rootProps
+    } = props;
+    const group = useSlotProps(props);
+    const slot = useSlotProps(radioProps);
     return (
-        <Root {...rootProps}>
+        <Root {...rootProps} {...(group("root") as object)}>
             {(items ?? []).map((item) => (
                 <Item
                     key={item.value}
@@ -291,9 +303,10 @@ function ReadyMade(props: RadioGroupProps): ReactNode {
                     value={item.value}
                     disabled={item.disabled}
                     invalid={item.invalid}
-                    testId={item.testId}
+                    testId={item.testId ?? radioProps.testId}
+                    tokens={radioProps.tokens}
                     interactionSource={item.interactionSource}
-                    unstyled={unstyled}
+                    unstyled={radioProps.unstyled}
                 >
                     <ItemTouchTarget {...slot("touchTarget")} />
                     <ItemInput aria-label={item.label} {...slot("input")} />

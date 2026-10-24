@@ -3,17 +3,16 @@
 // highlight across the options (the highlighted one hovers), and a press or Enter or Space selects
 // one. Options are passed as data, so the machine's collection follows them.
 
+import type { listAnatomy, listItemAnatomy } from "@pureform/anatomy";
 import {
+    overDefaults,
     SELECTION_LIST_CONTENT_PROPS,
     selectionListMachineProps,
     selectionListOptions,
 } from "@pureform/binding-core";
 import type {
-    ListItemPart,
-    SelectionListContentProps,
+    SelectionListItem,
     SelectionListRootOwnProps,
-    SlotKeyed,
-    Unstyled,
 } from "@pureform/binding-core";
 import * as selectionList from "@pureform/machines/selection-list";
 import { normalizeProps } from "@zag-js/react";
@@ -22,27 +21,41 @@ import { type ReactNode, useId, useMemo } from "react";
 import { useControllable } from "../controllable";
 import { useItemInteractionSources } from "../interaction";
 import { ListItem } from "../list-item/list-item";
-import type { ListItemPartProps, ListItemProps } from "../list-item/list-item";
+import type { ListItemProps } from "../list-item/list-item";
 import { List } from "../list/list";
 import type { ListRootProps } from "../list/list";
 import { useMachine } from "../machine";
+import { useSlotProps } from "../parts";
+import type { InnerPropsOf, SlotKeyedProps } from "../parts";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 
-/** The selection list's props: the list's variants (`variant`, `density`, `color`, …), the
- *  selection (`selectionMode`, `value`, …), the options as data, props for every option's parts
- *  keyed by part, `testId`, and the list element's own props. Name it with `aria-label` or
- *  `aria-labelledby`. */
+type Keyed = SlotKeyedProps<typeof listAnatomy>;
+
+/** The selection list's props: the list's variants (`variant`, `density`, `color`, …) and own
+ *  tokens, the selection (`selectionMode`, `value`, …), the options as data, `className`,
+ *  `style` and `slotProps` keyed by the list's parts (`root`, `item`), `listItemProps` for every
+ *  option under its own, `testId`, and the list element's own props. Name it with `aria-label`
+ *  or `aria-labelledby`. */
 export interface SelectionListProps
     extends
-        Omit<PartProps, keyof SelectionListRootOwnProps | "children">,
+        Omit<
+            PartProps,
+            keyof SelectionListRootOwnProps | keyof Keyed | "children"
+        >,
         SelectionListRootOwnProps,
-        SelectionListContentProps<ReactNode> {
-    /** Every option's parts' props, by part: `{ headline: { className: "…" } }`. */
-    readonly slotProps?: SlotKeyed<ListItemPart, ListItemPartProps> | undefined;
-    /** Every option's parts, or some, without the registry's styles. */
-    readonly unstyled?: Unstyled<ListItemPart> | undefined;
+        Keyed {
+    /** The options, in order: each a list item's content and variants, its value, and its own
+     *  `className`, `style`, `slotProps`, `unstyled`, `testId` and `tokens`, over
+     *  `listItemProps`. */
+    readonly items?:
+        | readonly (SelectionListItem<ReactNode> &
+              InnerPropsOf<typeof listItemAnatomy>)[]
+        | undefined;
+    /** Every option's `className`, `style`, `slotProps`, `unstyled`, `testId` and `tokens`,
+     *  under the option's own. */
+    readonly listItemProps?: InnerPropsOf<typeof listItemAnatomy> | undefined;
 }
 
 // The selection's props, which the machine takes rather than the list.
@@ -55,8 +68,10 @@ const BEHAVIOR_PROPS = [
     "value",
     "defaultValue",
     "onValueChange",
+    "className",
+    "style",
     "slotProps",
-    "unstyled",
+    "listItemProps",
     ...SELECTION_LIST_CONTENT_PROPS,
 ] as const;
 
@@ -71,7 +86,8 @@ export function SelectionList(props: SelectionListProps): ReactNode {
         "value",
         props,
     );
-    const { items = [], slotProps, unstyled } = props;
+    const { items = [], listItemProps } = props;
+    const slot = useSlotProps(props);
     const collection = useMemo(
         () => selectionList.collection({ items: selectionListOptions(items) }),
         [items],
@@ -90,6 +106,7 @@ export function SelectionList(props: SelectionListProps): ReactNode {
     return (
         <List.Root
             {...(rest as ListRootProps)}
+            {...slot("root")}
             {...(api.getContentProps() as object)}
         >
             {items.map(
@@ -100,13 +117,16 @@ export function SelectionList(props: SelectionListProps): ReactNode {
                     interactionSource,
                     ...item
                 }) => (
-                    <List.Item key={value} role="presentation">
+                    <List.Item
+                        key={value}
+                        {...slot("item")}
+                        role="presentation"
+                    >
                         <ListItem
-                            {...(item as ListItemProps)}
-                            {...({
-                                slotProps,
-                                unstyled,
-                            } as Partial<ListItemProps>)}
+                            {...overDefaults(
+                                listItemProps as ListItemProps | undefined,
+                                item as ListItemProps,
+                            )}
                             {...(api.getItemProps({
                                 item: collection.find(value)!,
                             }) as object)}

@@ -45,7 +45,7 @@ describe("RadioGroup, ready-made", () => {
                 name="size"
                 color="error"
                 items={ITEMS}
-                className="sizes"
+                className={{ root: "sizes" }}
             />,
         );
         await settle();

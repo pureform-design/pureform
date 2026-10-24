@@ -139,7 +139,10 @@ describe("List", () => {
                     { headline: "Inbox", testId: "inbox" },
                     { headline: "Sent", density: undefined, testId: "sent" },
                 ]}
-                slotProps={{ headline: { className: "bold" } }}
+                className={{ item: "row" }}
+                listItemProps={{
+                    slotProps: { headline: { className: "bold" } },
+                }}
             />,
         );
         await settle();
@@ -151,13 +154,49 @@ describe("List", () => {
         );
         expect(wrappers).toHaveLength(2);
         expect(wrappers[0]!.tagName).toBe("LI");
-        expect(wrappers[0]!.className).toBe("list__item");
+        expect(wrappers[0]!.className).toBe("list__item row");
         expect(byTestId("inbox-root").className).toContain(
             "list-item--density-compact",
         );
         expect(byTestId("sent-headline").className).toBe(
             "list-item__headline bold",
         );
+    });
+
+    it("gives every item listItemProps under its own, and its tokens to the list", async () => {
+        withRegistry(
+            <List
+                className={{ root: "inbox" }}
+                tokens={{ paddingBlock: "8px" }}
+                listItemProps={{
+                    className: { headline: "bold" },
+                    tokens: { height: "56px" } as never,
+                }}
+                items={[
+                    { headline: "A", testId: "a" },
+                    {
+                        headline: "B",
+                        testId: "b",
+                        className: { headline: "own" },
+                        tokens: { height: "64px" } as never,
+                    },
+                ]}
+            />,
+        );
+        await settle();
+        const root = byTestId(testIds.list.root);
+        expect(root.className).toBe("list inbox");
+        expect(root.style.getPropertyValue("--padding-block")).toBe("8px");
+        expect(byTestId("a-headline").className).toBe(
+            "list-item__headline bold",
+        );
+        expect(byTestId("b-headline").className).toBe(
+            "list-item__headline bold own",
+        );
+        const height = (id: string) =>
+            byTestId(id).style.getPropertyValue("--height");
+        expect(height("a-root")).toBe("56px");
+        expect(height("b-root")).toBe("64px");
     });
 
     it("gives a segmented list's items their positions, an item's own winning", async () => {

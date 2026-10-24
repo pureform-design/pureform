@@ -348,7 +348,9 @@ export const navigationRegistry = () =>
             "header",
             "sectionLabel",
         ]),
-        list: named("list", ["root", "item"]),
+        list: tokened("list", ["root", "item"], {
+            paddingBlock: "--padding-block",
+        }),
         scrim: named("scrim", ["root"]),
         fadeThrough: named("fade-through", ["root", "page"]),
         horizontalSharedAxis: named("horizontal-shared-axis", [
@@ -356,21 +358,39 @@ export const navigationRegistry = () =>
             "page",
             "scrim",
         ]),
-        listItem: named("list-item", [
-            "root",
-            "leading",
-            "content",
-            "overline",
-            "headline",
-            "supportingText",
-            "trailing",
-            "trailingText",
-            "indicator",
-            "region",
-            "frame",
-            "action",
-        ]),
+        listItem: tokened(
+            "list-item",
+            [
+                "root",
+                "leading",
+                "content",
+                "overline",
+                "headline",
+                "supportingText",
+                "trailing",
+                "trailingText",
+                "indicator",
+                "region",
+                "frame",
+                "action",
+            ],
+            { height: "--height" },
+        ),
     });
+
+/** A fake factory like `named`'s that also writes some tokens to Root, by `vars`. */
+const tokened =
+    (
+        component: string,
+        slots: readonly string[],
+        vars: Readonly<Record<string, `--${string}`>>,
+    ): ClassFactory<ComponentShape> =>
+    (s) =>
+        withTokenStyle(
+            named(component, slots)(s) as never,
+            s.tokens as never,
+            vars,
+        ) as never;
 
 /** A fake factory like `named`'s that also writes the `value` token to Root as `--value`. */
 const valued =

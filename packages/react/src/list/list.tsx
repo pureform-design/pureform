@@ -3,25 +3,21 @@
 // `items`, each in its place among the tiles of a segmented list.
 
 import { listAnatomy } from "@pureform/anatomy";
+import type { listItemAnatomy } from "@pureform/anatomy";
 import {
     LIST_ROOT_PROPS,
     listItemPosition,
     listSelection,
+    overDefaults,
 } from "@pureform/binding-core";
-import type {
-    ListContentProps,
-    ListItemPart,
-    ListRootOwnProps,
-    SlotKeyed,
-    Unstyled,
-} from "@pureform/binding-core";
+import type { ListItemData, ListRootOwnProps } from "@pureform/binding-core";
 import { type ElementType, type ReactNode, useMemo } from "react";
 
 import { ListDefaults, ListItem } from "../list-item/list-item";
-import type { ListItemPartProps, ListItemProps } from "../list-item/list-item";
+import type { ListItemProps } from "../list-item/list-item";
 import { createPartContext } from "../part-context";
-import { useComponent } from "../parts";
-import type { ComponentScope } from "../parts";
+import { useComponent, useSlotProps } from "../parts";
+import type { ComponentScope, InnerPropsOf, SlotKeyedProps } from "../parts";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
 
@@ -32,8 +28,8 @@ interface ListContextValue {
 
 const context = createPartContext<ListContextValue>("List");
 
-/** Root's props: every list item's default variants and tokens, `testId`, `as`, and the element's
- *  own props. */
+/** Root's props: every list item's default variants, the list's own tokens, `testId`,
+ *  `unstyled`, `as`, and the element's own props. */
 export interface ListRootProps
     extends Omit<PartProps, keyof ListRootOwnProps>, ListRootOwnProps {
     /** Another element or component to render instead of `<ul>`. */
@@ -48,11 +44,12 @@ function Root(props: ListRootProps): ReactNode {
     const scope = useComponent(listAnatomy, {
         selection: listSelection(props),
         testId: props.testId,
+        unstyled: props.unstyled,
     });
-    const { density, color, tokens, leadingType } = props;
+    const { density, color, leadingType } = props;
     const defaults = useMemo(
-        () => ({ density, color, tokens, leadingType }),
-        [density, color, tokens, leadingType],
+        () => ({ density, color, leadingType }),
+        [density, color, leadingType],
     );
     const { as, ...rest } = omitProps(props, LIST_ROOT_PROPS);
     return (
@@ -70,33 +67,54 @@ function Item(props: ListItemWrapperProps): ReactNode {
     return scope.render("item", { element: "li", props });
 }
 
-/** The ready-made list's props: Root's (`className` and `style` are the `<ul>`'s), the items as
- *  data, and props for every list item's parts, keyed by part. */
+/** The ready-made list's props: Root's, with `className`, `style`, and `slotProps` keyed by the
+ *  list's own parts (`root`, the `<ul>`; `item`, each `<li>`), the items as data, and
+ *  `listItemProps`, every list item's defaults, under each item's own. */
 export interface ListProps
-    extends Omit<ListRootProps, "children">, ListContentProps<ReactNode> {
-    /** Every list item's parts' props, by part: `{ headline: { className: "…" } }`. */
-    readonly slotProps?: SlotKeyed<ListItemPart, ListItemPartProps> | undefined;
-    /** Every list item's parts, or some, without the registry's styles. */
-    readonly unstyled?: Unstyled<ListItemPart> | undefined;
+    extends
+        Omit<
+            ListRootProps,
+            keyof SlotKeyedProps<typeof listAnatomy> | "children"
+        >,
+        SlotKeyedProps<typeof listAnatomy> {
+    /** The items, in order: each a list item's content, variants, and its own `className`,
+     *  `style`, `slotProps`, `unstyled`, `testId` and `tokens`, over `listItemProps`. */
+    readonly items?:
+        | readonly (ListItemData<ReactNode> &
+              InnerPropsOf<typeof listItemAnatomy>)[]
+        | undefined;
+    /** Every list item's `className`, `style`, `slotProps`, `unstyled`, `testId` and `tokens`,
+     *  under the item's own: `{ className: { headline: "bold" }, tokens: { … } }`. */
+    readonly listItemProps?: InnerPropsOf<typeof listItemAnatomy> | undefined;
 }
 
 /** The ready-made list: an item per entry of `items`, each a ListItem in an `<li>`. In a segmented
  *  list, each item takes its position among the tiles unless given one. */
 function ReadyMade(props: ListProps): ReactNode {
-    const { slotProps, unstyled, items = [], ...rootProps } = props;
+    const {
+        className: _className,
+        style: _style,
+        slotProps: _slotProps,
+        listItemProps,
+        items = [],
+        ...rootProps
+    } = props;
+    const slot = useSlotProps(props);
     const segmented = props.variant === "segmented";
     return (
-        <Root {...rootProps}>
+        <Root {...rootProps} {...slot("root")}>
             {items.map(({ value, ...item }, index) => (
-                <Item key={value ?? index}>
+                <Item key={value ?? index} {...slot("item")}>
                     <ListItem
                         position={listItemPosition(
                             index,
                             items.length,
                             segmented,
                         )}
-                        {...(item as ListItemProps)}
-                        {...({ slotProps, unstyled } as Partial<ListItemProps>)}
+                        {...overDefaults(
+                            listItemProps as ListItemProps | undefined,
+                            item as ListItemProps,
+                        )}
                     />
                 </Item>
             ))}
