@@ -119,7 +119,7 @@ Runs once r12 and slot-b are merged and no agent is running, before slot-c.
 
 | Batch       | What                                                                                                                                                                                                                                                                  |
 | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| commit-msgs | Reword the ~90 commits on `main` that `cog check` rejects into conventional commits (scope = package or area), with `git rebase -i --rebase-merges` and `reword` only (no content changes; merge commits become `chore(merge): …`); `cog check` clean; tree identical to before (`git diff <old> <new>` empty); force-push `main` with lease; recreate or rebase other branches |
+| commit-msgs | Reword the ~90 commits on `main` that `cog check` rejects into conventional commits (scope = package or area), with `cog edit` (it opens `$EDITOR` per invalid commit: drive it with a script as `EDITOR` that writes the new message from a prepared old-hash -> message map; no content changes; merge commits become `chore(merge): …`); `cog check` clean; tree identical to before (`git diff <old> <new>` empty); force-push `main` with lease; recreate or rebase other branches |
 
 ## Rules that apply to every phase
 
