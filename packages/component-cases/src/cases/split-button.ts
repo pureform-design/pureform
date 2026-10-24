@@ -11,13 +11,16 @@ import {
 
 import type { ComponentCase } from "../types";
 import { byTestId } from "../types";
-import { overlayParts } from "./overlay";
+import { expandingTrigger, overlayParts } from "./overlay";
 
 const ids = testIds.splitButton;
-const { read, click, overlay } = overlayParts({
-    trigger: ids.trailingButton,
-    content: compositeTestIds.menu.content,
-});
+const { read, click, overlay } = overlayParts(
+    {
+        trigger: ids.trailingButton,
+        content: compositeTestIds.menu.content,
+    },
+    { role: "menu", trigger: expandingTrigger },
+);
 
 const ITEMS = [
     { value: "draft", label: "Save as draft" },

@@ -35,7 +35,10 @@ const day = (host: HTMLElement, value: string) => {
     return found;
 };
 
-const modalParts = overlayParts(modal);
+const modalParts = overlayParts(modal, {
+    role: "dialog",
+    name: "Pick a date",
+});
 
 /** The day the arrow keys start from: the one in the tab order. */
 const focusedDay = (host: HTMLElement) => {

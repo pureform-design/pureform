@@ -11,10 +11,21 @@ import { userEvent } from "../user-event";
 import { overlayParts } from "./overlay";
 
 const ids = compositeTestIds.searchView;
-const { trigger, read, click, shown, overlay, placed } = overlayParts({
-    trigger: ids.trigger,
-    content: ids.surface,
-});
+const { trigger, read, click, shown, overlay, placed } = overlayParts(
+    {
+        trigger: ids.trigger,
+        content: ids.surface,
+    },
+    {
+        role: "dialog",
+        trigger: (host) => byTestId(host, ids.trigger),
+        // The web's bar is a plain element around the search bar, so nothing says the view is open
+        // but the view itself; one closing on the web still shows until its exit ends, which only
+        // Zag's `data-state` tells (React Native's is gone once closed).
+        expands: false,
+        leaving: (surface) => surface.closest('[data-state="closed"]') !== null,
+    },
+);
 
 const ITEMS = [
     { value: "inbox", label: "Inbox", supportingText: "Mail" },

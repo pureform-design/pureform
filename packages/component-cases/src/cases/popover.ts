@@ -9,7 +9,10 @@ import type { ComponentCase } from "../types";
 import { overlayParts } from "./overlay";
 
 const ids = compositeTestIds.popover;
-const { content, trigger, read, click, shown, overlay } = overlayParts(ids);
+const { content, trigger, read, click, shown, overlay } = overlayParts(ids, {
+    role: "dialog",
+    name: "Filters",
+});
 
 export const popover: ComponentCase = {
     component: "Popover",
