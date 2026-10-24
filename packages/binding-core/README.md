@@ -385,12 +385,12 @@ TOOLBAR_ROOT_PROPS; toolbarSelection(props); toolbarRootProps(props); // role, a
 interface ToolbarItem<Node>              // value, label, icon?, disabled?, selected?, onClick?, …
 TOOLBAR_CONTENT_PROPS; TOOLBAR_OVERFLOW_LABEL; toolbarOverflowTestId(testId);
 toolbarMenuItems(items, count); toolbarMenuSelect(items, value); toolbarMenuPositioning(o);
-// Time picker and time input (c5b): the generated timePickerAnatomy and timeInputAnatomy
+// Time picker and time input: the generated timePickerAnatomy and timeInputAnatomy
 interface TimeBehaviorProps                // value/defaultValue/onValueChange (HH:mm), hourCycle, locale, translations, disabled, readOnly, name, form, id
 interface TimePickerRootOwnProps          // + mode, color, tokens, view/defaultView/onViewChange, testId, unstyled
 TIME_PICKER_ROOT_PROPS; TIME_INPUT_ROOT_PROPS; TIME_CONTENT_PROPS; // headline, actions
 timeMachineProps(props); timePickerSelection(props); timeInputSelection(props);
-// Table (c6d): the generated dataTableAnatomy; the registry name is dataTable, the subpath table
+// Table: the generated dataTableAnatomy; the registry name is dataTable, the subpath table
 interface TableRootOwnProps               // stickyHeader, density, tokens, sort/defaultSort/onSortChange, sortStart, sortClearable, selectionMode, selection/defaultSelection/onSelectionChange, rowValues, translations, striped, id, testId, unstyled
 interface TableColumn<Row, Node>          // id, header?, footer?, sortable?, cell?(row), value?(row)
 TABLE_ROOT_PROPS; TABLE_CONTENT_PROPS;    // columns, rows, rowValue
@@ -398,7 +398,7 @@ tableMachineProps(props); tableSelection(props); tableRowPart(index, striped); t
 toolbarKeyTarget(key, index, count, orientation, dir); // arrows along the bar, Home, End
 overflowCount({ sizes, available, gap, trigger }); // how many elements stay in the row
 watchOverflow({ root, elements, trigger, vertical, onCount }); moveToolbarFocus(root, key, o, dir);
-// Paginator (c6c): the generated paginatorAnatomy (root, pageSize, pageSizeLabel, pageSizeSelect, rangeLabel, actions, four triggers)
+// Paginator: the generated paginatorAnatomy (root, pageSize, pageSizeLabel, pageSizeSelect, rangeLabel, actions, four triggers)
 interface PaginatorBehaviorProps          // page/defaultPage/onPageChange, pageSize/defaultPageSize/onPageSizeChange, count, pageSizeOptions, hidePageSize, showFirstLastButtons, disabled, translations, id
 interface PaginatorRootOwnProps           // + tokens, testId, unstyled
 PAGINATOR_ROOT_PROPS; paginatorSelection(props); paginatorMachineProps(props); paginatorTriggerProps(props, disabled);
@@ -510,7 +510,7 @@ tagsInputMachineProps(props); tagsInputFilled(count, text); tagsInputChipTestId(
 // Rating: RatingRootOwnProps, RatingBehaviorProps, RATING_ROOT_PROPS, ratingSelection(props), ratingMachineProps(props), starFill(itemState).
 type InputChipPart; interface InputChipVariantProps; inputChipSelection(props);
 
-// Number field (pureform's own, c9a): Zag's number input; `value` is text in the locale, its
+// Number field (pureform's own): Zag's number input; `value` is text in the locale, its
 // change details `{ value, valueAsNumber }`. Always formats (NUMBER_FIELD_FORMAT), in `locale`, else
 // the browser's or platform's (numberFieldLocale; NUMBER_FIELD_LOCALE "en-US" where there's none)
 type NumberFieldPart; interface NumberFieldRootOwnProps // variant, color, density, leadingIcon,
@@ -521,7 +521,7 @@ numberFieldMachineProps(props); numberFieldLocale(props); numberFieldPlaceholder
 // numberFieldStep, numberFieldClamp, numberFieldCanStep, numberFieldOutOfRange,
 // NUMBER_FIELD_SPIN_DELAY (300), NUMBER_FIELD_SPIN_INTERVAL (50), NUMBER_FIELD_LABELS
 
-// Code field (pureform's own, c9a): Zag's pin input; `value` is a character per cell, its change
+// Code field (pureform's own): Zag's pin input; `value` is a character per cell, its change
 // details `{ value, valueAsString }`
 type CodeFieldPart; interface CodeFieldRootOwnProps // variant, color, density, tokens, length,
 // type, otp, mask, onValueComplete, placeholder, cellLabel, error, …

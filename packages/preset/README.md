@@ -1134,7 +1134,7 @@ tooltip is its own component, `richTooltip` (`root`, `caret`, `subhead`, `suppor
 The `caret` takes the surface's color through its `color`; the binding draws Zag's arrow tip
 inside it in `currentColor`.
 
-`popover` (c9c, pureform's own; M3 has no popover) is an anchored panel for filters and small forms:
+`popover` (pureform's own; M3 has no popover) is an anchored panel for filters and small forms:
 `root` (the rich tooltip's surface and popup motion, stacked at the menu's layer), `title`, `body`,
 `actions`, and an optional `caret`. The rich tooltip holds text and opens on hover or focus; the
 popover holds controls and opens on a press.
@@ -1197,8 +1197,7 @@ transition on its `handSpring` token (the `spatialDefault` spring) that reduced 
 
 ## Data table
 
-`dataTable` is a data table, after Angular Material's table and sort header (M3 specifies none;
-the design calls are in `docs/roadmap-components/context/c6d.md`). It's registered as `dataTable`,
+`dataTable` is a data table, after Angular Material's table and sort header (M3 specifies none). It's registered as `dataTable`,
 since Tailwind's scanner makes a `display: table` utility of a bare `table` in the generated
 modules; the bindings' component is `Table`. Parts: the `root` (a `<table>`), the `header`, `body`
 and `footer` row groups, the `headerRow`, `row`, `alternateRow` (every other body row of a striped
@@ -1399,7 +1398,7 @@ instead.
 
 ## Stepper
 
-`stepper` (c6b): slots `root`, `list`, `item`, `trigger` (a pressable header: the state layer and
+`stepper`: slots `root`, `list`, `item`, `trigger` (a pressable header: the state layer and
 focus ring), `indicator` (the step's number, an icon or a check, in a circle), `label`, `caption`,
 `separator` (the connector) and `content`. `orientation`: `horizontal` (default; the connector
 fills the space between headers) or `vertical` (the connector runs down beside the content, which
@@ -1412,7 +1411,7 @@ indicator its own `aria-checked` (done). Tokens: `container`, `content`, `active
 
 ## Carousel
 
-`carousel` (c4d): slots `root`, `itemGroup` (the scrolling row), `item` (an item's place in it),
+`carousel`: slots `root`, `itemGroup` (the scrolling row), `item` (an item's place in it),
 `mask` (the rounded item people see: extra-large corners, the state layer and focus ring) and
 `content`. `layout`: `multiBrowse` (default), `hero`, `uncontained`, `multiAspect`, `fullScreen`
 (no padding, the parent's height); 0 compounds. Tokens: `container`, `content`, `radius`, `height`,
@@ -1423,7 +1422,7 @@ set from script.
 ## Accordion and tree
 
 Material 3 specifies neither; their parts come from Angular Material's token names and Zag's part
-lists (c6a), drawn with the list's row parts (`rowParts`, `rowTokens`).
+lists, drawn with the list's row parts (`rowParts`, `rowTokens`).
 
 - `accordion`: slots `root` (a column of tiles, `itemGap` apart), `item` (a tile on
   `surfaceContainer`, `radius` from the theme's medium role), `trigger` (the header: an interactive
@@ -1443,7 +1442,7 @@ lists (c6a), drawn with the list's row parts (`rowParts`, `rowTokens`).
 
 ## Grid list
 
-`gridList` (c6e, Angular parity: M3 doesn't specify it): slots `root` (a wrapping row), `tile` (a grid
+`gridList` (Angular parity: M3 doesn't specify it): slots `root` (a wrapping row), `tile` (a grid
 cell: its share of the row, padded by half the gutter), `content` (what you see: rounded, clipped,
 at the aspect ratio), `media`, `header`, `footer` (bands laid over the content's top and bottom
 edges, in the inverse surface colours) and `headline`/`subhead` (their lines). No machine, no CSS
