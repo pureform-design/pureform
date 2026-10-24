@@ -101,19 +101,33 @@ export const wavyRing = ({
     waves,
     thickness,
     amplitude,
+    half,
 }: {
     waves: number;
     thickness: NumericValue;
     amplitude: NumericValue;
+    /** Drawn for a box that is the circle's left or right half (as wide as half the circle,
+     *  as tall as it), so the wave stays put in the circle's frame. Omitted: the whole circle. */
+    half?: "left" | "right" | undefined;
 }): ShapeNode => {
     // A point at `angle` on a circle of radius 50% less (1 - s) amplitudes, and less the
-    // thickness on the inner edge: 50% + cos × (50% − (1 − s) × amplitude [− thickness]).
-    const coordinate = (c: number, s: number, inner: boolean) =>
-        shifted(
-            shifted(pct(round(50 + 50 * c)), amplitude, -c * (1 - s)),
+    // thickness on the inner edge: 50% + cos × (50% − (1 − s) × amplitude [− thickness]). In a
+    // half's box a share of the circle's width is twice as much of the box's, and the right
+    // half starts at the circle's middle.
+    const coordinate = (c: number, s: number, inner: boolean, x: boolean) => {
+        const share = 50 + 50 * c;
+        const position =
+            !x || half === undefined
+                ? share
+                : half === "left"
+                  ? share * 2
+                  : share * 2 - 100;
+        return shifted(
+            shifted(pct(round(position)), amplitude, -c * (1 - s)),
             thickness,
             inner ? -c : 0,
         );
+    };
     // Sampled as straight runs between close points, which a circle's curvature makes simplest.
     const samples = waves * 8;
     const ring = (inner: boolean) => {
@@ -123,8 +137,8 @@ export const wavyRing = ({
             const angle = (t / waves) * 2 * Math.PI - Math.PI / 2;
             const s = Math.sin(t * 2 * Math.PI);
             return [
-                coordinate(Math.cos(angle), s, inner),
-                coordinate(Math.sin(angle), s, inner),
+                coordinate(Math.cos(angle), s, inner, true),
+                coordinate(Math.sin(angle), s, inner, false),
             ];
         });
         return {
