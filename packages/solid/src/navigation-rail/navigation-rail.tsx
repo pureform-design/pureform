@@ -12,8 +12,9 @@ import type { NavigationProps, NavigationRootProps } from "../navigation";
  *  `testId` and `unstyled` for every part, `as`, and the element's own props. */
 export type NavigationRailRootProps = NavigationRootProps<"navigationRail">;
 
-/** The ready-made navigation rail's props: Root's, with `class`, `style`, and `slotProps` keyed
- *  by part, and the destinations as `items`. */
+/** The ready-made navigation rail's props: Root's, with `class`, `style`, `slotProps` and
+ *  `unstyled` keyed by part (a destination's parts also by destination, `NavigationItemInstance`;
+ *  a modal rail's `scrim` and `dialog` too), and the destinations as `items`. */
 export type NavigationRailProps = NavigationProps<"navigationRail">;
 
 const { ReadyMade, parts } = createNavigation({

@@ -4,7 +4,11 @@
 // preset swatches. The value is a CSS color string; changes report hex.
 
 import { colorPickerAnatomy } from "@pureform/anatomy";
-import type { iconButtonAnatomy, textFieldAnatomy } from "@pureform/anatomy";
+import type {
+    iconButtonAnatomy,
+    PartName,
+    textFieldAnatomy,
+} from "@pureform/anatomy";
 import {
     COLOR_PICKER_DEFAULT,
     COLOR_PICKER_ROOT_PROPS,
@@ -19,6 +23,7 @@ import {
 import type {
     ColorPickerChannel,
     ColorPickerContentProps,
+    ColorPickerInstances,
     ColorPickerRootOwnProps,
     ColorPickerValueDetails,
 } from "@pureform/binding-core";
@@ -26,7 +31,7 @@ import * as colorPicker from "@pureform/machines/color-picker";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";
 import type { ElementType, KeyboardEvent, ReactNode } from "react";
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 
 import { useControllable } from "../controllable";
 import { useFormReset } from "../form";
@@ -41,6 +46,7 @@ import type {
     InnerPropsOf,
     PlainPartProps,
     SlotKeyedProps,
+    SlotPropsOf,
 } from "../parts";
 import { combinePartProps, omitProps } from "../props";
 import type { PartProps } from "../props";
@@ -179,6 +185,27 @@ function Root(props: ColorPickerRootProps): ReactNode {
 
 const part = plainParts(context.use, "div");
 
+/** A ready-made picker's slot props for the parts a part draws inside it (the area's thumb, a
+ *  slider's track, a swatch's color), by copy. */
+export type ColorPickerSlots = SlotPropsOf<
+    PartName<Anatomy>,
+    ColorPickerInstances
+>;
+
+/** A part a part draws inside it, from the ready-made's slot props: its `unstyled` apart. */
+const inner = (props: PartProps | undefined) => {
+    const { unstyled, ...rest } = (props ?? {}) as PartProps & {
+        readonly unstyled?: boolean | undefined;
+    };
+    return { unstyled, props: rest };
+};
+
+/** A part's props that draws other parts inside it: its own, and the ready-made's slot props for
+ *  those. */
+export interface ColorPickerOuterPartProps extends PlainPartProps {
+    readonly slots?: ColorPickerSlots | undefined;
+}
+
 /** The picker's label. */
 function Label({ unstyled, ...props }: PlainPartProps): ReactNode {
     const { scope, api } = context.use("Label");
@@ -203,7 +230,11 @@ function Content({ unstyled, ...props }: PlainPartProps): ReactNode {
 
 /** The saturation and brightness area: its gradient and its thumb, which a drag or the arrow
  *  keys move. */
-function Area({ unstyled, ...props }: PlainPartProps): ReactNode {
+function Area({
+    unstyled,
+    slots,
+    ...props
+}: ColorPickerOuterPartProps): ReactNode {
     const { scope, api } = context.use("Area");
     return scope.render("area", {
         element: "div",
@@ -216,10 +247,12 @@ function Area({ unstyled, ...props }: PlainPartProps): ReactNode {
                     {scope.render("areaBackground", {
                         element: "div",
                         machine: api.getAreaBackgroundProps(),
+                        ...inner(slots?.("areaBackground")),
                     })}
                     {scope.render("areaThumb", {
                         element: "div",
                         machine: api.getAreaThumbProps(),
+                        ...inner(slots?.("areaThumb")),
                     })}
                 </>
             ),
@@ -228,7 +261,7 @@ function Area({ unstyled, ...props }: PlainPartProps): ReactNode {
 }
 
 /** A channel slider's props: its channel, and the element's own. */
-export interface ColorPickerChannelSliderProps extends PlainPartProps {
+export interface ColorPickerChannelSliderProps extends ColorPickerOuterPartProps {
     /** `hue`, or `alpha` (drawn over a transparency grid). */
     readonly channel: ColorPickerChannel;
 }
@@ -237,10 +270,18 @@ export interface ColorPickerChannelSliderProps extends PlainPartProps {
 function ChannelSlider({
     channel,
     unstyled,
+    slots,
     ...props
 }: ColorPickerChannelSliderProps): ReactNode {
     const { scope, api } = context.use("ChannelSlider");
     const slider = { channel, format: "hsba" } as const;
+    const each =
+        slots &&
+        (slots.each("transparencyGrid") ||
+            slots.each("channelSliderTrack") ||
+            slots.each("channelSliderThumb"))
+            ? { channel }
+            : undefined;
     return scope.render("channelSlider", {
         element: "div",
         machine: api.getChannelSliderProps(slider),
@@ -255,10 +296,12 @@ function ChannelSlider({
                             machine: api.getTransparencyGridProps({
                                 size: "8px",
                             }),
+                            ...inner(slots?.("transparencyGrid", each)),
                         })}
                     {scope.render("channelSliderTrack", {
                         element: "div",
                         machine: api.getChannelSliderTrackProps(slider),
+                        ...inner(slots?.("channelSliderTrack", each)),
                     })}
                     {scope.render("channelSliderThumb", {
                         element: "div",
@@ -266,6 +309,7 @@ function ChannelSlider({
                             api.getChannelSliderThumbProps(slider),
                             { style: COLOR_PICKER_THUMB_CENTRE },
                         ]),
+                        ...inner(slots?.("channelSliderThumb", each)),
                     })}
                 </>
             ),
@@ -307,6 +351,24 @@ function HexField(props: ColorPickerHexFieldProps): ReactNode {
         setDraft(null);
         if (next !== undefined && next !== hex) settle(next);
     };
+    const commitRef = useRef(commit);
+    commitRef.current = commit;
+    // The field's own handlers on the input, before the user's there.
+    const slotProps = useMemo(
+        () => ({
+            ...props.slotProps,
+            input: combinePartProps([
+                {
+                    onBlur: () => commitRef.current(),
+                    onKeyDown: (event: KeyboardEvent) => {
+                        if (event.key === "Enter") commitRef.current();
+                    },
+                },
+                props.slotProps?.input as Record<string, unknown> | undefined,
+            ]),
+        }),
+        [props.slotProps],
+    );
     return (
         <TextField
             variant="outlined"
@@ -319,14 +381,11 @@ function HexField(props: ColorPickerHexFieldProps): ReactNode {
             readOnly={readOnly}
             invalid={draft !== null && colorPickerHex(draft) === undefined}
             {...props}
+            slotProps={slotProps}
             value={draft ?? colorPickerHexText(hex)}
             // A form reset is the picker's: the field follows its value.
             onValueChange={({ value, reason }) => {
                 if (reason !== "reset") setDraft(value);
-            }}
-            onBlur={commit}
-            onKeyDown={(event: KeyboardEvent) => {
-                if (event.key === "Enter") commit();
             }}
         />
     );
@@ -378,10 +437,12 @@ function SwatchGroup({ unstyled, ...props }: PlainPartProps): ReactNode {
 }
 
 /** A swatch trigger's props: its color, and the element's own. */
-export interface ColorPickerSwatchTriggerProps extends PlainPartProps {
+export interface ColorPickerSwatchTriggerProps extends ColorPickerOuterPartProps {
     /** The color it picks. */
     readonly value: string;
     readonly disabled?: boolean | undefined;
+    /** Its index among the swatches, for a function of the copy in `slots`. */
+    readonly index?: number | undefined;
 }
 
 /** A preset swatch: a button that picks its color, ringed while it's the value. */
@@ -389,6 +450,8 @@ function SwatchTrigger({
     value,
     disabled,
     unstyled,
+    slots,
+    index = 0,
     ...props
 }: ColorPickerSwatchTriggerProps): ReactNode {
     const { scope, api } = context.use("SwatchTrigger");
@@ -406,17 +469,26 @@ function SwatchTrigger({
             children: scope.render("swatch", {
                 element: "div",
                 machine: api.getSwatchProps({ value }),
+                ...inner(
+                    slots?.(
+                        "swatch",
+                        slots.each("swatch")
+                            ? { color: value, index }
+                            : undefined,
+                    ),
+                ),
             }),
         },
     });
 }
 
-/** The ready-made picker's props: Root's, with `className`, `style`, and `slotProps` keyed by
- *  part, and its content. */
+/** The ready-made picker's props: Root's, with `className`, `style`, `slotProps` and `unstyled`
+ *  keyed by part (a preset swatch's parts also by swatch, `ColorPickerSwatchInstance`; a channel
+ *  slider's by channel, `ColorPickerChannelInstance`), and its content. */
 export interface ColorPickerProps
     extends
         Omit<ColorPickerRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
-        SlotKeyedProps<Anatomy>,
+        SlotKeyedProps<Anatomy, never, ColorPickerInstances>,
         ColorPickerContentProps<ReactNode> {
     /** The hex field, drawn as a text field, keyed by its parts. */
     readonly textFieldProps?: InnerPropsOf<typeof textFieldAnatomy> | undefined;
@@ -428,7 +500,9 @@ export interface ColorPickerProps
 
 /** The ready-made picker: the label, the area, the sliders, the field row and the swatches. */
 function ReadyMade(props: ColorPickerProps): ReactNode {
-    const slot = useSlotProps(props);
+    const slot = useSlotProps<Anatomy, never, ColorPickerInstances>(props);
+    const eachSlider = slot.each("channelSlider");
+    const eachSwatch = slot.each("swatchTrigger");
     const {
         className: _className,
         style: _style,
@@ -450,10 +524,24 @@ function ReadyMade(props: ColorPickerProps): ReactNode {
                 <Label {...slot("label")}>{label}</Label>
             )}
             <Content {...slot("content")}>
-                {area && <Area {...slot("area")} />}
-                <ChannelSlider {...slot("channelSlider")} channel="hue" />
+                {area && <Area {...slot("area")} slots={slot} />}
+                <ChannelSlider
+                    {...slot(
+                        "channelSlider",
+                        eachSlider ? { channel: "hue" } : undefined,
+                    )}
+                    channel="hue"
+                    slots={slot}
+                />
                 {alpha && (
-                    <ChannelSlider {...slot("channelSlider")} channel="alpha" />
+                    <ChannelSlider
+                        {...slot(
+                            "channelSlider",
+                            eachSlider ? { channel: "alpha" } : undefined,
+                        )}
+                        channel="alpha"
+                        slots={slot}
+                    />
                 )}
                 <Control {...slot("control")}>
                     <ValueSwatch {...slot("valueSwatch")} />
@@ -470,11 +558,18 @@ function ReadyMade(props: ColorPickerProps): ReactNode {
                 </Control>
                 {swatches && swatches.length > 0 && (
                     <SwatchGroup {...slot("swatchGroup")}>
-                        {swatches.map((swatch) => (
+                        {swatches.map((swatch, index) => (
                             <SwatchTrigger
                                 key={swatch}
-                                {...slot("swatchTrigger")}
+                                {...slot(
+                                    "swatchTrigger",
+                                    eachSwatch
+                                        ? { color: swatch, index }
+                                        : undefined,
+                                )}
                                 value={swatch}
+                                index={index}
+                                slots={slot}
                             />
                         ))}
                     </SwatchGroup>

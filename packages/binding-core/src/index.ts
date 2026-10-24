@@ -199,7 +199,9 @@ export {
 export type {
     CarouselBehaviorProps,
     CarouselContentProps,
+    CarouselInstances,
     CarouselItem,
+    CarouselItemInstance,
     CarouselItemSize,
     CarouselLayout,
     CarouselLayoutOptions,
@@ -554,10 +556,14 @@ export {
     weekStartOf,
 } from "./components/date-picker";
 export type {
+    CalendarCellInstance,
     CalendarCellPart,
     CalendarCellSelection,
     CalendarCellVariantProps,
+    CalendarInstances,
     CalendarView,
+    CalendarWeekdayInstance,
+    CalendarWeekInstance,
     DateInputContentProps,
     DateInputPart,
     DateInputRootOwnProps,
@@ -627,10 +633,14 @@ export {
 } from "./components/table";
 export type {
     TableBehaviorProps,
+    TableCellInstance,
     TableColumn,
+    TableColumnInstance,
     TableContentProps,
+    TableInstances,
     TablePart,
     TableRootOwnProps,
+    TableRowInstance,
     TableSelectionMode,
     TableSort,
     TableSortDirection,
@@ -651,9 +661,12 @@ export type {
     TimeContentProps,
     TimeInputPart,
     TimeInputRootOwnProps,
+    TimePickerDialLabelInstance,
     TimePickerHourCycle,
+    TimePickerInstances,
     TimePickerPart,
     TimePickerRootOwnProps,
+    TimePickerScrollItemInstance,
     TimePickerVariantProps,
     TimePickerView,
     TimeValueChangeDetails,
@@ -701,6 +714,8 @@ export type {
     ToastAction,
     ToasterOptions,
     ToasterOwnProps,
+    ToastInstance,
+    ToastInstances,
     ToastPart,
     ToastPlacement,
     ToastType,
@@ -749,7 +764,9 @@ export {
 export type {
     TreeBehaviorProps,
     TreeContentProps,
+    TreeInstances,
     TreeNode,
+    TreeNodeInstance,
     TreePart,
     TreeRootOwnProps,
     TreeVariantProps,
@@ -765,7 +782,9 @@ export type {
     AccordionBehaviorProps,
     AccordionContentProps,
     AccordionElementIds,
+    AccordionInstances,
     AccordionItem,
+    AccordionItemInstance,
     AccordionPart,
     AccordionRootOwnProps,
     AccordionVariantProps,
@@ -785,9 +804,11 @@ export type {
     StepperContentProps,
     StepperElementIds,
     StepperIndicator,
+    StepperInstances,
     StepperItem,
     StepperPart,
     StepperRootOwnProps,
+    StepperStepInstance,
     StepperVariantProps,
 } from "./components/stepper";
 export {
@@ -806,9 +827,11 @@ export type {
     TabsBehaviorProps,
     TabsContentProps,
     TabsElementIds,
+    TabsInstances,
     TabsItem,
     TabsPart,
     TabsRootOwnProps,
+    TabsTabInstance,
     TabsVariantProps,
 } from "./components/tabs";
 export {
@@ -879,7 +902,9 @@ export type {
     FileUploadBehaviorProps,
     FileUploadContentProps,
     FileUploadEntry,
+    FileUploadInstances,
     FileUploadItem,
+    FileUploadItemInstance,
     FileUploadErrorCode,
     FileUploadPart,
     FileUploadRootOwnProps,
@@ -1365,7 +1390,10 @@ export type {
     SliderElementIds,
     SliderPart,
     SliderInsetIconMeasures,
+    SliderInstances,
+    SliderMarkerInstance,
     SliderRootOwnProps,
+    SliderThumbInstance,
     SliderValue,
     SliderVariantProps,
 } from "./components/slider";
@@ -1429,3 +1457,24 @@ export type {
     TouchTargetPart,
     TouchTargetRootOwnProps,
 } from "./components/touch-target";
+export type {
+    MenuInstances,
+    MenuItemInstance,
+    MenuScopeInstances,
+} from "./components/menu";
+export type { FabMenuInstances } from "./components/fab-menu";
+export type {
+    CodeFieldCellInstance,
+    CodeFieldInstances,
+} from "./components/code-field";
+export type {
+    ColorPickerChannelInstance,
+    ColorPickerInstances,
+    ColorPickerSwatchInstance,
+} from "./components/color-picker";
+export type { NativeSelectInstances } from "./components/native-select";
+export type { ListInstances } from "./components/list";
+export type {
+    NavigationInstances,
+    NavigationItemInstance,
+} from "./components/navigation";

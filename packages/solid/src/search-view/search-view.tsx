@@ -11,6 +11,7 @@ import {
 } from "@pureform/anatomy";
 import type {
     iconButtonAnatomy,
+    PartName,
     searchBarAnatomy,
     TestIdOverride,
 } from "@pureform/anatomy";
@@ -32,6 +33,8 @@ import {
     searchViewSelection,
 } from "@pureform/binding-core";
 import type {
+    InnerProps,
+    MenuScopeInstances,
     SearchViewContentProps,
     SearchViewItem,
     SearchViewPart,
@@ -108,9 +111,19 @@ export interface SearchViewRootProps
     /** Another element or component to render instead of `<div>`. */
     readonly as?: ValidComponent | undefined;
     /** The suggestions' own props, drawn as menu items: `testId`, `unstyled`, and `tokens` (the
-     *  ready-made also takes `class`, `style`, and `slotProps` keyed by the items' parts). */
-    readonly menuProps?: InnerPropsOf<MenuAnatomy> | undefined;
+     *  ready-made also takes `class`, `style`, and `slotProps` keyed by the items' parts, also by
+     *  suggestion, `MenuScopeInstances`). */
+    readonly menuProps?: MenuScopeProps | undefined;
 }
+
+/** The list's own props, keyed by the menu's parts (an option's also by option). */
+type MenuScopeProps = Omit<
+    InnerPropsOf<MenuAnatomy>,
+    keyof SlotKeyedProps<MenuAnatomy>
+> &
+    InnerProps<
+        SlotKeyedProps<MenuAnatomy, never, MenuScopeInstances<SearchViewItem>>
+    >;
 
 /** A part's props: the element's own, and the part's `unstyled`. */
 export interface SearchViewPartProps extends PartProps {
@@ -210,7 +223,8 @@ function Root(props: SearchViewRootProps): JSX.Element {
         testId: () =>
             props.menuProps?.testId ??
             (typeof props.testId === "string" ? props.testId : undefined),
-        unstyled: () => props.menuProps?.unstyled,
+        unstyled: () =>
+            props.menuProps?.unstyled as Unstyled<PartName<MenuAnatomy>>,
         indication: () => props.indication,
     });
     return (
@@ -493,7 +507,11 @@ function ReadyMadeContent(props: {
     const { view, query, matches } = context.use("Root");
     const own = props.own;
     const slots = props.slots;
-    const menuSlots = createSlotProps({
+    const menuSlots = createSlotProps<
+        MenuAnatomy,
+        never,
+        MenuScopeInstances<SearchViewItem>
+    >({
         get class() {
             return own.menuProps?.class;
         },
@@ -503,11 +521,14 @@ function ReadyMadeContent(props: {
         get slotProps() {
             return own.menuProps?.slotProps;
         },
-    } as SlotKeyedProps<MenuAnatomy>);
-    const menuItem = menuSlots("item");
-    const menuItemContent = menuSlots("itemContent");
-    const menuItemLabel = menuSlots("itemLabel");
-    const menuItemSupportingText = menuSlots("itemSupportingText");
+        get unstyled() {
+            return own.menuProps?.unstyled;
+        },
+    } as SlotKeyedProps<
+        MenuAnatomy,
+        never,
+        MenuScopeInstances<SearchViewItem>
+    >);
     return (
         <>
             <Trigger {...slots("trigger")}>
@@ -577,22 +598,46 @@ function ReadyMadeContent(props: {
                                 each={matches()}
                                 keyed={(item: SearchViewItem) => item.value}
                             >
-                                {(item) => (
-                                    <Item item={item()} {...menuItem}>
-                                        <ItemContent {...menuItemContent}>
-                                            <ItemLabel {...menuItemLabel}>
-                                                {item().label}
-                                            </ItemLabel>
-                                            <Show when={item().supportingText}>
-                                                <ItemSupportingText
-                                                    {...menuItemSupportingText}
+                                {(item, index) => {
+                                    const copy = () => ({
+                                        index: index(),
+                                        item: item(),
+                                    });
+                                    return (
+                                        <Item
+                                            item={item()}
+                                            {...menuSlots("item", copy)}
+                                        >
+                                            <ItemContent
+                                                {...menuSlots(
+                                                    "itemContent",
+                                                    copy,
+                                                )}
+                                            >
+                                                <ItemLabel
+                                                    {...menuSlots(
+                                                        "itemLabel",
+                                                        copy,
+                                                    )}
                                                 >
-                                                    {item().supportingText}
-                                                </ItemSupportingText>
-                                            </Show>
-                                        </ItemContent>
-                                    </Item>
-                                )}
+                                                    {item().label}
+                                                </ItemLabel>
+                                                <Show
+                                                    when={item().supportingText}
+                                                >
+                                                    <ItemSupportingText
+                                                        {...menuSlots(
+                                                            "itemSupportingText",
+                                                            copy,
+                                                        )}
+                                                    >
+                                                        {item().supportingText}
+                                                    </ItemSupportingText>
+                                                </Show>
+                                            </ItemContent>
+                                        </Item>
+                                    );
+                                }}
                             </For>
                         )}
                     </Content>

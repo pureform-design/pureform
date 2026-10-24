@@ -247,6 +247,77 @@ describe("NavigationRail", () => {
     });
 });
 
+describe("NavigationBar and NavigationRail, keyed by destination", () => {
+    it("takes a function of each destination in its parts' keys", async () => {
+        withRegistry(
+            <NavigationBar
+                aria-label="Main"
+                items={ITEMS}
+                defaultValue="search"
+                className={{
+                    item: ({ item, selected }) =>
+                        selected ? `current-${item.value}` : undefined,
+                }}
+                style={{ label: ({ index }) => ({ opacity: index / 4 }) }}
+                slotProps={{
+                    icon: ({ index }) => ({ title: `icon ${index}` }),
+                }}
+                unstyled={{ activeIndicator: ({ index }) => index === 0 }}
+            />,
+        );
+        await settle();
+        const destinations = items();
+        expect(destinations[1]!.classList.contains("current-search")).toBe(
+            true,
+        );
+        expect(destinations[0]!.classList.contains("current-home")).toBe(false);
+        expect(items(ids.label)[2]!.style.opacity).toBe("0.5");
+        expect(items(ids.icon)[1]!.title).toBe("icon 1");
+        expect(items(ids.activeIndicator)[0]!.className).toBe("");
+        expect(items(ids.activeIndicator)[1]!.className).not.toBe("");
+    });
+
+    it("reaches a modal rail's scrim and dialog by their keys", async () => {
+        withRegistry(
+            <NavigationRail
+                aria-label="Main"
+                items={ITEMS}
+                modal
+                defaultOpen
+                testId={{ scrim: "rail-scrim", dialog: "rail-dialog" }}
+                className={{ scrim: "dim", dialog: "sheet" }}
+                style={{ scrim: { opacity: 0.5 } }}
+                slotProps={{ dialog: { title: "Main menu" } }}
+            />,
+        );
+        await settle();
+        const scrim = byTestId("rail-scrim");
+        expect(scrim.classList.contains("dim")).toBe(true);
+        expect(scrim.classList.contains("scrim")).toBe(true);
+        expect(scrim.style.opacity).toBe("0.5");
+        const dialog = byTestId("rail-dialog");
+        expect(dialog.getAttribute("role")).toBe("dialog");
+        expect(dialog.classList.contains("sheet")).toBe(true);
+        expect(dialog.title).toBe("Main menu");
+    });
+
+    it("leaves a modal rail's scrim unstyled by its key", async () => {
+        withRegistry(
+            <NavigationRail
+                aria-label="Main"
+                items={ITEMS}
+                modal
+                defaultOpen
+                testId="rail"
+                unstyled={{ scrim: true }}
+            />,
+        );
+        await settle();
+        expect(byTestId("rail-scrim").className).toBe("");
+        expect(byTestId("rail-dialog").getAttribute("role")).toBe("dialog");
+    });
+});
+
 describe("NavigationBar, item layout", () => {
     it("selects the horizontal layout", async () => {
         withRegistry(

@@ -12,7 +12,7 @@ import type {
 import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Controllable } from "../controllable";
-import type { Unstyled } from "../parts";
+import type { ItemInstance, Unstyled } from "../parts";
 import { fieldControlProps } from "./field-primitives";
 import type { FieldState } from "./field-primitives";
 import type { InteractiveProps } from "./indication";
@@ -229,3 +229,12 @@ export const sameNativeSelectValue = (
 export const nativeSelectGroups = (
     items: readonly NativeSelectItem[],
 ): SelectItemGroup<NativeSelectItem>[] => selectItemGroups(items);
+
+/** The ready-made native select's repeated parts, each to its copy (`ItemInstance`): an option
+ *  (its index in the order drawn, groups together, and its data; the placeholder is `-1`, with an
+ *  empty value and the placeholder as label), and a group (its index among the groups, and its
+ *  label as `item`). */
+export interface NativeSelectInstances {
+    readonly option: ItemInstance<NativeSelectItem>;
+    readonly group: ItemInstance<string>;
+}

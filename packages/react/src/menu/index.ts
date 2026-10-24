@@ -9,6 +9,7 @@ export type {
     MenuItemGroupProps,
     MenuItemProps,
     MenuItemEntryProps,
+    MenuItemSlot,
     MenuPartProps,
     MenuProps,
     MenuRootProps,

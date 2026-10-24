@@ -705,6 +705,44 @@ describe("file upload", () => {
             "Add a file",
         );
     });
+
+    it("takes a function of each file in its item and error keys", async () => {
+        const seen: string[] = [];
+        await render(
+            <FileUpload
+                label="Files"
+                files={FILES}
+                style={{
+                    item: (row) => {
+                        seen.push(`${row.index}:${row.type}`);
+                        return row.type === "rejected"
+                            ? { opacity: 0.5 }
+                            : undefined;
+                    },
+                    error: { opacity: 0.25 },
+                }}
+                slotProps={{
+                    error: (row) => ({ "aria-label": row.item.name }),
+                }}
+            />,
+        );
+        const rows = [
+            ...document.querySelectorAll('[data-testid="pf-file-upload-item"]'),
+        ];
+        expect(rows.map((row) => getComputedStyle(row).opacity)).toEqual([
+            "1",
+            "0.5",
+            "1",
+        ]);
+        const error = byTestId("pf-file-upload-error");
+        expect(getComputedStyle(error).opacity).toBe("0.25");
+        expect(error.getAttribute("aria-label")).toBe("big.png");
+        expect(seen.slice(0, 3)).toEqual([
+            "0:accepted",
+            "1:rejected",
+            "2:accepted",
+        ]);
+    });
 });
 
 describe("tags input", () => {
@@ -754,6 +792,22 @@ describe("tags input", () => {
         expect(labels()).toEqual(["green", "blue"]);
         await interact(() => userEvent.type(input(), "{Backspace}"));
         expect(labels()).toEqual(["green"]);
+    });
+
+    it("takes the chips' test ids from chipProps, over the field's", async () => {
+        await render(
+            <>
+                <TagsInput label="Tags" testId="tags" defaultValue={["red"]} />
+                <TagsInput
+                    label="Tags"
+                    testId="other"
+                    defaultValue={["blue"]}
+                    chipProps={{ testId: "tag" }}
+                />
+            </>,
+        );
+        expect(byTestId("tags-chip-label").textContent).toBe("red");
+        expect(byTestId("tag-label").textContent).toBe("blue");
     });
 
     it("floats the label while it holds a chip", async () => {

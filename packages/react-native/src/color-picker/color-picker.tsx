@@ -19,7 +19,10 @@ import {
     overDefaults,
 } from "@pureform/binding-core";
 import type {
+    ColorPickerChannelInstance,
     ColorPickerContentProps,
+    ColorPickerInstances,
+    ColorPickerSwatchInstance,
     ColorPickerValueDetails,
     ColorPickerVariantProps,
 } from "@pureform/binding-core";
@@ -27,7 +30,11 @@ import * as colorPicker from "@pureform/machines/color-picker";
 import { useEffect, useRef, useState } from "react";
 import type { ComponentRef, ReactNode } from "react";
 import { PanResponder, Platform, View } from "react-native";
-import type { GestureResponderEvent, LayoutChangeEvent } from "react-native";
+import type {
+    GestureResponderEvent,
+    LayoutChangeEvent,
+    TextInputProps,
+} from "react-native";
 
 import { IconButton } from "../icon-button";
 import type { IconButtonProps } from "../icon-button/icon-button";
@@ -72,7 +79,7 @@ export interface ColorPickerProps
     extends
         ColorPickerVariantProps,
         ColorPickerContentProps<ReactNode>,
-        NativeSlotProps<ColorPickerHosts> {
+        NativeSlotProps<ColorPickerHosts, ColorPickerInstances> {
     /** The eye dropper button's `style`, `slotProps`, `tokens` and `testId`. */
     readonly iconButtonProps?: InnerPropsOf<IconButtonProps> | undefined;
     /** The hex field's `style`, `slotProps`, `tokens` and `testId`. */
@@ -290,6 +297,13 @@ function Grid(props: { readonly width: number; readonly height: number }) {
 function ChannelSlider(props: PartsProps & { readonly channel: Channel }) {
     const slot = nativeSlots(props.picker);
     const { picker, color, rtl, channel } = props;
+    const each: ColorPickerChannelInstance | undefined =
+        slot.each("channelSlider") ||
+        slot.each("transparencyGrid") ||
+        slot.each("channelSliderTrack") ||
+        slot.each("channelSliderThumb")
+            ? { channel }
+            : undefined;
     const { styles: s, views: v } = useComponentSlots<Part>(
         "colorPicker",
         colorPickerSelection(picker),
@@ -336,43 +350,52 @@ function ChannelSlider(props: PartsProps & { readonly channel: Channel }) {
         Number((s.channelSliderTrack as { height?: unknown }).height) || 16;
     return (
         <v.channelSlider.View
-            {...slot.props("channelSlider")}
+            {...slot.props("channelSlider", each)}
             ref={drag.ref}
             onLayout={(event: LayoutChangeEvent) => {
                 drag.onLayout(event);
                 setWidth(event.nativeEvent.layout.width);
             }}
-            {...slot.with("channelSlider", drag.pan.panHandlers)}
+            {...slot.with("channelSlider", drag.pan.panHandlers, each)}
             style={slot.style(
                 "channelSlider",
                 withUnselectable(s.channelSlider),
+                each,
             )}
             testID={id("channelSlider")}
         >
             {channel === "alpha" ? (
                 <v.transparencyGrid.View
-                    {...slot.props("transparencyGrid")}
+                    {...slot.props("transparencyGrid", each)}
                     pointerEvents="none"
-                    style={slot.style("transparencyGrid", {
-                        ...s.transparencyGrid,
-                        backgroundColor: "#fff",
-                    })}
+                    style={slot.style(
+                        "transparencyGrid",
+                        {
+                            ...s.transparencyGrid,
+                            backgroundColor: "#fff",
+                        },
+                        each,
+                    )}
                     testID={id("transparencyGrid")}
                 >
                     <Grid width={width} height={trackHeight} />
                 </v.transparencyGrid.View>
             ) : null}
             <v.channelSliderTrack.View
-                {...slot.props("channelSliderTrack")}
+                {...slot.props("channelSliderTrack", each)}
                 pointerEvents="none"
-                style={slot.style("channelSliderTrack", {
-                    ...s.channelSliderTrack,
-                    ...gradient(track),
-                })}
+                style={slot.style(
+                    "channelSliderTrack",
+                    {
+                        ...s.channelSliderTrack,
+                        ...gradient(track),
+                    },
+                    each,
+                )}
                 testID={id("channelSliderTrack")}
             />
             <v.channelSliderThumb.View
-                {...slot.props("channelSliderThumb")}
+                {...slot.props("channelSliderThumb", each)}
                 role="adjustable"
                 aria-label={channel}
                 aria-valuenow={Math.round(channel === "hue" ? now : now * 100)}
@@ -390,16 +413,22 @@ function ChannelSlider(props: PartsProps & { readonly channel: Channel }) {
                                 ? 1
                                 : -1) * step,
                         ),
+                    each,
                 )}
                 {...({ onKeyDown } as object)}
-                style={slot.style("channelSliderThumb", {
-                    ...s.channelSliderThumb,
-                    left: (rtl ? 1 - fraction : fraction) * width - thumb / 2,
-                    backgroundColor:
-                        channel === "hue"
-                            ? `hsl(${now}, 100%, 50%)`
-                            : color.toString("css"),
-                })}
+                style={slot.style(
+                    "channelSliderThumb",
+                    {
+                        ...s.channelSliderThumb,
+                        left:
+                            (rtl ? 1 - fraction : fraction) * width - thumb / 2,
+                        backgroundColor:
+                            channel === "hue"
+                                ? `hsl(${now}, 100%, 50%)`
+                                : color.toString("css"),
+                    },
+                    each,
+                )}
                 testID={id("channelSliderThumb")}
             />
         </v.channelSlider.View>
@@ -409,11 +438,16 @@ function ChannelSlider(props: PartsProps & { readonly channel: Channel }) {
 function SwatchTrigger(props: {
     readonly picker: ColorPickerProps;
     readonly value: string;
+    readonly index: number;
     readonly checked: boolean;
     readonly pick: (value: string) => void;
 }): ReactNode {
     const slot = nativeSlots(props.picker);
     const { picker, value, checked } = props;
+    const each: ColorPickerSwatchInstance | undefined =
+        slot.each("swatchTrigger") || slot.each("swatch")
+            ? { color: value, index: props.index }
+            : undefined;
     const { styles: s, views: v } = useComponentSlots<Part>(
         "colorPicker",
         colorPickerSelection(picker),
@@ -423,30 +457,48 @@ function SwatchTrigger(props: {
         testIdOf(colorPickerAnatomy, part, picker.testId);
     return (
         <v.swatchTrigger.Pressable
-            {...slot.props("swatchTrigger")}
+            {...slot.props("swatchTrigger", each)}
             role="button"
             aria-label={colorPickerSwatchLabel(value)}
             aria-pressed={checked}
             disabled={picker.disabled || picker.readOnly}
-            onPress={slot.on("swatchTrigger", "onPress", () =>
-                props.pick(value),
+            onPress={slot.on(
+                "swatchTrigger",
+                "onPress",
+                () => props.pick(value),
+                each,
             )}
-            style={slot.style("swatchTrigger", s.swatchTrigger)}
+            style={slot.style("swatchTrigger", s.swatchTrigger, each)}
             testID={id("swatchTrigger")}
         >
             <v.swatch.View
-                {...slot.props("swatch")}
-                style={slot.style("swatch", {
-                    ...s.swatch,
-                    backgroundColor: value,
-                })}
+                {...slot.props("swatch", each)}
+                style={slot.style(
+                    "swatch",
+                    { ...s.swatch, backgroundColor: value },
+                    each,
+                )}
                 testID={id("swatch")}
             />
         </v.swatchTrigger.Pressable>
     );
 }
 
+/** `own`, then the user's handler of the same name, if any. */
+const after =
+    <A extends unknown[]>(
+        own: () => void,
+        user: ((...args: A) => void) | undefined,
+    ) =>
+    (...args: A) => {
+        own();
+        user?.(...args);
+    };
+
 function ColorPickerImpl(props: ColorPickerProps): ReactNode {
+    const userInput = props.textFieldProps?.slotProps?.input as
+        | TextInputProps
+        | undefined;
     const { styles: s, views: v } = useComponentSlots<Part>(
         "colorPicker",
         colorPickerSelection(props),
@@ -557,8 +609,14 @@ function ColorPickerImpl(props: ColorPickerProps): ReactNode {
                                         autoCapitalize: "characters",
                                         autoCorrect: false,
                                         maxLength: 8,
-                                        onBlur: commit,
-                                        onSubmitEditing: commit,
+                                        onBlur: after(
+                                            commit,
+                                            userInput?.onBlur,
+                                        ),
+                                        onSubmitEditing: after(
+                                            commit,
+                                            userInput?.onSubmitEditing,
+                                        ),
                                     },
                                 },
                             })}
@@ -595,9 +653,10 @@ function ColorPickerImpl(props: ColorPickerProps): ReactNode {
                         style={slot.style("swatchGroup", s.swatchGroup)}
                         testID={id("swatchGroup")}
                     >
-                        {props.swatches.map((swatch) => (
+                        {props.swatches.map((swatch, index) => (
                             <SwatchTrigger
                                 key={swatch}
+                                index={index}
                                 picker={props}
                                 value={swatch}
                                 checked={colorPickerHex(swatch) === current}

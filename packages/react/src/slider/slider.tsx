@@ -5,6 +5,7 @@
 // tokens: Root's from the value, and each thumb's and stop's own on its parts.
 
 import { sliderAnatomy } from "@pureform/anatomy";
+import type { PartName } from "@pureform/anatomy";
 import {
     SLIDER_INPUT_LABEL_PROPS,
     SLIDER_ROOT_PROPS,
@@ -21,7 +22,9 @@ import {
 } from "@pureform/binding-core";
 import type {
     SliderInsetIconMeasures,
+    SliderInstances,
     SliderRootOwnProps,
+    SliderThumbInstance,
     SliderValue,
 } from "@pureform/binding-core";
 import { readSliderInsetIcon } from "@pureform/binding-dom";
@@ -47,7 +50,7 @@ import { useOwnInteractionSource } from "../interaction";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import { useComponent, useSlotProps } from "../parts";
-import type { ComponentScope, SlotKeyedProps } from "../parts";
+import type { ComponentScope, SlotKeyedProps, SlotPropsOf } from "../parts";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
@@ -336,8 +339,9 @@ function Input({
     });
 }
 
-/** The ready-made slider's props: Root's, with `className`, `style`, and `slotProps` keyed by
- *  part; `aria-label` (one per thumb for a range), `aria-labelledby`, `aria-describedby`, and
+/** The ready-made slider's props: Root's, with `className`, `style`, `slotProps` and `unstyled`
+ *  keyed by part (a thumb's parts also by thumb, `SliderThumbInstance`; a marker by marker,
+ *  `SliderMarkerInstance`); `aria-label` (one per thumb for a range), `aria-labelledby`, `aria-describedby`, and
  *  `aria-valuetext` go on the handles. */
 export interface SliderProps<V extends SliderValue = SliderValue>
     extends
@@ -345,10 +349,65 @@ export interface SliderProps<V extends SliderValue = SliderValue>
             SliderRootProps<V>,
             keyof SlotKeyedProps<Anatomy> | "children" | "aria-label"
         >,
-        SlotKeyedProps<Anatomy> {
+        SlotKeyedProps<Anatomy, never, SliderInstances> {
     readonly "aria-label"?: string | readonly string[] | undefined;
     /** An icon inside the active track, at its start; drawn at sizes `medium` and up. */
     readonly insetIcon?: ReactNode;
+}
+
+/** The ready-made slider's markers, one per stop. */
+function Markers(props: {
+    readonly stops: readonly number[];
+    readonly slot: SlotPropsOf<PartName<Anatomy>, SliderInstances>;
+}): ReactNode {
+    const { slot } = props;
+    const each = slot.each("marker");
+    return props.stops.map((stop, index) => (
+        <Marker
+            key={stop}
+            {...slot("marker", each ? { value: stop, index } : undefined)}
+            value={stop}
+        />
+    ));
+}
+
+/** The ready-made slider's thumbs, each a handle, its value indicator and input. */
+function Thumbs(props: {
+    readonly count: number;
+    readonly label: (index: number) => Record<string, unknown>;
+    readonly slot: SlotPropsOf<PartName<Anatomy>, SliderInstances>;
+    readonly valueIndicator: boolean | undefined;
+}): ReactNode {
+    const { api } = context.use("Slider");
+    const { slot } = props;
+    const each =
+        slot.each("handle") ||
+        slot.each("stateLayer") ||
+        slot.each("valueIndicator") ||
+        slot.each("input");
+    return Array.from({ length: props.count }, (_, index) => {
+        const thumb: SliderThumbInstance | undefined = each
+            ? { index, value: api.value[index] ?? 0 }
+            : undefined;
+        return (
+            <Fragment key={index}>
+                <Handle
+                    {...props.label(index)}
+                    {...slot("handle", thumb)}
+                    index={index}
+                >
+                    <StateLayer {...slot("stateLayer", thumb)} index={index} />
+                </Handle>
+                {props.valueIndicator && (
+                    <ValueIndicator
+                        {...slot("valueIndicator", thumb)}
+                        index={index}
+                    />
+                )}
+                <Input {...slot("input", thumb)} index={index} />
+            </Fragment>
+        );
+    });
 }
 
 /** The ready-made slider: every part, in the preset's structure. */
@@ -370,7 +429,7 @@ function ReadyMade<V extends SliderValue = number>(
         if (typeof named === "object") picked["aria-label"] = named[index];
         return picked;
     };
-    const slot = useSlotProps(props as never);
+    const slot = useSlotProps<Anatomy, never, SliderInstances>(props as never);
     const given = props.value ?? props.defaultValue;
     const thumbs = typeof given === "object" ? given.length : 1;
     const stops = sliderStops(props.stops, props);
@@ -384,25 +443,15 @@ function ReadyMade<V extends SliderValue = number>(
             )}
             {stops.length > 0 && (
                 <MarkerGroup {...slot("markerGroup")}>
-                    {stops.map((stop) => (
-                        <Marker key={stop} {...slot("marker")} value={stop} />
-                    ))}
+                    <Markers slot={slot} stops={stops} />
                 </MarkerGroup>
             )}
-            {Array.from({ length: thumbs }, (_, index) => (
-                <Fragment key={index}>
-                    <Handle {...label(index)} {...slot("handle")} index={index}>
-                        <StateLayer {...slot("stateLayer")} index={index} />
-                    </Handle>
-                    {props.valueIndicator && (
-                        <ValueIndicator
-                            {...slot("valueIndicator")}
-                            index={index}
-                        />
-                    )}
-                    <Input {...slot("input")} index={index} />
-                </Fragment>
-            ))}
+            <Thumbs
+                count={thumbs}
+                label={label}
+                slot={slot}
+                valueIndicator={props.valueIndicator}
+            />
         </Root>
     );
 }

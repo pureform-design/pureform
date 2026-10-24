@@ -18,6 +18,32 @@ import type { VariantProp } from "./variants";
  *  "marker" | "stateLayer" | "handle" | "valueIndicator" | "input"`. */
 export type SliderPart = PartName<typeof sliderAnatomy>;
 
+/** What a ready-made slider's thumb is, for a function of the copy in its `handle`, `stateLayer`,
+ *  `valueIndicator` and `input` keys: `style={{ handle: (thumb) => ... }}`. */
+export interface SliderThumbInstance {
+    /** The thumb's 0-based index. */
+    readonly index: number;
+    /** Its value. */
+    readonly value: number;
+}
+
+/** What a ready-made slider's marker is, for a function of the copy in its `marker` key. */
+export interface SliderMarkerInstance {
+    /** The stop it marks. */
+    readonly value: number;
+    /** Its 0-based index among the stops. */
+    readonly index: number;
+}
+
+/** The ready-made slider's repeated parts, each to its copy. */
+export interface SliderInstances {
+    readonly handle: SliderThumbInstance;
+    readonly stateLayer: SliderThumbInstance;
+    readonly valueIndicator: SliderThumbInstance;
+    readonly input: SliderThumbInstance;
+    readonly marker: SliderMarkerInstance;
+}
+
 /** A slider's value: a number, or a range's two (or more) numbers, in order. */
 export type SliderValue = number | readonly number[];
 

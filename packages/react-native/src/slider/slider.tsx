@@ -24,7 +24,10 @@ import type {
     ChangeDetails,
     InteractiveProps,
     SliderInsetIconMeasures,
+    SliderInstances,
+    SliderMarkerInstance,
     SliderPart,
+    SliderThumbInstance,
     SliderValue,
     SliderVariantProps,
 } from "@pureform/binding-core";
@@ -59,7 +62,10 @@ export interface SliderHosts {
 }
 
 export interface SliderProps<V extends SliderValue = SliderValue>
-    extends SliderVariantProps, InteractiveProps, NativeSlotProps<SliderHosts> {
+    extends
+        SliderVariantProps,
+        InteractiveProps,
+        NativeSlotProps<SliderHosts, SliderInstances> {
     /** The value, or a range's two. Controlled when defined. */
     readonly value?: V | undefined;
     readonly defaultValue?: V | undefined;
@@ -142,9 +148,16 @@ function Thumb(props: {
     readonly showValue: boolean;
     readonly layer: ((selected: Slots["selected"]) => ReactNode) | undefined;
     readonly id: (part: SliderPart) => string | undefined;
+    readonly index: number;
     readonly slot: PartSlots;
 }): ReactNode {
     const slot = props.slot;
+    const thumb: SliderThumbInstance | undefined =
+        slot.each("handle") ||
+        slot.each("stateLayer") ||
+        slot.each("valueIndicator")
+            ? { index: props.index, value: props.value }
+            : undefined;
     const selection = props.selection as { tokens?: object };
     const {
         styles: s,
@@ -164,15 +177,15 @@ function Thumb(props: {
     return (
         <>
             <v.handle.View
-                {...slot.props("handle")}
+                {...slot.props("handle", thumb)}
                 pointerEvents="none"
-                style={slot.style("handle", s.handle)}
+                style={slot.style("handle", s.handle, thumb)}
                 testID={props.id("handle")}
             >
                 <v.stateLayer.View
-                    {...slot.props("stateLayer")}
+                    {...slot.props("stateLayer", thumb)}
                     pointerEvents="none"
-                    style={slot.style("stateLayer", s.stateLayer)}
+                    style={slot.style("stateLayer", s.stateLayer, thumb)}
                     testID={props.id("stateLayer")}
                 >
                     {props.layer?.(selected)}
@@ -180,9 +193,13 @@ function Thumb(props: {
             </v.handle.View>
             {props.showValue && (
                 <v.valueIndicator.View
-                    {...slot.props("valueIndicator")}
+                    {...slot.props("valueIndicator", thumb)}
                     pointerEvents="none"
-                    style={slot.style("valueIndicator", s.valueIndicator)}
+                    style={slot.style(
+                        "valueIndicator",
+                        s.valueIndicator,
+                        thumb,
+                    )}
                     testID={props.id("valueIndicator")}
                 >
                     <Text style={textOf(s.valueIndicator)}>{props.value}</Text>
@@ -199,9 +216,14 @@ function Marker(props: {
     readonly percent: number;
     readonly active: boolean;
     readonly testID: string | undefined;
+    readonly value: number;
+    readonly index: number;
     readonly slot: PartSlots;
 }): ReactNode {
     const slot = props.slot;
+    const marker: SliderMarkerInstance | undefined = slot.each("marker")
+        ? { value: props.value, index: props.index }
+        : undefined;
     const selection = props.selection as { tokens?: object };
     const { styles: s, views: v } = useComponentSlots<SliderPart>(
         "slider",
@@ -216,9 +238,9 @@ function Marker(props: {
     );
     return (
         <v.marker.View
-            {...slot.props("marker")}
+            {...slot.props("marker", marker)}
             pointerEvents="none"
-            style={slot.style("marker", s.marker)}
+            style={slot.style("marker", s.marker, marker)}
             testID={props.testID}
         />
     );
@@ -497,9 +519,11 @@ function SliderImpl(props: SliderProps): ReactNode {
                     style={slot.style("markerGroup", s.markerGroup)}
                     testID={id("markerGroup")}
                 >
-                    {stops.map((stop) => (
+                    {stops.map((stop, index) => (
                         <Marker
                             key={stop}
+                            value={stop}
+                            index={index}
                             selection={selection}
                             state={state}
                             percent={percentOf(stop)}
@@ -513,6 +537,7 @@ function SliderImpl(props: SliderProps): ReactNode {
             {values.map((thumb, index) => (
                 <Thumb
                     key={index}
+                    index={index}
                     slot={slot}
                     selection={selection}
                     state={state}

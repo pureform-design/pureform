@@ -26,6 +26,7 @@ import { useEngine } from "../provider";
 import { nativeSlots, overlayKeys } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
+import { triggerButtonProps } from "../trigger-button";
 
 /** The popover's parts this binding renders. */
 type Part = PartName<typeof popoverAnatomy>;
@@ -53,6 +54,7 @@ export interface PopoverActions {
 
 /** What each part renders as, for its keyed `style` and `slotProps`. */
 export interface PopoverHosts {
+    readonly trigger: "Pressable";
     readonly content: "View";
     readonly caret: "View";
     readonly title: "Text";
@@ -191,6 +193,10 @@ function PopoverOverlay(props: PopoverProps): ReactNode {
                 trigger(given, { open })
             ) : (
                 <Button
+                    {...triggerButtonProps(
+                        nativeSlots(props, KEYS),
+                        props.testId,
+                    )}
                     label={trigger}
                     onPress={given.onPress}
                     interactionSource={source}

@@ -24,9 +24,12 @@ import {
     toZagValue,
 } from "@pureform/binding-core";
 import type {
+    InnerProps,
+    MenuScopeInstances,
     SelectContentProps,
     SelectItem,
     SelectRootOwnProps,
+    Unstyled,
 } from "@pureform/binding-core";
 import * as select from "@pureform/machines/select";
 import type { JSX, ValidComponent } from "@solidjs/web";
@@ -95,9 +98,19 @@ export interface SelectRootProps
     /** Another element or component to render instead of `<div>`. */
     readonly as?: ValidComponent | undefined;
     /** The list's own props, drawn as a menu: `testId`, `unstyled`, and `tokens` (the ready-made
-     *  also takes `class`, `style`, and `slotProps` keyed by the menu's parts). */
-    readonly menuProps?: InnerPropsOf<MenuAnatomy> | undefined;
+     *  also takes `class`, `style`, and `slotProps` keyed by the menu's parts, an option's also by
+     *  option, `MenuScopeInstances`). */
+    readonly menuProps?: MenuScopeProps | undefined;
 }
+
+/** The list's own props, keyed by the menu's parts (an option's also by option). */
+type MenuScopeProps = Omit<
+    InnerPropsOf<MenuAnatomy>,
+    keyof SlotKeyedProps<MenuAnatomy>
+> &
+    InnerProps<
+        SlotKeyedProps<MenuAnatomy, never, MenuScopeInstances<SelectItem>>
+    >;
 
 /** A part's props: the element's own, and the part's `unstyled`. */
 export interface SelectPartProps extends PartProps {
@@ -180,7 +193,8 @@ function Root(props: SelectRootProps): JSX.Element {
         testId: () =>
             props.menuProps?.testId ??
             (typeof props.testId === "string" ? props.testId : undefined),
-        unstyled: () => props.menuProps?.unstyled,
+        unstyled: () =>
+            props.menuProps?.unstyled as Unstyled<PartName<MenuAnatomy>>,
         indication: () => props.indication,
     });
     return (
@@ -386,7 +400,11 @@ function ReadyMadeContent(props: {
     const supportingText = props.slots("supportingText");
     const hiddenSelect = props.slots("hiddenSelect") as object;
     const groups = createMemo(() => selectItemGroups(items()));
-    const menuSlots = createSlotProps({
+    const menuSlots = createSlotProps<
+        MenuAnatomy,
+        never,
+        MenuScopeInstances<SelectItem>
+    >({
         get class() {
             return own.menuProps?.class;
         },
@@ -396,19 +414,37 @@ function ReadyMadeContent(props: {
         get slotProps() {
             return own.menuProps?.slotProps;
         },
-    } as SlotKeyedProps<MenuAnatomy>);
-    const menuItem = menuSlots("item");
-    const menuItemLabel = menuSlots("itemLabel");
+        get unstyled() {
+            return own.menuProps?.unstyled;
+        },
+    } as SlotKeyedProps<MenuAnatomy, never, MenuScopeInstances<SelectItem>>);
     const menuItemGroup = menuSlots("itemGroup");
     const menuItemGroupLabel = menuSlots("itemGroupLabel");
     const groupId = createUniqueId();
+    // Each option's index in the order drawn, for a function of the copy.
+    const order = createMemo(
+        () =>
+            new Map(
+                groups()
+                    .flatMap((group) => group.items)
+                    .map((item, index) => [item, index]),
+            ),
+    );
     const renderItems = (list: () => readonly SelectItem[]) => (
         <For each={list()} keyed={(item: SelectItem) => item.value}>
-            {(item) => (
-                <Item item={item()} {...menuItem}>
-                    <ItemLabel {...menuItemLabel}>{item().label}</ItemLabel>
-                </Item>
-            )}
+            {(item) => {
+                const copy = () => ({
+                    index: order().get(item()) ?? 0,
+                    item: item(),
+                });
+                return (
+                    <Item item={item()} {...menuSlots("item", copy)}>
+                        <ItemLabel {...menuSlots("itemLabel", copy)}>
+                            {item().label}
+                        </ItemLabel>
+                    </Item>
+                );
+            }}
         </For>
     );
     const showsSupporting = createMemo(

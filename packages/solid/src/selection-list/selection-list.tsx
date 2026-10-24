@@ -11,6 +11,7 @@ import {
     selectionListOptions,
 } from "@pureform/binding-core";
 import type {
+    ListInstances,
     SelectionListItem,
     SelectionListRootOwnProps,
 } from "@pureform/binding-core";
@@ -30,15 +31,23 @@ import type { InnerPropsOf, SlotKeyedProps } from "../parts";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 
-type Keyed = Pick<
-    SlotKeyedProps<typeof listAnatomy>,
-    "class" | "style" | "slotProps"
->;
 type ListItemDefaults = InnerPropsOf<typeof listItemAnatomy>;
 
+/** One option of the selection list: a list item's content and variants, its value, and its own
+ *  customizing props. */
+export type SelectionListEntry = SelectionListItem<JSX.Element> &
+    ListItemDefaults;
+
+type Keyed = SlotKeyedProps<
+    typeof listAnatomy,
+    never,
+    ListInstances<SelectionListEntry>
+>;
+
 /** The selection list's props: the list's variants (`variant`, `density`, `color`, …) and own
- *  tokens, the selection (`selectionMode`, `value`, …), the options as data, `class`, `style`
- *  and `slotProps` keyed by the list's parts (`root`, `item`), `listItemProps` for every option
+ *  tokens, the selection (`selectionMode`, `value`, …), the options as data, `class`, `style`,
+ *  `slotProps` and `unstyled` keyed by the list's parts (`root`, `item`; an item's also by option,
+ *  `ListInstances`), `listItemProps` for every option
  *  under its own, `testId`, and the list element's own props. Name it with `aria-label` or
  *  `aria-labelledby`. */
 export interface SelectionListProps
@@ -47,13 +56,11 @@ export interface SelectionListProps
             PartProps,
             keyof SelectionListRootOwnProps | keyof Keyed | "children"
         >,
-        SelectionListRootOwnProps,
+        Omit<SelectionListRootOwnProps, keyof Keyed>,
         Keyed {
     /** The options, in order: each a list item's content and variants, its value, and its own
      *  `class`, `style`, `slotProps`, `unstyled`, `testId` and `tokens`, over `listItemProps`. */
-    readonly items?:
-        | readonly (SelectionListItem<JSX.Element> & ListItemDefaults)[]
-        | undefined;
+    readonly items?: readonly SelectionListEntry[] | undefined;
     /** Every option's `class`, `style`, `slotProps`, `unstyled`, `testId` and `tokens`, under
      *  the option's own. */
     readonly listItemProps?: ListItemDefaults | undefined;
@@ -99,11 +106,12 @@ export function SelectionList(props: SelectionListProps): JSX.Element {
     const api = createMemo(() =>
         selectionList.connect(service, normalizeProps),
     );
-    const slots = createSlotProps(
-        props as Keyed as SlotKeyedProps<typeof listAnatomy>,
-    );
+    const slots = createSlotProps<
+        typeof listAnatomy,
+        never,
+        ListInstances<SelectionListEntry>
+    >(props);
     const root = slots("root");
-    const wrapper = slots("item");
     // The list's variants and the element's props, with the listbox's props over them.
     const list = merge(
         omit(
@@ -124,7 +132,7 @@ export function SelectionList(props: SelectionListProps): JSX.Element {
                 each={items()}
                 keyed={(item: SelectionListItem<JSX.Element>) => item.value}
             >
-                {(item) => {
+                {(item, index) => {
                     const option = () => collection().find(item().value)!;
                     const source = sources.item(
                         () => item().value,
@@ -154,7 +162,13 @@ export function SelectionList(props: SelectionListProps): JSX.Element {
                         },
                     ) as ListItemProps;
                     return (
-                        <List.Item {...wrapper} role="presentation">
+                        <List.Item
+                            {...slots("item", () => ({
+                                index: index(),
+                                item: item() as SelectionListEntry,
+                            }))}
+                            role="presentation"
+                        >
                             <ListItem {...row} />
                         </List.Item>
                     );

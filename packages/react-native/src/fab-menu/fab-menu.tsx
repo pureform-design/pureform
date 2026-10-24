@@ -12,6 +12,7 @@ import {
 import type {
     ChangeDetails,
     FabMenuContentProps,
+    FabMenuInstances,
     FabMenuItem,
     FabMenuPart,
     FabMenuVariantProps,
@@ -57,7 +58,7 @@ export interface FabMenuProps
         FabMenuVariantProps,
         FabMenuContentProps<ReactNode>,
         IndicationProps,
-        NativeSlotProps<FabMenuHosts> {
+        NativeSlotProps<FabMenuHosts, FabMenuInstances<ReactNode>> {
     /** Whether the menu is open, controlled when defined. */
     readonly open?: boolean | undefined;
     readonly defaultOpen?: boolean | undefined;
@@ -115,6 +116,10 @@ function FabMenuItemImpl(props: {
     const id = (part: FabMenuPart) =>
         testIdOf(fabMenuAnatomy, part, props.testId);
     const slot = props.slot;
+    const copy =
+        slot.each("item") || slot.each("itemIcon") || slot.each("itemLabel")
+            ? { index: props.index, item }
+            : undefined;
     const engine = useEngine();
     const wait = (steps: number) => Math.min(steps, STAGGERED - 1) * STAGGER;
     // The item nearest the FAB (the last) enters first, the farthest leaves first.
@@ -125,20 +130,23 @@ function FabMenuItemImpl(props: {
     return (
         <engine.View {...presence.props} style={presence.style}>
             <v.item.Pressable
-                {...slot.props("item")}
-                {...slot.with("item", indication.handlers)}
+                {...slot.props("item", copy)}
+                {...slot.with("item", indication.handlers, copy)}
                 role="menuitem"
                 disabled={item.disabled}
-                onPress={slot.on("item", "onPress", () =>
-                    props.onSelect(item.value),
+                onPress={slot.on(
+                    "item",
+                    "onPress",
+                    () => props.onSelect(item.value),
+                    copy,
                 )}
-                style={slot.style("item", withUnselectable(s.item))}
+                style={slot.style("item", withUnselectable(s.item), copy)}
                 testID={id("item")}
             >
                 {isPresent(item.icon) ? (
                     <v.itemIcon.View
-                        {...slot.props("itemIcon")}
-                        style={slot.style("itemIcon", s.itemIcon)}
+                        {...slot.props("itemIcon", copy)}
+                        style={slot.style("itemIcon", s.itemIcon, copy)}
                         testID={id("itemIcon")}
                     >
                         <IconSlot
@@ -150,9 +158,9 @@ function FabMenuItemImpl(props: {
                     </v.itemIcon.View>
                 ) : null}
                 <v.itemLabel.Text
-                    {...slot.props("itemLabel")}
+                    {...slot.props("itemLabel", copy)}
                     selectable={false}
-                    style={slot.style("itemLabel", s.itemLabel)}
+                    style={slot.style("itemLabel", s.itemLabel, copy)}
                     testID={id("itemLabel")}
                 >
                     {item.label}

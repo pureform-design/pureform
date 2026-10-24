@@ -7,6 +7,7 @@ import {
     autocompleteAnatomy,
     autocompleteMenuAnatomy,
 } from "@pureform/anatomy";
+import type { PartName } from "@pureform/anatomy";
 import {
     AUTOCOMPLETE_ROOT_PROPS,
     autocompleteFilterText,
@@ -27,7 +28,10 @@ import {
 import type {
     AutocompleteItem,
     AutocompleteRootOwnProps,
+    InnerProps,
+    MenuScopeInstances,
     SelectContentProps,
+    Unstyled,
 } from "@pureform/binding-core";
 import * as combobox from "@pureform/machines/combobox";
 import { normalizeProps } from "@zag-js/react";
@@ -97,11 +101,21 @@ export interface AutocompleteRootProps
     /** Another element or component to render instead of `<div>`. */
     readonly as?: ElementType | undefined;
     /** The list's own props, drawn as a menu: `testId`, `unstyled`, and `tokens` (the ready-made
-     *  also takes `className`, `style`, and `slotProps` keyed by the menu's parts). */
-    readonly menuProps?: InnerPropsOf<MenuAnatomy> | undefined;
+     *  also takes `className`, `style`, and `slotProps` keyed by the menu's parts, an option's
+     *  also by option, `MenuScopeInstances`). */
+    readonly menuProps?: MenuScopeProps | undefined;
 }
 
-const NO_MENU_PROPS: InnerPropsOf<MenuAnatomy> = {};
+/** The list's own props, keyed by the menu's parts (an option's also by option). */
+type MenuScopeProps = Omit<
+    InnerPropsOf<MenuAnatomy>,
+    keyof SlotKeyedProps<MenuAnatomy>
+> &
+    InnerProps<
+        SlotKeyedProps<MenuAnatomy, never, MenuScopeInstances<AutocompleteItem>>
+    >;
+
+const NO_MENU_PROPS: MenuScopeProps = {};
 
 /** A part's props: the element's own, and the part's `unstyled`. */
 export interface AutocompletePartProps extends PartProps {
@@ -258,7 +272,7 @@ function Root(props: AutocompleteRootProps): ReactNode {
         testId:
             menuProps.testId ??
             (typeof props.testId === "string" ? props.testId : undefined),
-        unstyled: menuProps.unstyled,
+        unstyled: menuProps.unstyled as Unstyled<PartName<MenuAnatomy>>,
         indication: props.indication,
     });
     const {
@@ -413,7 +427,13 @@ function ReadyMadeContent({
 }): ReactNode {
     const { matches, supportingTextId, errorText } = context.use("Root");
     const slot = useSlotProps(own);
-    const menuSlot = useSlotProps(own.menuProps ?? NO_MENU_PROPS);
+    const menuSlot = useSlotProps<
+        MenuAnatomy,
+        never,
+        MenuScopeInstances<AutocompleteItem>
+    >(own.menuProps ?? NO_MENU_PROPS);
+    const each = menuSlot.each("item") || menuSlot.each("itemLabel");
+    let drawn = 0;
     const showsSupporting =
         isPresent(own.supportingText) || errorText !== undefined;
     return (
@@ -460,17 +480,21 @@ function ReadyMadeContent({
             <Positioner {...menuSlot("positioner")}>
                 <Content {...menuSlot("root")}>
                     {selectItemGroups(matches).map(({ group, items: run }) => {
-                        const options = run.map((item) => (
-                            <Item
-                                key={item.value}
-                                item={item}
-                                {...menuSlot("item")}
-                            >
-                                <ItemLabel {...menuSlot("itemLabel")}>
-                                    {item.label}
-                                </ItemLabel>
-                            </Item>
-                        ));
+                        const options = run.map((item) => {
+                            const index = drawn++;
+                            const copy = each ? { index, item } : undefined;
+                            return (
+                                <Item
+                                    key={item.value}
+                                    item={item}
+                                    {...menuSlot("item", copy)}
+                                >
+                                    <ItemLabel {...menuSlot("itemLabel", copy)}>
+                                        {item.label}
+                                    </ItemLabel>
+                                </Item>
+                            );
+                        });
                         return group === undefined ? (
                             <Fragment key={`-${run[0]!.value}`}>
                                 {options}

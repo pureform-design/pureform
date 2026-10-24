@@ -12,7 +12,7 @@ import type {
 import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Controllable } from "../controllable";
-import type { Unstyled } from "../parts";
+import type { ItemInstance, Unstyled } from "../parts";
 import type { IndicationProps, InteractionSourceProps } from "./indication";
 import type { OverlayPositioning } from "./overlay";
 import type { VariantProp } from "./variants";
@@ -428,3 +428,36 @@ export const menuItemMachineProps = <P>(
               onCheckedChange: item.onCheckedChange,
           });
 };
+
+/** What a ready-made menu's row is, for a function of the copy in its `item`, `itemLeading`,
+ *  `itemContent`, `itemLabel`, `itemSupportingText`, `itemTrailing` and `itemTrailingText` keys:
+ *  `className={{ item: (row) => (row.depth > 0 ? "nested" : undefined) }}`. */
+export interface MenuItemInstance<Node = unknown> {
+    /** The item, as data. The row that goes back out of a drilled submenu has its submenu's. */
+    readonly item: MenuItem<Node>;
+    /** Its 0-based index among its level's (or its group's) items; `-1` for the row back out. */
+    readonly index: number;
+    /** How deep its submenu is: `0` for the menu's own items. */
+    readonly depth: number;
+}
+
+/** The ready-made menu's repeated parts, each to its copy. */
+export interface MenuInstances<Node = unknown> {
+    readonly item: MenuItemInstance<Node>;
+    readonly itemLeading: MenuItemInstance<Node>;
+    readonly itemContent: MenuItemInstance<Node>;
+    readonly itemLabel: MenuItemInstance<Node>;
+    readonly itemSupportingText: MenuItemInstance<Node>;
+    readonly itemTrailing: MenuItemInstance<Node>;
+    readonly itemTrailingText: MenuItemInstance<Node>;
+}
+
+/** A field's list drawn as a menu (a select's, an autocomplete's, a search view's suggestions):
+ *  its repeated parts, each to its option (`ItemInstance`: its index in the order drawn, groups
+ *  together, and the option's data), for a function of the copy in its `menuProps`. */
+export interface MenuScopeInstances<Item> {
+    readonly item: ItemInstance<Item>;
+    readonly itemContent: ItemInstance<Item>;
+    readonly itemLabel: ItemInstance<Item>;
+    readonly itemSupportingText: ItemInstance<Item>;
+}

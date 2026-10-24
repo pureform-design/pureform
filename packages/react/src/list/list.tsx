@@ -10,7 +10,11 @@ import {
     listSelection,
     overDefaults,
 } from "@pureform/binding-core";
-import type { ListItemData, ListRootOwnProps } from "@pureform/binding-core";
+import type {
+    ListInstances,
+    ListItemData,
+    ListRootOwnProps,
+} from "@pureform/binding-core";
 import { type ElementType, type ReactNode, useMemo } from "react";
 
 import { ListDefaults, ListItem } from "../list-item/list-item";
@@ -36,8 +40,10 @@ export interface ListRootProps
     readonly as?: ElementType | undefined;
 }
 
-/** An item's props: the `<li>`'s own. */
-export type ListItemWrapperProps = PartProps;
+/** An item's props: the `<li>`'s own, and the part's `unstyled`. */
+export interface ListItemWrapperProps extends PartProps {
+    readonly unstyled?: boolean | undefined;
+}
 
 /** The list's root, a `<ul>`. */
 function Root(props: ListRootProps): ReactNode {
@@ -62,13 +68,18 @@ function Root(props: ListRootProps): ReactNode {
 }
 
 /** The `<li>` around a list item. */
-function Item(props: ListItemWrapperProps): ReactNode {
+function Item({ unstyled, ...props }: ListItemWrapperProps): ReactNode {
     const { scope } = context.use("Item");
-    return scope.render("item", { element: "li", props });
+    return scope.render("item", { element: "li", unstyled, props });
 }
 
-/** The ready-made list's props: Root's, with `className`, `style`, and `slotProps` keyed by the
- *  list's own parts (`root`, the `<ul>`; `item`, each `<li>`), the items as data, and
+/** One item of the ready-made list: a list item's content, variants and own customizing props. */
+export type ListEntry = ListItemData<ReactNode> &
+    InnerPropsOf<typeof listItemAnatomy>;
+
+/** The ready-made list's props: Root's, with `className`, `style`, `slotProps` and `unstyled` keyed
+ *  by the list's own parts (`root`, the `<ul>`; `item`, each `<li>`, also by item, `ListInstances`),
+ *  the items as data, and
  *  `listItemProps`, every list item's defaults, under each item's own. */
 export interface ListProps
     extends
@@ -76,13 +87,10 @@ export interface ListProps
             ListRootProps,
             keyof SlotKeyedProps<typeof listAnatomy> | "children"
         >,
-        SlotKeyedProps<typeof listAnatomy> {
+        SlotKeyedProps<typeof listAnatomy, never, ListInstances<ListEntry>> {
     /** The items, in order: each a list item's content, variants, and its own `className`,
      *  `style`, `slotProps`, `unstyled`, `testId` and `tokens`, over `listItemProps`. */
-    readonly items?:
-        | readonly (ListItemData<ReactNode> &
-              InnerPropsOf<typeof listItemAnatomy>)[]
-        | undefined;
+    readonly items?: readonly ListEntry[] | undefined;
     /** Every list item's `className`, `style`, `slotProps`, `unstyled`, `testId` and `tokens`,
      *  under the item's own: `{ className: { headline: "bold" }, tokens: { … } }`. */
     readonly listItemProps?: InnerPropsOf<typeof listItemAnatomy> | undefined;
@@ -99,12 +107,23 @@ function ReadyMade(props: ListProps): ReactNode {
         items = [],
         ...rootProps
     } = props;
-    const slot = useSlotProps(props);
+    const slot = useSlotProps<
+        typeof listAnatomy,
+        never,
+        ListInstances<ListEntry>
+    >(props);
     const segmented = props.variant === "segmented";
+    const each = slot.each("item");
     return (
         <Root {...rootProps} {...slot("root")}>
             {items.map(({ value, ...item }, index) => (
-                <Item key={value ?? index} {...slot("item")}>
+                <Item
+                    key={value ?? index}
+                    {...slot(
+                        "item",
+                        each ? { index, item: items[index]! } : undefined,
+                    )}
+                >
                     <ListItem
                         position={listItemPosition(
                             index,

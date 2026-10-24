@@ -29,6 +29,40 @@ const ITEMS = [
 ];
 
 describe("NativeSelect, ready-made", () => {
+    it("takes a function of each option and group in their keys", async () => {
+        withRegistry(
+            <NativeSelect
+                aria-label="Size"
+                items={ITEMS}
+                placeholder="Pick"
+                className={{
+                    option: ({ index, item }) =>
+                        `option-${index}-${item.value}`,
+                    icon: "chevron",
+                }}
+                style={{
+                    option: ({ index }) => ({ opacity: index < 0 ? 0.5 : 1 }),
+                }}
+                slotProps={{
+                    option: ({ item }) => ({ title: item.label }),
+                    group: ({ index, item }) => ({ title: `${index} ${item}` }),
+                }}
+                unstyled={{ option: ({ index }) => index === 0 }}
+            />,
+        );
+        await settle();
+        const select = byTestId<HTMLSelectElement>(ids.select);
+        const [placeholder, small, medium] = [...select.options];
+        expect(placeholder!.classList.contains("option--1-")).toBe(true);
+        expect(placeholder!.style.opacity).toBe("0.5");
+        expect(small!.className).toBe("option-0-s");
+        expect(medium!.classList.contains("option-1-m")).toBe(true);
+        expect(medium!.className).not.toBe("option-1-m");
+        expect(medium!.title).toBe("Medium");
+        expect(select.querySelector("optgroup")!.title).toBe("0 Sizes");
+        expect(byTestId(ids.icon).classList.contains("chevron")).toBe(true);
+    });
+
     it("renders a native select with its options and groups, and a chevron hidden from assistive technology", async () => {
         withRegistry(
             <NativeSelect aria-label="Size" items={ITEMS} placeholder="Pick" />,

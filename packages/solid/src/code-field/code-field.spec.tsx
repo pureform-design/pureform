@@ -36,6 +36,33 @@ const cells = () => [
 ];
 
 describe("CodeField, ready-made", () => {
+    it("takes a function of each cell in the input's keys", async () => {
+        withRegistry(() => (
+            <CodeField
+                label="Code"
+                length={3}
+                defaultValue={["1", "2"]}
+                class={{
+                    input: (cell) => (cell.value ? "filled" : undefined),
+                    control: "row",
+                }}
+                style={{ input: (cell) => ({ opacity: (cell.index + 1) / 4 }) }}
+                slotProps={{
+                    input: (cell) => ({ title: `cell ${cell.index}` }),
+                }}
+                unstyled={{ input: (cell) => cell.index === 2 }}
+            />
+        ));
+        await settle();
+        const [first, second, third] = cells();
+        expect(first!.classList.contains("filled")).toBe(true);
+        expect(second!.classList.contains("filled")).toBe(true);
+        expect(third!.className).toBe("");
+        expect(second!.style.opacity).toBe("0.5");
+        expect(third!.title).toBe("cell 2");
+        expect(byTestId(ids.control).classList.contains("row")).toBe(true);
+    });
+
     it("renders the label, a cell per character and the supporting text", async () => {
         withRegistry(() => (
             <CodeField

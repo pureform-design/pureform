@@ -19,6 +19,8 @@ import {
 } from "@pureform/binding-core";
 import type {
     NativeSelectContentProps,
+    NativeSelectInstances,
+    NativeSelectItem,
     NativeSelectRootOwnProps,
     NativeSelectValue,
     NativeSelectValueKeys,
@@ -27,6 +29,7 @@ import type {
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {
     type Accessor,
+    createMemo,
     createSignal,
     createUniqueId,
     flush,
@@ -284,15 +287,16 @@ function Option(props: NativeSelectOptionProps): JSX.Element {
     });
 }
 
-/** The ready-made native select's props: Root's, with `class`, `style`, and `slotProps` keyed by
- *  part, the options as `items`, a `placeholder` and the `icon`, and the select's attributes
+/** The ready-made native select's props: Root's, with `class`, `style`, `slotProps` and
+ *  `unstyled` keyed by part (an option and a group also by copy, `NativeSelectInstances`), the
+ *  options as `items`, a `placeholder` and the `icon`, and the select's attributes
  *  (`aria-label`, `autocomplete`, …), which go on it. Option elements as `children` come after
  *  the items. */
 export type NativeSelectProps = Omit<
     RootBaseProps,
     keyof SlotKeyedProps<Anatomy>
 > &
-    SlotKeyedProps<Anatomy> &
+    SlotKeyedProps<Anatomy, never, NativeSelectInstances> &
     NativeSelectContentProps<JSX.Element> &
     Pick<
         JSX.SelectHTMLAttributes<HTMLSelectElement>,
@@ -321,7 +325,7 @@ const READY_MADE_PROPS = [
 
 /** The ready-made native select: Root around the `<select>` with its options, and the chevron. */
 function ReadyMade(props: NativeSelectProps): JSX.Element {
-    const slots = createSlotProps(props);
+    const slots = createSlotProps<Anatomy, never, NativeSelectInstances>(props);
     const own = omit(props, ...READY_MADE_PROPS) as NativeSelectRootProps;
     // The root's slot props are an element's, whose `id` also takes `false`.
     const root = slots("root") as object;
@@ -334,20 +338,27 @@ function ReadyMade(props: NativeSelectProps): JSX.Element {
             get: () => props[key],
         });
     }
-    const groups = () => nativeSelectGroups(props.items ?? []);
-    const entries = (
-        items: () => readonly {
-            value: string;
-            label: string;
-            disabled?: boolean | undefined;
-        }[],
-    ) => (
+    const groups = createMemo(() => nativeSelectGroups(props.items ?? []));
+    // Each option's and group's index in the order drawn, for a function of the copy.
+    const order = createMemo(() => {
+        const at = new Map<unknown, number>();
+        let groupIndex = 0;
+        for (const run of groups()) {
+            if (run.group !== undefined) at.set(run, groupIndex++);
+            for (const item of run.items) at.set(item, at.size - groupIndex);
+        }
+        return at;
+    });
+    const entries = (items: () => readonly NativeSelectItem[]) => (
         <For each={items()} keyed={(item) => item.value}>
             {(item) => (
                 <Option
                     value={item().value}
                     disabled={item().disabled}
-                    {...slots("option")}
+                    {...slots("option", () => ({
+                        index: order().get(item()) ?? 0,
+                        item: item(),
+                    }))}
                 >
                     {item().label}
                 </Option>
@@ -358,7 +369,13 @@ function ReadyMade(props: NativeSelectProps): JSX.Element {
         <Root {...own} {...root}>
             <Select {...attributes} {...(select as object)}>
                 <Show when={props.placeholder !== undefined}>
-                    <Option value="" {...slots("option")}>
+                    <Option
+                        value=""
+                        {...slots("option", () => ({
+                            index: -1,
+                            item: { value: "", label: props.placeholder! },
+                        }))}
+                    >
                         {props.placeholder}
                     </Option>
                 </Show>
@@ -369,7 +386,13 @@ function ReadyMade(props: NativeSelectProps): JSX.Element {
                             fallback={entries(() => run().items)}
                         >
                             {(label) => (
-                                <Group label={label()} {...slots("group")}>
+                                <Group
+                                    label={label()}
+                                    {...slots("group", () => ({
+                                        index: order().get(run()) ?? 0,
+                                        item: label(),
+                                    }))}
+                                >
                                     {entries(() => run().items)}
                                 </Group>
                             )}

@@ -13,6 +13,7 @@ import {
 } from "@pureform/binding-core";
 import type {
     CodeFieldContentProps,
+    CodeFieldInstances,
     CodeFieldRootOwnProps,
     CodeFieldValueDetails,
 } from "@pureform/binding-core";
@@ -152,12 +153,12 @@ function SupportingText(props: CodeFieldPartProps): ReactNode {
     return renderErrorSupportingText(scope, error, props);
 }
 
-/** The ready-made code field's props: Root's, with `className`, `style`, and `slotProps` keyed by
- *  part (`input`'s go on every cell), and the label and supporting text as content. */
+/** The ready-made code field's props: Root's, with `className`, `style`, `slotProps` and
+ *  `unstyled` keyed by part (`input`'s go on every cell, or by cell, `CodeFieldCellInstance`), and the label and supporting text as content. */
 export interface CodeFieldProps
     extends
         Omit<CodeFieldRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
-        SlotKeyedProps<Anatomy>,
+        SlotKeyedProps<Anatomy, never, CodeFieldInstances>,
         CodeFieldContentProps<ReactNode> {}
 
 // Inside Root, so it can read the cells and whether an error shows.
@@ -167,7 +168,8 @@ function ReadyMadeContent({
     readonly own: CodeFieldProps;
 }): ReactNode {
     const { api, error } = context.use("Root");
-    const slot = useSlotProps(own);
+    const slot = useSlotProps<Anatomy, never, CodeFieldInstances>(own);
+    const each = slot.each("input");
     return (
         <>
             {isPresent(own.label) ? (
@@ -175,7 +177,16 @@ function ReadyMadeContent({
             ) : null}
             <Control {...slot("control")}>
                 {api.items.map((index) => (
-                    <Input key={index} index={index} {...slot("input")} />
+                    <Input
+                        key={index}
+                        index={index}
+                        {...slot(
+                            "input",
+                            each
+                                ? { index, value: api.value[index] ?? "" }
+                                : undefined,
+                        )}
+                    />
                 ))}
             </Control>
             {isPresent(own.supportingText) || error !== undefined ? (
@@ -190,7 +201,7 @@ function ReadyMadeContent({
 /** The ready-made code field: the label (when given), a cell per character, and the supporting
  *  text (when given, or while an error shows). */
 function ReadyMade(props: CodeFieldProps): ReactNode {
-    const slot = useSlotProps(props);
+    const slot = useSlotProps<Anatomy, never, CodeFieldInstances>(props);
     const {
         className: _className,
         style: _style,

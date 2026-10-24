@@ -446,6 +446,55 @@ describe("Menu, submenus", () => {
         expect(onSelect).toHaveBeenCalledWith({ value: "mail" });
     });
 
+    it("takes a function of each row in an item's keys, at every level", async () => {
+        withRegistry(
+            <Menu
+                trigger="Edit"
+                submenu="cascade"
+                items={NESTED}
+                className={{
+                    item: ({ item, depth }) => `row-${depth}-${item.value}`,
+                    content: "surface",
+                }}
+                style={{
+                    itemLabel: ({ index }) => ({ opacity: index ? 0.5 : 1 }),
+                }}
+                slotProps={{ item: ({ index }) => ({ title: `row ${index}` }) }}
+                unstyled={{ item: ({ item }) => item.value === "cut" }}
+            />,
+        );
+        await settle();
+        const rows = [...items()];
+        expect(rows[0]!.className).toBe("row-0-cut");
+        expect(rows[1]!.classList.contains("row-0-share")).toBe(true);
+        expect(rows[1]!.classList.contains("menu__item")).toBe(true);
+        expect(rows[2]!.classList.contains("row-1-mail")).toBe(true);
+        expect(rows[3]!.title).toBe("row 1");
+        const labels = document.querySelectorAll<HTMLElement>(
+            `[data-testid="${ids.itemLabel}"]`,
+        );
+        expect(labels[1]!.style.opacity).toBe("0.5");
+        expect(contents()[1]!.classList.contains("surface")).toBe(true);
+    });
+
+    it("gives a submenu the menu's test ids and unstyled", async () => {
+        withRegistry(
+            <Menu
+                trigger="Edit"
+                submenu="cascade"
+                items={NESTED}
+                testId="edit"
+                unstyled
+            />,
+        );
+        await settle();
+        const submenus = document.querySelectorAll<HTMLElement>(
+            '[data-testid="edit-content"]',
+        );
+        expect(submenus).toHaveLength(2);
+        expect(submenus[1]!.className).toBe("");
+    });
+
     const labels = () =>
         [...items()].map(
             (item) =>

@@ -1637,7 +1637,14 @@ Agreed in [slot-props-sketch.md](slot-props-sketch.md); batches in the
   one key reaches the same element on every renderer; a text input's `TextInput` props are
   `slotProps.input`.
 - **Repeated parts** (cells, steps, rows, stars, slides) take a value or a function of the
-  instance (`PerInstance<V, I>`), called once per copy only when passed.
+  instance (`PerInstance<V, I>`), called once per copy only when passed, in `className`/`class`,
+  `style`, `slotProps` and `unstyled` (React Native: `style`, `slotProps`). Each ready-made
+  declares its repeated parts and their instance types in binding-core (`RatingInstances`:
+  `item` → `RatingStarInstance`; data-driven copies use `ItemInstance<T>`, `{ index, item }`).
+  A binding resolves them through `slot(part, instance)` (React), `slots(part, accessor)` (Solid)
+  or `slot.style(part, own, instance)` (React Native), and builds the instance only when
+  `slot.each(part)` says a function was passed; plain values take the cached path. A container's
+  per-copy defaults merge with a child's own per copy (`overDefaults`).
 - **A part drawn as `Button`/`IconButton`** (trigger, close, prev/next, Cancel/Confirm) passes its
   part-keyed value to the button's root; the button's own `<component>Props` reach its other parts.
 - **A scrim** (dialog and sheet backdrop) is a part of the overlay's own anatomy and takes the

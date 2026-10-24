@@ -6,6 +6,7 @@
 // source the state layer reads, and inside a Field, the field's id, states and descriptions.
 
 import { nativeSelectAnatomy } from "@pureform/anatomy";
+import type { PartName } from "@pureform/anatomy";
 import {
     NATIVE_SELECT_ATTRIBUTE_PROPS,
     NATIVE_SELECT_CONTENT_PROPS,
@@ -19,6 +20,7 @@ import {
 } from "@pureform/binding-core";
 import type {
     NativeSelectContentProps,
+    NativeSelectInstances,
     NativeSelectItem,
     NativeSelectRootOwnProps,
     NativeSelectValue,
@@ -45,7 +47,7 @@ import {
 } from "../interaction";
 import { createPartContext } from "../part-context";
 import { useComponent, useSlotProps } from "../parts";
-import type { ComponentScope, SlotKeyedProps } from "../parts";
+import type { ComponentScope, SlotKeyedProps, SlotPropsOf } from "../parts";
 import { combinePartProps, omitProps } from "../props";
 import type { PartProps } from "../props";
 
@@ -235,15 +237,16 @@ function Option({ unstyled, ...props }: NativeSelectOptionProps): ReactNode {
 /** The attributes of the ready-made component that go on the `<select>`, in React's spelling. */
 const REACT_SELECT_PROPS = ["autoComplete", "autoFocus", "size"] as const;
 
-/** The ready-made native select's props: Root's, with `className`, `style`, and `slotProps` keyed
- *  by part, the options as `items`, a `placeholder` and the `icon`, and the select's attributes
+/** The ready-made native select's props: Root's, with `className`, `style`, `slotProps` and
+ *  `unstyled` keyed by part (an option and a group also by copy, `NativeSelectInstances`), the
+ *  options as `items`, a `placeholder` and the `icon`, and the select's attributes
  *  (`aria-label`, `autoComplete`, …), which go on it. Option elements as `children` come after the
  *  items. */
 export type NativeSelectProps = Omit<
     RootBaseProps,
     keyof SlotKeyedProps<Anatomy>
 > &
-    SlotKeyedProps<Anatomy> &
+    SlotKeyedProps<Anatomy, never, NativeSelectInstances> &
     NativeSelectContentProps<ReactNode> &
     Pick<
         SelectHTMLAttributes<HTMLSelectElement>,
@@ -265,31 +268,49 @@ const READY_MADE_PROPS = [
 
 const options = (
     items: readonly NativeSelectItem[],
-    slot: (part: "group" | "option") => object,
-): ReactNode =>
-    nativeSelectGroups(items).map((run, index) => {
-        const entries = run.items.map((item) => (
-            <Option
-                key={item.value}
-                value={item.value}
-                disabled={item.disabled}
-                {...slot("option")}
+    slot: SlotPropsOf<PartName<Anatomy>, NativeSelectInstances>,
+): ReactNode => {
+    const eachOption = slot.each("option");
+    const eachGroup = slot.each("group");
+    let drawn = 0;
+    let groups = 0;
+    return nativeSelectGroups(items).map((run, index) => {
+        const entries = run.items.map((item) => {
+            const at = drawn++;
+            return (
+                <Option
+                    key={item.value}
+                    value={item.value}
+                    disabled={item.disabled}
+                    {...slot(
+                        "option",
+                        eachOption ? { index: at, item } : undefined,
+                    )}
+                >
+                    {item.label}
+                </Option>
+            );
+        });
+        if (run.group === undefined) return entries;
+        const group = groups++;
+        return (
+            <Group
+                key={`group-${index}`}
+                label={run.group}
+                {...slot(
+                    "group",
+                    eachGroup ? { index: group, item: run.group } : undefined,
+                )}
             >
-                {item.label}
-            </Option>
-        ));
-        return run.group === undefined ? (
-            entries
-        ) : (
-            <Group key={`group-${index}`} label={run.group} {...slot("group")}>
                 {entries}
             </Group>
         );
     });
+};
 
 /** The ready-made native select: Root around the `<select>` with its options, and the chevron. */
 function ReadyMade(props: NativeSelectProps): ReactNode {
-    const slot = useSlotProps(props);
+    const slot = useSlotProps<Anatomy, never, NativeSelectInstances>(props);
     const rootProps = omitProps(
         props as NativeSelectProps & Record<string, unknown>,
         READY_MADE_PROPS as never,
@@ -301,7 +322,21 @@ function ReadyMade(props: NativeSelectProps): ReactNode {
         <Root {...rootProps} {...(slot("root") as object)}>
             <Select {...selectAttributes} {...slot("select")}>
                 {props.placeholder !== undefined ? (
-                    <Option value="" {...slot("option")}>
+                    <Option
+                        value=""
+                        {...slot(
+                            "option",
+                            slot.each("option")
+                                ? {
+                                      index: -1,
+                                      item: {
+                                          value: "",
+                                          label: props.placeholder,
+                                      },
+                                  }
+                                : undefined,
+                        )}
+                    >
                         {props.placeholder}
                     </Option>
                 ) : null}

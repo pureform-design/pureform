@@ -112,6 +112,89 @@ describe("ColorPicker", () => {
         expect(hexInput().value).toBe("AABBCC");
     });
 
+    it("runs the user's hex input handlers after its own", async () => {
+        const calls: string[] = [];
+        const onValueChangeEnd = vi.fn(() => calls.push("picker"));
+        withRegistry(
+            <ColorPicker
+                onValueChangeEnd={onValueChangeEnd}
+                textFieldProps={{
+                    slotProps: {
+                        input: {
+                            onKeyDown: (event) => {
+                                if (event.key === "Enter")
+                                    calls.push("keyDown");
+                            },
+                            onBlur: () => calls.push("blur"),
+                        },
+                    },
+                }}
+            />,
+        );
+        await userEvent.click(hexInput());
+        await userEvent.clear(hexInput());
+        await userEvent.type(hexInput(), "abc{Enter}");
+        await settle();
+        expect(calls).toEqual(["picker", "keyDown"]);
+        await userEvent.clear(hexInput());
+        await userEvent.type(hexInput(), "123456");
+        await userEvent.tab();
+        await settle();
+        expect(calls).toEqual(["picker", "keyDown", "picker", "blur"]);
+    });
+
+    it("takes a function of each swatch and channel in their keys, and reaches the inner parts", async () => {
+        withRegistry(
+            <ColorPicker
+                alpha
+                swatches={["#ff0000", "#00ff00"]}
+                className={{
+                    swatch: ({ color, index }) =>
+                        `swatch-${index}-${color.slice(1)}`,
+                    areaThumb: "thumb",
+                    areaBackground: "gradient",
+                }}
+                style={{
+                    channelSliderTrack: ({ channel }) =>
+                        channel === "alpha" ? { opacity: 0.5 } : undefined,
+                    transparencyGrid: { opacity: 0.25 },
+                }}
+                slotProps={{
+                    swatchTrigger: ({ index }) => ({
+                        title: `swatch ${index}`,
+                    }),
+                    channelSliderThumb: ({ channel }) => ({ title: channel }),
+                }}
+                unstyled={{ swatch: ({ index }) => index === 0 }}
+            />,
+        );
+        await settle();
+        const swatches = document.querySelectorAll<HTMLElement>(
+            `[data-testid="${ids.swatch}"]`,
+        );
+        expect(swatches[0]!.className).toBe("swatch-0-ff0000");
+        expect(swatches[1]!.classList.contains("swatch-1-00ff00")).toBe(true);
+        expect(swatches[1]!.className).not.toBe("swatch-1-00ff00");
+        const triggers = document.querySelectorAll<HTMLElement>(
+            `[data-testid="${ids.swatchTrigger}"]`,
+        );
+        expect(triggers[1]!.title).toBe("swatch 1");
+        expect(one(ids.areaThumb).classList.contains("thumb")).toBe(true);
+        expect(one(ids.areaBackground).classList.contains("gradient")).toBe(
+            true,
+        );
+        expect(one(ids.transparencyGrid).style.opacity).toBe("0.25");
+        const tracks = document.querySelectorAll<HTMLElement>(
+            `[data-testid="${ids.channelSliderTrack}"]`,
+        );
+        expect(tracks[0]!.style.opacity).toBe("");
+        expect(tracks[1]!.style.opacity).toBe("0.5");
+        const thumbs = document.querySelectorAll<HTMLElement>(
+            `[data-testid="${ids.channelSliderThumb}"]`,
+        );
+        expect(thumbs[1]!.title).toBe("alpha");
+    });
+
     it("moves the hue with the arrow keys", async () => {
         const onValueChange = vi.fn();
         withRegistry(

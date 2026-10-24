@@ -5,6 +5,7 @@ export type {
     MenuIconProps,
     MenuItemProps,
     MenuItemsProps,
+    MenuItemSlot,
     MenuPartProps,
     MenuProps,
     MenuRootProps,

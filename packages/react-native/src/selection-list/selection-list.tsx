@@ -11,7 +11,9 @@ import {
 } from "@pureform/binding-core";
 import type {
     ListPart,
+    ListInstances,
     SelectionListContentProps,
+    SelectionListItem,
     SelectionListRootOwnProps,
 } from "@pureform/binding-core";
 import { useMemo } from "react";
@@ -35,7 +37,10 @@ export interface SelectionListProps
     extends
         Omit<SelectionListRootOwnProps, "unstyled">,
         SelectionListContentProps<ReactNode>,
-        NativeSlotProps<SelectionListHosts> {
+        NativeSlotProps<
+            SelectionListHosts,
+            ListInstances<SelectionListItem<ReactNode>>
+        > {
     readonly "aria-label"?: string | undefined;
     /** Every option's `style`, `slotProps`, `tokens` and `testId`, under the option's own. */
     readonly listItemProps?: ListItemDefaults | undefined;
@@ -71,6 +76,7 @@ function SelectionListImpl(props: SelectionListProps): ReactNode {
     const segmented = props.variant === "segmented";
     const id = (part: ListPart) => testIdOf(listAnatomy, part, props.testId);
     const slot = nativeSlots(props);
+    const each = slot.each("item");
     return (
         <ListDefaults value={defaults}>
             <v.root.View
@@ -94,9 +100,20 @@ function SelectionListImpl(props: SelectionListProps): ReactNode {
                         index,
                     ) => (
                         <v.item.View
-                            {...slot.props("item")}
+                            {...slot.props(
+                                "item",
+                                each
+                                    ? { index, item: items[index]! }
+                                    : undefined,
+                            )}
                             key={key}
-                            style={slot.style("item", s.item)}
+                            style={slot.style(
+                                "item",
+                                s.item,
+                                each
+                                    ? { index, item: items[index]! }
+                                    : undefined,
+                            )}
                             testID={id("item")}
                         >
                             <ListItem

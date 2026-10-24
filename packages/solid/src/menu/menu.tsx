@@ -30,7 +30,9 @@ import {
 import type {
     MenuContentProps,
     MenuGroup,
+    MenuInstances,
     MenuItem,
+    MenuItemInstance,
     MenuBehaviorProps,
     MenuItemBehaviorProps,
     MenuRootOwnProps,
@@ -75,7 +77,7 @@ import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
 import { createSlotProps, useComponent, asRoot } from "../parts";
-import type { ComponentScope, SlotKeyedProps } from "../parts";
+import type { ComponentScope, SlotKeyedProps, SlotPropsOf } from "../parts";
 import { usePresence } from "../presence";
 import type { Presence } from "../presence";
 import type { PartProps } from "../props";
@@ -95,6 +97,9 @@ interface MenuContextValue {
     /** What a submenu takes from its parent unless given: choosing an item reports to the
      *  parent's `onSelect`, and the parent's keyboard options. */
     readonly behavior: Accessor<InheritedBehavior>;
+    /** The test ids and `unstyled`, which a submenu takes unless given its own. */
+    readonly testId: Accessor<MenuRootProps["testId"]>;
+    readonly unstyled: Accessor<MenuRootProps["unstyled"]>;
     /** A submenu's parent menu. */
     readonly parent?: MenuContextValue | undefined;
 }
@@ -202,10 +207,12 @@ function useMenu(
             tokens: own.tokens ?? inherited.tokens,
         } as MenuVariantProps;
     };
+    const testId = () => props.testId ?? parent?.testId();
+    const unstyled = () => props.unstyled ?? parent?.unstyled();
     const scope = useComponent(menuOverlayAnatomy, {
         selection: () => menuSelection(variants()),
-        testId: () => props.testId,
-        unstyled: () => props.unstyled,
+        testId,
+        unstyled,
         indication: () => props.indication,
     });
     if (parent) {
@@ -222,6 +229,8 @@ function useMenu(
         presence,
         variants,
         behavior,
+        testId,
+        unstyled,
         parent,
     };
 }
@@ -497,16 +506,30 @@ function ItemTrailingText(props: MenuPartProps): JSX.Element {
     });
 }
 
+/** The slot props `Items` gives each part of an item: a ready-made's `createSlotProps`, whose
+ *  functions of the row (`MenuItemInstance`) it resolves, or one function of the part. */
+export type MenuItemSlot =
+    | SlotPropsOf<PartName<Anatomy>, MenuInstances<JSX.Element>>
+    | ((part: PartName<Anatomy>) => PartProps);
+
+// What `Items` calls: either form, read loosely.
+type RowSlot = (
+    part: string,
+    instance?: Accessor<MenuItemInstance<JSX.Element>>,
+) => PartProps;
+
 /** `Items`' props: the items as data, and the slot props each of their parts takes. */
 export interface MenuItemsProps {
     readonly items: readonly MenuItem<JSX.Element>[];
-    readonly slot?: ((part: PartName<Anatomy>) => PartProps) | undefined;
+    readonly slot?: MenuItemSlot | undefined;
     /** An entry with `items` is a row that drills into them (the menu's `onSelect` hears its
      *  value) rather than a submenu beside it. */
     readonly drill?: boolean | undefined;
+    /** How deep their submenu is, for a function of the row: `0` for the menu's own items. */
+    readonly depth?: number | undefined;
 }
 
-const NO_SLOT = (): PartProps => ({});
+const NO_SLOT: MenuItemSlot = () => ({});
 
 /** What a ready-made menu under `submenu="auto"` gives its cascading submenus: the container
  *  they keep within, and what drills into one that doesn't fit. */
@@ -524,34 +547,33 @@ const AutoSubmenuContext = createContext<AutoSubmenuValue | null>(null);
 /** An `Item` per entry of `items`, with its icons, label, supporting text and trailing text, or
  *  a `Submenu` for an entry with `items` of its own: what the ready-made menu renders, for a component that holds a menu (the split button). */
 function Items(props: MenuItemsProps): JSX.Element {
-    const slot = untrack(() => props.slot) ?? NO_SLOT;
+    const given = untrack(() => props.slot) ?? NO_SLOT;
+    const slot = given as RowSlot;
     const auto = useContext(AutoSubmenuContext);
     const drills = (value: string) =>
         props.drill || (auto?.active() && auto.drills().has(value));
-    // Views, so every item reads the same ones.
-    const itemSlot = slot("item");
-    const itemLeading = slot("itemLeading");
-    const itemContent = slot("itemContent");
-    const itemLabel = slot("itemLabel");
-    const itemSupportingText = slot("itemSupportingText");
-    const itemTrailing = slot("itemTrailing");
-    const itemTrailingText = slot("itemTrailingText");
     const positioner = slot("positioner");
     const content = slot("content");
     const parts = (
         item: () => MenuItem<JSX.Element>,
+        row: Accessor<MenuItemInstance<JSX.Element>>,
         trailing?: JSX.Element,
     ) => (
         <>
             <Show when={isPresent(item().leadingIcon)}>
-                <ItemLeading mirror={item().mirrorLeadingIcon} {...itemLeading}>
+                <ItemLeading
+                    mirror={item().mirrorLeadingIcon}
+                    {...slot("itemLeading", row)}
+                >
                     {item().leadingIcon}
                 </ItemLeading>
             </Show>
-            <ItemContent {...itemContent}>
-                <ItemLabel {...itemLabel}>{item().label}</ItemLabel>
+            <ItemContent {...slot("itemContent", row)}>
+                <ItemLabel {...slot("itemLabel", row)}>
+                    {item().label}
+                </ItemLabel>
                 <Show when={isPresent(item().supportingText)}>
-                    <ItemSupportingText {...itemSupportingText}>
+                    <ItemSupportingText {...slot("itemSupportingText", row)}>
                         {item().supportingText}
                     </ItemSupportingText>
                 </Show>
@@ -559,13 +581,13 @@ function Items(props: MenuItemsProps): JSX.Element {
             <Show when={isPresent(item().trailingIcon)}>
                 <ItemTrailing
                     mirror={item().mirrorTrailingIcon}
-                    {...itemTrailing}
+                    {...slot("itemTrailing", row)}
                 >
                     {item().trailingIcon}
                 </ItemTrailing>
             </Show>
             <Show when={isPresent(item().trailingText)}>
-                <ItemTrailingText {...itemTrailingText}>
+                <ItemTrailingText {...slot("itemTrailingText", row)}>
                     {item().trailingText}
                 </ItemTrailingText>
             </Show>
@@ -577,62 +599,81 @@ function Items(props: MenuItemsProps): JSX.Element {
             each={props.items}
             keyed={(item: MenuItem<JSX.Element>) => item.value}
         >
-            {(item) => (
-                <Show
-                    when={hasSubmenu(item()) && !drills(item().value)}
-                    fallback={
-                        <Show
-                            when={hasSubmenu(item())}
-                            fallback={
-                                <Item {...menuItemProps(item())} {...itemSlot}>
-                                    {parts(item)}
-                                </Item>
-                            }
-                        >
-                            <Item
-                                {...menuItemProps(item())}
-                                closeOnSelect={false}
-                                aria-haspopup="menu"
-                                {...itemSlot}
+            {(item, index) => {
+                const row = () => ({
+                    item: item(),
+                    index: index(),
+                    depth: props.depth ?? 0,
+                });
+                const itemSlot = slot("item", row);
+                const itemTrailing = slot("itemTrailing", row);
+                return (
+                    <Show
+                        when={hasSubmenu(item()) && !drills(item().value)}
+                        fallback={
+                            <Show
+                                when={hasSubmenu(item())}
+                                fallback={
+                                    <Item
+                                        {...menuItemProps(item())}
+                                        {...itemSlot}
+                                    >
+                                        {parts(item, row)}
+                                    </Item>
+                                }
                             >
+                                <Item
+                                    {...menuItemProps(item())}
+                                    closeOnSelect={false}
+                                    aria-haspopup="menu"
+                                    {...itemSlot}
+                                >
+                                    {parts(
+                                        item,
+                                        row,
+                                        <ItemTrailing mirror {...itemTrailing}>
+                                            <ChevronEndIcon />
+                                        </ItemTrailing>,
+                                    )}
+                                </Item>
+                            </Show>
+                        }
+                    >
+                        <Submenu>
+                            <AutoSubmenu value={item().value} />
+                            <TriggerItem {...itemSlot}>
                                 {parts(
                                     item,
+                                    row,
                                     <ItemTrailing mirror {...itemTrailing}>
                                         <ChevronEndIcon />
                                     </ItemTrailing>,
                                 )}
-                            </Item>
-                        </Show>
-                    }
-                >
-                    <Submenu>
-                        <AutoSubmenu value={item().value} />
-                        <TriggerItem {...itemSlot}>
-                            {parts(
-                                item,
-                                <ItemTrailing mirror {...itemTrailing}>
-                                    <ChevronEndIcon />
-                                </ItemTrailing>,
-                            )}
-                        </TriggerItem>
-                        <Positioner {...positioner}>
-                            <Content {...content}>
-                                <Items items={item().items ?? []} slot={slot} />
-                            </Content>
-                        </Positioner>
-                    </Submenu>
-                </Show>
-            )}
+                            </TriggerItem>
+                            <Positioner {...positioner}>
+                                <Content {...content}>
+                                    <Items
+                                        items={item().items ?? []}
+                                        slot={given}
+                                        depth={(props.depth ?? 0) + 1}
+                                    />
+                                </Content>
+                            </Positioner>
+                        </Submenu>
+                    </Show>
+                );
+            }}
         </For>
     );
 }
 
-/** The ready-made menu's props: Root's, with `class`, `style`, and `slotProps` keyed by part, the
- *  trigger's label, and the items as data. */
+/** The ready-made menu's props: Root's, with `class`, `style`, `slotProps` and `unstyled` keyed by
+ *  part (an item's parts also by row, `MenuItemInstance`, at every submenu's level), the trigger's
+ *  label, and the items as data. */
 export interface MenuProps
     extends
         Omit<MenuRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
-        SlotKeyedProps<Anatomy>,
+        SlotKeyedProps<Anatomy, never, MenuInstances<JSX.Element>>,
         MenuContentProps<JSX.Element> {}
 
 const READY_MADE_PROPS = [
@@ -815,7 +856,10 @@ function ReadyMade(props: MenuProps): JSX.Element {
         }
         props.onOpenChange?.(details);
     };
-    const slots = createSlotProps(props);
+    const slots = createSlotProps<Anatomy, never, MenuInstances<JSX.Element>>(
+        props,
+    );
+    const depth = () => (drill() ? level().depth : 0);
     const own = omit(
         props,
         ...READY_MADE_PROPS,
@@ -873,29 +917,45 @@ function ReadyMade(props: MenuProps): JSX.Element {
                             />
                         </Show>
                         <Show when={level().submenu}>
-                            {(submenu) => (
-                                // The row that goes back out, headed by the submenu's item.
-                                <Item
-                                    value={MENU_BACK_VALUE}
-                                    valueText={submenu().valueText}
-                                    closeOnSelect={false}
-                                    {...slots("item")}
-                                >
-                                    <ItemLeading
-                                        mirror
-                                        {...slots("itemLeading")}
+                            {(submenu) => {
+                                const back = () => ({
+                                    item: submenu(),
+                                    index: -1,
+                                    depth: depth(),
+                                });
+                                return (
+                                    // The row that goes back out, headed by the submenu's item.
+                                    <Item
+                                        value={MENU_BACK_VALUE}
+                                        valueText={submenu().valueText}
+                                        closeOnSelect={false}
+                                        {...slots("item", back)}
                                     >
-                                        <ChevronStartIcon />
-                                    </ItemLeading>
-                                    <ItemContent {...slots("itemContent")}>
-                                        <ItemLabel {...slots("itemLabel")}>
-                                            {submenu().label}
-                                        </ItemLabel>
-                                    </ItemContent>
-                                </Item>
-                            )}
+                                        <ItemLeading
+                                            mirror
+                                            {...slots("itemLeading", back)}
+                                        >
+                                            <ChevronStartIcon />
+                                        </ItemLeading>
+                                        <ItemContent
+                                            {...slots("itemContent", back)}
+                                        >
+                                            <ItemLabel
+                                                {...slots("itemLabel", back)}
+                                            >
+                                                {submenu().label}
+                                            </ItemLabel>
+                                        </ItemContent>
+                                    </Item>
+                                );
+                            }}
                         </Show>
-                        <Items items={items()} slot={slots} drill={drill()} />
+                        <Items
+                            items={items()}
+                            slot={slots}
+                            drill={drill()}
+                            depth={depth()}
+                        />
                         <For
                             each={groups()}
                             keyed={(group: MenuGroup<JSX.Element>) => group.id}
@@ -914,6 +974,7 @@ function ReadyMade(props: MenuProps): JSX.Element {
                                         items={group().items}
                                         slot={slots}
                                         drill={drill()}
+                                        depth={depth()}
                                     />
                                 </ItemGroup>
                             )}

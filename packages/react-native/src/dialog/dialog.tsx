@@ -26,6 +26,7 @@ import { useEngine } from "../provider";
 import { backdropKeys, nativeSlots, overlayKeys } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
+import { triggerButtonProps } from "../trigger-button";
 
 /** The dialog's parts this binding renders. */
 type Part = PartName<typeof dialogAnatomy>;
@@ -52,6 +53,7 @@ const NO_ACTIONS: DialogActions = { close: () => {} };
 
 /** What each part renders as, for its keyed `style` and `slotProps`. */
 export interface DialogHosts {
+    readonly trigger: "Pressable";
     readonly content: "View";
     readonly icon: "View";
     readonly headline: "Text";
@@ -201,7 +203,14 @@ function ModalDialog(props: DialogProps): ReactNode {
             {trigger === undefined ? null : typeof trigger === "function" ? (
                 trigger(given)
             ) : (
-                <Button label={trigger} {...given} />
+                <Button
+                    {...triggerButtonProps(
+                        nativeSlots(props, KEYS),
+                        props.testId,
+                    )}
+                    label={trigger}
+                    {...given}
+                />
             )}
             <ModalWindow
                 visible={presence.present}

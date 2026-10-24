@@ -15,6 +15,7 @@ import {
 } from "@pureform/binding-core";
 import type {
     FabMenuContentProps,
+    FabMenuInstances,
     FabMenuItem,
     FabMenuRootOwnProps,
     InteractionSourceProps,
@@ -239,12 +240,13 @@ function CloseTrigger(props: FabMenuCloseTriggerProps): JSX.Element {
     );
 }
 
-/** The ready-made FAB menu's props: Root's, with `class`, `style`, and `slotProps` keyed by part,
- *  the FAB's icons and name, and the items as data. */
+/** The ready-made FAB menu's props: Root's, with `class`, `style`, `slotProps` and `unstyled` keyed
+ *  by part (an item's parts also by item, `FabMenuInstances`), the FAB's icons and name, and the
+ *  items as data. */
 export interface FabMenuProps
     extends
         Omit<FabMenuRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
-        SlotKeyedProps<Anatomy>,
+        SlotKeyedProps<Anatomy, never, FabMenuInstances<JSX.Element>>,
         FabMenuContentProps<JSX.Element> {}
 
 const READY_MADE_PROPS = [
@@ -257,13 +259,14 @@ const READY_MADE_PROPS = [
 /** The ready-made FAB menu: the list with an item per entry of `items`, and the FAB showing
  *  `icon`, or `closeIcon` while the menu is open. */
 function ReadyMade(props: FabMenuProps): JSX.Element {
-    const slots = createSlotProps(props);
+    const slots = createSlotProps<
+        Anatomy,
+        never,
+        FabMenuInstances<JSX.Element>
+    >(props);
     const own = omit(props, ...READY_MADE_PROPS) as FabMenuRootProps;
     const root = slots("root") as object;
     const list = slots("list");
-    const itemSlot = slots("item");
-    const itemIcon = slots("itemIcon");
-    const itemLabel = slots("itemLabel");
     const closeTrigger = slots("closeTrigger");
     return (
         <ReadyMadeItemCount value={() => (props.items ?? []).length}>
@@ -273,21 +276,30 @@ function ReadyMade(props: FabMenuProps): JSX.Element {
                         each={props.items ?? []}
                         keyed={(item: FabMenuItem<JSX.Element>) => item.value}
                     >
-                        {(item) => (
-                            <Item {...fabMenuItemProps(item())} {...itemSlot}>
-                                <Show when={isPresent(item().icon)}>
-                                    <ItemIcon
-                                        mirror={item().mirrorIcon}
-                                        {...itemIcon}
-                                    >
-                                        {item().icon}
-                                    </ItemIcon>
-                                </Show>
-                                <ItemLabel {...itemLabel}>
-                                    {item().label}
-                                </ItemLabel>
-                            </Item>
-                        )}
+                        {(item, index) => {
+                            const copy = () => ({
+                                index: index(),
+                                item: item(),
+                            });
+                            return (
+                                <Item
+                                    {...fabMenuItemProps(item())}
+                                    {...slots("item", copy)}
+                                >
+                                    <Show when={isPresent(item().icon)}>
+                                        <ItemIcon
+                                            mirror={item().mirrorIcon}
+                                            {...slots("itemIcon", copy)}
+                                        >
+                                            {item().icon}
+                                        </ItemIcon>
+                                    </Show>
+                                    <ItemLabel {...slots("itemLabel", copy)}>
+                                        {item().label}
+                                    </ItemLabel>
+                                </Item>
+                            );
+                        }}
                     </For>
                 </List>
                 <CloseTrigger aria-label={props.fabLabel} {...closeTrigger}>

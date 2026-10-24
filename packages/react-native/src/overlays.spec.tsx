@@ -761,6 +761,46 @@ describe.each([animated, reanimated])("the toaster with $name", (engine) => {
         expect(roots()).toEqual([]);
     });
 
+    it("takes a function of each toast in its parts' style and slotProps", async () => {
+        const toaster = createToaster();
+        await render(
+            <Toaster
+                toaster={toaster}
+                style={{
+                    root: (toast) =>
+                        toast.type === "error" ? { opacity: 0.5 } : undefined,
+                    closeTrigger: (toast) =>
+                        toast.index === 1 ? { opacity: 0.25 } : undefined,
+                }}
+                slotProps={{
+                    title: (toast) => ({ "aria-label": toast.type }),
+                }}
+            />,
+            engine,
+        );
+        await interact(() => {
+            toaster.success({ title: "Saved", duration: Infinity });
+            toaster.error({ title: "Failed", duration: Infinity });
+        });
+        await settle(100);
+        expect(roots().map((root) => getComputedStyle(root).opacity)).toEqual([
+            "0.5",
+            "1",
+        ]);
+        const closes = [
+            ...document.querySelectorAll(
+                '[data-testid="pf-toast-close-trigger"]',
+            ),
+        ];
+        expect(closes.map((close) => getComputedStyle(close).opacity)).toEqual([
+            "1",
+            "0.25",
+        ]);
+        expect(
+            document.querySelector('[aria-label="success"]')?.textContent,
+        ).toBe("Saved");
+    });
+
     it("runs the action, then closes; a loading toast stays", async () => {
         const toaster = createToaster();
         const onClick = vi.fn();

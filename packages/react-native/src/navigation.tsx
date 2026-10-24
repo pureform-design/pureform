@@ -20,7 +20,9 @@ import type {
     ChangeDetails,
     IndicationProps,
     NavigationComponent,
+    NavigationInstances,
     NavigationItem,
+    NavigationItemInstance,
     NavigationModalProps,
     NavigationVariantProps,
     TabsItem,
@@ -360,6 +362,7 @@ export interface NavigationHosts {
     readonly root: "View";
     readonly header: "View";
     readonly item: "Pressable";
+    readonly indicator: "View";
     readonly activeIndicator: "View";
     readonly icon: "View";
     readonly label: "Text";
@@ -371,7 +374,7 @@ export interface NavigationProps<C extends NavigationComponent>
         NavigationVariantProps<C>,
         NavigationModalProps,
         IndicationProps,
-        NativeSlotProps<NavigationHosts> {
+        NativeSlotProps<NavigationHosts, NavigationInstances<ReactNode>> {
     readonly items: readonly NavigationItem<ReactNode>[];
     /** The rail's header, above the destinations: a menu button and a FAB, say. */
     readonly header?: ReactNode;
@@ -398,6 +401,8 @@ interface DestinationProps {
     readonly slot: PartSlots;
     readonly name: NavigationComponent;
     readonly item: NavigationItem<ReactNode>;
+    /** Its index among the items. */
+    readonly index: number;
     readonly selection: Record<string, unknown>;
     readonly indication: Indication | undefined;
     readonly testId: TestIdOverride<NavigationPart> | undefined;
@@ -435,32 +440,49 @@ function DestinationImpl(props: DestinationProps): ReactNode {
             props.testId,
         );
     const slot = props.slot;
+    const copy: NavigationItemInstance<ReactNode> | undefined =
+        slot.each("item") ||
+        slot.each("indicator") ||
+        slot.each("activeIndicator") ||
+        slot.each("icon") ||
+        slot.each("label")
+            ? { index: props.index, item, selected: props.selected }
+            : undefined;
     return (
         <v.item.Pressable
-            {...slot.props("item")}
-            {...slot.with("item", indication.handlers)}
+            {...slot.props("item", copy)}
+            {...slot.with("item", indication.handlers, copy)}
             // A button, as the web's destination without an `href`: React Native's have none.
             role="button"
             aria-current={props.selected ? "page" : undefined}
             disabled={disabled}
-            onPress={slot.on("item", "onPress", () => props.onPick(item.value))}
-            style={slot.style("item", withUnselectable(s.item))}
+            onPress={slot.on(
+                "item",
+                "onPress",
+                () => props.onPick(item.value),
+                copy,
+            )}
+            style={slot.style("item", withUnselectable(s.item), copy)}
             testID={id("item")}
         >
             <v.indicator.View
-                {...slot.props("indicator")}
-                style={slot.style("indicator", s.indicator)}
+                {...slot.props("indicator", copy)}
+                style={slot.style("indicator", s.indicator, copy)}
                 testID={id("indicator")}
             >
                 <v.activeIndicator.View
-                    {...slot.props("activeIndicator")}
+                    {...slot.props("activeIndicator", copy)}
                     pointerEvents="none"
-                    style={slot.style("activeIndicator", s.activeIndicator)}
+                    style={slot.style(
+                        "activeIndicator",
+                        s.activeIndicator,
+                        copy,
+                    )}
                     testID={id("activeIndicator")}
                 />
                 <v.icon.View
-                    {...slot.props("icon")}
-                    style={slot.style("icon", s.icon)}
+                    {...slot.props("icon", copy)}
+                    style={slot.style("icon", s.icon, copy)}
                     testID={id("icon")}
                 >
                     <IconSlot {...iconSlot(selected, "icon")} motion={s.icon}>
@@ -470,9 +492,9 @@ function DestinationImpl(props: DestinationProps): ReactNode {
                 {indication.layer(selected)}
             </v.indicator.View>
             <v.label.Text
-                {...slot.props("label")}
+                {...slot.props("label", copy)}
                 selectable={false}
-                style={slot.style("label", s.label)}
+                style={slot.style("label", s.label, copy)}
                 testID={id("label")}
             >
                 {item.label}
@@ -559,6 +581,7 @@ function NavigationImpl<C extends NavigationComponent>(
                             key={item.value}
                             name={props.name}
                             item={item}
+                            index={props.items.indexOf(item)}
                             selection={selection}
                             indication={props.indication}
                             testId={
@@ -582,7 +605,25 @@ const Navigation = withEngine(NavigationImpl, "Navigation") as <
 ) => ReactNode;
 
 export type NavigationBarProps = NavigationProps<"navigationBar">;
-export type NavigationRailProps = NavigationProps<"navigationRail">;
+/** What a modal rail's own pieces render as: the scrim, and the dialog around the rail. */
+export interface NavigationRailHosts extends NavigationHosts {
+    readonly scrim: "View";
+    readonly dialog: "View";
+}
+
+export type NavigationRailProps = Omit<
+    NavigationProps<"navigationRail">,
+    "style" | "slotProps" | "testId"
+> &
+    NativeSlotProps<NavigationRailHosts, NavigationInstances<ReactNode>> & {
+        /** A prefix for every part's test id, or ids by part (a modal rail's `scrim` and
+         *  `dialog` too). */
+        readonly testId?:
+            | TestIdOverride<NavigationPart | "scrim" | "dialog">
+            | undefined;
+    };
+
+const scrimKeys = (part: string): string => (part === "root" ? "scrim" : part);
 
 /** Material's navigation bar: `<NavigationBar items={destinations} defaultValue="mail" />`. */
 export function NavigationBar(props: NavigationBarProps): ReactNode {
@@ -609,6 +650,12 @@ function ModalRail(props: NavigationRailProps): ReactNode {
         false,
     );
     const layer = useLayer("dialog");
+    const slot = nativeSlots(props);
+    const scrimSlot = nativeSlots(props, scrimKeys);
+    const testId = props.testId;
+    const modalId = (part: "scrim" | "dialog") =>
+        typeof testId === "string" ? `${testId}-${part}` : testId?.[part];
+    const scrimId = modalId("scrim");
     const close = useStableCallback(() => {
         if (open) setOpen(false);
     });
@@ -628,7 +675,15 @@ function ModalRail(props: NavigationRailProps): ReactNode {
         >
             <PortalHost>
                 <View style={StyleSheet.absoluteFill}>
-                    <Scrim open={open} />
+                    <Scrim
+                        open={open}
+                        testId={
+                            scrimId === undefined
+                                ? undefined
+                                : { root: scrimId }
+                        }
+                        slot={scrimSlot}
+                    />
                     <Pressable
                         accessible={false}
                         focusable={false}
@@ -636,12 +691,20 @@ function ModalRail(props: NavigationRailProps): ReactNode {
                         {...(closeOnInteractOutside ? { onPress: close } : {})}
                     />
                     <View
+                        {...slot.props("dialog")}
                         pointerEvents="box-none"
                         aria-modal
                         role="dialog"
-                        style={[modalStyles.positioner, { zIndex: layer }]}
+                        style={slot.style("dialog", [
+                            modalStyles.positioner,
+                            { zIndex: layer },
+                        ])}
+                        testID={modalId("dialog")}
                     >
-                        <Navigation {...rail} name="navigationRail" />
+                        <Navigation
+                            {...(rail as NavigationProps<"navigationRail">)}
+                            name="navigationRail"
+                        />
                     </View>
                 </View>
             </PortalHost>

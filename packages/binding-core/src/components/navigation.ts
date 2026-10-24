@@ -14,7 +14,7 @@ import type {
 import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Controllable } from "../controllable";
-import type { Unstyled } from "../parts";
+import type { ItemInstance, Unstyled } from "../parts";
 import type { IndicationProps, InteractionSourceProps } from "./indication";
 import { selectItemGroups, type SelectItemGroup } from "./select";
 import type { VariantProp } from "./variants";
@@ -244,3 +244,21 @@ export const navigationItemElementProps = (
     item.href === undefined
         ? { type: "button" as const, disabled: disabled || undefined }
         : {};
+
+/** What a ready-made navigation component's destination is, for a function of the copy in its
+ *  `item`, `indicator`, `activeIndicator`, `icon` and `label` keys: its index and data, and
+ *  whether it's the current one. */
+export interface NavigationItemInstance<Node = unknown> extends ItemInstance<
+    NavigationItem<Node>
+> {
+    readonly selected: boolean;
+}
+
+/** The ready-made navigation component's repeated parts, each to its destination. */
+export interface NavigationInstances<Node = unknown> {
+    readonly item: NavigationItemInstance<Node>;
+    readonly indicator: NavigationItemInstance<Node>;
+    readonly activeIndicator: NavigationItemInstance<Node>;
+    readonly icon: NavigationItemInstance<Node>;
+    readonly label: NavigationItemInstance<Node>;
+}

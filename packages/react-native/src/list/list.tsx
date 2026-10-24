@@ -10,6 +10,8 @@ import {
 } from "@pureform/binding-core";
 import type {
     ListContentProps,
+    ListInstances,
+    ListItemData,
     ListPart,
     ListRootOwnProps,
 } from "@pureform/binding-core";
@@ -37,7 +39,7 @@ export interface ListProps
     extends
         Omit<ListRootOwnProps, "unstyled">,
         ListContentProps<ReactNode>,
-        NativeSlotProps<ListHosts> {
+        NativeSlotProps<ListHosts, ListInstances<ListItemData<ReactNode>>> {
     readonly "aria-label"?: string | undefined;
     /** Every list item's `style`, `slotProps`, `tokens` and `testId`, under the item's own. */
     readonly listItemProps?: ListItemDefaults | undefined;
@@ -57,6 +59,7 @@ function ListImpl(props: ListProps): ReactNode {
     const segmented = props.variant === "segmented";
     const id = (part: ListPart) => testIdOf(listAnatomy, part, props.testId);
     const slot = nativeSlots(props);
+    const each = slot.each("item");
     return (
         <ListDefaults value={defaults}>
             <v.root.View
@@ -68,28 +71,37 @@ function ListImpl(props: ListProps): ReactNode {
                 style={slot.style("root", s.root)}
                 testID={id("root")}
             >
-                {items.map(({ value, ...item }, index) => (
-                    <v.item.View
-                        {...slot.props("item")}
-                        key={value ?? index}
-                        role="listitem"
-                        style={slot.style("item", s.item)}
-                        testID={id("item")}
-                    >
-                        <ListItem
-                            {...overDefaults(
-                                props.listItemProps as
-                                    | ListItemProps
-                                    | undefined,
-                                item as ListItemProps,
-                            )}
-                            position={
-                                item.position ??
-                                listItemPosition(index, items.length, segmented)
-                            }
-                        />
-                    </v.item.View>
-                ))}
+                {items.map(({ value, ...item }, index) => {
+                    const row = each
+                        ? { index, item: items[index]! }
+                        : undefined;
+                    return (
+                        <v.item.View
+                            {...slot.props("item", row)}
+                            key={value ?? index}
+                            role="listitem"
+                            style={slot.style("item", s.item, row)}
+                            testID={id("item")}
+                        >
+                            <ListItem
+                                {...overDefaults(
+                                    props.listItemProps as
+                                        | ListItemProps
+                                        | undefined,
+                                    item as ListItemProps,
+                                )}
+                                position={
+                                    item.position ??
+                                    listItemPosition(
+                                        index,
+                                        items.length,
+                                        segmented,
+                                    )
+                                }
+                            />
+                        </v.item.View>
+                    );
+                })}
             </v.root.View>
         </ListDefaults>
     );

@@ -29,7 +29,9 @@ import type {
     ChangeDetails,
     IndicationProps,
     MenuGroup,
+    MenuInstances,
     MenuItem,
+    MenuItemInstance,
     MenuSelectDetails,
     MenuSubmenu,
     MenuVariantProps,
@@ -57,7 +59,7 @@ import {
     useWindowDimensions,
     View,
 } from "react-native";
-import type { LayoutChangeEvent } from "react-native";
+import type { GestureResponderEvent, LayoutChangeEvent } from "react-native";
 
 import { Button } from "../button/button";
 import { iconParts } from "../icon-style";
@@ -76,6 +78,7 @@ import { useDirection, useEngine, usePureform } from "../provider";
 import { nativeSlots, withUnselectable, overlayKeys } from "../slot-props";
 import type { NativeSlotProps, PartSlots } from "../slot-props";
 import { useComponentSlots } from "../styles";
+import { triggerButtonProps } from "../trigger-button";
 
 /** The menu's parts this binding renders. */
 type Part = PartName<typeof menuAnatomy>;
@@ -98,7 +101,10 @@ export interface MenuTriggerProps {
 }
 
 export interface MenuProps
-    extends MenuVariantProps, IndicationProps, NativeSlotProps<MenuHosts> {
+    extends
+        MenuVariantProps,
+        IndicationProps,
+        NativeSlotProps<MenuHosts, MenuInstances<ReactNode>> {
     readonly items?: readonly MenuItem<ReactNode>[] | undefined;
     /** Groups of items, after `items`, each with an optional label. The menu is `grouped` unless
      *  told otherwise. */
@@ -152,6 +158,8 @@ export interface MenuProps
 
 /** What each part renders as, for its keyed `style` and `slotProps`: the web's parts. */
 export interface MenuHosts {
+    readonly trigger: "Pressable";
+    readonly contextTrigger: "Pressable";
     readonly itemLeading: "View";
     readonly itemLabel: "Text";
     readonly item: "Pressable";
@@ -170,6 +178,12 @@ interface ItemProps {
     /** The menu's per-part props: the same while its `style` and `slotProps` are. */
     readonly slot: PartSlots;
     readonly item: MenuItem<ReactNode>;
+    /** Its index among its level's (or group's) items, `-1` for the row back out of a drilled
+     *  submenu, and how deep its submenu is: for a function of the row. */
+    readonly index: number;
+    readonly depth: number;
+    /** The row back out's submenu, which a function of the row sees as its item. */
+    readonly of?: MenuItem<ReactNode> | undefined;
     readonly selection: Selection<"menu">;
     readonly indication: Indication | undefined;
     readonly testId: TestIdOverride<Key> | undefined;
@@ -218,6 +232,34 @@ interface SubmenuBounds {
 // moves focus into the submenu).
 type SelectHow = "press" | "key";
 
+const ROW_PARTS = [
+    "item",
+    "itemLeading",
+    "itemContent",
+    "itemLabel",
+    "itemSupportingText",
+    "itemTrailing",
+    "itemTrailingText",
+];
+
+/** The menu's per-part props with a row's own as the copy each part's function of the row sees:
+ *  the menu's own unless one was passed. */
+const forRow = (
+    slot: PartSlots,
+    row: () => MenuItemInstance<ReactNode>,
+): PartSlots => {
+    if (!ROW_PARTS.some((part) => slot.each(part))) return slot;
+    const at = row();
+    return {
+        props: (part, instance) => slot.props(part, instance ?? at),
+        style: (part, own, instance) => slot.style(part, own, instance ?? at),
+        on: (part, name, own, instance) =>
+            slot.on(part, name, own, instance ?? at),
+        with: (part, own, instance) => slot.with(part, own, instance ?? at),
+        each: (part) => slot.each(part),
+    };
+};
+
 function MenuItemImpl(props: ItemProps): ReactNode {
     const { item } = props;
     const indication = useSurfaceIndication(INDICATION!, {
@@ -247,7 +289,11 @@ function MenuItemImpl(props: ItemProps): ReactNode {
     const { styles: s, selected, views: v } = slots;
     const id = (part: Part) =>
         testIdOf(menuOverlayAnatomy, KEYS(part) as Key, props.testId);
-    const { slot } = props;
+    const slot = forRow(props.slot, () => ({
+        item: props.of ?? item,
+        index: props.index,
+        depth: props.depth,
+    }));
     const icon = iconParts(slots, id, slot);
     const row = useRef<Measurable>(null);
     const labelRef = useRef<Measurable>(null);
@@ -546,6 +592,8 @@ function MenuImpl(
         readonly measureContainer?: MeasureContainer;
         /** A listbox of options (the select's), with this id, rather than a menu. */
         readonly listbox?: MenuListboxOptions;
+        /** How deep a cascaded submenu is: `1` for the menu's own submenus. */
+        readonly depth?: number;
     },
 ): ReactNode {
     const engine = useEngine();
@@ -763,13 +811,19 @@ function MenuImpl(
         ) : (
             <FadeIn key={`${step}\u0000${key}`}>{node}</FadeIn>
         );
-    const item = (entry: MenuItem<ReactNode>) =>
-        flip?.to === entry.value ? row(entry) : fadeIn(entry.value, row(entry));
-    const row = (entry: MenuItem<ReactNode>) => (
+    const depth = (props.depth ?? 0) + level.depth;
+    const item = (entry: MenuItem<ReactNode>, index: number) =>
+        flip?.to === entry.value
+            ? row(entry, index)
+            : fadeIn(entry.value, row(entry, index));
+    const row = (entry: MenuItem<ReactNode>, index: number) => (
         <Item
             key={entry.value}
             slot={slot}
             item={entry}
+            index={index}
+            depth={depth}
+            {...(index < 0 && submenu ? { of: submenu } : {})}
             flip={flip?.to === entry.value ? flip : undefined}
             selection={selection}
             indication={props.indication}
@@ -833,13 +887,16 @@ function MenuImpl(
                 <>
                     {submenu ? (
                         <>
-                            {item({
-                                value: MENU_BACK_VALUE,
-                                label: submenu.label,
-                                leadingIcon: "‹",
-                                mirrorLeadingIcon: true,
-                                closeOnSelect: false,
-                            })}
+                            {item(
+                                {
+                                    value: MENU_BACK_VALUE,
+                                    label: submenu.label,
+                                    leadingIcon: "‹",
+                                    mirrorLeadingIcon: true,
+                                    closeOnSelect: false,
+                                },
+                                -1,
+                            )}
                             {level.items.map(item)}
                         </>
                     ) : null}
@@ -956,6 +1013,7 @@ function MenuImpl(
                                         groups={undefined}
                                         grouped={false}
                                         open={undefined}
+                                        depth={depth + 1}
                                         onSelect={(details) => {
                                             setBeside(undefined);
                                             props.onSelect?.(details);
@@ -1187,8 +1245,10 @@ const pointAt = (x: number, y: number): WindowPoint => ({
 function ContextTrigger(props: {
     readonly onOpen: (at: WindowPoint) => void;
     readonly testID: string;
+    readonly slot: PartSlots;
     readonly children: ReactNode;
 }): ReactNode {
+    const { slot } = props;
     const web = Platform.OS === "web";
     const webProps = web
         ? {
@@ -1223,15 +1283,23 @@ function ContextTrigger(props: {
         : {};
     return (
         <Pressable
+            {...slot.props("contextTrigger")}
             accessible={false}
             focusable={false}
-            onLongPress={(event) =>
-                props.onOpen(
-                    pointAt(event.nativeEvent.pageX, event.nativeEvent.pageY),
-                )
-            }
+            onLongPress={slot.on(
+                "contextTrigger",
+                "onLongPress",
+                (event: GestureResponderEvent) =>
+                    props.onOpen(
+                        pointAt(
+                            event.nativeEvent.pageX,
+                            event.nativeEvent.pageY,
+                        ),
+                    ),
+            )}
+            style={slot.style("contextTrigger", undefined)}
             testID={props.testID}
-            {...(webProps as object)}
+            {...(slot.with("contextTrigger", webProps) as object)}
         >
             {props.children}
         </Pressable>
@@ -1251,6 +1319,8 @@ function MenuOverlay(props: MenuProps): ReactNode {
         ...surface
     } = props;
     const engine = useEngine();
+    const slot = nativeSlots(props, KEYS);
+    const testId = props.testId as TestIdOverride<Key> | undefined;
     const container = useContainerFrame(props.container);
     const measureContainer = useMeasureContainer(props.container);
     const { open, source, measured, presence, close, toggle } =
@@ -1288,6 +1358,7 @@ function MenuOverlay(props: MenuProps): ReactNode {
                 trigger(given, { open })
             ) : (
                 <Button
+                    {...triggerButtonProps(slot, testId)}
                     label={trigger}
                     onPress={given.onPress}
                     interactionSource={source}
@@ -1298,12 +1369,11 @@ function MenuOverlay(props: MenuProps): ReactNode {
             {contextTrigger === undefined ? null : (
                 <ContextTrigger
                     onOpen={opened}
+                    slot={slot}
                     testID={testIdOf(
                         menuOverlayAnatomy,
                         "contextTrigger",
-                        props.testId as TestIdOverride<
-                            PartName<typeof menuOverlayAnatomy>
-                        >,
+                        testId,
                     )}
                 >
                     {contextTrigger}

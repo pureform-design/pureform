@@ -28,6 +28,8 @@ import {
     searchViewSelection,
 } from "@pureform/binding-core";
 import type {
+    InnerProps,
+    MenuScopeInstances,
     SearchViewContentProps,
     SearchViewItem,
     SearchViewPart,
@@ -107,11 +109,21 @@ export interface SearchViewRootProps
     /** Another element or component to render instead of `<div>`. */
     readonly as?: ElementType | undefined;
     /** The suggestions' own props, drawn as menu items: `testId`, `unstyled`, and `tokens` (the
-     *  ready-made also takes `className`, `style`, and `slotProps` keyed by the items' parts). */
-    readonly menuProps?: InnerPropsOf<MenuAnatomy> | undefined;
+     *  ready-made also takes `className`, `style`, and `slotProps` keyed by the items' parts, also
+     *  by suggestion, `MenuScopeInstances`). */
+    readonly menuProps?: MenuScopeProps | undefined;
 }
 
-const NO_MENU_PROPS: InnerPropsOf<MenuAnatomy> = {};
+/** The list's own props, keyed by the menu's parts (an option's also by option). */
+type MenuScopeProps = Omit<
+    InnerPropsOf<MenuAnatomy>,
+    keyof SlotKeyedProps<MenuAnatomy>
+> &
+    InnerProps<
+        SlotKeyedProps<MenuAnatomy, never, MenuScopeInstances<SearchViewItem>>
+    >;
+
+const NO_MENU_PROPS: MenuScopeProps = {};
 
 /** A part's props: the element's own, and the part's `unstyled`. */
 export interface SearchViewPartProps extends PartProps {
@@ -217,7 +229,7 @@ function Root(props: SearchViewRootProps): ReactNode {
         testId:
             menuProps.testId ??
             (typeof props.testId === "string" ? props.testId : undefined),
-        unstyled: menuProps.unstyled,
+        unstyled: menuProps.unstyled as Unstyled<PartName<MenuAnatomy>>,
         indication: props.indication,
     });
     const {
@@ -486,7 +498,16 @@ function ReadyMadeContent({
 }): ReactNode {
     const { view, query, matches } = context.use("Root");
     const slot = useSlotProps(own);
-    const menuSlot = useSlotProps(own.menuProps ?? NO_MENU_PROPS);
+    const menuSlot = useSlotProps<
+        MenuAnatomy,
+        never,
+        MenuScopeInstances<SearchViewItem>
+    >(own.menuProps ?? NO_MENU_PROPS);
+    const each =
+        menuSlot.each("item") ||
+        menuSlot.each("itemContent") ||
+        menuSlot.each("itemLabel") ||
+        menuSlot.each("itemSupportingText");
     return (
         <>
             <Trigger {...slot("trigger")}>
@@ -546,28 +567,41 @@ function ReadyMadeContent({
                     <Content {...slot("content")}>
                         {isPresent(own.children)
                             ? own.children
-                            : matches.map((item) => (
-                                  <Item
-                                      key={item.value}
-                                      item={item}
-                                      {...menuSlot("item")}
-                                  >
-                                      <ItemContent {...menuSlot("itemContent")}>
-                                          <ItemLabel {...menuSlot("itemLabel")}>
-                                              {item.label}
-                                          </ItemLabel>
-                                          {item.supportingText ? (
-                                              <ItemSupportingText
+                            : matches.map((item, index) => {
+                                  const copy = each
+                                      ? { index, item }
+                                      : undefined;
+                                  return (
+                                      <Item
+                                          key={item.value}
+                                          item={item}
+                                          {...menuSlot("item", copy)}
+                                      >
+                                          <ItemContent
+                                              {...menuSlot("itemContent", copy)}
+                                          >
+                                              <ItemLabel
                                                   {...menuSlot(
-                                                      "itemSupportingText",
+                                                      "itemLabel",
+                                                      copy,
                                                   )}
                                               >
-                                                  {item.supportingText}
-                                              </ItemSupportingText>
-                                          ) : null}
-                                      </ItemContent>
-                                  </Item>
-                              ))}
+                                                  {item.label}
+                                              </ItemLabel>
+                                              {item.supportingText ? (
+                                                  <ItemSupportingText
+                                                      {...menuSlot(
+                                                          "itemSupportingText",
+                                                          copy,
+                                                      )}
+                                                  >
+                                                      {item.supportingText}
+                                                  </ItemSupportingText>
+                                              ) : null}
+                                          </ItemContent>
+                                      </Item>
+                                  );
+                              })}
                     </Content>
                 </Surface>
             </Positioner>

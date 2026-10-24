@@ -11,7 +11,11 @@ import {
     listSelection,
     overDefaults,
 } from "@pureform/binding-core";
-import type { ListItemData, ListRootOwnProps } from "@pureform/binding-core";
+import type {
+    ListInstances,
+    ListItemData,
+    ListRootOwnProps,
+} from "@pureform/binding-core";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import { createMemo, For, omit } from "solid-js";
 
@@ -38,7 +42,9 @@ export interface ListRootProps
 }
 
 /** An item's props: the `<li>`'s own. */
-export type ListItemWrapperProps = PartProps;
+export interface ListItemWrapperProps extends PartProps {
+    readonly unstyled?: boolean | undefined;
+}
 
 /** The list's root, a `<ul>`. A segmented list's items take their `position` among the tiles
  *  (`listItemPosition`). */
@@ -70,22 +76,33 @@ function Root(props: ListRootProps): JSX.Element {
 /** The `<li>` around a list item. */
 function Item(props: ListItemWrapperProps): JSX.Element {
     const { scope } = context.use("Item");
-    return scope.render("item", { element: "li", props });
+    return scope.render("item", {
+        element: "li",
+        unstyled: () => props.unstyled,
+        props: omit(props, "unstyled"),
+    });
 }
 
-type Keyed = SlotKeyedProps<typeof listAnatomy>;
 type ListItemDefaults = InnerPropsOf<typeof listItemAnatomy>;
 
-/** The ready-made list's props: Root's, with `class`, `style` and `slotProps` keyed by the list's
- *  own parts (`root`, the `<ul>`; `item`, each `<li>`), the items as data, and `listItemProps`,
+/** One item of the ready-made list: a list item's content, variants and own customizing props. */
+export type ListEntry = ListItemData<JSX.Element> & ListItemDefaults;
+
+type Keyed = SlotKeyedProps<
+    typeof listAnatomy,
+    never,
+    ListInstances<ListEntry>
+>;
+
+/** The ready-made list's props: Root's, with `class`, `style`, `slotProps` and `unstyled` keyed by
+ *  the list's own parts (`root`, the `<ul>`; `item`, each `<li>`, also by item, `ListInstances`),
+ *  the items as data, and `listItemProps`,
  *  every list item's defaults, under each item's own. */
 export interface ListProps
     extends Omit<ListRootProps, keyof Keyed | "children">, Keyed {
     /** The items, in order: each a list item's content, variants, and its own `class`, `style`,
      *  `slotProps`, `unstyled`, `testId` and `tokens`, over `listItemProps`. */
-    readonly items?:
-        | readonly (ListItemData<JSX.Element> & ListItemDefaults)[]
-        | undefined;
+    readonly items?: readonly ListEntry[] | undefined;
     /** Every list item's `class`, `style`, `slotProps`, `unstyled`, `testId` and `tokens`, under
      *  the item's own: `{ class: { headline: "bold" }, tokens: { … } }`. */
     readonly listItemProps?: ListItemDefaults | undefined;
@@ -99,23 +116,26 @@ const READY_MADE_PROPS = [
     ...LIST_CONTENT_PROPS,
 ] as const;
 
-interface ListEntry {
+interface ListRow {
     readonly key: string | number;
-    readonly item: ListItemData<JSX.Element> & ListItemDefaults;
+    readonly item: ListEntry;
 }
 
 /** The ready-made list: an item per entry of `items`, each a ListItem in an `<li>`, with its
  *  position among the tiles when segmented (an item's own `position` wins). An item's row
  *  is kept while its `value` (else its index) stays among the items, and follows its props. */
 function ReadyMade(props: ListProps): JSX.Element {
-    const slots = createSlotProps(props);
+    const slots = createSlotProps<
+        typeof listAnatomy,
+        never,
+        ListInstances<ListEntry>
+    >(props);
     const root = slots("root");
-    const item = slots("item");
     // An entry per item, kept while its item is the same object, so a row's props change only
     // when its item does.
-    let previous = new Map<string | number, ListEntry>();
+    let previous = new Map<string | number, ListRow>();
     const entries = createMemo(() => {
-        const next = new Map<string | number, ListEntry>();
+        const next = new Map<string | number, ListRow>();
         const list = (props.items ?? []).map((item, index) => {
             const key = item.value ?? index;
             const kept = previous.get(key);
@@ -147,7 +167,12 @@ function ReadyMade(props: ListProps): JSX.Element {
                             ) as ListItemProps,
                     );
                     return (
-                        <Item {...item}>
+                        <Item
+                            {...slots("item", () => ({
+                                index: index(),
+                                item: entry().item,
+                            }))}
+                        >
                             <ListItem position={position(index())} {...own()} />
                         </Item>
                     );

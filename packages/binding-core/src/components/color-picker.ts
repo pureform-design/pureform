@@ -163,3 +163,28 @@ export const COLOR_PICKER_THUMB_CENTRE = {
 /** Whether this browser has an eye dropper (Chromium's `EyeDropper`). Read it after mounting,
  *  so the server and the first render agree. */
 export const hasEyeDropper = (): boolean => "EyeDropper" in globalThis;
+
+/** What a ready-made color picker's preset swatch is, for a function of the copy in its
+ *  `swatchTrigger` and `swatch` keys. */
+export interface ColorPickerSwatchInstance {
+    /** The color it picks. */
+    readonly color: string;
+    /** Its 0-based index among the swatches. */
+    readonly index: number;
+}
+
+/** What a ready-made color picker's channel slider is, for a function of the copy in its
+ *  `channelSlider`, `channelSliderTrack`, `channelSliderThumb` and `transparencyGrid` keys. */
+export interface ColorPickerChannelInstance {
+    readonly channel: ColorPickerChannel;
+}
+
+/** The ready-made color picker's repeated parts, each to its copy. */
+export interface ColorPickerInstances {
+    readonly swatchTrigger: ColorPickerSwatchInstance;
+    readonly swatch: ColorPickerSwatchInstance;
+    readonly channelSlider: ColorPickerChannelInstance;
+    readonly channelSliderTrack: ColorPickerChannelInstance;
+    readonly channelSliderThumb: ColorPickerChannelInstance;
+    readonly transparencyGrid: ColorPickerChannelInstance;
+}

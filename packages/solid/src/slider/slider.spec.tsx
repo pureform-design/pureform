@@ -203,4 +203,44 @@ describe("Slider", () => {
             document.querySelector(`[data-testid="${ids.insetIcon}"]`),
         ).toBeNull();
     });
+
+    it("takes a function of each thumb and marker in their keys", async () => {
+        withRegistry(() => (
+            <Slider
+                aria-label={["From", "To"]}
+                defaultValue={[1, 3]}
+                min={0}
+                max={4}
+                stops
+                class={{
+                    handle: (thumb) => `thumb-${thumb.index}-${thumb.value}`,
+                    track: "plain",
+                }}
+                style={{ marker: (marker) => ({ opacity: marker.index / 4 }) }}
+                slotProps={{
+                    input: (thumb) => ({ title: `input ${thumb.index}` }),
+                }}
+                unstyled={{ stateLayer: (thumb) => thumb.index === 0 }}
+            />
+        ));
+        await settle();
+        const root = byTestId(ids.root);
+        const handles = root.querySelectorAll<HTMLElement>(
+            "[data-pf-part=handle]",
+        );
+        expect(handles[0]!.classList.contains("thumb-0-1")).toBe(true);
+        expect(handles[1]!.classList.contains("thumb-1-3")).toBe(true);
+        expect(byTestId(ids.track).classList.contains("plain")).toBe(true);
+        const markers = root.querySelectorAll<HTMLElement>(
+            "[data-pf-part=marker]",
+        );
+        expect(markers[2]!.style.opacity).toBe("0.5");
+        const inputs = root.querySelectorAll<HTMLInputElement>("input");
+        expect(inputs[1]!.title).toBe("input 1");
+        const layers = root.querySelectorAll<HTMLElement>(
+            `[data-testid="${ids.stateLayer}"]`,
+        );
+        expect(layers[0]!.className).toBe("");
+        expect(layers[1]!.className).not.toBe("");
+    });
 });

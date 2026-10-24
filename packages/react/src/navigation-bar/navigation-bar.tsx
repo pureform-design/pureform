@@ -12,8 +12,9 @@ import type { NavigationProps, NavigationRootProps } from "../navigation";
  *  `testId` and `unstyled` for every part, `as`, and the element's own props. */
 export type NavigationBarRootProps = NavigationRootProps<"navigationBar">;
 
-/** The ready-made navigation bar's props: Root's, with `className`, `style`, and `slotProps` keyed
- *  by part, and the destinations as `items`. */
+/** The ready-made navigation bar's props: Root's, with `className`, `style`, `slotProps` and
+ *  `unstyled` keyed by part (a destination's parts also by destination,
+ *  `NavigationItemInstance`), and the destinations as `items`. */
 export type NavigationBarProps = NavigationProps<"navigationBar">;
 
 const { ReadyMade, parts } = createNavigation({

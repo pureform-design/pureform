@@ -19,7 +19,9 @@ import {
 } from "@pureform/binding-core";
 import type {
     CodeFieldBehaviorProps,
+    CodeFieldCellInstance,
     CodeFieldContentProps,
+    CodeFieldInstances,
     CodeFieldPart,
     CodeFieldVariantProps,
 } from "@pureform/binding-core";
@@ -65,7 +67,7 @@ export interface CodeFieldProps
             | "cellLabel"
         >,
         CodeFieldContentProps<ReactNode>,
-        NativeSlotProps<CodeFieldHosts> {
+        NativeSlotProps<CodeFieldHosts, CodeFieldInstances> {
     /** A prefix for every part's test id (`otp` → `otp-input`), or ids by part. */
     readonly testId?: TestIdOverride<CodeFieldPart> | undefined;
 }
@@ -102,6 +104,9 @@ const WEB = Platform.OS === "web";
 function CellImpl(options: CellOptions): ReactNode {
     const { props, index } = options;
     const slot = nativeSlots(props);
+    const cell: CodeFieldCellInstance | undefined = slot.each("input")
+        ? { index, value: options.value }
+        : undefined;
     const [focused, setFocused] = useState(false);
     const { styles: s, views: v } = useComponentSlots<CodeFieldPart>(
         "codeField",
@@ -118,18 +123,23 @@ function CellImpl(options: CellOptions): ReactNode {
     const numeric = (props.type ?? "numeric") === "numeric";
     return (
         <v.input.TextInput
-            {...slot.props("input")}
+            {...slot.props("input", cell)}
             ref={options.inputRef}
             value={options.value}
-            onChangeText={slot.on("input", "onChangeText", (text: string) => {
-                // The new character is what the cell didn't hold.
-                const typed =
-                    text.length > 1 && text.startsWith(options.value)
-                        ? text.slice(options.value.length)
-                        : text;
-                if (typed === "") options.onBackspace();
-                else options.onText(typed);
-            })}
+            onChangeText={slot.on(
+                "input",
+                "onChangeText",
+                (text: string) => {
+                    // The new character is what the cell didn't hold.
+                    const typed =
+                        text.length > 1 && text.startsWith(options.value)
+                            ? text.slice(options.value.length)
+                            : text;
+                    if (typed === "") options.onBackspace();
+                    else options.onText(typed);
+                },
+                cell,
+            )}
             onKeyPress={slot.on(
                 "input",
                 "onKeyPress",
@@ -140,15 +150,26 @@ function CellImpl(options: CellOptions): ReactNode {
                     )
                         options.onBackspace();
                 },
+                cell,
             )}
-            onFocus={slot.on("input", "onFocus", () => {
-                setFocused(true);
-                options.onFocus();
-            })}
-            onBlur={slot.on("input", "onBlur", () => {
-                setFocused(false);
-                options.onBlur();
-            })}
+            onFocus={slot.on(
+                "input",
+                "onFocus",
+                () => {
+                    setFocused(true);
+                    options.onFocus();
+                },
+                cell,
+            )}
+            onBlur={slot.on(
+                "input",
+                "onBlur",
+                () => {
+                    setFocused(false);
+                    options.onBlur();
+                },
+                cell,
+            )}
             editable={!(props.disabled && !WEB) && !props.readOnly}
             {...(WEB
                 ? ({
@@ -173,7 +194,7 @@ function CellImpl(options: CellOptions): ReactNode {
                 options.length,
             )}
             aria-invalid={options.invalid}
-            style={slot.style("input", s.input)}
+            style={slot.style("input", s.input, cell)}
             testID={id("input", props)}
         />
     );

@@ -6,7 +6,7 @@
 import type { listAnatomy, PartName, TestIdOverride } from "@pureform/anatomy";
 import type { InstanceTokens, Selection } from "@pureform/styling";
 
-import type { Unstyled } from "../parts";
+import type { ItemInstance, Unstyled } from "../parts";
 import type {
     ListItemContentProps,
     ListItemExpandProps,
@@ -126,3 +126,9 @@ export const listItemPosition = (
     count: number,
     segmented: boolean,
 ): "none" | TilePosition => (segmented ? tilePosition(index, count) : "none");
+
+/** The ready-made list's repeated parts, each to its copy (`ItemInstance`: its index and the
+ *  item's data): `className={{ item: ({ index }) => ... }}`. */
+export interface ListInstances<Item = unknown> {
+    readonly item: ItemInstance<Item>;
+}

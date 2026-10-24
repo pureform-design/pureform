@@ -33,6 +33,29 @@ const options = () =>
     ] as HTMLElement[];
 
 describe("SelectionList", () => {
+    it("takes a function of each option in the item's keys", async () => {
+        withRegistry(
+            <SelectionList
+                aria-label="Folders"
+                items={ITEMS}
+                className={{ item: ({ item }) => `row-${item.value}` }}
+                style={{ item: ({ index }) => ({ opacity: index ? 0.5 : 1 }) }}
+                slotProps={{ item: ({ index }) => ({ title: `row ${index}` }) }}
+                unstyled={{ item: ({ index }) => index === 0 }}
+            />,
+        );
+        await settle();
+        const rows = [
+            ...document.querySelectorAll<HTMLElement>(
+                `[data-testid="${testIds.list.item}"]`,
+            ),
+        ];
+        expect(rows[0]!.className).toBe("row-inbox");
+        expect(rows[1]!.classList.contains("row-starred")).toBe(true);
+        expect(rows[2]!.style.opacity).toBe("0.5");
+        expect(rows[2]!.title).toBe("row 2");
+    });
+
     it("renders a listbox of list items as options, marked with aria-selected", async () => {
         withRegistry(
             <SelectionList

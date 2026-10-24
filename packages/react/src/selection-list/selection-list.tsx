@@ -11,6 +11,7 @@ import {
     selectionListOptions,
 } from "@pureform/binding-core";
 import type {
+    ListInstances,
     SelectionListItem,
     SelectionListRootOwnProps,
 } from "@pureform/binding-core";
@@ -31,11 +32,21 @@ import { omitProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 
-type Keyed = SlotKeyedProps<typeof listAnatomy>;
+/** One option of the selection list: a list item's content and variants, its value, and its own
+ *  customizing props. */
+export type SelectionListEntry = SelectionListItem<ReactNode> &
+    InnerPropsOf<typeof listItemAnatomy>;
+
+type Keyed = SlotKeyedProps<
+    typeof listAnatomy,
+    never,
+    ListInstances<SelectionListEntry>
+>;
 
 /** The selection list's props: the list's variants (`variant`, `density`, `color`, …) and own
  *  tokens, the selection (`selectionMode`, `value`, …), the options as data, `className`,
- *  `style` and `slotProps` keyed by the list's parts (`root`, `item`), `listItemProps` for every
+ *  `style`, `slotProps` and `unstyled` keyed by the list's parts (`root`, `item`; an item's also by
+ *  option, `ListInstances`), `listItemProps` for every
  *  option under its own, `testId`, and the list element's own props. Name it with `aria-label`
  *  or `aria-labelledby`. */
 export interface SelectionListProps
@@ -49,10 +60,7 @@ export interface SelectionListProps
     /** The options, in order: each a list item's content and variants, its value, and its own
      *  `className`, `style`, `slotProps`, `unstyled`, `testId` and `tokens`, over
      *  `listItemProps`. */
-    readonly items?:
-        | readonly (SelectionListItem<ReactNode> &
-              InnerPropsOf<typeof listItemAnatomy>)[]
-        | undefined;
+    readonly items?: readonly SelectionListEntry[] | undefined;
     /** Every option's `className`, `style`, `slotProps`, `unstyled`, `testId` and `tokens`,
      *  under the option's own. */
     readonly listItemProps?: InnerPropsOf<typeof listItemAnatomy> | undefined;
@@ -87,7 +95,12 @@ export function SelectionList(props: SelectionListProps): ReactNode {
         props,
     );
     const { items = [], listItemProps } = props;
-    const slot = useSlotProps(props);
+    const slot = useSlotProps<
+        typeof listAnatomy,
+        never,
+        ListInstances<SelectionListEntry>
+    >(props);
+    const each = slot.each("item");
     const collection = useMemo(
         () => selectionList.collection({ items: selectionListOptions(items) }),
         [items],
@@ -110,16 +123,22 @@ export function SelectionList(props: SelectionListProps): ReactNode {
             {...(api.getContentProps() as object)}
         >
             {items.map(
-                ({
-                    value,
-                    textValue: _text,
-                    disabled,
-                    interactionSource,
-                    ...item
-                }) => (
+                (
+                    {
+                        value,
+                        textValue: _text,
+                        disabled,
+                        interactionSource,
+                        ...item
+                    },
+                    index,
+                ) => (
                     <List.Item
                         key={value}
-                        {...slot("item")}
+                        {...slot(
+                            "item",
+                            each ? { index, item: items[index]! } : undefined,
+                        )}
                         role="presentation"
                     >
                         <ListItem

@@ -8,7 +8,9 @@
 import type {
     navigationBarAnatomy,
     navigationRailAnatomy,
+    PartName,
     scrimAnatomy,
+    TestIdOverride,
 } from "@pureform/anatomy";
 import {
     dialogBackdropLayout,
@@ -27,9 +29,12 @@ import {
 import type {
     NavigationComponent,
     NavigationContentProps,
+    NavigationInstances,
     NavigationItem,
+    NavigationItemInstance,
     NavigationItemOwnProps,
     NavigationRootOwnProps,
+    Unstyled,
 } from "@pureform/binding-core";
 import type { InteractionSource } from "@pureform/binding-core/interaction";
 import * as dialog from "@pureform/machines/dialog";
@@ -37,7 +42,15 @@ import * as navigation from "@pureform/machines/navigation";
 import type { Selection } from "@pureform/styling";
 import { mergeProps, normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";
-import { type ElementType, Fragment, type ReactNode, useId } from "react";
+import {
+    createContext,
+    type ElementType,
+    Fragment,
+    type ReactNode,
+    useContext,
+    useId,
+    useMemo,
+} from "react";
 
 import { useControllable } from "./controllable";
 import { useItemInteractionSources } from "./interaction";
@@ -45,7 +58,7 @@ import type { ItemInteractionSources } from "./interaction";
 import { useMachine } from "./machine";
 import { createPartContext } from "./part-context";
 import { useComponent, useSlotProps } from "./parts";
-import type { ComponentScope, SlotKeyedProps } from "./parts";
+import type { ComponentScope, SlotKeyedProps, SlotPropsOf } from "./parts";
 import { combinePartProps, omitProps } from "./props";
 import type { PartProps } from "./props";
 import { useDirection } from "./provider";
@@ -89,14 +102,50 @@ export interface NavigationIconProps extends NavigationPartProps {
 export interface NavigationItemProps
     extends NavigationPartProps, NavigationItemOwnProps {}
 
+/** A modal rail's own pieces besides its anatomy's: the scrim and the dialog around the rail. */
+export type NavigationModalPart = "scrim" | "dialog";
+
+/** The extra keys the ready-made component `C` takes: a rail's modal pieces. */
+type ExtraOf<C extends NavigationComponent> = C extends "navigationRail"
+    ? NavigationModalPart
+    : never;
+
 /** The ready-made component's props, for the component `C`: Root's, with `className`, `style`,
- *  and `slotProps` keyed by part, and the destinations as data. */
+ *  `slotProps` and `unstyled` keyed by part (a destination's parts also by destination,
+ *  `NavigationItemInstance`; a modal rail's `scrim` and `dialog` too), and the destinations as
+ *  data. */
 export type NavigationProps<C extends NavigationComponent> = Omit<
     NavigationRootProps<C>,
     keyof SlotKeyedProps<Anatomy> | "children"
 > &
-    SlotKeyedProps<Anatomy> &
-    NavigationContentProps<ReactNode>;
+    Omit<
+        SlotKeyedProps<Anatomy, ExtraOf<C>, NavigationInstances<ReactNode>>,
+        "testId" | "unstyled"
+    > &
+    NavigationContentProps<ReactNode> & {
+        /** Opts parts out of the registry's styles: every part, or by part (a destination's also
+         *  by destination; a modal rail's `scrim` too). */
+        readonly unstyled?:
+            | Unstyled<
+                  PartName<Anatomy> | ExtraOf<C>,
+                  NavigationInstances<ReactNode>
+              >
+            | undefined;
+        /** A prefix for every part's test id, or ids by part (a modal rail's `scrim` and
+         *  `dialog` too). */
+        readonly testId?:
+            | TestIdOverride<PartName<Anatomy> | ExtraOf<C>>
+            | undefined;
+    };
+
+/** What the ready-made rail gives its modal pieces: the keyed props of `scrim` and `dialog`. */
+const ModalSlots = createContext<
+    | {
+          readonly scrim: PartProps;
+          readonly dialog: PartProps;
+      }
+    | undefined
+>(undefined);
 
 /** Builds a navigation component's parts and ready-made component. */
 export function createNavigation<C extends NavigationComponent>(config: {
@@ -132,13 +181,25 @@ export function createNavigation<C extends NavigationComponent>(config: {
             ...open.machineProps,
         });
         const api = dialog.connect(service, normalizeProps);
-        const testId = props.own.testId;
+        const slots = useContext(ModalSlots);
+        const { unstyled: scrimUnstyled, ...scrimProps } = (slots?.scrim ??
+            {}) as PartProps & { readonly unstyled?: boolean };
+        const testId = props.own.testId as
+            | TestIdOverride<NavigationModalPart>
+            | undefined;
+        const modalId = (part: NavigationModalPart) =>
+            typeof testId === "string" ? `${testId}-${part}` : testId?.[part];
+        const unstyled = props.own.unstyled;
         const scrim = useComponent(config.scrim!, {
             selection: {},
             testId:
-                typeof testId === "string"
-                    ? { root: `${testId}-scrim` }
-                    : undefined,
+                modalId("scrim") === undefined
+                    ? undefined
+                    : { root: modalId("scrim")! },
+            unstyled:
+                unstyled === true ||
+                (typeof unstyled === "object" &&
+                    (unstyled as { scrim?: unknown }).scrim === true),
         });
         return (
             <>
@@ -148,6 +209,8 @@ export function createNavigation<C extends NavigationComponent>(config: {
                         api.getBackdropProps(),
                         normalizeProps.element(dialogBackdropLayout(api.open)),
                     ),
+                    unstyled: scrimUnstyled,
+                    props: scrimProps,
                 })}
                 <div
                     {...mergeProps(
@@ -158,12 +221,18 @@ export function createNavigation<C extends NavigationComponent>(config: {
                     )}
                 >
                     <div
-                        {...mergeProps(
-                            api.getContentProps(),
-                            normalizeProps.element(
-                                navigationModalContentLayout(api.open),
+                        {...(combinePartProps([
+                            mergeProps(
+                                api.getContentProps(),
+                                normalizeProps.element(
+                                    navigationModalContentLayout(api.open),
+                                ),
                             ),
-                        )}
+                            slots?.dialog as
+                                | Record<string, unknown>
+                                | undefined,
+                            { "data-testid": modalId("dialog") },
+                        ]) as object)}
                     >
                         {props.children}
                     </div>
@@ -345,6 +414,46 @@ export function createNavigation<C extends NavigationComponent>(config: {
         });
     }
 
+    /** A ready-made destination: every part, the icon only when given. */
+    function Destination(props: {
+        readonly item: NavigationItem<ReactNode>;
+        readonly index: number;
+        readonly slot: SlotPropsOf<
+            PartName<Anatomy>,
+            NavigationInstances<ReactNode>
+        >;
+    }): ReactNode {
+        const { item, slot } = props;
+        const { api } = context.use("Item");
+        const copy: NavigationItemInstance<ReactNode> | undefined =
+            props.index < 0
+                ? undefined
+                : {
+                      index: props.index,
+                      item,
+                      selected: api.value === item.value,
+                  };
+        return (
+            <Item
+                value={item.value}
+                href={item.href}
+                disabled={item.disabled}
+                interactionSource={item.interactionSource}
+                {...slot("item", copy)}
+            >
+                <Indicator {...slot("indicator", copy)}>
+                    <ActiveIndicator {...slot("activeIndicator", copy)} />
+                    {isPresent(item.icon) ? (
+                        <Icon mirror={item.mirrorIcon} {...slot("icon", copy)}>
+                            {item.icon}
+                        </Icon>
+                    ) : null}
+                </Indicator>
+                <Label {...slot("label", copy)}>{item.label}</Label>
+            </Item>
+        );
+    }
+
     /** The ready-made component: a destination per item, each with every part in the preset's
      *  structure, the icon only when given. */
     function ReadyMade(props: NavigationProps<C>): ReactNode {
@@ -356,55 +465,63 @@ export function createNavigation<C extends NavigationComponent>(config: {
             header,
             ...rootProps
         } = props;
-        const slot = useSlotProps(props);
+        const slot = useSlotProps<
+            Anatomy,
+            NavigationModalPart,
+            NavigationInstances<ReactNode>
+        >(props as never);
+        const each =
+            slot.each("item") ||
+            slot.each("indicator") ||
+            slot.each("activeIndicator") ||
+            slot.each("icon") ||
+            slot.each("label");
+        const scrim = slot("scrim");
+        const dialogSlot = slot("dialog");
+        const modalSlots = useMemo(
+            () => ({ scrim, dialog: dialogSlot }),
+            [scrim, dialogSlot],
+        );
         const destination = (item: NavigationItem<ReactNode>) => (
-            <Item
+            <Destination
                 key={item.value}
-                value={item.value}
-                href={item.href}
-                disabled={item.disabled}
-                interactionSource={item.interactionSource}
-                {...slot("item")}
-            >
-                <Indicator {...slot("indicator")}>
-                    <ActiveIndicator {...slot("activeIndicator")} />
-                    {isPresent(item.icon) ? (
-                        <Icon mirror={item.mirrorIcon} {...slot("icon")}>
-                            {item.icon}
-                        </Icon>
-                    ) : null}
-                </Indicator>
-                <Label {...slot("label")}>{item.label}</Label>
-            </Item>
+                item={item}
+                index={each ? items.indexOf(item) : -1}
+                slot={slot}
+            />
         );
         return (
-            <Root
-                {...(rootProps as NavigationRootProps<C>)}
-                {...(slot("root") as object)}
-            >
-                {hasHeader && isPresent(header) ? (
-                    <Header {...(slot as (part: string) => object)("header")}>
-                        {header}
-                    </Header>
-                ) : null}
-                {(hasHeader
-                    ? navigationSections(items)
-                    : [{ group: undefined, items }]
-                ).map((section, index) => (
-                    <Fragment key={section.group ?? `#${index}`}>
-                        {section.group === undefined ? null : (
-                            <SectionLabel
-                                {...(slot as (part: string) => PartProps)(
-                                    "sectionLabel",
-                                )}
-                            >
-                                {section.group}
-                            </SectionLabel>
-                        )}
-                        {section.items.map(destination)}
-                    </Fragment>
-                ))}
-            </Root>
+            <ModalSlots.Provider value={modalSlots}>
+                <Root
+                    {...(rootProps as NavigationRootProps<C>)}
+                    {...(slot("root") as object)}
+                >
+                    {hasHeader && isPresent(header) ? (
+                        <Header
+                            {...(slot as (part: string) => object)("header")}
+                        >
+                            {header}
+                        </Header>
+                    ) : null}
+                    {(hasHeader
+                        ? navigationSections(items)
+                        : [{ group: undefined, items }]
+                    ).map((section, index) => (
+                        <Fragment key={section.group ?? `#${index}`}>
+                            {section.group === undefined ? null : (
+                                <SectionLabel
+                                    {...(slot as (part: string) => PartProps)(
+                                        "sectionLabel",
+                                    )}
+                                >
+                                    {section.group}
+                                </SectionLabel>
+                            )}
+                            {section.items.map(destination)}
+                        </Fragment>
+                    ))}
+                </Root>
+            </ModalSlots.Provider>
         );
     }
 

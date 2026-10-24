@@ -5,6 +5,7 @@
 // pasting a whole code fills every cell.
 
 import { codeFieldAnatomy } from "@pureform/anatomy";
+import type { PartName } from "@pureform/anatomy";
 import {
     CODE_FIELD_CONTENT_PROPS,
     CODE_FIELD_ROOT_PROPS,
@@ -14,6 +15,7 @@ import {
 } from "@pureform/binding-core";
 import type {
     CodeFieldContentProps,
+    CodeFieldInstances,
     CodeFieldRootOwnProps,
     CodeFieldValueDetails,
 } from "@pureform/binding-core";
@@ -37,7 +39,7 @@ import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
 import { createSlotProps, useComponent } from "../parts";
-import type { ComponentScope, SlotKeyedProps } from "../parts";
+import type { ComponentScope, SlotKeyedProps, SlotPropsOf } from "../parts";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 
@@ -164,12 +166,12 @@ function SupportingText(props: CodeFieldPartProps): JSX.Element {
     return renderErrorSupportingText(scope, error, props);
 }
 
-/** The ready-made code field's props: Root's, with `class`, `style`, and `slotProps` keyed by
- *  part (`input`'s go on every cell), and the label and supporting text as content. */
+/** The ready-made code field's props: Root's, with `class`, `style`, `slotProps` and `unstyled`
+ *  keyed by part (`input`'s go on every cell, or by cell, `CodeFieldCellInstance`), and the label and supporting text as content. */
 export interface CodeFieldProps
     extends
         Omit<CodeFieldRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
-        SlotKeyedProps<Anatomy>,
+        SlotKeyedProps<Anatomy, never, CodeFieldInstances>,
         CodeFieldContentProps<JSX.Element> {}
 
 const READY_MADE_PROPS = [
@@ -182,7 +184,7 @@ const READY_MADE_PROPS = [
 // Inside Root, so it can read the cells and whether an error shows.
 function Content(props: {
     readonly own: CodeFieldProps;
-    readonly slots: (part: string) => PartProps;
+    readonly slots: SlotPropsOf<PartName<Anatomy>, CodeFieldInstances>;
 }): JSX.Element {
     const { api, error } = context.use("Root");
     const own = props.own;
@@ -194,7 +196,13 @@ function Content(props: {
             <Control {...props.slots("control")}>
                 <For each={api().items}>
                     {(index) => (
-                        <Input index={index} {...props.slots("input")} />
+                        <Input
+                            index={index}
+                            {...props.slots("input", () => ({
+                                index,
+                                value: api().value[index] ?? "",
+                            }))}
+                        />
                     )}
                 </For>
             </Control>
@@ -210,7 +218,7 @@ function Content(props: {
 /** The ready-made code field: the label (when given), a cell per character, and the supporting
  *  text (when given, or while an error shows). */
 function ReadyMade(props: CodeFieldProps): JSX.Element {
-    const slots = createSlotProps(props) as (part: string) => PartProps;
+    const slots = createSlotProps<Anatomy, never, CodeFieldInstances>(props);
     const own = omit(props, ...READY_MADE_PROPS) as CodeFieldRootProps;
     const root = slots("root") as object;
     return (

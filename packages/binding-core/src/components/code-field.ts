@@ -239,3 +239,16 @@ export const codeFieldBackspace = (
     next.push("");
     return { cells: next, focus: Math.max(0, index - 1) };
 };
+
+/** What a ready-made code field's cell is, for a function of the copy in its `input` key. */
+export interface CodeFieldCellInstance {
+    /** The cell's 0-based index. */
+    readonly index: number;
+    /** Its character, or `""` while empty. */
+    readonly value: string;
+}
+
+/** The ready-made code field's repeated parts, each to its copy. */
+export interface CodeFieldInstances {
+    readonly input: CodeFieldCellInstance;
+}

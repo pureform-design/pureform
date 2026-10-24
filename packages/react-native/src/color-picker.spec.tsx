@@ -116,6 +116,66 @@ describe("ColorPicker on React Native", () => {
         await until(() => expect(hexInput().value).toBe("AABBCC"));
     });
 
+    it("runs the user's hex input handlers after its own", async () => {
+        const calls: string[] = [];
+        const onValueChangeEnd = vi.fn(() => calls.push("picker"));
+        await withRegistry(
+            <ColorPicker
+                onValueChangeEnd={onValueChangeEnd}
+                textFieldProps={{
+                    slotProps: {
+                        input: {
+                            onSubmitEditing: () => calls.push("submit"),
+                            onBlur: () => calls.push("blur"),
+                        },
+                    },
+                }}
+            />,
+        );
+        await userEvent.clear(hexInput());
+        await userEvent.type(hexInput(), "abc{Enter}");
+        await until(() =>
+            expect(calls.slice(0, 2)).toEqual(["picker", "submit"]),
+        );
+        await userEvent.clear(hexInput());
+        await userEvent.type(hexInput(), "123456");
+        await userEvent.tab();
+        await until(() => expect(calls.slice(-2)).toEqual(["picker", "blur"]));
+    });
+
+    it("takes a function of each swatch and channel in their style and slotProps", async () => {
+        await withRegistry(
+            <ColorPicker
+                alpha
+                swatches={["#ff0000", "#00ff00"]}
+                style={{
+                    swatch: ({ index }) =>
+                        index === 1 ? { opacity: 0.5 } : undefined,
+                    channelSliderTrack: ({ channel }) =>
+                        channel === "alpha" ? { opacity: 0.25 } : undefined,
+                    areaThumb: { opacity: 0.75 },
+                }}
+                slotProps={{
+                    swatchTrigger: ({ color }) => ({
+                        accessibilityHint: color,
+                    }),
+                }}
+            />,
+        );
+        const all = (id: string) => [
+            ...document.querySelectorAll<HTMLElement>(`[data-testid="${id}"]`),
+        ];
+        expect(
+            all(ids.swatch).map((each) => getComputedStyle(each).opacity),
+        ).toEqual(["1", "0.5"]);
+        expect(
+            all(ids.channelSliderTrack).map(
+                (each) => getComputedStyle(each).opacity,
+            ),
+        ).toEqual(["1", "0.25"]);
+        expect(getComputedStyle(byTestId(ids.areaThumb)).opacity).toBe("0.75");
+    });
+
     it("adds the alpha slider over a transparency grid", async () => {
         await withRegistry(<ColorPicker alpha />);
         expect(byTestId(ids.transparencyGrid)).toBeTruthy();

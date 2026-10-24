@@ -30,7 +30,9 @@ import type {
     MenuBehaviorProps,
     MenuContentProps,
     MenuItem as MenuItemData,
+    MenuInstances,
     MenuItemBehaviorProps,
+    MenuItemInstance,
     MenuRootOwnProps,
     MenuSelectDetails,
     MenuVariantProps,
@@ -71,7 +73,7 @@ import type { ItemInteractionSources } from "../interaction";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import { useComponent, useSlotProps, asRoot } from "../parts";
-import type { ComponentScope, SlotKeyedProps } from "../parts";
+import type { ComponentScope, SlotKeyedProps, SlotPropsOf } from "../parts";
 import { usePresence } from "../presence";
 import type { Presence } from "../presence";
 import { omitProps } from "../props";
@@ -92,6 +94,9 @@ interface MenuContextValue {
     /** What a submenu takes from its parent unless given: choosing an item reports to the
      *  parent's `onSelect`, and the parent's keyboard options. */
     readonly behavior: InheritedBehavior;
+    /** The test ids and `unstyled`, which a submenu takes unless given its own. */
+    readonly testId: MenuRootProps["testId"];
+    readonly unstyled: MenuRootProps["unstyled"];
     /** A submenu's parent menu. */
     readonly parent?: MenuContextValue | undefined;
 }
@@ -196,10 +201,12 @@ function useMenu(
               tokens: own.tokens ?? parent.variants.tokens,
           }
         : own;
+    const testId = props.testId ?? parent?.testId;
+    const unstyled = props.unstyled ?? parent?.unstyled;
     const scope = useComponent(menuOverlayAnatomy, {
         selection: menuSelection(variants),
-        testId: props.testId,
-        unstyled: props.unstyled,
+        testId,
+        unstyled,
         indication: props.indication,
     });
     const parentService = parent?.service;
@@ -216,6 +223,8 @@ function useMenu(
         presence,
         variants,
         behavior,
+        testId,
+        unstyled,
         parent: parent ?? undefined,
     };
 }
@@ -492,35 +501,70 @@ const AutoSubmenuContext = createContext<AutoSubmenuValue | undefined>(
     undefined,
 );
 
+/** The slot props `ItemEntry` gives each part of an item: a ready-made's `useSlotProps`, whose
+ *  functions of the row (`MenuItemInstance`) it resolves, or one function of the part. */
+export type MenuItemSlot =
+    | SlotPropsOf<PartName<Anatomy>, MenuInstances<ReactNode>>
+    | ((part: PartName<Anatomy>) => PartProps);
+
+// What `ItemEntry` calls: either form, read loosely.
+type RowSlot = ((part: string, instance?: unknown) => PartProps) & {
+    readonly each?: ((part: string) => boolean) | undefined;
+};
+
 /** `ItemEntry`'s props: the item as data, and the slot props each of its parts takes. */
 export interface MenuItemEntryProps {
     readonly item: MenuItemData<ReactNode>;
-    readonly slot?: ((part: PartName<Anatomy>) => PartProps) | undefined;
+    readonly slot?: MenuItemSlot | undefined;
     /** An item with `items` is a row that drills into them (the menu's `onSelect` hears its
      *  value) rather than a submenu beside it. */
     readonly drill?: boolean | undefined;
+    /** Its index among its level's (or group's) items, for a function of the row. */
+    readonly index?: number | undefined;
+    /** How deep its submenu is, for a function of the row: `0` for the menu's own items. */
+    readonly depth?: number | undefined;
 }
 
-const NO_SLOT = (): PartProps => ({});
+const NO_SLOT: MenuItemSlot = () => ({});
+
+const ITEM_PARTS = [
+    "item",
+    "itemLeading",
+    "itemContent",
+    "itemLabel",
+    "itemSupportingText",
+    "itemTrailing",
+    "itemTrailingText",
+] as const;
+
+/** Whether a function of the row was passed for any of an item's parts. */
+const eachRow = (slot: MenuItemSlot): boolean => {
+    const { each } = slot as RowSlot;
+    return !!each && ITEM_PARTS.some((part) => each(part));
+};
 
 /** An `Item` from data, with its icons, label, supporting text and trailing text: what the
  *  ready-made menu renders per entry, for a component that holds a menu (the split button). */
 function ItemEntry({
     item,
-    slot = NO_SLOT,
+    slot: given = NO_SLOT,
     drill,
+    index = 0,
+    depth = 0,
 }: MenuItemEntryProps): ReactNode {
     const auto = useContext(AutoSubmenuContext);
+    const slot = given as RowSlot;
+    const row = eachRow(slot) ? { item, index, depth } : undefined;
     if (hasSubmenu(item) && (drill || auto?.drills.has(item.value))) {
         return (
             <Item
                 {...menuItemProps(item)}
                 closeOnSelect={false}
                 aria-haspopup="menu"
-                {...slot("item")}
+                {...slot("item", row)}
             >
-                <ItemParts item={item} slot={slot} />
-                <ItemTrailing mirror {...slot("itemTrailing")}>
+                <ItemParts item={item} slot={slot} row={row} />
+                <ItemTrailing mirror {...slot("itemTrailing", row)}>
                     <ChevronEndIcon />
                 </ItemTrailing>
             </Item>
@@ -530,19 +574,21 @@ function ItemEntry({
         return (
             <Submenu>
                 <AutoSubmenu value={item.value} />
-                <TriggerItem {...slot("item")}>
-                    <ItemParts item={item} slot={slot} />
-                    <ItemTrailing mirror {...slot("itemTrailing")}>
+                <TriggerItem {...slot("item", row)}>
+                    <ItemParts item={item} slot={slot} row={row} />
+                    <ItemTrailing mirror {...slot("itemTrailing", row)}>
                         <ChevronEndIcon />
                     </ItemTrailing>
                 </TriggerItem>
                 <Positioner {...slot("positioner")}>
                     <Content {...slot("content")}>
-                        {(item.items ?? []).map((entry) => (
+                        {(item.items ?? []).map((entry, at) => (
                             <ItemEntry
                                 key={entry.value}
                                 item={entry}
-                                slot={slot}
+                                slot={given}
+                                index={at}
+                                depth={depth + 1}
                             />
                         ))}
                     </Content>
@@ -551,8 +597,8 @@ function ItemEntry({
         );
     }
     return (
-        <Item {...menuItemProps(item)} {...slot("item")}>
-            <ItemParts item={item} slot={slot} />
+        <Item {...menuItemProps(item)} {...slot("item", row)}>
+            <ItemParts item={item} slot={slot} row={row} />
         </Item>
     );
 }
@@ -561,24 +607,26 @@ function ItemEntry({
 function ItemParts({
     item,
     slot,
+    row,
 }: {
     readonly item: MenuItemData<ReactNode>;
-    readonly slot: (part: PartName<Anatomy>) => PartProps;
+    readonly slot: RowSlot;
+    readonly row: MenuItemInstance<ReactNode> | undefined;
 }): ReactNode {
     return (
         <>
             {isPresent(item.leadingIcon) ? (
                 <ItemLeading
                     mirror={item.mirrorLeadingIcon}
-                    {...slot("itemLeading")}
+                    {...slot("itemLeading", row)}
                 >
                     {item.leadingIcon}
                 </ItemLeading>
             ) : null}
-            <ItemContent {...slot("itemContent")}>
-                <ItemLabel {...slot("itemLabel")}>{item.label}</ItemLabel>
+            <ItemContent {...slot("itemContent", row)}>
+                <ItemLabel {...slot("itemLabel", row)}>{item.label}</ItemLabel>
                 {isPresent(item.supportingText) ? (
-                    <ItemSupportingText {...slot("itemSupportingText")}>
+                    <ItemSupportingText {...slot("itemSupportingText", row)}>
                         {item.supportingText}
                     </ItemSupportingText>
                 ) : null}
@@ -586,13 +634,13 @@ function ItemParts({
             {isPresent(item.trailingIcon) ? (
                 <ItemTrailing
                     mirror={item.mirrorTrailingIcon}
-                    {...slot("itemTrailing")}
+                    {...slot("itemTrailing", row)}
                 >
                     {item.trailingIcon}
                 </ItemTrailing>
             ) : null}
             {isPresent(item.trailingText) ? (
-                <ItemTrailingText {...slot("itemTrailingText")}>
+                <ItemTrailingText {...slot("itemTrailingText", row)}>
                     {item.trailingText}
                 </ItemTrailingText>
             ) : null}
@@ -679,12 +727,13 @@ function DrillMotion(props: {
     return null;
 }
 
-/** The ready-made menu's props: Root's, with `className`, `style`, and `slotProps` keyed by part,
- *  the trigger's label, and the items as data. */
+/** The ready-made menu's props: Root's, with `className`, `style`, `slotProps` and `unstyled`
+ *  keyed by part (an item's parts also by row, `MenuItemInstance`, at every submenu's level), the
+ *  trigger's label, and the items as data. */
 export interface MenuProps
     extends
         Omit<MenuRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
-        SlotKeyedProps<Anatomy>,
+        SlotKeyedProps<Anatomy, never, MenuInstances<ReactNode>>,
         MenuContentProps<ReactNode> {}
 
 /** The ready-made menu: the trigger, drawn as a button, when given a label, and the menu with an
@@ -702,7 +751,7 @@ function ReadyMade(props: MenuProps): ReactNode {
         container,
         ...rootProps
     } = props;
-    const slot = useSlotProps(props);
+    const slot = useSlotProps<Anatomy, never, MenuInstances<ReactNode>>(props);
     const auto = submenuProp === undefined || submenuProp === "auto";
     // The submenu items drilled into, outermost first. Once drilled into (`auto` drills into a
     // submenu that doesn't fit as it opens), the menu stays a drill until it's back out.
@@ -712,6 +761,11 @@ function ReadyMade(props: MenuProps): ReactNode {
     const [drills, setDrills] = useState<ReadonlySet<string>>(new Set());
     const level = menuDrillLevel(allItems, allGroups, drill ? path : []);
     const { items, groups, submenu } = level;
+    const depth = drill ? level.depth : 0;
+    const back =
+        submenu && eachRow(slot)
+            ? { item: submenu, index: -1, depth }
+            : undefined;
     // Out of any submenu once it closes.
     useEffect(() => {
         if (props.open === false) {
@@ -807,24 +861,29 @@ function ReadyMade(props: MenuProps): ReactNode {
                                 value={MENU_BACK_VALUE}
                                 valueText={submenu.valueText}
                                 closeOnSelect={false}
-                                {...slot("item")}
+                                {...slot("item", back)}
                             >
-                                <ItemLeading mirror {...slot("itemLeading")}>
+                                <ItemLeading
+                                    mirror
+                                    {...slot("itemLeading", back)}
+                                >
                                     <ChevronStartIcon />
                                 </ItemLeading>
-                                <ItemContent {...slot("itemContent")}>
-                                    <ItemLabel {...slot("itemLabel")}>
+                                <ItemContent {...slot("itemContent", back)}>
+                                    <ItemLabel {...slot("itemLabel", back)}>
                                         {submenu.label}
                                     </ItemLabel>
                                 </ItemContent>
                             </Item>
                         ) : null}
-                        {items.map((item) => (
+                        {items.map((item, index) => (
                             <ItemEntry
                                 key={item.value}
                                 item={item}
                                 slot={slot}
                                 drill={drill}
+                                index={index}
+                                depth={depth}
                             />
                         ))}
                         {groups.map((group) => (
@@ -841,12 +900,14 @@ function ReadyMade(props: MenuProps): ReactNode {
                                         {group.label}
                                     </ItemGroupLabel>
                                 ) : null}
-                                {group.items.map((item) => (
+                                {group.items.map((item, index) => (
                                     <ItemEntry
                                         key={item.value}
                                         item={item}
                                         slot={slot}
                                         drill={drill}
+                                        index={index}
+                                        depth={depth}
                                     />
                                 ))}
                             </ItemGroup>

@@ -14,6 +14,7 @@ import {
 } from "@pureform/binding-core";
 import type {
     FabMenuContentProps,
+    FabMenuInstances,
     FabMenuRootOwnProps,
     InteractionSourceProps,
 } from "@pureform/binding-core";
@@ -214,12 +215,12 @@ function FabIcon(props: {
     return isPresent(props.closeIcon) ? props.closeIcon : <CloseIcon />;
 }
 
-/** The ready-made FAB menu's props: Root's, with `className`, `style`, and `slotProps` keyed by
- *  part, the FAB's icons and name, and the items as data. */
+/** The ready-made FAB menu's props: Root's, with `className`, `style`, `slotProps` and `unstyled`
+ *  keyed by part (an item's parts also by item, `FabMenuInstances`), the FAB's icons and name, and the items as data. */
 export interface FabMenuProps
     extends
         Omit<FabMenuRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
-        SlotKeyedProps<Anatomy>,
+        SlotKeyedProps<Anatomy, never, FabMenuInstances<ReactNode>>,
         FabMenuContentProps<ReactNode> {}
 
 /** The ready-made FAB menu: the list with an item per entry of `items`, and the FAB showing
@@ -235,30 +236,37 @@ function ReadyMade(props: FabMenuProps): ReactNode {
         items = [],
         ...rootProps
     } = props;
-    const slot = useSlotProps(props);
+    const slot = useSlotProps<Anatomy, never, FabMenuInstances<ReactNode>>(
+        props,
+    );
+    const each =
+        slot.each("item") || slot.each("itemIcon") || slot.each("itemLabel");
     return (
         <ReadyMadeItemCount.Provider value={items.length}>
             <Root {...rootProps} {...(slot("root") as object)}>
                 <List {...slot("list")}>
-                    {items.map((item) => (
-                        <Item
-                            key={item.value}
-                            {...fabMenuItemProps(item)}
-                            {...slot("item")}
-                        >
-                            {isPresent(item.icon) ? (
-                                <ItemIcon
-                                    mirror={item.mirrorIcon}
-                                    {...slot("itemIcon")}
-                                >
-                                    {item.icon}
-                                </ItemIcon>
-                            ) : null}
-                            <ItemLabel {...slot("itemLabel")}>
-                                {item.label}
-                            </ItemLabel>
-                        </Item>
-                    ))}
+                    {items.map((item, index) => {
+                        const copy = each ? { index, item } : undefined;
+                        return (
+                            <Item
+                                key={item.value}
+                                {...fabMenuItemProps(item)}
+                                {...slot("item", copy)}
+                            >
+                                {isPresent(item.icon) ? (
+                                    <ItemIcon
+                                        mirror={item.mirrorIcon}
+                                        {...slot("itemIcon", copy)}
+                                    >
+                                        {item.icon}
+                                    </ItemIcon>
+                                ) : null}
+                                <ItemLabel {...slot("itemLabel", copy)}>
+                                    {item.label}
+                                </ItemLabel>
+                            </Item>
+                        );
+                    })}
                 </List>
                 <CloseTrigger aria-label={fabLabel} {...slot("closeTrigger")}>
                     <FabIcon icon={icon} closeIcon={closeIcon} />

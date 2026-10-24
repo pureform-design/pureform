@@ -8,7 +8,9 @@
 import type {
     navigationBarAnatomy,
     navigationRailAnatomy,
+    PartName,
     scrimAnatomy,
+    TestIdOverride,
 } from "@pureform/anatomy";
 import {
     dialogBackdropLayout,
@@ -29,9 +31,11 @@ import {
 import type {
     NavigationComponent,
     NavigationContentProps,
+    NavigationInstances,
     NavigationItem,
     NavigationItemOwnProps,
     NavigationRootOwnProps,
+    Unstyled,
 } from "@pureform/binding-core";
 import type { InteractionSource } from "@pureform/binding-core/interaction";
 import * as dialog from "@pureform/machines/dialog";
@@ -40,12 +44,14 @@ import type { Selection } from "@pureform/styling";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {
     type Accessor,
+    createContext,
     createMemo,
     createUniqueId,
     For,
     omit,
     Show,
     untrack,
+    useContext,
 } from "solid-js";
 
 import { useControllable } from "./controllable";
@@ -55,7 +61,7 @@ import { mergeProps, normalizeProps, useMachine } from "./internal/zag";
 import type { PropTypes } from "./internal/zag";
 import { createPartContext } from "./part-context";
 import { createSlotProps, useComponent } from "./parts";
-import type { ComponentScope, SlotKeyedProps } from "./parts";
+import type { ComponentScope, SlotKeyedProps, SlotPropsOf } from "./parts";
 import { combinePartProps } from "./props";
 import type { PartProps } from "./props";
 import { useDirection } from "./provider";
@@ -99,14 +105,50 @@ export interface NavigationIconProps extends NavigationPartProps {
 export interface NavigationItemProps
     extends Omit<NavigationPartProps, "href">, NavigationItemOwnProps {}
 
-/** The ready-made component's props, for the component `C`: Root's, with `class`, `style`, and
- *  `slotProps` keyed by part, and the destinations as data. */
+/** A modal rail's own pieces besides its anatomy's: the scrim and the dialog around the rail. */
+export type NavigationModalPart = "scrim" | "dialog";
+
+/** The extra keys the ready-made component `C` takes: a rail's modal pieces. */
+type ExtraOf<C extends NavigationComponent> = C extends "navigationRail"
+    ? NavigationModalPart
+    : never;
+
+/** The ready-made component's props, for the component `C`: Root's, with `class`, `style`,
+ *  `slotProps` and `unstyled` keyed by part (a destination's parts also by destination,
+ *  `NavigationItemInstance`; a modal rail's `scrim` and `dialog` too), and the destinations as
+ *  data. */
 export type NavigationProps<C extends NavigationComponent> = Omit<
     NavigationRootProps<C>,
     keyof SlotKeyedProps<Anatomy> | "children"
 > &
-    SlotKeyedProps<Anatomy> &
-    NavigationContentProps<JSX.Element>;
+    Omit<
+        SlotKeyedProps<Anatomy, ExtraOf<C>, NavigationInstances<JSX.Element>>,
+        "testId" | "unstyled"
+    > &
+    NavigationContentProps<JSX.Element> & {
+        /** A prefix for every part's test id, or ids by part (a modal rail's `scrim` and
+         *  `dialog` too). */
+        readonly testId?:
+            | TestIdOverride<PartName<Anatomy> | ExtraOf<C>>
+            | undefined;
+        /** Opts parts out of the registry's styles: every part, or by part (a destination's also
+         *  by destination; a modal rail's `scrim` too). */
+        readonly unstyled?:
+            | Unstyled<
+                  PartName<Anatomy> | ExtraOf<C>,
+                  NavigationInstances<JSX.Element>
+              >
+            | undefined;
+    };
+
+/** What the ready-made rail gives its modal pieces: the keyed props of `scrim` and `dialog`. */
+const ModalSlots = createContext<
+    | {
+          readonly scrim: PartProps;
+          readonly dialog: PartProps;
+      }
+    | undefined
+>(undefined);
 
 /** Builds a navigation component's parts and ready-made component. */
 export function createNavigation<C extends NavigationComponent>(config: {
@@ -144,15 +186,33 @@ export function createNavigation<C extends NavigationComponent>(config: {
             ...open.machineProps(),
         }));
         const api = createMemo(() => dialog.connect(service, normalizeProps));
+        const slots = useContext(ModalSlots);
+        const modalId = (part: NavigationModalPart) => {
+            const testId = props.own.testId as
+                | TestIdOverride<NavigationModalPart>
+                | undefined;
+            return typeof testId === "string"
+                ? `${testId}-${part}`
+                : testId?.[part];
+        };
         const scrim = useComponent(config.scrim!, {
             selection: () => ({}),
             testId: () => {
-                const testId = props.own.testId;
-                return typeof testId === "string"
-                    ? { root: `${testId}-scrim` }
-                    : undefined;
+                const id = modalId("scrim");
+                return id === undefined ? undefined : { root: id };
+            },
+            unstyled: () => {
+                const unstyled = props.own.unstyled;
+                return (
+                    unstyled === true ||
+                    (typeof unstyled === "object" &&
+                        (unstyled as { scrim?: unknown }).scrim === true)
+                );
             },
         });
+        const scrimProps = slots?.scrim as
+            | (PartProps & { readonly unstyled?: boolean })
+            | undefined;
         const positioner = createMemo(() =>
             mergeProps(
                 api().getPositionerProps(),
@@ -162,12 +222,16 @@ export function createNavigation<C extends NavigationComponent>(config: {
             ),
         );
         const content = createMemo(() =>
-            mergeProps(
-                api().getContentProps(),
-                normalizeProps.element(
-                    navigationModalContentLayout(api().open),
-                ),
-            ),
+            combinePartProps([
+                mergeProps(
+                    api().getContentProps(),
+                    normalizeProps.element(
+                        navigationModalContentLayout(api().open),
+                    ),
+                ) as Record<string, unknown>,
+                slots?.dialog as Record<string, unknown> | undefined,
+                { "data-testid": modalId("dialog") },
+            ]),
         );
         return (
             <>
@@ -180,6 +244,8 @@ export function createNavigation<C extends NavigationComponent>(config: {
                                 dialogBackdropLayout(api().open),
                             ),
                         ),
+                    unstyled: () => scrimProps?.unstyled,
+                    props: scrimProps ? omit(scrimProps, "unstyled") : {},
                 })}
                 <div {...positioner()}>
                     <div {...content()}>{props.children}</div>
@@ -365,81 +431,108 @@ export function createNavigation<C extends NavigationComponent>(config: {
         ...NAVIGATION_CONTENT_PROPS,
     ] as const;
 
+    /** A ready-made destination: every part, the icon only when given. */
+    function Destination(props: {
+        readonly item: Accessor<NavigationItem<JSX.Element>>;
+        readonly index: Accessor<number>;
+        readonly slots: SlotPropsOf<
+            PartName<Anatomy>,
+            NavigationInstances<JSX.Element>
+        >;
+    }): JSX.Element {
+        const { item, slots } = props;
+        const { api } = context.use("Item");
+        const copy = () => ({
+            index: props.index(),
+            item: item(),
+            selected: api().value === item().value,
+        });
+        return (
+            <Item
+                value={item().value}
+                href={item().href}
+                disabled={item().disabled}
+                interactionSource={item().interactionSource}
+                {...(slots("item", copy) as object)}
+            >
+                <Indicator {...slots("indicator", copy)}>
+                    <ActiveIndicator {...slots("activeIndicator", copy)} />
+                    <Show when={isPresent(item().icon)}>
+                        <Icon
+                            mirror={item().mirrorIcon}
+                            {...slots("icon", copy)}
+                        >
+                            {item().icon}
+                        </Icon>
+                    </Show>
+                </Indicator>
+                <Label {...slots("label", copy)}>{item().label}</Label>
+            </Item>
+        );
+    }
+
     /** A ready-made destination's section label, when it has one: the rail's only. */
     /** The ready-made component: a destination per item, each with every part in the preset's
      *  structure, the icon only when given. */
     function ReadyMade(props: NavigationProps<C>): JSX.Element {
-        const slots = createSlotProps(props);
+        const slots = createSlotProps<
+            Anatomy,
+            NavigationModalPart,
+            NavigationInstances<JSX.Element>
+        >(props as never);
         const own = omit(props, ...READY_MADE_PROPS) as NavigationRootProps<C>;
         const root = slots("root") as object;
-        // Views, so every destination reads the same ones.
-        const itemSlot = slots("item") as object;
-        const indicator = slots("indicator");
-        const activeIndicator = slots("activeIndicator");
-        const icon = slots("icon");
-        const label = slots("label");
         const header = (slots as (part: string) => object)("header");
         const sectionLabel = (slots as (part: string) => object)(
             "sectionLabel",
         );
+        const modal = { scrim: slots("scrim"), dialog: slots("dialog") };
         // The bar ignores `section`: its destinations stay in one run, in order.
         const sections = createMemo(() =>
             hasHeader
                 ? navigationSections(props.items ?? [])
                 : [{ group: undefined, items: props.items ?? [] }],
         );
+        const indexes = createMemo(
+            () => new Map((props.items ?? []).map((item, at) => [item, at])),
+        );
         return (
-            <Root {...own} {...root}>
-                <Show when={hasHeader && isPresent(props.header)}>
-                    <Header {...header}>{props.header}</Header>
-                </Show>
-                <For each={sections()} keyed={false}>
-                    {(section) => (
-                        <>
-                            <Show when={section().group}>
-                                {(name) => (
-                                    <SectionLabel {...sectionLabel}>
-                                        {name()}
-                                    </SectionLabel>
-                                )}
-                            </Show>
-                            <For
-                                each={section().items}
-                                keyed={(item: NavigationItem<JSX.Element>) =>
-                                    item.value
-                                }
-                            >
-                                {(item) => (
-                                    <Item
-                                        value={item().value}
-                                        href={item().href}
-                                        disabled={item().disabled}
-                                        interactionSource={
-                                            item().interactionSource
-                                        }
-                                        {...itemSlot}
-                                    >
-                                        <Indicator {...indicator}>
-                                            <ActiveIndicator
-                                                {...activeIndicator}
-                                            />
-                                            <Show when={isPresent(item().icon)}>
-                                                <Icon
-                                                    mirror={item().mirrorIcon}
-                                                    {...icon}
-                                                >
-                                                    {item().icon}
-                                                </Icon>
-                                            </Show>
-                                        </Indicator>
-                                        <Label {...label}>{item().label}</Label>
-                                    </Item>
-                                )}
-                            </For>
-                        </>
-                    )}
-                </For>
-            </Root>
+            <ModalSlots value={modal}>
+                <Root {...own} {...root}>
+                    <Show when={hasHeader && isPresent(props.header)}>
+                        <Header {...header}>{props.header}</Header>
+                    </Show>
+                    <For each={sections()} keyed={false}>
+                        {(section) => (
+                            <>
+                                <Show when={section().group}>
+                                    {(name) => (
+                                        <SectionLabel {...sectionLabel}>
+                                            {name()}
+                                        </SectionLabel>
+                                    )}
+                                </Show>
+                                <For
+                                    each={section().items}
+                                    keyed={(
+                                        item: NavigationItem<JSX.Element>,
+                                    ) => item.value}
+                                >
+                                    {(item) => (
+                                        <Destination
+                                            item={item}
+                                            index={() =>
+                                                indexes().get(item()) ?? 0
+                                            }
+                                            slots={slots}
+                                        />
+                                    )}
+                                </For>
+                            </>
+                        )}
+                    </For>
+                </Root>
+            </ModalSlots>
         );
     }
 

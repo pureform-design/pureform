@@ -4,7 +4,11 @@
 // preset swatches. The value is a CSS color string; changes report hex.
 
 import { colorPickerAnatomy } from "@pureform/anatomy";
-import type { iconButtonAnatomy, textFieldAnatomy } from "@pureform/anatomy";
+import type {
+    iconButtonAnatomy,
+    PartName,
+    textFieldAnatomy,
+} from "@pureform/anatomy";
 import {
     COLOR_PICKER_DEFAULT,
     COLOR_PICKER_ROOT_PROPS,
@@ -19,6 +23,7 @@ import {
 import type {
     ColorPickerChannel,
     ColorPickerContentProps,
+    ColorPickerInstances,
     ColorPickerRootOwnProps,
     ColorPickerValueDetails,
 } from "@pureform/binding-core";
@@ -45,7 +50,12 @@ import type { IconButtonProps } from "../icon-button/icon-button";
 import { normalizeProps, useMachine } from "../internal/zag";
 import { createPartContext } from "../part-context";
 import { createSlotProps, useComponent } from "../parts";
-import type { ComponentScope, InnerPropsOf, SlotKeyedProps } from "../parts";
+import type {
+    ComponentScope,
+    InnerPropsOf,
+    SlotKeyedProps,
+    SlotPropsOf,
+} from "../parts";
 import { combinePartProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
@@ -232,25 +242,47 @@ const SwatchGroup = machinePart("swatchGroup", "SwatchGroup", "div", (api) => ({
     role: "group",
 }));
 
+/** A ready-made picker's slot props for the parts a part draws inside it (the area's thumb, a
+ *  slider's track, a swatch's color), by copy. */
+export type ColorPickerSlots = SlotPropsOf<
+    PartName<Anatomy>,
+    ColorPickerInstances
+>;
+
+/** A part a part draws inside it, from the ready-made's slot props: its `unstyled` apart. */
+const inner = (props: PartProps | undefined) => {
+    if (!props) return {};
+    const own = props as PartProps & { readonly unstyled?: boolean };
+    return { unstyled: () => own.unstyled, props: omit(own, "unstyled") };
+};
+
+/** A part's props that draws other parts inside it: its own, and the ready-made's slot props for
+ *  those. */
+export interface ColorPickerOuterPartProps extends ColorPickerPartProps {
+    readonly slots?: ColorPickerSlots | undefined;
+}
+
 /** The saturation and brightness area: its gradient and its thumb, which a drag or the arrow
  *  keys move. */
-function Area(props: ColorPickerPartProps): JSX.Element {
+function Area(props: ColorPickerOuterPartProps): JSX.Element {
     const { scope, api } = context.use("Area");
     return scope.render("area", {
         element: "div",
         machine: () => api().getAreaProps(),
         unstyled: () => props.unstyled,
-        props: merge(omit(props, "unstyled"), {
+        props: merge(omit(props, "unstyled", "slots"), {
             get children() {
                 return (
                     <>
                         {scope.render("areaBackground", {
                             element: "div",
                             machine: () => api().getAreaBackgroundProps(),
+                            ...inner(props.slots?.("areaBackground")),
                         })}
                         {scope.render("areaThumb", {
                             element: "div",
                             machine: () => api().getAreaThumbProps(),
+                            ...inner(props.slots?.("areaThumb")),
                         })}
                     </>
                 );
@@ -260,7 +292,7 @@ function Area(props: ColorPickerPartProps): JSX.Element {
 }
 
 /** A channel slider's props: its channel, and the element's own. */
-export interface ColorPickerChannelSliderProps extends ColorPickerPartProps {
+export interface ColorPickerChannelSliderProps extends ColorPickerOuterPartProps {
     /** `hue`, or `alpha` (drawn over a transparency grid). */
     readonly channel: ColorPickerChannel;
 }
@@ -269,11 +301,12 @@ export interface ColorPickerChannelSliderProps extends ColorPickerPartProps {
 function ChannelSlider(props: ColorPickerChannelSliderProps): JSX.Element {
     const { scope, api } = context.use("ChannelSlider");
     const slider = () => ({ channel: props.channel, format: "hsba" }) as const;
+    const each = () => ({ channel: props.channel });
     return scope.render("channelSlider", {
         element: "div",
         machine: () => api().getChannelSliderProps(slider()),
         unstyled: () => props.unstyled,
-        props: merge(omit(props, "channel", "unstyled"), {
+        props: merge(omit(props, "channel", "unstyled", "slots"), {
             get children() {
                 return (
                     <>
@@ -284,12 +317,16 @@ function ChannelSlider(props: ColorPickerChannelSliderProps): JSX.Element {
                                     api().getTransparencyGridProps({
                                         size: "8px",
                                     }),
+                                ...inner(
+                                    props.slots?.("transparencyGrid", each),
+                                ),
                             })}
                         </Show>
                         {scope.render("channelSliderTrack", {
                             element: "div",
                             machine: () =>
                                 api().getChannelSliderTrackProps(slider()),
+                            ...inner(props.slots?.("channelSliderTrack", each)),
                         })}
                         {scope.render("channelSliderThumb", {
                             element: "div",
@@ -298,6 +335,7 @@ function ChannelSlider(props: ColorPickerChannelSliderProps): JSX.Element {
                                     api().getChannelSliderThumbProps(slider()),
                                     { style: COLOR_PICKER_THUMB_CENTRE },
                                 ]),
+                            ...inner(props.slots?.("channelSliderThumb", each)),
                         })}
                     </>
                 );
@@ -338,6 +376,20 @@ function HexField(props: ColorPickerHexFieldProps): JSX.Element {
         setDraft(null);
         if (next !== undefined && next !== hex()) settle(next);
     };
+    // The field's own handlers on the input, before the user's there.
+    const own = {
+        onBlur: commit,
+        onKeyDown: (event: KeyboardEvent) => {
+            if (event.key === "Enter") commit();
+        },
+    };
+    const slotProps = createMemo(() => ({
+        ...props.slotProps,
+        input: combinePartProps([
+            own,
+            props.slotProps?.input as Record<string, unknown> | undefined,
+        ]),
+    }));
     return (
         <TextField
             variant="outlined"
@@ -350,6 +402,7 @@ function HexField(props: ColorPickerHexFieldProps): JSX.Element {
             readOnly={readOnly()}
             invalid={draft() !== null && colorPickerHex(draft()!) === undefined}
             {...props}
+            slotProps={slotProps()}
             value={draft() ?? colorPickerHexText(hex())}
             // A form reset is the picker's: the field follows its value.
             onValueChange={({
@@ -360,10 +413,6 @@ function HexField(props: ColorPickerHexFieldProps): JSX.Element {
                 reason?: string;
             }) => {
                 if (reason !== "reset") setDraft(value);
-            }}
-            onFocusOut={commit}
-            onKeyDown={(event: KeyboardEvent) => {
-                if (event.key === "Enter") commit();
             }}
         />
     );
@@ -407,10 +456,12 @@ function EyeDropperTrigger(
 }
 
 /** A swatch trigger's props: its color, and the element's own. */
-export interface ColorPickerSwatchTriggerProps extends ColorPickerPartProps {
+export interface ColorPickerSwatchTriggerProps extends ColorPickerOuterPartProps {
     /** The color it picks. */
     readonly value: string;
     readonly disabled?: boolean | undefined;
+    /** Its index among the swatches, for a function of the copy in `slots`. */
+    readonly index?: number | undefined;
 }
 
 /** A preset swatch: a button that picks its color, ringed while it's the value. */
@@ -427,23 +478,34 @@ function SwatchTrigger(props: ColorPickerSwatchTriggerProps): JSX.Element {
             ),
         }),
         unstyled: () => props.unstyled,
-        props: merge(omit(props, "value", "disabled", "unstyled"), {
-            get children() {
-                return scope.render("swatch", {
-                    element: "div",
-                    machine: () => api().getSwatchProps({ value: props.value }),
-                });
+        props: merge(
+            omit(props, "value", "disabled", "unstyled", "slots", "index"),
+            {
+                get children() {
+                    return scope.render("swatch", {
+                        element: "div",
+                        machine: () =>
+                            api().getSwatchProps({ value: props.value }),
+                        ...inner(
+                            props.slots?.("swatch", () => ({
+                                color: props.value,
+                                index: props.index ?? 0,
+                            })),
+                        ),
+                    });
+                },
             },
-        }),
+        ),
     });
 }
 
-/** The ready-made picker's props: Root's, with `class`, `style`, and `slotProps` keyed by part,
- *  and its content. */
+/** The ready-made picker's props: Root's, with `class`, `style`, `slotProps` and `unstyled` keyed
+ *  by part (a preset swatch's parts also by swatch, `ColorPickerSwatchInstance`; a channel
+ *  slider's by channel, `ColorPickerChannelInstance`), and its content. */
 export interface ColorPickerProps
     extends
         Omit<ColorPickerRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
-        SlotKeyedProps<Anatomy>,
+        SlotKeyedProps<Anatomy, never, ColorPickerInstances>,
         ColorPickerContentProps<JSX.Element> {
     /** The hex field, drawn as a text field, keyed by its parts. */
     readonly textFieldProps?: InnerPropsOf<typeof textFieldAnatomy> | undefined;
@@ -470,7 +532,7 @@ const READY_MADE_PROPS = [
 
 /** The ready-made picker: the label, the area, the sliders, the field row and the swatches. */
 function ReadyMade(props: ColorPickerProps): JSX.Element {
-    const slots = createSlotProps(props);
+    const slots = createSlotProps<Anatomy, never, ColorPickerInstances>(props);
     const own = omit(props, ...READY_MADE_PROPS) as ColorPickerRootProps;
     return (
         <Root {...own} {...(slots("root") as object)}>
@@ -479,16 +541,22 @@ function ReadyMade(props: ColorPickerProps): JSX.Element {
             </Show>
             <Content {...(slots("content") as object)}>
                 <Show when={props.area !== false}>
-                    <Area {...(slots("area") as object)} />
+                    <Area {...(slots("area") as object)} slots={slots} />
                 </Show>
                 <ChannelSlider
-                    {...(slots("channelSlider") as object)}
+                    {...(slots("channelSlider", () => ({
+                        channel: "hue",
+                    })) as object)}
                     channel="hue"
+                    slots={slots}
                 />
                 <Show when={props.alpha}>
                     <ChannelSlider
-                        {...(slots("channelSlider") as object)}
+                        {...(slots("channelSlider", () => ({
+                            channel: "alpha",
+                        })) as object)}
                         channel="alpha"
+                        slots={slots}
                     />
                 </Show>
                 <Control {...(slots("control") as object)}>
@@ -513,10 +581,15 @@ function ReadyMade(props: ColorPickerProps): JSX.Element {
                             each={props.swatches ?? []}
                             keyed={(swatch) => swatch}
                         >
-                            {(swatch: Accessor<string>) => (
+                            {(swatch: Accessor<string>, index) => (
                                 <SwatchTrigger
-                                    {...(slots("swatchTrigger") as object)}
+                                    {...(slots("swatchTrigger", () => ({
+                                        color: swatch(),
+                                        index: index(),
+                                    })) as object)}
                                     value={swatch()}
+                                    index={index()}
+                                    slots={slots}
                                 />
                             )}
                         </For>

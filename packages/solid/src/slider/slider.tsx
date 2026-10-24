@@ -5,6 +5,7 @@
 // tokens: Root's from the value, and each thumb's and stop's own on its parts.
 
 import { sliderAnatomy } from "@pureform/anatomy";
+import type { PartName } from "@pureform/anatomy";
 import {
     SLIDER_INPUT_LABEL_PROPS,
     SLIDER_ROOT_PROPS,
@@ -21,7 +22,9 @@ import {
 } from "@pureform/binding-core";
 import type {
     SliderInsetIconMeasures,
+    SliderInstances,
     SliderRootOwnProps,
+    SliderThumbInstance,
     SliderValue,
 } from "@pureform/binding-core";
 import { readSliderInsetIcon } from "@pureform/binding-dom";
@@ -48,7 +51,7 @@ import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
 import { createSlotProps, useComponent } from "../parts";
-import type { ComponentScope, SlotKeyedProps } from "../parts";
+import type { ComponentScope, SlotKeyedProps, SlotPropsOf } from "../parts";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 
@@ -352,8 +355,9 @@ function Input(props: SliderThumbPartProps): JSX.Element {
     });
 }
 
-/** The ready-made slider's props: Root's, with `class`, `style`, and `slotProps` keyed by part;
- *  `aria-label` (one per thumb for a range), `aria-labelledby`, `aria-describedby`, and
+/** The ready-made slider's props: Root's, with `class`, `style`, `slotProps` and `unstyled` keyed
+ *  by part (a thumb's parts also by thumb, `SliderThumbInstance`; a marker by marker,
+ *  `SliderMarkerInstance`); `aria-label` (one per thumb for a range), `aria-labelledby`, `aria-describedby`, and
  *  `aria-valuetext` go on the handles. */
 export interface SliderProps<V extends SliderValue = SliderValue>
     extends
@@ -361,7 +365,7 @@ export interface SliderProps<V extends SliderValue = SliderValue>
             SliderRootProps<V>,
             keyof SlotKeyedProps<Anatomy> | "children" | "aria-label"
         >,
-        SlotKeyedProps<Anatomy> {
+        SlotKeyedProps<Anatomy, never, SliderInstances> {
     readonly "aria-label"?: string | readonly string[] | undefined;
     readonly "aria-valuetext"?: string | undefined;
     /** An icon inside the active track, at its start; drawn at sizes `medium` and up. */
@@ -376,6 +380,42 @@ const READY_MADE_PROPS = [
     ...SLIDER_INPUT_LABEL_PROPS,
 ] as const;
 
+/** A ready-made slider's thumb: its handle, value indicator and input. */
+function Thumb(props: {
+    readonly index: number;
+    readonly label: Record<string, unknown>;
+    readonly slots: SlotPropsOf<PartName<Anatomy>, SliderInstances>;
+    readonly valueIndicator: boolean | undefined;
+}): JSX.Element {
+    const { api } = context.use("Slider");
+    const slots = props.slots;
+    const thumb = createMemo((): SliderThumbInstance => ({
+        index: props.index,
+        value: api().value[props.index] ?? 0,
+    }));
+    return (
+        <>
+            <Handle
+                {...props.label}
+                {...slots("handle", thumb)}
+                index={props.index}
+            >
+                <StateLayer
+                    {...slots("stateLayer", thumb)}
+                    index={props.index}
+                />
+            </Handle>
+            <Show when={props.valueIndicator}>
+                <ValueIndicator
+                    {...slots("valueIndicator", thumb)}
+                    index={props.index}
+                />
+            </Show>
+            <Input {...slots("input", thumb)} index={props.index} />
+        </>
+    );
+}
+
 /** The ready-made slider: every part, in the preset's structure. */
 function ReadyMade<V extends SliderValue = number>(
     props: SliderProps<V>,
@@ -387,7 +427,9 @@ function ReadyMade<V extends SliderValue = number>(
         if (typeof named === "object") picked["aria-label"] = named[index];
         return picked;
     };
-    const slots = createSlotProps(props as never);
+    const slots = createSlotProps<Anatomy, never, SliderInstances>(
+        props as never,
+    );
     const own = omit(props, ...READY_MADE_PROPS) as SliderRootProps;
     const root = slots("root") as object;
     const thumbs = createMemo(() => {
@@ -407,31 +449,26 @@ function ReadyMade<V extends SliderValue = number>(
             <Show when={stops().length > 0}>
                 <MarkerGroup {...slots("markerGroup")}>
                     <For each={stops()}>
-                        {(stop) => <Marker {...slots("marker")} value={stop} />}
+                        {(stop, index) => (
+                            <Marker
+                                {...slots("marker", () => ({
+                                    value: stop,
+                                    index: index(),
+                                }))}
+                                value={stop}
+                            />
+                        )}
                     </For>
                 </MarkerGroup>
             </Show>
             <For each={thumbs()}>
                 {(index) => (
-                    <>
-                        <Handle
-                            {...label(index)}
-                            {...slots("handle")}
-                            index={index}
-                        >
-                            <StateLayer
-                                {...slots("stateLayer")}
-                                index={index}
-                            />
-                        </Handle>
-                        <Show when={props.valueIndicator}>
-                            <ValueIndicator
-                                {...slots("valueIndicator")}
-                                index={index}
-                            />
-                        </Show>
-                        <Input {...slots("input")} index={index} />
-                    </>
+                    <Thumb
+                        index={index}
+                        label={label(index)}
+                        slots={slots}
+                        valueIndicator={props.valueIndicator}
+                    />
                 )}
             </For>
         </Root>

@@ -9,7 +9,7 @@ import type {
 } from "@pureform/anatomy";
 import type { InstanceTokens, Selection } from "@pureform/styling";
 
-import type { Unstyled } from "../parts";
+import type { ItemInstance, Unstyled } from "../parts";
 import type { IndicationProps, InteractionSourceProps } from "./indication";
 import type { MenuBehaviorProps } from "./menu";
 import {
@@ -116,3 +116,11 @@ export const fabMenuItemFocusProps = (
     tabIndex: disabled ? -1 : 0,
     onFocus: highlight,
 });
+
+/** The ready-made FAB menu's repeated parts, each to its item (`ItemInstance`: its index and
+ *  data): `style={{ item: ({ item }) => ... }}`. */
+export interface FabMenuInstances<Node = unknown> {
+    readonly item: ItemInstance<FabMenuItem<Node>>;
+    readonly itemIcon: ItemInstance<FabMenuItem<Node>>;
+    readonly itemLabel: ItemInstance<FabMenuItem<Node>>;
+}
