@@ -15,6 +15,17 @@ const native = (stories: Readonly<Record<string, RendererSkip>>) => ({
  *  the key plays spy on. React Native has no bubbling, and its composites take no root press. */
 const NO_BUBBLING =
     "React Native doesn't bubble a press to its composite's root, which takes no onPress: the key's click reaches the item's own handler only.";
+/** React Native Web draws a disabled field's label (and the file upload's headline) as plain
+ *  text in the disabled colors, not as a disabled control's `<label>`, so axe holds it to the
+ *  contrast rule a disabled control's text is exempt from. */
+const DISABLED_TEXT = {
+    a11y: {
+        "color-contrast":
+            "React Native Web's disabled label is plain text, which axe doesn't exempt as a disabled control's.",
+    },
+};
+const NO_FILE_INPUT =
+    "React Native has no file input to give files to: its trigger calls the app's onPick.";
 const keyClicks = (...stories: readonly string[]) =>
     native(
         Object.fromEntries(
@@ -123,6 +134,31 @@ export default defineStories({
         ButtonGroup: { parameters: keyClicks("KeyEnter", "KeySpace") },
         ChipSet: { parameters: keyClicks("KeyEnter", "KeySpace") },
         SplitButton: { parameters: keyClicks("KeyEnter", "KeySpace") },
+        TimePicker: {
+            parameters: native({
+                KeyEnter: { play: NO_BUBBLING },
+                // The chosen minute is white over the dial's handle, a sibling drawn under it
+                // rather than its ancestor, so axe reads the dial's surface as its background.
+                TheMinutes: {
+                    a11y: {
+                        "color-contrast":
+                            "The chosen label's background is the dial's handle, a sibling under it, which axe doesn't see.",
+                    },
+                },
+            }),
+        },
+        CodeField: { parameters: native({ Disabled: DISABLED_TEXT }) },
+        NumberField: { parameters: native({ Disabled: DISABLED_TEXT }) },
+        TagsInput: { parameters: native({ Disabled: DISABLED_TEXT }) },
+        FileUpload: {
+            parameters: native({
+                Disabled: DISABLED_TEXT,
+                // React Native has no file input: its file upload's trigger calls the app's
+                // `onPick`, so the state play has nothing to give files to.
+                Light: { play: NO_FILE_INPUT },
+                Dark: { play: NO_FILE_INPUT },
+            }),
+        },
         Tooltip: { parameters: keyClicks("KeyEnter") },
         RichTooltip: { parameters: keyClicks("KeyEnter") },
         Carousel: {
