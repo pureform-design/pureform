@@ -134,5 +134,5 @@ Runs once r12 and slot-b are merged and no agent is running, before slot-c.
 - Nothing is copied from the sources: they are open-source docs and public APIs we read
   ([guidelines §1](../design/component-guidelines.md#1-sources-and-provenance)).
 - Subphases run targeted builds and tests only. A phase is done only when, after merging all
-  its branches, `omni run build test -f all -o continue` passes (failures go to one fixing
+  its branches, `omni run build test check:types -f all -o continue` passes (failures go to one fixing
   subagent), the type check is clean, and the gap analysis matches the code.

@@ -185,7 +185,7 @@ evidence and stops; don't refactor for its own sake.
 Subphases check only what they affect (see [parallel work](#parallel-work)); the whole run
 below happens once, on the merged phase.
 
-1. `omni run build test -f all -o continue` passes on the merged phase (every task, nothing
+1. `omni run build test check:types -f all -o continue` passes on the merged phase (every task, nothing
    replayed from cache). Failures go to a single fixing subagent, which reruns with
    `-f failed` until those pass; the gate doesn't repeat the whole run with `-f all`.
 2. `bunx tsc --noEmit -p tsconfig.json` is clean in each package you touched.
