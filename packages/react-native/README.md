@@ -587,7 +587,10 @@ trigger shows their labels joined by ", " (the placeholder when none):
   cascading when a submenu (as wide as the menu) fits beside the open menu within the window and
   the nearest `PureformContainer`'s measured frame (its position and size in the window, read with
   `useContainerFrame()`; no container, the window alone), measured once it's laid out, else
-  drilling (it replaces the window-width rule; `MENU_CASCADE_MIN_WIDTH` is gone).
+  drilling (it replaces the window-width rule; `MENU_CASCADE_MIN_WIDTH` is gone). A cascaded
+  submenu grows in and fades out as the menu does; a drill step springs the menu's height to the
+  new level and moves the pressed row into the header (and the header back into its row going
+  out), on the theme's default spatial spring; nothing moves under reduced motion.
 - **Navigation rail:** destinations with the same `section` sit together under one heading with
   its text, shown only while the rail is `expanded`, in the order the sections first appear (like
   a select's `group`). The bar ignores `section`. It replaces the removed `sectionLabel`.
