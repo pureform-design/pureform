@@ -13,7 +13,8 @@ compaction). Where this file differs, it wins for the component roadmap. Context
    `component-architecture.md` it points to (at least §5.5 tokens and §9.8 indication).
 3. Read the output contexts of every phase you depend on, **including their refactoring
    hints**, then `git log --oneline -20`.
-4. In a fresh worktree, run `bun install`, then `omni run build`. The demos' `generate` runs
+4. In a fresh worktree, run `cog install-hook --all --overwrite` (the commit-msg hook checks
+   conventional commits), then `bun install`, then `omni run build`. The demos' `generate` runs
    the CLI's build directly with Node, so no bin link is needed.
 5. `build` doesn't run tests (only `publish` waits for them). Tests run through `omni run test`
    or `build test`; a test package's own `test` runs its whole e2e suite, so run those files
