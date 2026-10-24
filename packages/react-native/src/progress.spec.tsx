@@ -136,6 +136,43 @@ describe("the indeterminate linear track", () => {
         expect(track.overflow).toBe("hidden");
     });
 
+    it.each(
+        [animated, reanimated].flatMap((engine) =>
+            [
+                ["20%", 40],
+                ["60px", 60],
+                [60, 60],
+            ].map(([width, px]) => ({ engine, name: engine.name, width, px })),
+        ),
+    )(
+        "moves the parts with an instance's own indicator width ($width), with $name",
+        async ({ engine, width, px }) => {
+            await render(
+                <div style={{ width: 200 }}>
+                    <LinearProgress
+                        testId="p"
+                        tokens={{ indeterminateWidth: width as never }}
+                    />
+                </div>,
+                engine,
+            );
+            await settle(300);
+            const box = (part: string) =>
+                document
+                    .querySelector(`[data-testid="p-${part}"]`)!
+                    .getBoundingClientRect();
+            const indicator = box("indicator");
+            // The instance's width, and the parts still a gap from it.
+            expect(indicator.width).toBeCloseTo(px as number, 0);
+            expect(indicator.left).toBeGreaterThan(0);
+            expect(box("track-before").right).toBeCloseTo(
+                indicator.left - 4,
+                0,
+            );
+            expect(box("track-after").left).toBeCloseTo(indicator.right + 4, 0);
+        },
+    );
+
     it("draws no parts while determinate", async () => {
         await render(<LinearProgress testId="p" value={40} />);
         for (const part of ["track-before", "track-after"])
