@@ -80,6 +80,9 @@ function ListItemImpl(props: ListItemProps): ReactNode {
     const swipeable = isPresent(props.swipeAction);
     const link = !expandable && props.href !== undefined;
     const interactive = expandable || link || props.onPress !== undefined;
+    // In a list, its item (`List`'s wrapper) is the `listitem`, as the web's `<li>` is; on its
+    // own, the row is.
+    const plainRole = list === null ? ("listitem" as const) : undefined;
     const rtl = useDirection() === "rtl";
     const width = props.swipeWidth ?? LIST_ITEM_SWIPE_WIDTH;
     const [own, setOwn] = useState(props.defaultRevealed ?? false);
@@ -236,7 +239,7 @@ function ListItemImpl(props: ListItemProps): ReactNode {
             <v.root.View
                 {...keys}
                 focusable
-                role="listitem"
+                {...(plainRole ? { role: plainRole } : {})}
                 style={{ ...s.root, ...unselectable }}
                 testID={id("root")}
             >
@@ -260,7 +263,7 @@ function ListItemImpl(props: ListItemProps): ReactNode {
             role={
                 interactive
                     ? (props.role ?? (link ? "link" : "button"))
-                    : "listitem"
+                    : plainRole
             }
             {...(interactive && props.role === "option"
                 ? { "aria-selected": props.selected ?? false }
