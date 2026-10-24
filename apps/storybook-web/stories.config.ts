@@ -24,6 +24,13 @@ const DISABLED_TEXT = {
             "React Native Web's disabled label is plain text, which axe doesn't exempt as a disabled control's.",
     },
 };
+/** A branch's tree item is named from its row, not from the children's labels it holds. */
+const TREE_NAME = {
+    a11y: {
+        "label-content-name-mismatch":
+            "A tree branch is named from its row, not from the children's labels it holds.",
+    },
+};
 const NO_FILE_INPUT =
     "React Native has no file input to give files to: its trigger calls the app's onPick.";
 const NO_CAROUSEL_KEYS =
@@ -179,18 +186,19 @@ export default defineStories({
         },
         Tooltip: { parameters: keyClicks("KeyEnter") },
         Tree: {
-            // Kept on purpose (fix-storybook-7b): React Native's tree items are named from their
-            // text alone (`aria-labelledby`), and a branch's row owns its group (`aria-owns`).
-            // axe's heuristic reads an element's visible text, and on React Native Web it may
-            // count what the row owns, the children's labels, as text left out of the name.
-            parameters: native({
-                "*": {
-                    a11y: {
-                        "label-content-name-mismatch":
-                            "A tree branch is named from its row, not from the children's labels it holds.",
-                    },
+            // Kept on purpose, on every renderer now (fix-storybook-8): a branch's tree item holds
+            // its row and its group of children (as Safari needs), and is named from its row's
+            // text alone (`aria-labelledby`). axe's heuristic reads all the text inside as the
+            // item's visible text, the children's labels too, which the name leaves out.
+            parameters: {
+                pureform: {
+                    skip: Object.fromEntries(
+                        (["solid", "react", "native"] as const).map(
+                            (renderer) => [renderer, { "*": TREE_NAME }],
+                        ),
+                    ),
                 },
-            }),
+            },
         },
         RichTooltip: { parameters: keyClicks("KeyEnter") },
         Carousel: {

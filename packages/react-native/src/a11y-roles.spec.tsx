@@ -253,7 +253,7 @@ describe.each(ENGINES)("with $name", (engine) => {
     });
 
     describe("the tree", () => {
-        it("makes each row its node's tree item, a branch's owning its group, named from its text", async () => {
+        it("makes each node a tree item holding its row and its group, named from its row's text", async () => {
             await render(
                 <Tree
                     aria-label="Files"
@@ -271,17 +271,24 @@ describe.each(ENGINES)("with $name", (engine) => {
                 HTMLElement,
                 HTMLElement,
             ];
-            expect(src.getAttribute("data-testid")).toBe("pf-tree-node");
-            const group = document.getElementById(
-                src.getAttribute("aria-owns")!,
-            )!;
-            expect(group.getAttribute("role")).toBe("group");
+            // A branch's tree item is its view, around its row and then its group.
+            expect(src.getAttribute("data-testid")).toBe("pf-tree-branch");
+            expect(readme.getAttribute("data-testid")).toBe("pf-tree-node");
+            const group = src.querySelector<HTMLElement>('[role="group"]')!;
             expect(group.contains(index)).toBe(true);
             expect(group.contains(util)).toBe(true);
-            // The group sits beside the row, so the row's name is its own text.
-            expect(src.contains(group)).toBe(false);
+            const row = src.querySelector<HTMLElement>(
+                '[data-testid="pf-tree-node"]',
+            )!;
+            expect(row.compareDocumentPosition(group)).toBe(
+                Node.DOCUMENT_POSITION_FOLLOWING,
+            );
+            // The row is plain, out of the tab order.
+            for (const attribute of ["role", "aria-expanded", "aria-level"])
+                expect(row.hasAttribute(attribute)).toBe(false);
+            expect(row.tabIndex).toBe(-1);
             expect(src.getAttribute("aria-expanded")).toBe("true");
-            expect(readme.hasAttribute("aria-owns")).toBe(false);
+            expect(src.hasAttribute("aria-owns")).toBe(false);
             const name = (item: HTMLElement) =>
                 document.getElementById(item.getAttribute("aria-labelledby")!)
                     ?.textContent;
@@ -304,6 +311,27 @@ describe.each(ENGINES)("with $name", (engine) => {
             // No button inside: the tree item takes focus, one tab stop for the tree.
             expect(document.querySelector('[role="button"]')).toBeNull();
             expect(items.map((item) => item.tabIndex)).toEqual([0, -1, -1, -1]);
+        });
+
+        it("focuses a branch's tree item when its row is pressed, and shows the focus on the row", async () => {
+            await render(<Tree aria-label="Files" items={FILES} />, engine);
+            const src = all('[role="treeitem"]')[0]!;
+            const row = src.querySelector<HTMLElement>(
+                '[data-testid="pf-tree-node"]',
+            )!;
+            await interact(() => userEvent.click(row));
+            expect(document.activeElement).toBe(src);
+            expect(src.getAttribute("aria-expanded")).toBe("true");
+            // Back to it by the keys, which show the focus.
+            await interact(() => userEvent.keyboard("{ArrowDown}"));
+            await interact(() => userEvent.keyboard("{ArrowUp}"));
+            expect(document.activeElement).toBe(src);
+            expect(getComputedStyle(row).outlineStyle).toBe("solid");
+            // Only the row draws it, not the tree item around its group.
+            const around = getComputedStyle(src);
+            expect(
+                around.outlineStyle === "none" || around.outlineWidth === "0px",
+            ).toBe(true);
         });
 
         it("toggles a branch from its tree item by Enter and Space", async () => {

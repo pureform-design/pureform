@@ -3206,6 +3206,8 @@ export function Page() {
                                                         class={c.trackStartArc}
                                                     />
                                                 </span>
+                                                <span class={c.trackTailCap} />
+                                                <span class={c.trackHeadCap} />
                                             </span>
                                             <span class={c.endHalf}>
                                                 <span class={c.endArc} />
@@ -3213,6 +3215,8 @@ export function Page() {
                                             <span class={c.startHalf}>
                                                 <span class={c.startArc} />
                                             </span>
+                                            <span class={c.tailCap} />
+                                            <span class={c.headCap} />
                                         </div>
                                     );
                                 })()}
@@ -3233,6 +3237,8 @@ export function Page() {
                                             <span class={c.startHalf}>
                                                 <span class={c.startArc} />
                                             </span>
+                                            <span class={c.tailCap} />
+                                            <span class={c.headCap} />
                                         </div>
                                     );
                                 })()}
@@ -3254,6 +3260,8 @@ export function Page() {
                                             <span class={c.startHalf}>
                                                 <span class={c.startArc} />
                                             </span>
+                                            <span class={c.tailCap} />
+                                            <span class={c.headCap} />
                                         </div>
                                     );
                                 })()}
@@ -3576,6 +3584,8 @@ export function Page() {
                                         <span class={c.trackStartHalf}>
                                             <span class={c.trackStartArc} />
                                         </span>
+                                        <span class={c.trackTailCap} />
+                                        <span class={c.trackHeadCap} />
                                     </span>
                                     <span class={c.endHalf}>
                                         <span class={c.endArc} />
@@ -3583,6 +3593,8 @@ export function Page() {
                                     <span class={c.startHalf}>
                                         <span class={c.startArc} />
                                     </span>
+                                    <span class={c.tailCap} />
+                                    <span class={c.headCap} />
                                 </div>
                             );
                         }}
@@ -4298,12 +4310,9 @@ export function Page() {
                                             class={t.branch}
                                             role="treeitem"
                                             aria-expanded="true"
+                                            tabindex="0"
                                         >
-                                            <div
-                                                class={t.node}
-                                                tabindex="0"
-                                                aria-expanded="true"
-                                            >
+                                            <div class={t.node}>
                                                 <span class={t.leading}>▤</span>
                                                 <span class={t.text}>src</span>
                                                 <span class={t.indicator}>
@@ -4337,12 +4346,9 @@ export function Page() {
                                             class={t.branch}
                                             role="treeitem"
                                             aria-expanded="false"
+                                            tabindex="-1"
                                         >
-                                            <div
-                                                class={t.node}
-                                                tabindex="-1"
-                                                aria-expanded="false"
-                                            >
+                                            <div class={t.node}>
                                                 <span class={t.leading}>▤</span>
                                                 <span class={t.text}>docs</span>
                                                 <span class={t.indicator}>

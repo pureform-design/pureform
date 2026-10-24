@@ -155,7 +155,8 @@ describe("Tree", () => {
         const rows = all(t.node!);
         expect(rows).toHaveLength(4);
         expect(rows[0]!.className).toBe("tree__node");
-        expect(rows[0]!.getAttribute("aria-expanded")).toBe("false");
+        const branch = all(t.branch!)[0]!;
+        expect(branch.getAttribute("aria-expanded")).toBe("false");
         expect(
             [...rows[0]!.children]
                 .map((el) => el.getAttribute("data-pf-part"))
@@ -164,7 +165,7 @@ describe("Tree", () => {
         expect(all(t.indicator!)).toHaveLength(1);
         expect(all(t.group!)[0]!.hidden).toBe(true);
         expect(rows[3]!.getAttribute("role")).toBe("treeitem");
-        expect(rows[0]!.tabIndex).toBe(0);
+        expect(branch.tabIndex).toBe(0);
         expect(rows[3]!.tabIndex).toBe(-1);
     });
 
@@ -187,14 +188,15 @@ describe("Tree", () => {
         expect(tree.getAttribute("aria-label")).toBe("Files");
         expect(tree.hasAttribute("aria-labelledby")).toBe(false);
         const rows = all(t.node!);
-        rows[0]!.focus();
+        const branch = all(t.branch!)[0]!;
+        branch.focus();
         // Under rtl the left arrow points into the branch.
         await userEvent.keyboard("{ArrowLeft}");
         await settle();
         expect(onExpandedValueChange).toHaveBeenLastCalledWith(
             expect.objectContaining({ expandedValue: ["src"] }),
         );
-        expect(rows[0]!.getAttribute("aria-expanded")).toBe("true");
+        expect(branch.getAttribute("aria-expanded")).toBe("true");
         expect(all(t.group!)[0]!.hidden).toBe(false);
         await userEvent.keyboard("{ArrowDown}");
         await settle();
@@ -207,7 +209,7 @@ describe("Tree", () => {
         expect(rows[1]!.getAttribute("aria-current")).toBe("true");
     });
 
-    it("makes each row its node's treeitem, a branch's owning its group, with no button inside (APG)", async () => {
+    it("makes each node a treeitem holding its row and its group, named from its row, with no button inside (APG)", async () => {
         withRegistry(() => (
             <Tree
                 aria-label="Files"
@@ -218,35 +220,56 @@ describe("Tree", () => {
         ));
         await settle();
         const rows = all(t.node!);
-        expect(rows.map((row) => row.getAttribute("role"))).toEqual([
-            "treeitem",
-            "treeitem",
-            "treeitem",
-            "treeitem",
-        ]);
-        const src = rows[0]!;
-        expect(src.getAttribute("aria-level")).toBe("1");
-        expect(src.getAttribute("aria-expanded")).toBe("true");
-        expect(src.getAttribute("aria-selected")).toBe("true");
-        const group = all(t.group!)[0]!;
-        expect(src.getAttribute("aria-owns")).toBe(group.id);
-        expect(group.getAttribute("role")).toBe("group");
-        // The branch's element is plain, so the row's name is its own text.
         const branch = all(t.branch!)[0]!;
-        expect(branch.hasAttribute("role")).toBe(false);
-        expect(branch.hasAttribute("aria-expanded")).toBe(false);
+        const treeitems = [...document.querySelectorAll('[role="treeitem"]')];
+        // The branch's element, then its leaves (in its group), then the leaf at the top.
+        expect(treeitems).toEqual([branch, rows[1], rows[2], rows[3]]);
+        expect(branch.getAttribute("aria-level")).toBe("1");
+        expect(branch.getAttribute("aria-expanded")).toBe("true");
+        expect(branch.getAttribute("aria-selected")).toBe("true");
+        expect(branch.hasAttribute("aria-owns")).toBe(false);
+        const group = all(t.group!)[0]!;
+        expect(group.getAttribute("role")).toBe("group");
+        // The group sits in the treeitem, after its row, holding the children's treeitems.
+        expect([...branch.children]).toEqual([rows[0], group]);
+        expect(group.contains(rows[1]!)).toBe(true);
+        expect(rows[1]!.getAttribute("aria-level")).toBe("2");
+        // Named from its own row's text, not its children's.
+        const text = all(t.text!)[0]!;
+        expect(branch.getAttribute("aria-labelledby")).toBe(text.id);
+        expect(text.textContent).toBe("src");
+        // The row is plain: no role, state or focus of its own.
+        const row = rows[0]!;
+        for (const attribute of ["role", "aria-expanded", "tabindex"])
+            expect(row.hasAttribute(attribute)).toBe(false);
         expect(document.querySelector('[role="button"]')).toBeNull();
-        // Focus and the keys are on the treeitem.
-        src.focus();
+        // One tab stop, and the keys on the treeitems.
+        expect(
+            treeitems.filter((item) => (item as HTMLElement).tabIndex === 0),
+        ).toEqual([branch]);
+        await userEvent.click(rows[3]!);
+        await settle();
+        expect(document.activeElement).toBe(rows[3]);
+        await userEvent.keyboard("{Home}");
+        await settle();
+        expect(document.activeElement).toBe(branch);
         await userEvent.keyboard("{ArrowDown}");
         await settle();
         expect(document.activeElement).toBe(rows[1]);
         await userEvent.keyboard("{ArrowLeft}");
         await settle();
-        expect(document.activeElement).toBe(src);
+        expect(document.activeElement).toBe(branch);
         await userEvent.keyboard("{ArrowLeft}");
         await settle();
-        expect(src.getAttribute("aria-expanded")).toBe("false");
+        expect(branch.getAttribute("aria-expanded")).toBe("false");
+        await userEvent.keyboard("{Enter}");
+        await settle();
+        expect(branch.getAttribute("aria-expanded")).toBe("true");
+        // Clicking a branch's row focuses its treeitem.
+        await userEvent.click(rows[3]!);
+        await userEvent.click(row);
+        await settle();
+        expect(document.activeElement).toBe(branch);
     });
 
     it("passes the density and color to the registry", async () => {

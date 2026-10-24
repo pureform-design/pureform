@@ -203,7 +203,8 @@ const quantity = (value: Value, what: string): Quantity => {
         throw new Error(
             `${what} needs a number, got "${JSON.stringify(value)}"`,
         );
-    return { n: Number(match[1]), unit: match[2]! };
+    // A CSS pixel length (an instance token written as on the web) is React Native's plain number.
+    return { n: Number(match[1]), unit: match[2] === "px" ? "" : match[2]! };
 };
 
 const written = ({ n, unit, offset }: Quantity): Value =>

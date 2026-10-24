@@ -173,7 +173,28 @@ describe("@pureform/machines", () => {
         };
         for (const [name, own] of Object.entries(zag)) {
             const ours = machines[name as keyof typeof zag];
-            expect(ours.machine.states, name).toBe(own.machine.states);
+            // The select's closed field opens on typing (APG), its one change of state.
+            if (name === "select") {
+                const { focused, ...rest } = ours.machine.states as Record<
+                    string,
+                    { on?: Record<string, unknown> }
+                >;
+                const zagStates = own.machine.states as Record<
+                    string,
+                    { on?: Record<string, unknown> }
+                >;
+                for (const [state, node] of Object.entries(rest))
+                    expect(node, state).toBe(zagStates[state]);
+                const { "TRIGGER.TYPEAHEAD": typed, ...on } = focused!.on!;
+                expect(on).toEqual(
+                    Object.fromEntries(
+                        Object.entries(zagStates.focused!.on!).filter(
+                            ([event]) => event !== "TRIGGER.TYPEAHEAD",
+                        ),
+                    ),
+                );
+                expect(JSON.stringify(typed)).toContain('"target":"open"');
+            } else expect(ours.machine.states, name).toBe(own.machine.states);
             expect(ours.machine.on, name).toBe(own.machine.on);
             // The select's context leaves its selected items to a computed value.
             if (name !== "select")

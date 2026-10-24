@@ -2,6 +2,8 @@
 // tree); each node a row (a leaf's item, or a branch's control) holding an optional leading icon
 // and its text, a branch's row ending in the expand indicator over a group of its children, which
 // Zag hides while it's collapsed; and the ready-made Tree, which renders the nodes it's given.
+// Every node is a `treeitem` holding what's below it: a leaf's row, or a branch's element around
+// its row and its group, which takes focus and the keys and is named from the row's text.
 
 import { treeAnatomy } from "@pureform/anatomy";
 import {
@@ -181,7 +183,8 @@ function TreeElement(props: TreePartProps): JSX.Element {
     });
 }
 
-/** A branch: its row (`BranchControl`) over its children (`Group`). */
+/** A branch: its treeitem, which takes focus and the keys, named from its row's text, around its
+ *  row (`BranchControl`) over its children (`Group`). */
 function Branch(props: TreeNodeProps): JSX.Element {
     const { scope, api } = context.use("Branch");
     const ref = () => ({ node: props.node, indexPath: props.indexPath });
@@ -217,7 +220,8 @@ const row = (
     });
 };
 
-/** A branch's row: a click or Enter selects it and expands or collapses it. */
+/** A branch's row, plain inside its treeitem: a click (or Enter on the treeitem) selects it and
+ *  expands or collapses it. */
 function BranchControl(props: TreeRowProps): JSX.Element {
     return row("BranchControl", props, (api, ref) =>
         api.getBranchControlProps(ref),
