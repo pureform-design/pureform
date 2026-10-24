@@ -12,6 +12,7 @@ import type {
 } from "@pureform/binding-core";
 import type { ReactNode } from "react";
 
+import { useCheckKeys } from "../check-keys";
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
 import { useComponentSlots, withUserStyle } from "../styles";
@@ -67,18 +68,23 @@ function SwitchImpl(props: SwitchProps): ReactNode {
     );
     const id = (part: SwitchPart) =>
         testIdOf(switchControlAnatomy, part, props.testId);
+    const keys = useCheckKeys(
+        () => {
+            if (!props.readOnly) setChecked(!checked);
+        },
+        props.disabled,
+        indication.handlers.onPressIn,
+    );
     return (
         <v.root.Pressable
             {...indication.handlers}
+            {...keys}
             role="switch"
             aria-checked={checked}
             {...(props["aria-label"] === undefined
                 ? {}
                 : { "aria-label": props["aria-label"] })}
             disabled={props.disabled}
-            onPress={() => {
-                if (!props.readOnly) setChecked(!checked);
-            }}
             style={withUserStyle({ ...s.root, ...unselectable }, props.style)}
             testID={id("root")}
         >

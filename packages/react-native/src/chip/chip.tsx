@@ -3,17 +3,19 @@
 
 import { chipAnatomy } from "@pureform/anatomy";
 import type { TestIdOverride } from "@pureform/anatomy";
-import { chipSelection } from "@pureform/binding-core";
+import { chipSelection, isToggle } from "@pureform/binding-core";
 import type {
+    ChangeDetails,
     ChipPart,
     ChipVariantProps,
     InteractiveProps,
 } from "@pureform/binding-core";
 import type { ReactNode } from "react";
+import type { GestureResponderEvent } from "react-native";
 
 import { IconSlot, iconSlot } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
-import { testIdOf, unselectable, withEngine } from "../parts";
+import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
 import { useComponentSlots, withUserStyle } from "../styles";
 import type { RootStyleProps } from "../styles";
 
@@ -28,10 +30,15 @@ export interface ChipProps
     readonly trailingIcon?: ReactNode;
     /** Flips a pointing icon under right to left. */
     readonly mirrorIcon?: boolean | undefined;
-    /** A filter chip that's on. */
+    /** A filter chip that's on. Giving it, or `defaultSelected`, makes the chip a filter chip:
+     *  a press flips it, reported with `aria-pressed`. */
     readonly selected?: boolean | undefined;
+    readonly defaultSelected?: boolean | undefined;
+    readonly onSelectedChange?:
+        | ((details: ChangeDetails<"selected", boolean>) => void)
+        | undefined;
     readonly disabled?: boolean | undefined;
-    readonly onPress?: (() => void) | undefined;
+    readonly onPress?: ((event: GestureResponderEvent) => void) | undefined;
     /** A long press: given it, a long press calls it rather than pressing (a tooltip's trigger
      *  shows its tooltip so). */
     readonly onLongPress?: (() => void) | undefined;
@@ -39,6 +46,15 @@ export interface ChipProps
 }
 
 function ChipImpl(props: ChipProps): ReactNode {
+    const toggle = isToggle(props);
+    const [on, setOn] = useControllable(
+        "Chip",
+        "selected",
+        props.selected,
+        props.defaultSelected,
+        props.onSelectedChange,
+        false,
+    );
     const indication = useSurfaceIndication(INDICATION!, {
         indication: props.indication,
         interactionSource: props.interactionSource,
@@ -52,7 +68,7 @@ function ChipImpl(props: ChipProps): ReactNode {
         "chip",
         indication.select(chipSelection(props)),
         indication.states({
-            selected: props.selected ?? false,
+            selected: toggle && on,
             ...(props.disabled ? { disabled: true } : {}),
             ...(props.mirrorIcon ? { mirrored: true } : {}),
         }),
@@ -62,9 +78,13 @@ function ChipImpl(props: ChipProps): ReactNode {
         <v.root.Pressable
             {...indication.handlers}
             role="button"
+            {...(toggle ? { "aria-pressed": on } : {})}
             disabled={props.disabled}
             onLongPress={props.onLongPress}
-            onPress={props.onPress}
+            onPress={(event: GestureResponderEvent) => {
+                if (toggle) setOn(!on);
+                props.onPress?.(event);
+            }}
             style={withUserStyle({ ...s.root, ...unselectable }, props.style)}
             testID={id("root")}
         >

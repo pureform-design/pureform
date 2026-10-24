@@ -14,6 +14,7 @@ import type {
 } from "@pureform/binding-core";
 import type { ReactNode } from "react";
 
+import { useCheckKeys } from "../check-keys";
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
 import { useComponentSlots, withUserStyle } from "../styles";
@@ -70,18 +71,23 @@ function CheckboxImpl(props: CheckboxProps): ReactNode {
     );
     const id = (part: CheckboxPart) =>
         testIdOf(checkboxAnatomy, part, props.testId);
+    const keys = useCheckKeys(
+        () => {
+            if (!props.readOnly) setChecked(checked !== true);
+        },
+        props.disabled,
+        indication.handlers.onPressIn,
+    );
     return (
         <v.root.Pressable
             {...indication.handlers}
+            {...keys}
             role="checkbox"
             aria-checked={indeterminate ? "mixed" : checked}
             {...(props["aria-label"] === undefined
                 ? {}
                 : { "aria-label": props["aria-label"] })}
             disabled={props.disabled}
-            onPress={() => {
-                if (!props.readOnly) setChecked(checked !== true);
-            }}
             style={withUserStyle({ ...s.root, ...unselectable }, props.style)}
             testID={id("root")}
         >
