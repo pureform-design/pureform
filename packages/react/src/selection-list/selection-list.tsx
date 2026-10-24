@@ -44,7 +44,7 @@ export interface SelectionListProps
             PartProps,
             keyof SelectionListRootOwnProps | keyof Keyed | "children"
         >,
-        SelectionListRootOwnProps,
+        Omit<SelectionListRootOwnProps, keyof Keyed>,
         Keyed {
     /** The options, in order: each a list item's content and variants, its value, and its own
      *  `className`, `style`, `slotProps`, `unstyled`, `testId` and `tokens`, over

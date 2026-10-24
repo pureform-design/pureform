@@ -474,8 +474,17 @@ export function createSlotProps<
     A extends ComponentAnatomy,
     Extra extends string = never,
     I = {},
->(props: SlotKeyedProps<A, Extra, I>): SlotPropsOf<PartName<A> | Extra, I> {
-    const keyed = props as SlotKeyedProps<ComponentAnatomy, never, PartInstances>;
+>(
+    // `unstyled` loosely: Root's (every part's copy unknown) passes through too.
+    props: Omit<SlotKeyedProps<A, Extra, I>, "unstyled"> & {
+        readonly unstyled?: unknown;
+    },
+): SlotPropsOf<PartName<A> | Extra, I> {
+    const keyed = props as SlotKeyedProps<
+        ComponentAnatomy,
+        never,
+        PartInstances
+    >;
     const view = (read: Accessor<Dict>) =>
         new Proxy(new SlotView(read), SLOT_VIEW) as PartProps;
     if (untrack(() => SLOT_KEYED.every((key) => isFixed(keyed, key)))) {

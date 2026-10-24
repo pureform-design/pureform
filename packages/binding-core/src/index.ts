@@ -931,8 +931,10 @@ export {
 export type {
     RatingBehaviorProps,
     RatingContentProps,
+    RatingInstances,
     RatingPart,
     RatingRootOwnProps,
+    RatingStarInstance,
     RatingVariantProps,
 } from "./components/rating";
 export {
@@ -1064,6 +1066,7 @@ export {
 } from "./parts";
 export type {
     InnerProps,
+    ItemInstance,
     PartInstances,
     PartSourcesInput,
     PartStates,

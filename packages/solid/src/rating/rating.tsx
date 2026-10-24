@@ -4,6 +4,7 @@
 // with `allowHalf` the pointer's side of a star picks the half.
 
 import { ratingAnatomy } from "@pureform/anatomy";
+import type { PartName } from "@pureform/anatomy";
 import {
     RATING_ROOT_PROPS,
     ratingMachineProps,
@@ -12,7 +13,9 @@ import {
 } from "@pureform/binding-core";
 import type {
     RatingContentProps,
+    RatingInstances,
     RatingRootOwnProps,
+    RatingStarInstance,
 } from "@pureform/binding-core";
 import * as ratingGroup from "@pureform/machines/rating-group";
 import type { JSX, ValidComponent } from "@solidjs/web";
@@ -34,7 +37,7 @@ import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
 import { createSlotProps, useComponent } from "../parts";
-import type { ComponentScope, SlotKeyedProps } from "../parts";
+import type { ComponentScope, SlotKeyedProps, SlotPropsOf } from "../parts";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 
@@ -180,13 +183,13 @@ const Fill = star("fill", "Fill");
 /** The filled star's inline-start half, for a half value. */
 const HalfFill = star("halfFill", "HalfFill");
 
-/** The ready-made rating's props: Root's, with `class`, `style`, and `slotProps` keyed by part,
- *  a `label` and the star `icon`. */
+/** The ready-made rating's props: Root's, with `class`, `style`, `slotProps` and `unstyled` keyed
+ *  by part (a star's parts also by star, `RatingStarInstance`), a `label` and the star `icon`. */
 export type RatingProps = Omit<
     RatingRootProps,
     keyof SlotKeyedProps<Anatomy> | "children"
 > &
-    SlotKeyedProps<Anatomy> &
+    SlotKeyedProps<Anatomy, never, RatingInstances> &
     RatingContentProps<JSX.Element>;
 
 const READY_MADE_PROPS = [
@@ -200,23 +203,28 @@ const READY_MADE_PROPS = [
 /** Each star of the ready-made rating, filled by the machine's item state. */
 function Stars(props: {
     readonly icon: JSX.Element;
-    readonly slots: ReturnType<typeof createSlotProps<Anatomy>>;
+    readonly slots: SlotPropsOf<PartName<Anatomy>, RatingInstances>;
 }): JSX.Element {
     const { api } = context.use("Rating");
+    const slots = props.slots;
     return (
         <For each={api().items}>
             {(index) => {
                 const fill = createMemo(() =>
                     starFill(api().getItemState({ index })),
                 );
+                const star = createMemo((): RatingStarInstance => ({
+                    index,
+                    fill: fill(),
+                }));
                 return (
-                    <Item index={index} {...props.slots("item")}>
-                        <Icon {...props.slots("icon")}>{props.icon}</Icon>
+                    <Item index={index} {...slots("item", star)}>
+                        <Icon {...slots("icon", star)}>{props.icon}</Icon>
                         <Show when={fill() === "full"}>
-                            <Fill {...props.slots("fill")}>{props.icon}</Fill>
+                            <Fill {...slots("fill", star)}>{props.icon}</Fill>
                         </Show>
                         <Show when={fill() === "half"}>
-                            <HalfFill {...props.slots("halfFill")}>
+                            <HalfFill {...slots("halfFill", star)}>
                                 {props.icon}
                             </HalfFill>
                         </Show>
@@ -229,7 +237,7 @@ function Stars(props: {
 
 /** The ready-made rating: Root, an optional label, and the control with a star per count. */
 function ReadyMade(props: RatingProps): JSX.Element {
-    const slots = createSlotProps(props);
+    const slots = createSlotProps<Anatomy, never, RatingInstances>(props);
     const own = omit(props, ...READY_MADE_PROPS) as RatingRootProps;
     const root = slots("root") as object;
     return (

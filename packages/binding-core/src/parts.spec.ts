@@ -352,7 +352,9 @@ describe("overDefaults", () => {
         const defaults: Item = { tokens: { height: "56px" } };
         const own: Item = { headline: "Inbox" };
         expect(overDefaults(defaults, {})).toBe(defaults);
-        expect(overDefaults(defaults, { testId: undefined } as unknown as Item)).toBe(defaults);
+        expect(
+            overDefaults(defaults, { testId: undefined } as unknown as Item),
+        ).toBe(defaults);
         expect(overDefaults(undefined, own)).toBe(own);
         expect(overDefaults({}, own)).toBe(own);
     });

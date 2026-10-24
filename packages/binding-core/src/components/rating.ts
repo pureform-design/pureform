@@ -115,6 +115,23 @@ export const ratingMachineProps = (props: RatingBehaviorProps) => ({
         : undefined,
 });
 
+/** What a ready-made rating's star is, for a function of the copy in its `item`, `icon`, `fill`
+ *  and `halfFill` keys: `className={{ item: (star) => (star.fill === "full" ? "lit" : undefined) }}`. */
+export interface RatingStarInstance {
+    /** The star's 1-based index. */
+    readonly index: number;
+    /** What it draws for the value (or the pointer's hover). */
+    readonly fill: "full" | "half" | "none";
+}
+
+/** The ready-made rating's repeated parts, each to its copy. */
+export interface RatingInstances {
+    readonly item: RatingStarInstance;
+    readonly icon: RatingStarInstance;
+    readonly fill: RatingStarInstance;
+    readonly halfFill: RatingStarInstance;
+}
+
 /** What each item draws for `value` and the item's 1-based `index`: the filled star, the half
  *  one, or only the empty one. Zag's item state decides the highlight (it follows the pointer
  *  too); this reads it. */

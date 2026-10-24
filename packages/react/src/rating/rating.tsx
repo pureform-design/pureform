@@ -13,7 +13,9 @@ import {
 } from "@pureform/binding-core";
 import type {
     RatingContentProps,
+    RatingInstances,
     RatingRootOwnProps,
+    RatingStarInstance,
 } from "@pureform/binding-core";
 import * as ratingGroup from "@pureform/machines/rating-group";
 import { normalizeProps } from "@zag-js/react";
@@ -26,7 +28,7 @@ import { StarIcon } from "../glyphs";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import { useComponent, useSlotProps } from "../parts";
-import type { ComponentScope, SlotKeyedProps } from "../parts";
+import type { ComponentScope, SlotKeyedProps, SlotPropsOf } from "../parts";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
@@ -189,31 +191,41 @@ function HalfFill({ unstyled, ...props }: RatingPartProps): ReactNode {
     });
 }
 
-/** The ready-made rating's props: Root's, with `className`, `style`, and `slotProps` keyed by
- *  part, a `label` and the star `icon`. */
+/** The ready-made rating's props: Root's, with `className`, `style`, `slotProps` and `unstyled`
+ *  keyed by part (a star's parts also by star, `RatingStarInstance`), a `label` and the star
+ *  `icon`. */
 export type RatingProps = Omit<
     RatingRootProps,
     keyof SlotKeyedProps<Anatomy> | "children"
 > &
-    SlotKeyedProps<Anatomy> &
+    SlotKeyedProps<Anatomy, never, RatingInstances> &
     RatingContentProps<ReactNode>;
 
 /** Each star of the ready-made rating, filled by the machine's item state. */
 function Stars(props: {
     readonly icon: ReactNode;
-    readonly slot: (part: PartName<Anatomy>) => PartProps;
+    readonly slot: SlotPropsOf<PartName<Anatomy>, RatingInstances>;
 }): ReactNode {
     const { api } = context.use("Rating");
+    const { slot } = props;
+    const each =
+        slot.each("item") ||
+        slot.each("icon") ||
+        slot.each("fill") ||
+        slot.each("halfFill");
     return api.items.map((index) => {
         const fill = starFill(api.getItemState({ index }));
+        const star: RatingStarInstance | undefined = each
+            ? { index, fill }
+            : undefined;
         return (
-            <Item key={index} index={index} {...props.slot("item")}>
-                <Icon {...props.slot("icon")}>{props.icon}</Icon>
+            <Item key={index} index={index} {...slot("item", star)}>
+                <Icon {...slot("icon", star)}>{props.icon}</Icon>
                 {fill === "full" ? (
-                    <Fill {...props.slot("fill")}>{props.icon}</Fill>
+                    <Fill {...slot("fill", star)}>{props.icon}</Fill>
                 ) : null}
                 {fill === "half" ? (
-                    <HalfFill {...props.slot("halfFill")}>
+                    <HalfFill {...slot("halfFill", star)}>
                         {props.icon}
                     </HalfFill>
                 ) : null}
@@ -224,7 +236,7 @@ function Stars(props: {
 
 /** The ready-made rating: Root, an optional label, and the control with a star per count. */
 function ReadyMade(props: RatingProps): ReactNode {
-    const slot = useSlotProps(props);
+    const slot = useSlotProps<Anatomy, never, RatingInstances>(props);
     const {
         className: _className,
         style: _style,

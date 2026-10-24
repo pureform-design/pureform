@@ -88,10 +88,12 @@ export const isPerInstance = (
 
 /** What `unstyled` takes: `true` for every part, or per part (a repeated part's by copy, which
  *  Root ignores: the ready-made resolves it for each copy). */
-export type Unstyled<P extends string = string, I = {}> =
+export type Unstyled<P extends string = string, I = AnyInstances> =
     | boolean
-    | SlotKeyedEach<P, boolean, I>
-    | SlotKeyed<P, boolean | ((instance: never) => boolean | undefined)>;
+    | SlotKeyedEach<P, boolean, I>;
+
+/** Every part's copy unknown: what Root's `unstyled` takes, so a ready-made's passes through. */
+type AnyInstances = { readonly [part: string]: never };
 
 /** One part's entry of a per-part override (`testId`, `unstyled`) as a separate component's
  *  `root`: a Root that also renders another component's root (a dialog's backdrop, drawn by the
@@ -318,3 +320,10 @@ export const overDefaults = <P extends object>(
     }
     return merged as P;
 };
+
+/** A repeated part's copy drawn from a ready-made's data (a step, a tab, a slide): its 0-based
+ *  `index` and the user's `item`. */
+export interface ItemInstance<T> {
+    readonly index: number;
+    readonly item: T;
+}

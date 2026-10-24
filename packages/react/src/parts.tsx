@@ -481,7 +481,12 @@ export function useSlotProps<
     A extends ComponentAnatomy,
     Extra extends string = never,
     I = {},
->(props: SlotKeyedProps<A, Extra, I>): SlotPropsOf<PartName<A> | Extra, I> {
+>(
+    // `unstyled` loosely: Root's (every part's copy unknown) passes through too.
+    props: Omit<SlotKeyedProps<A, Extra, I>, "unstyled"> & {
+        readonly unstyled?: unknown;
+    },
+): SlotPropsOf<PartName<A> | Extra, I> {
     const { slotProps, className, style } = props;
     const unstyled =
         typeof props.unstyled === "object" ? props.unstyled : undefined;

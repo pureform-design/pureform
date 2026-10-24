@@ -87,4 +87,40 @@ describe("Rating, ready-made", () => {
         );
         expect(input?.value).toBe("3");
     });
+
+    it("takes a function of each star in a repeated part's keys", async () => {
+        withRegistry(() => (
+            <Rating
+                defaultValue={2}
+                count={3}
+                class={{
+                    item: (star) => (star.fill === "full" ? "lit" : undefined),
+                    control: "row",
+                }}
+                style={{ icon: (star) => ({ opacity: star.index / 4 }) }}
+                slotProps={{
+                    item: (star) => ({ title: `star ${star.index}` }),
+                }}
+                unstyled={{ fill: (star) => star.index === 1 }}
+            />
+        ));
+        await settle();
+        const stars = items() as HTMLElement[];
+        expect(stars.map((each) => each.classList.contains("lit"))).toEqual([
+            true,
+            true,
+            false,
+        ]);
+        expect(stars[2]!.title).toBe("star 3");
+        expect(byTestId(ids.control).classList.contains("row")).toBe(true);
+        const icons = document.querySelectorAll<HTMLElement>(
+            `[data-testid="${ids.icon}"]`,
+        );
+        expect(icons[1]!.style.opacity).toBe("0.5");
+        const fills = document.querySelectorAll<HTMLElement>(
+            `[data-testid="${ids.fill}"]`,
+        );
+        expect(fills[0]!.className).toBe("");
+        expect(fills[1]!.className).not.toBe("");
+    });
 });

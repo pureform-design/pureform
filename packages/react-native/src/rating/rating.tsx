@@ -9,7 +9,9 @@ import { isPresent, ratingSelection } from "@pureform/binding-core";
 import type {
     RatingBehaviorProps,
     RatingContentProps,
+    RatingInstances,
     RatingPart,
+    RatingStarInstance,
     RatingVariantProps,
 } from "@pureform/binding-core";
 import { useRef } from "react";
@@ -49,7 +51,7 @@ export interface RatingProps
             | "valueText"
         >,
         RatingContentProps<ReactNode>,
-        NativeSlotProps<RatingHosts> {
+        NativeSlotProps<RatingHosts, RatingInstances> {
     /** A prefix for every part's test id (`quality` → `quality-item`), or ids by part. */
     readonly testId?: TestIdOverride<RatingPart> | undefined;
 }
@@ -81,6 +83,11 @@ function RatingImpl(props: RatingProps): ReactNode {
     const id = (part: RatingPart) =>
         testIdOf(ratingAnatomy, part, props.testId);
     const slot = nativeSlots(props);
+    const perStar =
+        slot.each("item") ||
+        slot.each("icon") ||
+        slot.each("fill") ||
+        slot.each("halfFill");
     const text = props.valueText ?? defaultText;
     const star = props.icon ?? <Glyph glyph="★" />;
     const pick = (index: number, event: GestureResponderEvent) => {
@@ -126,9 +133,15 @@ function RatingImpl(props: RatingProps): ReactNode {
                         const reached = Math.ceil(value) === index;
                         const half = reached && value - index === -0.5;
                         const full = index <= value || (reached && !half);
+                        const each: RatingStarInstance | undefined = perStar
+                            ? {
+                                  index,
+                                  fill: half ? "half" : full ? "full" : "none",
+                              }
+                            : undefined;
                         return (
                             <v.item.Pressable
-                                {...slot.props("item")}
+                                {...slot.props("item", each)}
                                 key={index}
                                 aria-checked={
                                     reached || (value <= 0 && index === 1)
@@ -145,17 +158,19 @@ function RatingImpl(props: RatingProps): ReactNode {
                                     "onPress",
                                     (event: GestureResponderEvent) =>
                                         pick(index, event),
+                                    each,
                                 )}
                                 role="radio"
                                 style={slot.style(
                                     "item",
                                     withUnselectable(s.item),
+                                    each,
                                 )}
                                 testID={id("item")}
                             >
                                 <v.icon.View
-                                    {...slot.props("icon")}
-                                    style={slot.style("icon", s.icon)}
+                                    {...slot.props("icon", each)}
+                                    style={slot.style("icon", s.icon, each)}
                                     testID={id("icon")}
                                 >
                                     <IconSlot
@@ -167,9 +182,9 @@ function RatingImpl(props: RatingProps): ReactNode {
                                 </v.icon.View>
                                 {full ? (
                                     <v.fill.View
-                                        {...slot.props("fill")}
+                                        {...slot.props("fill", each)}
                                         pointerEvents="none"
-                                        style={slot.style("fill", s.fill)}
+                                        style={slot.style("fill", s.fill, each)}
                                         testID={id("fill")}
                                     >
                                         <IconSlot
@@ -182,11 +197,12 @@ function RatingImpl(props: RatingProps): ReactNode {
                                 ) : null}
                                 {half ? (
                                     <v.halfFill.View
-                                        {...slot.props("halfFill")}
+                                        {...slot.props("halfFill", each)}
                                         pointerEvents="none"
                                         style={slot.style(
                                             "halfFill",
                                             s.halfFill,
+                                            each,
                                         )}
                                         testID={id("halfFill")}
                                     >

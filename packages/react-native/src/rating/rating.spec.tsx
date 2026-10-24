@@ -65,4 +65,34 @@ describe("Rating on React Native", () => {
         );
         expect(all("shown-fill")).toHaveLength(1);
     });
+
+    it("takes a function of each star in a repeated part's style and slotProps", async () => {
+        const seen: number[] = [];
+        await withRegistry(
+            <Rating
+                defaultValue={2}
+                count={3}
+                style={{
+                    item: (star) => {
+                        seen.push(star.index);
+                        return star.fill === "full"
+                            ? { opacity: 0.5 }
+                            : undefined;
+                    },
+                }}
+                slotProps={{
+                    item: (star) => ({
+                        accessibilityHint: `star ${star.index}`,
+                    }),
+                }}
+            />,
+        );
+        const stars = all(ids.item);
+        expect(stars.map((each) => getComputedStyle(each).opacity)).toEqual([
+            "0.5",
+            "0.5",
+            "1",
+        ]);
+        expect(seen.slice(0, 3)).toEqual([1, 2, 3]);
+    });
 });
