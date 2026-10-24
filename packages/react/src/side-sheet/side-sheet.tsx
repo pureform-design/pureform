@@ -204,7 +204,10 @@ const Actions: (props: SideSheetPartProps) => ReactNode = chrome.part(
  *  body and actions as content. */
 export interface SideSheetProps
     extends
-        Omit<SideSheetRootProps, keyof SlotKeyedProps<Anatomy, "backdrop"> | "children">,
+        Omit<
+            SideSheetRootProps,
+            keyof SlotKeyedProps<Anatomy, "backdrop"> | "children"
+        >,
         SlotKeyedProps<Anatomy, "backdrop">,
         SideSheetContentProps<ReactNode> {
     readonly testId?: TestIdOverride<SideSheetPart>;

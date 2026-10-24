@@ -245,7 +245,10 @@ function Body(props: BottomSheetPartProps): JSX.Element {
  *  the trigger's label, the drag handle and its name, and the body as content. */
 export interface BottomSheetProps
     extends
-        Omit<BottomSheetRootProps, keyof SlotKeyedProps<Anatomy, "backdrop"> | "children">,
+        Omit<
+            BottomSheetRootProps,
+            keyof SlotKeyedProps<Anatomy, "backdrop"> | "children"
+        >,
         SlotKeyedProps<Anatomy, "backdrop">,
         BottomSheetContentProps<JSX.Element> {
     readonly testId?: TestIdOverride<BottomSheetPart>;

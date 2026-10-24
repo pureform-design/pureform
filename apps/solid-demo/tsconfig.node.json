@@ -1,4 +1,11 @@
 {
     "extends": ["@pureform/tsconfig/node.json"],
-    "include": ["oxlint.config.ts", "panda.config.ts", "pureform.config.ts", "vite.config.ts", "vitest.config.e2e.ts", "vitest.config.unit.ts"]
+    "include": [
+        "oxlint.config.ts",
+        "panda.config.ts",
+        "pureform.config.ts",
+        "vite.config.ts",
+        "vitest.config.e2e.ts",
+        "vitest.config.unit.ts"
+    ]
 }

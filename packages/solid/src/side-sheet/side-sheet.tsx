@@ -195,7 +195,10 @@ const Actions: (props: SideSheetPartProps) => JSX.Element = chrome.part(
  *  and actions as content. */
 export interface SideSheetProps
     extends
-        Omit<SideSheetRootProps, keyof SlotKeyedProps<Anatomy, "backdrop"> | "children">,
+        Omit<
+            SideSheetRootProps,
+            keyof SlotKeyedProps<Anatomy, "backdrop"> | "children"
+        >,
         SlotKeyedProps<Anatomy, "backdrop">,
         SideSheetContentProps<JSX.Element> {
     readonly testId?: TestIdOverride<SideSheetPart>;

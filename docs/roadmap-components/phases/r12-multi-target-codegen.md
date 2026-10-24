@@ -3,10 +3,12 @@
 Runs in parallel with fix-storybook-8, ts71 and r11 (different files).
 
 ## Goal
+
 One codegen setup can serve several targets, and pruned (build) and full (dev) output live apart,
 so dev and build never overwrite each other. Mostly transparent: existing apps change little.
 
 ## Design
+
 - `codegen` takes `targets: { <name>: { target, options, components? } }`; a single `target` stays
   valid (shorthand for one target).
 - Layout: `.pureform/<target>/full/` and `.pureform/<target>/pruned/`; stable top-level entries
@@ -21,13 +23,16 @@ so dev and build never overwrite each other. Mostly transparent: existing apps c
 - CLI `pureform generate` writes every target's `full/` by default; `--prune` writes `pruned/`.
 
 ## Storybook
+
 Declare web and native targets; drop the run-time `pureformRn()` plugin so React Native stories use
 generated styles like a real app.
 
 ## Gate
+
 Every demo in dev and build; Storybook dev and build; full gate.
 
 ## Types and editor (added, user-approved)
+
 - Declarations live only at the top of `.pureform/` (`registry.d.ts`), generated from the full
   output (a superset of pruned), so the editor and `tsc` never depend on dev vs build. `full/` and
   `pruned/` hold no `.d.ts` augmenting `@pureform/styling` (an app's `.pureform/**/*.*` include

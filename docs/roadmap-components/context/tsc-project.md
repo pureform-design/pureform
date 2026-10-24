@@ -15,14 +15,14 @@ Branch `tsc-project`, from main. Not pushed.
   nothing was "fixed" there; the real configs are the ones to check.
 - Real configs (`tsconfig.json`, `tsconfig.types.json`, `tsconfig.spec.json`) across every
   package, after `omni run build`, before the fix:
-  - react, solid `tsconfig.types.json`: the exclude `src/**/*.{spec,test}.*` used braces, which tsc
-    globs don't support, so specs were type-checked (`emulateReducedMotion` missing on
-    `BrowserCommands`). The same pattern was in `packages/tsconfig/types.json`.
-  - react-native `tsconfig.types.json`: included `src/testing/**` (Vitest browser commands, not
-    published), error TS2883 on `CONFIGS`.
-  - tests/component-suites, browser-e2e-tests, panda-fixture: import generated output
-    (`.pureform/*`, `$recipes`) that no task writes before a check.
-  - Pre-existing vs recent: not bisected; the brace glob predates this batch.
+    - react, solid `tsconfig.types.json`: the exclude `src/**/*.{spec,test}.*` used braces, which tsc
+      globs don't support, so specs were type-checked (`emulateReducedMotion` missing on
+      `BrowserCommands`). The same pattern was in `packages/tsconfig/types.json`.
+    - react-native `tsconfig.types.json`: included `src/testing/**` (Vitest browser commands, not
+      published), error TS2883 on `CONFIGS`.
+    - tests/component-suites, browser-e2e-tests, panda-fixture: import generated output
+      (`.pureform/*`, `$recipes`) that no task writes before a check.
+    - Pre-existing vs recent: not bisected; the brace glob predates this batch.
 
 ## Done
 

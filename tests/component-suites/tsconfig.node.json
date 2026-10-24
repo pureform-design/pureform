@@ -1,15 +1,7 @@
 {
-    "extends": [
-        "@pureform/tsconfig/node.json"
-    ],
-    "include": [
-        "vite.config.ts",
-        "vitest.config.e2e.ts"
-    ],
+    "extends": ["@pureform/tsconfig/node.json"],
+    "include": ["vite.config.ts", "vitest.config.e2e.ts"],
     "compilerOptions": {
-        "lib": [
-            "ESNext",
-            "DOM"
-        ]
+        "lib": ["ESNext", "DOM"]
     }
 }

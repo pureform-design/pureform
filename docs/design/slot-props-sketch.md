@@ -18,8 +18,10 @@ ready-made draws is a fact of the binding, declared next to the code that draws 
 // packages/binding-core/src/parts.ts
 /** What a ready-made accepts to customize a component it draws: the inner component's own
  *  per-part props, tokens and testId. Variants are not included; the outer one passes its own. */
-export type InnerProps<C extends ComponentName, Platform = DefaultPlatform> =
-    Partial<CustomizeProps<C, Platform>>;
+export type InnerProps<
+    C extends ComponentName,
+    Platform = DefaultPlatform,
+> = Partial<CustomizeProps<C, Platform>>;
 ```
 
 `CustomizeProps<C>` is the set each renderer already defines for its own parts:
@@ -27,7 +29,7 @@ export type InnerProps<C extends ComponentName, Platform = DefaultPlatform> =
 ```ts
 // React and Solid (binding-dom)
 interface CustomizeProps<C> {
-    readonly className?: string | SlotKeyed<C, string>;   // Solid: `class`
+    readonly className?: string | SlotKeyed<C, string>; // Solid: `class`
     readonly style?: SlotKeyed<C, Style>;
     readonly slotProps?: SlotKeyed<C, PartProps>;
     readonly unstyled?: Unstyled<C>;
@@ -37,8 +39,8 @@ interface CustomizeProps<C> {
 
 // React Native
 interface CustomizeProps<C> {
-    readonly style?: SlotKeyed<C, NativeStyle>;           // ViewStyle or TextStyle per part
-    readonly slotProps?: SlotKeyed<C, NativePartProps>;   // ViewProps, TextProps, PressableProps… per part
+    readonly style?: SlotKeyed<C, NativeStyle>; // ViewStyle or TextStyle per part
+    readonly slotProps?: SlotKeyed<C, NativePartProps>; // ViewProps, TextProps, PressableProps… per part
     readonly testId?: TestIdOverride<C>;
     readonly tokens?: InstanceTokens<C>;
     // className / unstyled: web only
@@ -64,7 +66,7 @@ interface SelectProps extends CustomizeProps<"select"> {
 }
 
 interface ListProps extends CustomizeProps<"list"> {
-    readonly listItemProps?: InnerProps<"listItem">;   // defaults for every item
+    readonly listItemProps?: InnerProps<"listItem">; // defaults for every item
 }
 
 interface DatePickerProps extends CustomizeProps<"datePicker"> {
@@ -103,12 +105,16 @@ new objects. React Native takes the same path.
 ```tsx
 function ReadyMade(props: ListProps) {
     const { items = [], listItemProps, density, color, ...rest } = props;
-    const slot = useSlotProps<"list">(rest);                    // own parts: root, item
+    const slot = useSlotProps<"list">(rest); // own parts: root, item
     return (
         <Root {...slot("root")} tokens={rest.tokens}>
             {items.map(({ value, ...item }, i) => (
                 <Item key={value ?? i} {...slot("item")}>
-                    <ListItem density={density} color={color} {...overDefaults(listItemProps, item)} />
+                    <ListItem
+                        density={density}
+                        color={color}
+                        {...overDefaults(listItemProps, item)}
+                    />
                 </Item>
             ))}
         </Root>

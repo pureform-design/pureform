@@ -83,13 +83,13 @@ element props on the root; `testId`/`unstyled` on Root; no keyed form. Not part 
 
 - Plain `tokens` normally goes to the component's own recipe (`xSelection(props)` in
   `binding-core/src/components/*.ts`). Outliers:
-  - **List / SelectionList**: `tokens` -> the _items_ (ListItem defaults via `ListDefaults`/`listItemVariants`); `listTokens` -> the list recipe.
-  - **RadioGroup**: `tokens` -> the radios (no group recipe).
-  - **ButtonGroup**: `groupTokens` -> `buttonGroup`; no plain `tokens`. Button tokens unreachable.
-  - **ChipSet**: `setTokens` -> `chipSet`; `tokens` -> each chip (under the chip's own).
-  - **Toolbar**: `tokens` -> `toolbar`; `color: "vibrant"` provides `iconButton.accent` to children via `ProvidedTokens`.
-  - **TagsInput**: `chip.tokens` (the one nested-token prop in the field group).
-  - **Paginator**: only _provided_ tokens reach its Select and IconButtons.
+    - **List / SelectionList**: `tokens` -> the _items_ (ListItem defaults via `ListDefaults`/`listItemVariants`); `listTokens` -> the list recipe.
+    - **RadioGroup**: `tokens` -> the radios (no group recipe).
+    - **ButtonGroup**: `groupTokens` -> `buttonGroup`; no plain `tokens`. Button tokens unreachable.
+    - **ChipSet**: `setTokens` -> `chipSet`; `tokens` -> each chip (under the chip's own).
+    - **Toolbar**: `tokens` -> `toolbar`; `color: "vibrant"` provides `iconButton.accent` to children via `ProvidedTokens`.
+    - **TagsInput**: `chip.tokens` (the one nested-token prop in the field group).
+    - **Paginator**: only _provided_ tokens reach its Select and IconButtons.
 - No prefixed token props elsewhere. Nested components' tokens (Button/IconButton in overlays,
   pickers, SplitButton; Menu in Select/Autocomplete/SplitButton/Toolbar; Chip; ListItem; Checkbox in
   Table selection cells; Scrim in dialogs/sheets) are not reachable by a dedicated prop. In R/S the
@@ -168,14 +168,14 @@ Common facts (verified):
 Anatomy: root, label, icon, secondaryIcon, touchTarget
 
 - **Props**
-  |                                                          | R                                | S                                       | N                                                              |
-  | -------------------------------------------------------- | -------------------------------- | --------------------------------------- | -------------------------------------------------------------- |
-  | className/class                                          | keyed own parts                  | keyed own parts                         | absent                                                         |
-  | style                                                    | keyed own parts (CSSProperties)  | keyed own parts (CSSProperties\|string) | plain, root only, `StyleProp<ViewStyle>` (`button.tsx:30,128`) |
-  | slotProps                                                | keyed own parts                  | keyed                                   | absent                                                         |
-  | unstyled                                                 | root prop `Unstyled<ButtonPart>` | same                                    | absent                                                         |
-  | testId                                                   | prefix\|by part                  | same                                    | same (`button.tsx:51`)                                         |
-  | Evidence R `button.tsx:141-179`, S `button.tsx:155-215`. |
+    |                                                          | R                                | S                                       | N                                                              |
+    | -------------------------------------------------------- | -------------------------------- | --------------------------------------- | -------------------------------------------------------------- |
+    | className/class                                          | keyed own parts                  | keyed own parts                         | absent                                                         |
+    | style                                                    | keyed own parts (CSSProperties)  | keyed own parts (CSSProperties\|string) | plain, root only, `StyleProp<ViewStyle>` (`button.tsx:30,128`) |
+    | slotProps                                                | keyed own parts                  | keyed                                   | absent                                                         |
+    | unstyled                                                 | root prop `Unstyled<ButtonPart>` | same                                    | absent                                                         |
+    | testId                                                   | prefix\|by part                  | same                                    | same (`button.tsx:51`)                                         |
+    | Evidence R `button.tsx:141-179`, S `button.tsx:155-215`. |
 - **Parts reachable**: R/S all 5 (`slot("root"|"touchTarget"|"icon"|"secondaryIcon"|"label")`). N: all 5 reachable for testId only; none for style except root.
 - **Nested**: none (icon/secondaryIcon are user nodes).
 - **Tokens**: `tokens` → `button` recipe (`buttonSelection`, `binding-core/src/components/button.ts:112-126`). Same in N (`button.tsx:92`).
@@ -395,22 +395,22 @@ Anatomy: root, touchTarget, actionArea, media, header, avatar, headerText, headl
 Legend: R = packages/react, S = packages/solid, N = packages/react-native. Paths are relative to `packages/`.
 
 - **R/S shared mechanism.** Ready-mades take `SlotKeyedProps<Anatomy>`: `className` (R) or `class` (S), `style`, `slotProps`, `testId`, `unstyled`.
-  - These are keyed by the component's own parts. `className`/`style`/`slotProps` are per part. `testId` is a prefix string or an object by part. `unstyled` is `boolean` or an object by part.
-  - R definition: `react/src/parts.tsx:380`. S definition: `solid/src/parts.tsx:320`.
-  - S `style` is `JSX.CSSProperties | string`; R `style` is `CSSProperties`.
-  - The ready-made spreads `slot("root")` onto Root. Root also gets every other prop: `tokens`, variants, machine props and element attributes such as `id`, `onClick`.
-  - `testId` and `unstyled` go to Root whole. Root then applies them to every part.
+    - These are keyed by the component's own parts. `className`/`style`/`slotProps` are per part. `testId` is a prefix string or an object by part. `unstyled` is `boolean` or an object by part.
+    - R definition: `react/src/parts.tsx:380`. S definition: `solid/src/parts.tsx:320`.
+    - S `style` is `JSX.CSSProperties | string`; R `style` is `CSSProperties`.
+    - The ready-made spreads `slot("root")` onto Root. Root also gets every other prop: `tokens`, variants, machine props and element attributes such as `id`, `onClick`.
+    - `testId` and `unstyled` go to Root whole. Root then applies them to every part.
 - **N shared mechanism.** There is no `className`, `slotProps` or `unstyled` anywhere in RN.
-  - Parts are drawn by `useComponentSlots` (`react-native/src/styles.ts:169`). Test ids come from `testIdOf` / `partId`, which take a string prefix or an object by part.
-  - The only style prop is plain `style` on the plain single-part components, and only on the ones noted below. The multi-part RN ready-mades have no `style` at all.
-  - Per-render allocations in RN (hot spots): `testId={(part)=>partId(...)}` closures, `selection={xSelection({...props})}` objects, spread style objects `{...s[part], ...unselectable}`, and `[s.root, rest.style]` arrays.
-  - `useComponentSlots` runs `splitSelection(withDefaults(...))` every render.
+    - Parts are drawn by `useComponentSlots` (`react-native/src/styles.ts:169`). Test ids come from `testIdOf` / `partId`, which take a string prefix or an object by part.
+    - The only style prop is plain `style` on the plain single-part components, and only on the ones noted below. The multi-part RN ready-mades have no `style` at all.
+    - Per-render allocations in RN (hot spots): `testId={(part)=>partId(...)}` closures, `selection={xSelection({...props})}` objects, spread style objects `{...s[part], ...unselectable}`, and `[s.root, rest.style]` arrays.
+    - `useComponentSlots` runs `splitSelection(withDefaults(...))` every render.
 - **Dir layout.** `text-field` and `text-area` have a ready-made in R and S via the shared factory `createTextInput` (`react/src/text-input.tsx`, `solid/src/text-input.tsx`). In N they have only an `index.ts` re-exporting `TextField` / `TextArea` from `react-native/src/text-input.tsx`.
 - **Tokens, general rule.**
-  - Plain `tokens` is typed `InstanceTokens<recipe>` and goes to the component's own recipe: textField, textArea, field, label, input, plainTextarea, description, errorText, supportingText, numberField, codeField, tagsInput, searchBar, searchView, autocomplete, select, nativeSelect, dateInput, timeInput, fileUpload.
-  - Selection functions are in `binding-core/src/components/*`.
-  - The only prefixed or nested token prop in this group is TagsInput's `chip`.
-  - No component here accepts `listTokens`, `menuTokens` or similar.
+    - Plain `tokens` is typed `InstanceTokens<recipe>` and goes to the component's own recipe: textField, textArea, field, label, input, plainTextarea, description, errorText, supportingText, numberField, codeField, tagsInput, searchBar, searchView, autocomplete, select, nativeSelect, dateInput, timeInput, fileUpload.
+    - Selection functions are in `binding-core/src/components/*`.
+    - The only prefixed or nested token prop in this group is TagsInput's `chip`.
+    - No component here accepts `listTokens`, `menuTokens` or similar.
 
 ### TextField (`text-field/`, factory `text-input.tsx`)
 
@@ -418,51 +418,51 @@ Anatomy `textField`: root, container, leadingIcon, prefixText, input, suffixText
 
 1. **Props.**
 
-   | Prop              | R                             | S                                              | N                                                              |
-   | ----------------- | ----------------------------- | ---------------------------------------------- | -------------------------------------------------------------- |
-   | className / class | keyed by own parts            | keyed by own parts (`class`)                   | absent                                                         |
-   | style             | keyed by own parts            | keyed by own parts (`CSSProperties \| string`) | absent (see Gaps)                                              |
-   | slotProps         | keyed by own parts            | keyed by own parts                             | absent                                                         |
-   | unstyled          | boolean or keyed by own parts | boolean or keyed by own parts                  | absent                                                         |
-   | testId            | prefix or keyed by own parts  | prefix or keyed by own parts                   | prefix or keyed by own parts (`TestIdOverride<TextFieldPart>`) |
-   - R/S evidence: `react/src/text-field/text-field.tsx:62-77`.
-   - N: `inputProps?: TextInputProps` (`text-input.tsx:57`). This is the only RN style-ish escape hatch and it targets the TextInput only.
+    | Prop              | R                             | S                                              | N                                                              |
+    | ----------------- | ----------------------------- | ---------------------------------------------- | -------------------------------------------------------------- |
+    | className / class | keyed by own parts            | keyed by own parts (`class`)                   | absent                                                         |
+    | style             | keyed by own parts            | keyed by own parts (`CSSProperties \| string`) | absent (see Gaps)                                              |
+    | slotProps         | keyed by own parts            | keyed by own parts                             | absent                                                         |
+    | unstyled          | boolean or keyed by own parts | boolean or keyed by own parts                  | absent                                                         |
+    | testId            | prefix or keyed by own parts  | prefix or keyed by own parts                   | prefix or keyed by own parts (`TestIdOverride<TextFieldPart>`) |
+    - R/S evidence: `react/src/text-field/text-field.tsx:62-77`.
+    - N: `inputProps?: TextInputProps` (`text-input.tsx:57`). This is the only RN style-ish escape hatch and it targets the TextInput only.
 
 2. **Own parts.**
-   - R/S: all 10 parts reachable through the keyed props. `slot("root")` is spread onto Root.
-   - N: all parts get a `testID`, but none take a style or props. Only the TextInput is reachable, through `inputProps`.
-   - N: `style` inside `inputProps` is overridden by `style={s.input}` (`text-input.tsx:~217`) because the spread comes first. `onFocus` in `inputProps` is also overridden; only `onBlur` is composed.
+    - R/S: all 10 parts reachable through the keyed props. `slot("root")` is spread onto Root.
+    - N: all parts get a `testID`, but none take a style or props. Only the TextInput is reachable, through `inputProps`.
+    - N: `style` inside `inputProps` is overridden by `style={s.input}` (`text-input.tsx:~217`) because the spread comes first. `onFocus` in `inputProps` is also overridden; only `onBlur` is composed.
 3. **Nested components.** None. The visibility icon is an inline SVG (R/S). N renders a `Pressable` with a "◉/◡" glyph for `secure`; its `aria-label` is `revealLabel`.
 4. **Tokens.** Plain `tokens` go to `textField` (`binding-core/text-field.ts:226`). The same in S and N. No other token props.
 5. **Variants passed down.** None.
 6. **Inconsistencies.**
-   - Prop names: R `className`/`autoComplete`/`maxLength`; S `class`/`autocomplete`/`maxlength`, plus `style` may be a string.
-   - R/S take input attributes directly (TEXT_FIELD_INPUT_PROPS + framework spelling). N has an `inputProps` bag instead.
-   - N lacks `unstyled`, `className` and `slotProps`.
-   - N `secure` has `revealLabel`; R/S have no equivalent label prop (the secure toggle's label is fixed).
-   - N `TextField` is a plain function wrapping `Field` (itself `withEngine`).
-   - Part-id helper `partId` types `testId` per anatomy, but the N `Field` is shared with TextArea, Select, Autocomplete and DockedDatePicker. Its `FieldPart` is the union of text-field and text-area parts.
+    - Prop names: R `className`/`autoComplete`/`maxLength`; S `class`/`autocomplete`/`maxlength`, plus `style` may be a string.
+    - R/S take input attributes directly (TEXT_FIELD_INPUT_PROPS + framework spelling). N has an `inputProps` bag instead.
+    - N lacks `unstyled`, `className` and `slotProps`.
+    - N `secure` has `revealLabel`; R/S have no equivalent label prop (the secure toggle's label is fixed).
+    - N `TextField` is a plain function wrapping `Field` (itself `withEngine`).
+    - Part-id helper `partId` types `testId` per anatomy, but the N `Field` is shared with TextArea, Select, Autocomplete and DockedDatePicker. Its `FieldPart` is the union of text-field and text-area parts.
 
 ### TextArea (`text-area/`, factory `text-input.tsx`)
 
 Anatomy `textArea`: root, container, leadingIcon, input, label, trailingIcon, supportingText, counter. It has no prefixText or suffixText.
 
 1. **Props.** As TextField (R/S keyed by own parts via `SlotKeyedProps<textAreaAnatomy>`, `react/src/text-area/text-area.tsx:63-77`).
-   - N: `lines` (default 3), `inputProps`, `testId` by `TextAreaPart`, no style, no unstyled.
+    - N: `lines` (default 3), `inputProps`, `testId` by `TextAreaPart`, no style, no unstyled.
 2. **Own parts.** Same as TextField minus the affixes.
 3. **Nested.** None.
 4. **Tokens.** `tokens` go to `textArea` (`textAreaSelection`).
 5. **Variants.** `autoGrow` is an R/S/N variant of the root.
 6. **Inconsistencies.**
-   - N has `lines`. R/S take `rows` as the textarea attribute (React: `rows`, via TEXT_AREA_INPUT_PROPS).
-   - R/S omit `prefixText`/`suffixText` by deleting them from `parts`. N's shared `Field` guards `affix()` with `name === "textArea"`.
-   - Otherwise the same as TextField.
+    - N has `lines`. R/S take `rows` as the textarea attribute (React: `rows`, via TEXT_AREA_INPUT_PROPS).
+    - R/S omit `prefixText`/`suffixText` by deleting them from `parts`. N's shared `Field` guards `affix()` with `name === "textArea"`.
+    - Otherwise the same as TextField.
 
 ### textarea (plain `Textarea`; anatomy `plainTextarea`, single part `root`)
 
 1. **Props.**
-   - R/S: element props (`className`/`class`, `style`, `ref`) go to the single native `<textarea>`: plain, not keyed. `testId`/`unstyled` typed by `TestIdOverride<"root">` / `Unstyled<"root">` (`PieceOwnProps`, `binding-core/field-primitives.ts:~48`). `as` is supported.
-   - N: `TextControlProps` (`field/text-control.tsx:23`): all of RN `TextInputProps` minus `testID`/`value`/`defaultValue`, so `style` is `StyleProp<TextStyle>` and is applied as `[s.root, rest.style]`. `testId` is a prefix or by part. No unstyled.
+    - R/S: element props (`className`/`class`, `style`, `ref`) go to the single native `<textarea>`: plain, not keyed. `testId`/`unstyled` typed by `TestIdOverride<"root">` / `Unstyled<"root">` (`PieceOwnProps`, `binding-core/field-primitives.ts:~48`). `as` is supported.
+    - N: `TextControlProps` (`field/text-control.tsx:23`): all of RN `TextInputProps` minus `testID`/`value`/`defaultValue`, so `style` is `StyleProp<TextStyle>` and is applied as `[s.root, rest.style]`. `testId` is a prefix or by part. No unstyled.
 2. **Own parts.** `root` is reachable. N also merges `multiline` / `numberOfLines: 3` / `textAlignVertical: "top"` defaults.
 3. **Nested.** None.
 4. **Tokens.** `tokens` go to `plainTextarea` (`plainTextareaSelection`).
@@ -481,105 +481,105 @@ Same shape as plain Textarea.
 ### Field (anatomy `field`, single part `root`)
 
 1. **Props.**
-   - R/S: element props plain (`className`/`class`, `style`); `testId` (root only) and `unstyled` (`boolean`) typed by `"root"`; `as`.
-   - N: no `style`, no `unstyled`; only `testId`.
-   - All: `disabled`, `invalid`, `required`, `controlId`, and content props `label`, `description`, `error`.
+    - R/S: element props plain (`className`/`class`, `style`); `testId` (root only) and `unstyled` (`boolean`) typed by `"root"`; `as`.
+    - N: no `style`, no `unstyled`; only `testId`.
+    - All: `disabled`, `invalid`, `required`, `controlId`, and content props `label`, `description`, `error`.
 2. **Own parts.** `root`.
 3. **Nested (ready-made, when no `children`).** `Label`, `Input`, `Description`, `ErrorText` (`react/src/field/field.tsx:90`).
-   - Their props are not reachable: none of `labelProps`, `inputProps` or `slotProps` exists. The nested `Input` is rendered with no props at all, so no `type`, `placeholder`, `value` or `tokens`.
-   - To customize them you must compose via `children`.
+    - Their props are not reachable: none of `labelProps`, `inputProps` or `slotProps` exists. The nested `Input` is rendered with no props at all, so no `type`, `placeholder`, `value` or `tokens`.
+    - To customize them you must compose via `children`.
 4. **Tokens.** `tokens` go to `field` only. Nested pieces cannot be given tokens.
 5. **Variants.** None. States (`disabled`, `invalid`, `required`) are shared through context. Pieces' own props win.
 6. **Inconsistencies.**
-   - N counts description and error via `register` (`useFieldPiece`). R/S use `describe` and a `useState`.
-   - N lacks `as`, `style` and `unstyled`.
-   - N's context gives `aria-labelledby` only, since RN has no `aria-describedby`.
+    - N counts description and error via `register` (`useFieldPiece`). R/S use `describe` and a `useState`.
+    - N lacks `as`, `style` and `unstyled`.
+    - N's context gives `aria-labelledby` only, since RN has no `aria-describedby`.
 
 ### Label (anatomy `label`: root, requiredIndicator)
 
 1. **Props.**
-   - R/S: element props plain on root (`className`, `style`). `testId`/`unstyled` typed by `"root" | "requiredIndicator"`. Props `required` and `disabled`.
-   - N: no style, no unstyled; `testId` by part; `required`, `disabled`, `tokens`; `children`.
+    - R/S: element props plain on root (`className`, `style`). `testId`/`unstyled` typed by `"root" | "requiredIndicator"`. Props `required` and `disabled`.
+    - N: no style, no unstyled; `testId` by part; `required`, `disabled`, `tokens`; `children`.
 2. **Own parts.** `requiredIndicator` is **not** reachable for className/style/slotProps in R/S. `unstyled`/`testId` can address it by part. In N, `testId` by part works (`label.tsx:~45`).
 3. **Nested.** None.
 4. **Tokens.** `tokens` go to `label` (`labelSelection`).
 5. **Variants.** None.
 6. **Inconsistencies.**
-   - N lacks `style`, `as` and `unstyled`.
-   - N renders a `Text` with `nativeID={field.ids.label}`. R uses `htmlFor`.
-   - The required mark is `REQUIRED_MARK`, rendered via a nested `scope.render("requiredIndicator")` in R/S.
+    - N lacks `style`, `as` and `unstyled`.
+    - N renders a `Text` with `nativeID={field.ids.label}`. R uses `htmlFor`.
+    - The required mark is `REQUIRED_MARK`, rendered via a nested `scope.render("requiredIndicator")` in R/S.
 
 ### Description / ErrorText (anatomies `description`, `errorText`; single part `root`)
 
 1. **Props.**
-   - R/S: element props plain on root; `tokens`, `testId` (`"root"`), `unstyled`; `as`.
-   - N: only `children`, `tokens`, `testId` (`DescriptionProps`/`ErrorTextProps`, `description.tsx:11`, `error-text.tsx:11`). No `style`.
+    - R/S: element props plain on root; `tokens`, `testId` (`"root"`), `unstyled`; `as`.
+    - N: only `children`, `tokens`, `testId` (`DescriptionProps`/`ErrorTextProps`, `description.tsx:11`, `error-text.tsx:11`). No `style`.
 2. **Own parts.** `root` only.
 3. **Nested.** None.
 4. **Tokens.** `tokens` go to `description` / `errorText`.
 5. **Variants.** None.
 6. **Inconsistencies.**
-   - The N `tokens` type is derived with `Parameters<typeof xSelection>[0]["tokens"]`, versus an `InstanceTokens` import elsewhere.
-   - N lacks `style` and `unstyled`.
-   - N mounts register with a counter; R/S use `useDescribes`.
-   - An unrelated name clash: `errorText` here and the `error` part of `fileUpload` are different things (see FileUpload).
+    - The N `tokens` type is derived with `Parameters<typeof xSelection>[0]["tokens"]`, versus an `InstanceTokens` import elsewhere.
+    - N lacks `style` and `unstyled`.
+    - N mounts register with a counter; R/S use `useDescribes`.
+    - An unrelated name clash: `errorText` here and the `error` part of `fileUpload` are different things (see FileUpload).
 
 ### SupportingText (anatomy `supportingText`: root; variant `tone`)
 
 1. **Props.**
-   - R/S: via `createSinglePart`, element props plain; `tone`, `tokens`, `testId` (`"root"`), `unstyled`; `as`.
-   - N (`single-part.tsx:260`): `tone`, `tokens`, `children`, `testId`. No `style`, no `unstyled`.
+    - R/S: via `createSinglePart`, element props plain; `tone`, `tokens`, `testId` (`"root"`), `unstyled`; `as`.
+    - N (`single-part.tsx:260`): `tone`, `tokens`, `children`, `testId`. No `style`, no `unstyled`.
 2. **Own parts.** `root`.
 3. **Nested.** None.
 4. **Tokens.** `tokens` go to `supportingText` (`supportingTextSelection`: `{tone, tokens}`).
 5. **Variants.** `tone`. This is a standalone component; the ready-mades with a `supportingText` part use their own recipe's `supportingText` part, not this recipe.
 6. **Inconsistencies.**
-   - N is a plain function with `useSelectedStyles`, not `withEngine`. It has no `style`, unlike N `Text`, which has `style`.
-   - N `Text` takes `style: StyleProp<TextStyle>` and `Separator`/`Scrim` etc. have their own.
-   - Same-named `supportingText` part exists in 10+ recipes (textField, textArea, numberField, codeField, tagsInput, autocomplete, select, dateInput, fileUpload, plus the standalone recipe). All are independent.
+    - N is a plain function with `useSelectedStyles`, not `withEngine`. It has no `style`, unlike N `Text`, which has `style`.
+    - N `Text` takes `style: StyleProp<TextStyle>` and `Separator`/`Scrim` etc. have their own.
+    - Same-named `supportingText` part exists in 10+ recipes (textField, textArea, numberField, codeField, tagsInput, autocomplete, select, dateInput, fileUpload, plus the standalone recipe). All are independent.
 
 ### NumberField (anatomy `numberField`: root, container, leadingIcon, prefixText, input, suffixText, label, control, decrementTrigger, incrementTrigger, supportingText)
 
 1. **Props.**
-   - R/S: `SlotKeyedProps<numberFieldAnatomy>`: all five keyed by own parts (`react/src/number-field/number-field.tsx:223-235`).
-   - N (`number-field.tsx:57-83`): `testId` by part only. `inputProps: TextInputProps`. No style, no unstyled. Also `indication`.
+    - R/S: `SlotKeyedProps<numberFieldAnatomy>`: all five keyed by own parts (`react/src/number-field/number-field.tsx:223-235`).
+    - N (`number-field.tsx:57-83`): `testId` by part only. `inputProps: TextInputProps`. No style, no unstyled. Also `indication`.
 2. **Own parts.** All 11 reachable in R/S through `slot(...)`, including `control`, `decrementTrigger` and `incrementTrigger`. N: testIds for all, nothing else.
 3. **Nested.** None as components. The trigger icons are default SVGs; `decrementIcon` / `incrementIcon` are content props.
 4. **Tokens.** `tokens` go to `numberField` (`numberFieldSelection`).
 5. **Variants.** `variant`, `color`, `density`.
 6. **Inconsistencies.**
-   - N `NumberFieldProps` is a pick list. It lacks `largeStep`, `allowMouseWheel`, `required`, `name`, `form`, `id` and `interactionSource`; R/S take the full set.
-   - N has `inputProps`; R/S spread input attributes through `slotProps.input`.
-   - N trigger objects are rebuilt every render: `{ ...s[part], ...unselectable }`.
-   - R `ReadyMade` passes `leadingIcon`/`prefixText`/`suffixText` booleans into Root. There is no `trailingIcon` (the control occupies it).
+    - N `NumberFieldProps` is a pick list. It lacks `largeStep`, `allowMouseWheel`, `required`, `name`, `form`, `id` and `interactionSource`; R/S take the full set.
+    - N has `inputProps`; R/S spread input attributes through `slotProps.input`.
+    - N trigger objects are rebuilt every render: `{ ...s[part], ...unselectable }`.
+    - R `ReadyMade` passes `leadingIcon`/`prefixText`/`suffixText` booleans into Root. There is no `trailingIcon` (the control occupies it).
 
 ### CodeField (anatomy `codeField`: root, label, control, input, supportingText)
 
 1. **Props.**
-   - R/S: `SlotKeyedProps<Anatomy>` keyed by own parts. `slotProps.input` is applied to **every cell** (`react/src/code-field/code-field.tsx:150`: `<Input key index {...slot("input")} />`).
-   - N: `testId` by part only; `inputProps` ("for every cell"); no style, no unstyled.
+    - R/S: `SlotKeyedProps<Anatomy>` keyed by own parts. `slotProps.input` is applied to **every cell** (`react/src/code-field/code-field.tsx:150`: `<Input key index {...slot("input")} />`).
+    - N: `testId` by part only; `inputProps` ("for every cell"); no style, no unstyled.
 2. **Own parts.** All 5 reachable in R/S. The hidden `<input>` Root renders for form submit is not a part and is not reachable (`code-field.tsx:80-90`). N: all `testId`; same for cells (one `input` testId for all cells).
 3. **Nested.** None.
 4. **Tokens.** `tokens` go to `codeField`.
 5. **Variants.** `variant`, `color`, `density`.
 6. **Inconsistencies.**
-   - Per-cell customization is impossible: every cell receives the same slot props and the same `testId`.
-   - N's prop pick lacks `name`, `form`, `required`, `autoFocus` etc.
-   - N `testId` prefix doc: `otp` → `otp-input`.
+    - Per-cell customization is impossible: every cell receives the same slot props and the same `testId`.
+    - N's prop pick lacks `name`, `form`, `required`, `autoFocus` etc.
+    - N `testId` prefix doc: `otp` → `otp-input`.
 
 ### TagsInput (anatomy `tagsInput`: root, container, leadingIcon, input, label, trailingIcon, supportingText)
 
 Nested anatomy `inputChip`: root, avatar, icon, label, remove, touchTarget. It has same-named `root`, `label` and `icon` parts.
 
 1. **Props.**
-   - R/S: `SlotKeyedProps<tagsInputAnatomy>` keyed by own parts. Root-level `chip?: InputChipVariantProps` (corner, toggle, color, density, tokens) is the only way to reach chips.
-   - N: `testId`, `inputProps`, `chip` (via TagsInputVariantProps), no style/unstyled.
+    - R/S: `SlotKeyedProps<tagsInputAnatomy>` keyed by own parts. Root-level `chip?: InputChipVariantProps` (corner, toggle, color, density, tokens) is the only way to reach chips.
+    - N: `testId`, `inputProps`, `chip` (via TagsInputVariantProps), no style/unstyled.
 2. **Own parts.** All 7 reachable in R/S.
 3. **Nested.** `Chip`, `ChipTouchTarget`, `ChipAvatar`/`ChipIcon`, `ChipLabel`, `ChipRemove`, under their own `inputChip` scope.
-   - Chip parts are **not** reachable via className/style/slotProps or `unstyled`.
-   - `testId` only reaches them when it is a **string** prefix (`tagsInputChipTestId` → `${prefix}-chip`, `binding-core/components/tags-input.ts:167`). A by-part object does not reach chips.
-   - `chip` gives variants and tokens to the chips. `indication` is forwarded to chips. `unstyled` is not (`react/src/tags-input/tags-input.tsx:122-126`).
-   - Content hooks: `chipAvatar`, `chipIcon`, `removeIcon`.
+    - Chip parts are **not** reachable via className/style/slotProps or `unstyled`.
+    - `testId` only reaches them when it is a **string** prefix (`tagsInputChipTestId` → `${prefix}-chip`, `binding-core/components/tags-input.ts:167`). A by-part object does not reach chips.
+    - `chip` gives variants and tokens to the chips. `indication` is forwarded to chips. `unstyled` is not (`react/src/tags-input/tags-input.tsx:122-126`).
+    - Content hooks: `chipAvatar`, `chipIcon`, `removeIcon`.
 4. **Tokens.** Plain `tokens` → `tagsInput`. `chip.tokens` → `inputChip` recipe. This is the only nested token path in the group.
 5. **Variants.** `variant`, `color`, `density` are the field's. The chip's `color`/`density` are separate, under `chip`; the field's are not passed down.
 6. **Inconsistencies.** R/S same. N takes `chip` and chip testId the same way, plus `indication`. N lacks the className/style/slotProps/unstyled route.
@@ -587,60 +587,60 @@ Nested anatomy `inputChip`: root, avatar, icon, label, remove, touchTarget. It h
 ### SearchBar (anatomy `searchBar`: root, leading, input, trailing)
 
 1. **Props.**
-   - R/S: `SlotKeyedProps<Anatomy>` keyed by own parts. Input attributes `list`, `aria-*` go to the input (`SEARCH_BAR_INPUT_PROPS`). Everything else goes to Root.
-   - N (`search-bar.tsx:25`): `testId` by part; `inputProps`; `placeholder`; no style/unstyled.
+    - R/S: `SlotKeyedProps<Anatomy>` keyed by own parts. Input attributes `list`, `aria-*` go to the input (`SEARCH_BAR_INPUT_PROPS`). Everything else goes to Root.
+    - N (`search-bar.tsx:25`): `testId` by part; `inputProps`; `placeholder`; no style/unstyled.
 2. **Own parts.** All 4 reachable in R/S.
 3. **Nested.** None.
 4. **Tokens.** `tokens` go to `searchBar`. Variants are `centered` and `scrolled` (`searchBarSelection`).
 5. **Variants.** `centered`, `scrolled`.
 6. **Inconsistencies.**
-   - N takes `placeholder` and `inputProps` explicitly; R/S spread attributes.
-   - N's list has `value`/`defaultValue`/`onValueChange` plus `disabled` only (no `name`, `required`, `readOnly`).
-   - N root style: `{ ...s.root, ...unselectable }` per render.
+    - N takes `placeholder` and `inputProps` explicitly; R/S spread attributes.
+    - N's list has `value`/`defaultValue`/`onValueChange` plus `disabled` only (no `name`, `required`, `readOnly`).
+    - N root style: `{ ...s.root, ...unselectable }` per render.
 
 ### SearchView (R/S anatomy `searchViewOverlayAnatomy`: root, trigger, positioner, surface, header, leading, input, trailing, divider, content; N anatomy `searchView`: root, header, leading, input, trailing, divider, content)
 
 Nested menu anatomy `searchViewMenuAnatomy` (item parts).
 
 1. **Props.**
-   - R/S: `SlotKeyedProps<overlayAnatomy>` keyed by the 10 overlay parts, with `testId`/`unstyled` re-typed to `SearchViewPart` (`react/src/search-view/search-view.tsx:450-456`).
-   - N: `testId` by the 7-part N anatomy only; no className/style/slotProps/unstyled.
+    - R/S: `SlotKeyedProps<overlayAnatomy>` keyed by the 10 overlay parts, with `testId`/`unstyled` re-typed to `SearchViewPart` (`react/src/search-view/search-view.tsx:450-456`).
+    - N: `testId` by the 7-part N anatomy only; no className/style/slotProps/unstyled.
 2. **Own parts.**
-   - R/S: all 10 reachable.
-   - N: `trigger`, `positioner` and `surface` do not exist. The trigger is an unstyled `View` with a fixed `testID` (`compositeTestIds.searchView.trigger`), unaffected by `testId`.
+    - R/S: all 10 reachable.
+    - N: `trigger`, `positioner` and `surface` do not exist. The trigger is an unstyled `View` with a fixed `testID` (`compositeTestIds.searchView.trigger`), unaffected by `testId`.
 3. **Nested.**
-   - Default trigger: a `SearchBar` (R/S `<SearchBar as="span" inert readOnly value placeholder>`). Its props and parts are **not reachable**; only the `trigger` slot of the view itself is. `trigger?: ReactNode` replaces it.
-   - Leading/trailing buttons: `IconButton`. Not reachable except via `leading` / `trailing` content and `backLabel` / `clearLabel`.
-   - Suggestion items: drawn as menu parts (`Item`, `ItemLabel`, …). These are **not reachable** through the ready-made. The `menu` scope takes a testId only when `testId` is a string (`search-view.tsx:206-210`), and `indication` is forwarded. No `unstyled`.
-   - N: `MenuItems` gets `searchViewMenuSelection()` plus `indication`. No `testId`.
+    - Default trigger: a `SearchBar` (R/S `<SearchBar as="span" inert readOnly value placeholder>`). Its props and parts are **not reachable**; only the `trigger` slot of the view itself is. `trigger?: ReactNode` replaces it.
+    - Leading/trailing buttons: `IconButton`. Not reachable except via `leading` / `trailing` content and `backLabel` / `clearLabel`.
+    - Suggestion items: drawn as menu parts (`Item`, `ItemLabel`, …). These are **not reachable** through the ready-made. The `menu` scope takes a testId only when `testId` is a string (`search-view.tsx:206-210`), and `indication` is forwarded. No `unstyled`.
+    - N: `MenuItems` gets `searchViewMenuSelection()` plus `indication`. No `testId`.
 4. **Tokens.** `tokens` go to `searchView` only. The menu gets `{}` (`searchViewMenuSelection`). No menu or bar tokens.
 5. **Variants.** `variant` (fullScreen/docked/contained). Nothing is passed to the menu.
 6. **Inconsistencies.**
-   - The R/S and N part sets differ (10 vs 7). R/S `SearchViewProps.testId` accepts `trigger`, `positioner`, `surface`; N doesn't.
-   - N `trigger` can be a render function receiving `SearchViewTriggerProps`; R/S take a node.
-   - N lacks className/style/slotProps/unstyled.
-   - Same-named parts: `leading`/`trailing`/`input` appear in both searchBar and searchView. `searchViewMenu.item*` vs `menu.item*`.
+    - The R/S and N part sets differ (10 vs 7). R/S `SearchViewProps.testId` accepts `trigger`, `positioner`, `surface`; N doesn't.
+    - N `trigger` can be a render function receiving `SearchViewTriggerProps`; R/S take a node.
+    - N lacks className/style/slotProps/unstyled.
+    - Same-named parts: `leading`/`trailing`/`input` appear in both searchBar and searchView. `searchViewMenu.item*` vs `menu.item*`.
 
 ### Autocomplete (anatomy `autocomplete`: root, container, leadingIcon, prefixText, input, suffixText, label, trailingIcon, supportingText; menu anatomy `autocompleteMenu`: positioner, root, itemGroup, itemGroupLabel, item, itemLabel)
 
 1. **Props.**
-   - R/S: `SlotKeyedProps<autocompleteAnatomy>` keyed by the 9 field parts. `aria-label*` go to the combobox.
-   - N: `testId` by `AutocompletePart`. `inputProps` (merged: its `role`, `onKeyPress` etc. are overridden by your `...props.inputProps` spread last). No style/unstyled. N has `error`, `toggleLabel`, `indication`.
+    - R/S: `SlotKeyedProps<autocompleteAnatomy>` keyed by the 9 field parts. `aria-label*` go to the combobox.
+    - N: `testId` by `AutocompletePart`. `inputProps` (merged: its `role`, `onKeyPress` etc. are overridden by your `...props.inputProps` spread last). No style/unstyled. N has `error`, `toggleLabel`, `indication`.
 2. **Own parts.** The 9 field parts are reachable in R/S. The menu parts (`positioner`, `content`, `item`, `itemGroup`, `itemGroupLabel`, `itemLabel`) are **not reachable** through slot props. `Positioner` and `Content` are rendered bare (`autocomplete.tsx:443-446`).
 3. **Nested.** Menu scope `autocompleteMenu` plus items. `testId` reaches it only if a string prefix (`autocomplete.tsx:247-251`). `unstyled` is not forwarded to the menu; `indication` is. N: `MenuListbox` gets no `testId` or tokens.
 4. **Tokens.** `tokens` go to `autocomplete`. The menu gets none.
 5. **Variants.** The menu receives the field's `color` and `density` (`autocompleteMenuSelection`). `variant` is not passed.
 6. **Inconsistencies.**
-   - N spreads every other prop into `Field` and uses TextFieldPart ids (`partId(autocompleteAnatomy, ...)`).
-   - N `trailingIcon` defaults to "▾"; R/S use a `DropDownArrow`.
-   - Autocomplete `items` group by `group` in R/S only.
-   - N builds `inputProps` and `selection` objects per render.
+    - N spreads every other prop into `Field` and uses TextFieldPart ids (`partId(autocompleteAnatomy, ...)`).
+    - N `trailingIcon` defaults to "▾"; R/S use a `DropDownArrow`.
+    - Autocomplete `items` group by `group` in R/S only.
+    - N builds `inputProps` and `selection` objects per render.
 
 ### Select (anatomy `select`: root, container, leadingIcon, prefixText, input, suffixText, label, trailingIcon, supportingText, hiddenSelect; menu anatomy `selectMenu` as above)
 
 1. **Props.**
-   - R/S: `SlotKeyedProps<selectAnatomy>` keyed by the 10 parts, including `hiddenSelect`.
-   - N: `testId` by `SelectPart`, plus FieldProps (`inputProps` omitted). No style/unstyled.
+    - R/S: `SlotKeyedProps<selectAnatomy>` keyed by the 10 parts, including `hiddenSelect`.
+    - N: `testId` by `SelectPart`, plus FieldProps (`inputProps` omitted). No style/unstyled.
 2. **Own parts.** R/S: all 10, including `hiddenSelect`. N: no `hiddenSelect` is rendered, and the field's `partId` typing uses the text-field part set.
 3. **Nested.** Same as Autocomplete: the `selectMenu` scope (`testId` string only, `indication` forwarded, no `unstyled`). The menu's parts are unreachable. `Positioner`/`Content` are bare.
 4. **Tokens.** `tokens` go to `select`. The menu gets none.
@@ -650,113 +650,113 @@ Nested menu anatomy `searchViewMenuAnatomy` (item parts).
 ### NativeSelect (anatomy `nativeSelect`: root, select, icon, group, option)
 
 1. **Props.**
-   - R/S: `SlotKeyedProps<Anatomy>` keyed by own parts. `slotProps.option` is applied to **every** option, including the placeholder one. `slotProps.group` is applied to every group (`react/src/native-select/native-select.tsx:259-311`).
-   - N: `testId` by part; no style/unstyled. Props `items`, `placeholder`, `icon`, `aria-*`, `disabled`, `invalid`, `required`, `name`, `form`, `id`.
+    - R/S: `SlotKeyedProps<Anatomy>` keyed by own parts. `slotProps.option` is applied to **every** option, including the placeholder one. `slotProps.group` is applied to every group (`react/src/native-select/native-select.tsx:259-311`).
+    - N: `testId` by part; no style/unstyled. Props `items`, `placeholder`, `icon`, `aria-*`, `disabled`, `invalid`, `required`, `name`, `form`, `id`.
 2. **Own parts.**
-   - R/S: all 5.
-   - N: only `root`, `select` and `icon` have test ids. `group` and `option` are not rendered (a native menu or `Menu` draws them).
+    - R/S: all 5.
+    - N: only `root`, `select` and `icon` have test ids. `group` and `option` are not rendered (a native menu or `Menu` draws them).
 3. **Nested.** N renders `Menu` (or `@react-native-menu/menu`) as the picker. Its parts and tokens are not reachable.
 4. **Tokens.** `tokens` go to `nativeSelect`.
 5. **Variants.** None.
 6. **Inconsistencies.**
-   - N has a different part set in practice (3 of 5).
-   - R/S per-option customization is impossible: one slot for all options.
-   - N `select` is a `Pressable` with `[plain.select, unselectable]` style per render.
+    - N has a different part set in practice (3 of 5).
+    - R/S per-option customization is impossible: one slot for all options.
+    - N `select` is a `Pressable` with `[plain.select, unselectable]` style per render.
 
 ### DateInput (anatomy `dateInput`: root, header, headline, selectedDate, modeToggle, divider, field, container, leadingIcon, prefixText, input, suffixText, label, trailingIcon, supportingText, segment, actions)
 
 1. **Props.**
-   - R/S: `SlotKeyedProps<Anatomy>` keyed by own parts, 17 parts.
-   - N: `DateInputProps = Omit<DateInputRootOwnProps, unstyled|icons|affixes> & DateInputContentProps`. `testId` by part, and N has no style/unstyled.
+    - R/S: `SlotKeyedProps<Anatomy>` keyed by own parts, 17 parts.
+    - N: `DateInputProps = Omit<DateInputRootOwnProps, unstyled|icons|affixes> & DateInputContentProps`. `testId` by part, and N has no style/unstyled.
 2. **Own parts.**
-   - R/S: 16 of 17 reachable. R's ready-made does not give `segment` a slot (`react/src/date-input/date-input.tsx:224-226`: bare `<Segment segment>`). S passes `slots("segment")` to every segment (`solid/src/date-input/date-input.tsx:388`).
-   - N: every part gets a `testID`; `segment` is a repeated `id("segment")` for all segments.
+    - R/S: 16 of 17 reachable. R's ready-made does not give `segment` a slot (`react/src/date-input/date-input.tsx:224-226`: bare `<Segment segment>`). S passes `slots("segment")` to every segment (`solid/src/date-input/date-input.tsx:388`).
+    - N: every part gets a `testID`; `segment` is a repeated `id("segment")` for all segments.
 3. **Nested.**
-   - `modeToggle`: rendered `as={IconButton}`, so `slotProps.modeToggle` is spread on `IconButton` and its props are reachable that way. N: `IconButton`.
-   - `Actions`: Cancel and OK are `Button variant="text"` with only `cancelLabel` / `confirmLabel`; not reachable. The same in N.
+    - `modeToggle`: rendered `as={IconButton}`, so `slotProps.modeToggle` is spread on `IconButton` and its props are reachable that way. N: `IconButton`.
+    - `Actions`: Cancel and OK are `Button variant="text"` with only `cancelLabel` / `confirmLabel`; not reachable. The same in N.
 4. **Tokens.** `tokens` go to `dateInput`. No Button or IconButton tokens.
 5. **Variants.** `variant`, `color`, `density` are the field's. None are passed to the buttons.
 6. **Inconsistencies.**
-   - **Range**: S renders two `Input`s for `selectionMode="range"` (`indexes()`, `solid/.../date-input.tsx:329`). R renders a single input even though `selectionMode` is accepted. N renders a single input.
-   - The `segment` slot works in S only.
-   - N has the combined supporting text `props.error ?? supportingText ?? hint`.
+    - **Range**: S renders two `Input`s for `selectionMode="range"` (`indexes()`, `solid/.../date-input.tsx:329`). R renders a single input even though `selectionMode` is accepted. N renders a single input.
+    - The `segment` slot works in S only.
+    - N has the combined supporting text `props.error ?? supportingText ?? hint`.
 
 ### TimeInput (anatomy `timeInput`: root, headline, body, hourField, minuteField, input, fieldLabel, separator, periodSelector, period, actions)
 
 1. **Props.**
-   - R/S: `SlotKeyedProps<Anatomy>` keyed by own parts. Content props: `headline` and `actions` only.
-   - N: `tokens`, `testId` by part, `TimeBehaviorProps`, content props; no style/unstyled.
+    - R/S: `SlotKeyedProps<Anatomy>` keyed by own parts. Content props: `headline` and `actions` only.
+    - N: `tokens`, `testId` by part, `TimeBehaviorProps`, content props; no style/unstyled.
 2. **Own parts.**
-   - R/S: `input` and `fieldLabel` are **not reachable**; they are rendered inside each `hourField` / `minuteField` label with no props (`react/src/time-input/time-input.tsx:103-125`). `slotProps.hourField` and `slotProps.minuteField` do reach the label wrapper. The same applies to the `period` slot: one slot for both AM and PM. The `Field` part takes a `label` prop (`TimeInputFieldProps`), reachable only through `slotProps.hourField.label`, not typed.
-   - N: all parts get a `testID` (`props.id(part)`), and `period` takes the root's `testId` through `TimeButton`.
+    - R/S: `input` and `fieldLabel` are **not reachable**; they are rendered inside each `hourField` / `minuteField` label with no props (`react/src/time-input/time-input.tsx:103-125`). `slotProps.hourField` and `slotProps.minuteField` do reach the label wrapper. The same applies to the `period` slot: one slot for both AM and PM. The `Field` part takes a `label` prop (`TimeInputFieldProps`), reachable only through `slotProps.hourField.label`, not typed.
+    - N: all parts get a `testID` (`props.id(part)`), and `period` takes the root's `testId` through `TimeButton`.
 3. **Nested.** None. N `TimeButton` is internal.
 4. **Tokens.** `tokens` go to `timeInput` (`timeInputSelection({tokens})`).
 5. **Variants.** None.
 6. **Inconsistencies.**
-   - The ready-made has no `hourLabel` / `minuteLabel` props.
-   - N takes `tokens` through `TimeInputRootOwnProps["tokens"]`.
-   - `indication` is supported in all three.
+    - The ready-made has no `hourLabel` / `minuteLabel` props.
+    - N takes `tokens` through `TimeInputRootOwnProps["tokens"]`.
+    - `indication` is supported in all three.
 
 ### FileUpload (anatomy `fileUpload`: root, label, dropzone, icon, headline, supportingText, itemGroup, item, error)
 
 1. **Props.**
-   - R/S: `SlotKeyedProps<Anatomy>` keyed by own parts.
-   - N: `testId` by part; `FileUploadVariantProps` (`color`, `tokens`) plus `files`, `onPick`, `onRemove`, `fileIcon`, `removeIcon`, `errorMessage`, `removeLabel`; no style/unstyled. The N `Image` preview and the other inline styles are internal.
+    - R/S: `SlotKeyedProps<Anatomy>` keyed by own parts.
+    - N: `testId` by part; `FileUploadVariantProps` (`color`, `tokens`) plus `files`, `onPick`, `onRemove`, `fileIcon`, `removeIcon`, `errorMessage`, `removeLabel`; no style/unstyled. The N `Image` preview and the other inline styles are internal.
 2. **Own parts.** R/S: all but `error` are reachable (`slot("item")` goes to every item, accepted and rejected alike). The `error` part has a `Part` (`react/src/file-upload/file-upload.tsx:245`) but the ready-made renders the `ErrorText` component for rejected files, so the part is unused there. N renders `v.error.Text` with `testId("error")`.
 3. **Nested.**
-   - `Trigger`: `Button variant="outlined"` with only a `trigger` label (`null` hides it). Not reachable.
-   - Per item: `ListItem` (gets a `testId` of `${prefix}-item` only when `testId` is a string: `fileUploadItemTestId`, `binding-core/file-upload.ts:253`). `IconButton`, `LinearProgress` and `ErrorText` are also nested and not reachable. `ListItem`'s `slotProps` are used internally for `headline` and `supportingText`.
+    - `Trigger`: `Button variant="outlined"` with only a `trigger` label (`null` hides it). Not reachable.
+    - Per item: `ListItem` (gets a `testId` of `${prefix}-item` only when `testId` is a string: `fileUploadItemTestId`, `binding-core/file-upload.ts:253`). `IconButton`, `LinearProgress` and `ErrorText` are also nested and not reachable. `ListItem`'s `slotProps` are used internally for `headline` and `supportingText`.
 4. **Tokens.** `tokens` go to `fileUpload`. `error` is a derived variant from `invalid || error`.
 5. **Variants.** `color`. Nothing is passed down.
 6. **Inconsistencies.**
-   - N has an `onPick` callback; R/S use a native file dialog and drop (Zag).
-   - N renders `v.error.Text` where R/S render `ErrorText`.
-   - N has no `fileIcon` prop (it is omitted from content props; `fileIcon` instead lives on `FileUploadEntry`).
-   - R/S item testId is a prefix only.
+    - N has an `onPick` callback; R/S use a native file dialog and drop (Zag).
+    - N renders `v.error.Text` where R/S render `ErrorText`.
+    - N has no `fileIcon` prop (it is omitted from content props; `fileIcon` instead lives on `FileUploadEntry`).
+    - R/S item testId is a prefix only.
 
 ### No ready-made / not applicable
 
 - `supporting-text/` in R/S: a single-part component, no `ReadyMade` (covered above).
 - `native-select/` etc.: covered above.
 - `text-input.tsx`: the factory, not a component.
-  - R/S: `createTextInput` builds `Root`/parts/`ReadyMade` for TextField and TextArea.
-  - N: `Field` (`withEngine(FieldImpl)`) plus `TextField` / `TextArea`.
+    - R/S: `createTextInput` builds `Root`/parts/`ReadyMade` for TextField and TextArea.
+    - N: `Field` (`withEngine(FieldImpl)`) plus `TextField` / `TextArea`.
 - `field/text-control.tsx` (N): the shared `TextInput` core of Input and Textarea.
 - `description/`, `error-text/`, `label/`, `field/`, `input/`, `textarea/` in R/S are single-part pieces without a keyed ready-made (their props are plain element props).
 
 ### Gaps (group B)
 
 1. N has no `className`, `slotProps` or `unstyled` on any component here.
-   - `style` exists only on the TextInput-backed pieces (Input, Textarea) via `TextInputProps`, as `TextStyle`.
-   - There is no `style` on the plain RN pieces Field, Label, Description, ErrorText, SupportingText.
-   - The text-field family's `inputProps.style` is silently overridden by `style={s.input}`.
+    - `style` exists only on the TextInput-backed pieces (Input, Textarea) via `TextInputProps`, as `TextStyle`.
+    - There is no `style` on the plain RN pieces Field, Label, Description, ErrorText, SupportingText.
+    - The text-field family's `inputProps.style` is silently overridden by `style={s.input}`.
 2. R/S never expose nested components' parts:
-   - TagsInput chips (only `chip` variants/tokens, and `testId` as a string).
-   - Select/Autocomplete/SearchView menus (only `testId` as a string; no `menu` or `menuSlotProps`).
-   - SearchView's default SearchBar trigger, IconButtons and menu items.
-   - DateInput Cancel/OK `Button`s.
-   - FileUpload `Button`, `ListItem`, `IconButton` and `LinearProgress`.
-   - Field's Label, Input, Description and ErrorText.
-   - Only `DateInput.modeToggle` is reachable incidentally, because `as={IconButton}` spreads its slot props.
+    - TagsInput chips (only `chip` variants/tokens, and `testId` as a string).
+    - Select/Autocomplete/SearchView menus (only `testId` as a string; no `menu` or `menuSlotProps`).
+    - SearchView's default SearchBar trigger, IconButtons and menu items.
+    - DateInput Cancel/OK `Button`s.
+    - FileUpload `Button`, `ListItem`, `IconButton` and `LinearProgress`.
+    - Field's Label, Input, Description and ErrorText.
+    - Only `DateInput.modeToggle` is reachable incidentally, because `as={IconButton}` spreads its slot props.
 3. Slot props applied to many instances share one slot: every CodeField cell, every NativeSelect option, every FileUpload item, both `period` buttons. There is no per-instance customization.
 4. Unreachable own parts:
-   - TimeInput `input` and `fieldLabel`.
-   - Label `requiredIndicator`.
-   - CodeField's hidden input.
-   - DateInput `segment` in R (reachable in S).
-   - FileUpload `error` (unused in R/S).
+    - TimeInput `input` and `fieldLabel`.
+    - Label `requiredIndicator`.
+    - CodeField's hidden input.
+    - DateInput `segment` in R (reachable in S).
+    - FileUpload `error` (unused in R/S).
 5. `testId` for nested menus and chips only works with string prefixes; a by-part object does not propagate. `unstyled` never reaches nested chips or menus.
 6. Part-set mismatch for the same component:
-   - SearchView R/S have 10 parts; N has 7.
-   - NativeSelect N exposes only 3 of 5.
-   - N Select lacks `hiddenSelect`.
-   - R vs S DateInput `segment` and range input.
+    - SearchView R/S have 10 parts; N has 7.
+    - NativeSelect N exposes only 3 of 5.
+    - N Select lacks `hiddenSelect`.
+    - R vs S DateInput `segment` and range input.
 7. Prop shape differences:
-   - R `className` vs S `class`; S `style` may be a string.
-   - R/S take input attributes directly; N uses an `inputProps` bag.
-   - N Select lacks `error`/`required`/`name`. N NumberField and CodeField are partial prop picks (no `name`/`form`/`required`/`id`).
-   - N `Autocomplete` `...props.inputProps` overrides its own role/aria handlers.
-   - N `secure` has `revealLabel`; R/S have no equivalent.
+    - R `className` vs S `class`; S `style` may be a string.
+    - R/S take input attributes directly; N uses an `inputProps` bag.
+    - N Select lacks `error`/`required`/`name`. N NumberField and CodeField are partial prop picks (no `name`/`form`/`required`/`id`).
+    - N `Autocomplete` `...props.inputProps` overrides its own role/aria handlers.
+    - N `secure` has `revealLabel`; R/S have no equivalent.
 8. Token inconsistency: plain `tokens` is the only token prop, aimed at the component's own recipe. Menus, buttons and the list item have none, and TagsInput's `chip.tokens` is the lone exception.
 9. Variants passed down are only `color`/`density` to select and autocomplete menus. SearchView, FileUpload and DateInput pass nothing.
 10. RN allocations per render: closure `testId`, new `selection` objects, spread style objects and `inputProps` objects. Because `useComponentSlots` re-splits the selection, this adds work on every render.
@@ -769,343 +769,343 @@ Everything below was read from source; nothing was run.
 ### Shared facts (apply to every component below unless a section says otherwise)
 
 - **R/S slot props.** Every R/S ready-made (except Scrim and the snackbar queue host) is typed `Omit<RootProps, keyof SlotKeyedProps<Anatomy> | "children"> & SlotKeyedProps<Anatomy> & XContentProps`.
-  - `SlotKeyedProps`: `react/src/parts.tsx:380`, `solid/src/parts.tsx:320`.
-  - Shape of each prop:
+    - `SlotKeyedProps`: `react/src/parts.tsx:380`, `solid/src/parts.tsx:320`.
+    - Shape of each prop:
 
-    | Prop                          | Shape                                                                 |
-    | ----------------------------- | --------------------------------------------------------------------- |
-    | `className` (R) / `class` (S) | keyed by own parts                                                    |
-    | `style`                       | keyed by own parts (R: `CSSProperties`; S: `CSSProperties \| string`) |
-    | `slotProps`                   | keyed by own parts (arbitrary part props)                             |
-    | `testId`                      | prefix string, or keyed by part                                       |
-    | `unstyled`                    | boolean, or keyed by part                                             |
+        | Prop                          | Shape                                                                 |
+        | ----------------------------- | --------------------------------------------------------------------- |
+        | `className` (R) / `class` (S) | keyed by own parts                                                    |
+        | `style`                       | keyed by own parts (R: `CSSProperties`; S: `CSSProperties \| string`) |
+        | `slotProps`                   | keyed by own parts (arbitrary part props)                             |
+        | `testId`                      | prefix string, or keyed by part                                       |
+        | `unstyled`                    | boolean, or keyed by part                                             |
 
-  - A part with no key gets a shared frozen empty object (R `useSlotProps`, `parts.tsx:409`).
-  - S uses `createSlotProps` (`solid/src/parts.tsx:402`).
+    - A part with no key gets a shared frozen empty object (R `useSlotProps`, `parts.tsx:409`).
+    - S uses `createSlotProps` (`solid/src/parts.tsx:402`).
 - **Prop name differs by renderer.** R uses `className`; S uses `class`. N has neither.
 - **`Anatomy` is the OVERLAY anatomy** (composites.ts), not the plain generated one. That anatomy adds `trigger`, `positioner`, `content` (and `closeTrigger`, `contextTrigger` where applicable) around the plain anatomy's parts. For dialog, fullscreen dialog, the sheets, popover, tooltip, rich tooltip and menu, `content` is the styled surface (`slot: "root"`).
-  - `root` is an unstyled wrapper `<div>` (`styled:false`) around the trigger and positioner. So `className={{root}}` hits an element the registry doesn't style.
-  - Overlay anatomies: `anatomy/src/composites.ts` lines 182 (menu), 343 (tooltip), 416 (rich tooltip), 509 (popover), 612 (dialog), 1219 (fullscreen dialog), 1322 (bottom sheet), 1415 (side sheet).
+    - `root` is an unstyled wrapper `<div>` (`styled:false`) around the trigger and positioner. So `className={{root}}` hits an element the registry doesn't style.
+    - Overlay anatomies: `anatomy/src/composites.ts` lines 182 (menu), 343 (tooltip), 416 (rich tooltip), 509 (popover), 612 (dialog), 1219 (fullscreen dialog), 1322 (bottom sheet), 1415 (side sheet).
 - **Variants and tokens (R/S).** `Root` calls `<x>Selection(props)` from `binding-core/src/components/*.ts`.
-  - Plain `tokens` always goes to the component's own recipe.
-  - No ready-made has any other prefixed token prop.
-  - Nested component tokens are never reachable by a dedicated prop. The only route is `slotProps.<part>.tokens` (see the trigger note).
+    - Plain `tokens` always goes to the component's own recipe.
+    - No ready-made has any other prefixed token prop.
+    - Nested component tokens are never reachable by a dedicated prop. The only route is `slotProps.<part>.tokens` (see the trigger note).
 - **Trigger and close buttons are nested ready-mades: `<Trigger as={Button} label={trigger} {...slot("trigger")}/>`.**
-  - Fullscreen dialog's `CloseTrigger` is `as={IconButton}` and its `ConfirmAction` is `as={Button} variant="text"`.
-  - Side sheet's `BackButton` and `CloseTrigger` are `as={IconButton}`.
-  - `slot(part)` returns `PartProps`: a plain `className` string and plain `style` object, plus whatever `slotProps[part]` holds.
-  - Button/IconButton's own `className`/`style` are keyed by Button parts and are discarded in `Button ReadyMade` (`react/src/button/button.tsx:151`).
-  - So, by code reading (not run), `className` and `style` on `trigger`/`closeTrigger`/`backButton`/`confirmAction` are effectively LOST. A string/CSS object indexed by "root"/"label" finds nothing.
-  - What does reach the nested Button: other keys inside `slotProps.<part>`. Example: `slotProps={{trigger:{variant:"outlined", tokens:{...}, slotProps:{label:{...}}}}}`, since `combinePartProps` keeps non-class/style keys.
-  - So Button/IconButton variants, tokens and parts are reachable only that way, undocumented and untyped (`PartProps`).
+    - Fullscreen dialog's `CloseTrigger` is `as={IconButton}` and its `ConfirmAction` is `as={Button} variant="text"`.
+    - Side sheet's `BackButton` and `CloseTrigger` are `as={IconButton}`.
+    - `slot(part)` returns `PartProps`: a plain `className` string and plain `style` object, plus whatever `slotProps[part]` holds.
+    - Button/IconButton's own `className`/`style` are keyed by Button parts and are discarded in `Button ReadyMade` (`react/src/button/button.tsx:151`).
+    - So, by code reading (not run), `className` and `style` on `trigger`/`closeTrigger`/`backButton`/`confirmAction` are effectively LOST. A string/CSS object indexed by "root"/"label" finds nothing.
+    - What does reach the nested Button: other keys inside `slotProps.<part>`. Example: `slotProps={{trigger:{variant:"outlined", tokens:{...}, slotProps:{label:{...}}}}}`, since `combinePartProps` keeps non-class/style keys.
+    - So Button/IconButton variants, tokens and parts are reachable only that way, undocumented and untyped (`PartProps`).
 - **Same-named part in two recipes.** `root` appears in the overlay anatomy (unstyled wrapper) and, in R/S, in the nested scrim backdrop. The backdrop's anatomy `dialogBackdropAnatomy` / `bottomSheetBackdropAnatomy` / `sideSheetBackdropAnatomy` is `name:"scrim"`, part `root`, attribute `backdrop`.
-  - `dialog-parts.tsx:188-194` maps the user's `testId.backdrop` / `unstyled.backdrop` onto the scrim's `root` via `partAsRoot`.
-  - The scrim's selection is `{}`. Scrim tokens and variants are NOT reachable from any ready-made.
+    - `dialog-parts.tsx:188-194` maps the user's `testId.backdrop` / `unstyled.backdrop` onto the scrim's `root` via `partAsRoot`.
+    - The scrim's selection is `{}`. Scrim tokens and variants are NOT reachable from any ready-made.
 - **Backdrop gets no slot props (R/S).** `<Backdrop />` is rendered bare in Dialog, BottomSheet and SideSheet. Only `testId.backdrop` and `unstyled.backdrop` reach it.
-  - `className`, `style` and `slotProps` have no `backdrop` key, because `SlotKeyedProps<Anatomy>` is keyed by the overlay anatomy, which has no backdrop.
-  - Fullscreen dialog has no backdrop at all.
+    - `className`, `style` and `slotProps` have no `backdrop` key, because `SlotKeyedProps<Anatomy>` is keyed by the overlay anatomy, which has no backdrop.
+    - Fullscreen dialog has no backdrop at all.
 - **`testId` / `unstyled` types.** The Part union is `PartName<overlayAnatomy> | "backdrop"` for dialog, bottom sheet and side sheet (binding-core `dialog.ts:20`, `sheet.ts:34-40`). It is the overlay anatomy alone for the others.
 - **RN (all components).**
-  - **API shape.** One ready-made per dir, `withEngine(Impl)`. A bare function sits above it for the surface-or-modal split (dialogs, sheets, popover, tooltip, menu).
-  - **Props taken.** Only `testId?: TestIdOverride<Part>` (prefix string or keyed by part) plus variants/`tokens` (and `indication` where the recipe has it). There is NO `style`, `className`, `slotProps` or `unstyled` anywhere.
-  - **Part names.** `Part = PartName<plainAnatomy>` (e.g. `dialogAnatomy`, `bottomSheetAnatomy`), NOT the overlay anatomy.
-    - So RN has no `trigger`, `positioner`, `content` or `backdrop` test-id keys. Exception: menu's `contextTrigger` (see Menu).
-    - In RN `root` is the styled surface. In web the surface is `content`; web `root` is the wrapper. Same key, different element.
-    - Default test ids differ: web `pf-dialog-content` vs RN `pf-dialog-root` for the same surface.
-  - **Styling plumbing.**
-    - `useComponentSlots<Part>(name, selection)` returns `{styles: s (MotionStyles), selected, views: v}` (`react-native/src/styles.ts:169`).
-    - Parts render as `<v.part.View|Text style={s.part} testID={id("part")}>` (View/Text are the engine's or RN's own).
-    - `testIdOf(anatomy, part, props.testId)` is called via a per-render `id` closure.
-  - **Style types.** `s.*` is `MotionStyles` (not typed as `ViewStyle`/`TextStyle`). It is spread into the style object (`{...s.root, ...presence.style}`) and cast to `ViewStyle` / `TextStyle` only in single-part components.
-  - **Per-render allocations.** A new style object per render for the root view (e.g. `dialog.tsx:~113`). Closures `id`, `given` (trigger props) and `onKeyDown` are rebuilt each render. The selection object is rebuilt each render, e.g. `dialogSelection({...props, icon})`, except Menu, which uses `useStableSelection`. Details are in the per-component sections.
-  - **Trigger.** A string/node `trigger` becomes `<Button label={trigger} {...given}/>`, with no way to style or token it. A function `trigger` lets the app render its own.
-  - **Portal infra.** `portal.tsx`, `portal-host.tsx`, `overlay.tsx` (Anchored, useDismiss, placeOverlay), `modal.tsx` (ModalWindow, ModalScrimLayer, useModalOverlay) and `tooltip-overlay.tsx` (TooltipHost) have no parts, test ids, styling or ready-made of their own.
-    - The modal scrim in RN is `<Scrim open/>` from `single-part.tsx`, rendered with no `testId`. It always has the default `pf-scrim-root`, and the dialog's `testId` can't name or prefix it.
+    - **API shape.** One ready-made per dir, `withEngine(Impl)`. A bare function sits above it for the surface-or-modal split (dialogs, sheets, popover, tooltip, menu).
+    - **Props taken.** Only `testId?: TestIdOverride<Part>` (prefix string or keyed by part) plus variants/`tokens` (and `indication` where the recipe has it). There is NO `style`, `className`, `slotProps` or `unstyled` anywhere.
+    - **Part names.** `Part = PartName<plainAnatomy>` (e.g. `dialogAnatomy`, `bottomSheetAnatomy`), NOT the overlay anatomy.
+        - So RN has no `trigger`, `positioner`, `content` or `backdrop` test-id keys. Exception: menu's `contextTrigger` (see Menu).
+        - In RN `root` is the styled surface. In web the surface is `content`; web `root` is the wrapper. Same key, different element.
+        - Default test ids differ: web `pf-dialog-content` vs RN `pf-dialog-root` for the same surface.
+    - **Styling plumbing.**
+        - `useComponentSlots<Part>(name, selection)` returns `{styles: s (MotionStyles), selected, views: v}` (`react-native/src/styles.ts:169`).
+        - Parts render as `<v.part.View|Text style={s.part} testID={id("part")}>` (View/Text are the engine's or RN's own).
+        - `testIdOf(anatomy, part, props.testId)` is called via a per-render `id` closure.
+    - **Style types.** `s.*` is `MotionStyles` (not typed as `ViewStyle`/`TextStyle`). It is spread into the style object (`{...s.root, ...presence.style}`) and cast to `ViewStyle` / `TextStyle` only in single-part components.
+    - **Per-render allocations.** A new style object per render for the root view (e.g. `dialog.tsx:~113`). Closures `id`, `given` (trigger props) and `onKeyDown` are rebuilt each render. The selection object is rebuilt each render, e.g. `dialogSelection({...props, icon})`, except Menu, which uses `useStableSelection`. Details are in the per-component sections.
+    - **Trigger.** A string/node `trigger` becomes `<Button label={trigger} {...given}/>`, with no way to style or token it. A function `trigger` lets the app render its own.
+    - **Portal infra.** `portal.tsx`, `portal-host.tsx`, `overlay.tsx` (Anchored, useDismiss, placeOverlay), `modal.tsx` (ModalWindow, ModalScrimLayer, useModalOverlay) and `tooltip-overlay.tsx` (TooltipHost) have no parts, test ids, styling or ready-made of their own.
+        - The modal scrim in RN is `<Scrim open/>` from `single-part.tsx`, rendered with no `testId`. It always has the default `pf-scrim-root`, and the dialog's `testId` can't name or prefix it.
 
 ---
 
 ### Dialog
 
 1. **Props**
-   - Shapes by renderer:
+    - Shapes by renderer:
 
-     | Prop                  | R                                            | S                                            | N                         |
-     | --------------------- | -------------------------------------------- | -------------------------------------------- | ------------------------- |
-     | `className` / `class` | keyed by own parts                           | keyed by own parts                           | absent                    |
-     | `style`               | keyed by own parts                           | keyed by own parts                           | absent                    |
-     | `slotProps`           | keyed by own parts                           | keyed by own parts                           | absent                    |
-     | `unstyled`            | keyed by own parts, or boolean (+`backdrop`) | keyed by own parts, or boolean (+`backdrop`) | absent                    |
-     | `testId`              | prefix or keyed (+`backdrop`)                | prefix or keyed (+`backdrop`)                | prefix or keyed (5 parts) |
+        | Prop                  | R                                            | S                                            | N                         |
+        | --------------------- | -------------------------------------------- | -------------------------------------------- | ------------------------- |
+        | `className` / `class` | keyed by own parts                           | keyed by own parts                           | absent                    |
+        | `style`               | keyed by own parts                           | keyed by own parts                           | absent                    |
+        | `slotProps`           | keyed by own parts                           | keyed by own parts                           | absent                    |
+        | `unstyled`            | keyed by own parts, or boolean (+`backdrop`) | keyed by own parts, or boolean (+`backdrop`) | absent                    |
+        | `testId`              | prefix or keyed (+`backdrop`)                | prefix or keyed (+`backdrop`)                | prefix or keyed (5 parts) |
 
-   - R/S: `react/src/dialog/dialog.tsx:132-142`, `solid/src/dialog/dialog.tsx`.
-   - N: `react-native/src/dialog/dialog.tsx:79-122`.
+    - R/S: `react/src/dialog/dialog.tsx:132-142`, `solid/src/dialog/dialog.tsx`.
+    - N: `react-native/src/dialog/dialog.tsx:79-122`.
 2. **Own parts**
-   - Overlay anatomy: root, trigger, positioner, content, icon, headline, body, actions, closeTrigger.
-   - Reachable via slot props: root, trigger, positioner, content, icon, headline, body, actions.
-   - NOT reachable through className/style/slotProps: backdrop. It is reachable only via `testId` and `unstyled`.
-   - `closeTrigger` is in the anatomy but is not rendered by the ready-made (compose with `Dialog.CloseTrigger`).
-   - N parts (`dialogAnatomy`): root, icon, headline, body, actions. All have a testId.
+    - Overlay anatomy: root, trigger, positioner, content, icon, headline, body, actions, closeTrigger.
+    - Reachable via slot props: root, trigger, positioner, content, icon, headline, body, actions.
+    - NOT reachable through className/style/slotProps: backdrop. It is reachable only via `testId` and `unstyled`.
+    - `closeTrigger` is in the anatomy but is not rendered by the ready-made (compose with `Dialog.CloseTrigger`).
+    - N parts (`dialogAnatomy`): root, icon, headline, body, actions. All have a testId.
 3. **Nested**
-   - R/S: `Button` as trigger (`Trigger as={Button} label={trigger}`, `dialog.tsx:167`). It is reachable only via `slotProps.trigger.*`, with className/style lost (see Shared facts).
-   - R/S: the scrim is the backdrop, not reachable except testId/unstyled.
-   - N: `Button` for a string trigger (`:~152`). No customization. The `trigger` function form gives a custom trigger. The scrim is `ModalScrimLayer`, with no props.
+    - R/S: `Button` as trigger (`Trigger as={Button} label={trigger}`, `dialog.tsx:167`). It is reachable only via `slotProps.trigger.*`, with className/style lost (see Shared facts).
+    - R/S: the scrim is the backdrop, not reachable except testId/unstyled.
+    - N: `Button` for a string trigger (`:~152`). No customization. The `trigger` function form gives a custom trigger. The scrim is `ModalScrimLayer`, with no props.
 4. **Tokens**
-   - `tokens` goes to the `dialog` recipe in all three renderers (`dialogSelection`, binding-core `dialog.ts:158`).
-   - No prefixed token props, and no nested tokens. Scrim and Button tokens are unreachable.
+    - `tokens` goes to the `dialog` recipe in all three renderers (`dialogSelection`, binding-core `dialog.ts:158`).
+    - No prefixed token props, and no nested tokens. Scrim and Button tokens are unreachable.
 5. **Variants down**
-   - `icon`: R/S set it automatically from `isPresent(icon)` (`dialog.tsx:163`) and drop the user's `icon` variant. N does the same in `dialogSelection({...props, icon: isPresent(props.icon)})`.
-   - Nothing passed to children as defaults.
+    - `icon`: R/S set it automatically from `isPresent(icon)` (`dialog.tsx:163`) and drop the user's `icon` variant. N does the same in `dialogSelection({...props, icon: isPresent(props.icon)})`.
+    - Nothing passed to children as defaults.
 6. **Inconsistencies**
-   - The web body is the `body` prop. N's body is `children`; N has no `body` prop.
-   - N is surface-or-modal depending on `trigger`/`onOpenChange`/`defaultOpen`. Web is always modal-capable via Root.
-   - N `actions` can be a function `({close})`. R/S take a node only.
-   - Part sets differ (see Shared): web `content` is the surface, N `root` is the surface.
-   - N has no `closeTrigger` key.
-   - N takes `trigger` as a function, R/S as a node only.
-   - Web `testId`/`unstyled` accept `backdrop`. N has no equivalent.
-   - N uses `{...s.root, ...presence.style}` allocated each render; the `Root = props.open === undefined ? v.root : engine` choice is made per render.
+    - The web body is the `body` prop. N's body is `children`; N has no `body` prop.
+    - N is surface-or-modal depending on `trigger`/`onOpenChange`/`defaultOpen`. Web is always modal-capable via Root.
+    - N `actions` can be a function `({close})`. R/S take a node only.
+    - Part sets differ (see Shared): web `content` is the surface, N `root` is the surface.
+    - N has no `closeTrigger` key.
+    - N takes `trigger` as a function, R/S as a node only.
+    - Web `testId`/`unstyled` accept `backdrop`. N has no equivalent.
+    - N uses `{...s.root, ...presence.style}` allocated each render; the `Root = props.open === undefined ? v.root : engine` choice is made per render.
 
 ### Fullscreen dialog
 
 1. **Props**
-   - R `className`/`style`/`slotProps`: keyed by own (overlay) parts.
-   - S `class`/`style`/`slotProps`: keyed by own (overlay) parts.
-   - R/S `unstyled`, `testId`: keyed or plain.
-   - N: `testId` only (6 parts: root, header, closeTrigger, headline, confirmAction, body).
-   - Refs: `react/src/fullscreen-dialog/fullscreen-dialog.tsx:84-94`, `solid/src/fullscreen-dialog/fullscreen-dialog.tsx`, `react-native/src/fullscreen-dialog/fullscreen-dialog.tsx:59-90`.
+    - R `className`/`style`/`slotProps`: keyed by own (overlay) parts.
+    - S `class`/`style`/`slotProps`: keyed by own (overlay) parts.
+    - R/S `unstyled`, `testId`: keyed or plain.
+    - N: `testId` only (6 parts: root, header, closeTrigger, headline, confirmAction, body).
+    - Refs: `react/src/fullscreen-dialog/fullscreen-dialog.tsx:84-94`, `solid/src/fullscreen-dialog/fullscreen-dialog.tsx`, `react-native/src/fullscreen-dialog/fullscreen-dialog.tsx:59-90`.
 2. **Own parts**
-   - Overlay anatomy: root, trigger, positioner, content, header, closeTrigger, headline, confirmAction, body.
-   - All reachable in R/S via slot props. There is NO backdrop.
-   - N lacks `trigger`/`positioner`/`content` keys, and `root` is the surface.
+    - Overlay anatomy: root, trigger, positioner, content, header, closeTrigger, headline, confirmAction, body.
+    - All reachable in R/S via slot props. There is NO backdrop.
+    - N lacks `trigger`/`positioner`/`content` keys, and `root` is the surface.
 3. **Nested**
-   - R/S: `Button` trigger, `IconButton` as `CloseTrigger` (`as={IconButton}`, props `aria-label`, `icon`), `Button variant="text"` as `ConfirmAction`. All are reachable only via `slotProps.<part>.*`, with className/style lost.
-   - N: `Button` trigger. `IconButton` is rendered inside `v.closeTrigger.View`, so the `closeTrigger` testId lands on the wrapper, and the IconButton keeps its default testId. `confirmAction` is a node or a function, rendered inside its own `v.confirmAction.View`.
+    - R/S: `Button` trigger, `IconButton` as `CloseTrigger` (`as={IconButton}`, props `aria-label`, `icon`), `Button variant="text"` as `ConfirmAction`. All are reachable only via `slotProps.<part>.*`, with className/style lost.
+    - N: `Button` trigger. `IconButton` is rendered inside `v.closeTrigger.View`, so the `closeTrigger` testId lands on the wrapper, and the IconButton keeps its default testId. `confirmAction` is a node or a function, rendered inside its own `v.confirmAction.View`.
 4. **Tokens**
-   - `tokens` goes to the `fullscreenDialog` recipe (`fullscreenDialogSelection`, `fullscreen-dialog.ts:82`: `{tokens}` only).
-   - No nested tokens.
+    - `tokens` goes to the `fullscreenDialog` recipe (`fullscreenDialogSelection`, `fullscreen-dialog.ts:82`: `{tokens}` only).
+    - No nested tokens.
 5. **Variants down**: none.
 6. **Inconsistencies**
-   - Web content prop is `body`; N's is `children`. N's `closeIcon` default is the string `"✕"` (a `CloseIcon` glyph on web).
-   - N's `confirmAction` can be a function `({close})`.
-   - N has a fallback `<View style={{flexGrow:1}}/>` spacer when there is no headline. The web renders nothing.
-   - N body: a string renders as `v.body.Text`, anything else as `v.body.View` wrapping a `ScrollView`. Web is always a `div`.
-   - A new style object per render (`style={{...s.root, ...presence.style}}`).
+    - Web content prop is `body`; N's is `children`. N's `closeIcon` default is the string `"✕"` (a `CloseIcon` glyph on web).
+    - N's `confirmAction` can be a function `({close})`.
+    - N has a fallback `<View style={{flexGrow:1}}/>` spacer when there is no headline. The web renders nothing.
+    - N body: a string renders as `v.body.Text`, anything else as `v.body.View` wrapping a `ScrollView`. Web is always a `div`.
+    - A new style object per render (`style={{...s.root, ...presence.style}}`).
 
 ### Bottom sheet
 
 1. **Props**
-   - R `className`/`style`/`slotProps`, S `class`/`style`/`slotProps`: keyed by own (overlay) parts (`bottom-sheet.tsx:~236`).
-   - R/S `unstyled` and `testId`: plain or keyed, and may name `backdrop`.
-   - N: `testId` only (`bottom-sheet.tsx:110`).
+    - R `className`/`style`/`slotProps`, S `class`/`style`/`slotProps`: keyed by own (overlay) parts (`bottom-sheet.tsx:~236`).
+    - R/S `unstyled` and `testId`: plain or keyed, and may name `backdrop`.
+    - N: `testId` only (`bottom-sheet.tsx:110`).
 2. **Own parts**
-   - Overlay anatomy: root, trigger, positioner, content, dragHandle, body. Reachable: all six.
-   - Backdrop is not reachable except via testId/unstyled.
-   - N parts (`bottomSheetAnatomy`): root, dragHandle, content.
+    - Overlay anatomy: root, trigger, positioner, content, dragHandle, body. Reachable: all six.
+    - Backdrop is not reachable except via testId/unstyled.
+    - N parts (`bottomSheetAnatomy`): root, dragHandle, content.
 3. **Nested**
-   - R/S: `Button` trigger (`as={Button}`). `DragHandle` is rendered as a part of this recipe (not a nested ready-made) in R/S.
-   - N: `DragHandle` ready-made is nested inside `v.dragHandle.View` (`:364`). Its testId, style and slots are not reachable. `Button` is the trigger.
+    - R/S: `Button` trigger (`as={Button}`). `DragHandle` is rendered as a part of this recipe (not a nested ready-made) in R/S.
+    - N: `DragHandle` ready-made is nested inside `v.dragHandle.View` (`:364`). Its testId, style and slots are not reachable. `Button` is the trigger.
 4. **Tokens**
-   - `tokens` goes to the `bottomSheet` recipe (`bottomSheetSelection`, `sheet.ts:386`).
-   - No other token props.
+    - `tokens` goes to the `bottomSheet` recipe (`bottomSheetSelection`, `sheet.ts:386`).
+    - No other token props.
 5. **Variants down (and selection)**
-   - `modal` (default true) and `dragHandle` (default true) go into the selection.
-   - `modal` gates the backdrop and the click-outside behaviour.
-   - `dragHandle === false` skips the drag handle.
-   - R/S pass `dragHandle` to Root explicitly (`bottom-sheet.tsx:269`).
+    - `modal` (default true) and `dragHandle` (default true) go into the selection.
+    - `modal` gates the backdrop and the click-outside behaviour.
+    - `dragHandle === false` skips the drag handle.
+    - R/S pass `dragHandle` to Root explicitly (`bottom-sheet.tsx:269`).
 6. **Inconsistencies**
-   - **Part-name collision.** Web `content` is the sheet surface and `body` is the content area. N `root` is the surface and `content` is the content area (anatomy `bottomSheetAnatomy`). The same key `content` means different elements.
-   - N accepts both `children` and `body`, and `children` wins. Web only has `body`.
-   - N has an extra standard (`modal={false}`) mode via `StandardBottomSheet`, plus drag/spring handling.
-   - Per-render allocations in N: `placement(s.root ?? {})` returns two new objects each render. Style arrays `[placed, {transform: [{translateY: drag}]}]` and `{...own, ...presence.style}` are also per render.
-   - `onLayout` is also reallocated each render.
+    - **Part-name collision.** Web `content` is the sheet surface and `body` is the content area. N `root` is the surface and `content` is the content area (anatomy `bottomSheetAnatomy`). The same key `content` means different elements.
+    - N accepts both `children` and `body`, and `children` wins. Web only has `body`.
+    - N has an extra standard (`modal={false}`) mode via `StandardBottomSheet`, plus drag/spring handling.
+    - Per-render allocations in N: `placement(s.root ?? {})` returns two new objects each render. Style arrays `[placed, {transform: [{translateY: drag}]}]` and `{...own, ...presence.style}` are also per render.
+    - `onLayout` is also reallocated each render.
 
 ### Side sheet
 
 1. **Props**
-   - R `className`/`style`/`slotProps`, S `class`/`style`/`slotProps`: keyed by own (overlay) parts.
-   - R/S `unstyled` and `testId`: plain or keyed (+`backdrop`).
-   - N: `testId` only (`side-sheet.tsx:61`).
+    - R `className`/`style`/`slotProps`, S `class`/`style`/`slotProps`: keyed by own (overlay) parts.
+    - R/S `unstyled` and `testId`: plain or keyed (+`backdrop`).
+    - N: `testId` only (`side-sheet.tsx:61`).
 2. **Own parts**
-   - Overlay anatomy: root, trigger, positioner, content, header, backButton, headline, closeTrigger, body, actions. R/S reach all ten via slot props. Backdrop is testId/unstyled only.
-   - N parts: root, header, backButton, headline, closeTrigger, content, actions.
+    - Overlay anatomy: root, trigger, positioner, content, header, backButton, headline, closeTrigger, body, actions. R/S reach all ten via slot props. Backdrop is testId/unstyled only.
+    - N parts: root, header, backButton, headline, closeTrigger, content, actions.
 3. **Nested**
-   - R/S: `Button` trigger, `IconButton` for both `BackButton` and `CloseTrigger`, each reachable only via `slotProps.<part>.*`.
-   - N: `Button` trigger, `IconButton` back and close inside `v.backButton.View` and `v.closeTrigger.View`. The testId lands on the wrapper.
+    - R/S: `Button` trigger, `IconButton` for both `BackButton` and `CloseTrigger`, each reachable only via `slotProps.<part>.*`.
+    - N: `Button` trigger, `IconButton` back and close inside `v.backButton.View` and `v.closeTrigger.View`. The testId lands on the wrapper.
 4. **Tokens**: `tokens` goes to the `sideSheet` recipe (`sideSheetSelection`, `sheet.ts:395`). No nested tokens.
 5. **Variants down**
-   - `modal` and `coplanar` go into the selection. `coplanar` is forced false on modal sheets.
-   - R/S Root forwards `modal` to the backdrop's visibility.
+    - `modal` and `coplanar` go into the selection. `coplanar` is forced false on modal sheets.
+    - R/S Root forwards `modal` to the backdrop's visibility.
 6. **Inconsistencies**
-   - Same web `content`/`body` vs N `root`/`content` split as the bottom sheet.
-   - N has `children` (no `body`). Web has `body`.
-   - N has an extra `StandardSideSheet` mode.
-   - `onBack` renders the back button on both.
-   - N `closeIcon` has its own default.
-   - Per-render style object allocations.
+    - Same web `content`/`body` vs N `root`/`content` split as the bottom sheet.
+    - N has `children` (no `body`). Web has `body`.
+    - N has an extra `StandardSideSheet` mode.
+    - `onBack` renders the back button on both.
+    - N `closeIcon` has its own default.
+    - Per-render style object allocations.
 
 ### Popover
 
 1. **Props**
-   - R `className`/`style`/`slotProps`, S `class`/`style`/`slotProps`: keyed by own (overlay) parts.
-   - R/S `testId`/`unstyled`: from `PopoverRootOwnProps`, plain or keyed (type `TestIdOverride<PopoverPart>`).
-   - N: `testId` only (`popover.tsx`, `TestIdOverride<Part>`).
+    - R `className`/`style`/`slotProps`, S `class`/`style`/`slotProps`: keyed by own (overlay) parts.
+    - R/S `testId`/`unstyled`: from `PopoverRootOwnProps`, plain or keyed (type `TestIdOverride<PopoverPart>`).
+    - N: `testId` only (`popover.tsx`, `TestIdOverride<Part>`).
 2. **Own parts**
-   - Overlay anatomy: root, trigger, positioner, content, caret, title, body, actions, closeTrigger.
-   - R/S reach root, trigger, positioner, content, title, body, actions, caret. `closeTrigger` is NOT rendered by the ready-made (compose it with `Popover.CloseTrigger`).
-   - N parts (`popoverAnatomy`): root, caret, title, body, actions. N renders root, title, body and actions. It has NO caret and no `caret` prop, although `caret` is in the anatomy.
+    - Overlay anatomy: root, trigger, positioner, content, caret, title, body, actions, closeTrigger.
+    - R/S reach root, trigger, positioner, content, title, body, actions, caret. `closeTrigger` is NOT rendered by the ready-made (compose it with `Popover.CloseTrigger`).
+    - N parts (`popoverAnatomy`): root, caret, title, body, actions. N renders root, title, body and actions. It has NO caret and no `caret` prop, although `caret` is in the anatomy.
 3. **Nested**
-   - R/S: `Button` trigger (via slotProps only).
-   - N: `Button` trigger (`label`, `onPress`, `interactionSource`, aria attrs).
+    - R/S: `Button` trigger (via slotProps only).
+    - N: `Button` trigger (`label`, `onPress`, `interactionSource`, aria attrs).
 4. **Tokens**: `tokens` goes to the `popover` recipe (`popoverSelection`, `popover.ts:117`). No nested tokens.
 5. **Variants down**: none.
 6. **Inconsistencies**
-   - N lacks `caret`, `modal`, `autoFocus`, `closeOnEscape`, `restoreFocus` and the focus elements. It takes `closeOnInteractOutside`, `positioning`, `open`, `defaultOpen`, `onOpenChange`, `aria-label`.
-   - N's `actions` can be a function `({close})`.
-   - N's trigger function also receives `{open}`.
-   - Part keys: web `content` is the surface, N `root` is the surface.
-   - N wraps the surface in a separate `engine.View` with a per-render style `{pointerEvents, transformOrigin, ...presence.style}`.
+    - N lacks `caret`, `modal`, `autoFocus`, `closeOnEscape`, `restoreFocus` and the focus elements. It takes `closeOnInteractOutside`, `positioning`, `open`, `defaultOpen`, `onOpenChange`, `aria-label`.
+    - N's `actions` can be a function `({close})`.
+    - N's trigger function also receives `{open}`.
+    - Part keys: web `content` is the surface, N `root` is the surface.
+    - N wraps the surface in a separate `engine.View` with a per-render style `{pointerEvents, transformOrigin, ...presence.style}`.
 
 ### Rich tooltip
 
 1. **Props**
-   - R/S slot-keyed props keyed by own (overlay) parts. `testId`/`unstyled` plain or keyed.
-   - N: `testId` only (`rich-tooltip.tsx`, `TestIdOverride<Part>`).
+    - R/S slot-keyed props keyed by own (overlay) parts. `testId`/`unstyled` plain or keyed.
+    - N: `testId` only (`rich-tooltip.tsx`, `TestIdOverride<Part>`).
 2. **Own parts**
-   - Overlay anatomy: root, trigger, positioner, content, caret, subhead, supportingText, actions.
-   - R/S reach all eight, and the ready-made renders all of them.
-   - N parts (`richTooltipAnatomy`): root, caret, subhead, supportingText, actions. N renders root, subhead, supportingText and actions. No caret.
+    - Overlay anatomy: root, trigger, positioner, content, caret, subhead, supportingText, actions.
+    - R/S reach all eight, and the ready-made renders all of them.
+    - N parts (`richTooltipAnatomy`): root, caret, subhead, supportingText, actions. N renders root, subhead, supportingText and actions. No caret.
 3. **Nested**
-   - R/S: `Button` trigger.
-   - N: `TooltipHost` renders a `Button` for a non-function trigger, with `interactionSource` and `onLongPress`, and nothing else. Actions are a plain node inside `v.actions.View`.
+    - R/S: `Button` trigger.
+    - N: `TooltipHost` renders a `Button` for a non-function trigger, with `interactionSource` and `onLongPress`, and nothing else. Actions are a plain node inside `v.actions.View`.
 4. **Tokens**: `tokens` goes to the `richTooltip` recipe (`richTooltipSelection`). No nested tokens (including for buttons passed in `actions`).
 5. **Variants down**: none (the rich tooltip is interactive by default via `interactiveByDefault`).
 6. **Inconsistencies**
-   - N has no `caret`.
-   - N's behaviour props are defined in `tooltip-overlay.tsx` `TooltipBehaviorProps`.
-   - Web `testId` keys include `trigger`/`positioner`/`content`; N's do not. N's `root` is the surface and web's `content` is.
+    - N has no `caret`.
+    - N's behaviour props are defined in `tooltip-overlay.tsx` `TooltipBehaviorProps`.
+    - Web `testId` keys include `trigger`/`positioner`/`content`; N's do not. N's `root` is the surface and web's `content` is.
 
 ### Tooltip
 
 1. **Props**
-   - R/S: as for rich tooltip (slot-keyed by overlay parts, `testId`/`unstyled`).
-   - N: `testId` only.
+    - R/S: as for rich tooltip (slot-keyed by overlay parts, `testId`/`unstyled`).
+    - N: `testId` only.
 2. **Own parts**
-   - Overlay anatomy: root, trigger, positioner, content, caret, supportingText. R/S reach all of them, and the ready-made renders all of them.
-   - N parts (`tooltipAnatomy`): root, caret, supportingText. N has no caret.
+    - Overlay anatomy: root, trigger, positioner, content, caret, supportingText. R/S reach all of them, and the ready-made renders all of them.
+    - N parts (`tooltipAnatomy`): root, caret, supportingText. N has no caret.
 3. **Nested**: `Button` trigger in all three, reachable only via slotProps in R/S.
 4. **Tokens**: `tokens` goes to the `tooltip` recipe (`tooltipSelection`). Nothing else.
 5. **Variants down**: none.
 6. **Inconsistencies**
-   - N has no `caret`.
-   - R/S `supportingText` is always rendered, since the ready-made has no `isPresent` guard (`tooltip.tsx`).
-   - N: same string-trigger `Button` with no styling hook.
-   - The trigger's `onLongPress` is wired in N. Web uses `useTooltipLongPress` (`long-press.ts`).
-   - N's overlay rebuilds a `given` object, an inline surface style and render callbacks each render.
+    - N has no `caret`.
+    - R/S `supportingText` is always rendered, since the ready-made has no `isPresent` guard (`tooltip.tsx`).
+    - N: same string-trigger `Button` with no styling hook.
+    - The trigger's `onLongPress` is wired in N. Web uses `useTooltipLongPress` (`long-press.ts`).
+    - N's overlay rebuilds a `given` object, an inline surface style and render callbacks each render.
 
 ### Scrim
 
 1. **Props**
-   - R: `ScrimProps` = element props (`className` and `style` as plain values, not keyed) + `tokens`, `testId`, `unstyled`, `as`. S: same with `class`/`style` plain.
-   - Single-part: `createSinglePart` (`react/src/scrim/scrim.tsx:22`).
-   - N: `ScrimProps` has `tokens`, `open`, `testId` only (`react-native/src/single-part.tsx:281`).
+    - R: `ScrimProps` = element props (`className` and `style` as plain values, not keyed) + `tokens`, `testId`, `unstyled`, `as`. S: same with `class`/`style` plain.
+    - Single-part: `createSinglePart` (`react/src/scrim/scrim.tsx:22`).
+    - N: `ScrimProps` has `tokens`, `open`, `testId` only (`react-native/src/single-part.tsx:281`).
 2. **Own parts**: just `root`, which is the whole component.
 3. **Nested**: none.
 4. **Tokens**: `tokens` goes to the `scrim` recipe (`scrimSelection`). Nothing else.
 5. **Variants down**: none.
 6. **Inconsistencies**
-   - R/S scrim is a stand-alone component with plain `className`/`style`; N's has neither.
-   - N's `open` animates in and out. R/S are static and `Scrim` is `aria-hidden`.
-   - Dialog, bottom sheet and side sheet draw the backdrop with the scrim but give no access to its tokens or class/style (R/S) or testId (N).
+    - R/S scrim is a stand-alone component with plain `className`/`style`; N's has neither.
+    - N's `open` animates in and out. R/S are static and `Scrim` is `aria-hidden`.
+    - Dialog, bottom sheet and side sheet draw the backdrop with the scrim but give no access to its tokens or class/style (R/S) or testId (N).
 
 ### Snackbar
 
 1. **Props**
-   - R/S: slot-keyed props keyed by own parts. `testId`/`unstyled` plain or keyed.
-   - N: `testId` only.
-   - Refs: `react/src/snackbar/snackbar.tsx:~165`, `react-native/src/snackbar/snackbar.tsx:31-48`.
+    - R/S: slot-keyed props keyed by own parts. `testId`/`unstyled` plain or keyed.
+    - N: `testId` only.
+    - Refs: `react/src/snackbar/snackbar.tsx:~165`, `react-native/src/snackbar/snackbar.tsx:31-48`.
 2. **Own parts**
-   - Anatomy: root, supportingText, actions, action, close.
-   - R/S: all reachable via slot props. The `actions` wrapper is rendered only when there is an `action` or a `closeLabel`.
-   - N: all five reachable via `testId` only.
+    - Anatomy: root, supportingText, actions, action, close.
+    - R/S: all reachable via slot props. The `actions` wrapper is rendered only when there is an `action` or a `closeLabel`.
+    - N: all five reachable via `testId` only.
 3. **Nested**
-   - R/S: none. `Action` and `Close` are own parts rendered via `useMachineButton`.
-   - N: `SurfaceButton` (own part) renders `action` and `close`, with `testId` and `selection` from the snackbar. Its tokens are the snackbar's.
+    - R/S: none. `Action` and `Close` are own parts rendered via `useMachineButton`.
+    - N: `SurfaceButton` (own part) renders `action` and `close`, with `testId` and `selection` from the snackbar. Its tokens are the snackbar's.
 4. **Tokens**: `tokens` goes to the `snackbar` recipe (`snackbarSelection`, `snackbar.ts:118`, which also takes `layout`). Nothing else.
 5. **Variants down**: `layout` goes into the selection.
 6. **Inconsistencies**
-   - **N always renders the close button** (`closeLabel ?? "Dismiss"`, default glyph `"×"`, `:~121`). Web renders it only when `closeLabel` is given, with `CloseIcon` as the default icon.
-   - N's `onClose` and `onAction` callbacks. Web: `onOpenChange` with a reason, and `onAction` on Root. R/S Root also take `duration`, `ids`, `id`, `onExitComplete`.
-   - N's `open`/`defaultOpen` are optional, and `open === undefined` means always shown.
-   - **Queue.**
-     - R/S: `createSnackbarQueue()` + `<SnackbarHost queue offset/>`. The host spreads `item.options` into `<Snackbar>` and overrides `style` with `{root:{pointerEvents:"auto"}}`, built each render (`queue.tsx`). `className`, `style`, `slotProps`, `unstyled`, `layout`, `tokens` and `testId` are all in the options type, except className/style/slotProps/unstyled, which are not.
-     - N: `useSnackbar().show(opts)` with `SnackbarOptions.offset: number`.
-     - Queue options are `SnackbarQueueOptions` (variants, `IndicationProps`, content, `duration`, `onAction`, `onOpenChange`, `testId`). No className, style, slotProps or unstyled. An `onOpenChange` in the options is overwritten by the host's own handler in R (`queue.tsx`: `onOpenChange={...}` after the spread). Not verified for S.
+    - **N always renders the close button** (`closeLabel ?? "Dismiss"`, default glyph `"×"`, `:~121`). Web renders it only when `closeLabel` is given, with `CloseIcon` as the default icon.
+    - N's `onClose` and `onAction` callbacks. Web: `onOpenChange` with a reason, and `onAction` on Root. R/S Root also take `duration`, `ids`, `id`, `onExitComplete`.
+    - N's `open`/`defaultOpen` are optional, and `open === undefined` means always shown.
+    - **Queue.**
+        - R/S: `createSnackbarQueue()` + `<SnackbarHost queue offset/>`. The host spreads `item.options` into `<Snackbar>` and overrides `style` with `{root:{pointerEvents:"auto"}}`, built each render (`queue.tsx`). `className`, `style`, `slotProps`, `unstyled`, `layout`, `tokens` and `testId` are all in the options type, except className/style/slotProps/unstyled, which are not.
+        - N: `useSnackbar().show(opts)` with `SnackbarOptions.offset: number`.
+        - Queue options are `SnackbarQueueOptions` (variants, `IndicationProps`, content, `duration`, `onAction`, `onOpenChange`, `testId`). No className, style, slotProps or unstyled. An `onOpenChange` in the options is overwritten by the host's own handler in R (`queue.tsx`: `onOpenChange={...}` after the spread). Not verified for S.
 
 ### Toast
 
 1. **Props**
-   - R/S: `Toaster`/`Toast` (`Toaster` is the ready-made; `Toast = Object.assign(Toaster, {Group, Root, ...})`). Slot-keyed props keyed by anatomy parts (`SlotKeyedProps<typeof toastAnatomy>`). Also `toaster` (the store), `label`, `closeLabel`, `tokens`, `indication`, `testId`, `unstyled` (`ToasterOwnProps`).
-   - N: `ToasterProps` = `toaster`, `closeLabel`, `tokens`, `indication`, `testId`. No class/style/slotProps/unstyled, and no `label`.
-   - N exports only `createToaster` and `Toaster` (`toast/index.ts`). No `Toast` namespace.
+    - R/S: `Toaster`/`Toast` (`Toaster` is the ready-made; `Toast = Object.assign(Toaster, {Group, Root, ...})`). Slot-keyed props keyed by anatomy parts (`SlotKeyedProps<typeof toastAnatomy>`). Also `toaster` (the store), `label`, `closeLabel`, `tokens`, `indication`, `testId`, `unstyled` (`ToasterOwnProps`).
+    - N: `ToasterProps` = `toaster`, `closeLabel`, `tokens`, `indication`, `testId`. No class/style/slotProps/unstyled, and no `label`.
+    - N exports only `createToaster` and `Toaster` (`toast/index.ts`). No `Toast` namespace.
 2. **Own parts**
-   - Anatomy: group, root, icon, title, description, actionTrigger, closeTrigger.
-   - **Two roots.** `group` is the anatomy root (the region). `root` is each toast. Both are reachable.
-   - R/S reach all seven through `slot(part)`. `slot("root")` is applied identically to every toast; per-toast class/style is not possible.
-   - N: `testIdOf(toastAnatomy, "group", props.testId)` and the rest via `id(part)`. The same testId prefix is applied to EVERY toast (collision), in R/S/N.
+    - Anatomy: group, root, icon, title, description, actionTrigger, closeTrigger.
+    - **Two roots.** `group` is the anatomy root (the region). `root` is each toast. Both are reachable.
+    - R/S reach all seven through `slot(part)`. `slot("root")` is applied identically to every toast; per-toast class/style is not possible.
+    - N: `testIdOf(toastAnatomy, "group", props.testId)` and the rest via `id(part)`. The same testId prefix is applied to EVERY toast (collision), in R/S/N.
 3. **Nested**
-   - R/S: none. `ActionTrigger` and `CloseTrigger` are own parts via `useMachineButton`, with their own interaction source.
-   - N: `SurfaceButton` for both, with the toaster's `testId` and `selection` (`toastSelection(type, toaster)`).
+    - R/S: none. `ActionTrigger` and `CloseTrigger` are own parts via `useMachineButton`, with their own interaction source.
+    - N: `SurfaceButton` for both, with the toaster's `testId` and `selection` (`toastSelection(type, toaster)`).
 4. **Tokens**: `tokens` goes to the `toast` recipe via `toastSelection(type, props)` (`toast.ts:98`). It is shared by group and toasts. Nothing else.
 5. **Variants down**
-   - `type` comes from each toast's data (`item.type`, falling back to `info`).
-   - It is passed to every part's selection through `toastSelection(api.type, group.props)` (R/S Root).
+    - `type` comes from each toast's data (`item.type`, falling back to `info`).
+    - It is passed to every part's selection through `toastSelection(api.type, group.props)` (R/S Root).
 6. **Inconsistencies**
-   - N has no `label` prop; the group's `aria-label` is hardcoded to `"Notifications"`. R/S take `label` and pass it to `api.getGroupProps`.
-   - N has no `closeIcon`: it uses the literal `"×"`. Glyphs come from the `TOAST_GLYPHS` text; R/S use `ToastIcon`/`CloseIcon` components.
-   - N has its own swipe and hold-timeout implementation (`useToastSwipe`, `useHeldTimeout`). R/S use Zag's toast machine plus `toastSwipeToDismiss`.
-   - N: group style is an allocation per render (`style={{...s.group, position:"absolute", ...}}`). `ToastItem` creates its own style objects per render.
-   - N's `ToastItem` runs `useComponentSlots` once per toast, and each toast re-calls `toastSelection`.
+    - N has no `label` prop; the group's `aria-label` is hardcoded to `"Notifications"`. R/S take `label` and pass it to `api.getGroupProps`.
+    - N has no `closeIcon`: it uses the literal `"×"`. Glyphs come from the `TOAST_GLYPHS` text; R/S use `ToastIcon`/`CloseIcon` components.
+    - N has its own swipe and hold-timeout implementation (`useToastSwipe`, `useHeldTimeout`). R/S use Zag's toast machine plus `toastSwipeToDismiss`.
+    - N: group style is an allocation per render (`style={{...s.group, position:"absolute", ...}}`). `ToastItem` creates its own style objects per render.
+    - N's `ToastItem` runs `useComponentSlots` once per toast, and each toast re-calls `toastSelection`.
 
 ### Menu
 
 1. **Props**
-   - R `className`/`style`/`slotProps`, S `class`/`style`/`slotProps`: keyed by own (overlay) parts. They apply to all menu levels: root, submenu positioner/content, and every item.
-   - `testId`/`unstyled`: plain or keyed.
-   - N: `testId` only (`menu.tsx:145`).
+    - R `className`/`style`/`slotProps`, S `class`/`style`/`slotProps`: keyed by own (overlay) parts. They apply to all menu levels: root, submenu positioner/content, and every item.
+    - `testId`/`unstyled`: plain or keyed.
+    - N: `testId` only (`menu.tsx:145`).
 2. **Own parts**
-   - Overlay anatomy: root, trigger, contextTrigger, positioner, content, itemGroup, itemGroupLabel, item, itemLeading, itemContent, itemLabel, itemSupportingText, itemTrailing, itemTrailingText.
-   - R/S reach all 14 via `slot(part)` (`menu.tsx:773-835`, ItemEntry at `:520-595`).
-   - **No per-item customization.** One `className.item` applies to all items, in every submenu level. `MenuItem` has no class/style/slotProps.
-   - N parts (`menuAnatomy`): root, itemGroup, itemGroupLabel, item, itemLeading, itemContent, itemLabel, itemSupportingText, itemTrailing, itemTrailingText.
-   - N has no trigger/positioner/content testIds. Special case: `ContextTrigger` takes its testId through `testIdOf(menuOverlayAnatomy, "contextTrigger", props.testId as …)` (`menu.tsx:~1260`). The cast means the type does not allow `{contextTrigger}` but the runtime does.
+    - Overlay anatomy: root, trigger, contextTrigger, positioner, content, itemGroup, itemGroupLabel, item, itemLeading, itemContent, itemLabel, itemSupportingText, itemTrailing, itemTrailingText.
+    - R/S reach all 14 via `slot(part)` (`menu.tsx:773-835`, ItemEntry at `:520-595`).
+    - **No per-item customization.** One `className.item` applies to all items, in every submenu level. `MenuItem` has no class/style/slotProps.
+    - N parts (`menuAnatomy`): root, itemGroup, itemGroupLabel, item, itemLeading, itemContent, itemLabel, itemSupportingText, itemTrailing, itemTrailingText.
+    - N has no trigger/positioner/content testIds. Special case: `ContextTrigger` takes its testId through `testIdOf(menuOverlayAnatomy, "contextTrigger", props.testId as …)` (`menu.tsx:~1260`). The cast means the type does not allow `{contextTrigger}` but the runtime does.
 3. **Nested**
-   - R/S: `Button` trigger, reachable only via `slotProps.trigger.*`. Submenus are `Menu.Submenu` roots rendered inside `ItemEntry`; they share the ready-made's `slot` function, so slot props apply to submenu parts too.
-   - N: `Button` trigger (label form). Submenus are rendered inside the menu.
+    - R/S: `Button` trigger, reachable only via `slotProps.trigger.*`. Submenus are `Menu.Submenu` roots rendered inside `ItemEntry`; they share the ready-made's `slot` function, so slot props apply to submenu parts too.
+    - N: `Button` trigger (label form). Submenus are rendered inside the menu.
 4. **Tokens**
-   - `tokens` goes to the `menu` recipe (`menuSelection`: color, density, vibrant, grouped, tokens; `menu.ts:329`).
-   - Submenus inherit `color`, `density`, `vibrant` and `tokens` from the parent (`menu.tsx:189-200`). They are not grouped.
-   - No nested tokens.
+    - `tokens` goes to the `menu` recipe (`menuSelection`: color, density, vibrant, grouped, tokens; `menu.ts:329`).
+    - Submenus inherit `color`, `density`, `vibrant` and `tokens` from the parent (`menu.tsx:189-200`). They are not grouped.
+    - No nested tokens.
 5. **Variants down**
-   - `color`, `density`, `vibrant`, `tokens` go from a menu to its submenus (R/S, and N via one shared selection).
-   - `grouped` is computed as `menuGrouped(props)` (true if there are groups) and forced false in a drilled submenu.
+    - `color`, `density`, `vibrant`, `tokens` go from a menu to its submenus (R/S, and N via one shared selection).
+    - `grouped` is computed as `menuGrouped(props)` (true if there are groups) and forced false in a drilled submenu.
 6. **Inconsistencies**
-   - **R/S submenus don't inherit `testId` or `unstyled`.** `<Submenu>` is rendered with no props, so `useComponent` there gets `testId: undefined`/`unstyled: undefined` (`menu.tsx:193-203`, `ItemEntry` at `:527`). Submenu parts get default test ids and the registry's styles, even when the root menu has `testId`/`unstyled`.
-   - N-only props: `value` (the selected item, for listbox-like use) and `closeOnSelect`. Web adds `typeahead`, `loopFocus` and others via `MenuBehaviorProps`; N takes a subset.
-   - N has per-item allocation control (`useStableSelection`, `ItemProps` documented as stable); web does not memoize.
-   - Per-item data: web `MenuItem` has the same shape for R/S/N, so there is nothing per-item in any renderer.
+    - **R/S submenus don't inherit `testId` or `unstyled`.** `<Submenu>` is rendered with no props, so `useComponent` there gets `testId: undefined`/`unstyled: undefined` (`menu.tsx:193-203`, `ItemEntry` at `:527`). Submenu parts get default test ids and the registry's styles, even when the root menu has `testId`/`unstyled`.
+    - N-only props: `value` (the selected item, for listbox-like use) and `closeOnSelect`. Web adds `typeahead`, `loopFocus` and others via `MenuBehaviorProps`; N takes a subset.
+    - N has per-item allocation control (`useStableSelection`, `ItemProps` documented as stable); web does not memoize.
+    - Per-item data: web `MenuItem` has the same shape for R/S/N, so there is nothing per-item in any renderer.
 
 ---
 
 ### Not applicable / no ready-made
 
 - **R/S**
-  - `dialog-parts.tsx` and `solid/src/dialog-parts.tsx`: the shared overlay Root/Backdrop/Positioner/Content factory. It has no ready-made.
-  - `overlay.ts`, `popover` Positioner, `tooltip/long-press.ts`.
-  - `snackbar/queue.tsx` has a host (`SnackbarHost`) but no parts.
-  - R/S have no portal or modal modules at all; every overlay renders in place.
+    - `dialog-parts.tsx` and `solid/src/dialog-parts.tsx`: the shared overlay Root/Backdrop/Positioner/Content factory. It has no ready-made.
+    - `overlay.ts`, `popover` Positioner, `tooltip/long-press.ts`.
+    - `snackbar/queue.tsx` has a host (`SnackbarHost`) but no parts.
+    - R/S have no portal or modal modules at all; every overlay renders in place.
 - **N**
-  - `portal.tsx`, `portal-host.tsx`, `overlay.tsx` (Anchored, useDismiss), `modal.tsx` (ModalWindow, ModalScrimLayer, useModalOverlay), `tooltip-overlay.tsx` (TooltipHost). All are plumbing with no parts or testIds.
-  - `modal.tsx` draws the Scrim with no `testId`.
+    - `portal.tsx`, `portal-host.tsx`, `overlay.tsx` (Anchored, useDismiss), `modal.tsx` (ModalWindow, ModalScrimLayer, useModalOverlay), `tooltip-overlay.tsx` (TooltipHost). All are plumbing with no parts or testIds.
+    - `modal.tsx` draws the Scrim with no `testId`.
 
 ### Gaps (this group)
 
@@ -1142,265 +1142,265 @@ Conventions verified in the code:
 ### list
 
 - **Props**
-  - R `ListProps` (react/src/list/list.tsx):
-    - `className` / `style`: plain, on the `<ul>` (via `PartProps`).
-    - `slotProps`: keyed child (`ListItemPart` → `ListItemPartProps`).
-    - `unstyled`: keyed child (`Unstyled<ListItemPart>`).
-    - `testId`: keyed own (`TestIdOverride<ListPart>`, i.e. `root` and `item`).
-  - S: same, with `class`.
-  - N `ListProps`: `testId` only (`testIdOf(listAnatomy, …)`), plus `aria-label`. No style, class, slotProps or unstyled.
+    - R `ListProps` (react/src/list/list.tsx):
+        - `className` / `style`: plain, on the `<ul>` (via `PartProps`).
+        - `slotProps`: keyed child (`ListItemPart` → `ListItemPartProps`).
+        - `unstyled`: keyed child (`Unstyled<ListItemPart>`).
+        - `testId`: keyed own (`TestIdOverride<ListPart>`, i.e. `root` and `item`).
+    - S: same, with `class`.
+    - N `ListProps`: `testId` only (`testIdOf(listAnatomy, …)`), plus `aria-label`. No style, class, slotProps or unstyled.
 - **Own parts** (`root`, `item`)
-  - R/S: `root` is reachable through plain `className`/`style`/element props. `item` (the `<li>`) is NOT reachable from `<List>` ready-made: `List.Item` is wrapped without props, and `slotProps` goes to ListItem parts. `testId` reaches both.
-  - N: both parts only through `testId`.
+    - R/S: `root` is reachable through plain `className`/`style`/element props. `item` (the `<li>`) is NOT reachable from `<List>` ready-made: `List.Item` is wrapped without props, and `slotProps` goes to ListItem parts. `testId` reaches both.
+    - N: both parts only through `testId`.
 - **Nested**
-  - ListItem per entry.
-  - R/S: `slotProps` and `unstyled` are spread onto every ListItem AFTER the item's data (list.tsx ReadyMade). A list-level value therefore overrides an item's own `slotProps`/`unstyled`.
-  - Per-item `testId` comes from `ListItemData.testId`.
-  - ListItem `className`/`style` are NOT reachable (keyed `slotProps.<part>.className` only).
-  - N: no way to reach ListItem parts, except item-data `testId`.
+    - ListItem per entry.
+    - R/S: `slotProps` and `unstyled` are spread onto every ListItem AFTER the item's data (list.tsx ReadyMade). A list-level value therefore overrides an item's own `slotProps`/`unstyled`.
+    - Per-item `testId` comes from `ListItemData.testId`.
+    - ListItem `className`/`style` are NOT reachable (keyed `slotProps.<part>.className` only).
+    - N: no way to reach ListItem parts, except item-data `testId`.
 - **Tokens**
-  - `tokens` go to the list items (the `listItem` recipe, as defaults merged per item by `listItemVariants`).
-  - `listTokens` go to the list recipe (`listSelection`, binding-core list.ts:98).
-  - `variant` ("standard" | "segmented") selects the list recipe.
-  - Nested-component tokens: only through `tokens`.
+    - `tokens` go to the list items (the `listItem` recipe, as defaults merged per item by `listItemVariants`).
+    - `listTokens` go to the list recipe (`listSelection`, binding-core list.ts:98).
+    - `variant` ("standard" | "segmented") selects the list recipe.
+    - Nested-component tokens: only through `tokens`.
 - **Variants down**
-  - `density`, `color`, `leadingType` and `tokens` go to items via the `ListDefaults` context.
-  - `variant === "segmented"` makes the ready-made compute each item's `position`.
+    - `density`, `color`, `leadingType` and `tokens` go to items via the `ListDefaults` context.
+    - `variant === "segmented"` makes the ready-made compute each item's `position`.
 - **Inconsistencies**
-  - S `List` ready-made keeps keyed rows and memoizes entries. No API difference.
-  - R puts `slotProps`/`unstyled` after the item's props and N's `position` is `item.position ?? …`. In R the item's `position` comes after the computed one, so the item wins in both.
-  - N has no part customization beyond `testId`.
-  - Same-named part: the `list` recipe's `item` is the `<li>` wrapper. The listItem recipe has no `item`.
+    - S `List` ready-made keeps keyed rows and memoizes entries. No API difference.
+    - R puts `slotProps`/`unstyled` after the item's props and N's `position` is `item.position ?? …`. In R the item's `position` comes after the computed one, so the item wins in both.
+    - N has no part customization beyond `testId`.
+    - Same-named part: the `list` recipe's `item` is the `<li>` wrapper. The listItem recipe has no `item`.
 
 ### list-item
 
 - **Props** (`ListItemProps`: R react/src/list-item/list-item.tsx:386, S :420)
-  - R/S: `className`/`style`/`slotProps` keyed own (`ListItemPart`).
-  - R/S: `testId` and `unstyled` keyed own (`ListItemPart`), on Root.
-  - N `ListItemProps` (react-native/src/list-item/list-item.tsx:45): `testId` keyed own only. No style, class, slotProps or unstyled.
+    - R/S: `className`/`style`/`slotProps` keyed own (`ListItemPart`).
+    - R/S: `testId` and `unstyled` keyed own (`ListItemPart`), on Root.
+    - N `ListItemProps` (react-native/src/list-item/list-item.tsx:45): `testId` keyed own only. No style, class, slotProps or unstyled.
 - **Own parts** (`root`, `leading`, `content`, `overline`, `headline`, `supportingText`, `trailing`, `trailingText`, `indicator`, `region`, `frame`, `action`)
-  - R/S `slot("…")` reaches all of them for className, style and slotProps. `frame`/`action` only when `swipeAction` is given, and `region`/`indicator` only when `region` is given.
-  - R/S **gap:** keyed `unstyled` does not reach `frame`, `action` or `region` from the ready-made.
-    - Root's scope gets `unstyled`. The Frame and Expandable scopes are built with `testId` only (R :289-291, :346-356).
-    - `Region`/`Frame`/`Action` take only a per-part boolean `unstyled`. It is reachable only as `slotProps.<part>.unstyled`, which is not typed on `SlotKeyedProps`.
-    - `testId` is forwarded to Frame and Expandable.
-  - N: all parts via `testId` only. The N parts are root/Pressable, content, leading, trailing, overline, headline, supportingText, trailingText, region, frame, action, indicator.
+    - R/S `slot("…")` reaches all of them for className, style and slotProps. `frame`/`action` only when `swipeAction` is given, and `region`/`indicator` only when `region` is given.
+    - R/S **gap:** keyed `unstyled` does not reach `frame`, `action` or `region` from the ready-made.
+        - Root's scope gets `unstyled`. The Frame and Expandable scopes are built with `testId` only (R :289-291, :346-356).
+        - `Region`/`Frame`/`Action` take only a per-part boolean `unstyled`. It is reachable only as `slotProps.<part>.unstyled`, which is not typed on `SlotKeyedProps`.
+        - `testId` is forwarded to Frame and Expandable.
+    - N: all parts via `testId` only. The N parts are root/Pressable, content, leading, trailing, overline, headline, supportingText, trailingText, region, frame, action, indicator.
 - **Nested**
-  - none (leading/trailing are content nodes).
-  - `indication` is a Root-only prop (`indication`, `interactionSource`) in R/S/N.
+    - none (leading/trailing are content nodes).
+    - `indication` is a Root-only prop (`indication`, `interactionSource`) in R/S/N.
 - **Tokens**
-  - `tokens` go to the `listItem` recipe, merged over list defaults (`listItemVariants`).
-  - With a swipe the Root scope's tokens get `...swipeTokens` merged (R :166, N list-item.tsx ~:155).
-  - Frame scope tokens are only the swipe's tokens (R :352). The item's own `tokens` are not on the frame scope.
+    - `tokens` go to the `listItem` recipe, merged over list defaults (`listItemVariants`).
+    - With a swipe the Root scope's tokens get `...swipeTokens` merged (R :166, N list-item.tsx ~:155).
+    - Frame scope tokens are only the swipe's tokens (R :352). The item's own `tokens` are not on the frame scope.
 - **Variants**
-  - Receives list defaults `density`, `color`, `leadingType` and `tokens` through `ListDefaults` (R :98, S :112, N :67).
-  - `lines` is derived from content (`listItemLines`) unless given.
+    - Receives list defaults `density`, `color`, `leadingType` and `tokens` through `ListDefaults` (R :98, S :112, N :67).
+    - `lines` is derived from content (`listItemLines`) unless given.
 - **Inconsistencies**
-  - N has no `className`, `style`, `slotProps` or `unstyled`, and no way to reach most parts except `testId`.
-  - N adds `onPress` and `role="option"`. R/S use `href`/`as`.
-  - N per-render allocations: `style={{ ...s.root, ...unselectable }}` (×2 for Pressable vs View).
+    - N has no `className`, `style`, `slotProps` or `unstyled`, and no way to reach most parts except `testId`.
+    - N adds `onPress` and `role="option"`. R/S use `href`/`as`.
+    - N per-render allocations: `style={{ ...s.root, ...unselectable }}` (×2 for Pressable vs View).
 
 ### selection-list
 
 - **Props**
-  - R `SelectionListProps` (react/src/selection-list/selection-list.tsx:37):
-    - `className`/`style`: plain on the `<ul>` list element.
-    - `slotProps`: keyed child (`ListItemPart`).
-    - `unstyled`: keyed child (`ListItemPart`).
-    - `testId`: keyed own `ListPart` (`root`, `item`).
-  - S: the same, with `class`.
-  - N `SelectionListProps`: `testId` only, plus `aria-label`.
+    - R `SelectionListProps` (react/src/selection-list/selection-list.tsx:37):
+        - `className`/`style`: plain on the `<ul>` list element.
+        - `slotProps`: keyed child (`ListItemPart`).
+        - `unstyled`: keyed child (`ListItemPart`).
+        - `testId`: keyed own `ListPart` (`root`, `item`).
+    - S: the same, with `class`.
+    - N `SelectionListProps`: `testId` only, plus `aria-label`.
 - **Own parts**: same as List. `item` is the `<li role=presentation>`, not reachable except through `testId`.
 - **Nested**
-  - ListItem per option.
-  - R/S: `slotProps`/`unstyled` spread on each ListItem. Item-level `testId` comes from `SelectionListItem`.
-  - N: not reachable.
-  - R renders `List.Root`/`List.Item` directly. Its remaining props (`variant`, `listTokens`, `testId`, …) pass through.
+    - ListItem per option.
+    - R/S: `slotProps`/`unstyled` spread on each ListItem. Item-level `testId` comes from `SelectionListItem`.
+    - N: not reachable.
+    - R renders `List.Root`/`List.Item` directly. Its remaining props (`variant`, `listTokens`, `testId`, …) pass through.
 - **Tokens**
-  - `tokens` go to the items (via `ListDefaults`). `listTokens` go to the list.
+    - `tokens` go to the items (via `ListDefaults`). `listTokens` go to the list.
 - **Variants**
-  - Same as List. Down to items: `density`, `color`, `tokens` and `leadingType`.
+    - Same as List. Down to items: `density`, `color`, `tokens` and `leadingType`.
 - **Inconsistencies**
-  - **R/S SelectionList never sets `position` on its ListItems.** A `variant="segmented"` list therefore does not round its tiles' corners. N does (`listItemPosition(...)`, selection-list.tsx), and so does `List` R/S.
-  - N has no `loopFocus` or keyboard highlight behavior.
-  - N `role="listbox"`; options are `ListItem role="option"`.
-  - N passes `onPress={() => press(key)}` per render (new closure per item).
+    - **R/S SelectionList never sets `position` on its ListItems.** A `variant="segmented"` list therefore does not round its tiles' corners. N does (`listItemPosition(...)`, selection-list.tsx), and so does `List` R/S.
+    - N has no `loopFocus` or keyboard highlight behavior.
+    - N `role="listbox"`; options are `ListItem role="option"`.
+    - N passes `onPress={() => press(key)}` per render (new closure per item).
 
 ### radio-group (RadioGroup + Radio)
 
 - **Props**
-  - R `RadioGroupProps` (react/src/radio-group/radio-group.tsx:272):
-    - `className`/`style`: plain on the group element.
-    - `slotProps`: keyed child (`RadioPart` → `RadioGroupPartProps`, which has `unstyled?`).
-    - `unstyled`: keyed child (`RadioPart`).
-    - `testId`: keyed own `RadioGroupPart` (only `root`).
-  - S: the same, with `class`.
-  - N `RadioGroupProps` (react-native/src/radio-group/radio-group.tsx): `style` (`StyleProp<ViewStyle>`, group View). NO `testId` (fixed `compositeTestIds.radioGroup.root`), no slotProps, no unstyled.
-  - N `RadioProps`: `style` (ViewStyle on the radio root via `withUserStyle`) and `testId` keyed own `RadioPart`.
+    - R `RadioGroupProps` (react/src/radio-group/radio-group.tsx:272):
+        - `className`/`style`: plain on the group element.
+        - `slotProps`: keyed child (`RadioPart` → `RadioGroupPartProps`, which has `unstyled?`).
+        - `unstyled`: keyed child (`RadioPart`).
+        - `testId`: keyed own `RadioGroupPart` (only `root`).
+    - S: the same, with `class`.
+    - N `RadioGroupProps` (react-native/src/radio-group/radio-group.tsx): `style` (`StyleProp<ViewStyle>`, group View). NO `testId` (fixed `compositeTestIds.radioGroup.root`), no slotProps, no unstyled.
+    - N `RadioProps`: `style` (ViewStyle on the radio root via `withUserStyle`) and `testId` keyed own `RadioPart`.
 - **Own parts**
-  - Group: only `root`, reachable by plain `className`/`style`/element props. In R/S it uses `useUnstyledComponent` (no recipe, no tokens).
-  - Radios (`root`, `touchTarget`, `input`, `ring`, `dot`): via keyed `slotProps` for all radios at once.
-  - The `slotProps` lookup is a direct `slotProps?.[part] ?? {}`, not `useSlotProps`. `className` and `style` are NOT keyed here, so radio parts get no className/style except through `slotProps.<part>.className`.
-  - Same-named `root`: `slotProps.root` targets the radio `<label>`, not the group element.
-  - Per-item `testId` comes from `RadioGroupItem.testId`.
-  - N: `testId` and `style` on the radio root only. No `input` part in N.
+    - Group: only `root`, reachable by plain `className`/`style`/element props. In R/S it uses `useUnstyledComponent` (no recipe, no tokens).
+    - Radios (`root`, `touchTarget`, `input`, `ring`, `dot`): via keyed `slotProps` for all radios at once.
+    - The `slotProps` lookup is a direct `slotProps?.[part] ?? {}`, not `useSlotProps`. `className` and `style` are NOT keyed here, so radio parts get no className/style except through `slotProps.<part>.className`.
+    - Same-named `root`: `slotProps.root` targets the radio `<label>`, not the group element.
+    - Per-item `testId` comes from `RadioGroupItem.testId`.
+    - N: `testId` and `style` on the radio root only. No `input` part in N.
 - **Nested**: Radio per item.
-  - In R/S the item's `unstyled` is the group-level `unstyled`. Its props come from `slotProps`.
+    - In R/S the item's `unstyled` is the group-level `unstyled`. Its props come from `slotProps`.
 - **Tokens**
-  - `tokens`, `color` and `density` on the group go to the radios (`radioSelection` merges the group's tokens with each radio's).
-  - There is no group recipe, so no token prop for the group itself.
-  - N: the same. `useStableSelection` keeps the group's variants stable.
+    - `tokens`, `color` and `density` on the group go to the radios (`radioSelection` merges the group's tokens with each radio's).
+    - There is no group recipe, so no token prop for the group itself.
+    - N: the same. `useStableSelection` keeps the group's variants stable.
 - **Variants**: `color`, `density`, `tokens` down to radios as defaults. A radio's own props win.
 - **Inconsistencies**
-  - N has `style` on the group and radio, R/S have `className`/`style` plain only on the group element.
-  - N has no `testId` on the group.
-  - N `RadioGroup` takes `children` (`Radio`s) or `items`. R/S ready-made takes `items` only (children go through `RadioGroup.Root`).
-  - N `Radio` is `memo(withEngine(...))`; `RadioGroup` is neither.
-  - N per-render allocations: `withUserStyle({...s.root, ...unselectable}, style)` and the `items.map` creating props each render.
+    - N has `style` on the group and radio, R/S have `className`/`style` plain only on the group element.
+    - N has no `testId` on the group.
+    - N `RadioGroup` takes `children` (`Radio`s) or `items`. R/S ready-made takes `items` only (children go through `RadioGroup.Root`).
+    - N `Radio` is `memo(withEngine(...))`; `RadioGroup` is neither.
+    - N per-render allocations: `withUserStyle({...s.root, ...unselectable}, style)` and the `items.map` creating props each render.
 
 ### checkbox
 
 - **Props**
-  - R `CheckboxProps` (react/src/checkbox/checkbox.tsx:213): `className`/`style`/`slotProps` keyed own, `testId` keyed own, `unstyled` keyed own.
-  - S: the same, with `class`.
-  - N `CheckboxProps` (react-native/src/checkbox/checkbox.tsx): `style` (ViewStyle, root only), `testId` keyed own. No className, slotProps or unstyled.
+    - R `CheckboxProps` (react/src/checkbox/checkbox.tsx:213): `className`/`style`/`slotProps` keyed own, `testId` keyed own, `unstyled` keyed own.
+    - S: the same, with `class`.
+    - N `CheckboxProps` (react-native/src/checkbox/checkbox.tsx): `style` (ViewStyle, root only), `testId` keyed own. No className, slotProps or unstyled.
 - **Own parts** (`root`, `touchTarget`, `input`, `box`, `checkIcon`, `indeterminateIcon`)
-  - R/S: all reachable through keyed props.
-  - N: `testId` reaches all. `style` reaches `root` only. N has no `input` part (the Pressable is the control).
-  - `aria-label`, `aria-labelledby` and `aria-describedby` go to `input` in R/S, and to the root in N (`aria-label` only).
+    - R/S: all reachable through keyed props.
+    - N: `testId` reaches all. `style` reaches `root` only. N has no `input` part (the Pressable is the control).
+    - `aria-label`, `aria-labelledby` and `aria-describedby` go to `input` in R/S, and to the root in N (`aria-label` only).
 - **Nested**: none.
 - **Tokens**: `tokens` go to the `checkbox` recipe (`checkboxSelection`).
 - **Variants**: `color`, `density`.
 - **Inconsistencies**
-  - N `style` is a plain `ViewStyle` on the root. R/S keep root style under `style.root`.
-  - N `aria-label` only.
-  - R/S ready-made is also used by Table's selection cell, with only `aria-label`, `checked` and `onCheckedChange` (see table).
+    - N `style` is a plain `ViewStyle` on the root. R/S keep root style under `style.root`.
+    - N `aria-label` only.
+    - R/S ready-made is also used by Table's selection cell, with only `aria-label`, `checked` and `onCheckedChange` (see table).
 
 ### switch
 
 - **Props**
-  - R `SwitchProps` (react/src/switch/switch.tsx:216): `className`/`style`/`slotProps` keyed own, `testId` keyed own, `unstyled` keyed own.
-  - S: the same, with `class`.
-  - N `SwitchProps`: `style` (ViewStyle on root), `testId` keyed own.
+    - R `SwitchProps` (react/src/switch/switch.tsx:216): `className`/`style`/`slotProps` keyed own, `testId` keyed own, `unstyled` keyed own.
+    - S: the same, with `class`.
+    - N `SwitchProps`: `style` (ViewStyle on root), `testId` keyed own.
 - **Own parts** (`root`, `touchTarget`, `input`, `track`, `stateLayer`, `handle`, `icon`)
-  - R/S: all reachable. N: `testId` for all except `input` (there is no `input` part). `style` reaches `root` only.
+    - R/S: all reachable. N: `testId` for all except `input` (there is no `input` part). `style` reaches `root` only.
 - **Nested**: none.
 - **Tokens**: `tokens` go to the `switchControl` recipe. The `icons` variant selects when the handle's icon shows.
 - **Variants**: `color`, `icons`.
 - **Inconsistencies**
-  - Icon prop: R/S take `icon` (`SwitchContentProps`) and render the `icon` part only when given.
-  - N takes `checkedIcon`, defaulting to `"✓"` (react-native/src/switch/switch.tsx:36,112).
-  - Recipe name `switchControl` vs component name `Switch`.
+    - Icon prop: R/S take `icon` (`SwitchContentProps`) and render the `icon` part only when given.
+    - N takes `checkedIcon`, defaulting to `"✓"` (react-native/src/switch/switch.tsx:36,112).
+    - Recipe name `switchControl` vs component name `Switch`.
 
 ### slider
 
 - **Props**
-  - R `SliderProps` (react/src/slider/slider.tsx:342): `className`/`style`/`slotProps` keyed own, `testId` keyed own, `unstyled` keyed own.
-  - S: the same, with `class`.
-  - N `SliderProps` (react-native/src/slider/slider.tsx:44): `testId` keyed own only. NO `style`, className, slotProps or unstyled.
+    - R `SliderProps` (react/src/slider/slider.tsx:342): `className`/`style`/`slotProps` keyed own, `testId` keyed own, `unstyled` keyed own.
+    - S: the same, with `class`.
+    - N `SliderProps` (react-native/src/slider/slider.tsx:44): `testId` keyed own only. NO `style`, className, slotProps or unstyled.
 - **Own parts**
-  - R/S reach all 11 (`root`, `startTrack`, `track`, `activeTrack`, `markerGroup`, `marker`, `stateLayer`, `insetIcon`, `handle`, `valueIndicator`, `input`).
-  - `slot("handle")`, `slot("stateLayer")`, `slot("valueIndicator")`, `slot("input")` apply to EVERY thumb of a range, and `slot("marker")` to every stop. Individual thumbs are not addressable.
-  - `insetIcon` renders only when the `insetIcon` prop is given.
-  - N: all parts via `testId`. There is no `input` part in N.
+    - R/S reach all 11 (`root`, `startTrack`, `track`, `activeTrack`, `markerGroup`, `marker`, `stateLayer`, `insetIcon`, `handle`, `valueIndicator`, `input`).
+    - `slot("handle")`, `slot("stateLayer")`, `slot("valueIndicator")`, `slot("input")` apply to EVERY thumb of a range, and `slot("marker")` to every stop. Individual thumbs are not addressable.
+    - `insetIcon` renders only when the `insetIcon` prop is given.
+    - N: all parts via `testId`. There is no `input` part in N.
 - **Nested**: none.
 - **Tokens**
-  - `tokens` go to the `slider` recipe.
-  - Root tokens are computed from the value (`sliderTrackTokens`) and `...props.tokens` is merged on top (binding-core slider.ts:297-311).
-  - Thumb and marker tokens go on parts through `useOwnTokens`, which calls `useClasses("slider", { tokens })` (R :247).
+    - `tokens` go to the `slider` recipe.
+    - Root tokens are computed from the value (`sliderTrackTokens`) and `...props.tokens` is merged on top (binding-core slider.ts:297-311).
+    - Thumb and marker tokens go on parts through `useOwnTokens`, which calls `useClasses("slider", { tokens })` (R :247).
 - **Variants**: `color`, `handleShape`, `size`, `orientation`.
 - **Inconsistencies**
-  - `aria-label`: R/S accept `string | string[]` (one per thumb) plus `aria-labelledby`/`aria-describedby`/`aria-valuetext` (S declares `aria-valuetext` explicitly). N accepts a single string.
-  - N has no `style` or `invalid`/`readOnly`/`largeStep`/`stops` parity differences.
-  - N per-render allocations: root `{...s.root, ...unselectable}`.
+    - `aria-label`: R/S accept `string | string[]` (one per thumb) plus `aria-labelledby`/`aria-describedby`/`aria-valuetext` (S declares `aria-valuetext` explicitly). N accepts a single string.
+    - N has no `style` or `invalid`/`readOnly`/`largeStep`/`stops` parity differences.
+    - N per-render allocations: root `{...s.root, ...unselectable}`.
 
 ### rating
 
 - **Props**
-  - R `RatingProps` (react/src/rating/rating.tsx:194, a type alias): `className`/`style`/`slotProps` keyed own, `testId` and `unstyled` keyed own.
-  - S: the same, with `class`.
-  - N `RatingProps`: `testId` keyed own only. No style, className, slotProps or unstyled.
+    - R `RatingProps` (react/src/rating/rating.tsx:194, a type alias): `className`/`style`/`slotProps` keyed own, `testId` and `unstyled` keyed own.
+    - S: the same, with `class`.
+    - N `RatingProps`: `testId` keyed own only. No style, className, slotProps or unstyled.
 - **Own parts** (`root`, `label`, `control`, `item`, `icon`, `fill`, `halfFill`)
-  - R/S: all reachable. `slot("item")`, `slot("icon")` and `slot("fill")` apply to EVERY star. `fill` and `halfFill` are present only when the value reaches them.
-  - N: via `testId` only.
+    - R/S: all reachable. `slot("item")`, `slot("icon")` and `slot("fill")` apply to EVERY star. `fill` and `halfFill` are present only when the value reaches them.
+    - N: via `testId` only.
 - **Nested**: none (the `icon` prop is a content node).
 - **Tokens**: `tokens` go to the `rating` recipe.
 - **Variants**: `color`, `size`.
 - **Inconsistencies**
-  - The default star differs: R/S `<StarIcon/>` (glyphs), N `<Glyph glyph="★"/>`.
-  - N lacks `name`, `form`, `required`. It takes only `value`, `defaultValue`, `onValueChange`, `count`, `allowHalf`, `readOnly`, `disabled`, `valueText`.
-  - N per-render allocations: `style={{...s.item, ...unselectable}}` per star and an `onLayout`/`onPress` closure per star.
+    - The default star differs: R/S `<StarIcon/>` (glyphs), N `<Glyph glyph="★"/>`.
+    - N lacks `name`, `form`, `required`. It takes only `value`, `defaultValue`, `onValueChange`, `count`, `allowHalf`, `readOnly`, `disabled`, `valueText`.
+    - N per-render allocations: `style={{...s.item, ...unselectable}}` per star and an `onLayout`/`onPress` closure per star.
 
 ### stepper
 
 - **Props**
-  - R `StepperProps` (react/src/stepper/stepper.tsx:287): `className`/`style`/`slotProps` keyed own, `testId` and `unstyled` keyed own.
-  - S: the same, with `class`.
-  - N `StepperProps`: `testId` keyed own only. No style, className, slotProps or unstyled.
+    - R `StepperProps` (react/src/stepper/stepper.tsx:287): `className`/`style`/`slotProps` keyed own, `testId` and `unstyled` keyed own.
+    - S: the same, with `class`.
+    - N `StepperProps`: `testId` keyed own only. No style, className, slotProps or unstyled.
 - **Own parts** (`root`, `list`, `item`, `trigger`, `indicator`, `label`, `caption`, `separator`, `content`)
-  - R/S: all reachable.
-  - `slot("trigger")`, `slot("item")` and `slot("indicator")` apply to every step.
-  - `separator` is omitted after the last step.
-  - `slot("content")` is used in the item for a vertical stepper, and after the list for a horizontal one.
-  - N: via `testId`. N has no `list` part and no `content` part in the same sense; its `testId` map is applied per step.
+    - R/S: all reachable.
+    - `slot("trigger")`, `slot("item")` and `slot("indicator")` apply to every step.
+    - `separator` is omitted after the last step.
+    - `slot("content")` is used in the item for a vertical stepper, and after the list for a horizontal one.
+    - N: via `testId`. N has no `list` part and no `content` part in the same sense; its `testId` map is applied per step.
 - **Nested**: the `transition` prop (`sharedAxis`/`fadeThrough`) wraps content in `HorizontalSharedAxis`/`FadeThrough` (R :395). Their parts are not reachable (`transitionScrim` is a bool only).
 - **Tokens**: `tokens` go to the `stepper` recipe.
 - **Variants**: `orientation`, `density`.
 - **Inconsistencies**
-  - N: no keyboard stepping, no next/previous triggers (file header comment).
-  - N renders `item`/`trigger` itself, with `s.item`, and takes `StepperItem` per step.
-  - N glyphs use `TOAST_GLYPHS` text. R/S use icons.
-  - N `selection` is a per-render object passed into every `StepImpl`.
-  - R `Root` gets `count={items.length}`.
+    - N: no keyboard stepping, no next/previous triggers (file header comment).
+    - N renders `item`/`trigger` itself, with `s.item`, and takes `StepperItem` per step.
+    - N glyphs use `TOAST_GLYPHS` text. R/S use icons.
+    - N `selection` is a per-render object passed into every `StepImpl`.
+    - R `Root` gets `count={items.length}`.
 
 ### splitter
 
 - **Props**
-  - R `SplitterProps` (react/src/splitter/splitter.tsx:214): `className`/`style`/`slotProps` keyed own, `testId` and `unstyled` keyed own.
-  - S: the same, with `class`.
-  - N `SplitterProps` (react-native/src/splitter/splitter.tsx:46): `testId` only. No style, className, slotProps or unstyled.
+    - R `SplitterProps` (react/src/splitter/splitter.tsx:214): `className`/`style`/`slotProps` keyed own, `testId` and `unstyled` keyed own.
+    - S: the same, with `class`.
+    - N `SplitterProps` (react-native/src/splitter/splitter.tsx:46): `testId` only. No style, className, slotProps or unstyled.
 - **Own parts**
-  - Reachable in R/S: `root`, `panel` (every pane), `resizeTrigger` (every divider).
-  - **NOT reachable** through className, style or slotProps: `resizeTriggerIndicator`.
-    - It is rendered inside `ResizeTrigger` with no user props (R :201, S ~:209).
-    - Only the keyed `unstyled`/`testId` on Root reach it.
-  - N: all four parts via `testId`. The panel's wrapping `Animated.View` has no part and no testID.
+    - Reachable in R/S: `root`, `panel` (every pane), `resizeTrigger` (every divider).
+    - **NOT reachable** through className, style or slotProps: `resizeTriggerIndicator`.
+        - It is rendered inside `ResizeTrigger` with no user props (R :201, S ~:209).
+        - Only the keyed `unstyled`/`testId` on Root reach it.
+    - N: all four parts via `testId`. The panel's wrapping `Animated.View` has no part and no testID.
 - **Nested**: none.
 - **Tokens**: `tokens` go to the `splitter` recipe. There are no nested tokens.
 - **Variants**: `orientation`.
 - **Inconsistencies**
-  - R/S take `resizeLabel`. N does not mention one.
-  - N has `anchors` and `keyboardResizeBy` props.
-  - N per-render allocations: `{ flexGrow: 1, ...s.root }` (splitter.tsx:326), panel style objects per pane, `{...s.resizeTrigger, ...unselectable}`.
+    - R/S take `resizeLabel`. N does not mention one.
+    - N has `anchors` and `keyboardResizeBy` props.
+    - N per-render allocations: `{ flexGrow: 1, ...s.root }` (splitter.tsx:326), panel style objects per pane, `{...s.resizeTrigger, ...unselectable}`.
 
 ### tabs
 
 - **Props**
-  - R `TabsProps` (react/src/tabs/tabs.tsx:287): `className`/`style`/`slotProps` keyed own, `testId` and `unstyled` keyed own.
-  - Anatomy is `tabsCompositeAnatomy` (react/src/tabs/tabs.tsx:7). It has parts `root`, `list`, `tab`, `tabContent`, `icon`, `label`, `indicator`, `content`. The `tabsAnatomy` recipe omits `list` and `content`.
-  - S: the same, with `class`.
-  - N: **no ready-made** (only index.ts).
+    - R `TabsProps` (react/src/tabs/tabs.tsx:287): `className`/`style`/`slotProps` keyed own, `testId` and `unstyled` keyed own.
+    - Anatomy is `tabsCompositeAnatomy` (react/src/tabs/tabs.tsx:7). It has parts `root`, `list`, `tab`, `tabContent`, `icon`, `label`, `indicator`, `content`. The `tabsAnatomy` recipe omits `list` and `content`.
+    - S: the same, with `class`.
+    - N: **no ready-made** (only index.ts).
 - **Own parts**
-  - R/S: all 8 reachable. `slot("tab")`, `icon`, `label` and `indicator` apply to every tab.
-  - `tabContent` is the wrapper inside each tab, reachable through `tabContentProps={slot("tabContent")}`.
-  - `content` (the panel) is reachable. In transition mode it goes through `TransitionPanels` with `slot("content")`.
+    - R/S: all 8 reachable. `slot("tab")`, `icon`, `label` and `indicator` apply to every tab.
+    - `tabContent` is the wrapper inside each tab, reachable through `tabContentProps={slot("tabContent")}`.
+    - `content` (the panel) is reachable. In transition mode it goes through `TransitionPanels` with `slot("content")`.
 - **Nested**: `FadeThrough`/`HorizontalSharedAxis` for `transition`: not reachable (`transitionScrim` is a bool).
 - **Tokens**: `tokens` go to the `tabs` recipe. There are no nested tokens.
 - **Variants**
-  - `variant`, `icon`, `inlineIcon`, `scrollable`, `color`.
-  - `icon` defaults to `tabsHaveIcons(items)` (R :306).
+    - `variant`, `icon`, `inlineIcon`, `scrollable`, `color`.
+    - `icon` defaults to `tabsHaveIcons(items)` (R :306).
 - **Inconsistencies**: none within R/S. N: not applicable.
 - **Note**: `tabs` recipe vs `tabsComposite` anatomy: the part sets differ.
 
 ### navigation-bar
 
 - **Props**
-  - R `NavigationBarProps = NavigationProps<"navigationBar">` (react/src/navigation.tsx, built by `createNavigation`): `className`/`style`/`slotProps` keyed own, `testId` and `unstyled` keyed own.
-  - S: the same, with `class`.
-  - N: **no ready-made**.
+    - R `NavigationBarProps = NavigationProps<"navigationBar">` (react/src/navigation.tsx, built by `createNavigation`): `className`/`style`/`slotProps` keyed own, `testId` and `unstyled` keyed own.
+    - S: the same, with `class`.
+    - N: **no ready-made**.
 - **Own parts** (`root`, `item`, `indicator`, `activeIndicator`, `icon`, `label`)
-  - R/S: all reachable. `item`, `indicator`, `activeIndicator`, `icon` and `label` apply to every destination.
-  - `icon` renders only when the item has one.
+    - R/S: all reachable. `item`, `indicator`, `activeIndicator`, `icon` and `label` apply to every destination.
+    - `icon` renders only when the item has one.
 - **Nested**: none.
 - **Tokens**: `tokens` go to the `navigationBar` recipe (`navigationSelection`, binding-core navigation.ts:170).
 - **Variants**: `color`, `itemLayout`.
@@ -1409,16 +1409,16 @@ Conventions verified in the code:
 ### navigation-rail
 
 - **Props**
-  - R `NavigationRailProps = NavigationProps<"navigationRail">`: `className`/`style`/`slotProps` keyed own, `testId` and `unstyled` keyed own.
-  - S: the same, with `class`.
-  - N: **no ready-made**.
+    - R `NavigationRailProps = NavigationProps<"navigationRail">`: `className`/`style`/`slotProps` keyed own, `testId` and `unstyled` keyed own.
+    - S: the same, with `class`.
+    - N: **no ready-made**.
 - **Own parts** (`root`, `item`, `indicator`, `activeIndicator`, `icon`, `label`, `header`, `sectionLabel`)
-  - R/S: all reachable. `header` renders only when `header` content is given. `sectionLabel` renders per section (items with `section`).
+    - R/S: all reachable. `header` renders only when `header` content is given. `sectionLabel` renders per section (items with `section`).
 - **Nested**
-  - A modal rail (`modal`) renders a scrim (`scrimAnatomy`) and a dialog (R navigation.tsx:117-164).
-  - The scrim gets only `testId`: when the rail's `testId` is a string it becomes `{ root: `${testId}-scrim` }`. If it is keyed, the scrim gets none.
-  - className, style, slotProps and unstyled are NOT forwarded to the scrim, and the dialog `<div>` positioner/content have no props.
-  - The `header` is a content node, so the app's own components keep their own props.
+    - A modal rail (`modal`) renders a scrim (`scrimAnatomy`) and a dialog (R navigation.tsx:117-164).
+    - The scrim gets only `testId`: when the rail's `testId` is a string it becomes `{ root: `${testId}-scrim` }`. If it is keyed, the scrim gets none.
+    - className, style, slotProps and unstyled are NOT forwarded to the scrim, and the dialog `<div>` positioner/content have no props.
+    - The `header` is a content node, so the app's own components keep their own props.
 - **Tokens**: `tokens` go to the `navigationRail` recipe. The scrim has no token prop.
 - **Variants**: `color`, `itemLayout`, `expanded` (defaults to `modal`), `modal`.
 - **Inconsistencies**: none between R/S. Same-named part: the scrim's `root` vs the rail's `root`. N: not applicable.
@@ -1426,122 +1426,122 @@ Conventions verified in the code:
 ### accordion
 
 - **Props**
-  - R `AccordionProps` (react/src/accordion/accordion.tsx:219): `className`/`style`/`slotProps` keyed own, `testId` and `unstyled` keyed own.
-  - S: the same, with `class`.
-  - N `AccordionProps` (react-native/src/accordion/accordion.tsx): `testId` keyed own only, no style/className/slotProps/unstyled.
+    - R `AccordionProps` (react/src/accordion/accordion.tsx:219): `className`/`style`/`slotProps` keyed own, `testId` and `unstyled` keyed own.
+    - S: the same, with `class`.
+    - N `AccordionProps` (react-native/src/accordion/accordion.tsx): `testId` keyed own only, no style/className/slotProps/unstyled.
 - **Own parts** (`root`, `item`, `trigger`, `leading`, `text`, `title`, `description`, `indicator`, `content`)
-  - R/S: all reachable. `item`, `trigger`, `leading`, `text`, `title`, `description`, `indicator` and `content` apply to every item. `leading` and `description` render only when given.
-  - N: via `testId`.
+    - R/S: all reachable. `item`, `trigger`, `leading`, `text`, `title`, `description`, `indicator` and `content` apply to every item. `leading` and `description` render only when given.
+    - N: via `testId`.
 - **Nested**: none.
 - **Tokens**: `tokens` go to the `accordion` recipe.
 - **Variants**: `density`.
 - **Inconsistencies**
-  - N hardcodes the indicator glyph as `"⌄"` (R/S have a real Indicator part).
-  - N `Item` gets `selection={props}` (the whole props object).
-  - N has no Zag machine. It keeps `value` as React state.
-  - N per-render allocations: `{...s.trigger, ...unselectable}` per item, `toggle` closures.
+    - N hardcodes the indicator glyph as `"⌄"` (R/S have a real Indicator part).
+    - N `Item` gets `selection={props}` (the whole props object).
+    - N has no Zag machine. It keeps `value` as React state.
+    - N per-render allocations: `{...s.trigger, ...unselectable}` per item, `toggle` closures.
 
 ### tree
 
 - **Props**
-  - R `TreeProps` (react/src/tree/tree.tsx:296): `className`/`style`/`slotProps` keyed own, `testId` and `unstyled` keyed own.
-  - S: the same, with `class`.
-  - N `TreeProps` (react-native/src/tree/tree.tsx:42): `testId` keyed own only. N also has `translations`.
+    - R `TreeProps` (react/src/tree/tree.tsx:296): `className`/`style`/`slotProps` keyed own, `testId` and `unstyled` keyed own.
+    - S: the same, with `class`.
+    - N `TreeProps` (react-native/src/tree/tree.tsx:42): `testId` keyed own only. N also has `translations`.
 - **Own parts** (`root`, `label`, `tree`, `branch`, `node`, `leading`, `text`, `indicator`, `group`)
-  - R/S: all reachable. `slot("node")` is used for BOTH leaf `Item`s and branch `BranchControl`s (R :343, :358), so leaf and branch rows cannot be told apart.
-  - `label` renders only when `label` is given.
-  - N: via `testId`.
+    - R/S: all reachable. `slot("node")` is used for BOTH leaf `Item`s and branch `BranchControl`s (R :343, :358), so leaf and branch rows cannot be told apart.
+    - `label` renders only when `label` is given.
+    - N: via `testId`.
 - **Nested**: none.
 - **Tokens**: `tokens` go to the `tree` recipe.
 - **Variants**: `density`, `color`.
 - **Inconsistencies**
-  - N `items` is required; R/S are optional.
-  - N has `translations`. R/S do not.
-  - N: `style={{ ...s.node, ...unselectable }}` per row.
+    - N `items` is required; R/S are optional.
+    - N has `translations`. R/S do not.
+    - N: `style={{ ...s.node, ...unselectable }}` per row.
 
 ### table
 
 - **Props**
-  - R `TableProps<Row>` (react/src/table/table.tsx:299): `className`/`style`/`slotProps` keyed own, `testId` and `unstyled` keyed own.
-  - S: the same, with `class`.
-  - N `TableProps` (react-native/src/table/table.tsx:42): `Omit<TableRootOwnProps, "unstyled" | "rowValues">`, so it has `testId` (and `striped`, selection props). No style/className/slotProps/unstyled.
+    - R `TableProps<Row>` (react/src/table/table.tsx:299): `className`/`style`/`slotProps` keyed own, `testId` and `unstyled` keyed own.
+    - S: the same, with `class`.
+    - N `TableProps` (react-native/src/table/table.tsx:42): `Omit<TableRootOwnProps, "unstyled" | "rowValues">`, so it has `testId` (and `striped`, selection props). No style/className/slotProps/unstyled.
 - **Own parts** (15)
-  - R/S reachable: `root`, `header`, `body`, `footer`, `headerRow`, `row`, `alternateRow`, `headerCell`, `cell`, `footerCell`, `footerRow`, `selectionCell`, `sortHeader`.
-  - R/S **not** reachable (rendered inside `SortHeader` with no user props, R :275-283): `sortLabel`, `sortIndicator`. They are reachable only through Root's `unstyled`/`testId`.
-  - Striped tables: `slot(tableRowPart(index, striped))` (R :382) applies `slotProps.row` only to odd-position rows. Alternate rows get `slotProps.alternateRow` only.
-  - `selectionCell` is shared by the header and the body rows.
-  - N: all parts via `testId`, including `sortLabel` and `sortIndicator`.
+    - R/S reachable: `root`, `header`, `body`, `footer`, `headerRow`, `row`, `alternateRow`, `headerCell`, `cell`, `footerCell`, `footerRow`, `selectionCell`, `sortHeader`.
+    - R/S **not** reachable (rendered inside `SortHeader` with no user props, R :275-283): `sortLabel`, `sortIndicator`. They are reachable only through Root's `unstyled`/`testId`.
+    - Striped tables: `slot(tableRowPart(index, striped))` (R :382) applies `slotProps.row` only to odd-position rows. Alternate rows get `slotProps.alternateRow` only.
+    - `selectionCell` is shared by the header and the body rows.
+    - N: all parts via `testId`, including `sortLabel` and `sortIndicator`.
 - **Nested**
-  - `Checkbox` in `SelectionCell` (R :228, :235): gets only `aria-label`, `checked` and `onCheckedChange`.
-  - Not reachable: Checkbox `tokens`, `slotProps`, `className`, `testId`. The same applies in S. N also uses Checkbox (table.tsx ~:171, ~:289).
-  - `ArrowUpwardIcon` for the sort indicator: not reachable.
+    - `Checkbox` in `SelectionCell` (R :228, :235): gets only `aria-label`, `checked` and `onCheckedChange`.
+    - Not reachable: Checkbox `tokens`, `slotProps`, `className`, `testId`. The same applies in S. N also uses Checkbox (table.tsx ~:171, ~:289).
+    - `ArrowUpwardIcon` for the sort indicator: not reachable.
 - **Tokens**: `tokens` go to the `dataTable` recipe. There are no nested tokens.
 - **Variants**: `stickyHeader` (not on N), `density`, `striped` (a Root prop, not a variant).
 - **Inconsistencies**
-  - N's `testId` reaches `sortLabel`/`sortIndicator` and R/S's slot props do not.
-  - N has no `unstyled`.
-  - `stickyHeader` is "not on React Native" (binding-core table.ts:34).
-  - Recipe name `dataTable` vs component `Table`.
+    - N's `testId` reaches `sortLabel`/`sortIndicator` and R/S's slot props do not.
+    - N has no `unstyled`.
+    - `stickyHeader` is "not on React Native" (binding-core table.ts:34).
+    - Recipe name `dataTable` vs component `Table`.
 
 ### paginator
 
 - **Props**
-  - R `PaginatorProps` (react/src/paginator/paginator.tsx:225): `className`/`style`/`slotProps` keyed own, `testId` and `unstyled` keyed own.
-  - S: the same, with `class`.
-  - N `PaginatorProps` (react-native/src/paginator/paginator.tsx): `Omit<PaginatorRootOwnProps, "id"|"unstyled">`, so `testId` (and the behavior props, translations, `density`, `tokens`), plus `aria-label`. No style/className/slotProps/unstyled.
+    - R `PaginatorProps` (react/src/paginator/paginator.tsx:225): `className`/`style`/`slotProps` keyed own, `testId` and `unstyled` keyed own.
+    - S: the same, with `class`.
+    - N `PaginatorProps` (react-native/src/paginator/paginator.tsx): `Omit<PaginatorRootOwnProps, "id"|"unstyled">`, so `testId` (and the behavior props, translations, `density`, `tokens`), plus `aria-label`. No style/className/slotProps/unstyled.
 - **Own parts** (`root`, `pageSize`, `pageSizeLabel`, `pageSizeSelect`, `rangeLabel`, `actions`, `firstTrigger`, `prevTrigger`, `nextTrigger`, `lastTrigger`)
-  - R/S: all reachable.
-  - `firstTrigger`/`lastTrigger` only when `showFirstLastButtons`.
-  - `pageSize*` omitted when `hidePageSize`.
-  - The triggers are `as={IconButton}` (R :266-272). Their `slotProps`/`className`/`style` therefore go to the IconButton as ordinary props. IconButton's own parts are not reachable by key.
-  - N: parts via `testId`. In N each trigger is a View part (`Slot.View style={s[part]}`) that WRAPS an `IconButton` (paginator.tsx ~:102-106), whereas in R/S the trigger part is the IconButton.
+    - R/S: all reachable.
+    - `firstTrigger`/`lastTrigger` only when `showFirstLastButtons`.
+    - `pageSize*` omitted when `hidePageSize`.
+    - The triggers are `as={IconButton}` (R :266-272). Their `slotProps`/`className`/`style` therefore go to the IconButton as ordinary props. IconButton's own parts are not reachable by key.
+    - N: parts via `testId`. In N each trigger is a View part (`Slot.View style={s[part]}`) that WRAPS an `IconButton` (paginator.tsx ~:102-106), whereas in R/S the trigger part is the IconButton.
 - **Nested**
-  - `Select` (variant `outlined`, `density={root.density}`, `aria-label`, `items`, `value`, `disabled`) in `pageSizeSelect`. Nothing else is reachable (no `selectSlotProps`, tokens or menu). The same goes for S/N.
-  - `IconButton` ×2-4: reachable only through the per-trigger plain props on R/S. N: none.
-  - N applies the recipe's provided tokens to the nested Select and the actions with `<ProvidedTokens tokens={providedTokensFromPaths(selected.providedTokens[...])}>` (paginator.tsx:134, :171).
-  - Web uses the same provided tokens as inherited CSS custom properties.
+    - `Select` (variant `outlined`, `density={root.density}`, `aria-label`, `items`, `value`, `disabled`) in `pageSizeSelect`. Nothing else is reachable (no `selectSlotProps`, tokens or menu). The same goes for S/N.
+    - `IconButton` ×2-4: reachable only through the per-trigger plain props on R/S. N: none.
+    - N applies the recipe's provided tokens to the nested Select and the actions with `<ProvidedTokens tokens={providedTokensFromPaths(selected.providedTokens[...])}>` (paginator.tsx:134, :171).
+    - Web uses the same provided tokens as inherited CSS custom properties.
 - **Tokens**
-  - `tokens` go to the `paginator` recipe.
-  - The recipe's provided tokens flow to the nested Select and IconButtons. There is no direct token prop for them.
+    - `tokens` go to the `paginator` recipe.
+    - The recipe's provided tokens flow to the nested Select and IconButtons. There is no direct token prop for them.
 - **Variants**: `density` (also passed to the nested `Select`).
 - **Inconsistencies**
-  - Trigger structure (IconButton as the part vs wrapper View).
-  - N per-render allocations: `providedTokensFromPaths(...)` builds a new object each render when the tokens are non-empty (so `ProvidedTokens` context consumers re-render). Also `paginatorSizeItems(...)` and the `onValueChange` closures.
+    - Trigger structure (IconButton as the part vs wrapper View).
+    - N per-render allocations: `providedTokensFromPaths(...)` builds a new object each render when the tokens are non-empty (so `ProvidedTokens` context consumers re-render). Also `paginatorSizeItems(...)` and the `onValueChange` closures.
 
 ### carousel
 
 - **Props**
-  - R `CarouselProps` (react/src/carousel/carousel.tsx:275): `className`/`style`/`slotProps` keyed own, `testId` and `unstyled` keyed own.
-  - S: the same, with `class`.
-  - N `CarouselProps` (react-native/src/carousel/carousel.tsx:41): `testId` keyed own only. No style/className/slotProps/unstyled.
+    - R `CarouselProps` (react/src/carousel/carousel.tsx:275): `className`/`style`/`slotProps` keyed own, `testId` and `unstyled` keyed own.
+    - S: the same, with `class`.
+    - N `CarouselProps` (react-native/src/carousel/carousel.tsx:41): `testId` keyed own only. No style/className/slotProps/unstyled.
 - **Own parts** (`root`, `itemGroup`, `item`, `mask`, `content`)
-  - R/S: all reachable. `item`, `mask` and `content` apply to every entry.
-  - Per-item data: `aspectRatio`, `aria-label`, `disabled`, `interactionSource`.
-  - N: all via `testId`.
+    - R/S: all reachable. `item`, `mask` and `content` apply to every entry.
+    - Per-item data: `aspectRatio`, `aria-label`, `disabled`, `interactionSource`.
+    - N: all via `testId`.
 - **Nested**: none (item `content` is a node).
 - **Tokens**: `tokens` go to the `carousel` recipe.
 - **Variants**: `layout`.
 - **Inconsistencies**
-  - N has `itemWidth` as a prop. R/S take it through Root's behavior props (`itemWidth` on `CarouselBehaviorProps`).
-  - N adds `onItemPress`.
-  - N lacks `allowMouseDrag`.
-  - N per-render allocations: `style={{ ...s.item, width: size.slot }}` per item, the mask's inline style, `rowStyle`.
+    - N has `itemWidth` as a prop. R/S take it through Root's behavior props (`itemWidth` on `CarouselBehaviorProps`).
+    - N adds `onItemPress`.
+    - N lacks `allowMouseDrag`.
+    - N per-render allocations: `style={{ ...s.item, width: size.slot }}` per item, the mask's inline style, `rowStyle`.
 
 ### grid-list
 
 - **No ready-made in any renderer.** `GridList` is `Root` plus parts (`Object.assign(Root, { Root, Tile, Content, Media, Header, Footer, Headline, Subhead })`, react/src/grid-list/grid-list.tsx:118, N grid-list.tsx:~150).
 - **Props**
-  - R/S: Root takes `PartProps` (className/class, style, element props), `as`, `testId` (keyed own), `unstyled` (keyed own), and the variants. Each part takes its own `PartProps` (R/S `Tile`/`Media` also take `as` and `unstyled`). There is no `slotProps`.
-  - N: `GridListRootProps` has `testId`, `aria-label` and variants. `GridListPartProps` is only `children`. `Media` takes `source` and `alt`. No style, className or unstyled.
+    - R/S: Root takes `PartProps` (className/class, style, element props), `as`, `testId` (keyed own), `unstyled` (keyed own), and the variants. Each part takes its own `PartProps` (R/S `Tile`/`Media` also take `as` and `unstyled`). There is no `slotProps`.
+    - N: `GridListRootProps` has `testId`, `aria-label` and variants. `GridListPartProps` is only `children`. `Media` takes `source` and `alt`. No style, className or unstyled.
 - **Own parts** (`root`, `tile`, `content`, `media`, `header`, `footer`, `headline`, `subhead`)
-  - R/S: each reachable through its own component's props.
-  - N: `testId` only. In N the root `testId` is stored in context and every part reads it.
+    - R/S: each reachable through its own component's props.
+    - N: `testId` only. In N the root `testId` is stored in context and every part reads it.
 - **Nested**: none.
 - **Tokens**: `tokens` go to the `gridList` recipe. `columns`, `gutter` and `aspect` are variants (and also tokens).
 - **Variants**: `columns`, `gutter`, `aspect`. They are Root props and nothing is passed to the parts.
 - **Inconsistencies**
-  - N `Media` destructures `objectFit` out of the recipe style on every render: `{ objectFit, ...style } = styles.media` (grid-list.tsx:131).
-  - R/S `Root` skips the `role="list"` when `as` is `ul`/`ol`. N always sets `role="list"`.
+    - N `Media` destructures `objectFit` out of the recipe style on every render: `{ objectFit, ...style } = styles.media` (grid-list.tsx:131).
+    - R/S `Root` skips the `role="list"` when `as` is `ul`/`ol`. N always sets `role="list"`.
 
 ---
 
@@ -1551,23 +1551,23 @@ Conventions verified in the code:
 2. **N `style` is root-only and a plain `ViewStyle`** (`RootStyleProps`), while R/S `style` is keyed by part. The shapes are incompatible, and N `RadioGroup` has no `testId`.
 3. **Child-keyed props.** List, SelectionList and RadioGroup key `slotProps`/`unstyled` by the CHILD's parts (ListItemPart, RadioPart). Their own `item`/`root` parts are reachable only through plain `className`/`style` or `testId`. R/S List's `<li>` has no styling path.
 4. **`unstyled`/`slotProps` not forwarded** to nested scopes:
-   - R/S ListItem `frame`/`action`/`region` (Expandable and Frame scopes get only `testId`).
-   - Navigation rail scrim and dialog (only a `testId` prefix, and only for string `testId`).
-   - Tabs/Stepper transition wrappers (`transition`, `transitionScrim`).
+    - R/S ListItem `frame`/`action`/`region` (Expandable and Frame scopes get only `testId`).
+    - Navigation rail scrim and dialog (only a `testId` prefix, and only for string `testId`).
+    - Tabs/Stepper transition wrappers (`transition`, `transitionScrim`).
 5. **Unreachable own parts in R/S**: splitter `resizeTriggerIndicator`; table `sortLabel`, `sortIndicator` (but reachable by `testId` in N); table SelectionCell `Checkbox`; paginator `Select`, `IconButton`s; tree `node` is shared by leaf and branch rows; list `item`.
 6. **No per-instance addressing**: slot props on repeated parts (slider handles/markers, rating stars, stepper steps, tabs, tiles/cells) apply to all instances. Striped table rows split only `row`/`alternateRow`.
 7. **Inconsistent token props**: `tokens` means "the items'" on List/SelectionList (with `listTokens` for the list), "the radios'" on RadioGroup (no group recipe), and "the component's" elsewhere. Nested components (Select, IconButton, Checkbox) have no token props. Only provided tokens (the recipe's) reach paginator's Select and IconButtons.
 8. **Renderer drift**
-   - Switch: R/S `icon` (optional) vs N `checkedIcon` (default "✓").
-   - Rating: star glyph differs.
-   - Slider `aria-label`: R/S per-thumb array, N string.
-   - R/S SelectionList sets no `position` for `variant="segmented"`, N does.
-   - Paginator trigger structure differs.
-   - N has no `input` part for checkbox/radio/switch/slider.
-   - Accordion indicator: N hardcoded `⌄`.
-   - Tree: N `translations`, `items` required.
-   - Splitter: N `anchors`/`keyboardResizeBy` and `resizeLabel` differences.
-   - N has no Tabs, NavigationBar or NavigationRail.
+    - Switch: R/S `icon` (optional) vs N `checkedIcon` (default "✓").
+    - Rating: star glyph differs.
+    - Slider `aria-label`: R/S per-thumb array, N string.
+    - R/S SelectionList sets no `position` for `variant="segmented"`, N does.
+    - Paginator trigger structure differs.
+    - N has no `input` part for checkbox/radio/switch/slider.
+    - Accordion indicator: N hardcoded `⌄`.
+    - Tree: N `translations`, `items` required.
+    - Splitter: N `anchors`/`keyboardResizeBy` and `resizeLabel` differences.
+    - N has no Tabs, NavigationBar or NavigationRail.
 9. **Typing gap**: ListItem `slotProps.<part>.unstyled` works at runtime (parts take `unstyled`), but the ListItem ready-made types it as plain `PartProps`. The List/SelectionList/RadioGroup types do include `unstyled`.
 10. **N per-render allocations**: `{...s.x, ...unselectable}` styles per Pressable (every N component here), `withUserStyle` copies, `providedTokensFromPaths` in paginator, `{flexGrow:1,...s.root}` in splitter, and `item.map` closures. None of these are memoized.
 
@@ -1582,11 +1582,11 @@ Scope: date-picker, docked-date-picker, time-picker, color-picker, calendar-part
 #### React/Solid ready-made slot props
 
 - `SlotKeyedProps<A>` (R `react/src/parts.tsx:380`, S `solid/src/parts.tsx:320`) has these shapes:
-  - className (R) / class (S): keyed by own part, value `ClassValue`.
-  - style: keyed by own part. R `CSSProperties`; S `CSSProperties | string`.
-  - slotProps: keyed by own part, value `PartProps`.
-  - testId: `TestIdOverride<Part>`, either a string prefix or an object by part.
-  - unstyled: `boolean | {part: boolean}`.
+    - className (R) / class (S): keyed by own part, value `ClassValue`.
+    - style: keyed by own part. R `CSSProperties`; S `CSSProperties | string`.
+    - slotProps: keyed by own part, value `PartProps`.
+    - testId: `TestIdOverride<Part>`, either a string prefix or an object by part.
+    - unstyled: `boolean | {part: boolean}`.
 - Renderer difference: **R prop is `className`, S prop is `class`**. S `style` may also be a string.
 - A part's props are `slotProps[part]` combined with `{className|class, style}[part]` (`slotPartProps`, R:390, S:331).
 - `testId` and `unstyled` go whole to Root (`useComponent` options), not per part.
@@ -1594,21 +1594,21 @@ Scope: date-picker, docked-date-picker, time-picker, color-picker, calendar-part
 - S `createSlotProps` (S:~345) builds plain objects once if the props are static literals. Otherwise it returns a live `Proxy` per part (`SlotView`) over one memo.
 - Slot-keyed props only reach the parts the ready-made forwards `slot("x")` to. Parts not forwarded are unreachable except by composing the parts under `.Root`.
 - Merge order inside a part (`partSources`, `binding-core/src/parts.ts:155`):
-  1. machine props
-  2. `data-scope`, `data-pf-part`, `data-testid`
-  3. state attributes
-  4. registry class and token style (skipped if unstyled)
-  5. provider `slotProps`
-  6. user props
+    1. machine props
+    2. `data-scope`, `data-pf-part`, `data-testid`
+    3. state attributes
+    4. registry class and token style (skipped if unstyled)
+    5. provider `slotProps`
+    6. user props
 
 #### Provider-level slotProps
 
 - Type: `ProviderSlotProps<P>` = `{ [ComponentName]?: { [SlotOf<N>]?: P } }` (`binding-core/src/provider.ts:33`). It is keyed **component → slot → part props**.
 - Lookup is `slotProps?.[anatomy.name]?.[slot]` where `slot = partSlot(spec) = spec.slot ?? part.name` (`attributes.ts:95`, `binding-core/src/parts.ts:158-172`).
 - A part with `slot: null` gets no provider props. A part may map to a different slot name.
-  - Modal date picker (`composites.ts:734`): `root` has `slot: null`, so provider `datePicker.root` does not reach it. `content` has `slot: "root"`, so provider `datePicker.root` is applied to **content**.
-  - The picker's backdrop uses a separate anatomy named `scrim`, so provider `slotProps.scrim.root` applies.
-  - Calendar cell is its own component, `calendarCell.{root,trigger}`.
+    - Modal date picker (`composites.ts:734`): `root` has `slot: null`, so provider `datePicker.root` does not reach it. `content` has `slot: "root"`, so provider `datePicker.root` is applied to **content**.
+    - The picker's backdrop uses a separate anatomy named `scrim`, so provider `slotProps.scrim.root` applies.
+    - Calendar cell is its own component, `calendarCell.{root,trigger}`.
 - Merging: `mergeSlotProps(base, own, merge)` (`provider.ts:194`) merges per component then per slot, nested providers over outer.
 - In a part, provider props sit below the user's props (user wins).
 - R passes `state.slotProps` in `useComponent` (`R parts.tsx:361`). S reads `state().slotProps` (`S parts.tsx:163`).
@@ -1618,42 +1618,42 @@ Scope: date-picker, docked-date-picker, time-picker, color-picker, calendar-part
 #### RN mechanics (`react-native/src/styles.ts`, `parts.tsx`)
 
 - **`useComponentSlots(name, selection, state?, velocities?)`** (styles.ts:~170) works like this:
-  1. Reads `provider = usePureform()` and `factory = useEntryFactory(name)`. A lazy registry entry suspends via `use()`.
-  2. `withDefaults(provider.defaults[name], selection)`.
-  3. `splitSelection` splits the result into `variants` and `tokens`, mapping token names through `factory.tokens[token] ?? token` to theme keys.
-  4. `provider.engine.useStyles(name, variants, state, tokens, keyed)` returns `MotionStyles`, the per-slot styles from the engine, including animated values.
-  5. `useComponentState(...)` returns `selected` (drawings, icon fills, rest styles).
-  6. Returns `{ styles, selected, views }`.
+    1. Reads `provider = usePureform()` and `factory = useEntryFactory(name)`. A lazy registry entry suspends via `use()`.
+    2. `withDefaults(provider.defaults[name], selection)`.
+    3. `splitSelection` splits the result into `variants` and `tokens`, mapping token names through `factory.tokens[token] ?? token` to theme keys.
+    4. `provider.engine.useStyles(name, variants, state, tokens, keyed)` returns `MotionStyles`, the per-slot styles from the engine, including animated values.
+    5. `useComponentState(...)` returns `selected` (drawings, icon fills, rest styles).
+    6. Returns `{ styles, selected, views }`.
 - `views` is a per-slot `{View, Text, TextInput, Pressable}` map. It is a `Proxy` cached in a `WeakMap<engine, WeakMap<factory, …>>` (`viewsOf`).
-  - Slots in `factory.moving` get the engine's animated views. Others get plain RN views (`STILL`; Pressable is wrapped by `pressNow`).
-  - It is chosen per component, not per state.
+    - Slots in `factory.moving` get the engine's animated views. Others get plain RN views (`STILL`; Pressable is wrapped by `pressNow`).
+    - It is chosen per component, not per state.
 - Per-render allocations in `useComponentSlots`:
-  - `withDefaults` result and `splitSelection` (variants object, keyed token object) are new each render.
-  - `Object.fromEntries` runs when `velocities` is passed.
-  - Callers also build selection objects each render (`xSelection(props)` or `{...props, …}`).
-  - Only `viewsOf` is cached. Whether the engine and `useStyles` dedupe by value is outside this audit.
-  - `useStyles` (plain, `styles.ts:~72`) builds `{reducedMotion, rtl?, ...selected}` per call. Its doc says "same selection returns the same frozen object", so the factory caches by value.
+    - `withDefaults` result and `splitSelection` (variants object, keyed token object) are new each render.
+    - `Object.fromEntries` runs when `velocities` is passed.
+    - Callers also build selection objects each render (`xSelection(props)` or `{...props, …}`).
+    - Only `viewsOf` is cached. Whether the engine and `useStyles` dedupe by value is outside this audit.
+    - `useStyles` (plain, `styles.ts:~72`) builds `{reducedMotion, rtl?, ...selected}` per call. Its doc says "same selection returns the same frozen object", so the factory caches by value.
 - **No user-style merge for parts.** The only user style hook is `RootStyleProps { style?: StyleProp<ViewStyle> }` (styles.ts:230) with `withUserStyle(root, style) = style ? {...root, ...StyleSheet.flatten(style)} : root` (styles.ts:235).
-  - It allocates a new object per render and **flattens**, so user keys override engine-supplied values on the root. If `s.root` holds animated values, the user key replaces them.
-  - It is used only by the group A/D components (button, chip, checkbox, switch, fab, icon-button, radio-group, badge via single-part). **None of the group E components use it.**
-  - Other places with `StyleProp` or `style` props: `FadeThrough.style` (array style, not flattened), `single-part.tsx:69` `Text` (`StyleProp<TextStyle>`), `modal.tsx:119` `positionerStyle` (internal).
+    - It allocates a new object per render and **flattens**, so user keys override engine-supplied values on the root. If `s.root` holds animated values, the user key replaces them.
+    - It is used only by the group A/D components (button, chip, checkbox, switch, fab, icon-button, radio-group, badge via single-part). **None of the group E components use it.**
+    - Other places with `StyleProp` or `style` props: `FadeThrough.style` (array style, not flattened), `single-part.tsx:69` `Text` (`StyleProp<TextStyle>`), `modal.tsx:119` `positionerStyle` (internal).
 - Types in RN: root style is `StyleProp<ViewStyle>`. Per-part styles are not typed for users because they do not exist. Internal part styles are cast `s.page as StyleProp<ViewStyle>`.
 - Per-render style allocations inside components (not user-facing):
-  - `{ ...s.viewTrigger, ...unselectable }` (date-picker:~112, docked:94, color-picker:193 etc.)
-  - `inFlowInline(s.root ?? {})` (time-picker:207)
-  - `slots={{ styles: s, views: v, id }}` (date-picker:~134)
-  - inline `<View style={{flexDirection…}}>` (docked:128, 137)
-  - closure `id = (part) => …` per render
+    - `{ ...s.viewTrigger, ...unselectable }` (date-picker:~112, docked:94, color-picker:193 etc.)
+    - `inFlowInline(s.root ?? {})` (time-picker:207)
+    - `slots={{ styles: s, views: v, id }}` (date-picker:~134)
+    - inline `<View style={{flexDirection…}}>` (docked:128, 137)
+    - closure `id = (part) => …` per render
 - **`testIdOf(anatomy, part, testId)`** (`parts.tsx:~35`) = `partTestId` (`anatomy/src/attributes.ts:29`):
-  - string `testId` gives `` `${testId}-${part.attribute}` `` (note: `attribute`, not part name; they can differ, e.g. backdrop's attribute is `backdrop`).
-  - object `testId` gives `testId[part] ?? default` (`pf-<component>-<part>`).
-  - It throws for an unknown part.
-  - RN has `partId` (`text-input.tsx:239`) as the same function with a loose part type for the field family.
-  - **`testId` is the only per-part RN prop.** No `slotProps`, `className` or `unstyled` exists on RN components. `unstyled` is omitted: DatePicker and DockedDatePicker explicitly `Omit<…, "unstyled">`, and no RN Props include it.
+    - string `testId` gives `` `${testId}-${part.attribute}` `` (note: `attribute`, not part name; they can differ, e.g. backdrop's attribute is `backdrop`).
+    - object `testId` gives `testId[part] ?? default` (`pf-<component>-<part>`).
+    - It throws for an unknown part.
+    - RN has `partId` (`text-input.tsx:239`) as the same function with a loose part type for the field family.
+    - **`testId` is the only per-part RN prop.** No `slotProps`, `className` or `unstyled` exists on RN components. `unstyled` is omitted: DatePicker and DockedDatePicker explicitly `Omit<…, "unstyled">`, and no RN Props include it.
 - RN components are wrapped `withEngine(Impl, name)` (`parts.tsx`), which adds `key = engine.name` to restart state on engine change. Exceptions in this group:
-  - `DatePicker` and `DockedDatePicker` are plain functions. Only the inner Surface/Popup is engine-keyed, and DockedDatePicker's Popup is not wrapped.
-  - `FadeThrough` is a plain function with no `withEngine`.
-  - `Expanding` is a plain function.
+    - `DatePicker` and `DockedDatePicker` are plain functions. Only the inner Surface/Popup is engine-keyed, and DockedDatePicker's Popup is not wrapped.
+    - `FadeThrough` is a plain function with no `withEngine`.
+    - `Expanding` is a plain function.
 
 ### Non-component files
 
@@ -1686,32 +1686,32 @@ R `date-picker.tsx:337`, S `date-picker.tsx:357`, N `date-picker.tsx:48`. Ready-
 | testId            | prefix or by part, `TestIdOverride<DatePickerPart>` | same                             | same (prefix or by part). The trigger Button's id is hard-coded `pf-date-picker-trigger` (N:~232), not overridable. |
 
 - **Own parts**
-  - Web anatomy `datePickerOverlayAnatomy` (composites.ts:734): root, trigger, positioner, content, header, headline, selectedDate, modeToggle, divider, controls, viewTrigger, prev, next, weekdays, weekday, grid, week, yearList, actions.
-  - The N anatomy is the generated `datePickerAnatomy` (generated.ts:2091). It lacks trigger, positioner and content.
-  - R reachable: root, trigger (only when `trigger` given), positioner, content, header, headline, selectedDate, modeToggle (only with `onModeToggle`), divider, controls, viewTrigger, prev, next, weekdays, grid, yearList, actions.
-  - R not reachable: weekday, week (default Grid/Weekdays children). Cell is not in this anatomy. Also not reachable: Backdrop (`<Backdrop />` gets no slot props and its anatomy is `scrim`), and CancelTrigger/ConfirmTrigger (no `slot()` forwarded).
-  - S reachable: root, trigger, positioner, content, header, headline, selectedDate, modeToggle, divider, controls, viewTrigger, prev, next, yearList, actions.
-  - **S not reachable: `weekdays`, `grid`, `weekday`, `week`.** `calendar.DayCalendar()` takes no props (`S calendar-parts.tsx:313`), whereas R forwards `slot("weekdays")` and `slot("grid")` (R:~418).
-  - N: `testId` only, all parts including weekday/week (duplicate id per element, e.g. `id("weekday")` repeated).
+    - Web anatomy `datePickerOverlayAnatomy` (composites.ts:734): root, trigger, positioner, content, header, headline, selectedDate, modeToggle, divider, controls, viewTrigger, prev, next, weekdays, weekday, grid, week, yearList, actions.
+    - The N anatomy is the generated `datePickerAnatomy` (generated.ts:2091). It lacks trigger, positioner and content.
+    - R reachable: root, trigger (only when `trigger` given), positioner, content, header, headline, selectedDate, modeToggle (only with `onModeToggle`), divider, controls, viewTrigger, prev, next, weekdays, grid, yearList, actions.
+    - R not reachable: weekday, week (default Grid/Weekdays children). Cell is not in this anatomy. Also not reachable: Backdrop (`<Backdrop />` gets no slot props and its anatomy is `scrim`), and CancelTrigger/ConfirmTrigger (no `slot()` forwarded).
+    - S reachable: root, trigger, positioner, content, header, headline, selectedDate, modeToggle, divider, controls, viewTrigger, prev, next, yearList, actions.
+    - **S not reachable: `weekdays`, `grid`, `weekday`, `week`.** `calendar.DayCalendar()` takes no props (`S calendar-parts.tsx:313`), whereas R forwards `slot("weekdays")` and `slot("grid")` (R:~418).
+    - N: `testId` only, all parts including weekday/week (duplicate id per element, e.g. `id("weekday")` repeated).
 - **Nested components (ready-made form)**
-  - `Trigger as={Button}`, `ModeToggle as={IconButton}`, `Prev/Next as={IconButton}`, `Cancel/ConfirmTrigger as={Button}`.
-  - Reachability: `slot("trigger")` etc. spread onto the `as` component. There are no dedicated props (no `buttonProps` / `iconButtonProps`).
-  - **Possible issue (unverified at runtime):** R `scope.render` passes the merged `className` (a plain string) as a prop to the `as` component. R's Button/IconButton ready-made `className` is _keyed by part_, and `useSlotProps` skips non-object keyed values (`parts.tsx:418`). So per-part `className` and `style` for trigger, modeToggle, prev and next may be dropped when `as` is a ready-made. `slotProps` entries with plain keys pass through, but `slotProps` on these `as` targets is keyed too.
-  - Cancel/ConfirmTrigger `Button`s get only `variant="text"` and `label`.
-  - Calendar Cell (a separate `calendarCell` component) is not reachable (see calendarCell).
-  - N: `IconButton` (mode toggle, prev, next) and `Button` (trigger, cancel, OK) are fixed. Each IconButton sits inside a `v.<part>.View` wrapper that gets `s.<part>` style. The inner button is not reachable, and the trigger Button gets only `testId={{root: …}}`.
+    - `Trigger as={Button}`, `ModeToggle as={IconButton}`, `Prev/Next as={IconButton}`, `Cancel/ConfirmTrigger as={Button}`.
+    - Reachability: `slot("trigger")` etc. spread onto the `as` component. There are no dedicated props (no `buttonProps` / `iconButtonProps`).
+    - **Possible issue (unverified at runtime):** R `scope.render` passes the merged `className` (a plain string) as a prop to the `as` component. R's Button/IconButton ready-made `className` is _keyed by part_, and `useSlotProps` skips non-object keyed values (`parts.tsx:418`). So per-part `className` and `style` for trigger, modeToggle, prev and next may be dropped when `as` is a ready-made. `slotProps` entries with plain keys pass through, but `slotProps` on these `as` targets is keyed too.
+    - Cancel/ConfirmTrigger `Button`s get only `variant="text"` and `label`.
+    - Calendar Cell (a separate `calendarCell` component) is not reachable (see calendarCell).
+    - N: `IconButton` (mode toggle, prev, next) and `Button` (trigger, cancel, OK) are fixed. Each IconButton sits inside a `v.<part>.View` wrapper that gets `s.<part>` style. The inner button is not reachable, and the trigger Button gets only `testId={{root: …}}`.
 - **Tokens**
-  - Plain `tokens` go to the `datePicker` recipe (`datePickerSelection = {tokens}`, binding-core `date-picker.ts:458`), in R/S/N.
-  - No prefixed token props. Nested Button/IconButton/Cell tokens are not reachable in R/S/N.
+    - Plain `tokens` go to the `datePicker` recipe (`datePickerSelection = {tokens}`, binding-core `date-picker.ts:458`), in R/S/N.
+    - No prefixed token props. Nested Button/IconButton/Cell tokens are not reachable in R/S/N.
 - **Variants passed down**: none. `datePicker` has no variants, and Button gets `variant="text"` in R/S/N.
 - **Inconsistencies**
-  - `className` vs `class` and string `style`.
-  - S misses `weekdays`/`grid` slots. R has them.
-  - R ready-made reads `open`/`closeOnEscape` etc. as Root props. N takes them via `DatePickerRootOwnProps` minus `restoreFocus`.
-  - N has no slotProps/className/style/unstyled.
-  - N part set lacks trigger/positioner/content.
-  - N does not render `modeToggle` as a part when no `onModeToggle`. All three agree on that.
-  - N `view` is only `day | year`.
+    - `className` vs `class` and string `style`.
+    - S misses `weekdays`/`grid` slots. R has them.
+    - R ready-made reads `open`/`closeOnEscape` etc. as Root props. N takes them via `DatePickerRootOwnProps` minus `restoreFocus`.
+    - N has no slotProps/className/style/unstyled.
+    - N part set lacks trigger/positioner/content.
+    - N does not render `modeToggle` as a part when no `onModeToggle`. All three agree on that.
+    - N `view` is only `day | year`.
 - **Notable**: two parts named "trigger" exist in the web picker (datePicker `trigger` and `calendarCell.trigger`). Two roots exist (datePicker root, scrim root). Provider `datePicker.root` applies to _content_ (slot remap), while `root` has `slot: null`. N allocs per render: `{...s.viewTrigger, ...unselectable}`, `slots={{...}}`, `cells.map(...)`.
 
 #### DockedDatePicker — `docked-date-picker/`
@@ -1719,29 +1719,29 @@ R `date-picker.tsx:337`, S `date-picker.tsx:357`, N `date-picker.tsx:48`. Ready-
 R:334, S:351, N:45 (`DockedDatePickerProps`).
 
 - **Props taken**
-  - R/S: same as DatePicker (keyed className|class, style, slotProps; unstyled by part; testId prefix or by part). `aria-label`/`aria-labelledby`/`aria-describedby` go to the input. `leadingIcon`, `prefixText`, `suffixText` are content props.
-  - N: `testId` only (`DockedDatePickerRootOwnProps` minus unstyled, leadingIcon, prefixText, suffixText, plus `DockedDatePickerContentProps`). The calendar trigger id is hard-coded `pf-docked-date-picker-trigger` (N:295).
+    - R/S: same as DatePicker (keyed className|class, style, slotProps; unstyled by part; testId prefix or by part). `aria-label`/`aria-labelledby`/`aria-describedby` go to the input. `leadingIcon`, `prefixText`, `suffixText` are content props.
+    - N: `testId` only (`DockedDatePickerRootOwnProps` minus unstyled, leadingIcon, prefixText, suffixText, plus `DockedDatePickerContentProps`). The calendar trigger id is hard-coded `pf-docked-date-picker-trigger` (N:295).
 - **Own parts (anatomy `dockedDatePickerOverlayAnatomy`, composites.ts:964)**
-  - Parts: root, container, leadingIcon, prefixText, input, suffixText, label, trailingIcon, supportingText, positioner, content, controls, prev, monthButton, next, yearButton, weekdays, weekday, grid, week, monthList, yearList, actions.
-  - R reachable: root, container, leadingIcon (if given), prefixText (if given), input, suffixText (if given), label (if given), trailingIcon, supportingText, positioner, content, controls, prev, monthButton, next, yearButton, weekdays, grid, monthList, yearList.
-  - S reachable: same except `weekdays` and `grid`, which are not forwarded (`DayCalendar`). Also `label` is always rendered in S. R renders it only when `label` is present (R:~407, S ready-made).
-  - **Never reachable in R/S/N: `actions`.** The part is in the anatomy and the Root, but no ready-made renders `Actions`. Also unreachable: `weekday`, `week`, and Cell.
-  - **Shared keys:** `prev` and `next` each style _two_ buttons (month and year) with the same slot (R:354,372; S:424-441).
-  - N: all through `testId`. N has no `positioner` or `trigger` parts (generated anatomy). The `prev`/`next` testId is given only to the first pair (`withId`).
+    - Parts: root, container, leadingIcon, prefixText, input, suffixText, label, trailingIcon, supportingText, positioner, content, controls, prev, monthButton, next, yearButton, weekdays, weekday, grid, week, monthList, yearList, actions.
+    - R reachable: root, container, leadingIcon (if given), prefixText (if given), input, suffixText (if given), label (if given), trailingIcon, supportingText, positioner, content, controls, prev, monthButton, next, yearButton, weekdays, grid, monthList, yearList.
+    - S reachable: same except `weekdays` and `grid`, which are not forwarded (`DayCalendar`). Also `label` is always rendered in S. R renders it only when `label` is present (R:~407, S ready-made).
+    - **Never reachable in R/S/N: `actions`.** The part is in the anatomy and the Root, but no ready-made renders `Actions`. Also unreachable: `weekday`, `week`, and Cell.
+    - **Shared keys:** `prev` and `next` each style _two_ buttons (month and year) with the same slot (R:354,372; S:424-441).
+    - N: all through `testId`. N has no `positioner` or `trigger` parts (generated anatomy). The `prev`/`next` testId is given only to the first pair (`withId`).
 - **Nested components**
-  - `Prev/Next as={IconButton}` (`icon`, `unit`, `mirror`), reachable by `slot("prev")` etc. The same `className`-to-keyed-ready-made concern as DatePicker applies (unverified).
-  - N: `Field` (the shared text-field engine, `text-input.tsx`) renders container/input/label etc. Docked `testId` goes through the `testId` function. `IconButton` in `v.prev.View` wrappers, a raw `Pressable` for the calendar trigger, and an `engine.View` popup. Field `inputProps` is hard-coded (`onBlur`, `onSubmitEditing`, `placeholder`, `inputMode`), with no user `inputProps` escape.
-  - The calendar-cell `Cell`s are not reachable.
+    - `Prev/Next as={IconButton}` (`icon`, `unit`, `mirror`), reachable by `slot("prev")` etc. The same `className`-to-keyed-ready-made concern as DatePicker applies (unverified).
+    - N: `Field` (the shared text-field engine, `text-input.tsx`) renders container/input/label etc. Docked `testId` goes through the `testId` function. `IconButton` in `v.prev.View` wrappers, a raw `Pressable` for the calendar trigger, and an `engine.View` popup. Field `inputProps` is hard-coded (`onBlur`, `onSubmitEditing`, `placeholder`, `inputMode`), with no user `inputProps` escape.
+    - The calendar-cell `Cell`s are not reachable.
 - **Tokens**
-  - Plain `tokens` go to the `dockedDatePicker` recipe (`dockedDatePickerSelection`: variant, color, density, leadingIcon, prefixText, suffixText, tokens; binding-core `date-picker.ts:528`).
-  - No prefixed token props in any renderer. Nested IconButton tokens are not reachable.
+    - Plain `tokens` go to the `dockedDatePicker` recipe (`dockedDatePickerSelection`: variant, color, density, leadingIcon, prefixText, suffixText, tokens; binding-core `date-picker.ts:528`).
+    - No prefixed token props in any renderer. Nested IconButton tokens are not reachable.
 - **Variants down**: none to children. `variant/color/density` apply to the docked recipe only. In N they also go to `Field` via `selection`.
 - **Inconsistencies**
-  - The `className`/`class`/string-style split.
-  - Missing S slots `weekdays` and `grid`.
-  - Controls order differs. R renders prev/month/next/prev/year/next with both steps shown in all views. S renders prev, month, next, prev(year), year, next(year) and wraps prev/next in `view === "day"`, hiding them in the month and year views.
-  - S always renders Label. R renders it only when `label` is present.
-  - N `trailingIcon="📅"` is hard-coded. R/S use `CalendarIcon` (R) or the `TrailingIcon` part (S).
+    - The `className`/`class`/string-style split.
+    - Missing S slots `weekdays` and `grid`.
+    - Controls order differs. R renders prev/month/next/prev/year/next with both steps shown in all views. S renders prev, month, next, prev(year), year, next(year) and wraps prev/next in `view === "day"`, hiding them in the month and year views.
+    - S always renders Label. R renders it only when `label` is present.
+    - N `trailingIcon="📅"` is hard-coded. R/S use `CalendarIcon` (R) or the `TrailingIcon` part (S).
 - **Notable**: N per-render allocs `{...s[part], ...unselectable}`, inline `View` styles, `slots = {…}`, `dockedDatePickerSelection({...props,…})` twice. N has `error` content prop (R/S: not verified).
 
 #### TimePicker — `time-picker/`
@@ -1749,12 +1749,12 @@ R:334, S:351, N:45 (`DockedDatePickerProps`).
 R:~275 `TimePickerProps`, S:256, N:56.
 
 - **Props taken**
-  - R/S: keyed className|class, style, slotProps; unstyled by part; testId prefix or by part (`TimePickerRootOwnProps`, binding-core `time-picker.ts:83`).
-  - N: `testId?: TestIdOverride<TimePickerPart>` only (N:68). Note N also exposes `indication`.
+    - R/S: keyed className|class, style, slotProps; unstyled by part; testId prefix or by part (`TimePickerRootOwnProps`, binding-core `time-picker.ts:83`).
+    - N: `testId?: TestIdOverride<TimePickerPart>` only (N:68). Note N also exposes `indication`.
 - **Own parts**: root, headline, body, hourSelector, separator, minuteSelector, scrollItem, periodSelector, period, dial, dialTrack, dialHandle, dialCenter, dialLabel, actions.
-  - R/S reachable: root, headline, body, hourSelector, separator, minuteSelector, periodSelector (12-hour), period (shared by both am and pm), dial (dial mode), actions (only when `actions` given).
-  - **R/S not reachable: scrollItem, dialTrack, dialHandle, dialCenter, dialLabel.** They are in the anatomy and render inside HourSelector, MinuteSelector and Dial. Only the Dial wrapper is keyed.
-  - N: every part has a test id, including scrollItem and dial parts. The `dialLabel` id is passed down as `testId`.
+    - R/S reachable: root, headline, body, hourSelector, separator, minuteSelector, periodSelector (12-hour), period (shared by both am and pm), dial (dial mode), actions (only when `actions` given).
+    - **R/S not reachable: scrollItem, dialTrack, dialHandle, dialCenter, dialLabel.** They are in the anatomy and render inside HourSelector, MinuteSelector and Dial. Only the Dial wrapper is keyed.
+    - N: every part has a test id, including scrollItem and dial parts. The `dialLabel` id is passed down as `testId`.
 - **Nested components**: none as ready-made components. N uses an internal `TimeButton` (`time.tsx`) with `anatomy`, `component="timePicker"`, `testId`.
 - **Tokens**: plain `tokens` go to the `timePicker` recipe. `timePickerSelection = {mode, color, tokens}` (`time-picker.ts:172`). No prefixed props, no nested.
 - **Variants down**: `mode` (dial/input) and `color` apply to the recipe only. N passes `selection` to `TimeButton`. R/S use `mode` only to pick the Dial.
@@ -1765,17 +1765,17 @@ R:~275 `TimePickerProps`, S:256, N:56.
 R:~383 `ColorPickerProps`, S:442, N:47.
 
 - **Props taken**
-  - R/S: keyed className|class, style, slotProps; unstyled by part; testId prefix or by part.
-  - N: `testId?: TestIdOverride<Part>` (N:63) only.
+    - R/S: keyed className|class, style, slotProps; unstyled by part; testId prefix or by part.
+    - N: `testId?: TestIdOverride<Part>` (N:63) only.
 - **Own parts (anatomy `colorPickerAnatomy`, generated.ts:4930)**: root, label, content, area, areaBackground, areaThumb, channelSlider, transparencyGrid, channelSliderTrack, channelSliderThumb, control, valueSwatch, swatchGroup, swatchTrigger, swatch.
-  - R/S reachable: root, label (when `label` given), content, area, channelSlider (shared by hue and alpha), control, valueSwatch, swatchGroup, swatchTrigger (each swatch).
-  - **R/S not reachable: areaBackground, areaThumb, transparencyGrid, channelSliderTrack, channelSliderThumb, swatch.** They render inside Area, ChannelSlider and SwatchTrigger.
-  - N: all by `testId` (swatchTrigger/swatch ids repeat per swatch).
+    - R/S reachable: root, label (when `label` given), content, area, channelSlider (shared by hue and alpha), control, valueSwatch, swatchGroup, swatchTrigger (each swatch).
+    - **R/S not reachable: areaBackground, areaThumb, transparencyGrid, channelSliderTrack, channelSliderThumb, swatch.** They render inside Area, ChannelSlider and SwatchTrigger.
+    - N: all by `testId` (swatchTrigger/swatch ids repeat per swatch).
 - **Nested components (ready-made)**
-  - `HexField` renders `TextField` (R:295). `HexField label=…` is the only prop forwarded by the ready-made (`inputLabel`). No slot props or tokens for it, so the TextField's parts and tokens are not reachable from ColorPicker props.
-  - `EyeDropperTrigger` renders `IconButton`, forwarding only `aria-label` (`eyeDropperLabel`). It is not reachable otherwise. Rendered only where the browser supports `EyeDropper`.
-  - N: `TextField` (outlined, `inputProps` fixed) and `IconButton` are fixed the same way.
-  - Composed form takes `ColorPickerHexFieldProps = Omit<TextFieldProps, value|defaultValue|onValueChange>` and `ColorPickerEyeDropperTriggerProps = Omit<IconButtonProps, …>`, so the nested components are fully reachable only in composed form.
+    - `HexField` renders `TextField` (R:295). `HexField label=…` is the only prop forwarded by the ready-made (`inputLabel`). No slot props or tokens for it, so the TextField's parts and tokens are not reachable from ColorPicker props.
+    - `EyeDropperTrigger` renders `IconButton`, forwarding only `aria-label` (`eyeDropperLabel`). It is not reachable otherwise. Rendered only where the browser supports `EyeDropper`.
+    - N: `TextField` (outlined, `inputProps` fixed) and `IconButton` are fixed the same way.
+    - Composed form takes `ColorPickerHexFieldProps = Omit<TextFieldProps, value|defaultValue|onValueChange>` and `ColorPickerEyeDropperTriggerProps = Omit<IconButtonProps, …>`, so the nested components are fully reachable only in composed form.
 - **Tokens**: plain `tokens` go to the `colorPicker` recipe (`colorPickerSelection = {tokens}`, `color-picker.ts:106`). No variants. Nested TextField/IconButton tokens are not reachable.
 - **Variants down**: none. The hex TextField is hard-coded `variant="outlined"`.
 - **Inconsistencies**: className/class and string-style differences. N has no keyed props. N calls `useComponentSlots("colorPicker", colorPickerSelection(picker))` _four_ times (Area, ChannelSlider, SwatchTrigger, Impl), each with a new selection object per render (N:139, 257, 366, 392). N per-render style spreads are everywhere (`{...s.area, ...unselectable}`).
@@ -1785,9 +1785,9 @@ R:~383 `ColorPickerProps`, S:442, N:47.
 Not a ready-made on its own; the cells are rendered inside the pickers. R `calendar-parts.tsx:285` `Cell`, S `calendar-parts.tsx` (similar), N `calendar.tsx`.
 
 - **Props taken**
-  - R/S `CalendarCellProps` (`R calendar-parts.tsx:68`): `value`, `view`, `columns`, `tokens`, `testId`, `unstyled`, `interactionSource`, `children`, plus element props.
-  - `className`/`style` are plain element props (Root div). Nothing is keyed by part (`root`, `trigger`). `testId`/`unstyled` take the `calendarCell` part override shape.
-  - N: no props at all. `testIdOf(calendarCellAnatomy, part, undefined)` (calendar.tsx:71), with no tokens, testId or style.
+    - R/S `CalendarCellProps` (`R calendar-parts.tsx:68`): `value`, `view`, `columns`, `tokens`, `testId`, `unstyled`, `interactionSource`, `children`, plus element props.
+    - `className`/`style` are plain element props (Root div). Nothing is keyed by part (`root`, `trigger`). `testId`/`unstyled` take the `calendarCell` part override shape.
+    - N: no props at all. `testIdOf(calendarCellAnatomy, part, undefined)` (calendar.tsx:71), with no tokens, testId or style.
 - **Own parts**: `calendarCell.root`, `calendarCell.trigger` (anatomy generated.ts:2044). The `trigger` is distinct from datePicker's `trigger`.
 - **Nested components**: none. The cell renders its own `scope.render("root"…{trigger})`.
 - **Tokens**: its own `tokens` prop goes to the `calendarCell` recipe (`calendarCellSelectionOf`). Pickers never pass it (R/S ready-made make Cells by default). So cell tokens, className, style and testId are **not reachable from DatePicker/DockedDatePicker ready-mades** (only via composed `Grid`/`YearList` children).
@@ -1800,19 +1800,19 @@ Not a ready-made on its own; the cells are rendered inside the pickers. R `calen
 R:~70 `LinearProgressProps`, S: same file layout, N `progress.tsx:21`.
 
 - **Props taken**
-  - R/S: keyed className|class, style, slotProps; unstyled by part (`ProgressRootOwnProps<"linearProgress">`); testId prefix or by part.
-  - N: **only `testId`**, `aria-label` and variants. No `style`, no `unstyled`.
+    - R/S: keyed className|class, style, slotProps; unstyled by part (`ProgressRootOwnProps<"linearProgress">`); testId prefix or by part.
+    - N: **only `testId`**, `aria-label` and variants. No `style`, no `unstyled`.
 - **Own parts**: root, track, trackBefore, trackAfter, indicator, stopIndicator.
-  - R/S reachable: all six. `track`, `trackBefore`, `trackAfter` and `stopIndicator` render only when `track !== false`.
-  - N: all by `testId`.
+    - R/S reachable: all six. `track`, `trackBefore`, `trackAfter` and `stopIndicator` render only when `track !== false`.
+    - N: all by `testId`.
 - **Nested components**: none.
 - **Tokens**: plain `tokens` go to the `linearProgress` recipe through `progressSelection`, which also merges a `value` token computed from `value`/`min`/`max` (progress.ts:117). No prefixed tokens.
 - **Variants down**: none to children. Selection: `indeterminate`, `color`, `thickness`, `shape`.
 - **Inconsistencies**
-  - className/class and string-style split.
-  - N has no style or unstyled.
-  - N omits `as`, aria-labelledby and other element props. It takes only `aria-label` (N:52).
-  - N accepts `shape="wavy"` and draws the indicator through `engine.Drawing` only when an SVG engine is present.
+    - className/class and string-style split.
+    - N has no style or unstyled.
+    - N omits `as`, aria-labelledby and other element props. It takes only `aria-label` (N:52).
+    - N accepts `shape="wavy"` and draws the indicator through `engine.Drawing` only when an SVG engine is present.
 - **Notable**: N `valueProps` builds a new object per render.
 
 #### CircularProgress — `circular-progress/` (N: `progress.tsx`)
@@ -1821,7 +1821,7 @@ Identical structure to LinearProgress.
 
 - **Props taken**: R/S keyed className|class, style, slotProps, unstyled, testId. N `testId` only (N:30).
 - **Own parts (14)**: root, track, trackEndHalf, trackEndArc, trackStartHalf, trackStartArc, trackTailCap, trackHeadCap, endHalf, endArc, startHalf, startArc, tailCap, headCap.
-  - R/S reachable: all. The `track*` parts render only when `track !== false`.
+    - R/S reachable: all. The `track*` parts render only when `track !== false`.
 - **Nested**: none.
 - **Tokens**: plain `tokens` go to the `circularProgress` recipe with `value` added by `progressSelection`.
 - **Variants down**: none.
@@ -1832,8 +1832,8 @@ Identical structure to LinearProgress.
 R:~83, S, N `loading-indicator.tsx:19`.
 
 - **Props taken**
-  - R/S: keyed className|class, style, slotProps; unstyled by part (`LoadingIndicatorRootOwnProps`); testId prefix or by part.
-  - N: `testId?: TestIdOverride<LoadingIndicatorPart>` and `aria-label` only. No style, no unstyled.
+    - R/S: keyed className|class, style, slotProps; unstyled by part (`LoadingIndicatorRootOwnProps`); testId prefix or by part.
+    - N: `testId?: TestIdOverride<LoadingIndicatorPart>` and `aria-label` only. No style, no unstyled.
 - **Own parts**: root, container, indicator. R/S reach all three. N reaches all three by testId.
 - **Nested**: none.
 - **Tokens**: plain `tokens` go to the `loadingIndicator` recipe (`loadingIndicatorSelection = {variant, color, tokens}`).
@@ -1845,27 +1845,27 @@ R:~83, S, N `loading-indicator.tsx:19`.
 R:~34 `FadeThroughProps`, S:31, N:37. Not slot-keyed; a single flat component.
 
 - **Props taken**
-  - R/S: `PartProps` of Root (plain className|class and style apply to the root element only, **not keyed**), `testId` (`TestIdOverride<FadeThroughPart>`), `unstyled` (`Unstyled<FadeThroughPart>`), `as`, `value`, `children` (node or function).
-  - N: `style?: StyleProp<ViewStyle>`, `testId`. No `unstyled`, no tokens. `children` is a node or function.
-  - `className`/`slotProps` are absent in N. R/S have `slotProps`? **No** (not in `Omit<PartProps, …>`; `slotProps` is an ordinary `PartProps` key only if `PartProps` defines it, unverified).
+    - R/S: `PartProps` of Root (plain className|class and style apply to the root element only, **not keyed**), `testId` (`TestIdOverride<FadeThroughPart>`), `unstyled` (`Unstyled<FadeThroughPart>`), `as`, `value`, `children` (node or function).
+    - N: `style?: StyleProp<ViewStyle>`, `testId`. No `unstyled`, no tokens. `children` is a node or function.
+    - `className`/`slotProps` are absent in N. R/S have `slotProps`? **No** (not in `Omit<PartProps, …>`; `slotProps` is an ordinary `PartProps` key only if `PartProps` defines it, unverified).
 - **Own parts**: root, page. Via `className/style`: root only. `page` is reachable only via `unstyled`/`testId`. N: `testId` for root and page. **Every page shares one id** (`pageTestId`).
 - **Nested**: none (the content is children).
 - **Tokens**: **none**. `fadeThroughSelection()` is `{}`.
 - **Variants down**: none.
 - **Inconsistencies**
-  - N `style` is the root's (array composition, not flattened: `[s.root, CLIP, props.style]`, N:~110). R/S `style` also targets root.
-  - R/S can disable styles per part with `unstyled`. N cannot.
-  - Provider `slotProps` (`fadeThrough.root/page`) work in R/S only.
+    - N `style` is the root's (array composition, not flattened: `[s.root, CLIP, props.style]`, N:~110). R/S `style` also targets root.
+    - R/S can disable styles per part with `unstyled`. N cannot.
+    - Provider `slotProps` (`fadeThrough.root/page`) work in R/S only.
 
 #### HorizontalSharedAxis — `horizontal-shared-axis/`
 
 R:~27 `HorizontalSharedAxisProps`, S:31, N:43.
 
 - **Props taken**
-  - R/S: `PartProps` on Root (plain className|class, style → root element only), `index`, `scrim`, `tokens`, `testId`, `unstyled` by part (`HorizontalSharedAxisRootOwnProps`), `as`, `children`. S `children` can also be a function `(index) => JSX.Element`. R children is plain.
-  - N: `index`, `scrim`, `tokens`, `children`, `testId`. **No `style`** (unlike N FadeThrough), no `unstyled`.
+    - R/S: `PartProps` on Root (plain className|class, style → root element only), `index`, `scrim`, `tokens`, `testId`, `unstyled` by part (`HorizontalSharedAxisRootOwnProps`), `as`, `children`. S `children` can also be a function `(index) => JSX.Element`. R children is plain.
+    - N: `index`, `scrim`, `tokens`, `children`, `testId`. **No `style`** (unlike N FadeThrough), no `unstyled`.
 - **Own parts**: root, page, scrim. R/S/N reach root via className/style (R/S) and all three by testId.
-  - N `page` has a single id shared by every page. The `scrim` renders only when `scrim && leaving && entering.direction`.
+    - N `page` has a single id shared by every page. The `scrim` renders only when `scrim && leaving && entering.direction`.
 - **Nested**: none.
 - **Tokens**: plain `tokens` go to the `horizontalSharedAxis` recipe (`{tokens}`, horizontal-shared-axis.ts:55). N also reads `props.tokens` over provider `defaults[...].tokens` for the spring (N:~256).
 - **Variants down**: none.
@@ -1876,7 +1876,7 @@ R:~27 `HorizontalSharedAxisProps`, S:31, N:43.
 R `ripple.tsx:~14`, S `ripple.tsx:24`; **N: none** (no ripple component; indication in N is `indication.tsx`).
 
 - **Props taken**
-  - R/S: `RippleProps` = `PartProps` on Root (the `span`) + `RippleRootOwnProps` (machine props `disabled`, `centered`, `effect`, …, `tokens`, `testId`, `unstyled`) + `as`. className|class and style are plain element props.
+    - R/S: `RippleProps` = `PartProps` on Root (the `span`) + `RippleRootOwnProps` (machine props `disabled`, `centered`, `effect`, …, `tokens`, `testId`, `unstyled`) + `as`. className|class and style are plain element props.
 - **Own parts (generated.ts:6474)**: root, ripple. `ripple` is not an element Root renders; the machine adds ripple elements classed with the registry's `ripple` slot (`scope.classes.ripple?.class`, skipped when `isUnstyled(unstyled,"ripple")`). So `unstyled.ripple`/`testId.ripple` exist, but className/style/slotProps cannot reach `ripple` elements.
 - **Nested**: none.
 - **Tokens**: plain `tokens` go to the `ripple` recipe (`{tokens}`, ripple.ts:67). Per the doc, its timing is the layer's transition tokens.

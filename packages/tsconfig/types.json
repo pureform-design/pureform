@@ -6,6 +6,5 @@
         "declaration": true,
         "emitDeclarationOnly": true
     },
-    "exclude": ["${configDir}/src/**/*.spec.*",
-        "${configDir}/src/**/*.test.*"]
+    "exclude": ["${configDir}/src/**/*.spec.*", "${configDir}/src/**/*.test.*"]
 }
