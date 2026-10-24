@@ -312,6 +312,108 @@ const useMorph = (
     useLayoutEffect(() => () => run.current?.run.stop(), []);
 };
 
+// A keyframe animation's shapes (the loading indicator's): the drawing's paths morph through
+// them as CSS eases between keyframes, each step on the animation's curve, looping as it does.
+// The browser runs it where CSS animates `d`; elsewhere Animated writes the paths each frame.
+const useShapeKeyframes = (
+    drawing: Drawing | undefined,
+    box: { width: number; height: number } | undefined,
+    paths: { all: Set<unknown> },
+) => {
+    const keyframes = drawing?.keyframes;
+    const base = drawing?.shape;
+    const key =
+        keyframes && base && box
+            ? JSON.stringify([keyframes, box.width, box.height])
+            : "";
+    useLayoutEffect(() => {
+        if (!keyframes || !base || !box) return;
+        const frames = [...keyframes.frames];
+        if (frames[0]?.offset !== 0) frames.unshift({ offset: 0, shape: base });
+        if (frames.at(-1)?.offset !== 1)
+            frames.push({ offset: 1, shape: base });
+        const points = frames.map((frame) =>
+            shapeCoordinates(frame.shape, box),
+        );
+        // Shapes of another structure can't morph into each other.
+        if (points.some((p) => mixPoints(points[0]!, p, 0) === undefined))
+            return;
+        const iterations =
+            keyframes.iterations < 0 ? Infinity : keyframes.iterations;
+        const nodes = [...paths.all];
+        if (WEB && cssPathAnimates()) {
+            const animations = nodes.flatMap((node) => {
+                const element = elementOf(node);
+                return element
+                    ? [
+                          element.animate(
+                              frames.map((frame, i) => ({
+                                  offset: frame.offset,
+                                  d: `path("${pathAt(frame.shape, points[i]!)}")`,
+                                  easing: keyframes.easing,
+                              })),
+                              {
+                                  duration: keyframes.duration,
+                                  delay: keyframes.delay,
+                                  iterations,
+                                  direction:
+                                      keyframes.direction === "alternateReverse"
+                                          ? "alternate-reverse"
+                                          : keyframes.direction,
+                              },
+                          ),
+                      ]
+                    : [];
+            });
+            return () => {
+                for (const animation of animations) animation.cancel();
+            };
+        }
+        const ease = curve(keyframes.easing);
+        const backwards = keyframes.direction.toLowerCase().includes("reverse");
+        const pathOf = (progress: number) => {
+            const t = backwards ? 1 - progress : progress;
+            let i = 0;
+            while (i < frames.length - 2 && t > frames[i + 1]!.offset) i++;
+            const [from, to] = [frames[i]!, frames[i + 1]!];
+            const local =
+                to.offset > from.offset
+                    ? ease(clamp((t - from.offset) / (to.offset - from.offset)))
+                    : 1;
+            return pathAt(
+                from.shape,
+                mixPoints(points[i]!, points[i + 1]!, local)!,
+            );
+        };
+        const value = new Animated.Value(0);
+        const listener = value.addListener(({ value: t }) => {
+            const d = pathOf(t);
+            for (const node of nodes) {
+                if (WEB) elementOf(node)?.setAttribute("d", d);
+                else (node as SvgNode).setNativeProps?.({ d });
+            }
+        });
+        const loop = Animated.loop(
+            Animated.timing(value, {
+                toValue: 1,
+                duration: keyframes.duration,
+                easing: (t) => t,
+                useNativeDriver: false,
+            }),
+            { iterations: iterations === Infinity ? -1 : iterations },
+        );
+        const running =
+            keyframes.delay > 0
+                ? Animated.sequence([Animated.delay(keyframes.delay), loop])
+                : loop;
+        running.start();
+        return () => {
+            running.stop();
+            value.removeListener(listener);
+        };
+    }, [key]);
+};
+
 // A change of fill cross-fades over its transition: the new fill's path fades in over a path of
 // the color shown before, which goes once it has.
 const useCrossFade = (drawing: Drawing | undefined, fading: Set<unknown>) => {
@@ -383,6 +485,7 @@ export const SvgDrawing = ({ drawing, color, image }: SvgDrawingProps) => {
     const id = useSvgId();
     const { paths, ShapePath } = useShapePaths();
     useMorph(drawing, box, paths);
+    useShapeKeyframes(drawing, box, paths);
     const under = useCrossFade(drawing, paths.fading);
     if (!drawing) return null;
     const { shape } = drawing;

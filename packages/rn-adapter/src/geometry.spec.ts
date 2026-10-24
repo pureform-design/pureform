@@ -424,3 +424,40 @@ describe("the wavy linear progress", () => {
         expect(bottom("thick")).toBeCloseTo(3 + 8 + 3, 1);
     });
 });
+
+describe("the loading indicator's keyframed shapes", () => {
+    const precomputed = precompute(pureform(), {
+        components: ["loadingIndicator"],
+    });
+    const styles = stylesFor(precomputed, "base:light");
+    const pick = (state: { svg?: boolean; reducedMotion?: boolean }) =>
+        selectWithTransitions(styles.loadingIndicator!, {}, state);
+
+    it("gives the SVG drawing the keyframes' shapes, and the keyframes only the turn", () => {
+        const { drawings, animations } = pick({ svg: true });
+        const keyframes = drawings.indicator!.keyframes!;
+        // The seven shapes and the first again, on the animation's timing.
+        expect(keyframes.frames.map((frame) => frame.offset)).toHaveLength(8);
+        expect(keyframes.iterations).toBe(-1);
+        expect(keyframes.duration).toBe(animations.indicator!.duration);
+        const box = { width: 38, height: 38 };
+        const paths = keyframes.frames.map((frame) =>
+            shapePath(frame.shape, box),
+        );
+        expect(new Set(paths).size).toBe(7);
+        expect(paths[0]).toBe(paths[7]);
+        // The same structure throughout, so each step morphs.
+        const sizes = keyframes.frames.map(
+            (frame) => shapeCoordinates(frame.shape, box).length,
+        );
+        expect(new Set(sizes).size).toBe(1);
+    });
+
+    it("draws none without SVG, and none under reduced motion, which only turns", () => {
+        expect(pick({}).drawings.indicator).toBeUndefined();
+        expect(
+            pick({ svg: true, reducedMotion: true }).drawings.indicator!
+                .keyframes,
+        ).toBeUndefined();
+    });
+});

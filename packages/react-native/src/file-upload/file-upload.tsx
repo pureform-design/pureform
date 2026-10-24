@@ -128,7 +128,11 @@ function FileUploadImpl(props: FileUploadProps): ReactNode {
                 ) : null}
             </v.dropzone.View>
             {files.length > 0 ? (
-                <v.itemGroup.View style={s.itemGroup} testID={id("itemGroup")}>
+                <v.itemGroup.View
+                    role="list"
+                    style={s.itemGroup}
+                    testID={id("itemGroup")}
+                >
                     {files.map((file, index) => {
                         const rejected = (file.errors?.length ?? 0) > 0;
                         const image =

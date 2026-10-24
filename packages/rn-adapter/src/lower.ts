@@ -453,7 +453,9 @@ const keyframes = (name: string, ctx: Ctx): Value => {
                       : Number.parseFloat(stop) / 100;
             const style: Record<string, Value> = {};
             for (const [property, node] of Object.entries(map)) {
-                const rn = rnProperty(property);
+                // A frame's clip shape is what an SVG engine morphs the slot's drawing through.
+                const rn =
+                    property === "clipPath" ? SHAPE : rnProperty(property);
                 if (!rn || node === undefined) continue;
                 try {
                     style[rn] = lowerNode(node as ValueNode, {

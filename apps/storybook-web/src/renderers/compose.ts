@@ -43,6 +43,8 @@ export interface ComposeInput {
     readonly height?: number | undefined;
     /** The component's parameters from `stories.config.ts`. */
     readonly parameters?: Readonly<Record<string, unknown>> | undefined;
+    /** The component's globals from `stories.config.ts` (a viewport). */
+    readonly globals?: Readonly<Record<string, unknown>> | undefined;
 }
 
 export const composeStories = (input: ComposeInput) => {
@@ -199,7 +201,14 @@ export const composeStories = (input: ComposeInput) => {
                       }
                     : {}),
             },
-            ...(input.scheme ? { globals: { scheme: input.scheme } } : {}),
+            ...(input.scheme || input.globals
+                ? {
+                      globals: {
+                          ...input.globals,
+                          ...(input.scheme ? { scheme: input.scheme } : {}),
+                      },
+                  }
+                : {}),
         },
         /** A story; `base.globals.scheme` pins its scheme over the toolbar's, and `play` gives
          *  it a play test from the case. */

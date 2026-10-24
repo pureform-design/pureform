@@ -661,6 +661,10 @@ describe("file upload", () => {
             ),
         ].map((node) => node.textContent);
         expect(headlines).toEqual(["a.txt", "big.png", "c.pdf"]);
+        // A list of list items, for assistive technology.
+        expect(byTestId("pf-file-upload-item-group").getAttribute("role")).toBe(
+            "list",
+        );
         expect(byTestId("pf-file-upload-error").textContent).toBe(
             "The file is too large",
         );
@@ -1267,6 +1271,81 @@ describe("nested rows", () => {
         expect(onSelect).toHaveBeenCalledExactlyOnceWith({ value: "mail" });
         // Picking an item puts the submenu away; pressing its row again does too.
         await until(() => expect(menuLabels()).toEqual(["Cut", "Share›"]));
+    });
+
+    // Full motion, slowed, so a test sees a step part way.
+    const moving = (node: ReactNode) =>
+        mount(
+            <PureformProvider
+                registry={registry}
+                engine={animated}
+                motion="full"
+                timeScale={10}
+            >
+                <View style={{ width: 400 }}>{node}</View>
+            </PureformProvider>,
+        );
+    const rows = () => [
+        ...document.querySelectorAll<HTMLElement>('[role="menuitem"]'),
+    ];
+
+    it("grows a cascaded submenu in as the menu does, and fades it out", async () => {
+        await moving(<Menu submenu="cascade" items={SHARE} />);
+        await interact(() => userEvent.click(rows()[1]!));
+        await until(() =>
+            expect(document.querySelectorAll('[role="menu"]')).toHaveLength(2),
+        );
+        const moved = () =>
+            document.querySelectorAll('[role="menu"]')[1]!.parentElement!
+                .parentElement!;
+        // Part way in: faded and scaled, from its row's side.
+        expect(Number(getComputedStyle(moved()).opacity)).toBeLessThan(1);
+        // Pressing the row again puts it away: it stays while it fades.
+        await interact(() => userEvent.click(rows()[1]!));
+        expect(document.querySelectorAll('[role="menu"]')).toHaveLength(2);
+        expect(getComputedStyle(moved()).pointerEvents).toBe("none");
+    });
+
+    it("springs a drilled menu's height to the new level, and moves the pressed row into the header", async () => {
+        const deep = [
+            ...SHARE.slice(0, 1),
+            {
+                value: "share",
+                label: "Share",
+                items: ["mail", "link", "print"].map((value) => ({
+                    value,
+                    label: value,
+                })),
+            },
+        ];
+        await moving(<Menu submenu="drill" items={deep} />);
+        const menu = document.querySelector<HTMLElement>('[role="menu"]')!;
+        const before = menu.getBoundingClientRect().height;
+        const share = rows()[1]!.getBoundingClientRect().top;
+        await interact(() => userEvent.click(rows()[1]!));
+        await until(() => expect(rows()[0]!.textContent).toBe("‹Share"));
+        // The header starts where the pressed row was, and the height where it was.
+        const header = rows()[0]!.getBoundingClientRect().top;
+        expect(header).toBeGreaterThan(menu.getBoundingClientRect().top + 8);
+        expect(Math.abs(header - share)).toBeLessThan(
+            Math.abs(menu.getBoundingClientRect().top - share),
+        );
+        // Two rows to four: part way between.
+        expect(menu.getBoundingClientRect().height).toBeLessThan(
+            before * 2 - 1,
+        );
+        // At rest: the new level's own height, the header at the top.
+        await until(
+            () =>
+                expect(
+                    rows()[0]!.getBoundingClientRect().top -
+                        menu.getBoundingClientRect().top,
+                ).toBeLessThan(9),
+            5000,
+        );
+        expect(menu.getBoundingClientRect().height).toBeGreaterThan(
+            before * 1.5,
+        );
     });
 
     it("cascades by default when a submenu fits beside the menu, and drills when it doesn't", async () => {

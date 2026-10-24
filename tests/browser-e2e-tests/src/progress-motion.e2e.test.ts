@@ -96,7 +96,7 @@ describe.each(Object.keys(STYLINGS) as (keyof typeof STYLINGS)[])(
             });
             const root =
                 show(`<div data-root class="${c.root}" role="progressbar">
-                <span class="${c.track}"></span>
+                <span class="${c.track}"><span class="${c.trackEndHalf}"><span class="${c.trackEndArc}"></span></span><span class="${c.trackStartHalf}"><span class="${c.trackStartArc}"></span></span></span>
                 <span class="${c.endHalf}"><span class="${c.endArc}"></span></span>
                 <span class="${c.startHalf}"><span class="${c.startArc}"></span></span>
             </div>`);
@@ -117,11 +117,94 @@ describe.each(Object.keys(STYLINGS) as (keyof typeof STYLINGS)[])(
             pauseAt(root, 2250);
             expect(value()).toBeGreaterThan(10);
             expect(value()).toBeLessThan(87);
-            // The arcs draw it: the halves show, the track doesn't.
-            const shown = (selector: string) =>
-                getComputedStyle(root.querySelector(selector)!).display;
-            expect(shown(`.${c.endHalf!.split(" ")[0]}`)).not.toBe("none");
-            expect(shown(`.${c.track!.split(" ")[0]}`)).toBe("none");
+            // The arcs draw it, and the track shows too, turned to start a gap after the arc
+            // (Compose's wavy and linear indeterminate indicators keep their track).
+            const part = (name: string) =>
+                root.querySelector<HTMLElement>(`.${name.split(" ")[0]}`)!;
+            expect(getComputedStyle(part(c.endHalf!)).display).not.toBe("none");
+            const track = part(c.track!);
+            expect(getComputedStyle(track).display).not.toBe("none");
+            const angle = () => {
+                const m = new DOMMatrix(getComputedStyle(track).transform);
+                return (Math.atan2(m.b, m.a) * 180) / Math.PI;
+            };
+            // At 2250ms the arc is about halfway between its sizes; the track turns past it by
+            // the gap (3% of the circle), so it follows the arc's value.
+            const expected = ((value() + 3) * 3.6 + 180) % 360 - 180;
+            expect(angle()).toBeCloseTo(expected, 0);
+        });
+
+        it("keeps the wavy circular halves' wave in the circle's frame, meeting at the seam", () => {
+            const c = STYLINGS[styling].classes("circularProgress", {
+                shape: "wavy",
+            });
+            const root =
+                show(`<div data-root class="${c.root}" role="progressbar" style="--pf-components-circularProgress-value: 75">
+                <span class="${c.endHalf}"><span class="${c.endArc}"></span></span>
+                <span class="${c.startHalf}"><span class="${c.startArc}"></span></span>
+            </div>`);
+            const [end, start] = [...root.children] as HTMLElement[];
+            // The halves clip; the arcs, which turn, don't, so their wave doesn't turn with them.
+            expect(getComputedStyle(end!).clipPath).toMatch(/^shape\(/);
+            expect(getComputedStyle(start!).clipPath).toMatch(/^shape\(/);
+            expect(getComputedStyle(end!.firstElementChild!).clipPath).toBe("none");
+            // Each half is clipped to its share of one ring: their first points (the top of the
+            // circle) sit on the seam, the end half's left edge and the start half's right one.
+            expect(getComputedStyle(end!).clipPath).toMatch(/^shape\(evenodd from 0%/);
+            expect(getComputedStyle(start!).clipPath).toMatch(
+                /^shape\(evenodd from 100%/,
+            );
+            const box = (el: Element) => el.getBoundingClientRect();
+            expect(box(end!).left).toBeCloseTo(box(start!).right, 0);
+        });
+
+        it("leaves a gap on each side of the sliding linear indicator", () => {
+            const c = STYLINGS[styling].classes("linearProgress", {
+                indeterminate: true,
+            });
+            const root =
+                show(`<div data-root class="${c.root}" role="progressbar" style="width: 400px">
+                <div class="${c.track}"></div>
+                <div class="${c.indicator}"></div>
+            </div>`);
+            const [track, indicator] = [...root.children] as HTMLElement[];
+            pauseAt(root, 700);
+            const slide = Number(
+                getComputedStyle(track!).getPropertyValue(
+                    "--pf-components-linearProgress-slide",
+                ),
+            );
+            // The track follows the indicator's slide, in step with it.
+            expect(slide).toBeCloseTo(
+                Number(
+                    getComputedStyle(indicator!).getPropertyValue(
+                        "--pf-components-linearProgress-slide",
+                    ),
+                ),
+                3,
+            );
+            const image = getComputedStyle(track!).backgroundImage;
+            expect(image).toMatch(/^linear-gradient\(90deg/);
+            // The hole runs from the indicator's start less the gap to its end plus the gap.
+            const bar = indicator!.getBoundingClientRect();
+            const left = bar.left - root.getBoundingClientRect().left;
+            // Chromium keeps each stop as `calc(<share>% ± 4px)`, the share of the track's width.
+            const width = track!.getBoundingClientRect().width;
+            const stops = [
+                ...image.matchAll(
+                    /rgba\(0, 0, 0, 0\) calc\(([-\d.]+)% ([-+]) ([\d.]+)px\)/g,
+                ),
+            ].map(
+                (m) =>
+                    (Number(m[1]) / 100) * width +
+                    (m[2] === "-" ? -1 : 1) * Number(m[3]),
+            );
+            expect(stops, image).toHaveLength(2);
+            expect(stops[0]).toBeCloseTo(left - 4, 0);
+            expect(stops[1]).toBeCloseTo(left + bar.width + 4, 0);
+            expect(getComputedStyle(track!).backgroundColor).toBe(
+                "rgba(0, 0, 0, 0)",
+            );
         });
 
         it("moves the wavy line's wave along the track, a wavelength a second", () => {

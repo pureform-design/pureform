@@ -285,6 +285,13 @@
                 "default": "./dist/list-item.mjs"
             }
         },
+        "./touch-target": {
+            "types": "./dist/touch-target/index.d.ts",
+            "import": {
+                "development": "./src/touch-target/index.ts",
+                "default": "./dist/touch-target.mjs"
+            }
+        },
         "./media": {
             "types": "./dist/media/index.d.ts",
             "import": {

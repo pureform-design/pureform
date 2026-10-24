@@ -31,6 +31,8 @@ export const decorators: Decorator[] = [
         el.setAttribute(DOT_ATTRIBUTE, "");
         Object.assign(el.style, {
             position: "relative",
+            // A flex box, so React Native's app root fills the dot (it grows, as an app's does).
+            display: "flex",
             width: `${DOT}px`,
             height: `${DOT}px`,
             borderRadius: "50%",

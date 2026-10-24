@@ -39,8 +39,11 @@ import type {
 } from "@pureform/binding-core";
 import {
     markMenuGroupEdges,
+    menuDrillFrom,
+    menuDrillTo,
     watchMenuSubmenuRoom,
 } from "@pureform/binding-core/dom";
+import type { MenuDrillSnapshot } from "@pureform/binding-core/dom";
 import * as menu from "@pureform/machines/menu";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {
@@ -659,6 +662,32 @@ function HighlightOnDrill(props: {
     return null;
 }
 
+/** A drilled menu's motion between levels: it notes the content's id for the step's start, and
+ *  runs the step once the new level is drawn (`menuDrillTo`). */
+function DrillMotion(props: {
+    readonly level: string;
+    readonly drill: {
+        contentId?: string | undefined;
+        from?: MenuDrillSnapshot | undefined;
+    };
+}): JSX.Element {
+    const { api } = context.use("Content");
+    createEffect(
+        () => [props.level, api().getContentProps().id] as const,
+        ([, id]) => {
+            props.drill.contentId = typeof id === "string" ? id : undefined;
+            const snapshot = props.drill.from;
+            props.drill.from = undefined;
+            if (snapshot && props.drill.contentId)
+                menuDrillTo(
+                    document.getElementById(props.drill.contentId),
+                    snapshot,
+                );
+        },
+    );
+    return null;
+}
+
 /** The ready-made menu: the trigger, drawn as a button, when given a label, and the menu with an
  *  item per entry of `items`, then a group per entry of `groups`; an entry with `items` opens
  *  its submenu as `submenu` says. */
@@ -684,6 +713,11 @@ function ReadyMade(props: MenuProps): JSX.Element {
             if (open === false) setPath([]);
         },
     );
+    // The drill motion's content id and the step it starts from: plain, not reactive.
+    const drillState: {
+        contentId?: string | undefined;
+        from?: MenuDrillSnapshot | undefined;
+    } = {};
     const onSelect = (details: MenuSelectDetails) => {
         const next = drill()
             ? menuDrillPick(
@@ -694,6 +728,15 @@ function ReadyMade(props: MenuProps): JSX.Element {
               )
             : undefined;
         if (next) {
+            const content = drillState.contentId
+                ? document.getElementById(drillState.contentId)
+                : null;
+            // In: the pressed item's label goes into the header. Out: the header's goes back
+            // into the submenu's item.
+            drillState.from =
+                next.length > path().length
+                    ? menuDrillFrom(content, details.value, MENU_BACK_VALUE)
+                    : menuDrillFrom(content, MENU_BACK_VALUE, path().at(-1)!);
             setPath(next);
             return;
         }
@@ -741,6 +784,12 @@ function ReadyMade(props: MenuProps): JSX.Element {
                 <Content {...content}>
                     <Show when={auto()}>
                         <MeasureSubmenuRoom onRoom={setRoom} />
+                    </Show>
+                    <Show when={drill()}>
+                        <DrillMotion
+                            level={path().join("\u0000")}
+                            drill={drillState}
+                        />
                     </Show>
                     <Show when={drill()}>
                         <HighlightOnDrill

@@ -34,6 +34,7 @@ import {
     flex,
     pct,
     px,
+    transparent,
     unitless,
 } from "@pureform/core/ast";
 import type { MaterialDensity } from "@pureform/theme";
@@ -144,6 +145,22 @@ export const createDockedDatePicker = <
             recipe: () => ({
                 base: {
                     ...parts.base,
+                    // The input's placeholder is the date's format, as Material's: shown in the
+                    // supporting color once the field is focused and the label has floated, and
+                    // hidden while the label rests over the input.
+                    input: {
+                        ...parts.base.input,
+                        rawRules: {
+                            css: {
+                                "&::placeholder": {
+                                    color: ref("supportingColor"),
+                                },
+                                "&:not(:focus)::placeholder": {
+                                    color: transparent,
+                                },
+                            },
+                        },
+                    },
                     ...calendar,
                     content: {
                         ...surface(

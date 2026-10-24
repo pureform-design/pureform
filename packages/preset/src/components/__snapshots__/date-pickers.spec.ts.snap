@@ -937,8 +937,14 @@ exports[`dockedDatePicker > compiles to a stable Panda slot recipe 1`] = `
       "paddingInlineStart": "var(--components-dockedDatePicker-calendarPadding, token(spacing.3))",
     },
     "input": {
+      "&::placeholder": {
+        "color": "var(--components-dockedDatePicker-supportingColor, token(colors.onSurfaceVariant))",
+      },
       "&:is(:disabled, [aria-disabled=true])": {
         "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+      },
+      "&:not(:focus)::placeholder": {
+        "color": "transparent",
       },
       "backgroundColor": "transparent",
       "borderWidth": "0px",

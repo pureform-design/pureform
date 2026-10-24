@@ -171,6 +171,17 @@ describe("dockedDatePicker", () => {
         });
     });
 
+    it("shows the format placeholder only once focused, when the label has floated", () => {
+        const input = recipe("dockedDatePicker", dockedDatePicker)?.base
+            ?.input as Record<string, Record<string, string> | undefined>;
+        expect(input["&::placeholder"]?.["color"]).toContain(
+            "--components-dockedDatePicker-supportingColor",
+        );
+        expect(input["&:not(:focus)::placeholder"]).toEqual({
+            color: "transparent",
+        });
+    });
+
     it("keeps the field's one compound", () => {
         expect(dockedDatePicker.recipe.compoundVariants).toHaveLength(1);
     });

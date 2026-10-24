@@ -75,6 +75,20 @@ export interface Drawing {
     gradient?: GradientValue;
     /** How a change of shape morphs, and a change of fill blends, where they transition. */
     transitions?: { shape?: Transition; fill?: Transition };
+    /** A keyframe animation's shapes, which the drawing morphs through as the slot's other
+     *  keyframes run (the loading indicator's): its timing, each frame's shape at its offset. */
+    keyframes?: ShapeKeyframes;
+}
+
+/** The shapes of a slot's keyframe animation, with its timing. */
+export interface ShapeKeyframes extends Omit<
+    Animation,
+    "frames" | "name" | "spring"
+> {
+    readonly frames: readonly {
+        readonly offset: number;
+        readonly shape: ShapeValue;
+    }[];
 }
 
 export type Style = Record<string, Value>;
@@ -391,6 +405,25 @@ export const selectWithTransitions = (
                 delete style.boxShadow;
             }
             if (gradient) drawing.gradient = gradient;
+            const keyframed = animations[slot];
+            const shapes = keyframed?.frames.filter(
+                (frame) => frame.style[SHAPE] !== undefined,
+            );
+            if (shape && keyframed && shapes && shapes.length > 0) {
+                const {
+                    frames: _frames,
+                    name: _name,
+                    spring: _spring,
+                    ...timing
+                } = keyframed;
+                drawing.keyframes = {
+                    ...timing,
+                    frames: shapes.map((frame) => ({
+                        offset: frame.offset,
+                        shape: frame.style[SHAPE] as unknown as ShapeValue,
+                    })),
+                };
+            }
             const timed = (property: string) =>
                 transitions[slot]!.find((t) => t.property === property);
             const [morph, blend] = [

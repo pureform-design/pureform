@@ -53,6 +53,9 @@ export interface ComponentConfig {
     /** Parameters for every story of the component (the meta's), plain data:
      *  `{ a11y: { test: "todo" } }`. */
     readonly parameters?: Readonly<Record<string, unknown>>;
+    /** Globals for every story of the component (the meta's), plain data:
+     *  `{ viewport: { value: "suites", isRotated: false } }`. */
+    readonly globals?: Readonly<Record<string, unknown>>;
     /** Pins every story of the component to a scheme (the meta's `globals`). */
     readonly scheme?: "light" | "dark";
     /** Story fields by export name, merged into the generated story (plain data):

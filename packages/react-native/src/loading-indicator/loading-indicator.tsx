@@ -1,7 +1,7 @@
 // The loading indicator: a `role="progressbar"` view with no value, around a container and the
-// indicator, which turns and (with an SVG engine) is drawn in Material's shapes. React Native's
-// keyframes don't carry a clip shape, so the shape doesn't morph here: the indicator turns in its
-// first shape with an SVG engine, and as a circle without one.
+// indicator, which turns and (with an SVG engine) morphs through Material's shapes, as the web's
+// keyframes do (the engine's drawing runs the keyframes' shapes). Without SVG it turns as a
+// circle; under reduced motion it only turns.
 
 import { loadingIndicatorAnatomy } from "@pureform/anatomy";
 import type { TestIdOverride } from "@pureform/anatomy";

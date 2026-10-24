@@ -238,6 +238,12 @@ export {
     springRoleVar,
     transitionSpring,
 } from "./settle";
+export {
+    MENU_DRILL_TIMING,
+    menuDrillFrom,
+    menuDrillTo,
+} from "./menu-drill-motion";
+export type { MenuDrillSnapshot, MenuDrillTiming } from "./menu-drill-motion";
 export { markMenuGroupEdges } from "./menu-groups";
 export { menuSubmenuRoom, watchMenuSubmenuRoom } from "./menu-submenu-room";
 export { revealInRow } from "./reveal";

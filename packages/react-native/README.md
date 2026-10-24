@@ -559,6 +559,11 @@ trigger shows their labels joined by ", " (the placeholder when none):
   `PanResponder`): a drag past the slop takes the touch from the row, so its `onPress` (or an
   expandable item's expanding) fires on a tap only; the action is hidden from assistive technology until revealed. `Avatar` takes a `src` that shows once loaded
   (`onStatusChange`), its children the fallback.
+- **TouchTarget** (`@pureform/react-native/touch-target`): put `<TouchTarget />` first inside a
+  small `Pressable`; it grows the press area to the theme's minimum (48), centred, hidden from
+  assistive technology, as the web's does. On Android a child's touches outside its parent count
+  only where nothing clips them, so `useTouchTargetSlop(width, height)` gives the same area as a
+  `hitSlop` for a pressable that takes one.
 - **Media:** `Media` takes the web's `src`, or a `source` as React Native's `Image` takes it
   (`ImageSourcePropType`): a `require()`d asset (its proportions from
   `Image.resolveAssetSource`), `{ uri, headers, cache }` (measured with
@@ -592,7 +597,10 @@ trigger shows their labels joined by ", " (the placeholder when none):
   cascading when a submenu (as wide as the menu) fits beside the open menu within the window and
   the nearest `PureformContainer`'s measured frame (its position and size in the window, read with
   `useContainerFrame()`; no container, the window alone), measured once it's laid out, else
-  drilling (it replaces the window-width rule; `MENU_CASCADE_MIN_WIDTH` is gone).
+  drilling (it replaces the window-width rule; `MENU_CASCADE_MIN_WIDTH` is gone). A cascaded
+  submenu grows in and fades out as the menu does; a drill step springs the menu's height to the
+  new level and moves the pressed row into the header (and the header back into its row going
+  out), on the theme's default spatial spring; nothing moves under reduced motion.
 - **Navigation rail:** destinations with the same `section` sit together under one heading with
   its text, shown only while the rail is `expanded`, in the order the sections first appear (like
   a select's `group`). The bar ignores `section`. It replaces the removed `sectionLabel`.

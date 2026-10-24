@@ -62,6 +62,28 @@ describe("LoadingIndicator", () => {
         ).not.toBeNull();
     });
 
+    it("morphs through Material's shapes with an SVG engine, and only turns under reduced motion", async () => {
+        const path = (id = "s") =>
+            byTestId(`${id}-indicator`).querySelector("svg path") as SVGElement;
+        await render(
+            <LoadingIndicator aria-label="Loading" testId="s" />,
+            animatedSvg,
+        );
+        const [morph] = path().getAnimations();
+        // The web's seven shapes and the first again, each step on the standard curve.
+        const frames = (morph!.effect as KeyframeEffect).getKeyframes();
+        expect(frames).toHaveLength(8);
+        expect(new Set(frames.map((frame) => frame["d"])).size).toBe(7);
+        expect(frames[0]!.easing).not.toBe("linear");
+        expect(morph!.effect!.getTiming().iterations).toBe(Infinity);
+        await render(
+            <LoadingIndicator aria-label="Loading" testId="r" />,
+            animatedSvg,
+            "reduce",
+        );
+        expect(path("r").getAnimations()).toHaveLength(0);
+    });
+
     it("turns, under reduced motion too", async () => {
         await render(
             <LoadingIndicator aria-label="Loading" />,

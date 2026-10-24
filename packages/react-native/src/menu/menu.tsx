@@ -40,15 +40,23 @@ import type { MutableInteractionSource } from "@pureform/binding-core/interactio
 import {
   useContainerFrame,
   useMeasureContainer,
+  useReducedMotion,
+  useTokens,
 } from "@pureform/rn-adapter/react";
 import type {
   ContainerFrame,
   MeasureContainer,
 } from "@pureform/rn-adapter/react";
 import type { Selection } from "@pureform/styling";
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { ComponentRef, ReactNode } from "react";
-import { Platform, Pressable, useWindowDimensions, View } from "react-native";
+import {
+  Animated,
+  Platform,
+  Pressable,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import type { LayoutChangeEvent } from "react-native";
 
 import { Button } from "../button/button";
@@ -64,8 +72,8 @@ import {
 } from "../parts";
 import { Portal } from "../portal";
 import type { WindowRect } from "../portal-host";
-import { useOverlayPresence } from "../presence";
-import { useDirection, useEngine } from "../provider";
+import { themeSpring, useOverlayPresence } from "../presence";
+import { useDirection, useEngine, usePureform } from "../provider";
 import { useComponentSlots } from "../styles";
 
 /** The menu's parts this binding renders. */
@@ -279,6 +287,115 @@ function MenuItemImpl(props: ItemProps): ReactNode {
 
 const Item = memo(withEngine(MenuItemImpl, "MenuItem"));
 
+// The theme's default spatial spring, or none under reduced motion.
+function useSpatialSpring() {
+  const tokens = useTokens();
+  const reducedMotion = useReducedMotion();
+  const { timeScale } = usePureform();
+  return reducedMotion
+    ? undefined
+    : themeSpring("spatialDefault", tokens, timeScale);
+}
+
+const springing = (
+  value: Animated.Value | Animated.ValueXY,
+  to: number | { x: number; y: number },
+  spring: NonNullable<ReturnType<typeof themeSpring>>,
+) =>
+  Animated.spring(value, {
+    toValue: to as never,
+    stiffness: spring.stiffness,
+    damping: spring.damping,
+    mass: spring.mass,
+    overshootClamping: true,
+    useNativeDriver: false,
+  });
+
+// A drilled menu's rows: a new level springs the menu's height from the last level's to its
+// own, clipped meanwhile, as the web's does; at rest it has no height of its own.
+function DrillSize(props: {
+  readonly level: string;
+  readonly children: ReactNode;
+}): ReactNode {
+  const spring = useSpatialSpring();
+  const height = useRef(new Animated.Value(0)).current;
+  const natural = useRef(0);
+  const pending = useRef(false);
+  const [moving, setMoving] = useState(false);
+  const first = useRef(true);
+  useLayoutEffect(() => {
+    if (first.current) {
+      first.current = false;
+      return;
+    }
+    if (!spring || natural.current <= 0) return;
+    height.stopAnimation();
+    height.setValue(natural.current);
+    pending.current = true;
+    setMoving(true);
+  }, [props.level]);
+  useEffect(() => () => height.stopAnimation(), [height]);
+  return (
+    <Animated.View style={moving ? { height, overflow: "hidden" } : undefined}>
+      <View
+        collapsable={false}
+        onLayout={(event: LayoutChangeEvent) => {
+          const measured = event.nativeEvent.layout.height;
+          natural.current = measured;
+          if (!pending.current || !spring) return;
+          pending.current = false;
+          springing(height, measured, spring).start(({ finished }) => {
+            if (finished) setMoving(false);
+          });
+        }}
+      >
+        {props.children}
+      </View>
+    </Animated.View>
+  );
+}
+
+// Where a drill step's moving row was, in the window: the pressed item going in (it moves into
+// the header), the header going out (it moves into the submenu's item).
+interface DrillFlip {
+  readonly x: number;
+  readonly y: number;
+  /** The row it moves into, by value. */
+  readonly to: string;
+}
+
+// The row a drill step moves into: it starts where the moving row was and springs into its
+// place (hidden until it's measured, so it doesn't show there first).
+function Flip(props: {
+  readonly from: DrillFlip;
+  readonly children: ReactNode;
+}): ReactNode {
+  const spring = useSpatialSpring();
+  const view = useRef<ComponentRef<typeof View>>(null);
+  const offset = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
+  const [placed, setPlaced] = useState(!spring);
+  useLayoutEffect(() => {
+    if (!spring) return;
+    view.current?.measureInWindow((x, y) => {
+      offset.setValue({ x: props.from.x - x, y: props.from.y - y });
+      setPlaced(true);
+      springing(offset, { x: 0, y: 0 }, spring).start();
+    });
+    return () => offset.stopAnimation();
+  }, [props.from]);
+  return (
+    <Animated.View
+      ref={view}
+      style={{
+        opacity: placed ? 1 : 0,
+        transform: offset.getTranslateTransform(),
+      }}
+    >
+      {props.children}
+    </Animated.View>
+  );
+}
+
 function MenuImpl(
   props: MenuProps & {
     /** Its items alone, without the surface (container, elevation, width), for a view that
@@ -347,6 +464,25 @@ function MenuImpl(
     // The row's element, which focus goes back to; set when the key opened it.
     readonly from?: Measurable;
   }>();
+  // The drill step under way: where its moving row was.
+  const [flip, setFlip] = useState<DrillFlip>();
+  // Into a level or out of one: the moving row (the pressed item, or the back row) is noted
+  // where it is, then the level changes.
+  const drillTo = (
+    next: readonly string[],
+    value: string,
+    row: Measurable | null,
+  ) => {
+    const to = next.length > path.length ? MENU_BACK_VALUE : path.at(-1)!;
+    if (!row) {
+      setFlip(undefined);
+      return setPath(next);
+    }
+    row.measureInWindow((x, y) => {
+      setFlip({ x, y, to });
+      setPath(next);
+    });
+  };
   const level = menuDrillLevel(props.items ?? [], props.groups ?? [], path);
   const { submenu } = level;
   const shown = [
@@ -367,7 +503,7 @@ function MenuImpl(
         menuDrillPick(props.items ?? [], props.groups ?? [], path, value);
       if (props.submenu === "drill" || path.length > 0) {
         const next = pick();
-        if (next) return setPath(next);
+        if (next) return drillTo(next, value, row);
       }
       const chosen = shown.find((entry) => entry.value === value);
       if (chosen && hasSubmenu(chosen)) {
@@ -379,7 +515,7 @@ function MenuImpl(
           void room.then((room) => {
             if (menuSubmenuMode(props.submenu, room) === "drill") {
               const next = pick();
-              if (next) return setPath(next);
+              if (next) return drillTo(next, value, row);
             }
             setBeside({
               item: chosen,
@@ -397,14 +533,29 @@ function MenuImpl(
   useEffect(() => {
     if (props.open === false) {
       setPath([]);
+      setFlip(undefined);
       setBeside(undefined);
     }
   }, [props.open]);
   const { styles: s, views: v } = useComponentSlots<Part>("menu", selection);
   const presence = useOverlayPresence(props.open, "popup");
+  // The cascaded submenu grows in and fades out as the menu does: the last one shown stays
+  // while it goes.
+  const lastBeside = useRef(beside);
+  if (beside) lastBeside.current = beside;
+  const cascade = useOverlayPresence(beside !== undefined, "popup");
   if (!presence.present) return null;
   const id = (part: Part) => testIdOf(menuAnatomy, part, props.testId);
-  const item = (entry: MenuItem<ReactNode>) => (
+  const shownBeside = lastBeside.current;
+  const item = (entry: MenuItem<ReactNode>) =>
+    flip?.to === entry.value ? (
+      <Flip key={entry.value} from={flip}>
+        {row(entry)}
+      </Flip>
+    ) : (
+      row(entry)
+    );
+  const row = (entry: MenuItem<ReactNode>) => (
     <Item
       key={entry.value}
       item={entry}
@@ -417,6 +568,13 @@ function MenuImpl(
       option={props.listbox !== undefined}
     />
   );
+  // A menu that may drill springs its height from level to level.
+  const drills = (rows: ReactNode) =>
+    props.bare || props.submenu === "cascade" ? (
+      rows
+    ) : (
+      <DrillSize level={path.join("\u0000")}>{rows}</DrillSize>
+    );
   // The engine's view where it enters and leaves, the slot's own while it's still.
   const Root = props.open === undefined ? v.root : engine;
   return (
@@ -442,85 +600,101 @@ function MenuImpl(
       style={props.bare ? presence.style : { ...s.root, ...presence.style }}
       testID={id("root")}
     >
-      {submenu ? (
+      {drills(
         <>
-          {item({
-            value: MENU_BACK_VALUE,
-            label: submenu.label,
-            leadingIcon: "‹",
-            mirrorLeadingIcon: true,
-            closeOnSelect: false,
-          })}
-          {level.items.map(item)}
-        </>
-      ) : null}
-      {submenu ? null : level.items.map(item)}
-      {level.groups.map((group) => (
-        <v.itemGroup.View
-          key={group.id}
-          role="group"
-          {...(typeof group.label === "string"
-            ? { "aria-label": group.label }
-            : {})}
-          style={s.itemGroup}
-          testID={id("itemGroup")}
-        >
-          {isPresent(group.label) ? (
-            <v.itemGroupLabel.Text
-              selectable={false}
-              style={s.itemGroupLabel}
-              testID={id("itemGroupLabel")}
-            >
-              {group.label}
-            </v.itemGroupLabel.Text>
+          {submenu ? (
+            <>
+              {item({
+                value: MENU_BACK_VALUE,
+                label: submenu.label,
+                leadingIcon: "‹",
+                mirrorLeadingIcon: true,
+                closeOnSelect: false,
+              })}
+              {level.items.map(item)}
+            </>
           ) : null}
-          {group.items.map(item)}
-        </v.itemGroup.View>
-      ))}
-      {beside ? (
+          {submenu ? null : level.items.map(item)}
+          {level.groups.map((group) => (
+            <v.itemGroup.View
+              key={group.id}
+              role="group"
+              {...(typeof group.label === "string"
+                ? { "aria-label": group.label }
+                : {})}
+              style={s.itemGroup}
+              testID={id("itemGroup")}
+            >
+              {isPresent(group.label) ? (
+                <v.itemGroupLabel.Text
+                  selectable={false}
+                  style={s.itemGroupLabel}
+                  testID={id("itemGroupLabel")}
+                >
+                  {group.label}
+                </v.itemGroupLabel.Text>
+              ) : null}
+              {group.items.map(item)}
+            </v.itemGroup.View>
+          ))}
+        </>,
+      )}
+      {cascade.present && shownBeside ? (
         // Beside its item, over the page; the menu's own layer under it takes a press
         // outside both.
         <Portal layer="menu">
           <Anchored
-            anchor={beside.row}
+            anchor={shownBeside.row}
             positioning={submenuPositioning(rtl ? "rtl" : "ltr")}
             placement="right-start"
             gutter={0}
           >
-            {() => (
-              <MenuKeys
-                autoFocus={beside.from !== undefined}
-                onKey={(key) => {
-                  // Back out to the item: the arrow toward the inline start,
-                  // or Tab.
-                  if (
-                    key !== (rtl ? "ArrowRight" : "ArrowLeft") &&
-                    key !== "Tab"
-                  )
-                    return false;
-                  const from = beside.from;
-                  setBeside(undefined);
-                  from?.focus?.();
-                  return true;
+            {(placed) => (
+              <engine.View
+                {...cascade.props}
+                style={{
+                  // A closing submenu takes no more presses.
+                  pointerEvents: beside ? "auto" : "none",
+                  ...(placed
+                    ? { transformOrigin: placed.transformOrigin }
+                    : {}),
+                  ...cascade.style,
                 }}
               >
-                <Surface
-                  {...props}
-                  items={beside.item.items}
-                  groups={undefined}
-                  grouped={false}
-                  open={undefined}
-                  onSelect={(details) => {
+                <MenuKeys
+                  autoFocus={shownBeside.from !== undefined}
+                  onKey={(key) => {
+                    // Back out to the item: the arrow toward the inline start,
+                    // or Tab.
+                    if (
+                      key !== (rtl ? "ArrowRight" : "ArrowLeft") &&
+                      key !== "Tab"
+                    )
+                      return false;
+                    const from = shownBeside.from;
                     setBeside(undefined);
-                    props.onSelect?.(details);
+                    from?.focus?.();
+                    return true;
                   }}
-                  aria-label={
-                    typeof beside.item.label === "string"
-                      ? beside.item.label
-                      : undefined
-                  }
-                />
-              </MenuKeys>
+                >
+                  <Surface
+                    {...props}
+                    items={shownBeside.item.items}
+                    groups={undefined}
+                    grouped={false}
+                    open={undefined}
+                    onSelect={(details) => {
+                      setBeside(undefined);
+                      props.onSelect?.(details);
+                    }}
+                    aria-label={
+                      typeof shownBeside.item.label === "string"
+                        ? shownBeside.item.label
+                        : undefined
+                    }
+                  />
+                </MenuKeys>
+              </engine.View>
             )}
           </Anchored>
         </Portal>

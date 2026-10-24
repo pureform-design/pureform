@@ -1282,17 +1282,20 @@ Expressive has no equivalent.
 
 - `linearProgress`: `track` (the rest of the bar, starting after the indicator and the `gap`
   token, 4px), `indicator`, and `stopIndicator` (a dot at the track's end, `stopSize`). Turn on
-  `indeterminate` when the amount is unknown: the track fills the bar and the dot goes.
+  `indeterminate` when the amount is unknown: the dot goes and the track spans the bar, less a
+  `gap` on each side of the sliding indicator (on the web; React Native draws the whole track).
 - `circularProgress`: a `track` (the same two-half ring in `trackColor`, turned past the
   indicator and drawing the rest of the circle less a `gap` at each end, a percent of the
   circle, 3 by default) under a ring drawn by two halves, each turning through its share of the
   value. The arcs draw from their own tokens, not the radius roles, so they stay round under
-  a theme whose radii are all 0 (nothing to allow-list: the circle is `50%`, not a fixed px). Turn on `indeterminate` for a spinner, which needs only the root.
+  a theme whose radii are all 0 (nothing to allow-list: the circle is `50%`, not a fixed px). Turn on `indeterminate` for a spinner: the arc grows and shrinks as it turns, and the
+  track turns with it, keeping its gaps.
 - `shape: wavy` (M3 Expressive, both): the indicator is drawn as a wave and the track stays
   flat. The linear bar grows by the `amplitude` token (3px) above and below, and its indicator is
   clipped to a band along a sine wave of 40px waves (24 of them, so a bar wider than 960px ends
-  flat); each circular arc's ring widens by twice `amplitude` (1.5px) and is clipped to a ring of
-  nine waves, as is the spinner. A clip's points are drawn once, so the wave per thickness is a
+  flat); each circular arc's ring widens by twice `amplitude` (1.5px), and each half clips to its
+  share of one ring of nine waves, fixed in the circle, so the halves' waves meet at the seam
+  however far the arcs have turned; the spinner too. A clip's points are drawn once, so the wave per thickness is a
   compound (one on the linear, three on the circular). Where a target can't clip to a shape
   (React Native without an SVG engine, a browser without CSS `shape()`), the indicator stays
   flat; React Native draws the linear wave with an SVG engine, not the circular one.
