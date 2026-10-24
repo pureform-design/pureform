@@ -5,7 +5,12 @@ import {
     add,
     alias,
     alpha,
+    asin,
+    atan2,
     clamp,
+    ratio,
+    sin,
+    tan,
     colorMix,
     conicGradient,
     cubicBezier,
@@ -211,6 +216,13 @@ describe("math helpers", () => {
             fn: "clamp",
             args: [rem(1), pct(50), rem(2)],
         });
+    });
+
+    it("builds the trigonometry, and ratio as tan(atan2(a, b))", () => {
+        expect(sin(numeric(30, "deg")).fn).toBe("sin");
+        expect(asin(unitless(0.5)).fn).toBe("asin");
+        expect(atan2(px(1), px(2)).args).toEqual([px(1), px(2)]);
+        expect(ratio(px(1), px(2))).toEqual(tan(atan2(px(1), px(2))));
     });
 
     it("withUnit stamps a unit through multiplication", () => {

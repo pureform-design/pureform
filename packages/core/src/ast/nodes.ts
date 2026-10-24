@@ -822,7 +822,7 @@ export interface CalcNode {
  *  Fluid values that need viewport units (`clamp(1rem, ...vw, 2rem)`) carry the `vw` leg
  *  through `platform()` or `literal`, since `vw` is not a portable `Unit`. Also a dimension:
  *  leaf-kind "mathFn", where every variant shares `type: "mathFn"` and `fn` discriminates. */
-export type MathFnNode = MinMaxNode | ClampNode;
+export type MathFnNode = MinMaxNode | ClampNode | TrigNode;
 
 /** `min()` / `max()`: the smallest / largest of one or more operands. */
 export interface MinMaxNode {
@@ -838,4 +838,23 @@ export interface ClampNode {
     fn: "clamp";
     /** Exactly `[lower, preferred, upper]`. */
     args: [NumericValue, NumericValue, NumericValue];
+}
+
+/** CSS trigonometry: `sin(angle)` and `tan(angle)` give numbers, `asin(number)` an angle, and
+ *  `atan2(y, x)` the angle of two values of one type (two lengths, say), which is how CSS
+ *  relates lengths without dividing them. A native target works them out with its tokens. */
+export type TrigNode = TrigFnNode | Atan2Node;
+
+/** `sin()` / `tan()` of an angle, or `asin()` of a number. */
+export interface TrigFnNode {
+    type: "mathFn";
+    fn: "sin" | "tan" | "asin";
+    args: [NumericValue];
+}
+
+/** `atan2(y, x)`: the angle to the point (x, y). */
+export interface Atan2Node {
+    type: "mathFn";
+    fn: "atan2";
+    args: [NumericValue, NumericValue];
 }

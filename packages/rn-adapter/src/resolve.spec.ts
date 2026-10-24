@@ -536,6 +536,43 @@ describe("evaluate", () => {
         expect(evaluate({ $math: "clamp", args: [1, 9, 5] }, {})).toBe(5);
     });
 
+    it("works out CSS trigonometry, angles in degrees, so lengths divide through atan2", () => {
+        const theme = { gap: "4px", thickness: 4, size: 48 };
+        // ratio(a, b) = tan(atan2(a, b)), in pixels as on the web.
+        const ratio = {
+            $math: "tan" as const,
+            args: [
+                {
+                    $math: "atan2" as const,
+                    args: [
+                        {
+                            $calc: "+" as const,
+                            args: [{ $ref: "gap" }, { $ref: "thickness" }],
+                        },
+                        {
+                            $calc: "-" as const,
+                            args: [{ $ref: "size" }, { $ref: "thickness" }],
+                        },
+                    ],
+                },
+            ],
+        };
+        expect(evaluate(ratio, theme)).toBeCloseTo(8 / 44, 6);
+        const angle = evaluate({ $math: "asin", args: [ratio] }, theme);
+        expect(Number.parseFloat(String(angle))).toBeCloseTo(
+            (Math.asin(8 / 44) * 180) / Math.PI,
+            5,
+        );
+        expect(String(angle)).toMatch(/deg$/);
+        expect(evaluate({ $math: "sin", args: ["30deg"] }, {})).toBeCloseTo(
+            0.5,
+            9,
+        );
+        expect(() => evaluate({ $math: "atan2", args: ["4%", 4] }, {})).toThrow(
+            /atan2/,
+        );
+    });
+
     it("writes shadows as React Native's boxShadow string", () => {
         expect(
             evaluate(

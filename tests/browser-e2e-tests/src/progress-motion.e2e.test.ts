@@ -128,19 +128,34 @@ describe.each(Object.keys(STYLINGS) as (keyof typeof STYLINGS)[])(
                 const m = new DOMMatrix(getComputedStyle(track).transform);
                 return (Math.atan2(m.b, m.a) * 180) / Math.PI;
             };
-            // At 2250ms the arc is about halfway between its sizes; the track turns past it by
-            // the gap (3% of the circle) and both rounded ends (1.45% each), so it follows the
-            // arc's value.
-            const expected = (((value() + 3 + 2.9) * 3.6 + 180) % 360) - 180;
+            // At 2250ms the arc is about halfway between its sizes; the track turns past it so
+            // the rounded ends' centres are the gap and a thickness apart (8px on a 44px middle
+            // line), so it follows the arc's value.
+            const apart = (2 * Math.asin(8 / 44) * 180) / Math.PI;
+            const expected =
+                ((((value() * 3.6 + apart + 180) % 360) + 360) % 360) - 180;
             expect(angle()).toBeCloseTo(expected, 0);
         });
 
-        it.each(["ltr", "rtl"])(
-            "rounds the circular arcs' ends, keeping the gap between them (%s)",
-            (dir) => {
-                const c = STYLINGS[styling].classes("circularProgress", {});
+        it.each([
+            ["ltr", 48, 4, false],
+            ["rtl", 48, 4, false],
+            ["ltr", 48, 8, false],
+            ["ltr", 24, 4, false],
+            ["rtl", 96, 12, false],
+            ["ltr", 48, 4, true],
+            ["rtl", 48, 4, true],
+            ["ltr", 64, 8, true],
+        ] as const)(
+            "rounds the circular arcs' ends, keeping the gap between them (%s, %ipx, %ipx thick, wavy %s)",
+            (dir, size, thickness, wavy) => {
+                const c = STYLINGS[styling].classes(
+                    "circularProgress",
+                    wavy ? { shape: "wavy" } : {},
+                );
+                // Only the size and thickness are set: the ends' angle follows them.
                 const root =
-                    show(`<div dir="${dir}"><div data-root class="${c.root}" role="progressbar" style="--pf-components-circularProgress-value: 40; transition: none">
+                    show(`<div dir="${dir}"><div data-root class="${c.root}" role="progressbar" style="--pf-components-circularProgress-value: 40; --pf-components-circularProgress-size: ${size}px; --pf-components-circularProgress-thickness: ${thickness}px; transition: none">
                 <span class="${c.track}" style="transition: none"><span class="${c.trackEndHalf}"><span class="${c.trackEndArc}"></span></span><span class="${c.trackStartHalf}"><span class="${c.trackStartArc}"></span></span><span class="${c.trackTailCap}"></span><span class="${c.trackHeadCap}"></span></span>
                 <span class="${c.endHalf}"><span class="${c.endArc}"></span></span>
                 <span class="${c.startHalf}"><span class="${c.startArc}"></span></span>
@@ -153,32 +168,53 @@ describe.each(Object.keys(STYLINGS) as (keyof typeof STYLINGS)[])(
                     expect(getComputedStyle(el).borderTopLeftRadius).not.toBe(
                         "0px",
                     );
-                    expect((el as HTMLElement).offsetWidth).toBe(4);
+                    expect(getComputedStyle(el).display).not.toBe("none");
+                    expect((el as HTMLElement).offsetWidth).toBe(thickness);
                     return [
                         r.left + r.width / 2 - (box.left + box.width / 2),
                         r.top + r.height / 2 - (box.top + box.height / 2),
                     ] as const;
                 };
                 // Clockwise from the top (anticlockwise under right to left), on the ring's
-                // middle line, 22px out.
-                const at = (percent: number) => {
+                // middle line (the wavy track's, smaller by the 1.5px amplitude, and the wavy
+                // indicator's, moving in and out with its nine waves).
+                const amplitude = wavy ? 1.5 : 0;
+                const middle = (size - thickness) / 2 - amplitude;
+                const at = (percent: number, out = 0) => {
                     const a = (percent * 3.6 * Math.PI) / 180;
-                    const x = 22 * Math.sin(a);
-                    return [dir === "rtl" ? -x : x, -22 * Math.cos(a)];
+                    const x = (middle + out) * Math.sin(a);
+                    return [
+                        dir === "rtl" ? -x : x,
+                        -(middle + out) * Math.cos(a),
+                    ];
                 };
                 const near = (p: readonly number[], q: readonly number[]) => {
                     expect(p[0]).toBeCloseTo(q[0]!, 0);
                     expect(p[1]).toBeCloseTo(q[1]!, 0);
                 };
                 near(center(c.tailCap!), at(0));
-                near(center(c.headCap!), at(40));
-                // The track's ends sit the gap and a rounded end on from the indicator's, so the
-                // space between the rounded ends is the gap: 3% of the ring, about 4px.
-                near(center(c.trackTailCap!), at(40 + 3 + 2.9));
-                near(center(c.trackHeadCap!), at(100 - 3 - 2.9));
-                const [hx, hy] = center(c.headCap!);
-                const [tx, ty] = center(c.trackTailCap!);
-                expect(Math.hypot(tx - hx, ty - hy) - 4).toBeCloseTo(4.1, 0);
+                // The wave at 40%: sin(9 × 144°) of the amplitude out (in, here); right to left
+                // mirrors the wave with the circle.
+                const wave = Math.sin((9 * 144 * Math.PI) / 180);
+                near(center(c.headCap!), at(40, amplitude * wave));
+                // The track's ends' centres sit the gap and a thickness from the indicator's,
+                // along the middle line, so the space between the rounded ends is the gap.
+                const apart =
+                    (2 * Math.asin((4 + thickness) / (2 * middle)) * 180) /
+                    Math.PI /
+                    3.6;
+                near(center(c.trackTailCap!), at(40 + apart));
+                near(center(c.trackHeadCap!), at(100 - apart));
+                const gap = (a: readonly number[], b: readonly number[]) =>
+                    Math.hypot(a[0]! - b[0]!, a[1]! - b[1]!) - thickness;
+                expect(
+                    gap(center(c.tailCap!), center(c.trackHeadCap!)),
+                ).toBeCloseTo(4, 0);
+                if (!wavy) {
+                    expect(
+                        gap(center(c.headCap!), center(c.trackTailCap!)),
+                    ).toBeCloseTo(4, 0);
+                }
             },
         );
 
