@@ -17,6 +17,10 @@ export const extendStory: NonNullable<StoryHooks["extendStory"]> = (
               ...story,
               play: async (context) => {
                   await story.play?.(context);
+                  // React Native Web's slider doesn't move for this synthetic press (the
+                  // events reach its root with their position, but its responder sets no
+                  // value; not traced further). Its state play's real click moves it.
+                  if (context.globals["renderer"] === "native") return;
                   const { canvasElement } = context;
                   const part = (id: string) =>
                       canvasElement.querySelector<HTMLElement>(

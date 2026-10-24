@@ -2,7 +2,25 @@
 // renderers, the shared hooks, and overrides (skips, args, schemes). Every component with an
 // anatomy and a case is drawn. See the README for adding to each.
 
+import type { RendererSkip } from "./src/renderers/compose";
 import { defineStories } from "./src/renderers/config";
+
+// React Native's narrow exceptions, by story export name (`"*"`: every story), each for what the
+// platform can't do; `parameters.pureform.skip` (see `RendererSkip`).
+const native = (stories: Readonly<Record<string, RendererSkip>>) => ({
+    pureform: { skip: { native: stories } },
+});
+
+/** The web's click bubbles from the item a key pressed to the component's root `onClick`, which
+ *  the key plays spy on. React Native has no bubbling, and its composites take no root press. */
+const NO_BUBBLING =
+    "React Native doesn't bubble a press to its composite's root, which takes no onPress: the key's click reaches the item's own handler only.";
+const keyClicks = (...stories: readonly string[]) =>
+    native(
+        Object.fromEntries(
+            stories.map((story) => [story, { play: NO_BUBBLING }]),
+        ),
+    );
 
 export default defineStories({
     // The controls come from React's exports' props (Solid's agree; see the README).
@@ -37,13 +55,6 @@ export default defineStories({
                 module: "./src/native/scenes.ts",
                 components: ["Toast", "GridList"],
             },
-            // React Native skipped for now; needs renderer-neutral readers. The cases read the
-            // web bindings' DOM (a button's `aria-pressed`, the switch's native input, the
-            // field's `data-pf-filled`), which React Native Web doesn't draw, so its stories
-            // run without the generated plays and stay out of the story tests. They still draw
-            // in Storybook.
-            casePlays: false,
-            tests: false,
         },
     },
     schemes: ["light", "dark"],
@@ -109,6 +120,8 @@ export default defineStories({
                 },
             },
         },
+        ButtonGroup: { parameters: keyClicks("KeyEnter", "KeySpace") },
+        ChipSet: { parameters: keyClicks("KeyEnter", "KeySpace") },
         Carousel: {
             // Its items are sized from the row's width once mounted (the case's `measured`): a
             // frame as wide as the component suites' page (their 1280px viewport, the reset's

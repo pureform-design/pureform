@@ -40,6 +40,7 @@ export const userEvent = {
             { keys: "[MouseLeft]", target: element, coords },
         ]);
     },
+    unhover: (element: Element) => storybookUserEvent.unhover(element),
     keyboard: (text: string) => storybookUserEvent.keyboard(text),
     type: (element: Element, text: string, options?: object) =>
         storybookUserEvent.type(element, text, options),
