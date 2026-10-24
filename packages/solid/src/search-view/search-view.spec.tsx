@@ -58,6 +58,37 @@ describe("SearchView, ready-made", () => {
         expect(byTestId(ids.root).style.position).toBe("relative");
     });
 
+    it("opens from a native button named by the placeholder, saying it opens a dialog and whether it's open", async () => {
+        withRegistry(() => (
+            <SearchView placeholder="Search mail" items={ITEMS} />
+        ));
+        await settle();
+        const trigger = byTestId(ids.trigger);
+        expect(trigger.tagName).toBe("BUTTON");
+        expect(trigger.getAttribute("type")).toBe("button");
+        expect(trigger.getAttribute("aria-label")).toBe("Search mail");
+        expect(trigger.getAttribute("aria-haspopup")).toBe("dialog");
+        expect(trigger.getAttribute("aria-expanded")).toBe("false");
+        expect(trigger.getAttribute("aria-controls")).toBe(
+            byTestId(ids.surface).id,
+        );
+        // The bar inside is only its look: nothing in it takes focus.
+        expect(byTestId(bar.input).closest("[inert]")).not.toBeNull();
+        trigger.focus();
+        await userEvent.keyboard(" ");
+        await frames();
+        expect(trigger.getAttribute("aria-expanded")).toBe("true");
+        // Space opens it without typing a space into the query.
+        expect(byTestId<HTMLInputElement>(ids.input).value).toBe("");
+        await userEvent.keyboard("{Escape}");
+        await frames();
+        expect(trigger.getAttribute("aria-expanded")).toBe("false");
+        expect(document.activeElement).toBe(trigger);
+        await userEvent.keyboard("{Enter}");
+        await frames();
+        expect(trigger.getAttribute("aria-expanded")).toBe("true");
+    });
+
     it("drops a docked or contained view over the bar's place", async () => {
         withRegistry(() => (
             <SearchView variant="contained" placeholder="Search" />
@@ -82,8 +113,8 @@ describe("SearchView, ready-made", () => {
             </>
         ));
         await settle();
-        const barInput = byTestId<HTMLInputElement>(bar.input);
-        await userEvent.click(barInput);
+        const trigger = byTestId(ids.trigger);
+        await userEvent.click(trigger);
         await frames();
         expect(onOpenChange).toHaveBeenLastCalledWith({ open: true });
         expect(byTestId(ids.positioner).hidden).toBe(false);
@@ -100,13 +131,13 @@ describe("SearchView, ready-made", () => {
         await frames();
         expect(onOpenChange).toHaveBeenLastCalledWith({ open: false });
         expect(byTestId(ids.positioner).hidden).toBe(true);
-        expect(document.activeElement).toBe(barInput);
+        expect(document.activeElement).toBe(trigger);
     });
 
     it("carries a key typed in the bar into the query, and filters the suggestions", async () => {
         withRegistry(() => <SearchView placeholder="Search" items={ITEMS} />);
         await settle();
-        byTestId<HTMLInputElement>(bar.input).focus();
+        byTestId(ids.trigger).focus();
         await userEvent.keyboard("i");
         await frames();
         const input = byTestId<HTMLInputElement>(ids.input);
@@ -127,7 +158,7 @@ describe("SearchView, ready-made", () => {
             />
         ));
         await settle();
-        await userEvent.click(byTestId(bar.input));
+        await userEvent.click(byTestId(ids.trigger));
         await frames();
         await userEvent.keyboard("{ArrowDown}{Enter}");
         await frames();
@@ -150,7 +181,7 @@ describe("SearchView, ready-made", () => {
             />
         ));
         await settle();
-        await userEvent.click(byTestId(bar.input));
+        await userEvent.click(byTestId(ids.trigger));
         await frames();
         await userEvent.keyboard("zebra{Enter}");
         await settle();

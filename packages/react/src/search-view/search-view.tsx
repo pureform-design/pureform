@@ -17,6 +17,8 @@ import {
     SEARCH_VIEW_COLLECTION,
     SEARCH_VIEW_ROOT_PROPS,
     SEARCH_VIEW_ROOT_STYLE,
+    SEARCH_VIEW_TRIGGER_STYLE,
+    searchViewCarriedKey,
     searchViewComboboxProps,
     searchViewDialogProps,
     searchViewLabel,
@@ -79,6 +81,8 @@ interface SearchViewContextValue {
     readonly presence: Presence;
     readonly sources: ItemInteractionSources;
     readonly positioner: RefObject<HTMLElement | null>;
+    readonly label: string;
+    readonly disabled: boolean | undefined;
     readonly setInput: (element: HTMLElement | null) => void;
     readonly submit: () => void;
 }
@@ -217,6 +221,8 @@ function Root(props: SearchViewRootProps): ReactNode {
                 presence,
                 sources,
                 positioner,
+                label: searchViewLabel(props),
+                disabled: props.disabled,
                 setInput,
                 submit,
             }}
@@ -231,27 +237,34 @@ function Root(props: SearchViewRootProps): ReactNode {
     );
 }
 
-/** Around the search bar that opens the view: a press on it, Enter, the down arrow, or typing
- *  opens it, and a typed character carries over to the view's query. It marks whether the view
- *  is open (`data-state`). The registry doesn't style it. */
+/** The search bar that opens the view: a native `<button>` around it, named from the view's
+ *  label (the placeholder), which says it opens a dialog (`aria-haspopup`) and whether it's open
+ *  (`aria-expanded`). A press on it, Enter, Space, the down arrow, or typing opens it, and a
+ *  typed character carries over to the view's query. Put no interactive element in it: the
+ *  ready-made's search bar is inert. The registry doesn't style it. */
 function Trigger({ unstyled, ...props }: SearchViewPartProps): ReactNode {
-    const { scope, view, query } = context.use("Trigger");
+    const { scope, view, query, label, disabled } = context.use("Trigger");
     return scope.render("trigger", {
-        element: "div",
-        machine: {
-            "data-state": view.open ? "open" : "closed",
-            onClick: () => view.setOpen(true),
-            onKeyDown: (event: KeyboardEvent) => {
-                if (view.open || !opensSearchView(event)) return;
-                event.preventDefault();
-                if (event.key.length === 1)
-                    query.setInputValue(
-                        query.inputValue + event.key,
-                        "input-change",
-                    );
-                view.setOpen(true);
-            },
-        },
+        element: "button",
+        machine: mergeProps(
+            view.getTriggerProps(),
+            normalizeProps.button({
+                "aria-label": label,
+                disabled,
+                style: SEARCH_VIEW_TRIGGER_STYLE,
+                onKeyDown: (event: KeyboardEvent) => {
+                    if (view.open || !opensSearchView(event)) return;
+                    event.preventDefault();
+                    const carried = searchViewCarriedKey(event.key);
+                    if (carried !== undefined)
+                        query.setInputValue(
+                            query.inputValue + carried,
+                            "input-change",
+                        );
+                    view.setOpen(true);
+                },
+            }),
+        ),
         unstyled,
         props,
     });
@@ -458,7 +471,8 @@ function ReadyMadeContent({
                     own.trigger
                 ) : (
                     <SearchBar
-                        aria-label={searchViewLabel(own)}
+                        as="span"
+                        inert
                         placeholder={own.placeholder}
                         value={query.inputValue}
                         readOnly

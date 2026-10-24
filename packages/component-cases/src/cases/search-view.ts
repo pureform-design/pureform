@@ -9,22 +9,29 @@ import { allByRole } from "../aria";
 import type { ComponentCase } from "../types";
 import { byTestId, itemSources } from "../types";
 import { userEvent } from "../user-event";
-import { leavingOnWeb, overlayParts } from "./overlay";
+import { overlayParts } from "./overlay";
 
 const ids = compositeTestIds.searchView;
-const { trigger, read, click, shown, overlay, placed } = overlayParts(
+
+// The search bar that opens the view: a button that opens a dialog (the web's trigger itself,
+// React Native's over the bar), saying whether it's open (`aria-expanded`). An open view hides
+// it from assistive technology.
+const bar = (host: HTMLElement): HTMLElement => {
+    const found = allByRole(host, "button", { hidden: true }).filter(
+        (element) => element.getAttribute("aria-haspopup") === "dialog",
+    );
+    if (found.length !== 1) {
+        throw new Error(`${found.length} buttons open a dialog`);
+    }
+    return found[0]!;
+};
+
+const { read, click, shown, overlay, placed } = overlayParts(
     {
         trigger: ids.trigger,
         content: ids.surface,
     },
-    {
-        role: "dialog",
-        trigger: (host) => byTestId(host, ids.trigger),
-        // The web's bar is a plain element around the search bar, so nothing says the view is
-        // open but the view itself.
-        expands: false,
-        leaving: leavingOnWeb,
-    },
+    { role: "dialog", trigger: bar },
 );
 
 const ITEMS = [
@@ -35,13 +42,6 @@ const ITEMS = [
 
 const input = (host: HTMLElement) =>
     byTestId<HTMLInputElement>(host, ids.input);
-
-// What takes focus in the trigger: the search bar's input, or a button over it that opens the
-// view (React Native's, whose bar isn't editable).
-const bar = (host: HTMLElement): HTMLElement =>
-    allByRole(trigger(host), "button").find((element) =>
-        element.hasAttribute("aria-haspopup"),
-    ) ?? trigger(host).querySelector("input")!;
 
 export const searchView: ComponentCase = {
     component: "SearchView",
@@ -66,6 +66,7 @@ export const searchView: ComponentCase = {
         disables: false,
         keys: [
             { key: "{Enter}", does: "change" },
+            { key: " ", does: "change" },
             { key: "a", does: "change" },
         ],
         // The down arrow opens it too, in either direction.

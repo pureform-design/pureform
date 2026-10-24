@@ -13,6 +13,7 @@ import type { PartName, TestIdOverride } from "@pureform/anatomy";
 import {
     isPresent,
     opensSearchView,
+    searchViewCarriedKey,
     searchViewLabel,
     searchViewMatches,
     searchViewMenuSelection,
@@ -60,6 +61,8 @@ export interface SearchViewTriggerProps {
     /** Opens the view. */
     readonly onPress: () => void;
     readonly "aria-haspopup": "dialog";
+    /** Whether the view is open. */
+    readonly "aria-expanded": boolean;
     /** The query. */
     readonly value: string;
 }
@@ -169,12 +172,14 @@ export function SearchView(props: SearchViewProps): ReactNode {
         const key = event.nativeEvent;
         if (props.disabled || open || !opensSearchView(key)) return;
         event.preventDefault?.();
-        if (key.key.length === 1) setQuery(query + key.key);
+        const carried = searchViewCarriedKey(key.key);
+        if (carried !== undefined) setQuery(query + carried);
         show();
     };
     const given: SearchViewTriggerProps = {
         onPress: show,
         "aria-haspopup": "dialog",
+        "aria-expanded": open,
         value: query,
     };
     return (
@@ -198,6 +203,7 @@ export function SearchView(props: SearchViewProps): ReactNode {
                         <Pressable
                             role="button"
                             aria-haspopup="dialog"
+                            aria-expanded={open}
                             aria-label={label}
                             disabled={props.disabled}
                             onPress={show}

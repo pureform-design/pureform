@@ -1292,6 +1292,8 @@ export {
     SEARCH_VIEW_CONTENT_PROPS,
     SEARCH_VIEW_ROOT_PROPS,
     SEARCH_VIEW_ROOT_STYLE,
+    SEARCH_VIEW_TRIGGER_STYLE,
+    searchViewCarriedKey,
     searchViewComboboxProps,
     searchViewDialogProps,
     searchViewLabel,

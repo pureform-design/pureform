@@ -256,3 +256,24 @@ export const searchViewPositionerLayout = (
 
 /** Root's own layout: positioned, so a docked view drops over the search bar inside it. */
 export const SEARCH_VIEW_ROOT_STYLE = { position: "relative" } as const;
+
+/** The character a key pressed on the search bar carries into the view's query: a printable
+ *  one, but not Space, which opens the view like any button's press. */
+export const searchViewCarriedKey = (key: string): string | undefined =>
+    key.length === 1 && key !== " " ? key : undefined;
+
+/** The web's trigger, a native `<button>` around the search bar: none of the button's own look,
+ *  laid out as the block the bar was. */
+export const SEARCH_VIEW_TRIGGER_STYLE = {
+    display: "block",
+    boxSizing: "border-box",
+    width: "100%",
+    margin: "0",
+    padding: "0",
+    border: "0",
+    background: "none",
+    font: "inherit",
+    color: "inherit",
+    textAlign: "inherit",
+    cursor: "pointer",
+} as const;

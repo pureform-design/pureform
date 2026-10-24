@@ -20,12 +20,6 @@ export interface OverlayAria {
     readonly name?: string | RegExp;
     /** Or the trigger itself, when it isn't a button found by its name. */
     readonly trigger?: (host: HTMLElement) => HTMLElement;
-    /** `false` for a trigger that doesn't say `aria-expanded` (a search view's bar, which
-     *  stays where it is under the view): the state is whether the surface shows and isn't
-     *  `leaving`. */
-    readonly expands?: false;
-    /** With `expands: false`, whether a surface still drawn is on its way out. */
-    readonly leaving?: (surface: HTMLElement) => boolean;
 }
 
 /** The button inside `host` that says whether what it opens is open (`aria-expanded`): a FAB
@@ -61,7 +55,7 @@ export const drawn = async <T>(find: () => T): Promise<T> => {
 };
 
 /** Whether a surface still drawn is on its way out, for an overlay nothing in ARIA tells open
- *  (a search view, a snackbar): the web's Zag marks it `data-state="closed"` while its exit
+ *  (a snackbar): the web's Zag marks it `data-state="closed"` while its exit
  *  runs; React Native's is gone once closed, so this never holds there. */
 export const leavingOnWeb = (surface: HTMLElement): boolean =>
     surface.closest('[data-state="closed"]') !== null;
@@ -92,9 +86,6 @@ export const overlayParts = (
     /** Whether it's open: the trigger's `aria-expanded`, throwing if it's open and no surface
      *  shows. A closed one's surface may still show while it leaves. */
     const read = (host: HTMLElement): boolean => {
-        if (aria.expands === false) {
-            return surfaces(host).some((surface) => !aria.leaving?.(surface));
-        }
         const expanded = trigger(host).getAttribute("aria-expanded");
         if (expanded !== "true" && expanded !== "false") {
             throw new Error(`aria-expanded is ${String(expanded)}`);
