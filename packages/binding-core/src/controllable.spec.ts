@@ -93,10 +93,10 @@ describe("createChangeReason", () => {
         const { seen, callback } = collect();
         reason.untilNextTask();
         reason.report(callback, { value: "a" });
-        await new Promise((resolve) => setTimeout(resolve));
+        await new Promise((resolve) => setTimeout(() => resolve(undefined)));
         reason.untilNextTask({ drop: true });
         reason.report(callback, { value: "b" });
-        await new Promise((resolve) => setTimeout(resolve));
+        await new Promise((resolve) => setTimeout(() => resolve(undefined)));
         reason.report(callback, { value: "c" });
         expect(seen).toEqual([{ value: "a", reason: "reset" }, { value: "c" }]);
     });

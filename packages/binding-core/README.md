@@ -751,8 +751,8 @@ items), and that no Solid or React source sets a listed group from anything but 
 - `task_run` `build` on `@pureform/binding-core`: Vite library build, four entries (`index`,
   `interaction`, `indication`, `usage`), with declarations.
 - `task_run` `test:unit`: `tsc` on the source without the DOM lib (`tsconfig.json`), `tsc` on the
-  specs with it (`tsconfig.spec.json`), then Vitest in browser mode (Chromium; `CHROMIUM_PATH`
-  from `.env.local`), with type checks.
+  specs, also without it (`tsconfig.spec.json`), then Vitest under Node (`TZ` is Asia/Manila), with
+  type checks.
 
 ## Worth knowing
 

@@ -1,9 +1,11 @@
 {
     "extends": ["./tsconfig.json"],
     "compilerOptions": {
-        "lib": ["ESNext", "DOM", "DOM.Iterable"],
-        "types": ["vite/client", "@vitest/browser-playwright"]
+        "types": ["vite/client"]
     },
-    "include": ["${configDir}/src/**/*.spec.ts"],
+    "include": [
+        "${configDir}/src/**/*.spec.ts",
+        "${configDir}/src/platform-globals.d.ts"
+    ],
     "exclude": []
 }
