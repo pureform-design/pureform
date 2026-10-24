@@ -26,6 +26,8 @@ const DISABLED_TEXT = {
 };
 const NO_FILE_INPUT =
     "React Native has no file input to give files to: its trigger calls the app's onPick.";
+const NO_CAROUSEL_KEYS =
+    "React Native's carousel pages follow its native scroll; arrow keys between items would have to drive it.";
 const keyClicks = (...stories: readonly string[]) =>
     native(
         Object.fromEntries(
@@ -85,7 +87,16 @@ export default defineStories({
                 },
             },
         },
-        Scrim: { hooks: ["./src/stages/scrim.ts"] },
+        Scrim: {
+            hooks: ["./src/stages/scrim.ts"],
+            // Every React Native Web view is a positioned container, so its scrim fills the
+            // story's root view inside the stage's padding, not the stage the play measures.
+            parameters: native({
+                "*": {
+                    play: "React Native's scrim fills its nearest view (every view is positioned), inside the stage's padding.",
+                },
+            }),
+        },
         // Invisible on its own: drawn in a small element, its area outlined.
         TouchTarget: { hooks: ["./src/stages/touch-target.ts"] },
         FabMenu: {
@@ -134,6 +145,12 @@ export default defineStories({
         ButtonGroup: { parameters: keyClicks("KeyEnter", "KeySpace") },
         ChipSet: { parameters: keyClicks("KeyEnter", "KeySpace") },
         SplitButton: { parameters: keyClicks("KeyEnter", "KeySpace") },
+        List: { parameters: keyClicks("KeyEnter") },
+        Snackbar: { parameters: keyClicks("KeyEnter", "KeySpace") },
+        Stepper: { parameters: keyClicks("KeyEnter", "KeySpace") },
+        Table: { parameters: keyClicks("KeyEnter", "KeySpace") },
+        Tabs: { parameters: keyClicks("KeyEnter", "KeySpace") },
+        Toolbar: { parameters: keyClicks("KeyEnter", "KeySpace") },
         TimePicker: {
             parameters: native({
                 KeyEnter: { play: NO_BUBBLING },
@@ -168,7 +185,17 @@ export default defineStories({
             // width too (the Vitest addon's default is 1200px).
             parameters: {
                 layout: "fullscreen",
-                pureform: { width: 1280 },
+                pureform: {
+                    width: 1280,
+                    // React Native's pages follow its native scroll, and it has no arrow keys
+                    // between its items: they would have to drive that scroll.
+                    skip: {
+                        native: {
+                            Light: { play: NO_CAROUSEL_KEYS },
+                            Dark: { play: NO_CAROUSEL_KEYS },
+                        },
+                    },
+                },
                 viewport: {
                     options: {
                         suites: {

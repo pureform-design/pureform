@@ -11,29 +11,42 @@ import { ADD_TOAST_LABEL } from "../renderers/scenes";
 
 const ROOT = `[data-testid="${testIds.toast.root}"]`;
 
-/** A sideways drag of `by` pixels on `element`, by a mouse. */
+/** A sideways drag of `by` pixels on `element`, by a mouse: pointer events, which the web's
+ *  toasts follow, and mouse events, which React Native Web's responder (its pan) follows. */
 const swipe = (element: HTMLElement, by: number) => {
     const box = element.getBoundingClientRect();
     const y = box.top + box.height / 2;
     const x = box.left + 40;
-    const at = (type: string, clientX: number) =>
+    const at = (type: string, clientX: number, buttons: number) => {
+        const init = {
+            bubbles: true,
+            cancelable: true,
+            button: 0,
+            buttons,
+            clientX,
+            clientY: y,
+        };
         element.dispatchEvent(
-            new PointerEvent(type, {
-                bubbles: true,
-                cancelable: true,
+            new PointerEvent(`pointer${type}`, {
+                ...init,
                 pointerId: 9,
                 pointerType: "mouse",
                 isPrimary: true,
-                button: 0,
-                clientX,
-                clientY: y,
             }),
         );
-    at("pointerdown", x);
-    for (let step = 1; step <= 6; step++)
-        at("pointermove", x + (by * step) / 6);
-    at("pointerup", x + by);
+        element.dispatchEvent(new MouseEvent(`mouse${type}`, init));
+    };
+    at("down", x, 1);
+    for (let step = 1; step <= 6; step++) at("move", x + (by * step) / 6, 1);
+    at("up", x + by, 0);
 };
+
+/** Whether a toast shows and isn't leaving: the web's say `data-state="open"`; React Native's
+ *  have no state of their own and are gone once dismissed. */
+const isOpen = (toast: HTMLElement) =>
+    toast.isConnected &&
+    (!toast.hasAttribute("data-state") ||
+        toast.getAttribute("data-state") === "open");
 
 export const extendStory: NonNullable<StoryHooks["extendStory"]> = (
     name,
@@ -63,10 +76,7 @@ export const extendStory: NonNullable<StoryHooks["extendStory"]> = (
                             ...canvasElement.querySelectorAll<HTMLElement>(
                                 ROOT,
                             ),
-                        ].filter(
-                            (toast) =>
-                                toast.getAttribute("data-state") === "open",
-                        );
+                        ].filter(isOpen);
                     const before = open().length;
                     await userEvent.click(
                         await within(canvasElement).findByRole("button", {
@@ -82,11 +92,7 @@ export const extendStory: NonNullable<StoryHooks["extendStory"]> = (
                     });
                     // Past half its width: it goes, and closes.
                     swipe(added, added.offsetWidth * 0.75);
-                    await waitFor(() =>
-                        expect(added.getAttribute("data-state")).not.toBe(
-                            "open",
-                        ),
-                    );
+                    await waitFor(() => expect(isOpen(added)).toBe(false));
                 },
             }
           : story;
