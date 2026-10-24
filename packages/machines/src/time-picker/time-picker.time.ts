@@ -307,3 +307,30 @@ export const dialLabelSelected = (
         : cycle === 24
           ? label.value === time.hour
           : label.value === displayHour(time.hour, 12);
+
+/** How far a key moves the view's value: arrows one step, Page Up and Down five minutes or three
+ *  hours, Home and End to the ends. `undefined` for any other key. */
+export const timeKeyStep = (
+    key: string,
+    view: TimeView,
+): number | "start" | "end" | undefined => {
+    const page = view === "minute" ? 5 : 3;
+    switch (key) {
+        case "ArrowUp":
+        case "ArrowRight":
+            return 1;
+        case "ArrowDown":
+        case "ArrowLeft":
+            return -1;
+        case "PageUp":
+            return page;
+        case "PageDown":
+            return -page;
+        case "Home":
+            return "start";
+        case "End":
+            return "end";
+        default:
+            return undefined;
+    }
+};
