@@ -75,11 +75,15 @@ export {
 export type { ComponentSlots, SlotViews, SlotViewsBySlot } from "./styles";
 export {
     PureformContainer,
+    useContainerFrame,
     useReducedMotion,
     useStyleEnvironment,
     useTokens,
 } from "@pureform/rn-adapter/react";
-export type { PureformContainerProps } from "@pureform/rn-adapter/react";
+export type {
+    ContainerFrame,
+    PureformContainerProps,
+} from "@pureform/rn-adapter/react";
 export type {
     PresenceDriver,
     PresenceFrame,

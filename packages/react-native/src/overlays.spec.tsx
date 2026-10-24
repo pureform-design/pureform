@@ -3,7 +3,7 @@ import { View } from "react-native";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
-import { PureformProvider, placeOverlay } from ".";
+import { PureformContainer, PureformProvider, placeOverlay } from ".";
 import { BottomSheet } from "./bottom-sheet";
 import { Button } from "./button";
 import { Dialog } from "./dialog";
@@ -230,6 +230,50 @@ describe.each([animated, reanimated])("the menu with $name", (engine) => {
         await until(() => menu() === null);
         expect(menu()).toBeNull();
         expect(document.activeElement).toBe(byTestId("pf-button-root"));
+    });
+
+    it("cascades by default only when a submenu fits beside the menu within the nearest container too", async () => {
+        const items = [
+            { value: "cut", label: "Cut" },
+            {
+                value: "share",
+                label: "Share",
+                items: [{ value: "mail", label: "Mail" }],
+            },
+        ];
+        const labels = () =>
+            [...document.querySelectorAll('[role="menuitem"]')].map(
+                (item) => item.textContent,
+            );
+        const openShare = async (container: ReactNode) => {
+            document.body.innerHTML = "";
+            await render(container, engine);
+            await interact(() => userEvent.click(byTestId("pf-button-root")));
+            await settle(400);
+            await interact(() => userEvent.click(items_()[1]!));
+        };
+        const items_ = () => [
+            ...document.querySelectorAll<HTMLElement>('[role="menuitem"]'),
+        ];
+        // The window is wide enough for a submenu beside the menu either way.
+        await openShare(
+            <PureformContainer style={{ width: 200 }}>
+                <Menu trigger="Edit" items={items} />
+            </PureformContainer>,
+        );
+        await until(() => labels().includes("‹Share"));
+        expect(labels()).toEqual(["‹Share", "Mail"]);
+        await openShare(
+            <PureformContainer style={{ width: 400 }}>
+                <Menu trigger="Edit" items={items} />
+            </PureformContainer>,
+        );
+        await until(() => labels().includes("Mail"));
+        expect(labels()).toEqual(["Cut", "Share›", "Mail"]);
+        // With no container around it, only the window counts.
+        await openShare(<Menu trigger="Edit" items={items} />);
+        await until(() => labels().includes("Mail"));
+        expect(labels()).toEqual(["Cut", "Share›", "Mail"]);
     });
 
     it("opens a cascaded submenu with the arrow toward the end and backs out with the other, on the web", async () => {

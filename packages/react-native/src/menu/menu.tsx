@@ -7,7 +7,8 @@
 // submenu as `submenu` says: beside it (`cascade`, over the page against the item's row, as a
 // trigger's menu is against its trigger), or in its place (`drill`: the submenu's items under a
 // row that goes back, headed by the item's label); `auto` cascades when a submenu fits beside the
-// open menu in the window (measured once it's laid out), else drills.
+// open menu in the window and the nearest `PureformContainer` (measured once it's laid out), else
+// drills.
 
 import { menuAnatomy, menuOverlayAnatomy } from "@pureform/anatomy";
 import type { PartName, TestIdOverride } from "@pureform/anatomy";
@@ -36,6 +37,8 @@ import type {
 } from "@pureform/binding-core";
 import type { Indication } from "@pureform/binding-core/indication";
 import type { MutableInteractionSource } from "@pureform/binding-core/interaction";
+import { useContainerFrame } from "@pureform/rn-adapter/react";
+import type { ContainerFrame } from "@pureform/rn-adapter/react";
 import type { Selection } from "@pureform/styling";
 import { memo, useEffect, useRef, useState } from "react";
 import type { ComponentRef, ReactNode } from "react";
@@ -262,23 +265,35 @@ function MenuImpl(
         /** Its items alone, without the surface (container, elevation, width), for a view that
          *  draws its own, as the search view's content does. */
         readonly bare?: boolean;
+        /** The nearest container's frame, for a menu rendered through the portal host, which
+         *  doesn't carry the container's context. */
+        readonly container?: ContainerFrame;
     },
 ): ReactNode {
     const engine = useEngine();
     const rtl = useDirection() === "rtl";
     const windowWidth = useWindowDimensions().width;
     const auto = props.submenu === undefined || props.submenu === "auto";
-    const [room, setRoom] = useState<MenuSubmenuRoom>();
+    const inherited = useContainerFrame();
+    const container = props.container ?? inherited;
+    const [measured, setMeasured] = useState<{
+        readonly left: number;
+        readonly right: number;
+    }>();
     const surface = useRef<ComponentRef<typeof View>>(null);
     const measureRoom = () =>
         surface.current?.measureInWindow((x, _y, width) => {
-            if (width > 0)
-                setRoom(
-                    menuSubmenuRoomOf(
-                        { left: x, right: x + width },
-                        { left: 0, right: windowWidth },
-                    ),
-                );
+            if (width > 0) setMeasured({ left: x, right: x + width });
+        });
+    // Within the window and, when there's one, the nearest container's measured frame.
+    const room: MenuSubmenuRoom | undefined =
+        measured &&
+        menuSubmenuRoomOf(measured, {
+            left: Math.max(0, container?.x ?? 0),
+            right: Math.min(
+                windowWidth,
+                container ? container.x + container.width : windowWidth,
+            ),
         });
     const drill = menuSubmenuMode(props.submenu, room) === "drill";
     // The submenu items drilled into, outermost first.
@@ -653,6 +668,7 @@ function MenuOverlay(props: MenuProps): ReactNode {
         ...surface
     } = props;
     const engine = useEngine();
+    const container = useContainerFrame();
     const { open, source, measured, presence, close, toggle } =
         useAnchoredOverlay("Menu", {
             open: props.open,
@@ -732,7 +748,11 @@ function MenuOverlay(props: MenuProps): ReactNode {
                                 }}
                             >
                                 <Popup onClose={close}>
-                                    <Surface {...surface} onSelect={select} />
+                                    <Surface
+                                        {...surface}
+                                        {...(container ? { container } : {})}
+                                        onSelect={select}
+                                    />
                                 </Popup>
                             </engine.View>
                         )}
