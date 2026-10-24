@@ -42,8 +42,34 @@ Branch `rn-menu-container` from main `040b9fc1` (after r10). Single agent. Not p
 
 ## Open questions
 
-- The frame is measured on the container's layout, so a container that moves without resizing
-  (an ancestor scrolls or shifts) keeps its old position, as `auto` measures once per open.
+- The cached frame is measured on the container's layout, so a container that moves without
+  resizing keeps its old position. Fixed on the branch `rn-menu-frame` (below).
 - The container's frame only counts horizontally; vertical bounds don't affect cascading.
 - Only the nearest container counts; a named container can be read with `useContainerFrame(name)`
   but `Menu` doesn't take a name.
+
+## Follow-up: re-measuring the container when a Menu opens (`rn-menu-frame`)
+
+Branch `rn-menu-frame` from main `3f98a6c7`. Not pushed. It was cheap and reliable, so it's done.
+
+- **rn-adapter (`src/react.ts`):** `PureformContainer` also provides a stable `measure` function
+  through a third context (keyed by `withContainer` like the others); new `useMeasureContainer(name?)`
+  and `MeasureContainer` type. It calls `measureInWindow` on the container's ref once per call and
+  resolves the frame (`undefined` when unmounted or zero-sized). Nothing runs per frame, and
+  there are no scroll listeners; the cached `useContainerFrame` is unchanged.
+- **React Native `Menu`:** when the surface lays out (that is, as the menu opens), `auto` also calls
+  the container's measure and keeps the result as `fresh`, which wins over the cached frame for the
+  room. The trigger's `Menu` reads `useMeasureContainer()` and passes it to the portal surface
+  (`measureContainer` prop), as it does the frame. Exported from `@pureform/react-native`.
+- **Why it works on both:** `measureInWindow` is `getBoundingClientRect` on React Native Web (so it
+  includes transforms and scroll) and a native-side measure on iOS and Android; the callback is
+  asynchronous on both, so the fresh frame arrives a render after the first room.
+- **Tests:** rn-adapter `react.spec.ts` (measure function only inside a container); React Native
+  `overlays.spec.tsx` "decides with the container's position as of the menu opening, though it
+  moved without resizing" (animated and reanimated; fails without the fix). Native itself isn't run
+  here; it relies on `measureInWindow`'s documented behaviour.
+- **Limits:** the room can flip once after opening (cached frame first, fresh a render later). A
+  submenu about to cascade doesn't re-measure: the decision is made from the room at open, and a
+  container that moves while the menu stays open isn't followed (the menu closes on outside
+  presses and scrolling parents move the trigger anyway). The fresh frame stays until the surface
+  next lays out.
