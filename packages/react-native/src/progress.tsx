@@ -83,10 +83,12 @@ function LinearProgressImpl(props: LinearProgressProps): ReactNode {
                     <engine.Drawing drawing={selected.drawings.indicator} />
                 ) : null}
             </v.indicator.View>
-            <v.stopIndicator.View
-                style={s.stopIndicator}
-                testID={id("stopIndicator")}
-            />
+            {props.track === false ? null : (
+                <v.stopIndicator.View
+                    style={s.stopIndicator}
+                    testID={id("stopIndicator")}
+                />
+            )}
         </v.root.View>
     );
 }
@@ -124,6 +126,14 @@ function CircularProgressImpl(props: CircularProgressProps): ReactNode {
                             testID={id("trackStartArc")}
                         />
                     </v.trackStartHalf.View>
+                    <v.trackTailCap.View
+                        style={s.trackTailCap}
+                        testID={id("trackTailCap")}
+                    />
+                    <v.trackHeadCap.View
+                        style={s.trackHeadCap}
+                        testID={id("trackHeadCap")}
+                    />
                 </v.track.View>
             )}
             <v.endHalf.View style={s.endHalf} testID={id("endHalf")}>
@@ -132,6 +142,8 @@ function CircularProgressImpl(props: CircularProgressProps): ReactNode {
             <v.startHalf.View style={s.startHalf} testID={id("startHalf")}>
                 <v.startArc.View style={s.startArc} testID={id("startArc")} />
             </v.startHalf.View>
+            <v.tailCap.View style={s.tailCap} testID={id("tailCap")} />
+            <v.headCap.View style={s.headCap} testID={id("headCap")} />
         </v.root.View>
     );
 }

@@ -129,10 +129,58 @@ describe.each(Object.keys(STYLINGS) as (keyof typeof STYLINGS)[])(
                 return (Math.atan2(m.b, m.a) * 180) / Math.PI;
             };
             // At 2250ms the arc is about halfway between its sizes; the track turns past it by
-            // the gap (3% of the circle), so it follows the arc's value.
-            const expected = (((value() + 3) * 3.6 + 180) % 360) - 180;
+            // the gap (3% of the circle) and both rounded ends (1.45% each), so it follows the
+            // arc's value.
+            const expected = (((value() + 3 + 2.9) * 3.6 + 180) % 360) - 180;
             expect(angle()).toBeCloseTo(expected, 0);
         });
+
+        it.each(["ltr", "rtl"])(
+            "rounds the circular arcs' ends, keeping the gap between them (%s)",
+            (dir) => {
+                const c = STYLINGS[styling].classes("circularProgress", {});
+                const root =
+                    show(`<div dir="${dir}"><div data-root class="${c.root}" role="progressbar" style="--pf-components-circularProgress-value: 40; transition: none">
+                <span class="${c.track}" style="transition: none"><span class="${c.trackEndHalf}"><span class="${c.trackEndArc}"></span></span><span class="${c.trackStartHalf}"><span class="${c.trackStartArc}"></span></span><span class="${c.trackTailCap}"></span><span class="${c.trackHeadCap}"></span></span>
+                <span class="${c.endHalf}"><span class="${c.endArc}"></span></span>
+                <span class="${c.startHalf}"><span class="${c.startArc}"></span></span>
+                <span class="${c.tailCap}"></span><span class="${c.headCap}"></span>
+            </div></div>`);
+                const box = root.getBoundingClientRect();
+                const center = (name: string) => {
+                    const el = root.querySelector(`.${name.split(" ")[0]}`)!;
+                    const r = el.getBoundingClientRect();
+                    expect(getComputedStyle(el).borderTopLeftRadius).not.toBe(
+                        "0px",
+                    );
+                    expect((el as HTMLElement).offsetWidth).toBe(4);
+                    return [
+                        r.left + r.width / 2 - (box.left + box.width / 2),
+                        r.top + r.height / 2 - (box.top + box.height / 2),
+                    ] as const;
+                };
+                // Clockwise from the top (anticlockwise under right to left), on the ring's
+                // middle line, 22px out.
+                const at = (percent: number) => {
+                    const a = (percent * 3.6 * Math.PI) / 180;
+                    const x = 22 * Math.sin(a);
+                    return [dir === "rtl" ? -x : x, -22 * Math.cos(a)];
+                };
+                const near = (p: readonly number[], q: readonly number[]) => {
+                    expect(p[0]).toBeCloseTo(q[0]!, 0);
+                    expect(p[1]).toBeCloseTo(q[1]!, 0);
+                };
+                near(center(c.tailCap!), at(0));
+                near(center(c.headCap!), at(40));
+                // The track's ends sit the gap and a rounded end on from the indicator's, so the
+                // space between the rounded ends is the gap: 3% of the ring, about 4px.
+                near(center(c.trackTailCap!), at(40 + 3 + 2.9));
+                near(center(c.trackHeadCap!), at(100 - 3 - 2.9));
+                const [hx, hy] = center(c.headCap!);
+                const [tx, ty] = center(c.trackTailCap!);
+                expect(Math.hypot(tx - hx, ty - hy) - 4).toBeCloseTo(4.1, 0);
+            },
+        );
 
         it("keeps the wavy circular halves' wave in the circle's frame, meeting at the seam", () => {
             const c = STYLINGS[styling].classes("circularProgress", {

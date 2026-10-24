@@ -456,6 +456,10 @@ export const displayRegistry = () =>
             "endArc",
             "startHalf",
             "startArc",
+            "trackTailCap",
+            "trackHeadCap",
+            "tailCap",
+            "headCap",
         ]),
         loadingIndicator: named("loading-indicator", [
             "root",

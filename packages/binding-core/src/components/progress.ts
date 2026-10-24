@@ -19,8 +19,8 @@ import type { VariantProp } from "./variants";
 export type LinearProgressPart = PartName<typeof linearProgressAnatomy>;
 
 /** The circular progress indicator's parts: `"root"`, the track's `"track" | "trackEndHalf" |
- *  "trackEndArc" | "trackStartHalf" | "trackStartArc"`, and the indicator's `"endHalf" | "endArc" |
- *  "startHalf" | "startArc"`. */
+ *  "trackEndArc" | "trackStartHalf" | "trackStartArc" | "trackTailCap" | "trackHeadCap"`, and the
+ *  indicator's `"endHalf" | "endArc" | "startHalf" | "startArc" | "tailCap" | "headCap"`. */
 export type CircularProgressPart = PartName<typeof circularProgressAnatomy>;
 
 /** Which progress indicator. */
@@ -42,7 +42,8 @@ export interface ProgressVariantProps<C extends ProgressComponent> {
 /** The ready-made progress indicators' own props. */
 export interface ProgressReadyMadeProps {
     /** Whether to draw the track, the rest of the bar or circle beyond the indicator and its
-     *  gaps. Hidden with `false`; the indicator and the stop dot stay. @default true */
+     *  gaps, with the linear one's stop dot. Hidden with `false` (the dot too); the indicator
+     *  stays. @default true */
     readonly track?: boolean | undefined;
 }
 

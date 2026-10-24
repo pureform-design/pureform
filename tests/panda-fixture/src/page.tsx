@@ -3206,6 +3206,8 @@ export function Page() {
                                                         class={c.trackStartArc}
                                                     />
                                                 </span>
+                                                <span class={c.trackTailCap} />
+                                                <span class={c.trackHeadCap} />
                                             </span>
                                             <span class={c.endHalf}>
                                                 <span class={c.endArc} />
@@ -3213,6 +3215,8 @@ export function Page() {
                                             <span class={c.startHalf}>
                                                 <span class={c.startArc} />
                                             </span>
+                                            <span class={c.tailCap} />
+                                            <span class={c.headCap} />
                                         </div>
                                     );
                                 })()}
@@ -3233,6 +3237,8 @@ export function Page() {
                                             <span class={c.startHalf}>
                                                 <span class={c.startArc} />
                                             </span>
+                                            <span class={c.tailCap} />
+                                            <span class={c.headCap} />
                                         </div>
                                     );
                                 })()}
@@ -3254,6 +3260,8 @@ export function Page() {
                                             <span class={c.startHalf}>
                                                 <span class={c.startArc} />
                                             </span>
+                                            <span class={c.tailCap} />
+                                            <span class={c.headCap} />
                                         </div>
                                     );
                                 })()}
@@ -3576,6 +3584,8 @@ export function Page() {
                                         <span class={c.trackStartHalf}>
                                             <span class={c.trackStartArc} />
                                         </span>
+                                        <span class={c.trackTailCap} />
+                                        <span class={c.trackHeadCap} />
                                     </span>
                                     <span class={c.endHalf}>
                                         <span class={c.endArc} />
@@ -3583,6 +3593,8 @@ export function Page() {
                                     <span class={c.startHalf}>
                                         <span class={c.startArc} />
                                     </span>
+                                    <span class={c.tailCap} />
+                                    <span class={c.headCap} />
                                 </div>
                             );
                         }}

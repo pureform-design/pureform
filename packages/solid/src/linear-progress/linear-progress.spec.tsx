@@ -58,13 +58,18 @@ describe("CircularProgress", () => {
         expect(root.getAttribute("aria-valuenow")).toBe("75");
         expect(
             [...root.children].map((part) => part.getAttribute("data-pf-part")),
-        ).toEqual(["track", "end-half", "start-half"]);
+        ).toEqual(["track", "end-half", "start-half", "tail-cap", "head-cap"]);
         const track = byTestId(ids.track);
         expect(
             [...track.children].map((part) =>
                 part.getAttribute("data-pf-part"),
             ),
-        ).toEqual(["track-end-half", "track-start-half"]);
+        ).toEqual([
+            "track-end-half",
+            "track-start-half",
+            "track-tail-cap",
+            "track-head-cap",
+        ]);
         expect(byTestId(ids.trackEndArc).parentElement).toBe(
             byTestId(ids.trackEndHalf),
         );
@@ -104,11 +109,23 @@ describe("the progress indicators' track", () => {
             "indicator",
             "stop-indicator",
         ]);
-        expect(parts("c-root")).toEqual(["track", "end-half", "start-half"]);
-        expect(parts("d-root")).toEqual(["track", "end-half", "start-half"]);
+        expect(parts("c-root")).toEqual([
+            "track",
+            "end-half",
+            "start-half",
+            "tail-cap",
+            "head-cap",
+        ]);
+        expect(parts("d-root")).toEqual([
+            "track",
+            "end-half",
+            "start-half",
+            "tail-cap",
+            "head-cap",
+        ]);
     });
 
-    it("leaves the track out with track={false}", async () => {
+    it("leaves the track and the stop dot out with track={false}", async () => {
         withRegistry(() => (
             <>
                 <LinearProgress testId="a" value={40} track={false} />
@@ -118,10 +135,11 @@ describe("the progress indicators' track", () => {
             </>
         ));
         await settle();
-        expect(parts("a-root")).toEqual(["indicator", "stop-indicator"]);
-        expect(parts("b-root")).toEqual(["indicator", "stop-indicator"]);
-        expect(parts("c-root")).toEqual(["end-half", "start-half"]);
-        expect(parts("d-root")).toEqual(["end-half", "start-half"]);
+        expect(parts("a-root")).toEqual(["indicator"]);
+        expect(parts("b-root")).toEqual(["indicator"]);
+        const indicator = ["end-half", "start-half", "tail-cap", "head-cap"];
+        expect(parts("c-root")).toEqual(indicator);
+        expect(parts("d-root")).toEqual(indicator);
         expect(byTestId("a-root").hasAttribute("track")).toBe(false);
     });
 });

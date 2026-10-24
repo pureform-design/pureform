@@ -249,6 +249,43 @@ describe("progress", () => {
         );
     });
 
+    it("rounds every circular arc's ends with a dot, the track kept a gap and a dot's reach away", () => {
+        const recipe = compilePreset(configWith(circularProgress)).theme
+            ?.slotRecipes?.circularProgress;
+        const base = recipe?.base;
+        for (const part of [
+            "trackTailCap",
+            "trackHeadCap",
+            "tailCap",
+            "headCap",
+        ] as const) {
+            expect(base?.[part]?.borderRadius).toBeDefined();
+            expect(base?.[part]?.width).toContain("thickness");
+            expect(JSON.stringify(base?.[part]?.transform)).toContain(
+                "translateY",
+            );
+        }
+        expect(base?.trackTailCap?.backgroundColor).toContain("trackColor");
+        expect(base?.headCap?.backgroundColor).toContain("activeColor");
+        expect(JSON.stringify(base?.headCap?.transform)).toContain(
+            "var(--components-circularProgress-value",
+        );
+        expect(JSON.stringify(base?.track?.transform)).toContain(
+            "var(--components-circularProgress-cap",
+        );
+        // The default ring and the thick one: half the thickness along the middle line.
+        expect(circularProgress.tokens?.cap).toMatchObject({
+            default: { value: 1.45 },
+        });
+        expect(
+            JSON.stringify(recipe?.variants?.thickness?.thick?.root),
+        ).toContain("3.18");
+        // A wavy indicator's ends follow its wave.
+        expect(recipe?.variants?.shape?.wavy?.headCap).toEqual({
+            display: "none",
+        });
+    });
+
     it("starts the linear track after the indicator and a gap, and while indeterminate draws it in two parts around the indicator, without the stop dot", () => {
         const css = compilePreset(configWith(linearProgress)).theme?.slotRecipes
             ?.linearProgress;
