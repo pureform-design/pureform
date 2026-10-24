@@ -3,7 +3,11 @@
 // `overflow` moves those that don't fit into the menu component behind an overflow button.
 
 import { toolbarAnatomy } from "@pureform/anatomy";
-import type { buttonAnatomy, iconButtonAnatomy } from "@pureform/anatomy";
+import type {
+    buttonAnatomy,
+    iconButtonAnatomy,
+    menuOverlayAnatomy,
+} from "@pureform/anatomy";
 import {
     isPresent,
     isUnstyled,
@@ -39,7 +43,7 @@ import { MoreIcon } from "../glyphs";
 import { IconButton } from "../icon-button";
 import type { IconButtonProps } from "../icon-button";
 import { Menu } from "../menu";
-import { useComponent, useSlotProps } from "../parts";
+import { asRoot, useComponent, useSlotProps } from "../parts";
 import type { InnerPropsOf, SlotKeyedProps } from "../parts";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
@@ -108,6 +112,9 @@ function Root(props: ToolbarRootProps): ReactNode {
 type Keyed = SlotKeyedProps<typeof toolbarAnatomy>;
 type ButtonDefaults = InnerPropsOf<typeof buttonAnatomy>;
 type IconButtonDefaults = InnerPropsOf<typeof iconButtonAnatomy>;
+type MenuInnerProps = InnerPropsOf<typeof menuOverlayAnatomy>;
+
+const NO_MENU_PROPS: MenuInnerProps = {};
 
 /** The ready-made toolbar's props: Root's, with `className`, `style` and `slotProps` keyed by the
  *  toolbar's own part (`root`), the elements as data, and the defaults of the buttons it draws:
@@ -122,6 +129,9 @@ export interface ToolbarProps
     readonly buttonProps?: ButtonDefaults | undefined;
     /** The same for every icon button, keyed by the icon button's parts. */
     readonly iconButtonProps?: IconButtonDefaults | undefined;
+    /** The overflow menu's own props, keyed by the menu's parts; its `trigger` is the overflow
+     *  button. */
+    readonly menuProps?: MenuInnerProps | undefined;
 }
 
 const ITEM = "data-pf-toolbar-item";
@@ -192,9 +202,12 @@ function ReadyMade(props: ToolbarProps): ReactNode {
         slotProps: _slotProps,
         buttonProps,
         iconButtonProps,
+        menuProps = NO_MENU_PROPS,
         ...rootProps
     } = props;
     const slot = useSlotProps(props);
+    const menuSlot = useSlotProps(menuProps);
+    const menuRoot = menuSlot("root");
     const root = useRef<HTMLElement>(null);
     // How many elements stay in the row; all of them, with the overflow button, until measured.
     const [count, setCount] = useState<number>();
@@ -231,8 +244,16 @@ function ReadyMade(props: ToolbarProps): ReactNode {
             ))}
             {overflow ? (
                 <Menu.Root
+                    testId={menuProps.testId}
+                    unstyled={menuProps.unstyled}
+                    tokens={menuProps.tokens}
+                    {...menuRoot}
                     {...{ [OVERFLOW]: "" }}
-                    style={overflowing ? undefined : HIDDEN}
+                    style={
+                        overflowing
+                            ? menuRoot.style
+                            : { ...menuRoot.style, ...HIDDEN }
+                    }
                     positioning={toolbarMenuPositioning(props.orientation)}
                     onSelect={(details) =>
                         toolbarMenuSelect(items, details.value)
@@ -249,11 +270,16 @@ function ReadyMade(props: ToolbarProps): ReactNode {
                             )
                         }
                         testId={toolbarOverflowTestId(props.testId)}
+                        {...asRoot(menuSlot("trigger"))}
                     />
-                    <Menu.Positioner>
-                        <Menu.Content>
+                    <Menu.Positioner {...menuSlot("positioner")}>
+                        <Menu.Content {...menuSlot("content")}>
                             {toolbarMenuItems(items, shown).map((item) => (
-                                <Menu.ItemEntry key={item.value} item={item} />
+                                <Menu.ItemEntry
+                                    key={item.value}
+                                    item={item}
+                                    slot={menuSlot}
+                                />
                             ))}
                         </Menu.Content>
                     </Menu.Positioner>

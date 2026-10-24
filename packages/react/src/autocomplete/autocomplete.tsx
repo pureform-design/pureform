@@ -52,7 +52,7 @@ import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import type { PartContext } from "../part-context";
 import { useComponent, useSlotProps } from "../parts";
-import type { ComponentScope, SlotKeyedProps } from "../parts";
+import type { ComponentScope, InnerPropsOf, SlotKeyedProps } from "../parts";
 import { usePresence } from "../presence";
 import type { Presence } from "../presence";
 import { omitProps } from "../props";
@@ -96,7 +96,12 @@ export interface AutocompleteRootProps
         AutocompleteRootOwnProps {
     /** Another element or component to render instead of `<div>`. */
     readonly as?: ElementType | undefined;
+    /** The list's own props, drawn as a menu: `testId`, `unstyled`, and `tokens` (the ready-made
+     *  also takes `className`, `style`, and `slotProps` keyed by the menu's parts). */
+    readonly menuProps?: InnerPropsOf<MenuAnatomy> | undefined;
 }
+
+const NO_MENU_PROPS: InnerPropsOf<MenuAnatomy> = {};
 
 /** A part's props: the element's own, and the part's `unstyled`. */
 export interface AutocompletePartProps extends PartProps {
@@ -244,12 +249,22 @@ function Root(props: AutocompleteRootProps): ReactNode {
         testId: props.testId,
         unstyled: props.unstyled,
     });
+    const menuProps = props.menuProps ?? NO_MENU_PROPS;
     const menu = useComponent(autocompleteMenuAnatomy, {
-        selection: autocompleteMenuSelection(props),
-        testId: typeof props.testId === "string" ? props.testId : undefined,
+        selection: {
+            ...autocompleteMenuSelection(props),
+            tokens: menuProps.tokens,
+        },
+        testId:
+            menuProps.testId ??
+            (typeof props.testId === "string" ? props.testId : undefined),
+        unstyled: menuProps.unstyled,
         indication: props.indication,
     });
-    const { as, ...rest } = omitProps(props, AUTOCOMPLETE_ROOT_PROPS);
+    const { as, menuProps: _menuProps, ...rest } = omitProps(
+        props,
+        AUTOCOMPLETE_ROOT_PROPS,
+    );
     return (
         <context.Provider
             value={{
@@ -397,6 +412,7 @@ function ReadyMadeContent({
 }): ReactNode {
     const { matches, supportingTextId, errorText } = context.use("Root");
     const slot = useSlotProps(own);
+    const menuSlot = useSlotProps(own.menuProps ?? NO_MENU_PROPS);
     const showsSupporting =
         isPresent(own.supportingText) || errorText !== undefined;
     return (
@@ -440,12 +456,18 @@ function ReadyMadeContent({
                     {own.supportingText}
                 </SupportingText>
             ) : null}
-            <Positioner>
-                <Content>
+            <Positioner {...menuSlot("positioner")}>
+                <Content {...menuSlot("root")}>
                     {selectItemGroups(matches).map(({ group, items: run }) => {
                         const options = run.map((item) => (
-                            <Item key={item.value} item={item}>
-                                <ItemLabel>{item.label}</ItemLabel>
+                            <Item
+                                key={item.value}
+                                item={item}
+                                {...menuSlot("item")}
+                            >
+                                <ItemLabel {...menuSlot("itemLabel")}>
+                                    {item.label}
+                                </ItemLabel>
                             </Item>
                         ));
                         return group === undefined ? (
@@ -453,8 +475,15 @@ function ReadyMadeContent({
                                 {options}
                             </Fragment>
                         ) : (
-                            <ItemGroup key={group} id={group}>
-                                <ItemGroupLabel group={group}>
+                            <ItemGroup
+                                key={group}
+                                {...menuSlot("itemGroup")}
+                                id={group}
+                            >
+                                <ItemGroupLabel
+                                    group={group}
+                                    {...menuSlot("itemGroupLabel")}
+                                >
                                     {group}
                                 </ItemGroupLabel>
                                 {options}

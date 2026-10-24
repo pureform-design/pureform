@@ -9,6 +9,7 @@ import {
     searchViewMenuAnatomy,
     searchViewOverlayAnatomy,
 } from "@pureform/anatomy";
+import type { iconButtonAnatomy, searchBarAnatomy } from "@pureform/anatomy";
 import type { PartName, TestIdOverride } from "@pureform/anatomy";
 import {
     isPresent,
@@ -59,7 +60,7 @@ import type { ItemInteractionSources } from "../interaction";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import { useComponent, useSlotProps } from "../parts";
-import type { ComponentScope, SlotKeyedProps } from "../parts";
+import type { ComponentScope, InnerPropsOf, SlotKeyedProps } from "../parts";
 import { usePresence } from "../presence";
 import type { Presence } from "../presence";
 import { omitProps } from "../props";
@@ -69,6 +70,8 @@ import { SearchBar } from "../search-bar";
 
 type Anatomy = typeof searchViewOverlayAnatomy;
 type MenuAnatomy = typeof searchViewMenuAnatomy;
+type SearchBarAnatomy = typeof searchBarAnatomy;
+type IconButtonAnatomy = typeof iconButtonAnatomy;
 
 /** What Root shares with its parts. */
 interface SearchViewContextValue {
@@ -103,7 +106,12 @@ export interface SearchViewRootProps
         SearchViewRootOwnProps {
     /** Another element or component to render instead of `<div>`. */
     readonly as?: ElementType | undefined;
+    /** The suggestions' own props, drawn as menu items: `testId`, `unstyled`, and `tokens` (the
+     *  ready-made also takes `className`, `style`, and `slotProps` keyed by the items' parts). */
+    readonly menuProps?: InnerPropsOf<MenuAnatomy> | undefined;
 }
+
+const NO_MENU_PROPS: InnerPropsOf<MenuAnatomy> = {};
 
 /** A part's props: the element's own, and the part's `unstyled`. */
 export interface SearchViewPartProps extends PartProps {
@@ -203,12 +211,19 @@ function Root(props: SearchViewRootProps): ReactNode {
         testId: props.testId as TestIdOverride<PartName<Anatomy>> | undefined,
         unstyled: props.unstyled as Unstyled<PartName<Anatomy>> | undefined,
     });
+    const menuProps = props.menuProps ?? NO_MENU_PROPS;
     const menu = useComponent(searchViewMenuAnatomy, {
-        selection: searchViewMenuSelection(),
-        testId: typeof props.testId === "string" ? props.testId : undefined,
+        selection: { ...searchViewMenuSelection(), tokens: menuProps.tokens },
+        testId:
+            menuProps.testId ??
+            (typeof props.testId === "string" ? props.testId : undefined),
+        unstyled: menuProps.unstyled,
         indication: props.indication,
     });
-    const { as, ...rest } = omitProps(props, SEARCH_VIEW_ROOT_PROPS);
+    const { as, menuProps: _menuProps, ...rest } = omitProps(
+        props,
+        SEARCH_VIEW_ROOT_PROPS,
+    );
     return (
         <context.Provider
             value={{
@@ -454,6 +469,12 @@ export interface SearchViewProps
         SearchViewContentProps<ReactNode> {
     readonly testId?: TestIdOverride<SearchViewPart>;
     readonly unstyled?: Unstyled<SearchViewPart>;
+    /** The search bar drawn as the trigger when `trigger` isn't given. */
+    readonly searchBarProps?: InnerPropsOf<SearchBarAnatomy> | undefined;
+    /** The back button in the header. */
+    readonly backButtonProps?: InnerPropsOf<IconButtonAnatomy> | undefined;
+    /** The clear button shown while there's a query. */
+    readonly clearButtonProps?: InnerPropsOf<IconButtonAnatomy> | undefined;
 }
 
 // Inside Root, so it can read the query and the suggestions.
@@ -464,6 +485,7 @@ function ReadyMadeContent({
 }): ReactNode {
     const { view, query, matches } = context.use("Root");
     const slot = useSlotProps(own);
+    const menuSlot = useSlotProps(own.menuProps ?? NO_MENU_PROPS);
     return (
         <>
             <Trigger {...slot("trigger")}>
@@ -471,6 +493,7 @@ function ReadyMadeContent({
                     own.trigger
                 ) : (
                     <SearchBar
+                        {...own.searchBarProps}
                         as="span"
                         inert
                         placeholder={own.placeholder}
@@ -484,6 +507,7 @@ function ReadyMadeContent({
                     <Header {...slot("header")}>
                         <Leading mirror {...slot("leading")}>
                             <IconButton
+                                {...own.backButtonProps}
                                 aria-label={own.backLabel ?? "Back"}
                                 icon={
                                     isPresent(own.leading) ? (
@@ -502,6 +526,7 @@ function ReadyMadeContent({
                                     own.trailing
                                 ) : (
                                     <IconButton
+                                        {...own.clearButtonProps}
                                         aria-label={own.clearLabel ?? "Clear"}
                                         icon={<CloseIcon />}
                                         onClick={() => {
@@ -521,11 +546,21 @@ function ReadyMadeContent({
                         {isPresent(own.children)
                             ? own.children
                             : matches.map((item) => (
-                                  <Item key={item.value} item={item}>
-                                      <ItemContent>
-                                          <ItemLabel>{item.label}</ItemLabel>
+                                  <Item
+                                      key={item.value}
+                                      item={item}
+                                      {...menuSlot("item")}
+                                  >
+                                      <ItemContent {...menuSlot("itemContent")}>
+                                          <ItemLabel {...menuSlot("itemLabel")}>
+                                              {item.label}
+                                          </ItemLabel>
                                           {item.supportingText ? (
-                                              <ItemSupportingText>
+                                              <ItemSupportingText
+                                                  {...menuSlot(
+                                                      "itemSupportingText",
+                                                  )}
+                                              >
                                                   {item.supportingText}
                                               </ItemSupportingText>
                                           ) : null}
@@ -552,6 +587,9 @@ function ReadyMade(props: SearchViewProps): ReactNode {
         trailing: _trailing,
         backLabel: _backLabel,
         clearLabel: _clearLabel,
+        searchBarProps: _searchBarProps,
+        backButtonProps: _backButtonProps,
+        clearButtonProps: _clearButtonProps,
         ...rootProps
     } = props;
     const slot = useSlotProps(props);

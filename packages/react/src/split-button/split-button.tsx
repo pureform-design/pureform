@@ -5,6 +5,7 @@
 // them from data.
 
 import { splitButtonAnatomy } from "@pureform/anatomy";
+import type { menuOverlayAnatomy } from "@pureform/anatomy";
 import {
     isPresent,
     SPLIT_BUTTON_MENU_LABEL,
@@ -28,7 +29,7 @@ import {
 import { Menu } from "../menu";
 import { createPartContext } from "../part-context";
 import { useComponent, useSlotProps } from "../parts";
-import type { ComponentScope, SlotKeyedProps } from "../parts";
+import type { ComponentScope, InnerPropsOf, SlotKeyedProps } from "../parts";
 import { combinePartProps, omitProps } from "../props";
 import type { PartProps } from "../props";
 
@@ -51,7 +52,14 @@ export interface SplitButtonRootProps
         SplitButtonRootOwnProps {
     /** Another element or component to render instead of `<div>`. */
     readonly as?: ElementType | undefined;
+    /** The menu's own props: `testId`, `unstyled`, `tokens`, and its root's `className`,
+     *  `style` and `slotProps` (the ready-made also reaches the menu's other parts). */
+    readonly menuProps?: InnerPropsOf<MenuAnatomy> | undefined;
 }
+
+type MenuAnatomy = typeof menuOverlayAnatomy;
+
+const NO_MENU_PROPS: InnerPropsOf<MenuAnatomy> = {};
 
 /** A part's props: the element's own, and the part's `unstyled`. */
 export interface SplitButtonPartProps extends PartProps {
@@ -76,10 +84,15 @@ function Root(props: SplitButtonRootProps): ReactNode {
         unstyled: props.unstyled,
         indication: props.indication,
     });
-    const { as, ...rest } = omitProps(props, SPLIT_BUTTON_ROOT_PROPS);
+    const { as, menuProps = NO_MENU_PROPS, ...rest } = omitProps(
+        props,
+        SPLIT_BUTTON_ROOT_PROPS,
+    );
+    const menuSlot = useSlotProps(menuProps);
     return (
         <context.Provider value={{ scope, disabled: !!props.disabled }}>
             <Menu.Root
+                {...(menuSlot("root") as object)}
                 open={props.open}
                 defaultOpen={props.defaultOpen}
                 onOpenChange={props.onOpenChange}
@@ -91,6 +104,9 @@ function Root(props: SplitButtonRootProps): ReactNode {
                 ids={props.ids}
                 positioning={splitButtonMachineProps(props).positioning}
                 indication={props.indication}
+                testId={menuProps.testId}
+                unstyled={menuProps.unstyled}
+                tokens={menuProps.tokens}
             >
                 {scope.render("root", { element: "div", as, props: rest })}
             </Menu.Root>
@@ -197,6 +213,7 @@ function ReadyMade(props: SplitButtonProps): ReactNode {
         ...rootProps
     } = props;
     const slot = useSlotProps(props);
+    const menuSlot = useSlotProps(props.menuProps ?? NO_MENU_PROPS);
     return (
         <Root {...rootProps} {...(slot("root") as object)}>
             <LeadingButton
@@ -214,11 +231,17 @@ function ReadyMade(props: SplitButtonProps): ReactNode {
                     {isPresent(trailingIcon) ? trailingIcon : <DropDownArrow />}
                 </TrailingIcon>
             </TrailingButton>
-            <SplitButtonMenu>
-                {items.map((item) => (
-                    <Menu.ItemEntry key={item.value} item={item} />
-                ))}
-            </SplitButtonMenu>
+            <Menu.Positioner {...menuSlot("positioner")}>
+                <Menu.Content {...menuSlot("content")}>
+                    {items.map((item) => (
+                        <Menu.ItemEntry
+                            key={item.value}
+                            item={item}
+                            slot={menuSlot}
+                        />
+                    ))}
+                </Menu.Content>
+            </Menu.Positioner>
         </Root>
     );
 }
