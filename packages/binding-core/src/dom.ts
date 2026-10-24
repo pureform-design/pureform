@@ -241,6 +241,7 @@ export {
 export {
     MENU_DRILL_TIMING,
     menuDrillFrom,
+    menuDrillTiming,
     menuDrillTo,
 } from "./menu-drill-motion";
 export type { MenuDrillSnapshot, MenuDrillTiming } from "./menu-drill-motion";

@@ -38,7 +38,9 @@ import type {
 import {
     markMenuGroupEdges,
     menuDrillFrom,
+    menuDrillTiming,
     menuDrillTo,
+    springRoleVar,
     watchMenuSubmenuRoom,
 } from "@pureform/binding-core/dom";
 import type { MenuDrillSnapshot } from "@pureform/binding-core/dom";
@@ -70,7 +72,7 @@ import { usePresence } from "../presence";
 import type { Presence } from "../presence";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
-import { useDirection } from "../provider";
+import { useComponentState, useDirection } from "../provider";
 
 type Anatomy = typeof menuOverlayAnatomy;
 
@@ -622,12 +624,17 @@ function DrillMotion(props: {
 }): null {
     const { api } = context.use("Content");
     const { level, contentId, from } = props;
+    const spring = springRoleVar(
+        useComponentState().registry,
+        "spatialDefault",
+    );
     contentId.current = api.getContentProps().id;
     useLayoutEffect(() => {
         const snapshot = from.current;
         from.current = undefined;
-        if (snapshot && contentId.current)
-            menuDrillTo(document.getElementById(contentId.current), snapshot);
+        if (!snapshot || !contentId.current) return;
+        const content = document.getElementById(contentId.current);
+        menuDrillTo(content, snapshot, menuDrillTiming(content, spring));
     }, [level]);
     return null;
 }
