@@ -50,6 +50,7 @@ export default createConfig({
                     list: "src/list/index.ts",
                     "list-item": "src/list-item/index.ts",
                     media: "src/media/index.ts",
+                    "touch-target": "src/touch-target/index.ts",
                     menu: "src/menu/index.ts",
                     "navigation-bar": "src/navigation-bar/index.ts",
                     "navigation-rail": "src/navigation-rail/index.ts",

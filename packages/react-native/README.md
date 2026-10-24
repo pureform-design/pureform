@@ -549,6 +549,11 @@ trigger shows their labels joined by ", " (the placeholder when none):
   `PanResponder`): a drag past the slop takes the touch from the row, so its `onPress` (or an
   expandable item's expanding) fires on a tap only; the action is hidden from assistive technology until revealed. `Avatar` takes a `src` that shows once loaded
   (`onStatusChange`), its children the fallback.
+- **TouchTarget** (`@pureform/react-native/touch-target`): put `<TouchTarget />` first inside a
+  small `Pressable`; it grows the press area to the theme's minimum (48), centred, hidden from
+  assistive technology, as the web's does. On Android a child's touches outside its parent count
+  only where nothing clips them, so `useTouchTargetSlop(width, height)` gives the same area as a
+  `hitSlop` for a pressable that takes one.
 - **Media:** `Media` takes the web's `src`, or a `source` as React Native's `Image` takes it
   (`ImageSourcePropType`): a `require()`d asset (its proportions from
   `Image.resolveAssetSource`), `{ uri, headers, cache }` (measured with
