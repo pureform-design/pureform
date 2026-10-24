@@ -239,10 +239,19 @@ function ModalDatePicker(props: DatePickerProps): ReactNode {
                     label={props.trigger}
                     disabled={props.disabled}
                     onPress={show}
+                    aria-haspopup="dialog"
+                    aria-expanded={open}
                     testId={{ root: "pf-date-picker-trigger" }}
                 />
             ) : null}
-            <ModalWindow visible={presence.present}>
+            <ModalWindow
+                visible={presence.present}
+                label={
+                    typeof props.headline === "string"
+                        ? props.headline
+                        : "Select date"
+                }
+            >
                 <ModalScrimLayer
                     open={open}
                     presence={presence}

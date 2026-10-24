@@ -160,6 +160,28 @@ function Area(props: PartsProps): ReactNode {
     const x = (rtl ? 1 - saturation : saturation) * size.width;
     const id = (part: Part) =>
         testIdOf(colorPickerAnatomy, part, picker.testId);
+    // A step of 1 in saturation (across, by direction) or brightness (up and down), from the
+    // channels rounded, as the web's area thumb steps.
+    const step = (channel: "saturation" | "brightness", by: number) => {
+        if (!interactive) return;
+        const rounded = color
+            .withChannelValue("saturation", Math.round(saturation * 100))
+            .withChannelValue("brightness", Math.round(brightness * 100));
+        const next = rounded.getChannelValue(channel) + by;
+        props.set(
+            rounded.withChannelValue(channel, Math.min(100, Math.max(0, next))),
+        );
+        props.end();
+    };
+    const onKeyDown = (event: { nativeEvent: { key?: string } }) => {
+        const key = event.nativeEvent.key;
+        const forward = rtl ? "ArrowLeft" : "ArrowRight";
+        const backward = rtl ? "ArrowRight" : "ArrowLeft";
+        if (key === forward) step("saturation", 1);
+        else if (key === backward) step("saturation", -1);
+        else if (key === "ArrowUp") step("brightness", 1);
+        else if (key === "ArrowDown") step("brightness", -1);
+    };
     return (
         <v.area.View
             ref={drag.ref}
@@ -186,6 +208,8 @@ function Area(props: PartsProps): ReactNode {
                 pointerEvents="none"
                 role="adjustable"
                 aria-label="saturation and brightness"
+                focusable={interactive}
+                {...({ onKeyDown } as object)}
                 aria-valuetext={`saturation ${Math.round(saturation * 100)}, brightness ${Math.round(brightness * 100)}`}
                 style={{
                     ...s.areaThumb,

@@ -69,12 +69,22 @@ function CalendarCellImpl(props: CalendarCellProps): ReactNode {
     );
     const id = (part: CalendarCellPart) =>
         testIdOf(calendarCellAnatomy, part, undefined);
+    // A day is a cell of the month's grid, chosen with `aria-selected` as the web's is; a month or
+    // a year is a button in a list, chosen with `aria-pressed`.
+    const day = props.view === "day";
+    const chosen = props.selection !== "none";
     return (
-        <v.root.View style={s.root} testID={id("root")}>
+        <v.root.View
+            {...(day
+                ? { role: "gridcell" as const, "aria-selected": chosen }
+                : {})}
+            style={s.root}
+            testID={id("root")}
+        >
             <v.trigger.Pressable
                 {...indication.handlers}
                 role="button"
-                aria-selected={props.selection !== "none"}
+                {...(day ? {} : { "aria-pressed": chosen })}
                 aria-disabled={props.disabled}
                 aria-label={props.label}
                 {...(props.today ? { "aria-current": "date" } : {})}

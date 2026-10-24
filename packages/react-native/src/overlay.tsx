@@ -477,6 +477,13 @@ export function useFieldPopup(open: boolean, setOpen: (open: boolean) => void) {
         if (open) setOpen(false);
     });
     useDismiss(open, close);
+    // Open without `show` (from the start, or by its owner): placed once it's measured.
+    useEffect(() => {
+        if (!open || anchor) return;
+        container.current?.measureInWindow((x, y, width, h) =>
+            setAnchor({ x, y, width, height: h }),
+        );
+    }, [open, anchor]);
     return {
         presence,
         container,
