@@ -5,8 +5,8 @@
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 
-import { generate } from "./generate";
-import type { GenerateOptions, GenerateResult } from "./generate";
+import { generateTargets } from "./targets";
+import type { GenerateTargetsOptions, GenerateTargetsResult } from "./targets";
 
 /** The config file names looked for in the root, in order. */
 export const CONFIG_FILES = [
@@ -27,9 +27,9 @@ export const findConfigFile = (root: string = process.cwd()): string =>
 export interface GenerateRunner {
     /** Generates. A call while a run is going waits for it, then for one more run that every
      *  call made meanwhile shares, so the result reflects the files as they are now. */
-    run(): Promise<GenerateResult>;
+    run(): Promise<GenerateTargetsResult>;
     /** The last run's result, if one succeeded. */
-    readonly last: GenerateResult | undefined;
+    readonly last: GenerateTargetsResult | undefined;
     /** The files a change to should generate again, absolute: the config and the files it
      *  imports, as of the last run that got that far, and the config file at least. */
     readonly dependencies: readonly string[];
@@ -37,9 +37,9 @@ export interface GenerateRunner {
     affects(file: string): boolean;
 }
 
-/** A runner over `generate` with these options. `config` is resolved against `root` once. */
+/** A runner over `generateTargets` with these options. `config` is resolved against `root` once. */
 export const createGenerateRunner = <Options = Record<string, unknown>>(
-    options: GenerateOptions<Options>,
+    options: GenerateTargetsOptions<Options>,
 ): GenerateRunner => {
     const root = resolve(options.root ?? process.cwd());
     const settled = { ...options, root };
@@ -48,12 +48,12 @@ export const createGenerateRunner = <Options = Record<string, unknown>>(
             ? resolve(root, options.config)
             : undefined;
     let dependencies = new Set<string>(configFile ? [configFile] : []);
-    let last: GenerateResult | undefined;
-    let running: Promise<GenerateResult> | undefined;
-    let queued: Promise<GenerateResult> | undefined;
+    let last: GenerateTargetsResult | undefined;
+    let running: Promise<GenerateTargetsResult> | undefined;
+    let queued: Promise<GenerateTargetsResult> | undefined;
 
-    const once = async (): Promise<GenerateResult> => {
-        const result = await generate(settled);
+    const once = async (): Promise<GenerateTargetsResult> => {
+        const result = await generateTargets(settled);
         last = result;
         if (result.dependencies.length > 0 || configFile) {
             dependencies = new Set([
@@ -64,7 +64,7 @@ export const createGenerateRunner = <Options = Record<string, unknown>>(
         return result;
     };
 
-    const run = (): Promise<GenerateResult> => {
+    const run = (): Promise<GenerateTargetsResult> => {
         if (!running) {
             running = once().finally(() => {
                 running = undefined;

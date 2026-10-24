@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { fakeAdapter, tempRoot, writeTree } from "./__fixtures__/project";
-import type { GenerateResult } from "./generate";
+import type { GenerateTargetsResult as GenerateResult } from "./targets";
 import { watchGenerate } from "./watch";
 import type { GenerateWatcher } from "./watch";
 
@@ -46,7 +46,7 @@ describe("watchGenerate", () => {
         writeFileSync(join(root, "pureform.config.ts"), config("divider"));
         const second = await result.promise;
         expect(second.files.map((file) => file.path)).toContain(
-            "web/divider.ts",
+            "fake/full/web/divider.ts",
         );
 
         result = next();

@@ -82,11 +82,12 @@ export const readGenerated = async (
 const unwanted = async (
     outDir: string,
     planned: readonly PlannedFile[],
+    keep: (path: string) => boolean = () => false,
 ): Promise<string[]> => {
     const wanted = new Set(planned.map((file) => file.path));
     return (await readGenerated(outDir))
         .map((file) => file.path)
-        .filter((path) => !wanted.has(path));
+        .filter((path) => !wanted.has(path) && !keep(path));
 };
 
 // Remove a file's folders up to `outDir` while they're empty.
@@ -103,10 +104,12 @@ const pruneFolders = async (outDir: string, path: string): Promise<void> => {
 };
 
 /** Writes each planned file whose contents differ, and removes generated files that aren't
- *  planned. Files without the header are the app's, and are left alone. */
+ *  planned, besides those `keep` names (relative paths). Files without the header are the
+ *  app's, and are left alone. */
 export const writeFiles = async (
     outDir: string,
     planned: readonly PlannedFile[],
+    keep?: (path: string) => boolean,
 ): Promise<FileResult[]> => {
     const results: FileResult[] = [];
     for (const file of planned) {
@@ -119,7 +122,7 @@ export const writeFiles = async (
         await writeFile(target, file.contents);
         results.push({ path: file.path, status: "written" });
     }
-    for (const path of await unwanted(outDir, planned)) {
+    for (const path of await unwanted(outDir, planned, keep)) {
         await rm(join(outDir, path));
         await pruneFolders(outDir, path);
         results.push({ path, status: "removed" });
@@ -132,6 +135,7 @@ export const compareFiles = async (
     outDir: string,
     planned: readonly PlannedFile[],
     hash: string,
+    keep?: (path: string) => boolean,
 ): Promise<FileResult[]> => {
     const results: FileResult[] = [];
     for (const file of planned) {
@@ -146,7 +150,7 @@ export const compareFiles = async (
                     : "modified";
         results.push({ path: file.path, status });
     }
-    for (const path of await unwanted(outDir, planned)) {
+    for (const path of await unwanted(outDir, planned, keep)) {
         results.push({ path, status: "extra" });
     }
     return results;

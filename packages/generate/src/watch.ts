@@ -6,13 +6,13 @@ import { watch } from "node:fs";
 import type { FSWatcher } from "node:fs";
 import { basename, dirname, join } from "node:path";
 
-import type { GenerateOptions, GenerateResult } from "./generate";
+import type { GenerateTargetsOptions, GenerateTargetsResult } from "./targets";
 import { createGenerateRunner } from "./runner";
 import type { GenerateRunner } from "./runner";
 
 export interface WatchGenerateOptions {
     /** Called after every successful run, the first included. */
-    readonly onResult?: (result: GenerateResult) => void;
+    readonly onResult?: (result: GenerateTargetsResult) => void;
     /** Called when a run fails. Watching goes on: fixing the file runs it again. */
     readonly onError?: (error: unknown) => void;
     /** How long to wait after a change for more, in milliseconds. Default 50. */
@@ -26,14 +26,14 @@ export interface GenerateWatcher {
     /** The runner behind the watcher. */
     readonly runner: GenerateRunner;
     /** Settles after the first run: its result, or `undefined` when it failed. */
-    readonly ready: Promise<GenerateResult | undefined>;
+    readonly ready: Promise<GenerateTargetsResult | undefined>;
     /** Stops watching. */
     close(): void;
 }
 
 /** Generates now and again on every change to the config or a file it imports. */
 export const watchGenerate = <Options = Record<string, unknown>>(
-    options: GenerateOptions<Options>,
+    options: GenerateTargetsOptions<Options>,
     watching: WatchGenerateOptions = {},
 ): GenerateWatcher => {
     const runner = createGenerateRunner(options);
@@ -41,7 +41,7 @@ export const watchGenerate = <Options = Record<string, unknown>>(
     let timer: ReturnType<typeof setTimeout> | undefined;
     let closed = false;
 
-    const run = async (): Promise<GenerateResult | undefined> => {
+    const run = async (): Promise<GenerateTargetsResult | undefined> => {
         try {
             const result = await runner.run();
             if (!closed) watching.onResult?.(result);

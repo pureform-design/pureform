@@ -12,6 +12,7 @@ import type {
     CodegenContext,
     CodegenOutput,
     ComponentShape,
+    Platform,
     Target,
 } from "./adapter";
 import { loadConfig } from "./config";
@@ -69,6 +70,9 @@ export interface GenerateOptions<Options = Record<string, unknown>> {
     /** Check the config's import rules when loading it from a path: `true` (default), with
      *  these options, or `false`. */
     readonly imports?: boolean | ImportRuleOptions;
+    /** Write the declarations (`registry.d.ts`) into the folder. Default `true`;
+     *  `generateTargets` writes them once, at the top of `.pureform/`, instead. */
+    readonly declarations?: boolean;
 }
 
 export interface GenerateResult {
@@ -94,6 +98,11 @@ export interface GenerateResult {
     readonly dependencies: readonly string[];
     /** The components generated, in the config's order. */
     readonly components: readonly string[];
+    /** The adapter's platform. */
+    readonly platform: Platform;
+    /** The declarations' contents, without the header, whether written or not. Empty in check
+     *  mode when the adapter wasn't run. */
+    readonly declarations: string;
 }
 
 const toPosix = (path: string): string => path.split(sep).join("/");
@@ -218,7 +227,7 @@ const importPath = (
 
 // The tsconfig hint: TypeScript's globs skip dot folders, so the declarations are invisible
 // unless the folder is included by name.
-const tsconfigHint = (root: string, outDir: string): string | undefined => {
+export const tsconfigHint = (root: string, outDir: string): string | undefined => {
     const file = join(root, "tsconfig.json");
     if (!existsSync(file)) return undefined;
     const folder = toPosix(relative(root, outDir));
@@ -342,6 +351,8 @@ export const generate = async <Options = Record<string, unknown>>(
         generate: VERSION,
     });
 
+    const writeDeclarations = options.declarations !== false;
+    let declarations = "";
     const result = (
         files: FileResult[],
         hints: string[] = [],
@@ -358,6 +369,8 @@ export const generate = async <Options = Record<string, unknown>>(
             hints,
             dependencies: loaded?.dependencies ?? [],
             components,
+            platform: adapter.platform,
+            declarations,
         };
     };
 
@@ -424,12 +437,13 @@ export const generate = async <Options = Record<string, unknown>>(
             output.vars,
         ),
     );
-    add(
-        DECLARATIONS_FILE,
-        registryDeclarations(entries, Object.keys(config.springs ?? {})),
+    declarations = registryDeclarations(
+        entries,
+        Object.keys(config.springs ?? {}),
     );
+    if (writeDeclarations) add(DECLARATIONS_FILE, declarations);
 
-    const hint = tsconfigHint(root, outDir);
+    const hint = writeDeclarations ? tsconfigHint(root, outDir) : undefined;
     const files = options.check
         ? await compareFiles(outDir, planned, hash)
         : await writeFiles(outDir, planned);
