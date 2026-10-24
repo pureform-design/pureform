@@ -4,13 +4,14 @@
 import {
     createContext,
     createElement,
+    useCallback,
     useContext,
     useEffect,
     useMemo,
     useRef,
     useState,
 } from "react";
-import type { ReactNode } from "react";
+import type { ComponentRef, ReactNode } from "react";
 import { Animated, View } from "react-native";
 import type { StyleProp, ViewProps, ViewStyle } from "react-native";
 
@@ -227,6 +228,44 @@ const slowed = (selected: Selected, by: number): Selected => {
 // name.
 const ContainerContext = createContext<Record<string, number>>({});
 
+/** A container's box in the window's coordinates, as `measureInWindow` gives it. */
+export interface ContainerFrame {
+    readonly x: number;
+    readonly y: number;
+    readonly width: number;
+    readonly height: number;
+}
+
+// The measured frames of the containers around a component, keyed as the widths are. A
+// separate context, so consumers of the widths don't rerender when a container moves.
+const FrameContext = createContext<Record<string, ContainerFrame>>({});
+
+/** `outer` with `value` as the nearest container (under "") and under `name`. */
+export const withContainer = <T>(
+    outer: Record<string, T>,
+    value: T | undefined,
+    name?: string,
+): Record<string, T> =>
+    value === undefined
+        ? outer
+        : { ...outer, "": value, ...(name ? { [name]: value } : {}) };
+
+/** The measured frame, in window coordinates, of the nearest `PureformContainer` (or the one
+ *  `name`d), or `undefined` with none around or before it's measured. */
+export const useContainerFrame = (name = ""): ContainerFrame | undefined =>
+    useContext(FrameContext)[name];
+
+/** Measures a container's frame now, in window coordinates; `undefined` when it has none yet. */
+export type MeasureContainer = () => Promise<ContainerFrame | undefined>;
+
+const MeasureContext = createContext<Record<string, MeasureContainer>>({});
+
+/** A function that measures the nearest `PureformContainer` (or the one `name`d) when called,
+ *  for a container that moves without resizing, which its cached frame misses. Call it when it
+ *  matters (a menu opening), not per frame. `undefined` with no container around. */
+export const useMeasureContainer = (name = ""): MeasureContainer | undefined =>
+    useContext(MeasureContext)[name];
+
 export interface PureformContainerProps extends ViewProps {
     /** The container's name, for conditions on a named container. It's still the nearest
      *  container for conditions that name none. */
@@ -245,26 +284,75 @@ export const PureformContainer = ({
     ...props
 }: PureformContainerProps) => {
     const outer = useContext(ContainerContext);
+    const outerFrames = useContext(FrameContext);
     const [width, setWidth] = useState<number>();
-    const widths = useMemo(
+    const [frame, setFrame] = useState<ContainerFrame>();
+    const view = useRef<ComponentRef<typeof View>>(null);
+    const outerMeasures = useContext(MeasureContext);
+    const measure = useCallback<MeasureContainer>(
         () =>
-            width === undefined
-                ? outer
-                : { ...outer, "": width, ...(name ? { [name]: width } : {}) },
+            new Promise((resolve) => {
+                const node = view.current;
+                if (!node) return resolve(undefined);
+                node.measureInWindow((x, y, width, height) =>
+                    resolve(
+                        width > 0 || height > 0
+                            ? { x, y, width, height }
+                            : undefined,
+                    ),
+                );
+            }),
+        [],
+    );
+    const measures = useMemo(
+        () => withContainer(outerMeasures, measure, name),
+        [outerMeasures, measure, name],
+    );
+    const widths = useMemo(
+        () => withContainer(outer, width, name),
         [outer, width, name],
+    );
+    const frames = useMemo(
+        () => withContainer(outerFrames, frame, name),
+        [outerFrames, frame, name],
     );
     return createElement(
         View,
         {
             ...props,
+            ref: view,
             onLayout: (
                 event: Parameters<NonNullable<ViewProps["onLayout"]>>[0],
             ) => {
                 setWidth(event.nativeEvent.layout.width);
+                view.current?.measureInWindow((x, y, w, height) => {
+                    if (w > 0 || height > 0)
+                        setFrame((was) =>
+                            was &&
+                            was.x === x &&
+                            was.y === y &&
+                            was.width === w &&
+                            was.height === height
+                                ? was
+                                : { x, y, width: w, height },
+                        );
+                });
                 onLayout?.(event);
             },
         },
-        createElement(ContainerContext.Provider, { value: widths }, children),
+        createElement(
+            ContainerContext.Provider,
+            { value: widths },
+            createElement(
+                FrameContext.Provider,
+                { value: frames },
+                createElement(
+                    MeasureContext.Provider,
+                    { value: measures },
+                    children,
+                ),
+            ),
+        ),
     );
 };
 

@@ -16,12 +16,16 @@ import { precompute, runtimeStyles } from "./build";
 import { nativeFactory } from "./factory";
 import {
     PureformProvider,
+    PureformContainer,
     StylesProvider,
     pressableState,
     useStyleEnvironment,
     useComponentState,
     useComponentStyles,
+    useContainerFrame,
+    useMeasureContainer,
     useTokens,
+    withContainer,
 } from "./react";
 import type { Overrides, Styles } from "./resolve";
 import type { State } from "./select";
@@ -520,4 +524,47 @@ describe("variant tokens", () => {
             );
         });
     }
+});
+
+describe("container frames", () => {
+    it("puts a value under the nearest key and the container's name, keeping the outer ones", () => {
+        const outer = { page: 1, "": 2 };
+        expect(withContainer(outer, 3, "card")).toEqual({
+            page: 1,
+            "": 3,
+            card: 3,
+        });
+        expect(withContainer(outer, 3)).toEqual({ page: 1, "": 3 });
+        expect(withContainer(outer, undefined, "card")).toBe(outer);
+    });
+
+    it("has no frame outside a container, or before one is measured", () => {
+        const frames: unknown[] = [];
+        const Probe = () => {
+            frames.push(useContainerFrame(), useContainerFrame("card"));
+            return null;
+        };
+        renderToString(createElement(Probe));
+        renderToString(
+            createElement(
+                PureformContainer,
+                { name: "card" },
+                createElement(Probe),
+            ),
+        );
+        expect(frames).toEqual([undefined, undefined, undefined, undefined]);
+    });
+
+    it("gives a measure function inside a container only", () => {
+        const found: unknown[] = [];
+        const Probe = () => {
+            found.push(typeof useMeasureContainer());
+            return null;
+        };
+        renderToString(createElement(Probe));
+        renderToString(
+            createElement(PureformContainer, null, createElement(Probe)),
+        );
+        expect(found).toEqual(["undefined", "function"]);
+    });
 });
