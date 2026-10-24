@@ -211,4 +211,4 @@ tests live only there.
   `prefix`, its `pandaPrefix`). The registry's `springs` (beside `tokens`) types it: `InstanceTokens` gives a
   spring token `InstanceSpringValue` (a spring or a `SpringRole`, from `SpringRoleRegistry`)
   and every other token a `TokenValue`.
-- The hooks (`useClasses`, `useClassFactory`, `useStyles`) are the bindings' (p2a, p2b, p8).
+- The hooks (`useClasses`, `useClassFactory`, `useStyles`) are the bindings'.

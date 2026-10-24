@@ -9,8 +9,8 @@ different output.
 - **Depends on:** `@pureform/core` (config types), `jiti` (loads the config), `oxc-parser`
   (checks the config's imports). At run time it loads the target's adapter
   (`@pureform/<target>-adapter/codegen`) from the app's install.
-- **Depended on by:** `@pureform/bundler` and `@pureform/cli` (p4c), and each adapter's
-  `/codegen` subpath, which implements the interface here (p4b).
+- **Depended on by:** `@pureform/bundler` and `@pureform/cli`, and each adapter's
+  `/codegen` subpath, which implements the interface here.
 - Part of the core train: released at the same version as `core`, `styling`, and the
   adapters.
 

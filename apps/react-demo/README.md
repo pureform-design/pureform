@@ -48,7 +48,7 @@ codegen`.
 
 ## Worth knowing
 
-- Theme switching and runtime overrides wait for p5b; the provider's `theme` prop does nothing yet.
+- The demo has no theme switcher; `apps/css-demo` switches themes and schemes through the provider.
 - Its only test is a smoke test: `test:e2e` (`vitest.config.e2e.ts`, over the demo's own Vite
   config, after `prepare`) renders the page in Chromium, its buttons styled by Panda's stylesheet,
   without an error; its global setup, `@pureform/vitest-config/browser-warmup`, compiles the page's
