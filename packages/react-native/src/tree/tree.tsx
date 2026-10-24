@@ -1,8 +1,12 @@
 // The tree: an optional label over the tree, each node a pressable row (an optional leading icon
 // and its text), a branch's row ending in the expand indicator, which turns over while it's
 // expanded, over its children, indented from the start while it's expanded. React Native has no
-// Zag machine: the expanded and selected nodes are React state, and each row says what it is to
-// assistive technology.
+// Zag machine: the expanded and selected nodes are React state, and each node says what it is to
+// assistive technology. On the web, as the web's tree: a leaf's row is its tree item; a branch is
+// a tree item holding its row (a button) and its group of children, named from the row's text.
+// Each says its level, its place among its siblings and how many they are. On iOS and Android,
+// which have no tree item, the row says it: its label carries the level, its state whether it's
+// expanded and selected.
 
 import { treeAnatomy } from "@pureform/anatomy";
 import type { TestIdOverride } from "@pureform/anatomy";
@@ -14,6 +18,7 @@ import type {
     TreePart,
     TreeVariantProps,
 } from "@pureform/binding-core";
+import { useId } from "react";
 import type { ReactNode } from "react";
 import { Platform } from "react-native";
 
@@ -47,9 +52,29 @@ interface TreeState {
     readonly select: (value: string) => void;
 }
 
+/** What a row says on iOS and Android, which have no tree item: its label with its level (when
+ *  the label is text), and whether it's expanded (a branch), selected and disabled. */
+export const nativeTreeRow = (
+    node: Node,
+    level: number,
+    state: { readonly expanded: boolean; readonly selected: boolean },
+) => ({
+    ...(typeof node.label === "string"
+        ? { accessibilityLabel: `${node.label}, level ${level}` }
+        : {}),
+    accessibilityState: {
+        selected: state.selected,
+        disabled: !!node.disabled,
+        ...(isTreeBranch(node) ? { expanded: state.expanded } : {}),
+    },
+});
+
 function Row(props: {
     readonly node: Node;
     readonly level: number;
+    /** Its place among its siblings, from 1, and how many they are. */
+    readonly position: number;
+    readonly count: number;
     readonly tree: TreeState;
 }): ReactNode {
     const { node, tree } = props;
@@ -76,6 +101,27 @@ function Row(props: {
     const id = (part: TreePart) =>
         testIdOf(treeAnatomy, part, tree.props.testId);
     const icon = iconParts(slots, id);
+    const textId = useId();
+    const web = Platform.OS === "web";
+    // The tree item's own ARIA: the row's for a leaf, the branch's around it for a branch.
+    const item = {
+        role: "treeitem",
+        "aria-level": props.level,
+        "aria-setsize": props.count,
+        "aria-posinset": props.position,
+        "aria-selected": selectedNode,
+        "aria-labelledby": textId,
+        ...(disabled ? { "aria-disabled": true } : {}),
+        ...(branch ? { "aria-expanded": expanded } : {}),
+    } as const;
+    const rowA11y = !web
+        ? nativeTreeRow(node, props.level, {
+              expanded,
+              selected: selectedNode,
+          })
+        : branch
+          ? { role: "button" as const }
+          : item;
     const press = () => {
         tree.select(node.value);
         if (branch) tree.toggle(node.value);
@@ -83,13 +129,11 @@ function Row(props: {
     const row = (
         <v.node.Pressable
             {...indication.handlers}
-            role="treeitem"
-            aria-level={props.level}
-            aria-selected={selectedNode}
-            {...(branch ? { "aria-expanded": expanded } : {})}
+            {...rowA11y}
             onPress={press}
-            // React Native Web presses a row on Enter only; Space acts too, as the web's tree.
-            {...(Platform.OS === "web"
+            // React Native Web presses a tree item on Enter only; Space acts too, as the web's
+            // tree (a branch's row is a button, which takes Space already).
+            {...(web && !branch
                 ? ({
                       onKeyDown: (event: {
                           nativeEvent: { key: string };
@@ -106,7 +150,12 @@ function Row(props: {
             testID={id("node")}
         >
             {icon("leading", node.leading)}
-            <v.text.Text selectable={false} style={s.text} testID={id("text")}>
+            <v.text.Text
+                nativeID={textId}
+                selectable={false}
+                style={s.text}
+                testID={id("text")}
+            >
                 {node.label}
             </v.text.Text>
             {branch ? icon("indicator", "⌄") : null}
@@ -115,15 +164,21 @@ function Row(props: {
     );
     if (!branch) return row;
     return (
-        <v.branch.View style={s.branch} testID={id("branch")}>
+        <v.branch.View
+            {...(web ? item : {})}
+            style={s.branch}
+            testID={id("branch")}
+        >
             {row}
             <Expanding open={expanded}>
                 <v.group.View style={s.group} role="group" testID={id("group")}>
-                    {(node.children ?? []).map((child) => (
+                    {(node.children ?? []).map((child, index, all) => (
                         <Row
                             key={child.value}
                             node={child}
                             level={props.level + 1}
+                            position={index + 1}
+                            count={all.length}
                             tree={tree}
                         />
                     ))}
@@ -192,8 +247,15 @@ function TreeImpl(props: TreeProps): ReactNode {
                 aria-label={props["aria-label"]}
                 testID={id("tree")}
             >
-                {props.items.map((node) => (
-                    <Row key={node.value} node={node} level={1} tree={tree} />
+                {props.items.map((node, index, all) => (
+                    <Row
+                        key={node.value}
+                        node={node}
+                        level={1}
+                        position={index + 1}
+                        count={all.length}
+                        tree={tree}
+                    />
                 ))}
             </v.tree.View>
         </v.root.View>
