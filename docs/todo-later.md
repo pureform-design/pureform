@@ -6,9 +6,8 @@
   recording, the browser and the pointing device. Suspect: React's menu highlight trails the CSS
   hover by ~50 ms; the first item counts as hovered for one frame on open.
 - **Device checks** (only tested on React Native Web so far):
-  - NativeSelect's iOS and Android menu;
-  - the SVG engine's device paths (native-driver ripples, morphs written to native paths);
-  - React Native toast swipe;
-  - container measuring for Menu `submenu="auto"` (`measureInWindow`);
-  - TouchTarget on Android (`useTouchTargetSlop`).
-- **Full README pass:** only once things are stable.
+    - NativeSelect's iOS and Android menu;
+    - the SVG engine's device paths (native-driver ripples, morphs written to native paths);
+    - React Native toast swipe;
+    - container measuring for Menu `submenu="auto"` (`measureInWindow`);
+    - TouchTarget on Android (`useTouchTargetSlop`).
