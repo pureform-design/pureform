@@ -20,7 +20,7 @@ import type { VariantProp } from "./variants";
  *  "container" | "leadingIcon" | "input" | "label" | "trailingIcon" | "supportingText"`. */
 export type TagsInputPart = PartName<typeof tagsInputAnatomy>;
 
-/** The tags input's variant groups and instance tokens, and its chips'. `leadingIcon` and
+/** The tags input's variant groups and instance tokens, and its chips' variants. `leadingIcon` and
  *  `trailingIcon` make room for an icon at either end; the ready-made component sets them when
  *  it renders one. */
 export interface TagsInputVariantProps {
@@ -30,8 +30,8 @@ export interface TagsInputVariantProps {
     readonly leadingIcon?: boolean | undefined;
     readonly trailingIcon?: boolean | undefined;
     readonly tokens?: InstanceTokens<"tagsInput"> | undefined;
-    /** The chips' variants and tokens. */
-    readonly chip?: InputChipVariantProps | undefined;
+    /** The chips' variants. Their tokens go in the binding's `chipProps`. */
+    readonly chip?: Omit<InputChipVariantProps, "tokens"> | undefined;
 }
 
 /** What the tags input machine takes from Root's props. */

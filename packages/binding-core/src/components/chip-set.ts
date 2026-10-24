@@ -15,7 +15,7 @@ import type { Controllable } from "../controllable";
 import type { Unstyled } from "../parts";
 import { buttonGroupMachineProps } from "./button-group";
 import type { ChipVariantProps } from "./chip";
-import type { InteractionSourceProps } from "./indication";
+import type { IndicationProps, InteractionSourceProps } from "./indication";
 
 /** The set's own parts: `"root"`. */
 export type ChipSetPart = PartName<typeof chipSetAnatomy>;
@@ -50,7 +50,11 @@ export interface ChipSetBehaviorProps extends Controllable<"value", string[]> {
 
 /** Everything Root takes for itself, besides the element's own props and `as`. */
 export interface ChipSetRootOwnProps
-    extends ChipSetVariantProps, ChipSetChipVariantProps, ChipSetBehaviorProps {
+    extends
+        ChipSetVariantProps,
+        ChipSetChipVariantProps,
+        ChipSetBehaviorProps,
+        IndicationProps {
     /** The set element's test id: a prefix (`filters` → `filters-root`), or by part. */
     readonly testId?: TestIdOverride<ChipSetPart> | undefined;
     /** The set's parts, or some, without the registry's styles. */
@@ -74,6 +78,7 @@ export const CHIP_SET_ROOT_PROPS = [
     "onValueChange",
     "testId",
     "unstyled",
+    "indication",
 ] as const satisfies readonly (keyof ChipSetRootOwnProps)[];
 
 /** One chip of the ready-made set, as data. */

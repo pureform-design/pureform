@@ -17,7 +17,7 @@ import type { Controllable } from "../controllable";
 import type { Unstyled } from "../parts";
 import type { ButtonVariantProps } from "./button";
 import type { IconButtonVariantProps } from "./icon-button";
-import type { InteractionSourceProps } from "./indication";
+import type { IndicationProps, InteractionSourceProps } from "./indication";
 import { tilePosition } from "./list";
 import type { TilePosition } from "./list";
 import type { VariantProp } from "./variants";
@@ -71,7 +71,8 @@ export interface ButtonGroupRootOwnProps
     extends
         ButtonGroupVariantProps,
         ButtonGroupButtonVariantProps,
-        ButtonGroupBehaviorProps {
+        ButtonGroupBehaviorProps,
+        IndicationProps {
     /** The group element's test id: a prefix (`view` → `view-root`), or by part. */
     readonly testId?: TestIdOverride<ButtonGroupPart> | undefined;
     /** The group's parts, or some, without the registry's styles. */
@@ -96,6 +97,7 @@ export const BUTTON_GROUP_ROOT_PROPS = [
     "onValueChange",
     "testId",
     "unstyled",
+    "indication",
 ] as const satisfies readonly (keyof ButtonGroupRootOwnProps)[];
 
 /** One button of the ready-made group, as data. With a label it's a button; with only an icon,

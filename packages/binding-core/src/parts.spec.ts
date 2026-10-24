@@ -367,9 +367,9 @@ describe("overDefaults", () => {
     });
 
     it("joins classes, part by part when keyed", () => {
-        expect(overDefaults<Item>({ className: "a" }, { className: "b" })).toEqual(
-            { className: "a b" },
-        );
+        expect(
+            overDefaults<Item>({ className: "a" }, { className: "b" }),
+        ).toEqual({ className: "a b" });
         expect(
             overDefaults<Item>(
                 { className: { root: "a", headline: "h" } },

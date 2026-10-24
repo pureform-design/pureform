@@ -32,7 +32,10 @@ export interface RadioVariantProps {
 
 /** The group's variants: every radio's defaults. The group has no recipe, so no tokens of its
  *  own; the ready-made group gives its radios' tokens in `radioProps`. */
-export type RadioGroupVariantProps = Pick<RadioVariantProps, "color" | "density">;
+export type RadioGroupVariantProps = Pick<
+    RadioVariantProps,
+    "color" | "density"
+>;
 
 /** The ids of the group's elements, for composition. Zag builds each radio's ids from its value:
  *  `itemHiddenInput("small")` is the input of the radio whose value is `small`, for a

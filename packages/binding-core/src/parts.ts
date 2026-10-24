@@ -252,18 +252,18 @@ export const overDefaults = <P extends object>(
             base === undefined
                 ? value
                 : CLASS_KEYS.has(key)
-            ? isRecord(base) || isRecord(value)
-                ? isRecord(base) && isRecord(value)
-                    ? byPart(base, value, joinClass)
-                    : isRecord(base)
-                      ? byPart(base, { root: value }, joinClass)
-                      : byPart({ root: base }, value, joinClass)
-                : joinClass(base, value)
-            : PER_PART_KEYS.has(key)
-              ? byPart(base, value, shallow)
-              : key === "tokens"
-                ? shallow(base, value)
-                : value;
+                  ? isRecord(base) || isRecord(value)
+                      ? isRecord(base) && isRecord(value)
+                          ? byPart(base, value, joinClass)
+                          : isRecord(base)
+                            ? byPart(base, { root: value }, joinClass)
+                            : byPart({ root: base }, value, joinClass)
+                      : joinClass(base, value)
+                  : PER_PART_KEYS.has(key)
+                    ? byPart(base, value, shallow)
+                    : key === "tokens"
+                      ? shallow(base, value)
+                      : value;
     }
     return merged as P;
 };
