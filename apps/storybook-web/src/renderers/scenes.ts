@@ -17,3 +17,11 @@ export const addedToast = (count: number) => ({
     title: `Toast ${count}`,
     description: "It closes on its own after a few seconds.",
 });
+
+/** The `count`th file React Native's file upload scene picks (its app's picker, as React Native
+ *  leaves the picking to the app). */
+export const pickedFile = (count: number) => ({
+    name: `document-${count}.pdf`,
+    size: 1024 * (40 + count),
+    type: "application/pdf",
+});

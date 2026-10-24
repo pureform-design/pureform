@@ -607,6 +607,10 @@ describe("file upload", () => {
             ),
         ].map((node) => node.textContent);
         expect(headlines).toEqual(["a.txt", "big.png", "c.pdf"]);
+        // A list of list items, for assistive technology.
+        expect(byTestId("pf-file-upload-item-group").getAttribute("role")).toBe(
+            "list",
+        );
         expect(byTestId("pf-file-upload-error").textContent).toBe(
             "The file is too large",
         );
