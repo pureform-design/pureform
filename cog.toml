@@ -60,6 +60,7 @@ include = [
     "packages/type-utils/**",
     "packages/utils/**",
     "packages/binding-core/**",
+    "packages/binding-dom/**",
     "packages/generate/**",
     "packages/bundler/**",
     "packages/cli/**",

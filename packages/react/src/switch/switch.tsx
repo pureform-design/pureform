@@ -16,7 +16,7 @@ import type {
     SwitchContentProps,
     SwitchRootOwnProps,
 } from "@pureform/binding-core";
-import { syncCheckedInput } from "@pureform/binding-core/dom";
+import { syncCheckedInput } from "@pureform/binding-dom";
 import * as switchControl from "@pureform/machines/switch";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";

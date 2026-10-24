@@ -18,7 +18,7 @@ import type {
     SwitchContentProps,
     SwitchRootOwnProps,
 } from "@pureform/binding-core";
-import { syncCheckedInput } from "@pureform/binding-core/dom";
+import { syncCheckedInput } from "@pureform/binding-dom";
 import * as switchControl from "@pureform/machines/switch";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {

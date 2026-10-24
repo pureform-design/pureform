@@ -12,11 +12,18 @@ dependencies:
     - "@pureform/core"
     - "@pureform/styling"
     - "@pureform/anatomy"
-    - "@pureform/js-effects"
 
 tasks:
   test:unit:
     enabled: true
+    # The source type-checks without the DOM lib first (`tsconfig.json`), so a DOM type or API
+    # fails here; then the specs, which run in Chromium, with it (`tsconfig.spec.json`).
+    exec: bun run test:unit
+    cache:
+      key:
+        files:
+          append:
+            - "./tsconfig*.json"
 
   test:integration:
     enabled: false

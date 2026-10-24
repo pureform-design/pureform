@@ -53,11 +53,6 @@ export interface DialogBehaviorProps extends Controllable<"open", boolean> {
     readonly closeOnEscape?: boolean | undefined;
     /** Whether focus goes back to the trigger once it closes. @default true */
     readonly restoreFocus?: boolean | undefined;
-    /** The element that takes focus when it opens: a function, so it's read then. @default the
-     *  first focusable element inside, else the dialog */
-    readonly initialFocusEl?: (() => HTMLElement | null) | undefined;
-    /** The element that takes focus once it closes. @default the trigger */
-    readonly finalFocusEl?: (() => HTMLElement | null) | undefined;
     /** The dialog's name, when it has no headline. */
     readonly "aria-label"?: string | undefined;
     readonly ids?: DialogElementIds | undefined;
@@ -107,8 +102,6 @@ export const DIALOG_BEHAVIOR_PROPS = [
     "closeOnInteractOutside",
     "closeOnEscape",
     "restoreFocus",
-    "initialFocusEl",
-    "finalFocusEl",
     "aria-label",
     "ids",
     "open",
@@ -169,8 +162,6 @@ export const dialogMachineProps = (props: DialogBehaviorProps) => ({
     closeOnInteractOutside: props.closeOnInteractOutside,
     closeOnEscape: props.closeOnEscape,
     restoreFocus: props.restoreFocus,
-    initialFocusEl: props.initialFocusEl,
-    finalFocusEl: props.finalFocusEl,
     "aria-label": props["aria-label"],
     ids: {
         trigger: props.ids?.trigger,

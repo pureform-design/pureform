@@ -2,8 +2,8 @@
 // it, and reports how many stay in the row (`overflowCount`), again whenever the row or its parent
 // resizes; `moveToolbarFocus` runs its arrow keys.
 
-import { toolbarKeyTarget } from "./components/toolbar";
-import { overflowCount } from "./overflow";
+import { toolbarKeyTarget } from "@pureform/binding-core";
+import { overflowCount } from "@pureform/binding-core";
 
 /** What `watchOverflow` measures. `elements` are the row's elements in order, shown or not;
  *  hidden ones (taken out with `display: none`) keep the size they had when last shown. */

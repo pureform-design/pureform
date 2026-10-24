@@ -20,7 +20,6 @@ import {
     SEARCH_VIEW_TRIGGER_STYLE,
     searchViewCarriedKey,
     searchViewComboboxProps,
-    searchViewDialogProps,
     searchViewLabel,
     searchViewMatches,
     searchViewMenuSelection,
@@ -34,7 +33,8 @@ import type {
     SearchViewRootOwnProps,
     Unstyled,
 } from "@pureform/binding-core";
-import { stackPositioner } from "@pureform/binding-core/dom";
+import { searchViewDomDialogProps } from "@pureform/binding-dom";
+import { stackPositioner } from "@pureform/binding-dom";
 import * as combobox from "@pureform/machines/combobox";
 import * as dialog from "@pureform/machines/dialog";
 import { mergeProps, normalizeProps } from "@zag-js/react";
@@ -140,7 +140,7 @@ function Root(props: SearchViewRootProps): ReactNode {
     const view = useMachine(dialog.machine, {
         id,
         dir,
-        ...searchViewDialogProps(props, () => input.current),
+        ...searchViewDomDialogProps(props, () => input.current),
         ...open.machineProps,
     });
     const viewApi = dialog.connect(view, normalizeProps);

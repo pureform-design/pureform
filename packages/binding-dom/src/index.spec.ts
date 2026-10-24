@@ -1,3 +1,4 @@
+import type { IconStyle } from "@pureform/binding-core";
 import { afterEach, describe, expect, it } from "vitest";
 import { commands } from "vitest/browser";
 
@@ -14,8 +15,7 @@ import {
     syncTextInput,
     systemReducedMotion,
     whenAnimationsEnd,
-} from "./dom";
-import type { IconStyle } from "./icon-style";
+} from "./index";
 
 afterEach(async () => {
     document.body.innerHTML = "";

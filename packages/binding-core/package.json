@@ -1,7 +1,7 @@
 {
     "name": "@pureform/binding-core",
     "version": "0.0.0-semantically-released",
-    "description": "Framework-free pieces the Solid, React, and React Native bindings share",
+    "description": "Framework- and platform-free pieces the Solid, React, and React Native bindings share",
     "type": "module",
     "sideEffects": false,
     "exports": {
@@ -14,17 +14,6 @@
             "require": {
                 "development": "./src/index.ts",
                 "default": "./dist/index.mjs"
-            }
-        },
-        "./dom": {
-            "types": "./dist/dom.d.ts",
-            "import": {
-                "development": "./src/dom.ts",
-                "default": "./dist/dom.mjs"
-            },
-            "require": {
-                "development": "./src/dom.ts",
-                "default": "./dist/dom.mjs"
             }
         },
         "./interaction": {
@@ -61,10 +50,12 @@
             }
         }
     },
+    "scripts": {
+        "test:unit": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.spec.json && vitest --config ./vitest.config.unit.ts run"
+    },
     "dependencies": {
         "@pureform/anatomy": "workspace:^",
         "@pureform/core": "workspace:^",
-        "@pureform/js-effects": "workspace:^",
         "@pureform/styling": "workspace:^"
     },
     "devDependencies": {

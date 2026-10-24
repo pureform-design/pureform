@@ -162,5 +162,4 @@ export const COLOR_PICKER_THUMB_CENTRE = {
 
 /** Whether this browser has an eye dropper (Chromium's `EyeDropper`). Read it after mounting,
  *  so the server and the first render agree. */
-export const hasEyeDropper = (): boolean =>
-    typeof window !== "undefined" && "EyeDropper" in window;
+export const hasEyeDropper = (): boolean => "EyeDropper" in globalThis;

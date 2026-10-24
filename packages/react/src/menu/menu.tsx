@@ -44,8 +44,8 @@ import {
     menuSubmenuRoom,
     noteMenuSubmenuPresses,
     springRoleVar,
-} from "@pureform/binding-core/dom";
-import type { MenuDrillSnapshot } from "@pureform/binding-core/dom";
+} from "@pureform/binding-dom";
+import type { MenuDrillSnapshot } from "@pureform/binding-dom";
 import * as menu from "@pureform/machines/menu";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";

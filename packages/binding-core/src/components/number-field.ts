@@ -16,6 +16,7 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Controllable } from "../controllable";
 import type { Unstyled } from "../parts";
+import { platformLanguage } from "../platform";
 import type { InteractiveProps } from "./indication";
 import type { VariantProp } from "./variants";
 
@@ -203,8 +204,8 @@ export const numberFieldLocale = (
     props: { readonly locale?: string | undefined } = {},
 ): string => {
     if (props.locale) return props.locale;
-    if (typeof navigator !== "undefined" && navigator.language)
-        return navigator.language;
+    const language = platformLanguage();
+    if (language) return language;
     try {
         return (
             new Intl.NumberFormat().resolvedOptions().locale ||

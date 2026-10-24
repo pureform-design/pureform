@@ -1,11 +1,11 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
-
 import {
     askingDismissProps,
     closeAsker,
     sheetPartialOffset,
     sheetRelease,
-} from "./components/sheet";
+} from "@pureform/binding-core";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { settleOnSpring, settleTransition } from "./settle";
 import { dragToDismiss } from "./sheet-drag";
 

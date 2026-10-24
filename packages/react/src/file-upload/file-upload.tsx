@@ -17,13 +17,13 @@ import {
     isPresent,
     isPreviewable,
 } from "@pureform/binding-core";
-import type {
-    FileUploadContentProps,
-    FileUploadRootOwnProps,
-    FileUploadValueDetails,
-} from "@pureform/binding-core";
-import { writeInputFiles } from "@pureform/binding-core/dom";
 import type { MutableInteractionSource } from "@pureform/binding-core/interaction";
+import type {
+    FileUploadDomContentProps,
+    FileUploadDomRootOwnProps,
+    FileUploadDomValueDetails,
+} from "@pureform/binding-dom";
+import { writeInputFiles } from "@pureform/binding-dom";
 import * as fileUpload from "@pureform/machines/file-upload";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";
@@ -59,7 +59,7 @@ interface FileUploadContextValue {
     readonly scope: ComponentScope<Anatomy>;
     readonly api: fileUpload.Api<PropTypes>;
     readonly source: MutableInteractionSource | undefined;
-    readonly props: FileUploadRootOwnProps;
+    readonly props: FileUploadDomRootOwnProps;
 }
 
 const context = createPartContext<FileUploadContextValue>("FileUpload");
@@ -68,8 +68,8 @@ const context = createPartContext<FileUploadContextValue>("FileUpload");
  *  `maxFiles`, …), `testId` and `unstyled` for every part, `as`, and the element's own props. */
 export interface FileUploadRootProps
     extends
-        Omit<PartProps, keyof FileUploadRootOwnProps>,
-        FileUploadRootOwnProps {
+        Omit<PartProps, keyof FileUploadDomRootOwnProps>,
+        FileUploadDomRootOwnProps {
     /** Another element or component to render instead of `<div>`. */
     readonly as?: ElementType | undefined;
 }
@@ -107,7 +107,7 @@ export interface FileUploadItemProps extends Omit<
 function Root(props: FileUploadRootProps): ReactNode {
     const id = useId();
     const dir = useDirection();
-    const value = useControllable<"value", File[], FileUploadValueDetails>(
+    const value = useControllable<"value", File[], FileUploadDomValueDetails>(
         "FileUpload",
         "value",
         props,
@@ -356,7 +356,7 @@ export interface FileUploadProps
     extends
         Omit<FileUploadRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
         SlotKeyedProps<Anatomy>,
-        FileUploadContentProps<ReactNode> {}
+        FileUploadDomContentProps<ReactNode> {}
 
 // Inside Root, so it can read the files and whether an error shows.
 function ReadyMadeContent({

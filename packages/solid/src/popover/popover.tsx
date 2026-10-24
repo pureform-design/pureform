@@ -10,15 +10,15 @@ import {
     overlayPositionerProps,
     presentProps,
     POPOVER_CONTENT_PROPS,
-    POPOVER_ROOT_PROPS,
-    popoverMachineProps,
     popoverSelection,
     CARET_STYLE,
 } from "@pureform/binding-core";
-import type {
-    PopoverContentProps,
-    PopoverRootOwnProps,
-} from "@pureform/binding-core";
+import type { PopoverContentProps } from "@pureform/binding-core";
+import {
+    POPOVER_DOM_ROOT_PROPS,
+    popoverDomMachineProps,
+} from "@pureform/binding-dom";
+import type { PopoverDomRootOwnProps } from "@pureform/binding-dom";
 import * as popover from "@pureform/machines/popover";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {
@@ -56,7 +56,9 @@ const context = createPartContext<PopoverContextValue>("Popover");
 /** Root's props: the tokens, the machine's props (`open`, `modal`,
  *  `positioning`, …), `testId` and `unstyled` for every part, `as`, and the element's own props. */
 export interface PopoverRootProps
-    extends Omit<PartProps, keyof PopoverRootOwnProps>, PopoverRootOwnProps {
+    extends
+        Omit<PartProps, keyof PopoverDomRootOwnProps>,
+        PopoverDomRootOwnProps {
     /** Another element or component to render instead of `<div>`. */
     readonly as?: ValidComponent | undefined;
 }
@@ -82,7 +84,7 @@ function Root(props: PopoverRootProps): JSX.Element {
     const service = useMachine(popover.machine, () => ({
         id,
         dir: dir(),
-        ...popoverMachineProps(props),
+        ...popoverDomMachineProps(props),
         ...open.machineProps(),
     }));
     const api = createMemo(() => popover.connect(service, normalizeProps));
@@ -97,7 +99,7 @@ function Root(props: PopoverRootProps): JSX.Element {
             {scope.render("root", {
                 element: "div",
                 as: () => props.as,
-                props: omit(props, "as", ...POPOVER_ROOT_PROPS),
+                props: omit(props, "as", ...POPOVER_DOM_ROOT_PROPS),
             })}
         </context.Provider>
     );

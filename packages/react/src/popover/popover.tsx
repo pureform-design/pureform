@@ -9,15 +9,15 @@ import {
     isPresent,
     overlayPositionerProps,
     presentProps,
-    POPOVER_ROOT_PROPS,
-    popoverMachineProps,
     popoverSelection,
     CARET_STYLE,
 } from "@pureform/binding-core";
-import type {
-    PopoverContentProps,
-    PopoverRootOwnProps,
-} from "@pureform/binding-core";
+import type { PopoverContentProps } from "@pureform/binding-core";
+import {
+    POPOVER_DOM_ROOT_PROPS,
+    popoverDomMachineProps,
+} from "@pureform/binding-dom";
+import type { PopoverDomRootOwnProps } from "@pureform/binding-dom";
 import * as popover from "@pureform/machines/popover";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";
@@ -49,7 +49,9 @@ const context = createPartContext<PopoverContextValue>("Popover");
 /** Root's props: the tokens, the machine's props (`open`, `modal`, `positioning`, …), `testId`
  *  and `unstyled` for every part, `as`, and the element's own props. */
 export interface PopoverRootProps
-    extends Omit<PartProps, keyof PopoverRootOwnProps>, PopoverRootOwnProps {
+    extends
+        Omit<PartProps, keyof PopoverDomRootOwnProps>,
+        PopoverDomRootOwnProps {
     /** Another element or component to render instead of `<div>`. */
     readonly as?: ElementType | undefined;
 }
@@ -75,7 +77,7 @@ function Root(props: PopoverRootProps): ReactNode {
     const service = useMachine(popover.machine, {
         id,
         dir,
-        ...popoverMachineProps(props),
+        ...popoverDomMachineProps(props),
         ...open.machineProps,
     });
     const api = popover.connect(service, normalizeProps);
@@ -85,7 +87,7 @@ function Root(props: PopoverRootProps): ReactNode {
         testId: props.testId,
         unstyled: props.unstyled,
     });
-    const { as, ...rest } = omitProps(props, POPOVER_ROOT_PROPS);
+    const { as, ...rest } = omitProps(props, POPOVER_DOM_ROOT_PROPS);
     return (
         <context.Provider value={{ scope, api, presence }}>
             {scope.render("root", { element: "div", as, props: rest })}

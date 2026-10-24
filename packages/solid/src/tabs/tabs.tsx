@@ -26,7 +26,7 @@ import type {
     TabsItem,
     TabsRootOwnProps,
 } from "@pureform/binding-core";
-import { revealInRow, slideIndicator } from "@pureform/binding-core/dom";
+import { revealInRow, slideIndicator } from "@pureform/binding-dom";
 import * as tabs from "@pureform/machines/tabs";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {

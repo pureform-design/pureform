@@ -17,7 +17,7 @@ import type {
     TextFieldBehaviorProps,
     TextFieldContentProps,
 } from "@pureform/binding-core";
-import { syncTextInput } from "@pureform/binding-core/dom";
+import { syncTextInput } from "@pureform/binding-dom";
 import * as textField from "@pureform/machines/text-field";
 import type { Selection } from "@pureform/styling";
 import type { JSX, ValidComponent } from "@solidjs/web";

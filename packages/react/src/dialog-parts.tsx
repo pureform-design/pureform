@@ -24,7 +24,12 @@ import type {
     Controllable,
     Unstyled,
 } from "@pureform/binding-core";
-import { stackPositioner } from "@pureform/binding-core/dom";
+import {
+    DIALOG_FOCUS_PROPS,
+    dialogFocusMachineProps,
+    stackPositioner,
+} from "@pureform/binding-dom";
+import type { DialogFocusProps } from "@pureform/binding-dom";
 import * as dialog from "@pureform/machines/dialog";
 import type { Selection } from "@pureform/styling";
 import { mergeProps, normalizeProps } from "@zag-js/react";
@@ -53,9 +58,10 @@ import { useDirection } from "./provider";
 
 type Layout = Parameters<typeof normalizeProps.element>[0];
 
-/** What a dialog-machine Root takes for the shared parts: `open`'s props, `testId`, `unstyled`
- *  and `as`. */
-export interface DialogChromeRootProps extends Controllable<"open", boolean> {
+/** What a dialog-machine Root takes for the shared parts: `open`'s props, the focus elements,
+ *  `testId`, `unstyled` and `as`. */
+export interface DialogChromeRootProps
+    extends Controllable<"open", boolean>, DialogFocusProps {
     readonly testId?: TestIdOverride | undefined;
     readonly unstyled?: Unstyled | undefined;
     readonly as?: ElementType | undefined;
@@ -161,6 +167,7 @@ export function dialogParts<
         const service = useMachine(dialog.machine, {
             id,
             dir,
+            ...dialogFocusMachineProps(props),
             ...options.machineProps(props),
             ...askingDismissProps(
                 options.onClose?.(props),
@@ -192,7 +199,10 @@ export function dialogParts<
                   unstyled: partAsRoot<boolean>(props.unstyled, "backdrop"),
               })
             : undefined;
-        const { as, ...rest } = omitProps(props, options.rootProps) as {
+        const { as, ...rest } = omitProps(props, [
+            ...options.rootProps,
+            ...DIALOG_FOCUS_PROPS,
+        ]) as {
             as?: ElementType | undefined;
         };
         return (

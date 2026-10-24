@@ -16,6 +16,7 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Controllable } from "../controllable";
 import type { Unstyled } from "../parts";
+import { platformLanguage } from "../platform";
 import type { DialogBehaviorProps } from "./dialog";
 import type { VariantProp } from "./variants";
 
@@ -327,10 +328,7 @@ export const DATE_BEHAVIOR_PROPS = [
 
 /** The locale a picker writes its dates in: its own, else the platform's. */
 export const pickerLocale = (props: { readonly locale?: string | undefined }) =>
-    props.locale ??
-    (typeof navigator !== "undefined" && navigator.language
-        ? navigator.language
-        : "en-US");
+    props.locale ?? platformLanguage() ?? "en-US";
 
 /** The first day of a picker's week: its own, else its locale's. */
 export const pickerWeekStart = (props: {

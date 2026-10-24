@@ -13,6 +13,7 @@ dependencies:
     - "@pureform/anatomy"
     - "@pureform/machines"
     - "@pureform/binding-core"
+    - "@pureform/binding-dom"
 
 tasks:
   test:unit:

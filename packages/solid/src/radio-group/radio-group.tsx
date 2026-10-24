@@ -26,12 +26,12 @@ import type {
     SlotKeyed,
     Unstyled,
 } from "@pureform/binding-core";
+import type { Indication } from "@pureform/binding-core/indication";
 import {
     radioInputs,
     setRadioDefaults,
     syncRadioInputs,
-} from "@pureform/binding-core/dom";
-import type { Indication } from "@pureform/binding-core/indication";
+} from "@pureform/binding-dom";
 import * as radioGroup from "@pureform/machines/radio-group";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {

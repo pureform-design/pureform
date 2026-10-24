@@ -21,7 +21,7 @@ import type {
     ToasterOwnProps,
     ToastType,
 } from "@pureform/binding-core";
-import { toastSwipeToDismiss } from "@pureform/binding-core/dom";
+import { toastSwipeToDismiss } from "@pureform/binding-dom";
 import * as toast from "@pureform/machines/toast";
 import type { JSX } from "@solidjs/web";
 import {

@@ -22,6 +22,7 @@ import type {
     DialogRootOwnProps,
     Unstyled,
 } from "@pureform/binding-core";
+import type { DialogFocusProps } from "@pureform/binding-dom";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import { omit, Show } from "solid-js";
 
@@ -36,7 +37,10 @@ type Anatomy = typeof dialogOverlayAnatomy;
 /** Root's props: the `icon` variant and tokens, the machine's props (`open`, `modal`, `role`,
  *  …), `testId` and `unstyled` for every part, `as`, and the element's own props. */
 export interface DialogRootProps
-    extends Omit<PartProps, keyof DialogRootOwnProps>, DialogRootOwnProps {
+    extends
+        Omit<PartProps, keyof DialogRootOwnProps>,
+        DialogRootOwnProps,
+        DialogFocusProps {
     /** Another element or component to render instead of `<div>`. */
     readonly as?: ValidComponent | undefined;
 }

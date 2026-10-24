@@ -38,29 +38,44 @@ export type FileUploadErrorCode =
     | "FILE_INVALID"
     | "FILE_EXISTS";
 
+/** What the contract reads of a file: the web's `File` (`@pureform/binding-dom`'s
+ *  `FileUploadDom*` types), or a platform's own. */
+export interface FileUploadItem {
+    readonly name: string;
+    /** The size in bytes. */
+    readonly size: number;
+    /** The MIME type. */
+    readonly type: string;
+}
+
 /** What a change of the files reports: the accepted files as `value`, and the rejected ones with
  *  their reasons. */
-export interface FileUploadValueDetails {
-    readonly value: File[];
-    readonly rejectedFiles: { file: File; errors: string[] }[];
+export interface FileUploadValueDetails<
+    F extends FileUploadItem = FileUploadItem,
+> {
+    readonly value: F[];
+    readonly rejectedFiles: { file: F; errors: string[] }[];
 }
 
 /** What the file upload takes for itself and passes on to the machine. The accepted files are
- *  the `value` (Zag's `acceptedFiles`), with `defaultValue` and `onValueChange`. */
-export interface FileUploadBehaviorProps {
+ *  the `value` (Zag's `acceptedFiles`), with `defaultValue` and `onValueChange`. `F` is the
+ *  platform's file. */
+export interface FileUploadBehaviorProps<
+    F extends FileUploadItem = FileUploadItem,
+> {
     /** The accepted files, to control them. Leave it out and the machine keeps them. */
-    readonly value?: File[] | undefined;
+    readonly value?: F[] | undefined;
     /** @control none */
-    readonly defaultValue?: File[] | undefined;
+    readonly defaultValue?: F[] | undefined;
     /** Called with the accepted (`value`) and the rejected files when either changes. */
     readonly onValueChange?:
-        | ((details: FileUploadValueDetails) => void)
+        | ((details: FileUploadValueDetails<F>) => void)
         | undefined;
     /** Called when files are accepted. */
-    readonly onFileAccept?: ((details: { files: File[] }) => void) | undefined;
+    readonly onFileAccept?: ((details: { files: F[] }) => void) | undefined;
     /** Called when files are rejected, each with the reasons. */
     readonly onFileReject?:
-        | ((details: { files: { file: File; errors: string[] }[] }) => void)
+        | ((details: { files: { file: F; errors: string[] }[] }) => void)
         | undefined;
     readonly disabled?: boolean | undefined;
     readonly readOnly?: boolean | undefined;
@@ -86,27 +101,32 @@ export interface FileUploadBehaviorProps {
     /** The camera to capture media with, on devices that have one. */
     readonly capture?: "user" | "environment" | undefined;
     /** Rejects a file by returning the reasons. */
-    readonly validate?: ((file: File) => string[] | null) | undefined;
+    readonly validate?: ((file: F) => string[] | null) | undefined;
     /** The name the files submit under. @control none */
     readonly name?: string | undefined;
     /** The id of the form the files belong to, for one outside it. @control none */
     readonly form?: string | undefined;
     /** A remove button's accessible name, from its file. @default `Remove ${file.name}` */
-    readonly removeLabel?: ((file: File) => string) | undefined;
+    readonly removeLabel?: ((file: F) => string) | undefined;
     /** How far a file's upload has got, from 0 to 100, as the app reports it: a progress bar
      *  under the file while this returns a number, an indeterminate one for `null`, none for
      *  `undefined`. */
-    readonly progress?: ((file: File) => number | null | undefined) | undefined;
+    readonly progress?: ((file: F) => number | null | undefined) | undefined;
     /** A rejected file's message, from the reason. @default the messages below */
-    readonly errorMessage?: ((code: string, file: File) => string) | undefined;
+    readonly errorMessage?: ((code: string, file: F) => string) | undefined;
     /** The root element's id; the machine builds the other ids from it.
      *  @control none */
     readonly id?: string | undefined;
 }
 
 /** Everything Root takes for itself, besides the element's own props and `as`. */
-export interface FileUploadRootOwnProps
-    extends FileUploadVariantProps, FileUploadBehaviorProps, InteractiveProps {
+export interface FileUploadRootOwnProps<
+    F extends FileUploadItem = FileUploadItem,
+>
+    extends
+        FileUploadVariantProps,
+        FileUploadBehaviorProps<F>,
+        InteractiveProps {
     /** A prefix for every part's test id (`files` → `files-root`), or ids by part. */
     readonly testId?: TestIdOverride<FileUploadPart> | undefined;
     /** Every part, or some, without the registry's styles. */
@@ -148,7 +168,10 @@ export const FILE_UPLOAD_ROOT_PROPS = [
 ] as const satisfies readonly (keyof FileUploadRootOwnProps)[];
 
 /** What the ready-made file upload renders inside Root, in the framework's node type. */
-export interface FileUploadContentProps<Node> {
+export interface FileUploadContentProps<
+    Node,
+    F extends FileUploadItem = FileUploadItem,
+> {
     /** The label above the drop zone. */
     readonly label?: Node;
     /** The drop zone's icon. @default an arrow pointing up */
@@ -161,7 +184,7 @@ export interface FileUploadContentProps<Node> {
      *  leaves the button out. */
     readonly trigger?: Node;
     /** A file's leading icon, from the file, when it has no image preview. @default a document */
-    readonly fileIcon?: ((file: File) => Node) | undefined;
+    readonly fileIcon?: ((file: F) => Node) | undefined;
     /** The remove buttons' icon. @default a cross */
     readonly removeIcon?: Node;
 }
@@ -189,7 +212,9 @@ export const fileUploadSelection = (
 
 /** The file upload machine's props from Root's, besides `id`, `dir` and the files (see
  *  `fileUploadValueProps`). An error marks the drop zone invalid. */
-export const fileUploadMachineProps = (props: FileUploadBehaviorProps) => ({
+export const fileUploadMachineProps = <F extends FileUploadItem>(
+    props: FileUploadBehaviorProps<F>,
+) => ({
     onFileAccept: props.onFileAccept,
     onFileReject: props.onFileReject,
     disabled: props.disabled,
@@ -206,8 +231,7 @@ export const fileUploadMachineProps = (props: FileUploadBehaviorProps) => ({
     validate: props.validate,
     name: props.name,
     translations: {
-        deleteFile:
-            props.removeLabel ?? ((file: File) => `Remove ${file.name}`),
+        deleteFile: props.removeLabel ?? ((file: F) => `Remove ${file.name}`),
     },
 });
 
@@ -236,16 +260,16 @@ export const fileUploadErrorText = <F>(
 
 /** What a file's upload shows: whether there's a progress bar, and its value (`null` for
  *  indeterminate). */
-export const fileUploadProgress = (
-    progress: FileUploadBehaviorProps["progress"],
-    file: File,
+export const fileUploadProgress = <F extends FileUploadItem>(
+    progress: FileUploadBehaviorProps<F>["progress"],
+    file: F,
 ): { readonly shown: boolean; readonly value: number | null } => {
     const value = progress?.(file);
     return { shown: value !== undefined, value: value ?? null };
 };
 
 /** Whether a file is an image the item can preview. */
-export const isPreviewable = (file: File): boolean =>
+export const isPreviewable = (file: Pick<FileUploadItem, "type">): boolean =>
     file.type.startsWith("image/");
 
 /** The test id prefix of the item's list item parts, from Root's `testId`: `files` →
@@ -286,14 +310,14 @@ export const formatFileSize = (bytes: number): string => {
 
 /** The files' controllable props (`useControllable`'s `value`, `defaultValue`, `onValueChange`)
  *  in Zag's names: `acceptedFiles`, `defaultAcceptedFiles`, `onFileChange`. */
-export const fileUploadValueProps = (
-    value: ControllableMachineProps<"value", File[], FileUploadValueDetails>,
+export const fileUploadValueProps = <F extends FileUploadItem>(
+    value: ControllableMachineProps<"value", F[], FileUploadValueDetails<F>>,
 ) => ({
     acceptedFiles: value.value,
     defaultAcceptedFiles: value.defaultValue,
     onFileChange: (details: {
-        acceptedFiles: File[];
-        rejectedFiles: { file: File; errors: string[] }[];
+        acceptedFiles: F[];
+        rejectedFiles: { file: F; errors: string[] }[];
     }) =>
         value.onValueChange({
             value: details.acceptedFiles,

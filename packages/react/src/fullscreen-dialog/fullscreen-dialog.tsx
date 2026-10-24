@@ -21,6 +21,7 @@ import type {
     FullscreenDialogRootOwnProps,
     Unstyled,
 } from "@pureform/binding-core";
+import type { DialogFocusProps } from "@pureform/binding-dom";
 import { type ElementType, type ReactNode } from "react";
 
 import { Button } from "../button";
@@ -38,7 +39,8 @@ type Anatomy = typeof fullscreenDialogOverlayAnatomy;
 export interface FullscreenDialogRootProps
     extends
         Omit<PartProps, keyof FullscreenDialogRootOwnProps>,
-        FullscreenDialogRootOwnProps {
+        FullscreenDialogRootOwnProps,
+        DialogFocusProps {
     /** Another element or component to render instead of `<div>`. */
     readonly as?: ElementType | undefined;
 }

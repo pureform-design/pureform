@@ -1,24 +1,32 @@
-import { createRegistry } from "@pureform/styling";
-import { afterEach, describe, expect, it, vi } from "vitest";
-
+import { resolveProvider } from "@pureform/binding-core";
 import {
     componentIndicationTokens,
-    DEFAULT_INDICATION,
     defineIndication,
     dropsFocusIndicator,
-    IndicationHost,
-    holdsLayer,
-    indicationRoles,
     indicationTokenValues,
-    materialIndication,
     noIndication,
     providerIndicationOverrides,
     rippleClasses,
+} from "@pureform/binding-core/indication";
+import type {
+    Indication,
+    IndicationContext,
+    IndicationTarget,
+} from "@pureform/binding-core/indication";
+import { createInteractionSource } from "@pureform/binding-core/interaction";
+import type { InteractionSource } from "@pureform/binding-core/interaction";
+import { createRegistry } from "@pureform/styling";
+import { afterEach, describe, expect, expectTypeOf, it, vi } from "vitest";
+
+import {
+    DEFAULT_INDICATION,
+    IndicationHost,
+    holdsLayer,
+    indicationRoles,
+    materialIndication,
     surfaceLayer,
 } from "./indication";
-import type { ForwardedStates, Indication } from "./indication";
-import { createInteractionSource } from "./interaction";
-import { resolveProvider } from "./provider";
+import type { ForwardedStates } from "./indication";
 
 const registry = createRegistry({
     ripple: () => ({
@@ -391,5 +399,40 @@ describe("IndicationHost", () => {
         ]);
         stop();
         detach();
+    });
+});
+
+describe("defineIndication on the web", () => {
+    it("types a web effect over the target, source, and context", () => {
+        const scaled = defineIndication({
+            name: "app:scale",
+            layer: false,
+            web(target, source, context) {
+                expectTypeOf(target).toEqualTypeOf<IndicationTarget>();
+                expectTypeOf(source).toEqualTypeOf<InteractionSource>();
+                expectTypeOf(context).toEqualTypeOf<IndicationContext>();
+                return source.subscribe((_, state) => {
+                    target.surface.style.scale = state.pressed ? "0.98" : "";
+                });
+            },
+        });
+        const surface = document.createElement("div");
+        const source = createInteractionSource();
+        const cleanup = scaled.web?.({ trigger: surface, surface }, source, {
+            centered: false,
+            reducedMotion: () => false,
+            dir: () => "ltr",
+            registry: {} as IndicationContext["registry"],
+        });
+        source.emit({
+            type: "press",
+            id: 1,
+            origin: "center",
+            pointer: "keyboard",
+        });
+        expect(surface.style.scale).toBe("0.98");
+        cleanup?.();
+        source.emit({ type: "release", id: 1 });
+        expect(surface.style.scale).toBe("0.98");
     });
 });

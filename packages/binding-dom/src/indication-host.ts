@@ -5,10 +5,17 @@
 // Framework-free: each binding attaches elements from its own after-mount hooks.
 
 import type { IndicationAnatomy } from "@pureform/anatomy";
+import type { AnyRegistry, Direction } from "@pureform/binding-core";
+import type {
+    Indication,
+    IndicationContext,
+} from "@pureform/binding-core/indication";
+import type {
+    Interaction,
+    InteractionSource,
+} from "@pureform/binding-core/interaction";
 
-import type { Indication, IndicationContext } from "./indication";
-import type { Interaction, InteractionSource } from "./interaction";
-import type { AnyRegistry, Direction } from "./provider";
+import { webIndication } from "./indication-material";
 
 /** What an element is to a surface's indication: the `trigger` whose interactions feed the
  *  source, the `surface` it draws on, the `state` element the preset matches hover and press
@@ -170,7 +177,9 @@ export class IndicationInstance {
      *  when the indication changes; stops it when one goes. The layer is found in the surface
      *  each time the effect reads it, so the bindings needn't track it as it mounts. */
     update(): void {
-        const { indication, registry } = this.#host;
+        const { registry } = this.#host;
+        const given = this.#host.indication;
+        const indication = given && webIndication(given);
         const trigger = this.#elements.get("trigger");
         const surface = this.#elements.get("surface");
         const ready =

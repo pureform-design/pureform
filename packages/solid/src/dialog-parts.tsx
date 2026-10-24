@@ -24,7 +24,12 @@ import type {
     Controllable,
     Unstyled,
 } from "@pureform/binding-core";
-import { stackPositioner } from "@pureform/binding-core/dom";
+import {
+    DIALOG_FOCUS_PROPS,
+    dialogFocusMachineProps,
+    stackPositioner,
+} from "@pureform/binding-dom";
+import type { DialogFocusProps } from "@pureform/binding-dom";
 import * as dialog from "@pureform/machines/dialog";
 import type { Selection } from "@pureform/styling";
 import type { JSX, ValidComponent } from "@solidjs/web";
@@ -49,9 +54,10 @@ import { useDirection } from "./provider";
 
 type Layout = Parameters<typeof normalizeProps.element>[0];
 
-/** What a dialog-machine Root takes for the shared parts: `open`'s props, `testId`, `unstyled`
- *  and `as`. */
-export interface DialogChromeRootProps extends Controllable<"open", boolean> {
+/** What a dialog-machine Root takes for the shared parts: `open`'s props, the focus elements,
+ *  `testId`, `unstyled` and `as`. */
+export interface DialogChromeRootProps
+    extends Controllable<"open", boolean>, DialogFocusProps {
     readonly testId?: TestIdOverride | undefined;
     readonly unstyled?: Unstyled | undefined;
     readonly as?: ValidComponent | undefined;
@@ -143,6 +149,7 @@ export function dialogParts<
         const service = useMachine(dialog.machine, () => ({
             id,
             dir: dir(),
+            ...dialogFocusMachineProps(props),
             ...options.machineProps(props),
             ...askingDismissProps(
                 onClose(),
@@ -201,7 +208,12 @@ export function dialogParts<
                 {scope.render(name("root"), {
                     element: "div",
                     as: () => props.as,
-                    props: omit(props, "as", ...(options.rootProps as [])),
+                    props: omit(
+                        props,
+                        "as",
+                        ...(options.rootProps as []),
+                        ...DIALOG_FOCUS_PROPS,
+                    ),
                 })}
             </context.Provider>
         );

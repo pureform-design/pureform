@@ -25,9 +25,9 @@ export type {
 } from "./indication";
 export {
     defineIndication,
-    materialIndication,
     noIndication,
 } from "@pureform/binding-core/indication";
+export { materialIndication } from "@pureform/binding-dom/indication";
 export type {
     Indication,
     IndicationContext,

@@ -7,7 +7,6 @@ import {
     FAB_MENU_ROOT_PROPS,
     fabMenuItemFocusProps,
     fabMenuItemProps,
-    fabMenuListProps,
     fabMenuMachineProps,
     fabMenuSelection,
     isPresent,
@@ -18,6 +17,7 @@ import type {
     FabMenuRootOwnProps,
     InteractionSourceProps,
 } from "@pureform/binding-core";
+import { fabMenuListProps } from "@pureform/binding-dom";
 import * as menu from "@pureform/machines/menu";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";

@@ -6,8 +6,9 @@ import {
     SPLITTER_SETTLE,
     splitterLimits,
     splitterSnap,
-} from "./components/splitter";
-import type { SplitterAnchor, SplitterPanelData } from "./components/splitter";
+} from "@pureform/binding-core";
+import type { SplitterAnchor, SplitterPanelData } from "@pureform/binding-core";
+
 import { settleOnSpring } from "./settle";
 
 /** The panes' room along the axis: the root less its dividers. */

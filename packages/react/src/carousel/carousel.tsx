@@ -19,10 +19,7 @@ import type {
     CarouselRootOwnProps,
     InteractionSourceProps,
 } from "@pureform/binding-core";
-import {
-    carouselRowPadding,
-    observeCarouselRow,
-} from "@pureform/binding-core/dom";
+import { carouselRowPadding, observeCarouselRow } from "@pureform/binding-dom";
 import * as carousel from "@pureform/machines/carousel";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";

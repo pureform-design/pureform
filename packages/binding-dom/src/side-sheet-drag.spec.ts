@@ -1,10 +1,10 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
-
 import {
     closeAsker,
     SIDE_SHEET_VELOCITY_THRESHOLD,
     sideSheetRelease,
-} from "./components/sheet";
+} from "@pureform/binding-core";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { sideSheetDragToDismiss } from "./side-sheet-drag";
 
 describe("sideSheetRelease", () => {

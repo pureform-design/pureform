@@ -16,7 +16,7 @@ import type {
     SearchBarContentProps,
     SearchBarRootOwnProps,
 } from "@pureform/binding-core";
-import { syncTextInput } from "@pureform/binding-core/dom";
+import { syncTextInput } from "@pureform/binding-dom";
 import * as textField from "@pureform/machines/text-field";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {

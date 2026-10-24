@@ -3,11 +3,11 @@
 // speed, as React Native's `settle()` carries the release velocity. The row's transition is read
 // as the press starts, before the drag's `pressed` state swaps it for the state layer's.
 
+import { createDragVelocity } from "@pureform/binding-core";
 import type { SpringNode } from "@pureform/core/ast";
 import type { Registry } from "@pureform/styling";
 import { tokenVar } from "@pureform/styling/theme-vars";
 
-import { createDragVelocity } from "./drag";
 import { settleOnSpring, springRoleVar, transitionSpring } from "./settle";
 
 /** The spring role the preset's swipeable row settles on. */

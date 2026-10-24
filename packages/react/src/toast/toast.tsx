@@ -20,7 +20,7 @@ import type {
     ToasterOptions,
     ToasterOwnProps,
 } from "@pureform/binding-core";
-import { toastSwipeToDismiss } from "@pureform/binding-core/dom";
+import { toastSwipeToDismiss } from "@pureform/binding-dom";
 import * as toast from "@pureform/machines/toast";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";
