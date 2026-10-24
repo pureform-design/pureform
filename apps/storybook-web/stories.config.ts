@@ -177,6 +177,19 @@ export default defineStories({
             }),
         },
         Tooltip: { parameters: keyClicks("KeyEnter") },
+        Tree: {
+            // React Native's branch is a tree item holding its children's group (APG), named
+            // from its row's text alone (`aria-labelledby`); axe's heuristic wants an element's
+            // whole visible text, its children's labels too, in its name.
+            parameters: native({
+                "*": {
+                    a11y: {
+                        "label-content-name-mismatch":
+                            "A tree branch is named from its row, not from the children's labels it holds.",
+                    },
+                },
+            }),
+        },
         RichTooltip: { parameters: keyClicks("KeyEnter") },
         Carousel: {
             // Its items are sized from the row's width once mounted (the case's `measured`): a
