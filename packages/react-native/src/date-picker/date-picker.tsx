@@ -46,6 +46,7 @@ import {
 import type { InnerPropsOf, NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 import { partId } from "../text-input";
+import { triggerButtonProps } from "../trigger-button";
 
 type Part = PartName<typeof datePickerAnatomy>;
 const KEYS = overlayKeys(datePickerOverlayAnatomy);
@@ -54,6 +55,7 @@ const NONE: readonly string[] = [];
 
 /** What each part renders as, for its keyed `style` and `slotProps`: the web's parts. */
 export interface DatePickerHosts {
+    readonly trigger: "Pressable";
     readonly content: "View";
     readonly header: "View";
     readonly headline: "Text";
@@ -319,6 +321,7 @@ function ModalDatePicker(props: DatePickerProps): ReactNode {
         <>
             {isPresent(props.trigger) ? (
                 <Button
+                    {...triggerButtonProps(nativeSlots(props, KEYS), undefined)}
                     label={props.trigger}
                     disabled={props.disabled}
                     onPress={show}

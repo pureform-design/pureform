@@ -66,6 +66,7 @@ import { useEngine, usePureform } from "../provider";
 import { backdropKeys, nativeSlots, overlayKeys } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
+import { triggerButtonProps } from "../trigger-button";
 
 /** The sheet's parts this binding renders. */
 type Part = PartName<typeof bottomSheetAnatomy>;
@@ -84,6 +85,7 @@ export interface BottomSheetTriggerProps {
 
 /** What each part renders as, for its keyed `style` and `slotProps`. */
 export interface BottomSheetHosts {
+    readonly trigger: "Pressable";
     readonly content: "View";
     readonly dragHandle: "View";
     readonly body: "View";
@@ -443,7 +445,14 @@ function ModalBottomSheet(props: BottomSheetProps): ReactNode {
             {trigger === undefined ? null : typeof trigger === "function" ? (
                 trigger(given)
             ) : (
-                <Button label={trigger} {...given} />
+                <Button
+                    {...triggerButtonProps(
+                        nativeSlots(props, KEYS),
+                        props.testId,
+                    )}
+                    label={trigger}
+                    {...given}
+                />
             )}
             <ModalWindow visible={presence.present} label={props["aria-label"]}>
                 <ModalScrimLayer
@@ -497,7 +506,14 @@ function StandardBottomSheet(props: BottomSheetProps): ReactNode {
             {trigger === undefined ? null : typeof trigger === "function" ? (
                 trigger(given)
             ) : (
-                <Button label={trigger} {...given} />
+                <Button
+                    {...triggerButtonProps(
+                        nativeSlots(props, KEYS),
+                        props.testId,
+                    )}
+                    label={trigger}
+                    {...given}
+                />
             )}
             <Surface
                 {...surface}
