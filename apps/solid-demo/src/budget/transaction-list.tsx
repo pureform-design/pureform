@@ -31,7 +31,7 @@ export function TransactionList(props: {
     const setSize = (transaction: Transaction) =>
         props.position?.(transaction) === undefined ? undefined : props.setSize;
     return (
-        <List.Root tokens={{ container: "transparent" }}>
+        <List.Root>
             {/* By reference: the query's data is a store that keeps a transaction's object when
                 it changes, so a row is made once and reads its fields as they're drawn. */}
             <For each={props.transactions}>
@@ -51,6 +51,8 @@ export function TransactionList(props: {
         </List.Root>
     );
 }
+
+const TRANSPARENT = { container: "transparent" } as const;
 
 function TransactionRow(props: {
     transaction: Transaction;
@@ -85,8 +87,11 @@ function TransactionRow(props: {
             trailingText={trailingText()}
             tokens={
                 amount() > 0
-                    ? { trailingColor: "var(--colors-success)" }
-                    : undefined
+                    ? {
+                          container: "transparent",
+                          trailingColor: "var(--colors-success)",
+                      }
+                    : TRANSPARENT
             }
             onClick={() => editTransaction(props.transaction)}
         />

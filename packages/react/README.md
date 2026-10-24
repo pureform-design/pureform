@@ -287,17 +287,22 @@ import { RichTooltip } from "@pureform/react/rich-tooltip";
 - **The switch, radio group, chip, icon button, and FAB** behave as `@pureform/solid`'s do (see
   its README): the switch is a `<label>` around a checkbox with `role="switch"`; the radio group
   is an unstyled `div` (`radioGroupAnatomy`) around a preset `radio` per `Item`, its ready-made
-  taking `items`, and `slotProps`/`unstyled` keyed by the radio's parts; the chip and icon button
+  taking `items`, `className`/`style`/`slotProps` keyed by the group's `root`, and `radioProps`
+  (every radio's `className`, `style`, `slotProps`, `unstyled`, `testId` and `tokens`, keyed by
+  the radio's parts; the group has no tokens of its own); the chip and icon button
   toggle when given `selected` or `defaultSelected` (a toggle icon button also selects the
   `toggle` variant); the FAB is extended when its ready-made has a `label`. Icon-only components
   need `aria-label` or `aria-labelledby`, and warn in development without one.
 - **The button group** (`@pureform/react/button-group`) behaves as `@pureform/solid`'s does: a
   `div` with `role="group"` holding `ButtonGroup.Button`s and `ButtonGroup.IconButton`s in its
   variants, each with its `position` (the ready-made sets it from `items`), and toggle buttons on
-  Zag's toggle group with `selectable`.
+  Zag's toggle group with `selectable`. `tokens` are the group's own; the ready-made takes
+  `buttonProps` and `iconButtonProps` for the buttons it draws, and `indication` reaches them.
 - **The chip set** (`@pureform/react/chip-set`) is a `div` with `role="group"` (`chipSetAnatomy`)
-  holding chips in its variants (`variant`, `corner`, `color`, `density`, `tokens` under each
-  chip's own); `singleLine` keeps them on one scrolling line. With `selectable` (`single` or
+  holding chips in its variants (`variant`, `corner`, `color`, `density` under each chip's own);
+  `singleLine` keeps them on one scrolling line. `tokens` are the set's own; the ready-made's
+  `chipProps` gives every chip its `className`, `style`, `slotProps`, `unstyled`, `testId` and
+  `tokens`. With `selectable` (`single` or
   `multiple`) it runs Zag's toggle group, as the button group does, and its chips are filter
   chips (`aria-pressed`). `ChipSet.Root` and `ChipSet.Chip` compose it.
 - **The selection list** (`@pureform/react/selection-list`) is a `List` that is Zag's listbox:
@@ -366,7 +371,8 @@ import { RichTooltip } from "@pureform/react/rich-tooltip";
 - **The tags input** draws Material's input chips inside the text field's container: Enter (or
   `delimiter`) adds the typed text as a chip, Backspace highlights the last chip (the hover state)
   and then removes it, and each chip's remove button removes it. The input chip exists only inside
-  it (drawn with the `inputChip` registry entry, styled by Root's `chip`); tags aren't edited in
+  it (drawn with the `inputChip` registry entry, its variants in Root's `chip`, its parts and
+  tokens in `chipProps`); tags aren't edited in
   place. `value` is a `string[]`; the ready-made takes `chipAvatar` / `chipIcon` from a value.
 - **The number field** parses and formats in `locale`, else the browser's language
   (`navigator.language`), else the platform's `Intl` locale, else `en-US`. **When server
@@ -541,7 +547,8 @@ inputValue })`); either closes it unless `closeOnSelect={false}`. The ready-made
   words the labels; `disabled` disables every control. Compose with `Paginator.Root` and its parts;
   the triggers take `as={IconButton}`. The numbered pages Zag offers aren't drawn.
 - **The toolbar** (`@pureform/react/toolbar`) renders its `items` as an icon button per element
-  with an icon (named by its label) and a text button per element without; `selected` makes an element a toggle. `placement` (`floating`, `docked`),
+  with an icon (named by its label) and a text button per element without; `selected` makes an element a toggle. `className`/`style`/`slotProps` are keyed by its `root`, and
+  `iconButtonProps` and `buttonProps` reach the buttons it draws. `placement` (`floating`, `docked`),
   `orientation` and `color` (`standard`, `vibrant`) pick the bar. With `overflow`, it measures
   its elements and the room its parent gives it, and moves those that don't fit, from the end,
   into the menu behind an overflow button (`overflowLabel`, "More options"; `overflowIcon`); the
@@ -614,11 +621,12 @@ mirrorIcon?, disabled?, content? }`; a tab without a label shows only its icon, 
   `Root` no longer takes `swipeable` or the swipe props: `Frame` replaces them.
 - **The list** is a `<ul>` (`listAnatomy`, `pf-list-root`) with each list item in an `<li>`
   (`List.Item`, `pf-list-item`). `variant="segmented"` sets its items apart as tiles, and
-  `listTokens` are the list's own tokens. Its `density`, `color`, `leadingType`, and `tokens` are
-  every item's defaults. In a segmented list, the ready-made gives each item its `position`
+  `tokens` are the list's own. Its `density`, `color` and `leadingType` are every item's
+  defaults. In a segmented list, the ready-made gives each item its `position`
   (`first`, `middle`, `last`, or `single`) unless the item has one. The ready-made takes `items` (a list item's content and props, with an optional
-  `value` as its key), and `slotProps` and `unstyled` keyed by the list item's parts, applied to
-  every item. A `ListItem` alone isn't in a list; put it in `List.Item`, or give it `as="li"` in
+  `value` as its key), `className`/`style`/`slotProps` keyed by the list's own parts (`root`,
+  `item` for each `<li>`), and `listItemProps`, every item's `className`, `style`, `slotProps`,
+  `unstyled`, `testId` and `tokens` under the item's own (the selection list takes the same). A `ListItem` alone isn't in a list; put it in `List.Item`, or give it `as="li"` in
   your own `<ul>`.
 - **Progress indicators** (`LinearProgress`: `Track` (holding `TrackBefore` and `TrackAfter`, the indeterminate track's rounded parts either side of the sliding indicator and its gaps), `Indicator`, `StopIndicator`; `CircularProgress`: `Track` with its two halves and arcs and its rounded ends `TrackTailCap` and `TrackHeadCap`, then the indicator's halves and arcs, then its rounded ends `TailCap` and `HeadCap`) have no machine: Root is a
   `role="progressbar"` with `aria-valuemin`, `aria-valuemax`, and `aria-valuenow`, and `value`

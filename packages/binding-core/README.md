@@ -35,7 +35,7 @@ to prune builds.
 | `provider.ts`            | `ProviderOptions`, `ProviderState`, `resolveProvider` (nesting), `providerAttributes`, `themeAttributes`, `requireRegistry`                                                                                                                                          |
 | `selection.ts`           | `withDefaults`: a selection over the provider's defaults; `selectionSignature` to memoize on one                                                                                                                                                                     |
 | `entries.ts`             | `classEntry` (the provider registry's entry), and the class hooks' errors about lazy entries                                                                                                                                                                         |
-| `parts.ts`               | `partSources` (a part's props, in merge order), `stateAttributes`, `partClasses`, `forSlot`, `isUnstyled`, `isIconPart`                                                                                                                                              |
+| `parts.ts`               | `partSources` (a part's props, in merge order), `stateAttributes`, `partClasses`, `forSlot`, `isUnstyled`, `isIconPart`, `InnerProps`, `overDefaults`                                                                                                                |
 | `props.ts`               | `combineProps`: one part's props from several sources, with the binding's rules for classes and styles                                                                                                                                                               |
 | `class-names.ts`         | `cx`: a `clsx`-compatible class joiner, for bindings whose class prop is a string (React)                                                                                                                                                                            |
 | `controllable.ts`        | `Controllable<N, T>`, the controlled/uncontrolled warning, and `reason: "reset"` tracking                                                                                                                                                                            |
@@ -89,6 +89,8 @@ partSources({ anatomy, part, machine, states, testId, unstyled, partUnstyled, cl
 spreadableProps(props);                  // without children and ref
 cx("a", ["b", { c: true }]);             // "a b c", as clsx joins
 forSlot(slotKeyed, slot); isUnstyled(unstyled, part); isIconPart(anatomy, part);
+overDefaults(listItemProps, item);      // a child's own over its container's defaults: classes join,
+                                        // style/slotProps/tokens merge per part; either as-is when the other is empty
 combineProps(sources, rules): Record<string, unknown>;
 outsideRootMessage("Button", "Label");   // the error for a compound part outside its Root
 
@@ -166,7 +168,7 @@ radioGroupRootProps(p); radioItemProps(p); radioInputProps(p); radioRingProps(p)
 
 // Button group: the row (buttonGroupAnatomy) on Zag's toggle group when selectable; its buttons
 // are the preset's buttons and icon buttons
-interface ButtonGroupRootOwnProps        // size, connected, groupTokens, the buttons' color,
+interface ButtonGroupRootOwnProps        // size, connected, tokens (its own), the buttons' color,
                                          // variant, corner, density, selectable ("single" |
                                          // "multiple"), deselectable, disabled, id, value,
                                          // defaultValue, onValueChange, testId
@@ -178,7 +180,7 @@ groupedButtonVariants(group, button, position); // the button's own win
 buttonGroupRootProps(p); buttonGroupItemProps(p); // without Zag's style; without id, disabled, type
 
 // Chip set: the row (chipSetAnatomy) on the button group's toggle group when selectable.
-interface ChipSetRootOwnProps  // singleLine, setTokens, the chips' variant, corner, color,
+interface ChipSetRootOwnProps  // singleLine, tokens (its own), the chips' variant, corner, color,
                                // density, tokens; selectable, deselectable, disabled, id, value
 interface ChipSetItem { value?; label?; icon?; trailingIcon?; disabled?; onClick?; testId? }
 chipSetSelection(props); chipSetMachineProps(props); chipSetChipVariants(set, chip);
@@ -442,7 +444,7 @@ listItemElement({ href, as });           // "a" with an href, else as, else "div
 listItemSelection(props, element);       // interactive defaults to a link or a button
 listItemRootProps(props, element);       // aria-current while selected; disabled or aria-disabled
 listItemLines(content);                  // one, two (overline or supporting text), three (both)
-interface ListRootOwnProps               // variant, listTokens; density, color, tokens, leadingType
+interface ListRootOwnProps               // variant, tokens (its own); density, color, leadingType
                                          // (every item's defaults), testId
 listSelection(props);                    // the list's variant (standard or segmented)
 listItemPosition(index, count, segmented); // first, middle, last, single; none unless segmented

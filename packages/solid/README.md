@@ -294,10 +294,14 @@ import { RichTooltip } from "@pureform/solid/rich-tooltip";
   `selectable="single"` or `"multiple"` makes them toggle buttons on Zag's toggle group (arrow keys
   move between them; each reports `aria-pressed`), with `value`, `defaultValue` and
   `onValueChange` on the group and a `value` per button. It replaces the deprecated segmented
-  button.
+  button. `tokens` are the group's own; the ready-made takes `class`/`style`/`slotProps` keyed by
+  its `root`, `buttonProps` and `iconButtonProps` for the buttons it draws, and `indication`
+  reaches them.
 - **The chip set** (`@pureform/solid/chip-set`) is a `div` with `role="group"` (`chipSetAnatomy`)
-  holding chips in its variants (`variant`, `corner`, `color`, `density`, `tokens` under each
-  chip's own); `singleLine` keeps them on one scrolling line. With `selectable` (`single` or
+  holding chips in its variants (`variant`, `corner`, `color`, `density` under each chip's own);
+  `singleLine` keeps them on one scrolling line. `tokens` are the set's own; the ready-made's
+  `chipProps` gives every chip its `class`, `style`, `slotProps`, `unstyled`, `testId` and
+  `tokens`. With `selectable` (`single` or
   `multiple`) it runs Zag's toggle group, as the button group does, and its chips are filter
   chips (`aria-pressed`). `ChipSet.Root` and `ChipSet.Chip` compose it.
 - **The selection list** (`@pureform/solid/selection-list`) is a `List` that is Zag's listbox:
@@ -323,10 +327,11 @@ import { RichTooltip } from "@pureform/solid/rich-tooltip";
 - **The radio group** is an unstyled `div` (`radioGroupAnatomy`, `data-scope="radio-group"`, test
   id `pf-radio-group-root`) holding a preset `radio` per item. Name the group with `aria-label` or
   `aria-labelledby`, and each radio on its `ItemInput` (the ready-made uses each item's `label`).
-  Variants on the group (`color`, `density`, `tokens`) are every radio's defaults; an `Item`'s own
-  win. The ready-made takes `items` (`{ value, label, disabled?, invalid?, testId? }`), and
-  `slotProps` and `unstyled` keyed by the radio's parts, applied to every radio; `class` and
-  `style` are the group element's. Arrow keys move and check, by direction, natively.
+  Variants on the group (`color`, `density`) are every radio's defaults; an `Item`'s own
+  win. The group has no tokens of its own. The ready-made takes `items` (`{ value, label,
+disabled?, invalid?, testId? }`), `class`/`style`/`slotProps` keyed by the group's `root`, and
+  `radioProps`, every radio's `class`, `style`, `slotProps`, `unstyled`, `testId` and `tokens`,
+  keyed by the radio's parts (an item's own `testId` wins). Arrow keys move and check, by direction, natively.
 - **The chip and icon button toggle** when given `selected` or `defaultSelected` (`aria-pressed`);
   a toggle icon button also selects the preset's `toggle` variant. **The FAB** never toggles; its
   ready-made is extended (`extended` variant) when it has a `label`. Icon-only components (icon
@@ -544,7 +549,8 @@ import { RichTooltip } from "@pureform/solid/rich-tooltip";
   words the labels; `disabled` disables every control. Compose with `Paginator.Root` and its parts;
   the triggers take `as={IconButton}`. The numbered pages Zag offers aren't drawn.
 - **The toolbar** (`@pureform/solid/toolbar`) renders its `items` as an icon button per element
-  with an icon (named by its label) and a text button per element without; `selected` makes an element a toggle. `placement` (`floating`, `docked`),
+  with an icon (named by its label) and a text button per element without; `selected` makes an element a toggle. `class`/`style`/`slotProps` are keyed by its `root`, and
+  `iconButtonProps` and `buttonProps` reach the buttons it draws. `placement` (`floating`, `docked`),
   `orientation` and `color` (`standard`, `vibrant`) pick the bar. With `overflow`, it measures
   its elements and the room its parent gives it, and moves those that don't fit, from the end,
   into the menu behind an overflow button (`overflowLabel`, "More options"; `overflowIcon`); the
@@ -607,14 +613,16 @@ mirrorIcon?, disabled?, content? }`; a tab without a label shows only its icon, 
   `Root` no longer takes `swipeable` or the swipe props: `Frame` replaces them.
 - **The list** is a `<ul>` (`listAnatomy`, `pf-list-root`) with each list item in an `<li>`
   (`List.Item`, `pf-list-item`). `variant="segmented"` sets the items apart as tiles, and
-  `listTokens` are the list's own tokens. Its `density`, `color`, `leadingType` (`icon`, `avatar`,
-  `thumbnail`, or `video`), and `tokens` are every item's defaults. In a segmented list, each item
+  `tokens` are the list's own. Its `density`, `color` and `leadingType` (`icon`, `avatar`,
+  `thumbnail`, or `video`) are every item's defaults. In a segmented list, each item
   takes its `position` (`first`, `middle`, `last`, or `single`), which shapes its corners: the
   ready-made sets it from the item's index, an item's own winning; composing, set it on each
   `ListItem` with `listItemPosition(index, count, true)` from `@pureform/binding-core`. The ready-made takes `items` (a list item's content and props, with an optional
   `value` as its key: a row stays while its value, else its index, does, and follows its item's
-  props, so a list made again from data keeps its rows), and `slotProps` and `unstyled` keyed by
-  the list item's parts, applied to every item. A `ListItem` alone isn't in a list; put it in `List.Item`, or give it `as="li"` in
+  props, so a list made again from data keeps its rows), `class`/`style`/`slotProps` keyed by the
+  list's own parts (`root`, `item` for each `<li>`), and `listItemProps`, every item's `class`,
+  `style`, `slotProps`, `unstyled`, `testId` and `tokens` under the item's own (the selection
+  list takes the same). A `ListItem` alone isn't in a list; put it in `List.Item`, or give it `as="li"` in
   your own `<ul>`.
 - **Progress indicators** (`LinearProgress`: `Track` (holding `TrackBefore` and `TrackAfter`, the indeterminate track's rounded parts either side of the sliding indicator and its gaps), `Indicator`, `StopIndicator`; `CircularProgress`: `Track` with its two halves and arcs and its rounded ends `TrackTailCap` and `TrackHeadCap`, then the indicator's halves and arcs, then its rounded ends `TailCap` and `HeadCap`) have no machine: Root is a
   `role="progressbar"` with `aria-valuemin`, `aria-valuemax`, and `aria-valuenow`, and `value`

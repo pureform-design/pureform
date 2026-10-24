@@ -48,7 +48,7 @@ interface ChipSetContextValue {
 
 const context = createPartContext<ChipSetContextValue>("ChipSet");
 
-/** Root's props: the set's `singleLine` and `setTokens`, the chips' variants, the selection
+/** Root's props: the set's `singleLine` and own `tokens`, the chips' variants, the selection
  *  (`selectable`, `value`, …), `testId`, `as`, and the element's own props. Name the set with
  *  `aria-label` or `aria-labelledby`. */
 export interface ChipSetRootProps

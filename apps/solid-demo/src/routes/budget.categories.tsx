@@ -200,7 +200,10 @@ function Categories() {
                 <Text as="h2" textStyle="titleMedium">
                     Income this month
                 </Text>
-                <List items={income()} tokens={{ container: "transparent" }} />
+                <List
+                    items={income()}
+                    listItemProps={{ tokens: { container: "transparent" } }}
+                />
             </section>
 
             <BudgetDialog

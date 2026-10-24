@@ -67,7 +67,10 @@ function Launcher() {
                     </Text>
                 </header>
                 <nav aria-label="Apps">
-                    <List items={apps} tokens={{ container: "transparent" }} />
+                    <List
+                        items={apps}
+                        listItemProps={{ tokens: { container: "transparent" } }}
+                    />
                 </nav>
                 <Separator />
                 <Text textStyle="bodySmall" class={inset}>
