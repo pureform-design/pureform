@@ -38,11 +38,19 @@ interface CustomizeProps<C> {
 // React Native
 interface CustomizeProps<C> {
     readonly style?: SlotKeyed<C, NativeStyle>;           // ViewStyle or TextStyle per part
+    readonly slotProps?: SlotKeyed<C, NativePartProps>;   // ViewProps, TextProps, PressableProps… per part
     readonly testId?: TestIdOverride<C>;
     readonly tokens?: InstanceTokens<C>;
-    // slotProps: later; className / unstyled: web only
+    // className / unstyled: web only
 }
 ```
+
+React Native `slotProps` follows the web's override rule: the component wins for state and
+accessibility props (`accessibilityRole`, `accessibilityState`, `aria-*`) and for what it depends
+on (`ref`, measuring `onLayout`, overlay `pointerEvents`); handlers (`onPress`, `onFocus`, …) are
+composed, the component's first. The compose is built only when a handler is passed, and the
+merged props are memoized like `style`. Each component declares a part -> host props map by hand
+(the anatomy doesn't record it), which also picks `ViewStyle` or `TextStyle` for keyed `style`.
 
 No recursive type is needed. Nesting deeper works because an inner component's `<key>Props` can
 hold its own `<key>Props`, whenever that component is a ready-made one.
@@ -140,11 +148,26 @@ defaults, and a child's own wins.
 />
 ```
 
-## 5. Later step: per-instance values for repeated parts
+## 5. Per-instance values for repeated parts (batch e)
+
+A part drawn many times (calendar cells, steps, table rows and cells, rating stars, slides) takes
+a value or a function of that instance, in `className`, `style`, `slotProps` and `unstyled`, on
+every renderer. Each repeated part documents its argument type (what the component knows of that
+copy: index, state, data). The function is called once per copy per render, only when passed; a
+plain value works as today.
+
+```tsx
+<DatePicker
+    className={{ cell: (cell) => (isWeekend(cell.date) ? "weekend" : undefined) }}
+    slotProps={{ cell: (cell) => (holidays.has(cell.date) ? { "aria-description": "Holiday" } : {}) }}
+/>
+<Stepper style={{ step: (step) => (step.index === 0 ? { borderStyle: "dashed" } : undefined) }} />
+```
 
 ```ts
-// a function where the part repeats
-slotProps={{ cell: (cell: { date: DateValue; selected: boolean }) => ({ "aria-description": … }) }}
+// binding-core
+export type PerInstance<V, I> = V | ((instance: I) => V | undefined);
+// a component's repeated parts map part -> instance type, declared next to the anatomy use
 ```
 
 ## 6. What goes away
