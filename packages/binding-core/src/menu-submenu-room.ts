@@ -31,7 +31,8 @@ export const menuSubmenuBoundary = (
         element = element.parentElement
     ) {
         const style = getComputedStyle(element);
-        const isContainer = !contained && named(element, container);
+        const isContainer: boolean =
+            !contained && named(element, container);
         const clipsX = style.overflowX !== "visible";
         const clipsY = style.overflowY !== "visible";
         if (!isContainer && !clipsX && !clipsY) continue;

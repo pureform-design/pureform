@@ -18,7 +18,7 @@ import { useSurfaceIndication } from "../indication";
 import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
 import { useComponentSlots, withUserStyle } from "../styles";
 import type { RootStyleProps } from "../styles";
-import { touchTargetSlopOf } from "../touch-target/touch-target";
+import { touchTargetSlopOf } from "../touch-slop";
 
 const [INDICATION] = chipAnatomy.indication!;
 

@@ -107,7 +107,7 @@ describe("tree view", () => {
         },
     });
 
-    it("marks a branch's control as its treeitem, and emits each row's interactions", async () => {
+    it("makes a branch's control its treeitem, owning its group, and emits each row's interactions", async () => {
         const seen: Interaction["type"][] = [];
         const source = createInteractionSource();
         source.subscribe((interaction) => seen.push(interaction.type));
@@ -148,16 +148,22 @@ describe("tree view", () => {
         stops.push(running.stop);
         await settle();
         const control = $("[data-control]");
+        expect(control.getAttribute("role")).toBe("treeitem");
+        expect(control.getAttribute("aria-level")).toBe("1");
         expect(control.getAttribute("aria-expanded")).toBe("false");
-        expect(control.hasAttribute("aria-current")).toBe(false);
+        expect(control.getAttribute("aria-selected")).toBe("false");
+        expect(control.getAttribute("aria-owns")).toBe($("[data-group]").id);
+        expect($("[data-group]").id).not.toBe("");
+        // The branch's element is plain: the row is the treeitem.
+        expect($("[data-branch]").hasAttribute("role")).toBe(false);
+        expect($("[data-branch]").hasAttribute("aria-expanded")).toBe(false);
         expect($("[data-group]").hidden).toBe(true);
         control.dispatchEvent(pointer("pointerdown"));
         await userEvent.click(control);
         await settle();
         expect(seen).toContain("press");
         expect(control.getAttribute("aria-expanded")).toBe("true");
-        expect($("[data-branch]").getAttribute("aria-expanded")).toBe("true");
-        expect(control.getAttribute("aria-current")).toBe("true");
+        expect(control.getAttribute("aria-selected")).toBe("true");
         expect($("[data-group]").hidden).toBe(false);
         // The arrow keys walk the visible rows, into the expanded branch.
         await userEvent.keyboard("{ArrowDown}");

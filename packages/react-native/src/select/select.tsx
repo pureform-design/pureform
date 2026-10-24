@@ -166,8 +166,16 @@ export function Select(props: SelectProps): ReactNode {
     useEffect(() => {
         if (presence.present || !refocus.current) return undefined;
         refocus.current = false;
-        // After the `Modal` lets go: its focus trap holds focus while it's mounted.
-        const frame = requestAnimationFrame(() => combobox.current?.focus?.());
+        // After the `Modal` lets go: its focus trap holds focus while it's mounted, and may hand
+        // it back to the page a frame later, so it's checked again then.
+        let frame = requestAnimationFrame(() => {
+            combobox.current?.focus?.();
+            frame = requestAnimationFrame(() => {
+                const field = combobox.current as unknown;
+                if (globalThis.document?.activeElement !== field)
+                    combobox.current?.focus?.();
+            });
+        });
         return () => cancelAnimationFrame(frame);
     }, [presence.present]);
     const shown = useShownLabel(items, value);
