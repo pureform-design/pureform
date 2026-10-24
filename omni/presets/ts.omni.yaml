@@ -37,5 +37,21 @@ tasks:
         files:
           - dist/**/*
 
+  check:format:
+    exec: bun x oxfmt --check
+
+  check:lint:
+    exec: bun x oxlint .
+
+  check:types:
+    exec: bun check .
+
+  check:
+    exec: ""
+    dependencies:
+      - ^check:fmt
+      - ^check:lint
+      - ^check:format
+
 meta:
   language: typescript
