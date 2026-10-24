@@ -88,7 +88,7 @@ export interface AppBarContentProps<Node, Search = never> {
     readonly trailing?: Node;
     /** A search bar in place of the headline, with these props; it takes the bar's scrolled
      *  color and centers its text. */
-    readonly searchBar?: Search | undefined;
+    readonly searchBarProps?: Search | undefined;
     /** Flip the leading part under `rtl`, for a back arrow. */
     readonly mirrorLeading?: boolean | undefined;
 }
@@ -99,7 +99,7 @@ export const APP_BAR_CONTENT_PROPS = [
     "headline",
     "subtitle",
     "trailing",
-    "searchBar",
+    "searchBarProps",
     "mirrorLeading",
 ] as const satisfies readonly (keyof AppBarContentProps<unknown, unknown>)[];
 

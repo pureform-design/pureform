@@ -1151,7 +1151,7 @@ describe("app bar", () => {
     it("holds a search bar, drawn scrolled with the bar", async () => {
         await render(
             <>
-                <AppBar searchBar={{}} scrolled testId="bar" />
+                <AppBar searchBarProps={{}} scrolled testId="bar" />
                 <SearchBar testId="plain" />
                 <SearchBar scrolled testId="scrolled" />
             </>,

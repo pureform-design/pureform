@@ -28,7 +28,7 @@ export const appBar: ComponentCase = {
         },
         "with a search bar": {
             headline: undefined,
-            searchBar: { "aria-label": "Search mail", placeholder: "Search" },
+            searchBarProps: { "aria-label": "Search mail", placeholder: "Search" },
         },
     },
 };

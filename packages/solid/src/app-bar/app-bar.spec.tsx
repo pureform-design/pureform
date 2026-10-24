@@ -99,7 +99,7 @@ describe("AppBar", () => {
         withRegistry(() => (
             <AppBar
                 size="largeFlexible"
-                searchBar={{ "aria-label": "Search mail" }}
+                searchBarProps={{ "aria-label": "Search mail" }}
                 scrolled
             />
         ));

@@ -195,7 +195,7 @@ function EmbeddedSearchBar(props: { readonly search: SearchBarProps }) {
 function ReadyMade(props: AppBarProps): JSX.Element {
     const slots = createSlotProps(props);
     const own = omit(props, ...READY_MADE_PROPS) as AppBarRootProps;
-    const search = () => props.searchBar !== undefined;
+    const search = () => props.searchBarProps !== undefined;
     return (
         <Root
             {...own}
@@ -221,7 +221,7 @@ function ReadyMadeParts(
     const content = () => (
         <Content {...props.slots("content")}>
             <Show
-                when={props.searchBar}
+                when={props.searchBarProps}
                 fallback={
                     <>
                         <Show when={isPresent(props.headline)}>

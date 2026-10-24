@@ -186,13 +186,13 @@ function ReadyMadeParts({
 }): ReactNode {
     const state = useAppBarState();
     const last = appBarContentLast(
-        { size: props.size, search: props.searchBar !== undefined },
+        { size: props.size, search: props.searchBarProps !== undefined },
         state,
     );
     const content = (
         <Content {...slot("content")}>
-            {props.searchBar !== undefined ? (
-                <EmbeddedSearchBar search={props.searchBar} />
+            {props.searchBarProps !== undefined ? (
+                <EmbeddedSearchBar search={props.searchBarProps} />
             ) : (
                 <>
                     {isPresent(props.headline) ? (
@@ -234,7 +234,7 @@ function ReadyMade(props: AppBarProps): ReactNode {
     return (
         <Root
             {...rootProps}
-            search={props.search ?? props.searchBar !== undefined}
+            search={props.search ?? props.searchBarProps !== undefined}
             {...(slot("root") as object)}
         >
             <ReadyMadeParts props={props} slot={slot} />

@@ -60,7 +60,7 @@ function useScrollState(props: AppBarProps): AppBarScrollState {
 }
 
 function AppBarImpl(props: AppBarProps): ReactNode {
-    const search = props.searchBar !== undefined;
+    const search = props.searchBarProps !== undefined;
     const state = useScrollState(props);
     const {
         styles: s,
@@ -92,7 +92,7 @@ function AppBarImpl(props: AppBarProps): ReactNode {
                 <SearchBar
                     centered
                     scrolled={state.scrolled}
-                    {...props.searchBar}
+                    {...props.searchBarProps}
                 />
             ) : (
                 <>
