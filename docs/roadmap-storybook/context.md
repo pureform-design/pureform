@@ -533,3 +533,62 @@ its decorators return it, so machines that find parts by id in an effect (the ri
 see them. A play that reads the canvas synchronously right after rendering would see it empty
 in Solid: await the canvas (`findBy…`, `waitFor`, or a frame) before reading it. React and
 React Native are unchanged. Decided in r10: no change to the adapter.
+
+## Round 6: renderer-neutral case readers (branch `neutral-readers`)
+
+From `main` (`040b9fc1`). Not pushed. Per component detail (reader changes, React Native ARIA
+fixes, skips with reasons): [neutral-readers.md](../roadmap-components/context/neutral-readers.md).
+
+### What changed
+
+- **The cases read state only through ARIA** (`packages/component-cases/src/aria.ts`): roles
+  (explicit, or a native element's implicit one), `aria-checked` (a native checkbox's or radio's
+  implicit state counts), `aria-pressed`, `aria-selected`, `aria-expanded`, `aria-current`,
+  `aria-valuenow`, `aria-disabled`, accessible names, and a textbox's value. Elements are found by
+  test id or by role and name; `aria-hidden` ones are left out unless asked (`hidden: true`, for
+  a trigger an open modal hides). Overlays read their trigger's `aria-expanded` (a tooltip's
+  `aria-describedby`) and find the surface by role anywhere in the document (React Native Web's
+  modals draw at the end of the body); a closed one's surface may still show while it leaves.
+- **React Native's story tests are on by default:** `stories.config.ts` drops `casePlays: false`
+  and `tests: false`; `vitest.config.storybook.ts` drops the `SB_RENDERERS` opt-in. The plays wait
+  for the root or any part (React Native's closed dialog is its trigger alone).
+- **Narrow per-renderer skips** (`parameters.pureform.skip[renderer][story]`, `RendererSkip` in
+  `src/renderers/compose.ts`): `{ play: reason }` skips a story's play there, `{ a11y: { rule:
+reason } }` turns axe rules off there (set in the story's `beforeEach`, read by the a11y
+  addon's `afterEach` from the same context). A renderer without the component runs no play.
+- **React Native's ARIA and keys fixed in the bindings** (the list is in neutral-readers.md):
+  toggles say `aria-pressed` (ButtonGroup's buttons said `aria-checked` on `role=button`),
+  overlay triggers `aria-haspopup`/`aria-expanded`, comboboxes `aria-controls`, modals and the
+  popover named, calendar days gridcells, list items under the list, checkable controls on
+  Space not Enter, and the web's keys on tabs, trees, time pickers, the colour area and the
+  search view's bar.
+- **The reaches-window check stays** (the key plays' `reachesWindow`, unchanged).
+- The copy button's check reads its accessible name, not `data-copied`; the toast stage swipes
+  with pointer and mouse events (React Native's pan follows the latter); `userEvent.unhover` joins
+  the cases' `UserEvent` (the rating previews the star under the pointer).
+
+### Checks run
+
+- Story tests per group, Solid, React and React Native, until all passed: selection 489,
+  overlays 333, fields 750, navigation/display 1155 (the last narrowed reruns 177, 192, 240).
+  Then the whole story suite once (`omni run build test -p @pureform/storybook-web`): 2841 tests,
+  32 failed (a modal hides its trigger from assistive technology, which the new `aria-hidden`
+  filter dropped); fixed, `-f failed` passed (build, unit, the whole e2e).
+- Component suites narrowed to the touched components, `solid/css` and `react/css`:
+  controllable, keyboard, forms, direction, overlays, accessibility and server rendering where
+  the readers changed (720, 526, 748, 558, 420, 128, 42 passed).
+- `omni run build test -p @pureform/component-cases -p @pureform/machines -p
+@pureform/react-native` (React Native specs updated for the new ARIA; one table opacity timing
+  flake passed on `-f failed`). React and Solid carousel specs (12 each).
+- `bunx tsc --noEmit -p tsconfig.json` clean in component-cases, machines, react-native and the
+  app (both tsconfigs). `omni run build -p @pureform/storybook-web` passes. No conflict markers.
+
+### Open questions (round 6)
+
+- The cases' `form` and `overlay` parts (the web suites' native forms and Zag's positioners) still
+  read the web's DOM; they never run on React Native.
+- Two readings ARIA can't give: a search view or a snackbar on its way out on the web (Zag's
+  `data-state`, `leavingOnWeb`), and a rating's 0, which Zag and React Native both mark as the
+  first star checked (its arrow keys now start from 2).
+- React Native's select lists its options as a menu (`menuitem`), not a listbox; the readers
+  accept either (`choiceNamed`).

@@ -266,6 +266,16 @@ trigger shows their labels joined by ", " (the placeholder when none):
 
 ## Worth knowing
 
+- **ARIA as the web's:** React Native Web draws the same roles and states the web bindings
+  do, so the shared component cases read either (Storybook's `storybook/native` plays). A toggle
+  (`Button`, `IconButton`, a filter `Chip`, given `selected` or `defaultSelected`) says
+  `aria-pressed`; an overlay's ready-made trigger says `aria-haspopup` and `aria-expanded` (a
+  tooltip describes its trigger while it shows); a combobox names its open list
+  (`aria-controls`); a calendar's days are gridcells with `aria-selected`; a list's items are its
+  `listitem`s; the carousel's current item says `aria-current`. On the web, checkboxes, switches
+  and radios check on Space and not Enter, tabs take the arrow keys, Home and End, a tree row
+  takes Space, and the time picker's selectors and the time input's fields take the web's step
+  keys.
 - **Engines change hooks**, so each component starts over (`withEngine`, keyed by the engine's
   name) when the provider's engine changes: the app's state stays, a press in progress doesn't.
 - **Overlays open over the page:** a menu or tooltip given a `trigger` renders the trigger in
