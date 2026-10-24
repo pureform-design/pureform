@@ -280,6 +280,32 @@ describe("DateInput", () => {
         );
     });
 
+    it("spaces its separators as the web's: each takes a segment's padding", async () => {
+        await render(<DateInput locale="en-US" />);
+        const input = byTestId("pf-date-input-input");
+        const separators = [
+            ...input.querySelectorAll<HTMLElement>('[aria-hidden="true"]'),
+        ].filter((element) => element.textContent === "/");
+        expect(separators).toHaveLength(2);
+        const [month, day] = segments();
+        const look = getComputedStyle(month!);
+        for (const separator of separators) {
+            const own = getComputedStyle(separator);
+            expect(own.paddingLeft).toBe(look.paddingLeft);
+            expect(own.paddingRight).toBe(look.paddingRight);
+            expect(own.fontSize).toBe(look.fontSize);
+        }
+        // The separator fills the space between the segments around it, its padding included.
+        const between =
+            day!.getBoundingClientRect().left -
+            month!.getBoundingClientRect().right;
+        expect(between).toBeCloseTo(
+            separators[0]!.getBoundingClientRect().width,
+            0,
+        );
+        expect(parseFloat(look.paddingLeft)).toBeGreaterThan(0);
+    });
+
     it("moves on from a full segment, back from an empty one, and along the row and up and down with the arrow keys", async () => {
         const onValueChange = vi.fn();
         await render(

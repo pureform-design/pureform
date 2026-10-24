@@ -354,11 +354,17 @@ function DateInputImpl(props: DateInputProps): ReactNode {
                     >
                         {segments.map((segment, index) =>
                             segment.kind === "literal" ? (
+                                // A separator is a segment on the web (Zag's literal), so it takes the
+                                // segment's look, its padding included, and sits as far from the
+                                // digits as the web's.
                                 <v.input.Text
                                     key={index}
                                     selectable={false}
                                     aria-hidden
-                                    style={ownText(s.input)}
+                                    style={{
+                                        ...ownText(s.input),
+                                        ...s.segment,
+                                    }}
                                 >
                                     {segment.text}
                                 </v.input.Text>
