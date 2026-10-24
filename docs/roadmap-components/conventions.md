@@ -13,7 +13,11 @@ compaction). Where this file differs, it wins for the component roadmap. Context
    `component-architecture.md` it points to (at least §5.5 tokens and §9.8 indication).
 3. Read the output contexts of every phase you depend on, **including their refactoring
    hints**, then `git log --oneline -20`.
-4. In a fresh worktree, run `bun install`, then `omni run build`. The demos' `generate` runs
+4. In a fresh worktree, run `cog install-hook --all --overwrite` (the commit-msg hook checks
+   conventional commits: an allowed type, one scope without spaces or commas, `type(scope): …`).
+   Until the commit-msgs cleanup lands, the hook's `cog check` fails on old history: check each
+   message with `cog verify "<message>"` and commit with `--no-verify`. Then `bun install`, then
+   `omni run build`. The demos' `generate` runs
    the CLI's build directly with Node, so no bin link is needed.
 5. `build` doesn't run tests (only `publish` waits for them). Tests run through `omni run test`
    or `build test`; a test package's own `test` runs its whole e2e suite, so run those files
@@ -107,6 +111,16 @@ gap analysis updated. Also:
 - Deprecated options of anything you touch: remove those the new version already has an
   equivalent for (name the replacement in the gap analysis and READMEs, and update their tests
   and fixtures); those without one still work, and a test says so.
+
+## Slot props
+
+Follow the [slot-props standard](../design/component-architecture.md#93-configurability)
+(sketch: [slot-props-sketch.md](../design/slot-props-sketch.md)): own parts take flat
+`SlotKeyedProps`; a drawn component gets one `<component>Props` (`InnerProps<C>`, never
+`itemProps`; a role name only when drawn more than once); containers merge defaults with
+`overDefaults` (child's own wins); variants stay flat; React Native takes keyed
+`style`/`slotProps`/`testId`/`tokens`; repeated parts take per-instance functions. New
+ready-mades declare what they draw this way, and `tokens` is the component's own only.
 
 ## Native scrolling
 

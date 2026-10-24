@@ -62,7 +62,6 @@
         "@pureform/tsconfig": "workspace:^",
         "@pureform/vite-config": "workspace:^",
         "@pureform/vitest-config": "workspace:^",
-        "@vitest/browser-playwright": "catalog:",
         "playwright": "catalog:",
         "typescript": "catalog:",
         "vite": "catalog:",

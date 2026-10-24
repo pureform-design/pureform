@@ -264,6 +264,30 @@ describe("DatePicker, ready-made", () => {
         expect(onModeToggle).toHaveBeenCalled();
     });
 
+    it("passes the previous and next parts' className and style to their IconButtons, and the backdrop's", async () => {
+        withRegistry(
+            <DatePicker
+                locale="en-US"
+                defaultOpen
+                className={{
+                    prev: "my-prev",
+                    next: "my-next",
+                    backdrop: "my-dim",
+                }}
+                style={{ prev: { color: "red" } }}
+            />,
+        );
+        await settle();
+        expect(byTestId(ids.prev).classList.contains("my-prev")).toBe(true);
+        expect(byTestId(ids.prev).style.color).toBe("red");
+        expect(byTestId(ids.next).classList.contains("my-next")).toBe(true);
+        expect(
+            byTestId(
+                compositeTestIds.datePickerBackdrop.root,
+            ).classList.contains("my-dim"),
+        ).toBe(true);
+    });
+
     it("mirrors the previous and next buttons", async () => {
         withRegistry(<DatePicker locale="en-US" defaultOpen />, "rtl");
         await settle();

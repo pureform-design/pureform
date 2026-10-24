@@ -18,6 +18,7 @@ import {
     sheetModal,
     sideSheetRelease,
     sideSheetSelection,
+    partAsRoot,
 } from "@pureform/binding-core";
 import type {
     ChangeDetails,
@@ -92,7 +93,7 @@ export interface SideSheetProps
     readonly closeOnEscape?: boolean | undefined;
     /** Its name, when it has no headline. */
     readonly "aria-label"?: string | undefined;
-    readonly testId?: TestIdOverride<Part> | undefined;
+    readonly testId?: TestIdOverride<Part | "backdrop"> | undefined;
 }
 
 const NEEDS_CLOSE: () => void = () => {};
@@ -314,6 +315,7 @@ function ModalSideSheet(props: SideSheetProps): ReactNode {
                 }
             >
                 <ModalScrimLayer
+                    scrimTestId={partAsRoot<string>(props.testId, "backdrop")}
                     open={open}
                     presence={presence}
                     onPressOutside={close}

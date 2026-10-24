@@ -31,6 +31,29 @@ const frames = async (count = 3) => {
 };
 
 describe("Dialog, ready-made", () => {
+    it("passes a part's className and style to the Button it draws", async () => {
+        withRegistry(
+            <Dialog
+                trigger="Discard"
+                headline="Discard draft?"
+                className={{ trigger: "my-trigger", backdrop: "my-backdrop" }}
+                style={{
+                    trigger: { color: "red" },
+                    backdrop: { opacity: "0.5" },
+                }}
+                slotProps={{ backdrop: { title: "yes" } }}
+            />,
+        );
+        await settle();
+        const trigger = byTestId(ids.trigger);
+        expect(trigger.classList.contains("my-trigger")).toBe(true);
+        expect(trigger.style.color).toBe("red");
+        const scrim = byTestId(backdrop.root);
+        expect(scrim.classList.contains("my-backdrop")).toBe(true);
+        expect(scrim.style.opacity).toBe("0.5");
+        expect(scrim.getAttribute("title")).toBe("yes");
+    });
+
     it("renders the dialog in place, named by its headline, hidden while closed", async () => {
         withRegistry(
             <Dialog

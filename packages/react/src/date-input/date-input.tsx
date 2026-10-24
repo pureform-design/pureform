@@ -32,7 +32,7 @@ import { CalendarIcon } from "../glyphs";
 import { IconButton } from "../icon-button";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
-import { plainParts, useComponent, useSlotProps } from "../parts";
+import { plainParts, useComponent, useSlotProps, asRoot } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { pickerAction } from "../picker-actions";
 import type { PickerActionProps } from "../picker-actions";
@@ -323,7 +323,7 @@ function ReadyMadeContent({ own }: { readonly own: DateInputProps }) {
                         icon={<CalendarIcon />}
                         aria-label={own.modeToggleLabel ?? "Switch to calendar"}
                         onClick={own.onModeToggle}
-                        {...slot("modeToggle")}
+                        {...asRoot(slot("modeToggle"))}
                     />
                 ) : null}
             </Header>

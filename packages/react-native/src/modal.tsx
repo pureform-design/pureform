@@ -3,6 +3,7 @@
 // window holding a portal host of its own, so menus, tooltips and selects opened inside draw over
 // it; and, for those over a scrim, the scrim, the press outside and the positioned surface.
 
+import type { TestIdOverride } from "@pureform/anatomy";
 import { closeAsker } from "@pureform/binding-core";
 import type { ChangeDetails, CloseQuestion } from "@pureform/binding-core";
 import { useEffect, useState } from "react";
@@ -119,6 +120,8 @@ export interface ModalScrimLayerProps {
     readonly positionerStyle: StyleProp<ViewStyle>;
     /** The surface's own layout, under its motion. */
     readonly surfaceStyle?: ViewStyle | undefined;
+    /** The scrim's test id, as the scrim's own `testId` takes it. */
+    readonly scrimTestId?: TestIdOverride<"root"> | undefined;
     readonly children: ReactNode;
 }
 
@@ -131,7 +134,7 @@ export function ModalScrimLayer(props: ModalScrimLayerProps): ReactNode {
     const layer = useLayer("dialog");
     return (
         <View style={StyleSheet.absoluteFill}>
-            <Scrim open={props.open} />
+            <Scrim open={props.open} testId={props.scrimTestId} />
             <Pressable
                 accessible={false}
                 focusable={false}

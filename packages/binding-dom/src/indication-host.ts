@@ -6,15 +6,13 @@
 
 import type { IndicationAnatomy } from "@pureform/anatomy";
 import type { AnyRegistry, Direction } from "@pureform/binding-core";
-import type {
-    Indication,
-    IndicationContext,
-} from "@pureform/binding-core/indication";
+import type { IndicationContext } from "@pureform/binding-core/indication";
 import type {
     Interaction,
     InteractionSource,
 } from "@pureform/binding-core/interaction";
 
+import type { Indication } from "./indication";
 import { webIndication } from "./indication-material";
 
 /** What an element is to a surface's indication: the `trigger` whose interactions feed the

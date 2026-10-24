@@ -1,18 +1,13 @@
 import { resolveProvider } from "@pureform/binding-core";
 import {
     componentIndicationTokens,
-    defineIndication,
     dropsFocusIndicator,
     indicationTokenValues,
     noIndication,
     providerIndicationOverrides,
     rippleClasses,
 } from "@pureform/binding-core/indication";
-import type {
-    Indication,
-    IndicationContext,
-    IndicationTarget,
-} from "@pureform/binding-core/indication";
+import type { IndicationContext } from "@pureform/binding-core/indication";
 import { createInteractionSource } from "@pureform/binding-core/interaction";
 import type { InteractionSource } from "@pureform/binding-core/interaction";
 import { createRegistry } from "@pureform/styling";
@@ -26,7 +21,12 @@ import {
     materialIndication,
     surfaceLayer,
 } from "./indication";
-import type { ForwardedStates } from "./indication";
+import { defineIndication } from "./indication";
+import type {
+    ForwardedStates,
+    Indication,
+    IndicationTarget,
+} from "./indication";
 
 const registry = createRegistry({
     ripple: () => ({

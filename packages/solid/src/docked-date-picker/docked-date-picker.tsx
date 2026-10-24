@@ -48,7 +48,7 @@ import { IconButton } from "../icon-button";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
-import { createSlotProps, plainParts, useComponent } from "../parts";
+import { createSlotProps, plainParts, useComponent, asRoot } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { usePresence } from "../presence";
 import type { Presence } from "../presence";
@@ -421,15 +421,15 @@ function ReadyMadeContent(props: {
                 <Content {...slots("content")}>
                     <Controls {...slots("controls")}>
                         <Show when={view() === "day"}>
-                            <Prev as={IconButton} {...slots("prev")} />
+                            <Prev as={IconButton} {...asRoot(slots("prev"))} />
                         </Show>
                         <MonthButton {...slots("monthButton")} />
                         <Show when={view() === "day"}>
-                            <Next as={IconButton} {...slots("next")} />
+                            <Next as={IconButton} {...asRoot(slots("next"))} />
                             <Prev
                                 as={IconButton}
                                 unit="year"
-                                {...slots("prev")}
+                                {...asRoot(slots("prev"))}
                             />
                         </Show>
                         <YearButton {...slots("yearButton")} />
@@ -437,7 +437,7 @@ function ReadyMadeContent(props: {
                             <Next
                                 as={IconButton}
                                 unit="year"
-                                {...slots("next")}
+                                {...asRoot(slots("next"))}
                             />
                         </Show>
                     </Controls>

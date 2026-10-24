@@ -8,7 +8,7 @@
 
 import { dialogAnatomy } from "@pureform/anatomy";
 import type { PartName, TestIdOverride } from "@pureform/anatomy";
-import { dialogSelection, isPresent } from "@pureform/binding-core";
+import { dialogSelection, isPresent, partAsRoot } from "@pureform/binding-core";
 import type {
     ChangeDetails,
     DialogVariantProps,
@@ -80,7 +80,7 @@ export interface DialogProps
     readonly closeOnEscape?: boolean | undefined;
     /** Its name, when it has no headline. */
     readonly "aria-label"?: string | undefined;
-    readonly testId?: TestIdOverride<Part> | undefined;
+    readonly testId?: TestIdOverride<Part | "backdrop"> | undefined;
 }
 
 function DialogImpl(props: DialogProps): ReactNode {
@@ -176,6 +176,7 @@ function ModalDialog(props: DialogProps): ReactNode {
                 }
             >
                 <ModalScrimLayer
+                    scrimTestId={partAsRoot<string>(props.testId, "backdrop")}
                     open={open}
                     presence={presence}
                     onPressOutside={outside ? close : undefined}

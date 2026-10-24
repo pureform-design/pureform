@@ -26,6 +26,7 @@ import {
     sheetPartialOffset,
     sheetPartiallyExpandable,
     sheetRelease,
+    partAsRoot,
 } from "@pureform/binding-core";
 import type {
     BottomSheetRestProps,
@@ -107,7 +108,7 @@ export interface BottomSheetProps
     readonly closeOnEscape?: boolean | undefined;
     /** Its name, for assistive technology. */
     readonly "aria-label"?: string | undefined;
-    readonly testId?: TestIdOverride<Part> | undefined;
+    readonly testId?: TestIdOverride<Part | "backdrop"> | undefined;
 }
 
 const NEEDS_CLOSE: () => void = () => {};
@@ -414,6 +415,7 @@ function ModalBottomSheet(props: BottomSheetProps): ReactNode {
             )}
             <ModalWindow visible={presence.present} label={props["aria-label"]}>
                 <ModalScrimLayer
+                    scrimTestId={partAsRoot<string>(props.testId, "backdrop")}
                     open={open}
                     presence={presence}
                     onPressOutside={close}

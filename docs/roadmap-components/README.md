@@ -97,8 +97,29 @@ contexts exist.
 | [x]  | [c10 Plain form primitives](phases/c10-plain-form.md) ([a](context/c10a.md), [b](context/c10b.md), [c10](context/c10.md))                                                                                          | c10a Field, Label, Input, Textarea, Description, ErrorText; c10b NativeSelect                                                         | Themed form pieces without Material's field design                 |                  |
 | [x]  | [r9 Refactor after m3 to c10](phases/r9-refactor.md) ([r9](context/r9.md))                                                                                                                                         | r9a, r9b, r9c, r9d                                                                                                                    | Duplication pass over m3, c8, c9 and c10                           |                  |
 | [x]  | [r10 Refactor after r9 and fix-storybook-5](phases/r10-refactor.md) ([r10](context/r10.md))                                                                                                                        |                                                                                                                                       | Duplication pass over r9 and fix-storybook-5                       |                  |
-| [x]  | [r11 binding-dom split](phases/r11-binding-dom.md) ([r11](context/r11.md)) | | binding-core platform-neutral; DOM code in binding-dom | |
-| [ ]  | [r12 multi-target codegen](phases/r12-multi-target-codegen.md) | | several targets per setup; pruned and full output apart | |
+| [x]  | [r11 binding-dom split](phases/r11-binding-dom.md) ([r11](context/r11.md))                                                                                                                                         |                                                                                                                                       | binding-core platform-neutral; DOM code in binding-dom             |                  |
+| [ ]  | [r12 multi-target codegen](phases/r12-multi-target-codegen.md)                                                                                                                                                     |                                                                                                                                       | several targets per setup; pruned and full output apart            |                  |
+
+## Slot-props batches
+
+Implement the [slot-props standard](../design/slot-props-sketch.md). Independent of the phases
+above; each batch is one branch (`slot-a` … `slot-e`), output in `context/slot-<x>.md`.
+
+| Batch  | Delivers                                                                                                                   |
+| ------ | -------------------------------------------------------------------------------------------------------------------------- |
+| slot-a | Standard written into the docs; `className`/`style` reach Button/IconButton parts; styleable backdrop                      |
+| slot-b | Containers (List, ChipSet, ButtonGroup, Toolbar, RadioGroup, SelectionList) and tokens: `overDefaults`, `<component>Props` |
+| slot-c | Drawn components (Select/Autocomplete menus, DatePicker buttons, TagsInput chips, …)                                       |
+| slot-d | React Native: keyed `style`, `slotProps`, `testId`, `tokens` with the override rule                                        |
+| slot-e | Dead parts wired up; per-instance functions for repeated parts                                                             |
+
+### Commit message cleanup
+
+Runs once r12 and slot-b are merged and no agent is running, before slot-c.
+
+| Batch       | What                                                                                                                                                                                                                                                                  |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| commit-msgs | Reword the ~90 commits on `main` that `cog check` rejects into conventional commits (scope = package or area), with `cog edit` (it opens `$EDITOR` per invalid commit: drive it with a script as `EDITOR` that writes the new message from a prepared old-hash -> message map; no content changes; merge commits become `chore(merge): …`); `cog check` clean; tree identical to before (`git diff <old> <new>` empty); force-push `main` with lease; recreate or rebase other branches |
 
 ## Rules that apply to every phase
 

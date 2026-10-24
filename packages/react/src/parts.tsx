@@ -24,8 +24,8 @@ import type {
     Unstyled,
 } from "@pureform/binding-core";
 import { componentIndicationTokens } from "@pureform/binding-core/indication";
-import type { Indication } from "@pureform/binding-core/indication";
 import type { InteractionSource } from "@pureform/binding-core/interaction";
+import type { Indication } from "@pureform/binding-dom/indication";
 import { holdsLayer, indicationRoles } from "@pureform/binding-dom/indication";
 import type {
     ClassSlots,
@@ -374,11 +374,14 @@ export function useUnstyledComponent<A extends ComponentAnatomy>(
 
 /** The props of a ready-made component that address each part by name:
  *  `className={{ root: "wide", label: "caps" }}`, `testId="save"`. */
-export interface SlotKeyedProps<A extends ComponentAnatomy> {
-    readonly className?: SlotKeyed<PartName<A>, ClassValue> | undefined;
-    readonly style?: SlotKeyed<PartName<A>, CSSProperties> | undefined;
+export interface SlotKeyedProps<
+    A extends ComponentAnatomy,
+    Extra extends string = never,
+> {
+    readonly className?: SlotKeyed<PartName<A> | Extra, ClassValue> | undefined;
+    readonly style?: SlotKeyed<PartName<A> | Extra, CSSProperties> | undefined;
     readonly testId?: TestIdOverride<PartName<A>> | undefined;
-    readonly slotProps?: SlotKeyed<PartName<A>, PartProps> | undefined;
+    readonly slotProps?: SlotKeyed<PartName<A> | Extra, PartProps> | undefined;
     readonly unstyled?: Unstyled<PartName<A>> | undefined;
 }
 
@@ -398,14 +401,34 @@ export const slotPartProps = <A extends ComponentAnatomy>(
         },
     ]) as PartProps;
 
+/** A part drawn as a `Button` or `IconButton` (`as={Button}`): its `className` and `style` are
+ *  plain values for the part, but the button keys them by its own parts, so they go to its root
+ *  (`slotProps.root`), which the button's own `className` and `style` keys then join. */
+export const asRoot = (props: PartProps): PartProps => {
+    const { className, style, slotProps, ...rest } = props as {
+        className?: unknown;
+        style?: unknown;
+        slotProps?: Readonly<Record<string, Record<string, unknown>>>;
+    };
+    if (className == null && style == null) return props;
+    return {
+        ...rest,
+        slotProps: {
+            ...slotProps,
+            root: combinePartProps([slotProps?.root, { className, style }]),
+        },
+    } as PartProps;
+};
+
 const NO_PROPS: PartProps = Object.freeze({});
 
 /** A ready-made component's slot-keyed props for each of its parts, computed together, once per
  *  change of `className`, `style`, or `slotProps`: `slot("label")` is what `slotPartProps(props,
  *  "label")` gives, and a part none of them names gets the same empty object. */
-export function useSlotProps<A extends ComponentAnatomy>(
-    props: SlotKeyedProps<A>,
-): (part: PartName<A>) => PartProps {
+export function useSlotProps<
+    A extends ComponentAnatomy,
+    Extra extends string = never,
+>(props: SlotKeyedProps<A, Extra>): (part: PartName<A> | Extra) => PartProps {
     const { slotProps, className, style } = props;
     return useMemo(() => {
         if (!slotProps && !className && !style) return () => NO_PROPS;

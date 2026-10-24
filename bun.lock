@@ -161,6 +161,7 @@
       "dependencies": {
         "@pureform/anatomy": "workspace:^",
         "@pureform/binding-core": "workspace:^",
+        "@pureform/binding-dom": "workspace:^",
         "@pureform/component-cases": "workspace:^",
         "@pureform/react": "workspace:^",
         "@pureform/react-native": "workspace:^",
@@ -263,7 +264,6 @@
         "@pureform/tsconfig": "workspace:^",
         "@pureform/vite-config": "workspace:^",
         "@pureform/vitest-config": "workspace:^",
-        "@vitest/browser-playwright": "catalog:",
         "playwright": "catalog:",
         "typescript": "catalog:",
         "vite": "catalog:",

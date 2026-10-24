@@ -55,7 +55,7 @@ import { IconButton } from "../icon-button";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
-import { createSlotProps, plainParts } from "../parts";
+import { createSlotProps, plainParts, asRoot } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { pickerAction } from "../picker-actions";
 import type { PartProps } from "../props";
@@ -356,8 +356,8 @@ const CancelTrigger = pickerAction(
  *  toggle as content. */
 export interface DatePickerProps
     extends
-        Omit<DatePickerRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
-        SlotKeyedProps<Anatomy>,
+        Omit<DatePickerRootProps, keyof SlotKeyedProps<Anatomy, "backdrop"> | "children">,
+        SlotKeyedProps<Anatomy, "backdrop">,
         DatePickerContentProps<JSX.Element> {
     readonly testId?: TestIdOverride<DatePickerPart>;
     readonly unstyled?: Unstyled<DatePickerPart>;
@@ -373,7 +373,7 @@ const READY_MADE_PROPS = [
 // Inside Root, so it reads the draft and the view.
 function ReadyMadeContent(props: {
     readonly own: DatePickerProps;
-    readonly slots: ReturnType<typeof createSlotProps<Anatomy>>;
+    readonly slots: ReturnType<typeof createSlotProps<Anatomy, "backdrop">>;
 }): JSX.Element {
     const { picker, draft, locale } = pickerContext.use("Root");
     const own = props.own;
@@ -398,7 +398,7 @@ function ReadyMadeContent(props: {
                             own.modeToggleLabel ?? "Switch to text input"
                         }
                         onClick={() => own.onModeToggle?.()}
-                        {...(slots("modeToggle") as object)}
+                        {...asRoot(slots("modeToggle") as object)}
                     />
                 </Show>
             </Header>
@@ -406,8 +406,8 @@ function ReadyMadeContent(props: {
             <Controls {...slots("controls")}>
                 <ViewTrigger {...slots("viewTrigger")} />
                 <Show when={picker().view === "day"}>
-                    <Prev as={IconButton} {...slots("prev")} />
-                    <Next as={IconButton} {...slots("next")} />
+                    <Prev as={IconButton} {...asRoot(slots("prev"))} />
+                    <Next as={IconButton} {...asRoot(slots("next"))} />
                 </Show>
             </Controls>
             <Show
@@ -444,6 +444,7 @@ function ReadyMadeContent(props: {
  *  and the dialog with the header, the calendar (the days, or the years), and Cancel and OK. */
 function ReadyMade(props: DatePickerProps): JSX.Element {
     const slots = createSlotProps(props);
+    const backdrop = slots("backdrop");
     const own = omit(props, ...READY_MADE_PROPS) as DatePickerRootProps;
     return (
         <Root {...own} {...(slots("root") as object)}>
@@ -451,10 +452,10 @@ function ReadyMade(props: DatePickerProps): JSX.Element {
                 <Trigger
                     as={Button}
                     label={props.trigger}
-                    {...(slots("trigger") as object)}
+                    {...asRoot(slots("trigger") as object)}
                 />
             </Show>
-            <Backdrop />
+            <Backdrop {...backdrop} />
             <Positioner {...slots("positioner")}>
                 <Content {...slots("content")}>
                     <ReadyMadeContent own={props} slots={slots} />

@@ -52,7 +52,7 @@ import { IconButton } from "../icon-button";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import type { PartContext } from "../part-context";
-import { plainParts, useComponent, useSlotProps } from "../parts";
+import { plainParts, useComponent, useSlotProps, asRoot } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { usePresence } from "../presence";
 import type { Presence } from "../presence";
@@ -355,7 +355,7 @@ function ReadyMadeContent({ own }: { readonly own: DockedDatePickerProps }) {
                 icon={<ChevronStartIcon />}
                 unit={unit}
                 mirror
-                {...slot("prev")}
+                {...asRoot(slot("prev"))}
             />
             {unit === "month" ? (
                 <MonthButton {...slot("monthButton")}>
@@ -373,7 +373,7 @@ function ReadyMadeContent({ own }: { readonly own: DockedDatePickerProps }) {
                 icon={<ChevronEndIcon />}
                 unit={unit}
                 mirror
-                {...slot("next")}
+                {...asRoot(slot("next"))}
             />
         </>
     );

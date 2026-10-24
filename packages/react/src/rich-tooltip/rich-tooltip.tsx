@@ -27,7 +27,7 @@ import { Button } from "../button";
 import { useControllable } from "../controllable";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
-import { useComponent, useSlotProps } from "../parts";
+import { useComponent, useSlotProps, asRoot } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { usePresence } from "../presence";
 import type { Presence } from "../presence";
@@ -222,7 +222,11 @@ function ReadyMade(props: RichTooltipProps): ReactNode {
     return (
         <Root {...rootProps} {...(slot("root") as object)}>
             {isPresent(trigger) ? (
-                <Trigger as={Button} label={trigger} {...slot("trigger")} />
+                <Trigger
+                    as={Button}
+                    label={trigger}
+                    {...asRoot(slot("trigger"))}
+                />
             ) : null}
             <Positioner {...slot("positioner")}>
                 <Content {...slot("content")}>

@@ -654,6 +654,10 @@ color: {
       the web, and on React Native only where the portal keeps React's context. Keep provided
       tokens to parts rendered in place.
 
+- **Container tokens (slot-props standard):** a ready-made's `tokens` is its own recipe's.
+  Tokens for what it draws go in `<component>Props.tokens` (`listItemProps.tokens`,
+  `buttonProps.tokens`), replacing `listTokens`, `groupTokens` and `setTokens` (§9.3).
+
 ### 5.6 Themes
 
 - **Static:** each target scopes themes the way it natively does, and the factory exposes
@@ -1605,6 +1609,37 @@ leaves through `usePresence` with the engine, and leaves the host only once its 
 - **Ownership:** compound parts and slot-keyed overrides replace copying source. An
   `eject` command is deferred (§10).
 
+#### Per-part props of ready-made components (slot-props standard)
+
+Agreed in [slot-props-sketch.md](slot-props-sketch.md); batches in the
+[roadmap README](../roadmap-components/README.md).
+
+- **Own parts: flat.** A ready-made takes `className` (`class` on Solid), `style`, `slotProps`,
+  `unstyled`, `testId` and `tokens` (`SlotKeyedProps`), keyed by its own parts only.
+- **Drawn components: `<component>Props`.** Each component a ready-made draws (a menu, a field, a
+  child item, a button) gets one prop named after the component (`menuProps`, `listItemProps`,
+  `chipProps`), typed `InnerProps<C>` (the inner component's own `CustomizeProps`, no variants).
+  The key names the role instead (`confirmButtonProps`, `prevButtonProps`) only when the
+  component is drawn more than once in different roles. Never `itemProps`.
+- **Containers** (List, ChipSet, ButtonGroup, Toolbar, RadioGroup, SelectionList) give every child
+  their `<component>Props` as defaults, merged with `overDefaults(defaults, own)`: the child's own
+  wins, classes join, `style`/`slotProps`/`tokens` merge per part. A child with nothing of its
+  own gets the defaults object as-is.
+- **Variants stay flat** (`density`, `color`, `size`); a container passes them to children as
+  defaults and a child's own wins.
+- **Anatomy is unchanged:** no `contains` metadata; what a ready-made draws is declared in the
+  binding next to the code that draws it.
+- **React Native** takes keyed `style` (`ViewStyle`/`TextStyle` per part), `slotProps`, `testId`
+  and `tokens` (no `className`/`unstyled`). `slotProps` follows the web override rule: the
+  component wins for state and accessibility props and for what it depends on (`ref`, measuring
+  `onLayout`, overlay `pointerEvents`); handlers compose, the component's first.
+- **Repeated parts** (cells, steps, rows, stars, slides) take a value or a function of the
+  instance (`PerInstance<V, I>`), called once per copy only when passed.
+- **A part drawn as `Button`/`IconButton`** (trigger, close, prev/next, Cancel/Confirm) passes its
+  part-keyed value to the button's root; the button's own `<component>Props` reach its other parts.
+- **A scrim** (dialog and sheet backdrop) is a part of the overlay's own anatomy and takes the
+  same keyed props.
+
 ### 9.4 Controlled and uncontrolled state
 
 Every piece of state a user can change takes three props on `Root` (and on the ready-made
@@ -2389,7 +2424,7 @@ mounts (React's 1,000-item mount re-rendered every surface once before).
 
 - `@pureform/binding-core/interaction`: the source and its state, framework-free.
 - `@pureform/binding-core/indication`: `Indication`, `defineIndication`, the tokens, and the
-  built-ins without live halves; no DOM types (`IndicationPlatform` leaves the element type to
+  built-ins without live halves; no DOM types (`Indication<E>` leaves the element type to
   the platform).
 - `@pureform/binding-dom/indication`: the built-ins' web halves (the ripple, over
   `createRipple`), `webIndication`, and the `IndicationHost` the web bindings share. React
