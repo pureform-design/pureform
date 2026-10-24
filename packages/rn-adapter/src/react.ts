@@ -4,6 +4,7 @@
 import {
     createContext,
     createElement,
+    useCallback,
     useContext,
     useEffect,
     useMemo,
@@ -254,6 +255,17 @@ export const withContainer = <T>(
 export const useContainerFrame = (name = ""): ContainerFrame | undefined =>
     useContext(FrameContext)[name];
 
+/** Measures a container's frame now, in window coordinates; `undefined` when it has none yet. */
+export type MeasureContainer = () => Promise<ContainerFrame | undefined>;
+
+const MeasureContext = createContext<Record<string, MeasureContainer>>({});
+
+/** A function that measures the nearest `PureformContainer` (or the one `name`d) when called,
+ *  for a container that moves without resizing, which its cached frame misses. Call it when it
+ *  matters (a menu opening), not per frame. `undefined` with no container around. */
+export const useMeasureContainer = (name = ""): MeasureContainer | undefined =>
+    useContext(MeasureContext)[name];
+
 export interface PureformContainerProps extends ViewProps {
     /** The container's name, for conditions on a named container. It's still the nearest
      *  container for conditions that name none. */
@@ -276,6 +288,26 @@ export const PureformContainer = ({
     const [width, setWidth] = useState<number>();
     const [frame, setFrame] = useState<ContainerFrame>();
     const view = useRef<ComponentRef<typeof View>>(null);
+    const outerMeasures = useContext(MeasureContext);
+    const measure = useCallback<MeasureContainer>(
+        () =>
+            new Promise((resolve) => {
+                const node = view.current;
+                if (!node) return resolve(undefined);
+                node.measureInWindow((x, y, width, height) =>
+                    resolve(
+                        width > 0 || height > 0
+                            ? { x, y, width, height }
+                            : undefined,
+                    ),
+                );
+            }),
+        [],
+    );
+    const measures = useMemo(
+        () => withContainer(outerMeasures, measure, name),
+        [outerMeasures, measure, name],
+    );
     const widths = useMemo(
         () => withContainer(outer, width, name),
         [outer, width, name],
@@ -311,7 +343,15 @@ export const PureformContainer = ({
         createElement(
             ContainerContext.Provider,
             { value: widths },
-            createElement(FrameContext.Provider, { value: frames }, children),
+            createElement(
+                FrameContext.Provider,
+                { value: frames },
+                createElement(
+                    MeasureContext.Provider,
+                    { value: measures },
+                    children,
+                ),
+            ),
         ),
     );
 };

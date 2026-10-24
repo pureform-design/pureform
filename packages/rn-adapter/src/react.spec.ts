@@ -23,6 +23,7 @@ import {
     useComponentState,
     useComponentStyles,
     useContainerFrame,
+    useMeasureContainer,
     useTokens,
     withContainer,
 } from "./react";
@@ -552,5 +553,18 @@ describe("container frames", () => {
             ),
         );
         expect(frames).toEqual([undefined, undefined, undefined, undefined]);
+    });
+
+    it("gives a measure function inside a container only", () => {
+        const found: unknown[] = [];
+        const Probe = () => {
+            found.push(typeof useMeasureContainer());
+            return null;
+        };
+        renderToString(createElement(Probe));
+        renderToString(
+            createElement(PureformContainer, null, createElement(Probe)),
+        );
+        expect(found).toEqual(["undefined", "function"]);
     });
 });
