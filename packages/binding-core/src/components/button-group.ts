@@ -14,6 +14,7 @@ import type {
 import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Controllable } from "../controllable";
+import type { Unstyled } from "../parts";
 import type { ButtonVariantProps } from "./button";
 import type { IconButtonVariantProps } from "./icon-button";
 import type { InteractionSourceProps } from "./indication";
@@ -34,7 +35,8 @@ export interface ButtonGroupVariantProps {
     readonly size?: VariantProp<"buttonGroup", "size">;
     /** Sets the buttons 2px apart with square inner corners, as the segmented button did. */
     readonly connected?: boolean | undefined;
-    readonly groupTokens?: InstanceTokens<"buttonGroup"> | undefined;
+    /** The group's own tokens (the button group recipe's). */
+    readonly tokens?: InstanceTokens<"buttonGroup"> | undefined;
 }
 
 /** The buttons' variants, which the ready-made group gives every button. */
@@ -72,13 +74,15 @@ export interface ButtonGroupRootOwnProps
         ButtonGroupBehaviorProps {
     /** The group element's test id: a prefix (`view` → `view-root`), or by part. */
     readonly testId?: TestIdOverride<ButtonGroupPart> | undefined;
+    /** The group's parts, or some, without the registry's styles. */
+    readonly unstyled?: Unstyled<ButtonGroupPart> | undefined;
 }
 
 /** The keys of `ButtonGroupRootOwnProps`, which Root keeps off its element. */
 export const BUTTON_GROUP_ROOT_PROPS = [
     "size",
     "connected",
-    "groupTokens",
+    "tokens",
     "color",
     "variant",
     "corner",
@@ -91,6 +95,7 @@ export const BUTTON_GROUP_ROOT_PROPS = [
     "defaultValue",
     "onValueChange",
     "testId",
+    "unstyled",
 ] as const satisfies readonly (keyof ButtonGroupRootOwnProps)[];
 
 /** One button of the ready-made group, as data. With a label it's a button; with only an icon,
@@ -130,7 +135,7 @@ export const buttonGroupSelection = (
 ): Selection<"buttonGroup"> => ({
     size: props.size,
     connected: props.connected || undefined,
-    tokens: props.groupTokens,
+    tokens: props.tokens,
 });
 
 /** Where the button at `index` among `count` sits: `single` in a standard group, its place in

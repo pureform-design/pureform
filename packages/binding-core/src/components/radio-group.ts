@@ -23,12 +23,16 @@ export type RadioPart = PartName<typeof radioAnatomy>;
 /** The radio group's own parts: `"root"`. */
 export type RadioGroupPart = PartName<typeof radioGroupAnatomy>;
 
-/** The radio's variant groups and instance tokens. On the group, they're every radio's default. */
+/** The radio's variant groups and instance tokens. */
 export interface RadioVariantProps {
     readonly color?: VariantProp<"radio", "color">;
     readonly density?: VariantProp<"radio", "density">;
     readonly tokens?: InstanceTokens<"radio"> | undefined;
 }
+
+/** The group's variants: every radio's defaults. The group has no recipe, so no tokens of its
+ *  own; the ready-made group gives its radios' tokens in `radioProps`. */
+export type RadioGroupVariantProps = Pick<RadioVariantProps, "color" | "density">;
 
 /** The ids of the group's elements, for composition. Zag builds each radio's ids from its value:
  *  `itemHiddenInput("small")` is the input of the radio whose value is `small`, for a
@@ -69,7 +73,7 @@ export interface RadioGroupBehaviorProps extends Controllable<
 
 /** Everything the group's Root takes for itself, besides the element's own props and `as`. */
 export interface RadioGroupRootOwnProps
-    extends RadioVariantProps, RadioGroupBehaviorProps, IndicationProps {
+    extends RadioGroupVariantProps, RadioGroupBehaviorProps, IndicationProps {
     /** The group element's test id: a prefix (`size` → `size-root`), or by part. */
     readonly testId?: TestIdOverride<RadioGroupPart> | undefined;
 }
@@ -78,7 +82,6 @@ export interface RadioGroupRootOwnProps
 export const RADIO_GROUP_ROOT_PROPS = [
     "color",
     "density",
-    "tokens",
     "disabled",
     "invalid",
     "required",
@@ -156,15 +159,12 @@ export const RADIO_GROUP_CONTENT_PROPS = [
 
 /** A radio's registry selection: its own variants over the group's. */
 export const radioSelection = (
-    group: RadioVariantProps,
+    group: RadioGroupVariantProps,
     radio: RadioVariantProps,
 ): Selection<"radio"> => ({
     color: radio.color ?? group.color,
     density: radio.density ?? group.density,
-    tokens:
-        group.tokens || radio.tokens
-            ? { ...group.tokens, ...radio.tokens }
-            : undefined,
+    tokens: radio.tokens,
 });
 
 /** Zag's radio group props from Root's, besides `id`, `dir`, and the controllable `value` (the

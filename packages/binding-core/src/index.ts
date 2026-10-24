@@ -470,6 +470,7 @@ export type {
     RadioGroupRootOwnProps,
     RadioOwnProps,
     RadioPart,
+    RadioGroupVariantProps,
     RadioVariantProps,
 } from "./components/radio-group";
 export {

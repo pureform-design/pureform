@@ -12,6 +12,7 @@ import type {
 import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Controllable } from "../controllable";
+import type { Unstyled } from "../parts";
 import { buttonGroupMachineProps } from "./button-group";
 import type { ChipVariantProps } from "./chip";
 import type { InteractionSourceProps } from "./indication";
@@ -19,17 +20,18 @@ import type { InteractionSourceProps } from "./indication";
 /** The set's own parts: `"root"`. */
 export type ChipSetPart = PartName<typeof chipSetAnatomy>;
 
-/** The set's own variant and tokens. */
+/** The set's own variant and tokens (the chip set recipe's). */
 export interface ChipSetVariantProps {
     /** Keeps the chips on one line, scrolling sideways, rather than wrapping them. */
     readonly singleLine?: boolean | undefined;
-    readonly setTokens?: InstanceTokens<"chipSet"> | undefined;
+    readonly tokens?: InstanceTokens<"chipSet"> | undefined;
 }
 
-/** The chips' variants, which the set gives every chip under the chip's own. */
+/** The chips' variants, which the set gives every chip under the chip's own. A chip's tokens
+ *  aren't among them: the ready-made set gives them in `chipProps`. */
 export type ChipSetChipVariantProps = Pick<
     ChipVariantProps,
-    "variant" | "corner" | "color" | "density" | "tokens"
+    "variant" | "corner" | "color" | "density"
 >;
 
 /** What Zag's toggle group takes from Root's props. Without `selectable`, the set is a plain
@@ -51,12 +53,13 @@ export interface ChipSetRootOwnProps
     extends ChipSetVariantProps, ChipSetChipVariantProps, ChipSetBehaviorProps {
     /** The set element's test id: a prefix (`filters` → `filters-root`), or by part. */
     readonly testId?: TestIdOverride<ChipSetPart> | undefined;
+    /** The set's parts, or some, without the registry's styles. */
+    readonly unstyled?: Unstyled<ChipSetPart> | undefined;
 }
 
 /** The keys of `ChipSetRootOwnProps`, which Root keeps off its element. */
 export const CHIP_SET_ROOT_PROPS = [
     "singleLine",
-    "setTokens",
     "variant",
     "corner",
     "color",
@@ -70,6 +73,7 @@ export const CHIP_SET_ROOT_PROPS = [
     "defaultValue",
     "onValueChange",
     "testId",
+    "unstyled",
 ] as const satisfies readonly (keyof ChipSetRootOwnProps)[];
 
 /** One chip of the ready-made set, as data. */
@@ -103,7 +107,7 @@ export const chipSetSelection = (
     props: ChipSetVariantProps,
 ): Selection<"chipSet"> => ({
     singleLine: props.singleLine || undefined,
-    tokens: props.setTokens,
+    tokens: props.tokens,
 });
 
 /** Zag's toggle group props from Root's, besides `id`, `dir`, and the controllable `value`: the
@@ -112,7 +116,7 @@ export const chipSetMachineProps: (
     props: ChipSetBehaviorProps,
 ) => ReturnType<typeof buttonGroupMachineProps> = buttonGroupMachineProps;
 
-/** The variants a chip takes from its set, under its own; tokens merge. */
+/** The variants a chip takes from its set, under its own. */
 export const chipSetChipVariants = (
     set: ChipSetChipVariantProps,
     chip: ChipSetChipVariantProps,
@@ -121,8 +125,4 @@ export const chipSetChipVariants = (
     corner: chip.corner ?? set.corner,
     color: chip.color ?? set.color,
     density: chip.density ?? set.density,
-    tokens:
-        set.tokens && chip.tokens
-            ? { ...set.tokens, ...chip.tokens }
-            : (chip.tokens ?? set.tokens),
 });

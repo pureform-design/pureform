@@ -109,13 +109,13 @@ describe("radio group", () => {
     it("selects a radio's variants over the group's", () => {
         expect(
             radioSelection(
-                { color: "error", density: "compact", tokens: { size: "1px" } },
+                { color: "error", density: "compact" },
                 { color: "primary", tokens: { dotSize: "2px" } },
             ),
         ).toEqual({
             color: "primary",
             density: "compact",
-            tokens: { size: "1px", dotSize: "2px" },
+            tokens: { dotSize: "2px" },
         });
         expect(radioSelection({}, {}).tokens).toBeUndefined();
     });

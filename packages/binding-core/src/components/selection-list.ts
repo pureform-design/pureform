@@ -34,12 +34,12 @@ export interface SelectionListRootOwnProps
 /** The keys of `SelectionListRootOwnProps`, which Root keeps off its element. */
 export const SELECTION_LIST_ROOT_PROPS = [
     "variant",
-    "listTokens",
     "density",
     "color",
     "tokens",
     "leadingType",
     "testId",
+    "unstyled",
     "selectionMode",
     "deselectable",
     "loopFocus",

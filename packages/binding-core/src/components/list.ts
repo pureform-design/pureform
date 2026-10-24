@@ -6,6 +6,7 @@
 import type { listAnatomy, PartName, TestIdOverride } from "@pureform/anatomy";
 import type { InstanceTokens, Selection } from "@pureform/styling";
 
+import type { Unstyled } from "../parts";
 import type {
     ListItemContentProps,
     ListItemExpandProps,
@@ -16,16 +17,18 @@ import type { ListItemVariantProps } from "./list-item";
 /** The list's own parts: `"root" | "item"` (the `<li>` around each list item). */
 export type ListPart = PartName<typeof listAnatomy>;
 
-/** The list's variants: every list item's defaults, which an item's own override. */
+/** The list's variants: every list item's defaults, which an item's own override. A list
+ *  item's tokens aren't among them: the ready-made list gives them in `listItemProps`. */
 export type ListVariantProps = Pick<
     ListItemVariantProps,
-    "density" | "color" | "tokens" | "leadingType"
+    "density" | "color" | "leadingType"
 >;
 
-/** The list's own variant and tokens: `segmented` sets its items apart as tiles. */
+/** The list's own variant and tokens (the list recipe's): `segmented` sets its items apart as
+ *  tiles. */
 export interface ListOwnVariantProps {
     readonly variant?: "standard" | "segmented" | undefined;
-    readonly listTokens?: InstanceTokens<"list"> | undefined;
+    readonly tokens?: InstanceTokens<"list"> | undefined;
 }
 
 /** Everything Root takes for itself, besides the element's own props and `as`. */
@@ -34,17 +37,19 @@ export interface ListRootOwnProps
     /** The list's and its `<li>`s' test ids: a prefix (`mail` → `mail-root`, `mail-item`), or by
      *  part. */
     readonly testId?: TestIdOverride<ListPart> | undefined;
+    /** The list's parts, or some, without the registry's styles. */
+    readonly unstyled?: Unstyled<ListPart> | undefined;
 }
 
 /** The keys of `ListRootOwnProps`, which Root keeps off its element. */
 export const LIST_ROOT_PROPS = [
     "variant",
-    "listTokens",
     "density",
     "color",
     "tokens",
     "leadingType",
     "testId",
+    "unstyled",
 ] as const satisfies readonly (keyof ListRootOwnProps)[];
 
 /** One item of the ready-made list, as data: a list item's content, variants, and props. */
@@ -74,7 +79,7 @@ export const LIST_CONTENT_PROPS = [
     "items",
 ] as const satisfies readonly (keyof ListContentProps<unknown>)[];
 
-/** A list item's variants over its list's: the item's own win; tokens merge. Reads only the
+/** A list item's variants over its list's: the item's own win. Reads only the
  *  variant props, so a binding's props (with their children) can be passed as they are. */
 export const listItemVariants = (
     list: ListVariantProps | null | undefined,
@@ -88,10 +93,7 @@ export const listItemVariants = (
     actionColor: item.actionColor,
     density: item.density ?? list?.density,
     color: item.color ?? list?.color,
-    tokens:
-        list?.tokens || item.tokens
-            ? { ...list?.tokens, ...item.tokens }
-            : undefined,
+    tokens: item.tokens,
 });
 
 /** The list's registry selection. */
@@ -99,7 +101,7 @@ export const listSelection = (
     props: ListOwnVariantProps,
 ): Selection<"list"> => ({
     variant: props.variant,
-    tokens: props.listTokens,
+    tokens: props.tokens,
 });
 
 /** A tile's place in a run of separate tiles (a segmented list's items, a menu's groups, a

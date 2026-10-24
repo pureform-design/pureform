@@ -236,7 +236,7 @@ describe("list item", () => {
     it("takes the list's variants under its own", () => {
         expect(
             listItemVariants(
-                { density: "compact", color: "a", tokens: { gap: 1 } as never },
+                { density: "compact", color: "a" },
                 { color: "b", tokens: { paddingInline: 2 } as never },
             ),
         ).toEqual({
@@ -244,7 +244,7 @@ describe("list item", () => {
             interactive: undefined,
             density: "compact",
             color: "b",
-            tokens: { gap: 1, paddingInline: 2 },
+            tokens: { paddingInline: 2 },
         });
     });
 });
