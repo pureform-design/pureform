@@ -179,4 +179,35 @@ describe("FileUpload, ready-made", () => {
         expect(byTestId("docs-root")).toBeTruthy();
         expect(byTestId("docs-item-headline").textContent).toBe("a.txt");
     });
+
+    it("takes a function of each file in its item and error keys", async () => {
+        withRegistry(
+            <FileUpload
+                label="Files"
+                maxFiles={3}
+                maxFileSize={100}
+                className={{
+                    item: (row) => `${row.type}-${row.index}`,
+                    error: "why",
+                }}
+                style={{ error: (row) => ({ opacity: row.index / 2 }) }}
+                slotProps={{ item: (row) => ({ title: row.item.name }) }}
+                unstyled={{ error: (row) => row.type === "rejected" }}
+            />,
+        );
+        await userEvent.upload(hiddenInput(), [
+            file("a.txt"),
+            file("big.txt", 500),
+        ]);
+        await settle();
+        const rows = [...document.querySelectorAll<HTMLElement>("li")];
+        expect(rows.map((row) => row.title)).toEqual(["a.txt", "big.txt"]);
+        expect(rows[0]!.classList.contains("accepted-0")).toBe(true);
+        expect(rows[1]!.classList.contains("rejected-1")).toBe(true);
+        const error = rows[1]!.querySelector<HTMLElement>(
+            '[data-pf-part="error"]',
+        )!;
+        expect(error.className).toBe("why");
+        expect(error.style.opacity).toBe("0.5");
+    });
 });

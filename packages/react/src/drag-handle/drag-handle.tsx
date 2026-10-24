@@ -23,6 +23,10 @@ export interface DragHandleProps
     extends
         Omit<PartProps, keyof DragHandleRootOwnProps>,
         DragHandleRootOwnProps {
+    /** The pill's props (`className`, `style`, attributes). */
+    readonly slotProps?:
+        | { readonly handle?: PartProps | undefined }
+        | undefined;
     /** Another element or component to render instead of `<button>`. */
     readonly as?: ElementType | undefined;
     readonly [prop: string]: unknown;
@@ -36,7 +40,11 @@ export function DragHandle(props: DragHandleProps): ReactNode {
         testId: props.testId as TestIdOverride<PartName<Anatomy>> | undefined,
         unstyled: props.unstyled as Unstyled<PartName<Anatomy>> | undefined,
     });
-    const { as, ...rest } = omitProps(props, DRAG_HANDLE_ROOT_PROPS);
+    const {
+        as,
+        slotProps: _slotProps,
+        ...rest
+    } = omitProps(props, DRAG_HANDLE_ROOT_PROPS);
     return scope.render("root", {
         element: "button",
         as: as as ElementType | undefined,
@@ -46,6 +54,7 @@ export function DragHandle(props: DragHandleProps): ReactNode {
             children: scope.render("handle", {
                 element: "span",
                 machine: { "aria-hidden": "true" },
+                props: props.slotProps?.handle,
             }),
         },
     });

@@ -23,6 +23,10 @@ export interface DragHandleProps
     extends
         Omit<PartProps, keyof DragHandleRootOwnProps>,
         DragHandleRootOwnProps {
+    /** The pill's props (`class`, `style`, attributes). */
+    readonly slotProps?:
+        | { readonly handle?: PartProps | undefined }
+        | undefined;
     /** Another element or component to render instead of `<button>`. */
     readonly as?: ValidComponent | undefined;
     readonly [prop: string]: unknown;
@@ -40,13 +44,17 @@ export function DragHandle(props: DragHandleProps): JSX.Element {
         element: "button",
         as: () => props.as,
         machine: () => ({ type: "button" }),
-        props: merge(omit(props, "as", ...DRAG_HANDLE_ROOT_PROPS), {
-            get children() {
-                return scope.render("handle", {
-                    element: "span",
-                    machine: () => ({ "aria-hidden": "true" }),
-                });
+        props: merge(
+            omit(props, "as", "slotProps", ...DRAG_HANDLE_ROOT_PROPS),
+            {
+                get children() {
+                    return scope.render("handle", {
+                        element: "span",
+                        machine: () => ({ "aria-hidden": "true" }),
+                        props: merge(() => props.slotProps?.handle, {}),
+                    });
+                },
             },
-        }),
+        ),
     });
 }

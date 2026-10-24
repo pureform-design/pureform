@@ -18,6 +18,7 @@ import type {
     FileUploadBehaviorProps,
     FileUploadContentProps,
     FileUploadEntry,
+    FileUploadInstances,
     FileUploadPart,
     FileUploadVariantProps,
 } from "@pureform/binding-core";
@@ -53,6 +54,8 @@ export interface FileUploadHosts {
     readonly error: "Text";
 }
 
+/** The file upload's props; a file's `item` and `error` are also keyed by file,
+ *  `FileUploadItemInstance`. */
 export interface FileUploadProps
     extends
         FileUploadVariantProps,
@@ -61,7 +64,7 @@ export interface FileUploadProps
             FileUploadBehaviorProps,
             "disabled" | "readOnly" | "invalid" | "error"
         >,
-        NativeSlotProps<FileUploadHosts> {
+        NativeSlotProps<FileUploadHosts, FileUploadInstances<FileUploadEntry>> {
     /** Every upload's progress bar's `style`, `slotProps`, `tokens` and `testId`. */
     readonly linearProgressProps?:
         | InnerPropsOf<LinearProgressProps>
@@ -112,6 +115,7 @@ function FileUploadImpl(props: FileUploadProps): ReactNode {
     const files = props.files ?? [];
     const supporting = props.error ?? props.supportingText;
     const itemTestId = fileUploadItemTestId(props.testId);
+    const each = slot.each("item") || slot.each("error");
     return (
         <v.root.View
             {...slot.props("root")}
@@ -185,11 +189,20 @@ function FileUploadImpl(props: FileUploadProps): ReactNode {
                             file.uri !== undefined &&
                             file.type?.startsWith("image/") === true;
                         const shown = file.progress !== undefined;
+                        const row = each
+                            ? {
+                                  index,
+                                  item: file,
+                                  type: rejected
+                                      ? ("rejected" as const)
+                                      : ("accepted" as const),
+                              }
+                            : undefined;
                         return (
                             <v.item.View
-                                {...slot.props("item")}
+                                {...slot.props("item", row)}
                                 key={`${index}:${file.uri ?? file.name}`}
-                                style={slot.style("item", s.item)}
+                                style={slot.style("item", s.item, row)}
                                 testID={id("item")}
                             >
                                 <ListItem
@@ -218,11 +231,12 @@ function FileUploadImpl(props: FileUploadProps): ReactNode {
                                     supportingText={
                                         rejected ? (
                                             <v.error.Text
-                                                {...slot.props("error")}
+                                                {...slot.props("error", row)}
                                                 selectable={false}
                                                 style={slot.style(
                                                     "error",
                                                     s.error,
+                                                    row,
                                                 )}
                                                 testID={id("error")}
                                             >

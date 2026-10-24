@@ -83,6 +83,27 @@ export interface ToasterOwnProps extends ToastVariantProps, IndicationProps {
     readonly unstyled?: Unstyled<ToastPart> | undefined;
 }
 
+/** What a ready-made toaster's toast is, for a function of the copy in its parts' keys:
+ *  `className={{ root: (toast) => (toast.type === "error" ? "loud" : undefined) }}`. */
+export interface ToastInstance {
+    /** The toast's id, from the toaster. */
+    readonly id: string;
+    /** Its type: `info` when it has none, or one the preset doesn't know. */
+    readonly type: ToastType;
+    /** Its 0-based place in the group. */
+    readonly index: number;
+}
+
+/** The ready-made toaster's repeated parts (all but the group), each to its toast. */
+export interface ToastInstances {
+    readonly root: ToastInstance;
+    readonly icon: ToastInstance;
+    readonly title: ToastInstance;
+    readonly description: ToastInstance;
+    readonly actionTrigger: ToastInstance;
+    readonly closeTrigger: ToastInstance;
+}
+
 /** The keys of `ToasterOwnProps`, kept off the group's element. */
 export const TOASTER_PROPS = [
     "tokens",

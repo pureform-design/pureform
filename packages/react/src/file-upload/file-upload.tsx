@@ -24,6 +24,7 @@ import {
     isPresent,
     isPreviewable,
 } from "@pureform/binding-core";
+import type { FileUploadInstances } from "@pureform/binding-core";
 import type { MutableInteractionSource } from "@pureform/binding-core/interaction";
 import type {
     FileUploadDomContentProps,
@@ -60,6 +61,7 @@ import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 
 type Anatomy = typeof fileUploadAnatomy;
+type Instances = FileUploadInstances<File>;
 
 /** What Root shares with its parts. */
 interface FileUploadContextValue {
@@ -107,6 +109,8 @@ export interface FileUploadItemProps extends Omit<
     /** The remove button's icon. @default a cross */
     readonly removeIcon?: ReactNode;
     readonly children?: ReactNode;
+    /** The error part's props, while the file is rejected. */
+    readonly errorProps?: FileUploadPartProps | undefined;
     /** The list item drawn for the file, keyed by its parts. */
     readonly listItemProps?: InnerPropsOf<typeof listItemAnatomy> | undefined;
     /** The remove button. */
@@ -293,6 +297,7 @@ function Item({
     icon,
     removeIcon,
     children,
+    errorProps,
     listItemProps,
     iconButtonProps,
     linearProgressProps,
@@ -337,7 +342,7 @@ function Item({
                         headline={file.name}
                         supportingText={
                             rejected ? (
-                                <ErrorText>
+                                <ErrorText {...errorProps}>
                                     {fileUploadErrorText(
                                         errors ?? [],
                                         file,
@@ -377,11 +382,12 @@ function Item({
 }
 
 /** The ready-made file upload's props: Root's, with `className`, `style`, and `slotProps` keyed
- *  by part, and the content. */
+ *  by part (a file's `item` and `error` also by file, `FileUploadItemInstance`), and the
+ *  content. */
 export interface FileUploadProps
     extends
         Omit<FileUploadRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
-        SlotKeyedProps<Anatomy>,
+        SlotKeyedProps<Anatomy, never, Instances>,
         FileUploadDomContentProps<ReactNode> {
     /** The trigger, drawn as a button. */
     readonly buttonProps?: InnerPropsOf<typeof buttonAnatomy> | undefined;
@@ -400,7 +406,10 @@ function ReadyMadeContent({
     readonly own: FileUploadProps;
 }): ReactNode {
     const { api, props } = context.use("Root");
-    const slot = useSlotProps(own);
+    const slot = useSlotProps<Anatomy, never, Instances>(own);
+    const eachItem = slot.each("item");
+    const eachError = slot.each("error");
+    const accepted = api.acceptedFiles.length;
     const supporting =
         isPresent(own.supportingText) || props.error !== undefined;
     return (
@@ -438,23 +447,39 @@ function ReadyMadeContent({
                             listItemProps={own.listItemProps}
                             iconButtonProps={own.iconButtonProps}
                             linearProgressProps={own.linearProgressProps}
-                            {...slot("item")}
+                            {...slot(
+                                "item",
+                                eachItem
+                                    ? { index, item: file, type: "accepted" }
+                                    : undefined,
+                            )}
                         />
                     ))}
-                    {api.rejectedFiles.map(({ file, errors }, index) => (
-                        <Item
-                            key={`rejected-${index}-${file.name}-${file.size}`}
-                            file={file}
-                            type="rejected"
-                            errors={errors}
-                            icon={own.fileIcon?.(file)}
-                            removeIcon={own.removeIcon}
-                            listItemProps={own.listItemProps}
-                            iconButtonProps={own.iconButtonProps}
-                            linearProgressProps={own.linearProgressProps}
-                            {...slot("item")}
-                        />
-                    ))}
+                    {api.rejectedFiles.map(({ file, errors }, index) => {
+                        const row =
+                            eachItem || eachError
+                                ? {
+                                      index: accepted + index,
+                                      item: file,
+                                      type: "rejected" as const,
+                                  }
+                                : undefined;
+                        return (
+                            <Item
+                                key={`rejected-${index}-${file.name}-${file.size}`}
+                                file={file}
+                                type="rejected"
+                                errors={errors}
+                                icon={own.fileIcon?.(file)}
+                                removeIcon={own.removeIcon}
+                                errorProps={slot("error", row)}
+                                listItemProps={own.listItemProps}
+                                iconButtonProps={own.iconButtonProps}
+                                linearProgressProps={own.linearProgressProps}
+                                {...slot("item", row)}
+                            />
+                        );
+                    })}
                 </ItemGroup>
             ) : null}
         </>
@@ -464,7 +489,7 @@ function ReadyMadeContent({
 /** The ready-made file upload: the label, the drop zone with its icon, headline, supporting text
  *  and trigger, and the list of files. */
 function ReadyMade(props: FileUploadProps): ReactNode {
-    const slot = useSlotProps(props);
+    const slot = useSlotProps<Anatomy, never, Instances>(props);
     const {
         className: _className,
         style: _style,

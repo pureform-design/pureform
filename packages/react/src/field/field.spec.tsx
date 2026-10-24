@@ -54,6 +54,22 @@ describe("Field", () => {
         expect(mark.className).toBe("label__requiredIndicator");
     });
 
+    it("gives the required mark the label's slotProps", async () => {
+        await withRegistry(
+            <Field required>
+                <Label slotProps={{ requiredIndicator: { className: "mark" } }}>
+                    Name
+                </Label>
+                <Input />
+            </Field>,
+        );
+        expect(
+            byTestId(testIds.label.requiredIndicator).classList.contains(
+                "mark",
+            ),
+        ).toBe(true);
+    });
+
     it("disables the control and dims the label", async () => {
         await withRegistry(
             <Field disabled>

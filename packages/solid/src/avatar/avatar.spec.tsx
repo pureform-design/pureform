@@ -75,6 +75,7 @@ describe("Avatar", () => {
         expect(root.getAttribute("role")).toBe("img");
         expect(root.getAttribute("aria-label")).toBe("Ada Lovelace");
         expect(root.textContent).toBe("AL");
+        expect(byTestId(testIds.avatar.fallback).hidden).toBe(false);
         expect(
             document.querySelector(`[data-testid="${testIds.avatar.image}"]`),
         ).toBeNull();

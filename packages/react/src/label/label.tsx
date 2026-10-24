@@ -14,6 +14,7 @@ import type { ElementType, LabelHTMLAttributes, ReactNode, Ref } from "react";
 import { useField } from "../field/context";
 import { useComponent } from "../parts";
 import { omitProps } from "../props";
+import type { PartProps } from "../props";
 
 /** The label's props: its required mark and dimming over the field's, its tokens, `testId` and
  *  `unstyled`, `as`, and the element's own props. */
@@ -24,6 +25,10 @@ export interface LabelProps
     readonly ref?: Ref<HTMLLabelElement> | undefined;
     /** Another element or component to render instead of `<label>`. */
     readonly as?: ElementType | undefined;
+    /** The required mark's props (`className`, `style`, attributes). */
+    readonly slotProps?:
+        | { readonly requiredIndicator?: PartProps | undefined }
+        | undefined;
 }
 
 /** The label: names the field's control, dims while it's disabled, and marks it required. */
@@ -35,7 +40,10 @@ export function Label(props: LabelProps): ReactNode {
         testId: props.testId,
         unstyled: props.unstyled,
     });
-    const { as, children, ...rest } = omitProps(props, LABEL_ROOT_PROPS);
+    const { as, children, slotProps, ...rest } = omitProps(
+        props,
+        LABEL_ROOT_PROPS,
+    );
     const { for: htmlFor, ...own } = fieldLabelProps(field?.state, state);
     return scope.render("root", {
         element: "label",
@@ -50,7 +58,10 @@ export function Label(props: LabelProps): ReactNode {
                         scope.render("requiredIndicator", {
                             element: "span",
                             machine: { "aria-hidden": true },
-                            props: { children: REQUIRED_MARK },
+                            props: {
+                                ...slotProps?.requiredIndicator,
+                                children: REQUIRED_MARK,
+                            },
                         })}
                 </>
             ),

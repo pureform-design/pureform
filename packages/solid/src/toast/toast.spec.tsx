@@ -113,4 +113,42 @@ describe("Toaster, right to left", () => {
         // The theme's layer, not Zag's highest one.
         expect(group.style.zIndex).toBe("");
     });
+
+    it("takes a function of each toast in its parts' keys", async () => {
+        const toaster = createToaster({ placement: "bottom-end" });
+        mount(() => (
+            <PureformProvider registry={overlaysRegistry()}>
+                <Toaster
+                    toaster={toaster}
+                    class={{
+                        root: (toast) => `is-${toast.type}`,
+                        group: "stack",
+                    }}
+                    style={{
+                        title: (toast) => ({
+                            opacity: toast.index === 0 ? 0.5 : 1,
+                        }),
+                    }}
+                    slotProps={{ root: (toast) => ({ title: toast.id }) }}
+                    unstyled={{ icon: (toast) => toast.type === "error" }}
+                />
+            </PureformProvider>
+        ));
+        const id = toaster.error({ title: "Failed" });
+        toaster.success({ title: "Saved" });
+        await settle();
+        expect(byTestId(ids.group).classList.contains("stack")).toBe(true);
+        const roots = all(ids.root);
+        const failed = roots.find((root) => root.dataset.type === "error")!;
+        const saved = roots.find((root) => root.dataset.type === "success")!;
+        expect(failed.classList.contains("is-error")).toBe(true);
+        expect(saved.classList.contains("is-success")).toBe(true);
+        expect(failed.title).toBe(id);
+        const icon = (root: HTMLElement) =>
+            root.querySelector<HTMLElement>(`[data-testid="${ids.icon}"]`)!;
+        expect(icon(failed).className).toBe("");
+        expect(icon(saved).className).not.toBe("");
+        const opacities = all(ids.title).map((title) => title.style.opacity);
+        expect(opacities.sort()).toEqual(["0.5", "1"]);
+    });
 });

@@ -313,4 +313,17 @@ describe("DragHandle", () => {
             byTestId("pf-drag-handle-handle").getAttribute("aria-hidden"),
         ).toBe("true");
     });
+
+    it("gives the pill its slotProps", async () => {
+        withRegistry(
+            <DragHandle
+                aria-label="Close"
+                slotProps={{ handle: { className: "pill", title: "grip" } }}
+            />,
+        );
+        await settle();
+        const handle = byTestId("pf-drag-handle-handle");
+        expect(handle.classList.contains("pill")).toBe(true);
+        expect(handle.title).toBe("grip");
+    });
 });

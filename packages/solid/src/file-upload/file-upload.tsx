@@ -11,6 +11,7 @@ import type {
     iconButtonAnatomy,
     linearProgressAnatomy,
     listItemAnatomy,
+    PartName,
 } from "@pureform/anatomy";
 import {
     FILE_UPLOAD_CONTENT_PROPS,
@@ -25,6 +26,7 @@ import {
     isPreviewable,
     overDefaults,
 } from "@pureform/binding-core";
+import type { FileUploadInstances } from "@pureform/binding-core";
 import type {
     FileUploadDomContentProps,
     FileUploadDomRootOwnProps,
@@ -59,11 +61,17 @@ import { LinearProgress } from "../linear-progress";
 import { ListItem } from "../list-item";
 import { createPartContext } from "../part-context";
 import { createSlotProps, useComponent } from "../parts";
-import type { ComponentScope, InnerPropsOf, SlotKeyedProps } from "../parts";
+import type {
+    ComponentScope,
+    InnerPropsOf,
+    SlotKeyedProps,
+    SlotPropsOf,
+} from "../parts";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 
 type Anatomy = typeof fileUploadAnatomy;
+type Instances = FileUploadInstances<File>;
 
 /** What Root shares with its parts. */
 interface FileUploadContextValue {
@@ -106,6 +114,8 @@ export interface FileUploadItemProps extends FileUploadPartProps {
     readonly icon?: JSX.Element;
     /** The remove button's icon. @default a cross */
     readonly removeIcon?: JSX.Element;
+    /** The error part's props, while the file is rejected. */
+    readonly errorProps?: FileUploadPartProps | undefined;
     /** The list item drawn for the file, keyed by its parts. */
     readonly listItemProps?: InnerPropsOf<typeof listItemAnatomy> | undefined;
     /** The remove button. */
@@ -342,6 +352,7 @@ function Item(props: FileUploadItemProps): JSX.Element {
                 "icon",
                 "removeIcon",
                 "children",
+                "errorProps",
                 "listItemProps",
                 "iconButtonProps",
                 "linearProgressProps",
@@ -384,7 +395,7 @@ function Item(props: FileUploadItemProps): JSX.Element {
                                     headline={props.file.name}
                                     supportingText={
                                         rejected() ? (
-                                            <ErrorText>
+                                            <ErrorText {...props.errorProps}>
                                                 {fileUploadErrorText(
                                                     props.errors ?? [],
                                                     props.file,
@@ -432,11 +443,11 @@ function Item(props: FileUploadItemProps): JSX.Element {
 }
 
 /** The ready-made file upload's props: Root's, with `class`, `style`, and `slotProps` keyed by
- *  part, and the content. */
+ *  part (a file's `item` and `error` also by file, `FileUploadItemInstance`), and the content. */
 export interface FileUploadProps
     extends
         Omit<FileUploadRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
-        SlotKeyedProps<Anatomy>,
+        SlotKeyedProps<Anatomy, never, Instances>,
         FileUploadDomContentProps<JSX.Element> {
     /** The trigger, drawn as a button. */
     readonly buttonProps?: InnerPropsOf<typeof buttonAnatomy> | undefined;
@@ -462,20 +473,19 @@ const READY_MADE_PROPS = [
 // Inside Root, so it can read the files and whether an error shows.
 function Content(props: {
     readonly own: FileUploadProps;
-    readonly slots: (part: string) => PartProps;
+    readonly slots: SlotPropsOf<PartName<Anatomy>, Instances>;
 }): JSX.Element {
     const { api, props: root } = context.use("Root");
     const own = props.own;
+    const slots = props.slots;
     return (
         <>
             <Show when={isPresent(own.label)}>
-                <Label {...props.slots("label")}>{own.label}</Label>
+                <Label {...slots("label")}>{own.label}</Label>
             </Show>
-            <Dropzone {...props.slots("dropzone")}>
-                <Icon {...props.slots("icon")}>
-                    {own.icon ?? <UploadIcon />}
-                </Icon>
-                <Headline {...props.slots("headline")}>
+            <Dropzone {...slots("dropzone")}>
+                <Icon {...slots("icon")}>{own.icon ?? <UploadIcon />}</Icon>
+                <Headline {...slots("headline")}>
                     {own.headline ?? "Drop files here"}
                 </Headline>
                 <Show
@@ -484,7 +494,7 @@ function Content(props: {
                         root.error !== undefined
                     }
                 >
-                    <SupportingText {...props.slots("supportingText")}>
+                    <SupportingText {...slots("supportingText")}>
                         {own.supportingText}
                     </SupportingText>
                 </Show>
@@ -501,9 +511,9 @@ function Content(props: {
                     api().acceptedFiles.length + api().rejectedFiles.length > 0
                 }
             >
-                <ItemGroup {...props.slots("itemGroup")}>
+                <ItemGroup {...slots("itemGroup")}>
                     <For each={api().acceptedFiles}>
-                        {(file) => (
+                        {(file, index) => (
                             <Item
                                 file={file}
                                 progress={root.progress?.(file)}
@@ -512,24 +522,38 @@ function Content(props: {
                                 listItemProps={own.listItemProps}
                                 iconButtonProps={own.iconButtonProps}
                                 linearProgressProps={own.linearProgressProps}
-                                {...props.slots("item")}
+                                {...slots("item", () => ({
+                                    index: index(),
+                                    item: file,
+                                    type: "accepted",
+                                }))}
                             />
                         )}
                     </For>
                     <For each={api().rejectedFiles}>
-                        {(rejected) => (
-                            <Item
-                                file={rejected.file}
-                                type="rejected"
-                                errors={rejected.errors}
-                                icon={own.fileIcon?.(rejected.file)}
-                                removeIcon={own.removeIcon}
-                                listItemProps={own.listItemProps}
-                                iconButtonProps={own.iconButtonProps}
-                                linearProgressProps={own.linearProgressProps}
-                                {...props.slots("item")}
-                            />
-                        )}
+                        {(rejected, index) => {
+                            const row = () => ({
+                                index: api().acceptedFiles.length + index(),
+                                item: rejected.file,
+                                type: "rejected" as const,
+                            });
+                            return (
+                                <Item
+                                    file={rejected.file}
+                                    type="rejected"
+                                    errors={rejected.errors}
+                                    icon={own.fileIcon?.(rejected.file)}
+                                    removeIcon={own.removeIcon}
+                                    errorProps={slots("error", row)}
+                                    listItemProps={own.listItemProps}
+                                    iconButtonProps={own.iconButtonProps}
+                                    linearProgressProps={
+                                        own.linearProgressProps
+                                    }
+                                    {...slots("item", row)}
+                                />
+                            );
+                        }}
                     </For>
                 </ItemGroup>
             </Show>
@@ -540,7 +564,7 @@ function Content(props: {
 /** The ready-made file upload: the label, the drop zone with its icon, headline, supporting text
  *  and trigger, and the list of files. */
 function ReadyMade(props: FileUploadProps): JSX.Element {
-    const slots = createSlotProps(props) as (part: string) => PartProps;
+    const slots = createSlotProps<Anatomy, never, Instances>(props);
     const own = omit(props, ...READY_MADE_PROPS) as FileUploadRootProps;
     // The root's slot props are an element's, whose `id` also takes `false`.
     const root = slots("root") as object;

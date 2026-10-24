@@ -42,6 +42,7 @@ import { Menu } from "../menu";
 import { MENU_TRIGGER_ATTRIBUTES } from "../menu/menu";
 import { asRoot, createSlotProps, useComponent } from "../parts";
 import type { InnerPropsOf, SlotKeyedProps } from "../parts";
+import { mergeStyles } from "../props";
 import type { PartProps } from "../props";
 import { ProvidedTokens } from "../provided-tokens";
 import { useDirection, usePureform } from "../provider";
@@ -273,7 +274,7 @@ function ReadyMade(props: ToolbarProps): JSX.Element {
                     style={
                         overflowing()
                             ? menuRoot.style
-                            : { ...(menuRoot.style as object), ...HIDDEN }
+                            : mergeStyles([menuRoot.style, HIDDEN])
                     }
                     positioning={toolbarMenuPositioning(props.orientation)}
                     onSelect={(details) =>

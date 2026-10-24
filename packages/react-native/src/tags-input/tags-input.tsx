@@ -81,11 +81,13 @@ export interface TagsInputProps
         TagsInputContentProps<ReactNode>,
         IndicationProps,
         NativeSlotProps<TagsInputHosts> {
-    /** Every chip's `tokens`, keyed `style` and `slotProps`. */
+    /** Every chip's `tokens`, keyed `style` and `slotProps`, and `testId` (over the one from
+     *  the field's). */
     readonly chipProps?:
         | InnerProps<
               {
                   readonly tokens?: InstanceTokens<"inputChip">;
+                  readonly testId?: TestIdOverride<InputChipPart>;
               } & NativeSlotProps<InputChipHosts>
           >
         | undefined;
@@ -101,7 +103,11 @@ interface ChipOptions {
 }
 
 const chipId = (part: InputChipPart, props: TagsInputProps) =>
-    testIdOf(inputChipAnatomy, part, tagsInputChipTestId(props.testId));
+    testIdOf(
+        inputChipAnatomy,
+        part,
+        props.chipProps?.testId ?? tagsInputChipTestId(props.testId),
+    );
 
 function RemoveImpl(options: ChipOptions): ReactNode {
     const { props, value } = options;

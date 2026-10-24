@@ -145,11 +145,10 @@ function ReadyMade(props: AvatarProps): JSX.Element {
     const root = slots("root") as object;
     return (
         <Root {...own} {...root}>
-            {/* Without a picture the children sit in the root, as an avatar of initials is. */}
-            <Show when={props.src !== undefined} fallback={props.children}>
+            <Show when={props.src !== undefined}>
                 <Image {...slots("image")} src={props.src} />
-                <Fallback {...slots("fallback")}>{props.children}</Fallback>
             </Show>
+            <Fallback {...slots("fallback")}>{props.children}</Fallback>
         </Root>
     );
 }

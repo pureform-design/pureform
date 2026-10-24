@@ -19,6 +19,7 @@ import type {
     InteractionSourceProps,
     ToasterOptions,
     ToasterOwnProps,
+    ToastInstances,
 } from "@pureform/binding-core";
 import { toastSwipeToDismiss } from "@pureform/binding-dom";
 import * as toast from "@pureform/machines/toast";
@@ -126,6 +127,8 @@ function Group(props: ToastGroupProps): ReactNode {
 export interface ToastRootProps extends PartProps {
     readonly toast: ToastData;
     readonly index: number;
+    /** Opts this toast's root out of the registry's styles. */
+    readonly unstyled?: boolean | undefined;
 }
 
 /** One toast, on Zag's toast machine: it closes after its duration (held while the pointer is
@@ -135,6 +138,7 @@ function Root({
     toast: data,
     index,
     children,
+    unstyled,
     ...props
 }: ToastRootProps): ReactNode {
     const group = groupContext.use("Root");
@@ -172,6 +176,7 @@ function Root({
             {scope.render("root", {
                 element: "div",
                 ref: swipe,
+                unstyled,
                 machine: {
                     ...machine,
                     style: {
@@ -261,11 +266,20 @@ const ActionTrigger = toastButton("actionTrigger", "ActionTrigger");
 const CloseTrigger = toastButton("closeTrigger", "CloseTrigger");
 
 /** The ready-made toaster's props: Group's, with `className`, `style` and `slotProps` keyed by
- *  part, and no children. */
+ *  part (a toast's parts also by toast, `ToastInstance`), and no children. */
 export interface ToasterProps
     extends
         Omit<ToastGroupProps, keyof SlotKeyedProps<Anatomy> | "children">,
-        SlotKeyedProps<Anatomy> {}
+        SlotKeyedProps<Anatomy, never, ToastInstances> {}
+
+const TOAST_PARTS = [
+    "root",
+    "icon",
+    "title",
+    "description",
+    "actionTrigger",
+    "closeTrigger",
+] as const;
 
 /** The ready-made toaster: each toast with its type's icon, its title, description, action
  *  (when it has one) and close button (unless `closable: false`). */
@@ -276,44 +290,49 @@ function Toaster(props: ToasterProps): ReactNode {
         slotProps: _slotProps,
         ...groupProps
     } = props;
-    const slot = useSlotProps(props);
+    const slot = useSlotProps<Anatomy, never, ToastInstances>(props);
+    const each = TOAST_PARTS.some((part) => slot.each(part));
     return (
         <Group {...groupProps} {...(slot("group") as object)}>
-            {(item, index) => (
-                <Root
-                    key={item.id}
-                    toast={item}
-                    index={index}
-                    {...(slot("root") as object)}
-                >
-                    <Icon {...slot("icon")}>
-                        <ToastIcon
-                            type={isToastType(item.type) ? item.type : "info"}
-                        />
-                    </Icon>
-                    {isPresent(item.title) ? (
-                        <Title {...slot("title")}>{item.title}</Title>
-                    ) : null}
-                    {isPresent(item.description) ? (
-                        <Description {...slot("description")}>
-                            {item.description}
-                        </Description>
-                    ) : null}
-                    {item.action ? (
-                        <ActionTrigger {...slot("actionTrigger")}>
-                            {item.action.label}
-                        </ActionTrigger>
-                    ) : null}
-                    {item.closable !== false ? (
-                        <CloseTrigger
-                            aria-label={props.closeLabel ?? "Dismiss"}
-                            {...slot("closeTrigger")}
-                        >
-                            <CloseIcon />
-                        </CloseTrigger>
-                    ) : null}
-                </Root>
-            )}
+            {(item, index) => {
+                const type = isToastType(item.type) ? item.type : "info";
+                const toast = each ? { id: item.id!, type, index } : undefined;
+                return (
+                    <Root
+                        key={item.id}
+                        toast={item}
+                        index={index}
+                        {...(slot("root", toast) as object)}
+                    >
+                        <Icon {...slot("icon", toast)}>
+                            <ToastIcon type={type} />
+                        </Icon>
+                        {isPresent(item.title) ? (
+                            <Title {...slot("title", toast)}>
+                                {item.title}
+                            </Title>
+                        ) : null}
+                        {isPresent(item.description) ? (
+                            <Description {...slot("description", toast)}>
+                                {item.description}
+                            </Description>
+                        ) : null}
+                        {item.action ? (
+                            <ActionTrigger {...slot("actionTrigger", toast)}>
+                                {item.action.label}
+                            </ActionTrigger>
+                        ) : null}
+                        {item.closable !== false ? (
+                            <CloseTrigger
+                                aria-label={props.closeLabel ?? "Dismiss"}
+                                {...slot("closeTrigger", toast)}
+                            >
+                                <CloseIcon />
+                            </CloseTrigger>
+                        ) : null}
+                    </Root>
+                );
+            }}
         </Group>
     );
 }

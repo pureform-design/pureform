@@ -11,6 +11,7 @@ import { listItemAnatomy } from "@pureform/anatomy";
 import type { PartName, TestIdOverride } from "@pureform/anatomy";
 import {
     isPresent,
+    isUnstyled,
     LIST_ITEM_CONTENT_PROPS,
     LIST_ITEM_EXPAND_PROPS,
     LIST_ITEM_EXPAND_VALUE,
@@ -31,6 +32,7 @@ import type {
     ListItemPart,
     ListItemRootOwnProps,
     ListVariantProps,
+    Unstyled,
 } from "@pureform/binding-core";
 import type { MutableInteractionSource } from "@pureform/binding-core/interaction";
 import * as accordion from "@pureform/machines/accordion";
@@ -434,6 +436,13 @@ const READY_MADE_PROPS = [
     ...LIST_ITEM_FRAME_PROPS,
 ] as const;
 
+// A frame's, action's or region's `unstyled`: drawn in a scope of its own, apart from Root's.
+const partUnstyled = (
+    props: ListItemProps,
+    part: "frame" | "action" | "region",
+): true | undefined =>
+    isUnstyled(props.unstyled as Unstyled | undefined, part) || undefined;
+
 /** The ready-made list item: every part in the preset's structure that has content; given a
  *  `region` when it's created, an expandable item showing it under the row; given a
  *  `swipeAction` when it's created, in a frame with it. */
@@ -456,7 +465,9 @@ function ReadyMade(props: ListItemProps): JSX.Element {
             testId={props.testId}
         >
             {framed()}
-            <Region {...region}>{props.region}</Region>
+            <Region {...region} unstyled={partUnstyled(props, "region")}>
+                {props.region}
+            </Region>
         </Expandable>
     );
 }
@@ -479,9 +490,12 @@ function inFrame(
             position={props.position}
             testId={props.testId}
             {...frame}
+            unstyled={partUnstyled(props, "frame")}
         >
             {row()}
-            <Action {...action}>{props.swipeAction}</Action>
+            <Action {...action} unstyled={partUnstyled(props, "action")}>
+                {props.swipeAction}
+            </Action>
         </Frame>
     );
 }

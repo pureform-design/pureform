@@ -20,6 +20,8 @@ import {
 import type {
     IndicationProps,
     ToasterOptions,
+    ToastInstance,
+    ToastInstances,
     ToastPart,
     ToastVariantProps,
 } from "@pureform/binding-core";
@@ -64,8 +66,12 @@ export interface ToasterHosts {
     readonly closeTrigger: "Pressable";
 }
 
+/** The toaster's props; a toast's parts are also keyed by toast, `ToastInstance`. */
 export interface ToasterProps
-    extends ToastVariantProps, IndicationProps, NativeSlotProps<ToasterHosts> {
+    extends
+        ToastVariantProps,
+        IndicationProps,
+        NativeSlotProps<ToasterHosts, ToastInstances> {
     readonly toaster: ToastStore;
     /** The close buttons' name for assistive technology. Default "Dismiss". */
     readonly closeLabel?: string | undefined;
@@ -103,6 +109,7 @@ function ToastButtonImpl(props: {
     readonly toaster: ToasterProps;
     readonly type: string | undefined;
     readonly part: "actionTrigger" | "closeTrigger";
+    readonly instance: ToastInstance | undefined;
     readonly label: string | undefined;
     readonly onPress: () => void;
     readonly children: ReactNode;
@@ -116,6 +123,7 @@ function ToastButtonImpl(props: {
             indication={props.toaster.indication}
             testId={props.toaster.testId}
             slot={nativeSlots(props.toaster)}
+            instance={props.instance}
             label={props.label}
             onPress={props.onPress}
         >
@@ -197,9 +205,19 @@ function useToastSwipe(closable: boolean, dismiss: () => void) {
     };
 }
 
+const TOAST_PARTS = [
+    "root",
+    "icon",
+    "title",
+    "description",
+    "actionTrigger",
+    "closeTrigger",
+] as const;
+
 function ToastItem(props: {
     readonly item: Shown;
     readonly toaster: ToasterProps;
+    readonly index: number;
     readonly zIndex: number;
 }): ReactNode {
     const slot = nativeSlots(props.toaster);
@@ -226,6 +244,9 @@ function ToastItem(props: {
     const id = (part: ToastPart) =>
         testIdOf(toastAnatomy, part, toaster.testId);
     const type = isToastType(item.type) ? item.type : "info";
+    const toast = TOAST_PARTS.some((part) => slot.each(part))
+        ? { id: item.id!, type, index: props.index }
+        : undefined;
     return (
         <engine.View
             {...presence.props}
@@ -242,27 +263,28 @@ function ToastItem(props: {
             >
                 <Pressable {...holdProps}>
                     <v.root.View
-                        {...slot.props("root")}
+                        {...slot.props("root", toast)}
                         role="status"
                         aria-live="polite"
-                        style={slot.style("root", {
-                            ...s.root,
-                            maxWidth: "100%",
-                        })}
+                        style={slot.style(
+                            "root",
+                            { ...s.root, maxWidth: "100%" },
+                            toast,
+                        )}
                         testID={id("root")}
                     >
                         <v.icon.Text
-                            {...slot.props("icon")}
+                            {...slot.props("icon", toast)}
                             aria-hidden
-                            style={slot.style("icon", s.icon)}
+                            style={slot.style("icon", s.icon, toast)}
                             testID={id("icon")}
                         >
                             {TOAST_GLYPHS[type]}
                         </v.icon.Text>
                         {isPresent(item.title) ? (
                             <v.title.Text
-                                {...slot.props("title")}
-                                style={slot.style("title", s.title)}
+                                {...slot.props("title", toast)}
+                                style={slot.style("title", s.title, toast)}
                                 testID={id("title")}
                             >
                                 {item.title}
@@ -270,8 +292,12 @@ function ToastItem(props: {
                         ) : null}
                         {isPresent(item.description) ? (
                             <v.description.Text
-                                {...slot.props("description")}
-                                style={slot.style("description", s.description)}
+                                {...slot.props("description", toast)}
+                                style={slot.style(
+                                    "description",
+                                    s.description,
+                                    toast,
+                                )}
                                 testID={id("description")}
                             >
                                 {item.description}
@@ -282,6 +308,7 @@ function ToastItem(props: {
                                 toaster={toaster}
                                 type={item.type}
                                 part="actionTrigger"
+                                instance={toast}
                                 label={item.action.label}
                                 onPress={() => {
                                     item.action?.onClick();
@@ -296,6 +323,7 @@ function ToastItem(props: {
                                 toaster={toaster}
                                 type={item.type}
                                 part="closeTrigger"
+                                instance={toast}
                                 label={toaster.closeLabel ?? "Dismiss"}
                                 onPress={() => store.dismiss(item.id)}
                             >
@@ -353,6 +381,7 @@ function ToasterImpl(props: ToasterProps): ReactNode {
                     key={item.id}
                     item={item}
                     toaster={props}
+                    index={index}
                     zIndex={toasts.length - index}
                 />
             ))}

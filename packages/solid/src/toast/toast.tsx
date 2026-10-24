@@ -19,6 +19,8 @@ import type {
     InteractionSourceProps,
     ToasterOptions,
     ToasterOwnProps,
+    ToastInstance,
+    ToastInstances,
     ToastType,
 } from "@pureform/binding-core";
 import { toastSwipeToDismiss } from "@pureform/binding-dom";
@@ -134,6 +136,8 @@ function Group(props: ToastGroupProps): JSX.Element {
 export interface ToastRootProps extends PartProps {
     readonly toast: ToastData;
     readonly index: number;
+    /** Opts this toast's root out of the registry's styles. */
+    readonly unstyled?: boolean | undefined;
 }
 
 /** One toast, on Zag's toast machine: it closes after its duration (held while the pointer is
@@ -171,6 +175,7 @@ function Root(props: ToastRootProps): JSX.Element {
                 ref: (el: HTMLElement) => {
                     element = el;
                 },
+                unstyled: () => props.unstyled,
                 machine: () => {
                     const machine = api().getRootProps();
                     return {
@@ -185,7 +190,7 @@ function Root(props: ToastRootProps): JSX.Element {
                     };
                 },
                 props: {
-                    ...omit(props, "toast", "index"),
+                    ...omit(props, "toast", "index", "unstyled"),
                     get children() {
                         return (
                             <>
@@ -264,61 +269,68 @@ const ActionTrigger = toastButton("actionTrigger", "ActionTrigger");
 /** The close button, an icon button. */
 const CloseTrigger = toastButton("closeTrigger", "CloseTrigger");
 
-/** The ready-made toaster's props: Group's, with `class`, `style` and `slotProps` keyed by part,
- *  and no children. */
+/** The ready-made toaster's props: Group's, with `class`, `style` and `slotProps` keyed by part
+ *  (a toast's parts also by toast, `ToastInstance`), and no children. */
 export interface ToasterProps
     extends
         Omit<ToastGroupProps, keyof SlotKeyedProps<Anatomy> | "children">,
-        SlotKeyedProps<Anatomy> {}
+        SlotKeyedProps<Anatomy, never, ToastInstances> {}
 
 /** The ready-made toaster: each toast with its type's icon, its title, description, action
  *  (when it has one) and close button (unless `closable: false`). */
 function Toaster(props: ToasterProps): JSX.Element {
-    const slots = createSlotProps(props);
+    const slots = createSlotProps<Anatomy, never, ToastInstances>(props);
     const own = omit(props, "class", "style", "slotProps") as Omit<
         ToastGroupProps,
         "children"
     >;
     return (
         <Group {...own} {...(slots("group") as object)}>
-            {(item, index) => (
-                <Root
-                    toast={item()}
-                    index={index()}
-                    {...(slots("root") as object)}
-                >
-                    <Icon {...slots("icon")}>
-                        <ToastIcon
-                            type={
-                                isToastType(item().type)
-                                    ? (item().type as ToastType)
-                                    : "info"
-                            }
-                        />
-                    </Icon>
-                    <Show when={isPresent(item().title)}>
-                        <Title {...slots("title")}>{item().title}</Title>
-                    </Show>
-                    <Show when={isPresent(item().description)}>
-                        <Description {...slots("description")}>
-                            {item().description}
-                        </Description>
-                    </Show>
-                    <Show when={item().action}>
-                        <ActionTrigger {...slots("actionTrigger")}>
-                            {item().action?.label}
-                        </ActionTrigger>
-                    </Show>
-                    <Show when={item().closable !== false}>
-                        <CloseTrigger
-                            aria-label={props.closeLabel ?? "Dismiss"}
-                            {...slots("closeTrigger")}
-                        >
-                            <CloseIcon />
-                        </CloseTrigger>
-                    </Show>
-                </Root>
-            )}
+            {(item, index) => {
+                const type = (): ToastType =>
+                    isToastType(item().type)
+                        ? (item().type as ToastType)
+                        : "info";
+                const toast = createMemo((): ToastInstance => ({
+                    id: item().id!,
+                    type: type(),
+                    index: index(),
+                }));
+                return (
+                    <Root
+                        toast={item()}
+                        index={index()}
+                        {...(slots("root", toast) as object)}
+                    >
+                        <Icon {...slots("icon", toast)}>
+                            <ToastIcon type={type()} />
+                        </Icon>
+                        <Show when={isPresent(item().title)}>
+                            <Title {...slots("title", toast)}>
+                                {item().title}
+                            </Title>
+                        </Show>
+                        <Show when={isPresent(item().description)}>
+                            <Description {...slots("description", toast)}>
+                                {item().description}
+                            </Description>
+                        </Show>
+                        <Show when={item().action}>
+                            <ActionTrigger {...slots("actionTrigger", toast)}>
+                                {item().action?.label}
+                            </ActionTrigger>
+                        </Show>
+                        <Show when={item().closable !== false}>
+                            <CloseTrigger
+                                aria-label={props.closeLabel ?? "Dismiss"}
+                                {...slots("closeTrigger", toast)}
+                            >
+                                <CloseIcon />
+                            </CloseTrigger>
+                        </Show>
+                    </Root>
+                );
+            }}
         </Group>
     );
 }

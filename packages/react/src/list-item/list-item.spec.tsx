@@ -368,6 +368,22 @@ describe("a swipeable ListItem", () => {
             }),
         );
 
+    it("gives its frame, action and region their keyed props and unstyled", async () => {
+        withRegistry(
+            <ListItem
+                headline="Message"
+                region={<span>More</span>}
+                swipeAction={<button type="button">Delete</button>}
+                className={{ frame: "framed", region: "more" }}
+                unstyled={{ action: true, region: true }}
+            />,
+        );
+        await settle();
+        expect(byTestId(ids.frame).className).toBe("list-item__frame framed");
+        expect(byTestId(ids.action).className).toBe("");
+        expect(byTestId(ids.region).className).toBe("more");
+    });
+
     it("renders its action after the row, in a frame, out of reach until revealed", async () => {
         withRegistry(
             <ListItem

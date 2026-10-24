@@ -13,7 +13,7 @@ import type {
 import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { ControllableMachineProps } from "../controllable";
-import type { Unstyled } from "../parts";
+import type { ItemInstance, Unstyled } from "../parts";
 import type { InteractiveProps } from "./indication";
 import type { VariantProp } from "./variants";
 
@@ -293,6 +293,21 @@ export interface FileUploadEntry {
     readonly errors?: readonly string[] | undefined;
     /** How far its upload has got, from 0 to 100, `null` for unknown, left out for no bar. */
     readonly progress?: number | null | undefined;
+}
+
+/** What a ready-made file upload's file row is, for a function of the copy in its `item` and
+ *  `error` keys: `className={{ item: (row) => (row.type === "rejected" ? "bad" : undefined) }}`.
+ *  `index` counts the rows in order (the accepted files, then the rejected ones); `item` is the
+ *  file (the web's `File`, React Native's `FileUploadEntry`). */
+export interface FileUploadItemInstance<F> extends ItemInstance<F> {
+    /** Whether the file was accepted or rejected. */
+    readonly type: "accepted" | "rejected";
+}
+
+/** The ready-made file upload's repeated parts, each to its copy. */
+export interface FileUploadInstances<F> {
+    readonly item: FileUploadItemInstance<F>;
+    readonly error: FileUploadItemInstance<F>;
 }
 
 /** A size in bytes as the file list shows it: `1.5 KB`, `10 bytes`. */

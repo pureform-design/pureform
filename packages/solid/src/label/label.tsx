@@ -14,6 +14,7 @@ import { merge, omit, Show } from "solid-js";
 
 import { useField } from "../field/context";
 import { useComponent } from "../parts";
+import type { PartProps } from "../props";
 
 /** The label's props: its required mark and dimming over the field's, its tokens, `testId` and
  *  `unstyled`, `as`, and the element's own props. */
@@ -26,6 +27,10 @@ export interface LabelProps
         LabelRootOwnProps {
     /** Another element or component to render instead of `<label>`. */
     readonly as?: ValidComponent | undefined;
+    /** The required mark's props (`class`, `style`, attributes). */
+    readonly slotProps?:
+        | { readonly requiredIndicator?: PartProps | undefined }
+        | undefined;
 }
 
 /** The label: names the field's control, dims while it's disabled, and marks it required. */
@@ -41,7 +46,7 @@ export function Label(props: LabelProps): JSX.Element {
         element: "label",
         as: () => props.as,
         machine: () => fieldLabelProps(field?.state(), state()),
-        props: merge(omit(props, "as", ...LABEL_ROOT_PROPS), {
+        props: merge(omit(props, "as", "slotProps", ...LABEL_ROOT_PROPS), {
             get children() {
                 return (
                     <>
@@ -50,7 +55,10 @@ export function Label(props: LabelProps): JSX.Element {
                             {scope.render("requiredIndicator", {
                                 element: "span",
                                 machine: () => ({ "aria-hidden": "true" }),
-                                props: { children: REQUIRED_MARK },
+                                props: merge(
+                                    () => props.slotProps?.requiredIndicator,
+                                    { children: REQUIRED_MARK },
+                                ),
                             })}
                         </Show>
                     </>

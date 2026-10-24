@@ -213,6 +213,25 @@ describe("Toolbar, overflow", () => {
         );
     });
 
+    it("keeps a string menu root style while the overflow menu is hidden", async () => {
+        withRegistry(
+            () => (
+                <Toolbar
+                    overflow
+                    items={ITEMS.slice(0, 3)}
+                    menuProps={{ style: { root: "margin-left: 7px" } }}
+                />
+            ),
+            400,
+        );
+        await frames();
+        const trigger = document.querySelector<HTMLElement>(
+            "[data-pf-toolbar-overflow]",
+        );
+        expect(trigger?.style.display).toBe("none");
+        expect(trigger?.style.marginLeft).toBe("7px");
+    });
+
     it("moves what doesn't fit into the overflow menu, and runs its click there", async () => {
         const onClick = vi.fn();
         withRegistry(

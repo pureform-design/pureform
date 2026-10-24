@@ -30,6 +30,8 @@ export interface SurfaceButtonProps<A extends ComponentAnatomy> {
     readonly testId: TestIdOverride<PartName<A>> | undefined;
     /** The owner's per-part props, when it customizes this part. */
     readonly slot?: PartSlots | undefined;
+    /** What this copy is, for the owner's per-copy values (a toast's). */
+    readonly instance?: unknown;
     /** Its name for assistive technology. */
     readonly label: string | undefined;
     readonly onPress: (() => void) | undefined;
@@ -59,14 +61,23 @@ export function SurfaceButton<A extends ComponentAnatomy>(
     const Surface = v[props.part];
     return (
         <Surface.Pressable
-            {...slot.props(props.part)}
-            {...slot.with(props.part, indication.handlers)}
+            {...slot.props(props.part, props.instance)}
+            {...slot.with(props.part, indication.handlers, props.instance)}
             role="button"
             {...(props.label === undefined
                 ? {}
                 : { "aria-label": props.label })}
-            onPress={slot.on(props.part, "onPress", props.onPress)}
-            style={slot.style(props.part, withUnselectable(s[props.part]))}
+            onPress={slot.on(
+                props.part,
+                "onPress",
+                props.onPress,
+                props.instance,
+            )}
+            style={slot.style(
+                props.part,
+                withUnselectable(s[props.part]),
+                props.instance,
+            )}
             testID={testIdOf(props.anatomy, props.part, props.testId)}
         >
             <IconSlot
