@@ -180,3 +180,90 @@ export const partSources = <A extends ComponentAnatomy>(
         spreadableProps(input.props),
     ];
 };
+
+/** What a ready-made accepts to customize a component it draws (a list's list items, a group's
+ *  buttons): the inner component's own per-part props, tokens and test ids, every one optional.
+ *  `C` is the binding's customize props for that component (React's `className`, `style`,
+ *  `slotProps`, `unstyled`, `testId`, `tokens`; Solid's `class` for `className`; React Native's
+ *  keyed `style`, `slotProps`, `testId`, `tokens`). Variants aren't included: the outer component
+ *  passes its own. */
+export type InnerProps<C extends object> = { readonly [K in keyof C]?: C[K] };
+
+const CLASS_KEYS = new Set(["className", "class"]);
+const PER_PART_KEYS = new Set(["style", "slotProps"]);
+
+const isEmpty = (value: object | null | undefined): boolean => {
+    if (!value) return true;
+    for (const key in value) {
+        if ((value as Dict)[key] !== undefined) return false;
+    }
+    return true;
+};
+
+const joinClass = (defaults: unknown, own: unknown): unknown =>
+    defaults == null || defaults === ""
+        ? own
+        : own == null || own === ""
+          ? defaults
+          : typeof defaults === "string" && typeof own === "string"
+            ? `${defaults} ${own}`
+            : [defaults, own];
+
+const isRecord = (value: unknown): value is Dict =>
+    typeof value === "object" && value !== null && !Array.isArray(value);
+
+/** Two keyed values merged part by part with `part`, either one as-is when the other is unset. */
+const byPart = (
+    defaults: unknown,
+    own: unknown,
+    part: (defaults: unknown, own: unknown) => unknown,
+): unknown => {
+    if (defaults === undefined) return own;
+    if (own === undefined) return defaults;
+    if (!isRecord(defaults) || !isRecord(own)) return own;
+    const merged: Record<string, unknown> = { ...defaults };
+    for (const key of Object.keys(own)) {
+        merged[key] =
+            merged[key] === undefined ? own[key] : part(merged[key], own[key]);
+    }
+    return merged;
+};
+
+const shallow = (defaults: unknown, own: unknown): unknown =>
+    isRecord(defaults) && isRecord(own) ? { ...defaults, ...own } : own;
+
+/** A child's own props over its container's defaults for it (a list item's over the list's
+ *  `listItemProps`): the child's own win; classes join, part by part when keyed; `style`,
+ *  `slotProps` and `tokens` merge shallowly per part (a part's style or props, a token). Returns
+ *  `own` or `defaults` as-is when the other is empty, so a child with nothing of its own gets the
+ *  defaults object itself. Keys other than these pass through, own over defaults. */
+export const overDefaults = <P extends object>(
+    defaults: P | undefined,
+    own: P,
+): P => {
+    if (isEmpty(defaults)) return own;
+    if (isEmpty(own)) return defaults as P;
+    const merged: Record<string, unknown> = { ...(defaults as Dict) };
+    for (const key of Object.keys(own)) {
+        const value = (own as Dict)[key];
+        if (value === undefined) continue;
+        const base = merged[key];
+        merged[key] =
+            base === undefined
+                ? value
+                : CLASS_KEYS.has(key)
+            ? isRecord(base) || isRecord(value)
+                ? isRecord(base) && isRecord(value)
+                    ? byPart(base, value, joinClass)
+                    : isRecord(base)
+                      ? byPart(base, { root: value }, joinClass)
+                      : byPart({ root: base }, value, joinClass)
+                : joinClass(base, value)
+            : PER_PART_KEYS.has(key)
+              ? byPart(base, value, shallow)
+              : key === "tokens"
+                ? shallow(base, value)
+                : value;
+    }
+    return merged as P;
+};

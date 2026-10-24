@@ -10,12 +10,13 @@ import {
     isIconPart,
     isUnstyled,
     outsideRootMessage,
+    overDefaults,
     partClasses,
     partSources,
     spreadableProps,
     stateAttributes,
 } from "./parts";
-import type { StateAttributes } from "./parts";
+import type { InnerProps, StateAttributes } from "./parts";
 import { combineProps, mergeStyleObjects } from "./props";
 import type { CombineRules } from "./props";
 import { selectionSignature, withDefaults } from "./selection";
@@ -331,5 +332,73 @@ describe("outsideRootMessage", () => {
         expect(outsideRootMessage("Button", "Label")).toMatch(
             /^pureform: <Button.Label> must be inside <Button.Root>/,
         );
+    });
+});
+
+describe("overDefaults", () => {
+    type Customize = {
+        readonly className?: string | { readonly [part: string]: string };
+        readonly style?: { readonly [part: string]: Record<string, string> };
+        readonly slotProps?: {
+            readonly [part: string]: Record<string, unknown>;
+        };
+        readonly tokens?: Record<string, string>;
+        readonly testId?: string;
+        readonly unstyled?: boolean;
+    };
+    type Item = InnerProps<Customize> & { readonly headline?: string };
+
+    it("returns either side as-is when the other is empty", () => {
+        const defaults: Item = { tokens: { height: "56px" } };
+        const own: Item = { headline: "Inbox" };
+        expect(overDefaults(defaults, {})).toBe(defaults);
+        expect(overDefaults(defaults, { testId: undefined })).toBe(defaults);
+        expect(overDefaults(undefined, own)).toBe(own);
+        expect(overDefaults({}, own)).toBe(own);
+    });
+
+    it("lets the child's own win and keeps the defaults it doesn't set", () => {
+        expect(
+            overDefaults<Item>(
+                { testId: "a", unstyled: true, headline: "x" },
+                { testId: "b" },
+            ),
+        ).toEqual({ testId: "b", unstyled: true, headline: "x" });
+    });
+
+    it("joins classes, part by part when keyed", () => {
+        expect(overDefaults<Item>({ className: "a" }, { className: "b" })).toEqual(
+            { className: "a b" },
+        );
+        expect(
+            overDefaults<Item>(
+                { className: { root: "a", headline: "h" } },
+                { className: { root: "b", leading: "l" } },
+            ),
+        ).toEqual({ className: { root: "a b", headline: "h", leading: "l" } });
+    });
+
+    it("merges style, slotProps and tokens shallowly per part", () => {
+        expect(
+            overDefaults<Item>(
+                {
+                    style: { root: { color: "red", margin: "0" } },
+                    slotProps: { headline: { title: "a", id: "x" } },
+                    tokens: { height: "56px", gap: "4px" },
+                },
+                {
+                    style: { root: { color: "blue" }, leading: { gap: "1" } },
+                    slotProps: { headline: { title: "b" } },
+                    tokens: { height: "64px" },
+                },
+            ),
+        ).toEqual({
+            style: {
+                root: { color: "blue", margin: "0" },
+                leading: { gap: "1" },
+            },
+            slotProps: { headline: { title: "b", id: "x" } },
+            tokens: { height: "64px", gap: "4px" },
+        });
     });
 });

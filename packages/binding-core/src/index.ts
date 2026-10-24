@@ -1052,6 +1052,7 @@ export {
     isIconPart,
     isUnstyled,
     outsideRootMessage,
+    overDefaults,
     partAsRoot,
     partClasses,
     partSources,
@@ -1059,6 +1060,7 @@ export {
     stateAttributes,
 } from "./parts";
 export type {
+    InnerProps,
     PartSourcesInput,
     PartStates,
     SlotKeyed,
