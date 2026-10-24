@@ -156,11 +156,14 @@ describe("the indeterminate linear track", () => {
                 </div>,
                 engine,
             );
-            await settle(300);
             const box = (part: string) =>
                 document
                     .querySelector(`[data-testid="p-${part}"]`)!
                     .getBoundingClientRect();
+            // Mid-slide, once the indicator has come into the track (later on a loaded machine).
+            await settle(300);
+            for (let i = 0; i < 40 && box("indicator").left <= 0; i++)
+                await settle(50);
             const indicator = box("indicator");
             // The instance's width, and the parts still a gap from it.
             expect(indicator.width).toBeCloseTo(px as number, 0);

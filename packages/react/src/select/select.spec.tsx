@@ -184,8 +184,8 @@ describe("Select, ready-made", () => {
         expect(item("m").hasAttribute("data-highlighted")).toBe(true);
         expect(onValueChange).not.toHaveBeenCalled();
         expect(input.value).toBe("Small");
-        // Keys typed next add up: "mi" finds the next.
-        await interact(() => userEvent.keyboard("i"));
+        // Typed again in the list, the same letter goes on to the next starting with it.
+        await interact(() => userEvent.keyboard("m"));
         await frames();
         expect(item("x").hasAttribute("data-highlighted")).toBe(true);
         await interact(() => userEvent.keyboard("{Enter}"));
