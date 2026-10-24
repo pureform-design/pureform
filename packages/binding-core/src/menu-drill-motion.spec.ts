@@ -90,9 +90,7 @@ describe("the drilled menu's motion", () => {
             easing: formatLinearEasing(sampled.points),
         });
         const snapshot = menuDrillFrom(content, "cut", "pf-menu-back");
-        content.replaceChildren(
-            ...level(["pf-menu-back", "mail"]).children,
-        );
+        content.replaceChildren(...level(["pf-menu-back", "mail"]).children);
         const [size] = menuDrillTo(content, snapshot, timing);
         const run = size!.effect!.getTiming();
         expect(run.duration).toBe(sampled.duration);

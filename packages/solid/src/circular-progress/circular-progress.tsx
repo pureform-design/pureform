@@ -9,9 +9,12 @@ import {
     progressRootProps,
     progressSelection,
 } from "@pureform/binding-core";
-import type { ProgressRootOwnProps } from "@pureform/binding-core";
+import type {
+    ProgressReadyMadeProps,
+    ProgressRootOwnProps,
+} from "@pureform/binding-core";
 import type { JSX, ValidComponent } from "@solidjs/web";
-import { omit } from "solid-js";
+import { Show, omit } from "solid-js";
 
 import { createPartContext } from "../part-context";
 import { createSlotProps, useComponent, plainParts } from "../parts";
@@ -93,7 +96,8 @@ export interface CircularProgressProps
             CircularProgressRootProps,
             keyof SlotKeyedProps<Anatomy> | "children"
         >,
-        SlotKeyedProps<Anatomy> {}
+        SlotKeyedProps<Anatomy>,
+        ProgressReadyMadeProps {}
 
 /** The ready-made circular progress indicator: Root, its track, its halves, and their arcs. */
 function ReadyMade(props: CircularProgressProps): JSX.Element {
@@ -103,6 +107,7 @@ function ReadyMade(props: CircularProgressProps): JSX.Element {
         "class",
         "style",
         "slotProps",
+        "track",
     ) as CircularProgressRootProps;
     const root = slots("root") as object;
     const track = slots("track");
@@ -116,14 +121,16 @@ function ReadyMade(props: CircularProgressProps): JSX.Element {
     const startArc = slots("startArc");
     return (
         <Root {...own} {...root}>
-            <TrackPart {...track}>
-                <TrackEndHalf {...trackEndHalf}>
-                    <TrackEndArc {...trackEndArc} />
-                </TrackEndHalf>
-                <TrackStartHalf {...trackStartHalf}>
-                    <TrackStartArc {...trackStartArc} />
-                </TrackStartHalf>
-            </TrackPart>
+            <Show when={props.track !== false}>
+                <TrackPart {...track}>
+                    <TrackEndHalf {...trackEndHalf}>
+                        <TrackEndArc {...trackEndArc} />
+                    </TrackEndHalf>
+                    <TrackStartHalf {...trackStartHalf}>
+                        <TrackStartArc {...trackStartArc} />
+                    </TrackStartHalf>
+                </TrackPart>
+            </Show>
             <EndHalf {...endHalf}>
                 <EndArc {...endArc} />
             </EndHalf>

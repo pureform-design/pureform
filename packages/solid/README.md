@@ -612,7 +612,9 @@ mirrorIcon?, disabled?, content? }`; a tab without a label shows only its icon, 
   (from `min` to `max`, 0 to 100 by default) sets the preset's `value` token as a percentage.
   Without a value (or with `indeterminate`) it's indeterminate: no `aria-valuenow`, and the preset
   animates it. Name it with `aria-label`. `<LinearProgress value={40} aria-label="Uploading" />`.
-  `shape="wavy"` draws the indicator as a wave (M3 Expressive).
+  `shape="wavy"` draws the indicator as a wave (M3 Expressive). The ready-made ones draw the track
+  in every case (flat or wavy, with or without a value); `track={false}` leaves it out (the
+  indicator and the stop dot stay). Composed, leave out `Track`.
 - **The loading indicator** (`LoadingIndicator`: `Root`, `Container` holding `Indicator`) has no
   machine: Root is a `role="progressbar"` with no value, and the preset turns and morphs the
   indicator (a turn only under reduced motion). `variant="contained"` puts it on a round

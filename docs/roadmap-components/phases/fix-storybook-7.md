@@ -3,7 +3,10 @@
 Open questions from r9-r10, fix-storybook-6a/6b and a11y-roles, with the agreed answers.
 
 ## 7a: progress, motion and drawing
-1. Flat indeterminate spinner draws no track (Compose); the wavy one keeps it.
+
+1. The track shows by default on linear and circular progress (flat and wavy, determinate and
+   indeterminate, every renderer), and a `track` prop hides it (`track={false}`), documented in
+   the READMEs. (Replaces "the flat indeterminate spinner draws no track"; user decision.)
 2. Progress gaps' ends are rounded as Compose's (track drawn in two parts).
 3. React Native linear indeterminate track leaves the same gap as the web.
 4. Web drill motion reads the theme's spring (CSS vars, `springFromVars`), as React Native does.
@@ -16,6 +19,7 @@ Open questions from r9-r10, fix-storybook-6a/6b and a11y-roles, with the agreed 
 9. Storybook toolbar switch for the React Native engine: animated, svg, reanimated.
 
 ## 7b: menus, accessibility and components
+
 10. Menu `auto` measures the submenu's real width at the press.
 11. Menu `auto` checks vertical room too (flip up, or drill).
 12. Menu `container` prop naming a container (default: nearest).

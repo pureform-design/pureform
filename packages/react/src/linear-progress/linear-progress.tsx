@@ -9,7 +9,10 @@ import {
     progressRootProps,
     progressSelection,
 } from "@pureform/binding-core";
-import type { ProgressRootOwnProps } from "@pureform/binding-core";
+import type {
+    ProgressReadyMadeProps,
+    ProgressRootOwnProps,
+} from "@pureform/binding-core";
 import type { ElementType, ReactNode } from "react";
 
 import { createPartContext } from "../part-context";
@@ -80,7 +83,8 @@ export interface LinearProgressProps
             LinearProgressRootProps,
             keyof SlotKeyedProps<Anatomy> | "children"
         >,
-        SlotKeyedProps<Anatomy> {}
+        SlotKeyedProps<Anatomy>,
+        ProgressReadyMadeProps {}
 
 /** The ready-made linear progress indicator: Root, its track, indicator and stop indicator. */
 function ReadyMade(props: LinearProgressProps): ReactNode {
@@ -89,11 +93,12 @@ function ReadyMade(props: LinearProgressProps): ReactNode {
         className: _className,
         style: _style,
         slotProps: _slotProps,
+        track = true,
         ...rootProps
     } = props;
     return (
         <Root {...rootProps} {...(slot("root") as object)}>
-            <Track {...slot("track")} />
+            {track ? <Track {...slot("track")} /> : null}
             <Indicator {...slot("indicator")} />
             <StopIndicator {...slot("stopIndicator")} />
         </Root>

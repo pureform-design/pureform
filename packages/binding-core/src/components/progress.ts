@@ -38,6 +38,13 @@ export interface ProgressVariantProps<C extends ProgressComponent> {
     readonly tokens?: InstanceTokens<C> | undefined;
 }
 
+/** The ready-made progress indicators' own props. */
+export interface ProgressReadyMadeProps {
+    /** Whether to draw the track, the rest of the bar or circle beyond the indicator and its
+     *  gaps. Hidden with `false`; the indicator and the stop dot stay. @default true */
+    readonly track?: boolean | undefined;
+}
+
 /** The amount a progress indicator shows. */
 export interface ProgressValueProps {
     /** The amount done, from `min` to `max`. Left out (or `null`), the amount is unknown: the

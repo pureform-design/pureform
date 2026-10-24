@@ -9,9 +9,12 @@ import {
     progressRootProps,
     progressSelection,
 } from "@pureform/binding-core";
-import type { ProgressRootOwnProps } from "@pureform/binding-core";
+import type {
+    ProgressReadyMadeProps,
+    ProgressRootOwnProps,
+} from "@pureform/binding-core";
 import type { JSX, ValidComponent } from "@solidjs/web";
-import { omit } from "solid-js";
+import { Show, omit } from "solid-js";
 
 import { createPartContext } from "../part-context";
 import { createSlotProps, useComponent, plainParts } from "../parts";
@@ -79,7 +82,8 @@ export interface LinearProgressProps
             LinearProgressRootProps,
             keyof SlotKeyedProps<Anatomy> | "children"
         >,
-        SlotKeyedProps<Anatomy> {}
+        SlotKeyedProps<Anatomy>,
+        ProgressReadyMadeProps {}
 
 /** The ready-made linear progress indicator: Root, its track, indicator and stop indicator. */
 function ReadyMade(props: LinearProgressProps): JSX.Element {
@@ -89,6 +93,7 @@ function ReadyMade(props: LinearProgressProps): JSX.Element {
         "class",
         "style",
         "slotProps",
+        "track",
     ) as LinearProgressRootProps;
     const root = slots("root") as object;
     const track = slots("track");
@@ -96,7 +101,9 @@ function ReadyMade(props: LinearProgressProps): JSX.Element {
     const stopIndicator = slots("stopIndicator");
     return (
         <Root {...own} {...root}>
-            <Track {...track} />
+            <Show when={props.track !== false}>
+                <Track {...track} />
+            </Show>
             <Indicator {...indicator} />
             <StopIndicator {...stopIndicator} />
         </Root>

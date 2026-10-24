@@ -83,3 +83,51 @@ describe("CircularProgress", () => {
         );
     });
 });
+
+describe("the progress indicators' track", () => {
+    const parts = (id: string) =>
+        [...byTestId(id).children].map((part) =>
+            part.getAttribute("data-pf-part"),
+        );
+
+    it("draws the track by default, determinate and indeterminate, flat and wavy", async () => {
+        withRegistry(
+            <>
+                <LinearProgress testId="a" value={40} />
+                <LinearProgress testId="b" shape="wavy" />
+                <CircularProgress testId="c" value={40} shape="wavy" />
+                <CircularProgress testId="d" />
+            </>,
+        );
+        await settle();
+        expect(parts("a-root")).toEqual([
+            "track",
+            "indicator",
+            "stop-indicator",
+        ]);
+        expect(parts("b-root")).toEqual([
+            "track",
+            "indicator",
+            "stop-indicator",
+        ]);
+        expect(parts("c-root")).toEqual(["track", "end-half", "start-half"]);
+        expect(parts("d-root")).toEqual(["track", "end-half", "start-half"]);
+    });
+
+    it("leaves the track out with track={false}", async () => {
+        withRegistry(
+            <>
+                <LinearProgress testId="a" value={40} track={false} />
+                <LinearProgress testId="b" track={false} />
+                <CircularProgress testId="c" value={40} track={false} />
+                <CircularProgress testId="d" shape="wavy" track={false} />
+            </>,
+        );
+        await settle();
+        expect(parts("a-root")).toEqual(["indicator", "stop-indicator"]);
+        expect(parts("b-root")).toEqual(["indicator", "stop-indicator"]);
+        expect(parts("c-root")).toEqual(["end-half", "start-half"]);
+        expect(parts("d-root")).toEqual(["end-half", "start-half"]);
+        expect(byTestId("a-root").hasAttribute("track")).toBe(false);
+    });
+});

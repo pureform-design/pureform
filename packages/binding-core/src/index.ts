@@ -1185,6 +1185,7 @@ export type {
     LinearProgressPart,
     ProgressComponent,
     ProgressRootOwnProps,
+    ProgressReadyMadeProps,
     ProgressValueProps,
     ProgressVariantProps,
 } from "./components/progress";
