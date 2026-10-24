@@ -15,6 +15,7 @@ import type {
     TreeVariantProps,
 } from "@pureform/binding-core";
 import type { ReactNode } from "react";
+import { Platform } from "react-native";
 
 import { Expanding } from "../expand";
 import { iconParts } from "../icon-style";
@@ -75,6 +76,10 @@ function Row(props: {
     const id = (part: TreePart) =>
         testIdOf(treeAnatomy, part, tree.props.testId);
     const icon = iconParts(slots, id);
+    const press = () => {
+        tree.select(node.value);
+        if (branch) tree.toggle(node.value);
+    };
     const row = (
         <v.node.Pressable
             {...indication.handlers}
@@ -82,10 +87,20 @@ function Row(props: {
             aria-level={props.level}
             aria-selected={selectedNode}
             {...(branch ? { "aria-expanded": expanded } : {})}
-            onPress={() => {
-                tree.select(node.value);
-                if (branch) tree.toggle(node.value);
-            }}
+            onPress={press}
+            // React Native Web presses a row on Enter only; Space acts too, as the web's tree.
+            {...(Platform.OS === "web"
+                ? ({
+                      onKeyDown: (event: {
+                          nativeEvent: { key: string };
+                          preventDefault?(): void;
+                      }) => {
+                          if (event.nativeEvent.key !== " " || disabled) return;
+                          event.preventDefault?.();
+                          press();
+                      },
+                  } as object)
+                : {})}
             disabled={disabled}
             style={{ ...s.node, ...unselectable }}
             testID={id("node")}

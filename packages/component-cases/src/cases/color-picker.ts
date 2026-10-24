@@ -7,6 +7,7 @@
 
 import { testIds } from "@pureform/anatomy";
 
+import { textValueOf } from "../aria";
 import type { ComponentCase } from "../types";
 import { byTestId } from "../types";
 import { userEvent } from "../user-event";
@@ -17,7 +18,7 @@ const thumb = (host: HTMLElement) => byTestId(host, ids.areaThumb);
 
 /** The value, as the hex field shows it. */
 const read = (host: HTMLElement): string =>
-    `#${byTestId<HTMLInputElement>(host, testIds.textField.input).value.toLowerCase()}`;
+    `#${textValueOf(byTestId(host, testIds.textField.input)).toLowerCase()}`;
 
 /** The hidden input the value submits with: the root's own input. */
 const hidden = (host: HTMLElement) =>

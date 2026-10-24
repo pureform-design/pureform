@@ -8,22 +8,16 @@ import { compositeTestIds } from "@pureform/anatomy";
 
 import type { ActOptions, ComponentCase } from "../types";
 import { userEvent } from "../user-event";
-import { overlayParts } from "./overlay";
+import { overlayParts, tooltipRead } from "./overlay";
 
 const ids = compositeTestIds.tooltip;
-const { trigger, placed, shown, overlay } = overlayParts(ids);
+const { trigger, placed, shown, overlay } = overlayParts(ids, {
+    role: "tooltip",
+    name: "Save",
+});
 
-/** Whether it's open: shown, and the trigger described by it, throwing if they disagree. */
-const read = (host: HTMLElement): boolean => {
-    const open = shown(host);
-    const described = trigger(host).hasAttribute("aria-describedby");
-    if (described !== open) {
-        throw new Error(
-            `the tooltip ${open ? "shows" : "is hidden"}, its trigger ${described ? "is" : "isn't"} described`,
-        );
-    }
-    return open;
-};
+/** Whether it's open: shown, and the trigger described by it. */
+const read = tooltipRead({ trigger, shown });
 
 /** Keyboard focus reaches the trigger: a key press makes the keyboard the input, then the trigger
  *  takes focus. */

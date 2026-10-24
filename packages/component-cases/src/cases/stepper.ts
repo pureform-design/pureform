@@ -1,11 +1,12 @@
 // The stepper: `step`, by a click on a header; only the current header takes focus from Tab, Enter
 // and Space press it, and the arrow keys of the orientation (a row's by direction) move focus
-// between the headers, without changing the step, with Home and End to the first and last. Each
-// step shows its content while it's current. It isn't a form control, and has no disabled state of
+// between the headers, without changing the step, with Home and End to the first and last. The
+// current step's header says so (`aria-selected` or `aria-current`). It isn't a form control, and has no disabled state of
 // its own (a step has).
 
 import { stepperAnatomy, testIds } from "@pureform/anatomy";
 
+import { optionalFlagOf } from "../aria";
 import type { ActOptions, ComponentCase } from "../types";
 import { itemSources } from "../types";
 import { userEvent } from "../user-event";
@@ -26,24 +27,14 @@ const triggers = (host: HTMLElement) => [
 
 const trigger = (host: HTMLElement, index: number) => triggers(host)[index]!;
 
-/** The current step, checked against the contents each header names: the one whose header is
- *  selected shows, and the rest are hidden. */
-const read = (host: HTMLElement): number => {
-    let current = -1;
-    for (const [index, element] of triggers(host).entries()) {
-        const on = element.getAttribute("aria-selected") === "true";
-        const content = host.querySelector<HTMLElement>(
-            `#${CSS.escape(element.getAttribute("aria-controls") ?? "")}`,
-        );
-        if (content && content.hidden === on) {
-            throw new Error(
-                `step ${index} is ${on ? "current" : "not current"}, its content ${content.hidden ? "hidden" : "shown"}`,
-            );
-        }
-        if (on) current = index;
-    }
-    return current;
-};
+/** The current step: the header that's selected (`aria-selected`, a row's tabs) or current
+ *  (`aria-current`, a column's headers), or -1. */
+const read = (host: HTMLElement): number =>
+    triggers(host).findIndex(
+        (element) =>
+            optionalFlagOf(element, "selected") ||
+            optionalFlagOf(element, "current"),
+    );
 
 const click =
     (index: number) =>

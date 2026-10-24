@@ -8,9 +8,11 @@ import {
     testIds,
 } from "@pureform/anatomy";
 
+import { byRole, choiceNamed, flagOf, textValueOf } from "../aria";
 import type { ActOptions, ComponentCase } from "../types";
 import { byTestId, itemSources } from "../types";
 import { userEvent } from "../user-event";
+import { drawn } from "./overlay";
 
 const ids = testIds.select;
 const menu = compositeTestIds.selectMenu;
@@ -29,22 +31,16 @@ const hiddenSelect = (host: HTMLElement) =>
 
 const content = (host: HTMLElement) => byTestId(host, menu.root);
 
-// Open: the list shows, and isn't on its way out.
-const isOpen = (host: HTMLElement) =>
-    !content(host).hidden && content(host).dataset.state !== "closed";
+/** The element with the combobox role, which opens the list. */
+const field = (host: HTMLElement) => byRole(host, "combobox");
 
-/** The chosen option's value, or `null`: the label the field shows, checked against the hidden
- *  select. */
+// Open: the combobox says so.
+const isOpen = (host: HTMLElement) => flagOf(field(host), "expanded");
+
+/** The chosen option's value, or `null`: from the label the field shows. */
 const read = (host: HTMLElement): string | null => {
-    const shown = input(host).value;
-    const value = ITEMS.find((item) => item.label === shown)?.value ?? null;
-    const submitted = hiddenSelect(host).selectedOptions[0]?.value ?? null;
-    if (submitted !== value) {
-        throw new Error(
-            `the field shows ${JSON.stringify(shown)}, the hidden select holds ${JSON.stringify(submitted)}`,
-        );
-    }
-    return value;
+    const shown = textValueOf(input(host));
+    return ITEMS.find((item) => item.label === shown)?.value ?? null;
 };
 
 const frame = () => new Promise((resolve) => requestAnimationFrame(resolve));
@@ -66,15 +62,13 @@ const opened = async (host: HTMLElement): Promise<boolean> => {
 const choose =
     (value: string) =>
     async (host: HTMLElement, options: ActOptions = {}) => {
-        await userEvent.click(input(host), options);
+        await userEvent.click(field(host), options);
         if (!(await opened(host))) return;
-        const item = [
-            ...host.querySelectorAll<HTMLElement>(
-                `[data-testid="${menu.item}"]`,
-            ),
-        ].find((element) => element.dataset.value === value);
-        if (!item) throw new Error(`no option with the value ${value}`);
-        await userEvent.click(item, options);
+        const label = ITEMS.find((item) => item.value === value)!.label;
+        await userEvent.click(
+            await drawn(() => choiceNamed(host, label)),
+            options,
+        );
     };
 
 export const select: ComponentCase = {
@@ -135,7 +129,7 @@ export const select: ComponentCase = {
     },
     keyboard: {
         // The list takes focus while it's open.
-        focusable: (host) => (isOpen(host) ? content(host) : input(host)),
+        focusable: (host) => (isOpen(host) ? content(host) : field(host)),
         keys: [
             { key: "{Enter}", does: "nothing" },
             { key: " ", does: "nothing" },

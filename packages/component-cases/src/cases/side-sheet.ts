@@ -10,7 +10,10 @@ import { byTestId } from "../types";
 import { overlayParts } from "./overlay";
 
 const ids = compositeTestIds.sideSheet;
-const { trigger, read, click, shown, overlay } = overlayParts(ids);
+const { trigger, read, click, shown, overlay } = overlayParts(ids, {
+    role: "dialog",
+    name: "Filters",
+});
 
 export const sideSheet: ComponentCase = {
     component: "SideSheet",

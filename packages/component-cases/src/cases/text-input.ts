@@ -1,6 +1,7 @@
 // What the text field's and the text area's cases share: `value` from "" to "a", typed into the
-// native input; the native input submits, resets, and validates; an error blocks submitting.
+// input and read from it (every renderer's textbox is an input); the native input submits, resets, and validates; an error blocks submitting.
 
+import { textValueOf } from "../aria";
 import type { ComponentName, SceneProps } from "../scene";
 import type { ActOptions, ComponentCase, KeyCase } from "../types";
 import { byTestId } from "../types";
@@ -8,7 +9,6 @@ import { userEvent } from "../user-event";
 
 interface TextInputIds {
     readonly root: string;
-    readonly container: string;
     readonly input: string;
 }
 
@@ -23,19 +23,8 @@ export const textInputCase = (options: {
     const input = (host: HTMLElement) =>
         byTestId<HTMLInputElement | HTMLTextAreaElement>(host, ids.input);
 
-    /** The input's value, checked against the container's `filled` state. */
-    const read = (host: HTMLElement): string => {
-        const value = input(host).value;
-        const filled = byTestId(host, ids.container).hasAttribute(
-            "data-pf-filled",
-        );
-        if (filled !== (value !== "")) {
-            throw new Error(
-                `the input holds ${JSON.stringify(value)}, the container ${filled ? "is" : "isn't"} filled`,
-            );
-        }
-        return value;
-    };
+    /** The textbox's value. */
+    const read = (host: HTMLElement): string => textValueOf(input(host));
 
     // A click to focus the input, then one key.
     const type = async (host: HTMLElement, options: ActOptions = {}) => {

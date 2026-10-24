@@ -6,13 +6,14 @@ import { snackbarAnatomy } from "@pureform/anatomy";
 import type { TestIdOverride } from "@pureform/anatomy";
 import { isPresent, snackbarSelection } from "@pureform/binding-core";
 import type {
+    ChangeDetails,
     IndicationProps,
     SnackbarPart,
     SnackbarVariantProps,
 } from "@pureform/binding-core";
 import type { ReactNode } from "react";
 
-import { testIdOf, withEngine } from "../parts";
+import { testIdOf, useControllable, withEngine } from "../parts";
 import { useOverlayPresence } from "../presence";
 import { useEngine } from "../provider";
 import { useComponentSlots } from "../styles";
@@ -30,8 +31,15 @@ export interface SnackbarProps extends SnackbarVariantProps, IndicationProps {
     readonly closeIcon?: ReactNode;
     readonly onClose?: (() => void) | undefined;
     /** Whether it shows: it grows in when this turns true and fades out when it turns false,
-     *  rendering nothing once it's gone. Without it, the surface is always shown, still. */
+     *  rendering nothing once it's gone. Without it or `defaultOpen`, the surface is always
+     *  shown, still. */
     readonly open?: boolean | undefined;
+    /** Whether it starts shown, uncontrolled: its close button, its action and Escape inside it
+     *  close it, as the web's. */
+    readonly defaultOpen?: boolean | undefined;
+    readonly onOpenChange?:
+        | ((details: ChangeDetails<"open", boolean>) => void)
+        | undefined;
     readonly testId?: TestIdOverride<SnackbarPart> | undefined;
 }
 
@@ -66,15 +74,33 @@ function SnackbarImpl(props: SnackbarProps): ReactNode {
         "snackbar",
         snackbarSelection(props),
     );
-    const presence = useOverlayPresence(props.open, "popup");
+    const managed = props.open !== undefined || props.defaultOpen !== undefined;
+    const [own, setOwn] = useControllable(
+        "Snackbar",
+        "open",
+        props.open,
+        props.defaultOpen,
+        props.onOpenChange,
+        true,
+    );
+    const open = managed ? own : undefined;
+    const presence = useOverlayPresence(open, "popup");
+    const close = () => {
+        if (managed && own) setOwn(false);
+    };
     const id = (part: SnackbarPart) =>
         testIdOf(snackbarAnatomy, part, props.testId);
     if (!presence.present) return null;
     // The engine's view where it enters and leaves, the slot's own while it's still.
-    const Root = props.open === undefined ? v.root : engine;
+    const Root = open === undefined ? v.root : engine;
+    // Escape inside it closes it, on the web.
+    const onKeyDown = (event: { nativeEvent: { key: string } }) => {
+        if (event.nativeEvent.key === "Escape") close();
+    };
     return (
         <Root.View
             {...presence.props}
+            {...({ onKeyDown } as object)}
             role="status"
             aria-live="polite"
             style={{ ...s.root, ...presence.style }}
@@ -96,7 +122,10 @@ function SnackbarImpl(props: SnackbarProps): ReactNode {
                                 ? props.action
                                 : undefined
                         }
-                        onPress={props.onAction}
+                        onPress={() => {
+                            props.onAction?.();
+                            close();
+                        }}
                     >
                         {props.action}
                     </SnackbarButton>
@@ -105,7 +134,10 @@ function SnackbarImpl(props: SnackbarProps): ReactNode {
                     snackbar={props}
                     part="close"
                     label={props.closeLabel ?? "Dismiss"}
-                    onPress={props.onClose}
+                    onPress={() => {
+                        props.onClose?.();
+                        close();
+                    }}
                 >
                     {props.closeIcon ?? "×"}
                 </SnackbarButton>

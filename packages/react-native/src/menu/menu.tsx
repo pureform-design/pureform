@@ -717,6 +717,8 @@ function MenuOverlay(props: MenuProps): ReactNode {
           label={trigger}
           onPress={given.onPress}
           interactionSource={source}
+          aria-haspopup={given["aria-haspopup"]}
+          aria-expanded={given["aria-expanded"]}
         />
       )}
       {contextTrigger === undefined ? null : (

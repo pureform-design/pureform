@@ -319,7 +319,8 @@ describe.each(ENGINES)("with $name", (engine) => {
 
         const leaving = record(menuWrapper);
         await interact(() =>
-            userEvent.click(document.querySelector('[aria-label="Close"]')!),
+            // Escape: the press outside it is out of the accessibility tree.
+            userEvent.keyboard("{Escape}"),
         );
         expect(
             document

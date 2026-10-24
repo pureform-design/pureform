@@ -4,9 +4,11 @@
 
 import { snackbarAnatomy, testIds } from "@pureform/anatomy";
 
+import { allByRole } from "../aria";
 import type { ActOptions, ComponentCase } from "../types";
 import { byTestId } from "../types";
 import { userEvent } from "../user-event";
+import { leavingOnWeb, visible } from "./overlay";
 
 const ids = testIds.snackbar;
 
@@ -18,16 +20,11 @@ const action = (host: HTMLElement) =>
 const close = (host: HTMLElement) =>
     byTestId<HTMLButtonElement>(host, ids.close);
 
-/** Whether it's open: a status region that isn't hidden, and isn't on its way out. */
-const read = (host: HTMLElement): boolean => {
-    const element = root(host);
-    if (element.getAttribute("role") !== "status") {
-        throw new Error(
-            `the snackbar's role is ${element.getAttribute("role")}`,
-        );
-    }
-    return !element.hidden && element.dataset.state !== "closed";
-};
+/** Whether it's open: its status region is drawn, and isn't on its way out. */
+const read = (host: HTMLElement): boolean =>
+    allByRole(host, "status").some(
+        (element) => visible(element) && !leavingOnWeb(element),
+    );
 
 export const snackbar: ComponentCase = {
     component: "Snackbar",

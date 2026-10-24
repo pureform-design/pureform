@@ -8,6 +8,7 @@ import {
     testIds,
 } from "@pureform/anatomy";
 
+import { optionalFlagOf } from "../aria";
 import type { ComponentName } from "../scene";
 import type { ActOptions, ComponentCase } from "../types";
 import { byTestId, itemSources } from "../types";
@@ -31,21 +32,21 @@ export const navigationCase = (
         ...host.querySelectorAll<HTMLElement>(`[data-testid="${ids.item}"]`),
     ];
     const item = (host: HTMLElement, value: string) => {
-        const found = items(host).find(
-            (element) => element.getAttribute("data-value") === value,
-        );
+        const found =
+            items(host)[ITEMS.findIndex((entry) => entry.value === value)];
         if (!found) throw new Error(`no destination with the value ${value}`);
         return found;
     };
-    /** The current destination's value, or `null`; only one may be current. */
+    /** The current destination's value (by its place), or `null`, from `aria-current`; only one
+     *  may be current. */
     const read = (host: HTMLElement): string | null => {
-        const current = items(host).filter((element) =>
-            element.hasAttribute("aria-current"),
+        const current = items(host).flatMap((element, index) =>
+            optionalFlagOf(element, "current") ? [ITEMS[index]!.value] : [],
         );
         if (current.length > 1) {
             throw new Error(`${current.length} destinations are current`);
         }
-        return current[0]?.getAttribute("data-value") ?? null;
+        return current[0] ?? null;
     };
     const click =
         (value: string) =>

@@ -9,7 +9,10 @@ import { byTestId } from "../types";
 import { overlayParts } from "./overlay";
 
 const ids = compositeTestIds.fullscreenDialog;
-const { trigger, read, click, shown, overlay } = overlayParts(ids);
+const { trigger, read, click, shown, overlay } = overlayParts(ids, {
+    role: "dialog",
+    name: "New event",
+});
 
 export const fullscreenDialog: ComponentCase = {
     component: "FullscreenDialog",

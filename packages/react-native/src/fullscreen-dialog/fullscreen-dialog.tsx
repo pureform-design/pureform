@@ -40,6 +40,8 @@ export interface FullscreenDialogTriggerProps {
     /** Opens the dialog. */
     readonly onPress: () => void;
     readonly "aria-haspopup": "dialog";
+    /** Whether it's open. */
+    readonly "aria-expanded": boolean;
 }
 
 export interface FullscreenDialogProps
@@ -175,13 +177,14 @@ function ModalFullscreenDialog(props: FullscreenDialogProps): ReactNode {
     const given: FullscreenDialogTriggerProps = {
         onPress: show,
         "aria-haspopup": "dialog",
+        "aria-expanded": open,
     };
     return (
         <>
             {trigger === undefined ? null : typeof trigger === "function" ? (
                 trigger(given)
             ) : (
-                <Button label={trigger} onPress={show} />
+                <Button label={trigger} {...given} />
             )}
             <ModalWindow
                 visible={presence.present}

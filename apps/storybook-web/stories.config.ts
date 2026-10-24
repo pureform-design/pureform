@@ -2,7 +2,38 @@
 // renderers, the shared hooks, and overrides (skips, args, schemes). Every component with an
 // anatomy and a case is drawn. See the README for adding to each.
 
+import type { RendererSkip } from "./src/renderers/compose";
 import { defineStories } from "./src/renderers/config";
+
+// React Native's narrow exceptions, by story export name (`"*"`: every story), each for what the
+// platform can't do; `parameters.pureform.skip` (see `RendererSkip`).
+const native = (stories: Readonly<Record<string, RendererSkip>>) => ({
+    pureform: { skip: { native: stories } },
+});
+
+/** The web's click bubbles from the item a key pressed to the component's root `onClick`, which
+ *  the key plays spy on. React Native has no bubbling, and its composites take no root press. */
+const NO_BUBBLING =
+    "React Native doesn't bubble a press to its composite's root, which takes no onPress: the key's click reaches the item's own handler only.";
+/** React Native Web draws a disabled field's label (and the file upload's headline) as plain
+ *  text in the disabled colors, not as a disabled control's `<label>`, so axe holds it to the
+ *  contrast rule a disabled control's text is exempt from. */
+const DISABLED_TEXT = {
+    a11y: {
+        "color-contrast":
+            "React Native Web's disabled label is plain text, which axe doesn't exempt as a disabled control's.",
+    },
+};
+const NO_FILE_INPUT =
+    "React Native has no file input to give files to: its trigger calls the app's onPick.";
+const NO_CAROUSEL_KEYS =
+    "React Native's carousel pages follow its native scroll; arrow keys between items would have to drive it.";
+const keyClicks = (...stories: readonly string[]) =>
+    native(
+        Object.fromEntries(
+            stories.map((story) => [story, { play: NO_BUBBLING }]),
+        ),
+    );
 
 export default defineStories({
     // The controls come from React's exports' props (Solid's agree; see the README).
@@ -37,13 +68,6 @@ export default defineStories({
                 module: "./src/native/scenes.ts",
                 components: ["Toast", "GridList"],
             },
-            // React Native skipped for now; needs renderer-neutral readers. The cases read the
-            // web bindings' DOM (a button's `aria-pressed`, the switch's native input, the
-            // field's `data-pf-filled`), which React Native Web doesn't draw, so its stories
-            // run without the generated plays and stay out of the story tests. They still draw
-            // in Storybook.
-            casePlays: false,
-            tests: false,
         },
     },
     schemes: ["light", "dark"],
@@ -63,7 +87,16 @@ export default defineStories({
                 },
             },
         },
-        Scrim: { hooks: ["./src/stages/scrim.ts"] },
+        Scrim: {
+            hooks: ["./src/stages/scrim.ts"],
+            // Every React Native Web view is a positioned container, so its scrim fills the
+            // story's root view inside the stage's padding, not the stage the play measures.
+            parameters: native({
+                "*": {
+                    play: "React Native's scrim fills its nearest view (every view is positioned), inside the stage's padding.",
+                },
+            }),
+        },
         // Invisible on its own: drawn in a small element, its area outlined.
         TouchTarget: { hooks: ["./src/stages/touch-target.ts"] },
         FabMenu: {
@@ -109,6 +142,42 @@ export default defineStories({
                 },
             },
         },
+        ButtonGroup: { parameters: keyClicks("KeyEnter", "KeySpace") },
+        ChipSet: { parameters: keyClicks("KeyEnter", "KeySpace") },
+        SplitButton: { parameters: keyClicks("KeyEnter", "KeySpace") },
+        List: { parameters: keyClicks("KeyEnter") },
+        Snackbar: { parameters: keyClicks("KeyEnter", "KeySpace") },
+        Stepper: { parameters: keyClicks("KeyEnter", "KeySpace") },
+        Table: { parameters: keyClicks("KeyEnter", "KeySpace") },
+        Tabs: { parameters: keyClicks("KeyEnter", "KeySpace") },
+        Toolbar: { parameters: keyClicks("KeyEnter", "KeySpace") },
+        TimePicker: {
+            parameters: native({
+                KeyEnter: { play: NO_BUBBLING },
+                // The chosen minute is white over the dial's handle, a sibling drawn under it
+                // rather than its ancestor, so axe reads the dial's surface as its background.
+                TheMinutes: {
+                    a11y: {
+                        "color-contrast":
+                            "The chosen label's background is the dial's handle, a sibling under it, which axe doesn't see.",
+                    },
+                },
+            }),
+        },
+        CodeField: { parameters: native({ Disabled: DISABLED_TEXT }) },
+        NumberField: { parameters: native({ Disabled: DISABLED_TEXT }) },
+        TagsInput: { parameters: native({ Disabled: DISABLED_TEXT }) },
+        FileUpload: {
+            parameters: native({
+                Disabled: DISABLED_TEXT,
+                // React Native has no file input: its file upload's trigger calls the app's
+                // `onPick`, so the state play has nothing to give files to.
+                Light: { play: NO_FILE_INPUT },
+                Dark: { play: NO_FILE_INPUT },
+            }),
+        },
+        Tooltip: { parameters: keyClicks("KeyEnter") },
+        RichTooltip: { parameters: keyClicks("KeyEnter") },
         Carousel: {
             // Its items are sized from the row's width once mounted (the case's `measured`): a
             // frame as wide as the component suites' page (their 1280px viewport, the reset's
@@ -116,7 +185,17 @@ export default defineStories({
             // width too (the Vitest addon's default is 1200px).
             parameters: {
                 layout: "fullscreen",
-                pureform: { width: 1280 },
+                pureform: {
+                    width: 1280,
+                    // React Native's pages follow its native scroll, and it has no arrow keys
+                    // between its items: they would have to drive that scroll.
+                    skip: {
+                        native: {
+                            Light: { play: NO_CAROUSEL_KEYS },
+                            Dark: { play: NO_CAROUSEL_KEYS },
+                        },
+                    },
+                },
                 viewport: {
                     options: {
                         suites: {

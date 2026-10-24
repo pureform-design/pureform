@@ -7,6 +7,7 @@
 
 import { testIds } from "@pureform/anatomy";
 
+import { byRole, disabledOf, roleOf } from "../aria";
 import type { ActOptions, ComponentCase } from "../types";
 import { byTestId } from "../types";
 import { userEvent } from "../user-event";
@@ -15,16 +16,23 @@ const ids = testIds.paginator;
 
 const PAGE_SIZE = 10;
 
-/** The page the range label shows, checked against the buttons: the first page has no previous
+/** A trigger's button: the part itself, or the button inside it (React Native wraps it). */
+const button = (host: HTMLElement, id: string): HTMLElement => {
+    const part = byTestId(host, id);
+    return roleOf(part) === "button" ? part : byRole(part, "button");
+};
+
+/** The page the range label's text shows, checked against the buttons (`aria-disabled` or
+ *  `disabled`): the first page has no previous
  *  button, the last no next. */
 const read = (host: HTMLElement): number => {
     const label = byTestId(host, ids.rangeLabel).textContent ?? "";
     const start = Number(/^(\d+)\s–/.exec(label)?.[1]);
     if (Number.isNaN(start)) throw new Error(`range label is "${label}"`);
     const page = Math.floor((start - 1) / PAGE_SIZE) + 1;
-    const prev = byTestId<HTMLButtonElement>(host, ids.prevTrigger);
-    if (prev.disabled !== (page === 1)) {
-        throw new Error(`previous is ${prev.disabled ? "" : "not "}disabled`);
+    const prev = disabledOf(button(host, ids.prevTrigger));
+    if (prev !== (page === 1)) {
+        throw new Error(`previous is ${prev ? "" : "not "}disabled`);
     }
     return page;
 };
@@ -59,12 +67,12 @@ export const paginator: ComponentCase = {
         to: 2,
         props: { defaultPageSize: PAGE_SIZE },
         act: async (host, options: ActOptions = {}) => {
-            await userEvent.click(byTestId(host, ids.nextTrigger), options);
+            await userEvent.click(button(host, ids.nextTrigger), options);
         },
         read,
     },
     keyboard: {
-        focusable: (host) => byTestId(host, ids.nextTrigger),
+        focusable: (host) => button(host, ids.nextTrigger),
         keys: [
             { key: "{Enter}", does: "change" },
             { key: " ", does: "change" },

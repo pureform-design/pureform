@@ -1,36 +1,41 @@
 // The rating: `value`, a radio group of stars (a `radio` each, the chosen one checked) with a
 // hidden input that submits the value, half values, a read-only display, and arrow keys that
-// move by a star, by direction. A star is filled by its `fill` part, or half by `halfFill`; the
-// stars also preview the one under the pointer, so the state is read from the hidden input.
+// move by a star, by direction. A star is filled by its `fill` part, or half by `halfFill`. The
+// state is the checked star's place among the radios: the stars preview the one under the
+// pointer (so a click moves the pointer off after), and with nothing chosen the first star is
+// checked to take focus, so ARIA reads 0 as 1 (the cases never read a 0).
 
 import { testIds } from "@pureform/anatomy";
 
+import { allByRole, checkedOf } from "../aria";
 import type { ActOptions, ComponentCase } from "../types";
 import { byTestId } from "../types";
 import { userEvent } from "../user-event";
 
 const ids = testIds.rating;
 
-const items = (host: HTMLElement) => [
-    ...host.querySelectorAll<HTMLElement>(`[data-testid="${ids.item}"]`),
-];
+/** The stars, by role. */
+const items = (host: HTMLElement) => allByRole(host, "radio");
 
 const hidden = (host: HTMLElement) =>
     host.querySelector<HTMLInputElement>("input[hidden]");
 
-/** The hidden input's value. The stars and the checked radio also preview the star under the
- *  pointer, so only the input shows the value itself. */
+/** The checked star's place, from 1. */
 const read = (host: HTMLElement): number => {
-    const input = hidden(host);
-    if (!input) throw new Error("no hidden input");
-    return Math.max(0, Number(input.value));
+    const checked = items(host).findIndex((item) => checkedOf(item) === true);
+    if (checked < 0) throw new Error("no star is checked");
+    return checked + 1;
 };
 
 const click =
     (star: number) =>
     async (host: HTMLElement, options: ActOptions = {}) => {
         await userEvent.click(items(host)[star - 1]!, options);
+        // The stars preview the one under the pointer, in ARIA too.
+        await userEvent.unhover(items(host)[star - 1]!);
     };
+
+const FROM_2 = { defaultValue: 2 };
 
 export const rating: ComponentCase = {
     component: "Rating",
@@ -59,25 +64,25 @@ export const rating: ComponentCase = {
     },
     keyboard: {
         focusable: (host) =>
-            items(host).find(
-                (item) => item.getAttribute("aria-checked") === "true",
-            ) ?? items(host)[0]!,
+            items(host).find((item) => checkedOf(item) === true) ??
+            items(host)[0]!,
         keys: [
             { key: " ", does: "nothing" },
             { key: "{Enter}", does: "nothing" },
         ],
+        // From 2, so a step down reads 1 rather than a 0 ARIA can't tell from 1.
         arrows: {
             ltr: [
-                { key: "{ArrowLeft}", does: "change", to: 0 },
-                { key: "{ArrowRight}", does: "change", to: 2 },
-                { key: "{ArrowUp}", does: "change", to: 0 },
-                { key: "{ArrowDown}", does: "change", to: 2 },
+                { key: "{ArrowLeft}", does: "change", to: 1, props: FROM_2 },
+                { key: "{ArrowRight}", does: "change", to: 3, props: FROM_2 },
+                { key: "{ArrowUp}", does: "change", to: 1, props: FROM_2 },
+                { key: "{ArrowDown}", does: "change", to: 3, props: FROM_2 },
             ],
             rtl: [
-                { key: "{ArrowLeft}", does: "change", to: 2 },
-                { key: "{ArrowRight}", does: "change", to: 0 },
-                { key: "{ArrowUp}", does: "change", to: 0 },
-                { key: "{ArrowDown}", does: "change", to: 2 },
+                { key: "{ArrowLeft}", does: "change", to: 3, props: FROM_2 },
+                { key: "{ArrowRight}", does: "change", to: 1, props: FROM_2 },
+                { key: "{ArrowUp}", does: "change", to: 1, props: FROM_2 },
+                { key: "{ArrowDown}", does: "change", to: 3, props: FROM_2 },
             ],
         },
     },

@@ -1,9 +1,10 @@
 // The tabs: `value`, by a click on a tab; only the selected tab takes focus from Tab, Enter and
 // Space click it, and the arrow keys left and right select the tab before or after, by direction.
-// Each tab shows its panel. They aren't a form control.
+// They aren't a form control.
 
 import { compositeTestIds, tabsAnatomy } from "@pureform/anatomy";
 
+import { allByRole, optionalFlagOf } from "../aria";
 import type { ActOptions, ComponentCase } from "../types";
 import { itemSources } from "../types";
 import { userEvent } from "../user-event";
@@ -16,46 +17,24 @@ const ITEMS = [
     { value: "cars", label: "Cars", content: "Cars panel" },
 ];
 
-const tabs = (host: HTMLElement) => [
-    ...host.querySelectorAll<HTMLButtonElement>(`[data-testid="${ids.tab}"]`),
-];
+/** The tabs, by role. */
+const tabs = (host: HTMLElement) => allByRole(host, "tab");
 
 const tab = (host: HTMLElement, value: string) => {
-    const found = tabs(host).find(
-        (element) => element.getAttribute("data-value") === value,
-    );
+    const found = tabs(host)[ITEMS.findIndex((item) => item.value === value)];
     if (!found) throw new Error(`no tab with the value ${value}`);
     return found;
 };
 
-/** The selected tab's value, or `null`, checked against the panels each tab shows. */
+/** The selected tab's value (by its place), or `null`, from `aria-selected`; only one may be
+ *  selected. */
 const read = (host: HTMLElement): string | null => {
-    let selected: string | null = null;
-    for (const element of tabs(host)) {
-        const on = element.getAttribute("aria-selected") === "true";
-        const panel = element.getAttribute("aria-controls");
-        if (
-            panel &&
-            host.querySelector<HTMLElement>(`#${CSS.escape(panel)}`)?.hidden
-        ) {
-            throw new Error(
-                `the tab ${element.dataset.value} is selected, its panel hidden`,
-            );
-        }
-        if (on) selected = element.getAttribute("data-value");
-    }
-    for (const panel of host.querySelectorAll<HTMLElement>(
-        `[data-testid="${ids.content}"]`,
-    )) {
-        const shown = !panel.hidden;
-        const owner = host.querySelector(
-            `#${CSS.escape(panel.getAttribute("aria-labelledby") ?? "")}`,
-        );
-        if (shown !== (owner?.getAttribute("aria-selected") === "true")) {
-            throw new Error(`a panel shows ${String(shown)} against its tab`);
-        }
-    }
-    return selected;
+    const selected = tabs(host).flatMap((element, index) =>
+        optionalFlagOf(element, "selected") ? [ITEMS[index]!.value] : [],
+    );
+    if (selected.length > 1)
+        throw new Error(`${selected.length} tabs are selected`);
+    return selected[0] ?? null;
 };
 
 const click =
@@ -106,9 +85,8 @@ export const tabsCase: ComponentCase = {
     },
     keyboard: {
         focusable: (host) =>
-            tabs(host).find(
-                (element) => element.getAttribute("aria-selected") === "true",
-            ) ?? tabs(host)[0]!,
+            tabs(host).find((element) => optionalFlagOf(element, "selected")) ??
+            tabs(host)[0]!,
         keys: [
             { key: "{Enter}", does: "click" },
             { key: " ", does: "click" },

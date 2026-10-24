@@ -63,6 +63,8 @@ const number = (value: unknown): number =>
 interface ItemProps {
     readonly item: CarouselItem<ReactNode>;
     readonly index: number;
+    /** Whether it's the current page's: `aria-current`, as the web's mask says. */
+    readonly current: boolean;
     readonly size: CarouselItemSize;
     readonly selection: Record<string, unknown>;
     readonly indication: Indication | undefined;
@@ -73,6 +75,7 @@ interface ItemProps {
 function ItemImpl({
     item,
     index,
+    current,
     size,
     selection,
     indication: given,
@@ -105,6 +108,7 @@ function ItemImpl({
                 {...(item["aria-label"] === undefined
                     ? {}
                     : { "aria-label": item["aria-label"] })}
+                {...(current ? { "aria-current": true } : {})}
                 disabled={item.disabled}
                 {...(onPress ? { onPress: () => onPress(index) } : {})}
                 style={{
@@ -273,6 +277,7 @@ function CarouselImpl(props: CarouselProps): ReactNode {
                         key={index}
                         item={item}
                         index={index}
+                        current={index === page}
                         size={sizes[index]!}
                         selection={selection}
                         indication={props.indication}

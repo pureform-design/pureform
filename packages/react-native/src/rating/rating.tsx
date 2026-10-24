@@ -70,7 +70,8 @@ function RatingImpl(props: RatingProps): ReactNode {
     const star = props.icon ?? <Glyph glyph="★" />;
     const pick = (index: number, event: GestureResponderEvent) => {
         const width = widths.current[index];
-        const x = event.nativeEvent.locationX;
+        // A key's press (React Native Web's Enter) has no position.
+        const x = event.nativeEvent?.locationX;
         const first =
             props.allowHalf && width !== undefined && x !== undefined
                 ? rtl

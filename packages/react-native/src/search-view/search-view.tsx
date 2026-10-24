@@ -8,10 +8,11 @@
 // contained view moves its icons outward as it opens, by keyframes; React Native draws no motion
 // there.
 
-import { searchViewAnatomy } from "@pureform/anatomy";
+import { compositeTestIds, searchViewAnatomy } from "@pureform/anatomy";
 import type { PartName, TestIdOverride } from "@pureform/anatomy";
 import {
     isPresent,
+    opensSearchView,
     searchViewLabel,
     searchViewMatches,
     searchViewMenuSelection,
@@ -27,7 +28,7 @@ import type {
     SearchViewVariantProps,
     AutocompleteFilter,
 } from "@pureform/binding-core";
-import { useRef, useState } from "react";
+import { useId, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 
@@ -145,12 +146,31 @@ export function SearchView(props: SearchViewProps): ReactNode {
     );
     const id = (part: Part) => testIdOf(searchViewAnatomy, part, props.testId);
     const label = searchViewLabel(props);
+    // The suggestions the view's combobox controls.
+    const listId = useId();
     const matches = searchViewMatches(props.items ?? [], query, props.filter);
     const select = (value: string) => {
         const item = matches.find((entry) => entry.value === value);
         if (item && item.label !== query) setQuery(item.label);
         props.onSelect?.({ value, item });
         if (props.closeOnSelect ?? true) close();
+    };
+    // On the web, as the web's bar: Enter, the down arrow or a typed character opens it, the
+    // character carried into the query.
+    const openOnKey = (event: {
+        readonly nativeEvent: {
+            readonly key: string;
+            readonly ctrlKey?: boolean;
+            readonly metaKey?: boolean;
+            readonly altKey?: boolean;
+        };
+        preventDefault?(): void;
+    }) => {
+        const key = event.nativeEvent;
+        if (props.disabled || open || !opensSearchView(key)) return;
+        event.preventDefault?.();
+        if (key.key.length === 1) setQuery(query + key.key);
+        show();
     };
     const given: SearchViewTriggerProps = {
         onPress: show,
@@ -159,7 +179,11 @@ export function SearchView(props: SearchViewProps): ReactNode {
     };
     return (
         <>
-            <View ref={trigger as never} collapsable={false}>
+            <View
+                ref={trigger as never}
+                collapsable={false}
+                testID={compositeTestIds.searchView.trigger}
+            >
                 {props.trigger === undefined ? (
                     <View>
                         <SearchBar
@@ -168,7 +192,8 @@ export function SearchView(props: SearchViewProps): ReactNode {
                                 ? {}
                                 : { placeholder: props.placeholder })}
                             disabled={props.disabled}
-                            inputProps={{ editable: false }}
+                            // The button over it takes focus and presses.
+                            inputProps={{ editable: false, focusable: false }}
                         />
                         <Pressable
                             role="button"
@@ -176,6 +201,7 @@ export function SearchView(props: SearchViewProps): ReactNode {
                             aria-label={label}
                             disabled={props.disabled}
                             onPress={show}
+                            {...({ onKeyDown: openOnKey } as object)}
                             style={StyleSheet.absoluteFill}
                         />
                     </View>
@@ -185,11 +211,12 @@ export function SearchView(props: SearchViewProps): ReactNode {
                     props.trigger
                 )}
             </View>
-            <ModalWindow visible={presence.present}>
+            <ModalWindow visible={presence.present} label={label}>
                 <View {...modalViewProps()} style={StyleSheet.absoluteFill}>
                     {anchored ? (
                         <Pressable
-                            aria-label="Close"
+                            accessible={false}
+                            focusable={false}
                             style={StyleSheet.absoluteFill}
                             onPress={close}
                         />
@@ -244,6 +271,7 @@ export function SearchView(props: SearchViewProps): ReactNode {
                                     role="combobox"
                                     aria-label={label}
                                     aria-expanded
+                                    aria-controls={listId}
                                     style={s.input}
                                     testID={id("input")}
                                 />
@@ -274,6 +302,7 @@ export function SearchView(props: SearchViewProps): ReactNode {
                                 testID={id("divider")}
                             />
                             <v.content.View
+                                nativeID={listId}
                                 style={s.content}
                                 testID={id("content")}
                             >

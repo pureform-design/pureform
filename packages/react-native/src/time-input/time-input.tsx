@@ -20,10 +20,13 @@ import {
     displayValue,
     parseField,
     periodOf,
+    stepTime,
+    timeKeyStep,
     withPeriod,
 } from "@pureform/machines/time-picker";
 import type { HourCycle, Time } from "@pureform/machines/time-picker";
 import { Fragment, type ReactNode, useState } from "react";
+import type { TextInputKeyPressEvent } from "react-native";
 
 import { testIdOf, withEngine } from "../parts";
 import { inFlowInline, useComponentSlots } from "../styles";
@@ -170,6 +173,18 @@ function FieldImpl(props: {
                 onBlur={() => {
                     setFocused(false);
                     setText(null);
+                }}
+                onKeyPress={(event: TextInputKeyPressEvent) => {
+                    // As the web's field: the arrows up and down and Page Up and Down step it;
+                    // the sideways arrows, Home and End stay the caret's.
+                    const step = timeKeyStep(event.nativeEvent.key, of);
+                    if (typeof step !== "number") return;
+                    const key = event.nativeEvent.key;
+                    if (key === "ArrowLeft" || key === "ArrowRight") return;
+                    (event as { preventDefault?(): void }).preventDefault?.();
+                    if (!props.editable) return;
+                    setText(null);
+                    props.onTime(stepTime(time, of, step, cycle));
                 }}
                 editable={props.editable}
                 keyboardType="number-pad"

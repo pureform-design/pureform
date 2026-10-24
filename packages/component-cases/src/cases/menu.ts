@@ -12,7 +12,10 @@ import { userEvent } from "../user-event";
 import { overlayParts } from "./overlay";
 
 const ids = compositeTestIds.menu;
-const { content, trigger, read, click, shown, overlay } = overlayParts(ids);
+const { content, trigger, read, click, shown, overlay } = overlayParts(ids, {
+    role: "menu",
+    name: "Edit",
+});
 
 const ITEMS = [
     { value: "cut", label: "Cut" },

@@ -57,10 +57,10 @@ export const chipSet: ComponentCase = {
         read,
     },
     keyboard: {
-        // A selectable set's arrow keys move focus between its chips (Zag marks the focused one
-        // with `data-focus`), and change nothing.
+        // A selectable set's arrow keys move focus between its chips (the one in the tab order
+        // takes focus), and change nothing.
         focusable: (host) =>
-            chips(host).find((chip) => chip.hasAttribute("data-focus")) ??
+            chips(host).find((one) => one.getAttribute("tabindex") !== "-1") ??
             chips(host)[0]!,
         keys: [
             { key: "{Enter}", does: "click" },

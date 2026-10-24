@@ -3,6 +3,7 @@
 
 import { switchControlAnatomy, testIds } from "@pureform/anatomy";
 
+import { byRole, checkedOf } from "../aria";
 import type { ActOptions, ComponentCase } from "../types";
 import { byTestId, ownSource } from "../types";
 import { userEvent } from "../user-event";
@@ -12,20 +13,14 @@ const ids = testIds.switchControl;
 const input = (host: HTMLElement) =>
     byTestId<HTMLInputElement>(host, ids.input);
 
-/** The native input's state, checked against the machine's `data-state` on the root. */
-const read = (host: HTMLElement): boolean => {
-    const native = input(host).checked;
-    const shown = byTestId(host, ids.root).dataset.state === "checked";
-    if (shown !== native) {
-        throw new Error(
-            `the input is ${String(native)}, the root shows ${String(shown)}`,
-        );
-    }
-    return native;
-};
+/** The element with `role="switch"`: the web's native checkbox, React Native's pressable. */
+const control = (host: HTMLElement) => byRole(host, "switch");
+
+/** Its `aria-checked` (the web's native checkbox's checked state). */
+const read = (host: HTMLElement): boolean => checkedOf(control(host)) === true;
 
 const click = async (host: HTMLElement, options: ActOptions = {}) => {
-    await userEvent.click(input(host), options);
+    await userEvent.click(control(host), options);
 };
 
 export const switchControl: ComponentCase = {
@@ -57,7 +52,7 @@ export const switchControl: ComponentCase = {
         invalid: { props: { invalid: true } },
     },
     keyboard: {
-        focusable: input,
+        focusable: control,
         keys: [
             { key: " ", does: "change" },
             { key: "{Enter}", does: "nothing" },

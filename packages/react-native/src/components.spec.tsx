@@ -346,6 +346,60 @@ describe("controlled and uncontrolled state", () => {
         expect(change).toHaveBeenCalledExactlyOnceWith({ value: "m" });
     });
 
+    it("toggles a button and a chip given defaultSelected, reported with aria-pressed", async () => {
+        const button = vi.fn();
+        const chip = vi.fn();
+        await render(
+            <View>
+                <Button
+                    label="Bold"
+                    defaultSelected={false}
+                    onSelectedChange={button}
+                    testId="b"
+                />
+                <Chip label="Vegan" defaultSelected testId="c" />
+                <Chip label="Plain" testId="p" onSelectedChange={chip} />
+            </View>,
+        );
+        expect(byTestId("b-root").getAttribute("aria-pressed")).toBe("false");
+        expect(byTestId("b-root").hasAttribute("aria-checked")).toBe(false);
+        await interact(() => userEvent.click(byTestId("b-root")));
+        expect(byTestId("b-root").getAttribute("aria-pressed")).toBe("true");
+        expect(button).toHaveBeenCalledExactlyOnceWith({ selected: true });
+        await interact(() => userEvent.click(byTestId("c-root")));
+        expect(byTestId("c-root").getAttribute("aria-pressed")).toBe("false");
+        // Not a filter chip: no pressed state, and a press flips nothing.
+        expect(byTestId("p-root").hasAttribute("aria-pressed")).toBe(false);
+        await interact(() => userEvent.click(byTestId("p-root")));
+        expect(chip).not.toHaveBeenCalled();
+    });
+
+    it("checks a checkbox, a switch and a radio with Space on the web, and not with Enter", async () => {
+        await render(
+            <View>
+                <Checkbox aria-label="Agree" />
+                <Switch aria-label="Wi-Fi" />
+                <RadioGroup
+                    items={[{ value: "s", label: "Small", testId: "s" }]}
+                />
+            </View>,
+        );
+        for (const id of [
+            "pf-checkbox-root",
+            "pf-switch-control-root",
+            "s-root",
+        ]) {
+            const root = byTestId(id);
+            await interact(async () => {
+                root.focus();
+                await userEvent.keyboard("{Enter}");
+            });
+            expect(root.getAttribute("aria-checked")).toBe("false");
+            await interact(() => userEvent.keyboard(" "));
+            expect(root.getAttribute("aria-checked")).toBe("true");
+        }
+    });
+
     it("toggles an icon button given selected, and draws its icon filled", async () => {
         const seen: boolean[] = [];
         function Probe() {
@@ -753,7 +807,10 @@ describe("lists, menus, and selects", () => {
             '[data-testid="pf-list-item-root"]',
         );
         expect(link!.getAttribute("role")).toBe("link");
-        expect(row!.getAttribute("role")).toBe("listitem");
+        // In a list, the item around each row is the listitem, as the web's `<li>`.
+        expect(row!.hasAttribute("role")).toBe(false);
+        for (const item of [link!, row!])
+            expect(item.parentElement!.getAttribute("role")).toBe("listitem");
         await userEvent.click(link!);
         expect(open).toHaveBeenCalledWith("#inbox");
         open.mockRestore();
@@ -950,7 +1007,8 @@ describe("lists, menus, and selects", () => {
             ),
         );
         await settle(50);
-        expect(shown()).toEqual(["Prague"]);
+        // It filters by what was typed only, as the web's: the chosen label shows them all.
+        expect(shown()).toEqual(["Paris", "Prague", "Rome"]);
     });
 
     it("opens a search view, filters, selects, and closes", async () => {

@@ -71,10 +71,10 @@ describe("ButtonGroup", () => {
                 ]}
             />,
         );
-        expect(byTestId("day-root").getAttribute("aria-checked")).toBe("true");
+        expect(byTestId("day-root").getAttribute("aria-pressed")).toBe("true");
         await interact(() => userEvent.click(byTestId("week-root")));
-        expect(byTestId("week-root").getAttribute("aria-checked")).toBe("true");
-        expect(byTestId("day-root").getAttribute("aria-checked")).toBe("false");
+        expect(byTestId("week-root").getAttribute("aria-pressed")).toBe("true");
+        expect(byTestId("day-root").getAttribute("aria-pressed")).toBe("false");
         expect(change).toHaveBeenCalledExactlyOnceWith({ value: ["week"] });
     });
 });
