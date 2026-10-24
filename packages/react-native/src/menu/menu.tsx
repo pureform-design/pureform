@@ -6,9 +6,10 @@
 // a press outside, the back button or Escape, or picking an item. An item with `items` opens a
 // submenu as `submenu` says: beside it (`cascade`, over the page against the item's row, as a
 // trigger's menu is against its trigger), or in its place (`drill`: the submenu's items under a
-// row that goes back, headed by the item's label); `auto` cascades when a submenu fits beside the
-// open menu in the window and the nearest `PureformContainer` (measured once it's laid out), else
-// drills.
+// row that goes back, headed by the item's label); `auto` decides as an item's submenu opens:
+// the submenu is laid out unseen at its own size and cascades when it fits beside the open menu
+// and down or up from its item, in the window and the nearest `PureformContainer` (or the one
+// `container` names), else the menu drills.
 
 import { menuAnatomy, menuOverlayAnatomy } from "@pureform/anatomy";
 import type { PartName, TestIdOverride } from "@pureform/anatomy";
@@ -31,7 +32,6 @@ import type {
     MenuItem,
     MenuSelectDetails,
     MenuSubmenu,
-    MenuSubmenuRoom,
     MenuVariantProps,
     OverlayPositioning,
 } from "@pureform/binding-core";
@@ -134,9 +134,13 @@ export interface MenuProps extends MenuVariantProps, IndicationProps {
     /** An item was picked. */
     readonly onSelect?: ((details: MenuSelectDetails) => void) | undefined;
     /** How an item with `items` opens its submenu: `cascade` beside it, `drill` in the menu's
-     *  place under a row that goes back, `auto` cascading when a submenu fits beside the
-     *  open menu in the window, else drilling. @default "auto" */
+     *  place under a row that goes back, `auto` cascading when the submenu, measured as it opens,
+     *  fits beside the open menu and down or up from its item, within the window and the
+     *  container, else drilling. @default "auto" */
     readonly submenu?: MenuSubmenu | undefined;
+    /** The `PureformContainer` (by its `name`) `auto` keeps a cascading submenu within. Default:
+     *  the nearest. */
+    readonly container?: string | undefined;
     readonly "aria-label"?: string | undefined;
     readonly testId?: TestIdOverride<Part> | undefined;
 }
@@ -159,6 +163,8 @@ interface ItemProps {
     /** An option of a listbox (the select's), saying whether it's chosen, rather than a menu
      *  item. */
     readonly option: boolean;
+    /** Laid out unseen to be measured: no role, nothing to press. */
+    readonly measuring: boolean;
 }
 
 // An item's row, measured for where a cascading submenu opens beside it.
@@ -168,6 +174,17 @@ interface Measurable {
     ): void;
     /** On the web, where the keys move focus. */
     focus?(): void;
+}
+
+// The open menu's box and what bounds a submenu beside it, in the window.
+interface SubmenuBounds {
+    readonly menu: { readonly left: number; readonly right: number };
+    readonly boundary: {
+        readonly left: number;
+        readonly right: number;
+        readonly top: number;
+        readonly bottom: number;
+    };
 }
 
 // How an item asks for its submenu: by a press, or on the web by the key that opens it (which
@@ -206,11 +223,13 @@ function MenuItemImpl(props: ItemProps): ReactNode {
             ref={row as never}
             {...indication.handlers}
             role={
-                props.option
-                    ? "option"
-                    : item.type === undefined
-                      ? "menuitem"
-                      : `menuitem${item.type}`
+                props.measuring
+                    ? undefined
+                    : props.option
+                      ? "option"
+                      : item.type === undefined
+                        ? "menuitem"
+                        : `menuitem${item.type}`
             }
             {...(props.option ? { "aria-selected": props.selected } : {})}
             {...(hasSubmenu(item) ? { "aria-haspopup": "menu" as const } : {})}
@@ -416,9 +435,11 @@ function MenuImpl(
         /** Its items alone, without the surface (container, elevation, width), for a view that
          *  draws its own, as the search view's content does. */
         readonly bare?: boolean;
-        /** The nearest container's frame, for a menu rendered through the portal host, which
-         *  doesn't carry the container's context. */
-        readonly container?: ContainerFrame;
+        /** The container's frame, for a menu rendered through the portal host, which doesn't
+         *  carry the container's context. */
+        readonly containerFrame?: ContainerFrame;
+        /** Laid out unseen to be measured (a submenu `auto` is deciding on). */
+        readonly measuring?: boolean;
         /** Measures that container when the menu opens, as it may have moved since. */
         readonly measureContainer?: MeasureContainer;
         /** A listbox of options (the select's), with this id, rather than a menu. */
@@ -427,24 +448,25 @@ function MenuImpl(
 ): ReactNode {
     const engine = useEngine();
     const rtl = useDirection() === "rtl";
-    const windowWidth = useWindowDimensions().width;
+    const window_ = useWindowDimensions();
     const auto = props.submenu === undefined || props.submenu === "auto";
-    const inherited = useContainerFrame();
-    const inheritedMeasure = useMeasureContainer();
+    const inherited = useContainerFrame(props.container);
+    const inheritedMeasure = useMeasureContainer(props.container);
     const measureContainer = props.measureContainer ?? inheritedMeasure;
     const surface = useRef<ComponentRef<typeof View>>(null);
     // The last menu box and container frame seen, which stand in when a measure at the press
     // fails; they're kept in refs, so caching them renders nothing.
     const box = useRef<{ left: number; right: number } | undefined>(undefined);
-    const cachedFrame = useRef(props.container ?? inherited);
-    cachedFrame.current = props.container ?? inherited;
+    const cachedFrame = useRef(props.containerFrame ?? inherited);
+    cachedFrame.current = props.containerFrame ?? inherited;
     const cacheBox = () =>
         surface.current?.measureInWindow((x, _y, width) => {
             if (width > 0) box.current = { left: x, right: x + width };
         });
-    // The room beside the menu as of now, within the window and the nearest container: measured
-    // when a submenu opens, so the mode is decided once and doesn't change while it's shown.
-    const roomNow = async (): Promise<MenuSubmenuRoom | undefined> => {
+    // The menu's box and what bounds a submenu as of now (the window and the container):
+    // measured when a submenu opens, so the mode is decided once and doesn't change while it's
+    // shown.
+    const boundsNow = async (): Promise<SubmenuBounds | undefined> => {
         const [menu, frame] = await Promise.all([
             new Promise<{ left: number; right: number } | undefined>((done) =>
                 surface.current
@@ -464,16 +486,32 @@ function MenuImpl(
         const within = frame ?? cachedFrame.current;
         const at = menu ?? box.current;
         return (
-            at &&
-            menuSubmenuRoomOf(at, {
-                left: Math.max(0, within?.x ?? 0),
-                right: Math.min(
-                    windowWidth,
-                    within ? within.x + within.width : windowWidth,
-                ),
-            })
+            at && {
+                menu: at,
+                boundary: {
+                    left: Math.max(0, within?.x ?? 0),
+                    right: Math.min(
+                        window_.width,
+                        within ? within.x + within.width : window_.width,
+                    ),
+                    top: Math.max(0, within?.y ?? 0),
+                    bottom: Math.min(
+                        window_.height,
+                        within ? within.y + within.height : window_.height,
+                    ),
+                },
+            }
         );
     };
+    // A submenu `auto` is deciding on: laid out unseen, at its own size, then cascaded or
+    // drilled into.
+    const [measuring, setMeasuring] = useState<{
+        readonly item: MenuItem<ReactNode>;
+        readonly row: WindowRect;
+        readonly element: Measurable;
+        readonly how: SelectHow;
+        readonly bounds: SubmenuBounds | undefined;
+    }>();
     // The submenu items drilled into, outermost first.
     const [path, setPath] = useState<readonly string[]>([]);
     // The submenu cascading beside its item's row.
@@ -534,16 +572,21 @@ function MenuImpl(
                 if (beside?.item.value === value)
                     return how === "press" ? setBeside(undefined) : undefined;
                 if (!row) return undefined;
-                const room = auto ? roomNow() : Promise.resolve(undefined);
+                const bounds = auto ? boundsNow() : Promise.resolve(undefined);
                 return row.measureInWindow((x, y, width, height) => {
-                    void room.then((room) => {
-                        if (menuSubmenuMode(props.submenu, room) === "drill") {
-                            const next = pick();
-                            if (next) return drillTo(next, value, row);
-                        }
+                    const rect = { x, y, width, height };
+                    void bounds.then((bounds) => {
+                        if (auto)
+                            return setMeasuring({
+                                item: chosen,
+                                row: rect,
+                                element: row,
+                                how,
+                                bounds,
+                            });
                         setBeside({
                             item: chosen,
-                            row: { x, y, width, height },
+                            row: rect,
                             ...(how === "key" ? { from: row } : {}),
                         });
                     });
@@ -553,9 +596,38 @@ function MenuImpl(
             props.onSelect?.({ value });
         },
     );
+    // The submenu laid out unseen: it cascades when it fits, else the menu drills into it.
+    const decide = (width: number, height: number) => {
+        const shownNow = measuring;
+        if (!shownNow) return;
+        setMeasuring(undefined);
+        const { item: chosen, row, element, how, bounds } = shownNow;
+        const room =
+            bounds &&
+            width > 0 &&
+            menuSubmenuRoomOf(bounds.menu, bounds.boundary, {
+                row: { top: row.y, bottom: row.y + row.height },
+                size: { width, height },
+            });
+        if (menuSubmenuMode(props.submenu, room || undefined) === "drill") {
+            const next = menuDrillPick(
+                props.items ?? [],
+                props.groups ?? [],
+                path,
+                chosen.value,
+            );
+            if (next) return drillTo(next, chosen.value, element);
+        }
+        setBeside({
+            item: chosen,
+            row,
+            ...(how === "key" ? { from: element } : {}),
+        });
+    };
     // Out of any submenu once it closes.
     useEffect(() => {
         if (props.open === false) {
+            setMeasuring(undefined);
             setPath([]);
             setFlip(undefined);
             setBeside(undefined);
@@ -590,6 +662,7 @@ function MenuImpl(
             onSelect={select}
             openKey={rtl ? "ArrowLeft" : "ArrowRight"}
             option={props.listbox !== undefined}
+            measuring={props.measuring ?? false}
         />
     );
     // A menu that may drill springs its height from level to level.
@@ -617,7 +690,9 @@ function MenuImpl(
                       },
                   }
                 : {})}
-            role={props.listbox ? "listbox" : "menu"}
+            {...(props.measuring
+                ? {}
+                : { role: props.listbox ? "listbox" : "menu" })}
             {...(props.listbox ? { nativeID: props.listbox.id } : {})}
             {...(props["aria-label"] === undefined
                 ? {}
@@ -666,6 +741,36 @@ function MenuImpl(
                     ))}
                 </>,
             )}
+            {measuring ? (
+                <Portal layer="menu">
+                    <View
+                        aria-hidden
+                        pointerEvents="none"
+                        style={{
+                            position: "absolute",
+                            left: 0,
+                            top: 0,
+                            opacity: 0,
+                        }}
+                        onLayout={(event: LayoutChangeEvent) =>
+                            decide(
+                                event.nativeEvent.layout.width,
+                                event.nativeEvent.layout.height,
+                            )
+                        }
+                    >
+                        <Surface
+                            {...props}
+                            items={measuring.item.items}
+                            groups={undefined}
+                            grouped={false}
+                            open={undefined}
+                            submenu="cascade"
+                            measuring
+                        />
+                    </View>
+                </Portal>
+            ) : null}
             {cascade.present && shownBeside ? (
                 // Beside its item, over the page; the menu's own layer under it takes a press
                 // outside both.
@@ -931,8 +1036,8 @@ function MenuOverlay(props: MenuProps): ReactNode {
         ...surface
     } = props;
     const engine = useEngine();
-    const container = useContainerFrame();
-    const measureContainer = useMeasureContainer();
+    const container = useContainerFrame(props.container);
+    const measureContainer = useMeasureContainer(props.container);
     const { open, source, measured, presence, close, toggle } =
         useAnchoredOverlay("Menu", {
             open: props.open,
@@ -1016,7 +1121,9 @@ function MenuOverlay(props: MenuProps): ReactNode {
                                 <Popup onClose={close}>
                                     <Surface
                                         {...surface}
-                                        {...(container ? { container } : {})}
+                                        {...(container
+                                            ? { containerFrame: container }
+                                            : {})}
                                         {...(measureContainer
                                             ? { measureContainer }
                                             : {})}

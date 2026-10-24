@@ -593,11 +593,12 @@ trigger shows their labels joined by ", " (the placeholder when none):
   `group` sit together under its label, in the order each group first appears. An item with
   `items` opens a submenu, an arrow (`›`) at its end, as `submenu` says on every renderer:
   `cascade` beside the item (React Native: over the page through the portal host, against the
-  item's row), `drill` in the menu's place under a row that goes back, and `auto` (the default)
-  cascading when a submenu (as wide as the menu) fits beside the open menu within the window and
-  the nearest `PureformContainer`'s measured frame (its position and size in the window, read with
-  `useContainerFrame()`; no container, the window alone), measured once it's laid out, else
-  drilling (it replaces the window-width rule; `MENU_CASCADE_MIN_WIDTH` is gone). A cascaded
+  item's row), `drill` in the menu's place under a row that goes back, and `auto` (the default),
+  decided as a submenu opens: the submenu is laid out unseen at its own size, and cascades when it
+  fits beside the open menu and down or up from its item within the window and the nearest
+  `PureformContainer`'s frame (measured then; `container` names another, by its `name`; no
+  container, the window alone), else the menu drills into it (it replaces the window-width rule;
+  `MENU_CASCADE_MIN_WIDTH` is gone). A cascaded
   submenu grows in and fades out as the menu does; a drill step springs the menu's height to the
   new level and moves the pressed row into the header (and the header back into its row going
   out), on the theme's default spatial spring; nothing moves under reduced motion.

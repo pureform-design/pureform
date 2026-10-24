@@ -373,6 +373,84 @@ describe.each([animated, reanimated])("the menu with $name", (engine) => {
         expect(new Set(seen).size).toBe(1);
     });
 
+    it("measures the submenu's own width and height as it opens, within the container `container` names", async () => {
+        const share = (items: { value: string; label: string }[]) => [
+            { value: "cut", label: "Cut" },
+            { value: "share", label: "Share", items },
+        ];
+        const short = share([{ value: "mail", label: "Mail" }]);
+        const wide = share([
+            {
+                value: "mail",
+                label: "Mail it to everyone on the list, with a long note attached at the end of it",
+            },
+        ]);
+        const tall = share(
+            Array.from({ length: 24 }, (_, i) => ({
+                value: `to-${i}`,
+                label: `To ${i}`,
+            })),
+        );
+        const labels = () =>
+            [...document.querySelectorAll('[role="menuitem"]')].map((item) =>
+                item.textContent?.trim(),
+            );
+        const openShare = async (node: ReactNode) => {
+            document.body.innerHTML = "";
+            await render(node, engine);
+            await settle(200);
+            await interact(() => userEvent.click(byTestId("pf-button-root")));
+            await settle(400);
+            await interact(() =>
+                userEvent.click(
+                    document.querySelectorAll<HTMLElement>(
+                        '[role="menuitem"]',
+                    )[1]!,
+                ),
+            );
+            await until(() => labels().length > 2);
+            await settle(200);
+        };
+        const drilled = () => labels()[0] === "‹Share";
+        // A narrow submenu fits in 350 px beside the menu; one at the menu's widest (its long
+        // label wraps there) doesn't.
+        await openShare(
+            <PureformContainer style={{ width: 350 }}>
+                <Menu trigger="Edit" items={short} />
+            </PureformContainer>,
+        );
+        expect(drilled()).toBe(false);
+        await openShare(
+            <PureformContainer style={{ width: 350 }}>
+                <Menu trigger="Edit" items={wide} />
+            </PureformContainer>,
+        );
+        expect(drilled()).toBe(true);
+        // A short container has no room for a tall submenu, down or up.
+        await openShare(
+            <PureformContainer style={{ width: 600, height: 200 }}>
+                <Menu trigger="Edit" items={tall} />
+            </PureformContainer>,
+        );
+        expect(drilled()).toBe(true);
+        // Within the nearest container, or the one named.
+        const nested = (container?: string) => (
+            <PureformContainer name="page" style={{ width: 600 }}>
+                <PureformContainer style={{ width: 120 }}>
+                    <Menu
+                        trigger="Edit"
+                        items={short}
+                        {...(container ? { container } : {})}
+                    />
+                </PureformContainer>
+            </PureformContainer>
+        );
+        await openShare(nested());
+        expect(drilled()).toBe(true);
+        await openShare(nested("page"));
+        expect(drilled()).toBe(false);
+    });
+
     it("opens a cascaded submenu with the arrow toward the end and backs out with the other, on the web", async () => {
         const label = () =>
             (document.activeElement as HTMLElement | null)?.textContent;
