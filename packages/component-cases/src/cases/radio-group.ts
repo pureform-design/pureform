@@ -3,6 +3,7 @@
 
 import { compositeTestIds, radioAnatomy, testIds } from "@pureform/anatomy";
 
+import { allByRole, byRole, checkedOf, nameOf } from "../aria";
 import type { ActOptions, ComponentCase } from "../types";
 import { byTestId, itemSources } from "../types";
 import { userEvent } from "../user-event";
@@ -15,38 +16,34 @@ const ITEMS = [
     { value: "l", label: "Large" },
 ];
 
-const inputs = (host: HTMLElement) => [
-    ...host.querySelectorAll<HTMLInputElement>(`[data-testid="${ids.input}"]`),
-];
+const labelOf = (value: string) =>
+    ITEMS.find((item) => item.value === value)!.label;
 
-const input = (host: HTMLElement, value: string) => {
-    const found = inputs(host).find((element) => element.value === value);
-    if (!found) throw new Error(`no radio with the value ${value}`);
-    return found;
-};
+/** The radios, by role: the web's native inputs, React Native's pressables. */
+const radios = (host: HTMLElement) => allByRole(host, "radio");
 
-/** The checked radio's value, or `null`, checked against each radio's `data-state`. */
+/** The radio with the item's label as its accessible name. */
+const radio = (host: HTMLElement, value: string) =>
+    byRole(host, "radio", { name: labelOf(value) });
+
+/** The checked radio's value, from `aria-checked` and its name, or `null`. */
 const read = (host: HTMLElement): string | null => {
-    let checked: string | null = null;
-    for (const element of inputs(host)) {
-        const shown =
-            element
-                .closest(`[data-testid="${ids.root}"]`)
-                ?.getAttribute("data-state") === "checked";
-        if (shown !== element.checked) {
-            throw new Error(
-                `the radio ${element.value} is ${String(element.checked)}, its root shows ${String(shown)}`,
-            );
-        }
-        if (element.checked) checked = element.value;
-    }
-    return checked;
+    const checked = radios(host).filter(
+        (element) => checkedOf(element) === true,
+    );
+    if (checked.length > 1)
+        throw new Error(`${checked.length} radios are checked`);
+    if (!checked[0]) return null;
+    const name = nameOf(checked[0]);
+    const item = ITEMS.find((one) => one.label === name);
+    if (!item) throw new Error(`the checked radio is named ${name}`);
+    return item.value;
 };
 
 const click =
     (value: string) =>
     async (host: HTMLElement, options: ActOptions = {}) => {
-        await userEvent.click(input(host, value), options);
+        await userEvent.click(radio(host, value), options);
     };
 
 export const radioGroup: ComponentCase = {
@@ -68,7 +65,7 @@ export const radioGroup: ComponentCase = {
     },
     state: { prop: "value", from: "m", to: "l", act: click("l"), read },
     form: {
-        control: (host) => input(host, "s"),
+        control: (host) => radio(host, "s") as HTMLInputElement,
         disabled: (host) =>
             byTestId(host, ids.root).hasAttribute("data-disabled"),
         submits: {
@@ -85,7 +82,8 @@ export const radioGroup: ComponentCase = {
     },
     keyboard: {
         focusable: (host) =>
-            inputs(host).find((element) => element.checked) ?? inputs(host)[0]!,
+            radios(host).find((element) => checkedOf(element) === true) ??
+            radios(host)[0]!,
         keys: [
             { key: " ", does: "nothing" },
             {

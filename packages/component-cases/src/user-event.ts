@@ -5,6 +5,8 @@
 /** The part of a `userEvent` the cases use. Vitest's and Testing Library's both fit. */
 export interface UserEvent {
     click(element: Element, options?: any): Promise<unknown>;
+    /** Moves the pointer off the element. */
+    unhover(element: Element, options?: any): Promise<unknown>;
     keyboard(text: string): Promise<unknown>;
     type(element: Element, text: string, options?: any): Promise<unknown>;
     selectOptions(
@@ -34,6 +36,9 @@ const user = (): UserEvent => {
 export const userEvent = {
     click: async (element: Element, options?: unknown): Promise<void> => {
         await user().click(element, options);
+    },
+    unhover: async (element: Element): Promise<void> => {
+        await user().unhover(element);
     },
     keyboard: async (text: string): Promise<void> => {
         await user().keyboard(text);

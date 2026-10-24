@@ -3,6 +3,7 @@
 
 import { checkboxAnatomy, testIds } from "@pureform/anatomy";
 
+import { byRole, checkedOf } from "../aria";
 import type { ActOptions, ComponentCase } from "../types";
 import { byTestId, ownSource } from "../types";
 import { userEvent } from "../user-event";
@@ -12,30 +13,19 @@ const ids = testIds.checkbox;
 const input = (host: HTMLElement) =>
     byTestId<HTMLInputElement>(host, ids.input);
 
+/** The element with the checkbox role: the web's native input, React Native's pressable. */
+const control = (host: HTMLElement) => byRole(host, "checkbox");
+
 type Checked = boolean | "indeterminate";
 
-const STATES: Record<string, Checked> = {
-    checked: true,
-    unchecked: false,
-    indeterminate: "indeterminate",
-};
-
-/** The native input's state, checked against the machine's `data-state` on the root. */
+/** Its `aria-checked` (the web's native input's checked or indeterminate state). */
 const read = (host: HTMLElement): Checked => {
-    const native = input(host).indeterminate
-        ? "indeterminate"
-        : input(host).checked;
-    const shown = STATES[byTestId(host, ids.root).dataset.state ?? ""];
-    if (shown !== native) {
-        throw new Error(
-            `the input is ${String(native)}, the root shows ${String(shown)}`,
-        );
-    }
-    return native;
+    const checked = checkedOf(control(host));
+    return checked === "mixed" ? "indeterminate" : checked;
 };
 
 const click = async (host: HTMLElement, options: ActOptions = {}) => {
-    await userEvent.click(input(host), options);
+    await userEvent.click(control(host), options);
 };
 
 export const checkbox: ComponentCase = {
@@ -68,7 +58,7 @@ export const checkbox: ComponentCase = {
         invalid: { props: { invalid: true } },
     },
     keyboard: {
-        focusable: input,
+        focusable: control,
         keys: [
             { key: " ", does: "change" },
             { key: "{Enter}", does: "nothing" },

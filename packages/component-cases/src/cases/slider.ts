@@ -1,9 +1,10 @@
 // The slider: `value` from 40 to 50, by a click in the middle of the root (Zag's control), which
 // submits through its hidden input, resets, and takes the arrow keys by direction on its handle.
-// The root's value token, and the handle's `aria-valuenow`, follow the value.
+// The slider role's `aria-valuenow` (the web's handle, React Native's root) follows the value.
 
 import { sliderAnatomy, testIds } from "@pureform/anatomy";
 
+import { byRole, valueNowOf } from "../aria";
 import type { ActOptions, ComponentCase } from "../types";
 import { byTestId, ownSource } from "../types";
 import { userEvent } from "../user-event";
@@ -12,20 +13,11 @@ const ids = testIds.slider;
 
 const handle = (host: HTMLElement) => byTestId(host, ids.handle);
 
-/** The handle's value, checked against the root's value token (a percentage of 0 to 100, so the
- *  value itself). */
-const read = (host: HTMLElement): number => {
-    const value = Number(handle(host).getAttribute("aria-valuenow"));
-    const root = byTestId(host, ids.root);
-    const token = [...root.style].find((name) => name.endsWith("value"));
-    const percent = token && root.style.getPropertyValue(token).trim();
-    if (percent !== String(value)) {
-        throw new Error(
-            `the handle holds ${value}, the root's value token ${String(percent)}`,
-        );
-    }
-    return value;
-};
+/** The element with the slider role: the web's handle, React Native's root. */
+const thumb = (host: HTMLElement) => byRole(host, "slider");
+
+/** Its `aria-valuenow`. */
+const read = (host: HTMLElement): number => valueNowOf(thumb(host));
 
 const click = (host: HTMLElement, options: ActOptions = {}) =>
     userEvent.click(byTestId(host, ids.root), options);
@@ -82,7 +74,7 @@ export const slider: ComponentCase = {
         invalid: { props: { invalid: true } },
     },
     keyboard: {
-        focusable: handle,
+        focusable: thumb,
         keys: [
             { key: "{Enter}", does: "nothing" },
             { key: " ", does: "nothing" },
