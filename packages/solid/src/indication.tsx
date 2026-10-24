@@ -12,7 +12,6 @@ import {
     dropsFocusIndicator,
     rippleClasses,
 } from "@pureform/binding-core/indication";
-import type { Indication } from "@pureform/binding-core/indication";
 import {
     createInteractionSource as createSource,
     IDLE_INTERACTION_STATE,
@@ -23,6 +22,7 @@ import type {
     MutableInteractionSource,
 } from "@pureform/binding-core/interaction";
 import { systemReducedMotion } from "@pureform/binding-dom";
+import type { Indication } from "@pureform/binding-dom/indication";
 import {
     DEFAULT_INDICATION,
     holdsLayer,
