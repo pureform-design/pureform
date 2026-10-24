@@ -210,6 +210,26 @@ export const menuDrillLevel = <Node>(
         : { submenu, depth, items, groups };
 };
 
+/** What picking `value` in a drilled menu at `path` does: the path it moves to (out, on the back
+ *  row; in, on an item with a submenu), or `undefined` for a leaf, which the app hears. */
+export const menuDrillPick = <Node>(
+    items: readonly MenuItem<Node>[],
+    groups: readonly MenuGroup<Node>[],
+    path: readonly string[],
+    value: string,
+): readonly string[] | undefined => {
+    const level = menuDrillLevel(items, groups, path);
+    if (value === MENU_BACK_VALUE)
+        return path.slice(0, Math.max(0, level.depth - 1));
+    const chosen = [
+        ...level.items,
+        ...level.groups.flatMap((group) => group.items),
+    ].find((entry) => entry.value === value);
+    return chosen && hasSubmenu(chosen)
+        ? [...path.slice(0, level.depth), value]
+        : undefined;
+};
+
 /** A group of the ready-made menu's items, with an optional label. */
 export interface MenuGroup<Node = unknown> {
     /** Its id among the groups, which its label's id is built from. */

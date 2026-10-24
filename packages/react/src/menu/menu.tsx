@@ -16,6 +16,7 @@ import {
     menuGrouped,
     menuItemMachineProps,
     menuDrillLevel,
+    menuDrillPick,
     menuItemProps,
     menuMachineProps,
     menuSelection,
@@ -641,15 +642,10 @@ function ReadyMade(props: MenuProps): ReactNode {
         if (props.open === false) setPath([]);
     }, [props.open]);
     const onSelect = (details: MenuSelectDetails) => {
-        if (drill && details.value === MENU_BACK_VALUE)
-            return setPath((at) => at.slice(0, -1));
-        const chosen = drill
-            ? [...items, ...groups.flatMap((group) => group.items)].find(
-                  (entry) => entry.value === details.value,
-              )
+        const next = drill
+            ? menuDrillPick(allItems, allGroups, path, details.value)
             : undefined;
-        if (chosen && hasSubmenu(chosen))
-            return setPath((at) => [...at.slice(0, level.depth), chosen.value]);
+        if (next) return setPath(next);
         rootProps.onSelect?.(details);
     };
     const onOpenChange: MenuRootProps["onOpenChange"] = (details) => {

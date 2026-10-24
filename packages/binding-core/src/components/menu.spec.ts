@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { menuDrillLevel, menuSubmenuMode, menuSubmenuRoomOf } from "./menu";
+import {
+    MENU_BACK_VALUE,
+    menuDrillLevel,
+    menuDrillPick,
+    menuSubmenuMode,
+    menuSubmenuRoomOf,
+} from "./menu";
 
 describe("menuSubmenuMode", () => {
     it("keeps cascade and drill, and makes auto cascade when a submenu fits beside the menu", () => {
@@ -71,5 +77,37 @@ describe("menuDrillLevel", () => {
         expect(two.depth).toBe(2);
         expect(two.items.map((item) => item.value)).toEqual(["print"]);
         expect(menuDrillLevel(items, groups, ["cut", "x"]).depth).toBe(0);
+    });
+});
+
+describe("menuDrillPick", () => {
+    const items = [
+        { value: "cut", label: "Cut" },
+        {
+            value: "share",
+            label: "Share",
+            items: [
+                { value: "mail", label: "Mail" },
+                {
+                    value: "more",
+                    label: "More",
+                    items: [{ value: "print", label: "Print" }],
+                },
+            ],
+        },
+    ];
+    it("drills in on a submenu's item, out on the back row, and leaves a leaf to the app", () => {
+        expect(menuDrillPick(items, [], [], "share")).toEqual(["share"]);
+        expect(menuDrillPick(items, [], ["share"], "more")).toEqual([
+            "share",
+            "more",
+        ]);
+        expect(
+            menuDrillPick(items, [], ["share", "more"], MENU_BACK_VALUE),
+        ).toEqual(["share"]);
+        expect(menuDrillPick(items, [], [], "cut")).toBeUndefined();
+        expect(menuDrillPick(items, [], ["share"], "mail")).toBeUndefined();
+        // A stale path ends where it stops opening submenus.
+        expect(menuDrillPick(items, [], ["gone"], "share")).toEqual(["share"]);
     });
 });

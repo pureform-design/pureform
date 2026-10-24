@@ -16,6 +16,7 @@ import {
     isPresent,
     MENU_BACK_VALUE,
     menuDrillLevel,
+    menuDrillPick,
     menuGrouped,
     menuSelection,
     menuSubmenuMode,
@@ -307,12 +308,17 @@ function MenuImpl(
     );
     const select = useStableCallback(
         (value: string, row: Measurable | null, how: SelectHow = "press") => {
-            if (value === MENU_BACK_VALUE)
-                return setPath(path.slice(0, level.depth - 1));
+            const next = drill
+                ? menuDrillPick(
+                      props.items ?? [],
+                      props.groups ?? [],
+                      path,
+                      value,
+                  )
+                : undefined;
+            if (next) return setPath(next);
             const chosen = shown.find((entry) => entry.value === value);
             if (chosen && hasSubmenu(chosen)) {
-                if (drill)
-                    return setPath([...path.slice(0, level.depth), value]);
                 if (beside?.item.value === value)
                     return how === "press" ? setBeside(undefined) : undefined;
                 if (!row) return undefined;

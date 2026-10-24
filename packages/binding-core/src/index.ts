@@ -386,6 +386,7 @@ export {
     menuItemProps,
     menuMachineProps,
     menuSelection,
+    menuDrillPick,
     menuSubmenuMode,
     menuSubmenuRoomOf,
     submenuPositioning,
