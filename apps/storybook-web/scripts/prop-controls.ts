@@ -17,6 +17,20 @@
 // - A JSDoc tag on the prop in binding-core overrides the type: `@control none | select |
 //   boolean | text | number | radio | color` (`color`: Storybook's color picker, for a CSS color
 //   string).
+//
+// Order, which doesn't depend on the TypeScript version (the checker orders properties and a
+// union's members its own way, and that has changed between releases):
+// - Props follow declaration order (`orderedProps`): the type's parts in the order they're
+//   written (a union's or intersection's members, an interface's `extends` list, then its own
+//   members), and within one declaration list, source position. A mapped type's (`Omit`, `Pick`)
+//   props follow its source's; a prop with no declaration (`Controllable`'s `[K in N]`) sits at
+//   its mapped type's position. Props the rule can't place (no declaration anywhere) come last,
+//   by name.
+// - A select's options follow the order the declared type writes them (`declaredValues`): a
+//   plain literal union as written, through aliases. A `VariantProp<C, "group">` takes the
+//   registry's order (the generated `ComponentRegistry` the program is given), which is the
+//   config's. With nothing written to follow (a computed type), the options are in plain code
+//   point order.
 
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -26,15 +40,18 @@ import {
     SyntaxKind,
     isIdentifier,
     isIndexedAccessTypeNode,
+    isInterfaceDeclaration,
     isLiteralTypeNode,
     isNumericLiteral,
     isParenthesizedTypeNode,
     isPropertySignatureDeclaration,
     isStringLiteral,
     isTypeAliasDeclaration,
+    isTypeLiteralNode,
     isTypeReferenceNode,
     isUnionTypeNode,
     type Node,
+    type SourceFile,
     type TypeNode,
 } from "typescript/ast";
 // TypeScript 7's JavaScript API: a native checker process the calls are made to, so every
@@ -81,7 +98,7 @@ export interface PropControl {
     readonly name: string;
     /** What its type gives, or its `@control` tag. */
     readonly control: ControlKind;
-    /** A select's values, from the resolved type (in the order the checker gives them). */
+    /** A select's values, in the order the declared type writes them (see the file's notes). */
     readonly options?: readonly string[];
     /** A select's option → value, for the options that aren't strings (`"true"` → `true`). */
     readonly mapping?: Readonly<Record<string, unknown>>;
@@ -225,14 +242,17 @@ const variantOf = (checker: Checker, property: TsSymbol) =>
 const declaredValues = (
     checker: Checker,
     node: TypeNode | undefined,
+    registry: VariantOrder | undefined,
     depth = 0,
 ): string[] => {
     if (!node || depth > 8) return [];
     if (isUnionTypeNode(node)) {
-        return node.types.flatMap((t) => declaredValues(checker, t, depth + 1));
+        return node.types.flatMap((t) =>
+            declaredValues(checker, t, registry, depth + 1),
+        );
     }
     if (isParenthesizedTypeNode(node)) {
-        return declaredValues(checker, node.type, depth + 1);
+        return declaredValues(checker, node.type, registry, depth + 1);
     }
     if (isLiteralTypeNode(node)) {
         return isStringLiteral(node.literal) || isNumericLiteral(node.literal)
@@ -240,13 +260,26 @@ const declaredValues = (
             : [];
     }
     if (isTypeReferenceNode(node)) {
+        if (
+            isIdentifier(node.typeName) &&
+            node.typeName.text === "VariantProp"
+        ) {
+            const [component, group] = node.typeArguments ?? [];
+            const name = (n: TypeNode | undefined) =>
+                n && isLiteralTypeNode(n) && isStringLiteral(n.literal)
+                    ? n.literal.text
+                    : undefined;
+            const c = name(component);
+            const g = name(group);
+            return (c && g && registry?.(c, g)?.slice()) || [];
+        }
         let symbol = checker.getSymbolAtLocation(node.typeName);
         if (symbol && symbol.flags & SymbolFlags.Alias) {
             symbol = checker.getAliasedSymbol(symbol);
         }
         const declaration = symbol?.declarations[0]?.resolve();
         return declaration && isTypeAliasDeclaration(declaration)
-            ? declaredValues(checker, declaration.type, depth + 1)
+            ? declaredValues(checker, declaration.type, registry, depth + 1)
             : [];
     }
     if (
@@ -260,22 +293,85 @@ const declaredValues = (
         return declaredValues(
             checker,
             property && typeNodeOf(property),
+            registry,
             depth + 1,
         );
     }
     return [];
 };
 
-/** `options` in the order `node` writes them; the ones it doesn't write stay first. */
+/** `options` in the order `node` writes them; the ones it doesn't write stay first. With
+ *  nothing written to follow, a select of strings is in code point order, not the checker's. */
 const inDeclaredOrder = (
     checker: Checker,
     options: readonly string[],
     node: TypeNode | undefined,
+    registry: VariantOrder | undefined,
+    mapped: boolean,
 ) => {
-    const declared = declaredValues(checker, node);
-    return declared.length
-        ? options.toSorted((a, b) => declared.indexOf(a) - declared.indexOf(b))
-        : options;
+    const declared = declaredValues(checker, node, registry);
+    if (declared.length) {
+        return options.toSorted(
+            (a, b) => declared.indexOf(a) - declared.indexOf(b),
+        );
+    }
+    return mapped ? options : options.toSorted();
+};
+
+/** A variant group's values in the config's order (`ComponentRegistry`), or `undefined`. */
+export type VariantOrder = (
+    component: string,
+    group: string,
+) => readonly string[] | undefined;
+
+const position = (checker: Checker, type: Type, property: TsSymbol) => {
+    const node =
+        property.declarations[0]?.resolve() ??
+        mappedDeclaration(type, property.name);
+    return node ? node.pos : Number.POSITIVE_INFINITY;
+};
+
+/** The names of `type`'s props in declaration order (see the file's notes). */
+export const orderedProps = (
+    checker: Checker,
+    type: Type,
+    depth = 0,
+): string[] => {
+    if (depth > 12) return [];
+    if (isUnionType(type) || isIntersectionType(type)) {
+        return (type.getTypes() ?? []).flatMap((m) =>
+            orderedProps(checker, m, depth + 1),
+        );
+    }
+    if (type.isMappedType()) {
+        const template = type.getTemplateType();
+        if (template.isIndexedAccessType()) {
+            return orderedProps(checker, template.getObjectType(), depth + 1);
+        }
+    }
+    const bases =
+        type.getBaseTypes() ??
+        (type.isTypeReference()
+            ? type.getTarget().getBaseTypes()
+            : undefined) ??
+        [];
+    const fromBases = bases.flatMap((b) => orderedProps(checker, b, depth + 1));
+    const inBases = new Set(fromBases);
+    const own = checker
+        .getPropertiesOfType(type)
+        .filter((p) => !inBases.has(p.name))
+        .map((p) => ({
+            name: p.name,
+            file: p.declarations[0]?.path ?? "",
+            at: position(checker, type, p),
+        }))
+        .sort(
+            (a, b) =>
+                a.file.localeCompare(b.file) ||
+                a.at - b.at ||
+                (a.name < b.name ? -1 : a.name > b.name ? 1 : 0),
+        );
+    return [...fromBases, ...own.map((p) => p.name)];
 };
 
 /** The control a type gives, `undefined` and `null` left out. */
@@ -327,12 +423,13 @@ export const controlOfType = (
     return { control: "none" };
 };
 
-/** Each property of `props` declared in a file `own` accepts, with its control. A union's
- *  members' properties are merged, the first member's winning. */
+/** Each property of `props` declared in a file `own` accepts, with its control, in declaration
+ *  order. A union's members' properties are merged, the first member's winning. */
 export const propControls = (
     checker: Checker,
     props: Type,
     own: (fileName: string) => boolean,
+    registry?: VariantOrder,
 ): PropControl[] => {
     const seen = new Map<string, { property: TsSymbol; member: Type }>();
     for (const member of membersOf(props)) {
@@ -342,8 +439,18 @@ export const propControls = (
             }
         }
     }
+    const order = orderedProps(checker, props);
+    const rank = (name: string) => {
+        const i = order.indexOf(name);
+        return i < 0 ? Number.POSITIVE_INFINITY : i;
+    };
+    const ranked = [...seen.values()].sort(
+        (a, b) =>
+            rank(a.property.name) - rank(b.property.name) ||
+            (a.property.name < b.property.name ? -1 : 1),
+    );
     const out: PropControl[] = [];
-    for (const { property, member } of seen.values()) {
+    for (const { property, member } of ranked) {
         const file = declarationFile(member, property);
         if (!file || !own(file)) continue;
         const variant = variantOf(checker, property);
@@ -356,6 +463,8 @@ export const propControls = (
                       checker,
                       typed.options,
                       typeNodeOf(property),
+                      registry,
+                      !!typed.mapping,
                   ),
               }
             : typed;
@@ -426,6 +535,62 @@ export const propsTypeOf = (checker: Checker, symbol: TsSymbol) => {
 export const isBindingCore = (fileName: string) =>
     /[\\/](?:binding-core|@pureform[\\/]binding-core)[\\/]/.test(fileName);
 
+/** The order each variant group's values are written in the generated registry
+ *  (`interface ComponentRegistry { button: { variants: { density: "a" | "b" } } }`), which is
+ *  the config's order. */
+export const variantOrder = (
+    files: readonly (SourceFile | undefined)[],
+): VariantOrder => {
+    const member = (node: Node, name: string): Node | undefined => {
+        const members = isTypeLiteralNode(node)
+            ? node.members
+            : isInterfaceDeclaration(node)
+              ? node.members
+              : undefined;
+        return members?.find(
+            (m) =>
+                isPropertySignatureDeclaration(m) &&
+                (isIdentifier(m.name) || isStringLiteral(m.name)) &&
+                m.name.text === name,
+        );
+    };
+    const declarations: Node[] = [];
+    const visit = (node: Node) => {
+        if (
+            isInterfaceDeclaration(node) &&
+            node.name.text === "ComponentRegistry"
+        ) {
+            declarations.push(node);
+        }
+        node.forEachChild(visit);
+    };
+    for (const file of files) file?.forEachChild(visit);
+    return (component, group) => {
+        for (const registry of declarations) {
+            const type = member(registry, component);
+            const variants =
+                type && isPropertySignatureDeclaration(type) && type.type
+                    ? member(type.type, "variants")
+                    : undefined;
+            const groups =
+                variants &&
+                isPropertySignatureDeclaration(variants) &&
+                variants.type
+                    ? member(variants.type, group)
+                    : undefined;
+            if (groups && isPropertySignatureDeclaration(groups)) {
+                const values = declaredValues(
+                    undefined as never,
+                    groups.type,
+                    undefined,
+                );
+                if (values.length) return values;
+            }
+        }
+        return undefined;
+    };
+};
+
 /** For the binding `pkg` (read from `node_modules` under `app`), a function from a component's
  *  export name and subpath (`./button`) to its controls. `extra` adds declarations to the
  *  program (the app's generated registry, so variant props resolve to their values). */
@@ -463,6 +628,9 @@ export const bindingControls = (
         baseUrl: dirname(root),
     });
     const checker = program.getProject().checker;
+    const registryOrder = variantOrder(
+        extra.map((file) => program.getSourceFile(file)),
+    );
     const controlsOf = (name: string, subpath: string): PropControl[] => {
         const entry = entryOf(subpath);
         const module = checker.getSymbolOfSourceFile(entry);
@@ -484,7 +652,7 @@ export const bindingControls = (
                 `prop controls: ${name} (${pkg}) isn't callable with props`,
             );
         }
-        return propControls(checker, props, isBindingCore);
+        return propControls(checker, props, isBindingCore, registryOrder);
     };
     /** Ends the checker process; call it when the controls are all read. */
     controlsOf.close = () => api.close();

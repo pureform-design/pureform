@@ -10,6 +10,7 @@ import {
     controlFor,
     propControls,
     propsTypeOf,
+    variantOrder,
 } from "./prop-controls.ts";
 
 const FIXTURES = join(
@@ -34,9 +35,15 @@ const controls = () => {
             .getExportsOfModule(module)
             .find((s) => s.name === "Fixture")!;
         const props = propsTypeOf(checker, fixture)!;
+        const registry = variantOrder([
+            program.getSourceFile(join(FIXTURES, "binding-core/props.ts")),
+        ]);
         return new Map(
-            propControls(checker, props, (file) =>
-                file.includes("/binding-core/"),
+            propControls(
+                checker,
+                props,
+                (file) => file.includes("/binding-core/"),
+                registry,
             ).map((p) => [p.name, p]),
         );
     } finally {
@@ -51,6 +58,53 @@ describe("prop controls", () => {
         for (const name of ["title", "hidden", "as", "children"]) {
             expect(byName.has(name), name).toBe(false);
         }
+    });
+
+    it("lists props in declaration order: bases as written, then the type's own", () => {
+        expect([...byName.keys()]).toEqual([
+            "textStyle",
+            "tone",
+            "density",
+            "selected",
+            "defaultSelected",
+            "size",
+            "disabled",
+            "placeholder",
+            "max",
+            "onChange",
+            "label",
+            "ids",
+            "items",
+            "mixed",
+            "count",
+            "scale",
+            "wide",
+            "pair",
+            "computed",
+            "flag",
+            "loose",
+            "tricky",
+            "color",
+            "id",
+            "locale",
+        ]);
+    });
+
+    it("lists a plain literal union's options as written", () => {
+        expect(byName.get("scale")?.options).toEqual(["xs", "s", "m", "l"]);
+        expect(byName.get("wide")?.options).toEqual(["a", "b", "c", "d"]);
+    });
+
+    it("lists a variant group's options in the registry's (the config's) order", () => {
+        expect(byName.get("density")).toMatchObject({
+            control: "select",
+            variant: "density",
+            options: ["inherit", "comfortable", "default", "compact", "dense"],
+        });
+    });
+
+    it("sorts the options of a computed type by code point", () => {
+        expect(byName.get("computed")?.options).toEqual(["a", "b", "c"]);
     });
 
     it("keeps a mapped type's props, declared in binding-core", () => {
