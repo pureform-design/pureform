@@ -132,6 +132,42 @@ describe("Accordion", () => {
     });
 });
 
+describe("Accordion, per item", () => {
+    it("takes a function of each item in the per-item parts' keys", async () => {
+        withRegistry(() => (
+            <Accordion
+                items={ITEMS}
+                defaultValue={["returns"]}
+                className={{
+                    item: (item) => (item.expanded ? "open" : undefined),
+                    root: "list",
+                }}
+                style={{
+                    title: (item) => ({ opacity: item.index === 2 ? 0.5 : 1 }),
+                }}
+                slotProps={{
+                    trigger: (item) => ({ title: item.item.value }),
+                }}
+                unstyled={{ indicator: (item) => item.index === 0 }}
+            />
+        ));
+        await settle();
+        expect(
+            all(a.item!).map((item) => item.classList.contains("open")),
+        ).toEqual([false, true, false]);
+        expect(all(a.root!)[0]!.classList.contains("list")).toBe(true);
+        expect(all(a.title!)[2]!.style.opacity).toBe("0.5");
+        expect(all(a.trigger!).map((trigger) => trigger.title)).toEqual([
+            "shipping",
+            "returns",
+            "gifts",
+        ]);
+        const indicators = all(a.indicator!);
+        expect(indicators[0]!.className).toBe("");
+        expect(indicators[1]!.className).toBe("accordion__indicator");
+    });
+});
+
 const FILES = [
     {
         value: "src",
@@ -270,6 +306,56 @@ describe("Tree", () => {
         await userEvent.click(row);
         await settle();
         expect(document.activeElement).toBe(branch);
+    });
+
+    it("takes a function of each node in the per-node parts' keys", async () => {
+        withRegistry(() => (
+            <Tree
+                aria-label="Files"
+                items={FILES}
+                defaultExpandedValue={["src"]}
+                defaultSelectedValue={["util"]}
+                className={{
+                    node: (node) =>
+                        node.branch
+                            ? "folder"
+                            : node.selected
+                              ? "chosen"
+                              : undefined,
+                    tree: "files",
+                }}
+                style={{
+                    text: (node) => ({ opacity: node.depth === 2 ? 0.5 : 1 }),
+                }}
+                slotProps={{
+                    group: (node) => ({
+                        title: node.expanded ? "open" : "shut",
+                    }),
+                    node: (node) => ({ title: node.node.value }),
+                }}
+                unstyled={{ indicator: (node) => node.expanded }}
+            />
+        ));
+        await settle();
+        const nodes = all(t.node!);
+        expect(nodes.map((node) => node.title)).toEqual([
+            "src",
+            "index",
+            "util",
+            "readme",
+        ]);
+        expect(nodes[0]!.classList.contains("folder")).toBe(true);
+        expect(nodes[2]!.classList.contains("chosen")).toBe(true);
+        expect(nodes[3]!.classList.contains("chosen")).toBe(false);
+        expect(all(t.tree!)[0]!.classList.contains("files")).toBe(true);
+        expect(all(t.text!).map((text) => text.style.opacity)).toEqual([
+            "1",
+            "0.5",
+            "0.5",
+            "1",
+        ]);
+        expect(all(t.group!)[0]!.title).toBe("open");
+        expect(all(t.indicator!)[0]!.className).toBe("");
     });
 
     it("passes the density and color to the registry", async () => {

@@ -4,6 +4,7 @@
 // collapsed; and the ready-made Accordion over them.
 
 import { accordionAnatomy } from "@pureform/anatomy";
+import type { PartName } from "@pureform/anatomy";
 import {
     ACCORDION_ROOT_PROPS,
     accordionItemProps,
@@ -13,6 +14,9 @@ import {
 } from "@pureform/binding-core";
 import type {
     AccordionContentProps,
+    AccordionInstances,
+    AccordionItem,
+    AccordionItemInstance,
     AccordionRootOwnProps,
     InteractionSourceProps,
 } from "@pureform/binding-core";
@@ -29,7 +33,12 @@ import { useMachine } from "../machine";
 import { collapsible } from "../motion";
 import { createPartContext } from "../part-context";
 import { plainParts, useComponent, useSlotProps } from "../parts";
-import type { ComponentScope, PlainPartProps, SlotKeyedProps } from "../parts";
+import type {
+    ComponentScope,
+    PlainPartProps,
+    SlotKeyedProps,
+    SlotPropsOf,
+} from "../parts";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
@@ -214,13 +223,27 @@ const Title = plain("title", "Title");
 /** A line under the title. */
 const Description = plain("description", "Description");
 
-/** The ready-made accordion's props: Root's, with `className`, `style`, and `slotProps` keyed by
- *  part, and the items as data. */
+/** The ready-made accordion's props: Root's, with `className`, `style`, `slotProps` and
+ *  `unstyled` keyed by part (an item's parts also by item, `AccordionItemInstance`), and the items
+ *  as data. */
 export interface AccordionProps
     extends
         Omit<AccordionRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
-        SlotKeyedProps<Anatomy>,
+        SlotKeyedProps<Anatomy, never, AccordionInstances<ReactNode>>,
         AccordionContentProps<ReactNode> {}
+
+type Slot = SlotPropsOf<PartName<Anatomy>, AccordionInstances<ReactNode>>;
+
+const ITEM_PARTS = [
+    "item",
+    "trigger",
+    "leading",
+    "text",
+    "title",
+    "description",
+    "indicator",
+    "content",
+] as const;
 
 /** The ready-made accordion: an item per entry of `items`, its header showing its leading icon,
  *  title, description and the indicator, and its content. */
@@ -232,43 +255,61 @@ function ReadyMade(props: AccordionProps): ReactNode {
         items = [],
         ...rootProps
     } = props;
-    const slot = useSlotProps(props);
+    const slot = useSlotProps<Anatomy, never, AccordionInstances<ReactNode>>(
+        props,
+    );
     return (
         <Root {...rootProps} {...(slot("root") as object)}>
-            {items.map((item) => (
-                <Item
-                    key={item.value}
-                    value={item.value}
-                    disabled={item.disabled}
-                    {...slot("item")}
-                >
-                    <Trigger
-                        interactionSource={item.interactionSource}
-                        {...slot("trigger")}
-                    >
-                        {isPresent(item.leading) ? (
-                            <Leading
-                                mirror={item.mirrorLeading}
-                                {...slot("leading")}
-                            >
-                                {item.leading}
-                            </Leading>
-                        ) : null}
-                        <Text {...slot("text")}>
-                            <Title {...slot("title")}>{item.title}</Title>
-                            {isPresent(item.description) ? (
-                                <Description {...slot("description")}>
-                                    {item.description}
-                                </Description>
-                            ) : null}
-                        </Text>
-                        <Indicator {...slot("indicator")} />
-                    </Trigger>
-                    <Content {...slot("content")}>{item.content}</Content>
-                </Item>
-            ))}
+            <Items items={items} slotOf={slot} />
         </Root>
     );
+}
+
+// The ready-made's items, under Root, which knows which are expanded.
+function Items(props: {
+    readonly items: readonly AccordionItem<ReactNode>[];
+    readonly slotOf: Slot;
+}): ReactNode {
+    const { api } = context.use("Accordion");
+    const slot = props.slotOf;
+    const each = ITEM_PARTS.some((part) => slot.each(part));
+    return props.items.map((item, index) => {
+        const entry: AccordionItemInstance<ReactNode> | undefined = each
+            ? { index, item, expanded: api.value.includes(item.value) }
+            : undefined;
+        return (
+            <Item
+                key={item.value}
+                value={item.value}
+                disabled={item.disabled}
+                {...slot("item", entry)}
+            >
+                <Trigger
+                    interactionSource={item.interactionSource}
+                    {...slot("trigger", entry)}
+                >
+                    {isPresent(item.leading) ? (
+                        <Leading
+                            mirror={item.mirrorLeading}
+                            {...slot("leading", entry)}
+                        >
+                            {item.leading}
+                        </Leading>
+                    ) : null}
+                    <Text {...slot("text", entry)}>
+                        <Title {...slot("title", entry)}>{item.title}</Title>
+                        {isPresent(item.description) ? (
+                            <Description {...slot("description", entry)}>
+                                {item.description}
+                            </Description>
+                        ) : null}
+                    </Text>
+                    <Indicator {...slot("indicator", entry)} />
+                </Trigger>
+                <Content {...slot("content", entry)}>{item.content}</Content>
+            </Item>
+        );
+    });
 }
 
 /** Expansion panels, as Angular Material calls them, drawn as Material list rows. Use it

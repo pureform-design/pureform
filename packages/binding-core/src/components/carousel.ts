@@ -17,7 +17,7 @@ import type {
 import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Controllable } from "../controllable";
-import type { Unstyled } from "../parts";
+import type { ItemInstance, Unstyled } from "../parts";
 import type { IndicationProps, InteractionSourceProps } from "./indication";
 import type { VariantProp } from "./variants";
 
@@ -294,3 +294,16 @@ export const carouselInitialStyle = (
     layout: unknown,
     itemWidth: number = CAROUSEL_SIZES.itemWidth,
 ): string | undefined => (layout === "fullScreen" ? "100%" : `${itemWidth}px`);
+
+/** What a ready-made carousel's item is, for a function of the item in its `item`, `mask` and
+ *  `content` keys: its `index` and the user's `item`. */
+export type CarouselItemInstance<Node = unknown> = ItemInstance<
+    CarouselItem<Node>
+>;
+
+/** The ready-made carousel's repeated parts, each to its item. */
+export interface CarouselInstances<Node = unknown> {
+    readonly item: CarouselItemInstance<Node>;
+    readonly mask: CarouselItemInstance<Node>;
+    readonly content: CarouselItemInstance<Node>;
+}

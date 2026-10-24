@@ -146,4 +146,45 @@ describe("table", () => {
         ).not.toBe(computed("pf-data-table-row").backgroundColor);
         expect(computed("pf-data-table-row").minHeight).toBe("44px");
     });
+
+    it("takes a function of each row, cell and column in style and slotProps", async () => {
+        await render(
+            <Table
+                columns={COLUMNS}
+                rows={ELEMENTS}
+                selectionMode="multiple"
+                defaultSelection={["he"]}
+                style={{
+                    row: (row) => (row.selected ? { opacity: 0.5 } : undefined),
+                    sortLabel: (header) => ({
+                        opacity: header.columnIndex === 0 ? 0.25 : 1,
+                    }),
+                }}
+                slotProps={{
+                    cell: (cell) => ({
+                        "aria-label": `${cell.rowIndex}-${cell.column}`,
+                    }),
+                    headerCell: (header) => ({
+                        "aria-label": header.column,
+                    }),
+                    footerCell: (footer) => ({
+                        "aria-label": String(footer.columnIndex),
+                    }),
+                }}
+            />,
+        );
+        expect(
+            all("pf-data-table-row").map(
+                (row) => getComputedStyle(row).opacity,
+            ),
+        ).toEqual(["1", "0.5", "1"]);
+        expect(
+            getComputedStyle(all("pf-data-table-sort-label")[0]!).opacity,
+        ).toBe("0.25");
+        const hints = (id: string) =>
+            all(id).map((each) => each.getAttribute("aria-label"));
+        expect(hints("pf-data-table-cell")[3]).toBe("1-weight");
+        expect(hints("pf-data-table-header-cell")).toEqual(["name", "weight"]);
+        expect(hints("pf-data-table-footer-cell")).toEqual(["-1", "0", "1"]);
+    });
 });

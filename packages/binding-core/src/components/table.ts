@@ -185,3 +185,49 @@ export const tableRowPart = (
     striped: boolean | undefined,
 ): "row" | "alternateRow" =>
     striped && index % 2 === 1 ? "alternateRow" : "row";
+
+/** What a ready-made table's body row is, for a function of the row in its `row` and
+ *  `alternateRow` keys: `className={{ row: (each) => (each.selected ? "chosen" : undefined) }}`. */
+export interface TableRowInstance<Row> {
+    /** The row's 0-based index in the order shown (the sort's). */
+    readonly index: number;
+    /** The row's data. */
+    readonly row: Row;
+    /** The row's value, its key and what the selection holds. */
+    readonly value: string;
+    /** Whether the selection holds it. */
+    readonly selected: boolean;
+}
+
+/** What a ready-made table's body cell is, for a function of the cell in its `cell` key. */
+export interface TableCellInstance<Row> {
+    /** Its row's 0-based index in the order shown. */
+    readonly rowIndex: number;
+    /** Its row's data. */
+    readonly row: Row;
+    /** Its column's id. */
+    readonly column: string;
+    /** Its column's 0-based index. */
+    readonly columnIndex: number;
+}
+
+/** What a ready-made table's header or footer cell is, for a function of the cell in its
+ *  `headerCell`, `footerCell`, `sortHeader`, `sortLabel` and `sortIndicator` keys. */
+export interface TableColumnInstance {
+    /** Its column's id (`""` for the selection column's footer cell). */
+    readonly column: string;
+    /** Its column's 0-based index (-1 for the selection column's footer cell). */
+    readonly columnIndex: number;
+}
+
+/** The ready-made table's repeated parts, each to its copy. */
+export interface TableInstances<Row> {
+    readonly row: TableRowInstance<Row>;
+    readonly alternateRow: TableRowInstance<Row>;
+    readonly cell: TableCellInstance<Row>;
+    readonly headerCell: TableColumnInstance;
+    readonly footerCell: TableColumnInstance;
+    readonly sortHeader: TableColumnInstance;
+    readonly sortLabel: TableColumnInstance;
+    readonly sortIndicator: TableColumnInstance;
+}

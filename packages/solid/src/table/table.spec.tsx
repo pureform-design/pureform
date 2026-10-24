@@ -147,6 +147,62 @@ describe("Table", () => {
         expect(marked).toEqual([false, true]);
     });
 
+    it("takes a function of each row, cell and column in the repeated parts' keys", async () => {
+        withRegistry(() => (
+            <Table
+                columns={COLUMNS}
+                rows={ELEMENTS}
+                defaultSelection={["he"]}
+                selectionMode="multiple"
+                class={{
+                    row: (row) => (row.selected ? "chosen" : undefined),
+                    cell: (cell) => `c${cell.rowIndex}-${cell.columnIndex}`,
+                    sortLabel: (header) => `label-${header.column}`,
+                    body: "rows",
+                }}
+                style={{
+                    sortIndicator: (header) => ({
+                        opacity: header.columnIndex === 0 ? 0.5 : 1,
+                    }),
+                }}
+                slotProps={{
+                    row: (row) => ({ title: `${row.index}:${row.value}` }),
+                    headerCell: (header) => ({ title: header.column }),
+                    footerCell: (footer) => ({
+                        title: String(footer.columnIndex),
+                    }),
+                }}
+                unstyled={{ cell: (cell) => cell.row.id === "h" }}
+            />
+        ));
+        await settle();
+        const rows = all(ids.row);
+        expect(rows.map((row) => row.classList.contains("chosen"))).toEqual([
+            false,
+            true,
+            false,
+        ]);
+        expect(rows[2]!.title).toBe("2:li");
+        expect(byTestId(ids.body).classList.contains("rows")).toBe(true);
+        const cells = all(ids.cell);
+        expect(cells[0]!.className).toBe("c0-0");
+        expect(cells[3]!.classList.contains("c1-1")).toBe(true);
+        expect(cells[3]!.classList.length).toBeGreaterThan(1);
+        expect(all(ids.headerCell).map((cell) => cell.title)).toEqual([
+            "name",
+            "weight",
+        ]);
+        expect(all(ids.footerCell).map((cell) => cell.title)).toEqual([
+            "-1",
+            "0",
+            "1",
+        ]);
+        expect(all(ids.sortLabel)[1]!.classList.contains("label-weight")).toBe(
+            true,
+        );
+        expect(all(ids.sortIndicator)[0]!.style.opacity).toBe("0.5");
+    });
+
     it("composes from its parts", async () => {
         withRegistry(() => (
             <Table.Root defaultSort={{ column: "a", direction: "descending" }}>

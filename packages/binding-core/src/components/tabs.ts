@@ -12,7 +12,7 @@ import type {
 import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Controllable } from "../controllable";
-import type { Unstyled } from "../parts";
+import type { ItemInstance, Unstyled } from "../parts";
 import { isPresent, withoutControls } from "./content";
 import type { IndicationProps, InteractionSourceProps } from "./indication";
 import { PAGE_TRANSITION_PROPS } from "./page-transition";
@@ -196,3 +196,21 @@ export const tabsHaveIcons = (
 export const tabsHavePanels = (
     items: readonly Pick<TabsItem, "content">[],
 ): boolean => items.some((item) => isPresent(item.content));
+
+/** What a ready-made tabs' tab is, for a function of the tab in its per-tab keys: its `index`
+ *  and `item`, and whether it's `selected`. A panel (`content`) is its tab's. */
+export interface TabsTabInstance<Node = unknown> extends ItemInstance<
+    TabsItem<Node>
+> {
+    readonly selected: boolean;
+}
+
+/** The ready-made tabs' repeated parts, each to its tab. */
+export interface TabsInstances<Node = unknown> {
+    readonly tab: TabsTabInstance<Node>;
+    readonly tabContent: TabsTabInstance<Node>;
+    readonly icon: TabsTabInstance<Node>;
+    readonly label: TabsTabInstance<Node>;
+    readonly indicator: TabsTabInstance<Node>;
+    readonly content: TabsTabInstance<Node>;
+}

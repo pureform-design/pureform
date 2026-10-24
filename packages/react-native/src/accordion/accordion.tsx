@@ -8,7 +8,9 @@ import type { TestIdOverride } from "@pureform/anatomy";
 import { accordionSelection, isPresent } from "@pureform/binding-core";
 import type {
     AccordionBehaviorProps,
+    AccordionInstances,
     AccordionItem,
+    AccordionItemInstance,
     AccordionPart,
     AccordionVariantProps,
     IndicationProps,
@@ -38,12 +40,14 @@ export interface AccordionHosts {
     readonly root: "View";
 }
 
+/** The accordion's props, with `style` and `slotProps` keyed by part (an item's parts also by
+ *  item, `AccordionItemInstance`). */
 export interface AccordionProps
     extends
         AccordionVariantProps,
         Omit<AccordionBehaviorProps, "id" | "ids">,
         IndicationProps,
-        NativeSlotProps<AccordionHosts> {
+        NativeSlotProps<AccordionHosts, AccordionInstances<ReactNode>> {
     readonly items: readonly AccordionItem<ReactNode>[];
     readonly testId?: TestIdOverride<AccordionPart> | undefined;
 }
@@ -52,6 +56,7 @@ interface ItemProps {
     /** The accordion's per-part props. */
     readonly slot: PartSlots;
     readonly item: AccordionItem<ReactNode>;
+    readonly index: number;
     readonly selection: AccordionVariantProps;
     readonly expanded: boolean;
     readonly disabled: boolean;
@@ -59,6 +64,33 @@ interface ItemProps {
     readonly indication: AccordionProps["indication"];
     readonly testId: AccordionProps["testId"];
 }
+
+const ITEM_PARTS = [
+    "item",
+    "trigger",
+    "leading",
+    "text",
+    "title",
+    "description",
+    "indicator",
+    "content",
+] as const;
+
+// The accordion's per-part props for one item: each part's function of the copy gets the item.
+const forItem = (
+    slot: PartSlots,
+    instance: () => AccordionItemInstance<ReactNode>,
+): PartSlots => {
+    if (!ITEM_PARTS.some((part) => slot.each(part))) return slot;
+    const each = instance();
+    return {
+        props: (part) => slot.props(part, each),
+        style: (part, own) => slot.style(part, own, each),
+        on: (part, name, own) => slot.on(part, name, own, each),
+        with: (part, own) => slot.with(part, own, each),
+        each: slot.each,
+    };
+};
 
 function Item(props: ItemProps): ReactNode {
     const { item } = props;
@@ -79,7 +111,11 @@ function Item(props: ItemProps): ReactNode {
     const { styles: s, selected, views: v } = slots;
     const id = (part: AccordionPart) =>
         testIdOf(accordionAnatomy, part, props.testId);
-    const slot = props.slot;
+    const slot = forItem(props.slot, () => ({
+        index: props.index,
+        item,
+        expanded: props.expanded,
+    }));
     const icon = iconParts(slots, id, slot);
     return (
         <v.item.View
@@ -173,11 +209,12 @@ function AccordionImpl(props: AccordionProps): ReactNode {
             style={slot.style("root", s.root)}
             testID={testIdOf(accordionAnatomy, "root", props.testId)}
         >
-            {props.items.map((item) => (
+            {props.items.map((item, index) => (
                 <Item
                     slot={slot}
                     key={item.value}
                     item={item}
+                    index={index}
                     selection={props}
                     expanded={value.includes(item.value)}
                     disabled={!!(item.disabled || props.disabled)}

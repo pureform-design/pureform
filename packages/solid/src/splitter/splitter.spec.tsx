@@ -84,6 +84,22 @@ describe("Splitter", () => {
         );
     });
 
+    it("gives the handle's pill its keyed props", async () => {
+        withRegistry(() => (
+            <Splitter
+                panes={panes}
+                class={{ resizeTriggerIndicator: "grip" }}
+                style={{ resizeTriggerIndicator: { opacity: 0.5 } }}
+                slotProps={{ resizeTriggerIndicator: { title: "pill" } }}
+            />
+        ));
+        await settle();
+        const pill = all(testIds.splitter.resizeTriggerIndicator)[0]!;
+        expect(pill.classList.contains("grip")).toBe(true);
+        expect(pill.style.opacity).toBe("0.5");
+        expect(pill.title).toBe("pill");
+    });
+
     it("resizes by the arrow keys without snapping", async () => {
         const onSizeChange = vi.fn();
         withRegistry(() => (

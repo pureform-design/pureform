@@ -144,4 +144,37 @@ describe("Carousel", () => {
             document.body.innerHTML = "";
         }
     });
+
+    it("takes a function of each item in the per-item parts' keys", async () => {
+        mount(
+            <PureformProvider registry={displayRegistry()}>
+                <Carousel
+                    aria-label="Trips"
+                    items={ITEMS.slice(0, 3)}
+                    className={{
+                        item: (item) => `at-${item.index}`,
+                        itemGroup: "row",
+                    }}
+                    style={{
+                        content: (item) => ({
+                            opacity: item.index === 1 ? 0.5 : 1,
+                        }),
+                    }}
+                    slotProps={{
+                        itemGroup: ROW,
+                        mask: (item) => ({ title: item.item["aria-label"] }),
+                    }}
+                    unstyled={{ item: (item) => item.index === 0 }}
+                />
+            </PureformProvider>,
+        );
+        await settle();
+        const items = all(ids.item);
+        expect(items[0]!.className).toBe("at-0");
+        expect(items[2]!.classList.contains("at-2")).toBe(true);
+        expect(items[2]!.classList.length).toBeGreaterThan(1);
+        expect(byTestId(ids.itemGroup).classList.contains("row")).toBe(true);
+        expect(all(ids.mask)[1]!.title).toBe("Item 2");
+        expect(all(ids.content)[1]!.style.opacity).toBe("0.5");
+    });
 });

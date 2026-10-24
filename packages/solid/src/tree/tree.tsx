@@ -19,7 +19,9 @@ import {
 import type {
     InteractionSourceProps,
     TreeContentProps,
+    TreeInstances,
     TreeNode,
+    TreeNodeInstance,
     TreeRootOwnProps,
 } from "@pureform/binding-core";
 import * as treeView from "@pureform/machines/tree-view";
@@ -300,15 +302,15 @@ const leading = iconParts<Anatomy, TreeIconProps>(
 /** An icon before the text, hidden from assistive technology. */
 const Leading = leading.Part;
 
-/** The ready-made tree's props: Root's, with `class`, `style`, and `slotProps` keyed by part, the
- *  nodes as data, and a label. */
+/** The ready-made tree's props: Root's, with `class`, `style`, `slotProps` and `unstyled` keyed by
+ *  part (a node's parts also by node, `TreeNodeInstance`), the nodes as data, and a label. */
 export interface TreeProps
     extends
         Omit<
             TreeRootProps,
             keyof SlotKeyedProps<Anatomy> | "children" | "items"
         >,
-        SlotKeyedProps<Anatomy>,
+        SlotKeyedProps<Anatomy, never, TreeInstances<JSX.Element>>,
         TreeContentProps<JSX.Element> {}
 
 const READY_MADE_PROPS = [
@@ -324,7 +326,9 @@ const READY_MADE_PROPS = [
  *  children. */
 function ReadyMade(props: TreeProps): JSX.Element {
     const items = createMemo(() => props.items ?? []);
-    const slots = createSlotProps(props);
+    const slots = createSlotProps<Anatomy, never, TreeInstances<JSX.Element>>(
+        props,
+    );
     const own = omit(props, ...READY_MADE_PROPS) as Omit<
         TreeRootProps,
         "items"
@@ -333,14 +337,11 @@ function ReadyMade(props: TreeProps): JSX.Element {
     // Views, so every node reads the same ones.
     const label = slots("label");
     const tree = slots("tree");
-    const branch = slots("branch");
-    const node = slots("node");
-    const leadingSlot = slots("leading");
-    const text = slots("text");
-    const indicator = slots("indicator");
-    const group = slots("group");
 
-    const RowContent = (rowProps: { readonly node: Node }) => {
+    const RowContent = (rowProps: {
+        readonly node: Node;
+        readonly at: Accessor<TreeNodeInstance<JSX.Element>>;
+    }) => {
         const LeadingPart = optionalPart(
             untrack(() => rowProps.node),
             "leading",
@@ -351,11 +352,13 @@ function ReadyMade(props: TreeProps): JSX.Element {
             <>
                 <LeadingPart
                     mirror={rowProps.node.mirrorLeading}
-                    {...leadingSlot}
+                    {...slots("leading", rowProps.at)}
                 >
                     {rowProps.node.leading}
                 </LeadingPart>
-                <Text {...text}>{rowProps.node.label}</Text>
+                <Text {...slots("text", rowProps.at)}>
+                    {rowProps.node.label}
+                </Text>
             </>
         );
     };
@@ -363,48 +366,69 @@ function ReadyMade(props: TreeProps): JSX.Element {
     const Nodes = (nodesProps: {
         readonly nodes: readonly Node[];
         readonly path: readonly number[];
-    }): JSX.Element => (
-        <For each={nodesProps.nodes} keyed={(entry: Node) => entry.value}>
-            {(entry, index) => {
-                const indexPath = () => [...nodesProps.path, index()];
-                return (
-                    <Show
-                        when={isTreeBranch(entry())}
-                        fallback={
-                            <Item
+    }): JSX.Element => {
+        const { api } = context.use("Tree");
+        return (
+            <For each={nodesProps.nodes} keyed={(entry: Node) => entry.value}>
+                {(entry, index) => {
+                    const indexPath = () => [...nodesProps.path, index()];
+                    const at = (): TreeNodeInstance<JSX.Element> => {
+                        const branch = isTreeBranch(entry());
+                        return {
+                            node: entry(),
+                            depth: nodesProps.path.length + 1,
+                            branch,
+                            expanded:
+                                branch &&
+                                api().expandedValue.includes(entry().value),
+                            selected: api().selectedValue.includes(
+                                entry().value,
+                            ),
+                        };
+                    };
+                    return (
+                        <Show
+                            when={isTreeBranch(entry())}
+                            fallback={
+                                <Item
+                                    node={entry()}
+                                    indexPath={indexPath()}
+                                    interactionSource={
+                                        entry().interactionSource
+                                    }
+                                    {...slots("node", at)}
+                                >
+                                    <RowContent node={entry()} at={at} />
+                                </Item>
+                            }
+                        >
+                            <Branch
                                 node={entry()}
                                 indexPath={indexPath()}
-                                interactionSource={entry().interactionSource}
-                                {...node}
+                                {...slots("branch", at)}
                             >
-                                <RowContent node={entry()} />
-                            </Item>
-                        }
-                    >
-                        <Branch
-                            node={entry()}
-                            indexPath={indexPath()}
-                            {...branch}
-                        >
-                            <BranchControl
-                                interactionSource={entry().interactionSource}
-                                {...node}
-                            >
-                                <RowContent node={entry()} />
-                                <Indicator {...indicator} />
-                            </BranchControl>
-                            <Group {...group}>
-                                <Nodes
-                                    nodes={entry().children ?? []}
-                                    path={indexPath()}
-                                />
-                            </Group>
-                        </Branch>
-                    </Show>
-                );
-            }}
-        </For>
-    );
+                                <BranchControl
+                                    interactionSource={
+                                        entry().interactionSource
+                                    }
+                                    {...slots("node", at)}
+                                >
+                                    <RowContent node={entry()} at={at} />
+                                    <Indicator {...slots("indicator", at)} />
+                                </BranchControl>
+                                <Group {...slots("group", at)}>
+                                    <Nodes
+                                        nodes={entry().children ?? []}
+                                        path={indexPath()}
+                                    />
+                                </Group>
+                            </Branch>
+                        </Show>
+                    );
+                }}
+            </For>
+        );
+    };
 
     return (
         <Root {...own} items={items()} {...root}>

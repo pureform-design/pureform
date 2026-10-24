@@ -5,6 +5,7 @@
 // list scrolls it into view.
 
 import { tabsCompositeAnatomy } from "@pureform/anatomy";
+import type { PartName } from "@pureform/anatomy";
 import {
     isPresent,
     TABS_ROOT_PROPS,
@@ -19,7 +20,10 @@ import {
 import type {
     InteractionSourceProps,
     TabsContentProps,
+    TabsInstances,
+    TabsItem,
     TabsRootOwnProps,
+    TabsTabInstance,
 } from "@pureform/binding-core";
 import { revealInRow, slideIndicator } from "@pureform/binding-dom";
 import * as tabs from "@pureform/machines/tabs";
@@ -37,14 +41,16 @@ import {
 
 import { useControllable } from "../controllable";
 import { FadeThrough } from "../fade-through/fade-through";
+import type { FadeThroughProps } from "../fade-through/fade-through";
 import { HorizontalSharedAxis } from "../horizontal-shared-axis/horizontal-shared-axis";
+import type { HorizontalSharedAxisProps } from "../horizontal-shared-axis/horizontal-shared-axis";
 import { useItemInteractionSources } from "../interaction";
 import type { ItemInteractionSources } from "../interaction";
 import { useMachine } from "../machine";
 import { useTransitionPage } from "../page-transition";
 import { createPartContext } from "../part-context";
 import { useComponent, useSlotProps } from "../parts";
-import type { ComponentScope, SlotKeyedProps } from "../parts";
+import type { ComponentScope, SlotKeyedProps, SlotPropsOf } from "../parts";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
@@ -283,13 +289,34 @@ function Content({
     });
 }
 
-/** The ready-made tabs' props: Root's, with `className`, `style`, and `slotProps` keyed by part,
- *  the tabs as data, and the tab list's name (`aria-label`, `aria-labelledby`). */
+/** The ready-made tabs' props: Root's, with `className`, `style`, `slotProps` and `unstyled`
+ *  keyed by part (a tab's parts and its panel also by tab, `TabsTabInstance`), the tabs as data,
+ *  and the tab list's name (`aria-label`, `aria-labelledby`). */
 export interface TabsProps
     extends
         Omit<TabsRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
-        SlotKeyedProps<Anatomy>,
-        TabsContentProps<ReactNode> {}
+        SlotKeyedProps<Anatomy, never, TabsInstances<ReactNode>>,
+        TabsContentProps<ReactNode> {
+    /** The fade through's own props, for `transition="fadeThrough"`. */
+    readonly fadeThroughProps?:
+        | Omit<FadeThroughProps, "value" | "children">
+        | undefined;
+    /** The shared axis's own props, for `transition="sharedAxis"`. */
+    readonly horizontalSharedAxisProps?:
+        | Omit<HorizontalSharedAxisProps, "index" | "scrim" | "children">
+        | undefined;
+}
+
+type Slot = SlotPropsOf<PartName<Anatomy>, TabsInstances<ReactNode>>;
+
+const TAB_PARTS = [
+    "tab",
+    "tabContent",
+    "icon",
+    "label",
+    "indicator",
+    "content",
+] as const;
 
 /** The ready-made tabs: the tab list with a tab per item, and a panel per item with `content`.
  *  Without a value, the first enabled tab starts selected. */
@@ -299,16 +326,17 @@ function ReadyMade(props: TabsProps): ReactNode {
         style: _style,
         slotProps: _slotProps,
         items = [],
-        "aria-label": label,
-        "aria-labelledby": labelledBy,
-        transition,
-        transitionScrim,
+        "aria-label": _label,
+        "aria-labelledby": _labelledBy,
+        transition: _transition,
+        transitionScrim: _transitionScrim,
+        fadeThroughProps: _fadeThroughProps,
+        horizontalSharedAxisProps: _horizontalSharedAxisProps,
         ...rootProps
     } = props;
-    const slot = useSlotProps(props);
+    const slot = useSlotProps<Anatomy, never, TabsInstances<ReactNode>>(props);
     // Read once, as the default is.
     const [defaultValue] = useState(() => tabsDefaultValue(props, items));
-    const panels = tabsHavePanels(items);
     return (
         <Root
             {...rootProps}
@@ -316,79 +344,121 @@ function ReadyMade(props: TabsProps): ReactNode {
             icon={props.icon ?? tabsHaveIcons(items)}
             {...(slot("root") as object)}
         >
+            <ReadyMadeTabs {...props} items={items} slotOf={slot} />
+        </Root>
+    );
+}
+
+// The ready-made's list and panels, under Root, which knows the selected tab.
+function ReadyMadeTabs(
+    props: TabsProps & {
+        readonly items: readonly TabsItem<ReactNode>[];
+        readonly slotOf: Slot;
+    },
+): ReactNode {
+    const { api } = context.use("Tabs");
+    const { items, slotOf: slot, transition } = props;
+    const panels = tabsHavePanels(items);
+    const each = TAB_PARTS.some((part) => slot.each(part));
+    const tabs = items.map(
+        (item, index): TabsTabInstance<ReactNode> | undefined =>
+            each
+                ? { index, item, selected: item.value === api.value }
+                : undefined,
+    );
+    return (
+        <>
             <List
-                aria-label={label}
-                aria-labelledby={labelledBy}
+                aria-label={props["aria-label"]}
+                aria-labelledby={props["aria-labelledby"]}
                 {...slot("list")}
             >
-                {items.map((item) => (
-                    <Tab
-                        key={item.value}
-                        value={item.value}
-                        disabled={item.disabled}
-                        interactionSource={item.interactionSource}
-                        aria-label={item["aria-label"]}
-                        controls={panels}
-                        tabContentProps={slot("tabContent")}
-                        {...slot("tab")}
-                    >
-                        {isPresent(item.icon) ? (
-                            <Icon mirror={item.mirrorIcon} {...slot("icon")}>
-                                {item.icon}
-                            </Icon>
-                        ) : null}
-                        {isPresent(item.label) ? (
-                            <Label {...slot("label")}>{item.label}</Label>
-                        ) : null}
-                        <Indicator {...slot("indicator")} />
-                    </Tab>
-                ))}
+                {items.map((item, index) => {
+                    const tab = tabs[index];
+                    return (
+                        <Tab
+                            key={item.value}
+                            value={item.value}
+                            disabled={item.disabled}
+                            interactionSource={item.interactionSource}
+                            aria-label={item["aria-label"]}
+                            controls={panels}
+                            tabContentProps={slot("tabContent", tab)}
+                            {...slot("tab", tab)}
+                        >
+                            {isPresent(item.icon) ? (
+                                <Icon
+                                    mirror={item.mirrorIcon}
+                                    {...slot("icon", tab)}
+                                >
+                                    {item.icon}
+                                </Icon>
+                            ) : null}
+                            {isPresent(item.label) ? (
+                                <Label {...slot("label", tab)}>
+                                    {item.label}
+                                </Label>
+                            ) : null}
+                            <Indicator {...slot("indicator", tab)} />
+                        </Tab>
+                    );
+                })}
             </List>
             {transition === "sharedAxis" || transition === "fadeThrough" ? (
                 <TransitionPanels
                     items={items}
                     transition={transition}
-                    scrim={transitionScrim}
-                    slot={slot("content")}
+                    scrim={props.transitionScrim}
+                    fadeThroughProps={props.fadeThroughProps}
+                    sharedAxisProps={props.horizontalSharedAxisProps}
+                    panel={(index) => slot("content", tabs[index])}
                 />
             ) : (
-                items
-                    .filter((item) => isPresent(item.content))
-                    .map((item) => (
+                items.map((item, index) =>
+                    isPresent(item.content) ? (
                         <Content
                             key={item.value}
                             value={item.value}
-                            {...slot("content")}
+                            {...slot("content", tabs[index])}
                         >
                             {item.content}
                         </Content>
-                    ))
+                    ) : null,
+                )
             )}
-        </Root>
+        </>
     );
 }
 
 // The selected tab's panel in a horizontal shared axis, which slides between the panels in the
 // tabs' order, or a fade through.
 function TransitionPanels(props: {
-    readonly items: TabsProps["items"] & object;
+    readonly items: readonly TabsItem<ReactNode>[];
     readonly transition: "sharedAxis" | "fadeThrough";
     readonly scrim: boolean | undefined;
-    readonly slot: object;
+    readonly fadeThroughProps: TabsProps["fadeThroughProps"];
+    readonly sharedAxisProps: TabsProps["horizontalSharedAxisProps"];
+    readonly panel: (index: number) => object;
 }): ReactNode {
     const { api } = context.use("Content");
     const index = props.items.findIndex((item) => item.value === api.value);
     const item = props.items[index];
     const panel =
         item && isPresent(item.content) ? (
-            <Content value={item.value} {...props.slot}>
+            <Content value={item.value} {...props.panel(index)}>
                 {item.content}
             </Content>
         ) : null;
     return props.transition === "fadeThrough" ? (
-        <FadeThrough value={index}>{panel}</FadeThrough>
+        <FadeThrough {...props.fadeThroughProps} value={index}>
+            {panel}
+        </FadeThrough>
     ) : (
-        <HorizontalSharedAxis index={index} scrim={props.scrim}>
+        <HorizontalSharedAxis
+            {...props.sharedAxisProps}
+            index={index}
+            scrim={props.scrim}
+        >
             {panel}
         </HorizontalSharedAxis>
     );

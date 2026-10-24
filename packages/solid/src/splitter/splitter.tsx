@@ -88,6 +88,10 @@ export interface SplitterResizeTriggerProps extends Omit<PartProps, "id"> {
     readonly label?: string | undefined;
     readonly disabled?: boolean | undefined;
     readonly unstyled?: boolean | undefined;
+    /** The props of the handle's pill, the element the trigger draws inside it. */
+    readonly indicatorProps?:
+        | (PartProps & { readonly unstyled?: boolean | undefined })
+        | undefined;
 }
 
 /** The splitter's root: it runs the machine that sizes the panes. */
@@ -204,17 +208,29 @@ function ResizeTrigger(props: SplitterResizeTriggerProps): JSX.Element {
                 },
             ]),
         unstyled: () => props.unstyled,
-        props: merge(omit(props, "id", "label", "disabled", "unstyled"), {
-            get children() {
-                return scope.render("resizeTriggerIndicator", {
-                    element: "div",
-                    machine: () => ({
-                        ...api().getResizeTriggerIndicator(trigger()),
-                        "aria-hidden": "true",
-                    }),
-                });
+        props: merge(
+            omit(
+                props,
+                "id",
+                "label",
+                "disabled",
+                "unstyled",
+                "indicatorProps",
+            ),
+            {
+                get children() {
+                    return scope.render("resizeTriggerIndicator", {
+                        element: "div",
+                        machine: () => ({
+                            ...api().getResizeTriggerIndicator(trigger()),
+                            "aria-hidden": "true",
+                        }),
+                        unstyled: () => props.indicatorProps?.unstyled,
+                        props: omit(props.indicatorProps ?? {}, "unstyled"),
+                    });
+                },
             },
-        }),
+        ),
     });
 }
 
@@ -259,6 +275,11 @@ function ReadyMade(props: SplitterProps): JSX.Element {
                             {(next: Accessor<SplitterPane<JSX.Element>>) => (
                                 <ResizeTrigger
                                     {...(slots("resizeTrigger") as object)}
+                                    indicatorProps={
+                                        slots(
+                                            "resizeTriggerIndicator",
+                                        ) as object
+                                    }
                                     id={splitterTriggerId(pane().id, next().id)}
                                     label={props.resizeLabel}
                                 />

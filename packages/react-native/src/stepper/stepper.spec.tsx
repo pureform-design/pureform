@@ -14,7 +14,11 @@ import { byTestId, interact, mount, settle } from "../testing/render";
 let registry: TestRegistry;
 
 beforeAll(async () => {
-    registry = await presetRegistry(["stepper", "ripple"]);
+    registry = await presetRegistry([
+        "stepper",
+        "ripple",
+        "horizontalSharedAxis",
+    ]);
 });
 
 afterEach(() => {
@@ -125,5 +129,55 @@ describe.each([animated, reanimated])("the stepper with $name", (engine) => {
                 part.getAttribute("aria-disabled"),
             ),
         ).toEqual(["true", "true", "true"]);
+    });
+
+    it("takes a function of each step in style and slotProps", async () => {
+        await render(
+            <Stepper
+                aria-label="Checkout"
+                items={[...ITEMS.slice(0, 2), { label: "C", error: true }]}
+                defaultStep={1}
+                style={{
+                    item: (step) =>
+                        step.completed ? { opacity: 0.5 } : undefined,
+                    label: (step) =>
+                        step.error ? { opacity: 0.25 } : undefined,
+                }}
+                slotProps={{
+                    separator: (step) => ({
+                        "aria-label": step.current ? "here" : "not",
+                    }),
+                }}
+            />,
+        );
+        await settle();
+        expect(
+            all("pf-stepper-item").map(
+                (item) => getComputedStyle(item).opacity,
+            ),
+        ).toEqual(["0.5", "1", "1"]);
+        expect(getComputedStyle(all("pf-stepper-label")[2]!).opacity).toBe(
+            "0.25",
+        );
+        expect(
+            all("pf-stepper-separator").map((part) =>
+                part.getAttribute("aria-label"),
+            ),
+        ).toEqual(["not", "here"]);
+    });
+
+    it("gives the page transition its own props", async () => {
+        await render(
+            <Stepper
+                aria-label="Checkout"
+                items={ITEMS}
+                transition="sharedAxis"
+                horizontalSharedAxisProps={{
+                    slotProps: { root: { nativeID: "axis" } },
+                }}
+            />,
+        );
+        await settle();
+        expect(document.querySelectorAll("#axis")).toHaveLength(1);
     });
 });

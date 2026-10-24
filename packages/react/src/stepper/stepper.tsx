@@ -4,6 +4,7 @@
 // and the ready-made Stepper over them.
 
 import { stepperAnatomy } from "@pureform/anatomy";
+import type { PartName } from "@pureform/anatomy";
 import {
     isPresent,
     STEPPER_ROOT_PROPS,
@@ -16,8 +17,10 @@ import {
 import type {
     InteractionSourceProps,
     StepperContentProps,
+    StepperInstances,
     StepperItem,
     StepperRootOwnProps,
+    StepperStepInstance,
 } from "@pureform/binding-core";
 import * as stepper from "@pureform/machines/stepper";
 import { normalizeProps } from "@zag-js/react";
@@ -31,8 +34,10 @@ import {
 
 import { useControllable } from "../controllable";
 import { FadeThrough } from "../fade-through/fade-through";
+import type { FadeThroughProps } from "../fade-through/fade-through";
 import { ToastIcon } from "../glyphs";
 import { HorizontalSharedAxis } from "../horizontal-shared-axis/horizontal-shared-axis";
+import type { HorizontalSharedAxisProps } from "../horizontal-shared-axis/horizontal-shared-axis";
 import { useItemInteractionSources } from "../interaction";
 import type { ItemInteractionSources } from "../interaction";
 import { useMachine } from "../machine";
@@ -40,7 +45,7 @@ import { collapsible } from "../motion";
 import { useTransitionPage } from "../page-transition";
 import { createPartContext } from "../part-context";
 import { plainParts, useComponent, useSlotProps } from "../parts";
-import type { ComponentScope, SlotKeyedProps } from "../parts";
+import type { ComponentScope, SlotKeyedProps, SlotPropsOf } from "../parts";
 import { pickerAction } from "../picker-actions";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
@@ -282,16 +287,38 @@ const NextTrigger = stepAction("NextTrigger", "next");
 const PrevTrigger = stepAction("PrevTrigger", "previous");
 
 /** The ready-made stepper's props: Root's (without the step count, which the items give), with
- *  `className`, `style`, and `slotProps` keyed by part, the steps as data, and the step list's name
- *  (`aria-label`, `aria-labelledby`). */
+ *  `className`, `style`, `slotProps` and `unstyled` keyed by part (a step's parts also by step,
+ *  `StepperStepInstance`), the steps as data, and the step list's name (`aria-label`,
+ *  `aria-labelledby`). */
 export interface StepperProps
     extends
         Omit<
             StepperRootProps,
             keyof SlotKeyedProps<Anatomy> | "children" | "count"
         >,
-        SlotKeyedProps<Anatomy>,
-        StepperContentProps<ReactNode> {}
+        SlotKeyedProps<Anatomy, never, StepperInstances<ReactNode>>,
+        StepperContentProps<ReactNode> {
+    /** The fade through's own props, for `transition="fadeThrough"`. */
+    readonly fadeThroughProps?:
+        | Omit<FadeThroughProps, "value" | "children">
+        | undefined;
+    /** The shared axis's own props, for `transition="sharedAxis"`. */
+    readonly horizontalSharedAxisProps?:
+        | Omit<HorizontalSharedAxisProps, "index" | "scrim" | "children">
+        | undefined;
+}
+
+type Slot = SlotPropsOf<PartName<Anatomy>, StepperInstances<ReactNode>>;
+
+const STEP_PARTS = [
+    "item",
+    "trigger",
+    "indicator",
+    "label",
+    "caption",
+    "separator",
+    "content",
+] as const;
 
 // The indicator's content: an error's warning, a done step's check, the step's icon, or its number.
 function StepIndicator({
@@ -333,75 +360,116 @@ function ReadyMade(props: StepperProps): ReactNode {
         style: _style,
         slotProps: _slotProps,
         items = [],
-        "aria-label": label,
-        "aria-labelledby": labelledBy,
-        transition,
-        transitionScrim,
+        "aria-label": _label,
+        "aria-labelledby": _labelledBy,
+        transition: _transition,
+        transitionScrim: _transitionScrim,
+        fadeThroughProps: _fadeThroughProps,
+        horizontalSharedAxisProps: _horizontalSharedAxisProps,
         ...rootProps
     } = props;
-    const slot = useSlotProps(props);
+    const slot = useSlotProps<Anatomy, never, StepperInstances<ReactNode>>(
+        props,
+    );
+    return (
+        <Root {...rootProps} count={items.length} {...(slot("root") as object)}>
+            <Steps {...props} items={items} slotOf={slot} />
+        </Root>
+    );
+}
+
+// The ready-made's list, steps and content, under Root, which knows each step's state.
+function Steps(
+    props: StepperProps & {
+        readonly items: readonly StepperItem<ReactNode>[];
+        readonly slotOf: Slot;
+    },
+): ReactNode {
+    const { api } = context.use("Stepper");
+    const { items, slotOf: slot, transition } = props;
     const vertical = props.orientation === "vertical";
+    const each = STEP_PARTS.some((part) => slot.each(part));
+    const steps = items.map(
+        (item, index): StepperStepInstance<ReactNode> | undefined => {
+            if (!each) return undefined;
+            const state = api.getItemState({ index });
+            return {
+                index,
+                item,
+                completed: state.completed,
+                current: state.current,
+                error: !!item.error,
+            };
+        },
+    );
     const content = (item: StepperItem<ReactNode>, index: number) =>
         isPresent(item.content) ? (
             <Content
                 key={`content-${index}`}
                 index={index}
-                {...slot("content")}
+                {...slot("content", steps[index])}
             >
                 {item.content}
             </Content>
         ) : null;
     return (
-        <Root {...rootProps} count={items.length} {...(slot("root") as object)}>
+        <>
             <List
-                aria-label={label}
-                aria-labelledby={labelledBy}
+                aria-label={props["aria-label"]}
+                aria-labelledby={props["aria-labelledby"]}
                 {...slot("list")}
             >
-                {items.map((item, index) => (
-                    <Item key={index} index={index} {...slot("item")}>
-                        <Trigger
-                            error={item.error}
-                            editable={item.editable}
-                            disabled={item.disabled}
-                            controls={isPresent(item.content)}
-                            interactionSource={item.interactionSource}
-                            aria-label={item["aria-label"]}
-                            {...slot("trigger")}
-                        >
-                            <StepIndicator
-                                index={index}
-                                item={item}
-                                slot={slot("indicator") as object}
-                            />
-                            {isPresent(item.label) ? (
-                                <Label {...slot("label")}>{item.label}</Label>
+                {items.map((item, index) => {
+                    const step = steps[index];
+                    return (
+                        <Item key={index} index={index} {...slot("item", step)}>
+                            <Trigger
+                                error={item.error}
+                                editable={item.editable}
+                                disabled={item.disabled}
+                                controls={isPresent(item.content)}
+                                interactionSource={item.interactionSource}
+                                aria-label={item["aria-label"]}
+                                {...slot("trigger", step)}
+                            >
+                                <StepIndicator
+                                    index={index}
+                                    item={item}
+                                    slot={slot("indicator", step) as object}
+                                />
+                                {isPresent(item.label) ? (
+                                    <Label {...slot("label", step)}>
+                                        {item.label}
+                                    </Label>
+                                ) : null}
+                                {isPresent(item.caption) ? (
+                                    <Caption {...slot("caption", step)}>
+                                        {item.caption}
+                                    </Caption>
+                                ) : null}
+                            </Trigger>
+                            {index < items.length - 1 ? (
+                                <Separator {...slot("separator", step)} />
                             ) : null}
-                            {isPresent(item.caption) ? (
-                                <Caption {...slot("caption")}>
-                                    {item.caption}
-                                </Caption>
-                            ) : null}
-                        </Trigger>
-                        {index < items.length - 1 ? (
-                            <Separator {...slot("separator")} />
-                        ) : null}
-                        {vertical ? content(item, index) : null}
-                    </Item>
-                ))}
+                            {vertical ? content(item, index) : null}
+                        </Item>
+                    );
+                })}
             </List>
             {vertical ? null : transition === "sharedAxis" ||
               transition === "fadeThrough" ? (
                 <TransitionSteps
                     items={items}
                     transition={transition}
-                    scrim={transitionScrim}
+                    scrim={props.transitionScrim}
+                    fadeThroughProps={props.fadeThroughProps}
+                    sharedAxisProps={props.horizontalSharedAxisProps}
                     content={content}
                 />
             ) : (
                 items.map(content)
             )}
-        </Root>
+        </>
     );
 }
 
@@ -411,6 +479,8 @@ function TransitionSteps(props: {
     readonly items: readonly StepperItem<ReactNode>[];
     readonly transition: "sharedAxis" | "fadeThrough";
     readonly scrim: boolean | undefined;
+    readonly fadeThroughProps: StepperProps["fadeThroughProps"];
+    readonly sharedAxisProps: StepperProps["horizontalSharedAxisProps"];
     readonly content: (
         item: StepperItem<ReactNode>,
         index: number,
@@ -421,9 +491,15 @@ function TransitionSteps(props: {
     const item = props.items[index];
     const step = item ? props.content(item, index) : null;
     return props.transition === "fadeThrough" ? (
-        <FadeThrough value={index}>{step}</FadeThrough>
+        <FadeThrough {...props.fadeThroughProps} value={index}>
+            {step}
+        </FadeThrough>
     ) : (
-        <HorizontalSharedAxis index={index} scrim={props.scrim}>
+        <HorizontalSharedAxis
+            {...props.sharedAxisProps}
+            index={index}
+            scrim={props.scrim}
+        >
             {step}
         </HorizontalSharedAxis>
     );

@@ -8,7 +8,7 @@ import type { PartName, TestIdOverride, treeAnatomy } from "@pureform/anatomy";
 import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Controllable } from "../controllable";
-import type { Unstyled } from "../parts";
+import type { ItemInstance, Unstyled } from "../parts";
 import type { IndicationProps, InteractionSourceProps } from "./indication";
 import type { VariantProp } from "./variants";
 
@@ -161,3 +161,28 @@ export const treeNaming = <P extends object>(
     };
     return named as P;
 };
+
+/** What a ready-made tree's node is, for a function of the node in its per-node keys:
+ *  `className={{ node: (each) => (each.branch ? "folder" : "file") }}`. A branch's `branch` and
+ *  `group` are its node's. */
+export interface TreeNodeInstance<Node = unknown> {
+    /** The user's node. */
+    readonly node: TreeNode<Node>;
+    /** Its depth, 1 for a top-level node. */
+    readonly depth: number;
+    /** Whether it has children. */
+    readonly branch: boolean;
+    /** Whether it's a branch showing its children. */
+    readonly expanded: boolean;
+    readonly selected: boolean;
+}
+
+/** The ready-made tree's repeated parts, each to its node. */
+export interface TreeInstances<Node = unknown> {
+    readonly branch: TreeNodeInstance<Node>;
+    readonly node: TreeNodeInstance<Node>;
+    readonly leading: TreeNodeInstance<Node>;
+    readonly text: TreeNodeInstance<Node>;
+    readonly indicator: TreeNodeInstance<Node>;
+    readonly group: TreeNodeInstance<Node>;
+}

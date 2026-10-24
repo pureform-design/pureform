@@ -146,6 +146,72 @@ describe("Tabs, ready-made", () => {
         expect(contents[0]!.title).toBe("content");
         expect(byTestId(ids.list).hasAttribute("inlineIcon")).toBe(false);
     });
+
+    it("gives the page transition its own props", async () => {
+        for (const transition of ["fadeThrough", "sharedAxis"] as const) {
+            mount(
+                <PureformProvider registry={navigationRegistry()}>
+                    <Tabs
+                        aria-label="Trips"
+                        items={ITEMS}
+                        transition={transition}
+                        fadeThroughProps={{ className: "fade" }}
+                        horizontalSharedAxisProps={{ className: "axis" }}
+                    />
+                </PureformProvider>,
+            );
+            await settle();
+            const name = transition === "fadeThrough" ? "fade" : "axis";
+            expect(document.querySelectorAll(`.${name}`)).toHaveLength(1);
+            document.body.innerHTML = "";
+        }
+    });
+
+    it("takes a function of each tab in the per-tab parts' keys", async () => {
+        withRegistry(
+            <Tabs
+                aria-label="Trips"
+                items={ITEMS}
+                defaultValue="hotels"
+                className={{
+                    tab: (tab) => (tab.selected ? "on" : undefined),
+                    list: "trips",
+                }}
+                style={{
+                    label: (tab) => ({ opacity: tab.index === 2 ? 0.5 : 1 }),
+                }}
+                slotProps={{
+                    content: (tab) => ({ title: tab.item.value }),
+                }}
+                unstyled={{ indicator: (tab) => tab.index === 0 }}
+            />,
+        );
+        await settle();
+        expect(tabs().map((tab) => tab.classList.contains("on"))).toEqual([
+            false,
+            true,
+            false,
+        ]);
+        expect(byTestId(ids.list).classList.contains("trips")).toBe(true);
+        const labels = [
+            ...document.querySelectorAll<HTMLElement>(
+                `[data-testid="${ids.label}"]`,
+            ),
+        ];
+        expect(labels[2]!.style.opacity).toBe("0.5");
+        expect(panels().map((panel) => panel.title)).toEqual([
+            "flights",
+            "hotels",
+            "cars",
+        ]);
+        const indicators = [
+            ...document.querySelectorAll<HTMLElement>(
+                `[data-testid="${ids.indicator}"]`,
+            ),
+        ];
+        expect(indicators[0]!.className).toBe("");
+        expect(indicators[1]!.className).not.toBe("");
+    });
 });
 
 describe("Tabs, composed", () => {

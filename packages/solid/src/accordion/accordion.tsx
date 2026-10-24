@@ -4,6 +4,7 @@
 // collapsed; and the ready-made Accordion over them.
 
 import { accordionAnatomy } from "@pureform/anatomy";
+import type { PartName } from "@pureform/anatomy";
 import {
     ACCORDION_CONTENT_PROPS,
     ACCORDION_ROOT_PROPS,
@@ -13,7 +14,9 @@ import {
 } from "@pureform/binding-core";
 import type {
     AccordionContentProps,
+    AccordionInstances,
     AccordionItem,
+    AccordionItemInstance,
     AccordionRootOwnProps,
     InteractionSourceProps,
 } from "@pureform/binding-core";
@@ -50,6 +53,7 @@ import type {
     IconPartProps,
     PlainPartProps,
     SlotKeyedProps,
+    SlotPropsOf,
 } from "../parts";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
@@ -221,12 +225,12 @@ const Title = plain("title", "Title");
 /** A line under the title. */
 const Description = plain("description", "Description");
 
-/** The ready-made accordion's props: Root's, with `class`, `style`, and `slotProps` keyed by part,
- *  and the items as data. */
+/** The ready-made accordion's props: Root's, with `class`, `style`, `slotProps` and `unstyled`
+ *  keyed by part (an item's parts also by item, `AccordionItemInstance`), and the items as data. */
 export interface AccordionProps
     extends
         Omit<AccordionRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
-        SlotKeyedProps<Anatomy>,
+        SlotKeyedProps<Anatomy, never, AccordionInstances<JSX.Element>>,
         AccordionContentProps<JSX.Element> {}
 
 const READY_MADE_PROPS = [
@@ -242,61 +246,82 @@ const OptionalDescription = whenPresent(Description);
  *  title, description and the indicator, and its content. */
 function ReadyMade(props: AccordionProps): JSX.Element {
     const items = createMemo(() => props.items ?? []);
-    const slots = createSlotProps(props);
+    const slots = createSlotProps<
+        Anatomy,
+        never,
+        AccordionInstances<JSX.Element>
+    >(props);
     const own = omit(props, ...READY_MADE_PROPS) as AccordionRootProps;
     const root = slots("root") as object;
-    // Views, so every item reads the same ones.
-    const item = slots("item") as object;
-    const trigger = slots("trigger");
-    const leadingSlot = slots("leading");
-    const text = slots("text");
-    const title = slots("title");
-    const description = slots("description");
-    const indicator = slots("indicator");
-    const content = slots("content");
     return (
         <Root {...own} {...root}>
-            <For
-                each={items()}
-                keyed={(entry: AccordionItem<JSX.Element>) => entry.value}
-            >
-                {(entry) => {
-                    const LeadingPart = optionalPart(
-                        untrack(entry),
-                        "leading",
-                        Leading,
-                        leading.Optional,
-                    );
-                    return (
-                        <Item
-                            value={entry().value}
-                            disabled={entry().disabled}
-                            {...item}
-                        >
-                            <Trigger
-                                interactionSource={entry().interactionSource}
-                                {...trigger}
-                            >
-                                <LeadingPart
-                                    mirror={entry().mirrorLeading}
-                                    {...leadingSlot}
-                                >
-                                    {entry().leading}
-                                </LeadingPart>
-                                <Text {...text}>
-                                    <Title {...title}>{entry().title}</Title>
-                                    <OptionalDescription {...description}>
-                                        {entry().description}
-                                    </OptionalDescription>
-                                </Text>
-                                <Indicator {...indicator} />
-                            </Trigger>
-                            <Content {...content}>{entry().content}</Content>
-                        </Item>
-                    );
-                }}
-            </For>
+            <Items items={items} slots={slots} />
         </Root>
+    );
+}
+
+// The ready-made's items, under Root, which knows which are expanded.
+function Items(props: {
+    readonly items: Accessor<readonly AccordionItem<JSX.Element>[]>;
+    readonly slots: SlotPropsOf<
+        PartName<Anatomy>,
+        AccordionInstances<JSX.Element>
+    >;
+}): JSX.Element {
+    const { api } = context.use("Accordion");
+    const slots = props.slots;
+    return (
+        <For
+            each={props.items()}
+            keyed={(entry: AccordionItem<JSX.Element>) => entry.value}
+        >
+            {(entry) => {
+                const LeadingPart = optionalPart(
+                    untrack(entry),
+                    "leading",
+                    Leading,
+                    leading.Optional,
+                );
+                const item = (): AccordionItemInstance<JSX.Element> => ({
+                    index: props.items().indexOf(entry()),
+                    item: entry(),
+                    expanded: api().value.includes(entry().value),
+                });
+                return (
+                    <Item
+                        value={entry().value}
+                        disabled={entry().disabled}
+                        {...slots("item", item)}
+                    >
+                        <Trigger
+                            interactionSource={entry().interactionSource}
+                            {...slots("trigger", item)}
+                        >
+                            <LeadingPart
+                                mirror={entry().mirrorLeading}
+                                {...slots("leading", item)}
+                            >
+                                {entry().leading}
+                            </LeadingPart>
+                            <Text {...slots("text", item)}>
+                                <Title {...slots("title", item)}>
+                                    {entry().title}
+                                </Title>
+                                <OptionalDescription
+                                    {...slots("description", item)}
+                                >
+                                    {entry().description}
+                                </OptionalDescription>
+                            </Text>
+                            <Indicator {...slots("indicator", item)} />
+                        </Trigger>
+                        <Content {...slots("content", item)}>
+                            {entry().content}
+                        </Content>
+                    </Item>
+                );
+            }}
+        </For>
     );
 }
 

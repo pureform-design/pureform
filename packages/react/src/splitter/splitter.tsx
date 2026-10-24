@@ -80,6 +80,10 @@ export interface SplitterResizeTriggerProps extends PartProps {
     readonly label?: string | undefined;
     readonly disabled?: boolean | undefined;
     readonly unstyled?: boolean | undefined;
+    /** The props of the handle's pill, the element the trigger draws inside it. */
+    readonly indicatorProps?:
+        | (PartProps & { readonly unstyled?: boolean | undefined })
+        | undefined;
 }
 
 /** The splitter's root: it runs the machine that sizes the panes. */
@@ -171,9 +175,11 @@ function ResizeTrigger({
     label,
     disabled,
     unstyled,
+    indicatorProps,
     ...props
 }: SplitterResizeTriggerProps): ReactNode {
     const { scope, api, drag, along, measure } = context.use("ResizeTrigger");
+    const { unstyled: indicatorUnstyled, ...indicator } = indicatorProps ?? {};
     const state = api.getResizeTriggerState({ id, disabled });
     return scope.render("resizeTrigger", {
         element: "div",
@@ -204,6 +210,8 @@ function ResizeTrigger({
                     ...api.getResizeTriggerIndicator({ id, disabled }),
                     "aria-hidden": "true",
                 },
+                unstyled: indicatorUnstyled,
+                props: indicator,
             }),
         },
     });
@@ -244,6 +252,7 @@ function ReadyMade(props: SplitterProps): ReactNode {
                         {next && (
                             <ResizeTrigger
                                 {...slot("resizeTrigger")}
+                                indicatorProps={slot("resizeTriggerIndicator")}
                                 id={splitterTriggerId(pane.id, next.id)}
                                 label={resizeLabel}
                             />

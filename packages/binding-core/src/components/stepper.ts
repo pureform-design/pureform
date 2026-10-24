@@ -12,7 +12,7 @@ import type {
 import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Controllable } from "../controllable";
-import type { Unstyled } from "../parts";
+import type { ItemInstance, Unstyled } from "../parts";
 import { withoutControls } from "./content";
 import type { IndicationProps, InteractionSourceProps } from "./indication";
 import { PAGE_TRANSITION_PROPS } from "./page-transition";
@@ -202,3 +202,28 @@ export const stepperIndicator = (
           : state.hasIcon
             ? "icon"
             : "number";
+
+/** What a ready-made stepper's step is, for a function of the step in its per-step keys: the
+ *  step's `index` and `item`, and its state: `className={{ item: (step) => (step.current ?
+ *  "here" : undefined) }}`. */
+export interface StepperStepInstance<Node = unknown> extends ItemInstance<
+    StepperItem<Node>
+> {
+    /** Whether it's done. */
+    readonly completed: boolean;
+    /** Whether it's the current step. */
+    readonly current: boolean;
+    /** Whether it shows the error state (its item's `error`). */
+    readonly error: boolean;
+}
+
+/** The ready-made stepper's repeated parts, each to its step. */
+export interface StepperInstances<Node = unknown> {
+    readonly item: StepperStepInstance<Node>;
+    readonly trigger: StepperStepInstance<Node>;
+    readonly indicator: StepperStepInstance<Node>;
+    readonly label: StepperStepInstance<Node>;
+    readonly caption: StepperStepInstance<Node>;
+    readonly separator: StepperStepInstance<Node>;
+    readonly content: StepperStepInstance<Node>;
+}

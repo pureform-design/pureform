@@ -18,8 +18,12 @@ import {
 } from "@pureform/binding-core";
 import type {
     InteractionSourceProps,
+    TableCellInstance,
+    TableColumnInstance,
     TableContentProps,
+    TableInstances,
     TableRootOwnProps,
+    TableRowInstance,
     TableSort,
 } from "@pureform/binding-core";
 import * as table from "@pureform/machines/table";
@@ -41,7 +45,12 @@ import { useMachineButton } from "../interaction";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import { machinePart, useComponent, useSlotProps } from "../parts";
-import type { ComponentScope, InnerPropsOf, SlotKeyedProps } from "../parts";
+import type {
+    ComponentScope,
+    InnerPropsOf,
+    SlotKeyedProps,
+    SlotPropsOf,
+} from "../parts";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
@@ -256,10 +265,13 @@ function SelectionCell({
     });
 }
 
-/** A sort header's props: the column it sorts, its own source, and its label as children. */
+/** A sort header's props: the column it sorts, its own source, its label as children, and the
+ *  props of the label's and the arrow's elements. */
 export interface TableSortHeaderProps
     extends TablePartProps, InteractionSourceProps {
     readonly column: string;
+    readonly labelProps?: TablePartProps | undefined;
+    readonly indicatorProps?: TablePartProps | undefined;
 }
 
 /** The button in a sortable column's header: its label, then the arrow, which shows the
@@ -267,6 +279,8 @@ export interface TableSortHeaderProps
 function SortHeader({
     column,
     children,
+    labelProps,
+    indicatorProps,
     ...props
 }: TableSortHeaderProps): ReactNode {
     const { scope, api } = context.use("SortHeader");
@@ -275,6 +289,8 @@ function SortHeader({
     ]);
     const sorted = api.sort?.column === column;
     const descending = api.arrowDirection(column) === "descending";
+    const { unstyled: labelUnstyled, ...label } = labelProps ?? {};
+    const { unstyled: arrowUnstyled, ...arrow } = indicatorProps ?? {};
     return scope.render("sortHeader", {
         ...button,
         states: { filled: sorted },
@@ -285,13 +301,15 @@ function SortHeader({
                     {scope.render("sortLabel", {
                         element: "span",
                         machine: api.getSortLabelProps({ column }),
-                        props: { children },
+                        unstyled: labelUnstyled,
+                        props: { ...label, children },
                     })}
                     {scope.render("sortIndicator", {
                         element: "span",
                         machine: api.getSortIndicatorProps({ column }),
                         states: { descending },
-                        props: { children: <ArrowUpwardIcon /> },
+                        unstyled: arrowUnstyled,
+                        props: { ...arrow, children: <ArrowUpwardIcon /> },
                     })}
                 </>
             ),
@@ -304,15 +322,17 @@ export function useTable(): Api {
     return context.use("useTable").api;
 }
 
-/** The ready-made table's props: Root's, with `className`, `style`, and `slotProps` keyed by
- *  part, and its columns and rows. */
+/** The ready-made table's props: Root's, with `className`, `style`, `slotProps` and `unstyled`
+ *  keyed by part (a body row's parts also by row, `TableRowInstance`; a body cell's by cell,
+ *  `TableCellInstance`; a header's or footer's by column, `TableColumnInstance`), and its columns
+ *  and rows. */
 export interface TableProps<Row = Record<string, unknown>>
     extends
         Omit<TableRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
-        SlotKeyedProps<Anatomy>,
+        SlotKeyedProps<Anatomy, never, TableInstances<Row>>,
         TableContentProps<Row, ReactNode> {}
 
-type Slot = (part: PartName<Anatomy>) => PartProps;
+type Slot<Row> = SlotPropsOf<PartName<Anatomy>, TableInstances<Row>>;
 
 /** The ready-made table: a header row of the columns' headers (sort headers where they sort),
  *  a row per entry of `rows` in the sort's order, and a footer row when a column has a footer.
@@ -327,7 +347,7 @@ function ReadyMade<Row>(props: TableProps<Row>): ReactNode {
         rowValue,
         ...rootProps
     } = props;
-    const slot = useSlotProps(props);
+    const slot = useSlotProps<Anatomy, never, TableInstances<Row>>(props);
     const values = rows.map((row, index) =>
         tableRowValue(row, index, rowValue),
     );
@@ -339,7 +359,7 @@ function ReadyMade<Row>(props: TableProps<Row>): ReactNode {
 }
 
 function ReadyMadeParts<Row>(
-    props: TableProps<Row> & { readonly slotOf: Slot },
+    props: TableProps<Row> & { readonly slotOf: Slot<Row> },
 ): ReactNode {
     const { api } = context.use("Table");
     const slot = props.slotOf;
@@ -355,6 +375,21 @@ function ReadyMadeParts<Row>(
               tableCellValue(sortColumn, entry.row),
           )
         : entries;
+    const eachRow = slot.each("row") || slot.each("alternateRow");
+    const eachCell = slot.each("cell");
+    const eachHeader =
+        slot.each("headerCell") ||
+        slot.each("sortHeader") ||
+        slot.each("sortLabel") ||
+        slot.each("sortIndicator");
+    const eachFooter = slot.each("footerCell");
+    const columnOf = (
+        each: boolean,
+        column: string,
+        columnIndex: number,
+    ): TableColumnInstance | undefined =>
+        each ? { column, columnIndex } : undefined;
+    const footerSelection = columnOf(eachFooter, "", -1);
     return (
         <>
             <Header {...slot("header")}>
@@ -362,59 +397,109 @@ function ReadyMadeParts<Row>(
                     {selectable ? (
                         <SelectionCell {...slot("selectionCell")} />
                     ) : null}
-                    {columns.map((column) => (
-                        <HeaderCell
-                            key={column.id}
-                            column={column.id}
-                            sortable={column.sortable}
-                            {...slot("headerCell")}
-                        >
-                            {column.sortable ? (
-                                <SortHeader
-                                    column={column.id}
-                                    {...slot("sortHeader")}
-                                >
-                                    {column.header ?? column.id}
-                                </SortHeader>
-                            ) : (
-                                (column.header ?? column.id)
-                            )}
-                        </HeaderCell>
-                    ))}
+                    {columns.map((column, columnIndex) => {
+                        const header = columnOf(
+                            eachHeader,
+                            column.id,
+                            columnIndex,
+                        );
+                        return (
+                            <HeaderCell
+                                key={column.id}
+                                column={column.id}
+                                sortable={column.sortable}
+                                {...slot("headerCell", header)}
+                            >
+                                {column.sortable ? (
+                                    <SortHeader
+                                        column={column.id}
+                                        labelProps={slot("sortLabel", header)}
+                                        indicatorProps={slot(
+                                            "sortIndicator",
+                                            header,
+                                        )}
+                                        {...slot("sortHeader", header)}
+                                    >
+                                        {column.header ?? column.id}
+                                    </SortHeader>
+                                ) : (
+                                    (column.header ?? column.id)
+                                )}
+                            </HeaderCell>
+                        );
+                    })}
                 </HeaderRow>
             </Header>
             <Body {...slot("body")}>
-                {rows.map((entry, index) => (
-                    <Row
-                        key={entry.value}
-                        value={entry.value}
-                        index={index}
-                        {...slot(tableRowPart(index, props.striped))}
-                    >
-                        {selectable ? (
-                            <SelectionCell {...slot("selectionCell")} />
-                        ) : null}
-                        {columns.map((column) => (
-                            <Cell key={column.id} {...slot("cell")}>
-                                {column.cell
-                                    ? column.cell(entry.row)
-                                    : String(
-                                          tableCellValue(column, entry.row) ??
-                                              "",
-                                      )}
-                            </Cell>
-                        ))}
-                    </Row>
-                ))}
+                {rows.map((entry, index) => {
+                    const row: TableRowInstance<Row> | undefined = eachRow
+                        ? {
+                              index,
+                              row: entry.row,
+                              value: entry.value,
+                              selected: api.isSelected(entry.value),
+                          }
+                        : undefined;
+                    return (
+                        <Row
+                            key={entry.value}
+                            value={entry.value}
+                            index={index}
+                            {...slot(tableRowPart(index, props.striped), row)}
+                        >
+                            {selectable ? (
+                                <SelectionCell {...slot("selectionCell")} />
+                            ) : null}
+                            {columns.map((column, columnIndex) => {
+                                const cell: TableCellInstance<Row> | undefined =
+                                    eachCell
+                                        ? {
+                                              rowIndex: index,
+                                              row: entry.row,
+                                              column: column.id,
+                                              columnIndex,
+                                          }
+                                        : undefined;
+                                return (
+                                    <Cell
+                                        key={column.id}
+                                        {...slot("cell", cell)}
+                                    >
+                                        {column.cell
+                                            ? column.cell(entry.row)
+                                            : String(
+                                                  tableCellValue(
+                                                      column,
+                                                      entry.row,
+                                                  ) ?? "",
+                                              )}
+                                    </Cell>
+                                );
+                            })}
+                        </Row>
+                    );
+                })}
             </Body>
             {columns.some((column) => isPresent(column.footer)) ? (
                 <Footer {...slot("footer")}>
                     <FooterRow {...slot("footerRow")}>
                         {selectable ? (
-                            <FooterCell {...slot("footerCell")} />
+                            <FooterCell
+                                {...slot("footerCell", footerSelection)}
+                            />
                         ) : null}
-                        {columns.map((column) => (
-                            <FooterCell key={column.id} {...slot("footerCell")}>
+                        {columns.map((column, columnIndex) => (
+                            <FooterCell
+                                key={column.id}
+                                {...slot(
+                                    "footerCell",
+                                    columnOf(
+                                        eachFooter,
+                                        column.id,
+                                        columnIndex,
+                                    ),
+                                )}
+                            >
                                 {column.footer}
                             </FooterCell>
                         ))}

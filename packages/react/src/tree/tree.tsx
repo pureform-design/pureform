@@ -6,6 +6,7 @@
 // its row and its group, which takes focus and the keys and is named from the row's text.
 
 import { treeAnatomy } from "@pureform/anatomy";
+import type { PartName } from "@pureform/anatomy";
 import {
     isPresent,
     isTreeBranch,
@@ -19,7 +20,9 @@ import {
 import type {
     InteractionSourceProps,
     TreeContentProps,
+    TreeInstances,
     TreeNode,
+    TreeNodeInstance,
     TreeRootOwnProps,
 } from "@pureform/binding-core";
 import * as treeView from "@pureform/machines/tree-view";
@@ -35,7 +38,12 @@ import { useMachine } from "../machine";
 import { collapsible } from "../motion";
 import { createPartContext } from "../part-context";
 import { useComponent, useSlotProps } from "../parts";
-import type { ComponentScope, PlainPartProps, SlotKeyedProps } from "../parts";
+import type {
+    ComponentScope,
+    PlainPartProps,
+    SlotKeyedProps,
+    SlotPropsOf,
+} from "../parts";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
@@ -291,16 +299,28 @@ function Leading({ unstyled, mirror, ...props }: TreeIconProps): ReactNode {
     });
 }
 
-/** The ready-made tree's props: Root's, with `className`, `style`, and `slotProps` keyed by part,
- *  the nodes as data, and a label. */
+/** The ready-made tree's props: Root's, with `className`, `style`, `slotProps` and `unstyled`
+ *  keyed by part (a node's parts also by node, `TreeNodeInstance`), the nodes as data, and a
+ *  label. */
 export interface TreeProps
     extends
         Omit<
             TreeRootProps,
             keyof SlotKeyedProps<Anatomy> | "children" | "items"
         >,
-        SlotKeyedProps<Anatomy>,
+        SlotKeyedProps<Anatomy, never, TreeInstances<ReactNode>>,
         TreeContentProps<ReactNode> {}
+
+type Slot = SlotPropsOf<PartName<Anatomy>, TreeInstances<ReactNode>>;
+
+const NODE_PARTS = [
+    "branch",
+    "node",
+    "leading",
+    "text",
+    "indicator",
+    "group",
+] as const;
 
 /** The ready-made tree: the label when given, then a row per node, each branch over a group of its
  *  children. */
@@ -315,53 +335,7 @@ function ReadyMade(props: TreeProps): ReactNode {
         "aria-labelledby": labelledBy,
         ...rootProps
     } = props;
-    const slot = useSlotProps(props);
-
-    const content = (node: Node) => (
-        <>
-            {isPresent(node.leading) ? (
-                <Leading mirror={node.mirrorLeading} {...slot("leading")}>
-                    {node.leading}
-                </Leading>
-            ) : null}
-            <Text {...slot("text")}>{node.label}</Text>
-        </>
-    );
-
-    const render = (level: readonly Node[], path: readonly number[]) =>
-        level.map((node, index) => {
-            const indexPath = [...path, index];
-            return isTreeBranch(node) ? (
-                <Branch
-                    key={node.value}
-                    node={node}
-                    indexPath={indexPath}
-                    {...slot("branch")}
-                >
-                    <BranchControl
-                        interactionSource={node.interactionSource}
-                        {...slot("node")}
-                    >
-                        {content(node)}
-                        <Indicator {...slot("indicator")} />
-                    </BranchControl>
-                    <Group {...slot("group")}>
-                        {render(node.children ?? [], indexPath)}
-                    </Group>
-                </Branch>
-            ) : (
-                <Item
-                    key={node.value}
-                    node={node}
-                    indexPath={indexPath}
-                    interactionSource={node.interactionSource}
-                    {...slot("node")}
-                >
-                    {content(node)}
-                </Item>
-            );
-        });
-
+    const slot = useSlotProps<Anatomy, never, TreeInstances<ReactNode>>(props);
     return (
         <Root {...rootProps} items={items} {...(slot("root") as object)}>
             {isPresent(label) ? (
@@ -372,10 +346,81 @@ function ReadyMade(props: TreeProps): ReactNode {
                 aria-labelledby={labelledBy}
                 {...slot("tree")}
             >
-                {render(items, [])}
+                <Nodes items={items} slotOf={slot} />
             </TreeElement>
         </Root>
     );
+}
+
+// The ready-made's nodes, under Root, which knows which are expanded and selected.
+function Nodes(props: {
+    readonly items: readonly Node[];
+    readonly slotOf: Slot;
+}): ReactNode {
+    const { api } = context.use("Tree");
+    const slot = props.slotOf;
+    const each = NODE_PARTS.some((part) => slot.each(part));
+
+    const content = (
+        node: Node,
+        at: TreeNodeInstance<ReactNode> | undefined,
+    ) => (
+        <>
+            {isPresent(node.leading) ? (
+                <Leading mirror={node.mirrorLeading} {...slot("leading", at)}>
+                    {node.leading}
+                </Leading>
+            ) : null}
+            <Text {...slot("text", at)}>{node.label}</Text>
+        </>
+    );
+
+    const render = (level: readonly Node[], path: readonly number[]) =>
+        level.map((node, index) => {
+            const indexPath = [...path, index];
+            const branch = isTreeBranch(node);
+            const at: TreeNodeInstance<ReactNode> | undefined = each
+                ? {
+                      node,
+                      depth: indexPath.length,
+                      branch,
+                      expanded:
+                          branch && api.expandedValue.includes(node.value),
+                      selected: api.selectedValue.includes(node.value),
+                  }
+                : undefined;
+            return branch ? (
+                <Branch
+                    key={node.value}
+                    node={node}
+                    indexPath={indexPath}
+                    {...slot("branch", at)}
+                >
+                    <BranchControl
+                        interactionSource={node.interactionSource}
+                        {...slot("node", at)}
+                    >
+                        {content(node, at)}
+                        <Indicator {...slot("indicator", at)} />
+                    </BranchControl>
+                    <Group {...slot("group", at)}>
+                        {render(node.children ?? [], indexPath)}
+                    </Group>
+                </Branch>
+            ) : (
+                <Item
+                    key={node.value}
+                    node={node}
+                    indexPath={indexPath}
+                    interactionSource={node.interactionSource}
+                    {...slot("node", at)}
+                >
+                    {content(node, at)}
+                </Item>
+            );
+        });
+
+    return render(props.items, []);
 }
 
 const EMPTY: readonly Node[] = [];

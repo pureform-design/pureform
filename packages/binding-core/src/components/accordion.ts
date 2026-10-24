@@ -12,7 +12,7 @@ import type {
 import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Controllable } from "../controllable";
-import type { Unstyled } from "../parts";
+import type { ItemInstance, Unstyled } from "../parts";
 import type { IndicationProps, InteractionSourceProps } from "./indication";
 import type { VariantProp } from "./variants";
 
@@ -137,3 +137,23 @@ export const accordionItemProps = (
     value: item.value,
     disabled: !!(item.disabled || disabled),
 });
+
+/** What a ready-made accordion's item is, for a function of the item in its per-item keys: its
+ *  `index` and `item`, and whether it's `expanded`. */
+export interface AccordionItemInstance<Node = unknown> extends ItemInstance<
+    AccordionItem<Node>
+> {
+    readonly expanded: boolean;
+}
+
+/** The ready-made accordion's repeated parts, each to its item. */
+export interface AccordionInstances<Node = unknown> {
+    readonly item: AccordionItemInstance<Node>;
+    readonly trigger: AccordionItemInstance<Node>;
+    readonly leading: AccordionItemInstance<Node>;
+    readonly text: AccordionItemInstance<Node>;
+    readonly title: AccordionItemInstance<Node>;
+    readonly description: AccordionItemInstance<Node>;
+    readonly indicator: AccordionItemInstance<Node>;
+    readonly content: AccordionItemInstance<Node>;
+}

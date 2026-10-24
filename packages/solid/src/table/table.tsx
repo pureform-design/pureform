@@ -19,8 +19,12 @@ import {
 } from "@pureform/binding-core";
 import type {
     InteractionSourceProps,
+    TableCellInstance,
+    TableColumnInstance,
     TableContentProps,
+    TableInstances,
     TableRootOwnProps,
+    TableRowInstance,
     TableSort,
 } from "@pureform/binding-core";
 import * as table from "@pureform/machines/table";
@@ -46,7 +50,12 @@ import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
 import { createSlotProps, machinePart, useComponent } from "../parts";
-import type { ComponentScope, InnerPropsOf, SlotKeyedProps } from "../parts";
+import type {
+    ComponentScope,
+    InnerPropsOf,
+    SlotKeyedProps,
+    SlotPropsOf,
+} from "../parts";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 
@@ -267,21 +276,27 @@ function SelectionCell(props: TablePartProps): JSX.Element {
     });
 }
 
-/** A sort header's props: the column it sorts, its own source, and its label as children. */
+/** A sort header's props: the column it sorts, its own source, its label as children, and the
+ *  props of the label's and the arrow's elements. */
 export interface TableSortHeaderProps
     extends TablePartProps, InteractionSourceProps {
     readonly column: string;
+    readonly labelProps?: TablePartProps | undefined;
+    readonly indicatorProps?: TablePartProps | undefined;
 }
 
 /** The button in a sortable column's header: its label, then the arrow, which shows the
  *  sorted direction and hints at the first one while hovered or focused. */
 function SortHeader(props: TableSortHeaderProps): JSX.Element {
     const { scope, api } = context.use("SortHeader");
-    const button = useMachineButton(omit(props, "column", "children"), () => [
-        api().getSortHeaderProps({ column: props.column }) as Readonly<
-            Record<string, unknown>
-        >,
-    ]);
+    const button = useMachineButton(
+        omit(props, "column", "children", "labelProps", "indicatorProps"),
+        () => [
+            api().getSortHeaderProps({ column: props.column }) as Readonly<
+                Record<string, unknown>
+            >,
+        ],
+    );
     return scope.render("sortHeader", {
         ...button,
         states: () => ({ filled: api().sort?.column === props.column }),
@@ -295,7 +310,15 @@ function SortHeader(props: TableSortHeaderProps): JSX.Element {
                                 api().getSortLabelProps({
                                     column: props.column,
                                 }),
-                            props: { children: props.children },
+                            unstyled: () => props.labelProps?.unstyled,
+                            props: merge(
+                                omit(props.labelProps ?? {}, "unstyled"),
+                                {
+                                    get children() {
+                                        return props.children;
+                                    },
+                                },
+                            ),
                         })}
                         {scope.render("sortIndicator", {
                             element: "span",
@@ -308,7 +331,11 @@ function SortHeader(props: TableSortHeaderProps): JSX.Element {
                                     api().arrowDirection(props.column) ===
                                     "descending",
                             }),
-                            props: { children: <ArrowUpwardIcon /> },
+                            unstyled: () => props.indicatorProps?.unstyled,
+                            props: merge(
+                                omit(props.indicatorProps ?? {}, "unstyled"),
+                                { children: <ArrowUpwardIcon /> },
+                            ),
                         })}
                     </>
                 );
@@ -322,19 +349,21 @@ export function useTable(): Accessor<Api> {
     return context.use("useTable").api;
 }
 
-/** The ready-made table's props: Root's, with `class`, `style`, and `slotProps` keyed by part,
- *  and its columns and rows. */
+/** The ready-made table's props: Root's, with `class`, `style`, `slotProps` and `unstyled` keyed
+ *  by part (a body row's parts also by row, `TableRowInstance`; a body cell's by cell,
+ *  `TableCellInstance`; a header's or footer's by column, `TableColumnInstance`), and its columns
+ *  and rows. */
 export interface TableProps<Row = Record<string, unknown>>
     extends
         Omit<TableRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
-        SlotKeyedProps<Anatomy>,
+        SlotKeyedProps<Anatomy, never, TableInstances<Row>>,
         TableContentProps<Row, JSX.Element> {}
 
 /** The ready-made table: a header row of the columns' headers (sort headers where they sort),
  *  a row per entry of `rows` in the sort's order, and a footer row when a column has a footer.
  *  A table with a selection mode leads each row with a checkbox. */
 function ReadyMade<Row>(props: TableProps<Row>): JSX.Element {
-    const slots = createSlotProps(props);
+    const slots = createSlotProps<Anatomy, never, TableInstances<Row>>(props);
     const own = omit(
         props,
         "class",
@@ -356,7 +385,7 @@ function ReadyMade<Row>(props: TableProps<Row>): JSX.Element {
 
 function ReadyMadeParts<Row>(
     props: TableProps<Row> & {
-        readonly slots: (part: PartName<Anatomy>) => PartProps;
+        readonly slots: SlotPropsOf<PartName<Anatomy>, TableInstances<Row>>;
     },
 ): JSX.Element {
     const { api } = context.use("Table");
@@ -375,78 +404,122 @@ function ReadyMadeParts<Row>(
               )
             : entries;
     });
+    const slots = props.slots;
+    const columnOf =
+        (column: string, columnIndex: () => number) =>
+        (): TableColumnInstance => ({ column, columnIndex: columnIndex() });
     return (
         <>
-            <Header {...props.slots("header")}>
-                <HeaderRow {...props.slots("headerRow")}>
+            <Header {...slots("header")}>
+                <HeaderRow {...slots("headerRow")}>
                     <Show when={selectable()}>
-                        <SelectionCell {...props.slots("selectionCell")} />
+                        <SelectionCell {...slots("selectionCell")} />
                     </Show>
                     <For each={columns()}>
-                        {(column) => (
-                            <HeaderCell
-                                column={column.id}
-                                sortable={column.sortable}
-                                {...props.slots("headerCell")}
-                            >
-                                <Show
-                                    when={column.sortable}
-                                    fallback={column.header ?? column.id}
+                        {(column, columnIndex) => {
+                            const header = columnOf(column.id, columnIndex);
+                            return (
+                                <HeaderCell
+                                    column={column.id}
+                                    sortable={column.sortable}
+                                    {...slots("headerCell", header)}
                                 >
-                                    <SortHeader
-                                        column={column.id}
-                                        {...props.slots("sortHeader")}
+                                    <Show
+                                        when={column.sortable}
+                                        fallback={column.header ?? column.id}
                                     >
-                                        {column.header ?? column.id}
-                                    </SortHeader>
-                                </Show>
-                            </HeaderCell>
-                        )}
+                                        <SortHeader
+                                            column={column.id}
+                                            labelProps={slots(
+                                                "sortLabel",
+                                                header,
+                                            )}
+                                            indicatorProps={slots(
+                                                "sortIndicator",
+                                                header,
+                                            )}
+                                            {...slots("sortHeader", header)}
+                                        >
+                                            {column.header ?? column.id}
+                                        </SortHeader>
+                                    </Show>
+                                </HeaderCell>
+                            );
+                        }}
                     </For>
                 </HeaderRow>
             </Header>
-            <Body {...props.slots("body")}>
+            <Body {...slots("body")}>
                 <For each={rows()}>
-                    {(entry, index) => (
-                        <Row
-                            value={entry.value}
-                            index={index()}
-                            {...props.slots(
-                                tableRowPart(index(), props.striped),
-                            )}
-                        >
-                            <Show when={selectable()}>
-                                <SelectionCell
-                                    {...props.slots("selectionCell")}
-                                />
-                            </Show>
-                            <For each={columns()}>
-                                {(column) => (
-                                    <Cell {...props.slots("cell")}>
-                                        {column.cell
-                                            ? column.cell(entry.row)
-                                            : String(
-                                                  tableCellValue(
-                                                      column,
-                                                      entry.row,
-                                                  ) ?? "",
-                                              )}
-                                    </Cell>
+                    {(entry, index) => {
+                        const row = (): TableRowInstance<Row> => ({
+                            index: index(),
+                            row: entry.row,
+                            value: entry.value,
+                            selected: api().isSelected(entry.value),
+                        });
+                        return (
+                            <Row
+                                value={entry.value}
+                                index={index()}
+                                {...slots(
+                                    tableRowPart(index(), props.striped),
+                                    row,
                                 )}
-                            </For>
-                        </Row>
-                    )}
+                            >
+                                <Show when={selectable()}>
+                                    <SelectionCell
+                                        {...slots("selectionCell")}
+                                    />
+                                </Show>
+                                <For each={columns()}>
+                                    {(column, columnIndex) => (
+                                        <Cell
+                                            {...slots(
+                                                "cell",
+                                                (): TableCellInstance<Row> => ({
+                                                    rowIndex: index(),
+                                                    row: entry.row,
+                                                    column: column.id,
+                                                    columnIndex: columnIndex(),
+                                                }),
+                                            )}
+                                        >
+                                            {column.cell
+                                                ? column.cell(entry.row)
+                                                : String(
+                                                      tableCellValue(
+                                                          column,
+                                                          entry.row,
+                                                      ) ?? "",
+                                                  )}
+                                        </Cell>
+                                    )}
+                                </For>
+                            </Row>
+                        );
+                    }}
                 </For>
             </Body>
             <Show when={columns().some((column) => isPresent(column.footer))}>
-                <Footer {...props.slots("footer")}>
-                    <FooterRow {...props.slots("footerRow")}>
+                <Footer {...slots("footer")}>
+                    <FooterRow {...slots("footerRow")}>
                         <Show when={selectable()}>
-                            <FooterCell {...props.slots("footerCell")} />
+                            <FooterCell
+                                {...slots("footerCell", () => ({
+                                    column: "",
+                                    columnIndex: -1,
+                                }))}
+                            />
                         </Show>
                         <For each={columns()}>
-                            {(column) => (
-                                <FooterCell {...props.slots("footerCell")}>
+                            {(column, columnIndex) => (
+                                <FooterCell
+                                    {...slots(
+                                        "footerCell",
+                                        columnOf(column.id, columnIndex),
+                                    )}
+                                >
                                     {column.footer}
                                 </FooterCell>
                             )}

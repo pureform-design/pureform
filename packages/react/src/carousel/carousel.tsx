@@ -14,6 +14,8 @@ import {
 } from "@pureform/binding-core";
 import type {
     CarouselContentProps,
+    CarouselInstances,
+    CarouselItemInstance,
     CarouselItemSize,
     CarouselMetrics,
     CarouselRootOwnProps,
@@ -268,14 +270,15 @@ function Content({ unstyled, ...props }: CarouselPartProps): ReactNode {
 }
 
 /** The ready-made carousel's props: Root's (without the item count, which the items give), with
- *  `className`, `style`, and `slotProps` keyed by part, and the items as data. */
+ *  `className`, `style`, `slotProps` and `unstyled` keyed by part (an item's parts also by item,
+ *  `CarouselItemInstance`), and the items as data. */
 export interface CarouselProps
     extends
         Omit<
             CarouselRootProps,
             keyof SlotKeyedProps<Anatomy> | "children" | "slideCount"
         >,
-        SlotKeyedProps<Anatomy>,
+        SlotKeyedProps<Anatomy, never, CarouselInstances<ReactNode>>,
         CarouselContentProps<ReactNode> {}
 
 /** The ready-made carousel: the row with an item per entry of `items`, each a mask around its
@@ -288,7 +291,10 @@ function ReadyMade(props: CarouselProps): ReactNode {
         items = [],
         ...rootProps
     } = props;
-    const slot = useSlotProps(props);
+    const slot = useSlotProps<Anatomy, never, CarouselInstances<ReactNode>>(
+        props,
+    );
+    const each = slot.each("item") || slot.each("mask") || slot.each("content");
     return (
         <Root
             {...rootProps}
@@ -296,25 +302,29 @@ function ReadyMade(props: CarouselProps): ReactNode {
             {...(slot("root") as object)}
         >
             <ItemGroup {...slot("itemGroup")}>
-                {items.map((entry, index) => (
-                    <Item
-                        key={index}
-                        index={index}
-                        aspectRatio={entry.aspectRatio}
-                        {...slot("item")}
-                    >
-                        <Mask
-                            aria-label={entry["aria-label"]}
-                            disabled={entry.disabled}
-                            interactionSource={entry.interactionSource}
-                            {...slot("mask")}
+                {items.map((entry, index) => {
+                    const item: CarouselItemInstance<ReactNode> | undefined =
+                        each ? { index, item: entry } : undefined;
+                    return (
+                        <Item
+                            key={index}
+                            index={index}
+                            aspectRatio={entry.aspectRatio}
+                            {...slot("item", item)}
                         >
-                            <Content {...slot("content")}>
-                                {entry.content}
-                            </Content>
-                        </Mask>
-                    </Item>
-                ))}
+                            <Mask
+                                aria-label={entry["aria-label"]}
+                                disabled={entry.disabled}
+                                interactionSource={entry.interactionSource}
+                                {...slot("mask", item)}
+                            >
+                                <Content {...slot("content", item)}>
+                                    {entry.content}
+                                </Content>
+                            </Mask>
+                        </Item>
+                    );
+                })}
             </ItemGroup>
         </Root>
     );

@@ -12,7 +12,9 @@ import {
     carouselSelection,
 } from "@pureform/binding-core";
 import type {
+    CarouselInstances,
     CarouselItem,
+    CarouselItemInstance,
     CarouselItemSize,
     CarouselMetrics,
     CarouselPart,
@@ -49,8 +51,12 @@ export interface CarouselHosts {
     readonly itemGroup: "ScrollView";
 }
 
+/** The carousel's props, with `style` and `slotProps` keyed by part (an item's parts also by item,
+ *  `CarouselItemInstance`). */
 export interface CarouselProps
-    extends CarouselVariantProps, NativeSlotProps<CarouselHosts> {
+    extends
+        CarouselVariantProps,
+        NativeSlotProps<CarouselHosts, CarouselInstances<ReactNode>> {
     /** The items, in order. */
     readonly items: readonly CarouselItem<ReactNode>[];
     /** Its name, for assistive technology. */
@@ -111,15 +117,19 @@ function ItemImpl({
         indication.states(item.disabled ? { disabled: true } : {}),
     );
     const id = (part: CarouselPart) => testIdOf(carouselAnatomy, part, testId);
+    const each: CarouselItemInstance<ReactNode> | undefined =
+        slot.each("item") || slot.each("mask") || slot.each("content")
+            ? { index, item }
+            : undefined;
     return (
         <v.item.View
-            {...slot.props("item")}
-            style={slot.style("item", { ...s.item, width: size.slot })}
+            {...slot.props("item", each)}
+            style={slot.style("item", { ...s.item, width: size.slot }, each)}
             testID={id("item")}
         >
             <v.mask.Pressable
-                {...slot.props("mask")}
-                {...slot.with("mask", indication.handlers)}
+                {...slot.props("mask", each)}
+                {...slot.with("mask", indication.handlers, each)}
                 role="button"
                 {...(item["aria-label"] === undefined
                     ? {}
@@ -130,21 +140,30 @@ function ItemImpl({
                     "mask",
                     "onPress",
                     onPress ? () => onPress(index) : undefined,
+                    each,
                 )}
-                style={slot.style("mask", {
-                    ...s.mask,
-                    ...unselectable,
-                    width: size.mask,
-                    marginStart: size.offset,
-                })}
+                style={slot.style(
+                    "mask",
+                    {
+                        ...s.mask,
+                        ...unselectable,
+                        width: size.mask,
+                        marginStart: size.offset,
+                    },
+                    each,
+                )}
                 testID={id("mask")}
             >
                 <v.content.View
-                    {...slot.props("content")}
-                    style={slot.style("content", {
-                        ...s.content,
-                        width: size.slot,
-                    })}
+                    {...slot.props("content", each)}
+                    style={slot.style(
+                        "content",
+                        {
+                            ...s.content,
+                            width: size.slot,
+                        },
+                        each,
+                    )}
                     testID={id("content")}
                 >
                     {item.content}

@@ -4,6 +4,7 @@
 // and the ready-made Stepper over them.
 
 import { stepperAnatomy } from "@pureform/anatomy";
+import type { PartName } from "@pureform/anatomy";
 import {
     isPresent,
     STEPPER_CONTENT_PROPS,
@@ -20,8 +21,10 @@ import type {
     PageKey,
     PageTransitionProps,
     StepperContentProps,
+    StepperInstances,
     StepperItem,
     StepperRootOwnProps,
+    StepperStepInstance,
 } from "@pureform/binding-core";
 import * as stepper from "@pureform/machines/stepper";
 import type { JSX, ValidComponent } from "@solidjs/web";
@@ -37,8 +40,10 @@ import {
 
 import { useControllable } from "../controllable";
 import { FadeThrough } from "../fade-through/fade-through";
+import type { FadeThroughProps } from "../fade-through/fade-through";
 import { ToastIcon } from "../glyphs";
 import { HorizontalSharedAxis } from "../horizontal-shared-axis/horizontal-shared-axis";
+import type { HorizontalSharedAxisProps } from "../horizontal-shared-axis/horizontal-shared-axis";
 import { itemInteractionSources } from "../interaction";
 import type { ItemInteractionSources } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
@@ -47,7 +52,7 @@ import { useCollapsible } from "../motion";
 import { useTransitionPage } from "../page-transition";
 import { createPartContext } from "../part-context";
 import { createSlotProps, plainParts, useComponent } from "../parts";
-import type { ComponentScope, SlotKeyedProps } from "../parts";
+import type { ComponentScope, SlotKeyedProps, SlotPropsOf } from "../parts";
 import { pickerAction } from "../picker-actions";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
@@ -299,34 +304,56 @@ const NextTrigger = stepAction("NextTrigger", "next");
 const PrevTrigger = stepAction("PrevTrigger", "previous");
 
 /** The ready-made stepper's props: Root's (without the step count, which the items give), with
- *  `class`, `style`, and `slotProps` keyed by part, the steps as data, and the step list's name
- *  (`aria-label`, `aria-labelledby`). */
+ *  `class`, `style`, `slotProps` and `unstyled` keyed by part (a step's parts also by step,
+ *  `StepperStepInstance`), the steps as data, and the step list's name (`aria-label`,
+ *  `aria-labelledby`). */
 export interface StepperProps
     extends
         Omit<
             StepperRootProps,
             keyof SlotKeyedProps<Anatomy> | "children" | "count"
         >,
-        SlotKeyedProps<Anatomy>,
-        StepperContentProps<JSX.Element> {}
+        SlotKeyedProps<Anatomy, never, StepperInstances<JSX.Element>>,
+        StepperContentProps<JSX.Element> {
+    /** The fade through's own props, for `transition="fadeThrough"`. */
+    readonly fadeThroughProps?:
+        | Omit<FadeThroughProps, "value" | "children">
+        | undefined;
+    /** The shared axis's own props, for `transition="sharedAxis"`. */
+    readonly horizontalSharedAxisProps?:
+        | Omit<HorizontalSharedAxisProps, "index" | "scrim" | "children">
+        | undefined;
+}
 
 const READY_MADE_PROPS = [
     "class",
     "style",
     "slotProps",
+    "fadeThroughProps",
+    "horizontalSharedAxisProps",
     ...STEPPER_CONTENT_PROPS,
     ...STEPPER_LIST_LABEL_PROPS,
 ] as const;
 
-interface StepSlots {
-    readonly item: object;
-    readonly trigger: object;
-    readonly indicator: object;
-    readonly label: object;
-    readonly caption: object;
-    readonly separator: object;
-    readonly content: object;
-}
+type Slots = SlotPropsOf<PartName<Anatomy>, StepperInstances<JSX.Element>>;
+
+// A step's state for a function of the copy in a per-step key.
+const stepInstance =
+    (
+        api: Accessor<stepper.Api<PropTypes>>,
+        entry: Accessor<StepperItem<JSX.Element>>,
+        index: number,
+    ) =>
+    (): StepperStepInstance<JSX.Element> => {
+        const state = api().getItemState({ index });
+        return {
+            index,
+            item: entry(),
+            completed: state.completed,
+            current: state.current,
+            error: !!entry().error,
+        };
+    };
 
 // The indicator's content: an error's warning, a done step's check, the step's icon, or its number.
 function StepIndicator(props: {
@@ -376,94 +403,115 @@ function StepContent(props: {
  *  starts. */
 function ReadyMade(props: StepperProps): JSX.Element {
     const items = createMemo(() => props.items ?? []);
-    const slots = createSlotProps(props);
+    const slots = createSlotProps<
+        Anatomy,
+        never,
+        StepperInstances<JSX.Element>
+    >(props);
     const own = omit(props, ...READY_MADE_PROPS) as Omit<
         StepperRootProps,
         "count"
     >;
     const root = slots("root") as object;
+    return (
+        <Root {...own} count={items().length} {...root}>
+            <Steps {...props} items={items()} slotsOf={slots} />
+        </Root>
+    );
+}
+
+// The ready-made's list, steps and content, under Root, which knows each step's state.
+function Steps(
+    props: StepperProps & {
+        readonly items: readonly StepperItem<JSX.Element>[];
+        readonly slotsOf: Slots;
+    },
+): JSX.Element {
+    const { api } = context.use("Stepper");
+    const slots = props.slotsOf;
     const list = slots("list");
-    const part: StepSlots = {
-        item: slots("item") as object,
-        trigger: slots("trigger") as object,
-        indicator: slots("indicator") as object,
-        label: slots("label") as object,
-        caption: slots("caption") as object,
-        separator: slots("separator") as object,
-        content: slots("content") as object,
-    };
     const vertical = () => props.orientation === "vertical";
     const moving = () =>
         props.transition === "sharedAxis" || props.transition === "fadeThrough";
     return (
-        <Root {...own} count={items().length} {...root}>
+        <>
             <List
                 aria-label={props["aria-label"]}
                 aria-labelledby={props["aria-labelledby"]}
                 {...list}
             >
-                <For each={items()} keyed={false}>
-                    {(entry: Accessor<StepperItem<JSX.Element>>, index) => (
-                        <Item index={index} {...part.item}>
-                            <Trigger
-                                error={entry().error}
-                                editable={entry().editable}
-                                disabled={entry().disabled}
-                                controls={isPresent(entry().content)}
-                                interactionSource={entry().interactionSource}
-                                aria-label={entry()["aria-label"]}
-                                {...part.trigger}
-                            >
-                                <StepIndicator
-                                    index={index}
-                                    item={entry()}
-                                    slot={part.indicator}
-                                />
-                                <Show when={isPresent(entry().label)}>
-                                    <Label {...part.label}>
-                                        {entry().label}
-                                    </Label>
+                <For each={props.items} keyed={false}>
+                    {(entry: Accessor<StepperItem<JSX.Element>>, index) => {
+                        const step = stepInstance(api, entry, index);
+                        return (
+                            <Item index={index} {...slots("item", step)}>
+                                <Trigger
+                                    error={entry().error}
+                                    editable={entry().editable}
+                                    disabled={entry().disabled}
+                                    controls={isPresent(entry().content)}
+                                    interactionSource={
+                                        entry().interactionSource
+                                    }
+                                    aria-label={entry()["aria-label"]}
+                                    {...slots("trigger", step)}
+                                >
+                                    <StepIndicator
+                                        index={index}
+                                        item={entry()}
+                                        slot={slots("indicator", step)}
+                                    />
+                                    <Show when={isPresent(entry().label)}>
+                                        <Label {...slots("label", step)}>
+                                            {entry().label}
+                                        </Label>
+                                    </Show>
+                                    <Show when={isPresent(entry().caption)}>
+                                        <Caption {...slots("caption", step)}>
+                                            {entry().caption}
+                                        </Caption>
+                                    </Show>
+                                </Trigger>
+                                <Show when={index < props.items.length - 1}>
+                                    <Separator {...slots("separator", step)} />
                                 </Show>
-                                <Show when={isPresent(entry().caption)}>
-                                    <Caption {...part.caption}>
-                                        {entry().caption}
-                                    </Caption>
+                                <Show when={vertical()}>
+                                    <StepContent
+                                        entry={entry}
+                                        index={index}
+                                        slot={slots("content", step)}
+                                    />
                                 </Show>
-                            </Trigger>
-                            <Show when={index < items().length - 1}>
-                                <Separator {...part.separator} />
-                            </Show>
-                            <Show when={vertical()}>
-                                <StepContent
-                                    entry={entry}
-                                    index={index}
-                                    slot={part.content}
-                                />
-                            </Show>
-                        </Item>
-                    )}
+                            </Item>
+                        );
+                    }}
                 </For>
             </List>
             <Show when={!vertical() && !moving()}>
-                <For each={items()} keyed={false}>
+                <For each={props.items} keyed={false}>
                     {(entry: Accessor<StepperItem<JSX.Element>>, index) => (
                         <StepContent
                             entry={entry}
                             index={index}
-                            slot={part.content}
+                            slot={slots(
+                                "content",
+                                stepInstance(api, entry, index),
+                            )}
                         />
                     )}
                 </For>
             </Show>
             <Show when={!vertical() && moving()}>
                 <TransitionSteps
-                    items={items}
+                    items={() => props.items}
                     transition={() => props.transition}
                     scrim={() => props.transitionScrim}
-                    slot={part.content}
+                    fadeThroughProps={props.fadeThroughProps}
+                    sharedAxisProps={props.horizontalSharedAxisProps}
+                    slots={slots}
                 />
             </Show>
-        </Root>
+        </>
     );
 }
 
@@ -473,16 +521,22 @@ function TransitionSteps(props: {
     readonly items: Accessor<readonly StepperItem<JSX.Element>[]>;
     readonly transition: Accessor<PageTransitionProps["transition"]>;
     readonly scrim: Accessor<boolean | undefined>;
-    readonly slot: object;
+    readonly fadeThroughProps: StepperProps["fadeThroughProps"];
+    readonly sharedAxisProps: StepperProps["horizontalSharedAxisProps"];
+    readonly slots: Slots;
 }): JSX.Element {
     const { api } = context.use("Content");
     const step = (at: PageKey) => {
-        const entry = untrack(() => props.items()[Number(at)]);
+        const index = Number(at);
+        const entry = untrack(() => props.items()[index]);
         return entry ? (
             <StepContent
                 entry={() => entry}
-                index={Number(at)}
-                slot={props.slot}
+                index={index}
+                slot={props.slots(
+                    "content",
+                    stepInstance(api, () => entry, index),
+                )}
             />
         ) : null;
     };
@@ -490,12 +544,16 @@ function TransitionSteps(props: {
         <Show
             when={props.transition() === "fadeThrough"}
             fallback={
-                <HorizontalSharedAxis index={api().value} scrim={props.scrim()}>
+                <HorizontalSharedAxis
+                    {...props.sharedAxisProps}
+                    index={api().value}
+                    scrim={props.scrim()}
+                >
                     {(at: number) => step(at)}
                 </HorizontalSharedAxis>
             }
         >
-            <FadeThrough value={api().value}>
+            <FadeThrough {...props.fadeThroughProps} value={api().value}>
                 {(at: PageKey) => step(at)}
             </FadeThrough>
         </Show>

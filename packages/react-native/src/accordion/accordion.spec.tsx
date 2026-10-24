@@ -69,6 +69,40 @@ describe("Accordion", () => {
     });
 });
 
+describe("Accordion, per item", () => {
+    it("takes a function of each item in style and slotProps", async () => {
+        await render(
+            <Accordion
+                items={[
+                    { value: "a", title: "A", content: "A body" },
+                    { value: "b", title: "B", content: "B body" },
+                ]}
+                defaultValue={["b"]}
+                style={{
+                    item: (item) =>
+                        item.expanded ? { opacity: 0.5 } : undefined,
+                }}
+                slotProps={{
+                    indicator: (item) => ({
+                        "aria-label": `${item.index}:${item.item.value}`,
+                    }),
+                }}
+            />,
+        );
+        await settle();
+        expect(
+            all("pf-accordion-item").map(
+                (item) => getComputedStyle(item).opacity,
+            ),
+        ).toEqual(["1", "0.5"]);
+        expect(
+            all("pf-accordion-indicator").map((part) =>
+                part.getAttribute("aria-label"),
+            ),
+        ).toEqual(["0:a", "1:b"]);
+    });
+});
+
 describe("Expanding parts", () => {
     it("grows an accordion's content open and shrinks it shut, as the web's height transition", async () => {
         await mount(
@@ -152,5 +186,47 @@ describe("Tree", () => {
             rows[1]!.getBoundingClientRect().left -
             rows[0]!.getBoundingClientRect().left;
         expect(indent).toBe(24);
+    });
+});
+
+describe("Tree, per node", () => {
+    it("takes a function of each node in style and slotProps", async () => {
+        await render(
+            <Tree
+                aria-label="Files"
+                items={[
+                    {
+                        value: "src",
+                        label: "src",
+                        children: [{ value: "index", label: "index.ts" }],
+                    },
+                    { value: "readme", label: "README.md" },
+                ]}
+                defaultExpandedValue={["src"]}
+                defaultSelectedValue={["readme"]}
+                style={{
+                    text: (node) =>
+                        node.depth === 2 ? { opacity: 0.5 } : undefined,
+                }}
+                slotProps={{
+                    node: (node) => ({
+                        nativeID: [
+                            node.branch ? "branch" : "leaf",
+                            node.expanded ? "open" : "shut",
+                            node.selected ? "chosen" : "not",
+                        ].join("-"),
+                    }),
+                }}
+            />,
+        );
+        await settle();
+        expect(
+            all("pf-tree-text").map((text) => getComputedStyle(text).opacity),
+        ).toEqual(["1", "0.5", "1"]);
+        expect(all("pf-tree-node").map((node) => node.id)).toEqual([
+            "branch-open-not",
+            "leaf-shut-not",
+            "leaf-shut-chosen",
+        ]);
     });
 });

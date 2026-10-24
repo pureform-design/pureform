@@ -124,4 +124,30 @@ describe.each([animated, reanimated])("the carousel with $name", (engine) => {
             document.body.innerHTML = "";
         }
     });
+
+    it("takes a function of each item in style and slotProps", async () => {
+        await render(
+            <Carousel
+                aria-label="Trips"
+                items={ITEMS.slice(0, 3)}
+                style={{
+                    content: (item) =>
+                        item.index === 1 ? { opacity: 0.5 } : undefined,
+                }}
+                slotProps={{
+                    item: (item) => ({ "aria-label": `slot ${item.index}` }),
+                }}
+            />,
+        );
+        expect(
+            all("pf-carousel-item").map((item) =>
+                item.getAttribute("aria-label"),
+            ),
+        ).toEqual(["slot 0", "slot 1", "slot 2"]);
+        expect(
+            all("pf-carousel-content").map(
+                (content) => getComputedStyle(content).opacity,
+            ),
+        ).toEqual(["1", "0.5", "1"]);
+    });
 });

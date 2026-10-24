@@ -15,6 +15,8 @@ import {
 } from "@pureform/binding-core";
 import type {
     CarouselContentProps,
+    CarouselInstances,
+    CarouselItemInstance,
     CarouselItem,
     CarouselItemSize,
     CarouselMetrics,
@@ -271,14 +273,15 @@ function Content(props: CarouselPartProps): JSX.Element {
 }
 
 /** The ready-made carousel's props: Root's (without the item count, which the items give), with
- *  `class`, `style`, and `slotProps` keyed by part, and the items as data. */
+ *  `class`, `style`, `slotProps` and `unstyled` keyed by part (an item's parts also by item,
+ *  `CarouselItemInstance`), and the items as data. */
 export interface CarouselProps
     extends
         Omit<
             CarouselRootProps,
             keyof SlotKeyedProps<Anatomy> | "children" | "slideCount"
         >,
-        SlotKeyedProps<Anatomy>,
+        SlotKeyedProps<Anatomy, never, CarouselInstances<JSX.Element>>,
         CarouselContentProps<JSX.Element> {}
 
 const READY_MADE_PROPS = [
@@ -292,38 +295,47 @@ const READY_MADE_PROPS = [
  *  content. */
 function ReadyMade(props: CarouselProps): JSX.Element {
     const items = createMemo(() => props.items ?? []);
-    const slots = createSlotProps(props);
+    const slots = createSlotProps<
+        Anatomy,
+        never,
+        CarouselInstances<JSX.Element>
+    >(props);
     const own = omit(props, ...READY_MADE_PROPS) as Omit<
         CarouselRootProps,
         "slideCount"
     >;
     const root = slots("root") as object;
     const itemGroup = slots("itemGroup");
-    const item = slots("item") as object;
-    const mask = slots("mask") as object;
-    const content = slots("content");
     return (
         <Root {...own} slideCount={items().length} {...root}>
             <ItemGroup {...itemGroup}>
                 <For each={items()} keyed={false}>
-                    {(entry: Accessor<CarouselItem<JSX.Element>>, index) => (
-                        <Item
-                            index={index}
-                            aspectRatio={entry().aspectRatio}
-                            {...item}
-                        >
-                            <Mask
-                                aria-label={entry()["aria-label"]}
-                                disabled={entry().disabled}
-                                interactionSource={entry().interactionSource}
-                                {...mask}
+                    {(entry: Accessor<CarouselItem<JSX.Element>>, index) => {
+                        const item = (): CarouselItemInstance<JSX.Element> => ({
+                            index,
+                            item: entry(),
+                        });
+                        return (
+                            <Item
+                                index={index}
+                                aspectRatio={entry().aspectRatio}
+                                {...slots("item", item)}
                             >
-                                <Content {...content}>
-                                    {entry().content}
-                                </Content>
-                            </Mask>
-                        </Item>
-                    )}
+                                <Mask
+                                    aria-label={entry()["aria-label"]}
+                                    disabled={entry().disabled}
+                                    interactionSource={
+                                        entry().interactionSource
+                                    }
+                                    {...slots("mask", item)}
+                                >
+                                    <Content {...slots("content", item)}>
+                                        {entry().content}
+                                    </Content>
+                                </Mask>
+                            </Item>
+                        );
+                    }}
                 </For>
             </ItemGroup>
         </Root>

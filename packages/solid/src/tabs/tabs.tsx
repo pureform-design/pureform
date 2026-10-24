@@ -5,6 +5,7 @@
 // list scrolls it into view.
 
 import { tabsCompositeAnatomy } from "@pureform/anatomy";
+import type { PartName } from "@pureform/anatomy";
 import {
     isPresent,
     TABS_CONTENT_PROPS,
@@ -23,8 +24,10 @@ import type {
     PageKey,
     PageTransitionProps,
     TabsContentProps,
+    TabsInstances,
     TabsItem,
     TabsRootOwnProps,
+    TabsTabInstance,
 } from "@pureform/binding-core";
 import { revealInRow, slideIndicator } from "@pureform/binding-dom";
 import * as tabs from "@pureform/machines/tabs";
@@ -44,7 +47,9 @@ import {
 
 import { useControllable } from "../controllable";
 import { FadeThrough } from "../fade-through/fade-through";
+import type { FadeThroughProps } from "../fade-through/fade-through";
 import { HorizontalSharedAxis } from "../horizontal-shared-axis/horizontal-shared-axis";
+import type { HorizontalSharedAxisProps } from "../horizontal-shared-axis/horizontal-shared-axis";
 import { itemInteractionSources } from "../interaction";
 import type { ItemInteractionSources } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
@@ -52,7 +57,7 @@ import type { PropTypes } from "../internal/zag";
 import { useTransitionPage } from "../page-transition";
 import { createPartContext } from "../part-context";
 import { createSlotProps, useComponent } from "../parts";
-import type { ComponentScope, SlotKeyedProps } from "../parts";
+import type { ComponentScope, SlotKeyedProps, SlotPropsOf } from "../parts";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 
@@ -307,18 +312,32 @@ function Content(props: TabsContentPartProps): JSX.Element {
     });
 }
 
-/** The ready-made tabs' props: Root's, with `class`, `style`, and `slotProps` keyed by part, the
- *  tabs as data, and the tab list's name (`aria-label`, `aria-labelledby`). */
+/** The ready-made tabs' props: Root's, with `class`, `style`, `slotProps` and `unstyled` keyed by
+ *  part (a tab's parts and its panel also by tab, `TabsTabInstance`), the tabs as data, and the
+ *  tab list's name (`aria-label`, `aria-labelledby`). */
 export interface TabsProps
     extends
         Omit<TabsRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
-        SlotKeyedProps<Anatomy>,
-        TabsContentProps<JSX.Element> {}
+        SlotKeyedProps<Anatomy, never, TabsInstances<JSX.Element>>,
+        TabsContentProps<JSX.Element> {
+    /** The fade through's own props, for `transition="fadeThrough"`. */
+    readonly fadeThroughProps?:
+        | Omit<FadeThroughProps, "value" | "children">
+        | undefined;
+    /** The shared axis's own props, for `transition="sharedAxis"`. */
+    readonly horizontalSharedAxisProps?:
+        | Omit<HorizontalSharedAxisProps, "index" | "scrim" | "children">
+        | undefined;
+}
+
+type Slots = SlotPropsOf<PartName<Anatomy>, TabsInstances<JSX.Element>>;
 
 const READY_MADE_PROPS = [
     "class",
     "style",
     "slotProps",
+    "fadeThroughProps",
+    "horizontalSharedAxisProps",
     ...TABS_CONTENT_PROPS,
     ...TABS_LIST_LABEL_PROPS,
 ] as const;
@@ -329,19 +348,12 @@ function ReadyMade(props: TabsProps): JSX.Element {
     // Read once per change: items written in place make their content (`content`, `icon`) each
     // time they're read.
     const items = createMemo(() => props.items ?? []);
-    const panels = createMemo(() => tabsHavePanels(items()));
     const defaultValue = untrack(() => tabsDefaultValue(props, items()));
-    const slots = createSlotProps(props);
+    const slots = createSlotProps<Anatomy, never, TabsInstances<JSX.Element>>(
+        props,
+    );
     const own = omit(props, ...READY_MADE_PROPS) as TabsRootProps;
     const root = slots("root") as object;
-    const list = slots("list");
-    // Views, so every tab reads the same ones.
-    const tab = slots("tab") as object;
-    const tabContent = slots("tabContent");
-    const icon = slots("icon");
-    const label = slots("label");
-    const indicator = slots("indicator");
-    const content = slots("content") as object;
     return (
         <Root
             {...own}
@@ -349,6 +361,32 @@ function ReadyMade(props: TabsProps): JSX.Element {
             icon={props.icon ?? tabsHaveIcons(items())}
             {...root}
         >
+            <ReadyMadeTabs {...props} items={items} slotsOf={slots} />
+        </Root>
+    );
+}
+
+// The ready-made's list and panels, under Root, which knows the selected tab.
+function ReadyMadeTabs(
+    props: Omit<TabsProps, "items"> & {
+        readonly items: Accessor<readonly TabsItem<JSX.Element>[]>;
+        readonly slotsOf: Slots;
+    },
+): JSX.Element {
+    const { api } = context.use("Tabs");
+    const items = props.items;
+    const slots = props.slotsOf;
+    const panels = createMemo(() => tabsHavePanels(items()));
+    const list = slots("list");
+    const tabOf =
+        (item: Accessor<TabsItem<JSX.Element>>) =>
+        (): TabsTabInstance<JSX.Element> => ({
+            index: items().indexOf(item()),
+            item: item(),
+            selected: item().value === api().value,
+        });
+    return (
+        <>
             <List
                 aria-label={props["aria-label"]}
                 aria-labelledby={props["aria-labelledby"]}
@@ -358,27 +396,35 @@ function ReadyMade(props: TabsProps): JSX.Element {
                     each={items()}
                     keyed={(item: TabsItem<JSX.Element>) => item.value}
                 >
-                    {(item) => (
-                        <Tab
-                            value={item().value}
-                            disabled={item().disabled}
-                            interactionSource={item().interactionSource}
-                            aria-label={item()["aria-label"]}
-                            controls={panels()}
-                            tabContentProps={tabContent}
-                            {...tab}
-                        >
-                            <Show when={isPresent(item().icon)}>
-                                <Icon mirror={item().mirrorIcon} {...icon}>
-                                    {item().icon}
-                                </Icon>
-                            </Show>
-                            <Show when={isPresent(item().label)}>
-                                <Label {...label}>{item().label}</Label>
-                            </Show>
-                            <Indicator {...indicator} />
-                        </Tab>
-                    )}
+                    {(item) => {
+                        const tab = tabOf(item);
+                        return (
+                            <Tab
+                                value={item().value}
+                                disabled={item().disabled}
+                                interactionSource={item().interactionSource}
+                                aria-label={item()["aria-label"]}
+                                controls={panels()}
+                                tabContentProps={slots("tabContent", tab)}
+                                {...slots("tab", tab)}
+                            >
+                                <Show when={isPresent(item().icon)}>
+                                    <Icon
+                                        mirror={item().mirrorIcon}
+                                        {...slots("icon", tab)}
+                                    >
+                                        {item().icon}
+                                    </Icon>
+                                </Show>
+                                <Show when={isPresent(item().label)}>
+                                    <Label {...slots("label", tab)}>
+                                        {item().label}
+                                    </Label>
+                                </Show>
+                                <Indicator {...slots("indicator", tab)} />
+                            </Tab>
+                        );
+                    }}
                 </For>
             </List>
             <Show
@@ -392,7 +438,10 @@ function ReadyMade(props: TabsProps): JSX.Element {
                         keyed={(item: TabsItem<JSX.Element>) => item.value}
                     >
                         {(item) => (
-                            <Content value={item().value} {...content}>
+                            <Content
+                                value={item().value}
+                                {...slots("content", tabOf(item))}
+                            >
                                 {item().content}
                             </Content>
                         )}
@@ -403,10 +452,12 @@ function ReadyMade(props: TabsProps): JSX.Element {
                     items={items}
                     transition={() => props.transition}
                     scrim={() => props.transitionScrim}
-                    slot={content}
+                    fadeThroughProps={props.fadeThroughProps}
+                    sharedAxisProps={props.horizontalSharedAxisProps}
+                    panel={(item) => slots("content", tabOf(item))}
                 />
             </Show>
-        </Root>
+        </>
     );
 }
 
@@ -416,7 +467,9 @@ function TransitionPanels(props: {
     readonly items: Accessor<readonly TabsItem<JSX.Element>[]>;
     readonly transition: Accessor<PageTransitionProps["transition"]>;
     readonly scrim: Accessor<boolean | undefined>;
-    readonly slot: object;
+    readonly fadeThroughProps: TabsProps["fadeThroughProps"];
+    readonly sharedAxisProps: TabsProps["horizontalSharedAxisProps"];
+    readonly panel: (item: Accessor<TabsItem<JSX.Element>>) => object;
 }): JSX.Element {
     const { api } = context.use("Content");
     const index = createMemo(() =>
@@ -425,7 +478,7 @@ function TransitionPanels(props: {
     const panel = (at: PageKey) => {
         const item = untrack(() => props.items()[Number(at)]);
         return item && isPresent(item.content) ? (
-            <Content value={item.value} {...props.slot}>
+            <Content value={item.value} {...props.panel(() => item)}>
                 {item.content}
             </Content>
         ) : null;
@@ -434,12 +487,16 @@ function TransitionPanels(props: {
         <Show
             when={props.transition() === "fadeThrough"}
             fallback={
-                <HorizontalSharedAxis index={index()} scrim={props.scrim()}>
+                <HorizontalSharedAxis
+                    {...props.sharedAxisProps}
+                    index={index()}
+                    scrim={props.scrim()}
+                >
                     {(at: number) => panel(at)}
                 </HorizontalSharedAxis>
             }
         >
-            <FadeThrough value={index()}>
+            <FadeThrough {...props.fadeThroughProps} value={index()}>
                 {(at: PageKey) => panel(at)}
             </FadeThrough>
         </Show>

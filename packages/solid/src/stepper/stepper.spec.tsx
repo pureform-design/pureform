@@ -161,6 +161,62 @@ describe("Stepper, ready-made", () => {
 });
 
 describe("Stepper, composed", () => {
+    it("gives the page transition its own props", async () => {
+        mount(() => (
+            <PureformProvider registry={displayRegistry()}>
+                <Stepper
+                    aria-label="Checkout"
+                    items={ITEMS}
+                    transition="sharedAxis"
+                    horizontalSharedAxisProps={{ class: "axis" }}
+                />
+            </PureformProvider>
+        ));
+        await settle();
+        expect(document.querySelectorAll(".axis")).toHaveLength(1);
+    });
+
+    it("takes a function of each step in the per-step parts' keys", async () => {
+        mount(() => (
+            <PureformProvider registry={displayRegistry()}>
+                <Stepper
+                    aria-label="Checkout"
+                    items={[...ITEMS.slice(0, 2), { label: "C", error: true }]}
+                    defaultStep={1}
+                    class={{
+                        item: (step) =>
+                            step.completed
+                                ? "done"
+                                : step.current
+                                  ? "here"
+                                  : undefined,
+                        list: "steps",
+                    }}
+                    style={{
+                        label: (step) => ({ opacity: step.error ? 0.5 : 1 }),
+                    }}
+                    slotProps={{
+                        trigger: (step) => ({ title: `step ${step.index}` }),
+                    }}
+                    unstyled={{ separator: (step) => step.index === 0 }}
+                />
+            </PureformProvider>
+        ));
+        await settle();
+        expect(all(ids.item).map((item) => item.className)).toEqual([
+            expect.stringContaining("done"),
+            expect.stringContaining("here"),
+            expect.not.stringMatching(/done|here/),
+        ]);
+        expect(byTestId(ids.list).classList.contains("steps")).toBe(true);
+        expect(triggers()[2]!.title).toBe("step 2");
+        expect(all(ids.label)[2]!.style.opacity).toBe("0.5");
+        expect(all(ids.label)[0]!.style.opacity).toBe("1");
+        const separators = all(ids.separator);
+        expect(separators[0]!.className).toBe("");
+        expect(separators[1]!.className).not.toBe("");
+    });
+
     it("renders the parts under Root, with next and previous triggers", async () => {
         const onStepComplete = vi.fn();
         mount(() => (

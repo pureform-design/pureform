@@ -20,7 +20,9 @@ import { isPresent, isTreeBranch, treeSelection } from "@pureform/binding-core";
 import type {
     IndicationProps,
     TreeBehaviorProps,
+    TreeInstances,
     TreeNode,
+    TreeNodeInstance,
     TreePart,
     TreeVariantProps,
 } from "@pureform/binding-core";
@@ -34,7 +36,7 @@ import { useSurfaceIndication } from "../indication";
 import { testIdOf, useControllable, withEngine } from "../parts";
 import { useDirection } from "../provider";
 import { nativeSlots, withUnselectable } from "../slot-props";
-import type { NativeSlotProps } from "../slot-props";
+import type { NativeSlotProps, PartSlots } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
 const [INDICATION] = treeAnatomy.indication!;
@@ -54,12 +56,14 @@ export interface TreeHosts {
     readonly tree: "View";
 }
 
+/** The tree's props, with `style` and `slotProps` keyed by part (a node's parts also by node,
+ *  `TreeNodeInstance`). */
 export interface TreeProps
     extends
         TreeVariantProps,
         Omit<TreeBehaviorProps, "id" | "expandOnClick">,
         IndicationProps,
-        NativeSlotProps<TreeHosts> {
+        NativeSlotProps<TreeHosts, TreeInstances<ReactNode>> {
     readonly items: readonly Node[];
     /** A label over the tree, which names it. */
     readonly label?: ReactNode;
@@ -111,6 +115,31 @@ export const nativeTreeRow = (
     },
 });
 
+const NODE_PARTS = [
+    "branch",
+    "node",
+    "leading",
+    "text",
+    "indicator",
+    "group",
+] as const;
+
+// The tree's per-part props for one node: each part's function of the copy gets the node.
+const forNode = (
+    slot: PartSlots,
+    instance: () => TreeNodeInstance<ReactNode>,
+): PartSlots => {
+    if (!NODE_PARTS.some((part) => slot.each(part))) return slot;
+    const each = instance();
+    return {
+        props: (part) => slot.props(part, each),
+        style: (part, own) => slot.style(part, own, each),
+        on: (part, name, own) => slot.on(part, name, own, each),
+        with: (part, own) => slot.with(part, own, each),
+        each: slot.each,
+    };
+};
+
 function Row(props: {
     readonly node: Node;
     readonly level: number;
@@ -142,7 +171,13 @@ function Row(props: {
     const { styles: s, selected, views: v } = slots;
     const id = (part: TreePart) =>
         testIdOf(treeAnatomy, part, tree.props.testId);
-    const slot = nativeSlots(tree.props);
+    const slot = forNode(nativeSlots(tree.props), () => ({
+        node,
+        depth: props.level,
+        branch,
+        expanded,
+        selected: selectedNode,
+    }));
     const icon = iconParts(slots, id, slot);
     const textId = useId();
     const web = Platform.OS === "web";
