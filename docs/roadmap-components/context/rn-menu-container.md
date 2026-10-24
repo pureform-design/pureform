@@ -73,3 +73,25 @@ Branch `rn-menu-frame` from main `3f98a6c7`. Not pushed. It was cheap and reliab
   container that moves while the menu stays open isn't followed (the menu closes on outside
   presses and scrolling parents move the trigger anyway). The fresh frame stays until the surface
   next lays out.
+
+## Follow-up: deciding when the submenu opens (`rn-menu-decide`)
+
+Branch `rn-menu-decide` from main `13f12cbf`. Not pushed.
+
+- `Menu` (`auto`) no longer derives the mode from state at render. When a submenu item is pressed
+  (or its key), `select` measures the row, the menu surface and, through `useMeasureContainer`,
+  the container once, computes the room (window ∩ container) and opens it as a drill (`setPath`) or
+  a cascade (`setBeside`): one state update, no extra render. The mode afterwards follows from that
+  state (a non-empty path is a drill), so it can't flip while the submenu is shown. Explicit
+  `cascade` / `drill` skip the container and surface measures.
+- Fallback when there's no container, or a measure fails or is zero-sized: the cached container
+  frame (`useContainerFrame`) and the last menu box seen at layout (kept in refs, no render), else
+  the window alone.
+- The `fresh` state and the room measured at layout are gone. Nothing runs per frame.
+- Tests (`overlays.spec.tsx`, both engines): the container moved by a transform after the menu was
+  shown, then the submenu opened, decides with the new position, and every render of the submenu
+  shows the final mode.
+- **Limits:** the press takes a few asynchronous measures before the submenu appears (a frame or
+  so on native). There is no prop that opens a submenu at the start (`defaultOpen` opens the menu,
+  not a submenu), so nothing needs a hidden wait for a first measurement; a controlled submenu path
+  would need one. A container that moves while a submenu is already open isn't followed.
