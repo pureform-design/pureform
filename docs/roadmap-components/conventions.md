@@ -14,7 +14,10 @@ compaction). Where this file differs, it wins for the component roadmap. Context
 3. Read the output contexts of every phase you depend on, **including their refactoring
    hints**, then `git log --oneline -20`.
 4. In a fresh worktree, run `cog install-hook --all --overwrite` (the commit-msg hook checks
-   conventional commits), then `bun install`, then `omni run build`. The demos' `generate` runs
+   conventional commits: an allowed type, one scope without spaces or commas, `type(scope): …`).
+   Until the commit-msgs cleanup lands, the hook's `cog check` fails on old history: check each
+   message with `cog verify "<message>"` and commit with `--no-verify`. Then `bun install`, then
+   `omni run build`. The demos' `generate` runs
    the CLI's build directly with Node, so no bin link is needed.
 5. `build` doesn't run tests (only `publish` waits for them). Tests run through `omni run test`
    or `build test`; a test package's own `test` runs its whole e2e suite, so run those files
