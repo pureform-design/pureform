@@ -25,11 +25,13 @@ export const caseFor = (component: string): ComponentCase => {
 export const defaultProp = (prop: string): string =>
     `default${prop[0]!.toUpperCase()}${prop.slice(1)}`;
 
-/** The canvas, once the component's root is in it. */
+/** The canvas, once the component is drawn in it: its root, or for a renderer that draws no
+ *  element for a composite's root (React Native's closed dialog is its trigger alone), any part. */
 const mounted = async (c: ComponentCase, canvas: HTMLElement) => {
     await waitFor(() =>
         expect(
-            canvas.querySelector(`[data-testid="${c.root}"]`),
+            canvas.querySelector(`[data-testid="${c.root}"]`) ??
+                canvas.querySelector("[data-testid]"),
         ).not.toBeNull(),
     );
     return canvas;
@@ -67,7 +69,9 @@ export const keyPlay =
                 expect.objectContaining({ type: "click" }),
             );
             await expect(
-                reachesWindow((onClick as { mock: { calls: unknown } }).mock.calls),
+                reachesWindow(
+                    (onClick as { mock: { calls: unknown } }).mock.calls,
+                ),
             ).toBe(false);
         } else if (key.does === "change") {
             const to = key.to ?? c.state!.to;

@@ -122,6 +122,9 @@ export default defineStories({
         },
         ButtonGroup: { parameters: keyClicks("KeyEnter", "KeySpace") },
         ChipSet: { parameters: keyClicks("KeyEnter", "KeySpace") },
+        SplitButton: { parameters: keyClicks("KeyEnter", "KeySpace") },
+        Tooltip: { parameters: keyClicks("KeyEnter") },
+        RichTooltip: { parameters: keyClicks("KeyEnter") },
         Carousel: {
             // Its items are sized from the row's width once mounted (the case's `measured`): a
             // frame as wide as the component suites' page (their 1280px viewport, the reset's
