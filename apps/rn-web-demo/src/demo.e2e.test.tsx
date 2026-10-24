@@ -5,7 +5,7 @@
 import { flushSync } from "react-dom";
 import { createRoot } from "react-dom/client";
 import type { Root } from "react-dom/client";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { registry } from "../.pureform";
@@ -30,6 +30,19 @@ beforeAll(async () => {
 });
 
 afterAll(() => root.unmount());
+
+// A test that fails with a menu or dialog open must not leave its backdrop over the page for
+// the tests after it: close whatever is still open.
+afterEach(async () => {
+    const open = () =>
+        document.querySelector(
+            "[role=menu], [role=listbox], [aria-modal=true]",
+        );
+    for (let attempt = 0; attempt < 3 && open(); attempt++) {
+        await userEvent.keyboard("{Escape}");
+        await wait(500);
+    }
+});
 
 const all = (id: string) => [
     ...document.querySelectorAll<HTMLElement>(`[data-testid="${id}"]`),
@@ -162,10 +175,12 @@ describe("rn-web-demo", () => {
 
     it("picks a size from the select's menu", async () => {
         await press(document.querySelector<HTMLElement>("[role=combobox]")!);
+        // The select's list is a listbox: its rows are options, not menu items.
         const large = [
-            ...document.querySelectorAll<HTMLElement>("[role=menuitem]"),
-        ].find((item) => item.textContent === "Large")!;
-        await press(large);
+            ...document.querySelectorAll<HTMLElement>("[role=option]"),
+        ].find((item) => item.textContent === "Large");
+        expect(large, "the option labelled Large").toBeDefined();
+        await press(large!);
         expect((first("pf-select-input") as HTMLInputElement).value).toBe(
             "Large",
         );
