@@ -130,7 +130,10 @@ export type Expr =
     | { $dyn: string; default?: Value }
     | { $mix: [base: Value, over: Value, amount: Value]; space?: MixSpace }
     | { $calc: "+" | "-" | "*" | "/"; args: Value[] }
-    | { $math: "min" | "max" | "clamp"; args: Value[] }
+    | {
+          $math: "min" | "max" | "clamp" | "sin" | "tan" | "asin" | "atan2";
+          args: Value[];
+      }
     | { $shadow: ShadowLayer[] }
     | { $shape: ShapeValue }
     | { $gradient: GradientValue };
@@ -257,6 +260,33 @@ const ARITHMETIC: Record<
     },
 };
 
+const radians = (q: Quantity, what: string): number => {
+    if (q.offset) throw new Error(`${what} needs an angle, got ${shown(q)}`);
+    if (q.unit === "deg") return (q.n * Math.PI) / 180;
+    if (q.unit === "rad" || q.unit === "") return q.n;
+    if (q.unit === "turn") return q.n * 2 * Math.PI;
+    throw new Error(`${what} needs an angle, got ${shown(q)}`);
+};
+
+const degrees = (rad: number): Value =>
+    `${Math.round(((rad * 180) / Math.PI) * 1e6) / 1e6}deg`;
+
+// CSS trigonometry: angles in and out as degrees, as transforms take them.
+const TRIG: Record<"sin" | "tan" | "asin" | "atan2", (q: Quantity[]) => Value> =
+    {
+        sin: ([a]) => Math.sin(radians(a!, "sin")),
+        tan: ([a]) => Math.tan(radians(a!, "tan")),
+        asin: ([n]) => {
+            if (n!.unit || n!.offset)
+                throw new Error(`asin needs a number, got ${shown(n!)}`);
+            return degrees(Math.asin(n!.n));
+        },
+        atan2: ([y, x]) => {
+            sameUnit(y!, x!, "atan2");
+            return degrees(Math.atan2(y!.n, x!.n));
+        },
+    };
+
 /** Where evaluation reads tokens: a theme's values, or a lookup that works one out when it's
  *  read (`withSetTokens` evaluates the tokens a selection sets that way). */
 export type Tokens = ThemeValues | ((key: string) => Concrete | undefined);
@@ -323,6 +353,7 @@ export const evaluate = (value: Value, theme: Tokens): Value => {
     if ("$math" in value) {
         const what = value.$math;
         const args = value.args.map((a) => quantity(concrete(a), what));
+        if (what in TRIG) return TRIG[what as keyof typeof TRIG](args);
         const unit = args.reduce(
             (u, a) => sameUnit({ n: 0, unit: u }, a, what),
             args[0]!.unit,
