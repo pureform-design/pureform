@@ -300,12 +300,14 @@ describe("the overlay motions", () => {
 });
 
 describe.each(ENGINES)("with $name", (engine) => {
+    // The listbox sits in the keys' view, in the view that grows and fades.
     const menuWrapper = () =>
-        document.querySelector('[role="menu"]')?.parentElement ?? null;
+        document.querySelector('[role="listbox"]')?.parentElement
+            ?.parentElement ?? null;
 
     it("grows the select's menu in, and keeps it until it has faded out", async () => {
         await render(<Select label="Size" items={ITEMS} />, engine);
-        expect(document.querySelector('[role="menu"]')).toBeNull();
+        expect(document.querySelector('[role="listbox"]')).toBeNull();
         const entering = record(menuWrapper);
         await interact(() =>
             userEvent.click(document.querySelector('[role="combobox"]')!),
@@ -328,7 +330,7 @@ describe.each(ENGINES)("with $name", (engine) => {
                 .getAttribute("aria-expanded"),
         ).toBe("false");
         await until(() =>
-            expect(document.querySelector('[role="menu"]')).toBeNull(),
+            expect(document.querySelector('[role="listbox"]')).toBeNull(),
         );
         leaving.stop();
         const fading = leaving.partway();

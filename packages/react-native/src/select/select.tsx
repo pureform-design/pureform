@@ -1,6 +1,11 @@
-// The select: a field that takes no typing, whose trailing arrow turns while its menu is open.
-// Pressing it opens a menu of its items below it, over the page in a `Modal`; picking one closes
-// it. The menu grows in and fades out as on the web, and the `Modal` closes once it's gone.
+// The select: a field that takes no typing, whose trailing arrow turns while its list is open.
+// Pressing it opens a list of its items below it, over the page in a `Modal`; picking one closes
+// it. The list grows in and fades out as on the web, and the `Modal` closes once it's gone. To
+// assistive technology it's a select-only combobox (APG) controlling a listbox of options. On the
+// web its keys are the web's select's: Enter, Space, and the arrow keys up and down open the list
+// on the chosen option; the arrow keys sideways (by direction), Home and End choose without
+// opening it; in the list the arrow keys, Home and End move, Enter and Space choose, and Escape
+// and Tab close it, focus going back to the field.
 
 import { selectAnatomy } from "@pureform/anatomy";
 import type { TestIdOverride } from "@pureform/anatomy";
@@ -18,14 +23,14 @@ import type {
     SelectVariantProps,
     TextFieldAffixProps,
 } from "@pureform/binding-core";
-import { useId, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Modal, Platform, Pressable, StyleSheet, View } from "react-native";
 
-import { Menu } from "../menu/menu";
+import { MenuKeys, MenuListbox } from "../menu/menu";
 import { useControllable } from "../parts";
 import { usePresence } from "../presence";
-import { useEngine } from "../provider";
+import { useDirection, useEngine } from "../provider";
 import { Field, partId } from "../text-input";
 import type { FieldProps } from "../text-input";
 
@@ -109,7 +114,45 @@ export function Select(props: SelectProps): ReactNode {
             setMenu({ left, top: top + height, width });
             setExpanded(true);
         });
-    const close = () => setExpanded(false);
+    const combobox = useRef<{ focus?(): void }>(null);
+    // On the web, focus goes back to the field once the list is gone.
+    const refocus = useRef(false);
+    const close = () => {
+        setExpanded(false);
+        refocus.current = Platform.OS === "web";
+    };
+    const rtl = useDirection() === "rtl";
+    // The enabled options in order, for the keys that choose without opening the list.
+    const choosable = items.filter((item) => !item.disabled);
+    const chooseAt = (at: (index: number) => number) => {
+        const index = choosable.findIndex((item) => item.value === value);
+        const next = choosable[at(index)];
+        if (next && next.value !== value) setValue(next.value);
+    };
+    const onFieldKey = (event: {
+        nativeEvent: { key: string };
+        preventDefault(): void;
+    }) => {
+        if (props.disabled || expanded) return;
+        const { key } = event.nativeEvent;
+        const forward = rtl ? "ArrowLeft" : "ArrowRight";
+        const back = rtl ? "ArrowRight" : "ArrowLeft";
+        if (key === " " || key === "ArrowDown" || key === "ArrowUp") open();
+        else if (key === forward)
+            chooseAt((index) => Math.min(index + 1, choosable.length - 1));
+        else if (key === back) chooseAt((index) => Math.max(index - 1, 0));
+        else if (key === "Home") chooseAt(() => 0);
+        else if (key === "End") chooseAt(() => choosable.length - 1);
+        else return;
+        event.preventDefault();
+    };
+    useEffect(() => {
+        if (presence.present || !refocus.current) return undefined;
+        refocus.current = false;
+        // After the `Modal` lets go: its focus trap holds focus while it's mounted.
+        const frame = requestAnimationFrame(() => combobox.current?.focus?.());
+        return () => cancelAnimationFrame(frame);
+    }, [presence.present]);
     const shown = useShownLabel(items, value);
     // The options by group: a run outside any group goes unlabelled.
     const groups = useMemo(
@@ -148,6 +191,7 @@ export function Select(props: SelectProps): ReactNode {
                 container={container}
             />
             <Pressable
+                ref={combobox as never}
                 role="combobox"
                 {...(typeof props.label === "string"
                     ? { "aria-label": props.label }
@@ -158,6 +202,9 @@ export function Select(props: SelectProps): ReactNode {
                     : {})}
                 disabled={props.disabled}
                 onPress={open}
+                {...(Platform.OS === "web"
+                    ? ({ onKeyDown: onFieldKey } as object)
+                    : {})}
                 style={StyleSheet.absoluteFill}
             />
             <Modal
@@ -175,7 +222,6 @@ export function Select(props: SelectProps): ReactNode {
                 {presence.present && menu ? (
                     <engine.View
                         {...presence.props}
-                        nativeID={listId}
                         style={{
                             position: "absolute",
                             ...menu,
@@ -185,24 +231,36 @@ export function Select(props: SelectProps): ReactNode {
                             ...presence.style,
                         }}
                     >
-                        <Menu
-                            {...selectMenuSelection({
-                                color: props.color,
-                                density: props.density,
-                            })}
-                            {...(grouped
-                                ? { groups, grouped: false }
-                                : { items })}
-                            {...(indication === undefined
-                                ? {}
-                                : { indication })}
-                            value={value}
-                            onSelect={(details) => {
-                                if (details.value !== value)
-                                    setValue(details.value);
-                                close();
+                        <MenuKeys
+                            autoFocus
+                            onKey={(key) => {
+                                if (key === "Tab") close();
+                                return false;
                             }}
-                        />
+                        >
+                            <MenuListbox
+                                listbox={{ id: listId }}
+                                {...(typeof props.label === "string"
+                                    ? { "aria-label": props.label }
+                                    : {})}
+                                {...selectMenuSelection({
+                                    color: props.color,
+                                    density: props.density,
+                                })}
+                                {...(grouped
+                                    ? { groups, grouped: false }
+                                    : { items })}
+                                {...(indication === undefined
+                                    ? {}
+                                    : { indication })}
+                                value={value}
+                                onSelect={(details) => {
+                                    if (details.value !== value)
+                                        setValue(details.value);
+                                    close();
+                                }}
+                            />
+                        </MenuKeys>
                     </engine.View>
                 ) : null}
             </Modal>

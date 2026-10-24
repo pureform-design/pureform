@@ -147,6 +147,9 @@ interface ItemProps {
   ) => void;
   /** The key that opens its submenu on the web: the arrow toward the inline end. */
   readonly openKey: string;
+  /** An option of a listbox (the select's), saying whether it's chosen, rather than a menu
+   *  item. */
+  readonly option: boolean;
 }
 
 // An item's row, measured for where a cascading submenu opens beside it.
@@ -189,9 +192,16 @@ function MenuItemImpl(props: ItemProps): ReactNode {
     <v.item.Pressable
       ref={row as never}
       {...indication.handlers}
-      role={item.type === undefined ? "menuitem" : `menuitem${item.type}`}
+      role={
+        props.option
+          ? "option"
+          : item.type === undefined
+            ? "menuitem"
+            : `menuitem${item.type}`
+      }
+      {...(props.option ? { "aria-selected": props.selected } : {})}
       {...(hasSubmenu(item) ? { "aria-haspopup": "menu" as const } : {})}
-      {...(item.type === undefined
+      {...(item.type === undefined || props.option
         ? {}
         : { "aria-checked": item.checked ?? false })}
       disabled={item.disabled}
@@ -200,6 +210,19 @@ function MenuItemImpl(props: ItemProps): ReactNode {
           item.onCheckedChange?.(item.type === "radio" || !item.checked);
         props.onSelect(item.value, row.current);
       }}
+      {...(Platform.OS === "web" && props.option
+        ? {
+            // React Native Web presses only a button on Space; an option takes it too.
+            onKeyDown: (event: {
+              nativeEvent: { key: string };
+              preventDefault(): void;
+            }) => {
+              if (event.nativeEvent.key !== " " || item.disabled) return;
+              event.preventDefault();
+              props.onSelect(item.value, row.current);
+            },
+          }
+        : {})}
       {...(Platform.OS === "web" && hasSubmenu(item)
         ? {
             onKeyDown: (event: {
@@ -266,6 +289,8 @@ function MenuImpl(
     readonly container?: ContainerFrame;
     /** Measures that container when the menu opens, as it may have moved since. */
     readonly measureContainer?: MeasureContainer;
+    /** A listbox of options (the select's), with this id, rather than a menu. */
+    readonly listbox?: { readonly id: string };
   },
 ): ReactNode {
   const engine = useEngine();
@@ -389,6 +414,7 @@ function MenuImpl(
       selected={props.value === entry.value}
       onSelect={select}
       openKey={rtl ? "ArrowLeft" : "ArrowRight"}
+      option={props.listbox !== undefined}
     />
   );
   // The engine's view where it enters and leaves, the slot's own while it's still.
@@ -408,7 +434,8 @@ function MenuImpl(
             },
           }
         : {})}
-      role="menu"
+      role={props.listbox ? "listbox" : "menu"}
+      {...(props.listbox ? { nativeID: props.listbox.id } : {})}
       {...(props["aria-label"] === undefined
         ? {}
         : { "aria-label": props["aria-label"] })}
@@ -512,6 +539,16 @@ export function MenuItems(
   return <Surface {...props} bare />;
 }
 
+/** The menu's surface as a listbox of options with this id, each saying whether it's the
+ *  `value` (`aria-selected`): the select's list. */
+export function MenuListbox(
+  props: Omit<MenuProps, "trigger" | "contextTrigger"> & {
+    readonly listbox: { readonly id: string };
+  },
+): ReactNode {
+  return <Surface {...props} />;
+}
+
 // The items' elements on the web, where the keyboard moves between them.
 interface WebElement {
   focus(): void;
@@ -519,14 +556,14 @@ interface WebElement {
   getAttribute(name: string): string | null;
 }
 
-const ITEM = ["menuitem", "menuitemcheckbox", "menuitemradio"]
+const ITEM = ["menuitem", "menuitemcheckbox", "menuitemradio", "option"]
   .map((role) => `[role="${role}"]:not([aria-disabled="true"])`)
   .join(", ");
 
-// A menu's items on the web: it takes focus on its first item (given `autoFocus`), and the arrow
-// keys, Home, and End move it; `onKey` hears the other keys first, and takes those it returns
+// A menu's items on the web: it takes focus on its chosen option or else its first item (given
+// `autoFocus`), and the arrow keys, Home, and End move it; `onKey` hears the other keys first, and takes those it returns
 // true for. A cascaded submenu is another portal entry, so it has its own.
-function MenuKeys(props: {
+export function MenuKeys(props: {
   readonly autoFocus: boolean;
   readonly onKey?: ((key: string) => boolean) | undefined;
   readonly children: ReactNode;
@@ -538,7 +575,12 @@ function MenuKeys(props: {
         [],
     );
   useEffect(() => {
-    if (Platform.OS === "web" && props.autoFocus) items()[0]?.focus();
+    if (Platform.OS !== "web" || !props.autoFocus) return;
+    const all = items();
+    (
+      all.find((item) => item.getAttribute("aria-selected") === "true") ??
+      all[0]
+    )?.focus();
   }, []);
   const onKeyDown = (event: {
     nativeEvent: { key: string };

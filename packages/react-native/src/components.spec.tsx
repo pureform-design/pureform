@@ -443,7 +443,7 @@ describe("controlled and uncontrolled state", () => {
             userEvent.click(document.querySelector('[role="combobox"]')!),
         );
         await settle(50);
-        const large = [...document.querySelectorAll('[role="menuitem"]')].find(
+        const large = [...document.querySelectorAll('[role="option"]')].find(
             (item) => item.textContent === "Large",
         )!;
         await interact(() => userEvent.click(large));
