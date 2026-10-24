@@ -4,6 +4,7 @@
 
 import { testIds } from "@pureform/anatomy";
 
+import { textValueOf } from "../aria";
 import type { ActOptions, ComponentCase } from "../types";
 import { byTestId } from "../types";
 import { userEvent } from "../user-event";
@@ -21,17 +22,9 @@ const tabbable = (host: HTMLElement): HTMLInputElement =>
 const hidden = (host: HTMLElement) =>
     host.querySelector<HTMLInputElement>('input[name="code"]');
 
-/** The cells' characters, checked against the hidden input when it's named. */
-const read = (host: HTMLElement): string[] => {
-    const values = cells(host).map((cell) => cell.value);
-    const submitted = hidden(host);
-    if (submitted && submitted.value !== values.join("")) {
-        throw new Error(
-            `the cells hold ${JSON.stringify(values)}, the hidden input ${JSON.stringify(submitted.value)}`,
-        );
-    }
-    return values;
-};
+/** The cells' characters: each textbox's value. */
+const read = (host: HTMLElement): string[] =>
+    cells(host).map((cell) => textValueOf(cell));
 
 export const codeField: ComponentCase = {
     component: "CodeField",

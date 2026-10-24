@@ -75,15 +75,44 @@ const named = (element: Element, name: RoleQuery["name"]) =>
         ? nameOf(element) === name
         : name.test(nameOf(element)));
 
-/** Every element inside `host` (and `host` itself) with the role, in document order. */
+/** Whether assistive technology skips the element: it, or what holds it, is `aria-hidden`. */
+const ariaHidden = (element: Element) =>
+    element.closest('[aria-hidden="true"]') !== null;
+
+/** Every element inside `host` (and `host` itself) with the role, in document order, leaving
+ *  out those hidden from assistive technology (`aria-hidden`: a select's native element). */
 export const allByRole = <E extends HTMLElement = HTMLElement>(
     host: HTMLElement,
     role: string,
     query: RoleQuery = {},
 ): E[] =>
     [host, ...host.querySelectorAll<HTMLElement>("*")].filter(
-        (element) => roleOf(element) === role && named(element, query.name),
+        (element) =>
+            roleOf(element) === role &&
+            !ariaHidden(element) &&
+            named(element, query.name),
     ) as E[];
+
+/** The roles a list's choice has: a listbox's option, or a menu's item (React Native's select
+ *  lists its options in a menu). */
+export const CHOICE_ROLES = [
+    "option",
+    "menuitemradio",
+    "menuitemcheckbox",
+    "menuitem",
+] as const;
+
+/** The choice with this name, anywhere in `host`'s document (a list can open at the end of the
+ *  body). */
+export const choiceNamed = (host: HTMLElement, name: string): HTMLElement => {
+    const found = CHOICE_ROLES.flatMap((role) =>
+        allByRole(host.ownerDocument.body, role, { name }),
+    );
+    if (found.length !== 1) {
+        throw new Error(`${found.length} choices named ${name}`);
+    }
+    return found[0]!;
+};
 
 /** The one element inside `host` with the role (and name), throwing if there's none or more. */
 export const byRole = <E extends HTMLElement = HTMLElement>(

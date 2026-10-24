@@ -10,6 +10,7 @@ import {
     timePickerAnatomy,
 } from "@pureform/anatomy";
 
+import { optionalFlagOf, textValueOf } from "../aria";
 import type { ActOptions, ComponentCase } from "../types";
 import { byTestId } from "../types";
 import { userEvent } from "../user-event";
@@ -17,9 +18,37 @@ import { userEvent } from "../user-event";
 const picker = testIds.timePicker;
 const input = testIds.timeInput;
 
-/** The time the hidden input submits. */
-const read = (host: HTMLElement): string =>
-    host.querySelector<HTMLInputElement>('input[type="hidden"]')!.value;
+const pad = (n: number) => String(n).padStart(2, "0");
+
+/** The time the parts show, as `HH:mm`: the hour and the minute (a selector's text, a field's
+ *  value) and, on a 12-hour clock, the period pressed (`aria-pressed` on PM). */
+const timeOf =
+    (parts: (host: HTMLElement) => readonly HTMLElement[], period: string) =>
+    (host: HTMLElement): string => {
+        const [hourPart, minutePart] = parts(host);
+        const hour = Number(textValueOf(hourPart!).trim());
+        const minute = Number(textValueOf(minutePart!).trim());
+        const periods = [
+            ...host.querySelectorAll<HTMLElement>(`[data-testid="${period}"]`),
+        ];
+        if (periods.length === 0) return `${pad(hour)}:${pad(minute)}`;
+        const after = optionalFlagOf(periods[1]!, "pressed");
+        return `${pad((hour % 12) + (after ? 12 : 0))}:${pad(minute)}`;
+    };
+
+const all = (id: string) => (host: HTMLElement) => [
+    ...host.querySelectorAll<HTMLElement>(`[data-testid="${id}"]`),
+];
+
+const readPicker = timeOf(
+    (host) => [
+        byTestId(host, picker.hourSelector),
+        byTestId(host, picker.minuteSelector),
+    ],
+    picker.period,
+);
+
+const readInput = timeOf(all(input.input), input.period);
 
 /** The PM button. */
 const pm = (host: HTMLElement, id: string) =>
@@ -56,7 +85,7 @@ export const timePicker: ComponentCase = {
         act: async (host, options: ActOptions = {}) => {
             await userEvent.click(pm(host, picker.period), options);
         },
-        read,
+        read: readPicker,
     },
     keyboard: {
         focusable: (host) => byTestId(host, picker.hourSelector),
@@ -89,7 +118,7 @@ export const timeInput: ComponentCase = {
         act: async (host, options: ActOptions = {}) => {
             await userEvent.click(pm(host, input.period), options);
         },
-        read,
+        read: readInput,
     },
     keyboard: {
         focusable: (host) => byTestId(host, input.input),

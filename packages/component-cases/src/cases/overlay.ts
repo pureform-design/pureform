@@ -29,15 +29,35 @@ export interface OverlayAria {
 }
 
 /** The button inside `host` that says whether what it opens is open (`aria-expanded`): a FAB
- *  menu's FAB, a split button's trailing button. */
+ *  menu's FAB, a split button's trailing button; among several, the one with `aria-haspopup`. */
 export const expandingTrigger = (host: HTMLElement): HTMLElement => {
-    const found = allByRole(host, "button").filter((element) =>
+    const expanding = allByRole(host, "button").filter((element) =>
         element.hasAttribute("aria-expanded"),
     );
+    // Among several (a calendar's month and year buttons), the one that opens a popup.
+    const found =
+        expanding.length > 1
+            ? expanding.filter((element) =>
+                  element.hasAttribute("aria-haspopup"),
+              )
+            : expanding;
     if (found.length !== 1) {
         throw new Error(`${found.length} buttons say aria-expanded`);
     }
     return found[0]!;
+};
+
+/** What `find` finds once it's drawn, waiting up to 30 frames: a list's options a few frames
+ *  after it opens. */
+export const drawn = async <T>(find: () => T): Promise<T> => {
+    for (let i = 0; ; i++) {
+        try {
+            return find();
+        } catch (error) {
+            if (i >= 30) throw error;
+            await frame();
+        }
+    }
 };
 
 /** Whether an element is drawn: not hidden, nor inside something hidden or not displayed. */

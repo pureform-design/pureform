@@ -5,6 +5,7 @@
 
 import { compositeTestIds, searchViewMenuAnatomy } from "@pureform/anatomy";
 
+import { allByRole } from "../aria";
 import type { ComponentCase } from "../types";
 import { byTestId, itemSources } from "../types";
 import { userEvent } from "../user-event";
@@ -36,8 +37,12 @@ const ITEMS = [
 const input = (host: HTMLElement) =>
     byTestId<HTMLInputElement>(host, ids.input);
 
-// The search bar's input, inside the trigger.
-const bar = (host: HTMLElement) => trigger(host).querySelector("input")!;
+// What takes focus in the trigger: the search bar's input, or a button over it that opens the
+// view (React Native's, whose bar isn't editable).
+const bar = (host: HTMLElement): HTMLElement =>
+    allByRole(trigger(host), "button").find((element) =>
+        element.hasAttribute("aria-haspopup"),
+    ) ?? trigger(host).querySelector("input")!;
 
 export const searchView: ComponentCase = {
     component: "SearchView",
