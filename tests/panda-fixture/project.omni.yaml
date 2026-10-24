@@ -29,6 +29,10 @@ cache:
         - "src/**/*.css"
 
 tasks:
+  # Imports the Panda fixture's and the demos' generated output, which no task here writes.
+  check:types:
+    enabled: false
+
   # Writes `.pureform/` (ignored by git) from `pureform.config.ts` with the built Panda adapter's
   # codegen, for Panda's codegen and the suites.
   generate:

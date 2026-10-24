@@ -38,6 +38,10 @@ cache:
         - "../../packages/component-cases/src/**/*"
 
 tasks:
+  # Imports the Panda fixture's and the demos' generated output, which no task here writes.
+  check:types:
+    enabled: false
+
   test:e2e:
     enabled: true
     # The Panda fixture's codegen writes the styled-system the registry and stylesheet import.

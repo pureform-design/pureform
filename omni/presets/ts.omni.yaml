@@ -44,7 +44,10 @@ tasks:
     exec: bun x oxlint .
 
   check:types:
-    exec: bun check .
+    exec: bun x tsc --noEmit -p tsconfig.json
+    # Resolves dependencies' built declarations.
+    dependencies:
+      - ^build
 
   check:
     exec: ""

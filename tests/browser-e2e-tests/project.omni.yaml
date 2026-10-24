@@ -35,6 +35,10 @@ cache:
         - "../panda-fixture/pureform.codegen.ts"
 
 tasks:
+  # Imports the Panda fixture's and the demos' generated output, which no task here writes.
+  check:types:
+    enabled: false
+
   test:e2e:
     enabled: true
     # The Panda fixture's codegen writes the styled-system the tests import.
