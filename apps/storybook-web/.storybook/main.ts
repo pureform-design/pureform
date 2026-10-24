@@ -9,15 +9,12 @@ import { fileURLToPath } from "node:url";
 
 import { pandacss } from "@pandacss/vite";
 import pureform from "@pureform/bundler/vite";
-import { runtimeStyles } from "@pureform/rn-adapter";
-import { instanceTokenKeys } from "@pureform/rn-adapter/codegen";
 import solid from "@solidjs/vite-plugin";
 import type { StorybookConfig } from "@storybook/html-vite";
 import react from "@vitejs/plugin-react";
-import { mergeConfig, type Plugin } from "vite";
+import { mergeConfig } from "vite";
 
-import { codegen, COMPONENTS } from "../pureform.codegen.ts";
-import config from "../pureform.config.ts";
+import { codegen } from "../pureform.codegen.ts";
 
 const require = createRequire(import.meta.url);
 const APP = resolvePath(dirname(fileURLToPath(import.meta.url)), "..");
@@ -46,29 +43,6 @@ const WEB_EXTENSIONS = [
     ".json",
 ];
 
-const STYLES_ID = "virtual:pureform-rn";
-
-// React Native's styles resolved at run time, as apps/rn-web-demo's `pureformRn()` does: the
-// Panda registry in `.pureform/` serves Solid and React, so React Native doesn't get its own.
-const pureformRn = (): Plugin => ({
-    name: "pureform-rn",
-    resolveId: (id) => (id === STYLES_ID ? `\0${id}` : undefined),
-    load: (id) => {
-        if (id !== `\0${STYLES_ID}`) return undefined;
-        const specs = config.components as unknown as Record<string, never>;
-        const tokens = Object.fromEntries(
-            COMPONENTS.map((name) => [
-                name,
-                instanceTokenKeys(name, specs[name]!),
-            ]),
-        );
-        return [
-            `export const runtime = ${JSON.stringify(runtimeStyles(config, { components: COMPONENTS, fontStack: "all" }))};`,
-            `export const runtimeTokens = ${JSON.stringify(tokens)};`,
-        ].join("\n");
-    },
-});
-
 export default {
     framework: "@storybook/html-vite",
     addons: ["@storybook/addon-vitest", "@storybook/addon-a11y"],
@@ -81,7 +55,6 @@ export default {
                 pandacss(),
                 solid({ include: SOLID, ssr: false, start: false }),
                 react({ exclude: SOLID }),
-                pureformRn(),
             ],
             resolve: {
                 extensions: WEB_EXTENSIONS,
