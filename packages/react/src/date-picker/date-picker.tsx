@@ -9,7 +9,11 @@ import {
     datePickerBackdropAnatomy,
     datePickerOverlayAnatomy,
 } from "@pureform/anatomy";
-import type { ComponentAnatomy, TestIdOverride } from "@pureform/anatomy";
+import type {
+    buttonAnatomy,
+    ComponentAnatomy,
+    TestIdOverride,
+} from "@pureform/anatomy";
 import {
     DATE_PICKER_ROOT_PROPS,
     dateMachineProps,
@@ -63,7 +67,7 @@ import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import type { PartContext } from "../part-context";
 import { useSlotProps, asRoot } from "../parts";
-import type { SlotKeyedProps } from "../parts";
+import type { InnerPropsOf, SlotKeyedProps } from "../parts";
 import { pickerAction } from "../picker-actions";
 import type { PickerActionProps } from "../picker-actions";
 import type { PartProps } from "../props";
@@ -341,7 +345,13 @@ export interface DatePickerProps
         DatePickerContentProps<ReactNode> {
     readonly testId?: TestIdOverride<DatePickerPart> | undefined;
     readonly unstyled?: Unstyled<DatePickerPart> | undefined;
+    /** The Cancel action, drawn as a button. */
+    readonly cancelButtonProps?: ButtonInnerProps | undefined;
+    /** The OK action, drawn as a button. */
+    readonly confirmButtonProps?: ButtonInnerProps | undefined;
 }
+
+type ButtonInnerProps = InnerPropsOf<typeof buttonAnatomy>;
 
 // Inside Root, so it can read the view and the draft.
 function ReadyMadeContent({ own }: { readonly own: DatePickerProps }) {
@@ -415,11 +425,13 @@ function ReadyMadeContent({ own }: { readonly own: DatePickerProps }) {
                     )}
                     <Actions {...slot("actions")}>
                         <CancelTrigger
+                            {...own.cancelButtonProps}
                             as={Button}
                             variant="text"
                             label={own.cancelLabel ?? "Cancel"}
                         />
                         <ConfirmTrigger
+                            {...own.confirmButtonProps}
                             as={Button}
                             variant="text"
                             label={own.confirmLabel ?? "OK"}
@@ -444,6 +456,8 @@ function ReadyMade(props: DatePickerProps): ReactNode {
         placeholder: _placeholder,
         cancelLabel: _cancelLabel,
         confirmLabel: _confirmLabel,
+        cancelButtonProps: _cancelButtonProps,
+        confirmButtonProps: _confirmButtonProps,
         onModeToggle: _onModeToggle,
         modeToggleLabel: _modeToggleLabel,
         ...rootProps

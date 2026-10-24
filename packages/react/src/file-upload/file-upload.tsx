@@ -6,7 +6,14 @@
 // dialog and is what the keyboard reaches.
 
 import { fileUploadAnatomy } from "@pureform/anatomy";
+import type {
+    buttonAnatomy,
+    iconButtonAnatomy,
+    linearProgressAnatomy,
+    listItemAnatomy,
+} from "@pureform/anatomy";
 import {
+    overDefaults,
     FILE_UPLOAD_ROOT_PROPS,
     fileUploadErrorText,
     fileUploadItemTestId,
@@ -47,7 +54,7 @@ import { ListItem } from "../list-item";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import { useComponent, useSlotProps } from "../parts";
-import type { ComponentScope, SlotKeyedProps } from "../parts";
+import type { ComponentScope, InnerPropsOf, SlotKeyedProps } from "../parts";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
@@ -100,6 +107,16 @@ export interface FileUploadItemProps extends Omit<
     /** The remove button's icon. @default a cross */
     readonly removeIcon?: ReactNode;
     readonly children?: ReactNode;
+    /** The list item drawn for the file, keyed by its parts. */
+    readonly listItemProps?: InnerPropsOf<typeof listItemAnatomy> | undefined;
+    /** The remove button. */
+    readonly iconButtonProps?:
+        | InnerPropsOf<typeof iconButtonAnatomy>
+        | undefined;
+    /** The upload's progress bar. */
+    readonly linearProgressProps?:
+        | InnerPropsOf<typeof linearProgressAnatomy>
+        | undefined;
 }
 
 /** The file upload's root, a `<div>` around the label, the drop zone and the list, and the hidden
@@ -276,6 +293,9 @@ function Item({
     icon,
     removeIcon,
     children,
+    listItemProps,
+    iconButtonProps,
+    linearProgressProps,
     ...props
 }: FileUploadItemProps): ReactNode {
     const { scope, api, props: root } = context.use("Item");
@@ -295,8 +315,18 @@ function Item({
             children: children ?? (
                 <>
                     <ListItem
+                        {...overDefaults(
+                            {
+                                testId: fileUploadItemTestId(root.testId),
+                                slotProps: {
+                                    headline: api.getItemNameProps(item),
+                                    supportingText:
+                                        api.getItemSizeTextProps(item),
+                                } as object,
+                            },
+                            listItemProps ?? {},
+                        )}
                         leadingType={image ? "thumbnail" : "icon"}
-                        testId={fileUploadItemTestId(root.testId)}
                         leading={
                             image ? (
                                 <Preview file={file} type={type} />
@@ -321,6 +351,7 @@ function Item({
                         trailingControl
                         trailing={
                             <IconButton
+                                {...iconButtonProps}
                                 {...(api.getItemDeleteTriggerProps(
                                     item,
                                 ) as object)}
@@ -331,15 +362,10 @@ function Item({
                                 icon={removeIcon ?? <CloseIcon />}
                             />
                         }
-                        slotProps={
-                            {
-                                headline: api.getItemNameProps(item),
-                                supportingText: api.getItemSizeTextProps(item),
-                            } as object
-                        }
                     />
                     {upload.shown ? (
                         <LinearProgress
+                            {...linearProgressProps}
                             value={upload.value}
                             aria-label={`Uploading ${file.name}`}
                         />
@@ -356,7 +382,16 @@ export interface FileUploadProps
     extends
         Omit<FileUploadRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
         SlotKeyedProps<Anatomy>,
-        FileUploadDomContentProps<ReactNode> {}
+        FileUploadDomContentProps<ReactNode> {
+    /** The trigger, drawn as a button. */
+    readonly buttonProps?: InnerPropsOf<typeof buttonAnatomy> | undefined;
+    /** Every file's list item, keyed by its parts. */
+    readonly listItemProps?: FileUploadItemProps["listItemProps"];
+    /** Every file's remove button. */
+    readonly iconButtonProps?: FileUploadItemProps["iconButtonProps"];
+    /** Every upload's progress bar. */
+    readonly linearProgressProps?: FileUploadItemProps["linearProgressProps"];
+}
 
 // Inside Root, so it can read the files and whether an error shows.
 function ReadyMadeContent({
@@ -385,6 +420,7 @@ function ReadyMadeContent({
                 ) : null}
                 {own.trigger === null ? null : (
                     <Trigger
+                        {...own.buttonProps}
                         variant="outlined"
                         label={own.trigger ?? "Choose files"}
                     />
@@ -399,6 +435,9 @@ function ReadyMadeContent({
                             progress={props.progress?.(file)}
                             icon={own.fileIcon?.(file)}
                             removeIcon={own.removeIcon}
+                            listItemProps={own.listItemProps}
+                            iconButtonProps={own.iconButtonProps}
+                            linearProgressProps={own.linearProgressProps}
                             {...slot("item")}
                         />
                     ))}
@@ -410,6 +449,9 @@ function ReadyMadeContent({
                             errors={errors}
                             icon={own.fileIcon?.(file)}
                             removeIcon={own.removeIcon}
+                            listItemProps={own.listItemProps}
+                            iconButtonProps={own.iconButtonProps}
+                            linearProgressProps={own.linearProgressProps}
                             {...slot("item")}
                         />
                     ))}
@@ -434,6 +476,10 @@ function ReadyMade(props: FileUploadProps): ReactNode {
         trigger: _trigger,
         fileIcon: _fileIcon,
         removeIcon: _removeIcon,
+        buttonProps: _buttonProps,
+        listItemProps: _listItemProps,
+        iconButtonProps: _iconButtonProps,
+        linearProgressProps: _linearProgressProps,
         ...rootProps
     } = props;
     return (

@@ -6,6 +6,7 @@
 // date.
 
 import { dateInputAnatomy } from "@pureform/anatomy";
+import type { buttonAnatomy } from "@pureform/anatomy";
 import {
     DATE_INPUT_CONTENT_PROPS,
     DATE_INPUT_ROOT_PROPS,
@@ -33,7 +34,7 @@ import { IconButton } from "../icon-button";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import { plainParts, useComponent, useSlotProps, asRoot } from "../parts";
-import type { ComponentScope, SlotKeyedProps } from "../parts";
+import type { ComponentScope, InnerPropsOf, SlotKeyedProps } from "../parts";
 import { pickerAction } from "../picker-actions";
 import type { PickerActionProps } from "../picker-actions";
 import { omitProps } from "../props";
@@ -300,7 +301,14 @@ export interface DateInputProps
             | "suffixText"
         >,
         SlotKeyedProps<Anatomy>,
-        DateInputContentProps<ReactNode> {}
+        DateInputContentProps<ReactNode> {
+    /** The Cancel action, drawn as a button. */
+    readonly cancelButtonProps?: ButtonInnerProps | undefined;
+    /** The OK action, drawn as a button. */
+    readonly confirmButtonProps?: ButtonInnerProps | undefined;
+}
+
+type ButtonInnerProps = InnerPropsOf<typeof buttonAnatomy>;
 
 // Inside Root, so it can read the date typed.
 function ReadyMadeContent({ own }: { readonly own: DateInputProps }) {
@@ -367,11 +375,13 @@ function ReadyMadeContent({ own }: { readonly own: DateInputProps }) {
             </Field>
             <Actions {...slot("actions")}>
                 <CancelTrigger
+                    {...own.cancelButtonProps}
                     as={Button}
                     variant="text"
                     label={own.cancelLabel ?? "Cancel"}
                 />
                 <ConfirmTrigger
+                    {...own.confirmButtonProps}
                     as={Button}
                     variant="text"
                     label={own.confirmLabel ?? "OK"}
@@ -389,6 +399,8 @@ function ReadyMade(props: DateInputProps): ReactNode {
         className: _className,
         style: _style,
         slotProps: _slotProps,
+        cancelButtonProps: _cancelButtonProps,
+        confirmButtonProps: _confirmButtonProps,
         ...rest
     } = props;
     const rootProps = omitProps(rest, DATE_INPUT_CONTENT_PROPS);

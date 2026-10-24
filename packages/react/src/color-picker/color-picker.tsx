@@ -4,6 +4,7 @@
 // preset swatches. The value is a CSS color string; changes report hex.
 
 import { colorPickerAnatomy } from "@pureform/anatomy";
+import type { iconButtonAnatomy, textFieldAnatomy } from "@pureform/anatomy";
 import {
     COLOR_PICKER_DEFAULT,
     COLOR_PICKER_ROOT_PROPS,
@@ -35,7 +36,12 @@ import type { IconButtonProps } from "../icon-button";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import { plainParts, useComponent, useSlotProps } from "../parts";
-import type { ComponentScope, PlainPartProps, SlotKeyedProps } from "../parts";
+import type {
+    ComponentScope,
+    InnerPropsOf,
+    PlainPartProps,
+    SlotKeyedProps,
+} from "../parts";
 import { combinePartProps, omitProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
@@ -411,7 +417,12 @@ export interface ColorPickerProps
     extends
         Omit<ColorPickerRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
         SlotKeyedProps<Anatomy>,
-        ColorPickerContentProps<ReactNode> {}
+        ColorPickerContentProps<ReactNode> {
+    /** The hex field, drawn as a text field, keyed by its parts. */
+    readonly textFieldProps?: InnerPropsOf<typeof textFieldAnatomy> | undefined;
+    /** The eye dropper, drawn as an icon button. */
+    readonly iconButtonProps?: InnerPropsOf<typeof iconButtonAnatomy> | undefined;
+}
 
 /** The ready-made picker: the label, the area, the sliders, the field row and the swatches. */
 function ReadyMade(props: ColorPickerProps): ReactNode {
@@ -427,6 +438,8 @@ function ReadyMade(props: ColorPickerProps): ReactNode {
         inputLabel,
         eyeDropper = true,
         eyeDropperLabel,
+        textFieldProps,
+        iconButtonProps,
         ...rootProps
     } = props;
     return (
@@ -442,9 +455,13 @@ function ReadyMade(props: ColorPickerProps): ReactNode {
                 )}
                 <Control {...slot("control")}>
                     <ValueSwatch {...slot("valueSwatch")} />
-                    <HexField label={inputLabel ?? "Hex"} />
+                    <HexField
+                        {...textFieldProps}
+                        label={inputLabel ?? "Hex"}
+                    />
                     {eyeDropper && (
                         <EyeDropperTrigger
+                            {...iconButtonProps}
                             aria-label={
                                 eyeDropperLabel ??
                                 "Pick a color from the screen"

@@ -5,7 +5,7 @@
 // is the model; M3 has none.
 
 import { paginatorAnatomy } from "@pureform/anatomy";
-import type { PartName } from "@pureform/anatomy";
+import type { PartName, selectAnatomy } from "@pureform/anatomy";
 import {
     DEFAULT_PAGE_SIZE,
     PAGINATOR_ROOT_PROPS,
@@ -39,11 +39,12 @@ import { IconButton } from "../icon-button/icon-button";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import { machinePart, useComponent, useSlotProps, asRoot } from "../parts";
-import type { ComponentScope, SlotKeyedProps } from "../parts";
+import type { ComponentScope, InnerPropsOf, SlotKeyedProps } from "../parts";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 import { Select } from "../select/select";
+import type { SelectProps } from "../select/select";
 
 type Anatomy = typeof paginatorAnatomy;
 type Api = paginator.Api<PropTypes>;
@@ -225,12 +226,21 @@ const LastTrigger = trigger("last");
 export interface PaginatorProps
     extends
         Omit<PaginatorRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
-        SlotKeyedProps<Anatomy> {}
+        SlotKeyedProps<Anatomy> {
+    /** The page-size select's own props, keyed by its parts, and its `menuProps`. */
+    readonly selectProps?: PaginatorSelectProps | undefined;
+}
+
+/** What the paginator takes for the select it draws. */
+export type PaginatorSelectProps = InnerPropsOf<typeof selectAnatomy> &
+    Pick<SelectProps, "menuProps">;
 
 function ReadyMadeParts({
     slot,
+    selectProps,
 }: {
     readonly slot: (part: PartName<Anatomy>) => PartProps;
+    readonly selectProps: PaginatorSelectProps | undefined;
 }): ReactNode {
     const { api, props: root } = context.use("Paginator");
     const sizes = paginatorSizeItems(
@@ -246,6 +256,7 @@ function ReadyMadeParts({
                     </PageSizeLabel>
                     <PageSizeSelect {...slot("pageSizeSelect")}>
                         <Select
+                            {...selectProps}
                             variant="outlined"
                             density={root.density}
                             aria-label={label}
@@ -288,12 +299,13 @@ function ReadyMade(props: PaginatorProps): ReactNode {
         className: _className,
         style: _style,
         slotProps: _slotProps,
+        selectProps,
         ...rootProps
     } = props;
     const slot = useSlotProps(props);
     return (
         <Root {...rootProps} {...(slot("root") as object)}>
-            <ReadyMadeParts slot={slot} />
+            <ReadyMadeParts slot={slot} selectProps={selectProps} />
         </Root>
     );
 }

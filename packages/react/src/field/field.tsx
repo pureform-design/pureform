@@ -21,9 +21,13 @@ import { useCallback, useId, useMemo, useState } from "react";
 import type { ElementType, ReactNode } from "react";
 
 import { Description } from "../description/description";
+import type { DescriptionProps } from "../description/description";
 import { ErrorText } from "../error-text/error-text";
+import type { ErrorTextProps } from "../error-text/error-text";
 import { Input } from "../input/input";
+import type { InputProps } from "../input/input";
 import { Label } from "../label/label";
+import type { LabelProps } from "../label/label";
 import { useComponent } from "../parts";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
@@ -43,6 +47,15 @@ export interface FieldProps
     readonly children?: ReactNode;
     /** Another element or component to render instead of `<div>`. */
     readonly as?: ElementType | undefined;
+    /** The ready-made label's props: its `className`, `style`, `testId`, `unstyled`, `tokens`,
+     *  and the element's own. */
+    readonly labelProps?: Omit<LabelProps, "children"> | undefined;
+    /** The ready-made input's props (`type`, `placeholder`, `className`, `tokens`, …). */
+    readonly inputProps?: InputProps | undefined;
+    /** The ready-made description's props. */
+    readonly descriptionProps?: Omit<DescriptionProps, "children"> | undefined;
+    /** The ready-made error text's props. */
+    readonly errorTextProps?: Omit<ErrorTextProps, "children"> | undefined;
 }
 
 /** A column connecting the pieces inside it. */
@@ -72,7 +85,15 @@ export function Field(props: FieldProps): ReactNode {
         testId: props.testId,
         unstyled: props.unstyled,
     });
-    const { as, children, ...rest } = omitProps(props, FIELD_ROOT_PROPS);
+    const {
+        as,
+        children,
+        labelProps,
+        inputProps,
+        descriptionProps,
+        errorTextProps,
+        ...rest
+    } = omitProps(props, FIELD_ROOT_PROPS);
     return (
         <FieldContext value={{ state, describe }}>
             {scope.render("root", {
@@ -83,14 +104,18 @@ export function Field(props: FieldProps): ReactNode {
                     children: readyMade ? (
                         <>
                             {isPresent(props.label) && (
-                                <Label>{props.label}</Label>
+                                <Label {...labelProps}>{props.label}</Label>
                             )}
-                            <Input />
+                            <Input {...inputProps} />
                             {isPresent(props.description) && (
-                                <Description>{props.description}</Description>
+                                <Description {...descriptionProps}>
+                                    {props.description}
+                                </Description>
                             )}
                             {isPresent(props.error) && (
-                                <ErrorText>{props.error}</ErrorText>
+                                <ErrorText {...errorTextProps}>
+                                    {props.error}
+                                </ErrorText>
                             )}
                         </>
                     ) : (

@@ -6,7 +6,7 @@
 // role, which the preset's flex layout would otherwise drop.
 
 import { dataTableAnatomy } from "@pureform/anatomy";
-import type { PartName } from "@pureform/anatomy";
+import type { checkboxAnatomy, PartName } from "@pureform/anatomy";
 import {
     isPresent,
     TABLE_ROOT_PROPS,
@@ -41,7 +41,7 @@ import { useMachineButton } from "../interaction";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import { machinePart, useComponent, useSlotProps } from "../parts";
-import type { ComponentScope, SlotKeyedProps } from "../parts";
+import type { ComponentScope, InnerPropsOf, SlotKeyedProps } from "../parts";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
@@ -54,7 +54,10 @@ interface TableContextValue {
     readonly scope: ComponentScope<Anatomy>;
     readonly api: Api;
     readonly striped: boolean | undefined;
+    readonly checkboxProps: CheckboxInnerProps | undefined;
 }
+
+type CheckboxInnerProps = InnerPropsOf<typeof checkboxAnatomy>;
 
 const context = createPartContext<TableContextValue>("Table");
 
@@ -67,6 +70,9 @@ export interface TableRootProps
     extends Omit<PartProps, keyof TableRootOwnProps>, TableRootOwnProps {
     /** Another element or component to render instead of `<table>`. */
     readonly as?: ElementType | undefined;
+    /** The selection checkboxes' own props (select-all and each row's), keyed by the
+     *  checkbox's parts. */
+    readonly checkboxProps?: CheckboxInnerProps | undefined;
 }
 
 /** A part's props: the element's own, and the part's `unstyled`. */
@@ -110,9 +116,9 @@ function Root(props: TableRootProps): ReactNode {
         unstyled: props.unstyled,
         indication: props.indication,
     });
-    const { as, ...rest } = omitProps(props, TABLE_ROOT_PROPS);
+    const { as, checkboxProps, ...rest } = omitProps(props, TABLE_ROOT_PROPS);
     return (
-        <context.Provider value={{ scope, api, striped: props.striped }}>
+        <context.Provider value={{ scope, api, striped: props.striped, checkboxProps }}>
             {scope.render("root", {
                 element: "table",
                 as,
@@ -217,7 +223,7 @@ function SelectionCell({
     children,
     ...props
 }: TablePartProps): ReactNode {
-    const { scope, api } = context.use("SelectionCell");
+    const { scope, api, checkboxProps } = context.use("SelectionCell");
     const { value } = use(RowContext);
     // An empty header cell is a plain cell: the header has no select-all checkbox in a table
     // choosing one row.
@@ -226,6 +232,7 @@ function SelectionCell({
         value === undefined ? (
             api.selectionMode === "multiple" ? (
                 <Checkbox
+                    {...checkboxProps}
                     aria-label={api.translations.selectAll}
                     checked={api.selectAll}
                     onCheckedChange={() => api.toggleAll()}
@@ -233,6 +240,7 @@ function SelectionCell({
             ) : null
         ) : (
             <Checkbox
+                {...checkboxProps}
                 aria-label={api.translations.selectRow}
                 checked={api.isSelected(value)}
                 onCheckedChange={() => api.toggleRow(value)}
