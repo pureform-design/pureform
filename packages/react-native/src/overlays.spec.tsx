@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { ReactNode } from "react";
 import { View } from "react-native";
 import { beforeAll, describe, expect, it, vi } from "vitest";
@@ -272,6 +273,49 @@ describe.each([animated, reanimated])("the menu with $name", (engine) => {
         expect(labels()).toEqual(["Cut", "Share›", "Mail"]);
         // With no container around it, only the window counts.
         await openShare(<Menu trigger="Edit" items={items} />);
+        await until(() => labels().includes("Mail"));
+        expect(labels()).toEqual(["Cut", "Share›", "Mail"]);
+    });
+
+    it("decides with the container's position as of the menu opening, though it moved without resizing", async () => {
+        const items = [
+            { value: "cut", label: "Cut" },
+            {
+                value: "share",
+                label: "Share",
+                items: [{ value: "mail", label: "Mail" }],
+            },
+        ];
+        const labels = () =>
+            [...document.querySelectorAll('[role="menuitem"]')].map(
+                (item) => item.textContent,
+            );
+        let move: (to: number) => void = () => undefined;
+        const Moving = () => {
+            const [x, setX] = useState(-300);
+            move = setX;
+            return (
+                <PureformContainer
+                    style={{ width: 400, transform: [{ translateX: x }] }}
+                >
+                    <Menu trigger="Edit" items={items} />
+                </PureformContainer>
+            );
+        };
+        document.body.innerHTML = "";
+        await render(<Moving />, engine);
+        await settle(200);
+        // It moves by a transform, which doesn't lay it out again: its cached frame is stale.
+        await interact(() => move(0));
+        await settle(200);
+        await interact(() => userEvent.click(byTestId("pf-button-root")));
+        await settle(400);
+        await interact(() =>
+            userEvent.click(
+                document.querySelectorAll<HTMLElement>('[role="menuitem"]')[1]!,
+            ),
+        );
+        // Measured when it opens, it's back in the window, so the submenu cascades.
         await until(() => labels().includes("Mail"));
         expect(labels()).toEqual(["Cut", "Share›", "Mail"]);
     });

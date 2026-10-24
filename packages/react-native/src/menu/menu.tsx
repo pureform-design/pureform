@@ -37,8 +37,14 @@ import type {
 } from "@pureform/binding-core";
 import type { Indication } from "@pureform/binding-core/indication";
 import type { MutableInteractionSource } from "@pureform/binding-core/interaction";
-import { useContainerFrame } from "@pureform/rn-adapter/react";
-import type { ContainerFrame } from "@pureform/rn-adapter/react";
+import {
+    useContainerFrame,
+    useMeasureContainer,
+} from "@pureform/rn-adapter/react";
+import type {
+    ContainerFrame,
+    MeasureContainer,
+} from "@pureform/rn-adapter/react";
 import type { Selection } from "@pureform/styling";
 import { memo, useEffect, useRef, useState } from "react";
 import type { ComponentRef, ReactNode } from "react";
@@ -268,6 +274,8 @@ function MenuImpl(
         /** The nearest container's frame, for a menu rendered through the portal host, which
          *  doesn't carry the container's context. */
         readonly container?: ContainerFrame;
+        /** Measures that container when the menu opens, as it may have moved since. */
+        readonly measureContainer?: MeasureContainer;
     },
 ): ReactNode {
     const engine = useEngine();
@@ -275,7 +283,12 @@ function MenuImpl(
     const windowWidth = useWindowDimensions().width;
     const auto = props.submenu === undefined || props.submenu === "auto";
     const inherited = useContainerFrame();
-    const container = props.container ?? inherited;
+    const inheritedMeasure = useMeasureContainer();
+    const measureContainer = props.measureContainer ?? inheritedMeasure;
+    // The container's frame as of the menu opening, which wins over the cached one: the
+    // container may have moved without resizing since it laid out.
+    const [fresh, setFresh] = useState<ContainerFrame>();
+    const container = fresh ?? props.container ?? inherited;
     const [measured, setMeasured] = useState<{
         readonly left: number;
         readonly right: number;
@@ -285,6 +298,12 @@ function MenuImpl(
         surface.current?.measureInWindow((x, _y, width) => {
             if (width > 0) setMeasured({ left: x, right: x + width });
         });
+    const measureAll = () => {
+        measureRoom();
+        void measureContainer?.().then((frame) => {
+            if (frame) setFresh(frame);
+        });
+    };
     // Within the window and, when there's one, the nearest container's measured frame.
     const room: MenuSubmenuRoom | undefined =
         measured &&
@@ -386,7 +405,7 @@ function MenuImpl(
                                   | ((event: LayoutChangeEvent) => void)
                                   | undefined
                           )?.(event);
-                          measureRoom();
+                          measureAll();
                       },
                   }
                 : {})}
@@ -669,6 +688,7 @@ function MenuOverlay(props: MenuProps): ReactNode {
     } = props;
     const engine = useEngine();
     const container = useContainerFrame();
+    const measureContainer = useMeasureContainer();
     const { open, source, measured, presence, close, toggle } =
         useAnchoredOverlay("Menu", {
             open: props.open,
@@ -751,6 +771,9 @@ function MenuOverlay(props: MenuProps): ReactNode {
                                     <Surface
                                         {...surface}
                                         {...(container ? { container } : {})}
+                                        {...(measureContainer
+                                            ? { measureContainer }
+                                            : {})}
                                         onSelect={select}
                                     />
                                 </Popup>

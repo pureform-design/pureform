@@ -76,6 +76,7 @@ export type { ComponentSlots, SlotViews, SlotViewsBySlot } from "./styles";
 export {
     PureformContainer,
     useContainerFrame,
+    useMeasureContainer,
     useReducedMotion,
     useStyleEnvironment,
     useTokens,
