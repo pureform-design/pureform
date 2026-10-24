@@ -11,7 +11,7 @@ Tailwind, or React Native.
 @pureform/core  ◄── @pureform/theme, material, preset          (authoring)
                 ◄── @pureform/css-lowering ◄── panda-adapter, css-adapter, tailwind-adapter
                 ◄── @pureform/rn-adapter
-                ◄── the bindings (planned), for the state attribute names
+                ◄── binding-core, solid, react, react-native (state attribute names)
 ```
 
 It depends on nothing else in the workspace.

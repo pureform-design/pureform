@@ -249,4 +249,4 @@ they are.
 - Only what the AST says: which parts repeat (a menu's `item`), each part's role, the prop
   contract, and the state shape aren't here yet; the binding phases decide them.
 - The anatomy covers the preset's default components. An app's own components get theirs from
-  `@pureform/generate` (p4a) through `/derive`.
+  `@pureform/generate` through `/derive`.

@@ -369,7 +369,7 @@ trigger shows their labels joined by ", " (the placeholder when none):
       a long press shows the tooltip rather than pressing. `RichTooltip` (`@pureform/react-native/rich-tooltip`,
       with `subhead`, `supportingText` and `actions`) replaces `variant="rich"`; it is interactive. Neither draws a
       caret here: the web's comes from Zag's positioner.
-    - **`Popover`** (`@pureform/react-native/popover`, c9c): an anchored panel with a `heading`, `body` and `actions`
+    - **`Popover`** (`@pureform/react-native/popover`): an anchored panel with a `heading`, `body` and `actions`
       (a function is given `close`). With a `trigger` (a label, or a function given `onPress`,
       `interactionSource` and the ARIA props) it opens over the page against it and closes on a press outside
       (`closeOnInteractOutside`), Escape or back; without, it's its surface. It draws no caret, and `modal` has no
