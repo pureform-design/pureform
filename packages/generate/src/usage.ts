@@ -97,16 +97,53 @@ const narrowSpec = (
     } as AnyComponentSpec;
 };
 
+// Whether a value holds an alias or a token path into a component outside `kept`.
+const namesOtherComponent = (
+    value: unknown,
+    kept: readonly string[],
+): boolean => {
+    if (typeof value === "string") return false;
+    if (Array.isArray(value))
+        return value.some((v) => namesOtherComponent(v, kept));
+    if (typeof value !== "object" || value === null) return false;
+    const node = value as Record<string, unknown>;
+    if (
+        node["type"] === "alias" &&
+        Array.isArray(node["path"]) &&
+        node["path"][0] === "components"
+    ) {
+        return !kept.includes(String(node["path"][1]));
+    }
+    return Object.entries(node).some(([key, v]) => {
+        const [root, name] = key.split(".");
+        if (
+            root === "components" &&
+            name !== undefined &&
+            !kept.includes(name)
+        ) {
+            return true;
+        }
+        return namesOtherComponent(v, kept);
+    });
+};
+
 /** The config with only these components, each narrowed to the variant values in use: the values
  *  left out lose their styles, and so do the compound variants that match them. Tokens, themes,
  *  and everything else stay. For adapters that compile styles from the config (stylesheets,
- *  precomputed tables); the factory modules keep reading the whole config. */
+ *  precomputed tables); keyframes that name a left-out component's tokens go too. The factory modules keep reading the whole config. */
 export const narrowConfig = (
     config: CoreConfig,
     components: readonly string[],
     variants: VariantUsage = {},
 ): CoreConfig => ({
     ...config,
+    ...(config.keyframes && {
+        keyframes: Object.fromEntries(
+            Object.entries(config.keyframes).filter(
+                ([, stops]) => !namesOtherComponent(stops, components),
+            ),
+        ),
+    }),
     components: Object.fromEntries(
         components.map((name) => [
             name,
