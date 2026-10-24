@@ -204,7 +204,8 @@ describe("List", () => {
                     { headline: "Inbox", testId: "inbox" },
                     { headline: "Sent", density: undefined, testId: "sent" },
                 ]}
-                slotProps={{ headline: { class: "bold" } }}
+                class={{ item: "row" }}
+                listItemProps={{ slotProps: { headline: { class: "bold" } } }}
             />
         ));
         await settle();
@@ -216,11 +217,33 @@ describe("List", () => {
         );
         expect(wrappers).toHaveLength(2);
         expect(wrappers[0]!.tagName).toBe("LI");
+        expect(wrappers[0]!.className).toBe("list__item row");
         expect(byTestId("inbox-root").className).toContain(
             "list-item--density-compact",
         );
         expect(byTestId("sent-headline").className).toBe(
             "list-item__headline bold",
+        );
+    });
+
+    it("gives every item listItemProps under its own", async () => {
+        withRegistry(() => (
+            <List
+                class={{ root: "inbox" }}
+                listItemProps={{ class: { headline: "bold" } }}
+                items={[
+                    { headline: "A", testId: "a" },
+                    { headline: "B", testId: "b", class: { headline: "own" } },
+                ]}
+            />
+        ));
+        await settle();
+        expect(byTestId(testIds.list.root).className).toBe("list inbox");
+        expect(byTestId("a-headline").className).toBe(
+            "list-item__headline bold",
+        );
+        expect(byTestId("b-headline").className).toBe(
+            "list-item__headline bold own",
         );
     });
 

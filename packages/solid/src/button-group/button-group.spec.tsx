@@ -139,3 +139,20 @@ describe("ButtonGroup, composed", () => {
         expect(add?.className).toContain("icon-button--position-last");
     });
 });
+
+describe("ButtonGroup, slot props", () => {
+    it("keys its own parts flat and gives every button buttonProps under its own", async () => {
+        withRegistry(() => (
+            <ButtonGroup
+                aria-label="View"
+                class={{ root: "views" }}
+                buttonProps={{ class: { label: "caps" }, testId: "b" }}
+                items={[{ label: "Day" }, { label: "Week", testId: "own" }]}
+            />
+        ));
+        await settle();
+        expect(byTestId(testIds.buttonGroup.root).className).toContain("views");
+        expect(byTestId("b-label").className).toContain("caps");
+        expect(byTestId("own-label").className).toContain("caps");
+    });
+});

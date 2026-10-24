@@ -3,6 +3,7 @@
 // the ready-made ButtonGroup over them, which places each button by its index.
 
 import { buttonGroupAnatomy } from "@pureform/anatomy";
+import type { buttonAnatomy, iconButtonAnatomy } from "@pureform/anatomy";
 import {
     BUTTON_GROUP_CONTENT_PROPS,
     BUTTON_GROUP_ROOT_PROPS,
@@ -39,7 +40,8 @@ import type { IconButtonProps } from "../icon-button/icon-button";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
-import { useComponent } from "../parts";
+import { createSlotProps, useComponent } from "../parts";
+import type { InnerPropsOf, SlotKeyedProps } from "../parts";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 
@@ -90,6 +92,7 @@ function Root(props: ButtonGroupRootProps): JSX.Element {
     const scope = useComponent(buttonGroupAnatomy, {
         selection: () => buttonGroupSelection(props),
         testId: () => props.testId,
+        unstyled: () => props.unstyled,
     });
     return (
         <context.Provider value={{ api, props }}>
@@ -158,6 +161,12 @@ const useGrouped = <
             get disabled() {
                 return variants().disabled;
             },
+            get indication() {
+                return (
+                    (props as { indication?: unknown }).indication ??
+                    group.indication
+                );
+            },
         },
         selection,
     );
@@ -178,13 +187,33 @@ function GroupIconButton(props: ButtonGroupIconButtonProps): JSX.Element {
     return <IconButton {...(merged as unknown as IconButtonProps)} />;
 }
 
-/** The ready-made group's props: Root's and the buttons as data. */
+type Keyed = SlotKeyedProps<typeof buttonGroupAnatomy>;
+
+/** The ready-made group's props: Root's, with `class`, `style` and `slotProps` keyed by the
+ *  group's own part (`root`), the buttons as data, and the defaults of the buttons it draws:
+ *  `buttonProps` for those with a label, `iconButtonProps` for icon-only ones. */
 export interface ButtonGroupProps
     extends
-        Omit<ButtonGroupRootProps, "children">,
-        ButtonGroupContentProps<JSX.Element> {}
+        Omit<ButtonGroupRootProps, keyof Keyed | "children">,
+        Keyed,
+        ButtonGroupContentProps<JSX.Element> {
+    /** Every labelled button's `class`, `style`, `slotProps`, `unstyled`, `testId` and
+     *  `tokens`, keyed by the button's parts. An item's own `testId` wins. */
+    readonly buttonProps?: InnerPropsOf<typeof buttonAnatomy> | undefined;
+    /** The same for every icon-only button, keyed by the icon button's parts. */
+    readonly iconButtonProps?:
+        | InnerPropsOf<typeof iconButtonAnatomy>
+        | undefined;
+}
 
-const READY_MADE_PROPS = [...BUTTON_GROUP_CONTENT_PROPS] as const;
+const READY_MADE_PROPS = [
+    "class",
+    "style",
+    "slotProps",
+    "buttonProps",
+    "iconButtonProps",
+    ...BUTTON_GROUP_CONTENT_PROPS,
+] as const;
 
 /** The ready-made group: a button per item with a label, an icon button per icon-only item, each
  *  placed by its index. */
@@ -199,31 +228,49 @@ function ReadyMade(props: ButtonGroupProps): JSX.Element {
     );
     const position = (index: number) =>
         buttonGroupPosition(index, entries().length, props.connected);
-    const one = (item: ButtonGroupItem<JSX.Element>, index: number) => ({
+    const one = (
+        item: ButtonGroupItem<JSX.Element>,
+        index: number,
+        defaults: { readonly testId?: unknown } | undefined,
+    ) => ({
+        testId: item.testId ?? defaults?.testId,
         value: item.value ?? (props.selectable ? String(index) : undefined),
         position: position(index),
         disabled: item.disabled,
         onClick: item.onClick,
         "aria-label": item["aria-label"],
-        testId: item.testId,
         interactionSource: item.interactionSource,
     });
+    const root = createSlotProps(props)("root");
     return (
-        <Root {...(omit(props, ...READY_MADE_PROPS) as ButtonGroupRootProps)}>
+        <Root
+            {...(omit(props, ...READY_MADE_PROPS) as ButtonGroupRootProps)}
+            {...(root as object)}
+        >
             <For each={entries()} keyed={(entry) => entry.key}>
                 {(entry, index) => (
                     <Show
                         when={entry().item.label !== undefined}
                         fallback={
                             <GroupIconButton
-                                {...(one(entry().item, index()) as object)}
+                                {...(props.iconButtonProps as object)}
+                                {...(one(
+                                    entry().item,
+                                    index(),
+                                    props.iconButtonProps,
+                                ) as object)}
                                 icon={entry().item.icon}
                                 width={entry().item.width}
                             />
                         }
                     >
                         <GroupButton
-                            {...(one(entry().item, index()) as object)}
+                            {...(props.buttonProps as object)}
+                            {...(one(
+                                entry().item,
+                                index(),
+                                props.buttonProps,
+                            ) as object)}
                             label={entry().item.label}
                             icon={entry().item.icon}
                         />

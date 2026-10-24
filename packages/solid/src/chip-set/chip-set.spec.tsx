@@ -113,3 +113,22 @@ describe("ChipSet, composed", () => {
         );
     });
 });
+
+describe("ChipSet, slot props", () => {
+    it("keys its own parts flat and gives every chip chipProps under its own", async () => {
+        withRegistry(() => (
+            <ChipSet
+                aria-label="Filters"
+                class={{ root: "filters" }}
+                chipProps={{ class: { label: "caps" }, testId: "c" }}
+                items={[{ label: "A" }, { label: "B", testId: "own" }]}
+            />
+        ));
+        await settle();
+        expect(byTestId(testIds.chipSet.root).className).toBe(
+            "chip-set filters",
+        );
+        expect(byTestId("c-label").className).toContain("caps");
+        expect(byTestId("own-label").className).toContain("caps");
+    });
+});

@@ -3,18 +3,16 @@
 // highlight across the options (the highlighted one hovers), and a press or Enter or Space selects
 // one. Options are passed as data, so the machine's collection follows them.
 
+import type { listAnatomy, listItemAnatomy } from "@pureform/anatomy";
 import {
+    overDefaults,
     SELECTION_LIST_CONTENT_PROPS,
     selectionListMachineProps,
     selectionListOptions,
 } from "@pureform/binding-core";
 import type {
-    ListItemPart,
-    SelectionListContentProps,
     SelectionListItem,
     SelectionListRootOwnProps,
-    SlotKeyed,
-    Unstyled,
 } from "@pureform/binding-core";
 import * as selectionList from "@pureform/machines/selection-list";
 import type { JSX } from "@solidjs/web";
@@ -24,25 +22,41 @@ import { useControllable } from "../controllable";
 import { itemInteractionSources } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
 import { ListItem } from "../list-item/list-item";
-import type { ListItemPartProps, ListItemProps } from "../list-item/list-item";
+import type { ListItemProps } from "../list-item/list-item";
 import { List } from "../list/list";
 import type { ListRootProps } from "../list/list";
+import { createSlotProps } from "../parts";
+import type { InnerPropsOf, SlotKeyedProps } from "../parts";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 
-/** The selection list's props: the list's variants (`variant`, `density`, `color`, …), the
- *  selection (`selectionMode`, `value`, …), the options as data, props for every option's parts
- *  keyed by part, `testId`, and the list element's own props. Name it with `aria-label` or
+type Keyed = Pick<
+    SlotKeyedProps<typeof listAnatomy>,
+    "class" | "style" | "slotProps"
+>;
+type ListItemDefaults = InnerPropsOf<typeof listItemAnatomy>;
+
+/** The selection list's props: the list's variants (`variant`, `density`, `color`, …) and own
+ *  tokens, the selection (`selectionMode`, `value`, …), the options as data, `class`, `style`
+ *  and `slotProps` keyed by the list's parts (`root`, `item`), `listItemProps` for every option
+ *  under its own, `testId`, and the list element's own props. Name it with `aria-label` or
  *  `aria-labelledby`. */
 export interface SelectionListProps
     extends
-        Omit<PartProps, keyof SelectionListRootOwnProps | "children">,
+        Omit<
+            PartProps,
+            keyof SelectionListRootOwnProps | keyof Keyed | "children"
+        >,
         SelectionListRootOwnProps,
-        SelectionListContentProps<JSX.Element> {
-    /** Every option's parts' props, by part: `{ headline: { class: "…" } }`. */
-    readonly slotProps?: SlotKeyed<ListItemPart, ListItemPartProps> | undefined;
-    /** Every option's parts, or some, without the registry's styles. */
-    readonly unstyled?: Unstyled<ListItemPart> | undefined;
+        Keyed {
+    /** The options, in order: each a list item's content and variants, its value, and its own
+     *  `class`, `style`, `slotProps`, `unstyled`, `testId` and `tokens`, over `listItemProps`. */
+    readonly items?:
+        | readonly (SelectionListItem<JSX.Element> & ListItemDefaults)[]
+        | undefined;
+    /** Every option's `class`, `style`, `slotProps`, `unstyled`, `testId` and `tokens`, under
+     *  the option's own. */
+    readonly listItemProps?: ListItemDefaults | undefined;
 }
 
 // The selection's props, which the machine takes rather than the list.
@@ -85,23 +99,23 @@ export function SelectionList(props: SelectionListProps): JSX.Element {
     const api = createMemo(() =>
         selectionList.connect(service, normalizeProps),
     );
-    const shared = {
-        get slotProps() {
-            return props.slotProps;
-        },
-        get unstyled() {
-            return props.unstyled;
-        },
-    };
+    const slots = createSlotProps(
+        props as Keyed as SlotKeyedProps<typeof listAnatomy>,
+    );
+    const root = slots("root");
+    const wrapper = slots("item");
     // The list's variants and the element's props, with the listbox's props over them.
     const list = merge(
         omit(
             props,
             ...BEHAVIOR_PROPS,
             ...SELECTION_LIST_CONTENT_PROPS,
+            "class",
+            "style",
             "slotProps",
-            "unstyled",
+            "listItemProps",
         ),
+        root,
         () => api().getContentProps(),
     ) as ListRootProps;
     return (
@@ -118,14 +132,16 @@ export function SelectionList(props: SelectionListProps): JSX.Element {
                     );
                     const row = merge(
                         () =>
-                            omit(
-                                item(),
-                                "value",
-                                "textValue",
-                                "disabled",
-                                "interactionSource",
+                            overDefaults(
+                                props.listItemProps as object | undefined,
+                                omit(
+                                    item(),
+                                    "value",
+                                    "textValue",
+                                    "disabled",
+                                    "interactionSource",
+                                ),
                             ),
-                        shared,
                         () => api().getItemProps({ item: option() }),
                         {
                             interactive: true,
@@ -138,7 +154,7 @@ export function SelectionList(props: SelectionListProps): JSX.Element {
                         },
                     ) as ListItemProps;
                     return (
-                        <List.Item role="presentation">
+                        <List.Item {...wrapper} role="presentation">
                             <ListItem {...row} />
                         </List.Item>
                     );

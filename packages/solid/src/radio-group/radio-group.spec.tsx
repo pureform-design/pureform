@@ -41,7 +41,7 @@ describe("RadioGroup, ready-made", () => {
                 name="size"
                 color="error"
                 items={ITEMS}
-                class="sizes"
+                class={{ root: "sizes" }}
             />
         ));
         await settle();
@@ -118,5 +118,24 @@ describe("RadioGroup, ready-made", () => {
         expect(byTestId("error").textContent).toMatch(
             /<RadioGroup.ItemDot> must be inside <RadioGroup.Item>/,
         );
+    });
+});
+
+describe("RadioGroup, radioProps", () => {
+    it("gives every radio radioProps, an item's own testId winning", async () => {
+        withRegistry(() => (
+            <RadioGroup
+                aria-label="Size"
+                name="size"
+                items={[
+                    { value: "s", label: "Small" },
+                    { value: "m", label: "Medium", testId: "own" },
+                ]}
+                radioProps={{ class: { dot: "big" }, testId: "r" }}
+            />
+        ));
+        await settle();
+        expect(byTestId("r-dot").className).toContain("big");
+        expect(byTestId("own-dot").className).toContain("big");
     });
 });

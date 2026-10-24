@@ -46,7 +46,7 @@ import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
 import { createSlotProps, useComponent } from "../parts";
-import type { ComponentScope, SlotKeyedProps } from "../parts";
+import type { ComponentScope, InnerPropsOf, SlotKeyedProps } from "../parts";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 
@@ -71,7 +71,8 @@ interface ChipContextValue {
 
 const chipContext = createPartContext<ChipContextValue>("TagsInput.Chip");
 
-/** Root's props: the variants and tokens (the chips' in `chip`), the machine's props (`value`,
+/** Root's props: the variants and tokens (the chips' variants in `chip`, the rest of their
+ *  customization in `chipProps`), the machine's props (`value`,
  *  `max`, `delimiter`, …), `testId` and `unstyled` for every part, `as`, and the element's own
  *  props. */
 export interface TagsInputRootProps
@@ -80,6 +81,9 @@ export interface TagsInputRootProps
         TagsInputRootOwnProps {
     /** Another element or component to render instead of `<div>`. */
     readonly as?: ValidComponent | undefined;
+    /** Every chip's `class`, `style`, `slotProps`, `unstyled`, `testId` and `tokens`, keyed by
+     *  the input chip's parts. `testId` replaces the prefix the chips take from Root's. */
+    readonly chipProps?: InnerPropsOf<typeof inputChipAnatomy> | undefined;
 }
 
 /** A part's props: the element's own, and the part's `unstyled`. */
@@ -133,8 +137,13 @@ function Root(props: TagsInputRootProps): JSX.Element {
         unstyled: () => props.unstyled,
     });
     const chips = useComponent(inputChipAnatomy, {
-        selection: () => inputChipSelection(props.chip),
-        testId: () => tagsInputChipTestId(props.testId),
+        selection: () => ({
+            ...inputChipSelection(props.chip),
+            tokens: props.chipProps?.tokens,
+        }),
+        testId: () =>
+            props.chipProps?.testId ?? tagsInputChipTestId(props.testId),
+        unstyled: () => props.chipProps?.unstyled,
         indication: () => props.indication,
     });
     return (
@@ -145,21 +154,24 @@ function Root(props: TagsInputRootProps): JSX.Element {
                 element: "div",
                 as: () => props.as,
                 machine: () => api().getRootProps(),
-                props: merge(omit(props, "as", ...TAGS_INPUT_ROOT_PROPS), {
-                    get children() {
-                        return (
-                            <>
-                                {props.children}
-                                {/* Its value follows the tags: Zag's sets it once. */}
-                                <input
-                                    {...api().getHiddenInputProps()}
-                                    ref={setHidden}
-                                    value={api().valueAsString}
-                                />
-                            </>
-                        );
+                props: merge(
+                    omit(props, "as", "chipProps", ...TAGS_INPUT_ROOT_PROPS),
+                    {
+                        get children() {
+                            return (
+                                <>
+                                    {props.children}
+                                    {/* Its value follows the tags: Zag's sets it once. */}
+                                    <input
+                                        {...api().getHiddenInputProps()}
+                                        ref={setHidden}
+                                        value={api().valueAsString}
+                                    />
+                                </>
+                            );
+                        },
                     },
-                }),
+                ),
             })}
         </context.Provider>
     );
@@ -357,6 +369,23 @@ function Content(props: {
     const own = props.own;
     const avatar = (value: string) => own.chipAvatar?.(value);
     const chipIcon = (value: string) => own.chipIcon?.(value);
+    const chip = createSlotProps({
+        get class() {
+            return own.chipProps?.class;
+        },
+        get style() {
+            return own.chipProps?.style;
+        },
+        get slotProps() {
+            return own.chipProps?.slotProps;
+        },
+    } as SlotKeyedProps<typeof inputChipAnatomy>);
+    const chipRoot = chip("root");
+    const chipTouchTarget = chip("touchTarget");
+    const chipAvatar = chip("avatar");
+    const chipIconPart = chip("icon");
+    const chipLabel = chip("label");
+    const chipRemove = chip("remove");
     return (
         <>
             <Container {...props.slots("container")}>
@@ -367,20 +396,24 @@ function Content(props: {
                 </Show>
                 <For each={api().value}>
                     {(value, index) => (
-                        <Chip value={value} index={index()}>
-                            <ChipTouchTarget />
+                        <Chip {...chipRoot} value={value} index={index()}>
+                            <ChipTouchTarget {...chipTouchTarget} />
                             <Show
                                 when={isPresent(avatar(value))}
                                 fallback={
                                     <Show when={isPresent(chipIcon(value))}>
-                                        <ChipIcon>{chipIcon(value)}</ChipIcon>
+                                        <ChipIcon {...chipIconPart}>
+                                            {chipIcon(value)}
+                                        </ChipIcon>
                                     </Show>
                                 }
                             >
-                                <ChipAvatar>{avatar(value)}</ChipAvatar>
+                                <ChipAvatar {...chipAvatar}>
+                                    {avatar(value)}
+                                </ChipAvatar>
                             </Show>
-                            <ChipLabel />
-                            <ChipRemove>
+                            <ChipLabel {...chipLabel} />
+                            <ChipRemove {...chipRemove}>
                                 {isPresent(own.removeIcon) ? (
                                     own.removeIcon
                                 ) : (

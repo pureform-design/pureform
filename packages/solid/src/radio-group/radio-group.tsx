@@ -21,10 +21,7 @@ import type {
     RadioGroupItem,
     RadioGroupRootOwnProps,
     RadioOwnProps,
-    RadioPart,
-    RadioVariantProps,
-    SlotKeyed,
-    Unstyled,
+    RadioGroupVariantProps,
 } from "@pureform/binding-core";
 import {
     radioInputs,
@@ -52,8 +49,8 @@ import type { ItemInteractionSources } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
-import { useComponent, useUnstyledComponent } from "../parts";
-import type { ComponentScope } from "../parts";
+import { createSlotProps, useComponent, useUnstyledComponent } from "../parts";
+import type { ComponentScope, InnerPropsOf, SlotKeyedProps } from "../parts";
 import { combinePartProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
@@ -62,7 +59,7 @@ import { useDirection } from "../provider";
 interface RadioGroupContextValue {
     readonly api: Accessor<radioGroup.Api<PropTypes>>;
     /** The group's variants, every radio's defaults. */
-    readonly variants: Accessor<RadioVariantProps>;
+    readonly variants: Accessor<RadioGroupVariantProps>;
     /** The group's element, whose radios a controlled click puts back. */
     readonly root: Accessor<HTMLElement | undefined>;
     readonly sources: ItemInteractionSources;
@@ -148,7 +145,6 @@ function Root(props: RadioGroupRootProps): JSX.Element {
                 variants: () => ({
                     color: props.color,
                     density: props.density,
-                    tokens: props.tokens,
                 }),
                 root,
                 sources,
@@ -259,49 +255,78 @@ function ItemDot(props: RadioGroupPartProps): JSX.Element {
     });
 }
 
-/** The ready-made radio group's props: Root's (`class` and `style` are the group element's), the
- *  radios as `items`, and props for every radio's parts, keyed by part. */
+type GroupKeyed = Pick<
+    SlotKeyedProps<typeof radioGroupAnatomy>,
+    "class" | "style" | "slotProps"
+>;
+
+/** The ready-made radio group's props: Root's, with `class`, `style` and `slotProps` keyed by the
+ *  group's own part (`root`), the radios as `items`, and `radioProps`, every radio's defaults. */
 export interface RadioGroupProps
-    extends Omit<RadioGroupRootProps, "children">, RadioGroupContentProps {
-    /** Every radio's parts' props, by part: `{ input: { class: "…" } }`. */
-    readonly slotProps?: SlotKeyed<RadioPart, RadioGroupPartProps> | undefined;
-    /** Every radio's parts, or some, without the registry's styles. */
-    readonly unstyled?: Unstyled<RadioPart> | undefined;
+    extends
+        Omit<RadioGroupRootProps, keyof GroupKeyed | "children">,
+        GroupKeyed,
+        RadioGroupContentProps {
+    /** Every radio's `class`, `style`, `slotProps`, `unstyled`, `testId` and `tokens`, keyed by
+     *  the radio's parts: `{ class: { input: "…" }, tokens: { … } }`. An item's own `testId`
+     *  wins. */
+    readonly radioProps?: InnerPropsOf<typeof radioAnatomy> | undefined;
 }
 
 const READY_MADE_PROPS = [
+    "class",
+    "style",
     "slotProps",
-    "unstyled",
+    "radioProps",
     ...RADIO_GROUP_CONTENT_PROPS,
 ] as const;
 
 /** The ready-made radio group: a radio per item, each with every part in the preset's
  *  structure, named by its item's `label`. */
 function ReadyMade(props: RadioGroupProps): JSX.Element {
-    const slot = (part: RadioPart) => props.slotProps?.[part] ?? {};
+    const group = createSlotProps(
+        props as GroupKeyed as SlotKeyedProps<typeof radioGroupAnatomy>,
+    )("root");
+    const slot = createSlotProps({
+        get class() {
+            return props.radioProps?.class;
+        },
+        get style() {
+            return props.radioProps?.style;
+        },
+        get slotProps() {
+            return props.radioProps?.slotProps;
+        },
+    } as SlotKeyedProps<typeof radioAnatomy>);
+    const root = slot("root");
+    const touchTarget = slot("touchTarget");
+    const input = slot("input");
+    const ring = slot("ring");
+    const dot = slot("dot");
     return (
-        <Root {...(omit(props, ...READY_MADE_PROPS) as RadioGroupRootProps)}>
+        <Root
+            {...(omit(props, ...READY_MADE_PROPS) as RadioGroupRootProps)}
+            {...(group as object)}
+        >
             <For
                 each={props.items ?? []}
                 keyed={(item: RadioGroupItem) => item.value}
             >
                 {(item) => (
                     <Item
-                        {...slot("root")}
+                        {...root}
                         value={item().value}
                         disabled={item().disabled}
                         invalid={item().invalid}
-                        testId={item().testId}
+                        testId={item().testId ?? props.radioProps?.testId}
+                        tokens={props.radioProps?.tokens}
                         interactionSource={item().interactionSource}
-                        unstyled={props.unstyled}
+                        unstyled={props.radioProps?.unstyled}
                     >
-                        <ItemTouchTarget {...slot("touchTarget")} />
-                        <ItemInput
-                            aria-label={item().label}
-                            {...slot("input")}
-                        />
-                        <ItemRing {...slot("ring")}>
-                            <ItemDot {...slot("dot")} />
+                        <ItemTouchTarget {...touchTarget} />
+                        <ItemInput aria-label={item().label} {...input} />
+                        <ItemRing {...ring}>
+                            <ItemDot {...dot} />
                         </ItemRing>
                     </Item>
                 )}

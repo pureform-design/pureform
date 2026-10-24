@@ -3,9 +3,11 @@
 // `overflow` moves those that don't fit into the menu component behind an overflow button.
 
 import { toolbarAnatomy } from "@pureform/anatomy";
+import type { buttonAnatomy, iconButtonAnatomy } from "@pureform/anatomy";
 import {
     isPresent,
     isUnstyled,
+    overDefaults,
     TOOLBAR_CONTENT_PROPS,
     TOOLBAR_OVERFLOW_LABEL,
     TOOLBAR_ROOT_PROPS,
@@ -34,7 +36,8 @@ import { IconButton } from "../icon-button";
 import type { IconButtonProps } from "../icon-button";
 import { Menu } from "../menu";
 import { MENU_TRIGGER_ATTRIBUTES } from "../menu/menu";
-import { useComponent } from "../parts";
+import { createSlotProps, useComponent } from "../parts";
+import type { InnerPropsOf, SlotKeyedProps } from "../parts";
 import type { PartProps } from "../props";
 import { ProvidedTokens } from "../provided-tokens";
 import { useDirection, usePureform } from "../provider";
@@ -93,13 +96,36 @@ function Root(props: ToolbarRootProps): JSX.Element {
     });
 }
 
-/** The ready-made toolbar's props: Root's and the elements as data. */
+type Keyed = Pick<
+    SlotKeyedProps<typeof toolbarAnatomy>,
+    "class" | "style" | "slotProps"
+>;
+type ButtonDefaults = InnerPropsOf<typeof buttonAnatomy>;
+type IconButtonDefaults = InnerPropsOf<typeof iconButtonAnatomy>;
+
+/** The ready-made toolbar's props: Root's, with `class`, `style` and `slotProps` keyed by the
+ *  toolbar's own part (`root`), the elements as data, and the defaults of the buttons it draws:
+ *  `iconButtonProps` for elements with an icon, `buttonProps` for text ones. */
 export interface ToolbarProps
     extends
-        Omit<ToolbarRootProps, "children">,
-        ToolbarContentProps<JSX.Element> {}
+        Omit<ToolbarRootProps, keyof Keyed | "children">,
+        Keyed,
+        ToolbarContentProps<JSX.Element> {
+    /** Every text button's `class`, `style`, `slotProps`, `unstyled`, `testId` and `tokens`,
+     *  keyed by the button's parts. An element's own `testId` wins. */
+    readonly buttonProps?: ButtonDefaults | undefined;
+    /** The same for every icon button, keyed by the icon button's parts. */
+    readonly iconButtonProps?: IconButtonDefaults | undefined;
+}
 
-const READY_MADE_PROPS = [...TOOLBAR_CONTENT_PROPS] as const;
+const READY_MADE_PROPS = [
+    "class",
+    "style",
+    "slotProps",
+    "buttonProps",
+    "iconButtonProps",
+    ...TOOLBAR_CONTENT_PROPS,
+] as const;
 
 const ITEM = "data-pf-toolbar-item";
 const OVERFLOW = "data-pf-toolbar-overflow";
@@ -108,8 +134,10 @@ const OVERFLOW = "data-pf-toolbar-overflow";
 function Element(props: {
     readonly item: ToolbarItem<JSX.Element>;
     readonly hidden: boolean;
+    readonly buttonProps: ButtonDefaults | undefined;
+    readonly iconButtonProps: IconButtonDefaults | undefined;
 }): JSX.Element {
-    const shared = () => ({
+    const own = () => ({
         [ITEM]: "",
         disabled: props.item.disabled,
         onClick: props.item.onClick,
@@ -124,19 +152,21 @@ function Element(props: {
                   onSelectedChange: props.item.onSelectedChange,
               }),
     });
+    const shared = (defaults: object | undefined) =>
+        overDefaults(defaults as ReturnType<typeof own> | undefined, own());
     return (
         <Show
             when={isPresent(props.item.icon)}
             fallback={
                 <Button
-                    {...(shared() as object)}
+                    {...(shared(props.buttonProps) as object)}
                     variant="text"
                     label={props.item.label}
                 />
             }
         >
             <IconButton
-                {...(shared() as object)}
+                {...(shared(props.iconButtonProps) as object)}
                 aria-label={props.item.label}
                 icon={props.item.icon}
             />
@@ -156,6 +186,9 @@ function OverflowButton(props: IconButtonProps): JSX.Element {
 /** The ready-made toolbar: an icon button per element with an icon, a text button per element
  *  without, and with `overflow`, the overflow button opening a menu of those that don't fit. */
 function ReadyMade(props: ToolbarProps): JSX.Element {
+    const rootSlot = createSlotProps(
+        props as Keyed as SlotKeyedProps<typeof toolbarAnatomy>,
+    )("root");
     const items = () => props.items ?? [];
     const [root, setRoot] = createSignal<HTMLElement | undefined>(undefined, {
         ownedWrite: true,
@@ -195,12 +228,15 @@ function ReadyMade(props: ToolbarProps): JSX.Element {
     return (
         <Root
             {...(omit(props, ...READY_MADE_PROPS) as ToolbarRootProps)}
+            {...(rootSlot as object)}
             ref={setRoot}
         >
             <For each={items()} keyed={(item) => item.value}>
                 {(item, index) => (
                     <Element
                         item={item()}
+                        buttonProps={props.buttonProps}
+                        iconButtonProps={props.iconButtonProps}
                         hidden={!!props.overflow && index() >= shown()}
                     />
                 )}

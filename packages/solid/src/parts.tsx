@@ -18,7 +18,12 @@ import {
     partSources,
     withProvidedTokens,
 } from "@pureform/binding-core";
-import type { PartStates, SlotKeyed, Unstyled } from "@pureform/binding-core";
+import type {
+    InnerProps,
+    PartStates,
+    SlotKeyed,
+    Unstyled,
+} from "@pureform/binding-core";
 import { componentIndicationTokens } from "@pureform/binding-core/indication";
 import type { InteractionSource } from "@pureform/binding-core/interaction";
 import type { Indication } from "@pureform/binding-dom/indication";
@@ -26,6 +31,7 @@ import { indicationRoles } from "@pureform/binding-dom/indication";
 import type {
     ClassSlots,
     ComponentName,
+    InstanceTokens,
     Selection,
     SlotClasses,
 } from "@pureform/styling";
@@ -325,6 +331,20 @@ export interface SlotKeyedProps<
     readonly slotProps?: SlotKeyed<PartName<A> | Extra, PartProps>;
     readonly unstyled?: Unstyled<PartName<A>>;
 }
+
+/** Everything that customizes a component's parts without choosing its variants: the slot-keyed
+ *  props and its instance tokens. */
+export interface CustomizeProps<
+    A extends ComponentAnatomy,
+> extends SlotKeyedProps<A> {
+    readonly tokens?: InstanceTokens<ComponentOf<A>> | undefined;
+}
+
+/** What a ready-made takes to customize a component it draws (`listItemProps`, `chipProps`):
+ *  that component's `CustomizeProps`, each optional. */
+export type InnerPropsOf<A extends ComponentAnatomy> = InnerProps<
+    CustomizeProps<A>
+>;
 
 /** One part's props from a ready-made component's slot-keyed props: its `slotProps` entry with
  *  its `class` and `style` merged in. `testId` and `unstyled` go to Root whole. A component with

@@ -3,6 +3,7 @@
 // ready-made ChipSet over them.
 
 import { chipSetAnatomy } from "@pureform/anatomy";
+import type { chipAnatomy } from "@pureform/anatomy";
 import {
     buttonGroupRootProps,
     toggleGroupItemProps,
@@ -34,7 +35,8 @@ import { useControllable } from "../controllable";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
-import { useComponent } from "../parts";
+import { createSlotProps, useComponent } from "../parts";
+import type { InnerPropsOf, SlotKeyedProps } from "../parts";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 
@@ -75,6 +77,7 @@ function Root(props: ChipSetRootProps): JSX.Element {
     const scope = useComponent(chipSetAnatomy, {
         selection: () => chipSetSelection(props),
         testId: () => props.testId,
+        unstyled: () => props.unstyled,
     });
     return (
         <context.Provider value={{ api, props }}>
@@ -120,11 +123,11 @@ function SetChip(props: ChipSetChipProps): JSX.Element {
             get density() {
                 return variants().density;
             },
-            get tokens() {
-                return variants().tokens;
-            },
             get disabled() {
                 return props.disabled || set.disabled;
+            },
+            get indication() {
+                return props.indication ?? set.indication;
             },
         },
         selection,
@@ -132,13 +135,27 @@ function SetChip(props: ChipSetChipProps): JSX.Element {
     return <Chip {...(merged as unknown as ChipProps)} />;
 }
 
-/** The ready-made set's props: Root's and the chips as data. */
+type Keyed = SlotKeyedProps<typeof chipSetAnatomy>;
+
+/** The ready-made set's props: Root's, with `class`, `style` and `slotProps` keyed by the set's
+ *  own part (`root`), the chips as data, and `chipProps`, every chip's defaults. */
 export interface ChipSetProps
     extends
-        Omit<ChipSetRootProps, "children">,
-        ChipSetContentProps<JSX.Element> {}
+        Omit<ChipSetRootProps, keyof Keyed | "children">,
+        Keyed,
+        ChipSetContentProps<JSX.Element> {
+    /** Every chip's `class`, `style`, `slotProps`, `unstyled`, `testId` and `tokens`, keyed by
+     *  the chip's parts. An item's own `testId` wins. */
+    readonly chipProps?: InnerPropsOf<typeof chipAnatomy> | undefined;
+}
 
-const READY_MADE_PROPS = [...CHIP_SET_CONTENT_PROPS] as const;
+const READY_MADE_PROPS = [
+    "class",
+    "style",
+    "slotProps",
+    "chipProps",
+    ...CHIP_SET_CONTENT_PROPS,
+] as const;
 
 /** The ready-made set: a chip per item, a filter chip in a selectable set. */
 function ReadyMade(props: ChipSetProps): JSX.Element {
@@ -157,14 +174,21 @@ function ReadyMade(props: ChipSetProps): JSX.Element {
         trailingIcon: item.trailingIcon,
         disabled: item.disabled,
         onClick: item.onClick,
-        testId: item.testId,
+        testId: item.testId ?? props.chipProps?.testId,
         interactionSource: item.interactionSource,
     });
+    const root = createSlotProps(props)("root");
     return (
-        <Root {...(omit(props, ...READY_MADE_PROPS) as ChipSetRootProps)}>
+        <Root
+            {...(omit(props, ...READY_MADE_PROPS) as ChipSetRootProps)}
+            {...(root as object)}
+        >
             <For each={entries()} keyed={(entry) => entry.key}>
                 {(entry, index) => (
-                    <SetChip {...(one(entry().item, index()) as object)} />
+                    <SetChip
+                        {...(props.chipProps as object)}
+                        {...(one(entry().item, index()) as object)}
+                    />
                 )}
             </For>
         </Root>
