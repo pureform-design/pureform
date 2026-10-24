@@ -8,7 +8,7 @@ generation logic: it calls `@pureform/generate`, the same step the bundler plugi
 doesn't pull in the plugin.
 
 - **Depends on:** `@pureform/generate` (generation, config discovery, the watcher), `jiti`
-  (loading the codegen file).
+  (loading the codegen file), `@pureform/bundler` (the usage scan behind `--prune`).
 - **Depended on by:** apps' and fixtures' scripts (`apps/solid-demo`, `apps/react-demo`,
   `tests/panda-fixture`: their omni `generate` tasks).
 - Part of the core train: released at the same version as `core`, `styling`, and the adapters.
@@ -19,25 +19,27 @@ Design: [§10 CLI](../../docs/design/component-architecture.md#10-cli),
 ## Usage
 
 ```sh
-pureform generate                  # write .pureform/
+pureform generate                  # write every target's full output, and the entries
+pureform generate --prune          # also write each target's pruned output, as a build does
 pureform generate --check          # compare, write nothing, exit 1 when it differs
 pureform generate --watch          # write, then again on every change to the config
 pureform generate --target panda --options '{"prefix":"pf"}' --components button,checkbox
 ```
 
-| Flag                   | Default                                         | What it does                                                 |
-| ---------------------- | ----------------------------------------------- | ------------------------------------------------------------ |
-| `--check`              | off                                             | Compare instead of writing; exit 1 on missing or stale files |
-| `--watch`              | off                                             | Generate again when the config or a file it imports changes  |
-| `--root <dir>`         | the working directory                           | The app's root                                               |
-| `--config <file>`      | the first `pureform.config.{ts,mts,…}`          | The config, relative to the root                             |
-| `--codegen <file>`     | the first `pureform.codegen.{ts,mts,…}` in root | The module exporting the options                             |
-| `--target <target>`    | the codegen file's                              | `panda`, `css`, `tailwind`, or `native`                      |
-| `--options <json>`     | the codegen file's                              | The adapter's options, merged over the codegen file's        |
-| `--components <names>` | the codegen file's, else all                    | The allow-list, comma-separated                              |
-| `--lazy <names>`       | the codegen file's, else none                   | Components whose registry entries load on demand             |
-| `--out-dir <dir>`      | the codegen file's, else `.pureform`            | The folder written, relative to the root                     |
-| `--no-train-check`     | the check is on                                 | Skip checking that pureform packages share one version       |
+| Flag                   | Default                                         | What it does                                                                             |
+| ---------------------- | ----------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `--check`              | off                                             | Compare instead of writing; exit 1 on missing or stale files                             |
+| `--watch`              | off                                             | Generate again when the config or a file it imports changes                              |
+| `--prune`              | off                                             | Scan the app and write `<target>/pruned/` too (the codegen file's `prune` options apply) |
+| `--root <dir>`         | the working directory                           | The app's root                                                                           |
+| `--config <file>`      | the first `pureform.config.{ts,mts,…}`          | The config, relative to the root                                                         |
+| `--codegen <file>`     | the first `pureform.codegen.{ts,mts,…}` in root | The module exporting the options                                                         |
+| `--target <target>`    | the codegen file's                              | `panda`, `css`, `tailwind`, or `native`; replaces `targets`                              |
+| `--options <json>`     | the codegen file's                              | The adapter's options, merged over the codegen file's                                    |
+| `--components <names>` | the codegen file's, else all                    | The allow-list, comma-separated                                                          |
+| `--lazy <names>`       | the codegen file's, else none                   | Components whose registry entries load on demand                                         |
+| `--out-dir <dir>`      | the codegen file's, else `.pureform`            | The folder written, relative to the root                                                 |
+| `--no-train-check`     | the check is on                                 | Skip checking that pureform packages share one version                                   |
 
 Exit codes: 0 done (or up to date), 1 generation failed or `--check` found the output out of
 date, 2 called wrong (unknown command or flag, `--watch` with `--check`).
@@ -60,6 +62,23 @@ export const codegen = {
     components: ["button", "checkbox"],
 } satisfies PureformPluginOptions<PandaCodegenOptions>;
 ```
+
+Several targets go in `targets`, as the plugin takes them (see `@pureform/bundler`):
+
+```ts
+export const codegen = {
+    targets: {
+        web: { target: "panda", options: { prefix: "pf" } },
+        native: { target: "native" },
+    },
+};
+```
+
+The command writes `.pureform/<target>/full/` for each, then the entries at the top
+(`index.ts`, `registry.d.ts`, the default target's other root files, and `web.ts`,
+`native.ts`); `--prune` adds `.pureform/<target>/pruned/`. `--options`, `--components` and
+`--lazy` set a single target's, so with `targets` they need `--target`, which replaces the
+targets with one.
 
 Without a codegen file, `--target` is required.
 
@@ -87,8 +106,9 @@ cli/index.ts   the bin (#!/usr/bin/env node): main(process.argv.slice(2))
      │
 program.ts     main(args, io): the commands, help, version; parseGenerateFlags (node:util parseArgs)
      │
-generate.ts    runGenerate(flags, io): generate once (write or check) or watchGenerate; prints results
-     ├── codegen-file.ts  resolveCodegenOptions(flags, cwd): find and load the codegen file, flags over it, defaults
+generate.ts    runGenerate(flags, io): generateTargets once (write or check) or watchGenerate; prints results
+     ├── codegen-file.ts  resolveCodegenOptions(flags, cwd): find and load the codegen file, flags over it, defaults;
+     │                    --prune scans the app with @pureform/bundler's findUsage
      └── gitignore.ts     gitignoreHint(root, outDir): git check-ignore, git ls-files
 ```
 

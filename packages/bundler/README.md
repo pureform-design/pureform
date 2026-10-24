@@ -25,30 +25,33 @@ pruning), [§3 package layout](../../docs/design/component-architecture.md#3-pac
 ```
 vite.ts, rollup.ts, rolldown.ts, esbuild.ts   one unplugin instance per bundler
         │
-     plugin.ts ── createGenerateRunner (@pureform/generate)
-        │            config hook (Vite)    scan the app (builds), then generate before any
-        │                                  plugin's configResolved
+     plugin.ts ── createGenerateRunner (@pureform/generate's generateTargets)
+        │            config hook (Vite)    scan the app (builds), then generate every target
+        │                                  (full, and pruned in builds) before any plugin's
+        │                                  configResolved; set PUREFORM_OUTPUT=pruned in builds
         │            buildStart            generate (once), watch the config and its imports
         │            watchChange           generate again when one of them changes
-        │            resolveId             virtual:pureform/registry → <outDir>/index.ts;
+        │            resolveId             virtual:pureform/registry and .pureform/'s entries →
+        │                                  the import's target, full (dev) or pruned (build);
         │                                  an import into a missing outDir → missing-output error
+        │            transform             a pruned build's CSS @imports of an entry → pruned/
      metro.ts ── watchGenerate (@pureform/generate)
                      withPureform          generate before Metro starts, keep watching,
-                                           resolve virtual:pureform/registry
+                                           resolve the registry and entries to the native target
      options.ts      the shared options, generateOptions, pruneOptions, describeResult
      prune/
        scan.ts       scanUsage: the app's files → Usage (components, variant values)
        index.ts      findUsage (scan + the prune options), describePruning
 ```
 
-| Module        | What it does                                                                                                |
-| ------------- | ----------------------------------------------------------------------------------------------------------- |
-| `options.ts`  | `PureformPluginOptions`, `PruneOptions`, `REGISTRY_ID`, `generateOptions`, `pruneOptions`, `describeResult` |
-| `prune/`      | `scanUsage`, `findUsage`, `describePruning`                                                                 |
-| `plugin.ts`   | `unpluginFactory`, `pureform` (the unplugin instance)                                                       |
-| `vite.ts` …   | `pureform` for one bundler, also the default export                                                         |
-| `metro.ts`    | `withPureform(metroConfig, options)`                                                                        |
-| `client.d.ts` | ambient types for `virtual:pureform/registry` (`@pureform/bundler/client`)                                  |
+| Module        | What it does                                                                                                                                                     |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `options.ts`  | `PureformPluginOptions`, `PluginTarget`, `PruneOptions`, `REGISTRY_ID`, `generateOptions`, `pruneOptions`, `includes`, `aliasesReactNativeWeb`, `describeResult` |
+| `prune/`      | `scanUsage`, `findUsage`, `describePruning`                                                                                                                      |
+| `plugin.ts`   | `unpluginFactory`, `pureform` (the unplugin instance)                                                                                                            |
+| `vite.ts` …   | `pureform` for one bundler, also the default export                                                                                                              |
+| `metro.ts`    | `withPureform(metroConfig, options)`                                                                                                                             |
+| `client.d.ts` | ambient types for `virtual:pureform/registry` (`@pureform/bundler/client`)                                                                                       |
 
 ## Public API
 
@@ -70,25 +73,64 @@ export default defineConfig({
 });
 ```
 
-| Option       | Default                                   | What it does                                                   |
-| ------------ | ----------------------------------------- | -------------------------------------------------------------- |
-| `target`     | (required)                                | The adapter: `@pureform/<target>-adapter/codegen`, or one      |
-| `options`    | `{}`                                      | The adapter's build options; part of the output's hash         |
-| `config`     | the first `pureform.config.{ts,mts,…}`    | A path relative to the root, or the config object              |
-| `components` | every component                           | The allow-list                                                 |
-| `lazy`       | none                                      | Components whose registry entries load on demand               |
-| `root`       | Vite's `root`, else the working directory | The app's root                                                 |
-| `outDir`     | `.pureform`                               | The folder written, relative to the root                       |
-| `trainCheck` | `true`                                    | Fail when installed pureform packages disagree in version      |
-| `imports`    | `true`                                    | The config's import rules, or `{ allow }`, or `false`          |
-| `watch`      | `true`                                    | Generate again in dev and watch builds when the config changes |
-| `prune`      | `true` (Metro: `false`)                   | Usage-based pruning in builds, or `PruneOptions` (below)       |
+| Option       | Default                                   | What it does                                                                |
+| ------------ | ----------------------------------------- | --------------------------------------------------------------------------- |
+| `target`     | (`target` or `targets`)                   | One adapter: `@pureform/<target>-adapter/codegen`, or one                   |
+| `targets`    | (`target` or `targets`)                   | Several, by name: `{ web: { target, options, components, lazy, include } }` |
+| `options`    | `{}`                                      | The single target's build options; part of the output's hash                |
+| `config`     | the first `pureform.config.{ts,mts,…}`    | A path relative to the root, or the config object                           |
+| `components` | every component                           | The allow-list                                                              |
+| `lazy`       | none                                      | Components whose registry entries load on demand                            |
+| `root`       | Vite's `root`, else the working directory | The app's root                                                              |
+| `outDir`     | `.pureform`                               | The folder written, relative to the root                                    |
+| `trainCheck` | `true`                                    | Fail when installed pureform packages disagree in version                   |
+| `imports`    | `true`                                    | The config's import rules, or `{ allow }`, or `false`                       |
+| `watch`      | `true`                                    | Generate again in dev and watch builds when the config changes              |
+| `prune`      | `true` (Metro: `false`)                   | Usage-based pruning in builds, or `PruneOptions` (below)                    |
 
 The app reads the registry from the folder or from the virtual id:
 
 ```ts
-import { registry } from "virtual:pureform/registry"; // resolves to .pureform/index.ts
+import { registry } from "virtual:pureform/registry"; // the import's target's index
 // or: import { registry } from "../.pureform";
+```
+
+### Several targets, full and pruned output
+
+The plugin writes `@pureform/generate`'s layout (see its README): `.pureform/<target>/full/`
+for dev servers and the editor, `.pureform/<target>/pruned/` for builds, and stable entries at
+the top (`index.ts`, `panda.ts`, `styles.css`, `registry.d.ts`, and `<target>.ts` with several
+targets) that re-export `full/`. So tsconfig includes, Panda's `import "./.pureform/panda"` and
+stylesheet imports keep working, and a dev server and a build can run side by side.
+
+`resolveId` redirects each import of an entry (by relative or absolute path, with or without
+its extension, and `virtual:pureform/registry`) to the file it stands for, in `full/` for dev
+servers and watch builds and `pruned/` for builds that prune. The plain entry (`.pureform`,
+`.pureform/index`) gets the importing file's target:
+
+1. When any target has `include` (paths relative to the root, a folder taking everything
+   under it, or patterns over the absolute path), the target whose `include` matches the
+   importer, else the default target (the first web one).
+2. Otherwise, a native target when the importing environment maps `react-native` to
+   `react-native-web` (Vite's environment API, `this.environment.config.resolve.alias`, or the
+   resolved config's aliases), else the default target.
+
+Per-target entries (`.pureform/native`) and the other root files always resolve to their own
+target. Types of the plain entry come from the default target; import `.pureform/<target>`
+for another's. Tools that read the entries without the bundler see `full/`, except a `.ts`
+entry such as Panda's `panda.ts`, which gives `pruned/` when the build set
+`PUREFORM_OUTPUT=pruned` (the `config` hook does, before Panda's `configResolved`). CSS
+tools that resolve `@import` themselves (Tailwind) get `pruned/` from the `transform` hook,
+which rewrites a pruned build's `@import`s of an entry.
+
+```ts
+// Storybook, whose single Vite build maps react-native to react-native-web everywhere:
+export const codegen = {
+    targets: {
+        web: { target: "panda", options: { prefix: "pf" } },
+        native: { target: "native", include: ["src/native"] },
+    },
+};
 ```
 
 Keeping the options in a codegen file lets `pureform generate` (`@pureform/cli`) use them too,
@@ -113,7 +155,8 @@ without the client types (an ambient module wins over `paths`).
 ### Metro
 
 Metro has no plugin API unplugin reaches, so the config is wrapped. `target` defaults to
-`"native"`; the rest of the options are the plugin's.
+`"native"`; the rest of the options are the plugin's. With `targets`, the registry and
+`.pureform/`'s entries resolve to the first native target (full, or pruned with `prune`).
 
 ```js
 // metro.config.js
@@ -148,11 +191,10 @@ regenerations keep that usage, so don't prune a config a dev server runs.
 - **Regeneration.** Only changes to the config and the files it imports (relative paths)
   trigger it; generation rewrites only files whose contents differ, so an unchanged registry
   doesn't reload anything. Changes to installed packages need a restart.
-- **Pruning writes in place.** A pruned build writes the pruned registry to `.pureform/`, as Panda
-  writes `styled-system/`; the next dev server or `pureform generate` writes the full registry back
-  (the hash covers what pruning narrowed). An app that commits `.pureform/` sets `prune: false`,
-  and so does one that styles components the scan can't see, such as through
-  Panda's recipe functions.
+- **Pruning writes beside the full output.** A pruned build writes `<target>/pruned/` and leaves
+  `<target>/full/` and the entries as a dev server wrote them, so neither overwrites the other.
+  An app that styles components the scan can't see, such as through Panda's recipe functions,
+  sets `prune: false`.
 
 ## Pruning
 
