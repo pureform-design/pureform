@@ -10,6 +10,7 @@ dependencies:
     - "@pureform/vite-config"
     - "@pureform/vitest-config"
     - "@pureform/generate"
+    - "@pureform/bundler"
 
 tasks:
   test:unit:

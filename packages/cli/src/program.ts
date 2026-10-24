@@ -22,20 +22,24 @@ Options:
 
 export const GENERATE_USAGE = `Usage: pureform generate [options]
 
-Writes the generated registry to .pureform/ from pureform.config.ts with the target's
-adapter, as the bundler plugin does when dev or build starts. The options come from the
-codegen file's \`codegen\` export (pureform.codegen.ts), with these flags over them.
+Writes the generated registry to .pureform/ from pureform.config.ts with each target's
+adapter, as the bundler plugin does when dev or build starts: every target's full output
+in .pureform/<target>/full/, and the entries and declarations at the top. The options come
+from the codegen file's \`codegen\` export (pureform.codegen.ts), with these flags over them.
 
 Options:
   --check              Compare .pureform/ with what would be written, write nothing,
                        and exit 1 when it differs (for a committed registry in CI).
   --watch              Generate again whenever the config or a file it imports changes.
+  --prune              Also write each target's pruned output (.pureform/<target>/pruned/),
+                       from a scan of the app's source, as a build does.
   --root <dir>         The app's root (default: the working directory).
   --config <file>      The config, relative to the root
                        (default: the first pureform.config.{ts,mts,cts,js,mjs,cjs}).
   --codegen <file>     The module exporting the options as \`codegen\` or by default
                        (default: the first pureform.codegen.{ts,mts,cts,js,mjs,cjs} in the root).
   --target <target>    The adapter to generate with: ${TARGETS.join(", ")}.
+                       Replaces the codegen file's \`targets\` with this one.
   --options <json>     The adapter's options as a JSON object, over the codegen file's.
   --components <names> The components to generate, comma-separated (default: all).
   --lazy <names>       The components whose registry entries load on demand.
@@ -63,6 +67,7 @@ export const parseGenerateFlags = (
             options: {
                 check: { type: "boolean" },
                 watch: { type: "boolean" },
+                prune: { type: "boolean" },
                 root: { type: "string" },
                 config: { type: "string" },
                 codegen: { type: "string" },

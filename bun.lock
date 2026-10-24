@@ -304,6 +304,7 @@
         "pureform": "./dist/pureform.mjs",
       },
       "dependencies": {
+        "@pureform/bundler": "workspace:^",
         "@pureform/generate": "workspace:^",
         "jiti": "catalog:",
       },
