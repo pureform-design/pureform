@@ -357,6 +357,20 @@ describe("evaluate with units", () => {
             evaluate({ $calc: "*", args: ["2%", "3%"] }, theme),
         ).toThrow(`calc can't multiply "2%" by "3%"`);
     });
+
+    it("reads a CSS pixel length (an instance token written as on the web) as pixels", () => {
+        const theme = { width: "60px", gap: 4 };
+        expect(
+            evaluate(
+                { $calc: "+", args: [{ $ref: "width" }, { $ref: "gap" }] },
+                theme,
+            ),
+        ).toBe(64);
+        expect(
+            evaluate({ $calc: "*", args: [-1, { $ref: "width" }] }, theme),
+        ).toBe(-60);
+        expect(evaluate({ $math: "max", args: ["10px", 4] }, theme)).toBe(10);
+    });
 });
 
 describe("percentages plus pixels", () => {

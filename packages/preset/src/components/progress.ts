@@ -15,9 +15,11 @@
 //     <span class={track}>
 //       <span class={trackEndHalf}><span class={trackEndArc} /></span>
 //       <span class={trackStartHalf}><span class={trackStartArc} /></span>
+//       <span class={trackTailCap} /><span class={trackHeadCap} />
 //     </span>
 //     <span class={endHalf}><span class={endArc} /></span>
 //     <span class={startHalf}><span class={startArc} /></span>
+//     <span class={tailCap} /><span class={headCap} />
 //   </div>
 //
 // `shape: wavy` (M3 Expressive) draws the indicator as a wave: it is clipped to a band along a
@@ -52,11 +54,12 @@ import {
     sub,
     transform,
     translateX,
+    translateY,
     transparent,
     unitless,
     when,
 } from "@pureform/core/ast";
-import type { ShapeNode, StyleMap } from "@pureform/core/ast";
+import type { NumericValue, ShapeNode, StyleMap } from "@pureform/core/ast";
 import { easing, radius } from "@pureform/theme";
 
 import { waveBand, wavyRing } from "./shape-paths";
@@ -470,6 +473,12 @@ export const createLinearProgress = <const G extends string = ColorGroup>(
 
 export const linearProgress = createLinearProgress();
 
+// Half a ring's thickness as a share of its middle line, in percent, rounded to two places.
+function capShare(size: number, thickness: number): number {
+    const share = (thickness / 2 / (Math.PI * (size - thickness))) * 100;
+    return Math.round(share * 100) / 100;
+}
+
 // The value is a number that transitions, so both halves' arcs draw from one moving value
 // and meet at every frame; turning each arc on its own transition would open a gap between
 // them.
@@ -482,6 +491,9 @@ const circular = componentTokens(
         thickness: px(4),
         value: unitless(0),
         gap: unitless(3),
+        // The share of the circle (in percent) a rounded end reaches past its arc: half the
+        // thickness along the ring's middle line, for the default size and each thickness.
+        cap: unitless(capShare(48, 4)),
         // How far a wavy indicator's wave moves in and out of its circle.
         amplitude: px(1.5),
         // One indeterminate turn: Compose's indicator turns 1080° in its 6000ms cycle and
@@ -574,12 +586,59 @@ export const createCircularProgress = <const G extends string = ColorGroup>(
     });
 
     // The track is the same two-half ring, turned to where the gap after the indicator ends and
-    // drawing what is left of the circle less a gap at each end (in percent of the circle).
-    const trackTurn = add(ref("value"), ref("gap"));
+    // drawing what is left of the circle less a gap at each end (in percent of the circle). Every
+    // arc's ends are rounded by a dot on each (`cap`), reaching past it by `cap`, so the track
+    // keeps that much more away from the indicator at each end, and the gap stays `gap`.
+    const trackTurn = add(
+        ref("value"),
+        ref("gap"),
+        mul(ref("cap"), unitless(2)),
+    );
     const left = max(
-        sub(unitless(100), ref("value"), mul(ref("gap"), unitless(2))),
+        sub(
+            unitless(100),
+            ref("value"),
+            mul(ref("gap"), unitless(2)),
+            mul(ref("cap"), unitless(4)),
+        ),
         unitless(0),
     );
+
+    // A rounded end: a dot as wide as the ring, centred in its box, turned to `at` (percent of
+    // the circle) and moved out to the ring's middle line (`inset` in from the box's edge),
+    // shown only while its arc has a length (`shown`).
+    const cap = (
+        at: NumericValue,
+        color: ReturnType<typeof ref>,
+        shown: NumericValue,
+        inset: NumericValue = px(0),
+    ): StyleMap => {
+        const turn = mul(at, DEG_PER_PERCENT);
+        const out = translateY(
+            mul(
+                div(
+                    sub(ref("size"), ref("thickness"), mul(inset, unitless(2))),
+                    unitless(2),
+                ),
+                unitless(-1),
+            ),
+        );
+        return {
+            position: absolute,
+            top: sub(pct(50), div(ref("thickness"), unitless(2))),
+            insetInlineStart: sub(pct(50), div(ref("thickness"), unitless(2))),
+            width: ref("thickness"),
+            height: ref("thickness"),
+            borderRadius: circle,
+            backgroundColor: color,
+            transform: when(
+                "rtl",
+                transform(rotate(mul(turn, unitless(-1))), out),
+                transform(rotate(turn), out),
+            ),
+            opacity: clamp(unitless(0), shown, unitless(1)),
+        };
+    };
 
     return pf.slotComponent({
         name: "circularProgress",
@@ -599,10 +658,19 @@ export const createCircularProgress = <const G extends string = ColorGroup>(
             "endArc",
             "startHalf",
             "startArc",
+            "trackTailCap",
+            "trackHeadCap",
+            "tailCap",
+            "headCap",
         ],
         structure: {
-            root: ["track", "endHalf", "startHalf"],
-            track: ["trackEndHalf", "trackStartHalf"],
+            root: ["track", "endHalf", "startHalf", "tailCap", "headCap"],
+            track: [
+                "trackEndHalf",
+                "trackStartHalf",
+                "trackTailCap",
+                "trackHeadCap",
+            ],
             trackEndHalf: ["trackEndArc"],
             trackStartHalf: ["trackStartArc"],
             endHalf: ["endArc"],
@@ -666,6 +734,12 @@ export const createCircularProgress = <const G extends string = ColorGroup>(
                     max(sub(ref("value"), unitless(50)), unitless(0)),
                     ref("activeColor"),
                 ),
+                // The rounded ends: the track's at either end of what it draws, the
+                // indicator's where it starts and where it has reached.
+                trackTailCap: cap(unitless(0), ref("trackColor"), left),
+                trackHeadCap: cap(left, ref("trackColor"), left),
+                tailCap: cap(unitless(0), ref("activeColor"), ref("value")),
+                headCap: cap(ref("value"), ref("activeColor"), ref("value")),
             },
             variants: {
                 // The determinate arcs, turning, their length growing from a tenth of the
@@ -689,7 +763,12 @@ export const createCircularProgress = <const G extends string = ColorGroup>(
                 thickness: {
                     default: {},
                     thick: {
-                        root: { tokens: { thickness: px(8) } },
+                        root: {
+                            tokens: {
+                                thickness: px(8),
+                                cap: unitless(capShare(48, 8)),
+                            },
+                        },
                     },
                 },
                 // M3 Expressive's wavy indicator: each arc's ring is as wide as the wave and
@@ -713,6 +792,22 @@ export const createCircularProgress = <const G extends string = ColorGroup>(
                         startHalf: wavyHalf("Start"),
                         endArc: wavyArc,
                         startArc: wavyArc,
+                        // The track's ring is smaller by the wave's amplitude all round; the
+                        // indicator's ends follow its wave, so they stay as the wave cuts them.
+                        trackTailCap: cap(
+                            unitless(0),
+                            ref("trackColor"),
+                            left,
+                            ref("amplitude"),
+                        ),
+                        trackHeadCap: cap(
+                            left,
+                            ref("trackColor"),
+                            left,
+                            ref("amplitude"),
+                        ),
+                        tailCap: { display: none },
+                        headCap: { display: none },
                     },
                 },
                 // The arcs and the spinning ring read these, so the color doesn't set the

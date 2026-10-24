@@ -7,9 +7,18 @@ import { describe, expect, it } from "vitest";
 import { COMPONENTS } from "./components";
 import { mountCase, renderings, settlePlaced } from "./harness/page";
 
-/** Each violation, one line per element: `rule: selector (summary)`. */
-const violations = async (element: Element): Promise<string[]> => {
-    const results = await axe.run(element, { resultTypes: ["violations"] });
+/** Each violation, one line per element: `rule: selector (summary)`, leaving out the rules in
+ *  `exceptions`. */
+const violations = async (
+    element: Element,
+    exceptions: Readonly<Record<string, string>> = {},
+): Promise<string[]> => {
+    const results = await axe.run(element, {
+        resultTypes: ["violations"],
+        rules: Object.fromEntries(
+            Object.keys(exceptions).map((rule) => [rule, { enabled: false }]),
+        ),
+    });
     return results.violations.flatMap((violation) =>
         violation.nodes.map(
             (node) =>
@@ -27,7 +36,9 @@ describe.each(COMPONENTS)("$component", (component) => {
                     provider: { dir },
                 });
                 await settlePlaced();
-                expect(await violations(host)).toEqual([]);
+                expect(await violations(host, component.axeExceptions)).toEqual(
+                    [],
+                );
             },
         );
     });

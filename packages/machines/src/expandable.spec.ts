@@ -107,11 +107,11 @@ describe("tree view", () => {
         },
     });
 
-    it("makes a branch's control its treeitem, owning its group, and emits each row's interactions", async () => {
+    it("makes a branch's element its treeitem, holding its row and its group, named from the row, and emits each row's interactions", async () => {
         const seen: Interaction["type"][] = [];
         const source = createInteractionSource();
         source.subscribe((interaction) => seen.push(interaction.type));
-        document.body.innerHTML = `<div data-tree><div data-branch><div data-control>src</div><div data-group><div data-leaf="index">index.ts</div></div></div><div data-leaf="readme">README.md</div></div>`;
+        document.body.innerHTML = `<div data-tree><div data-branch><div data-control><span data-text>src</span></div><div data-group><div data-leaf="index">index.ts</div></div></div><div data-leaf="readme">README.md</div></div>`;
         const $ = (selector: string) =>
             document.querySelector<HTMLElement>(selector)!;
         const running = run(
@@ -128,6 +128,7 @@ describe("tree view", () => {
                 const src = { node: collection.at([0])!, indexPath: [0] };
                 spread($("[data-branch]"), api.getBranchProps(src));
                 spread($("[data-control]"), api.getBranchControlProps(src));
+                spread($("[data-text]"), api.getBranchTextProps(src));
                 spread($("[data-group]"), api.getBranchContentProps(src));
                 spread(
                     $('[data-leaf="index"]'),
@@ -147,23 +148,31 @@ describe("tree view", () => {
         );
         stops.push(running.stop);
         await settle();
+        const branch = $("[data-branch]");
         const control = $("[data-control]");
-        expect(control.getAttribute("role")).toBe("treeitem");
-        expect(control.getAttribute("aria-level")).toBe("1");
-        expect(control.getAttribute("aria-expanded")).toBe("false");
-        expect(control.getAttribute("aria-selected")).toBe("false");
-        expect(control.getAttribute("aria-owns")).toBe($("[data-group]").id);
-        expect($("[data-group]").id).not.toBe("");
-        // The branch's element is plain: the row is the treeitem.
-        expect($("[data-branch]").hasAttribute("role")).toBe(false);
-        expect($("[data-branch]").hasAttribute("aria-expanded")).toBe(false);
+        expect(branch.getAttribute("role")).toBe("treeitem");
+        expect(branch.getAttribute("aria-level")).toBe("1");
+        expect(branch.getAttribute("aria-expanded")).toBe("false");
+        expect(branch.getAttribute("aria-selected")).toBe("false");
+        expect(branch.hasAttribute("aria-owns")).toBe(false);
+        // Named from its row's text, not its children's.
+        expect(branch.getAttribute("aria-labelledby")).toBe(
+            $("[data-text]").id,
+        );
+        expect(branch.tabIndex).toBe(0);
+        // The row is plain, and takes no focus of its own.
+        for (const attribute of ["role", "tabindex", "aria-expanded", "id"])
+            expect(control.hasAttribute(attribute)).toBe(false);
+        expect($("[data-group]").getAttribute("role")).toBe("group");
         expect($("[data-group]").hidden).toBe(true);
         control.dispatchEvent(pointer("pointerdown"));
         await userEvent.click(control);
         await settle();
         expect(seen).toContain("press");
-        expect(control.getAttribute("aria-expanded")).toBe("true");
-        expect(control.getAttribute("aria-selected")).toBe("true");
+        // The click lands on the row and focuses the branch around it.
+        expect(document.activeElement).toBe(branch);
+        expect(branch.getAttribute("aria-expanded")).toBe("true");
+        expect(branch.getAttribute("aria-selected")).toBe("true");
         expect($("[data-group]").hidden).toBe(false);
         // The arrow keys walk the visible rows, into the expanded branch.
         await userEvent.keyboard("{ArrowDown}");
@@ -171,9 +180,21 @@ describe("tree view", () => {
         expect(document.activeElement).toBe($('[data-leaf="index"]'));
         await userEvent.keyboard("{ArrowLeft}");
         await settle();
-        expect(document.activeElement).toBe(control);
+        expect(document.activeElement).toBe(branch);
         await userEvent.keyboard("{ArrowLeft}");
         await settle();
-        expect(control.getAttribute("aria-expanded")).toBe("false");
+        expect(branch.getAttribute("aria-expanded")).toBe("false");
+        // Enter on the branch presses its row: it expands again.
+        seen.length = 0;
+        await userEvent.keyboard("{Enter}");
+        await settle();
+        expect(branch.getAttribute("aria-expanded")).toBe("true");
+        expect(seen).toContain("press");
+        await userEvent.keyboard("{End}");
+        await settle();
+        expect(document.activeElement).toBe($('[data-leaf="readme"]'));
+        await userEvent.keyboard("{Home}");
+        await settle();
+        expect(document.activeElement).toBe(branch);
     });
 });

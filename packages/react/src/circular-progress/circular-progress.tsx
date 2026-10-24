@@ -70,7 +70,7 @@ function Root(props: CircularProgressRootProps): ReactNode {
 const part = plainParts(context.use, "span");
 
 /** The track: the rest of the circle, with a gap after the indicator and before its start. Holds
- *  `TrackEndHalf` and `TrackStartHalf`. */
+ *  `TrackEndHalf`, `TrackStartHalf`, `TrackTailCap` and `TrackHeadCap`. */
 const TrackPart = part("track", "Track");
 /** The half of the track at the end side. Holds `TrackEndArc`. */
 const TrackEndHalf = part("trackEndHalf", "TrackEndHalf");
@@ -88,6 +88,15 @@ const EndArc = part("endArc", "EndArc");
 const StartHalf = part("startHalf", "StartHalf");
 /** The arc the start half clips. Empty. */
 const StartArc = part("startArc", "StartArc");
+
+/** The track's rounded end where it starts, after the gap past the indicator. Empty. */
+const TrackTailCap = part("trackTailCap", "TrackTailCap");
+/** The track's rounded end where it stops, before the gap ahead of the indicator. Empty. */
+const TrackHeadCap = part("trackHeadCap", "TrackHeadCap");
+/** The indicator's rounded end where it starts. Empty. */
+const TailCap = part("tailCap", "TailCap");
+/** The indicator's rounded end where it has reached. Empty. */
+const HeadCap = part("headCap", "HeadCap");
 
 /** The ready-made circular progress indicator's props: Root's, with `className`, `style`, and
  *  `slotProps` keyed by part. */
@@ -120,6 +129,8 @@ function ReadyMade(props: CircularProgressProps): ReactNode {
                     <TrackStartHalf {...slot("trackStartHalf")}>
                         <TrackStartArc {...slot("trackStartArc")} />
                     </TrackStartHalf>
+                    <TrackTailCap {...slot("trackTailCap")} />
+                    <TrackHeadCap {...slot("trackHeadCap")} />
                 </TrackPart>
             ) : null}
             <EndHalf {...slot("endHalf")}>
@@ -128,14 +139,17 @@ function ReadyMade(props: CircularProgressProps): ReactNode {
             <StartHalf {...slot("startHalf")}>
                 <StartArc {...slot("startArc")} />
             </StartHalf>
+            <TailCap {...slot("tailCap")} />
+            <HeadCap {...slot("headCap")} />
         </Root>
     );
 }
 
 /** Material's circular progress indicator. Use it ready-made, `<CircularProgress value={40}
  *  aria-label="Loading" />` (leave `value` out while the amount is unknown), or compose its parts
- *  under `CircularProgress.Root`: `Track` (its two halves, each holding an arc), then `EndHalf`
- *  holding `EndArc`, then `StartHalf` holding `StartArc`. */
+ *  under `CircularProgress.Root`: `Track` (its two halves, each holding an arc, then
+ *  `TrackTailCap` and `TrackHeadCap`), then `EndHalf` holding `EndArc`, then `StartHalf` holding
+ *  `StartArc`, then `TailCap` and `HeadCap`, the rounded ends. */
 export const CircularProgress = Object.assign(ReadyMade, {
     Root,
     Track: TrackPart,
@@ -147,4 +161,8 @@ export const CircularProgress = Object.assign(ReadyMade, {
     EndArc,
     StartHalf,
     StartArc,
+    TrackTailCap,
+    TrackHeadCap,
+    TailCap,
+    HeadCap,
 });

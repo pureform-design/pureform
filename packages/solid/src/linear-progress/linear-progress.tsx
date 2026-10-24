@@ -115,7 +115,9 @@ function ReadyMade(props: LinearProgressProps): JSX.Element {
                 </Track>
             </Show>
             <Indicator {...indicator} />
-            <StopIndicator {...stopIndicator} />
+            <Show when={props.track !== false}>
+                <StopIndicator {...stopIndicator} />
+            </Show>
         </Root>
     );
 }

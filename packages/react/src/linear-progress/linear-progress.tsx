@@ -110,7 +110,7 @@ function ReadyMade(props: LinearProgressProps): ReactNode {
                 </Track>
             ) : null}
             <Indicator {...slot("indicator")} />
-            <StopIndicator {...slot("stopIndicator")} />
+            {track ? <StopIndicator {...slot("stopIndicator")} /> : null}
         </Root>
     );
 }

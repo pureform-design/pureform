@@ -408,6 +408,7 @@ const generate = async () => {
         );
         written.push(component);
     }
+    controlsOf.close();
     if (missing.length) {
         throw new Error(
             `generate-stories: no props for ${missing.length} component(s):\n${missing.join("\n")}`,

@@ -97,6 +97,7 @@ const circularMarkup = (classes: Classes): string => {
         <span data-part="track" class="${c.track}"></span>
         <span data-part="endHalf" class="${c.endHalf}"><span data-part="endArc" class="${c.endArc}"></span></span>
         <span data-part="startHalf" class="${c.startHalf}"><span data-part="startArc" class="${c.startArc}"></span></span>
+        <span data-part="tailCap" class="${c.tailCap}"></span><span data-part="headCap" class="${c.headCap}"></span>
     </div>`;
 };
 

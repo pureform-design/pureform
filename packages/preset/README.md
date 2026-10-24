@@ -1336,11 +1336,19 @@ clip, so with an SVG engine it turns in its first shape without morphing.
         <span class="{trackStartHalf}"
             ><span class="{trackStartArc}"></span
         ></span>
+        <span class="{trackTailCap}"></span><span class="{trackHeadCap}"></span>
     </span>
     <span class="{endHalf}"><span class="{endArc}"></span></span>
     <span class="{startHalf}"><span class="{startArc}"></span></span>
+    <span class="{tailCap}"></span><span class="{headCap}"></span>
 </div>
 ```
+
+Every arc ends rounded, as Compose's stroke caps: a dot as wide as the ring on each end
+(`trackTailCap`, `trackHeadCap`, `tailCap`, `headCap`), reaching past it by the `cap` token (a
+share of the circle, set for the default size and each thickness; set it with `size` or
+`thickness`), and the track keeps that much further away so the gap stays `gap`. A wavy
+indicator's ends follow its wave and have no dots.
 
 ## Surfaces
 

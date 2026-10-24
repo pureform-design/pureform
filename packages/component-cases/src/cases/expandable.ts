@@ -117,13 +117,17 @@ const FILES = [
 
 const rows = (host: HTMLElement) => all(host, t.node);
 
+/** The tree items, in order: a branch's element (around its row and its group), or a leaf's
+ *  row. */
+const items = (host: HTMLElement) => allByRole(host, "treeitem");
+
 /** The branches, in order (only the first level has any). */
 const BRANCHES = FILES.filter((file) => file.children !== undefined);
 
 /** The expanded branches' values: the tree items that say `aria-expanded` are the branches, in
- *  order (on every renderer the branch's row, which owns its group). */
+ *  order (on every renderer the branch's element, holding its row and its group). */
 const readTree = (host: HTMLElement): string[] =>
-    allByRole(host, "treeitem")
+    items(host)
         .filter((item) => item.hasAttribute("aria-expanded"))
         .flatMap((branch, index) =>
             flagOf(branch, "expanded") ? [BRANCHES[index]!.value] : [],
@@ -162,7 +166,7 @@ export const treeCase: ComponentCase = {
         read: readTree,
     },
     keyboard: {
-        focusable: (host) => rows(host)[0]!,
+        focusable: (host) => items(host)[0]!,
         // The tree has no disabled state of its own; a node has.
         disables: false,
         keys: [
@@ -171,7 +175,7 @@ export const treeCase: ComponentCase = {
             {
                 key: "{End}",
                 does: "nothing",
-                focuses: (host) => rows(host).at(-1)!,
+                focuses: (host) => items(host).at(-1)!,
             },
         ],
         arrows: {
@@ -181,7 +185,7 @@ export const treeCase: ComponentCase = {
                 {
                     key: "{ArrowDown}",
                     does: "nothing",
-                    focuses: (host) => rows(host).at(-1)!,
+                    focuses: (host) => items(host).at(-1)!,
                 },
                 { key: "{ArrowUp}", does: "nothing" },
             ],
@@ -191,12 +195,30 @@ export const treeCase: ComponentCase = {
                 {
                     key: "{ArrowDown}",
                     does: "nothing",
-                    focuses: (host) => rows(host).at(-1)!,
+                    focuses: (host) => items(host).at(-1)!,
                 },
                 { key: "{ArrowUp}", does: "nothing" },
             ],
         },
     },
-    // The tree has no disabled state of its own; a node has.
-    indication: itemSources(treeAnatomy, FILES, { disabled: undefined }),
+    // A branch's tree item holds its row and its group of children (as Safari needs), named
+    // from its row's text alone; axe's heuristic reads the children's labels inside as the
+    // item's visible text too.
+    axeExceptions: {
+        "label-content-name-mismatch":
+            "A tree branch is named from its row, not from the children's labels it holds.",
+    },
+    // The tree has no disabled state of its own; a node has. A branch's row (the checked
+    // trigger) takes no focus itself: Tab reaches its treeitem, the branch's element around it,
+    // and the row shows the focus.
+    indication: itemSources(treeAnatomy, FILES, {
+        disabled: undefined,
+        focus: async (_host, trigger) => {
+            const item = trigger.closest<HTMLElement>('[role="treeitem"]')!;
+            (document.activeElement as HTMLElement | null)?.blur();
+            for (let i = 0; i < 30 && document.activeElement !== item; i++)
+                await userEvent.keyboard("{Tab}");
+        },
+        focusMoves: true,
+    }),
 };

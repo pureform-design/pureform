@@ -2,10 +2,11 @@
 // and its text), a branch's row ending in the expand indicator, which turns over while it's
 // expanded, over its children, indented from the start while it's expanded. React Native has no
 // Zag machine: the expanded and selected nodes are React state, and each node says what it is to
-// assistive technology. On the web, as the web's tree and WAI-ARIA APG's: every row is its node's
-// tree item, named from its text, a branch's owning its group of children (`aria-owns`; the group
-// stays beside the row in the branch's plain view). Each says its level, its place among its
-// siblings and how many they are. The tree is one tab stop: the focused row (else the first
+// assistive technology. On the web, as the web's tree and WAI-ARIA APG's: every node is a tree
+// item holding what's below it, as Safari needs: a leaf's row, or a branch's view around its row
+// and its group of children, which takes focus and the keys for its row (the row shows the focus)
+// and is named from the row's text. Each says its level, its place among its siblings and how
+// many they are. The tree is one tab stop: the focused row (else the first
 // selected one shown, else the first) takes Tab, and the keys move from row to row (up and down,
 // Home and End, a letter to the next row starting with it), into and out of branches (the arrow
 // toward the inline end expands or goes to the first child, the other collapses or goes to the
@@ -127,9 +128,8 @@ function Row(props: {
         testIdOf(treeAnatomy, part, tree.props.testId);
     const icon = iconParts(slots, id);
     const textId = useId();
-    const groupId = useId();
     const web = Platform.OS === "web";
-    // The tree item's own ARIA, on its row (a branch's owning its group).
+    // The tree item's own ARIA: on a leaf's row, or a branch's view around its row and group.
     const item = {
         role: "treeitem",
         "aria-level": props.level,
@@ -138,36 +138,49 @@ function Row(props: {
         "aria-selected": selectedNode,
         "aria-labelledby": textId,
         ...(disabled ? { "aria-disabled": true } : {}),
-        ...(branch ? { "aria-expanded": expanded, "aria-owns": groupId } : {}),
+        ...(branch ? { "aria-expanded": expanded } : {}),
     } as const;
     const press = () => {
         tree.select(node.value);
         if (branch) tree.toggle(node.value);
     };
+    const { onFocus, onBlur, ...pointer } = indication.handlers as {
+        onFocus?: (event: never) => void;
+        onBlur?: (event: never) => void;
+    };
+    // What takes focus and the keys on the web: the treeitem (a leaf's row, a branch's view).
+    const focusable = {
+        ...item,
+        ref: (element: Focusable | null) => {
+            if (element) tree.rows.set(node.value, element);
+            else tree.rows.delete(node.value);
+        },
+        tabIndex: tree.tabStop === node.value ? 0 : -1,
+        onFocus: (event: { target: unknown; currentTarget: unknown }) => {
+            if (event.target !== event.currentTarget) return;
+            onFocus?.(event as never);
+            tree.focused(node.value);
+        },
+        onBlur: (event: { target: unknown; currentTarget: unknown }) => {
+            if (event.target === event.currentTarget) onBlur?.(event as never);
+        },
+    };
     const row = (
         <v.node.Pressable
-            {...indication.handlers}
+            {...(web && branch ? pointer : indication.handlers)}
             {...(web
-                ? {
-                      ...item,
-                      ref: (element: Focusable | null) => {
-                          if (element) tree.rows.set(node.value, element);
-                          else tree.rows.delete(node.value);
-                      },
-                      tabIndex: tree.tabStop === node.value ? 0 : -1,
-                      onFocus: (event: {
-                          target: unknown;
-                          currentTarget: unknown;
-                      }) => {
-                          (
-                              indication.handlers as {
-                                  onFocus?: (event: never) => void;
-                              }
-                          ).onFocus?.(event as never);
-                          if (event.target === event.currentTarget)
-                              tree.focused(node.value);
-                      },
-                  }
+                ? branch
+                    ? {
+                          // Plain inside its treeitem, out of the tab order: focus arriving
+                          // by a press moves on to the treeitem.
+                          tabIndex: -1,
+                          onFocus: (event: {
+                              currentTarget: {
+                                  parentElement?: Focusable | null;
+                              };
+                          }) => event.currentTarget.parentElement?.focus(),
+                      }
+                    : focusable
                 : nativeTreeRow(
                       node,
                       props.level,
@@ -177,7 +190,7 @@ function Row(props: {
             onPress={press}
             // React Native Web presses a tree item on Enter only; Space acts too, as the web's
             // tree.
-            {...(web
+            {...(web && !branch
                 ? ({
                       onKeyDown: (event: {
                           nativeEvent: { key: string };
@@ -208,15 +221,32 @@ function Row(props: {
     );
     if (!branch) return row;
     return (
-        <v.branch.View style={s.branch} testID={id("branch")}>
+        <v.branch.View
+            {...(web
+                ? ({
+                      ...focusable,
+                      // Enter and Space on the treeitem press its row.
+                      onKeyDown: (event: {
+                          target: unknown;
+                          currentTarget: unknown;
+                          nativeEvent: { key: string };
+                          preventDefault?(): void;
+                      }) => {
+                          if (event.target !== event.currentTarget || disabled)
+                              return;
+                          const { key } = event.nativeEvent;
+                          if (key !== "Enter" && key !== " ") return;
+                          event.preventDefault?.();
+                          press();
+                      },
+                  } as object)
+                : {})}
+            style={s.branch}
+            testID={id("branch")}
+        >
             {row}
             <Expanding open={expanded}>
-                <v.group.View
-                    style={s.group}
-                    role="group"
-                    nativeID={groupId}
-                    testID={id("group")}
-                >
+                <v.group.View style={s.group} role="group" testID={id("group")}>
                     {(node.children ?? []).map((child, index, all) => (
                         <Row
                             key={child.value}
