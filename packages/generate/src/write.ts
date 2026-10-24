@@ -6,6 +6,7 @@ import {
     mkdir,
     readdir,
     readFile,
+    rename,
     rm,
     rmdir,
     writeFile,
@@ -70,6 +71,7 @@ export const readGenerated = async (
 ): Promise<{ path: string; hash: string | undefined }[]> => {
     const found: { path: string; hash: string | undefined }[] = [];
     for (const path of await listFiles(outDir)) {
+        if (path.endsWith(TEMP_SUFFIX)) continue;
         const contents = await readText(join(outDir, path));
         if (contents !== undefined && isGenerated(contents)) {
             found.push({ path, hash: headerHash(contents) });
@@ -77,6 +79,22 @@ export const readGenerated = async (
     }
     return found;
 };
+
+const TEMP_SUFFIX = ".pureform-tmp";
+
+// Write through a temporary file and a rename, so a run overlapping another never reads (or
+// bundles) a half-written file.
+const writeAtomic = async (path: string, contents: string): Promise<void> => {
+    const temp = `${path}.${process.pid}.${Math.random().toString(36).slice(2)}${TEMP_SUFFIX}`;
+    await writeFile(temp, contents);
+    await rename(temp, path);
+};
+
+// Top-level entries last, so they never point at folder files not written yet.
+const entriesLast = (planned: readonly PlannedFile[]): PlannedFile[] => [
+    ...planned.filter((file) => file.path.includes("/")),
+    ...planned.filter((file) => !file.path.includes("/")),
+];
 
 // Generated files under `outDir` that aren't planned.
 const unwanted = async (
@@ -112,18 +130,18 @@ export const writeFiles = async (
     keep?: (path: string) => boolean,
 ): Promise<FileResult[]> => {
     const results: FileResult[] = [];
-    for (const file of planned) {
+    for (const file of entriesLast(planned)) {
         const target = join(outDir, file.path);
         if ((await readText(target)) === file.contents) {
             results.push({ path: file.path, status: "unchanged" });
             continue;
         }
         await mkdir(dirname(target), { recursive: true });
-        await writeFile(target, file.contents);
+        await writeAtomic(target, file.contents);
         results.push({ path: file.path, status: "written" });
     }
     for (const path of await unwanted(outDir, planned, keep)) {
-        await rm(join(outDir, path));
+        await rm(join(outDir, path), { force: true });
         await pruneFolders(outDir, path);
         results.push({ path, status: "removed" });
     }
