@@ -1,15 +1,35 @@
 // Props as binding-core declares them, for `prop-controls.spec.ts`.
 
-/** Resolves to `undefined` here, as with no registry: the group comes from the alias. */
-export type VariantProp<C extends string, G extends string> =
-    | C
-    | G extends never
-    ? never
+/** The registry, as the generated declarations write it: the config's order. */
+export interface ComponentRegistry {
+    fixture: {
+        variants: {
+            density:
+                | "inherit"
+                | "comfortable"
+                | "default"
+                | "compact"
+                | "dense";
+        };
+    };
+}
+
+/** Takes the registry's values, and `undefined` for a group it doesn't declare. */
+export type VariantProp<
+    C extends string,
+    G extends string,
+> = C extends keyof ComponentRegistry
+    ? G extends keyof ComponentRegistry[C]["variants"]
+        ? ComponentRegistry[C]["variants"][G] | undefined
+        : undefined
     : undefined;
+
+type Computed = Extract<"c" | "a" | "b", string>;
 
 export interface FixtureVariantProps {
     readonly textStyle?: VariantProp<"text", "style">;
     readonly tone?: VariantProp<"text", "tone">;
+    readonly density?: VariantProp<"fixture", "density">;
 }
 
 export type Controllable<N extends string> = {
@@ -36,6 +56,7 @@ export interface FixtureProps
     readonly wide?: "a" | "b" | "c" | "d" | undefined;
     /** @control select */
     readonly pair?: "left" | "right" | undefined;
+    readonly computed?: Computed | undefined;
     readonly flag?: true | false | undefined;
     readonly loose?: boolean | string | undefined;
     readonly tricky?: boolean | { readonly a: string } | undefined;
