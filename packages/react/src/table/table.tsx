@@ -118,7 +118,9 @@ function Root(props: TableRootProps): ReactNode {
     });
     const { as, checkboxProps, ...rest } = omitProps(props, TABLE_ROOT_PROPS);
     return (
-        <context.Provider value={{ scope, api, striped: props.striped, checkboxProps }}>
+        <context.Provider
+            value={{ scope, api, striped: props.striped, checkboxProps }}
+        >
             {scope.render("root", {
                 element: "table",
                 as,

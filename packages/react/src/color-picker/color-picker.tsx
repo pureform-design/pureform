@@ -421,7 +421,9 @@ export interface ColorPickerProps
     /** The hex field, drawn as a text field, keyed by its parts. */
     readonly textFieldProps?: InnerPropsOf<typeof textFieldAnatomy> | undefined;
     /** The eye dropper, drawn as an icon button. */
-    readonly iconButtonProps?: InnerPropsOf<typeof iconButtonAnatomy> | undefined;
+    readonly iconButtonProps?:
+        | InnerPropsOf<typeof iconButtonAnatomy>
+        | undefined;
 }
 
 /** The ready-made picker: the label, the area, the sliders, the field row and the swatches. */
@@ -455,10 +457,7 @@ function ReadyMade(props: ColorPickerProps): ReactNode {
                 )}
                 <Control {...slot("control")}>
                     <ValueSwatch {...slot("valueSwatch")} />
-                    <HexField
-                        {...textFieldProps}
-                        label={inputLabel ?? "Hex"}
-                    />
+                    <HexField {...textFieldProps} label={inputLabel ?? "Hex"} />
                     {eyeDropper && (
                         <EyeDropperTrigger
                             {...iconButtonProps}

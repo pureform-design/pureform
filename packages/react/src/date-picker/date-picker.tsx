@@ -340,7 +340,10 @@ const CancelTrigger: (props: PickerActionProps) => ReactNode = pickerAction(
  *  content. */
 export interface DatePickerProps
     extends
-        Omit<DatePickerRootProps, keyof SlotKeyedProps<Anatomy, "backdrop"> | "children">,
+        Omit<
+            DatePickerRootProps,
+            keyof SlotKeyedProps<Anatomy, "backdrop"> | "children"
+        >,
         Omit<SlotKeyedProps<Anatomy, "backdrop">, "testId" | "unstyled">,
         DatePickerContentProps<ReactNode> {
     readonly testId?: TestIdOverride<DatePickerPart> | undefined;
@@ -356,7 +359,9 @@ type ButtonInnerProps = InnerPropsOf<typeof buttonAnatomy>;
 // Inside Root, so it can read the view and the draft.
 function ReadyMadeContent({ own }: { readonly own: DatePickerProps }) {
     const { picker, selected, locale } = context.use("Root");
-    const slot = useSlotProps(own as SlotKeyedProps<ComponentAnatomy, "backdrop">);
+    const slot = useSlotProps(
+        own as SlotKeyedProps<ComponentAnatomy, "backdrop">,
+    );
     const days = picker.view === "day";
     return (
         <>
@@ -462,7 +467,9 @@ function ReadyMade(props: DatePickerProps): ReactNode {
         modeToggleLabel: _modeToggleLabel,
         ...rootProps
     } = props;
-    const slot = useSlotProps(props as SlotKeyedProps<ComponentAnatomy, "backdrop">);
+    const slot = useSlotProps(
+        props as SlotKeyedProps<ComponentAnatomy, "backdrop">,
+    );
     return (
         <Root {...rootProps} {...(slot("root") as object)}>
             <ReadyMadeContent own={props} />

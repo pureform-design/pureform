@@ -84,10 +84,11 @@ function Root(props: SplitButtonRootProps): ReactNode {
         unstyled: props.unstyled,
         indication: props.indication,
     });
-    const { as, menuProps = NO_MENU_PROPS, ...rest } = omitProps(
-        props,
-        SPLIT_BUTTON_ROOT_PROPS,
-    );
+    const {
+        as,
+        menuProps = NO_MENU_PROPS,
+        ...rest
+    } = omitProps(props, SPLIT_BUTTON_ROOT_PROPS);
     const menuSlot = useSlotProps(menuProps);
     return (
         <context.Provider value={{ scope, disabled: !!props.disabled }}>

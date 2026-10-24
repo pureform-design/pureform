@@ -220,10 +220,11 @@ function Root(props: SearchViewRootProps): ReactNode {
         unstyled: menuProps.unstyled,
         indication: props.indication,
     });
-    const { as, menuProps: _menuProps, ...rest } = omitProps(
-        props,
-        SEARCH_VIEW_ROOT_PROPS,
-    );
+    const {
+        as,
+        menuProps: _menuProps,
+        ...rest
+    } = omitProps(props, SEARCH_VIEW_ROOT_PROPS);
     return (
         <context.Provider
             value={{

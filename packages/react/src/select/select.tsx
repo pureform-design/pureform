@@ -181,10 +181,11 @@ function Root(props: SelectRootProps): ReactNode {
         unstyled: menuProps.unstyled,
         indication: props.indication,
     });
-    const { as, menuProps: _menuProps, ...rest } = omitProps(
-        props,
-        SELECT_ROOT_PROPS,
-    );
+    const {
+        as,
+        menuProps: _menuProps,
+        ...rest
+    } = omitProps(props, SELECT_ROOT_PROPS);
     return (
         <context.Provider
             value={{

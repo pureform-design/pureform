@@ -85,9 +85,9 @@ describe("props of drawn components", () => {
             </PureformProvider>,
         );
         await settle();
-        expect(screen.getByText("Cancel").closest("button")!.className).toContain(
-            "cancel",
-        );
+        expect(
+            screen.getByText("Cancel").closest("button")!.className,
+        ).toContain("cancel");
         expect(screen.getByTestId("ok-root").textContent).toBe("OK");
     });
 
