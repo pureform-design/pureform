@@ -1306,46 +1306,63 @@ describe("nested rows", () => {
         expect(getComputedStyle(moved()).pointerEvents).toBe("none");
     });
 
-    it("springs a drilled menu's height to the new level, and moves the pressed row into the header", async () => {
+    it("springs a drilled menu's size to the new level, moves the pressed label into the header's, and fades the other rows in", async () => {
         const deep = [
             ...SHARE.slice(0, 1),
             {
                 value: "share",
                 label: "Share",
-                items: ["mail", "link", "print"].map((value) => ({
-                    value,
-                    label: value,
-                })),
+                items: ["mail", "link", "print a copy of this page"].map(
+                    (value) => ({
+                        value,
+                        label: value,
+                    }),
+                ),
             },
         ];
-        await moving(<Menu submenu="drill" items={deep} />);
+        await moving(
+            <View style={{ alignItems: "flex-start" }}>
+                <Menu submenu="drill" items={deep} />
+            </View>,
+        );
         const menu = document.querySelector<HTMLElement>('[role="menu"]')!;
-        const before = menu.getBoundingClientRect().height;
-        const share = rows()[1]!.getBoundingClientRect().top;
+        const box = () => menu.getBoundingClientRect();
+        const [before, beforeWidth] = [box().height, box().width];
+        const labelOf = (row: HTMLElement) =>
+            row.querySelector<HTMLElement>(
+                '[data-testid="pf-menu-item-label"]',
+            )!;
+        const share = labelOf(rows()[1]!).getBoundingClientRect().top;
         await interact(() => userEvent.click(rows()[1]!));
         await until(() => expect(rows()[0]!.textContent).toBe("‹Share"));
-        // The header starts where the pressed row was, and the height where it was.
-        const header = rows()[0]!.getBoundingClientRect().top;
-        expect(header).toBeGreaterThan(menu.getBoundingClientRect().top + 8);
-        expect(Math.abs(header - share)).toBeLessThan(
-            Math.abs(menu.getBoundingClientRect().top - share),
+        // The header's row is in its place; only its label starts where the pressed one was.
+        const header = rows()[0]!;
+        expect(header.getBoundingClientRect().top - box().top).toBeLessThan(9);
+        const label = labelOf(header).getBoundingClientRect().top;
+        expect(Math.abs(label - share)).toBeLessThan(
+            Math.abs(header.getBoundingClientRect().top - share),
         );
-        // Two rows to four: part way between.
-        expect(menu.getBoundingClientRect().height).toBeLessThan(
-            before * 2 - 1,
-        );
-        // At rest: the new level's own height, the header at the top.
+        // The other rows fade in.
+        const opacity = (row: HTMLElement) =>
+            Number(getComputedStyle(row.parentElement!).opacity);
+        expect(opacity(rows()[1]!)).toBeLessThan(1);
+        // Two rows to four, and wider: part way between.
+        expect(box().height).toBeLessThan(before * 2 - 1);
+        const midWidth = box().width;
+        // At rest: the new level's own size, every label in place and every row shown.
+        await until(() => {
+            expect(
+                labelOf(rows()[0]!).getBoundingClientRect().top -
+                    rows()[0]!.getBoundingClientRect().top,
+            ).toBeLessThan(20);
+            expect(opacity(rows()[1]!)).toBe(1);
+        }, 5000);
         await until(
-            () =>
-                expect(
-                    rows()[0]!.getBoundingClientRect().top -
-                        menu.getBoundingClientRect().top,
-                ).toBeLessThan(9),
+            () => expect(box().height).toBeGreaterThan(before * 1.5),
             5000,
         );
-        expect(menu.getBoundingClientRect().height).toBeGreaterThan(
-            before * 1.5,
-        );
+        expect(box().width).toBeGreaterThan(beforeWidth);
+        expect(midWidth).toBeLessThan(box().width);
     });
 
     it("cascades by default when a submenu fits beside the menu, and drills when it doesn't", async () => {
