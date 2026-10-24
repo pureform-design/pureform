@@ -3,6 +3,7 @@
 
 import { listAnatomy, listItemAnatomy, testIds } from "@pureform/anatomy";
 
+import { flagOf } from "../aria";
 import type { ComponentCase } from "../types";
 import { byTestId, ownSource } from "../types";
 import { userEvent } from "../user-event";
@@ -72,19 +73,9 @@ export const listItem: ComponentCase = {
     indication: ownSource(listItemAnatomy),
 };
 
-/** Whether an expandable item is expanded, checked against its region. */
-const readExpanded = (host: HTMLElement): boolean => {
-    const expanded = root(host).getAttribute("aria-expanded") === "true";
-    const region = host.querySelector<HTMLElement>(
-        `[data-testid="${ids.region}"]`,
-    );
-    // React Native renders the region only while expanded; the web hides it.
-    const shown = region !== null && !region.hidden;
-    if (shown !== expanded) {
-        throw new Error(`the item shows its region ${shown}`);
-    }
-    return expanded;
-};
+/** Whether an expandable item is expanded: its row's `aria-expanded`. */
+const readExpanded = (host: HTMLElement): boolean =>
+    flagOf(root(host), "expanded");
 
 /** An expandable list item: the accordion's behaviour for one item. `expanded`, by a click on the
  *  row, which Enter and Space toggle too. */

@@ -25,17 +25,6 @@ const DATE = ["2026-02-11"];
 
 const frame = () => new Promise((resolve) => requestAnimationFrame(resolve));
 
-/** The day cell's trigger for an ISO date. */
-const day = (host: HTMLElement, value: string) => {
-    const found = [
-        ...host.querySelectorAll<HTMLElement>(
-            `[data-testid="${cell.trigger}"]`,
-        ),
-    ].find((element) => element.dataset.value?.startsWith(value));
-    if (!found) throw new Error(`no day ${value}`);
-    return found;
-};
-
 const modalParts = overlayParts(modal, {
     role: "dialog",
     trigger: (host) => byTestId(host, modal.trigger),
