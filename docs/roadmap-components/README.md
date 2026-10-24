@@ -113,6 +113,14 @@ above; each batch is one branch (`slot-a` … `slot-e`), output in `context/slot
 | slot-d | React Native: keyed `style`, `slotProps`, `testId`, `tokens` with the override rule                                        |
 | slot-e | Dead parts wired up; per-instance functions for repeated parts                                                             |
 
+### Commit message cleanup
+
+Runs once r12 and slot-b are merged and no agent is running, before slot-c.
+
+| Batch       | What                                                                                                                                                                                                                                                                  |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| commit-msgs | Reword the ~90 commits on `main` that `cog check` rejects into conventional commits (scope = package or area), with `git rebase -i --rebase-merges` and `reword` only (no content changes; merge commits become `chore(merge): …`); `cog check` clean; tree identical to before (`git diff <old> <new>` empty); force-push `main` with lease; recreate or rebase other branches |
+
 ## Rules that apply to every phase
 
 - Read the [conventions](conventions.md) and the [component recipe](component-recipe.md)
