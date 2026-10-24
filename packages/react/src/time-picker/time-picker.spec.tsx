@@ -109,6 +109,57 @@ describe("TimePicker", () => {
     });
 });
 
+describe("TimePicker, slot props", () => {
+    it("reaches the dial's parts, its labels by copy", async () => {
+        withRegistry(
+            <TimePicker
+                defaultValue="21:05"
+                hourCycle={12}
+                className={{
+                    dialLabel: (label) => (label.selected ? "on" : undefined),
+                    dialTrack: "track",
+                }}
+                style={{ dialHandle: { opacity: 0.5 } }}
+                slotProps={{
+                    dialLabel: (label) => ({ title: `h${label.value}` }),
+                }}
+                unstyled={{ dialCenter: true }}
+            />,
+        );
+        await settle();
+        const labels = all(ids.dialLabel);
+        expect(
+            labels.filter((label) => label.classList.contains("on")),
+        ).toHaveLength(1);
+        expect(
+            labels.find((label) => label.classList.contains("on"))?.title,
+        ).toBe("h9");
+        expect(byTestId(ids.dialTrack).classList.contains("track")).toBe(true);
+        expect(byTestId(ids.dialHandle).style.opacity).toBe("0.5");
+        expect(byTestId(ids.dialCenter).className).toBe("");
+    });
+
+    it("reaches each scroll item, by copy", async () => {
+        withRegistry(
+            <TimePicker
+                mode="scroll"
+                defaultValue="10:00"
+                hourCycle={24}
+                className={{
+                    scrollItem: (item) =>
+                        item.selected ? `now-${item.view}` : undefined,
+                }}
+            />,
+        );
+        await settle();
+        expect(
+            all(ids.scrollItem)
+                .filter((item) => item.className.includes("now-"))
+                .map((item) => item.textContent),
+        ).toEqual(["10", "00"]);
+    });
+});
+
 describe("TimeInput", () => {
     it("takes a typed time, with the period selector in a 12-hour cycle", async () => {
         const onValueChange = vi.fn();
@@ -129,6 +180,30 @@ describe("TimeInput", () => {
             expect.objectContaining({ value: "14:45" }),
         );
         expect(all(testIds.timeInput.period)).toHaveLength(2);
+    });
+});
+
+describe("TimeInput, slot props", () => {
+    it("reaches each field's input and label", async () => {
+        withRegistry(
+            <TimeInput
+                defaultValue="14:00"
+                className={{ input: "digits", fieldLabel: "caption" }}
+                slotProps={{ input: { title: "time" } }}
+            />,
+        );
+        await settle();
+        const inputs = all(testIds.timeInput.input);
+        expect(inputs.map((input) => input.className)).toEqual([
+            expect.stringContaining("digits"),
+            expect.stringContaining("digits"),
+        ]);
+        expect(inputs[0]!.title).toBe("time");
+        expect(
+            all(testIds.timeInput.fieldLabel).every((label) =>
+                label.classList.contains("caption"),
+            ),
+        ).toBe(true);
     });
 });
 

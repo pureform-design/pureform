@@ -106,6 +106,78 @@ describe("TimePicker", () => {
     });
 });
 
+describe("TimePicker, slot props", () => {
+    it("reaches the dial's parts, its labels by copy", async () => {
+        withRegistry(() => (
+            <TimePicker
+                defaultValue="21:05"
+                hourCycle={12}
+                class={{
+                    dialLabel: (label) => (label.selected ? "on" : undefined),
+                    dialTrack: "track",
+                }}
+                style={{ dialHandle: { opacity: 0.5 } }}
+                slotProps={{
+                    dialLabel: (label) => ({ title: `h${label.value}` }),
+                }}
+                unstyled={{ dialCenter: true }}
+            />
+        ));
+        await settle();
+        const labels = all(ids.dialLabel);
+        const on = labels.filter((label) => label.classList.contains("on"));
+        expect(on).toHaveLength(1);
+        expect(on[0]!.title).toBe("h9");
+        expect(byTestId(ids.dialTrack).classList.contains("track")).toBe(true);
+        expect(byTestId(ids.dialHandle).style.opacity).toBe("0.5");
+        expect(byTestId(ids.dialCenter).className).toBe("");
+    });
+
+    it("reaches each scroll item, by copy", async () => {
+        withRegistry(() => (
+            <TimePicker
+                mode="scroll"
+                defaultValue="10:00"
+                hourCycle={24}
+                class={{
+                    scrollItem: (item) =>
+                        item.selected ? `now-${item.view}` : undefined,
+                }}
+            />
+        ));
+        await settle();
+        expect(
+            all(ids.scrollItem)
+                .filter((item) => item.className.includes("now-"))
+                .map((item) => item.textContent),
+        ).toEqual(["10", "00"]);
+    });
+});
+
+describe("TimeInput, slot props", () => {
+    it("reaches each field's input and label", async () => {
+        withRegistry(() => (
+            <TimeInput
+                defaultValue="14:00"
+                class={{ input: "digits", fieldLabel: "caption" }}
+                slotProps={{ input: { title: "time" } }}
+            />
+        ));
+        await settle();
+        const inputs = all(testIds.timeInput.input);
+        expect(inputs).toHaveLength(2);
+        expect(
+            inputs.every((input) => input.classList.contains("digits")),
+        ).toBe(true);
+        expect(inputs[0]!.title).toBe("time");
+        expect(
+            all(testIds.timeInput.fieldLabel).every((label) =>
+                label.classList.contains("caption"),
+            ),
+        ).toBe(true);
+    });
+});
+
 describe("TimeInput", () => {
     it("takes a typed time, with the period selector in a 12-hour cycle", async () => {
         const onValueChange = vi.fn();

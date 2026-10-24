@@ -17,6 +17,8 @@ import {
     presentProps,
 } from "@pureform/binding-core";
 import type {
+    CalendarInstances,
+    Unstyled,
     DockedDatePickerContentProps,
     DockedDatePickerRootOwnProps,
 } from "@pureform/binding-core";
@@ -49,7 +51,7 @@ import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
 import { createSlotProps, plainParts, useComponent, asRoot } from "../parts";
-import type { ComponentScope, SlotKeyedProps } from "../parts";
+import type { ComponentScope, SlotKeyedProps, SlotPropsOf } from "../parts";
 import { usePresence } from "../presence";
 import type { Presence } from "../presence";
 import { combinePartProps } from "../props";
@@ -345,8 +347,9 @@ const MonthList: (props: CalendarTableProps) => JSX.Element =
 /** The years, each a `Cell` with `view="year"`. */
 const YearList: (props: CalendarTableProps) => JSX.Element = calendar.YearList;
 
-/** The ready-made docked date picker's props: Root's, with `class`, `style`, and `slotProps`
- *  keyed by part, and the label, supporting text, icons, and the calendar button's name as
+/** The ready-made docked date picker's props: Root's, with `class`, `style`, `slotProps` and
+ *  `unstyled` keyed by part (and `cell` for each calendar cell; a cell, week or weekday also by
+ *  copy, `CalendarInstances`), and the label, supporting text, icons, and the calendar button's name as
  *  content. `aria-label`, `aria-labelledby`, and `aria-describedby` go on the input. */
 export interface DockedDatePickerProps
     extends
@@ -358,8 +361,10 @@ export interface DockedDatePickerProps
             | "prefixText"
             | "suffixText"
         >,
-        SlotKeyedProps<Anatomy>,
-        DockedDatePickerContentProps<JSX.Element> {}
+        SlotKeyedProps<Anatomy, "cell", CalendarInstances>,
+        DockedDatePickerContentProps<JSX.Element> {
+    readonly unstyled?: Unstyled<PartName<Anatomy> | "cell", CalendarInstances>;
+}
 
 const READY_MADE_PROPS = [
     "class",
@@ -374,7 +379,7 @@ const READY_MADE_PROPS = [
 // Inside Root, so it reads the view and whether an error shows.
 function ReadyMadeContent(props: {
     readonly own: DockedDatePickerProps;
-    readonly slots: (part: PartName<Anatomy>) => PartProps;
+    readonly slots: SlotPropsOf<PartName<Anatomy> | "cell", CalendarInstances>;
 }): JSX.Element {
     const { api, supportingTextId, locale } = context.use("Root");
     const own = props.own;
@@ -444,16 +449,16 @@ function ReadyMadeContent(props: {
                     <Switch>
                         <Match when={view() === "month"}>
                             <MonthList {...slots("monthList")}>
-                                <calendar.MonthCells />
+                                <calendar.MonthCells slots={slots} />
                             </MonthList>
                         </Match>
                         <Match when={view() === "year"}>
                             <YearList {...slots("yearList")}>
-                                <calendar.YearCells />
+                                <calendar.YearCells slots={slots} />
                             </YearList>
                         </Match>
                         <Match when={view() === "day"}>
-                            <calendar.DayCalendar />
+                            <calendar.DayCalendar slots={slots} />
                         </Match>
                     </Switch>
                 </Content>
@@ -466,7 +471,7 @@ function ReadyMadeContent(props: {
  *  affixes only when given), the supporting text (the date's format by default, or the error),
  *  and the calendar's popup. */
 function ReadyMade(props: DockedDatePickerProps): JSX.Element {
-    const slots = createSlotProps(props);
+    const slots = createSlotProps<Anatomy, "cell", CalendarInstances>(props);
     const own = omit(props, ...READY_MADE_PROPS) as DockedDatePickerRootProps;
     return (
         <Root

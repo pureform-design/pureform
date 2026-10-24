@@ -10,7 +10,12 @@ import {
     calendarCellSelection,
     calendarCellSelectionOf,
 } from "@pureform/binding-core";
-import type { CalendarView, Controllable } from "@pureform/binding-core";
+import type {
+    CalendarCellInstance,
+    CalendarInstances,
+    CalendarView,
+    Controllable,
+} from "@pureform/binding-core";
 import type { MutableInteractionSource } from "@pureform/binding-core/interaction";
 import * as datePicker from "@pureform/machines/date-picker";
 import type { JSX, ValidComponent } from "@solidjs/web";
@@ -21,7 +26,7 @@ import { ChevronEndIcon, ChevronStartIcon } from "./glyphs";
 import { useInteractionHandlers, useOwnInteractionSource } from "./interaction";
 import type { PropTypes } from "./internal/zag";
 import { useComponent } from "./parts";
-import type { PartScope } from "./parts";
+import type { PartScope, SlotPropsOf } from "./parts";
 import { combinePartProps } from "./props";
 import type { PartProps } from "./props";
 
@@ -35,6 +40,12 @@ export interface CalendarContext {
 export interface CalendarPartProps extends PartProps {
     readonly unstyled?: boolean | undefined;
 }
+
+/** A ready-made picker's slot props for the calendar it draws, the repeated parts by copy. */
+export type CalendarSlots = SlotPropsOf<
+    "weekdays" | "weekday" | "grid" | "week" | "cell",
+    CalendarInstances
+>;
 
 /** A previous or next button's props: a part's, `mirror` (on by default) to flip its chevron
  *  under `rtl`, and `unit`, what it steps by: the view's page (a month of days), or a year. */
@@ -57,6 +68,8 @@ export interface CalendarTableProps extends CalendarPartProps {
  *  day's number by default). */
 export type CalendarCellProps = CalendarPartProps & {
     readonly interactionSource?: MutableInteractionSource | undefined;
+    /** The ready-made's slot props, whose `cell` goes on the cell's root. */
+    readonly slots?: CalendarSlots | undefined;
 } & (
         | { readonly view?: "day" | undefined; readonly value: string }
         | { readonly view: "month" | "year"; readonly value: number }
@@ -237,6 +250,21 @@ export function calendarParts(use: (name: string) => CalendarContext) {
                 api.selectionMode === "range" ? "range" : "single",
             );
         };
+        const instance = (): CalendarCellInstance => ({
+            view: view(),
+            value: props.value,
+            selected: selection() !== "none",
+            today:
+                view() === "day" &&
+                (state() as datePicker.DayTableCellState).today,
+            outside: view() === "day" && state().outsideRange,
+            disabled: state().disabled,
+        });
+        const slots = props.slots;
+        const rootSlot = slots?.(
+            "cell",
+            slots.each("cell") ? instance : undefined,
+        ) as CalendarPartProps | undefined;
         const source = useOwnInteractionSource(() => props.interactionSource);
         const handlers = useInteractionHandlers(
             source,
@@ -298,6 +326,7 @@ export function calendarParts(use: (name: string) => CalendarContext) {
                     "view",
                     "value",
                     "children",
+                    "slots",
                 ),
                 content,
             ),
@@ -305,63 +334,99 @@ export function calendarParts(use: (name: string) => CalendarContext) {
         return cell.render("root", {
             element: "div",
             machine: () => cellProps()[0],
-            props: { children: trigger },
+            unstyled: () => rootSlot?.unstyled,
+            props: rootSlot
+                ? merge(omit(rootSlot, "unstyled"), { children: trigger })
+                : { children: trigger },
         });
     }
 
-    /** The weekday row and the grid of the shown month's days, ready-made. */
-    function DayCalendar(): JSX.Element {
+    /** The weekday row and the grid of the shown month's days, ready-made, with the ready-made
+     *  picker's slot props. */
+    function DayCalendar(props: {
+        readonly slots?: CalendarSlots | undefined;
+    }): JSX.Element {
         const { picker } = use("DayCalendar");
+        const slots = props.slots;
+        const weekdays = slots?.("weekdays");
+        const grid = slots?.("grid");
         return (
             <>
-                <Weekdays>
+                <Weekdays {...weekdays}>
                     <For each={picker().weekDays} keyed={false}>
-                        {(weekday) => (
-                            <Weekday aria-label={weekday().long}>
-                                {weekday().narrow}
-                            </Weekday>
-                        )}
+                        {(weekday, index) => {
+                            const label = slots?.(
+                                "weekday",
+                                slots.each("weekday")
+                                    ? () => ({
+                                          index,
+                                          long: weekday().long,
+                                          narrow: weekday().narrow,
+                                      })
+                                    : undefined,
+                            );
+                            return (
+                                <Weekday aria-label={weekday().long} {...label}>
+                                    {weekday().narrow}
+                                </Weekday>
+                            );
+                        }}
                     </For>
                 </Weekdays>
-                <Grid>
+                <Grid {...grid}>
                     <For each={picker().weeks} keyed={false}>
-                        {(week) => (
-                            <Week>
-                                <For each={week()} keyed={false}>
-                                    {(date) => (
-                                        <Cell
-                                            value={datePicker.toISO(date())}
-                                        />
-                                    )}
-                                </For>
-                            </Week>
-                        )}
+                        {(week, index) => {
+                            const row = slots?.(
+                                "week",
+                                slots.each("week")
+                                    ? () => ({ index })
+                                    : undefined,
+                            );
+                            return (
+                                <Week {...row}>
+                                    <For each={week()} keyed={false}>
+                                        {(date) => (
+                                            <Cell
+                                                value={datePicker.toISO(date())}
+                                                slots={slots}
+                                            />
+                                        )}
+                                    </For>
+                                </Week>
+                            );
+                        }}
                     </For>
                 </Grid>
             </>
         );
     }
 
-    const listCells = (view: "month" | "year") => () => {
-        const { picker } = use("ListCells");
-        const cells = () =>
-            (view === "month"
-                ? picker().getMonthsGrid({
-                      columns: MONTH_COLUMNS,
-                      format: "long",
-                  })
-                : picker().getYearsGrid({ columns: YEAR_COLUMNS })
-            ).flat();
-        return (
-            <For each={cells()} keyed={false}>
-                {(cell) => (
-                    <Cell view={view} value={cell().value}>
-                        {cell().label}
-                    </Cell>
-                )}
-            </For>
-        );
-    };
+    const listCells =
+        (view: "month" | "year") =>
+        (props: { readonly slots?: CalendarSlots | undefined }) => {
+            const { picker } = use("ListCells");
+            const cells = () =>
+                (view === "month"
+                    ? picker().getMonthsGrid({
+                          columns: MONTH_COLUMNS,
+                          format: "long",
+                      })
+                    : picker().getYearsGrid({ columns: YEAR_COLUMNS })
+                ).flat();
+            return (
+                <For each={cells()} keyed={false}>
+                    {(cell) => (
+                        <Cell
+                            view={view}
+                            value={cell().value}
+                            slots={props.slots}
+                        >
+                            {cell().label}
+                        </Cell>
+                    )}
+                </For>
+            );
+        };
 
     const Grid = table("grid", "Grid", { view: "day", columns: 7 });
 

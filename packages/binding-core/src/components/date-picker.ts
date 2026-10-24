@@ -275,6 +275,36 @@ export const calendarCellSelectionOf = (
     tokens: props.tokens,
 });
 
+/** What a ready-made picker's calendar cell is, for a function of the copy in its `cell` key:
+ *  `className={{ cell: (cell) => (cell.today ? "now" : undefined) }}`. */
+export interface CalendarCellInstance {
+    readonly view: CalendarView;
+    /** An ISO date in the day view, a month 1 to 12, or a year. */
+    readonly value: string | number;
+    readonly selected: boolean;
+    readonly today: boolean;
+    /** A day outside the shown month. */
+    readonly outside: boolean;
+    readonly disabled: boolean;
+}
+
+/** What a week of a ready-made picker's grid is: its 0-based row. */
+export interface CalendarWeekInstance {
+    readonly index: number;
+}
+
+/** What a ready-made picker's weekday label is: its 0-based column and its labels. */
+export interface CalendarWeekdayInstance extends WeekdayLabel {
+    readonly index: number;
+}
+
+/** A ready-made picker's repeated calendar parts, each to its copy. */
+export interface CalendarInstances {
+    readonly cell: CalendarCellInstance;
+    readonly week: CalendarWeekInstance;
+    readonly weekday: CalendarWeekdayInstance;
+}
+
 /** The parts of a calendar cell: `"root" | "trigger"`. */
 export type CalendarCellPart = PartName<typeof calendarCellAnatomy>;
 

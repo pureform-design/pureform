@@ -19,6 +19,27 @@ import type { VariantProp } from "./variants";
 /** The time picker's parts. */
 export type TimePickerPart = PartName<typeof timePickerAnatomy>;
 
+/** What a ready-made time picker's dial label is, for a function of the copy in its `dialLabel`
+ *  key: `className={{ dialLabel: (label) => (label.selected ? "on" : undefined) }}`. */
+export interface TimePickerDialLabelInstance {
+    readonly value: number;
+    readonly selected: boolean;
+}
+
+/** What a scroll-mode selector's item is: the selector's view, its value, and whether it's the
+ *  current one. */
+export interface TimePickerScrollItemInstance {
+    readonly view: TimePickerView;
+    readonly value: number;
+    readonly selected: boolean;
+}
+
+/** The ready-made time picker's repeated parts, each to its copy. */
+export interface TimePickerInstances {
+    readonly dialLabel: TimePickerDialLabelInstance;
+    readonly scrollItem: TimePickerScrollItemInstance;
+}
+
 /** The time input's parts. */
 export type TimeInputPart = PartName<typeof timeInputAnatomy>;
 

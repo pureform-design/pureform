@@ -8,7 +8,11 @@ import {
     datePickerBackdropAnatomy,
     datePickerOverlayAnatomy,
 } from "@pureform/anatomy";
-import type { buttonAnatomy, TestIdOverride } from "@pureform/anatomy";
+import type {
+    buttonAnatomy,
+    PartName,
+    TestIdOverride,
+} from "@pureform/anatomy";
 import {
     DATE_PICKER_CONTENT_PROPS,
     DATE_PICKER_ROOT_PROPS,
@@ -20,6 +24,7 @@ import {
     selectedDateText,
 } from "@pureform/binding-core";
 import type {
+    CalendarInstances,
     DatePickerContentProps,
     DatePickerPart,
     DatePickerRootOwnProps,
@@ -56,7 +61,12 @@ import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
 import { createSlotProps, plainParts, asRoot } from "../parts";
-import type { ComponentScope, InnerPropsOf, SlotKeyedProps } from "../parts";
+import type {
+    ComponentScope,
+    InnerPropsOf,
+    SlotKeyedProps,
+    SlotPropsOf,
+} from "../parts";
 import { pickerAction } from "../picker-actions";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
@@ -351,8 +361,9 @@ const CancelTrigger = pickerAction(
     (name) => pickerContext.use(name).cancel,
 );
 
-/** The ready-made date picker's props: Root's, with `class`, `style`, and `slotProps` keyed by
- *  part, and the trigger's label, the headline, the placeholder, the actions' labels, and the mode
+/** The ready-made date picker's props: Root's, with `class`, `style`, `slotProps` and
+ *  `unstyled` keyed by part (the backdrop's too, and `cell` for each calendar cell; a cell, week
+ *  or weekday also by copy, `CalendarInstances`), and the trigger's label, the headline, the placeholder, the actions' labels, and the mode
  *  toggle as content. */
 export interface DatePickerProps
     extends
@@ -360,10 +371,10 @@ export interface DatePickerProps
             DatePickerRootProps,
             keyof SlotKeyedProps<Anatomy, "backdrop"> | "children"
         >,
-        SlotKeyedProps<Anatomy, "backdrop">,
+        SlotKeyedProps<Anatomy, Extra, CalendarInstances>,
         DatePickerContentProps<JSX.Element> {
     readonly testId?: TestIdOverride<DatePickerPart>;
-    readonly unstyled?: Unstyled<DatePickerPart>;
+    readonly unstyled?: Unstyled<DatePickerPart | "cell", CalendarInstances>;
     /** The Cancel action, drawn as a button. */
     readonly cancelButtonProps?: ButtonInnerProps | undefined;
     /** The OK action, drawn as a button. */
@@ -371,6 +382,8 @@ export interface DatePickerProps
 }
 
 type ButtonInnerProps = InnerPropsOf<typeof buttonAnatomy>;
+
+type Extra = "backdrop" | "cell";
 
 const READY_MADE_PROPS = [
     "class",
@@ -384,7 +397,7 @@ const READY_MADE_PROPS = [
 // Inside Root, so it reads the draft and the view.
 function ReadyMadeContent(props: {
     readonly own: DatePickerProps;
-    readonly slots: ReturnType<typeof createSlotProps<Anatomy, "backdrop">>;
+    readonly slots: SlotPropsOf<PartName<Anatomy> | Extra, CalendarInstances>;
 }): JSX.Element {
     const { picker, draft, locale } = pickerContext.use("Root");
     const own = props.own;
@@ -425,11 +438,11 @@ function ReadyMadeContent(props: {
                 when={picker().view === "day"}
                 fallback={
                     <YearList {...slots("yearList")}>
-                        <calendar.YearCells />
+                        <calendar.YearCells slots={slots} />
                     </YearList>
                 }
             >
-                <calendar.DayCalendar />
+                <calendar.DayCalendar slots={slots} />
             </Show>
             <Actions {...slots("actions")}>
                 <CancelTrigger
@@ -456,7 +469,7 @@ function ReadyMadeContent(props: {
 /** The ready-made date picker: the trigger, drawn as a button, when given a label, the backdrop,
  *  and the dialog with the header, the calendar (the days, or the years), and Cancel and OK. */
 function ReadyMade(props: DatePickerProps): JSX.Element {
-    const slots = createSlotProps(props);
+    const slots = createSlotProps<Anatomy, Extra, CalendarInstances>(props);
     const backdrop = slots("backdrop");
     const own = omit(props, ...READY_MADE_PROPS) as DatePickerRootProps;
     return (

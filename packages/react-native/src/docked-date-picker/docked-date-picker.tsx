@@ -19,6 +19,7 @@ import {
     pickerWeekStart,
 } from "@pureform/binding-core";
 import type {
+    CalendarInstances,
     DockedDatePickerContentProps,
     DockedDatePickerRootOwnProps,
 } from "@pureform/binding-core";
@@ -67,8 +68,12 @@ export interface DockedDatePickerHosts {
     readonly week: "View";
     readonly monthList: "ScrollView";
     readonly yearList: "ScrollView";
+    readonly cell: "View";
 }
 
+/** The ready-made picker's props: Root's, its content, and `style` and `slotProps` keyed by part
+ *  (and `cell` for each calendar cell; a cell, week or weekday also by copy,
+ *  `CalendarInstances`). */
 export interface DockedDatePickerProps
     extends
         Omit<
@@ -76,7 +81,7 @@ export interface DockedDatePickerProps
             "unstyled" | "leadingIcon" | "prefixText" | "suffixText"
         >,
         DockedDatePickerContentProps<ReactNode>,
-        NativeSlotProps<DockedDatePickerHosts> {}
+        NativeSlotProps<DockedDatePickerHosts, CalendarInstances> {}
 
 type CalendarView = "day" | "month" | "year";
 

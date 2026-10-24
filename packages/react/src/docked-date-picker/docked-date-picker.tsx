@@ -6,7 +6,7 @@
 // the calendar. The ready-made DockedDatePicker draws all of it.
 
 import { dockedDatePickerOverlayAnatomy } from "@pureform/anatomy";
-import type { ComponentAnatomy } from "@pureform/anatomy";
+import type { ComponentAnatomy, PartName } from "@pureform/anatomy";
 import {
     DOCKED_DATE_PICKER_ROOT_PROPS,
     dateFormatHint,
@@ -18,8 +18,10 @@ import {
     presentProps,
 } from "@pureform/binding-core";
 import type {
+    CalendarInstances,
     DockedDatePickerContentProps,
     DockedDatePickerRootOwnProps,
+    Unstyled,
 } from "@pureform/binding-core";
 import * as datePicker from "@pureform/machines/date-picker";
 import { normalizeProps } from "@zag-js/react";
@@ -38,8 +40,10 @@ import type {
     CalendarCellProps,
     CalendarContext,
     CalendarPartProps,
+    CalendarSlots,
     CalendarStepProps,
     CalendarTableProps,
+    CalendarWeekdaysProps,
 } from "../calendar-parts";
 import { useControllable } from "../controllable";
 import {
@@ -308,7 +312,7 @@ const calendar = calendarParts(
 );
 
 /** The weekday row; by default a Weekday per day, from the week's first. */
-const Weekdays: (props: CalendarPartProps) => ReactNode = calendar.Weekdays;
+const Weekdays: (props: CalendarWeekdaysProps) => ReactNode = calendar.Weekdays;
 /** A weekday's label: the narrow one shown, the long one as `aria-label`. */
 const Weekday: (props: CalendarPartProps) => ReactNode = calendar.Weekday;
 /** The grid of days; by default a Week of Cells per week of the shown month. */
@@ -328,8 +332,9 @@ const Prev: (props: DockedDatePickerStepProps) => ReactNode = calendar.Prev;
 /** Shows the next month (`unit="month"`) or year (`unit="year"`). */
 const Next: (props: DockedDatePickerStepProps) => ReactNode = calendar.Next;
 
-/** The ready-made picker's props: Root's, with `className`, `style`, and `slotProps` keyed by
- *  part, and the label, supporting text, icons and affixes as content. `aria-label`,
+/** The ready-made picker's props: Root's, with `className`, `style`, `slotProps` and `unstyled`
+ *  keyed by part (and `cell` for each calendar cell; a cell, week or weekday also by copy,
+ *  `CalendarInstances`), and the label, supporting text, icons and affixes as content. `aria-label`,
  *  `aria-labelledby` and `aria-describedby` go on the input. */
 export interface DockedDatePickerProps
     extends
@@ -341,13 +346,18 @@ export interface DockedDatePickerProps
             | "prefixText"
             | "suffixText"
         >,
-        SlotKeyedProps<Anatomy>,
-        DockedDatePickerContentProps<ReactNode> {}
+        Omit<SlotKeyedProps<Anatomy, "cell", CalendarInstances>, "unstyled">,
+        DockedDatePickerContentProps<ReactNode> {
+    readonly unstyled?:
+        | Unstyled<PartName<Anatomy> | "cell", CalendarInstances>
+        | undefined;
+}
 
 // Inside Root, so it can read the view and the locale.
 function ReadyMadeContent({ own }: { readonly own: DockedDatePickerProps }) {
     const { picker, locale, supportingTextId } = context.use("Root");
-    const slot = useSlotProps(own as SlotKeyedProps<ComponentAnatomy>);
+    const slot = useSlotProps<Anatomy, "cell", CalendarInstances>(own);
+    const slots: CalendarSlots = slot;
     const step = (unit: "month" | "year") => (
         <>
             <Prev
@@ -426,13 +436,13 @@ function ReadyMadeContent({ own }: { readonly own: DockedDatePickerProps }) {
                     </Controls>
                     {picker.view === "day" ? (
                         <>
-                            <Weekdays {...slot("weekdays")} />
-                            <Grid {...slot("grid")} />
+                            <Weekdays {...slot("weekdays")} slots={slots} />
+                            <Grid {...slot("grid")} slots={slots} />
                         </>
                     ) : picker.view === "month" ? (
-                        <MonthList {...slot("monthList")} />
+                        <MonthList {...slot("monthList")} slots={slots} />
                     ) : (
-                        <YearList {...slot("yearList")} />
+                        <YearList {...slot("yearList")} slots={slots} />
                     )}
                 </Content>
             </Positioner>

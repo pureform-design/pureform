@@ -16,6 +16,7 @@ import {
     selectedDateText,
 } from "@pureform/binding-core";
 import type {
+    CalendarInstances,
     DatePickerContentProps,
     DatePickerRootOwnProps,
 } from "@pureform/binding-core";
@@ -69,14 +70,18 @@ export interface DatePickerHosts {
     readonly grid: "View";
     readonly week: "View";
     readonly yearList: "ScrollView";
+    readonly cell: "View";
     readonly backdrop: "View";
 }
 
+/** The ready-made picker's props: Root's, its content, and `style` and `slotProps` keyed by part
+ *  (and `cell` for each calendar cell; a cell, week or weekday also by copy,
+ *  `CalendarInstances`). */
 export interface DatePickerProps
     extends
         Omit<DatePickerRootOwnProps, "unstyled" | "restoreFocus">,
         DatePickerContentProps<ReactNode>,
-        NativeSlotProps<DatePickerHosts> {
+        NativeSlotProps<DatePickerHosts, CalendarInstances> {
     /** The cancel button's `style`, `slotProps`, `tokens` and `testId`. */
     readonly cancelButtonProps?: InnerPropsOf<ButtonProps> | undefined;
     /** The confirm button's `style`, `slotProps`, `tokens` and `testId`. */

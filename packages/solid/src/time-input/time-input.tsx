@@ -94,9 +94,12 @@ const Separator = span("separator", "Separator", ({ api }) =>
 /** Where the app's buttons go. */
 const Actions = div("actions", "Actions", ({ api }) => api().getActionsProps());
 
-/** A field's props: a part's, and the label under its input ("Hour", "Minute" by default). */
+/** A field's props: a part's, the label under its input ("Hour", "Minute" by default), and
+ *  the props of its input and of that label. */
 export interface TimeInputFieldProps extends TimeInputPartProps {
     readonly label?: JSX.Element;
+    readonly inputProps?: TimeInputPartProps | undefined;
+    readonly labelProps?: TimeInputPartProps | undefined;
 }
 
 const field = (of: TimePickerView, name: string) =>
@@ -106,29 +109,44 @@ const field = (of: TimePickerView, name: string) =>
             element: "label",
             machine: () => api().getFieldProps(of),
             unstyled: () => props.unstyled,
-            props: merge(omit(props, "unstyled", "label"), {
-                get children() {
-                    return (
-                        <>
-                            {scope.render("input", {
-                                element: "input",
-                                machine: () => api().getInputProps(of),
-                            })}
-                            {scope.render("fieldLabel", {
-                                element: "span",
-                                machine: () => api().getFieldLabelProps(of),
-                                props: {
-                                    get children() {
-                                        return isPresent(props.label)
-                                            ? props.label
-                                            : api().translations[of];
-                                    },
-                                },
-                            })}
-                        </>
-                    );
+            props: merge(
+                omit(props, "unstyled", "label", "inputProps", "labelProps"),
+                {
+                    get children() {
+                        return (
+                            <>
+                                {scope.render("input", {
+                                    element: "input",
+                                    machine: () => api().getInputProps(of),
+                                    unstyled: () => props.inputProps?.unstyled,
+                                    props: omit(
+                                        props.inputProps ?? {},
+                                        "unstyled",
+                                    ),
+                                })}
+                                {scope.render("fieldLabel", {
+                                    element: "span",
+                                    machine: () => api().getFieldLabelProps(of),
+                                    unstyled: () => props.labelProps?.unstyled,
+                                    props: merge(
+                                        omit(
+                                            props.labelProps ?? {},
+                                            "unstyled",
+                                        ),
+                                        {
+                                            get children() {
+                                                return isPresent(props.label)
+                                                    ? props.label
+                                                    : api().translations[of];
+                                            },
+                                        },
+                                    ),
+                                })}
+                            </>
+                        );
+                    },
                 },
-            }),
+            ),
         });
     };
 
@@ -193,6 +211,8 @@ function ReadyMadeParts(
     },
 ): JSX.Element {
     const { api } = context.use("TimeInput");
+    const input = props.slots("input");
+    const fieldLabel = props.slots("fieldLabel");
     return (
         <>
             <Headline {...props.slots("headline")}>
@@ -201,9 +221,17 @@ function ReadyMadeParts(
                     : TIME_INPUT_HEADLINE}
             </Headline>
             <Body {...props.slots("body")}>
-                <HourField {...props.slots("hourField")} />
+                <HourField
+                    {...props.slots("hourField")}
+                    inputProps={input}
+                    labelProps={fieldLabel}
+                />
                 <Separator {...props.slots("separator")}>:</Separator>
-                <MinuteField {...props.slots("minuteField")} />
+                <MinuteField
+                    {...props.slots("minuteField")}
+                    inputProps={input}
+                    labelProps={fieldLabel}
+                />
                 <Show when={api().hourCycle === 12}>
                     <PeriodSelector {...props.slots("periodSelector")}>
                         <Period period="am" {...props.slots("period")}>

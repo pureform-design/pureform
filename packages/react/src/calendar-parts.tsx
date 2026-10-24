@@ -11,8 +11,10 @@ import {
     weekdayLabels,
 } from "@pureform/binding-core";
 import type {
+    CalendarCellInstance,
     CalendarCellPart,
     CalendarCellSelection,
+    CalendarInstances,
     CalendarView,
     Controllable,
     DateSelectionMode,
@@ -28,7 +30,7 @@ import { useControllable } from "./controllable";
 import { useInteractionHandlers, useOwnInteractionSource } from "./interaction";
 import type { PartContext } from "./part-context";
 import { useComponent } from "./parts";
-import type { ComponentScope } from "./parts";
+import type { ComponentScope, SlotPropsOf } from "./parts";
 import { combinePartProps } from "./props";
 import type { PartProps } from "./props";
 
@@ -48,10 +50,23 @@ export interface CalendarPartProps extends PartProps {
     readonly unstyled?: boolean | undefined;
 }
 
-/** A table part's props (the grid, a year or month list): a part's, the view it shows, and how
- *  many cells a row holds, which the arrow keys move by. */
+/** A ready-made picker's slot props for the calendar's repeated parts, by copy. */
+export type CalendarSlots = SlotPropsOf<
+    "cell" | "week" | "weekday",
+    CalendarInstances
+>;
+
+/** The weekday row's props: a part's, and the ready-made's slot props for its weekdays. */
+export interface CalendarWeekdaysProps extends CalendarPartProps {
+    readonly slots?: CalendarSlots | undefined;
+}
+
+/** A table part's props (the grid, a year or month list): a part's, the view it shows, how
+ *  many cells a row holds, which the arrow keys move by, and the ready-made's slot props for
+ *  its weeks and cells. */
 export interface CalendarTableProps extends CalendarPartProps {
     readonly columns?: number | undefined;
+    readonly slots?: CalendarSlots | undefined;
 }
 
 /** A previous or next button's props: a part's, `as` to render a component instead of
@@ -121,12 +136,57 @@ export function useDateValue(
     };
 }
 
+/** A day cell as a ready-made's `cell` key sees it. */
+const dayInstance = (
+    picker: datePicker.Api<PropTypes>,
+    iso: string,
+    selected: readonly string[],
+    selectionMode: DateSelectionMode,
+): CalendarCellInstance => {
+    const state = picker.getDayTableCellState({ value: parseIso(iso) });
+    return {
+        view: "day",
+        value: iso,
+        selected:
+            calendarCellSelection(iso, selected, selectionMode) !== "none",
+        today: state.today,
+        outside: state.outsideRange,
+        disabled: state.disabled,
+    };
+};
+
+/** A month or year cell as a ready-made's `cell` key sees it. */
+const listInstance = (
+    picker: datePicker.Api<PropTypes>,
+    view: "year" | "month",
+    value: number,
+    columns: number,
+): CalendarCellInstance => {
+    const state =
+        view === "year"
+            ? picker.getYearTableCellState({ value, columns })
+            : picker.getMonthTableCellState({ value, columns });
+    return {
+        view,
+        value,
+        selected: state.selected,
+        today: false,
+        outside: false,
+        disabled: state.disabled,
+    };
+};
+
 /** Builds the calendar's parts over a picker's context. */
 export function calendarParts(context: PartContext<CalendarContext>) {
     const part = (name: string) => name as never;
 
-    function Weekdays({ unstyled, ...props }: CalendarPartProps): ReactNode {
+    function Weekdays({
+        unstyled,
+        slots,
+        ...props
+    }: CalendarWeekdaysProps): ReactNode {
         const { scope, picker, locale, weekStart } = context.use("Weekdays");
+        const each = slots?.each("weekday") ?? false;
         return scope.render(part("weekdays"), {
             element: "div",
             // Zag's head, hidden from assistive technology as Zag's is: each day's name
@@ -140,8 +200,15 @@ export function calendarParts(context: PartContext<CalendarContext>) {
                 ...props,
                 children:
                     props.children ??
-                    weekdayLabels(locale, weekStart).map((day) => (
-                        <Weekday key={day.long} aria-label={day.long}>
+                    weekdayLabels(locale, weekStart).map((day, index) => (
+                        <Weekday
+                            key={day.long}
+                            aria-label={day.long}
+                            {...slots?.(
+                                "weekday",
+                                each ? { ...day, index } : undefined,
+                            )}
+                        >
                             {day.narrow}
                         </Weekday>
                     )),
@@ -163,8 +230,10 @@ export function calendarParts(context: PartContext<CalendarContext>) {
         });
     }
 
-    function Grid({ unstyled, columns, ...props }: CalendarTableProps) {
-        const { scope, picker } = context.use("Grid");
+    function Grid({ unstyled, columns, slots, ...props }: CalendarTableProps) {
+        const { scope, picker, selected, selectionMode } = context.use("Grid");
+        const eachWeek = slots?.each("week") ?? false;
+        const eachCell = slots?.each("cell") ?? false;
         return scope.render(part("grid"), {
             element: "div",
             machine: picker.getTableProps({ view: "day", columns }),
@@ -173,14 +242,34 @@ export function calendarParts(context: PartContext<CalendarContext>) {
                 ...props,
                 children:
                     props.children ??
-                    picker.weeks.map((week) => (
-                        <Week key={week[0]!.toString()}>
-                            {week.map((day) => (
-                                <Cell
-                                    key={day.toString()}
-                                    value={datePicker.toISO(day)}
-                                />
-                            ))}
+                    picker.weeks.map((week, index) => (
+                        <Week
+                            key={week[0]!.toString()}
+                            {...slots?.(
+                                "week",
+                                eachWeek ? { index } : undefined,
+                            )}
+                        >
+                            {week.map((day) => {
+                                const iso = datePicker.toISO(day);
+                                return (
+                                    <Cell
+                                        key={day.toString()}
+                                        {...slots?.(
+                                            "cell",
+                                            eachCell
+                                                ? dayInstance(
+                                                      picker,
+                                                      iso,
+                                                      selected,
+                                                      selectionMode,
+                                                  )
+                                                : undefined,
+                                        )}
+                                        value={iso}
+                                    />
+                                );
+                            })}
                         </Week>
                     )),
             },
@@ -209,9 +298,11 @@ export function calendarParts(context: PartContext<CalendarContext>) {
         function List({
             unstyled,
             columns = fallback,
+            slots,
             ...props
         }: CalendarTableProps): ReactNode {
             const { scope, picker } = context.use(name);
+            const each = slots?.each("cell") ?? false;
             const rows =
                 view === "year"
                     ? picker.getYearsGrid({ columns })
@@ -227,6 +318,17 @@ export function calendarParts(context: PartContext<CalendarContext>) {
                         rows.flat().map((cell) => (
                             <Cell
                                 key={cell.value}
+                                {...slots?.(
+                                    "cell",
+                                    each
+                                        ? listInstance(
+                                              picker,
+                                              view,
+                                              cell.value,
+                                              columns,
+                                          )
+                                        : undefined,
+                                )}
                                 view={view}
                                 value={cell.value}
                                 columns={columns}

@@ -89,18 +89,25 @@ const Separator = span("separator", "Separator", ({ api }) =>
 /** Where the app's buttons go. */
 const Actions = div("actions", "Actions", ({ api }) => api.getActionsProps());
 
-/** A field's props: a part's, and the label under its input ("Hour", "Minute" by default). */
+/** A field's props: a part's, the label under its input ("Hour", "Minute" by default), and
+ *  the props of its input and of that label. */
 export interface TimeInputFieldProps extends TimeInputPartProps {
     readonly label?: ReactNode;
+    readonly inputProps?: TimeInputPartProps | undefined;
+    readonly labelProps?: TimeInputPartProps | undefined;
 }
 
 const field = (of: TimePickerView, name: string) =>
     function Field({
         unstyled,
         label,
+        inputProps,
+        labelProps,
         ...props
     }: TimeInputFieldProps): ReactNode {
         const { scope, api } = context.use(name);
+        const { unstyled: inputUnstyled, ...input } = inputProps ?? {};
+        const { unstyled: labelUnstyled, ...fieldLabel } = labelProps ?? {};
         return scope.render(of === "hour" ? "hourField" : "minuteField", {
             element: "label",
             machine: api.getFieldProps(of),
@@ -112,11 +119,15 @@ const field = (of: TimePickerView, name: string) =>
                         {scope.render("input", {
                             element: "input",
                             machine: api.getInputProps(of),
+                            unstyled: inputUnstyled,
+                            props: input,
                         })}
                         {scope.render("fieldLabel", {
                             element: "span",
                             machine: api.getFieldLabelProps(of),
+                            unstyled: labelUnstyled,
                             props: {
+                                ...fieldLabel,
                                 children: isPresent(label)
                                     ? label
                                     : api.translations[of],
@@ -181,9 +192,17 @@ function ReadyMade(props: TimeInputProps): ReactNode {
                 {isPresent(headline) ? headline : TIME_INPUT_HEADLINE}
             </Headline>
             <Body {...slot("body")}>
-                <HourField {...slot("hourField")} />
+                <HourField
+                    {...slot("hourField")}
+                    inputProps={slot("input")}
+                    labelProps={slot("fieldLabel")}
+                />
                 <Separator {...slot("separator")}>:</Separator>
-                <MinuteField {...slot("minuteField")} />
+                <MinuteField
+                    {...slot("minuteField")}
+                    inputProps={slot("input")}
+                    labelProps={slot("fieldLabel")}
+                />
                 <ReadyMadePeriods slot={slot} />
             </Body>
             {isPresent(actions) ? (

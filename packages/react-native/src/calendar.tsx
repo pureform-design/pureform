@@ -15,6 +15,7 @@ import {
     weekdayLabels,
 } from "@pureform/binding-core";
 import type {
+    CalendarCellInstance,
     CalendarCellPart,
     CalendarCellSelection,
     CalendarView,
@@ -47,10 +48,15 @@ export interface CalendarCellProps {
     /** Its name for assistive technology: the long date. */
     readonly label: string;
     readonly onPress: () => void;
+    /** The picker's per-part props, whose `cell` goes on the cell's root. */
+    readonly owner?: PartSlots | undefined;
+    /** What the cell is, for a function of the copy in the picker's `cell` key. */
+    readonly instance?: CalendarCellInstance | undefined;
 }
 
 function CalendarCellImpl(props: CalendarCellProps): ReactNode {
     const slot = nativeSlots(undefined);
+    const owner = props.owner ?? slot;
     const indication = useSurfaceIndication(INDICATION, {
         disabled: props.disabled,
     });
@@ -78,11 +84,11 @@ function CalendarCellImpl(props: CalendarCellProps): ReactNode {
     const chosen = props.selection !== "none";
     return (
         <v.root.View
-            {...slot.props("root")}
+            {...owner.props("cell", props.instance)}
             {...(day
                 ? { role: "gridcell" as const, "aria-selected": chosen }
                 : {})}
-            style={slot.style("root", s.root)}
+            style={owner.style("cell", s.root, props.instance)}
             testID={id("root")}
         >
             <v.trigger.Pressable
@@ -151,6 +157,9 @@ const LONG_DATE = {
 export function DayGrid(props: DayGridProps): ReactNode {
     const slot = props.slots.slot ?? nativeSlots(undefined);
     const { styles: s, views: v, id } = props.slots;
+    const eachWeekday = slot.each("weekday");
+    const eachWeek = slot.each("week");
+    const eachCell = slot.each("cell");
     const shown = parseIsoDate(props.month)!;
     const today = todayIso();
     return (
@@ -160,18 +169,25 @@ export function DayGrid(props: DayGridProps): ReactNode {
                 style={slot.style("weekdays", s.weekdays)}
                 testID={id("weekdays")}
             >
-                {weekdayLabels(props.locale, props.firstDay).map((label) => (
-                    <v.weekday.Text
-                        {...slot.props("weekday")}
-                        key={label.long}
-                        aria-label={label.long}
-                        selectable={false}
-                        style={slot.style("weekday", s.weekday)}
-                        testID={id("weekday")}
-                    >
-                        {label.narrow}
-                    </v.weekday.Text>
-                ))}
+                {weekdayLabels(props.locale, props.firstDay).map(
+                    (label, index) => {
+                        const each = eachWeekday
+                            ? { ...label, index }
+                            : undefined;
+                        return (
+                            <v.weekday.Text
+                                {...slot.props("weekday", each)}
+                                key={label.long}
+                                aria-label={label.long}
+                                selectable={false}
+                                style={slot.style("weekday", s.weekday, each)}
+                                testID={id("weekday")}
+                            >
+                                {label.narrow}
+                            </v.weekday.Text>
+                        );
+                    },
+                )}
             </v.weekdays.View>
             <v.grid.View
                 {...slot.props("grid")}
@@ -179,35 +195,55 @@ export function DayGrid(props: DayGridProps): ReactNode {
                 style={slot.style("grid", s.grid)}
                 testID={id("grid")}
             >
-                {monthWeeks(shown, props.firstDay).map((week) => (
+                {monthWeeks(shown, props.firstDay).map((week, index) => (
                     <v.week.View
-                        {...slot.props("week")}
+                        {...slot.props(
+                            "week",
+                            eachWeek ? { index } : undefined,
+                        )}
                         key={week[0]}
                         role="row"
-                        style={slot.style("week", s.week)}
+                        style={slot.style(
+                            "week",
+                            s.week,
+                            eachWeek ? { index } : undefined,
+                        )}
                         testID={id("week")}
                     >
                         {week.map((day) => {
                             const outside =
                                 parseIsoDate(day)!.month !== shown.month;
+                            const selection = outside
+                                ? "none"
+                                : calendarCellSelection(
+                                      day,
+                                      props.selected,
+                                      props.mode,
+                                  );
+                            const disabled =
+                                !!props.disabled ||
+                                !isSelectableDate(day, props);
                             return (
                                 <CalendarCell
                                     key={day}
                                     view="day"
-                                    selection={
-                                        outside
-                                            ? "none"
-                                            : calendarCellSelection(
-                                                  day,
-                                                  props.selected,
-                                                  props.mode,
-                                              )
-                                    }
+                                    selection={selection}
                                     today={day === today}
                                     outside={outside}
-                                    disabled={
-                                        !!props.disabled ||
-                                        !isSelectableDate(day, props)
+                                    disabled={disabled}
+                                    owner={slot}
+                                    instance={
+                                        eachCell
+                                            ? {
+                                                  view: "day",
+                                                  value: day,
+                                                  selected:
+                                                      selection !== "none",
+                                                  today: day === today,
+                                                  outside,
+                                                  disabled,
+                                              }
+                                            : undefined
                                     }
                                     label={formatIsoDate(
                                         day,
@@ -249,6 +285,7 @@ export function CellList<L extends ListSlot>(
 ): ReactNode {
     const slot = props.slots.slot ?? nativeSlots(undefined);
     const { styles: s, id } = props.slots;
+    const each = slot.each("cell");
     const {
         height,
         overflow: _overflow,
@@ -269,6 +306,19 @@ export function CellList<L extends ListSlot>(
                     today={cell.current}
                     outside={false}
                     disabled={cell.disabled}
+                    owner={slot}
+                    instance={
+                        each
+                            ? {
+                                  view: props.view,
+                                  value: cell.key,
+                                  selected: cell.selected,
+                                  today: cell.current,
+                                  outside: false,
+                                  disabled: cell.disabled,
+                              }
+                            : undefined
+                    }
                     label={cell.text}
                     onPress={() => props.onChoose(cell.key)}
                 >

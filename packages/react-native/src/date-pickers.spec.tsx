@@ -154,6 +154,48 @@ describe("DatePicker", () => {
         );
     });
 
+    it("takes a function of each cell, week and weekday in its style and slotProps", async () => {
+        const views = new Set<string>();
+        await render(
+            <DatePicker
+                locale="en-US"
+                defaultValue={["2026-08-17"]}
+                style={{
+                    cell: (each) => {
+                        views.add(each.view);
+                        return each.selected ? { opacity: 0.5 } : undefined;
+                    },
+                    weekday: (label) =>
+                        label.index === 0 ? { opacity: 0.25 } : undefined,
+                }}
+                slotProps={{
+                    cell: (each) => ({ accessibilityHint: String(each.value) }),
+                    week: (week) => ({
+                        accessibilityHint: `week ${week.index}`,
+                    }),
+                }}
+            />,
+        );
+        const cell = (label: string) =>
+            day(label).closest<HTMLElement>('[role="gridcell"]')!;
+        expect(getComputedStyle(cell("Monday, August 17, 2026")).opacity).toBe(
+            "0.5",
+        );
+        expect(getComputedStyle(cell("Tuesday, August 18, 2026")).opacity).toBe(
+            "1",
+        );
+        const labels = all('[data-testid="pf-date-picker-weekday"]');
+        expect(getComputedStyle(labels[0]!).opacity).toBe("0.25");
+        expect(getComputedStyle(labels[1]!).opacity).toBe("1");
+        await interact(() =>
+            userEvent.click(byTestId("pf-date-picker-view-trigger")),
+        );
+        expect(getComputedStyle(day("2026").parentElement!).opacity).toBe(
+            "0.5",
+        );
+        expect([...views].sort()).toEqual(["day", "year"]);
+    });
+
     it("draws a range's start, middle and end", async () => {
         await render(
             <DatePicker

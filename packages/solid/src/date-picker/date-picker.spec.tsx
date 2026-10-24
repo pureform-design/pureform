@@ -239,6 +239,52 @@ describe("DatePicker, ready-made", () => {
         expect(byTestId(ids.selectedDate).textContent).toBe("Aug 10 – Aug 12");
     });
 
+    it("takes a function of each cell, week and weekday in its keys", async () => {
+        const views = new Set<string>();
+        withRegistry(() => (
+            <DatePicker
+                locale="en-US"
+                defaultOpen
+                defaultValue={["2026-08-17"]}
+                class={{
+                    cell: (each) => {
+                        views.add(each.view);
+                        return each.selected ? "chosen" : undefined;
+                    },
+                    week: (week) => `week-${week.index}`,
+                    grid: "days",
+                }}
+                style={{
+                    weekday: (day) =>
+                        day.index === 0 ? { opacity: 0.5 } : undefined,
+                }}
+                slotProps={{
+                    cell: (each) => ({ title: String(each.value) }),
+                }}
+                unstyled={{ cell: (each) => each.value === "2026-08-18" }}
+            />
+        ));
+        await settle();
+        expect(cellOf("2026-08-17").classList.contains("chosen")).toBe(true);
+        expect(cellOf("2026-08-16").classList.contains("chosen")).toBe(false);
+        expect(cellOf("2026-08-17").title).toBe("2026-08-17");
+        expect(cellOf("2026-08-18").className).toBe("");
+        expect(byTestId(ids.grid).classList.contains("days")).toBe(true);
+        expect(
+            all(`[data-testid="${ids.week}"]`)[1]!.classList.contains("week-1"),
+        ).toBe(true);
+        const days = all(`[data-testid="${ids.weekday}"]`);
+        expect(days[0]!.style.opacity).toBe("0.5");
+        expect(days[1]!.style.opacity).toBe("");
+        await userEvent.click(byTestId(ids.viewTrigger));
+        await settle();
+        const year = document.querySelector<HTMLElement>(
+            `[data-testid="${ids.yearList}"] [data-value="2026"][role="button"]`,
+        )!;
+        expect(year.parentElement!.title).toBe("2026");
+        expect([...views].sort()).toEqual(["day", "year"]);
+    });
+
     it("switches to the years, and back on choosing one", async () => {
         withRegistry(() => (
             <DatePicker

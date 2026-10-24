@@ -15,6 +15,7 @@ import {
 import type {
     TimeBehaviorProps,
     TimeContentProps,
+    TimePickerInstances,
     TimePickerPart,
     TimePickerVariantProps,
     TimePickerView,
@@ -75,12 +76,14 @@ export interface TimePickerHosts {
     readonly period: "Pressable";
 }
 
+/** The time picker's props: the time's, its content, and `style` and `slotProps` keyed by part
+ *  (a dial label or scroll item also by copy, `TimePickerInstances`). */
 export interface TimePickerProps
     extends
         TimeBehaviorProps,
         TimePickerVariantProps,
         TimeContentProps<ReactNode>,
-        NativeSlotProps<TimePickerHosts> {
+        NativeSlotProps<TimePickerHosts, TimePickerInstances> {
     /** The controlled view: what the dial sets. */
     readonly view?: TimePickerView | undefined;
     /** @default "hour" */
@@ -179,6 +182,7 @@ function TimePickerImpl(props: TimePickerProps): ReactNode {
         </TimeButton>
     );
 
+    const eachItem = slot.each("scrollItem");
     const scrollField = (of: TimePickerView) => {
         const part = of === "hour" ? "hourSelector" : "minuteSelector";
         const Field = v[part];
@@ -193,16 +197,26 @@ function TimePickerImpl(props: TimePickerProps): ReactNode {
             >
                 {([-1, 0, 1] as const).map((offset) => {
                     const at = stepTime(time, of, offset, cycle);
+                    const each = eachItem
+                        ? {
+                              view: of,
+                              value: viewValue(at, of, cycle),
+                              selected: offset === 0,
+                          }
+                        : undefined;
                     return (
                         <v.scrollItem.Text
-                            {...slot.props("scrollItem")}
+                            {...slot.props("scrollItem", each)}
                             key={offset}
                             aria-hidden
                             aria-selected={offset === 0}
-                            onPress={slot.on("scrollItem", "onPress", () =>
-                                setTime(at),
+                            onPress={slot.on(
+                                "scrollItem",
+                                "onPress",
+                                () => setTime(at),
+                                each,
                             )}
-                            style={slot.style("scrollItem", s.scrollItem)}
+                            style={slot.style("scrollItem", s.scrollItem, each)}
                             testID={id("scrollItem")}
                         >
                             {displayValue(at, of, cycle)}
@@ -457,6 +471,7 @@ function Dial(props: {
             {dialLabels(view, cycle).map((label) => (
                 <DialLabel
                     key={label.text}
+                    value={label.value}
                     text={label.text}
                     x={label.x}
                     y={label.y}
@@ -478,6 +493,7 @@ const handleCentring = (style: unknown): object[] => {
 
 // A label: its own selection, so the selected one takes the handle's content color.
 function DialLabelImpl(props: {
+    readonly value: number;
     readonly text: string;
     readonly x: number;
     readonly y: number;
@@ -492,17 +508,24 @@ function DialLabelImpl(props: {
         props.selection,
         { selected: props.selected },
     );
+    const each = slot.each("dialLabel")
+        ? { value: props.value, selected: props.selected }
+        : undefined;
     return (
         <v.dialLabel.Text
-            {...slot.props("dialLabel")}
+            {...slot.props("dialLabel", each)}
             aria-hidden
             pointerEvents="none"
             selectable={false}
-            style={slot.style("dialLabel", {
-                ...s.dialLabel,
-                left: pct(props.x),
-                top: pct(props.y),
-            })}
+            style={slot.style(
+                "dialLabel",
+                {
+                    ...s.dialLabel,
+                    left: pct(props.x),
+                    top: pct(props.y),
+                },
+                each,
+            )}
             testID={props.testId}
         >
             {props.text}

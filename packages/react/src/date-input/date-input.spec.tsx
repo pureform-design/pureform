@@ -52,6 +52,24 @@ describe("DateInput, ready-made", () => {
         ).toBe(null);
     });
 
+    it("passes the segment's slot props to each segment", async () => {
+        withRegistry(
+            <DateInput
+                locale="en-GB"
+                className={{ segment: "digit" }}
+                style={{ segment: { opacity: 0.5 } }}
+            />,
+        );
+        await settle();
+        expect(
+            segments().every(
+                (segment) =>
+                    segment.classList.contains("digit") &&
+                    segment.style.opacity === "0.5",
+            ),
+        ).toBe(true);
+    });
+
     it("draws the icons and affixes only when given, as content", async () => {
         withRegistry(
             <DateInput

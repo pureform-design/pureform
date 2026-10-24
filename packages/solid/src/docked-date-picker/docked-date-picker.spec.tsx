@@ -111,6 +111,30 @@ describe("DockedDatePicker, ready-made", () => {
         expect(byTestId<HTMLInputElement>(ids.input).value).toBe("08/21/2026");
     });
 
+    it("takes a function of each cell in its keys, in every view", async () => {
+        withRegistry(() => (
+            <DockedDatePicker
+                label="Date"
+                locale="en-US"
+                defaultValue={["2026-08-17"]}
+                defaultOpen
+                class={{
+                    cell: (each) => (each.selected ? "chosen" : "plain"),
+                }}
+                style={{ cell: { opacity: 0.5 } }}
+            />
+        ));
+        await settle();
+        const root = (value: string) => day(value).parentElement!;
+        expect(root("2026-08-17").classList.contains("chosen")).toBe(true);
+        expect(root("2026-08-18").classList.contains("plain")).toBe(true);
+        expect(root("2026-08-18").style.opacity).toBe("0.5");
+        await userEvent.click(byTestId(ids.monthButton));
+        await settle();
+        expect(root("8").classList.contains("chosen")).toBe(true);
+        expect(root("3").classList.contains("plain")).toBe(true);
+    });
+
     it("steps by months and years, and chooses a month from its list", async () => {
         withRegistry(() => (
             <DockedDatePicker

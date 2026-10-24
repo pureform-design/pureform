@@ -138,6 +138,32 @@ describe("DockedDatePicker, ready-made", () => {
         expect(byTestId(ids.grid)).toBeTruthy();
     });
 
+    it("takes a function of each cell in its keys, in every view", async () => {
+        withRegistry(
+            <DockedDatePicker
+                label="Date"
+                locale="en-US"
+                defaultValue={["2026-08-17"]}
+                defaultOpen
+                className={{
+                    cell: (each) => (each.selected ? "chosen" : "plain"),
+                }}
+                style={{ cell: { opacity: 0.5 } }}
+            />,
+        );
+        await settle();
+        const root = (value: string) =>
+            trigger(value).closest<HTMLElement>(
+                `[data-testid="${testIds.calendarCell.root}"]`,
+            )!;
+        expect(root("2026-08-17").classList.contains("chosen")).toBe(true);
+        expect(root("2026-08-18").classList.contains("plain")).toBe(true);
+        expect(root("2026-08-18").style.opacity).toBe("0.5");
+        await interact(() => press(byTestId(ids.monthButton)));
+        expect(root("8").classList.contains("chosen")).toBe(true);
+        expect(root("3").classList.contains("plain")).toBe(true);
+    });
+
     it("shows an error instead of the supporting text and mirrors the steps under rtl", async () => {
         withRegistry(
             <DockedDatePicker

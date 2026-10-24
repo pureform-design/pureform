@@ -26,6 +26,7 @@ import {
     todayIso,
 } from "@pureform/binding-core";
 import type {
+    CalendarInstances,
     DatePickerContentProps,
     DatePickerPart,
     DatePickerRootOwnProps,
@@ -50,8 +51,10 @@ import type {
     CalendarCellProps,
     CalendarContext,
     CalendarPartProps,
+    CalendarSlots,
     CalendarStepProps,
     CalendarTableProps,
+    CalendarWeekdaysProps,
 } from "../calendar-parts";
 import { useControllable } from "../controllable";
 import { dialogParts } from "../dialog-parts";
@@ -308,7 +311,7 @@ const calendar = calendarParts(
 );
 
 /** The weekday row; by default a Weekday per day, from the week's first. */
-const Weekdays: (props: DatePickerPartProps) => ReactNode = calendar.Weekdays;
+const Weekdays: (props: CalendarWeekdaysProps) => ReactNode = calendar.Weekdays;
 /** A weekday's label: the narrow one shown, the long one as `aria-label`. */
 const Weekday: (props: DatePickerPartProps) => ReactNode = calendar.Weekday;
 /** The grid of days; by default a Week of Cells per week of the shown month. */
@@ -335,19 +338,25 @@ const CancelTrigger: (props: PickerActionProps) => ReactNode = pickerAction(
     (name) => context.use(name).cancel,
 );
 
-/** The ready-made picker's props: Root's, with `className`, `style` and `slotProps` keyed by
- *  part, and the trigger's label, the headline, the placeholder and the actions' labels as
+/** The ready-made picker's props: Root's, with `className`, `style`, `slotProps` and `unstyled`
+ *  keyed by part (the backdrop's too, and `cell` for each calendar cell; a cell, week or weekday
+ *  also by copy, `CalendarInstances`), and the trigger's label, the headline, the placeholder and the actions' labels as
  *  content. */
 export interface DatePickerProps
     extends
         Omit<
             DatePickerRootProps,
-            keyof SlotKeyedProps<Anatomy, "backdrop"> | "children"
+            keyof SlotKeyedProps<Anatomy, Extra> | "children"
         >,
-        Omit<SlotKeyedProps<Anatomy, "backdrop">, "testId" | "unstyled">,
+        Omit<
+            SlotKeyedProps<Anatomy, Extra, CalendarInstances>,
+            "testId" | "unstyled"
+        >,
         DatePickerContentProps<ReactNode> {
     readonly testId?: TestIdOverride<DatePickerPart> | undefined;
-    readonly unstyled?: Unstyled<DatePickerPart> | undefined;
+    readonly unstyled?:
+        | Unstyled<DatePickerPart | "cell", CalendarInstances>
+        | undefined;
     /** The Cancel action, drawn as a button. */
     readonly cancelButtonProps?: ButtonInnerProps | undefined;
     /** The OK action, drawn as a button. */
@@ -356,12 +365,13 @@ export interface DatePickerProps
 
 type ButtonInnerProps = InnerPropsOf<typeof buttonAnatomy>;
 
+type Extra = "backdrop" | "cell";
+
 // Inside Root, so it can read the view and the draft.
 function ReadyMadeContent({ own }: { readonly own: DatePickerProps }) {
     const { picker, selected, locale } = context.use("Root");
-    const slot = useSlotProps(
-        own as SlotKeyedProps<ComponentAnatomy, "backdrop">,
-    );
+    const slot = useSlotProps<Anatomy, Extra, CalendarInstances>(own);
+    const slots: CalendarSlots = slot;
     const days = picker.view === "day";
     return (
         <>
@@ -422,11 +432,11 @@ function ReadyMadeContent({ own }: { readonly own: DatePickerProps }) {
                     </Controls>
                     {days ? (
                         <>
-                            <Weekdays {...slot("weekdays")} />
-                            <Grid {...slot("grid")} />
+                            <Weekdays {...slot("weekdays")} slots={slots} />
+                            <Grid {...slot("grid")} slots={slots} />
                         </>
                     ) : (
-                        <YearList {...slot("yearList")} />
+                        <YearList {...slot("yearList")} slots={slots} />
                     )}
                     <Actions {...slot("actions")}>
                         <CancelTrigger

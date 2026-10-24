@@ -288,6 +288,51 @@ describe("DatePicker, ready-made", () => {
         ).toBe(true);
     });
 
+    it("takes a function of each cell, week and weekday in its keys", async () => {
+        const views = new Set<string>();
+        withRegistry(
+            <DatePicker
+                trigger="Pick"
+                locale="en-US"
+                defaultValue={["2026-08-17"]}
+                className={{
+                    cell: (each) => {
+                        views.add(each.view);
+                        return each.selected ? "chosen" : undefined;
+                    },
+                    week: (week) => `week-${week.index}`,
+                    grid: "days",
+                }}
+                style={{
+                    weekday: (day) =>
+                        day.index === 0 ? { opacity: 0.5 } : undefined,
+                }}
+                slotProps={{
+                    cell: (each) => ({ title: String(each.value) }),
+                }}
+                unstyled={{ cell: (each) => each.value === "2026-08-18" }}
+            />,
+        );
+        await settle();
+        await open();
+        expect(cellRoot("2026-08-17").classList.contains("chosen")).toBe(true);
+        expect(cellRoot("2026-08-16").classList.contains("chosen")).toBe(false);
+        expect(cellRoot("2026-08-17").title).toBe("2026-08-17");
+        expect(cellRoot("2026-08-18").className).toBe("");
+        expect(byTestId(ids.grid).classList.contains("days")).toBe(true);
+        expect(
+            screen.getAllByTestId(ids.week)[1]!.classList.contains("week-1"),
+        ).toBe(true);
+        const days = screen.getAllByTestId(ids.weekday);
+        expect(days[0]!.style.opacity).toBe("0.5");
+        expect(days[1]!.style.opacity).toBe("");
+        await interact(() => press(byTestId(ids.viewTrigger)));
+        expect(trigger("2026").closest("[title]")?.getAttribute("title")).toBe(
+            "2026",
+        );
+        expect([...views].sort()).toEqual(["day", "year"]);
+    });
+
     it("mirrors the previous and next buttons", async () => {
         withRegistry(<DatePicker locale="en-US" defaultOpen />, "rtl");
         await settle();

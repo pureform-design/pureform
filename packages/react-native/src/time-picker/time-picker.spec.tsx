@@ -159,6 +159,46 @@ describe("time picker", () => {
     });
 });
 
+describe("time picker, by copy", () => {
+    it("takes a function of each dial label and scroll item in its style", async () => {
+        await render(
+            <TimePicker
+                defaultValue="21:05"
+                hourCycle={12}
+                style={{
+                    dialLabel: (label) =>
+                        label.selected ? { opacity: 0.5 } : undefined,
+                }}
+            />,
+        );
+        const dimmed = all("pf-time-picker-dial-label").filter(
+            (label) => getComputedStyle(label).opacity === "0.5",
+        );
+        expect(dimmed.map((label) => label.textContent)).toEqual(["9"]);
+    });
+
+    it("reaches each scroll item by its value", async () => {
+        await render(
+            <TimePicker
+                mode="scroll"
+                defaultValue="10:00"
+                hourCycle={24}
+                style={{
+                    scrollItem: (item) =>
+                        item.selected && item.view === "hour"
+                            ? { opacity: 0.5 }
+                            : undefined,
+                }}
+            />,
+        );
+        expect(
+            all("pf-time-picker-scroll-item")
+                .filter((item) => getComputedStyle(item).opacity === "0.5")
+                .map((item) => item.textContent),
+        ).toEqual(["10"]);
+    });
+});
+
 describe("time input", () => {
     it("takes a typed minute", async () => {
         const onValueChange = vi.fn();

@@ -15,6 +15,7 @@ import {
 import type {
     InteractionSourceProps,
     TimeContentProps,
+    TimePickerInstances,
     TimePickerRootOwnProps,
     TimePickerView,
 } from "@pureform/binding-core";
@@ -23,7 +24,7 @@ import type { ElementType, ReactNode } from "react";
 import { useMachineButton } from "../interaction";
 import { createPartContext } from "../part-context";
 import { machinePart, useComponent, useSlotProps } from "../parts";
-import type { ComponentScope, SlotKeyedProps } from "../parts";
+import type { ComponentScope, SlotKeyedProps, SlotPropsOf } from "../parts";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
 import { useTimeMachine } from "../time";
@@ -100,15 +101,32 @@ const Separator = span("separator", "Separator", ({ api }) =>
 /** Where the app's buttons go, such as Cancel and OK. */
 const Actions = div("actions", "Actions", ({ api }) => api.getActionsProps());
 
-/** A selector's props: a part's, and the interaction source its presses are emitted to. */
+/** A ready-made time picker's slot props for the parts inside the selectors and the dial, the
+ *  repeated ones by copy. */
+export type TimePickerSlots = SlotPropsOf<
+    "scrollItem" | "dialTrack" | "dialHandle" | "dialCenter" | "dialLabel",
+    TimePickerInstances
+>;
+
+/** A selector's props: a part's, the interaction source its presses are emitted to, and the
+ *  ready-made's slot props for its scroll items. */
 export interface TimePickerSelectorProps
-    extends TimePickerPartProps, InteractionSourceProps {}
+    extends TimePickerPartProps, InteractionSourceProps {
+    readonly slots?: TimePickerSlots | undefined;
+}
+
+/** The dial's props: a part's, and the ready-made's slot props for its track, handle, centre
+ *  and labels. */
+export interface TimePickerDialProps extends TimePickerPartProps {
+    readonly slots?: TimePickerSlots | undefined;
+}
 
 // The hour or minute selector: a toggle button choosing what the dial sets, or in scroll mode a
 // spin button with the values around the current one.
 const selector = (of: TimePickerView, name: string) =>
     function Selector({
         children,
+        slots,
         ...props
     }: TimePickerSelectorProps): ReactNode {
         const { scope, api, mode } = context.use(name);
@@ -125,6 +143,7 @@ const selector = (of: TimePickerView, name: string) =>
             api.disabled,
         );
         const items = api.scrollItems(of);
+        const each = slots?.each("scrollItem") ?? false;
         return scope.render(of === "hour" ? "hourSelector" : "minuteSelector", {
             ...button,
             element: scroll ? "div" : "button",
@@ -138,6 +157,16 @@ const selector = (of: TimePickerView, name: string) =>
                                   key={item.offset}
                                   of={of}
                                   item={item}
+                                  {...slots?.(
+                                      "scrollItem",
+                                      each
+                                          ? {
+                                                view: of,
+                                                value: item.value,
+                                                selected: item.offset === 0,
+                                            }
+                                          : undefined,
+                                  )}
                               />
                           ))
                         : items[1]!.text),
@@ -148,7 +177,9 @@ const selector = (of: TimePickerView, name: string) =>
 function ScrollItem({
     of,
     item,
-}: {
+    unstyled,
+    ...props
+}: TimePickerPartProps & {
     readonly of: TimePickerView;
     readonly item: ReturnType<TimeApi["scrollItems"]>[number];
 }): ReactNode {
@@ -156,7 +187,8 @@ function ScrollItem({
     return scope.render("scrollItem", {
         element: "span",
         machine: api.getScrollItemProps(of, item),
-        props: { children: item.text },
+        unstyled,
+        props: { ...props, children: item.text },
     });
 }
 
@@ -191,8 +223,14 @@ function Period({ period, ...props }: TimePickerPeriodProps): ReactNode {
 
 /** The dial: a slider over the hour or the minute, with its track, handle, centre and labels,
  *  placed from the time. A clock doesn't mirror, so it draws the same under `rtl`. */
-function Dial({ unstyled, ...props }: TimePickerPartProps): ReactNode {
+function Dial({ unstyled, slots, ...props }: TimePickerDialProps): ReactNode {
     const { scope, api } = context.use("Dial");
+    const each = slots?.each("dialLabel") ?? false;
+    const inner = (part: "dialTrack" | "dialHandle" | "dialCenter") => {
+        const { unstyled: own, ...rest }: TimePickerPartProps =
+            slots?.(part) ?? {};
+        return { unstyled: own, props: rest };
+    };
     return scope.render("dial", {
         element: "div",
         machine: api.getDialProps(),
@@ -204,17 +242,32 @@ function Dial({ unstyled, ...props }: TimePickerPartProps): ReactNode {
                     {scope.render("dialTrack", {
                         element: "span",
                         machine: api.getDialTrackProps(),
+                        ...inner("dialTrack"),
                     })}
                     {scope.render("dialHandle", {
                         element: "span",
                         machine: api.getDialHandleProps(),
+                        ...inner("dialHandle"),
                     })}
                     {scope.render("dialCenter", {
                         element: "span",
                         machine: api.getDialCenterProps(),
+                        ...inner("dialCenter"),
                     })}
                     {api.dialLabels.map((label) => (
-                        <DialLabel key={label.text} label={label} />
+                        <DialLabel
+                            key={label.text}
+                            label={label}
+                            {...slots?.(
+                                "dialLabel",
+                                each
+                                    ? {
+                                          value: label.value,
+                                          selected: label.selected,
+                                      }
+                                    : undefined,
+                            )}
+                        />
                     ))}
                 </>
             ),
@@ -224,14 +277,17 @@ function Dial({ unstyled, ...props }: TimePickerPartProps): ReactNode {
 
 function DialLabel({
     label,
-}: {
+    unstyled,
+    ...props
+}: TimePickerPartProps & {
     readonly label: TimeApi["dialLabels"][number];
 }): ReactNode {
     const { scope, api } = context.use("DialLabel");
     return scope.render("dialLabel", {
         element: "span",
         machine: api.getDialLabelProps(label),
-        props: { children: label.text },
+        unstyled,
+        props: { ...props, children: label.text },
     });
 }
 
@@ -240,12 +296,13 @@ export function useTimePicker(): TimeApi {
     return context.use("useTimePicker").api;
 }
 
-/** The ready-made time picker's props: Root's, with `className`, `style`, and `slotProps` keyed
- *  by part, and its content. */
+/** The ready-made time picker's props: Root's, with `className`, `style`, `slotProps` and
+ *  `unstyled` keyed by part (a dial label or scroll item also by copy, `TimePickerInstances`),
+ *  and its content. */
 export interface TimePickerProps
     extends
         Omit<TimePickerRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
-        SlotKeyedProps<Anatomy>,
+        SlotKeyedProps<Anatomy, never, TimePickerInstances>,
         TimeContentProps<ReactNode> {}
 
 /** The ready-made time picker: the headline, the selectors and the period selector (in a 12-hour
@@ -259,20 +316,21 @@ function ReadyMade(props: TimePickerProps): ReactNode {
         actions,
         ...rootProps
     } = props;
-    const slot = useSlotProps(props);
+    const slot = useSlotProps<Anatomy, never, TimePickerInstances>(props);
+    const slots: TimePickerSlots = slot;
     return (
         <Root {...rootProps} {...(slot("root") as object)}>
             <Headline {...slot("headline")}>
                 {isPresent(headline) ? headline : TIME_PICKER_HEADLINE}
             </Headline>
             <Body {...slot("body")}>
-                <HourSelector {...slot("hourSelector")} />
+                <HourSelector {...slot("hourSelector")} slots={slots} />
                 <Separator {...slot("separator")}>:</Separator>
-                <MinuteSelector {...slot("minuteSelector")} />
+                <MinuteSelector {...slot("minuteSelector")} slots={slots} />
                 <ReadyMadePeriods slot={slot} />
             </Body>
             {(props.mode ?? "dial") === "dial" ? (
-                <Dial {...slot("dial")} />
+                <Dial {...slot("dial")} slots={slots} />
             ) : null}
             {isPresent(actions) ? (
                 <Actions {...slot("actions")}>{actions}</Actions>

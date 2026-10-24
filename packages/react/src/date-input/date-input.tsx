@@ -206,9 +206,18 @@ function Container({ unstyled, ...props }: DateInputPartProps): ReactNode {
     });
 }
 
+/** The group's props: a part's, and the props each default Segment takes. */
+export interface DateInputInputProps extends DateInputPartProps {
+    readonly segmentProps?: DateInputPartProps | undefined;
+}
+
 /** The group of segments; by default a Segment per segment, in the locale's order, and the
  *  hidden input that submits the date. */
-function Input({ unstyled, ...props }: DateInputPartProps): ReactNode {
+function Input({
+    unstyled,
+    segmentProps,
+    ...props
+}: DateInputInputProps): ReactNode {
     const { scope, api, supportingTextId } = context.use("Input");
     return scope.render("input", {
         element: "div",
@@ -223,7 +232,7 @@ function Input({ unstyled, ...props }: DateInputPartProps): ReactNode {
                 <>
                     {api.getSegments().map((segment, index) => (
                         <Fragment key={`${segment.type}-${index}`}>
-                            <Segment segment={segment} />
+                            <Segment {...segmentProps} segment={segment} />
                         </Fragment>
                     ))}
                     <input {...api.getHiddenInputProps()} />
@@ -351,7 +360,7 @@ function ReadyMadeContent({ own }: { readonly own: DateInputProps }) {
                             {own.prefixText}
                         </PrefixText>
                     ) : null}
-                    <Input {...slot("input")} />
+                    <Input {...slot("input")} segmentProps={slot("segment")} />
                     {isPresent(own.suffixText) ? (
                         <SuffixText {...slot("suffixText")}>
                             {own.suffixText}
