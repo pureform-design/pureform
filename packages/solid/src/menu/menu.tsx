@@ -15,6 +15,7 @@ import {
     MENU_ITEM_PROPS,
     MENU_ROOT_PROPS,
     menuDrillLevel,
+    menuDrillPathTo,
     menuDrillPick,
     menuGrouped,
     menuItemMachineProps,
@@ -34,20 +35,22 @@ import type {
     MenuItemBehaviorProps,
     MenuRootOwnProps,
     MenuSelectDetails,
-    MenuSubmenuRoom,
     MenuVariantProps,
 } from "@pureform/binding-core";
 import {
     markMenuGroupEdges,
     menuDrillFrom,
     menuDrillTo,
-    watchMenuSubmenuRoom,
+    menuSubmenuPressed,
+    menuSubmenuRoom,
+    noteMenuSubmenuPresses,
 } from "@pureform/binding-core/dom";
 import type { MenuDrillSnapshot } from "@pureform/binding-core/dom";
 import * as menu from "@pureform/machines/menu";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {
     type Accessor,
+    createContext,
     createEffect,
     createMemo,
     createSignal,
@@ -58,6 +61,7 @@ import {
     onSettled,
     Show,
     untrack,
+    useContext,
 } from "solid-js";
 
 import { Button } from "../button";
@@ -502,10 +506,26 @@ export interface MenuItemsProps {
 
 const NO_SLOT = (): PartProps => ({});
 
+/** What a ready-made menu under `submenu="auto"` gives its cascading submenus: the container
+ *  they keep within, and what drills into one that doesn't fit. */
+interface AutoSubmenuValue {
+    readonly active: () => boolean;
+    readonly container: () => string | undefined;
+    /** The submenu items found not to fit, which drill when chosen. */
+    readonly drills: () => ReadonlySet<string>;
+    /** Notes `value` doesn't fit, and drills into it when `now`. */
+    readonly drill: (value: string, now: boolean) => void;
+}
+
+const AutoSubmenuContext = createContext<AutoSubmenuValue | null>(null);
+
 /** An `Item` per entry of `items`, with its icons, label, supporting text and trailing text, or
  *  a `Submenu` for an entry with `items` of its own: what the ready-made menu renders, for a component that holds a menu (the split button). */
 function Items(props: MenuItemsProps): JSX.Element {
     const slot = untrack(() => props.slot) ?? NO_SLOT;
+    const auto = useContext(AutoSubmenuContext);
+    const drills = (value: string) =>
+        props.drill || (auto?.active() && auto.drills().has(value));
     // Views, so every item reads the same ones.
     const itemSlot = slot("item");
     const itemLeading = slot("itemLeading");
@@ -557,7 +577,7 @@ function Items(props: MenuItemsProps): JSX.Element {
         >
             {(item) => (
                 <Show
-                    when={hasSubmenu(item()) && !props.drill}
+                    when={hasSubmenu(item()) && !drills(item().value)}
                     fallback={
                         <Show
                             when={hasSubmenu(item())}
@@ -584,6 +604,7 @@ function Items(props: MenuItemsProps): JSX.Element {
                     }
                 >
                     <Submenu>
+                        <AutoSubmenu value={item().value} />
                         <TriggerItem {...itemSlot}>
                             {parts(
                                 item,
@@ -619,29 +640,46 @@ const READY_MADE_PROPS = [
     ...MENU_CONTENT_PROPS,
 ] as const;
 
-/** Measures the room beside the open menu for `submenu="auto"` (once settled, so a server's
- *  render and hydration agree: cascading). */
-function MeasureSubmenuRoom(props: {
-    readonly onRoom: (room: MenuSubmenuRoom) => void;
-}): JSX.Element {
-    const { api } = context.use("Content");
-    let stop: (() => void) | undefined;
+/** Under `submenu="auto"`, decides as its submenu opens, before it's painted: the submenu, laid
+ *  out at its own size, cascades when it fits beside the menu and down or up from its item;
+ *  else its item drills from then on: at once when a press or a key opened it, at the next press
+ *  when the pointer resting on the item did. */
+function AutoSubmenu(props: { readonly value: string }): JSX.Element {
+    const auto = useContext(AutoSubmenuContext);
+    const child = context.use("Submenu");
+    if (!auto || !child.parent) return null;
+    const parent = child.parent;
+    noteMenuSubmenuPresses();
     createEffect(
-        () => api().open,
+        () => child.api().open,
         (open) => {
-            stop?.();
-            stop = undefined;
-            if (!open) return;
+            if (!open || !untrack(auto.active)) return;
+            const api = untrack(child.api);
             const byId = (id: unknown) =>
                 typeof id === "string" ? document.getElementById(id) : null;
-            stop = watchMenuSubmenuRoom(
-                () => byId(untrack(api).getContentProps().id),
-                () => byId(untrack(api).getTriggerProps().id),
-                props.onRoom,
+            const submenu = byId(api.getContentProps().id);
+            const menu = byId(untrack(parent.api).getContentProps().id);
+            const row = byId(api.getTriggerProps().id);
+            if (!submenu || !menu || !row) return;
+            submenu.style.visibility = "";
+            let top: MenuContextValue = parent;
+            while (top.parent) top = top.parent;
+            const room = menuSubmenuRoom(
+                menu,
+                row,
+                submenu,
+                byId(untrack(top.api).getTriggerProps().id),
+                untrack(auto.container),
             );
+            if (menuSubmenuMode("auto", room) === "cascade") return;
+            // Hidden from now, so its way out isn't seen.
+            submenu.style.visibility = "hidden";
+            // Its item drills from now on (so the submenu goes), at once when it was pressed.
+            const pressed = menuSubmenuPressed(row, menu);
+            auto.drill(props.value, pressed);
+            if (pressed) menu.focus();
         },
     );
-    onCleanup(() => stop?.());
     return null;
 }
 
@@ -693,10 +731,13 @@ function DrillMotion(props: {
  *  its submenu as `submenu` says. */
 function ReadyMade(props: MenuProps): JSX.Element {
     const auto = () => props.submenu === undefined || props.submenu === "auto";
-    const [room, setRoom] = createSignal<MenuSubmenuRoom>();
-    const drill = () => menuSubmenuMode(props.submenu, room()) === "drill";
-    // The submenu items drilled into, outermost first.
+    // The submenu items drilled into, outermost first. Once drilled into (`auto` drills into a
+    // submenu that doesn't fit as it opens), the menu stays a drill until it's back out.
     const [path, setPath] = createSignal<readonly string[]>([]);
+    const drill = () =>
+        props.submenu === "drill" || (auto() && path().length > 0);
+    // Under `auto`, the submenu items found not to fit as they opened.
+    const [drills, setDrills] = createSignal<ReadonlySet<string>>(new Set());
     const level = createMemo(() =>
         menuDrillLevel(
             props.items ?? [],
@@ -710,7 +751,10 @@ function ReadyMade(props: MenuProps): JSX.Element {
     createEffect(
         () => props.open,
         (open) => {
-            if (open === false) setPath([]);
+            if (open === false) {
+                setPath([]);
+                setDrills(new Set<string>());
+            }
         },
     );
     // The drill motion's content id and the step it starts from: plain, not reactive.
@@ -718,6 +762,18 @@ function ReadyMade(props: MenuProps): JSX.Element {
         contentId?: string | undefined;
         from?: MenuDrillSnapshot | undefined;
     } = {};
+    const drillTo = (next: readonly string[], value: string) => {
+        const content = drillState.contentId
+            ? document.getElementById(drillState.contentId)
+            : null;
+        // In: the pressed item's label goes into the header. Out: the header's goes back into
+        // the submenu's item.
+        drillState.from =
+            next.length > path().length
+                ? menuDrillFrom(content, value, MENU_BACK_VALUE)
+                : menuDrillFrom(content, MENU_BACK_VALUE, path().at(-1)!);
+        setPath(next);
+    };
     const onSelect = (details: MenuSelectDetails) => {
         const next = drill()
             ? menuDrillPick(
@@ -726,24 +782,33 @@ function ReadyMade(props: MenuProps): JSX.Element {
                   path(),
                   details.value,
               )
-            : undefined;
-        if (next) {
-            const content = drillState.contentId
-                ? document.getElementById(drillState.contentId)
-                : null;
-            // In: the pressed item's label goes into the header. Out: the header's goes back
-            // into the submenu's item.
-            drillState.from =
-                next.length > path().length
-                    ? menuDrillFrom(content, details.value, MENU_BACK_VALUE)
-                    : menuDrillFrom(content, MENU_BACK_VALUE, path().at(-1)!);
-            setPath(next);
-            return;
-        }
+            : drills().has(details.value)
+              ? menuDrillPathTo(
+                    props.items ?? [],
+                    props.groups ?? [],
+                    details.value,
+                )
+              : undefined;
+        if (next) return drillTo(next, details.value);
         props.onSelect?.(details);
     };
+    const autoSubmenu: AutoSubmenuValue = {
+        active: () => auto() && !drill(),
+        container: () => props.container,
+        drills,
+        drill: (value, now) => {
+            setDrills((before) => new Set(before).add(value));
+            const next = now
+                ? menuDrillPathTo(props.items ?? [], props.groups ?? [], value)
+                : undefined;
+            if (next) drillTo(next, value);
+        },
+    };
     const onOpenChange: MenuRootProps["onOpenChange"] = (details) => {
-        if (!details.open) setPath([]);
+        if (!details.open) {
+            setPath([]);
+            setDrills(new Set<string>());
+        }
         props.onOpenChange?.(details);
     };
     const slots = createSlotProps(props);
@@ -761,92 +826,94 @@ function ReadyMade(props: MenuProps): JSX.Element {
     const itemGroup = slots("itemGroup");
     const itemGroupLabel = slots("itemGroupLabel");
     return (
-        <Root
-            {...own}
-            onSelect={onSelect}
-            onOpenChange={onOpenChange}
-            grouped={
-                level().submenu
-                    ? props.grouped
-                    : menuGrouped(props) || props.grouped
-            }
-            {...root}
-        >
-            <Show when={isPresent(props.trigger)}>
-                <Trigger as={Button} label={props.trigger} {...trigger} />
-            </Show>
-            <Show when={isPresent(props.contextTrigger)}>
-                <ContextTrigger {...contextTrigger}>
-                    {props.contextTrigger}
-                </ContextTrigger>
-            </Show>
-            <Positioner {...positioner}>
-                <Content {...content}>
-                    <Show when={auto()}>
-                        <MeasureSubmenuRoom onRoom={setRoom} />
-                    </Show>
-                    <Show when={drill()}>
-                        <DrillMotion
-                            level={path().join("\u0000")}
-                            drill={drillState}
-                        />
-                    </Show>
-                    <Show when={drill()}>
-                        <HighlightOnDrill
-                            level={path().join("\u0000")}
-                            first={
-                                level().submenu
-                                    ? MENU_BACK_VALUE
-                                    : items()[0]?.value
-                            }
-                        />
-                    </Show>
-                    <Show when={level().submenu}>
-                        {(submenu) => (
-                            // The row that goes back out, headed by the submenu's item.
-                            <Item
-                                value={MENU_BACK_VALUE}
-                                valueText={submenu().valueText}
-                                closeOnSelect={false}
-                                {...slots("item")}
-                            >
-                                <ItemLeading mirror {...slots("itemLeading")}>
-                                    <ChevronStartIcon />
-                                </ItemLeading>
-                                <ItemContent {...slots("itemContent")}>
-                                    <ItemLabel {...slots("itemLabel")}>
-                                        {submenu().label}
-                                    </ItemLabel>
-                                </ItemContent>
-                            </Item>
-                        )}
-                    </Show>
-                    <Items items={items()} slot={slots} drill={drill()} />
-                    <For
-                        each={groups()}
-                        keyed={(group: MenuGroup<JSX.Element>) => group.id}
-                    >
-                        {(group) => (
-                            <ItemGroup {...itemGroup} id={group().id}>
-                                <Show when={isPresent(group().label)}>
-                                    <ItemGroupLabel
-                                        htmlFor={group().id}
-                                        {...itemGroupLabel}
+        <AutoSubmenuContext value={autoSubmenu}>
+            <Root
+                {...own}
+                onSelect={onSelect}
+                onOpenChange={onOpenChange}
+                grouped={
+                    level().submenu
+                        ? props.grouped
+                        : menuGrouped(props) || props.grouped
+                }
+                {...root}
+            >
+                <Show when={isPresent(props.trigger)}>
+                    <Trigger as={Button} label={props.trigger} {...trigger} />
+                </Show>
+                <Show when={isPresent(props.contextTrigger)}>
+                    <ContextTrigger {...contextTrigger}>
+                        {props.contextTrigger}
+                    </ContextTrigger>
+                </Show>
+                <Positioner {...positioner}>
+                    <Content {...content}>
+                        <Show when={drill()}>
+                            <DrillMotion
+                                level={path().join("\u0000")}
+                                drill={drillState}
+                            />
+                        </Show>
+                        <Show when={drill()}>
+                            <HighlightOnDrill
+                                level={path().join("\u0000")}
+                                first={
+                                    level().submenu
+                                        ? MENU_BACK_VALUE
+                                        : items()[0]?.value
+                                }
+                            />
+                        </Show>
+                        <Show when={level().submenu}>
+                            {(submenu) => (
+                                // The row that goes back out, headed by the submenu's item.
+                                <Item
+                                    value={MENU_BACK_VALUE}
+                                    valueText={submenu().valueText}
+                                    closeOnSelect={false}
+                                    {...slots("item")}
+                                >
+                                    <ItemLeading
+                                        mirror
+                                        {...slots("itemLeading")}
                                     >
-                                        {group().label}
-                                    </ItemGroupLabel>
-                                </Show>
-                                <Items
-                                    items={group().items}
-                                    slot={slots}
-                                    drill={drill()}
-                                />
-                            </ItemGroup>
-                        )}
-                    </For>
-                </Content>
-            </Positioner>
-        </Root>
+                                        <ChevronStartIcon />
+                                    </ItemLeading>
+                                    <ItemContent {...slots("itemContent")}>
+                                        <ItemLabel {...slots("itemLabel")}>
+                                            {submenu().label}
+                                        </ItemLabel>
+                                    </ItemContent>
+                                </Item>
+                            )}
+                        </Show>
+                        <Items items={items()} slot={slots} drill={drill()} />
+                        <For
+                            each={groups()}
+                            keyed={(group: MenuGroup<JSX.Element>) => group.id}
+                        >
+                            {(group) => (
+                                <ItemGroup {...itemGroup} id={group().id}>
+                                    <Show when={isPresent(group().label)}>
+                                        <ItemGroupLabel
+                                            htmlFor={group().id}
+                                            {...itemGroupLabel}
+                                        >
+                                            {group().label}
+                                        </ItemGroupLabel>
+                                    </Show>
+                                    <Items
+                                        items={group().items}
+                                        slot={slots}
+                                        drill={drill()}
+                                    />
+                                </ItemGroup>
+                            )}
+                        </For>
+                    </Content>
+                </Positioner>
+            </Root>
+        </AutoSubmenuContext>
     );
 }
 

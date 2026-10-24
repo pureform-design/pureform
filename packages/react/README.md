@@ -397,10 +397,15 @@ import { RichTooltip } from "@pureform/react/rich-tooltip";
   An item with `items` opens a submenu, as the ready-made's `submenu` says: `cascade` (a
   `Submenu` beside the item), `drill` (the menu shows the submenu's items in its place under a row
   that goes back, headed by the item's label; `onSelect` hears only the leaves), or `auto`, the
-  default: cascading when a submenu (as wide as the menu) fits beside the open menu, on either side,
-  within the window and any ancestor of the trigger that clips sideways (a narrow side panel
-  drills), measured once it opens, so a server's render cascades; else drilling. It replaces the
-  window-width rule (`MENU_CASCADE_MIN_WIDTH` is gone). Composed menus cascade.
+  default, decided as each submenu opens (before it's painted): it cascades when the submenu, at
+  its own measured width and height, fits beside the open menu on either side and down from its
+  item or up from it, within the window, any ancestor of the trigger that clips its overflow (a
+  narrow side panel drills), and the nearest CSS container (`container-type`), or the one the
+  ready-made's `container` names (`container-name`). Else the menu drills into it when a press or
+  a key opened it; when the pointer resting on the item did, the item drills at the next press.
+  A server's render cascades. `menuSubmenuRoom(menu, row, submenu, anchor, container)` and
+  `menuSubmenuBoundary` (`@pureform/binding-core/dom`) replace `watchMenuSubmenuRoom` and the
+  old two-argument `menuSubmenuRoom`. Composed menus cascade.
 - **The tooltip** opens on hover after `openDelay` (400 ms), on keyboard focus, and on a touch held
   on the trigger (500 ms, as React Native's long press; a plain one goes 1.5 s after), and points the
   trigger's `aria-describedby` at itself. The ready-made renders `supportingText` in its part, and

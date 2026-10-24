@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
     MENU_BACK_VALUE,
     menuDrillLevel,
+    menuDrillPathTo,
     menuDrillPick,
     menuSubmenuMode,
     menuSubmenuRoomOf,
@@ -38,6 +39,45 @@ describe("menuSubmenuRoomOf", () => {
             menuSubmenuRoomOf({ left: 20, right: 300 }, { left: 0, right: 320 })
                 .beside,
         ).toBe(20);
+    });
+
+    it("measures the submenu's own size beside its row, down from its top or up from its bottom", () => {
+        const boundary = { left: 0, right: 1000, top: 0, bottom: 600 };
+        const menu = { left: 100, right: 300 };
+        const room = (top: number, width: number, height: number) =>
+            menuSubmenuRoomOf(menu, boundary, {
+                row: { top, bottom: top + 48 },
+                size: { width, height },
+            });
+        // A submenu wider than its menu, which still fits beside it.
+        expect(room(100, 500, 200)).toEqual({
+            beside: 700,
+            needed: 500,
+            upright: 500,
+            neededHeight: 200,
+        });
+        expect(menuSubmenuMode("auto", room(100, 500, 200))).toBe("cascade");
+        // Too wide for either side.
+        expect(menuSubmenuMode("auto", room(100, 800, 200))).toBe("drill");
+        // Near the bottom it opens upward from the row's bottom instead.
+        expect(menuSubmenuMode("auto", room(500, 200, 400))).toBe("cascade");
+        // Taller than the room either way: it drills.
+        expect(room(250, 200, 400).upright).toBe(350);
+        expect(menuSubmenuMode("auto", room(250, 200, 400))).toBe("drill");
+        // No top or bottom: unbounded downward.
+        expect(
+            menuSubmenuMode(
+                "auto",
+                menuSubmenuRoomOf(
+                    menu,
+                    { left: 0, right: 1000 },
+                    {
+                        row: { top: 0, bottom: 48 },
+                        size: { width: 200, height: 5000 },
+                    },
+                ),
+            ),
+        ).toBe("cascade");
     });
 });
 
@@ -109,5 +149,44 @@ describe("menuDrillPick", () => {
         expect(menuDrillPick(items, [], ["share"], "mail")).toBeUndefined();
         // A stale path ends where it stops opening submenus.
         expect(menuDrillPick(items, [], ["gone"], "share")).toEqual(["share"]);
+    });
+});
+
+describe("menuDrillPathTo", () => {
+    it("finds a submenu item at any depth, and nothing for a leaf", () => {
+        const items = [
+            { value: "cut", label: "Cut" },
+            {
+                value: "share",
+                label: "Share",
+                items: [
+                    {
+                        value: "social",
+                        label: "Social",
+                        items: [{ value: "post", label: "Post" }],
+                    },
+                ],
+            },
+        ];
+        const groups = [
+            {
+                id: "more",
+                items: [
+                    {
+                        value: "tools",
+                        label: "Tools",
+                        items: [{ value: "x", label: "X" }],
+                    },
+                ],
+            },
+        ];
+        expect(menuDrillPathTo(items, groups, "share")).toEqual(["share"]);
+        expect(menuDrillPathTo(items, groups, "social")).toEqual([
+            "share",
+            "social",
+        ]);
+        expect(menuDrillPathTo(items, groups, "tools")).toEqual(["tools"]);
+        expect(menuDrillPathTo(items, groups, "cut")).toBeUndefined();
+        expect(menuDrillPathTo(items, groups, "post")).toBeUndefined();
     });
 });

@@ -386,6 +386,7 @@ export {
     menuItemProps,
     menuMachineProps,
     menuSelection,
+    menuDrillPathTo,
     menuDrillPick,
     menuSubmenuMode,
     menuSubmenuRoomOf,
@@ -402,6 +403,7 @@ export type {
     MenuRootOwnProps,
     MenuSelectDetails,
     MenuSubmenu,
+    MenuSubmenuBox,
     MenuSubmenuRoom,
     MenuVariantProps,
 } from "./components/menu";

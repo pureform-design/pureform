@@ -566,26 +566,156 @@ describe("Menu, submenus", () => {
         expect(share.getAnimations()).toHaveLength(1);
     });
 
-    it("cascades by default when a submenu fits beside the open menu, and drills when its container is narrow", async () => {
+    // The submenu as it opens: its content shown, or drilled into (the rows read the submenu's).
+    const openShare = async (view: () => unknown) => {
+        await userEvent.keyboard("{Escape}{Escape}");
+        await frames();
+        document.body.innerHTML = "";
+        withRegistry(view);
+        await userEvent.click(byTestId(ids.trigger));
+        await frames(4);
+        await userEvent.keyboard("{ArrowDown}{ArrowDown}");
+        await settle();
+        await userEvent.keyboard("{ArrowRight}");
+        await frames(4);
+    };
+    const cascaded = () =>
+        contents().length === 2 &&
+        !contents()[1]!.hidden &&
+        contents()[1]!.style.visibility !== "hidden";
+
+    it("cascades by default when a submenu fits beside the open menu, and drills as it opens when its container is narrow", async () => {
         try {
             await page.viewport(1000, 800);
-            withRegistry(() => <Menu trigger="Edit" items={NESTED} />);
-            await userEvent.click(byTestId(ids.trigger));
-            await frames(6);
-            expect(contents()).toHaveLength(2);
-            await userEvent.keyboard("{Escape}");
+            await openShare(() => <Menu trigger="Edit" items={NESTED} />);
+            expect(cascaded()).toBe(true);
+            // A wide window, but the menu sits in a narrow panel that clips it: the press drills.
+            await openShare(() => (
+                <div
+                    style={{
+                        width: "70px",
+                        height: "300px",
+                        overflow: "hidden",
+                    }}
+                >
+                    <Menu trigger="Edit" items={NESTED} />
+                </div>
+            ));
+            expect(labels()).toEqual(["Share", "Mail", "Copy link"]);
+            expect(contents()).toHaveLength(1);
+            // The keys go on in the menu.
+            expect(document.activeElement).toBe(contents()[0]);
+            // Back out, the item still drills: the submenu doesn't fit there.
+            await userEvent.click(items()[0]!);
             await frames();
+            expect(labels()).toEqual(["Cut", "Share"]);
+            expect(contents()).toHaveLength(1);
+            // The pointer resting on it doesn't drill, nor show a submenu that doesn't fit; a
+            // click then does.
+            await userEvent.keyboard("{Escape}");
             document.body.innerHTML = "";
-            // A wide window, but the menu sits in a narrow panel that clips it.
             withRegistry(() => (
-                <div style={{ width: "70px", overflow: "hidden" }}>
+                <div
+                    style={{
+                        width: "70px",
+                        height: "300px",
+                        overflow: "hidden",
+                    }}
+                >
                     <Menu trigger="Edit" items={NESTED} />
                 </div>
             ));
             await userEvent.click(byTestId(ids.trigger));
-            await frames(6);
+            await frames(4);
+            await userEvent.hover(items()[1]!);
+            await frames(10);
+            expect(labels().slice(0, 2)).toEqual(["Cut", "Share"]);
+            expect(cascaded()).toBe(false);
+            await userEvent.hover(items()[0]!);
+            await userEvent.click(items()[1]!);
+            await frames(4);
+            expect(labels()).toEqual(["Share", "Mail", "Copy link"]);
+        } finally {
+            await page.viewport(414, 896);
+        }
+    });
+
+    it("measures the submenu's own width and height as it opens", async () => {
+        const wide = [
+            NESTED[0]!,
+            {
+                value: "share",
+                label: "Share",
+                items: [
+                    {
+                        value: "mail",
+                        label: "Mail it to everyone on the list, with a long note attached at the end",
+                    },
+                ],
+            },
+        ];
+        const tall = [
+            NESTED[0]!,
+            {
+                value: "share",
+                label: "Share",
+                items: Array.from({ length: 24 }, (_, i) => ({
+                    value: `to-${i}`,
+                    label: `To ${i}`,
+                })),
+            },
+        ];
+        try {
+            await page.viewport(1000, 800);
+            const panel = (items_: typeof NESTED, style: object) => (
+                <div style={{ overflow: "hidden", ...style }}>
+                    <Menu trigger="Edit" items={items_} />
+                </div>
+            );
+            // A 400 px panel has room for a submenu as wide as the menu, not for a wider one.
+            await openShare(() => panel(NESTED, { width: "400px" }));
+            expect(cascaded()).toBe(true);
+            await openShare(() => panel(wide, { width: "400px" }));
+            expect(labels()[0]).toBe("Share");
             expect(contents()).toHaveLength(1);
-            expect(items()[1]!.getAttribute("aria-haspopup")).toBe("menu");
+            // A short panel has no room for a tall submenu, down or up.
+            await openShare(() => panel(tall, { height: "160px" }));
+            expect(labels()[0]).toBe("Share");
+            expect(labels()).toHaveLength(25);
+        } finally {
+            await page.viewport(414, 896);
+        }
+    });
+
+    it("keeps within the nearest container, or the one `container` names", async () => {
+        try {
+            await page.viewport(1000, 800);
+            const nested = (container?: string) => (
+                <div
+                    style={{
+                        "container-type": "inline-size",
+                        "container-name": "page",
+                        width: "900px",
+                    }}
+                >
+                    <div
+                        style={{
+                            "container-type": "inline-size",
+                            width: "90px",
+                        }}
+                    >
+                        <Menu
+                            trigger="Edit"
+                            items={NESTED}
+                            {...(container ? { container } : {})}
+                        />
+                    </div>
+                </div>
+            );
+            await openShare(() => nested());
+            expect(labels()).toEqual(["Share", "Mail", "Copy link"]);
+            await openShare(() => nested("page"));
+            expect(cascaded()).toBe(true);
         } finally {
             await page.viewport(414, 896);
         }

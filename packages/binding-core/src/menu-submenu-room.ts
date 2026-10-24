@@ -1,54 +1,98 @@
-// The room a ready-made menu's `submenu="auto"` reads: beside the open menu, up to the edges of
-// what bounds it (the window, and any ancestor of its anchor that clips sideways, such as a side
-// panel that scrolls), measured once the menu has been placed and again as the window resizes.
+// The room a ready-made menu's `submenu="auto"` reads as a cascading submenu opens: beside the
+// open menu and down or up from the submenu's item, up to the edges of what bounds it (the
+// window, any ancestor of the menu's anchor that clips its overflow, such as a side panel that
+// scrolls, and the nearest container, or the one named), for the submenu's own size.
 
 import { menuSubmenuRoomOf } from "./components/menu";
-import type { MenuSubmenuRoom } from "./components/menu";
+import type { MenuSubmenuBox, MenuSubmenuRoom } from "./components/menu";
 
-/** The room beside `content` (the open menu), bounded by the window and by the ancestors of
- *  `anchor` (its trigger) that clip their overflow sideways. */
-export const menuSubmenuRoom = (
-    content: Element,
+const named = (element: Element, container: string | undefined): boolean => {
+    const style = getComputedStyle(element);
+    if (container === undefined)
+        return style.containerType !== "" && style.containerType !== "normal";
+    return style.containerName.split(/\s+/).includes(container);
+};
+
+/** What bounds a submenu of the menu opened from `anchor`: the window, the ancestors of `anchor`
+ *  that clip their overflow (on each axis they clip), and the nearest container (an ancestor with
+ *  a CSS `container-type`), or the ancestor whose `container-name` is `container`. */
+export const menuSubmenuBoundary = (
     anchor?: Element | null,
-): MenuSubmenuRoom => {
+    container?: string,
+): Required<MenuSubmenuBox> => {
     let left = 0;
+    let top = 0;
     let right = document.documentElement.clientWidth || window.innerWidth;
+    let bottom = document.documentElement.clientHeight || window.innerHeight;
+    let contained = false;
     for (
         let element = anchor?.parentElement;
         element && element !== document.body;
         element = element.parentElement
     ) {
-        if (getComputedStyle(element).overflowX === "visible") continue;
+        const style = getComputedStyle(element);
+        const isContainer = !contained && named(element, container);
+        const clipsX = style.overflowX !== "visible";
+        const clipsY = style.overflowY !== "visible";
+        if (!isContainer && !clipsX && !clipsY) continue;
         const box = element.getBoundingClientRect();
-        left = Math.max(left, box.left);
-        right = Math.min(right, box.right);
+        if (isContainer || clipsX) {
+            left = Math.max(left, box.left);
+            right = Math.min(right, box.right);
+        }
+        if (isContainer || clipsY) {
+            top = Math.max(top, box.top);
+            bottom = Math.min(bottom, box.bottom);
+        }
+        contained ||= isContainer;
     }
-    return menuSubmenuRoomOf(content.getBoundingClientRect(), { left, right });
+    return { left, right, top, bottom };
 };
 
-/** Measures the open menu's room once it has been placed (two frames on), and again on each
- *  resize of the window, calling `onRoom`; returns what stops it. */
-export const watchMenuSubmenuRoom = (
-    content: () => Element | null | undefined,
-    anchor: () => Element | null | undefined,
-    onRoom: (room: MenuSubmenuRoom) => void,
-): (() => void) => {
-    let frame = 0;
-    const measure = () => {
-        cancelAnimationFrame(frame);
-        frame = requestAnimationFrame(() => {
-            frame = requestAnimationFrame(() => {
-                const element = content();
-                if (!element || element.getBoundingClientRect().width === 0)
-                    return;
-                onRoom(menuSubmenuRoom(element, anchor()));
-            });
-        });
-    };
-    measure();
-    window.addEventListener("resize", measure);
-    return () => {
-        cancelAnimationFrame(frame);
-        window.removeEventListener("resize", measure);
-    };
+/** The room a cascading submenu (`submenu`, open and laid out at its own size) has beside its
+ *  menu (`menu`) from its item (`row`), within `menuSubmenuBoundary(anchor, container)`. A
+ *  submenu not laid out yet counts as fitting (`undefined`). */
+export const menuSubmenuRoom = (
+    menu: Element,
+    row: Element,
+    submenu: Element,
+    anchor?: Element | null,
+    container?: string,
+): MenuSubmenuRoom | undefined => {
+    const size = submenu.getBoundingClientRect();
+    if (size.width === 0) return undefined;
+    return menuSubmenuRoomOf(
+        menu.getBoundingClientRect(),
+        menuSubmenuBoundary(anchor, container),
+        { row: row.getBoundingClientRect(), size },
+    );
+};
+
+let pressed: { at: number; target: EventTarget | null; key: boolean } = {
+    at: -Infinity,
+    target: null,
+    key: false,
+};
+const PRESS_KEYS = new Set(["Enter", " ", "ArrowRight", "ArrowLeft"]);
+const notePress = (event: Event) => {
+    const key = event instanceof KeyboardEvent;
+    if (key && !PRESS_KEYS.has(event.key)) return;
+    pressed = { at: performance.now(), target: event.target, key };
+};
+
+/** Whether a submenu opening now was opened by a press in the last half second (a pointer down
+ *  on its item `row`, or Enter, Space or a sideways arrow in its `menu`) rather than the pointer
+ *  resting on its item. */
+export const menuSubmenuPressed = (row: Element, menu: Element): boolean =>
+    performance.now() - pressed.at < 500 &&
+    pressed.target instanceof Node &&
+    (pressed.key ? menu : row).contains(pressed.target);
+
+/** Starts noting presses for `menuSubmenuPressed` (once per document; later calls do nothing). */
+export const noteMenuSubmenuPresses = (): void => {
+    const doc = document as Document & { pfMenuPresses?: true };
+    if (doc.pfMenuPresses) return;
+    doc.pfMenuPresses = true;
+    doc.addEventListener("pointerdown", notePress, true);
+    doc.addEventListener("keydown", notePress, true);
 };

@@ -143,36 +143,67 @@ export const submenuPositioning = (
 
 /** How the ready-made menu opens a submenu: `cascade` beside its item, `drill` in the menu's
  *  place (the submenu's items under a row that goes back, headed by the item's label), `auto`
- *  cascading when there's room beside the menu, else drilling. */
+ *  deciding as the submenu opens: cascading when it fits beside the menu (across and down or up
+ *  from its item, within its container and the window), else drilling. */
 export type MenuSubmenu = "cascade" | "drill" | "auto";
 
 /** The room a cascading submenu has: the widest side beside the open menu (px, to the edge of
- *  what bounds it: its container, or the window), and what a submenu needs there (the menu's own
- *  width; Material's submenus are menus alike). */
+ *  what bounds it: its container, or the window) and the submenu's own width; and, once the
+ *  submenu has been measured beside its item, the taller of the room down from the item's top
+ *  and up from its bottom (where it opens, or flips to), and the submenu's own height. */
 export interface MenuSubmenuRoom {
     readonly beside: number;
     readonly needed: number;
+    readonly upright?: number;
+    readonly neededHeight?: number;
 }
 
-/** The room beside a `menu` box inside a `boundary` box (both along the screen's x axis). */
+/** A box along the screen's axes; a boundary's `top` and `bottom` are optional (unbounded). */
+export interface MenuSubmenuBox {
+    readonly left: number;
+    readonly right: number;
+    readonly top?: number;
+    readonly bottom?: number;
+}
+
+/** The room beside a `menu` box inside a `boundary` box for a submenu of `size` opening beside
+ *  the item `row`. Without them, what a submenu needs across is the menu's own width (a guess,
+ *  for a submenu not measured yet), and its height doesn't count. */
 export const menuSubmenuRoomOf = (
-    menu: { readonly left: number; readonly right: number },
-    boundary: { readonly left: number; readonly right: number },
+    menu: MenuSubmenuBox,
+    boundary: MenuSubmenuBox,
+    submenu?: {
+        readonly row: { readonly top: number; readonly bottom: number };
+        readonly size: { readonly width: number; readonly height: number };
+    },
 ): MenuSubmenuRoom => ({
     beside: Math.max(boundary.right - menu.right, menu.left - boundary.left, 0),
-    needed: menu.right - menu.left,
+    needed: submenu ? submenu.size.width : menu.right - menu.left,
+    ...(submenu
+        ? {
+              upright: Math.max(
+                  (boundary.bottom ?? Infinity) - submenu.row.top,
+                  submenu.row.bottom - (boundary.top ?? -Infinity),
+                  0,
+              ),
+              neededHeight: submenu.size.height,
+          }
+        : {}),
 });
 
-/** What `submenu` comes to given the `room` the open menu has (`undefined` before it's measured,
+/** What `submenu` comes to given the `room` a submenu has (`undefined` before it's measured,
  *  as when rendering on a server: cascading). `auto` cascades when a submenu fits beside the
- *  menu, on either side, and drills when it doesn't. */
+ *  menu, on either side, and down or up from its item; it drills when it doesn't. */
 export const menuSubmenuMode = (
     submenu: MenuSubmenu | undefined,
     room: MenuSubmenuRoom | undefined,
 ): "cascade" | "drill" =>
     submenu === "cascade" || submenu === "drill"
         ? submenu
-        : room !== undefined && room.beside < room.needed
+        : room !== undefined &&
+            (room.beside < room.needed ||
+                (room.neededHeight !== undefined &&
+                    (room.upright ?? 0) < room.neededHeight))
           ? "drill"
           : "cascade";
 
@@ -230,6 +261,28 @@ export const menuDrillPick = <Node>(
         : undefined;
 };
 
+/** The drill path into the submenu item `value`, wherever it is (a cascaded submenu's own
+ *  submenu included): the values of the submenu items around it, outermost first, then its own;
+ *  `undefined` when no item with a submenu has that value. */
+export const menuDrillPathTo = <Node>(
+    items: readonly MenuItem<Node>[],
+    groups: readonly MenuGroup<Node>[],
+    value: string,
+): readonly string[] | undefined => {
+    const find = (
+        level: readonly MenuItem<Node>[],
+    ): readonly string[] | undefined => {
+        for (const entry of level) {
+            if (!hasSubmenu(entry)) continue;
+            if (entry.value === value) return [value];
+            const inner = find(entry.items ?? []);
+            if (inner) return [entry.value, ...inner];
+        }
+        return undefined;
+    };
+    return find([...items, ...groups.flatMap((group) => group.items)]);
+};
+
 /** A group of the ready-made menu's items, with an optional label. */
 export interface MenuGroup<Node = unknown> {
     /** Its id among the groups, which its label's id is built from. */
@@ -253,8 +306,13 @@ export interface MenuContentProps<Node> {
     readonly groups?: readonly MenuGroup<Node>[] | undefined;
     /** How an item with `items` opens its submenu: `cascade` beside it, `drill` in the menu's
      *  place under a row that goes back, `auto` cascading when a submenu fits beside the
-     *  open menu (within its container and the window), else drilling. @default "auto" */
+     *  open menu, measured as it opens (within its container and the window), else drilling.
+     *  @default "auto" */
     readonly submenu?: MenuSubmenu | undefined;
+    /** The container `auto` keeps a cascading submenu within, by name (on the web an ancestor's
+     *  CSS `container-name`; on React Native a `PureformContainer`'s `name`). Default: the
+     *  nearest container. */
+    readonly container?: string | undefined;
 }
 
 /** The keys of `MenuContentProps`. */
@@ -264,6 +322,7 @@ export const MENU_CONTENT_PROPS = [
     "items",
     "groups",
     "submenu",
+    "container",
 ] as const satisfies readonly (keyof MenuContentProps<unknown>)[];
 
 /** The menu's registry selection from Root's props. */
