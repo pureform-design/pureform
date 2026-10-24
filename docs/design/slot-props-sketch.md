@@ -38,11 +38,19 @@ interface CustomizeProps<C> {
 // React Native
 interface CustomizeProps<C> {
     readonly style?: SlotKeyed<C, NativeStyle>;           // ViewStyle or TextStyle per part
+    readonly slotProps?: SlotKeyed<C, NativePartProps>;   // ViewProps, TextProps, PressableProps… per part
     readonly testId?: TestIdOverride<C>;
     readonly tokens?: InstanceTokens<C>;
-    // slotProps: later; className / unstyled: web only
+    // className / unstyled: web only
 }
 ```
+
+React Native `slotProps` follows the web's override rule: the component wins for state and
+accessibility props (`accessibilityRole`, `accessibilityState`, `aria-*`) and for what it depends
+on (`ref`, measuring `onLayout`, overlay `pointerEvents`); handlers (`onPress`, `onFocus`, …) are
+composed, the component's first. The compose is built only when a handler is passed, and the
+merged props are memoized like `style`. Each component declares a part -> host props map by hand
+(the anatomy doesn't record it), which also picks `ViewStyle` or `TextStyle` for keyed `style`.
 
 No recursive type is needed. Nesting deeper works because an inner component's `<key>Props` can
 hold its own `<key>Props`, whenever that component is a ready-made one.
