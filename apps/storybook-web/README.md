@@ -13,16 +13,15 @@ omni run test:e2e -p @pureform/storybook-web
 # one renderer, some components (by their generated files):
 bunx vitest run -c vitest.config.storybook.ts --project storybook/solid \
     src/stories/generated/Button.stories.ts src/stories/generated/Menu.stories.ts
-# React Native's tests are off (below); run them anyway:
-SB_RENDERERS=native bunx vitest run -c vitest.config.storybook.ts --project storybook/native \
+bunx vitest run -c vitest.config.storybook.ts --project storybook/native \
     src/stories/generated/TextField.stories.ts
 ```
 
-**React Native skipped for now; needs renderer-neutral readers.** Its stories still draw (the
-toolbar's React Native), but without the generated plays (`casePlays: false`) and outside the
-story tests (`tests: false` in `stories.config.ts`): the cases read the web bindings' DOM (a
-button's `aria-pressed`, the switch's native input, the field's `data-pf-filled`), which React
-Native Web doesn't draw.
+**Every renderer runs the plays.** The cases read state through ARIA only (roles, `aria-checked`,
+`aria-pressed`, `aria-selected`, `aria-expanded`, `aria-current`, `aria-valuenow`, accessible
+names, a textbox's value), so the same play reads Solid's, React's and React Native Web's DOM.
+What a platform can't do is a narrow skip in `stories.config.ts`, with its reason
+(`parameters.pureform.skip[renderer][story]`, below).
 
 ## How it fits together
 
@@ -80,7 +79,8 @@ false` when the story has the arg, so Storybook doesn't infer one; left out
       or `opened` gets a canvas at least `overlayHeight` tall (`parameters.pureform.height`,
       drawn by the shared hook), so a menu, a sheet or a dialog opens inside it. The cases act
       through `storybook/test`'s `userEvent` (`createCases(userEvent)`, `src/renderers/plays.ts`).
-    - **`stories.config.ts`**, overrides only: renderers (`casePlays`, `tests`, `scenes`), `include`,
+    - **`stories.config.ts`**, overrides only: renderers (`casePlays`, `tests`, `scenes`; both
+      default to on), `include`,
       `skip` (by component, with the reason), `schemes` for every component, `overlayHeight`,
       and `controls` (the renderer whose exports give the props), and per component `title`
       (a group, `Plain form/Input`, or a name apart from one differing only in case; the
@@ -90,10 +90,18 @@ false` when the story has the arg, so Storybook doesn't infer one; left out
       `hooks`, and `stories` (fields by export name; `tags` are written into the file, where
       Storybook's indexer reads them, so `tags: ["!test"]` keeps a story out of the tests).
 
+    A renderer's **skips** go in a component's `parameters.pureform.skip`, by renderer and
+    story export name (`"*"`: every story): `{ play: reason }` skips that story's play there,
+    and `{ a11y: { rule: reason } }` turns those axe rules off there (`RendererSkip` in
+    `src/renderers/compose.ts`). Only for what the platform can't do: React Native doesn't
+    bubble a press to a composite's root (`NO_BUBBLING`), has no file input, draws a disabled
+    field's label as plain text. A renderer without the component (it draws "isn't
+    implemented") runs no play.
+
     A renderer's **`scenes`** (`{ module, components }`) name the components whose case carries
-      data, not props of the binding's export (`Toast`'s `toasts`, `GridList`'s `tiles`): the story
-      draws the module's export of that name, which builds the toaster or the tiles
-      (`src/<renderer>/scenes.ts`, the suites' `ToastScene` and `GridListScene`).
+    data, not props of the binding's export (`Toast`'s `toasts`, `GridList`'s `tiles`): the story
+    draws the module's export of that name, which builds the toaster or the tiles
+    (`src/<renderer>/scenes.ts`, the suites' `ToastScene` and `GridListScene`).
 
     A hand-written `src/stories/*.stories.ts` with the same `title` replaces the generated file;
     the script never writes outside `generated/`.
@@ -182,8 +190,9 @@ context)` renders the component under `context.decorators` (each called with the
 2. Give the binding a `storybook` export (`package.json` export and its build's entry) with
    at least the provider decorator, mapping the theme to its provider's props.
 3. Add it to `stories.config.ts`'s `renderers` (`package`, `adapter`, `export`, `hooks`, and
-   `casePlays: false` if the cases can't read its DOM, `tests: false` to keep it out of the
-   story tests; the Vitest projects come from this list), and to the `renderer` toolbar items
+   `casePlays: false` only while a gap in its ARIA keeps the plays from reading it (better:
+   fix the binding, or skip the story narrowly), `tests: false` to keep it out of the story
+   tests; the Vitest projects come from this list), and to the `renderer` toolbar items
    in `.storybook/preview.ts`.
 4. Its compiler in `.storybook/main.ts`: Svelte's and Vue's plugins claim their own extensions;
    another JSX renderer gets a path list like `SOLID`, excluded from React's plugin.
