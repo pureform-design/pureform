@@ -102,8 +102,10 @@ describe("ListItem, setup cost", () => {
         // and go, the classes, the source's handlers, and the contexts. It was 144 before the
         // parts shared their slot props, dropped their extra memos, and built the leading content
         // once. The leading avatar is now a root, with the loaded signal its fallback hides for
-        // (c7c: it was one part), which is the 7 over the earlier 68. Lower it when it drops.
-        expect(nodes).toBeLessThanOrEqual(75);
+        // (c7c: it was one part), which is the 7 over the earlier 68; its initials are in its
+        // Fallback part, as React's are (slot-e: they sat in the root), 4 more. Lower it when it
+        // drops.
+        expect(nodes).toBeLessThanOrEqual(79);
         expect(nodes).toBeGreaterThan(40);
     });
 });
