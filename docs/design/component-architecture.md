@@ -2389,7 +2389,7 @@ mounts (React's 1,000-item mount re-rendered every surface once before).
 
 - `@pureform/binding-core/interaction`: the source and its state, framework-free.
 - `@pureform/binding-core/indication`: `Indication`, `defineIndication`, the tokens, and the
-  built-ins without live halves; no DOM types (`IndicationPlatform` leaves the element type to
+  built-ins without live halves; no DOM types (`Indication<E>` leaves the element type to
   the platform).
 - `@pureform/binding-dom/indication`: the built-ins' web halves (the ripple, over
   `createRipple`), `webIndication`, and the `IndicationHost` the web bindings share. React
