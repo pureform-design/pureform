@@ -7,7 +7,8 @@
 // props stay the same, and nothing at all for a part the user doesn't customize.
 
 import type { ComponentAnatomy } from "@pureform/anatomy";
-import type { InnerProps } from "@pureform/binding-core";
+import { forInstance, isPerInstance } from "@pureform/binding-core";
+import type { InnerProps, PerInstance } from "@pureform/binding-core";
 import { StyleSheet } from "react-native";
 import type {
     ImageProps,
@@ -65,12 +66,20 @@ export type NativePartProps<H extends NativeHost> = Partial<
 
 /** A ready-made's per-part props on React Native: `style` and `slotProps` keyed by its parts
  *  (`style={{ root: { margin: 8 }, label: { fontWeight: "600" } }}`). */
-export interface NativeSlotProps<H extends PartHosts<H>> {
+export interface NativeSlotProps<H extends PartHosts<H>, I = {}> {
     readonly style?:
-        | { readonly [P in keyof H]?: NativePartStyle<H[P]> }
+        | {
+              readonly [P in keyof H]?: P extends keyof I
+                  ? PerInstance<NativePartStyle<H[P]>, I[P]>
+                  : NativePartStyle<H[P]>;
+          }
         | undefined;
     readonly slotProps?:
-        | { readonly [P in keyof H]?: NativePartProps<H[P]> }
+        | {
+              readonly [P in keyof H]?: P extends keyof I
+                  ? PerInstance<NativePartProps<H[P]>, I[P]>
+                  : NativePartProps<H[P]>;
+          }
         | undefined;
 }
 
@@ -118,27 +127,34 @@ const compose = (own: Handler, user: Handler): Handler =>
         return user(...args);
     });
 
-/** A component's parts, customized by the user's keyed `style` and `slotProps`. */
+/** A component's parts, customized by the user's keyed `style` and `slotProps`. A repeated part's
+ *  copy passes what it is (`instance`), which a function of the copy is called with; build it only
+ *  when `each(part)` says one was passed. */
 export interface PartSlots {
     /** The user's props for `part`, to spread first on its element, so what the component sets
      *  after wins. The same object while `slotProps` is. */
-    props(part: string): object;
+    props(part: string, instance?: unknown): object;
     /** `own` (the part's own style) with the user's style for `part` over it; `own` itself when
      *  there's none. */
-    style<S>(part: string, own: S): S;
+    style<S>(part: string, own: S, instance?: unknown): S;
     /** A handler the component sets on `part`, run before the user's own of that name; `own`
      *  itself when the user has none. */
-    on<F>(part: string, name: string, own: F): F;
+    on<F>(part: string, name: string, own: F, instance?: unknown): F;
     /** Props the component spreads on `part` (its press handlers), with the user's handlers of
      *  the same names composed after its own; `own` itself when the user has none. */
-    with<O>(part: string, own: O): O;
+    with<O>(part: string, own: O, instance?: unknown): O;
+    /** Whether a function of the copy was passed for this repeated part, so its copy is needed. */
+    each(part: string): boolean;
 }
+
+const never = () => false;
 
 const plain: PartSlots = {
     props: () => EMPTY,
     style: (_part, own) => own,
     on: (_part, _name, own) => own,
     with: (_part, own) => own,
+    each: never,
 };
 
 const same = (part: string) => part;
@@ -148,12 +164,15 @@ const build = (
     slotProps: Dict,
     keyOf: (part: string) => string,
 ): PartSlots => {
-    const userProps = (part: string) =>
-        (slotProps[keyOf(part)] as Dict | undefined) ?? EMPTY;
+    const userProps = (part: string, instance?: unknown) =>
+        (forInstance(slotProps[keyOf(part)], instance) as Dict | undefined) ??
+        EMPTY;
+    const keyed = [style, slotProps];
     return {
         props: userProps,
-        style: (part, own) => {
-            const user = style[keyOf(part)];
+        each: (part) => isPerInstance(keyed, keyOf(part)),
+        style: (part, own, instance) => {
+            const user = forInstance(style[keyOf(part)], instance);
             if (user == null) return own;
             const base = (own ?? EMPTY) as object;
             return cached(styles, base, user as object, () => ({
@@ -163,15 +182,15 @@ const build = (
                 ...StyleSheet.flatten(user as StyleProp<ViewStyle>),
             })) as typeof own;
         },
-        on: (part, name, own) => {
-            const user = userProps(part)[name];
+        on: (part, name, own, instance) => {
+            const user = userProps(part, instance)[name];
             if (!isHandler(name, user)) return own;
             // A handler the component doesn't set this time is the user's alone.
             if (typeof own !== "function") return (own ?? user) as typeof own;
             return compose(own as Handler, user) as typeof own;
         },
-        with: (part, own) => {
-            const user = userProps(part);
+        with: (part, own, instance) => {
+            const user = userProps(part, instance);
             if (user === EMPTY || own == null) return own;
             const base = own as Dict;
             let any = false;

@@ -1049,8 +1049,10 @@ export {
 export type { MotionSetting } from "./motion";
 export { GLYPH_PATHS, TOAST_GLYPH_PATHS } from "./glyphs";
 export {
+    forInstance,
     forSlot,
     isIconPart,
+    isPerInstance,
     isUnstyled,
     outsideRootMessage,
     overDefaults,
@@ -1062,9 +1064,12 @@ export {
 } from "./parts";
 export type {
     InnerProps,
+    PartInstances,
     PartSourcesInput,
     PartStates,
+    PerInstance,
     SlotKeyed,
+    SlotKeyedEach,
     StateAttributes,
     Unstyled,
 } from "./parts";

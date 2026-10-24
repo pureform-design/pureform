@@ -92,6 +92,7 @@ export type {
     IconStyle,
     MotionSetting,
     PartStates,
+    PerInstance,
     SlotKeyed,
     Unstyled,
 } from "@pureform/binding-core";

@@ -68,6 +68,7 @@ export type {
     CustomizeProps,
     InnerPropsOf,
     SlotKeyedProps,
+    SlotPropsOf,
     UnstyledComponentOptions,
 } from "./parts";
 export { combinePartProps, mergePartProps, mergeStyles } from "./props";
@@ -97,6 +98,7 @@ export type {
     ThemeOverrides,
     MotionSetting,
     PartStates,
+    PerInstance,
     SlotKeyed,
     Unstyled,
 } from "@pureform/binding-core";

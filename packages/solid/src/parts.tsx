@@ -11,7 +11,9 @@ import type {
     TestIdOverride,
 } from "@pureform/anatomy";
 import {
+    forInstance,
     forSlot,
+    isPerInstance,
     isIconPart,
     isPresent,
     isUnstyled,
@@ -21,7 +23,9 @@ import {
 import type {
     InnerProps,
     PartStates,
+    PartInstances,
     SlotKeyed,
+    SlotKeyedEach,
     Unstyled,
 } from "@pureform/binding-core";
 import { componentIndicationTokens } from "@pureform/binding-core/indication";
@@ -324,12 +328,17 @@ export function useUnstyledComponent<A extends ComponentAnatomy>(
 export interface SlotKeyedProps<
     A extends ComponentAnatomy,
     Extra extends string = never,
+    I = {},
 > {
-    readonly class?: SlotKeyed<PartName<A> | Extra, JSX.ClassValue>;
-    readonly style?: SlotKeyed<PartName<A> | Extra, JSX.CSSProperties | string>;
+    readonly class?: SlotKeyedEach<PartName<A> | Extra, JSX.ClassValue, I>;
+    readonly style?: SlotKeyedEach<
+        PartName<A> | Extra,
+        JSX.CSSProperties | string,
+        I
+    >;
     readonly testId?: TestIdOverride<PartName<A>>;
-    readonly slotProps?: SlotKeyed<PartName<A> | Extra, PartProps>;
-    readonly unstyled?: Unstyled<PartName<A>>;
+    readonly slotProps?: SlotKeyedEach<PartName<A> | Extra, PartProps, I>;
+    readonly unstyled?: Unstyled<PartName<A>, I>;
 }
 
 /** Everything that customizes a component's parts without choosing its variants: the slot-keyed
@@ -354,14 +363,25 @@ export const slotPartProps = <A extends ComponentAnatomy>(
     part: PartName<A>,
 ): PartProps => merge(() => onePart(props, part)) as PartProps;
 
-const onePart = (props: SlotKeyedProps<ComponentAnatomy>, part: string): Dict =>
-    combinePartProps([
-        forSlot(props.slotProps, part) as Dict | undefined,
+const onePart = (
+    props: SlotKeyedProps<ComponentAnatomy, never, PartInstances>,
+    part: string,
+    instance?: unknown,
+): Dict => {
+    const one = (keyed: object | undefined) =>
+        forInstance((keyed as Dict | undefined)?.[part], instance);
+    const unstyled =
+        typeof props.unstyled === "object" ? one(props.unstyled) : undefined;
+    return combinePartProps([
+        one(props.slotProps) as Dict | undefined,
         {
-            class: forSlot(props.class, part),
-            style: forSlot(props.style, part),
+            class: one(props.class),
+            style: one(props.style),
+            // Only a copy's own `unstyled` (Root reads the rest).
+            unstyled: unstyled === true ? true : undefined,
         },
     ]);
+};
 
 /** A part drawn as a `Button` or `IconButton` (`as={Button}`): its `class` and `style` are plain
  *  values for the part, but the button keys them by its own parts, so they go to its root
@@ -380,35 +400,49 @@ export const asRoot = (props: PartProps): PartProps =>
     }) as PartProps;
 
 const NO_PROPS: Dict = Object.freeze({});
-const NO_SLOTS: Readonly<Record<string, Dict>> = Object.freeze({});
+
+interface EveryPart {
+    /** Each part's props, but the repeated parts' given a function of the copy. */
+    readonly parts: Readonly<Record<string, Dict>>;
+    /** The repeated parts given a function of the copy, resolved per copy. */
+    readonly each: ReadonlySet<string>;
+}
+
+const NO_SLOTS: EveryPart = Object.freeze({
+    parts: Object.freeze({}),
+    each: new Set<string>(),
+});
 
 // Every part the slot-keyed props name, each with its props combined.
 const everyPart = (
-    props: SlotKeyedProps<ComponentAnatomy>,
-): Readonly<Record<string, Dict>> => {
+    props: SlotKeyedProps<ComponentAnatomy, never, PartInstances>,
+): EveryPart => {
     const { slotProps, class: classes, style } = props;
-    if (!slotProps && !classes && !style) return NO_SLOTS;
+    const unstyled =
+        typeof props.unstyled === "object" ? props.unstyled : undefined;
+    if (!slotProps && !classes && !style && !unstyled) return NO_SLOTS;
+    const named = [slotProps, classes, style, unstyled];
     const parts: Record<string, Dict> = {};
-    for (const keyed of [slotProps, classes, style]) {
+    const each = new Set<string>();
+    for (const keyed of named) {
         if (!keyed || typeof keyed !== "object") continue;
         for (const part of Object.keys(keyed)) {
-            if (!Object.hasOwn(parts, part)) parts[part] = onePart(props, part);
+            if (Object.hasOwn(parts, part) || each.has(part)) continue;
+            if (isPerInstance(named, part)) each.add(part);
+            else if (keyed !== unstyled) parts[part] = onePart(props, part);
         }
     }
-    return parts;
+    return { parts, each };
 };
 
 // A live view of one part's entry: a merge or a spread reads it as a source whose keys can change,
 // as it reads a store, since it answers for `$PROXY`. Symbols, which merges ask for as they build,
 // aren't read through, so building one in a component body reads nothing reactive.
 class SlotView {
-    constructor(
-        readonly parts: Accessor<Readonly<Record<string, Dict>>>,
-        readonly part: string,
-    ) {}
+    constructor(readonly read: Accessor<Dict>) {}
 }
 
-const entry = (view: SlotView): Dict => view.parts()[view.part] ?? NO_PROPS;
+const entry = (view: SlotView): Dict => view.read();
 
 const SLOT_VIEW: ProxyHandler<SlotView> = {
     get: (view, key, receiver) => {
@@ -439,18 +473,50 @@ const SLOT_VIEW: ProxyHandler<SlotView> = {
 export function createSlotProps<
     A extends ComponentAnatomy,
     Extra extends string = never,
->(props: SlotKeyedProps<A, Extra>): (part: PartName<A> | Extra) => PartProps {
-    const keyed = props as SlotKeyedProps<ComponentAnatomy>;
+    I = {},
+>(props: SlotKeyedProps<A, Extra, I>): SlotPropsOf<PartName<A> | Extra, I> {
+    const keyed = props as SlotKeyedProps<ComponentAnatomy, never, PartInstances>;
+    const view = (read: Accessor<Dict>) =>
+        new Proxy(new SlotView(read), SLOT_VIEW) as PartProps;
     if (untrack(() => SLOT_KEYED.every((key) => isFixed(keyed, key)))) {
-        const parts = untrack(() => everyPart(keyed));
-        return (part) => (parts[part] ?? NO_PROPS) as PartProps;
+        const { parts, each } = untrack(() => everyPart(keyed));
+        return Object.assign(
+            (part: string, instance?: Accessor<unknown>) =>
+                each.has(part)
+                    ? view(createMemo(() => onePart(keyed, part, instance?.())))
+                    : ((parts[part] ?? NO_PROPS) as PartProps),
+            { each: (part: string) => each.has(part) },
+        ) as SlotPropsOf<PartName<A> | Extra, I>;
     }
-    const parts = createMemo(() => everyPart(keyed));
-    return (part) =>
-        new Proxy(new SlotView(parts, part), SLOT_VIEW) as PartProps;
+    const every = createMemo(() => everyPart(keyed));
+    return Object.assign(
+        (part: string, instance?: Accessor<unknown>) =>
+            view(
+                instance
+                    ? createMemo(() =>
+                          every().each.has(part)
+                              ? onePart(keyed, part, instance())
+                              : (every().parts[part] ?? NO_PROPS),
+                      )
+                    : () => every().parts[part] ?? NO_PROPS,
+            ),
+        { each: (part: string) => every().each.has(part) },
+    ) as SlotPropsOf<PartName<A> | Extra, I>;
 }
 
-const SLOT_KEYED = ["class", "style", "slotProps"] as const;
+/** A ready-made's parts' slot-keyed props: `slots("label")` to spread on a part; a repeated part's
+ *  copy passes an accessor of what it is, `slots("cell", () => cell)`, which a function of the copy
+ *  is called with (again when it changes). */
+export interface SlotPropsOf<P extends string, I = {}> {
+    <K extends P>(
+        part: K,
+        ...instance: K extends keyof I ? [instance?: Accessor<I[K]>] : []
+    ): PartProps;
+    /** Whether a function of the copy was passed for this repeated part. */
+    readonly each: (part: keyof I & P) => boolean;
+}
+
+const SLOT_KEYED = ["class", "style", "slotProps", "unstyled"] as const;
 
 // Whether a prop is a literal the compiler passed as is, or left out. Only on the props object the
 // compiler made: the server and the client build merges differently, and must pick the same parts.

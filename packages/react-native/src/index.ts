@@ -122,6 +122,7 @@ export type {
     Direction,
     IconStyle,
     MotionSetting,
+    PerInstance,
 } from "@pureform/binding-core";
 export {
     defineIndication,

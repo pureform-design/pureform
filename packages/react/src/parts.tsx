@@ -11,8 +11,10 @@ import type {
     TestIdOverride,
 } from "@pureform/anatomy";
 import {
+    forInstance,
     forSlot,
     isIconPart,
+    isPerInstance,
     isUnstyled,
     partSources,
     withProvidedTokens,
@@ -20,8 +22,9 @@ import {
 import type {
     ClassValue,
     InnerProps,
+    PartInstances,
     PartStates,
-    SlotKeyed,
+    SlotKeyedEach,
     Unstyled,
 } from "@pureform/binding-core";
 import { componentIndicationTokens } from "@pureform/binding-core/indication";
@@ -379,12 +382,19 @@ export function useUnstyledComponent<A extends ComponentAnatomy>(
 export interface SlotKeyedProps<
     A extends ComponentAnatomy,
     Extra extends string = never,
+    I = {},
 > {
-    readonly className?: SlotKeyed<PartName<A> | Extra, ClassValue> | undefined;
-    readonly style?: SlotKeyed<PartName<A> | Extra, CSSProperties> | undefined;
+    readonly className?:
+        | SlotKeyedEach<PartName<A> | Extra, ClassValue, I>
+        | undefined;
+    readonly style?:
+        | SlotKeyedEach<PartName<A> | Extra, CSSProperties, I>
+        | undefined;
     readonly testId?: TestIdOverride<PartName<A>> | undefined;
-    readonly slotProps?: SlotKeyed<PartName<A> | Extra, PartProps> | undefined;
-    readonly unstyled?: Unstyled<PartName<A>> | undefined;
+    readonly slotProps?:
+        | SlotKeyedEach<PartName<A> | Extra, PartProps, I>
+        | undefined;
+    readonly unstyled?: Unstyled<PartName<A>, I> | undefined;
 }
 
 /** Everything that customizes a component's parts without choosing its variants: the slot-keyed
@@ -404,18 +414,27 @@ export type InnerPropsOf<A extends ComponentAnatomy> = InnerProps<
 /** One part's props from a ready-made component's slot-keyed props: its `slotProps` entry with
  *  its `className` and `style` merged in. `testId` and `unstyled` go to Root whole. */
 export const slotPartProps = <A extends ComponentAnatomy>(
-    props: SlotKeyedProps<A>,
+    props: SlotKeyedProps<A, never, PartInstances>,
     part: PartName<A>,
-): PartProps =>
-    combinePartProps([
-        forSlot(props.slotProps, part) as
-            | Readonly<Record<string, unknown>>
-            | undefined,
+    instance?: unknown,
+): PartProps => {
+    const one = (keyed: object | undefined) =>
+        forInstance(
+            (keyed as Readonly<Record<string, unknown>> | undefined)?.[part],
+            instance,
+        );
+    const unstyled =
+        typeof props.unstyled === "object" ? one(props.unstyled) : undefined;
+    return combinePartProps([
+        one(props.slotProps) as Readonly<Record<string, unknown>> | undefined,
         {
-            className: forSlot(props.className, part),
-            style: forSlot(props.style, part),
+            className: one(props.className),
+            style: one(props.style),
+            // Only a copy's own `unstyled` (Root reads the rest).
+            unstyled: unstyled === true ? true : undefined,
         },
     ]) as PartProps;
+};
 
 /** A part drawn as a `Button` or `IconButton` (`as={Button}`): its `className` and `style` are
  *  plain values for the part, but the button keys them by its own parts, so they go to its root
@@ -438,28 +457,70 @@ export const asRoot = (props: PartProps): PartProps => {
 
 const NO_PROPS: PartProps = Object.freeze({});
 
+/** A ready-made's parts' slot-keyed props: `slot("label")` to spread on a part; a repeated part's
+ *  copy passes what it is, `slot("cell", cell)`, which a function of the copy is called with. Build
+ *  the copy only when `slot.each("cell")` says a function was passed. */
+export interface SlotPropsOf<P extends string, I = {}> {
+    <K extends P>(
+        part: K,
+        ...instance: K extends keyof I ? [instance?: I[K]] : []
+    ): PartProps;
+    /** Whether a function of the copy was passed for this repeated part, so the copy is needed. */
+    readonly each: (part: keyof I & P) => boolean;
+}
+
+const never = () => false;
+const NO_SLOTS = Object.assign(() => NO_PROPS, { each: never });
+
 /** A ready-made component's slot-keyed props for each of its parts, computed together, once per
- *  change of `className`, `style`, or `slotProps`: `slot("label")` is what `slotPartProps(props,
- *  "label")` gives, and a part none of them names gets the same empty object. */
+ *  change of `className`, `style`, `slotProps`, or a keyed `unstyled`: `slot("label")` is what
+ *  `slotPartProps(props, "label")` gives, and a part none of them names gets the same empty
+ *  object. A repeated part given a function of the copy is resolved per call, `slot("cell",
+ *  cell)`; any other part is computed once. */
 export function useSlotProps<
     A extends ComponentAnatomy,
     Extra extends string = never,
->(props: SlotKeyedProps<A, Extra>): (part: PartName<A> | Extra) => PartProps {
+    I = {},
+>(props: SlotKeyedProps<A, Extra, I>): SlotPropsOf<PartName<A> | Extra, I> {
     const { slotProps, className, style } = props;
+    const unstyled =
+        typeof props.unstyled === "object" ? props.unstyled : undefined;
     return useMemo(() => {
-        if (!slotProps && !className && !style) return () => NO_PROPS;
-        const keyed = { slotProps, className, style } as SlotKeyedProps<A>;
+        if (!slotProps && !className && !style && !unstyled)
+            return NO_SLOTS as SlotPropsOf<PartName<A> | Extra, I>;
+        const keyed = {
+            slotProps,
+            className,
+            style,
+            unstyled,
+        } as SlotKeyedProps<A, never, PartInstances>;
+        const named = [slotProps, className, style, unstyled];
         const parts: Record<string, PartProps> = {};
-        for (const named of [slotProps, className, style]) {
-            if (!named || typeof named !== "object") continue;
-            for (const part of Object.keys(named)) {
-                if (!Object.hasOwn(parts, part)) {
-                    parts[part] = slotPartProps(keyed, part as PartName<A>);
+        const each = new Set<string>();
+        for (const values of [slotProps, className, style]) {
+            if (!values || typeof values !== "object") continue;
+            for (const part of Object.keys(values)) {
+                if (Object.hasOwn(parts, part) || each.has(part)) continue;
+                if (isPerInstance(named, part)) each.add(part);
+                else parts[part] = slotPartProps(keyed, part as PartName<A>);
+            }
+        }
+        if (unstyled) {
+            for (const part of Object.keys(unstyled)) {
+                if (isPerInstance([unstyled], part)) {
+                    each.add(part);
+                    delete parts[part];
                 }
             }
         }
-        return (part: PartName<A>) => parts[part] ?? NO_PROPS;
-    }, [slotProps, className, style]);
+        const slot = (part: string, instance?: unknown) =>
+            each.has(part)
+                ? slotPartProps(keyed, part as PartName<A>, instance)
+                : (parts[part] ?? NO_PROPS);
+        return Object.assign(slot, {
+            each: each.size === 0 ? never : (part: string) => each.has(part),
+        }) as SlotPropsOf<PartName<A> | Extra, I>;
+    }, [slotProps, className, style, unstyled]);
 }
 
 /** A plain part's props: the element's own, and the part's `unstyled`. */

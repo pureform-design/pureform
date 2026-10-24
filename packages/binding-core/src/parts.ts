@@ -48,16 +48,56 @@ export const forSlot = <P extends string, V>(
     slot: NoInfer<P>,
 ): V | undefined => value?.[slot];
 
-/** What `unstyled` takes: `true` for every part, or per part. */
-export type Unstyled<P extends string = string> =
+/** A repeated part's value (a calendar cell's, a table row's): one for every copy, or a function
+ *  of the copy (its `instance`: index, state, data, as the component documents) returning it, or
+ *  `undefined` for none. The function runs once per copy per render, only when one is passed. */
+export type PerInstance<V, I> = V | ((instance: I) => V | undefined);
+
+/** A ready-made's repeated parts, each to what it knows of one copy: `{ cell: CalendarCellInstance }`. */
+export type PartInstances = { readonly [part: string]: unknown };
+
+/** A slot-keyed value whose repeated parts (`I`'s keys) also take a function of the copy. */
+export type SlotKeyedEach<P extends string, V, I = {}> = {
+    readonly [K in P]?: K extends keyof I ? PerInstance<V, I[K]> : V;
+};
+
+/** A repeated part's value for one copy: the function's result, or the value itself. */
+export const forInstance = <V, I>(
+    value: PerInstance<V, I> | undefined,
+    instance: I,
+): V | undefined =>
+    typeof value === "function"
+        ? (value as (instance: I) => V | undefined)(instance)
+        : value;
+
+/** Whether any of a part's keyed values is a function of the copy, which `forInstance` resolves. */
+export const isPerInstance = (
+    keyed: readonly unknown[],
+    part: string,
+): boolean => {
+    for (const value of keyed) {
+        if (
+            value &&
+            typeof value === "object" &&
+            typeof (value as Dict)[part] === "function"
+        )
+            return true;
+    }
+    return false;
+};
+
+/** What `unstyled` takes: `true` for every part, or per part (a repeated part's by copy, which
+ *  Root ignores: the ready-made resolves it for each copy). */
+export type Unstyled<P extends string = string, I = {}> =
     | boolean
-    | SlotKeyed<P, boolean>;
+    | SlotKeyedEach<P, boolean, I>
+    | SlotKeyed<P, boolean | ((instance: never) => boolean | undefined)>;
 
 /** One part's entry of a per-part override (`testId`, `unstyled`) as a separate component's
  *  `root`: a Root that also renders another component's root (a dialog's backdrop, drawn by the
  *  scrim) names it `part`. A value for every part passes through. */
 export const partAsRoot = <V extends string | boolean>(
-    value: V | SlotKeyed<string, V> | undefined,
+    value: V | SlotKeyed<string, unknown> | undefined,
     part: string,
 ): V | { readonly root: V } | undefined =>
     typeof value !== "object"
@@ -223,8 +263,19 @@ const byPart = (
     if (!isRecord(defaults) || !isRecord(own)) return own;
     const merged: Record<string, unknown> = { ...defaults };
     for (const key of Object.keys(own)) {
+        const base = merged[key];
+        const value = own[key];
         merged[key] =
-            merged[key] === undefined ? own[key] : part(merged[key], own[key]);
+            base === undefined
+                ? value
+                : typeof base === "function" || typeof value === "function"
+                  ? // A repeated part's values by copy: both resolved for each copy, then merged.
+                    (instance: unknown) =>
+                        part(
+                            forInstance(base, instance),
+                            forInstance(value, instance),
+                        )
+                  : part(base, value);
     }
     return merged;
 };
