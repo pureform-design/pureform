@@ -121,7 +121,7 @@ const rows = (host: HTMLElement) => all(host, t.node);
 const BRANCHES = FILES.filter((file) => file.children !== undefined);
 
 /** The expanded branches' values: the tree items that say `aria-expanded` are the branches, in
- *  order (on every renderer the branch element, holding its row and its group). */
+ *  order (on every renderer the branch's row, which owns its group). */
 const readTree = (host: HTMLElement): string[] =>
     allByRole(host, "treeitem")
         .filter((item) => item.hasAttribute("aria-expanded"))

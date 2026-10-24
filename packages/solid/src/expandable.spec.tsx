@@ -206,6 +206,48 @@ describe("Tree", () => {
         expect(rows[1]!.getAttribute("aria-current")).toBe("true");
     });
 
+    it("makes each row its node's treeitem, a branch's owning its group, with no button inside (APG)", async () => {
+        withRegistry(() => (
+            <Tree
+                aria-label="Files"
+                items={FILES}
+                defaultExpandedValue={["src"]}
+                defaultSelectedValue={["src"]}
+            />
+        ));
+        await settle();
+        const rows = all(t.node!);
+        expect(rows.map((row) => row.getAttribute("role"))).toEqual([
+            "treeitem",
+            "treeitem",
+            "treeitem",
+            "treeitem",
+        ]);
+        const src = rows[0]!;
+        expect(src.getAttribute("aria-level")).toBe("1");
+        expect(src.getAttribute("aria-expanded")).toBe("true");
+        expect(src.getAttribute("aria-selected")).toBe("true");
+        const group = all(t.group!)[0]!;
+        expect(src.getAttribute("aria-owns")).toBe(group.id);
+        expect(group.getAttribute("role")).toBe("group");
+        // The branch's element is plain, so the row's name is its own text.
+        const branch = all(t.branch!)[0]!;
+        expect(branch.hasAttribute("role")).toBe(false);
+        expect(branch.hasAttribute("aria-expanded")).toBe(false);
+        expect(document.querySelector('[role="button"]')).toBeNull();
+        // Focus and the keys are on the treeitem.
+        src.focus();
+        await userEvent.keyboard("{ArrowDown}");
+        await settle();
+        expect(document.activeElement).toBe(rows[1]);
+        await userEvent.keyboard("{ArrowLeft}");
+        await settle();
+        expect(document.activeElement).toBe(src);
+        await userEvent.keyboard("{ArrowLeft}");
+        await settle();
+        expect(src.getAttribute("aria-expanded")).toBe("false");
+    });
+
     it("passes the density and color to the registry", async () => {
         withRegistry(() => (
             <Tree

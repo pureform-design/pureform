@@ -179,9 +179,10 @@ export default defineStories({
         },
         Tooltip: { parameters: keyClicks("KeyEnter") },
         Tree: {
-            // React Native's branch is a tree item holding its children's group (APG), named
-            // from its row's text alone (`aria-labelledby`); axe's heuristic wants an element's
-            // whole visible text, its children's labels too, in its name.
+            // Kept on purpose (fix-storybook-7b): React Native's tree items are named from their
+            // text alone (`aria-labelledby`), and a branch's row owns its group (`aria-owns`).
+            // axe's heuristic reads an element's visible text, and on React Native Web it may
+            // count what the row owns, the children's labels, as text left out of the name.
             parameters: native({
                 "*": {
                     a11y: {

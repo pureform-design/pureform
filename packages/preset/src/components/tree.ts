@@ -10,13 +10,13 @@
 //   <div class={root}>
 //     <span class={label}>Files</span>
 //     <div class={tree} role="tree">
-//       <div class={branch} role="treeitem" aria-expanded="true">
-//         <div class={node} aria-expanded="true">
+//       <div class={branch}>
+//         <div class={node} role="treeitem" aria-expanded="true" aria-owns="src-group">
 //           <span class={leading}>📁</span>
 //           <span class={text}>src</span>
 //           <span class={indicator}>⌄</span>
 //         </div>
-//         <div class={group} role="group">
+//         <div class={group} role="group" id="src-group">
 //           <div class={node} role="treeitem"><span class={text}>index.ts</span></div>
 //         </div>
 //       </div>

@@ -2,10 +2,15 @@
 // and its text), a branch's row ending in the expand indicator, which turns over while it's
 // expanded, over its children, indented from the start while it's expanded. React Native has no
 // Zag machine: the expanded and selected nodes are React state, and each node says what it is to
-// assistive technology. On the web, as the web's tree: a leaf's row is its tree item; a branch is
-// a tree item holding its row (a button) and its group of children, named from the row's text.
-// Each says its level, its place among its siblings and how many they are. On iOS and Android,
-// which have no tree item, the row says it: its label carries the level, its state whether it's
+// assistive technology. On the web, as the web's tree and WAI-ARIA APG's: every row is its node's
+// tree item, named from its text, a branch's owning its group of children (`aria-owns`; the group
+// stays beside the row in the branch's plain view). Each says its level, its place among its
+// siblings and how many they are. The tree is one tab stop: the focused row (else the first
+// selected one shown, else the first) takes Tab, and the keys move from row to row (up and down,
+// Home and End, a letter to the next row starting with it), into and out of branches (the arrow
+// toward the inline end expands or goes to the first child, the other collapses or goes to the
+// parent), and Enter and Space select and toggle. On iOS and Android, which have no tree item, the
+// row says it: its label carries the level (in the tree's `translations`), its state whether it's
 // expanded and selected.
 
 import { treeAnatomy } from "@pureform/anatomy";
@@ -18,7 +23,7 @@ import type {
     TreePart,
     TreeVariantProps,
 } from "@pureform/binding-core";
-import { useId } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Platform } from "react-native";
 
@@ -26,6 +31,7 @@ import { Expanding } from "../expand";
 import { iconParts } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
+import { useDirection } from "../provider";
 import { useComponentSlots } from "../styles";
 
 const [INDICATION] = treeAnatomy.indication!;
@@ -41,6 +47,9 @@ export interface TreeProps
     /** A label over the tree, which names it. */
     readonly label?: ReactNode;
     readonly "aria-label"?: string | undefined;
+    /** Its words, for another language: what a row says on iOS and Android, its label with its
+     *  level (`"src, level 1"` by default). */
+    readonly translations?: TreeTranslations | undefined;
     readonly testId?: TestIdOverride<TreePart> | undefined;
 }
 
@@ -50,17 +59,33 @@ interface TreeState {
     readonly selected: readonly string[];
     readonly toggle: (value: string) => void;
     readonly select: (value: string) => void;
+    /** On the web, the row that takes Tab. */
+    readonly tabStop: string | undefined;
+    readonly focused: (value: string) => void;
+    /** On the web, each row's element, to move focus to. */
+    readonly rows: Map<string, Focusable>;
+}
+
+interface Focusable {
+    focus(): void;
 }
 
 /** What a row says on iOS and Android, which have no tree item: its label with its level (when
- *  the label is text), and whether it's expanded (a branch), selected and disabled. */
+ *  the label is text, through `translations.level`), and whether it's expanded (a branch),
+ *  selected and disabled. */
 export const nativeTreeRow = (
     node: Node,
     level: number,
     state: { readonly expanded: boolean; readonly selected: boolean },
+    translations?: TreeTranslations,
 ) => ({
     ...(typeof node.label === "string"
-        ? { accessibilityLabel: `${node.label}, level ${level}` }
+        ? {
+              accessibilityLabel: (translations?.level ?? treeLevelLabel)(
+                  node.label,
+                  level,
+              ),
+          }
         : {}),
     accessibilityState: {
         selected: state.selected,
@@ -102,8 +127,9 @@ function Row(props: {
         testIdOf(treeAnatomy, part, tree.props.testId);
     const icon = iconParts(slots, id);
     const textId = useId();
+    const groupId = useId();
     const web = Platform.OS === "web";
-    // The tree item's own ARIA: the row's for a leaf, the branch's around it for a branch.
+    // The tree item's own ARIA, on its row (a branch's owning its group).
     const item = {
         role: "treeitem",
         "aria-level": props.level,
@@ -112,16 +138,8 @@ function Row(props: {
         "aria-selected": selectedNode,
         "aria-labelledby": textId,
         ...(disabled ? { "aria-disabled": true } : {}),
-        ...(branch ? { "aria-expanded": expanded } : {}),
+        ...(branch ? { "aria-expanded": expanded, "aria-owns": groupId } : {}),
     } as const;
-    const rowA11y = !web
-        ? nativeTreeRow(node, props.level, {
-              expanded,
-              selected: selectedNode,
-          })
-        : branch
-          ? { role: "button" as const }
-          : item;
     const press = () => {
         tree.select(node.value);
         if (branch) tree.toggle(node.value);
@@ -129,11 +147,37 @@ function Row(props: {
     const row = (
         <v.node.Pressable
             {...indication.handlers}
-            {...rowA11y}
+            {...(web
+                ? {
+                      ...item,
+                      ref: (element: Focusable | null) => {
+                          if (element) tree.rows.set(node.value, element);
+                          else tree.rows.delete(node.value);
+                      },
+                      tabIndex: tree.tabStop === node.value ? 0 : -1,
+                      onFocus: (event: {
+                          target: unknown;
+                          currentTarget: unknown;
+                      }) => {
+                          (
+                              indication.handlers as {
+                                  onFocus?: (event: never) => void;
+                              }
+                          ).onFocus?.(event as never);
+                          if (event.target === event.currentTarget)
+                              tree.focused(node.value);
+                      },
+                  }
+                : nativeTreeRow(
+                      node,
+                      props.level,
+                      { expanded, selected: selectedNode },
+                      tree.props.translations,
+                  ))}
             onPress={press}
             // React Native Web presses a tree item on Enter only; Space acts too, as the web's
-            // tree (a branch's row is a button, which takes Space already).
-            {...(web && !branch
+            // tree.
+            {...(web
                 ? ({
                       onKeyDown: (event: {
                           nativeEvent: { key: string };
@@ -164,14 +208,15 @@ function Row(props: {
     );
     if (!branch) return row;
     return (
-        <v.branch.View
-            {...(web ? item : {})}
-            style={s.branch}
-            testID={id("branch")}
-        >
+        <v.branch.View style={s.branch} testID={id("branch")}>
             {row}
             <Expanding open={expanded}>
-                <v.group.View style={s.group} role="group" testID={id("group")}>
+                <v.group.View
+                    style={s.group}
+                    role="group"
+                    nativeID={groupId}
+                    testID={id("group")}
+                >
                     {(node.children ?? []).map((child, index, all) => (
                         <Row
                             key={child.value}
@@ -187,6 +232,20 @@ function Row(props: {
         </v.branch.View>
     );
 }
+
+// The rows shown, in order: each node with its parent's value, the branches' children while
+// they're expanded.
+const shownRows = (
+    nodes: readonly Node[],
+    expanded: readonly string[],
+    parent?: string,
+): { readonly node: Node; readonly parent: string | undefined }[] =>
+    nodes.flatMap((node) => [
+        { node, parent },
+        ...(isTreeBranch(node) && expanded.includes(node.value)
+            ? shownRows(node.children ?? [], expanded, node.value)
+            : []),
+    ]);
 
 function TreeImpl(props: TreeProps): ReactNode {
     const [expanded, setExpanded] = useControllable<"expandedValue", string[]>(
@@ -209,7 +268,29 @@ function TreeImpl(props: TreeProps): ReactNode {
         "tree",
         treeSelection(props),
     );
+    const rtl = useDirection() === "rtl";
+    const shown = shownRows(props.items, expanded);
+    const [focusedValue, setFocused] = useState<string>();
+    const rows = useRef(new Map<string, Focusable>()).current;
+    // A row to move focus to once it's shown (a branch's first child, as it expands).
+    const [focusTo, setFocusTo] = useState<string>();
+    useEffect(() => {
+        if (focusTo === undefined) return;
+        const row = rows.get(focusTo);
+        if (!row) return;
+        setFocusTo(undefined);
+        row.focus();
+    });
+    const isShown = (value: string | undefined) =>
+        shown.some((row) => row.node.value === value);
+    const tabStop = isShown(focusedValue)
+        ? focusedValue
+        : (shown.find((row) => selected.includes(row.node.value)) ?? shown[0])
+              ?.node.value;
     const tree: TreeState = {
+        tabStop,
+        rows,
+        focused: setFocused,
         props,
         expanded,
         selected,
@@ -230,6 +311,72 @@ function TreeImpl(props: TreeProps): ReactNode {
             ),
     };
     const id = (part: TreePart) => testIdOf(treeAnatomy, part, props.testId);
+    const go = (value: string | undefined) => {
+        if (value === undefined) return;
+        setFocused(value);
+        setFocusTo(value);
+    };
+    // The keys, on the web, from the focused row.
+    const onKeyDown = (event: {
+        nativeEvent: {
+            key: string;
+            altKey?: boolean;
+            ctrlKey?: boolean;
+            metaKey?: boolean;
+        };
+        preventDefault(): void;
+    }) => {
+        const { key } = event.nativeEvent;
+        if (
+            event.nativeEvent.altKey ||
+            event.nativeEvent.ctrlKey ||
+            event.nativeEvent.metaKey
+        )
+            return;
+        const at = shown.findIndex((row) => row.node.value === focusedValue);
+        if (at < 0) return;
+        const { node, parent } = shown[at]!;
+        const branch = isTreeBranch(node);
+        const open = branch && expanded.includes(node.value);
+        const inward = rtl ? "ArrowLeft" : "ArrowRight";
+        const outward = rtl ? "ArrowRight" : "ArrowLeft";
+        const handled = () => event.preventDefault();
+        if (key === "ArrowDown")
+            return (handled(), go(shown[at + 1]?.node.value));
+        if (key === "ArrowUp")
+            return (handled(), go(shown[at - 1]?.node.value));
+        if (key === "Home") return (handled(), go(shown[0]?.node.value));
+        if (key === "End") return (handled(), go(shown.at(-1)?.node.value));
+        if (key === inward) {
+            if (!branch) return undefined;
+            handled();
+            if (!open)
+                return node.disabled ? undefined : tree.toggle(node.value);
+            return go(node.children?.[0]?.value);
+        }
+        if (key === outward) {
+            handled();
+            if (open && !node.disabled) return tree.toggle(node.value);
+            return go(parent);
+        }
+        if (key.length === 1 && key !== " ") {
+            // The next row whose text starts with the letter, after this one, round again.
+            const letter = key.toLocaleLowerCase();
+            const next = [
+                ...shown.slice(at + 1),
+                ...shown.slice(0, at + 1),
+            ].find(
+                (row) =>
+                    typeof row.node.label === "string" &&
+                    row.node.label.toLocaleLowerCase().startsWith(letter),
+            );
+            if (next) {
+                handled();
+                go(next.node.value);
+            }
+        }
+        return undefined;
+    };
     return (
         <v.root.View style={s.root} testID={id("root")}>
             {isPresent(props.label) ? (
@@ -245,6 +392,7 @@ function TreeImpl(props: TreeProps): ReactNode {
                 style={s.tree}
                 role="tree"
                 aria-label={props["aria-label"]}
+                {...(Platform.OS === "web" ? ({ onKeyDown } as object) : {})}
                 testID={id("tree")}
             >
                 {props.items.map((node, index, all) => (
@@ -261,6 +409,16 @@ function TreeImpl(props: TreeProps): ReactNode {
         </v.root.View>
     );
 }
+
+/** The tree's words, for another language. */
+export interface TreeTranslations {
+    /** What a row says on iOS and Android: its label with its level. */
+    readonly level?: ((label: string, level: number) => string) | undefined;
+}
+
+/** The English default for `TreeTranslations.level`: `"src, level 1"`. */
+export const treeLevelLabel = (label: string, level: number): string =>
+    `${label}, level ${level}`;
 
 /** A tree, as Angular Material has it, its nodes drawn as Material list rows:
  *  `<Tree aria-label="Files" items={[{ value: "src", label: "src", children: [ … ] }]} />`. */

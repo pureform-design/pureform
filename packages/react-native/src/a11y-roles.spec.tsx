@@ -135,7 +135,7 @@ describe.each(ENGINES)("with $name", (engine) => {
     });
 
     describe("the tree", () => {
-        it("puts a branch's group inside its tree item, named from its row", async () => {
+        it("makes each row its node's tree item, a branch's owning its group, named from its text", async () => {
             await render(
                 <Tree
                     aria-label="Files"
@@ -153,11 +153,17 @@ describe.each(ENGINES)("with $name", (engine) => {
                 HTMLElement,
                 HTMLElement,
             ];
-            const group = src.querySelector('[role="group"]')!;
-            expect(group).not.toBeNull();
+            expect(src.getAttribute("data-testid")).toBe("pf-tree-node");
+            const group = document.getElementById(
+                src.getAttribute("aria-owns")!,
+            )!;
+            expect(group.getAttribute("role")).toBe("group");
             expect(group.contains(index)).toBe(true);
             expect(group.contains(util)).toBe(true);
+            // The group sits beside the row, so the row's name is its own text.
+            expect(src.contains(group)).toBe(false);
             expect(src.getAttribute("aria-expanded")).toBe("true");
+            expect(readme.hasAttribute("aria-owns")).toBe(false);
             const name = (item: HTMLElement) =>
                 document.getElementById(item.getAttribute("aria-labelledby")!)
                     ?.textContent;
@@ -177,21 +183,66 @@ describe.each(ENGINES)("with $name", (engine) => {
                 ["2", "2", "2"],
                 ["1", "2", "2"],
             ]);
-            // The branch's row is the button inside it that toggles it.
-            const row = src.querySelector('[role="button"]')!;
-            expect(row.textContent).toContain("src");
-            expect(readme.querySelector('[role="button"]')).toBeNull();
+            // No button inside: the tree item takes focus, one tab stop for the tree.
+            expect(document.querySelector('[role="button"]')).toBeNull();
+            expect(items.map((item) => item.tabIndex)).toEqual([0, -1, -1, -1]);
         });
 
-        it("toggles a branch from its row by Enter and Space", async () => {
+        it("toggles a branch from its tree item by Enter and Space", async () => {
             await render(<Tree aria-label="Files" items={FILES} />, engine);
             const src = all('[role="treeitem"]')[0]!;
-            const row = src.querySelector<HTMLElement>('[role="button"]')!;
-            row.focus();
+            src.focus();
             await interact(() => userEvent.keyboard(" "));
             expect(src.getAttribute("aria-expanded")).toBe("true");
             await interact(() => userEvent.keyboard("{Enter}"));
             expect(src.getAttribute("aria-expanded")).toBe("false");
+        });
+
+        it("moves between tree items with the keys, into and out of branches", async () => {
+            await render(
+                <Tree
+                    aria-label="Files"
+                    items={FILES}
+                    defaultSelectedValue={["readme"]}
+                />,
+                engine,
+            );
+            const item = (label: string) =>
+                all('[role="treeitem"]').find(
+                    (each) =>
+                        document.getElementById(
+                            each.getAttribute("aria-labelledby")!,
+                        )?.textContent === label,
+                )!;
+            const focused = () =>
+                document.getElementById(
+                    document.activeElement!.getAttribute("aria-labelledby")!,
+                )?.textContent;
+            // The selected row takes Tab.
+            expect(item("README.md").tabIndex).toBe(0);
+            item("README.md").focus();
+            await interact(() => userEvent.keyboard("{Home}"));
+            await until(() => expect(focused()).toBe("src"));
+            // Right expands, then goes to the first child; left goes back to the parent, then
+            // collapses.
+            await interact(() => userEvent.keyboard("{ArrowRight}"));
+            expect(item("src").getAttribute("aria-expanded")).toBe("true");
+            expect(focused()).toBe("src");
+            await interact(() => userEvent.keyboard("{ArrowRight}"));
+            await until(() => expect(focused()).toBe("index.ts"));
+            expect(item("index.ts").tabIndex).toBe(0);
+            expect(item("src").tabIndex).toBe(-1);
+            await interact(() => userEvent.keyboard("{ArrowDown}"));
+            await until(() => expect(focused()).toBe("util.ts"));
+            await interact(() => userEvent.keyboard("{ArrowLeft}"));
+            await until(() => expect(focused()).toBe("src"));
+            await interact(() => userEvent.keyboard("{ArrowLeft}"));
+            expect(item("src").getAttribute("aria-expanded")).toBe("false");
+            await interact(() => userEvent.keyboard("{End}"));
+            await until(() => expect(focused()).toBe("README.md"));
+            // A letter goes to the next row starting with it.
+            await interact(() => userEvent.keyboard("s"));
+            await until(() => expect(focused()).toBe("src"));
         });
     });
 
@@ -213,6 +264,17 @@ describe.each(ENGINES)("with $name", (engine) => {
 });
 
 describe("a tree row on iOS and Android", () => {
+    it("says its level in the tree's words", () => {
+        expect(
+            nativeTreeRow(
+                FILES[0]!,
+                2,
+                { expanded: false, selected: false },
+                { level: (label, level) => `${label}, niveau ${level}` },
+            ).accessibilityLabel,
+        ).toBe("src, niveau 2");
+    });
+
     it("carries its level in its label, and its expanded state", () => {
         expect(
             nativeTreeRow(FILES[0]!, 1, { expanded: true, selected: false }),
