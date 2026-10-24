@@ -938,6 +938,7 @@
         "@pureform/vitest-config": "workspace:^",
         "@solidjs/vite-plugin": "catalog:",
         "@solidjs/web": "catalog:",
+        "@types/node": "catalog:",
         "@vitest/browser-playwright": "catalog:",
         "@zag-js/checkbox": "catalog:",
         "@zag-js/radio-group": "catalog:",

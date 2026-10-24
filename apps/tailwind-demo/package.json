@@ -25,6 +25,7 @@
         "@pureform/vitest-config": "workspace:^",
         "@solidjs/vite-plugin": "catalog:",
         "@tailwindcss/vite": "catalog:",
+        "@types/node": "catalog:",
         "@vitest/browser-playwright": "catalog:",
         "playwright": "catalog:",
         "tailwindcss": "catalog:",

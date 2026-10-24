@@ -24,6 +24,7 @@
         "@pureform/vite-config": "workspace:^",
         "@pureform/vitest-config": "workspace:^",
         "@solidjs/vite-plugin": "catalog:",
+        "@types/node": "catalog:",
         "@vitest/browser-playwright": "catalog:",
         "playwright": "catalog:",
         "typescript": "catalog:",

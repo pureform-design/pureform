@@ -340,6 +340,7 @@
         "@pureform/tsconfig": "workspace:^",
         "@pureform/vite-config": "workspace:^",
         "@pureform/vitest-config": "workspace:^",
+        "@types/node": "catalog:",
         "@vitest/browser-playwright": "catalog:",
         "@zag-js/vanilla": "catalog:",
         "playwright": "catalog:",

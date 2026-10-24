@@ -28,6 +28,7 @@
         "@pureform/tsconfig": "workspace:^",
         "@pureform/vite-config": "workspace:^",
         "@pureform/vitest-config": "workspace:^",
+        "@types/node": "catalog:",
         "@types/react": "catalog:",
         "@types/react-dom": "catalog:",
         "@vitejs/plugin-react": "catalog:",

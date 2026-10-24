@@ -1,0 +1,4 @@
+{
+    "extends": ["@pureform/tsconfig/node.json"],
+    "include": ["panda.config.ts", "pureform.config.ts", ".storybook/main.ts"]
+}

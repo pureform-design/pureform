@@ -44,10 +44,20 @@ tasks:
     exec: bun x oxlint .
 
   check:types:
-    exec: bun x tsc --noEmit -p tsconfig.json
+    # Config files (vite, vitest, storybook, scripts) have their own tsconfig.node.json, when present.
+    exec: sh -c 'bun x tsc --noEmit -p tsconfig.json && if [ -f tsconfig.node.json ]; then bun x tsc -p tsconfig.node.json; fi'
     # Resolves dependencies' built declarations.
     dependencies:
       - ^build
+    cache:
+      key:
+        files:
+          append:
+            - "tsconfig*.json"
+            - "*.config.ts"
+            - "*.config.*.ts"
+            - ".storybook/*.ts"
+            - "scripts/**/*.ts"
 
   check:
     exec: ""

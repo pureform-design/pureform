@@ -1,0 +1,4 @@
+{
+    "extends": ["@pureform/tsconfig/node.json"],
+    "include": ["vite.config.ts", "vitest.config.integration.ts", "vitest.config.unit.ts"]
+}

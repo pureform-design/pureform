@@ -23,6 +23,7 @@
         "@pureform/panda-adapter": "workspace:^",
         "@pureform/theme": "workspace:^",
         "@pureform/tsconfig": "workspace:^",
+        "@types/node": "catalog:",
         "typescript": "catalog:"
     }
 }

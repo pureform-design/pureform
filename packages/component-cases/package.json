@@ -24,6 +24,7 @@
     "devDependencies": {
         "@pureform/tsconfig": "workspace:^",
         "@pureform/vite-config": "workspace:^",
+        "@types/node": "catalog:",
         "typescript": "catalog:",
         "vite": "catalog:"
     }
