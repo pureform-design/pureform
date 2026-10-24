@@ -807,7 +807,10 @@ describe("lists, menus, and selects", () => {
             '[data-testid="pf-list-item-root"]',
         );
         expect(link!.getAttribute("role")).toBe("link");
-        expect(row!.getAttribute("role")).toBe("listitem");
+        // In a list, the item around each row is the listitem, as the web's `<li>`.
+        expect(row!.hasAttribute("role")).toBe(false);
+        for (const item of [link!, row!])
+            expect(item.parentElement!.getAttribute("role")).toBe("listitem");
         await userEvent.click(link!);
         expect(open).toHaveBeenCalledWith("#inbox");
         open.mockRestore();
@@ -1004,7 +1007,8 @@ describe("lists, menus, and selects", () => {
             ),
         );
         await settle(50);
-        expect(shown()).toEqual(["Prague"]);
+        // It filters by what was typed only, as the web's: the chosen label shows them all.
+        expect(shown()).toEqual(["Paris", "Prague", "Rome"]);
     });
 
     it("opens a search view, filters, selects, and closes", async () => {
