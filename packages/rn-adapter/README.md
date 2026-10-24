@@ -67,8 +67,13 @@ two stacked paths, and a ripple drawn at its end size grows with its group's tra
 opacity. On a device ripples run on the native driver, but a morph or a cross-fade still writes
 the paths' props from the JavaScript thread: for components whose shapes morph, such as icon
 buttons and toggles, use `ReanimatedSvgDrawing` from `/reanimated-svg` (the `reanimatedSvg`
-engine), which runs them on the UI thread. A device's SVG ripples clip to the surface's corners,
-not to a drawn shape.
+engine), which runs them on the UI thread, keyframed shapes and `alternate` directions included.
+A device's SVG ripples clip to the surface's rounded corners, not to a drawn shape: the native
+driver moves views, a view can't sit inside the SVG's clip path, and clipping a view to a path
+needs a mask view, which React Native doesn't ship (nor pureform depend on). `ReanimatedSvgDrawing`'s
+ripples are drawn inside the clip path and grow on the UI thread, so they keep the exact shape. A
+fill cross-fade over a translucent fill fades the old fill out as the new one fades in, so
+together they cover as much as the color between them.
 
 ```tsx
 import { precompute } from "@pureform/rn-adapter";

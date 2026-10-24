@@ -132,6 +132,12 @@ import { registry } from "./.pureform";
   `"rtl"` puts `rtl` in every selection), `motion` (`"system"` follows `AccessibilityInfo`'s
   reduce motion setting and its `reduceMotionChanged` event), `defaults`, `engine`, `width` (the
   window's at the root), and `timeScale`. Everything is inherited.
+- **Engines and drawn shapes:** `animatedSvg` grows ripples on the native driver, so on a device
+  they clip to the surface's rounded corners, not to a drawn shape (a native-driven view can't sit
+  inside an SVG clip path, and masking a view needs a mask view, which React Native doesn't ship).
+  For surfaces whose shape isn't a rounded box (a shaped icon button, a cookie-shaped FAB), use
+  `reanimatedSvg`: its ripples are drawn inside the shape's clip and grow on the UI thread. On the
+  web both clip to the exact shape.
 - **Hooks:** `useStyles(name, selection)` gives `NativeSlots` (style, drawing, transitions,
   animation, parent, icon fill per slot), over the provider's defaults, with the direction and
   reduced motion added; the same selection returns the same frozen object.

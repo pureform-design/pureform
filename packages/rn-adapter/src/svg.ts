@@ -20,6 +20,7 @@ import Svg, { Circle, Defs, G, Path } from "react-native-svg";
 import type { PathProps } from "react-native-svg";
 
 import { animate, curve } from "./animate/curve";
+import { runKeyframes } from "./animate/keyframes";
 import {
     DISCS,
     useBrowserRipple,
@@ -32,10 +33,18 @@ import type {
     RippleProps,
     Ripples,
 } from "./animate/ripple";
-import { pathAt, placeGradient, shapeCoordinates, shapePath } from "./geometry";
+import {
+    cssDirection,
+    keyframeShapes,
+    pathAt,
+    placeGradient,
+    shapeCoordinates,
+    shapePath,
+} from "./geometry";
 import type { PlacedGradient } from "./geometry";
-import { animatable, blend } from "./motion";
+import { animatable, blend, fadeOutOpacity } from "./motion";
 import { useComponentState } from "./react";
+import { parseColor } from "./rgba";
 import type { Drawing } from "./select";
 import {
     drawingSvg,
@@ -193,29 +202,32 @@ const mixColors = (from: string, to: string, t: number) =>
     String(blend(animatable(from), animatable(to), t));
 
 // The drawing's shape paths, each registered while it's mounted: `fading` ones are the fill's
-// top path, which cross-fades over the color under it.
+// top path, which cross-fades over the color under it, and `under` ones that color's.
 const useShapePaths = () => {
     const [paths] = useState(() => ({
         all: new Set<unknown>(),
         fading: new Set<unknown>(),
+        under: new Set<unknown>(),
         // A path mounting mid-morph, such as a cross-fade's, joins it.
         join: (_node: unknown) => {},
     }));
     const ShapePath = useMemo(
         () =>
-            ((props: PathProps & { fading?: boolean }) => {
-                const { fading, ...own } = props;
+            ((props: PathProps & { fading?: boolean; under?: boolean }) => {
+                const { fading, under, ...own } = props;
                 const node = useRef<unknown>(null);
                 useLayoutEffect(() => {
                     const n = node.current;
                     paths.all.add(n);
                     if (fading) paths.fading.add(n);
+                    if (under) paths.under.add(n);
                     paths.join(n);
                     return () => {
                         paths.all.delete(n);
                         paths.fading.delete(n);
+                        paths.under.delete(n);
                     };
-                }, [fading]);
+                }, [fading, under]);
                 return h(Path, { ...own, ref: node as never });
             }) as ComponentType<PathProps>,
         [paths],
@@ -313,8 +325,9 @@ const useMorph = (
 };
 
 // A keyframe animation's shapes (the loading indicator's): the drawing's paths morph through
-// them as CSS eases between keyframes, each step on the animation's curve, looping as it does.
-// The browser runs it where CSS animates `d`; elsewhere Animated writes the paths each frame.
+// them as CSS eases between keyframes, each step on the animation's curve, looping as it does,
+// in its direction (`alternate` there and back). The browser runs it where CSS animates `d`;
+// elsewhere Animated writes the paths each frame.
 const useShapeKeyframes = (
     drawing: Drawing | undefined,
     box: { width: number; height: number } | undefined,
@@ -328,16 +341,8 @@ const useShapeKeyframes = (
             : "";
     useLayoutEffect(() => {
         if (!keyframes || !base || !box) return;
-        const frames = [...keyframes.frames];
-        if (frames[0]?.offset !== 0) frames.unshift({ offset: 0, shape: base });
-        if (frames.at(-1)?.offset !== 1)
-            frames.push({ offset: 1, shape: base });
-        const points = frames.map((frame) =>
-            shapeCoordinates(frame.shape, box),
-        );
-        // Shapes of another structure can't morph into each other.
-        if (points.some((p) => mixPoints(points[0]!, p, 0) === undefined))
-            return;
+        const frames = keyframeShapes(keyframes, base, box);
+        if (!frames) return;
         const iterations =
             keyframes.iterations < 0 ? Infinity : keyframes.iterations;
         const nodes = [...paths.all];
@@ -347,19 +352,16 @@ const useShapeKeyframes = (
                 return element
                     ? [
                           element.animate(
-                              frames.map((frame, i) => ({
+                              frames.map((frame) => ({
                                   offset: frame.offset,
-                                  d: `path("${pathAt(frame.shape, points[i]!)}")`,
+                                  d: `path("${frame.d}")`,
                                   easing: keyframes.easing,
                               })),
                               {
                                   duration: keyframes.duration,
                                   delay: keyframes.delay,
                                   iterations,
-                                  direction:
-                                      keyframes.direction === "alternateReverse"
-                                          ? "alternate-reverse"
-                                          : keyframes.direction,
+                                  direction: cssDirection(keyframes.direction),
                               },
                           ),
                       ]
@@ -370,9 +372,9 @@ const useShapeKeyframes = (
             };
         }
         const ease = curve(keyframes.easing);
-        const backwards = keyframes.direction.toLowerCase().includes("reverse");
-        const pathOf = (progress: number) => {
-            const t = backwards ? 1 - progress : progress;
+        // `t` is the directed progress through the frames, which `runKeyframes` turns back for
+        // a reverse or alternating direction, as CSS does before easing each step.
+        const pathOf = (t: number) => {
             let i = 0;
             while (i < frames.length - 2 && t > frames[i + 1]!.offset) i++;
             const [from, to] = [frames[i]!, frames[i + 1]!];
@@ -382,7 +384,7 @@ const useShapeKeyframes = (
                     : 1;
             return pathAt(
                 from.shape,
-                mixPoints(points[i]!, points[i + 1]!, local)!,
+                mixPoints(from.points, to.points, local)!,
             );
         };
         const value = new Animated.Value(0);
@@ -393,19 +395,7 @@ const useShapeKeyframes = (
                 else (node as SvgNode).setNativeProps?.({ d });
             }
         });
-        const loop = Animated.loop(
-            Animated.timing(value, {
-                toValue: 1,
-                duration: keyframes.duration,
-                easing: (t) => t,
-                useNativeDriver: false,
-            }),
-            { iterations: iterations === Infinity ? -1 : iterations },
-        );
-        const running =
-            keyframes.delay > 0
-                ? Animated.sequence([Animated.delay(keyframes.delay), loop])
-                : loop;
+        const running = runKeyframes(value, keyframes);
         running.start();
         return () => {
             running.stop();
@@ -414,13 +404,21 @@ const useShapeKeyframes = (
     }, [key]);
 };
 
+// SVG's samples of the old fill's fade, in the transition's progress.
+const FADE_SAMPLES = 16;
+
 // A change of fill cross-fades over its transition: the new fill's path fades in over a path of
-// the color shown before, which goes once it has.
-const useCrossFade = (drawing: Drawing | undefined, fading: Set<unknown>) => {
+// the color shown before, which goes once it has. Under a translucent new fill the old one fades
+// out meanwhile (`fadeOutOpacity`).
+const useCrossFade = (
+    drawing: Drawing | undefined,
+    fading: Set<unknown>,
+    under: Set<unknown>,
+) => {
     const fill = drawing?.fill;
     const transition = drawing?.transitions?.fill;
     // An object, so a fade restarting from the same color still starts again.
-    const [under, setUnder] = useState<{ color: string }>();
+    const [from, setUnder] = useState<{ color: string }>();
     const last = useRef(fill);
     const run = useRef<Run>(undefined);
     useLayoutEffect(() => {
@@ -428,8 +426,8 @@ const useCrossFade = (drawing: Drawing | undefined, fading: Set<unknown>) => {
         if (before === fill) return;
         last.current = fill;
         const shown =
-            run.current && under && before !== undefined
-                ? mixColors(under.color, before, run.current.progress())
+            run.current && from && before !== undefined
+                ? mixColors(from.color, before, run.current.progress())
                 : before;
         run.current?.stop();
         run.current = undefined;
@@ -441,27 +439,47 @@ const useCrossFade = (drawing: Drawing | undefined, fading: Set<unknown>) => {
         setUnder(fades ? { color: shown } : undefined);
     }, [fill]);
     useLayoutEffect(() => {
-        if (!under || !transition) return;
+        if (!from || !transition) return;
         const nodes = [...fading];
+        const olds = [...under];
+        const alpha = fill === undefined ? 1 : (parseColor(fill)[3] ?? 1);
+        const translucent = alpha < 1;
         const done = () => {
             run.current = undefined;
             setUnder(undefined);
         };
+        const timing = {
+            duration: transition.duration,
+            delay: transition.delay,
+            easing: transition.easing,
+            fill: "backwards" as const,
+        };
+        // The old fill's fade, sampled in the transition's progress, which its easing gives.
+        const fadeOut = Array.from({ length: FADE_SAMPLES + 1 }, (_, i) => ({
+            offset: i / FADE_SAMPLES,
+            opacity: fadeOutOpacity(alpha, i / FADE_SAMPLES),
+        }));
         run.current = WEB
             ? browserRun(
                   transition,
-                  nodes.flatMap((node) => {
-                      const animation = elementOf(node)?.animate(
-                          [{ opacity: 0 }, { opacity: 1 }],
-                          {
-                              duration: transition.duration,
-                              delay: transition.delay,
-                              easing: transition.easing,
-                              fill: "backwards",
-                          },
-                      );
-                      return animation ? [animation] : [];
-                  }),
+                  [
+                      ...nodes.flatMap((node) => {
+                          const animation = elementOf(node)?.animate(
+                              [{ opacity: 0 }, { opacity: 1 }],
+                              timing,
+                          );
+                          return animation ? [animation] : [];
+                      }),
+                      ...(translucent
+                          ? olds.flatMap((node) => {
+                                const animation = elementOf(node)?.animate(
+                                    fadeOut,
+                                    timing,
+                                );
+                                return animation ? [animation] : [];
+                            })
+                          : []),
+                  ],
                   done,
               )
             : animatedRun(
@@ -470,12 +488,18 @@ const useCrossFade = (drawing: Drawing | undefined, fading: Set<unknown>) => {
                       for (const node of nodes) {
                           (node as SvgNode).setNativeProps?.({ opacity: t });
                       }
+                      if (!translucent) return;
+                      for (const node of olds) {
+                          (node as SvgNode).setNativeProps?.({
+                              opacity: fadeOutOpacity(alpha, t),
+                          });
+                      }
                   },
                   done,
               );
-    }, [under]);
+    }, [from]);
     useLayoutEffect(() => () => run.current?.stop(), []);
-    return under?.color;
+    return from?.color;
 };
 
 /** A slot's drawing, filling the slot. A change of shape morphs, and a change of fill
@@ -486,7 +510,7 @@ export const SvgDrawing = ({ drawing, color, image }: SvgDrawingProps) => {
     const { paths, ShapePath } = useShapePaths();
     useMorph(drawing, box, paths);
     useShapeKeyframes(drawing, box, paths);
-    const under = useCrossFade(drawing, paths.fading);
+    const under = useCrossFade(drawing, paths.fading, paths.under);
     if (!drawing) return null;
     const { shape } = drawing;
     return inSlot(
@@ -502,6 +526,7 @@ export const SvgDrawing = ({ drawing, color, image }: SvgDrawingProps) => {
                 ShapePath,
                 fadeFrom: under,
                 fadeIn: { fading: true },
+                fadeOut: { under: true },
             }),
     );
 };
@@ -525,7 +550,10 @@ const BrowserRippleCircle = (props: RippleCircleProps) => {
 };
 
 // On a device, a ripple drawn at its end in its own SVG, in a view the native driver moves there
-// from its start and fades. Its layer clips it to the surface's corners, not to an SVG shape.
+// from its start and fades. Its layer clips it to the surface's rounded corners, not to an SVG
+// shape: a native-driven view can't sit inside the drawing's clip path, and clipping a view to a
+// path takes a mask view, which React Native doesn't ship. `reanimated-svg` keeps the exact clip
+// on the UI thread.
 const nativeSvgRipple =
     (gradient: GradientValue, id: string) => (props: RippleProps) => {
         const { grow, fade } = useRippleMotion(props, true);

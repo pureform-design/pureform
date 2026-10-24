@@ -1,9 +1,12 @@
+import { ReanimatedSvgDrawing } from "@pureform/rn-adapter/reanimated-svg";
 import type { ReactNode } from "react";
+import { View } from "react-native";
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { LoadingIndicator } from ".";
 import { PureformProvider } from "..";
 import { animated } from "../engine";
+import { reanimatedSvg } from "../engines/reanimated-svg";
 import { animatedSvg } from "../engines/svg";
 import { LinearProgress } from "../linear-progress";
 import { presetRegistry } from "../testing/registry";
@@ -82,6 +85,79 @@ describe("LoadingIndicator", () => {
             "reduce",
         );
         expect(path("r").getAnimations()).toHaveLength(0);
+    });
+
+    it("morphs through the shapes with reanimated-svg too, and only turns under reduced motion", async () => {
+        const path = (id: string) =>
+            byTestId(`${id}-indicator`).querySelector("svg path") as SVGElement;
+        await render(
+            <LoadingIndicator aria-label="Loading" testId="q" />,
+            reanimatedSvg,
+        );
+        const [morph] = path("q").getAnimations();
+        const frames = (morph!.effect as KeyframeEffect).getKeyframes();
+        expect(frames).toHaveLength(8);
+        expect(morph!.effect!.getTiming().iterations).toBe(Infinity);
+        const before = getComputedStyle(path("q")).d;
+        await settle(150);
+        expect(getComputedStyle(path("q")).d).not.toBe(before);
+        await render(
+            <LoadingIndicator aria-label="Loading" testId="qr" />,
+            reanimatedSvg,
+            "reduce",
+        );
+        expect(path("qr").getAnimations()).toHaveLength(0);
+    });
+
+    it("runs a keyframed shape's alternate direction with reanimated-svg", async () => {
+        const square = (inset: number) => ({
+            contours: [
+                {
+                    from: [inset, inset] as [number, number],
+                    segments: [
+                        {
+                            op: "line" as const,
+                            to: [100 - inset, inset] as [number, number],
+                        },
+                        {
+                            op: "line" as const,
+                            to: [100 - inset, 100 - inset] as [number, number],
+                        },
+                        {
+                            op: "line" as const,
+                            to: [inset, 100 - inset] as [number, number],
+                        },
+                    ],
+                },
+            ],
+        });
+        const view = await mount(
+            <View style={{ width: 100, height: 100 }}>
+                <ReanimatedSvgDrawing
+                    drawing={{
+                        shape: square(0),
+                        fill: "rgb(255, 0, 0)",
+                        keyframes: {
+                            duration: 400,
+                            delay: 0,
+                            easing: "linear",
+                            iterations: -1,
+                            direction: "alternate",
+                            frames: [
+                                { offset: 0, shape: square(0) },
+                                { offset: 1, shape: square(20) },
+                            ],
+                        },
+                    }}
+                />
+            </View>,
+        );
+        await settle(50);
+        const [animation] = view.querySelector("svg path")!.getAnimations();
+        expect(animation!.effect!.getTiming().direction).toBe("alternate");
+        expect(
+            (animation!.effect as KeyframeEffect).getKeyframes(),
+        ).toHaveLength(2);
     });
 
     it("turns, under reduced motion too", async () => {
