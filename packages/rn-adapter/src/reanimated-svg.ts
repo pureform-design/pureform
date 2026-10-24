@@ -1,5 +1,6 @@
 // Drawing with react-native-svg, moved by Reanimated 4 on the UI thread: shapes morph and fills
-// blend through CSS transitions on a path's `d` and `fill`, and press ripples grow through a
+// blend through CSS transitions on a path's `d` and `fill`, keyframed shapes (the loading
+// indicator's) run through a CSS animation of `d` in its direction, and press ripples grow through a
 // keyframe animation of their circle and fade through a transition of its opacity. Needs
 // react-native-reanimated and react-native-svg.
 
@@ -9,7 +10,7 @@ import { Circle, G, Path } from "react-native-svg";
 
 import { DISCS, useRippleDrawn } from "./animate/ripple";
 import type { RippleOptions, Ripples } from "./animate/ripple";
-import { shapePath } from "./geometry";
+import { cssDirection, keyframeShapes, shapePath } from "./geometry";
 import { useComponentState } from "./react";
 import { cssEasing } from "./reanimated";
 import type { Drawing } from "./select";
@@ -30,7 +31,7 @@ const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 const AnimatedG = Animated.createAnimatedComponent(G);
 
 /** As `SvgDrawing`, with Reanimated morphing the shape and blending the fill on the UI thread,
- *  over the slot's transitions. */
+ *  over the slot's transitions, and running its keyframed shapes. */
 export const ReanimatedSvgDrawing = ({
     drawing,
     color,
@@ -39,26 +40,62 @@ export const ReanimatedSvgDrawing = ({
     const { box, fill: inSlot } = useSlotBox();
     const id = useSvgId();
     const transitions = drawing?.transitions;
-    // The path's `d` and `fill` move over the shape's and the fill's transitions, as CSS's do.
+    const keyframes = drawing?.keyframes;
+    const base = drawing?.shape;
+    const keyframesKey =
+        keyframes && base && box
+            ? JSON.stringify([keyframes, base, box.width, box.height])
+            : "";
+    // The path's `d` and `fill` move over the shape's and the fill's transitions, as CSS's do,
+    // and `d` through the keyframed shapes, as CSS's animation of it, each step eased.
     const motion = useMemo(() => {
+        const frames =
+            keyframes && base && box
+                ? keyframeShapes(keyframes, base, box)
+                : undefined;
+        const animation = frames &&
+            keyframes && {
+                animationName: Object.fromEntries(
+                    frames.map((frame) => [
+                        `${Math.round(frame.offset * 10000) / 100}%`,
+                        { d: frame.d },
+                    ]),
+                ),
+                animationDuration: keyframes.duration,
+                animationDelay: keyframes.delay,
+                animationTimingFunction: cssEasing(keyframes.easing),
+                animationIterationCount:
+                    keyframes.iterations < 0
+                        ? ("infinite" as const)
+                        : keyframes.iterations,
+                animationDirection: cssDirection(keyframes.direction),
+            };
         const timed = (
             [
                 ["d", transitions?.shape],
                 ["fill", transitions?.fill],
             ] as const
         ).flatMap(([property, t]) => (t ? [{ property, t }] : []));
-        if (timed.length === 0) return undefined;
+        if (timed.length === 0 && !animation) return undefined;
         return {
             animatedProps: {
-                transitionProperty: timed.map(({ property }) => property),
-                transitionDuration: timed.map(({ t }) => t.duration),
-                transitionDelay: timed.map(({ t }) => t.delay),
-                transitionTimingFunction: timed.map(({ t }) =>
-                    cssEasing(t.easing),
-                ),
+                ...animation,
+                ...(timed.length > 0
+                    ? {
+                          transitionProperty: timed.map(
+                              ({ property }) => property,
+                          ),
+                          transitionDuration: timed.map(({ t }) => t.duration),
+                          transitionDelay: timed.map(({ t }) => t.delay),
+                          transitionTimingFunction: timed.map(({ t }) =>
+                              cssEasing(t.easing),
+                          ),
+                      }
+                    : {}),
             },
         };
-    }, [transitions]);
+        // A new animation restarts it, so it changes only with its frames or the box.
+    }, [transitions, keyframesKey]);
     if (!drawing) return null;
     return inSlot(
         box &&

@@ -18,11 +18,15 @@ interface Loop {
     running?: Animated.CompositeAnimation;
 }
 
-// Drive a keyframe animation's progress from 0 to 1 each time through: backwards for
-// `reverse`, there and back for `alternate`, as many times as it runs.
-const run = (
+/** Drives a keyframe animation's progress from 0 to 1 each time through: backwards for
+ *  `reverse`, there and back for `alternate`, as many times as it runs, after its delay. The
+ *  progress is the directed one, through the frames' offsets, linear in time. */
+export const runKeyframes = (
     progress: Animated.Value,
-    animation: Animation,
+    animation: Pick<
+        Animation,
+        "direction" | "duration" | "iterations" | "delay"
+    >,
 ): Animated.CompositeAnimation => {
     const backwards =
         animation.direction === "reverse" ||
@@ -70,7 +74,7 @@ export const useKeyframes = () => {
         for (const loop of stale.current.splice(0)) loop.running?.stop();
         for (const loop of loops.current.values()) {
             if (loop.running) continue;
-            loop.running = run(loop.progress, loop.animation);
+            loop.running = runKeyframes(loop.progress, loop.animation);
             loop.running.start();
         }
     });

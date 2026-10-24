@@ -40,10 +40,12 @@ import type {
 import {
     markMenuGroupEdges,
     menuDrillFrom,
+    menuDrillTiming,
     menuDrillTo,
     menuSubmenuPressed,
     menuSubmenuRoom,
     noteMenuSubmenuPresses,
+    springRoleVar,
 } from "@pureform/binding-core/dom";
 import type { MenuDrillSnapshot } from "@pureform/binding-core/dom";
 import * as menu from "@pureform/machines/menu";
@@ -77,7 +79,7 @@ import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { usePresence } from "../presence";
 import type { Presence } from "../presence";
 import type { PartProps } from "../props";
-import { useDirection } from "../provider";
+import { useDirection, usePureform } from "../provider";
 
 type Anatomy = typeof menuOverlayAnatomy;
 
@@ -710,17 +712,19 @@ function DrillMotion(props: {
     };
 }): JSX.Element {
     const { api } = context.use("Content");
+    const state = usePureform();
     createEffect(
         () => [props.level, api().getContentProps().id] as const,
         ([, id]) => {
             props.drill.contentId = typeof id === "string" ? id : undefined;
             const snapshot = props.drill.from;
             props.drill.from = undefined;
-            if (snapshot && props.drill.contentId)
-                menuDrillTo(
-                    document.getElementById(props.drill.contentId),
-                    snapshot,
-                );
+            if (!snapshot || !props.drill.contentId) return;
+            const content = document.getElementById(props.drill.contentId);
+            const spring = untrack(() =>
+                springRoleVar(state().registry, "spatialDefault"),
+            );
+            menuDrillTo(content, snapshot, menuDrillTiming(content, spring));
         },
     );
     return null;

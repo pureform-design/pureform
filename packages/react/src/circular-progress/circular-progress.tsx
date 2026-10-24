@@ -9,7 +9,10 @@ import {
     progressRootProps,
     progressSelection,
 } from "@pureform/binding-core";
-import type { ProgressRootOwnProps } from "@pureform/binding-core";
+import type {
+    ProgressReadyMadeProps,
+    ProgressRootOwnProps,
+} from "@pureform/binding-core";
 import type { ElementType, ReactNode } from "react";
 
 import { createPartContext } from "../part-context";
@@ -94,7 +97,8 @@ export interface CircularProgressProps
             CircularProgressRootProps,
             keyof SlotKeyedProps<Anatomy> | "children"
         >,
-        SlotKeyedProps<Anatomy> {}
+        SlotKeyedProps<Anatomy>,
+        ProgressReadyMadeProps {}
 
 /** The ready-made circular progress indicator: Root, its track, its halves, and their arcs. */
 function ReadyMade(props: CircularProgressProps): ReactNode {
@@ -102,19 +106,22 @@ function ReadyMade(props: CircularProgressProps): ReactNode {
         className: _className,
         style: _style,
         slotProps: _slotProps,
+        track = true,
         ...rootProps
     } = props;
     const slot = useSlotProps(props);
     return (
         <Root {...rootProps} {...(slot("root") as object)}>
-            <TrackPart {...slot("track")}>
-                <TrackEndHalf {...slot("trackEndHalf")}>
-                    <TrackEndArc {...slot("trackEndArc")} />
-                </TrackEndHalf>
-                <TrackStartHalf {...slot("trackStartHalf")}>
-                    <TrackStartArc {...slot("trackStartArc")} />
-                </TrackStartHalf>
-            </TrackPart>
+            {track ? (
+                <TrackPart {...slot("track")}>
+                    <TrackEndHalf {...slot("trackEndHalf")}>
+                        <TrackEndArc {...slot("trackEndArc")} />
+                    </TrackEndHalf>
+                    <TrackStartHalf {...slot("trackStartHalf")}>
+                        <TrackStartArc {...slot("trackStartArc")} />
+                    </TrackStartHalf>
+                </TrackPart>
+            ) : null}
             <EndHalf {...slot("endHalf")}>
                 <EndArc {...slot("endArc")} />
             </EndHalf>

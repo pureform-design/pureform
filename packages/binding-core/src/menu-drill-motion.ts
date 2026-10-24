@@ -4,7 +4,13 @@
 // animates the content from the old size to its new one and moves the label (FLIP) from where it
 // was to its place in the new level, while the other rows fade in. Going in, the pressed item's
 // label goes into the submenu's header (the back row); going back, the header's label goes into
-// the submenu's item in the level above. Under reduced motion nothing moves.
+// the submenu's item in the level above. The step runs on the theme's spatial spring, read from
+// the vars the web writes its parameters to (`menuDrillTiming`), as React Native springs it.
+// Under reduced motion nothing moves.
+
+import { formatLinearEasing, sampleSpring } from "@pureform/core";
+
+import { springFromVars } from "./settle";
 
 /** What a drill step moves from: the content's size, and the moving label's box. */
 export interface MenuDrillSnapshot {
@@ -15,15 +21,33 @@ export interface MenuDrillSnapshot {
     readonly to: string;
 }
 
-/** The drill motion's timing: Material's medium duration and emphasized curve by default. */
+/** The drill motion's timing: a duration and a CSS easing. */
 export interface MenuDrillTiming {
     readonly duration: number;
     readonly easing: string;
 }
 
+/** The timing without a theme's spring: Material's medium duration and emphasized curve. */
 export const MENU_DRILL_TIMING: MenuDrillTiming = {
     duration: 300,
     easing: "cubic-bezier(0.2, 0, 0, 1)",
+};
+
+/** The drill step's timing: the spring whose parameters `element` inherits under `spring` (a
+ *  spring token's var, `springRoleVar(registry, "spatialDefault")`), sampled into a duration
+ *  and a `linear()` curve; `MENU_DRILL_TIMING` when it isn't set. */
+export const menuDrillTiming = (
+    element: Element | null,
+    spring: string | undefined,
+): MenuDrillTiming => {
+    const found =
+        element && spring ? springFromVars(element, spring) : undefined;
+    if (!found) return MENU_DRILL_TIMING;
+    const sampled = sampleSpring(found);
+    return {
+        duration: sampled.duration,
+        easing: formatLinearEasing(sampled.points),
+    };
 };
 
 const row = (content: Element, value: string): HTMLElement | null =>

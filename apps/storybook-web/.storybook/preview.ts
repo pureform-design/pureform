@@ -36,6 +36,22 @@ export default {
                 dynamicTitle: true,
             },
         },
+        // React Native's motion engine (`storyEngine` in `@pureform/react-native/storybook`);
+        // the web renderers ignore it.
+        engine: {
+            description: "The motion engine React Native renders with",
+            toolbar: {
+                title: "Engine",
+                icon: "lightning",
+                items: [
+                    { value: "svg", title: "Animated + SVG" },
+                    { value: "animated", title: "Animated" },
+                    { value: "reanimated", title: "Reanimated" },
+                    { value: "reanimated-svg", title: "Reanimated + SVG" },
+                ],
+                dynamicTitle: true,
+            },
+        },
         // Each renderer's hook maps it to its provider's `theme`.
         theme: {
             description: "The theme the story renders with",
@@ -68,7 +84,12 @@ export default {
             }
         }
     },
-    initialGlobals: { renderer: "solid", scheme: "system", theme: "default" },
+    initialGlobals: {
+        renderer: "solid",
+        scheme: "system",
+        theme: "default",
+        engine: "svg",
+    },
     // The a11y addon's violations fail the story's test (in Vitest and in the panel's runs).
     parameters: {
         a11y: { test: "error" },

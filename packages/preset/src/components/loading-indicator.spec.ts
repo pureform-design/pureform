@@ -1,5 +1,6 @@
-import { px } from "@pureform/core/ast";
+import { flex, hidden, none, pct, px, transparent } from "@pureform/core/ast";
 import { compilePreset } from "@pureform/panda-adapter";
+import { radius } from "@pureform/theme";
 import { describe, expect, it } from "vitest";
 
 import { configWith } from "../__fixtures__/config";
@@ -223,32 +224,46 @@ describe("indeterminate progress tracks", () => {
         );
     });
 
-    it("leaves a gap on each side of the sliding linear indicator, on the web", () => {
-        const track = linearProgress.recipe.variants?.indeterminate?.true
-            ?.track as { rawRules?: { css?: Record<string, unknown> } };
-        const css = JSON.stringify(track.rawRules?.css?.["&"]);
-        // The track's color, less the indicator's width and a gap each side, at `slide`, which
-        // the track animates in step with the indicator.
-        expect(css).toContain('"type":"gradient"');
-        expect(css).toContain('"path":["components","linearProgress","slide"]');
-        expect(css).toContain('"path":["components","linearProgress","gap"]');
-        expect(css).toContain(
-            '"path":["components","linearProgress","indeterminateWidth"]',
+    it("draws the indeterminate linear track in two rounded parts either side of the sliding indicator", () => {
+        const recipe = linearProgress.recipe;
+        expect(linearProgress.structure?.["track"]).toEqual([
+            "trackBefore",
+            "trackAfter",
+        ]);
+        // Hidden while determinate.
+        expect(recipe.base?.trackBefore?.display).toEqual(none);
+        expect(recipe.base?.trackAfter?.display).toEqual(none);
+        const on = recipe.variants?.indeterminate?.true;
+        // The track only clips its parts to its rounded ends.
+        expect(on?.track?.backgroundColor).toEqual(transparent);
+        expect(recipe.base?.track?.overflow).toEqual(hidden);
+        for (const part of [on?.trackBefore, on?.trackAfter]) {
+            expect(part?.display).toEqual(flex);
+            expect(part?.borderRadius).toEqual(radius("full"));
+            expect(part?.width).toEqual(pct(100));
+            const css = JSON.stringify(part?.animation);
+            expect(css).toContain("linearProgressTrack");
+            expect(css).toContain("linearProgressTrackRtl");
+            // The same duration and easing as the indicator's slide.
+            expect(css).toContain("indeterminateDuration");
+        }
+        // Before ends a gap before the indicator, after starts a gap after it.
+        const before = JSON.stringify(on?.trackBefore?.insetInlineStart);
+        const after = JSON.stringify(on?.trackAfter?.insetInlineStart);
+        expect(before).toContain('"gap"');
+        expect(after).toContain('"gap"');
+        expect(after).toContain('"indeterminateWidth"');
+        // They move as far as the indicator: -1 to 2.5 indicator widths, the other way under
+        // right to left.
+        const frames = JSON.stringify(
+            PROGRESS_KEYFRAMES["linearProgressTrack"],
         );
-        expect(css).toContain("linearProgressTrackGap");
-        expect(css).toContain("linearProgressTrackGapRtl");
-        expect(PROGRESS_KEYFRAMES["linearProgressTrackGap"]).toEqual({
-            from: {
-                tokens: {
-                    "components.linearProgress.slide": expect.anything(),
-                },
-            },
-            to: {
-                tokens: {
-                    "components.linearProgress.slide": expect.anything(),
-                },
-            },
-        });
+        expect(frames).toContain('"indeterminateWidth"');
+        expect(frames).toContain("-1");
+        expect(frames).toContain("2.5");
+        expect(
+            JSON.stringify(PROGRESS_KEYFRAMES["linearProgressTrackRtl"]),
+        ).toContain("-2.5");
     });
 });
 

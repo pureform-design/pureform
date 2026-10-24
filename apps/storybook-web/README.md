@@ -2,8 +2,9 @@
 
 pureform's components in one Storybook, from every renderer: Solid, React, and React Native
 (through React Native Web). The toolbar's **Renderer** switches between them on the same story,
-**Scheme** picks System (the default), Light or Dark, and **Theme** a named theme from
-`pureform.config.ts`. Stories, controls
+**Scheme** picks System (the default), Light or Dark, **Theme** a named theme from
+`pureform.config.ts`, and **Engine** React Native's motion engine (Animated + SVG by default,
+Animated, Reanimated, or Reanimated + SVG; the web renderers ignore it). Stories, controls
 and `play` tests are shared, so one interaction test runs against every renderer.
 
 ```sh

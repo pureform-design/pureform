@@ -157,7 +157,10 @@ interface ItemProps {
         value: string,
         row: Measurable | null,
         how?: SelectHow,
+        label?: Measurable | null,
     ) => void;
+    /** Where a drill step's moving label was: this row's label moves from there into place. */
+    readonly flip?: DrillFlip | undefined;
     /** The key that opens its submenu on the web: the arrow toward the inline end. */
     readonly openKey: string;
     /** An option of a listbox (the select's), saying whether it's chosen, rather than a menu
@@ -224,6 +227,17 @@ function MenuItemImpl(props: ItemProps): ReactNode {
     const id = (part: Part) => testIdOf(menuAnatomy, part, props.testId);
     const icon = iconParts(slots, id);
     const row = useRef<Measurable>(null);
+    const labelRef = useRef<Measurable>(null);
+    const label = (
+        <v.itemLabel.Text
+            ref={labelRef as never}
+            selectable={false}
+            style={s.itemLabel}
+            testID={id("itemLabel")}
+        >
+            {item.label}
+        </v.itemLabel.Text>
+    );
     return (
         <v.item.Pressable
             ref={row as never}
@@ -257,7 +271,12 @@ function MenuItemImpl(props: ItemProps): ReactNode {
                     item.onCheckedChange?.(
                         item.type === "radio" || !item.checked,
                     );
-                props.onSelect(item.value, row.current);
+                props.onSelect(
+                    item.value,
+                    row.current,
+                    "press",
+                    labelRef.current,
+                );
             }}
             {...(Platform.OS === "web" && props.option
                 ? {
@@ -281,7 +300,12 @@ function MenuItemImpl(props: ItemProps): ReactNode {
                       }) => {
                           if (event.nativeEvent.key !== props.openKey) return;
                           event.preventDefault();
-                          props.onSelect(item.value, row.current, "key");
+                          props.onSelect(
+                              item.value,
+                              row.current,
+                              "key",
+                              labelRef.current,
+                          );
                       },
                   }
                 : {})}
@@ -293,13 +317,7 @@ function MenuItemImpl(props: ItemProps): ReactNode {
                 style={s.itemContent}
                 testID={id("itemContent")}
             >
-                <v.itemLabel.Text
-                    selectable={false}
-                    style={s.itemLabel}
-                    testID={id("itemLabel")}
-                >
-                    {item.label}
-                </v.itemLabel.Text>
+                {props.flip ? <Flip from={props.flip}>{label}</Flip> : label}
                 {isPresent(item.supportingText) ? (
                     <v.itemSupportingText.Text
                         selectable={false}
@@ -356,15 +374,17 @@ const springing = (
         useNativeDriver: false,
     });
 
-// A drilled menu's rows: a new level springs the menu's height from the last level's to its
-// own, clipped meanwhile, as the web's does; at rest it has no height of its own.
+// A drilled menu's rows: a new level springs the menu's width and height from the last level's
+// to its own, clipped meanwhile, as the web's does; at rest it has no size of its own. While it
+// moves, the rows lay out at their own width (in a view as wide as the window), which it measures.
 function DrillSize(props: {
     readonly level: string;
     readonly children: ReactNode;
 }): ReactNode {
     const spring = useSpatialSpring();
-    const height = useRef(new Animated.Value(0)).current;
-    const natural = useRef(0);
+    const { width: windowWidth } = useWindowDimensions();
+    const size = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
+    const natural = useRef({ width: 0, height: 0 });
     const pending = useRef(false);
     const [moving, setMoving] = useState(false);
     const first = useRef(true);
@@ -373,39 +393,75 @@ function DrillSize(props: {
             first.current = false;
             return;
         }
-        if (!spring || natural.current <= 0) return;
-        height.stopAnimation();
-        height.setValue(natural.current);
+        if (!spring || natural.current.height <= 0) return;
+        size.stopAnimation();
+        size.setValue({ x: natural.current.width, y: natural.current.height });
         pending.current = true;
         setMoving(true);
     }, [props.level]);
-    useEffect(() => () => height.stopAnimation(), [height]);
+    useEffect(() => () => size.stopAnimation(), [size]);
     return (
         <Animated.View
-            style={moving ? { height, overflow: "hidden" } : undefined}
+            style={
+                moving
+                    ? { width: size.x, height: size.y, overflow: "hidden" }
+                    : undefined
+            }
         >
             <View
-                collapsable={false}
-                onLayout={(event: LayoutChangeEvent) => {
-                    const measured = event.nativeEvent.layout.height;
-                    natural.current = measured;
-                    if (!pending.current || !spring) return;
-                    pending.current = false;
-                    springing(height, measured, spring).start(
-                        ({ finished }) => {
-                            if (finished) setMoving(false);
-                        },
-                    );
-                }}
+                style={
+                    moving
+                        ? {
+                              position: "absolute",
+                              top: 0,
+                              start: 0,
+                              width: windowWidth,
+                              alignItems: "flex-start",
+                          }
+                        : undefined
+                }
             >
-                {props.children}
+                <View
+                    collapsable={false}
+                    onLayout={(event: LayoutChangeEvent) => {
+                        const { width, height } = event.nativeEvent.layout;
+                        // At rest, the size it moves from next; moving, the new level's own.
+                        if (!pending.current) {
+                            if (!moving) natural.current = { width, height };
+                            return;
+                        }
+                        if (!spring) return;
+                        pending.current = false;
+                        natural.current = { width, height };
+                        springing(size, { x: width, y: height }, spring).start(
+                            ({ finished }) => {
+                                if (finished) setMoving(false);
+                            },
+                        );
+                    }}
+                >
+                    {props.children}
+                </View>
             </View>
         </Animated.View>
     );
 }
 
-// Where a drill step's moving row was, in the window: the pressed item going in (it moves into
-// the header), the header going out (it moves into the submenu's item).
+// The rows of a drill step's new level but the one its label moves into: they fade in, on the
+// spring the size moves on.
+function FadeIn(props: { readonly children: ReactNode }): ReactNode {
+    const spring = useSpatialSpring();
+    const opacity = useRef(new Animated.Value(spring ? 0 : 1)).current;
+    useLayoutEffect(() => {
+        if (!spring) return;
+        springing(opacity, 1, spring).start();
+        return () => opacity.stopAnimation();
+    }, []);
+    return <Animated.View style={{ opacity }}>{props.children}</Animated.View>;
+}
+
+// Where a drill step's moving label was, in the window: the pressed item's going in (it moves
+// into the header's), the header's going out (it moves into the submenu's item's).
 interface DrillFlip {
     readonly x: number;
     readonly y: number;
@@ -413,7 +469,7 @@ interface DrillFlip {
     readonly to: string;
 }
 
-// The row a drill step moves into: it starts where the moving row was and springs into its
+// The label a drill step moves into: it starts where the moving label was and springs into its
 // place (hidden until it's measured, so it doesn't show there first).
 function Flip(props: {
     readonly from: DrillFlip;
@@ -524,6 +580,7 @@ function MenuImpl(
         readonly item: MenuItem<ReactNode>;
         readonly row: WindowRect;
         readonly element: Measurable;
+        readonly label: Measurable | null;
         readonly how: SelectHow;
         readonly bounds: SubmenuBounds | undefined;
     }>();
@@ -536,21 +593,21 @@ function MenuImpl(
         // The row's element, which focus goes back to; set when the key opened it.
         readonly from?: Measurable;
     }>();
-    // The drill step under way: where its moving row was.
+    // The drill step under way: where its moving label was.
     const [flip, setFlip] = useState<DrillFlip>();
-    // Into a level or out of one: the moving row (the pressed item, or the back row) is noted
-    // where it is, then the level changes.
+    // Into a level or out of one: the moving label (the pressed item's, or the back row's) is
+    // noted where it is, then the level changes.
     const drillTo = (
         next: readonly string[],
         value: string,
-        row: Measurable | null,
+        label: Measurable | null,
     ) => {
         const to = next.length > path.length ? MENU_BACK_VALUE : path.at(-1)!;
-        if (!row) {
+        if (!label) {
             setFlip(undefined);
             return setPath(next);
         }
-        row.measureInWindow((x, y) => {
+        label.measureInWindow((x, y) => {
             setFlip({ x, y, to });
             setPath(next);
         });
@@ -568,7 +625,12 @@ function MenuImpl(
         }),
     );
     const select = useStableCallback(
-        (value: string, row: Measurable | null, how: SelectHow = "press") => {
+        (
+            value: string,
+            row: Measurable | null,
+            how: SelectHow = "press",
+            label: Measurable | null = row,
+        ) => {
             // Once drilled into, it stays a drill; a cascade or `auto` is decided as a submenu
             // opens.
             const pick = () =>
@@ -580,7 +642,7 @@ function MenuImpl(
                 );
             if (props.submenu === "drill" || path.length > 0) {
                 const next = pick();
-                if (next) return drillTo(next, value, row);
+                if (next) return drillTo(next, value, label);
             }
             const chosen = shown.find((entry) => entry.value === value);
             if (chosen && hasSubmenu(chosen)) {
@@ -596,6 +658,7 @@ function MenuImpl(
                                 item: chosen,
                                 row: rect,
                                 element: row,
+                                label,
                                 how,
                                 bounds,
                             });
@@ -616,7 +679,7 @@ function MenuImpl(
         const shownNow = measuring;
         if (!shownNow) return;
         setMeasuring(undefined);
-        const { item: chosen, row, element, how, bounds } = shownNow;
+        const { item: chosen, row, element, label, how, bounds } = shownNow;
         const room =
             bounds &&
             width > 0 &&
@@ -631,7 +694,7 @@ function MenuImpl(
                 path,
                 chosen.value,
             );
-            if (next) return drillTo(next, chosen.value, element);
+            if (next) return drillTo(next, chosen.value, label);
         }
         setBeside({
             item: chosen,
@@ -658,18 +721,22 @@ function MenuImpl(
     if (!presence.present) return null;
     const id = (part: Part) => testIdOf(menuAnatomy, part, props.testId);
     const shownBeside = lastBeside.current;
-    const item = (entry: MenuItem<ReactNode>) =>
-        flip?.to === entry.value ? (
-            <Flip key={entry.value} from={flip}>
-                {row(entry)}
-            </Flip>
+    // During a drill step, the row its label moves into takes it (`flip`), and the others fade
+    // in (`FadeIn`, remounted for each step's level).
+    const step = flip ? path.join("\u0000") : undefined;
+    const fadeIn = (key: string, node: ReactNode) =>
+        step === undefined ? (
+            node
         ) : (
-            row(entry)
+            <FadeIn key={`${step}\u0000${key}`}>{node}</FadeIn>
         );
+    const item = (entry: MenuItem<ReactNode>) =>
+        flip?.to === entry.value ? row(entry) : fadeIn(entry.value, row(entry));
     const row = (entry: MenuItem<ReactNode>) => (
         <Item
             key={entry.value}
             item={entry}
+            flip={flip?.to === entry.value ? flip : undefined}
             selection={selection}
             indication={props.indication}
             testId={props.testId}
@@ -751,15 +818,18 @@ function MenuImpl(
                             style={s.itemGroup}
                             testID={id("itemGroup")}
                         >
-                            {isPresent(group.label) ? (
-                                <v.itemGroupLabel.Text
-                                    selectable={false}
-                                    style={s.itemGroupLabel}
-                                    testID={id("itemGroupLabel")}
-                                >
-                                    {group.label}
-                                </v.itemGroupLabel.Text>
-                            ) : null}
+                            {isPresent(group.label)
+                                ? fadeIn(
+                                      `${group.id}\u0000label`,
+                                      <v.itemGroupLabel.Text
+                                          selectable={false}
+                                          style={s.itemGroupLabel}
+                                          testID={id("itemGroupLabel")}
+                                      >
+                                          {group.label}
+                                      </v.itemGroupLabel.Text>,
+                                  )
+                                : null}
                             {group.items.map(item)}
                         </v.itemGroup.View>
                     ))}

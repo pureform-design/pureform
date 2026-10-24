@@ -14,7 +14,8 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 import type { Unstyled } from "../parts";
 import type { VariantProp } from "./variants";
 
-/** The linear progress indicator's parts: `"root" | "track" | "indicator" | "stopIndicator"`. */
+/** The linear progress indicator's parts: `"root" | "track" | "trackBefore" | "trackAfter" | "indicator" |
+ *  "stopIndicator"`. */
 export type LinearProgressPart = PartName<typeof linearProgressAnatomy>;
 
 /** The circular progress indicator's parts: `"root"`, the track's `"track" | "trackEndHalf" |
@@ -36,6 +37,13 @@ export interface ProgressVariantProps<C extends ProgressComponent> {
      *  target can't clip to a shape. @default "flat" */
     readonly shape?: VariantProp<C, "shape">;
     readonly tokens?: InstanceTokens<C> | undefined;
+}
+
+/** The ready-made progress indicators' own props. */
+export interface ProgressReadyMadeProps {
+    /** Whether to draw the track, the rest of the bar or circle beyond the indicator and its
+     *  gaps. Hidden with `false`; the indicator and the stop dot stay. @default true */
+    readonly track?: boolean | undefined;
 }
 
 /** The amount a progress indicator shows. */

@@ -33,11 +33,12 @@ import { typed } from "@pureform/core";
 import {
     absolute,
     add,
+    alias,
     animation,
     clamp,
     div,
+    flex,
     hidden,
-    linearGradient,
     max,
     min,
     mul,
@@ -48,7 +49,6 @@ import {
     relative,
     rotate,
     solid,
-    stop,
     sub,
     transform,
     translateX,
@@ -111,6 +111,20 @@ function circularArcKeyframes(): Record<string, Record<string, StyleMap>> {
     };
 }
 
+// How far the indeterminate track's parts have moved: `from` to `to` indicator widths.
+function trackSlide(sign: 1 | -1): Record<string, StyleMap> {
+    const at = (widths: number) =>
+        transform(
+            translateX(
+                mul(
+                    unitless(sign * widths),
+                    alias("components", "linearProgress", "indeterminateWidth"),
+                ),
+            ),
+        );
+    return { from: { transform: at(-1) }, to: { transform: at(2.5) } };
+}
+
 /** The keyframes the progress indicators animate with; `pureform()` adds them to the
  *  config. */
 export const PROGRESS_KEYFRAMES: Record<string, Record<string, StyleMap>> = {
@@ -138,16 +152,6 @@ export const PROGRESS_KEYFRAMES: Record<string, Record<string, StyleMap>> = {
             tokens: { [SLIDE]: unitless(-2.5) },
         },
     },
-    // The track follows the sliding indicator to leave a gap around it: the same `slide`,
-    // without moving.
-    linearProgressTrackGap: {
-        from: { tokens: { [SLIDE]: unitless(-1) } },
-        to: { tokens: { [SLIDE]: unitless(2.5) } },
-    },
-    linearProgressTrackGapRtl: {
-        from: { tokens: { [SLIDE]: unitless(1) } },
-        to: { tokens: { [SLIDE]: unitless(-2.5) } },
-    },
     // A wavy line's wave travels along its track, a wavelength each cycle, toward the end.
     linearProgressWave: {
         from: { tokens: { [WAVE_DRIFT]: px(0) } },
@@ -158,6 +162,10 @@ export const PROGRESS_KEYFRAMES: Record<string, Record<string, StyleMap>> = {
         to: { tokens: { [WAVE_DRIFT]: px(0) } },
     },
     ...circularArcKeyframes(),
+    // The indeterminate track's two parts move with the indicator: as far, in the root's widths
+    // (theirs), as the indicator's `linearProgressSlide` moves it in its own.
+    linearProgressTrack: trackSlide(1),
+    linearProgressTrackRtl: trackSlide(-1),
 };
 
 const linear = componentTokens(
@@ -214,33 +222,23 @@ const travellingWave = (): ShapeNode =>
         ),
     });
 
-// The indeterminate track: its color, less a gap on each side of the sliding indicator (Compose
-// draws the track only outside the indicator and its gaps). The track spans the root then, so
-// the indicator's start is `slide` of its widths from the track's start; under right to left
-// it slides the other way, from the right.
-const trackWithGap = (sign: 1 | -1) => {
-    const start = mul(
-        linear.ref("slide"),
-        unitless(sign),
-        linear.ref("indeterminateWidth"),
-    );
-    const color = linear.ref("trackColor");
-    return linearGradient(
-        [
-            stop(color, sub(start, linear.ref("gap"))),
-            stop(transparent, sub(start, linear.ref("gap"))),
-            stop(
-                transparent,
-                add(start, linear.ref("indeterminateWidth"), linear.ref("gap")),
-            ),
-            stop(
-                color,
-                add(start, linear.ref("indeterminateWidth"), linear.ref("gap")),
-            ),
-        ],
-        numeric(sign === 1 ? 90 : 270, "deg"),
-    );
-};
+// A part of the indeterminate track, as wide as the track, starting at `start` (where it would be
+// with the indicator at the track's start), and moving with the indicator.
+const trackPart = (start: ReturnType<typeof add>): StyleMap => ({
+    display: flex,
+    position: absolute,
+    top: px(0),
+    height: pct(100),
+    width: pct(100),
+    insetInlineStart: start,
+    borderRadius: radius("full"),
+    backgroundColor: linear.ref("trackColor"),
+    animation: when(
+        "rtl",
+        slide("linearProgressTrackRtl"),
+        slide("linearProgressTrack"),
+    ),
+});
 
 const travel = (name: string) =>
     animation({
@@ -271,8 +269,18 @@ export const createLinearProgress = <const G extends string = ColorGroup>(
                     "Material linear progress. Set the value token (0 to 100), or turn on indeterminate.",
             },
             tokens: linear.tokens,
-            slots: ["root", "track", "indicator", "stopIndicator"],
-            structure: { root: ["track", "indicator", "stopIndicator"] },
+            slots: [
+                "root",
+                "track",
+                "trackBefore",
+                "trackAfter",
+                "indicator",
+                "stopIndicator",
+            ],
+            structure: {
+                root: ["track", "indicator", "stopIndicator"],
+                track: ["trackBefore", "trackAfter"],
+            },
             variants: {
                 indeterminate: ["true", "false"],
                 thickness: ["default", "thick"],
@@ -300,8 +308,13 @@ export const createLinearProgress = <const G extends string = ColorGroup>(
                         insetInlineEnd: px(0),
                         borderRadius: radius("full"),
                         backgroundColor: ref("trackColor"),
+                        overflow: hidden,
                         transition: tweens("insetInlineStart"),
                     },
+                    // The indeterminate track's parts before and after the sliding indicator
+                    // (none while determinate).
+                    trackBefore: { display: none },
+                    trackAfter: { display: none },
                     // The dot at the end of a determinate track, centred on it.
                     stopIndicator: {
                         position: absolute,
@@ -329,30 +342,19 @@ export const createLinearProgress = <const G extends string = ColorGroup>(
                 variants: {
                     indeterminate: {
                         true: {
-                            // On the web the track leaves a gap around the indicator as it
-                            // slides; React Native draws the whole track under it.
+                            // The track is drawn in two parts, one either side of the
+                            // sliding indicator and its gaps, each with rounded ends (Compose's
+                            // indeterminate track); the track only clips them to its own
+                            // rounded ends. Each part is as wide as the track and moves with the
+                            // indicator (`linearProgressTrack`).
                             track: {
                                 insetInlineStart: px(0),
-                                rawRules: {
-                                    css: {
-                                        "&": {
-                                            backgroundColor: transparent,
-                                            backgroundImage: when(
-                                                "rtl",
-                                                trackWithGap(-1),
-                                                trackWithGap(1),
-                                            ),
-                                            animation: when(
-                                                "rtl",
-                                                slide(
-                                                    "linearProgressTrackGapRtl",
-                                                ),
-                                                slide("linearProgressTrackGap"),
-                                            ),
-                                        },
-                                    },
-                                },
+                                backgroundColor: transparent,
                             },
+                            trackBefore: trackPart(sub(pct(-100), ref("gap"))),
+                            trackAfter: trackPart(
+                                add(ref("indeterminateWidth"), ref("gap")),
+                            ),
                             stopIndicator: { display: none },
                             indicator: {
                                 width: ref("indeterminateWidth"),

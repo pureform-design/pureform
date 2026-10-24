@@ -162,54 +162,45 @@ describe.each(Object.keys(STYLINGS) as (keyof typeof STYLINGS)[])(
             expect(box(end!).left).toBeCloseTo(box(start!).right, 0);
         });
 
-        it("leaves a gap on each side of the sliding linear indicator", () => {
-            const c = STYLINGS[styling].classes("linearProgress", {
-                indeterminate: true,
-            });
-            const root =
-                show(`<div data-root class="${c.root}" role="progressbar" style="width: 400px">
-                <div class="${c.track}"></div>
+        it.each(["ltr", "rtl"])(
+            "leaves a gap on each side of the sliding linear indicator, the track in two rounded parts (%s)",
+            (dir) => {
+                const c = STYLINGS[styling].classes("linearProgress", {
+                    indeterminate: true,
+                });
+                const root =
+                    show(`<div dir="${dir}"><div data-root class="${c.root}" role="progressbar" style="width: 400px">
+                <div class="${c.track}"><div class="${c.trackBefore}"></div><div class="${c.trackAfter}"></div></div>
                 <div class="${c.indicator}"></div>
-            </div>`);
-            const [track, indicator] = [...root.children] as HTMLElement[];
-            pauseAt(root, 700);
-            const slide = Number(
-                getComputedStyle(track!).getPropertyValue(
-                    "--pf-components-linearProgress-slide",
-                ),
-            );
-            // The track follows the indicator's slide, in step with it.
-            expect(slide).toBeCloseTo(
-                Number(
-                    getComputedStyle(indicator!).getPropertyValue(
-                        "--pf-components-linearProgress-slide",
-                    ),
-                ),
-                3,
-            );
-            const image = getComputedStyle(track!).backgroundImage;
-            expect(image).toMatch(/^linear-gradient\(90deg/);
-            // The hole runs from the indicator's start less the gap to its end plus the gap.
-            const bar = indicator!.getBoundingClientRect();
-            const left = bar.left - root.getBoundingClientRect().left;
-            // Chromium keeps each stop as `calc(<share>% ± 4px)`, the share of the track's width.
-            const width = track!.getBoundingClientRect().width;
-            const stops = [
-                ...image.matchAll(
-                    /rgba\(0, 0, 0, 0\) calc\(([-\d.]+)% ([-+]) ([\d.]+)px\)/g,
-                ),
-            ].map(
-                (m) =>
-                    (Number(m[1]) / 100) * width +
-                    (m[2] === "-" ? -1 : 1) * Number(m[3]),
-            );
-            expect(stops, image).toHaveLength(2);
-            expect(stops[0]).toBeCloseTo(left - 4, 0);
-            expect(stops[1]).toBeCloseTo(left + bar.width + 4, 0);
-            expect(getComputedStyle(track!).backgroundColor).toBe(
-                "rgba(0, 0, 0, 0)",
-            );
-        });
+            </div></div>`);
+                const [track, indicator] = [...root.children] as HTMLElement[];
+                const [before, after] = [...track!.children] as HTMLElement[];
+                pauseAt(root, 700);
+                const bar = indicator!.getBoundingClientRect();
+                const [lead, trail] =
+                    dir === "rtl" ? [after!, before!] : [before!, after!];
+                // Mid-slide, the parts stop a gap short of the indicator on each side.
+                expect(lead.getBoundingClientRect().right).toBeCloseTo(
+                    bar.left - 4,
+                    0,
+                );
+                expect(trail.getBoundingClientRect().left).toBeCloseTo(
+                    bar.right + 4,
+                    0,
+                );
+                // Each part's ends are rounded; the track only clips them to its own.
+                for (const part of [before!, after!]) {
+                    const style = getComputedStyle(part);
+                    expect(style.borderTopLeftRadius).not.toBe("0px");
+                    expect(style.borderTopRightRadius).not.toBe("0px");
+                    expect(style.backgroundColor).not.toBe("rgba(0, 0, 0, 0)");
+                }
+                expect(getComputedStyle(track!).backgroundColor).toBe(
+                    "rgba(0, 0, 0, 0)",
+                );
+                expect(getComputedStyle(track!).overflow).toBe("hidden");
+            },
+        );
 
         it("moves the wavy line's wave along the track, a wavelength a second", () => {
             const c = STYLINGS[styling].classes("linearProgress", {

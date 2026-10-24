@@ -502,12 +502,19 @@ exports[`linearProgress > compiles to a stable Panda slot recipe 1`] = `
       "height": "100%",
       "insetInlineEnd": "0px",
       "insetInlineStart": "calc(calc(var(--components-linearProgress-value, 0) * 1%) + var(--components-linearProgress-gap, 4px))",
+      "overflow": "hidden",
       "position": "absolute",
       "top": "0px",
       "transition": {
         "_motionReduce": "none",
         "base": "inset-inline-start token(durations.short3) token(easings.standard)",
       },
+    },
+    "trackAfter": {
+      "display": "none",
+    },
+    "trackBefore": {
+      "display": "none",
     },
   },
   "className": "linearProgress",
@@ -546,6 +553,8 @@ exports[`linearProgress > compiles to a stable Panda slot recipe 1`] = `
   "slots": [
     "root",
     "track",
+    "trackBefore",
+    "trackAfter",
     "indicator",
     "stopIndicator",
   ],
@@ -633,18 +642,36 @@ exports[`linearProgress > compiles to a stable Panda slot recipe 1`] = `
           "display": "none",
         },
         "track": {
-          "&": {
-            "animation": {
-              "_rtl": "var(--components-linearProgress-indeterminateDuration, 1750ms) token(easings.standard) infinite linearProgressTrackGapRtl",
-              "base": "var(--components-linearProgress-indeterminateDuration, 1750ms) token(easings.standard) infinite linearProgressTrackGap",
-            },
-            "backgroundColor": "transparent",
-            "backgroundImage": {
-              "_rtl": "linear-gradient(270deg, var(--components-linearProgress-trackColor, token(colors.secondaryContainer)) calc(calc(var(--components-linearProgress-slide, 0) * -1 * var(--components-linearProgress-indeterminateWidth, 40%)) - var(--components-linearProgress-gap, 4px)), transparent calc(calc(var(--components-linearProgress-slide, 0) * -1 * var(--components-linearProgress-indeterminateWidth, 40%)) - var(--components-linearProgress-gap, 4px)), transparent calc(calc(var(--components-linearProgress-slide, 0) * -1 * var(--components-linearProgress-indeterminateWidth, 40%)) + var(--components-linearProgress-indeterminateWidth, 40%) + var(--components-linearProgress-gap, 4px)), var(--components-linearProgress-trackColor, token(colors.secondaryContainer)) calc(calc(var(--components-linearProgress-slide, 0) * -1 * var(--components-linearProgress-indeterminateWidth, 40%)) + var(--components-linearProgress-indeterminateWidth, 40%) + var(--components-linearProgress-gap, 4px)))",
-              "base": "linear-gradient(90deg, var(--components-linearProgress-trackColor, token(colors.secondaryContainer)) calc(calc(var(--components-linearProgress-slide, 0) * 1 * var(--components-linearProgress-indeterminateWidth, 40%)) - var(--components-linearProgress-gap, 4px)), transparent calc(calc(var(--components-linearProgress-slide, 0) * 1 * var(--components-linearProgress-indeterminateWidth, 40%)) - var(--components-linearProgress-gap, 4px)), transparent calc(calc(var(--components-linearProgress-slide, 0) * 1 * var(--components-linearProgress-indeterminateWidth, 40%)) + var(--components-linearProgress-indeterminateWidth, 40%) + var(--components-linearProgress-gap, 4px)), var(--components-linearProgress-trackColor, token(colors.secondaryContainer)) calc(calc(var(--components-linearProgress-slide, 0) * 1 * var(--components-linearProgress-indeterminateWidth, 40%)) + var(--components-linearProgress-indeterminateWidth, 40%) + var(--components-linearProgress-gap, 4px)))",
-            },
-          },
+          "backgroundColor": "transparent",
           "insetInlineStart": "0px",
+        },
+        "trackAfter": {
+          "animation": {
+            "_rtl": "var(--components-linearProgress-indeterminateDuration, 1750ms) token(easings.standard) infinite linearProgressTrackRtl",
+            "base": "var(--components-linearProgress-indeterminateDuration, 1750ms) token(easings.standard) infinite linearProgressTrack",
+          },
+          "backgroundColor": "var(--components-linearProgress-trackColor, token(colors.secondaryContainer))",
+          "borderRadius": "token(radii.full)",
+          "display": "flex",
+          "height": "100%",
+          "insetInlineStart": "calc(var(--components-linearProgress-indeterminateWidth, 40%) + var(--components-linearProgress-gap, 4px))",
+          "position": "absolute",
+          "top": "0px",
+          "width": "100%",
+        },
+        "trackBefore": {
+          "animation": {
+            "_rtl": "var(--components-linearProgress-indeterminateDuration, 1750ms) token(easings.standard) infinite linearProgressTrackRtl",
+            "base": "var(--components-linearProgress-indeterminateDuration, 1750ms) token(easings.standard) infinite linearProgressTrack",
+          },
+          "backgroundColor": "var(--components-linearProgress-trackColor, token(colors.secondaryContainer))",
+          "borderRadius": "token(radii.full)",
+          "display": "flex",
+          "height": "100%",
+          "insetInlineStart": "calc(-100% - var(--components-linearProgress-gap, 4px))",
+          "position": "absolute",
+          "top": "0px",
+          "width": "100%",
         },
       },
     },

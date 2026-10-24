@@ -94,7 +94,8 @@ export const useSlotBox = () => {
 /** A slot's drawing as an SVG: its fill along the path `d`, a picture clipped to it, and its
  *  gradient over them. `ShapePath` draws each path, with `motion` added to its props, so an
  *  engine can move them. With `fadeFrom`, the fill path sits over one of that color, with
- *  `fadeIn` added to its props, so an engine can cross-fade them. */
+ *  `fadeIn` added to its props and `fadeOut` to the one under it, so an engine can cross-fade
+ *  them. */
 export const drawingSvg = (props: {
     id: string;
     box: Box;
@@ -107,6 +108,7 @@ export const drawingSvg = (props: {
     motion?: object;
     fadeFrom?: string | undefined;
     fadeIn?: object;
+    fadeOut?: object;
 }) => {
     const { id, box, drawing, d, fill, image } = props;
     const ShapePath = props.ShapePath ?? Path;
@@ -163,6 +165,7 @@ export const drawingSvg = (props: {
                 fill: props.fadeFrom,
                 fillRule,
                 ...props.motion,
+                ...props.fadeOut,
             }),
         d &&
             fill &&

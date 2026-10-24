@@ -468,3 +468,10 @@ export const slideFrames = (
     },
     { transform: [{ translateX: 0 }, { scaleX: 1 }] },
 ];
+
+/** The old fill's opacity `t` of the way through a cross-fade to a fill of opacity `alpha`, the
+ *  new one's being `t`: together they cover as much as the colors' blend does, `(1 - t)` of the
+ *  old and `t` of the new. An opaque new fill covers it whole, so the old stays until it's gone;
+ *  a translucent one lets it through, so the old fades out as the new fades in. */
+export const fadeOutOpacity = (alpha: number, t: number): number =>
+    t >= 1 ? 0 : alpha >= 1 ? 1 : (1 - t) / (1 - alpha * t);

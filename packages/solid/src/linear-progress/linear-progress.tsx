@@ -9,9 +9,12 @@ import {
     progressRootProps,
     progressSelection,
 } from "@pureform/binding-core";
-import type { ProgressRootOwnProps } from "@pureform/binding-core";
+import type {
+    ProgressReadyMadeProps,
+    ProgressRootOwnProps,
+} from "@pureform/binding-core";
 import type { JSX, ValidComponent } from "@solidjs/web";
-import { omit } from "solid-js";
+import { Show, omit } from "solid-js";
 
 import { createPartContext } from "../part-context";
 import { createSlotProps, useComponent, plainParts } from "../parts";
@@ -64,8 +67,13 @@ function Root(props: LinearProgressRootProps): JSX.Element {
 
 const part = plainParts(context.use, "div");
 
-/** The track: the rest of the bar, after the indicator and a gap. Empty. */
+/** The track: the rest of the bar, after the indicator and a gap. While indeterminate it only
+ *  clips its two parts, `TrackBefore` and `TrackAfter`, which it holds. */
 const Track = part("track", "Track");
+/** The indeterminate track's part before the sliding indicator and its gap. Empty. */
+const TrackBefore = part("trackBefore", "TrackBefore");
+/** The indeterminate track's part after the sliding indicator and its gap. Empty. */
+const TrackAfter = part("trackAfter", "TrackAfter");
 /** The bar that shows the amount done, or slides while indeterminate. Empty. */
 const Indicator = part("indicator", "Indicator");
 /** The dot at the end of a determinate track. Empty. */
@@ -79,7 +87,8 @@ export interface LinearProgressProps
             LinearProgressRootProps,
             keyof SlotKeyedProps<Anatomy> | "children"
         >,
-        SlotKeyedProps<Anatomy> {}
+        SlotKeyedProps<Anatomy>,
+        ProgressReadyMadeProps {}
 
 /** The ready-made linear progress indicator: Root, its track, indicator and stop indicator. */
 function ReadyMade(props: LinearProgressProps): JSX.Element {
@@ -89,14 +98,22 @@ function ReadyMade(props: LinearProgressProps): JSX.Element {
         "class",
         "style",
         "slotProps",
+        "track",
     ) as LinearProgressRootProps;
     const root = slots("root") as object;
     const track = slots("track");
+    const trackBefore = slots("trackBefore");
+    const trackAfter = slots("trackAfter");
     const indicator = slots("indicator");
     const stopIndicator = slots("stopIndicator");
     return (
         <Root {...own} {...root}>
-            <Track {...track} />
+            <Show when={props.track !== false}>
+                <Track {...track}>
+                    <TrackBefore {...trackBefore} />
+                    <TrackAfter {...trackAfter} />
+                </Track>
+            </Show>
             <Indicator {...indicator} />
             <StopIndicator {...stopIndicator} />
         </Root>
@@ -105,10 +122,13 @@ function ReadyMade(props: LinearProgressProps): JSX.Element {
 
 /** Material's linear progress indicator. Use it ready-made, `<LinearProgress value={40}
  *  aria-label="Uploading" />` (leave `value` out while the amount is unknown), or compose
- *  `LinearProgress.Root` around `Track`, `Indicator` and `StopIndicator`. */
+ *  `LinearProgress.Root` around `Track` (holding `TrackBefore` and `TrackAfter`), `Indicator`
+ *  and `StopIndicator`. */
 export const LinearProgress = Object.assign(ReadyMade, {
     Root,
     Track,
+    TrackBefore,
+    TrackAfter,
     Indicator,
     StopIndicator,
 });

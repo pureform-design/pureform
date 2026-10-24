@@ -126,4 +126,88 @@ describe("the Animated SVG engine on the web", () => {
         writes.disconnect();
         await until(() => expect(root.querySelector("svg circle")).toBeNull());
     });
+
+    it("fades a translucent old fill out as the new one fades in, keeping their coverage", async () => {
+        let change!: () => void;
+        function App(props: { readonly to: string }) {
+            const [changed, setChanged] = useState(false);
+            change = () => setChanged(true);
+            return (
+                <View style={{ width: 100, height: 100 }}>
+                    <SvgDrawing
+                        drawing={{
+                            shape: square(0),
+                            fill: changed ? props.to : "rgba(255, 0, 0, 0.5)",
+                            transitions,
+                        }}
+                    />
+                </View>
+            );
+        }
+        const fadeOf = async (to: string) => {
+            const view = await mount(<App to={to} />);
+            await until(() =>
+                expect(view.querySelector("svg path")).not.toBeNull(),
+            );
+            await act(async () => change());
+            const [old, fill] = [...view.querySelectorAll("svg path")];
+            expect(fill!.getAnimations()).toHaveLength(1);
+            return old!.getAnimations();
+        };
+        // Under a half-transparent fill, the old one fades out over the same time.
+        const [out] = await fadeOf("rgba(0, 0, 255, 0.5)");
+        const frames = (out!.effect as KeyframeEffect).getKeyframes();
+        const opacities = frames.map((frame) => Number(frame["opacity"]));
+        expect(opacities[0]).toBe(1);
+        expect(opacities.at(-1)).toBe(0);
+        // Halfway, (1 - ½) / (1 - ½ · ½) = ⅔ of it keeps the coverage at the blend's.
+        expect(
+            opacities[frames.findIndex((f) => f.offset === 0.5)],
+        ).toBeCloseTo(2 / 3, 3);
+        expect(out!.effect!.getTiming().duration).toBe(TIMING.duration);
+        // An opaque new fill covers the old one, which stays until it's gone.
+        expect(await fadeOf("rgb(0, 0, 255)")).toHaveLength(0);
+    });
+
+    it("runs keyframed shapes in their direction where the browser can't animate `d`", async () => {
+        const supports = CSS.supports;
+        CSS.supports = ((...args: [string, string?]) =>
+            args[0] === "d"
+                ? false
+                : supports.apply(CSS, args as never)) as never;
+        try {
+            const draw = (direction: "normal" | "alternate") => (
+                <View style={{ width: 100, height: 100 }}>
+                    <SvgDrawing
+                        drawing={{
+                            shape: square(0),
+                            fill: "rgb(255, 0, 0)",
+                            keyframes: {
+                                duration: 120,
+                                delay: 0,
+                                easing: "linear",
+                                iterations: 2,
+                                direction,
+                                frames: [
+                                    { offset: 0, shape: square(0) },
+                                    { offset: 1, shape: square(20) },
+                                ],
+                            },
+                        }}
+                    />
+                </View>
+            );
+            const box = { width: 100, height: 100 };
+            const ends = async (direction: "normal" | "alternate") => {
+                const view = await mount(draw(direction));
+                for (let i = 0; i < 12; i++) await settle(50);
+                return view.querySelector("svg path")!.getAttribute("d");
+            };
+            // Twice there: it ends on the last frame. There and back: on the first.
+            expect(await ends("normal")).toBe(shapePath(square(20), box));
+            expect(await ends("alternate")).toBe(shapePath(square(0), box));
+        } finally {
+            CSS.supports = supports;
+        }
+    });
 });

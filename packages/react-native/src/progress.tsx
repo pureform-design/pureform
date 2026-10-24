@@ -11,6 +11,7 @@ import { progressSelection } from "@pureform/binding-core";
 import type {
     CircularProgressPart,
     LinearProgressPart,
+    ProgressReadyMadeProps,
     ProgressValueProps,
     ProgressVariantProps,
 } from "@pureform/binding-core";
@@ -21,13 +22,19 @@ import { useEngine } from "./provider";
 import { useComponentSlots } from "./styles";
 
 export interface LinearProgressProps
-    extends ProgressVariantProps<"linearProgress">, ProgressValueProps {
+    extends
+        ProgressVariantProps<"linearProgress">,
+        ProgressValueProps,
+        ProgressReadyMadeProps {
     readonly "aria-label"?: string | undefined;
     readonly testId?: TestIdOverride<LinearProgressPart> | undefined;
 }
 
 export interface CircularProgressProps
-    extends ProgressVariantProps<"circularProgress">, ProgressValueProps {
+    extends
+        ProgressVariantProps<"circularProgress">,
+        ProgressValueProps,
+        ProgressReadyMadeProps {
     readonly "aria-label"?: string | undefined;
     readonly testId?: TestIdOverride<CircularProgressPart> | undefined;
 }
@@ -58,7 +65,18 @@ function LinearProgressImpl(props: LinearProgressProps): ReactNode {
         testIdOf(linearProgressAnatomy, part, props.testId);
     return (
         <v.root.View {...valueProps(props)} style={s.root} testID={id("root")}>
-            <v.track.View style={s.track} testID={id("track")} />
+            {props.track === false ? null : (
+                <v.track.View style={s.track} testID={id("track")}>
+                    <v.trackBefore.View
+                        style={s.trackBefore}
+                        testID={id("trackBefore")}
+                    />
+                    <v.trackAfter.View
+                        style={s.trackAfter}
+                        testID={id("trackAfter")}
+                    />
+                </v.track.View>
+            )}
             <v.indicator.View style={s.indicator} testID={id("indicator")}>
                 {/* A wavy indicator is drawn in its wave with an SVG engine. */}
                 {engine.Drawing ? (
@@ -86,26 +104,28 @@ function CircularProgressImpl(props: CircularProgressProps): ReactNode {
         testIdOf(circularProgressAnatomy, part, props.testId);
     return (
         <v.root.View {...valueProps(props)} style={s.root} testID={id("root")}>
-            <v.track.View style={s.track} testID={id("track")}>
-                <v.trackEndHalf.View
-                    style={s.trackEndHalf}
-                    testID={id("trackEndHalf")}
-                >
-                    <v.trackEndArc.View
-                        style={s.trackEndArc}
-                        testID={id("trackEndArc")}
-                    />
-                </v.trackEndHalf.View>
-                <v.trackStartHalf.View
-                    style={s.trackStartHalf}
-                    testID={id("trackStartHalf")}
-                >
-                    <v.trackStartArc.View
-                        style={s.trackStartArc}
-                        testID={id("trackStartArc")}
-                    />
-                </v.trackStartHalf.View>
-            </v.track.View>
+            {props.track === false ? null : (
+                <v.track.View style={s.track} testID={id("track")}>
+                    <v.trackEndHalf.View
+                        style={s.trackEndHalf}
+                        testID={id("trackEndHalf")}
+                    >
+                        <v.trackEndArc.View
+                            style={s.trackEndArc}
+                            testID={id("trackEndArc")}
+                        />
+                    </v.trackEndHalf.View>
+                    <v.trackStartHalf.View
+                        style={s.trackStartHalf}
+                        testID={id("trackStartHalf")}
+                    >
+                        <v.trackStartArc.View
+                            style={s.trackStartArc}
+                            testID={id("trackStartArc")}
+                        />
+                    </v.trackStartHalf.View>
+                </v.track.View>
+            )}
             <v.endHalf.View style={s.endHalf} testID={id("endHalf")}>
                 <v.endArc.View style={s.endArc} testID={id("endArc")} />
             </v.endHalf.View>

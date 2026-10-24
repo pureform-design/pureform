@@ -7,6 +7,10 @@ import { createElement } from "react";
 import type { ReactNode } from "react";
 import { View } from "react-native";
 
+import { animated } from "../engine";
+import type { MotionEngine } from "../engine";
+import { reanimated } from "../engines/reanimated";
+import { reanimatedSvg } from "../engines/reanimated-svg";
 import { animatedSvg } from "../engines/svg";
 import { PureformProvider } from "../provider";
 
@@ -29,17 +33,31 @@ export type Decorator = (
     context: StoryContext,
 ) => ReactNode;
 
-/** The provider with the story's registry, its scheme, and its named theme. Without a scheme the
- *  provider follows `useColorScheme()`, which React Native Web reads from the system. It draws
- *  with the SVG engine (react-native-svg, which runs on React Native Web), so shaped parts (a
- *  shaped media, the loading indicator's shapes) draw as an app with that engine shows them;
- *  the default engine has no shapes. */
+/** The motion engines the toolbar's `engine` global picks from, by its value. */
+export const STORY_ENGINES: Readonly<Record<string, MotionEngine>> = {
+    animated,
+    svg: animatedSvg,
+    reanimated,
+    "reanimated-svg": reanimatedSvg,
+};
+
+/** The engine for the toolbar's `engine` global: Animated with SVG (react-native-svg, which runs
+ *  on React Native Web) unless it names another, so shaped parts (a shaped media, the loading
+ *  indicator's shapes) draw as an app with that engine shows them; the engines without SVG have
+ *  no shapes. */
+export const storyEngine = (
+    globals: Readonly<Record<string, unknown>>,
+): MotionEngine => STORY_ENGINES[String(globals["engine"])] ?? animatedSvg;
+
+/** The provider with the story's registry, its scheme, its named theme, and the toolbar's
+ *  engine (`storyEngine`). Without a scheme the provider follows `useColorScheme()`, which React
+ *  Native Web reads from the system. */
 const withProvider: Decorator = (story, context) =>
     createElement(
         PureformProvider,
         {
             registry: context.registry,
-            engine: animatedSvg,
+            engine: storyEngine(context.globals),
             ...(context.theme.scheme ? { scheme: context.theme.scheme } : {}),
             theme: context.theme.name,
         },

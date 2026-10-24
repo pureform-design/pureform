@@ -2,6 +2,7 @@
 // that mix pixels and percentages until the box is laid out; these place them as CSS would.
 
 import { animatable, blend } from "./motion";
+import type { ShapeKeyframes } from "./select";
 import type { GradientValue, ShapePoint, ShapeValue, Value } from "./values";
 import { colorWith, pixels } from "./values";
 
@@ -277,3 +278,29 @@ export const conicWedges = (
         };
     });
 };
+
+/** A keyframed shape animation's frames for a box: each frame's offset, its shape and its
+ *  points, with the drawing's own shape at either end a frame leaves out, as CSS fills in a
+ *  missing keyframe. `undefined` when the shapes are of different structures, which can't
+ *  morph into each other. */
+export const keyframeShapes = (
+    keyframes: ShapeKeyframes,
+    base: ShapeValue,
+    box: Box,
+):
+    | { offset: number; shape: ShapeValue; points: number[]; d: string }[]
+    | undefined => {
+    const frames = [...keyframes.frames];
+    if (frames[0]?.offset !== 0) frames.unshift({ offset: 0, shape: base });
+    if (frames.at(-1)?.offset !== 1) frames.push({ offset: 1, shape: base });
+    const all = frames.map((frame) => {
+        const points = shapeCoordinates(frame.shape, box);
+        return { ...frame, points, d: pathAt(frame.shape, points) };
+    });
+    const size = all[0]!.points.length;
+    return all.every((frame) => frame.points.length === size) ? all : undefined;
+};
+
+/** A keyframe animation's direction as CSS writes it. */
+export const cssDirection = (direction: ShapeKeyframes["direction"]) =>
+    direction === "alternateReverse" ? "alternate-reverse" : direction;

@@ -1,6 +1,12 @@
+import { formatLinearEasing, sampleSpring } from "@pureform/core";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { menuDrillFrom, menuDrillTo } from "./menu-drill-motion";
+import {
+    MENU_DRILL_TIMING,
+    menuDrillFrom,
+    menuDrillTiming,
+    menuDrillTo,
+} from "./menu-drill-motion";
 
 // A menu's content with a row per entry, each with its label.
 const level = (rows: readonly string[], height = 48) => {
@@ -63,5 +69,31 @@ describe("the drilled menu's motion", () => {
         const snapshot = menuDrillFrom(content, "share", "pf-menu-back");
         content.replaceChildren(...level(["pf-menu-back", "mail"]).children);
         expect(menuDrillTo(content, snapshot)).toEqual([]);
+    });
+
+    it("runs on the theme's spring when its vars are set, and on the fixed curve otherwise", () => {
+        const content = level(["cut"]);
+        expect(menuDrillTiming(content, "--springs-spatial-default")).toBe(
+            MENU_DRILL_TIMING,
+        );
+        content.style.cssText +=
+            "; --springs-spatial-default-stiffness: 700; --springs-spatial-default-damping: 0.9; --springs-spatial-default-mass: 1";
+        const sampled = sampleSpring({
+            type: "spring",
+            stiffness: 700,
+            damping: 0.9,
+            mass: 1,
+        });
+        const timing = menuDrillTiming(content, "--springs-spatial-default");
+        expect(timing).toEqual({
+            duration: sampled.duration,
+            easing: formatLinearEasing(sampled.points),
+        });
+        const snapshot = menuDrillFrom(content, "cut", "pf-menu-back");
+        content.replaceChildren(...level(["pf-menu-back", "mail"]).children);
+        const [size] = menuDrillTo(content, snapshot, timing);
+        const run = size!.effect!.getTiming();
+        expect(run.duration).toBe(sampled.duration);
+        expect(run.easing).toMatch(/^linear\(/);
     });
 });
