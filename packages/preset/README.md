@@ -1354,6 +1354,9 @@ gone: it was a share of the circle set by hand for each size and thickness.) A w
 ends ride its wave: each dot sits on the wave's middle line at its angle, and the wavy track,
 smaller by `amplitude` all round, keeps the same gap.
 
+The web's trigonometric functions need Chrome 111, Safari 15.4 or Firefox 108. In older browsers
+the progress still shows, but the track and the round ends aren't turned into place.
+
 ## Surfaces
 
 - `card`: `variant` is `elevated`, `filled`, or `outlined`. Set `interactive` when the whole
