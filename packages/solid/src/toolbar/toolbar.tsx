@@ -3,7 +3,11 @@
 // `overflow` moves those that don't fit into the menu component behind an overflow button.
 
 import { toolbarAnatomy } from "@pureform/anatomy";
-import type { buttonAnatomy, iconButtonAnatomy } from "@pureform/anatomy";
+import type {
+    buttonAnatomy,
+    iconButtonAnatomy,
+    menuOverlayAnatomy,
+} from "@pureform/anatomy";
 import {
     isPresent,
     isUnstyled,
@@ -36,7 +40,7 @@ import { IconButton } from "../icon-button";
 import type { IconButtonProps } from "../icon-button";
 import { Menu } from "../menu";
 import { MENU_TRIGGER_ATTRIBUTES } from "../menu/menu";
-import { createSlotProps, useComponent } from "../parts";
+import { asRoot, createSlotProps, useComponent } from "../parts";
 import type { InnerPropsOf, SlotKeyedProps } from "../parts";
 import type { PartProps } from "../props";
 import { ProvidedTokens } from "../provided-tokens";
@@ -116,7 +120,12 @@ export interface ToolbarProps
     readonly buttonProps?: ButtonDefaults | undefined;
     /** The same for every icon button, keyed by the icon button's parts. */
     readonly iconButtonProps?: IconButtonDefaults | undefined;
+    /** The overflow menu's own props, keyed by the menu's parts; its `trigger` is the overflow
+     *  button. */
+    readonly menuProps?: MenuInnerProps | undefined;
 }
+
+type MenuInnerProps = InnerPropsOf<typeof menuOverlayAnatomy>;
 
 const READY_MADE_PROPS = [
     "class",
@@ -124,6 +133,7 @@ const READY_MADE_PROPS = [
     "slotProps",
     "buttonProps",
     "iconButtonProps",
+    "menuProps",
     ...TOOLBAR_CONTENT_PROPS,
 ] as const;
 
@@ -189,6 +199,18 @@ function ReadyMade(props: ToolbarProps): JSX.Element {
     const rootSlot = createSlotProps(
         props as Keyed as SlotKeyedProps<typeof toolbarAnatomy>,
     )("root");
+    const menuSlots = createSlotProps({
+        get class() {
+            return props.menuProps?.class;
+        },
+        get style() {
+            return props.menuProps?.style;
+        },
+        get slotProps() {
+            return props.menuProps?.slotProps;
+        },
+    } as SlotKeyedProps<typeof menuOverlayAnatomy>);
+    const menuRoot = menuSlots("root");
     const items = () => props.items ?? [];
     const [root, setRoot] = createSignal<HTMLElement | undefined>(undefined, {
         ownedWrite: true,
@@ -243,8 +265,16 @@ function ReadyMade(props: ToolbarProps): JSX.Element {
             </For>
             <Show when={props.overflow}>
                 <Menu.Root
+                    testId={props.menuProps?.testId}
+                    unstyled={props.menuProps?.unstyled}
+                    tokens={props.menuProps?.tokens}
+                    {...(menuRoot as object)}
                     {...{ [OVERFLOW]: "" }}
-                    style={overflowing() ? undefined : HIDDEN}
+                    style={
+                        overflowing()
+                            ? menuRoot.style
+                            : { ...(menuRoot.style as object), ...HIDDEN }
+                    }
                     positioning={toolbarMenuPositioning(props.orientation)}
                     onSelect={(details) =>
                         toolbarMenuSelect(items(), details.value)
@@ -263,11 +293,13 @@ function ReadyMade(props: ToolbarProps): JSX.Element {
                             )
                         }
                         testId={toolbarOverflowTestId(props.testId)}
+                        {...asRoot(menuSlots("trigger"))}
                     />
-                    <Menu.Positioner>
-                        <Menu.Content>
+                    <Menu.Positioner {...menuSlots("positioner")}>
+                        <Menu.Content {...menuSlots("content")}>
                             <Menu.Items
                                 items={toolbarMenuItems(items(), shown())}
+                                slot={menuSlots}
                             />
                         </Menu.Content>
                     </Menu.Positioner>

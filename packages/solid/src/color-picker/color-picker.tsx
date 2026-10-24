@@ -4,6 +4,7 @@
 // preset swatches. The value is a CSS color string; changes report hex.
 
 import { colorPickerAnatomy } from "@pureform/anatomy";
+import type { iconButtonAnatomy, textFieldAnatomy } from "@pureform/anatomy";
 import {
     COLOR_PICKER_DEFAULT,
     COLOR_PICKER_ROOT_PROPS,
@@ -44,7 +45,7 @@ import type { IconButtonProps } from "../icon-button/icon-button";
 import { normalizeProps, useMachine } from "../internal/zag";
 import { createPartContext } from "../part-context";
 import { createSlotProps, useComponent } from "../parts";
-import type { ComponentScope, SlotKeyedProps } from "../parts";
+import type { ComponentScope, InnerPropsOf, SlotKeyedProps } from "../parts";
 import { combinePartProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
@@ -443,12 +444,21 @@ export interface ColorPickerProps
     extends
         Omit<ColorPickerRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
         SlotKeyedProps<Anatomy>,
-        ColorPickerContentProps<JSX.Element> {}
+        ColorPickerContentProps<JSX.Element> {
+    /** The hex field, drawn as a text field, keyed by its parts. */
+    readonly textFieldProps?: InnerPropsOf<typeof textFieldAnatomy> | undefined;
+    /** The eye dropper, drawn as an icon button. */
+    readonly iconButtonProps?:
+        | InnerPropsOf<typeof iconButtonAnatomy>
+        | undefined;
+}
 
 const READY_MADE_PROPS = [
     "class",
     "style",
     "slotProps",
+    "textFieldProps",
+    "iconButtonProps",
     "label",
     "area",
     "alpha",
@@ -483,9 +493,13 @@ function ReadyMade(props: ColorPickerProps): JSX.Element {
                 </Show>
                 <Control {...(slots("control") as object)}>
                     <ValueSwatch {...(slots("valueSwatch") as object)} />
-                    <HexField label={props.inputLabel ?? "Hex"} />
+                    <HexField
+                        {...props.textFieldProps}
+                        label={props.inputLabel ?? "Hex"}
+                    />
                     <Show when={props.eyeDropper !== false}>
                         <EyeDropperTrigger
+                            {...props.iconButtonProps}
                             aria-label={
                                 props.eyeDropperLabel ??
                                 "Pick a color from the screen"

@@ -27,9 +27,13 @@ import {
 } from "solid-js";
 
 import { Description } from "../description/description";
+import type { DescriptionProps } from "../description/description";
 import { ErrorText } from "../error-text/error-text";
+import type { ErrorTextProps } from "../error-text/error-text";
 import { Input } from "../input/input";
+import type { InputProps } from "../input/input";
 import { Label } from "../label/label";
+import type { LabelProps } from "../label/label";
 import { useComponent } from "../parts";
 import type { PartProps } from "../props";
 import { FieldContext } from "./context";
@@ -47,6 +51,15 @@ export interface FieldProps
     readonly children?: JSX.Element;
     /** Another element or component to render instead of `<div>`. */
     readonly as?: ValidComponent | undefined;
+    /** The ready-made label's props: its `class`, `style`, `testId`, `unstyled`, `tokens`, and
+     *  the element's own. */
+    readonly labelProps?: Omit<LabelProps, "children"> | undefined;
+    /** The ready-made input's props (`type`, `placeholder`, `class`, `tokens`, …). */
+    readonly inputProps?: InputProps | undefined;
+    /** The ready-made description's props. */
+    readonly descriptionProps?: Omit<DescriptionProps, "children"> | undefined;
+    /** The ready-made error text's props. */
+    readonly errorTextProps?: Omit<ErrorTextProps, "children"> | undefined;
 }
 
 /** A column connecting the pieces inside it. */
@@ -85,22 +98,37 @@ export function Field(props: FieldProps): JSX.Element {
                 element: "div",
                 as: () => props.as,
                 props: merge(
-                    omit(props, "as", "children", ...FIELD_ROOT_PROPS),
+                    omit(
+                        props,
+                        "as",
+                        "children",
+                        "labelProps",
+                        "inputProps",
+                        "descriptionProps",
+                        "errorTextProps",
+                        ...FIELD_ROOT_PROPS,
+                    ),
                     {
                         get children() {
                             return readyMade() ? (
                                 <>
                                     <Show when={isPresent(props.label)}>
-                                        <Label>{props.label}</Label>
+                                        <Label {...props.labelProps}>
+                                            {props.label}
+                                        </Label>
                                     </Show>
-                                    <Input />
+                                    <Input {...props.inputProps} />
                                     <Show when={isPresent(props.description)}>
-                                        <Description>
+                                        <Description
+                                            {...props.descriptionProps}
+                                        >
                                             {props.description}
                                         </Description>
                                     </Show>
                                     <Show when={isPresent(props.error)}>
-                                        <ErrorText>{props.error}</ErrorText>
+                                        <ErrorText {...props.errorTextProps}>
+                                            {props.error}
+                                        </ErrorText>
                                     </Show>
                                 </>
                             ) : (

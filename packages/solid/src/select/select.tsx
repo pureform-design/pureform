@@ -52,7 +52,7 @@ import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
 import type { PartContext } from "../part-context";
 import { createSlotProps, useComponent } from "../parts";
-import type { ComponentScope, SlotKeyedProps } from "../parts";
+import type { ComponentScope, InnerPropsOf, SlotKeyedProps } from "../parts";
 import { usePresence } from "../presence";
 import type { Presence } from "../presence";
 import type { PartProps } from "../props";
@@ -94,6 +94,9 @@ export interface SelectRootProps
     extends Omit<PartProps, keyof SelectRootOwnProps>, SelectRootOwnProps {
     /** Another element or component to render instead of `<div>`. */
     readonly as?: ValidComponent | undefined;
+    /** The list's own props, drawn as a menu: `testId`, `unstyled`, and `tokens` (the ready-made
+     *  also takes `class`, `style`, and `slotProps` keyed by the menu's parts). */
+    readonly menuProps?: InnerPropsOf<MenuAnatomy> | undefined;
 }
 
 /** A part's props: the element's own, and the part's `unstyled`. */
@@ -170,9 +173,14 @@ function Root(props: SelectRootProps): JSX.Element {
         unstyled: () => props.unstyled,
     });
     const menu = useComponent(selectMenuAnatomy, {
-        selection: () => selectMenuSelection(props),
+        selection: () => ({
+            ...selectMenuSelection(props),
+            tokens: props.menuProps?.tokens,
+        }),
         testId: () =>
-            typeof props.testId === "string" ? props.testId : undefined,
+            props.menuProps?.testId ??
+            (typeof props.testId === "string" ? props.testId : undefined),
+        unstyled: () => props.menuProps?.unstyled,
         indication: () => props.indication,
     });
     return (
@@ -195,7 +203,7 @@ function Root(props: SelectRootProps): JSX.Element {
                 element: "div",
                 as: () => props.as,
                 machine: () => api().getRootProps(),
-                props: omit(props, "as", ...SELECT_ROOT_PROPS),
+                props: omit(props, "as", "menuProps", ...SELECT_ROOT_PROPS),
             })}
         </context.Provider>
     );
@@ -378,12 +386,27 @@ function ReadyMadeContent(props: {
     const supportingText = props.slots("supportingText");
     const hiddenSelect = props.slots("hiddenSelect") as object;
     const groups = createMemo(() => selectItemGroups(items()));
+    const menuSlots = createSlotProps({
+        get class() {
+            return own.menuProps?.class;
+        },
+        get style() {
+            return own.menuProps?.style;
+        },
+        get slotProps() {
+            return own.menuProps?.slotProps;
+        },
+    } as SlotKeyedProps<MenuAnatomy>);
+    const menuItem = menuSlots("item");
+    const menuItemLabel = menuSlots("itemLabel");
+    const menuItemGroup = menuSlots("itemGroup");
+    const menuItemGroupLabel = menuSlots("itemGroupLabel");
     const groupId = createUniqueId();
     const renderItems = (list: () => readonly SelectItem[]) => (
         <For each={list()} keyed={(item: SelectItem) => item.value}>
             {(item) => (
-                <Item item={item()}>
-                    <ItemLabel>{item().label}</ItemLabel>
+                <Item item={item()} {...menuItem}>
+                    <ItemLabel {...menuItemLabel}>{item().label}</ItemLabel>
                 </Item>
             )}
         </For>
@@ -429,8 +452,8 @@ function ReadyMadeContent(props: {
                 </SupportingText>
             </Show>
             <HiddenSelect {...hiddenSelect} />
-            <Positioner>
-                <Content>
+            <Positioner {...menuSlots("positioner")}>
+                <Content {...menuSlots("root")}>
                     <For each={groups()} keyed={false}>
                         {(group, index) => (
                             <Show
@@ -438,9 +461,13 @@ function ReadyMadeContent(props: {
                                 fallback={renderItems(() => group().items)}
                             >
                                 {(name) => (
-                                    <ItemGroup id={`${groupId}-${index}`}>
+                                    <ItemGroup
+                                        {...menuItemGroup}
+                                        id={`${groupId}-${index}`}
+                                    >
                                         <ItemGroupLabel
                                             htmlFor={`${groupId}-${index}`}
+                                            {...menuItemGroupLabel}
                                         >
                                             {name()}
                                         </ItemGroupLabel>

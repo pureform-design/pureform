@@ -6,6 +6,12 @@
 // dialog and is what the keyboard reaches.
 
 import { fileUploadAnatomy } from "@pureform/anatomy";
+import type {
+    buttonAnatomy,
+    iconButtonAnatomy,
+    linearProgressAnatomy,
+    listItemAnatomy,
+} from "@pureform/anatomy";
 import {
     FILE_UPLOAD_CONTENT_PROPS,
     FILE_UPLOAD_ROOT_PROPS,
@@ -17,6 +23,7 @@ import {
     fileUploadSelection,
     isPresent,
     isPreviewable,
+    overDefaults,
 } from "@pureform/binding-core";
 import type {
     FileUploadDomContentProps,
@@ -52,7 +59,7 @@ import { LinearProgress } from "../linear-progress";
 import { ListItem } from "../list-item";
 import { createPartContext } from "../part-context";
 import { createSlotProps, useComponent } from "../parts";
-import type { ComponentScope, SlotKeyedProps } from "../parts";
+import type { ComponentScope, InnerPropsOf, SlotKeyedProps } from "../parts";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 
@@ -99,6 +106,16 @@ export interface FileUploadItemProps extends FileUploadPartProps {
     readonly icon?: JSX.Element;
     /** The remove button's icon. @default a cross */
     readonly removeIcon?: JSX.Element;
+    /** The list item drawn for the file, keyed by its parts. */
+    readonly listItemProps?: InnerPropsOf<typeof listItemAnatomy> | undefined;
+    /** The remove button. */
+    readonly iconButtonProps?:
+        | InnerPropsOf<typeof iconButtonAnatomy>
+        | undefined;
+    /** The upload's progress bar. */
+    readonly linearProgressProps?:
+        | InnerPropsOf<typeof linearProgressAnatomy>
+        | undefined;
 }
 
 /** The file upload's root, a `<div>` around the label, the drop zone and the list, and the hidden
@@ -325,6 +342,9 @@ function Item(props: FileUploadItemProps): JSX.Element {
                 "icon",
                 "removeIcon",
                 "children",
+                "listItemProps",
+                "iconButtonProps",
+                "linearProgressProps",
             ),
             {
                 get children() {
@@ -332,8 +352,25 @@ function Item(props: FileUploadItemProps): JSX.Element {
                         props.children ?? (
                             <>
                                 <ListItem
+                                    {...overDefaults<
+                                        InnerPropsOf<typeof listItemAnatomy>
+                                    >(
+                                        {
+                                            ...itemTestId(root.testId),
+                                            slotProps: {
+                                                headline:
+                                                    api().getItemNameProps(
+                                                        item(),
+                                                    ),
+                                                supportingText:
+                                                    api().getItemSizeTextProps(
+                                                        item(),
+                                                    ),
+                                            } as object,
+                                        },
+                                        props.listItemProps ?? {},
+                                    )}
                                     leadingType={image() ? "thumbnail" : "icon"}
-                                    {...itemTestId(root.testId)}
                                     leading={
                                         image() ? (
                                             <Preview
@@ -361,6 +398,7 @@ function Item(props: FileUploadItemProps): JSX.Element {
                                     trailingControl
                                     trailing={
                                         <IconButton
+                                            {...props.iconButtonProps}
                                             {...(api().getItemDeleteTriggerProps(
                                                 item(),
                                             ) as object)}
@@ -376,19 +414,10 @@ function Item(props: FileUploadItemProps): JSX.Element {
                                             }
                                         />
                                     }
-                                    slotProps={
-                                        {
-                                            headline:
-                                                api().getItemNameProps(item()),
-                                            supportingText:
-                                                api().getItemSizeTextProps(
-                                                    item(),
-                                                ),
-                                        } as object
-                                    }
                                 />
                                 <Show when={upload().shown}>
                                     <LinearProgress
+                                        {...props.linearProgressProps}
                                         value={upload().value}
                                         aria-label={`Uploading ${props.file.name}`}
                                     />
@@ -408,12 +437,25 @@ export interface FileUploadProps
     extends
         Omit<FileUploadRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
         SlotKeyedProps<Anatomy>,
-        FileUploadDomContentProps<JSX.Element> {}
+        FileUploadDomContentProps<JSX.Element> {
+    /** The trigger, drawn as a button. */
+    readonly buttonProps?: InnerPropsOf<typeof buttonAnatomy> | undefined;
+    /** Every file's list item, keyed by its parts. */
+    readonly listItemProps?: FileUploadItemProps["listItemProps"];
+    /** Every file's remove button. */
+    readonly iconButtonProps?: FileUploadItemProps["iconButtonProps"];
+    /** Every upload's progress bar. */
+    readonly linearProgressProps?: FileUploadItemProps["linearProgressProps"];
+}
 
 const READY_MADE_PROPS = [
     "class",
     "style",
     "slotProps",
+    "buttonProps",
+    "listItemProps",
+    "iconButtonProps",
+    "linearProgressProps",
     ...FILE_UPLOAD_CONTENT_PROPS,
 ] as const;
 
@@ -448,6 +490,7 @@ function Content(props: {
                 </Show>
                 <Show when={own.trigger !== null}>
                     <Trigger
+                        {...own.buttonProps}
                         variant="outlined"
                         label={own.trigger ?? "Choose files"}
                     />
@@ -466,6 +509,9 @@ function Content(props: {
                                 progress={root.progress?.(file)}
                                 icon={own.fileIcon?.(file)}
                                 removeIcon={own.removeIcon}
+                                listItemProps={own.listItemProps}
+                                iconButtonProps={own.iconButtonProps}
+                                linearProgressProps={own.linearProgressProps}
                                 {...props.slots("item")}
                             />
                         )}
@@ -478,6 +524,9 @@ function Content(props: {
                                 errors={rejected.errors}
                                 icon={own.fileIcon?.(rejected.file)}
                                 removeIcon={own.removeIcon}
+                                listItemProps={own.listItemProps}
+                                iconButtonProps={own.iconButtonProps}
+                                linearProgressProps={own.linearProgressProps}
                                 {...props.slots("item")}
                             />
                         )}

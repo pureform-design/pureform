@@ -5,6 +5,7 @@
 // them from data.
 
 import { splitButtonAnatomy } from "@pureform/anatomy";
+import type { menuOverlayAnatomy } from "@pureform/anatomy";
 import {
     isPresent,
     SPLIT_BUTTON_CONTENT_PROPS,
@@ -31,7 +32,7 @@ import { Menu } from "../menu";
 import { MENU_TRIGGER_ATTRIBUTES } from "../menu/menu";
 import { createPartContext } from "../part-context";
 import { createSlotProps, useComponent } from "../parts";
-import type { ComponentScope, SlotKeyedProps } from "../parts";
+import type { ComponentScope, InnerPropsOf, SlotKeyedProps } from "../parts";
 import { combinePartProps } from "../props";
 import type { PartProps } from "../props";
 
@@ -54,7 +55,28 @@ export interface SplitButtonRootProps
         SplitButtonRootOwnProps {
     /** Another element or component to render instead of `<div>`. */
     readonly as?: ValidComponent | undefined;
+    /** The menu's own props: `testId`, `unstyled`, `tokens`, and its root's `class`, `style` and
+     *  `slotProps` (the ready-made also reaches the menu's other parts). */
+    readonly menuProps?: InnerPropsOf<MenuAnatomy> | undefined;
 }
+
+type MenuAnatomy = typeof menuOverlayAnatomy;
+
+// The menu's parts' slot props from `menuProps`, followed as it changes.
+const createMenuSlotProps = (props: {
+    readonly menuProps?: InnerPropsOf<MenuAnatomy> | undefined;
+}) =>
+    createSlotProps({
+        get class() {
+            return props.menuProps?.class;
+        },
+        get style() {
+            return props.menuProps?.style;
+        },
+        get slotProps() {
+            return props.menuProps?.slotProps;
+        },
+    } as SlotKeyedProps<MenuAnatomy>);
 
 /** A part's props: the element's own, and the part's `unstyled`. */
 export interface SplitButtonPartProps extends PartProps {
@@ -79,9 +101,11 @@ function Root(props: SplitButtonRootProps): JSX.Element {
         unstyled: () => props.unstyled,
         indication: () => props.indication,
     });
+    const menuRoot = createMenuSlotProps(props)("root") as object;
     return (
         <context.Provider value={{ scope, disabled: () => !!props.disabled }}>
             <Menu.Root
+                {...menuRoot}
                 open={props.open}
                 defaultOpen={props.defaultOpen}
                 onOpenChange={props.onOpenChange}
@@ -93,11 +117,19 @@ function Root(props: SplitButtonRootProps): JSX.Element {
                 ids={props.ids}
                 positioning={splitButtonMachineProps(props).positioning}
                 indication={props.indication}
+                testId={props.menuProps?.testId}
+                unstyled={props.menuProps?.unstyled}
+                tokens={props.menuProps?.tokens}
             >
                 {scope.render("root", {
                     element: "div",
                     as: () => props.as,
-                    props: omit(props, "as", ...SPLIT_BUTTON_ROOT_PROPS),
+                    props: omit(
+                        props,
+                        "as",
+                        "menuProps",
+                        ...SPLIT_BUTTON_ROOT_PROPS,
+                    ),
                 })}
             </Menu.Root>
         </context.Provider>
@@ -198,6 +230,7 @@ function ReadyMade(props: SplitButtonProps): JSX.Element {
     const leadingButton = slots("leadingButton");
     const trailingButton = slots("trailingButton");
     const trailingIcon = slots("trailingIcon");
+    const menuSlots = createMenuSlotProps(props);
     return (
         <Root {...own} {...root}>
             <LeadingButton
@@ -219,9 +252,11 @@ function ReadyMade(props: SplitButtonProps): JSX.Element {
                     )}
                 </TrailingIcon>
             </TrailingButton>
-            <SplitButtonMenu>
-                <Menu.Items items={props.items ?? []} />
-            </SplitButtonMenu>
+            <Menu.Positioner {...menuSlots("positioner")}>
+                <Menu.Content {...menuSlots("content")}>
+                    <Menu.Items items={props.items ?? []} slot={menuSlots} />
+                </Menu.Content>
+            </Menu.Positioner>
         </Root>
     );
 }

@@ -5,7 +5,7 @@
 // stays floated over the segments' placeholders. A hidden input submits the date.
 
 import { dateInputAnatomy } from "@pureform/anatomy";
-import type { PartName } from "@pureform/anatomy";
+import type { buttonAnatomy, PartName } from "@pureform/anatomy";
 import {
     DATE_INPUT_CONTENT_PROPS,
     DATE_INPUT_ROOT_PROPS,
@@ -41,7 +41,7 @@ import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
 import { createSlotProps, plainParts, useComponent, asRoot } from "../parts";
-import type { ComponentScope, SlotKeyedProps } from "../parts";
+import type { ComponentScope, InnerPropsOf, SlotKeyedProps } from "../parts";
 import { pickerAction } from "../picker-actions";
 import type { PickerActionProps } from "../picker-actions";
 import type { PartProps } from "../props";
@@ -310,12 +310,21 @@ export interface DateInputProps
             | "suffixText"
         >,
         SlotKeyedProps<Anatomy>,
-        DateInputContentProps<JSX.Element> {}
+        DateInputContentProps<JSX.Element> {
+    /** The Cancel action, drawn as a button. */
+    readonly cancelButtonProps?: ButtonInnerProps | undefined;
+    /** The OK action, drawn as a button. */
+    readonly confirmButtonProps?: ButtonInnerProps | undefined;
+}
+
+type ButtonInnerProps = InnerPropsOf<typeof buttonAnatomy>;
 
 const READY_MADE_PROPS = [
     "class",
     "style",
     "slotProps",
+    "cancelButtonProps",
+    "confirmButtonProps",
     "aria-describedby",
     ...DATE_INPUT_CONTENT_PROPS,
 ] as const;
@@ -417,6 +426,7 @@ function ReadyMadeContent(props: {
             </Field>
             <Actions {...slots("actions")}>
                 <CancelTrigger
+                    {...own.cancelButtonProps}
                     as={Button}
                     variant="text"
                     label={
@@ -424,6 +434,7 @@ function ReadyMadeContent(props: {
                     }
                 />
                 <ConfirmTrigger
+                    {...own.confirmButtonProps}
                     as={Button}
                     variant="text"
                     label={

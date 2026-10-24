@@ -282,6 +282,19 @@ import { RichTooltip } from "@pureform/solid/rich-tooltip";
 - **The ready-made** component takes Root's props, with `class`, `style`, and `slotProps` keyed by
   part. `Button` takes `label`, `icon` (the icon part renders only when given), and `mirrorIcon`.
   `Checkbox` puts `aria-label`, `aria-labelledby`, and `aria-describedby` on its input.
+- **Components a ready-made draws** take one `<component>Props` each (that component's
+  `class`, `style`, `slotProps`, `unstyled`, `testId` and `tokens`, keyed by its own parts),
+  passed straight through: `Select`, `Autocomplete`, `SearchView`, `SplitButton` and `Toolbar`
+  take `menuProps` (the toolbar's overflow menu; its `trigger` key is the overflow button);
+  `SearchView` also `searchBarProps`, `backButtonProps` and `clearButtonProps`; `AppBar`
+  `searchBarProps` (which also turns the search bar on); `DatePicker` and `DateInput`
+  `cancelButtonProps` and `confirmButtonProps`; `Paginator` `selectProps` (with its own
+  `menuProps`); `Table` `checkboxProps`; `FileUpload` `buttonProps`, `listItemProps`,
+  `iconButtonProps` and `linearProgressProps`; `ColorPicker` `textFieldProps` and
+  `iconButtonProps`; `Field` `labelProps`, `inputProps`, `descriptionProps` and `errorTextProps`
+  (the pieces' whole props). A part drawn as a component (`as={Button}`: dialog and sheet
+  triggers, close buttons, picker and paginator arrows) keeps its part key: its `class` and
+  `style` go to the button's root.
 - **The switch is a `<label>` too**, around a native checkbox with `role="switch"`; its ready-made
   takes `icon` (shown in the handle while on) and puts the ARIA naming props on the input.
 - **The button group** (`@pureform/solid/button-group`) is a `div` with `role="group"`
@@ -741,16 +754,16 @@ names it), states and descriptions, its own props winning.
 
 ```tsx
 <PureformProvider
-    registry={registry} // from .pureform, or a fake one in tests
-    dir="rtl" // written on its element, passed to machines; "ltr" at the root
-    motion="reduce" // "system" | "reduce" | "full"; writes data-pf-motion unless "system"
-    defaults={{ button: { variant: "tonal" } }}
-    slotProps={{ button: { label: { class: "caps" } } }}
-    theme="teal" // a named theme, or a runtime one: seedTheme({ seed: "#006A60" })
-    overrides={{ "colors.primary": "#006a60" }} // token vars in its element's style
-    hydrate="reuse" // or "regenerate": how the client gets a server-rendered runtime theme
+  registry={registry} // from .pureform, or a fake one in tests
+  dir="rtl" // written on its element, passed to machines; "ltr" at the root
+  motion="reduce" // "system" | "reduce" | "full"; writes data-pf-motion unless "system"
+  defaults={{ button: { variant: "tonal" } }}
+  slotProps={{ button: { label: { class: "caps" } } }}
+  theme="teal" // a named theme, or a runtime one: seedTheme({ seed: "#006A60" })
+  overrides={{ "colors.primary": "#006a60" }} // token vars in its element's style
+  hydrate="reuse" // or "regenerate": how the client gets a server-rendered runtime theme
 >
-    <App />
+  <App />
 </PureformProvider>
 ```
 
@@ -803,29 +816,29 @@ draws in a layer element inside each surface.
 
 ```tsx
 import {
-    defineIndication,
-    materialIndication,
-    noIndication,
+  defineIndication,
+  materialIndication,
+  noIndication,
 } from "@pureform/solid";
 
 <PureformProvider registry={registry} indication={noIndication}>
-    {" "}
-    {/* every component under it */}
-    <Button
-        label="Save"
-        indication={materialIndication({ ripple: "ink-sparkle" })}
-    />
+  {" "}
+  {/* every component under it */}
+  <Button
+    label="Save"
+    indication={materialIndication({ ripple: "ink-sparkle" })}
+  />
 </PureformProvider>;
 
 // An app's own: a softer hover, a thicker focus ring, and a press that scales the surface.
 const soft = defineIndication({
-    name: "app:soft",
-    tokens: { stateHoverOpacity: 0.04, focusIndicatorThickness: 4 },
-    web(target, source) {
-        return source.subscribe((_, state) => {
-            target.surface.style.scale = state.pressed ? "0.98" : "";
-        });
-    },
+  name: "app:soft",
+  tokens: { stateHoverOpacity: 0.04, focusIndicatorThickness: 4 },
+  web(target, source) {
+    return source.subscribe((_, state) => {
+      target.surface.style.scale = state.pressed ? "0.98" : "";
+    });
+  },
 });
 ```
 
@@ -860,14 +873,14 @@ const soft = defineIndication({
 
 ```tsx
 function Tile() {
-    const source = createInteractionSource();
-    const indication = useIndication(source, { centered: false });
-    return (
-        <div class="tile" {...indication.surface}>
-            {indication.layer}
-            Open
-        </div>
-    );
+  const source = createInteractionSource();
+  const indication = useIndication(source, { centered: false });
+  return (
+    <div class="tile" {...indication.surface}>
+      {indication.layer}
+      Open
+    </div>
+  );
 }
 ```
 
@@ -967,16 +980,16 @@ holds that budget.
 const checked = useControllable("Checkbox", "checked", props);
 // checked.machineProps(): { checked, defaultChecked (read once), onCheckedChange }
 useFormReset(inputElement, {
-    resetsTo: () => checked.resetsTo() === true, // controlled value, else the default
-    onBeforeReset: checked.beforeReset,
-    onReset: () =>
-        checked.reset(() =>
-            service.send({
-                type: "CHECKED.SET",
-                checked: checked.defaultValue ?? false,
-                isTrusted: true,
-            }),
-        ),
+  resetsTo: () => checked.resetsTo() === true, // controlled value, else the default
+  onBeforeReset: checked.beforeReset,
+  onReset: () =>
+    checked.reset(() =>
+      service.send({
+        type: "CHECKED.SET",
+        checked: checked.defaultValue ?? false,
+        isTrusted: true,
+      }),
+    ),
 });
 const fieldsetDisabled = useFieldsetDisabled(inputElement); // OR it into the machine's disabled
 ```

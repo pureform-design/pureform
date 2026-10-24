@@ -8,7 +8,7 @@ import {
     datePickerBackdropAnatomy,
     datePickerOverlayAnatomy,
 } from "@pureform/anatomy";
-import type { TestIdOverride } from "@pureform/anatomy";
+import type { buttonAnatomy, TestIdOverride } from "@pureform/anatomy";
 import {
     DATE_PICKER_CONTENT_PROPS,
     DATE_PICKER_ROOT_PROPS,
@@ -56,7 +56,7 @@ import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
 import { createSlotProps, plainParts, asRoot } from "../parts";
-import type { ComponentScope, SlotKeyedProps } from "../parts";
+import type { ComponentScope, InnerPropsOf, SlotKeyedProps } from "../parts";
 import { pickerAction } from "../picker-actions";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
@@ -356,17 +356,28 @@ const CancelTrigger = pickerAction(
  *  toggle as content. */
 export interface DatePickerProps
     extends
-        Omit<DatePickerRootProps, keyof SlotKeyedProps<Anatomy, "backdrop"> | "children">,
+        Omit<
+            DatePickerRootProps,
+            keyof SlotKeyedProps<Anatomy, "backdrop"> | "children"
+        >,
         SlotKeyedProps<Anatomy, "backdrop">,
         DatePickerContentProps<JSX.Element> {
     readonly testId?: TestIdOverride<DatePickerPart>;
     readonly unstyled?: Unstyled<DatePickerPart>;
+    /** The Cancel action, drawn as a button. */
+    readonly cancelButtonProps?: ButtonInnerProps | undefined;
+    /** The OK action, drawn as a button. */
+    readonly confirmButtonProps?: ButtonInnerProps | undefined;
 }
+
+type ButtonInnerProps = InnerPropsOf<typeof buttonAnatomy>;
 
 const READY_MADE_PROPS = [
     "class",
     "style",
     "slotProps",
+    "cancelButtonProps",
+    "confirmButtonProps",
     ...DATE_PICKER_CONTENT_PROPS,
 ] as const;
 
@@ -422,6 +433,7 @@ function ReadyMadeContent(props: {
             </Show>
             <Actions {...slots("actions")}>
                 <CancelTrigger
+                    {...own.cancelButtonProps}
                     as={Button}
                     variant="text"
                     label={
@@ -429,6 +441,7 @@ function ReadyMadeContent(props: {
                     }
                 />
                 <ConfirmTrigger
+                    {...own.confirmButtonProps}
                     as={Button}
                     variant="text"
                     label={

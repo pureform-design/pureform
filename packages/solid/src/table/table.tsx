@@ -6,7 +6,7 @@
 // role, which the preset's flex layout would otherwise drop.
 
 import { dataTableAnatomy } from "@pureform/anatomy";
-import type { PartName } from "@pureform/anatomy";
+import type { checkboxAnatomy, PartName } from "@pureform/anatomy";
 import {
     isPresent,
     TABLE_CONTENT_PROPS,
@@ -46,7 +46,7 @@ import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
 import { createSlotProps, machinePart, useComponent } from "../parts";
-import type { ComponentScope, SlotKeyedProps } from "../parts";
+import type { ComponentScope, InnerPropsOf, SlotKeyedProps } from "../parts";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 
@@ -58,7 +58,10 @@ interface TableContextValue {
     readonly scope: ComponentScope<Anatomy>;
     readonly api: Accessor<Api>;
     readonly striped: Accessor<boolean | undefined>;
+    readonly checkboxProps: Accessor<CheckboxInnerProps | undefined>;
 }
+
+type CheckboxInnerProps = InnerPropsOf<typeof checkboxAnatomy>;
 
 const context = createPartContext<TableContextValue>("Table");
 
@@ -71,6 +74,9 @@ export interface TableRootProps
     extends Omit<PartProps, keyof TableRootOwnProps>, TableRootOwnProps {
     /** Another element or component to render instead of `<table>`. */
     readonly as?: ValidComponent | undefined;
+    /** The selection checkboxes' own props (select-all and each row's), keyed by the
+     *  checkbox's parts. */
+    readonly checkboxProps?: CheckboxInnerProps | undefined;
 }
 
 /** A part's props: the element's own, and the part's `unstyled`. */
@@ -117,12 +123,19 @@ function Root(props: TableRootProps): JSX.Element {
         indication: () => props.indication,
     });
     return (
-        <context.Provider value={{ scope, api, striped: () => props.striped }}>
+        <context.Provider
+            value={{
+                scope,
+                api,
+                striped: () => props.striped,
+                checkboxProps: () => props.checkboxProps,
+            }}
+        >
             {scope.render("root", {
                 element: "table",
                 as: () => props.as,
                 machine: () => api().getRootProps(),
-                props: omit(props, "as", ...TABLE_ROOT_PROPS),
+                props: omit(props, "as", "checkboxProps", ...TABLE_ROOT_PROPS),
             })}
         </context.Provider>
     );
@@ -215,7 +228,7 @@ function HeaderCell(props: TableHeaderCellProps): JSX.Element {
 /** The cell of the selection column: the header row's select-all checkbox (in a table choosing
  *  many rows), or a body row's own. Holds the checkbox unless given children. */
 function SelectionCell(props: TablePartProps): JSX.Element {
-    const { scope, api } = context.use("SelectionCell");
+    const { scope, api, checkboxProps } = context.use("SelectionCell");
     const row = useContext(RowContext);
     // An empty header cell is a plain cell: the header has no select-all checkbox in a table
     // choosing one row.
@@ -226,6 +239,7 @@ function SelectionCell(props: TablePartProps): JSX.Element {
         if (value === undefined) {
             return api().selectionMode === "multiple" ? (
                 <Checkbox
+                    {...checkboxProps()}
                     aria-label={api().translations.selectAll}
                     checked={api().selectAll}
                     onCheckedChange={() => api().toggleAll()}
@@ -234,6 +248,7 @@ function SelectionCell(props: TablePartProps): JSX.Element {
         }
         return (
             <Checkbox
+                {...checkboxProps()}
                 aria-label={api().translations.selectRow}
                 checked={api().isSelected(value)}
                 onCheckedChange={() => api().toggleRow(value)}
