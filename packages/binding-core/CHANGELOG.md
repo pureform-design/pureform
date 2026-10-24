@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file. See [conven
 
 #### Breaking changes
 
+- `AppBar`: `searchBar` -> `searchBarProps` (slot-c).
 - `listTokens`, `groupTokens`, `setTokens` are gone: `ListRootOwnProps`, `ButtonGroupRootOwnProps`
   and `ChipSetRootOwnProps` take `tokens` as the container's own (and `unstyled`). `ListVariantProps`
   and `ChipSetChipVariantProps` no longer carry the children's tokens; `listItemVariants`,

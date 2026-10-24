@@ -284,6 +284,19 @@ import { RichTooltip } from "@pureform/react/rich-tooltip";
   keyed by part. `Button` takes `label`, `icon` (the icon part renders only when given), and
   `mirrorIcon`. `Checkbox` puts `aria-label`, `aria-labelledby`, and `aria-describedby` on its
   input.
+- **Components a ready-made draws** take one `<component>Props` each (that component's
+  `className`, `style`, `slotProps`, `unstyled`, `testId` and `tokens`, keyed by its own parts),
+  passed straight through: `Select`, `Autocomplete`, `SearchView`, `SplitButton` and `Toolbar`
+  take `menuProps` (the toolbar's overflow menu; its `trigger` key is the overflow button);
+  `SearchView` also `searchBarProps`, `backButtonProps` and `clearButtonProps`; `AppBar`
+  `searchBarProps` (which also turns the search bar on); `DatePicker` and `DateInput`
+  `cancelButtonProps` and `confirmButtonProps`; `Paginator` `selectProps` (with its own
+  `menuProps`); `Table` `checkboxProps`; `FileUpload` `buttonProps`, `listItemProps`,
+  `iconButtonProps` and `linearProgressProps`; `ColorPicker` `textFieldProps` and
+  `iconButtonProps`; `Field` `labelProps`, `inputProps`, `descriptionProps` and `errorTextProps`
+  (the pieces' whole props). A part drawn as a component (`as={Button}`: dialog and sheet
+  triggers, close buttons, picker and paginator arrows) keeps its part key: its `className` and
+  `style` go to the button's root.
 - **The switch, radio group, chip, icon button, and FAB** behave as `@pureform/solid`'s do (see
   its README): the switch is a `<label>` around a checkbox with `role="switch"`; the radio group
   is an unstyled `div` (`radioGroupAnatomy`) around a preset `radio` per `Item`, its ready-made

@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file. See [conven
 
 #### Breaking changes
 
+- `AppBar`: `searchBar` -> `searchBarProps` (slot-c).
 - `List`, `SelectionList`: `tokens` are the list's own (they were every item's); items' tokens and
   test ids go in `listItemProps`.
 - `RadioGroup`: `tokens` -> `radioProps.tokens` (with `radioProps.testId`).

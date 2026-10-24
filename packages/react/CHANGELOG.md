@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file. See [conven
 
 #### Breaking changes
 
+- `AppBar`: `searchBar` -> `searchBarProps` (slot-c).
 - Containers follow the slot-props standard (slot-b). Their `className`, `style` and `slotProps` are
   keyed by their own parts, and the components they draw take one `<component>Props`:
     - `List`, `SelectionList`: `listTokens` is gone; `tokens` are the list's own (they were every
@@ -24,5 +25,15 @@ All notable changes to this project will be documented in this file. See [conven
     - `Toolbar`: `className`/`style` keyed by `root`; new `buttonProps` and `iconButtonProps`.
     - `TagsInput`: `chip.tokens` -> `chipProps.tokens`; `chipProps` also reaches the chips' parts.
 - New `CustomizeProps<A>` and `InnerPropsOf<A>` types.
+
+#### Features
+
+- Ready-mades take props for the components they draw (slot-c): `menuProps` (Select,
+  Autocomplete, SearchView, SplitButton, Toolbar's overflow menu), `searchBarProps`,
+  `backButtonProps`, `clearButtonProps` (SearchView), `cancelButtonProps`/`confirmButtonProps`
+  (DatePicker, DateInput), `selectProps` (Paginator), `checkboxProps` (Table), `buttonProps`,
+  `listItemProps`, `iconButtonProps`, `linearProgressProps` (FileUpload), `textFieldProps`,
+  `iconButtonProps` (ColorPicker), `labelProps`, `inputProps`, `descriptionProps`,
+  `errorTextProps` (Field).
 
 - - -

@@ -574,7 +574,7 @@ cardEntryActive(rootInteractive)(entry); // the root's entry while Root acts, th
 type AppBarPart; type AppBarSize; type AppBarScrollBehavior; // "pinned" | "collapse"
 interface AppBarRootOwnProps             // size, centered, tokens, scrollBehavior, scrollOffset,
                                          // scrolled, collapsed, search, testId, unstyled
-APP_BAR_ROOT_PROPS; APP_BAR_CONTENT_PROPS; // leading, headline, subtitle, trailing, searchBar, mirrorLeading
+APP_BAR_ROOT_PROPS; APP_BAR_CONTENT_PROPS; // leading, headline, subtitle, trailing, searchBarProps, mirrorLeading
 appBarScrollState(offset, { size, behavior, previous }); // { scrolled, collapsed }, with hysteresis
 appBarDrawnState(props, fromOffset);     // the owner's scrolled/collapsed win
 appBarContentLast(props, state);         // an expanded flexible bar renders its content last
