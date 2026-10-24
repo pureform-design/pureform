@@ -1063,6 +1063,24 @@ describe.each([animated, reanimated])(
             expect(asked).toEqual([true, false, true, false, true, false]);
         });
 
+        it("names its scrim with the backdrop test id", async () => {
+            await render(
+                <Dialog
+                    defaultOpen
+                    headline="Discard draft?"
+                    testId={{ backdrop: "dim" }}
+                >
+                    Your changes won't be saved.
+                </Dialog>,
+                engine,
+            );
+            await settle(600);
+            expect(scrim()).toBeNull();
+            expect(
+                document.querySelector('[data-testid="dim"]'),
+            ).not.toBeNull();
+        });
+
         it("draws a menu opened inside it over it, and Escape closes the menu first", async () => {
             await render(
                 <Dialog
