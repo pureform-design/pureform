@@ -23,15 +23,17 @@ export type {
     SurfaceProps,
     UseIndicationOptions,
 } from "./indication";
+export { noIndication } from "@pureform/binding-core/indication";
 export {
     defineIndication,
-    noIndication,
-} from "@pureform/binding-core/indication";
-export { materialIndication } from "@pureform/binding-dom/indication";
+    materialIndication,
+} from "@pureform/binding-dom/indication";
 export type {
     Indication,
-    IndicationContext,
     IndicationTarget,
+} from "@pureform/binding-dom/indication";
+export type {
+    IndicationContext,
     IndicationTokens,
     MaterialIndicationOptions,
     MaterialRipple,

@@ -38,7 +38,7 @@ token and `target` props.
 | `settle.ts`, `list-item-swipe-settle.ts`, `splitter-release.ts`                                                         | Settling a released element on its spring transition, from the release's speed                                                                                                                  |
 | `menu-drill-motion.ts`, `menu-groups.ts`, `menu-submenu-room.ts`                                                        | The menu's drill motion, group edges, and a submenu's room                                                                                                                                      |
 | `collapse.ts`, `reveal.ts`, `slide.ts`, `scroll-focus.ts`, `carousel-row.ts`, `toolbar-dom.ts`, `tooltip-long-press.ts` | Collapsing, revealing in a row, the sliding indicator, focusable overflow, the carousel's row, the toolbar's overflow and focus, the tooltip's long press                                       |
-| `indication.ts`                                                                                                         | The `/indication` entry: declares `IndicationPlatform`'s `element: HTMLElement`, and re-exports the two modules below                                                                           |
+| `indication.ts`                                                                                                         | The `/indication` entry: `Indication<HTMLElement>`, `IndicationTarget` and `defineIndication` for the web, and re-exports the two modules below                                                 |
 | `indication-material.ts`                                                                                                | Material's web half (the ripple, over `createRipple` from `@pureform/js-effects`): `materialIndication`, `webIndication`, `DEFAULT_INDICATION`                                                  |
 | `indication-host.ts`                                                                                                    | `IndicationHost`: ties an anatomy's indication entries to a component's elements, runs the effect after mount, and tracks forwarded hover and press                                             |
 
@@ -117,8 +117,9 @@ fabMenuListProps(content, getFab);                   // Tab from the last item t
 
 ### `@pureform/binding-dom/indication`
 
-Loading it types an indication's elements as `HTMLElement` (it augments binding-core's
-`IndicationPlatform`).
+Exports `Indication`, `IndicationTarget` and `defineIndication` over `HTMLElement`: binding-core's
+are generic over the platform's element (`Indication<E>`), so loading this entry changes nothing
+for a program that also has React Native.
 
 ```ts
 materialIndication(options?): Indication;      // binding-core's, with the web half: draws Material's

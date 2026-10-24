@@ -22,7 +22,6 @@ import type {
     ThemeOverrides,
 } from "@pureform/binding-core";
 import { providerIndicationOverrides } from "@pureform/binding-core/indication";
-import type { Indication } from "@pureform/binding-core/indication";
 import {
     THEME_BLOCK_ATTRIBUTE,
     generatedBlock,
@@ -34,6 +33,7 @@ import {
     unloadedThemeMessage,
 } from "@pureform/binding-dom";
 import type { ThemeBlock } from "@pureform/binding-dom";
+import type { Indication } from "@pureform/binding-dom/indication";
 import { isRuntimeTheme, themeScope } from "@pureform/styling";
 import type { ThemeSchemeVars } from "@pureform/styling";
 import { isDev, isServer, useHead } from "@solidjs/web";

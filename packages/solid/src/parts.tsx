@@ -20,8 +20,8 @@ import {
 } from "@pureform/binding-core";
 import type { PartStates, SlotKeyed, Unstyled } from "@pureform/binding-core";
 import { componentIndicationTokens } from "@pureform/binding-core/indication";
-import type { Indication } from "@pureform/binding-core/indication";
 import type { InteractionSource } from "@pureform/binding-core/interaction";
+import type { Indication } from "@pureform/binding-dom/indication";
 import { indicationRoles } from "@pureform/binding-dom/indication";
 import type {
     ClassSlots,

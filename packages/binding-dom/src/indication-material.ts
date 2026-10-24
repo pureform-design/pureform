@@ -8,12 +8,14 @@ import {
     rippleClasses,
 } from "@pureform/binding-core/indication";
 import type {
-    Indication,
+    Indication as CoreIndication,
     IndicationContext,
     MaterialIndicationOptions,
 } from "@pureform/binding-core/indication";
 import { createRipple } from "@pureform/js-effects";
 import type { RippleController } from "@pureform/js-effects";
+
+import type { Indication } from "./indication";
 
 // Draws the ripple in the target's layer from each press the source hears, whichever surface it
 // came from; the controller is made on the first press.
@@ -62,18 +64,18 @@ const drawRipple =
         };
     };
 
-const webs = new WeakMap<Indication, Indication>();
+const webs = new WeakMap<CoreIndication, Indication>();
 
-const neutralRipples = new Map<Indication, "ink-well" | "ink-sparkle">([
+const neutralRipples = new Map<CoreIndication, "ink-well" | "ink-sparkle">([
     [neutralMaterialIndication(), "ink-well"],
     [neutralMaterialIndication({ ripple: "ink-sparkle" }), "ink-sparkle"],
 ]);
 
 /** An indication with its web half: binding-core's Material indications (which have no live
  *  half) get the ripple; any other is as given. The same object for the same indication. */
-export const webIndication = (indication: Indication): Indication => {
+export const webIndication = (indication: CoreIndication): Indication => {
     const variant = neutralRipples.get(indication);
-    if (variant === undefined) return indication;
+    if (variant === undefined) return indication as Indication;
     let web = webs.get(indication);
     if (!web) {
         web = Object.freeze({ ...indication, web: drawRipple(variant) });

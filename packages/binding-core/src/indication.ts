@@ -38,28 +38,18 @@ export interface IndicationTokens {
     readonly focusIndicatorColor?: TokenValue | undefined;
 }
 
-/** The platform's element type, which `@pureform/binding-dom` declares (`element: HTMLElement`)
- *  by augmenting this interface. Empty here, so this package needs no DOM types. */
-export interface IndicationPlatform {}
-
-/** The element an indication's web half draws on: `HTMLElement` once `@pureform/binding-dom`
- *  is loaded, else `unknown`. */
-export type IndicationElement = IndicationPlatform extends {
-    readonly element: infer E;
-}
-    ? E
-    : unknown;
-
-/** The elements an indication draws on, from the component's anatomy. */
-export interface IndicationTarget {
+/** The elements an indication draws on, from the component's anatomy. `E` is the platform's
+ *  element type (`HTMLElement` on the web, from `@pureform/binding-dom/indication`); `unknown`
+ *  here, so this package needs no DOM types. */
+export interface IndicationTarget<E = unknown> {
     /** The element whose interactions feed the source. */
-    readonly trigger: IndicationElement;
+    readonly trigger: E;
     /** The element the state layer tints and the ripple fills; it clips the ripple. */
-    readonly surface: IndicationElement;
+    readonly surface: E;
     /** The layer element inside the surface, when the indication asks for one (`layer`). It's
      *  found in the surface as it's read, so read it when drawing (at a press), not once when
      *  the effect starts. */
-    readonly layer?: IndicationElement | undefined;
+    readonly layer?: E | undefined;
 }
 
 /** What an indication's effect reads from the component and its provider. */
@@ -104,7 +94,7 @@ export type NativeIndicationComponent =
  * Native. Write one with `defineIndication`; a provider's `indication` sets the default, and an
  * interactive component's `indication` prop overrides it for that component.
  */
-export interface Indication {
+export interface Indication<E = unknown> {
     /** Identifies the indication, for development messages and equality. */
     readonly name: string;
     /** The token values it sets: the state layer's opacities and the focus indicator's
@@ -118,19 +108,19 @@ export interface Indication {
      * reaches it; it's not promised to run at mount, nor on the first interaction, so it may
      * move later. It runs again when the indication or its elements change. Returns its cleanup.
      */
-    readonly web?:
-        | ((
-              target: IndicationTarget,
-              source: InteractionSource,
-              context: IndicationContext,
-          ) => () => void)
-        | undefined;
+    web?(
+        target: IndicationTarget<E>,
+        source: InteractionSource,
+        context: IndicationContext,
+    ): () => void;
     /** React Native: the live half, rendered inside the surface. */
     readonly native?: NativeIndicationComponent | undefined;
 }
 
 /** An indication, checked against the interface: returns it unchanged. */
-export function defineIndication(indication: Indication): Indication {
+export function defineIndication<E = unknown>(
+    indication: Indication<E>,
+): Indication<E> {
     return indication;
 }
 

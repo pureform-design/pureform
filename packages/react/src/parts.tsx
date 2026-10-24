@@ -24,8 +24,8 @@ import type {
     Unstyled,
 } from "@pureform/binding-core";
 import { componentIndicationTokens } from "@pureform/binding-core/indication";
-import type { Indication } from "@pureform/binding-core/indication";
 import type { InteractionSource } from "@pureform/binding-core/interaction";
+import type { Indication } from "@pureform/binding-dom/indication";
 import { holdsLayer, indicationRoles } from "@pureform/binding-dom/indication";
 import type {
     ClassSlots,

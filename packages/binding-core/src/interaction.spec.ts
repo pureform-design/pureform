@@ -126,7 +126,7 @@ describe("createInteractionSource", () => {
 
     it("tells each subscriber every interaction, with the state after it and its origin", () => {
         const { source, seen } = recorded();
-        const element = document.createElement("button");
+        const element = { tag: "button" };
         source.emit(press(1), element);
         source.emit({ type: "release", id: 1 });
         expect(seen).toEqual([
