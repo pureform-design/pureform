@@ -159,6 +159,39 @@ describe("Select, ready-made", () => {
         expect(item("l").getAttribute("aria-disabled")).toBe("true");
     });
 
+    it("opens on the first option starting with what's typed on the closed field, choosing nothing (APG)", async () => {
+        const onValueChange = vi.fn();
+        const items = [
+            { value: "s", label: "Small" },
+            { value: "m", label: "Medium" },
+            { value: "x", label: "Mini" },
+        ];
+        withRegistry(
+            <Select
+                label="Size"
+                items={items}
+                defaultValue="s"
+                onValueChange={onValueChange}
+            />,
+        );
+        await settle();
+        const input = byTestId<HTMLInputElement>(ids.input);
+        input.focus();
+        await interact(() => userEvent.keyboard("m"));
+        await frames();
+        expect(input.getAttribute("aria-expanded")).toBe("true");
+        expect(byTestId(menu.root).hidden).toBe(false);
+        expect(item("m").hasAttribute("data-highlighted")).toBe(true);
+        expect(onValueChange).not.toHaveBeenCalled();
+        expect(input.value).toBe("Small");
+        // Keys typed next add up: "mi" finds the next.
+        await interact(() => userEvent.keyboard("i"));
+        await frames();
+        expect(item("x").hasAttribute("data-highlighted")).toBe(true);
+        await interact(() => userEvent.keyboard("{Enter}"));
+        expect(onValueChange).toHaveBeenCalledExactlyOnceWith({ value: "x" });
+    });
+
     it("opens a field as wide as the viewport onto a list that stays inside it", async () => {
         withRegistry(
             <div style={{ position: "absolute", left: 0, right: 0 }}>

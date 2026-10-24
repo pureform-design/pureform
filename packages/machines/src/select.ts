@@ -145,6 +145,37 @@ const derivedSelection: AnyMachine<SelectionSchema> = {
                 selectedItemMap: refs.get("selectedItemMap"),
             }),
     },
+    // Typed on the closed select, the list opens on the first option starting with the text
+    // (WAI-ARIA APG's select-only combobox), rather than Zag's choosing it without opening, as a
+    // native select does. Nothing is chosen by typing; the keys typed next in the list add up.
+    states: {
+        ...zagSelection.states,
+        focused: {
+            ...zagSelection.states.focused,
+            on: {
+                ...zagSelection.states.focused.on,
+                "TRIGGER.TYPEAHEAD": [
+                    {
+                        guard: "isOpenControlled",
+                        actions: [
+                            "clearHighlightedItem",
+                            "highlightMatchingItem",
+                            "invokeOnOpen",
+                        ],
+                    },
+                    {
+                        target: "open",
+                        actions: [
+                            "setInitialFocus",
+                            "invokeOnOpen",
+                            "clearHighlightedItem",
+                            "highlightMatchingItem",
+                        ],
+                    },
+                ],
+            },
+        },
+    },
     implementations: {
         ...zagSelection.implementations,
         actions: {

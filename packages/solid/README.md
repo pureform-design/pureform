@@ -362,7 +362,8 @@ import { RichTooltip } from "@pureform/solid/rich-tooltip";
   validates. The combobox's own default (its `defaultValue`) follows the label it shows, so a form
   reset doesn't blank it when the value stays (a controlled select whose owner ignores the reset).
   `value` is one string or `null`; `open` is controllable too. Enter, Space, and the
-  arrow keys up and down open the list; the sideways arrow keys choose the option before or after,
+  arrow keys up and down open the list, and typing opens it on the first option starting with
+  what's typed (WAI-ARIA APG's select-only combobox; nothing is chosen by typing); the sideways arrow keys choose the option before or after,
   by direction. Root takes `items` (`{ value, label, disabled?, group? }`); the ready-made renders
   every part. Options with a `group` sit together, in the order each group first appears, in an
   `ItemGroup` (`role="group"`, `pf-select-item-group`) named by its `ItemGroupLabel`

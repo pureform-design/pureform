@@ -1,6 +1,7 @@
 // The select: `value`, chosen from a list that opens under the field; a hidden native select
-// that submits, resets, and validates; Enter, Space, and the arrow keys up and down open the list,
-// and the arrow keys sideways choose the option before or after, by direction.
+// that submits, resets, and validates; Enter, Space, the arrow keys up and down, and typing open the
+// list (typing on the option starting with it), and the arrow keys sideways choose the option
+// before or after, by direction.
 
 import {
     compositeTestIds,
@@ -133,6 +134,9 @@ export const select: ComponentCase = {
         keys: [
             { key: "{Enter}", does: "nothing" },
             { key: " ", does: "nothing" },
+            // Typed, it opens the list on the option starting with it, choosing nothing (APG's
+            // select-only combobox).
+            { key: "l", does: "nothing" },
         ],
         arrows: {
             ltr: [

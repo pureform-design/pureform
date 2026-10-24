@@ -335,7 +335,8 @@ import { RichTooltip } from "@pureform/react/rich-tooltip";
   (`selectMenuAnatomy`: test ids `pf-select-content`, `pf-select-item`, …; the highlighted option
   shows the hover state). A hidden native `<select>` with an option per item submits, resets, and
   validates. `value` is one string or `null`; `open` is controllable too. Enter, Space, and the
-  arrow keys up and down open the list; the sideways arrow keys choose the option before or after,
+  arrow keys up and down open the list, and typing opens it on the first option starting with
+  what's typed (WAI-ARIA APG's select-only combobox; nothing is chosen by typing); the sideways arrow keys choose the option before or after,
   by direction. Root takes `items` (`{ value, label, disabled?, group? }`); the ready-made renders every
   part. Options with a `group` sit together in an `ItemGroup` (`role="group"`) under an
   `ItemGroupLabel` showing the group, in the order each group first appears (the arrow keys follow
