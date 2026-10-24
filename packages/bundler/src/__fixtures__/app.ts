@@ -52,22 +52,33 @@ export const outputFile = (root: string, path: string): string =>
     readFileSync(join(root, ".pureform", path), "utf8");
 
 /** A web adapter writing one module per component, counting its calls. */
-export const fakeAdapter = (): CodegenAdapter<{ prefix?: string }> & {
+export const fakeAdapter = (
+    platform: "web" | "native" = "web",
+    name = "fake",
+): CodegenAdapter<{ prefix?: string }> & {
     calls: CodegenContext<{ prefix?: string }>[];
 } => {
     const calls: CodegenContext<{ prefix?: string }>[] = [];
     const adapter = defineCodegen<{ prefix?: string }>({
-        name: "fake",
-        platform: "web",
+        name,
+        platform,
         codegen: (context) => {
             calls.push(context);
             const prefix = context.options.prefix ?? "";
             return {
                 components: context.components.map((name) => ({
                     name,
-                    path: `web/${name}.ts`,
+                    path: `${platform}/${name}.ts`,
                     contents: `export const ${name} = () => ({ root: { class: "${prefix}${name}" } });\n`,
                 })),
+                files: [
+                    {
+                        path: "styles.css",
+                        contents: context.components
+                            .map((name) => `.${prefix}${name} {}`)
+                            .join("\n"),
+                    },
+                ],
             };
         },
     });

@@ -79,8 +79,11 @@ describe("pureform.vite", () => {
             { root: { class: "pf-divider" } },
         ]);
         expect(app.themes).toEqual(["teal"]);
-        expect(outputFile(root, "web/chip.ts")).toContain('"pf-chip"');
-        expect(adapter.calls).toHaveLength(1);
+        expect(outputFile(root, "fake/pruned/web/chip.ts")).toContain(
+            '"pf-chip"',
+        );
+        // The full output, then the pruned one.
+        expect(adapter.calls).toHaveLength(2);
     });
 
     it("writes the generated registry before other plugins' configResolved, as Panda's needs", async () => {
@@ -147,20 +150,22 @@ describe("pureform.vite", () => {
             server: { middlewareMode: true, ws: false },
         });
         try {
-            expect(outputFile(root, "index.ts")).toContain('"chip"');
+            expect(outputFile(root, "fake/full/index.ts")).toContain('"chip"');
             const resolved =
                 await server.environments.client.pluginContainer.resolveId(
                     REGISTRY_ID,
                     join(root, "main.ts"),
                 );
-            expect(resolved?.id).toBe(join(root, ".pureform/index.ts"));
+            expect(resolved?.id).toBe(
+                join(root, ".pureform/fake/full/index.ts"),
+            );
 
             writeFileSync(
                 join(root, "pureform.config.ts"),
                 configSource("chip", "divider"),
             );
             await eventually(() =>
-                existsSync(join(root, ".pureform/web/divider.ts")),
+                existsSync(join(root, ".pureform/fake/full/web/divider.ts")),
             );
 
             writeFileSync(
@@ -229,7 +234,9 @@ describe("pureform.rolldown", () => {
         const { output } = await bundle.generate({ format: "es" });
         await bundle.close();
         expect(output[0].code).toContain('class: "chip"');
-        expect(outputFile(root, "index.ts")).toContain("createRegistry");
+        expect(outputFile(root, "fake/pruned/index.ts")).toContain(
+            "createRegistry",
+        );
     });
 });
 
@@ -239,7 +246,12 @@ describe("the plugin's hooks", () => {
         const plugin = hooks({ root, target: fakeAdapter() });
         await plugin.buildStart();
         const importer = join(root, "src/main.ts");
-        expect(await plugin.resolveId("../.pureform", importer)).toBeNull();
+        expect(await plugin.resolveId("../.pureform", importer)).toBe(
+            join(root, ".pureform/fake/pruned/index.ts"),
+        );
+        expect(
+            await plugin.resolveId("../.pureform/fake/full/web/chip", importer),
+        ).toBeNull();
         expect(await plugin.resolveId("./other", importer)).toBeNull();
         expect(await plugin.resolveId("react", importer)).toBeNull();
 
@@ -264,15 +276,15 @@ describe("the plugin's hooks", () => {
         plugin.watchChange(join(root, "main.ts"));
         plugin.watchChange(join(root, ".pureform/index.ts"));
         await plugin.buildStart();
-        expect(adapter.calls).toHaveLength(1);
+        expect(adapter.calls).toHaveLength(2);
         writeFileSync(
             join(root, "pureform.config.ts"),
             configSource("divider"),
         );
         plugin.watchChange(join(root, "pureform.config.ts"));
         await plugin.buildStart();
-        expect(adapter.calls).toHaveLength(2);
-        expect(outputFile(root, "index.ts")).toContain('"divider"');
+        expect(adapter.calls).toHaveLength(4);
+        expect(outputFile(root, "fake/full/index.ts")).toContain('"divider"');
     });
 
     it("doesn't watch with watch: false", async () => {
@@ -282,7 +294,7 @@ describe("the plugin's hooks", () => {
         await plugin.buildStart();
         plugin.watchChange(join(root, "pureform.config.ts"));
         await plugin.buildStart();
-        expect(adapter.calls).toHaveLength(1);
+        expect(adapter.calls).toHaveLength(2);
     });
 });
 
@@ -309,9 +321,15 @@ describe("pruning", () => {
         } finally {
             info.mockRestore();
         }
-        expect(adapter.calls).toHaveLength(1);
-        expect(adapter.calls[0]!.components).toEqual(["chip"]);
-        expect(existsSync(join(root, ".pureform/web/divider.ts"))).toBe(false);
+        expect(adapter.calls).toHaveLength(2);
+        expect(adapter.calls[1]!.components).toEqual(["chip"]);
+        expect(
+            existsSync(join(root, ".pureform/fake/pruned/web/divider.ts")),
+        ).toBe(false);
+        // The full output stays, for a dev server and the editor.
+        expect(
+            existsSync(join(root, ".pureform/fake/full/web/divider.ts")),
+        ).toBe(true);
     });
 
     it("keeps the components prune.keep names, and everything with prune: false", async () => {
@@ -357,7 +375,10 @@ describe("pruning", () => {
             server: { middlewareMode: true, ws: false },
         });
         try {
-            expect(outputFile(root, "index.ts")).toContain('"divider"');
+            expect(outputFile(root, "fake/full/index.ts")).toContain(
+                '"divider"',
+            );
+            expect(existsSync(join(root, ".pureform/fake/pruned"))).toBe(false);
         } finally {
             await server.close();
         }
@@ -373,7 +394,175 @@ describe("pruning", () => {
         });
         await bundle.generate({ format: "es" });
         await bundle.close();
-        expect(outputFile(root, "index.ts")).not.toContain('"divider"');
-        expect(outputFile(root, "index.ts")).toContain('"chip"');
+        expect(outputFile(root, "fake/pruned/index.ts")).not.toContain(
+            '"divider"',
+        );
+        expect(outputFile(root, "fake/pruned/index.ts")).toContain('"chip"');
+    });
+});
+
+describe("several targets", () => {
+    // Web and native targets told apart by their class prefix.
+    const targets = () => ({
+        web: { target: fakeAdapter(), options: { prefix: "web-" } },
+        native: {
+            target: fakeAdapter("native"),
+            options: { prefix: "native-" },
+        },
+    });
+
+    it("gives the web target by default, and the native one where react-native maps to react-native-web", async () => {
+        const root = tempApp("chip");
+        const web = await viteBuild(root, [
+            pureform.vite({ targets: targets(), prune: false }),
+        ]);
+        expect(web.classes).toEqual([{ root: { class: "web-chip" } }]);
+        const native = await build({
+            root,
+            configFile: false,
+            logLevel: "silent",
+            plugins: [pureform.vite({ targets: targets(), prune: false })],
+            resolve: { alias: { "react-native": "react-native-web" } },
+            build: {
+                outDir: "native-out",
+                minify: false,
+                lib: { entry: "main.ts", formats: ["es"], fileName: "main" },
+            },
+        }).then(
+            () =>
+                import(
+                    /* @vite-ignore */ join(root, "native-out/main.mjs")
+                ) as Promise<{
+                    classes: unknown[];
+                }>,
+        );
+        expect(native.classes).toEqual([{ root: { class: "native-chip" } }]);
+        expect(outputFile(root, "native.ts")).toContain(
+            'export * from "./native/full/index";',
+        );
+    });
+
+    it("gives a target to the files its include names, whatever the aliases", async () => {
+        const root = tempApp("chip");
+        writeTree(root, {
+            "main.ts": `export { classes as web } from "./web/app";\nexport { classes as native } from "./native/app";\nexport const names = [];\nexport const themes = [];\nexport const classes = [];\n`,
+            "web/app.ts": `import { registry } from "../.pureform";\nexport const classes = registry.names.map((name) => registry.entry(name).factory({}));\n`,
+            "native/app.ts": `import { registry } from "../.pureform";\nexport const classes = registry.names.map((name) => registry.entry(name).factory({}));\n`,
+        });
+        const { native: nativeTarget, web } = targets();
+        const app = (await build({
+            root,
+            configFile: false,
+            logLevel: "silent",
+            plugins: [
+                pureform.vite({
+                    targets: {
+                        web,
+                        native: { ...nativeTarget, include: ["native"] },
+                    },
+                    prune: false,
+                }),
+            ],
+            resolve: { alias: { "react-native": "react-native-web" } },
+            build: {
+                outDir: "out",
+                minify: false,
+                lib: { entry: "main.ts", formats: ["es"], fileName: "main" },
+            },
+        }).then(
+            () => import(/* @vite-ignore */ join(root, "out/main.mjs")),
+        )) as {
+            web: unknown[];
+            native: unknown[];
+        };
+        expect(app.web).toEqual([{ root: { class: "web-chip" } }]);
+        expect(app.native).toEqual([{ root: { class: "native-chip" } }]);
+    });
+
+    it("resolves a per-target entry to its target", async () => {
+        const root = tempApp("chip");
+        const plugin = hooks({ root, targets: targets() });
+        await plugin.buildStart();
+        const importer = join(root, "src/main.ts");
+        expect(await plugin.resolveId("../.pureform/native", importer)).toBe(
+            join(root, ".pureform/native/pruned/index.ts"),
+        );
+        expect(await plugin.resolveId("../.pureform/index.ts", importer)).toBe(
+            join(root, ".pureform/web/pruned/index.ts"),
+        );
+        expect(
+            await plugin.resolveId("../.pureform/styles.css?inline", importer),
+        ).toBe(join(root, ".pureform/web/pruned/styles.css?inline"));
+    });
+});
+
+describe("full and pruned output", () => {
+    it("lets a dev server and a build run side by side", async () => {
+        const root = tempApp("chip", "divider");
+        writeTree(root, {
+            "main.ts": `import { registry } from "virtual:pureform/registry";\nexport const names = registry.names;\nexport const classes = [];\nexport const themes = [];\n`,
+            "src/ui.tsx": `import { Chip } from "@pureform/solid/chip";\nexport const ui = <Chip variant="assist" />;\n`,
+        });
+        const server = await createServer({
+            root,
+            configFile: false,
+            logLevel: "silent",
+            plugins: [pureform.vite({ target: fakeAdapter() })],
+            server: { middlewareMode: true, ws: false },
+        });
+        try {
+            const top = outputFile(root, "index.ts");
+            const full = outputFile(root, "fake/full/index.ts");
+            const info = vi.spyOn(console, "log").mockImplementation(() => {});
+            try {
+                const app = await viteBuild(root, [
+                    pureform.vite({ target: fakeAdapter() }),
+                ]);
+                expect(app.names).toEqual(["chip"]);
+            } finally {
+                info.mockRestore();
+            }
+            expect(outputFile(root, "index.ts")).toBe(top);
+            expect(outputFile(root, "fake/full/index.ts")).toBe(full);
+            const resolved =
+                await server.environments.client.pluginContainer.resolveId(
+                    "./.pureform",
+                    join(root, "main.ts"),
+                );
+            expect(resolved?.id).toBe(
+                join(root, ".pureform/fake/full/index.ts"),
+            );
+        } finally {
+            await server.close();
+        }
+    });
+
+    it("points a pruned build's stylesheet imports at the pruned stylesheet", async () => {
+        const root = tempApp("chip", "divider");
+        writeTree(root, {
+            "app.css": `@import "./.pureform/styles.css";\n`,
+            "main.ts": `import "./app.css";\nexport const names = [];\nexport const classes = [];\nexport const themes = [];\n`,
+            "src/ui.tsx": `import { Chip } from "@pureform/solid/chip";\nexport const ui = <Chip variant="assist" />;\n`,
+        });
+        let seen: string | undefined;
+        const reader: Plugin = {
+            name: "reader",
+            enforce: "pre",
+            transform: (code, id) => {
+                if (id.endsWith("app.css")) seen = code;
+            },
+        };
+        const info = vi.spyOn(console, "log").mockImplementation(() => {});
+        try {
+            await viteBuild(root, [
+                pureform.vite({ target: fakeAdapter() }),
+                reader,
+            ]);
+        } finally {
+            info.mockRestore();
+        }
+        expect(seen).toContain('@import "./.pureform/fake/pruned/styles.css"');
+        expect(process.env["PUREFORM_OUTPUT"]).toBe("pruned");
+        delete process.env["PUREFORM_OUTPUT"];
     });
 });
