@@ -37,7 +37,7 @@ import { useControllable } from "../controllable";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
-import { createSlotProps, useComponent } from "../parts";
+import { createSlotProps, useComponent, asRoot } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { usePresence } from "../presence";
 import type { Presence } from "../presence";
@@ -237,7 +237,11 @@ function ReadyMade(props: TooltipProps): JSX.Element {
     return (
         <Root {...own} {...root}>
             <Show when={isPresent(props.trigger)}>
-                <Trigger as={Button} label={props.trigger} {...trigger} />
+                <Trigger
+                    as={Button}
+                    label={props.trigger}
+                    {...asRoot(trigger)}
+                />
             </Show>
             <Positioner {...positioner}>
                 <Content {...content}>

@@ -30,7 +30,7 @@ import { Button } from "../button";
 import { dialogParts } from "../dialog-parts";
 import { CloseIcon } from "../glyphs";
 import { IconButton } from "../icon-button";
-import { createSlotProps } from "../parts";
+import { createSlotProps, asRoot } from "../parts";
 import type { SlotKeyedProps } from "../parts";
 import type { PartProps } from "../props";
 
@@ -159,7 +159,11 @@ function ReadyMade(props: FullscreenDialogProps): JSX.Element {
     return (
         <Root {...own} {...root}>
             <Show when={isPresent(props.trigger)}>
-                <Trigger as={Button} label={props.trigger} {...trigger} />
+                <Trigger
+                    as={Button}
+                    label={props.trigger}
+                    {...asRoot(trigger)}
+                />
             </Show>
             <Positioner {...positioner}>
                 <Content {...content}>
@@ -174,7 +178,7 @@ function ReadyMade(props: FullscreenDialogProps): JSX.Element {
                                     <CloseIcon />
                                 )
                             }
-                            {...closeTrigger}
+                            {...asRoot(closeTrigger)}
                         />
                         <Show when={isPresent(props.headline)}>
                             <Headline {...headline}>{props.headline}</Headline>
@@ -184,7 +188,7 @@ function ReadyMade(props: FullscreenDialogProps): JSX.Element {
                                 as={Button}
                                 variant="text"
                                 label={props.confirmAction}
-                                {...confirmAction}
+                                {...asRoot(confirmAction)}
                             />
                         </Show>
                     </Header>

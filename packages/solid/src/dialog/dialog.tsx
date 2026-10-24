@@ -28,7 +28,7 @@ import { omit, Show } from "solid-js";
 
 import { Button } from "../button";
 import { dialogParts } from "../dialog-parts";
-import { createSlotProps } from "../parts";
+import { createSlotProps, asRoot } from "../parts";
 import type { SlotKeyedProps } from "../parts";
 import type { PartProps } from "../props";
 
@@ -139,9 +139,9 @@ export interface DialogProps
     extends
         Omit<
             DialogRootProps,
-            keyof SlotKeyedProps<Anatomy> | "children" | "icon"
+            keyof SlotKeyedProps<Anatomy, "backdrop"> | "children" | "icon"
         >,
-        SlotKeyedProps<Anatomy>,
+        SlotKeyedProps<Anatomy, "backdrop">,
         DialogContentProps<JSX.Element> {
     readonly testId?: TestIdOverride<DialogPart>;
     readonly unstyled?: Unstyled<DialogPart>;
@@ -159,6 +159,7 @@ const READY_MADE_PROPS = [
  *  dialog with its icon, headline, body, and actions, each only when given. */
 function ReadyMade(props: DialogProps): JSX.Element {
     const slots = createSlotProps(props);
+    const backdrop = slots("backdrop");
     const own = omit(props, ...READY_MADE_PROPS) as DialogRootProps;
     const root = slots("root") as object;
     const trigger = slots("trigger") as object;
@@ -171,9 +172,13 @@ function ReadyMade(props: DialogProps): JSX.Element {
     return (
         <Root {...own} icon={isPresent(props.icon) || undefined} {...root}>
             <Show when={isPresent(props.trigger)}>
-                <Trigger as={Button} label={props.trigger} {...trigger} />
+                <Trigger
+                    as={Button}
+                    label={props.trigger}
+                    {...asRoot(trigger)}
+                />
             </Show>
-            <Backdrop />
+            <Backdrop {...backdrop} />
             <Positioner {...positioner}>
                 <Content {...content}>
                     <Show when={isPresent(props.icon)}>

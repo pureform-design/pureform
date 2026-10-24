@@ -315,11 +315,14 @@ export function useUnstyledComponent<A extends ComponentAnatomy>(
 
 /** The props of a ready-made component that address each part by name:
  *  `class={{ root: "wide", label: "caps" }}`, `testId="save"`. */
-export interface SlotKeyedProps<A extends ComponentAnatomy> {
-    readonly class?: SlotKeyed<PartName<A>, JSX.ClassValue>;
-    readonly style?: SlotKeyed<PartName<A>, JSX.CSSProperties | string>;
+export interface SlotKeyedProps<
+    A extends ComponentAnatomy,
+    Extra extends string = never,
+> {
+    readonly class?: SlotKeyed<PartName<A> | Extra, JSX.ClassValue>;
+    readonly style?: SlotKeyed<PartName<A> | Extra, JSX.CSSProperties | string>;
     readonly testId?: TestIdOverride<PartName<A>>;
-    readonly slotProps?: SlotKeyed<PartName<A>, PartProps>;
+    readonly slotProps?: SlotKeyed<PartName<A> | Extra, PartProps>;
     readonly unstyled?: Unstyled<PartName<A>>;
 }
 
@@ -339,6 +342,22 @@ const onePart = (props: SlotKeyedProps<ComponentAnatomy>, part: string): Dict =>
             style: forSlot(props.style, part),
         },
     ]);
+
+/** A part drawn as a `Button` or `IconButton` (`as={Button}`): its `class` and `style` are plain
+ *  values for the part, but the button keys them by its own parts, so they go to its root
+ *  (`slotProps.root`), which the button's own `class` and `style` keys then join. */
+export const asRoot = (props: PartProps): PartProps =>
+    merge(omit(props as Dict, "class", "style"), {
+        get slotProps() {
+            const { class: value, style, slotProps } = props as Dict;
+            if (value == null && style == null) return slotProps;
+            const keyed = (slotProps ?? {}) as Record<string, Dict>;
+            return {
+                ...keyed,
+                root: combinePartProps([keyed.root, { class: value, style }]),
+            };
+        },
+    }) as PartProps;
 
 const NO_PROPS: Dict = Object.freeze({});
 const NO_SLOTS: Readonly<Record<string, Dict>> = Object.freeze({});
@@ -397,9 +416,10 @@ const SLOT_VIEW: ProxyHandler<SlotView> = {
  *  spread makes a memo of its own. When `class`, `style`, and `slotProps` can't change (absent, or
  *  plain data the compiler passed as is), each is a plain object; otherwise a live view of one
  *  memo. `testId` and `unstyled` go to Root whole. */
-export function createSlotProps<A extends ComponentAnatomy>(
-    props: SlotKeyedProps<A>,
-): (part: PartName<A>) => PartProps {
+export function createSlotProps<
+    A extends ComponentAnatomy,
+    Extra extends string = never,
+>(props: SlotKeyedProps<A, Extra>): (part: PartName<A> | Extra) => PartProps {
     const keyed = props as SlotKeyedProps<ComponentAnatomy>;
     if (untrack(() => SLOT_KEYED.every((key) => isFixed(keyed, key)))) {
         const parts = untrack(() => everyPart(keyed));

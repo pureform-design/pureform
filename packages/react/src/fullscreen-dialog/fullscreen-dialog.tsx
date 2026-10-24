@@ -28,7 +28,7 @@ import { Button } from "../button";
 import { dialogParts } from "../dialog-parts";
 import { CloseIcon } from "../glyphs";
 import { IconButton } from "../icon-button";
-import { useSlotProps } from "../parts";
+import { useSlotProps, asRoot } from "../parts";
 import type { SlotKeyedProps } from "../parts";
 import type { PartProps } from "../props";
 
@@ -151,7 +151,11 @@ function ReadyMade(props: FullscreenDialogProps): ReactNode {
     return (
         <Root {...rootProps} {...(slot("root") as object)}>
             {isPresent(trigger) ? (
-                <Trigger as={Button} label={trigger} {...slot("trigger")} />
+                <Trigger
+                    as={Button}
+                    label={trigger}
+                    {...asRoot(slot("trigger"))}
+                />
             ) : null}
             <Positioner {...slot("positioner")}>
                 <Content {...slot("content")}>
@@ -162,7 +166,7 @@ function ReadyMade(props: FullscreenDialogProps): ReactNode {
                             icon={
                                 isPresent(closeIcon) ? closeIcon : <CloseIcon />
                             }
-                            {...(slot("closeTrigger") as object)}
+                            {...asRoot(slot("closeTrigger") as object)}
                         />
                         {isPresent(headline) ? (
                             <Headline {...slot("headline")}>
@@ -174,7 +178,7 @@ function ReadyMade(props: FullscreenDialogProps): ReactNode {
                                 as={Button}
                                 variant="text"
                                 label={confirmAction}
-                                {...(slot("confirmAction") as object)}
+                                {...asRoot(slot("confirmAction") as object)}
                             />
                         ) : null}
                     </Header>

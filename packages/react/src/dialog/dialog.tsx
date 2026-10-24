@@ -26,7 +26,7 @@ import { type ElementType, type ReactNode } from "react";
 
 import { Button } from "../button";
 import { dialogParts } from "../dialog-parts";
-import { useSlotProps } from "../parts";
+import { useSlotProps, asRoot } from "../parts";
 import type { SlotKeyedProps } from "../parts";
 import type { PartProps } from "../props";
 
@@ -137,9 +137,9 @@ export interface DialogProps
     extends
         Omit<
             DialogRootProps,
-            keyof SlotKeyedProps<Anatomy> | "children" | "icon"
+            keyof SlotKeyedProps<Anatomy, "backdrop"> | "children" | "icon"
         >,
-        SlotKeyedProps<Anatomy>,
+        SlotKeyedProps<Anatomy, "backdrop">,
         DialogContentProps<ReactNode> {
     readonly testId?: TestIdOverride<DialogPart>;
     readonly unstyled?: Unstyled<DialogPart>;
@@ -168,9 +168,13 @@ function ReadyMade(props: DialogProps): ReactNode {
             {...(slot("root") as object)}
         >
             {isPresent(trigger) ? (
-                <Trigger as={Button} label={trigger} {...slot("trigger")} />
+                <Trigger
+                    as={Button}
+                    label={trigger}
+                    {...asRoot(slot("trigger"))}
+                />
             ) : null}
-            <Backdrop />
+            <Backdrop {...slot("backdrop")} />
             <Positioner {...slot("positioner")}>
                 <Content {...slot("content")}>
                     {isPresent(icon) ? (

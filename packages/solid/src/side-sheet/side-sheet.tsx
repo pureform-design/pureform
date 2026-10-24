@@ -39,7 +39,7 @@ import { dialogParts } from "../dialog-parts";
 import { BackIcon, CloseIcon } from "../glyphs";
 import { IconButton } from "../icon-button";
 import { normalizeProps } from "../internal/zag";
-import { createSlotProps } from "../parts";
+import { createSlotProps, asRoot } from "../parts";
 import type { SlotKeyedProps } from "../parts";
 import type { PartProps } from "../props";
 import { useDirection, usePureform } from "../provider";
@@ -195,8 +195,8 @@ const Actions: (props: SideSheetPartProps) => JSX.Element = chrome.part(
  *  and actions as content. */
 export interface SideSheetProps
     extends
-        Omit<SideSheetRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
-        SlotKeyedProps<Anatomy>,
+        Omit<SideSheetRootProps, keyof SlotKeyedProps<Anatomy, "backdrop"> | "children">,
+        SlotKeyedProps<Anatomy, "backdrop">,
         SideSheetContentProps<JSX.Element> {
     readonly testId?: TestIdOverride<SideSheetPart>;
     readonly unstyled?: Unstyled<SideSheetPart>;
@@ -214,6 +214,7 @@ const READY_MADE_PROPS = [
  *  and the close icon button), its body, and its actions when given. */
 function ReadyMade(props: SideSheetProps): JSX.Element {
     const slots = createSlotProps(props);
+    const backdrop = slots("backdrop");
     const own = omit(props, ...READY_MADE_PROPS) as SideSheetRootProps;
     const root = slots("root") as object;
     const trigger = slots("trigger") as object;
@@ -228,9 +229,13 @@ function ReadyMade(props: SideSheetProps): JSX.Element {
     return (
         <Root {...own} {...root}>
             <Show when={isPresent(props.trigger)}>
-                <Trigger as={Button} label={props.trigger} {...trigger} />
+                <Trigger
+                    as={Button}
+                    label={props.trigger}
+                    {...asRoot(trigger)}
+                />
             </Show>
-            <Backdrop />
+            <Backdrop {...backdrop} />
             <Positioner {...positioner}>
                 <Content {...content}>
                     <Header {...header}>
@@ -247,7 +252,7 @@ function ReadyMade(props: SideSheetProps): JSX.Element {
                                 }
                                 mirrorIcon
                                 onClick={() => props.onBack?.()}
-                                {...backButton}
+                                {...asRoot(backButton)}
                             />
                         </Show>
                         <Show when={isPresent(props.headline)}>
@@ -263,7 +268,7 @@ function ReadyMade(props: SideSheetProps): JSX.Element {
                                     <CloseIcon />
                                 )
                             }
-                            {...closeTrigger}
+                            {...asRoot(closeTrigger)}
                         />
                     </Header>
                     <Show when={isPresent(props.body)}>

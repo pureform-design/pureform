@@ -71,6 +71,26 @@ describe("DatePicker, ready-made", () => {
         ).toBe("scrim");
     });
 
+    it("passes the previous and next parts' className and style to their IconButtons, and the backdrop's", async () => {
+        withRegistry(() => (
+            <DatePicker
+                locale="en-US"
+                defaultOpen
+                class={{ prev: "my-prev", next: "my-next", backdrop: "my-dim" }}
+                style={{ prev: { color: "red" } }}
+            />
+        ));
+        await settle();
+        expect(byTestId(ids.prev).classList.contains("my-prev")).toBe(true);
+        expect(byTestId(ids.prev).style.color).toBe("red");
+        expect(byTestId(ids.next).classList.contains("my-next")).toBe(true);
+        expect(
+            byTestId(
+                compositeTestIds.datePickerBackdrop.root,
+            ).classList.contains("my-dim"),
+        ).toBe(true);
+    });
+
     it("starts the week on the locale's first day, unless told otherwise", async () => {
         withRegistry(() => (
             <>

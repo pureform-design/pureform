@@ -58,7 +58,7 @@ import { Button } from "../button";
 import { dialogParts } from "../dialog-parts";
 import { DragHandle as DragHandleComponent } from "../drag-handle";
 import { mergeProps, normalizeProps } from "../internal/zag";
-import { createSlotProps } from "../parts";
+import { createSlotProps, asRoot } from "../parts";
 import type { SlotKeyedProps } from "../parts";
 import type { PartProps } from "../props";
 import { usePureform } from "../provider";
@@ -245,8 +245,8 @@ function Body(props: BottomSheetPartProps): JSX.Element {
  *  the trigger's label, the drag handle and its name, and the body as content. */
 export interface BottomSheetProps
     extends
-        Omit<BottomSheetRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
-        SlotKeyedProps<Anatomy>,
+        Omit<BottomSheetRootProps, keyof SlotKeyedProps<Anatomy, "backdrop"> | "children">,
+        SlotKeyedProps<Anatomy, "backdrop">,
         BottomSheetContentProps<JSX.Element> {
     readonly testId?: TestIdOverride<BottomSheetPart>;
     readonly unstyled?: Unstyled<BottomSheetPart>;
@@ -263,6 +263,7 @@ const READY_MADE_PROPS = [
  *  backdrop, and the sheet with its drag handle (unless `dragHandle={false}`) and body. */
 function ReadyMade(props: BottomSheetProps): JSX.Element {
     const slots = createSlotProps(props);
+    const backdrop = slots("backdrop");
     const own = omit(props, ...READY_MADE_PROPS) as BottomSheetRootProps;
     const root = slots("root") as object;
     const trigger = slots("trigger") as object;
@@ -273,9 +274,13 @@ function ReadyMade(props: BottomSheetProps): JSX.Element {
     return (
         <Root {...own} {...root}>
             <Show when={isPresent(props.trigger)}>
-                <Trigger as={Button} label={props.trigger} {...trigger} />
+                <Trigger
+                    as={Button}
+                    label={props.trigger}
+                    {...asRoot(trigger)}
+                />
             </Show>
-            <Backdrop />
+            <Backdrop {...backdrop} />
             <Positioner {...positioner}>
                 <Content {...content}>
                     <Show when={props.dragHandle !== false}>

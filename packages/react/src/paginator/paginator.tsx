@@ -38,7 +38,7 @@ import {
 import { IconButton } from "../icon-button/icon-button";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
-import { machinePart, useComponent, useSlotProps } from "../parts";
+import { machinePart, useComponent, useSlotProps, asRoot } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
@@ -263,12 +263,18 @@ function ReadyMadeParts({
             <RangeLabel {...slot("rangeLabel")} />
             <Actions {...slot("actions")}>
                 {root.showFirstLastButtons ? (
-                    <FirstTrigger as={IconButton} {...slot("firstTrigger")} />
+                    <FirstTrigger
+                        as={IconButton}
+                        {...asRoot(slot("firstTrigger"))}
+                    />
                 ) : null}
-                <PrevTrigger as={IconButton} {...slot("prevTrigger")} />
-                <NextTrigger as={IconButton} {...slot("nextTrigger")} />
+                <PrevTrigger as={IconButton} {...asRoot(slot("prevTrigger"))} />
+                <NextTrigger as={IconButton} {...asRoot(slot("nextTrigger"))} />
                 {root.showFirstLastButtons ? (
-                    <LastTrigger as={IconButton} {...slot("lastTrigger")} />
+                    <LastTrigger
+                        as={IconButton}
+                        {...asRoot(slot("lastTrigger"))}
+                    />
                 ) : null}
             </Actions>
         </>

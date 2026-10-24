@@ -44,7 +44,7 @@ import { IconButton } from "../icon-button/icon-button";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
-import { createSlotProps, machinePart, useComponent } from "../parts";
+import { createSlotProps, machinePart, useComponent, asRoot } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
@@ -272,15 +272,21 @@ function ReadyMadeParts(props: {
                 <Show when={root.showFirstLastButtons}>
                     <FirstTrigger
                         as={IconButton}
-                        {...props.slots("firstTrigger")}
+                        {...asRoot(props.slots("firstTrigger"))}
                     />
                 </Show>
-                <PrevTrigger as={IconButton} {...props.slots("prevTrigger")} />
-                <NextTrigger as={IconButton} {...props.slots("nextTrigger")} />
+                <PrevTrigger
+                    as={IconButton}
+                    {...asRoot(props.slots("prevTrigger"))}
+                />
+                <NextTrigger
+                    as={IconButton}
+                    {...asRoot(props.slots("nextTrigger"))}
+                />
                 <Show when={root.showFirstLastButtons}>
                     <LastTrigger
                         as={IconButton}
-                        {...props.slots("lastTrigger")}
+                        {...asRoot(props.slots("lastTrigger"))}
                     />
                 </Show>
             </Actions>

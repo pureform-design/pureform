@@ -42,7 +42,7 @@ import { Button } from "../button";
 import { dialogParts } from "../dialog-parts";
 import { BackIcon, CloseIcon } from "../glyphs";
 import { IconButton } from "../icon-button";
-import { useSlotProps } from "../parts";
+import { useSlotProps, asRoot } from "../parts";
 import type { SlotKeyedProps } from "../parts";
 import type { PartProps } from "../props";
 import { useComponentState, useDirection } from "../provider";
@@ -204,8 +204,8 @@ const Actions: (props: SideSheetPartProps) => ReactNode = chrome.part(
  *  body and actions as content. */
 export interface SideSheetProps
     extends
-        Omit<SideSheetRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
-        SlotKeyedProps<Anatomy>,
+        Omit<SideSheetRootProps, keyof SlotKeyedProps<Anatomy, "backdrop"> | "children">,
+        SlotKeyedProps<Anatomy, "backdrop">,
         SideSheetContentProps<ReactNode> {
     readonly testId?: TestIdOverride<SideSheetPart>;
     readonly unstyled?: Unstyled<SideSheetPart>;
@@ -234,9 +234,13 @@ function ReadyMade(props: SideSheetProps): ReactNode {
     return (
         <Root {...rootProps} {...(slot("root") as object)}>
             {isPresent(trigger) ? (
-                <Trigger as={Button} label={trigger} {...slot("trigger")} />
+                <Trigger
+                    as={Button}
+                    label={trigger}
+                    {...asRoot(slot("trigger"))}
+                />
             ) : null}
-            <Backdrop />
+            <Backdrop {...slot("backdrop")} />
             <Positioner {...slot("positioner")}>
                 <Content {...slot("content")}>
                     <Header {...slot("header")}>
@@ -253,7 +257,7 @@ function ReadyMade(props: SideSheetProps): ReactNode {
                                 }
                                 mirrorIcon
                                 onClick={() => onBack()}
-                                {...(slot("backButton") as object)}
+                                {...asRoot(slot("backButton") as object)}
                             />
                         ) : null}
                         {isPresent(headline) ? (
@@ -267,7 +271,7 @@ function ReadyMade(props: SideSheetProps): ReactNode {
                             icon={
                                 isPresent(closeIcon) ? closeIcon : <CloseIcon />
                             }
-                            {...(slot("closeTrigger") as object)}
+                            {...asRoot(slot("closeTrigger") as object)}
                         />
                     </Header>
                     {isPresent(body) ? (

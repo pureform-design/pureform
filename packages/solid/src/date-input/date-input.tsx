@@ -40,7 +40,7 @@ import { IconButton } from "../icon-button";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
-import { createSlotProps, plainParts, useComponent } from "../parts";
+import { createSlotProps, plainParts, useComponent, asRoot } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { pickerAction } from "../picker-actions";
 import type { PickerActionProps } from "../picker-actions";
@@ -347,7 +347,7 @@ function ReadyMadeContent(props: {
                         icon={<CalendarIcon />}
                         aria-label={own.modeToggleLabel ?? "Switch to calendar"}
                         onClick={() => own.onModeToggle?.()}
-                        {...(slots("modeToggle") as object)}
+                        {...asRoot(slots("modeToggle") as object)}
                     />
                 </Show>
             </Header>

@@ -62,7 +62,7 @@ import { IconButton } from "../icon-button";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import type { PartContext } from "../part-context";
-import { useSlotProps } from "../parts";
+import { useSlotProps, asRoot } from "../parts";
 import type { SlotKeyedProps } from "../parts";
 import { pickerAction } from "../picker-actions";
 import type { PickerActionProps } from "../picker-actions";
@@ -336,8 +336,8 @@ const CancelTrigger: (props: PickerActionProps) => ReactNode = pickerAction(
  *  content. */
 export interface DatePickerProps
     extends
-        Omit<DatePickerRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
-        Omit<SlotKeyedProps<Anatomy>, "testId" | "unstyled">,
+        Omit<DatePickerRootProps, keyof SlotKeyedProps<Anatomy, "backdrop"> | "children">,
+        Omit<SlotKeyedProps<Anatomy, "backdrop">, "testId" | "unstyled">,
         DatePickerContentProps<ReactNode> {
     readonly testId?: TestIdOverride<DatePickerPart> | undefined;
     readonly unstyled?: Unstyled<DatePickerPart> | undefined;
@@ -346,14 +346,18 @@ export interface DatePickerProps
 // Inside Root, so it can read the view and the draft.
 function ReadyMadeContent({ own }: { readonly own: DatePickerProps }) {
     const { picker, selected, locale } = context.use("Root");
-    const slot = useSlotProps(own as SlotKeyedProps<ComponentAnatomy>);
+    const slot = useSlotProps(own as SlotKeyedProps<ComponentAnatomy, "backdrop">);
     const days = picker.view === "day";
     return (
         <>
             {isPresent(own.trigger) ? (
-                <Trigger as={Button} label={own.trigger} {...slot("trigger")} />
+                <Trigger
+                    as={Button}
+                    label={own.trigger}
+                    {...asRoot(slot("trigger"))}
+                />
             ) : null}
-            <Backdrop />
+            <Backdrop {...slot("backdrop")} />
             <Positioner {...slot("positioner")}>
                 <Content {...slot("content")}>
                     <Header {...slot("header")}>
@@ -374,7 +378,7 @@ function ReadyMadeContent({ own }: { readonly own: DatePickerProps }) {
                                     "Switch to text input"
                                 }
                                 onClick={own.onModeToggle}
-                                {...slot("modeToggle")}
+                                {...asRoot(slot("modeToggle"))}
                             />
                         ) : null}
                     </Header>
@@ -390,13 +394,13 @@ function ReadyMadeContent({ own }: { readonly own: DatePickerProps }) {
                                     as={IconButton}
                                     icon={<ChevronStartIcon />}
                                     mirror
-                                    {...slot("prev")}
+                                    {...asRoot(slot("prev"))}
                                 />
                                 <Next
                                     as={IconButton}
                                     icon={<ChevronEndIcon />}
                                     mirror
-                                    {...slot("next")}
+                                    {...asRoot(slot("next"))}
                                 />
                             </>
                         ) : null}
@@ -444,7 +448,7 @@ function ReadyMade(props: DatePickerProps): ReactNode {
         modeToggleLabel: _modeToggleLabel,
         ...rootProps
     } = props;
-    const slot = useSlotProps(props as SlotKeyedProps<ComponentAnatomy>);
+    const slot = useSlotProps(props as SlotKeyedProps<ComponentAnatomy, "backdrop">);
     return (
         <Root {...rootProps} {...(slot("root") as object)}>
             <ReadyMadeContent own={props} />

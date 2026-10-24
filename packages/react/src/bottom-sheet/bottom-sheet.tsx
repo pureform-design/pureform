@@ -55,7 +55,7 @@ import {
 import { Button } from "../button";
 import { dialogParts } from "../dialog-parts";
 import { DragHandle as DragHandleComponent } from "../drag-handle";
-import { useSlotProps } from "../parts";
+import { useSlotProps, asRoot } from "../parts";
 import type { SlotKeyedProps } from "../parts";
 import type { PartProps } from "../props";
 import { useComponentState } from "../provider";
@@ -244,8 +244,8 @@ function DragHandle({
  *  part, the trigger's label, the drag handle and its name, and the body as content. */
 export interface BottomSheetProps
     extends
-        Omit<BottomSheetRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
-        SlotKeyedProps<Anatomy>,
+        Omit<BottomSheetRootProps, keyof SlotKeyedProps<Anatomy, "backdrop"> | "children">,
+        SlotKeyedProps<Anatomy, "backdrop">,
         BottomSheetContentProps<ReactNode> {
     readonly testId?: TestIdOverride<BottomSheetPart>;
     readonly unstyled?: Unstyled<BottomSheetPart>;
@@ -272,9 +272,13 @@ function ReadyMade(props: BottomSheetProps): ReactNode {
             {...(slot("root") as object)}
         >
             {isPresent(trigger) ? (
-                <Trigger as={Button} label={trigger} {...slot("trigger")} />
+                <Trigger
+                    as={Button}
+                    label={trigger}
+                    {...asRoot(slot("trigger"))}
+                />
             ) : null}
-            <Backdrop />
+            <Backdrop {...slot("backdrop")} />
             <Positioner {...slot("positioner")}>
                 <Content {...slot("content")}>
                     {dragHandle !== false ? (
