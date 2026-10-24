@@ -6,6 +6,7 @@ import { listAnatomy } from "@pureform/anatomy";
 import {
     listItemPosition,
     listSelection,
+    overDefaults,
     selectionListMachineProps,
 } from "@pureform/binding-core";
 import type {
@@ -18,12 +19,17 @@ import type { ReactNode } from "react";
 
 import { ListDefaults, ListItem } from "../list-item/list-item";
 import type { ListItemProps } from "../list-item/list-item";
+import type { ListItemDefaults } from "../list/list";
 import { testIdOf, useControllable, withEngine } from "../parts";
 import { useComponentSlots } from "../styles";
 
 export interface SelectionListProps
-    extends SelectionListRootOwnProps, SelectionListContentProps<ReactNode> {
+    extends
+        Omit<SelectionListRootOwnProps, "unstyled">,
+        SelectionListContentProps<ReactNode> {
     readonly "aria-label"?: string | undefined;
+    /** Every option's `tokens` and `testId`, under the option's own. */
+    readonly listItemProps?: ListItemDefaults | undefined;
 }
 
 function SelectionListImpl(props: SelectionListProps): ReactNode {
@@ -31,10 +37,10 @@ function SelectionListImpl(props: SelectionListProps): ReactNode {
         "list",
         listSelection(props),
     );
-    const { density, color, tokens, leadingType } = props;
+    const { density, color, leadingType } = props;
     const defaults = useMemo(
-        () => ({ density, color, tokens, leadingType }),
-        [density, color, tokens, leadingType],
+        () => ({ density, color, leadingType }),
+        [density, color, leadingType],
     );
     const [value, setValue] = useControllable(
         "SelectionList",
@@ -82,7 +88,12 @@ function SelectionListImpl(props: SelectionListProps): ReactNode {
                             testID={id("item")}
                         >
                             <ListItem
-                                {...(item as ListItemProps)}
+                                {...overDefaults(
+                                    props.listItemProps as
+                                        | ListItemProps
+                                        | undefined,
+                                    item as ListItemProps,
+                                )}
                                 role="option"
                                 selected={value.includes(key)}
                                 disabled={disabled || props.disabled}

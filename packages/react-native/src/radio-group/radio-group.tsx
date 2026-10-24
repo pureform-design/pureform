@@ -10,6 +10,8 @@ import type {
     InteractiveProps,
     RadioGroupItem,
     RadioPart,
+    InnerProps,
+    RadioGroupVariantProps,
     RadioVariantProps,
 } from "@pureform/binding-core";
 import type { Indication } from "@pureform/binding-core/indication";
@@ -34,7 +36,7 @@ import { touchTargetSlopOf } from "../touch-slop";
 
 const [INDICATION] = radioAnatomy.indication!;
 
-interface GroupContext extends RadioVariantProps {
+interface GroupContext extends RadioGroupVariantProps {
     readonly value: string | null;
     readonly disabled: boolean;
     readonly invalid: boolean;
@@ -125,7 +127,11 @@ function RadioImpl(props: RadioProps): ReactNode {
  *  again only when its props, its group, or the provider change. */
 export const Radio = memo(withEngine(RadioImpl, "Radio"));
 
-export interface RadioGroupProps extends RadioVariantProps {
+export interface RadioGroupProps extends RadioGroupVariantProps {
+    /** Every ready-made radio's `tokens` and `testId`; an item's own `testId` wins. */
+    readonly radioProps?:
+        | InnerProps<Pick<RadioProps, "tokens" | "testId">>
+        | undefined;
     /** The radios' indication, over the provider's; a radio's own `indication` goes over it. */
     readonly indication?: Indication | undefined;
     /** The checked radio's value, `null` for none. Controlled when defined. */
@@ -160,8 +166,11 @@ export function RadioGroup(props: RadioGroupProps): ReactNode {
     const variants = useStableSelection({
         ...(props.color === undefined ? {} : { color: props.color }),
         ...(props.density === undefined ? {} : { density: props.density }),
-        ...(props.tokens === undefined ? {} : { tokens: props.tokens }),
     });
+    // Kept while the radios' tokens hold the same values, so a memoized radio skips the render.
+    const radioTokens = useStableSelection({
+        tokens: props.radioProps?.tokens,
+    }).tokens;
     const disabled = props.disabled ?? false;
     const invalid = props.invalid ?? false;
     // The radios render again with the group only when what they read from it changes.
@@ -196,9 +205,16 @@ export function RadioGroup(props: RadioGroupProps): ReactNode {
                         {...(item.interactionSource === undefined
                             ? {}
                             : { interactionSource: item.interactionSource })}
-                        {...(item.testId === undefined
+                        {...(radioTokens === undefined
                             ? {}
-                            : { testId: item.testId })}
+                            : { tokens: radioTokens })}
+                        {...((item.testId ?? props.radioProps?.testId) ===
+                        undefined
+                            ? {}
+                            : {
+                                  testId:
+                                      item.testId ?? props.radioProps?.testId,
+                              })}
                     />
                 ))}
                 {props.children}

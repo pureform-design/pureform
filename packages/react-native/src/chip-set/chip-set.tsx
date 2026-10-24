@@ -10,6 +10,7 @@ import {
     toggleSelection,
 } from "@pureform/binding-core";
 import type {
+    InnerProps,
     ChipSetContentProps,
     ChipSetPart,
     ChipSetRootOwnProps,
@@ -18,12 +19,19 @@ import type { ReactNode } from "react";
 import { ScrollView } from "react-native";
 
 import { Chip } from "../chip/chip";
+import type { ChipProps } from "../chip/chip";
 import { testIdOf, useControllable, withEngine } from "../parts";
 import { useComponentSlots } from "../styles";
 
 export interface ChipSetProps
-    extends ChipSetRootOwnProps, ChipSetContentProps<ReactNode> {
+    extends
+        Omit<ChipSetRootOwnProps, "unstyled">,
+        ChipSetContentProps<ReactNode> {
     readonly "aria-label"?: string | undefined;
+    /** Every chip's `tokens` and `testId`; an item's own `testId` wins. */
+    readonly chipProps?:
+        | InnerProps<Pick<ChipProps, "tokens" | "testId">>
+        | undefined;
 }
 
 function ChipSetImpl(props: ChipSetProps): ReactNode {
@@ -56,6 +64,7 @@ function ChipSetImpl(props: ChipSetProps): ReactNode {
                 return (
                     <Chip
                         key={key}
+                        {...(props.chipProps as object)}
                         {...variants}
                         label={item.label}
                         icon={item.icon}
@@ -74,7 +83,8 @@ function ChipSetImpl(props: ChipSetProps): ReactNode {
                                 );
                             item.onClick?.();
                         }}
-                        testId={item.testId}
+                        testId={item.testId ?? props.chipProps?.testId}
+                        indication={props.indication}
                         interactionSource={item.interactionSource}
                     />
                 );

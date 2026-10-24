@@ -13,12 +13,14 @@ import {
 } from "@pureform/binding-core";
 import type {
     IndicationProps,
+    InnerProps,
     InputChipPart,
     TagsInputBehaviorProps,
     TagsInputContentProps,
     TagsInputPart,
     TagsInputVariantProps,
 } from "@pureform/binding-core";
+import type { InstanceTokens } from "@pureform/styling";
 import { useState } from "react";
 import type { ReactNode } from "react";
 import type { TextInputKeyPressEvent, TextInputProps } from "react-native";
@@ -55,6 +57,10 @@ export interface TagsInputProps
         >,
         TagsInputContentProps<ReactNode>,
         IndicationProps {
+    /** Every chip's `tokens`. */
+    readonly chipProps?:
+        | InnerProps<{ readonly tokens?: InstanceTokens<"inputChip"> }>
+        | undefined;
     /** React Native's own `TextInput` props, such as `autoCapitalize`. */
     readonly inputProps?: TextInputProps | undefined;
     /** A prefix for every part's test id (`tags` → `tags-input`), or ids by part. The chips'
@@ -83,7 +89,10 @@ function RemoveImpl(options: ChipOptions): ReactNode {
         views: v,
     } = useComponentSlots<InputChipPart>(
         "inputChip",
-        indication.select(inputChipSelection(props.chip)),
+        indication.select({
+            ...inputChipSelection(props.chip),
+            tokens: props.chipProps?.tokens,
+        }),
         indication.states(props.disabled ? { disabled: true } : {}),
     );
     return (
@@ -118,7 +127,10 @@ function ChipImpl(options: ChipOptions): ReactNode {
         views: v,
     } = useComponentSlots<InputChipPart>(
         "inputChip",
-        indication.select(inputChipSelection(props.chip)),
+        indication.select({
+            ...inputChipSelection(props.chip),
+            tokens: props.chipProps?.tokens,
+        }),
         indication.states(props.disabled ? { disabled: true } : {}),
     );
     const avatar = props.chipAvatar?.(value);

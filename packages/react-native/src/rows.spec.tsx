@@ -110,7 +110,7 @@ describe("a composite's rows", () => {
                 ]}
                 value={value}
                 color="error"
-                tokens={{ ...TOKENS }}
+                radioProps={{ tokens: { ...TOKENS } }}
             />
         ));
         expect(await items.rerender()).toEqual([]);

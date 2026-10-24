@@ -11,6 +11,7 @@ import {
     toggleSelection,
 } from "@pureform/binding-core";
 import type {
+    InnerProps,
     ButtonGroupContentProps,
     ButtonGroupPart,
     ButtonGroupRootOwnProps,
@@ -25,8 +26,18 @@ import { testIdOf, useControllable, withEngine } from "../parts";
 import { useComponentSlots } from "../styles";
 
 export interface ButtonGroupProps
-    extends ButtonGroupRootOwnProps, ButtonGroupContentProps<ReactNode> {
+    extends
+        Omit<ButtonGroupRootOwnProps, "unstyled">,
+        ButtonGroupContentProps<ReactNode> {
     readonly "aria-label"?: string | undefined;
+    /** Every labelled button's `tokens` and `testId`; an item's own `testId` wins. */
+    readonly buttonProps?:
+        | InnerProps<Pick<ButtonProps, "tokens" | "testId">>
+        | undefined;
+    /** The same for every icon-only button. */
+    readonly iconButtonProps?:
+        | InnerProps<Pick<IconButtonProps, "tokens" | "testId">>
+        | undefined;
 }
 
 function ButtonGroupImpl(props: ButtonGroupProps): ReactNode {
@@ -79,6 +90,7 @@ function ButtonGroupImpl(props: ButtonGroupProps): ReactNode {
                 return item.label === undefined ? (
                     <IconButton
                         key={key}
+                        {...(props.iconButtonProps as object)}
                         {...(variants as Partial<IconButtonProps>)}
                         variant={
                             (variants.variant === "text"
@@ -91,19 +103,22 @@ function ButtonGroupImpl(props: ButtonGroupProps): ReactNode {
                         disabled={disabled}
                         selected={selected}
                         onPress={onPress}
-                        testId={item.testId}
+                        testId={item.testId ?? props.iconButtonProps?.testId}
+                        indication={props.indication}
                         interactionSource={item.interactionSource}
                     />
                 ) : (
                     <Button
                         key={key}
+                        {...(props.buttonProps as object)}
                         {...(variants as Partial<ButtonProps>)}
                         label={item.label}
                         icon={item.icon}
                         disabled={disabled}
                         selected={selected}
                         onPress={onPress}
-                        testId={item.testId}
+                        testId={item.testId ?? props.buttonProps?.testId}
+                        indication={props.indication}
                         interactionSource={item.interactionSource}
                     />
                 );
