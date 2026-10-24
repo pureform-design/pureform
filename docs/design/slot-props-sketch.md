@@ -148,11 +148,26 @@ defaults, and a child's own wins.
 />
 ```
 
-## 5. Later step: per-instance values for repeated parts
+## 5. Per-instance values for repeated parts (batch e)
+
+A part drawn many times (calendar cells, steps, table rows and cells, rating stars, slides) takes
+a value or a function of that instance, in `className`, `style`, `slotProps` and `unstyled`, on
+every renderer. Each repeated part documents its argument type (what the component knows of that
+copy: index, state, data). The function is called once per copy per render, only when passed; a
+plain value works as today.
+
+```tsx
+<DatePicker
+    className={{ cell: (cell) => (isWeekend(cell.date) ? "weekend" : undefined) }}
+    slotProps={{ cell: (cell) => (holidays.has(cell.date) ? { "aria-description": "Holiday" } : {}) }}
+/>
+<Stepper style={{ step: (step) => (step.index === 0 ? { borderStyle: "dashed" } : undefined) }} />
+```
 
 ```ts
-// a function where the part repeats
-slotProps={{ cell: (cell: { date: DateValue; selected: boolean }) => ({ "aria-description": … }) }}
+// binding-core
+export type PerInstance<V, I> = V | ((instance: I) => V | undefined);
+// a component's repeated parts map part -> instance type, declared next to the anatomy use
 ```
 
 ## 6. What goes away
