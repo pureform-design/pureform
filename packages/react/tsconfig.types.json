@@ -2,7 +2,8 @@
     "extends": ["@pureform/tsconfig/types.json", "./tsconfig.project.json"],
     "compilerOptions": {},
     "exclude": [
-        "${configDir}/src/**/*.{spec,test}.*",
+        "${configDir}/src/**/*.spec.*",
+        "${configDir}/src/**/*.test.*",
         "${configDir}/src/__fixtures__/**",
         "${configDir}/src/testing/**"
     ]
