@@ -524,3 +524,12 @@ From `main` (`42cef4ad`). Not pushed.
 
 - Boolean-valued variant groups with a third option, and `checked`'s `true`/`false`/
   `indeterminate`, are now radios; confirm that suits the panel.
+
+## Note for future plays: Solid stories render after Storybook returns the story (r10)
+
+Since fix-storybook-5a, the Solid adapter (`apps/storybook-web/src/solid/adapter.ts`) draws a
+story only once Storybook has put its element in the document, a microtask after the story and
+its decorators return it, so machines that find parts by id in an effect (the ripple's layer)
+see them. A play that reads the canvas synchronously right after rendering would see it empty
+in Solid: await the canvas (`findBy…`, `waitFor`, or a frame) before reading it. React and
+React Native are unchanged. Decided in r10: no change to the adapter.
