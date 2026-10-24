@@ -60,8 +60,14 @@ export const drawn = async <T>(find: () => T): Promise<T> => {
     }
 };
 
+/** Whether a surface still drawn is on its way out, for an overlay nothing in ARIA tells open
+ *  (a search view, a snackbar): the web's Zag marks it `data-state="closed"` while its exit
+ *  runs; React Native's is gone once closed, so this never holds there. */
+export const leavingOnWeb = (surface: HTMLElement): boolean =>
+    surface.closest('[data-state="closed"]') !== null;
+
 /** Whether an element is drawn: not hidden, nor inside something hidden or not displayed. */
-const visible = (element: HTMLElement) =>
+export const visible = (element: HTMLElement) =>
     element.checkVisibility({ visibilityProperty: true });
 
 /** An overlay's trigger and surface: by their role and name (`aria`), and the web's by their

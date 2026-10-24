@@ -1,11 +1,12 @@
 // The carousel: a region of items, each a focusable mask. Every mask takes focus from Tab (Material's
 // carousel: "Tab or Arrows moves to the previous or next carousel item"), the current page's
-// marked `data-current`; the arrow keys move focus to the item before or after, by direction, and scroll it into
+// marked `aria-current`; the arrow keys move focus to the item before or after, by direction, and scroll it into
 // place, which changes the `page`. Enter and Space do nothing of their own: what an item does is
 // the app's. It isn't a form control, and has no disabled state of its own (an item has).
 
 import { carouselAnatomy, testIds } from "@pureform/anatomy";
 
+import { optionalFlagOf } from "../aria";
 import type { ComponentCase } from "../types";
 import { itemSources } from "../types";
 import { userEvent } from "../user-event";
@@ -21,9 +22,9 @@ const masks = (host: HTMLElement) => [
     ...host.querySelectorAll<HTMLElement>(`[data-testid="${ids.mask}"]`),
 ];
 
-/** The page: the index of the item whose mask is current. */
+/** The page: the index of the item whose mask is current (`aria-current`). */
 const read = (host: HTMLElement): number =>
-    masks(host).findIndex((mask) => mask.hasAttribute("data-current"));
+    masks(host).findIndex((mask) => optionalFlagOf(mask, "current"));
 
 export const carouselCase: ComponentCase = {
     component: "Carousel",
