@@ -257,6 +257,26 @@
       "dependencies": {
         "@pureform/anatomy": "workspace:^",
         "@pureform/core": "workspace:^",
+        "@pureform/styling": "workspace:^",
+      },
+      "devDependencies": {
+        "@pureform/tsconfig": "workspace:^",
+        "@pureform/vite-config": "workspace:^",
+        "@pureform/vitest-config": "workspace:^",
+        "@vitest/browser-playwright": "catalog:",
+        "playwright": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:",
+      },
+    },
+    "packages/binding-dom": {
+      "name": "@pureform/binding-dom",
+      "version": "0.0.0-semantically-released",
+      "dependencies": {
+        "@pureform/anatomy": "workspace:^",
+        "@pureform/binding-core": "workspace:^",
+        "@pureform/core": "workspace:^",
         "@pureform/js-effects": "workspace:^",
         "@pureform/styling": "workspace:^",
       },
@@ -554,6 +574,7 @@
       "dependencies": {
         "@pureform/anatomy": "workspace:^",
         "@pureform/binding-core": "workspace:^",
+        "@pureform/binding-dom": "workspace:^",
         "@pureform/machines": "workspace:^",
         "@zag-js/core": "catalog:",
         "@zag-js/react": "catalog:",
@@ -705,6 +726,7 @@
       "dependencies": {
         "@pureform/anatomy": "workspace:^",
         "@pureform/binding-core": "workspace:^",
+        "@pureform/binding-dom": "workspace:^",
         "@pureform/machines": "workspace:^",
         "@zag-js/core": "catalog:",
         "@zag-js/types": "catalog:",
@@ -1594,6 +1616,8 @@
     "@pureform/anatomy": ["@pureform/anatomy@workspace:packages/anatomy"],
 
     "@pureform/binding-core": ["@pureform/binding-core@workspace:packages/binding-core"],
+
+    "@pureform/binding-dom": ["@pureform/binding-dom@workspace:packages/binding-dom"],
 
     "@pureform/browser-e2e-tests": ["@pureform/browser-e2e-tests@workspace:tests/browser-e2e-tests"],
 

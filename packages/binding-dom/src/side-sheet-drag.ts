@@ -9,9 +9,10 @@
 // sits in the page's layout: as it moves out, the element holding its place (`layout()`) gives
 // the room up, so the content beside it widens as MDC's coplanar sheet lets it.
 
-import type { CloseQuestion } from "./components/dialog";
-import { closeAsker, sideSheetRelease } from "./components/sheet";
-import type { CloseAsker } from "./components/sheet";
+import type { CloseQuestion } from "@pureform/binding-core";
+import { closeAsker, sideSheetRelease } from "@pureform/binding-core";
+import type { CloseAsker } from "@pureform/binding-core";
+
 import { settleTransition } from "./settle";
 import { sidewaysDrag } from "./sideways-drag";
 

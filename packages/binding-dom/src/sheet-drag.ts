@@ -10,21 +10,22 @@
 // fully open, puts it back partly open. A sheet resting partly open is placed again when it or
 // the window changes size.
 
-import type { CloseQuestion } from "./components/dialog";
+import type { CloseQuestion } from "@pureform/binding-core";
 import {
     closeAsker,
     sheetPartialOffset,
     sheetRelease,
-} from "./components/sheet";
-import type { CloseAsker, SheetRest } from "./components/sheet";
-import { createDragVelocity } from "./drag";
+} from "@pureform/binding-core";
+import type { CloseAsker, SheetRest } from "@pureform/binding-core";
+import { createDragVelocity } from "@pureform/binding-core";
+
 import { swallowNextClick } from "./drag-click";
 import { settleTransition } from "./settle";
 
 export {
     SHEET_POSITIONAL_THRESHOLD,
     SHEET_VELOCITY_THRESHOLD,
-} from "./components/sheet";
+} from "@pureform/binding-core";
 
 // Moves shorter than this are a press, not a drag.
 const SLOP = 4;

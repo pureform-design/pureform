@@ -14,10 +14,7 @@ import {
     swipeTokens,
 } from "@pureform/binding-core";
 import type { ListItemSwipeProps } from "@pureform/binding-core";
-import {
-    createSwipeSettle,
-    swallowNextClick,
-} from "@pureform/binding-core/dom";
+import { createSwipeSettle, swallowNextClick } from "@pureform/binding-dom";
 import { type Accessor, createSignal, untrack } from "solid-js";
 
 import { useDirection, usePureform } from "../provider";

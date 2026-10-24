@@ -1,0 +1,48 @@
+{
+    "name": "@pureform/binding-dom",
+    "version": "0.0.0-semantically-released",
+    "description": "The web half the Solid and React bindings share: everything that needs a DOM type or API",
+    "type": "module",
+    "sideEffects": false,
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": {
+                "development": "./src/index.ts",
+                "default": "./dist/index.mjs"
+            },
+            "require": {
+                "development": "./src/index.ts",
+                "default": "./dist/index.mjs"
+            }
+        },
+        "./indication": {
+            "types": "./dist/indication.d.ts",
+            "import": {
+                "development": "./src/indication.ts",
+                "default": "./dist/indication.mjs"
+            },
+            "require": {
+                "development": "./src/indication.ts",
+                "default": "./dist/indication.mjs"
+            }
+        }
+    },
+    "dependencies": {
+        "@pureform/anatomy": "workspace:^",
+        "@pureform/binding-core": "workspace:^",
+        "@pureform/core": "workspace:^",
+        "@pureform/js-effects": "workspace:^",
+        "@pureform/styling": "workspace:^"
+    },
+    "devDependencies": {
+        "@pureform/tsconfig": "workspace:^",
+        "@pureform/vite-config": "workspace:^",
+        "@pureform/vitest-config": "workspace:^",
+        "@vitest/browser-playwright": "catalog:",
+        "playwright": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:"
+    }
+}

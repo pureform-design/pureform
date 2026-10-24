@@ -21,7 +21,7 @@ import type {
     TabsContentProps,
     TabsRootOwnProps,
 } from "@pureform/binding-core";
-import { revealInRow, slideIndicator } from "@pureform/binding-core/dom";
+import { revealInRow, slideIndicator } from "@pureform/binding-dom";
 import * as tabs from "@pureform/machines/tabs";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";

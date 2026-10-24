@@ -8,7 +8,6 @@ import {
     FAB_MENU_ROOT_PROPS,
     fabMenuItemFocusProps,
     fabMenuItemProps,
-    fabMenuListProps,
     fabMenuMachineProps,
     fabMenuSelection,
     isPresent,
@@ -20,6 +19,7 @@ import type {
     FabMenuRootOwnProps,
     InteractionSourceProps,
 } from "@pureform/binding-core";
+import { fabMenuListProps } from "@pureform/binding-dom";
 import * as menu from "@pureform/machines/menu";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {

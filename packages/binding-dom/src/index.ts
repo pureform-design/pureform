@@ -1,18 +1,19 @@
-// The web half: the system's reduced-motion preference, an icon slot's measured style, a native
-// checkbox kept in step with its machine, an overlay's positioner stacked at its surface's layer,
-// an active indicator sliding between tabs, and runtime themes and overrides as CSS. Only call the
-// DOM readers in the browser, after mount; the root entry stays free of DOM use and of CSS
-// lowering for React Native.
+// The web half of pureform's bindings, for React and Solid: the system's reduced-motion
+// preference, an icon slot's measured style, a native checkbox kept in step with its machine, an
+// overlay's positioner stacked at its surface's layer, an active indicator sliding between tabs,
+// drags and swipes, runtime themes and overrides as CSS, and the web-only props of the components'
+// contracts. Only call the DOM readers in the browser, after mount. `@pureform/binding-core` stays
+// free of DOM types and APIs, for React Native.
 
 import {
     SLIDER_INSET_ICON,
     sliderClearanceOf,
     sliderTrackTokens,
-} from "./components/slider";
-import type { SliderInsetIconMeasures } from "./components/slider";
-import { DEFAULT_ICON_STYLE, sameIconStyle } from "./icon-style";
-import type { IconStyle } from "./icon-style";
-import { REDUCED_MOTION_QUERY } from "./motion";
+} from "@pureform/binding-core";
+import type { SliderInsetIconMeasures } from "@pureform/binding-core";
+import { DEFAULT_ICON_STYLE, sameIconStyle } from "@pureform/binding-core";
+import type { IconStyle } from "@pureform/binding-core";
+import { REDUCED_MOTION_QUERY } from "@pureform/binding-core";
 
 /** Whether the system asks for reduced motion now; `false` where there's no `matchMedia`. */
 export const systemReducedMotion = (): boolean =>
@@ -382,3 +383,24 @@ export {
     toastSwipeToDismiss,
 } from "./toast-swipe";
 export type { ToastSwipeOptions } from "./toast-swipe";
+export {
+    DIALOG_FOCUS_PROPS,
+    dialogFocusMachineProps,
+    fabMenuListProps,
+    POPOVER_DOM_ROOT_PROPS,
+    popoverDomMachineProps,
+    RIPPLE_DOM_ROOT_PROPS,
+    rippleDomMachineProps,
+    searchViewDomDialogProps,
+} from "./components";
+export type {
+    DialogFocusProps,
+    FileUploadDomBehaviorProps,
+    FileUploadDomContentProps,
+    FileUploadDomRootOwnProps,
+    FileUploadDomValueDetails,
+    PopoverDomRootOwnProps,
+    PopoverFocusProps,
+    RippleDomProps,
+    RippleDomRootOwnProps,
+} from "./components";

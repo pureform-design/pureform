@@ -4,7 +4,8 @@
 // down (the browser scrolls natively: `touch-action: pan-y`, which the element renders). Let go,
 // the drag hears how far it went and how fast, and the click that ends it is swallowed.
 
-import { createDragVelocity } from "./drag";
+import { createDragVelocity } from "@pureform/binding-core";
+
 import { swallowNextClick } from "./drag-click";
 
 export interface SidewaysDragHooks {

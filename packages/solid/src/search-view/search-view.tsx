@@ -21,7 +21,6 @@ import {
     SEARCH_VIEW_TRIGGER_STYLE,
     searchViewCarriedKey,
     searchViewComboboxProps,
-    searchViewDialogProps,
     searchViewLabel,
     searchViewMatches,
     searchViewMenuSelection,
@@ -35,7 +34,8 @@ import type {
     SearchViewRootOwnProps,
     Unstyled,
 } from "@pureform/binding-core";
-import { stackPositioner } from "@pureform/binding-core/dom";
+import { searchViewDomDialogProps } from "@pureform/binding-dom";
+import { stackPositioner } from "@pureform/binding-dom";
 import * as combobox from "@pureform/machines/combobox";
 import * as dialog from "@pureform/machines/dialog";
 import type { JSX, ValidComponent } from "@solidjs/web";
@@ -133,7 +133,7 @@ function Root(props: SearchViewRootProps): JSX.Element {
     const view = useMachine(dialog.machine, () => ({
         id,
         dir: dir(),
-        ...searchViewDialogProps(props, () => input ?? null),
+        ...searchViewDomDialogProps(props, () => input ?? null),
         ...open.machineProps(),
     }));
     const viewApi = createMemo(() => dialog.connect(view, normalizeProps));

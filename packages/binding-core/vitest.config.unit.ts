@@ -1,11 +1,10 @@
-// Unit tests in Chromium through Vitest's browser mode, since the DOM half reads computed styles
-// and media queries. Set CHROMIUM_PATH to use a system Chromium instead of Playwright's download.
+// Unit tests in Chromium through Vitest's browser mode, as the web bindings run. Set
+// CHROMIUM_PATH to use a system Chromium instead of Playwright's download.
 
 import unitTestConfig from "@pureform/vitest-config/unit";
 import { playwright } from "@vitest/browser-playwright";
 import { mergeConfig, type UserWorkspaceConfig } from "vitest/config";
 
-import { commands } from "./src/testing/commands";
 import baseConfig from "./vite.config";
 
 const executablePath = process.env.CHROMIUM_PATH;
@@ -26,7 +25,6 @@ export default mergeConfig(mergeConfig(baseConfig, unitTestConfig), {
                 contextOptions: { timezoneId: "Asia/Manila" },
             }),
             instances: [{ browser: "chromium" }],
-            commands,
         },
     },
 } satisfies UserWorkspaceConfig);

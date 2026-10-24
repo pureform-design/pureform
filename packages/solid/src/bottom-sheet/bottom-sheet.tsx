@@ -36,12 +36,13 @@ import type {
     SheetRest,
     Unstyled,
 } from "@pureform/binding-core";
+import type { DialogFocusProps } from "@pureform/binding-dom";
 import {
     dragToDismiss,
     springRoleVar,
     focusableWhileOverflowing,
-} from "@pureform/binding-core/dom";
-import type { SheetDrag } from "@pureform/binding-core/dom";
+} from "@pureform/binding-dom";
+import type { SheetDrag } from "@pureform/binding-dom";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {
     createEffect,
@@ -69,7 +70,8 @@ type Anatomy = typeof bottomSheetOverlayAnatomy;
 export interface BottomSheetRootProps
     extends
         Omit<PartProps, keyof BottomSheetRootOwnProps>,
-        BottomSheetRootOwnProps {
+        BottomSheetRootOwnProps,
+        DialogFocusProps {
     /** Another element or component to render instead of `<div>`. */
     readonly as?: ValidComponent | undefined;
 }

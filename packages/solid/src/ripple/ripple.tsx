@@ -3,13 +3,12 @@
 // `ripple` slot, and draws none while motion is reduced.
 
 import { rippleAnatomy } from "@pureform/anatomy";
+import { isUnstyled, rippleSelection } from "@pureform/binding-core";
 import {
-    isUnstyled,
-    RIPPLE_ROOT_PROPS,
-    rippleMachineProps,
-    rippleSelection,
-} from "@pureform/binding-core";
-import type { RippleRootOwnProps } from "@pureform/binding-core";
+    RIPPLE_DOM_ROOT_PROPS,
+    rippleDomMachineProps,
+} from "@pureform/binding-dom";
+import type { RippleDomRootOwnProps } from "@pureform/binding-dom";
 import * as ripple from "@pureform/machines/ripple";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import { createMemo, createUniqueId, omit } from "solid-js";
@@ -22,7 +21,9 @@ import type { PartProps } from "../props";
 /** The ripple's props: the machine's (`disabled`, `centered`, `effect`, …), the tokens, `testId`
  *  and `unstyled`, `as`, and the element's own props. */
 export interface RippleProps
-    extends Omit<PartProps, keyof RippleRootOwnProps>, RippleRootOwnProps {
+    extends
+        Omit<PartProps, keyof RippleDomRootOwnProps>,
+        RippleDomRootOwnProps {
     /** Another element or component to render instead of `<span>`. */
     readonly as?: ValidComponent | undefined;
 }
@@ -42,14 +43,14 @@ function Root(props: RippleProps): JSX.Element {
         rippleClass: isUnstyled(props.unstyled, "ripple")
             ? undefined
             : scope.classes().ripple?.class,
-        ...rippleMachineProps(props),
+        ...rippleDomMachineProps(props),
     }));
     const api = createMemo(() => ripple.connect(service, normalizeProps));
     return scope.render("root", {
         element: "span",
         as: () => props.as,
         machine: () => api().getLayerProps(),
-        props: omit(props, "as", ...RIPPLE_ROOT_PROPS),
+        props: omit(props, "as", ...RIPPLE_DOM_ROOT_PROPS),
     });
 }
 

@@ -32,10 +32,6 @@ export interface RippleBehaviorProps {
     readonly centered?: boolean | undefined;
     /** Let an ancestor surface ripple for the same press too. */
     readonly allowPropagation?: boolean | undefined;
-    /** The surface whose presses ripple. @default the layer's parent element */
-    readonly getSurfaceEl?:
-        | ((layer: HTMLElement) => HTMLElement | null)
-        | undefined;
     /** The layer's id, also the machine's.
      *  @control none */
     readonly id?: string | undefined;
@@ -57,7 +53,6 @@ export const RIPPLE_ROOT_PROPS = [
     "effect",
     "centered",
     "allowPropagation",
-    "getSurfaceEl",
     "id",
     "testId",
     "unstyled",
@@ -76,6 +71,5 @@ export const rippleMachineProps = (props: RippleBehaviorProps) => ({
     variant: props.effect,
     centered: props.centered,
     allowPropagation: props.allowPropagation,
-    getSurfaceEl: props.getSurfaceEl,
     ids: { layer: props.id },
 });

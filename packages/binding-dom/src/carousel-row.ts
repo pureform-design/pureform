@@ -3,10 +3,9 @@
 // too). The row snaps its items to where its padding ends: its padding (and scroll padding) is
 // the carousel's `padding` token, given to Zag's machine so both render from the server on.
 
+import type { CarouselMetrics } from "@pureform/binding-core";
 import type { Registry } from "@pureform/styling";
 import { tokenVar } from "@pureform/styling/theme-vars";
-
-import type { CarouselMetrics } from "./components/carousel";
 
 /** The row's padding for Zag's `padding` prop: the carousel's `padding` token, as the registry's
  *  target names its var. `undefined` without a registry. */

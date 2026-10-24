@@ -19,11 +19,11 @@ import {
     isPreviewable,
 } from "@pureform/binding-core";
 import type {
-    FileUploadContentProps,
-    FileUploadRootOwnProps,
-    FileUploadValueDetails,
-} from "@pureform/binding-core";
-import { writeInputFiles } from "@pureform/binding-core/dom";
+    FileUploadDomContentProps,
+    FileUploadDomRootOwnProps,
+    FileUploadDomValueDetails,
+} from "@pureform/binding-dom";
+import { writeInputFiles } from "@pureform/binding-dom";
 import * as fileUpload from "@pureform/machines/file-upload";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {
@@ -62,7 +62,7 @@ type Anatomy = typeof fileUploadAnatomy;
 interface FileUploadContextValue {
     readonly scope: ComponentScope<Anatomy>;
     readonly api: Accessor<fileUpload.Api<PropTypes>>;
-    readonly props: FileUploadRootOwnProps;
+    readonly props: FileUploadDomRootOwnProps;
 }
 
 const context = createPartContext<FileUploadContextValue>("FileUpload");
@@ -71,8 +71,8 @@ const context = createPartContext<FileUploadContextValue>("FileUpload");
  *  `maxFiles`, …), `testId` and `unstyled` for every part, `as`, and the element's own props. */
 export interface FileUploadRootProps
     extends
-        Omit<PartProps, keyof FileUploadRootOwnProps>,
-        FileUploadRootOwnProps {
+        Omit<PartProps, keyof FileUploadDomRootOwnProps>,
+        FileUploadDomRootOwnProps {
     /** Another element or component to render instead of `<div>`. */
     readonly as?: ValidComponent | undefined;
 }
@@ -106,7 +106,7 @@ export interface FileUploadItemProps extends FileUploadPartProps {
 function Root(props: FileUploadRootProps): JSX.Element {
     const id = createUniqueId();
     const dir = useDirection();
-    const value = useControllable<"value", File[], FileUploadValueDetails>(
+    const value = useControllable<"value", File[], FileUploadDomValueDetails>(
         "FileUpload",
         "value",
         props,
@@ -289,7 +289,7 @@ function Preview(props: {
 }
 
 // The list item's test id prefix, when Root's `testId` gives one.
-const itemTestId = (testId: FileUploadRootOwnProps["testId"]) => {
+const itemTestId = (testId: FileUploadDomRootOwnProps["testId"]) => {
     const prefix = fileUploadItemTestId(testId);
     return prefix === undefined ? {} : { testId: prefix };
 };
@@ -408,7 +408,7 @@ export interface FileUploadProps
     extends
         Omit<FileUploadRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
         SlotKeyedProps<Anatomy>,
-        FileUploadContentProps<JSX.Element> {}
+        FileUploadDomContentProps<JSX.Element> {}
 
 const READY_MADE_PROPS = [
     "class",

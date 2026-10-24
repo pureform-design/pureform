@@ -5,7 +5,7 @@
 
 import { DEFAULT_ICON_STYLE, sameIconStyle } from "@pureform/binding-core";
 import type { IconStyle } from "@pureform/binding-core";
-import { observeIconStyle } from "@pureform/binding-core/dom";
+import { observeIconStyle } from "@pureform/binding-dom";
 import {
     type Accessor,
     createContext,

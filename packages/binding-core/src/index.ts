@@ -1,6 +1,7 @@
 // The framework-free pieces every pureform binding shares: what the provider takes and how nested
 // providers combine, selections over defaults, part attributes and props merging, controllable
-// state, and reduced motion. DOM-only helpers are at `@pureform/binding-core/dom`.
+// state, and reduced motion. It uses no DOM type or API: the web's half is
+// `@pureform/binding-dom`.
 
 export { cx } from "./class-names";
 export type { ClassDictionary, ClassValue } from "./class-names";
@@ -284,7 +285,6 @@ export {
     FAB_MENU_ROOT_PROPS,
     fabMenuItemFocusProps,
     fabMenuItemProps,
-    fabMenuListProps,
     fabMenuMachineProps,
     fabMenuSelection,
 } from "./components/fab-menu";
@@ -693,6 +693,7 @@ export {
     toasterOptions,
     toastGroupStyle,
     toastSelection,
+    TOAST_SWIPE_VELOCITY_THRESHOLD,
     toastSwipeRelease,
 } from "./components/toast";
 export type {
@@ -877,6 +878,7 @@ export type {
     FileUploadBehaviorProps,
     FileUploadContentProps,
     FileUploadEntry,
+    FileUploadItem,
     FileUploadErrorCode,
     FileUploadPart,
     FileUploadRootOwnProps,

@@ -1,6 +1,6 @@
+import { toastSwipeRelease } from "@pureform/binding-core";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { toastSwipeRelease } from "./components/toast";
 import { toastSwipeToDismiss } from "./toast-swipe";
 
 describe("toastSwipeToDismiss", () => {

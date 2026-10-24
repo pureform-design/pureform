@@ -28,10 +28,8 @@ import type {
     SideSheetRootOwnProps,
     Unstyled,
 } from "@pureform/binding-core";
-import {
-    sideSheetDragToDismiss,
-    springRoleVar,
-} from "@pureform/binding-core/dom";
+import type { DialogFocusProps } from "@pureform/binding-dom";
+import { sideSheetDragToDismiss, springRoleVar } from "@pureform/binding-dom";
 import {
     type ElementType,
     type ReactNode,
@@ -57,7 +55,8 @@ type Anatomy = typeof sideSheetOverlayAnatomy;
 export interface SideSheetRootProps
     extends
         Omit<PartProps, keyof SideSheetRootOwnProps>,
-        SideSheetRootOwnProps {
+        SideSheetRootOwnProps,
+        DialogFocusProps {
     /** Another element or component to render instead of `<div>`. */
     readonly as?: ElementType | undefined;
 }

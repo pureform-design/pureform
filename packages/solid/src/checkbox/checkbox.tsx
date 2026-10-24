@@ -17,7 +17,7 @@ import type {
     CheckboxRootOwnProps,
     CheckedState,
 } from "@pureform/binding-core";
-import { syncCheckedInput } from "@pureform/binding-core/dom";
+import { syncCheckedInput } from "@pureform/binding-dom";
 import * as checkbox from "@pureform/machines/checkbox";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {

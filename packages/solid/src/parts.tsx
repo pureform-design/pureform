@@ -19,12 +19,10 @@ import {
     withProvidedTokens,
 } from "@pureform/binding-core";
 import type { PartStates, SlotKeyed, Unstyled } from "@pureform/binding-core";
-import {
-    componentIndicationTokens,
-    indicationRoles,
-} from "@pureform/binding-core/indication";
+import { componentIndicationTokens } from "@pureform/binding-core/indication";
 import type { Indication } from "@pureform/binding-core/indication";
 import type { InteractionSource } from "@pureform/binding-core/interaction";
+import { indicationRoles } from "@pureform/binding-dom/indication";
 import type {
     ClassSlots,
     ComponentName,

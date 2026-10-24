@@ -7,21 +7,12 @@
 import type { IndicationAnatomy } from "@pureform/anatomy";
 import { resolveReducedMotion, warnOnce } from "@pureform/binding-core";
 import type { PartStates } from "@pureform/binding-core";
-import { systemReducedMotion } from "@pureform/binding-core/dom";
 import {
-    DEFAULT_INDICATION,
     droppedFocusIndicatorMessage,
     dropsFocusIndicator,
-    holdsLayer,
-    IndicationHost,
-    NOT_FORWARDED,
     rippleClasses,
 } from "@pureform/binding-core/indication";
-import type {
-    ForwardedStates,
-    Indication,
-    IndicationRole,
-} from "@pureform/binding-core/indication";
+import type { Indication } from "@pureform/binding-core/indication";
 import {
     createInteractionSource,
     IDLE_INTERACTION_STATE,
@@ -31,6 +22,17 @@ import type {
     InteractionState,
     MutableInteractionSource,
 } from "@pureform/binding-core/interaction";
+import { systemReducedMotion } from "@pureform/binding-dom";
+import {
+    DEFAULT_INDICATION,
+    holdsLayer,
+    IndicationHost,
+    NOT_FORWARDED,
+} from "@pureform/binding-dom/indication";
+import type {
+    ForwardedStates,
+    IndicationRole,
+} from "@pureform/binding-dom/indication";
 import {
     InteractionEmitter,
     pressableItemProps,

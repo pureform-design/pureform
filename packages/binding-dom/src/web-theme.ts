@@ -2,6 +2,8 @@
 // as, the inline vars overrides become, and the decisions both bindings make about when to
 // generate a theme and when to keep the server's block.
 
+import type { ThemeHydration, ThemeOverrides } from "@pureform/binding-core";
+import { themeAttributeOf } from "@pureform/binding-core";
 import type {
     AnyRuntimeTheme,
     CssVars,
@@ -10,9 +12,6 @@ import type {
 } from "@pureform/styling";
 import { themeScope } from "@pureform/styling";
 import { tokenVar } from "@pureform/styling/theme-vars";
-
-import type { ThemeHydration, ThemeOverrides } from "./provider";
-import { themeAttributeOf } from "./provider";
 
 /** The attribute every runtime theme's `<style>` block carries, its scope as the value, so the
  *  client can find the server's block. */

@@ -4,10 +4,7 @@
 // runs after an interaction.
 
 import { resolveReducedMotion } from "@pureform/binding-core";
-import {
-    subscribeReducedMotion,
-    watchCollapse,
-} from "@pureform/binding-core/dom";
+import { subscribeReducedMotion, watchCollapse } from "@pureform/binding-dom";
 import { type Accessor, createMemo, createSignal, onSettled } from "solid-js";
 
 import { usePureform } from "./provider";

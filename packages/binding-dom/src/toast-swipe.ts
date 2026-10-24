@@ -4,10 +4,11 @@
 // page's to scroll (`touch-action: pan-y`). A press on its buttons (the action, the close button)
 // isn't a drag, and a toast that can't be closed doesn't move. Its timer waits while it's held.
 
-import { toastSwipeRelease } from "./components/toast";
+import { toastSwipeRelease } from "@pureform/binding-core";
+
 import { sidewaysDrag } from "./sideways-drag";
 
-export { TOAST_SWIPE_VELOCITY_THRESHOLD } from "./components/toast";
+export { TOAST_SWIPE_VELOCITY_THRESHOLD } from "@pureform/binding-core";
 
 // Moves shorter than this are a press, not a swipe.
 const SLOP = 8;

@@ -1,8 +1,9 @@
 // How an interactive surface answers the user: the state layer, the ripple, and the focus
 // indicator, in Material's names, as one pluggable `Indication` that draws from the component's
-// interaction source. This module is the interface, the web halves of the built-ins (Material's
-// and none), how the web writes an indication's tokens, and the wiring the web bindings share.
-// React Native fills in the built-ins' native halves.
+// interaction source. This module is the interface, the built-ins (Material's and none) without
+// their live halves, and how an indication's tokens are written. `@pureform/binding-dom` fills in
+// the built-ins' web halves and the wiring the web bindings share; React Native fills in the
+// native halves.
 
 import type { TokenValue } from "@pureform/styling";
 
@@ -37,16 +38,28 @@ export interface IndicationTokens {
     readonly focusIndicatorColor?: TokenValue | undefined;
 }
 
+/** The platform's element type, which `@pureform/binding-dom` declares (`element: HTMLElement`)
+ *  by augmenting this interface. Empty here, so this package needs no DOM types. */
+export interface IndicationPlatform {}
+
+/** The element an indication's web half draws on: `HTMLElement` once `@pureform/binding-dom`
+ *  is loaded, else `unknown`. */
+export type IndicationElement = IndicationPlatform extends {
+    readonly element: infer E;
+}
+    ? E
+    : unknown;
+
 /** The elements an indication draws on, from the component's anatomy. */
 export interface IndicationTarget {
     /** The element whose interactions feed the source. */
-    readonly trigger: HTMLElement;
+    readonly trigger: IndicationElement;
     /** The element the state layer tints and the ripple fills; it clips the ripple. */
-    readonly surface: HTMLElement;
+    readonly surface: IndicationElement;
     /** The layer element inside the surface, when the indication asks for one (`layer`). It's
      *  found in the surface as it's read, so read it when drawing (at a press), not once when
      *  the effect starts. */
-    readonly layer?: HTMLElement | undefined;
+    readonly layer?: IndicationElement | undefined;
 }
 
 /** What an indication's effect reads from the component and its provider. */
@@ -143,17 +156,3 @@ export type {
     MaterialRipple,
     RippleClasses,
 } from "./indication-material";
-export {
-    holdsLayer,
-    IndicationHost,
-    IndicationInstance,
-    indicationRoles,
-    NOT_FORWARDED,
-    stateIndicationPart,
-    surfaceLayer,
-} from "./indication-host";
-export type {
-    ForwardedStates,
-    IndicationEnvironment,
-    IndicationRole,
-} from "./indication-host";

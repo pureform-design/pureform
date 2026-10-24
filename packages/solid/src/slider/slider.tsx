@@ -24,7 +24,7 @@ import type {
     SliderRootOwnProps,
     SliderValue,
 } from "@pureform/binding-core";
-import { readSliderInsetIcon } from "@pureform/binding-core/dom";
+import { readSliderInsetIcon } from "@pureform/binding-dom";
 import { setNativeDefault } from "@pureform/machines/form";
 import * as slider from "@pureform/machines/slider";
 import type { JSX, ValidComponent } from "@solidjs/web";

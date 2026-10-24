@@ -21,7 +21,7 @@ import type {
     SplitterSize,
     SplitterSizeDetails,
 } from "@pureform/binding-core";
-import { splitterRelease } from "@pureform/binding-core/dom";
+import { splitterRelease } from "@pureform/binding-dom";
 import * as splitter from "@pureform/machines/splitter";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";

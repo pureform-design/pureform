@@ -8,7 +8,7 @@ import {
     subscribeReducedMotion,
     watchCollapse,
     systemReducedMotion,
-} from "@pureform/binding-core/dom";
+} from "@pureform/binding-dom";
 import { useSyncExternalStore } from "react";
 
 import { useComponentState } from "./provider";

@@ -10,7 +10,6 @@ export default createConfig({
             lib: {
                 entry: {
                     index: "src/index.ts",
-                    dom: "src/dom.ts",
                     interaction: "src/interaction.ts",
                     indication: "src/indication.ts",
                     usage: "src/usage.ts",

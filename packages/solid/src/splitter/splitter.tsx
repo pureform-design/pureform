@@ -22,7 +22,7 @@ import type {
     SplitterSize,
     SplitterSizeDetails,
 } from "@pureform/binding-core";
-import { splitterRelease } from "@pureform/binding-core/dom";
+import { splitterRelease } from "@pureform/binding-dom";
 import type { PropTypes } from "@pureform/machines";
 import * as splitter from "@pureform/machines/splitter";
 import type { JSX, ValidComponent } from "@solidjs/web";

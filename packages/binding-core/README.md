@@ -1,20 +1,27 @@
 # @pureform/binding-core
 
-The framework-free half of pureform's bindings. Everything `@pureform/solid`,
+The framework- and platform-free half of pureform's bindings. Everything `@pureform/solid`,
 `@pureform/react`, and `@pureform/react-native` would otherwise write twice lives here:
-what `PureformProvider` takes and how nested providers combine, runtime themes and token
-overrides as CSS, selections over the provider's defaults, a part's state attributes and how its props merge, controllable state, reduced
-motion, an icon slot's measured style, and each component's contract: the props Root takes and
-how they map onto the selection and the machine.
+what `PureformProvider` takes and how nested providers combine, selections over the provider's
+defaults, a part's state attributes and how its props merge, controllable state, reduced
+motion, the interaction source and the indication interface, and each component's contract: the
+props Root takes and how they map onto the selection and the machine.
+
+It uses no DOM type or API: its `tsconfig.json` leaves the DOM lib out, so a leak fails the type
+check `test:unit` runs first. What needs the DOM (runtime themes as CSS, measuring, drags and
+swipes, the indication host, element getters, the web's `File`) is in
+[`@pureform/binding-dom`](../binding-dom/README.md), which only the web bindings import.
 
 ## Where it sits
 
 ```
 @pureform/core, styling, anatomy, js-effects   (framework-free; types, registry, part names, the ripple)
                  │
-@pureform/binding-core   (this package; no framework)
-                 │
-@pureform/solid, @pureform/react, @pureform/react-native   (hooks and components)
+@pureform/binding-core   (this package; no framework, no DOM)
+                 │                     │
+                 │      @pureform/binding-dom   (the web half; no framework)
+                 │                     │
+@pureform/react-native     @pureform/solid, @pureform/react   (hooks and components)
 ```
 
 It's in the core train (`cog.toml`'s `core-train`). A binding adds only what needs its
@@ -37,16 +44,15 @@ to prune builds.
 | `icon-style.ts`          | `IconStyle`, `DEFAULT_ICON_STYLE`                                                                                                                                                                                                      |
 | `version.ts`             | `trainVersionMismatch`: the generated registry's recorded train version against the running `@pureform/styling`'s `VERSION`                                                                                                            |
 | `warn.ts`                | `warnOnce`                                                                                                                                                                                                                             |
-| `web-theme.ts`           | Runtime themes' `<style>` blocks, overrides as vars, and when to generate or keep the server's block (on `/dom`)                                                                                                                       |
+| `platform.ts`            | `platformLanguage()`: `navigator.language` where there is one, without the DOM's types                                                                                                                                                 |
+| `platform-globals.d.ts`  | The globals every platform has (`console.warn`, `setTimeout`, `queueMicrotask`), declared since the DOM lib is left out                                                                                                                |
 | `usage.ts`               | `COMPONENT_USAGE` and the hook and provider names the bundler's pruning scan reads (on `/usage`)                                                                                                                                       |
 | `interaction.ts`         | The interaction source (on `/interaction`): `InteractionKinds`, `Interaction`, `InteractionState`, `createInteractionSource` and the state it keeps                                                                                    |
-| `indication.ts`          | The `Indication` interface (on `/indication`): what an indication sets and draws, `defineIndication`; re-exports the three modules below                                                                                               |
-| `indication-material.ts` | The web halves of `materialIndication({ ripple })` (the ripple from the source's presses, over `createRipple` from `@pureform/js-effects`) and `noIndication`; `rippleClasses(registry)`                                               |
+| `indication.ts`          | The `Indication` interface (on `/indication`): what an indication sets and draws, `defineIndication`, `IndicationPlatform` (the element type `@pureform/binding-dom` declares); re-exports the two modules below                       |
+| `indication-material.ts` | `materialIndication({ ripple })` and `noIndication` without live halves (the bindings add them), `rippleClasses(registry)`                                                                                                             |
 | `indication-tokens.ts`   | An indication's tokens as CSS: theme-level overrides for a provider, instance tokens for a component, the focus indicator check                                                                                                        |
-| `indication-host.ts`     | `IndicationHost`: what the web bindings share to tie an anatomy's indication entries to a component's elements, run the effect after mount, and track hover and press forwarded from another origin                                    |
-| `dom.ts`                 | The web half, on its own subpath: reduced motion, measuring an icon slot, checkbox and radio inputs kept in step, `web-theme.ts`                                                                                                       |
 
-The root entry uses no DOM API and no CSS lowering, so React Native can import it.
+No entry uses a DOM type or API or CSS lowering, so React Native can import every one.
 
 ## Public API
 
@@ -182,7 +188,6 @@ interface SelectionListRootOwnProps // the list's props, selectionMode, deselect
                                     // disabled, id, value
 interface SelectionListItem         // a list item's content and variants, value, textValue?, disabled?
 selectionListOptions(items); selectionListMachineProps(props);
-revealInRow(item); // (dom) scrolls an item's scrolling row, never the page
 
 // Chip, icon button, FAB: on the button machine (buttonMachineProps, or fabMachineProps)
 CHIP_ROOT_PROPS; chipSelection(props);
@@ -276,7 +281,7 @@ popoverSelection(props); popoverMachineProps(props); // placement "bottom-start"
 type DialogPart                          // the overlay's parts, and "backdrop"
 interface DialogRootOwnProps             // icon (the variant), tokens, modal, role, onClose (OverlayCloseProps),
                                          // closeOnInteractOutside, closeOnEscape, restoreFocus,
-                                         // initialFocusEl, finalFocusEl, aria-label, ids (headline,
+                                         // aria-label, ids (headline,
                                          // body: Zag's title and description), open, defaultOpen,
                                          // onOpenChange, testId, unstyled
 DIALOG_ROOT_PROPS; DIALOG_CONTENT_PROPS; // trigger, mirrorIcon, headline, body, actions (and icon)
@@ -315,21 +320,13 @@ sheetMachineProps(props);                // modal by default; a click outside cl
 bottomSheetPositionerLayout(present, modal); // fixed to the bottom; a standard one lets presses through
 sideSheetPositionerLayout(present, modal, coplanar); // fixed to the end edge, or in the page's layout
 sheetContentLayout;                      // the surface takes presses back
-dragToDismiss(handle, sheet, dismiss, onClose?, asker?, { partial?, opening?, onRest? }); // from /dom: drag a sheet by its handle; closes it, or with `partial`, moves it between partly and fully open (re-placed on a resize); returns stop, with stop.rest(rest) for a controlled `expanded`; dismiss(kept) calls kept once rendered if the app kept it open
 sheetPartiallyExpandable(props); sheetOpeningRest(props); // partly open unless `partiallyExpandable: false`; where it opens (`expanded` ?? `defaultExpanded`)
 SHEET_POSITIONAL_THRESHOLD; SHEET_VELOCITY_THRESHOLD; // Compose's 56px and 125dp/s (0.125px/ms); replace SHEET_DISMISS_SHARE and SHEET_FLICK_SPEED
 sheetRelease({ offset, velocity, height, partial? }); // where a let-go sheet goes: "expanded" | "partial" | "closed", by chooseAnchor (shared with React Native)
-sideSheetDragToDismiss(sheet, rtl, dismiss, onClose?, asker?, draggable?); // from /dom: a touch or pen drags a side sheet toward its edge (pan-y keeps vertical scroll native); closes it or settles it back; returns stop
 SIDE_SHEET_VELOCITY_THRESHOLD; sideSheetRelease({ offset, velocity, width }); // MDC-Android's SideSheetBehavior: 500px/s (0.5px/ms) or halfway out closes; "open" | "closed" (shared with React Native)
 sheetPartialOffset(height, screen); sheetDragHandleLabel(rest, movable); // partly open's offset (top at half the screen); the handle's default name
-settleTransition(element, property, distance, velocity); // from /dom: starts an element's spring transition at a release's speed (core's springFromCurve + sampleSpring's `velocity`)
-settleOnSpring(elements, property, spring, distance, velocity); // from /dom: the same on a given spring (the splitter's panes on SPLITTER_SETTLE)
-focusableWhileOverflowing(element);      // from /dom: tabindex="0" only while its content overflows (the bottom sheet's body)
 createDragVelocity();                    // a drag's speed (px/s) over its last 100ms (drag.ts; the sheet and the splitter)
 chooseAnchor({ anchors, at, velocity, velocityThreshold, positionalThreshold? }); // Compose's anchored-drag target: the next one on a fling, else the nearest or past a positional threshold
-markMenuGroupEdges(content);             // from /dom: marks a menu's first and last groups data-first/data-last, from DOM order; a group's data-pf-first/data-pf-last (its explicit first/last) wins
-swallowNextClick(row);                   // from /dom: drop the click a drag ends with
-whenAnimationsEnd(element, done);        // from /dom: done once every animation running on it ends (at once with none); returns what stops waiting
 
 // Drag handle: dragHandleAnatomy
 interface DragHandleRootOwnProps         // orientation, tokens, testId, unstyled
@@ -378,7 +375,7 @@ toastSelection(type, props);             // an unknown type selects `info`
 TOAST_STACK_STYLE;                       // Zag's --x, --y, --scale, --opacity, --height applied
 toastGroupStyle(style);                  // Zag's region style, physical insets, no z-index
 
-// Toolbar: the generated toolbarAnatomy (root); overflow.ts and toolbar-dom.ts (`/dom`)
+// Toolbar: the generated toolbarAnatomy (root); overflow.ts (toolbar-dom.ts is binding-dom's)
 interface ToolbarRootOwnProps            // placement, orientation, color, tokens, overflow, testId
 TOOLBAR_ROOT_PROPS; toolbarSelection(props); toolbarRootProps(props); // role, aria-orientation
 interface ToolbarItem<Node>              // value, label, icon?, disabled?, selected?, onClick?, …
@@ -532,9 +529,10 @@ codeFieldMachineProps(props);
 // File upload: Zag's file upload; a drop zone with a trigger button over a list of files, each a
 // list item (with an icon button to remove it, and a linear progress while the app reports one).
 // The accepted files are `value` (Zag's acceptedFiles), with defaultValue and onValueChange
-// ({ value, rejectedFiles }). React Native has no picker or drop, so the app keeps `files`
-// (FileUploadEntry).
-type FileUploadPart; interface FileUploadRootOwnProps // color, tokens, value, accept,
+// ({ value, rejectedFiles }). Generic over the platform's file `F extends FileUploadItem`
+// ({ name, size, type }); binding-dom's FileUploadDom* types use the web's File. React Native has
+// no picker or drop, so the app keeps `files` (FileUploadEntry).
+type FileUploadPart; interface FileUploadItem; interface FileUploadRootOwnProps<F> // color, tokens, value, accept,
 // maxFiles, maxFileSize, validate, progress, errorMessage, removeLabel, error, …
 FILE_UPLOAD_ROOT_PROPS; FILE_UPLOAD_CONTENT_PROPS; fileUploadSelection(props);
 fileUploadMachineProps(props); fileUploadValueProps(controllable); fileUploadErrorText(errors, file, errorMessage);
@@ -580,7 +578,6 @@ appBarDrawnState(props, fromOffset);     // the owner's scrolled/collapsed win
 appBarContentLast(props, state);         // an expanded flexible bar renders its content last
 appBarSelection(props, state);           // collapsed and search select the small size
 isFlexibleAppBar(size); APP_BAR_COLLAPSE_OFFSET; APP_BAR_AT_REST;
-// dom: subscribeScroll(target, onOffset); scrollOffsetOf(target); type ScrollTarget
 
 // Search bar: the text field machine
 type SearchBarPart; interface SearchBarRootOwnProps // tokens, disabled, required, readOnly,
@@ -590,7 +587,8 @@ searchBarSelection(props); searchBarMachineProps(props); // the placeholder is t
 
 // Ripple: pureform's ripple machine
 type RipplePart; interface RippleRootOwnProps // tokens, disabled, effect, centered,
-                                         // allowPropagation, getSurfaceEl, id, testId, unstyled
+                                         // allowPropagation, id, testId, unstyled (the web's
+                                         // getSurfaceEl is binding-dom's RippleDomRootOwnProps)
 RIPPLE_ROOT_PROPS; rippleSelection(props); rippleMachineProps(props); // effect → the machine's variant
 
 // Single-part components: Root is the component
@@ -619,47 +617,6 @@ hasAccessibleName(props); missingNameMessage(component);
 
 A component's props are typed with these, so an app whose generated declarations register the
 button gets `variant?: "filled" | "tonal" | …` on every binding's button.
-
-### `@pureform/binding-core/dom`
-
-```ts
-systemReducedMotion(): boolean;
-subscribeReducedMotion(onChange): () => void;  // calls at once, then on each change
-readIconStyle(element): IconStyle;             // font-size, color, the FILL axis
-observeIconStyle(element, onChange): () => void;
-syncCheckedInput(input, checked);              // a native checkbox back to the machine's state
-radioInputs(group): HTMLInputElement[];        // a radio group's native radios
-syncRadioInputs(group, value);                 // the radios back to the group's value
-setRadioDefaults(group, value);                // each radio's default, written only when it differs
-syncTextInput(input, value);                   // a text input or text area back to its value
-stackPositioner(positioner, surface): () => void; // the surface's z-index as the positioner's (the
-                                               // dialog's), in the next frame; returns its cancel
-slideIndicator(from, to): Animation | undefined; // the tabs' new indicator, in from the old one's
-                                               // box (a Web Animation of transform, FLIP), timed
-                                               // by its transform transition (design doc §9.10)
-transformTiming(style); slideTransform(fromRect, toRect); // its timing and starting transform
-
-// Runtime themes and overrides
-themeCss(selector, { light, dark }): string;   // light vars, then dark ones under the scheme conditions
-themeSelector("data-theme", "pf-1x2y3z");      // '[data-theme="pf-1x2y3z"]'
-overrideVars({ "colors.primary": "red" }, registry); // { "--colors-primary": "red" }, the target's names
-interface ThemeBlock { scope; vars; css }      // what a provider holds for a runtime theme
-initialThemeBlock(theme, registry, { hydrate, server, existing }): ThemeBlock;
-needsThemeLoad(block, hydrate): boolean;       // load the generator after mount?
-generateThemeVars(theme, registry);            // sync, once the generator is loaded
-loadThemeVars(theme, registry): Promise<ThemeSchemeVars>;
-generatedBlock(theme, registry, vars): ThemeBlock;
-serverThemeCss(scope): string | undefined;     // the server's block in the page (Solid's or React's)
-THEME_BLOCK_ATTRIBUTE;                         // "data-pf-theme", on Solid's block
-THEME_PRECEDENCE;                              // "pureform", React's precedence for the block
-unloadedThemeMessage(theme);                   // the server rendered before the generator loaded
-```
-
-`syncCheckedInput` is for after a click: the browser toggles the input before the machine hears
-of it, so a controlled checkbox whose owner ignores the change would otherwise show the toggle.
-
-`observeIconStyle` re-reads after an attribute changes anywhere in the icon's component (its
-`data-scope` root), after a transition there ends, and when the slot resizes.
 
 ### `@pureform/binding-core/interaction`
 
@@ -707,9 +664,11 @@ isn't promised (today: at mount on the client, none on the server).
 
 ### `@pureform/binding-core/indication`
 
-The interface every indication implements, the web halves of the built-ins, and what the web
-bindings share to wire them (design doc §9.8). Apps import the built-ins from their binding
-(`@pureform/solid`, `@pureform/react`), which re-exports them.
+The interface every indication implements, the built-ins without their live halves, and how
+their tokens are written (design doc §9.8). The web halves and the wiring the web bindings share
+are `@pureform/binding-dom/indication`'s; React Native adds its own. Apps import the built-ins
+from their binding (`@pureform/solid`, `@pureform/react`, `@pureform/react-native`), which
+re-exports them with that binding's live half.
 
 ```ts
 interface Indication {
@@ -722,17 +681,19 @@ interface Indication {
                     context: IndicationContext) => () => void; // after mount, before the first interaction
     readonly native?: NativeIndicationComponent; // (props: NativeIndicationProps) => …, React-free
 }
-interface IndicationTarget { trigger: HTMLElement; surface: HTMLElement; layer?: HTMLElement }
+interface IndicationPlatform {}                // binding-dom adds { element: HTMLElement }
+type IndicationElement;                        // IndicationPlatform's element, else unknown
+interface IndicationTarget { trigger: IndicationElement; surface: IndicationElement; layer?: IndicationElement }
 //   `layer` is found in the surface as it's read (`surfaceLayer`): read it when drawing
 interface IndicationContext { centered; reducedMotion(); dir(); registry }
 interface NativeIndicationProps { source; surface: { style; drawing? }; centered; reducedMotion; dir; registry }
 defineIndication(indication): Indication;
 
-// The built-ins' web halves
+// The built-ins, without live halves
 materialIndication(options?: { ripple?: "ink-well" | "ink-sparkle" | false }): Indication;
-//   "material", layer: true, web: draws Material's ripple in the layer from the source's presses
-//   (its controller made on the first press; touch waits out the scroll delay; none under reduced
-//   motion). The same object for the same options. { ripple: false } has no layer and no web.
+//   "material", layer: true; no web or native half here: binding-dom's `materialIndication` (and
+//   `webIndication`) and React Native's add them. The same object for the same options.
+//   { ripple: false } has no layer.
 noIndication: Indication;      // "none": the four state-layer opacities at 0; keeps the focus indicator
 DEFAULT_INDICATION;            // materialIndication()
 rippleClasses(registry): { root?, ripple? } | undefined; // the registry's static `ripple` entry
@@ -744,18 +705,6 @@ componentIndicationTokens(indication, providerColor): Record<string, string> | u
 //   the component's instance tokens: the providers' focusIndicatorColor, then the prop's tokens
 indicationTokenValues(tokens); // lengths given as numbers become px, opacities percentages (0.08 → "8%")
 dropsFocusIndicator(indication); droppedFocusIndicatorMessage(indication);
-
-// What the web bindings share
-indicationRoles(entries, part); // [{ entry, role: "trigger" | "surface" | "state" }], cached
-surfaceLayer(surface): HTMLElement | undefined; // the surface's `:scope > [data-ripple-layer]`
-class IndicationHost {          // one per component
-    configure(indication, registry): void;
-    instance(entry, source): IndicationInstance; // one per surface and source
-}
-class IndicationInstance {
-    attach(role: "trigger" | "surface" | "state", element): () => void;
-    subscribeForwarded(listener: (states: { hover; pressed }) => void): () => void;
-}
 ```
 
 The provider's `indication` (on `ProviderOptions`) resolves through nesting like `motion`:
@@ -765,14 +714,8 @@ interactive component's contract takes `indication` and `interactionSource`
 (`components/indication.ts`: `IndicationProps`, `InteractionSourceProps`, `InteractiveProps`,
 `INTERACTIVE_PROPS`); a composite takes `indication` on Root and `interactionSource` per item.
 
-A forwarded hover or press is one whose emit's origin isn't one of the surface's own elements
-(its trigger, surface, or the element it marks states on): another component sharing the
-source, or the app emitting with no element. Focus is never forwarded.
-
-The bindings attach only the trigger, the surface, and the state element. The layer stays in the
-markup (server HTML and hydration unchanged), but nothing tracks it as it mounts: the effect starts
-once the trigger and surface are there, and the target's `layer` finds it in the surface when the
-ripple draws, at a press. So a surface doesn't render again once its layer mounts.
+The host that wires an indication to a component's elements, and what's forwarded to it, is
+`@pureform/binding-dom/indication`'s `IndicationHost`.
 
 ### `@pureform/binding-core/usage`
 
@@ -805,11 +748,11 @@ items), and that no Solid or React source sets a listed group from anything but 
 
 ## Building and testing
 
-- `task_run` `build` on `@pureform/binding-core`: Vite library build, five entries (`index`,
-  `dom`, `interaction`, `indication`, `usage`), with declarations.
-- `task_run` `test:unit`: Vitest in browser mode (Chromium; `CHROMIUM_PATH` from `.env.local`),
-  with type checks. A browser command, `emulateReducedMotion`, flips the media query
-  (`src/testing/commands.ts`).
+- `task_run` `build` on `@pureform/binding-core`: Vite library build, four entries (`index`,
+  `interaction`, `indication`, `usage`), with declarations.
+- `task_run` `test:unit`: `tsc` on the source without the DOM lib (`tsconfig.json`), `tsc` on the
+  specs with it (`tsconfig.spec.json`), then Vitest in browser mode (Chromium; `CHROMIUM_PATH`
+  from `.env.local`), with type checks.
 
 ## Worth knowing
 
@@ -867,7 +810,7 @@ motion ends: a leaving page goes, an entering one becomes current), `pagesLeavin
 was), `LEAVING_PAGE_PROPS` (`inert`, `aria-hidden`) and `pageRootProps(pages)`
 (`data-transitioning` while a page leaves, which clips the root so a taller old page doesn't
 spill). `PageTransitionProps` (`transition: "none" | "fadeThrough" | "sharedAxis"`,
-`transitionScrim`) is on the ready-made tabs' and stepper's content props. `/dom`'s
+`transitionScrim`) is on the ready-made tabs' and stepper's content props. binding-dom's
 `whenAnimationsEnd(element, done)` tells a web binding when a page's motion has ended.
 
 ## Horizontal shared axis
@@ -888,7 +831,7 @@ tokens hold (an instance's `slideSpring`, `fadeDuration` and `fadeDelay` tokens 
 itemWidth?)` (Material's sizes at rest) and `carouselItemSizes(options, metrics)` (each item's
 slot, mask width and mask offset at a scroll position; the keylines turn round near the end so the
 last item ends large). `CAROUSEL_SIZES` holds the fixed small (40 to 56) and large (186) widths.
-The `dom` subpath adds `observeCarouselRow`, `measureCarouselRow` and `carouselRowPadding` (the
+`@pureform/binding-dom` adds `observeCarouselRow`, `measureCarouselRow` and `carouselRowPadding` (the
 `padding` token's var, for Zag's `padding` prop, so the scroll padding renders on the server).
 
 ## Accordion and tree

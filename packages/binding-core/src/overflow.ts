@@ -1,7 +1,7 @@
 // Moving what doesn't fit into an overflow menu, as Android's `OverflowLinearLayout` does: the
 // elements stay in order, and those from the first that doesn't fit onwards leave the row for a
 // menu behind an overflow button, which then takes the row's last place. Framework-free: the web
-// measures elements (`watchOverflow`, `@pureform/binding-core/dom`), React Native its layouts.
+// measures elements (`watchOverflow`, `@pureform/binding-dom`), React Native its layouts.
 
 /** What `overflowCount` lays out: each element's size along the row, the room the row has, the
  *  gap between elements, and the overflow button's size. */

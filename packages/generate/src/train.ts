@@ -12,6 +12,7 @@ import { compareVersions, isVersion, satisfies } from "./semver";
 export const CORE_TRAIN_PACKAGES = [
     "@pureform/anatomy",
     "@pureform/binding-core",
+    "@pureform/binding-dom",
     "@pureform/bundler",
     "@pureform/cli",
     "@pureform/component-cases",

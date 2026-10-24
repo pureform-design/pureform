@@ -19,8 +19,8 @@ import type {
     AppBarRootOwnProps,
     AppBarScrollState,
 } from "@pureform/binding-core";
-import { subscribeScroll } from "@pureform/binding-core/dom";
-import type { ScrollTarget } from "@pureform/binding-core/dom";
+import { subscribeScroll } from "@pureform/binding-dom";
+import type { ScrollTarget } from "@pureform/binding-dom";
 import {
     type ElementType,
     type ReactNode,

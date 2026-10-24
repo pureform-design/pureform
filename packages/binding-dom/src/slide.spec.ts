@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 
-import { slideIndicator, slideTransform, transformTiming } from "./dom";
+import { slideIndicator, slideTransform, transformTiming } from "./index";
 
 afterEach(() => {
     document.body.innerHTML = "";

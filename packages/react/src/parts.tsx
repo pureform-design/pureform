@@ -23,13 +23,10 @@ import type {
     SlotKeyed,
     Unstyled,
 } from "@pureform/binding-core";
-import {
-    componentIndicationTokens,
-    holdsLayer,
-    indicationRoles,
-} from "@pureform/binding-core/indication";
+import { componentIndicationTokens } from "@pureform/binding-core/indication";
 import type { Indication } from "@pureform/binding-core/indication";
 import type { InteractionSource } from "@pureform/binding-core/interaction";
+import { holdsLayer, indicationRoles } from "@pureform/binding-dom/indication";
 import type {
     ClassSlots,
     ComponentName,

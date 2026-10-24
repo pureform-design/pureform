@@ -180,16 +180,12 @@ export const searchViewLabel = (props: SearchViewBehaviorProps): string =>
     props["aria-label"] ?? props.placeholder ?? "Search";
 
 /** Zag's dialog props for the view, besides `id`, `dir` and the controllable `open`: modal, so
- *  focus stays in it and goes back to the search bar once it closes. `input` finds the view's
- *  input, which takes focus as it opens. */
-export const searchViewDialogProps = (
-    props: SearchViewBehaviorProps,
-    input: () => HTMLElement | null,
-) => ({
+ *  focus stays in it and goes back to the search bar once it closes. The web adds the input that
+ *  takes focus as it opens (`@pureform/binding-dom`'s `searchViewDomDialogProps`). */
+export const searchViewDialogProps = (props: SearchViewBehaviorProps) => ({
     modal: true,
     role: "dialog" as const,
     restoreFocus: true,
-    initialFocusEl: input,
     "aria-label": searchViewLabel(props),
     ids: { content: props.ids?.surface },
 });

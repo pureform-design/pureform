@@ -1,13 +1,12 @@
-// The web halves of the built-in indications. Material's draws the state layer and the focus
-// indicator through the preset's CSS, at the theme's values, and the ripple in the surface's
-// layer element from the source's presses; no indication sets the state layer's opacities to 0
-// and keeps the focus indicator.
+// The built-in indications, without their live halves. Material's draws the state layer and the
+// focus indicator through the preset's styles, at the theme's values, and holds a layer element
+// for the ripple, which each platform draws (`@pureform/binding-dom` on the web, the engine's
+// press ripple on React Native); no indication sets the state layer's opacities to 0 and keeps
+// the focus indicator.
 
-import { createRipple } from "@pureform/js-effects";
-import type { RippleController } from "@pureform/js-effects";
 import type { SlotClasses } from "@pureform/styling";
 
-import type { Indication, IndicationContext } from "./indication";
+import type { Indication } from "./indication";
 import type { AnyRegistry } from "./provider";
 
 /** The ripple Material's indication draws: the ink well, the newer sparkle, or none. */
@@ -50,58 +49,12 @@ export const rippleClasses = (
     return classes ?? undefined;
 };
 
-// Draws the ripple in the target's layer from each press the source hears, whichever surface it
-// came from; the controller is made on the first press.
-const drawRipple =
-    (variant: "ink-well" | "ink-sparkle"): NonNullable<Indication["web"]> =>
-    (target, source, context: IndicationContext) => {
-        let controller: RippleController | undefined;
-        const held = new Set<number>();
-        const unsubscribe = source.subscribe((interaction) => {
-            switch (interaction.type) {
-                case "press": {
-                    if (!target.layer || context.reducedMotion()) return;
-                    controller ??= createRipple(() => target.layer, {
-                        variant,
-                        get centerOrigin() {
-                            return context.centered;
-                        },
-                        get class() {
-                            return (
-                                rippleClasses(context.registry)?.ripple
-                                    ?.class ?? ""
-                            );
-                        },
-                        // The context says whether motion is reduced.
-                        respectReducedMotion: false,
-                    });
-                    held.add(interaction.id);
-                    controller.press(
-                        interaction.origin,
-                        interaction.pointer === "touch",
-                    );
-                    return;
-                }
-                case "release":
-                    if (held.delete(interaction.id)) controller?.release();
-                    return;
-                case "cancel":
-                    if (held.delete(interaction.id)) controller?.cancel();
-                    return;
-            }
-        });
-        return () => {
-            unsubscribe();
-            held.clear();
-            controller?.cancel();
-        };
-    };
-
 const materialIndications = new Map<MaterialRipple, Indication>();
 
-/** Material's indication, the default: the state layer at the theme's opacities, the ripple
- *  through the preset's `ripple` styles (in a layer element inside each surface), and the focus
- *  indicator. The same object for the same options. */
+/** Material's indication, the default: the state layer at the theme's opacities, a layer element
+ *  inside each surface for the ripple, and the focus indicator. This is the platform-neutral one,
+ *  with no live half: the bindings draw its ripple (`@pureform/binding-dom`'s
+ *  `materialIndication` on the web, React Native's own). The same object for the same options. */
 export const materialIndication = (
     options: MaterialIndicationOptions = {},
 ): Indication => {
@@ -117,7 +70,6 @@ export const materialIndication = (
                               ? "material"
                               : `material:${ripple}`,
                       layer: true,
-                      web: drawRipple(ripple),
                   },
         );
         materialIndications.set(ripple, indication);

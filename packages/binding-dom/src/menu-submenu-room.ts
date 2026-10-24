@@ -3,8 +3,8 @@
 // window, any ancestor of the menu's anchor that clips its overflow, such as a side panel that
 // scrolls, and the nearest container, or the one named), for the submenu's own size.
 
-import { menuSubmenuRoomOf } from "./components/menu";
-import type { MenuSubmenuBox, MenuSubmenuRoom } from "./components/menu";
+import { menuSubmenuRoomOf } from "@pureform/binding-core";
+import type { MenuSubmenuBox, MenuSubmenuRoom } from "@pureform/binding-core";
 
 const named = (element: Element, container: string | undefined): boolean => {
     const style = getComputedStyle(element);
@@ -31,8 +31,7 @@ export const menuSubmenuBoundary = (
         element = element.parentElement
     ) {
         const style = getComputedStyle(element);
-        const isContainer: boolean =
-            !contained && named(element, container);
+        const isContainer: boolean = !contained && named(element, container);
         const clipsX = style.overflowX !== "visible";
         const clipsY = style.overflowY !== "visible";
         if (!isContainer && !clipsX && !clipsY) continue;

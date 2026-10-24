@@ -35,12 +35,13 @@ import type {
     SheetRest,
     Unstyled,
 } from "@pureform/binding-core";
+import type { DialogFocusProps } from "@pureform/binding-dom";
 import {
     dragToDismiss,
     focusableWhileOverflowing,
     springRoleVar,
-} from "@pureform/binding-core/dom";
-import type { SheetDrag } from "@pureform/binding-core/dom";
+} from "@pureform/binding-dom";
+import type { SheetDrag } from "@pureform/binding-dom";
 import { mergeProps, normalizeProps } from "@zag-js/react";
 import {
     type ElementType,
@@ -66,7 +67,8 @@ type Anatomy = typeof bottomSheetOverlayAnatomy;
 export interface BottomSheetRootProps
     extends
         Omit<PartProps, keyof BottomSheetRootOwnProps>,
-        BottomSheetRootOwnProps {
+        BottomSheetRootOwnProps,
+        DialogFocusProps {
     /** Another element or component to render instead of `<div>`. */
     readonly as?: ElementType | undefined;
 }
