@@ -37,17 +37,23 @@ import type {
 } from "@pureform/binding-core";
 import {
     markMenuGroupEdges,
+    menuDrillFrom,
+    menuDrillTo,
     watchMenuSubmenuRoom,
 } from "@pureform/binding-core/dom";
+import type { MenuDrillSnapshot } from "@pureform/binding-core/dom";
 import * as menu from "@pureform/machines/menu";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";
 import {
     type ElementType,
     type ReactNode,
+    type RefObject,
     useCallback,
     useEffect,
     useId,
+    useLayoutEffect,
+    useRef,
     useState,
 } from "react";
 
@@ -607,6 +613,25 @@ function HighlightOnDrill(props: {
     return null;
 }
 
+/** A drilled menu's motion between levels: it notes the content's id for the step's start, and
+ *  runs the step once the new level is drawn (`menuDrillTo`). */
+function DrillMotion(props: {
+    readonly level: string;
+    readonly contentId: RefObject<string | undefined>;
+    readonly from: RefObject<MenuDrillSnapshot | undefined>;
+}): null {
+    const { api } = context.use("Content");
+    const { level, contentId, from } = props;
+    contentId.current = api.getContentProps().id;
+    useLayoutEffect(() => {
+        const snapshot = from.current;
+        from.current = undefined;
+        if (snapshot && contentId.current)
+            menuDrillTo(document.getElementById(contentId.current), snapshot);
+    }, [level]);
+    return null;
+}
+
 /** The ready-made menu's props: Root's, with `className`, `style`, and `slotProps` keyed by part,
  *  the trigger's label, and the items as data. */
 export interface MenuProps
@@ -641,11 +666,24 @@ function ReadyMade(props: MenuProps): ReactNode {
     useEffect(() => {
         if (props.open === false) setPath([]);
     }, [props.open]);
+    const contentId = useRef<string | undefined>(undefined);
+    const drillFrom = useRef<MenuDrillSnapshot | undefined>(undefined);
     const onSelect = (details: MenuSelectDetails) => {
         const next = drill
             ? menuDrillPick(allItems, allGroups, path, details.value)
             : undefined;
-        if (next) return setPath(next);
+        if (next) {
+            const content = contentId.current
+                ? document.getElementById(contentId.current)
+                : null;
+            // In: the pressed item's label goes into the header. Out: the header's goes back
+            // into the submenu's item.
+            drillFrom.current =
+                next.length > path.length
+                    ? menuDrillFrom(content, details.value, MENU_BACK_VALUE)
+                    : menuDrillFrom(content, MENU_BACK_VALUE, path.at(-1)!);
+            return setPath(next);
+        }
         rootProps.onSelect?.(details);
     };
     const onOpenChange: MenuRootProps["onOpenChange"] = (details) => {
@@ -671,6 +709,13 @@ function ReadyMade(props: MenuProps): ReactNode {
             <Positioner {...slot("positioner")}>
                 <Content {...slot("content")}>
                     {auto ? <MeasureSubmenuRoom onRoom={setRoom} /> : null}
+                    {drill ? (
+                        <DrillMotion
+                            level={path.join("\u0000")}
+                            contentId={contentId}
+                            from={drillFrom}
+                        />
+                    ) : null}
                     {drill ? (
                         <HighlightOnDrill
                             level={path.join("\u0000")}

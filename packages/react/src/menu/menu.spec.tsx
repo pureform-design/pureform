@@ -500,6 +500,37 @@ describe("Menu, submenus", () => {
         expect(labels()).toEqual(["Cut", "Share"]);
     });
 
+    it("animates a drill step: the content's size, and the pressed label into the header and back", async () => {
+        withRegistry(<Menu trigger="Edit" submenu="drill" items={NESTED} />);
+        await settle();
+        await interact(() => userEvent.click(byTestId(ids.trigger)));
+        await frames();
+        const content = () => contents()[0]!;
+        const moving = () =>
+            content()
+                .getAnimations({ subtree: true })
+                .map(
+                    (animation) =>
+                        (
+                            (animation.effect as KeyframeEffect)
+                                .target as HTMLElement
+                        ).dataset["pfPart"],
+                );
+        await interact(() => userEvent.click(items()[1]!));
+        expect(moving()).toContain("content");
+        // The header's label, which the pressed item's moves into.
+        const header = items()[0]!.querySelector(
+            `[data-testid="${ids.itemLabel}"]`,
+        )!;
+        expect(header.getAnimations()).toHaveLength(1);
+        await frames(30);
+        await interact(() => userEvent.click(items()[0]!));
+        const share = items()[1]!.querySelector(
+            `[data-testid="${ids.itemLabel}"]`,
+        )!;
+        expect(share.getAnimations()).toHaveLength(1);
+    });
+
     it("cascades by default when a submenu fits beside the open menu, and drills when its container is narrow", async () => {
         try {
             await page.viewport(1000, 800);
