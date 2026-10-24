@@ -8,7 +8,7 @@
 // contained view moves its icons outward as it opens, by keyframes; React Native draws no motion
 // there.
 
-import { searchViewAnatomy } from "@pureform/anatomy";
+import { compositeTestIds, searchViewAnatomy } from "@pureform/anatomy";
 import type { PartName, TestIdOverride } from "@pureform/anatomy";
 import {
     isPresent,
@@ -159,7 +159,11 @@ export function SearchView(props: SearchViewProps): ReactNode {
     };
     return (
         <>
-            <View ref={trigger as never} collapsable={false}>
+            <View
+                ref={trigger as never}
+                collapsable={false}
+                testID={compositeTestIds.searchView.trigger}
+            >
                 {props.trigger === undefined ? (
                     <View>
                         <SearchBar

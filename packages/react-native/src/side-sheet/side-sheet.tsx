@@ -49,6 +49,8 @@ export interface SideSheetTriggerProps {
     /** Opens the sheet. */
     readonly onPress: () => void;
     readonly "aria-haspopup": "dialog";
+    /** Whether it's open. */
+    readonly "aria-expanded": boolean;
 }
 
 export interface SideSheetProps
@@ -293,13 +295,14 @@ function ModalSideSheet(props: SideSheetProps): ReactNode {
     const given: SideSheetTriggerProps = {
         onPress: show,
         "aria-haspopup": "dialog",
+        "aria-expanded": open,
     };
     return (
         <>
             {trigger === undefined ? null : typeof trigger === "function" ? (
                 trigger(given)
             ) : (
-                <Button label={trigger} onPress={show} />
+                <Button label={trigger} {...given} />
             )}
             <ModalWindow
                 visible={presence.present}

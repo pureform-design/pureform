@@ -41,9 +41,31 @@ export interface ButtonProps
     /** A long press: given it, a long press calls it rather than pressing (a tooltip's trigger
      *  shows its tooltip so). */
     readonly onLongPress?: (() => void) | undefined;
+    /** What a press opens, as an overlay's trigger says: `menu`, `dialog`, … */
+    readonly "aria-haspopup"?: "menu" | "dialog" | "listbox" | true | undefined;
+    /** Whether what it opens is open. */
+    readonly "aria-expanded"?: boolean | undefined;
+    /** The element that describes it, by `nativeID`: a tooltip showing for it. */
+    readonly "aria-describedby"?: string | undefined;
     /** A prefix for every part's test id (`save` → `save-root`), or ids by part. */
     readonly testId?: TestIdOverride<ButtonPart> | undefined;
 }
+
+const TRIGGER_ARIA = [
+    "aria-haspopup",
+    "aria-expanded",
+    "aria-describedby",
+] as const;
+
+const pick = <P extends object, K extends keyof P>(
+    props: P,
+    keys: readonly K[],
+): Partial<Pick<P, K>> =>
+    Object.fromEntries(
+        keys
+            .filter((key) => props[key] !== undefined)
+            .map((key) => [key, props[key]]),
+    ) as Partial<Pick<P, K>>;
 
 function ButtonImpl(props: ButtonProps): ReactNode {
     const disabled = props.disabled ?? false;
@@ -96,6 +118,7 @@ function ButtonImpl(props: ButtonProps): ReactNode {
             {...indication.handlers}
             role="button"
             {...(toggle ? { "aria-pressed": on } : {})}
+            {...pick(props, TRIGGER_ARIA)}
             disabled={props.disabled}
             onLongPress={props.onLongPress}
             onPress={(event: GestureResponderEvent) => {
