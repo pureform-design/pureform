@@ -1,15 +1,21 @@
-// pureform on plain CSS, no Panda and no Tailwind: Solid's components and the registry's class
-// factories, styled by the stylesheet the CSS target writes into `.pureform/`. The button and
-// checkbox are `@pureform/solid`'s components; the rest are plain elements classed through
-// `useClasses`, until their components exist.
+// pureform on plain CSS, no Panda and no Tailwind: `@pureform/solid`'s components, styled by the
+// stylesheet the CSS target writes into `.pureform/`.
 
 import "@pureform/css-adapter/reset.css";
 import "../.pureform/styles.css";
-import { PureformProvider, useClasses } from "@pureform/solid";
+import { PureformProvider } from "@pureform/solid";
 import type { Direction } from "@pureform/solid";
+import { Avatar } from "@pureform/solid/avatar";
 import { Button } from "@pureform/solid/button";
+import { Card } from "@pureform/solid/card";
 import { Checkbox } from "@pureform/solid/checkbox";
-import { Dynamic, render } from "@solidjs/web";
+import { Fab } from "@pureform/solid/fab";
+import { IconButton } from "@pureform/solid/icon-button";
+import { Media } from "@pureform/solid/media";
+import { Switch } from "@pureform/solid/switch";
+import { Text } from "@pureform/solid/text";
+import { TextField } from "@pureform/solid/text-field";
+import { render } from "@solidjs/web";
 import type { JSX } from "@solidjs/web";
 import { For, createSignal } from "solid-js";
 
@@ -30,129 +36,32 @@ const PICTURE = `data:image/svg+xml,${encodeURIComponent(
     '<svg xmlns="http://www.w3.org/2000/svg" width="120" height="60"><rect width="120" height="60" fill="#7aa6c2"/><circle cx="90" cy="18" r="10" fill="#f4d35e"/><path d="M0 60 40 22l30 30 20-14 30 22z" fill="#386641"/></svg>',
 )}`;
 
-function Heading(props: {
-    level: "h1" | "h2" | "h3";
-    style: "headlineMedium" | "titleLarge" | "titleMedium";
-    children: JSX.Element;
-}): JSX.Element {
-    const classes = useClasses("text", () => ({ style: props.style }));
-    return (
-        <Dynamic component={props.level} class={classes().root.class}>
-            {props.children}
-        </Dynamic>
-    );
-}
-
 function Section(props: { title: string; children: JSX.Element }): JSX.Element {
     return (
         <section style={{ display: "grid", gap: "12px" }}>
-            <Heading level="h2" style="titleLarge">
+            <Text as="h2" textStyle="titleLarge">
                 {props.title}
-            </Heading>
+            </Text>
             {props.children}
         </section>
     );
 }
 
-function IconButton(props: {
-    shape: "none" | "cookie9Sided" | "clover4Leaf" | "sunny";
-}): JSX.Element {
-    const classes = useClasses("iconButton", () => ({
-        variant: "filled",
-        shape: props.shape,
-    }));
-    return (
-        <button
-            class={classes().root.class}
-            type="button"
-            aria-label={props.shape}
-        >
-            <span class={classes().touchTarget.class} />
-            <span class={classes().container.class}>★</span>
-        </button>
-    );
-}
-
-function Fab(props: { shape: "arch" | "pill" }): JSX.Element {
-    const classes = useClasses("fab", () => ({ shape: props.shape }));
-    return (
-        <button
-            class={classes().root.class}
-            type="button"
-            aria-label={`${props.shape} FAB`}
-        >
-            <span class={classes().touchTarget.class} />
-            <span class={classes().container.class}>
-                <span class={classes().icon.class}>+</span>
-            </span>
-        </button>
-    );
-}
-
-function Avatar(props: { size: "small" | "medium" | "large" }): JSX.Element {
-    const classes = useClasses("avatar", () => ({
-        size: props.size,
-        shape: "cookie9Sided",
-    }));
-    return (
-        <span class={classes().root.class} role="img" aria-label="Ada Lovelace">
-            AL
-        </span>
-    );
-}
-
-function TextField(props: { variant: "filled" | "outlined" }): JSX.Element {
-    const classes = useClasses("textField", () => ({ variant: props.variant }));
-    const id = `field-${props.variant}`;
-    return (
-        <div class={classes().root.class} style={{ width: "240px" }}>
-            <div class={classes().container.class}>
-                <input class={classes().input.class} id={id} placeholder=" " />
-                <label class={classes().label.class} for={id}>
-                    {props.variant} field
-                </label>
-            </div>
-            <span class={classes().supportingText.class}>Supporting text</span>
-        </div>
-    );
-}
-
-function Switch(): JSX.Element {
-    const classes = useClasses("switchControl", () => ({}));
-    return (
-        <label class={classes().root.class} title="switch">
-            <span class={classes().touchTarget.class} />
-            <input
-                class={classes().input.class}
-                type="checkbox"
-                role="switch"
-                checked
-            />
-            <span class={classes().track.class}>
-                <span class={classes().stateLayer.class} />
-                <span class={classes().handle.class}>
-                    <span class={classes().icon.class}>✓</span>
-                </span>
-            </span>
-        </label>
-    );
-}
-
 function Artwork(): JSX.Element {
-    const card = useClasses("card", () => ({ variant: "elevated" }));
-    const media = useClasses("media", () => ({ aspect: "landscape" }));
-    const body = useClasses("text", () => ({ style: "bodyMedium" }));
     return (
-        <article
-            class={card().root.class}
-            style={{ width: "240px", display: "grid", gap: "12px" }}
+        <Card
+            as="article"
+            variant="elevated"
+            style={{ root: { width: "240px", display: "grid", gap: "12px" } }}
         >
-            <img class={media().root.class} src={PICTURE} alt="" />
-            <Heading level="h3" style="titleMedium">
+            <Media src={PICTURE} alt="" aspect="landscape" />
+            <Text as="h3" textStyle="titleMedium">
                 Hills at dusk
-            </Heading>
-            <p class={body().root.class}>Styled by the plain CSS target.</p>
-        </article>
+            </Text>
+            <Text as="p" textStyle="bodyMedium">
+                Styled by the plain CSS target.
+            </Text>
+        </Card>
     );
 }
 
@@ -177,9 +86,9 @@ function App(): JSX.Element {
                     color: "var(--colors-on-surface)",
                 }}
             >
-                <Heading level="h1" style="headlineMedium">
+                <Text as="h1" textStyle="headlineMedium">
                     pureform, Solid on plain CSS
-                </Heading>
+                </Text>
                 <div style={row}>
                     <For each={["light", "dark"] as const}>
                         {(scheme) => (
@@ -239,19 +148,42 @@ function App(): JSX.Element {
                                 ] as const
                             }
                         >
-                            {(shape) => <IconButton shape={shape} />}
+                            {(shape) => (
+                                <IconButton
+                                    icon="★"
+                                    aria-label={shape}
+                                    variant="filled"
+                                    shape={shape}
+                                />
+                            )}
                         </For>
-                        <Fab shape="arch" />
-                        <Fab shape="pill" />
+                        <Fab icon="+" aria-label="arch FAB" shape="arch" />
+                        <Fab icon="+" aria-label="pill FAB" shape="pill" />
                         <For each={["small", "medium", "large"] as const}>
-                            {(size) => <Avatar size={size} />}
+                            {(size) => (
+                                <Avatar
+                                    label="Ada Lovelace"
+                                    size={size}
+                                    shape="cookie9Sided"
+                                >
+                                    AL
+                                </Avatar>
+                            )}
                         </For>
                     </div>
                 </Section>
                 <Section title="Fields">
                     <div style={row}>
-                        <TextField variant="filled" />
-                        <TextField variant="outlined" />
+                        <For each={["filled", "outlined"] as const}>
+                            {(variant) => (
+                                <TextField
+                                    variant={variant}
+                                    label={`${variant} field`}
+                                    supportingText="Supporting text"
+                                    style={{ root: { width: "240px" } }}
+                                />
+                            )}
+                        </For>
                     </div>
                 </Section>
                 <Section title="Controls">
@@ -262,7 +194,11 @@ function App(): JSX.Element {
                             defaultChecked="indeterminate"
                         />
                         <Checkbox aria-label="Unchecked" />
-                        <Switch />
+                        <Switch
+                            aria-label="switch"
+                            icon="✓"
+                            defaultChecked
+                        />
                     </div>
                 </Section>
                 <Section title="Media">

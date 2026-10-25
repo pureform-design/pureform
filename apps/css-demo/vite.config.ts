@@ -1,5 +1,5 @@
-import pureform, { PureformPluginOptions } from "@pureform/bundler/vite";
-import { CssCodegenOptions } from "@pureform/css-adapter/codegen";
+import pureform, { type PureformPluginOptions } from "@pureform/bundler/vite";
+import type { CssCodegenOptions } from "@pureform/css-adapter/codegen";
 import { createConfig } from "@pureform/vite-config/app";
 import solid from "@solidjs/vite-plugin";
 

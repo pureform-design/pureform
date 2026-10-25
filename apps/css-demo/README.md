@@ -33,9 +33,8 @@ src/main.tsx: imports reset.css and .pureform/styles.css,
   the page inside `PureformProvider`. The theme buttons set the provider's `theme`, which writes
   `registry.themeAttributes(theme)` (`data-theme="teal"`) on its element; the scheme buttons put
   `.light` or `.dark` on the root (the stylesheet follows the system's scheme otherwise).
-  Components without a Solid component yet read their classes with `useClasses(name, selection)`.
 
-The build's script is about 40 kB gzipped (Solid, the button and checkbox with their Zag
+The build's script is about 40 kB gzipped (Solid, the components with their Zag
 machines, and the registry); the config, providers, and color generation stay at build time.
 
 ## Test
