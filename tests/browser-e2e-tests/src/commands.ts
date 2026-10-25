@@ -10,7 +10,7 @@ import { compileTailwind } from "@pureform/tailwind-adapter";
 import { compile } from "@tailwindcss/node";
 import type { BrowserCommand } from "vitest/node";
 
-import { pureformConfig } from "../../panda-fixture/panda.pureform";
+import pureformConfig from "../../panda-fixture/pureform.config";
 import { RN_COMPONENTS } from "./rn-components";
 
 /** The options both adapters take here. */
