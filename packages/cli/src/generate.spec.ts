@@ -316,6 +316,33 @@ describe("pureform generate", () => {
             expect(await done).toBe(0);
         });
 
+        it("picks up a codegen file created while watching", async () => {
+            const root = tempApp(["chip"], false);
+            const stdout: string[] = [];
+            const stderr: string[] = [];
+            const controller = new AbortController();
+            const done = main(["generate", "--watch", "--target", "css"], {
+                cwd: root,
+                stdout: (text) => stdout.push(text),
+                stderr: (text) => stderr.push(text),
+                signal: controller.signal,
+            });
+
+            await until(() => stdout.some((line) => line.includes("watching")));
+            writeFileSync(
+                join(root, "pureform.codegen.ts"),
+                "export default {",
+            );
+            await until(() =>
+                stderr.some((line) =>
+                    line.includes("loading the codegen options"),
+                ),
+            );
+
+            controller.abort();
+            expect(await done).toBe(0);
+        });
+
         it("doesn't go with --check", async () => {
             const root = tempApp();
             const result = await run(root, ["generate", "--watch", "--check"]);

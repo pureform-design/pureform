@@ -20,8 +20,6 @@ Still open when the batch notes (`docs/roadmap-components/context/` and the firs
 
 ### Accessibility
 
-- React Native tree: the row's `accessibilityLabel` hardcodes English `level N`
-  (`react-native/src/tree/tree.tsx`); add a `levelLabel` translation.
 - Open roles: should the web search view trigger (a plain `div`) get one; should React Native's
   select be a listbox rather than a menu; a never-set rating reads as one star (Zag marks the
   first star checked at 0).
@@ -53,8 +51,6 @@ Still open when the batch notes (`docs/roadmap-components/context/` and the firs
 - FAB menu: items scale from their own centre, not from the FAB (no `transform-origin` in
   preset `fab-menu.ts`); a composed `FabMenu.Root` counts items after mount, so server
   rendering falls back to eight steps until hydration.
-- rn-adapter `useAnimatedSlide`: the spring branch calls `settle()` on 0..1 progress, so it
-  stops within 0.5 instead of 0.001; fixing it changes output.
 - Linear wavy progress: the wave rides with the sliding bar; Compose moves it along the track
   at one wavelength per second. Indeterminate wavy runs a flat track under the whole bar
   without Compose's gaps; on React Native the linear indeterminate track has no gap window
@@ -136,7 +132,5 @@ Still open when the batch notes (`docs/roadmap-components/context/` and the firs
   native factory types imports `.pureform/native`. Revisit if it confuses users.
 - Bundler pruning keeps every token, theme, `@property`, keyframes and shape, most of the CSS
   left; dropping keyframes and shape paths no kept rule reads is the next step.
-- `pureform generate --watch` started before the codegen/glue file exists doesn't notice it
-  once created; restart it.
 - css-demo and tailwind-demo still draw components with `useClasses` although Solid components
   exist for them.

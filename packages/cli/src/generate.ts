@@ -16,7 +16,7 @@ import type {
     GenerateWatcher,
 } from "@pureform/generate";
 
-import { resolveCodegenOptions } from "./codegen-file";
+import { CODEGEN_FILES, resolveCodegenOptions } from "./codegen-file";
 import type { GenerateFlags, ResolvedCodegenOptions } from "./codegen-file";
 import { CliError } from "./errors";
 import { gitignoreHint } from "./gitignore";
@@ -172,28 +172,33 @@ const runWatch = async (
     };
 
     // The codegen file isn't the config's dependency, so it's watched here: an edit starts over
-    // with the new options, and a broken edit keeps the old ones.
+    // with the new options, and a broken edit keeps the old ones. Without one, its folder is
+    // watched for one being created.
     const codegenFile = resolved.file;
-    if (codegenFile !== undefined) {
-        try {
-            codegenFileWatcher = watch(dirname(codegenFile), (_event, name) => {
-                if (name && basename(name.toString()) !== basename(codegenFile))
-                    return;
-                clearTimeout(reloading);
-                reloading = setTimeout(() => {
-                    resolveCodegenOptions(flags, io.cwd).then(
-                        (next) => {
-                            first = true;
-                            void start(next.options);
-                        },
-                        (error: unknown) => io.stderr(describeError(error)),
-                    );
-                }, 50);
-            });
-            codegenFileWatcher.on("error", () => undefined);
-        } catch {
-            // Watching the codegen file is a convenience; the config is still watched.
-        }
+    const codegenNames: readonly string[] =
+        codegenFile === undefined ? CODEGEN_FILES : [basename(codegenFile)];
+    try {
+        const folder =
+            codegenFile === undefined
+                ? resolve(io.cwd, flags.root ?? ".")
+                : dirname(codegenFile);
+        codegenFileWatcher = watch(folder, (_event, name) => {
+            if (name && !codegenNames.includes(basename(name.toString())))
+                return;
+            clearTimeout(reloading);
+            reloading = setTimeout(() => {
+                resolveCodegenOptions(flags, io.cwd).then(
+                    (next) => {
+                        first = true;
+                        void start(next.options);
+                    },
+                    (error: unknown) => io.stderr(describeError(error)),
+                );
+            }, 50);
+        });
+        codegenFileWatcher.on("error", () => undefined);
+    } catch {
+        // Watching the codegen file is a convenience; the config is still watched.
     }
 
     await start(resolved.options);
