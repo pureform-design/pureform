@@ -1,7 +1,6 @@
 # tailwind-demo
 
-pureform on the Tailwind v4 target: `@pureform/solid`'s button and checkbox, and the registry's
-class factories for the components that have no Solid component yet, styled by the Tailwind
+pureform on the Tailwind v4 target: `@pureform/solid`'s components, styled by the Tailwind
 stylesheet the target generates, with Tailwind utilities over pureform's tokens around them. A
 client-rendered Solid app.
 

@@ -127,5 +127,3 @@ Still open when the batch notes (`docs/roadmap-components/context/` and the firs
   native factory types imports `.pureform/native`. Revisit if it confuses users.
 - Bundler pruning keeps every token, theme, `@property`, keyframes and shape, most of the CSS
   left; dropping keyframes and shape paths no kept rule reads is the next step.
-- css-demo and tailwind-demo still draw components with `useClasses` although Solid components
-  exist for them.

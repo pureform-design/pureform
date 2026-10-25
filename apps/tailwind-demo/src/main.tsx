@@ -1,12 +1,16 @@
-// pureform's components and tokens in Tailwind: Solid's components and the registry's class
-// factories, styled by the Tailwind stylesheet the Tailwind target writes into `.pureform/`. The
-// layout and page colors are utilities over pureform's tokens, and utilities override a
-// component's own style.
+// pureform's components and tokens in Tailwind: `@pureform/solid`'s components, styled by the
+// Tailwind stylesheet the Tailwind target writes into `.pureform/`. The layout and page colors
+// are utilities over pureform's tokens, and utilities override a component's own style.
 
 import "./app.css";
-import { PureformProvider, useClasses } from "@pureform/solid";
+import { PureformProvider } from "@pureform/solid";
 import { Button } from "@pureform/solid/button";
+import { Card } from "@pureform/solid/card";
 import { Checkbox } from "@pureform/solid/checkbox";
+import { IconButton } from "@pureform/solid/icon-button";
+import { Media } from "@pureform/solid/media";
+import { Text } from "@pureform/solid/text";
+import { TextField } from "@pureform/solid/text-field";
 import { render } from "@solidjs/web";
 import type { JSX } from "@solidjs/web";
 import { For, createSignal } from "solid-js";
@@ -38,54 +42,21 @@ function Section(props: { title: string; children: JSX.Element }): JSX.Element {
     );
 }
 
-function IconButton(props: { shape: "cookie9Sided" | "sunny" }): JSX.Element {
-    const classes = useClasses("iconButton", () => ({
-        variant: "filled",
-        shape: props.shape,
-    }));
-    return (
-        <button
-            class={classes().root.class}
-            type="button"
-            aria-label={props.shape}
-        >
-            <span class={classes().touchTarget.class} />
-            <span class={classes().container.class}>★</span>
-        </button>
-    );
-}
-
-function TextField(): JSX.Element {
-    const classes = useClasses("textField", () => ({ variant: "outlined" }));
-    return (
-        <div class={`${classes().root.class} w-60`}>
-            <div class={classes().container.class}>
-                <input
-                    class={classes().input.class}
-                    id="field"
-                    placeholder=" "
-                />
-                <label class={classes().label.class} for="field">
-                    outlined field
-                </label>
-            </div>
-            <span class={classes().supportingText.class}>Supporting text</span>
-        </div>
-    );
-}
-
 function Artwork(): JSX.Element {
-    const card = useClasses("card", () => ({ variant: "filled" }));
-    const media = useClasses("media", () => ({ aspect: "landscape" }));
-    const title = useClasses("text", () => ({ style: "titleMedium" }));
     return (
-        <article class={`${card().root.class} grid w-60 gap-3 p-4`}>
-            <img class={media().root.class} src={PICTURE} alt="" />
-            <h3 class={title().root.class}>Hills at dusk</h3>
+        <Card
+            as="article"
+            variant="filled"
+            class={{ root: "grid w-60 gap-3 p-4" }}
+        >
+            <Media src={PICTURE} alt="" aspect="landscape" />
+            <Text as="h3" textStyle="titleMedium">
+                Hills at dusk
+            </Text>
             <p class="text-body-medium text-on-surface-variant">
                 A filled card, padded with Tailwind.
             </p>
-        </article>
+        </Card>
     );
 }
 
@@ -151,13 +122,28 @@ function App(): JSX.Element {
                             variant="outlined"
                             class={{ root: "px-10" }}
                         />
-                        <IconButton shape="cookie9Sided" />
-                        <IconButton shape="sunny" />
+                        <IconButton
+                            icon="★"
+                            aria-label="cookie9Sided"
+                            variant="filled"
+                            shape="cookie9Sided"
+                        />
+                        <IconButton
+                            icon="★"
+                            aria-label="sunny"
+                            variant="filled"
+                            shape="sunny"
+                        />
                     </Row>
                 </Section>
                 <Section title="Fields and controls">
                     <Row>
-                        <TextField />
+                        <TextField
+                            variant="outlined"
+                            label="outlined field"
+                            supportingText="Supporting text"
+                            class={{ root: "w-60" }}
+                        />
                         <Checkbox aria-label="Checked" defaultChecked />
                         <Checkbox aria-label="Unchecked" />
                     </Row>
