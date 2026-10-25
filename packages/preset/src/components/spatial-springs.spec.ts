@@ -35,7 +35,7 @@ const transitions = (component: Component) => {
     return found;
 };
 
-// Compose Material 3's MotionScheme role per component (see context/m2a.md).
+// Compose Material 3's MotionScheme role per component.
 const cases: [string, Component, string[]][] = [
     ["button", button, ["effectsDefault"]],
     ["icon button", iconButton, ["effectsDefault"]],
