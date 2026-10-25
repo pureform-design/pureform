@@ -592,6 +592,7 @@
         "@zag-js/react": "catalog:"
     },
     "devDependencies": {
+        "@pureform/oxlint-config": "workspace:^",
         "@pureform/styling": "workspace:^",
         "@pureform/tsconfig": "workspace:^",
         "@pureform/vite-config": "workspace:^",

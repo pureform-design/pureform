@@ -13,6 +13,7 @@
     },
     "devDependencies": {
         "@pureform/tsconfig": "workspace:^",
+        "eslint-plugin-solid": "catalog:",
         "oxlint": "catalog:"
     }
 }

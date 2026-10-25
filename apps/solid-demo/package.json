@@ -37,6 +37,7 @@
         "@pandacss/vite": "catalog:",
         "@pureform/bundler": "workspace:^",
         "@pureform/cli": "workspace:^",
+        "@pureform/oxlint-config": "workspace:^",
         "@pureform/tsconfig": "workspace:^",
         "@pureform/vite-config": "workspace:^",
         "@pureform/vitest-config": "workspace:^",

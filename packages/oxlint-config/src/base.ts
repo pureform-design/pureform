@@ -1,9 +1,11 @@
 import { defineConfig } from "oxlint";
 
-const baseConfig = createConfig();
+const base = createConfig();
 
-export default baseConfig;
+export default base;
 
 export function createConfig() {
-    return defineConfig({});
+    return defineConfig({
+        plugins: ["jsdoc", "promise", "vitest"],
+    });
 }

@@ -1,0 +1,14 @@
+import solidV2 from "eslint-plugin-solid/configs/v2";
+import { defineConfig } from "oxlint";
+
+const config = createConfig();
+
+export default config;
+
+export function createConfig() {
+    return defineConfig({
+        jsPlugins: ["eslint-plugin-solid"],
+        settings: solidV2.settings,
+        rules: solidV2.rules,
+    });
+}

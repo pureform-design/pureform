@@ -605,6 +605,7 @@
     "devDependencies": {
         "@pureform/core": "workspace:^",
         "@pureform/material": "workspace:^",
+        "@pureform/oxlint-config": "workspace:^",
         "@pureform/preset": "workspace:^",
         "@pureform/rn-adapter": "workspace:^",
         "@pureform/styling": "workspace:^",

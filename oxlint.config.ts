@@ -2,6 +2,12 @@ import { createConfig } from "@pureform/oxlint-config/base";
 import { defineConfig } from "oxlint";
 
 export default defineConfig({
+    options: {
+        reportUnusedDisableDirectives: "deny",
+        typeAware: true,
+        typeCheck: true,
+    },
+    extends: [createConfig()],
     ignorePatterns: [
         "./**/__generated__/**/*",
         "./**/gen/**/*",
@@ -46,6 +52,4 @@ export default defineConfig({
         "**/CHANGELOG.md",
         "./CHANGELOG.root.md",
     ],
-    options: { reportUnusedDisableDirectives: "deny" },
-    extends: [createConfig()],
 });

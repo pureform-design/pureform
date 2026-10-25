@@ -1,9 +1,8 @@
-import solidV2 from "eslint-plugin-solid/configs/v2";
+import base from "@pureform/oxlint-config/base";
+import jsx from "@pureform/oxlint-config/jsx";
+import solid from "@pureform/oxlint-config/solid";
 import { defineConfig } from "oxlint";
 
 export default defineConfig({
-    jsPlugins: ["eslint-plugin-solid"],
-    ignorePatterns: ["**/*.gen.*", "dist"],
-    settings: solidV2.settings,
-    rules: solidV2.rules,
+    extends: [base, jsx, solid],
 });

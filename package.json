@@ -16,12 +16,13 @@
         "@typescript/typescript6": "catalog:",
         "oxfmt": "catalog:",
         "oxlint": "catalog:",
+        "oxlint-tsgolint": "catalog:",
         "vitest": "catalog:"
     },
     "packageManager": "bun@1.4.2",
     "catalog": {
-        "oxfmt": "^0.71.0",
-        "oxlint": "^1.86.0",
+        "oxfmt": "^0.74.0",
+        "oxlint": "^1.89.0",
         "vitest": "^5.0.1",
         "playwright": "^1.64.1",
         "@vitest/browser-playwright": "5.0.5",
@@ -132,6 +133,7 @@
         "@zag-js/pin-input": "^1.46.0",
         "@internationalized/date": "^3.12.4",
         "@zag-js/react": "^1.46.0",
-        "axe-core": "^4.14.0"
+        "axe-core": "^4.14.0",
+        "oxlint-tsgolint": "^7.0.2005"
     }
 }
