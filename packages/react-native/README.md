@@ -299,6 +299,12 @@ trigger shows their labels joined by ", " (the placeholder when none):
 
 ## Worth knowing
 
+- **Text in view parts.** React Native can't hold a string in a `View`, so a `ReactNode` prop
+  drawn in a view part (a popover's body, a stepper's content, …) goes through `resolveText`
+  (`src/resolve-text.tsx`): strings and numbers, alone or in an array, become the part's `Text`
+  in the part's text properties (or a sibling text part's style, as Card's content takes its
+  supporting text's). The unit tests fail on a raw string in a `View` (`src/testing/setup.ts`).
+
 - **No layout animation on React Native Web:** `LayoutAnimation` does nothing there, so expand
   and collapse jump on React Native Web; devices animate them.
 - **ARIA as the web's:** React Native Web draws the same roles and states the web bindings
