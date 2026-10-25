@@ -24,5 +24,5 @@ These are likely, not certain; the hints say what really happened.
 ## Done when
 
 The refactor's context lists what was extracted and where, the output is identical (fixtures,
-screenshots, resolved styles), the gate passes, and `context/r1.md` says what the next wave
+screenshots, resolved styles), the gate passes, and `/tmp/opencode/r1.md` says what the next wave
 should reuse.

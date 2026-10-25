@@ -15,4 +15,4 @@
 
 ## Done when
 
-As for r1, with `context/r2.md` telling c3's authors what to reuse.
+As for r1, with `/tmp/opencode/r2.md` telling c3's authors what to reuse.

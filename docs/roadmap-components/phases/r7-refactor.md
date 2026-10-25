@@ -4,7 +4,7 @@
 [refactor procedure](../conventions.md#refactor-phases).
 
 Covers everything since r6: m1 (springs foundation), m2 (spring components) and f1 (fixes).
-Read `context/m1.md`, `m2.md` and `f1*.md` (their refactoring hints and declined refactors).
+Read `/tmp/opencode/m1.md`, `m2.md` and `f1*.md` (their refactoring hints and declined refactors).
 
 ## Expected duplication to look for
 
@@ -33,4 +33,4 @@ Read `context/m1.md`, `m2.md` and `f1*.md` (their refactoring hints and declined
 
 ## Done when
 
-As for r1, with `context/r7.md` for m3's authors.
+As for r1, with `/tmp/opencode/r7.md` for m3's authors.

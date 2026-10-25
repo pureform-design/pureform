@@ -4,7 +4,7 @@
 [refactor procedure](../conventions.md#refactor-phases).
 
 One pass over everything since r8: m3 (Material transitions), c8 (Material gaps from Zag), c9
-(components beyond M3) and c10 (plain form primitives). Read `context/m3*.md`, `c8*.md`,
+(components beyond M3) and c10 (plain form primitives). Read `/tmp/opencode/m3*.md`, `c8*.md`,
 `c9*.md` and `c10*.md`: their refactoring hints, declined refactors and open questions.
 
 ## Expected duplication to look for
@@ -39,7 +39,7 @@ One pass over everything since r8: m3 (Material transitions), c8 (Material gaps 
 - **Machines root export:** find why exporting the color picker from `@pureform/machines`'s root
   breaks React Native's splitter drag spec, then export it there (c9d).
 - **c9's declined refactors:** the secure field's visibility toggle against `roundIconButton`, a
-  `holdRepeat` once a second user exists, the code field's per-cell field styles (`context/c9.md`).
+  `holdRepeat` once a second user exists, the code field's per-cell field styles (`/tmp/opencode/c9.md`).
 - **Forms suite and files:** the forms suite learns file entries, and FileUpload gets a form case.
 - **Server-rendered number fields:** the READMEs say to pass `locale` when server rendering, so
   number fields don't reformat on load.
@@ -106,4 +106,4 @@ Four in parallel, then a merge:
 
 ## Done when
 
-As for r1, with `context/r9.md` for the next phase's authors.
+As for r1, with `/tmp/opencode/r9.md` for the next phase's authors.

@@ -2,8 +2,8 @@
 
 These add to [`docs/roadmap/conventions.md`](../roadmap/conventions.md), which still applies
 (omni MCP first, commits, formatting, READMEs, refactors that don't change output,
-compaction). Where this file differs, it wins for the component roadmap. Contexts live in
-`docs/roadmap-components/context/`, not `docs/roadmap/context/`.
+compaction). Where this file differs, it wins for the component roadmap, including
+[handoff notes](#handoff-notes), which replace the first roadmap's committed output contexts.
 
 ## Before starting
 
@@ -11,8 +11,8 @@ compaction). Where this file differs, it wins for the component roadmap. Context
    [component recipe](component-recipe.md).
 2. Read the gap-analysis sections the phase lists, and the sections of
    `component-architecture.md` it points to (at least §5.5 tokens and §9.8 indication).
-3. Read the output contexts of every phase you depend on, **including their refactoring
-   hints**, then `git log --oneline -20`.
+3. Read the handoff notes (`/tmp/opencode/<id>.md`) of every phase you depend on, **including
+   their refactoring hints**, if they still exist, plus `docs/todo-later.md`, then `git log --oneline -20`.
 4. In a fresh worktree, make sure the commit-msg hook is installed: `cog install-hook --all`
    from the main checkout (hooks are shared by every worktree; it fails inside a linked one). It
    checks conventional commits: an allowed type, one scope without spaces or commas,
@@ -40,7 +40,7 @@ Subphases of one phase don't depend on each other and run at the same time.
   `isolation: "worktree"` or the opencode worktree tools. Install and generate in the
   worktree before building.
 - **Own files:** each subphase owns the component files named in its section. Don't edit
-  another subphase's files; if you need a change there, record it in your context.
+  another subphase's files; if you need a change there, record it in your handoff notes.
 - **Shared registration files** are the few files every new component touches:
   `packages/preset/src/index.ts`, `packages/preset/src/pureform.ts`,
   `packages/binding-core/src/index.ts`, `packages/binding-core/src/usage.ts`, each binding's
@@ -63,9 +63,9 @@ Subphases of one phase don't depend on each other and run at the same time.
 - **Merging:** the orchestrator merges the subphase branches one at a time in the order the
   phase lists, reruns `generate`, rebuilds, and runs the whole suite once, after the last
   merge. If anything fails, it spawns **one** subagent to fix all the failures (with the
-  failing output and the subphases' contexts), rather than one per failure or per subphase.
+  failing output and the subphases' handoff notes), rather than one per failure or per subphase.
   A conflict outside the shared files is a sign two subphases overlap: stop and say so in the
-  phase's context instead of resolving it silently.
+  phase's handoff notes instead of resolving it silently.
 - **Don't refactor across subphases.** Duplicated code between siblings is expected and is
   recorded as a hint; the refactor phase after the wave removes it.
 
@@ -94,7 +94,7 @@ Narrow `-f all` with `-p <project>` whenever it only needs one project.
 Before splitting a phase into subphases, check whether two items share most of their parts,
 tokens and behaviour (the same machine, the same row structure, the same sub-anatomy). If
 they do, one subphase builds both. The phase files already group these; regroup if a closer
-look shows more overlap, and note it in the context.
+look shows more overlap, and note it in the handoff notes.
 
 ## Theme conformance and tests in every subphase
 
@@ -128,11 +128,21 @@ Never replace or drive native scrolling, on any platform: no springs, no custom 
 code in place of the browser's scroll snapping or React Native's `ScrollView`. Motion that
 follows the scroll position reads it; it doesn't set it.
 
-## Output context
+## Handoff notes
 
-Write `docs/roadmap-components/context/<id>.md` before the final commit of a subphase, in
-the [format of the first roadmap](../roadmap/conventions.md#finishing-the-output-context-required),
-plus these sections:
+Handoff notes are for the agents that come next, not for the repo. Before the final commit of
+a subphase, write them to `/tmp/opencode/<id>.md` (shared by agents; never commit them), in the
+[format of the first roadmap](../roadmap/conventions.md#finishing-the-output-context-required),
+plus the sections below. In the same batch, put whatever must outlast the notes in the repo:
+
+- **Lasting design decisions** and their reasons go into the matching section of
+  [component-architecture.md](../design/component-architecture.md), the guidelines, the gap
+  analysis, or the package's README when it is package-specific. Keep them short.
+- **Open questions, known limitations and follow-ups** go into
+  [`docs/todo-later.md`](../todo-later.md), one line each under their area, with enough context
+  to act on without the notes. Remove a line when its item is done.
+
+Check logs, flake reruns and commit lists stay in the notes.
 
 ```md
 ## Refactoring hints
@@ -160,21 +170,21 @@ A subphase with nothing generic to report writes "None" under the hints, and say
 A refactor phase (`rN`) runs after a wave and is a single agent (or one per area when the
 hints split cleanly).
 
-1. Read every output context of the wave, collecting the refactoring hints.
+1. Read every handoff note of the wave, collecting the refactoring hints.
 2. Search for duplication the hints missed: components' token blocks, structural builders,
    shape and state-layer helpers, binding wrappers, tests' setup. Compare the sibling files
    side by side.
 3. Before each extraction, check that it makes sense logically, the duplication is obvious, and
    the shared code is flexible enough for future changes
    ([guidelines §4](../design/component-guidelines.md#4-variants-without-explosion)). If any
-   check fails, leave it and say why in the context. Otherwise extract shared code to the
+   check fails, leave it and say why in the handoff notes. Otherwise extract shared code to the
    suggested homes. Prefer the preset's shared helpers
    (`shared.ts`, `shaped.ts`, `list.ts`) and binding-core's component helpers over new
    packages.
 4. **Output must not change:** run the equivalence checks (React Native resolved styles and
    Chromium computed styles before and after, the recorded indication fixtures, screenshots)
    and the whole build and test run.
-5. Write the refactor's own context: what was extracted, where, and hints for the next
+5. Write the refactor's own handoff notes: what was extracted, where, and hints for the next
    wave's authors (what to reuse, so they don't copy again).
 
 If a wave produced no duplication worth extracting, the refactor phase says so with the
@@ -190,6 +200,7 @@ below happens once, on the merged phase.
    `-f failed` until those pass; the gate doesn't repeat the whole run with `-f all`.
 2. `bunx tsc --noEmit -p tsconfig.json` is clean in each package you touched.
 3. The gap analysis (matrix row, verdicts, totals, §7 done list) matches the code.
-4. Output contexts exist for each subphase, committed with the work.
+4. Each subphase's lasting decisions and open questions are in the design docs or
+   `docs/todo-later.md`, committed with the work.
 5. The phase is ticked in the [README](README.md) with links.
 6. Commits are pushed when asked to push.

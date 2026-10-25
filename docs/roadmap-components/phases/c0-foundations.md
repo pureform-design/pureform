@@ -69,7 +69,7 @@ outer ring and the opacity layer (gap analysis §0.1 row 7).
 `packages/preset/src/index.ts` is not needed here. c0a and c0d both touch the preset's
 indication-related specs and fixtures; merge in the order c0a, c0b, c0c, c0d.
 
-## Output context
+## Handoff notes
 
-`context/c0a.md` to `context/c0d.md`. Hints: anything generic you wrote in the state-layer or
+`/tmp/opencode/c0a.md` to `/tmp/opencode/c0d.md`. Hints: anything generic you wrote in the state-layer or
 shared helpers.

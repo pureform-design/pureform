@@ -1,7 +1,7 @@
 # f2: Fixes after f1
 
 **Depends on:** r7. **Subphases:** f2a to f2e, parallel.
-**Source:** [context/f1.md "Answers"](../context/f1.md#answers).
+**Source:** f1's handoff notes, "Answers" (git history: `docs/roadmap-components/context/f1.md`).
 
 The answers to f1's open questions. Each follows the component recipe and the conventions, in
 React, Solid and React Native, on the css, panda and tailwind targets. Remove an option outright
@@ -62,7 +62,7 @@ when its replacement covers it.
 
 ## Done when
 
-As for f1, with `context/f2a.md`..`f2e.md` and the merge's `context/f2.md`.
+As for f1, with `/tmp/opencode/f2a.md`..`f2e.md` and the merge's `/tmp/opencode/f2.md`.
 
 ## Answers to the subphases' questions
 

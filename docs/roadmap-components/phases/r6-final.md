@@ -14,7 +14,7 @@ The last pass over the whole library, after all waves.
    current; the component-recipe lists the real steps.
 4. Rerun the [recheck](../../design/component-guidelines.md#2-rechecking-against-the-spec)
    against the then-current spec and record anything new as the start of the next roadmap.
-5. Write `context/r6.md`.
+5. Write `/tmp/opencode/r6.md`.
 
 ## Done when
 

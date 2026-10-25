@@ -3,8 +3,8 @@
 **Depends on:** f2. **Single agent.** Follow the
 [refactor procedure](../conventions.md#refactor-phases).
 
-Covers f2 (fixes after f1). Read `context/f2*.md`: their refactoring hints, declined refactors
-and the "Answers to the open questions" in `context/f2.md`.
+Covers f2 (fixes after f1). Read `/tmp/opencode/f2*.md`: their refactoring hints, declined refactors
+and the "Answers to the open questions" in `/tmp/opencode/f2.md`.
 
 ## Decided work
 
@@ -44,4 +44,4 @@ and the "Answers to the open questions" in `context/f2.md`.
 
 ## Done when
 
-As for r1, with `context/r8.md` for m3's authors.
+As for r1, with `/tmp/opencode/r8.md` for m3's authors.

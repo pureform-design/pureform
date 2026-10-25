@@ -13,4 +13,4 @@
 
 ## Done when
 
-As for r1, with `context/r3.md` for c4's authors.
+As for r1, with `/tmp/opencode/r3.md` for c4's authors.

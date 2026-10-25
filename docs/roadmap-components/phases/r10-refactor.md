@@ -8,7 +8,7 @@ otherwise).
 
 ## Look for
 
-- Duplication groups r9 left open or declined (context/r9.md, r9d.md).
+- Duplication groups r9 left open or declined (/tmp/opencode/r9.md, r9d.md).
 - The menu's cascade and drill submenus against other nested popups and back-navigation.
 - React Native height animations (expanders) against the sheets' and other measured sizes.
 - React Native DateInput segments against the web's segmented fields and the code field.
@@ -35,5 +35,5 @@ otherwise).
 
 ## Done when
 
-Each candidate is extracted or declined with its failed check in context/r10.md; full gate
+Each candidate is extracted or declined with its failed check in /tmp/opencode/r10.md; full gate
 green.

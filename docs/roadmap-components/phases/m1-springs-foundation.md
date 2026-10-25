@@ -40,5 +40,5 @@ React Native engines, the theme's motion contract and refs, `materialMotion`, an
 - [x] `bun install` and `--frozen-lockfile` pass; build and test pass for core, css-lowering, the
       CSS, Panda, and Tailwind adapters, rn-adapter, react-native, theme, material, preset, the
       component suites, and the browser tests; tsc is clean in the touched packages.
-- [x] §5.8 has the springs subsection; the core, theme, and material READMEs match; `context/m1.md`
+- [x] §5.8 has the springs subsection; the core, theme, and material READMEs match; `/tmp/opencode/m1.md`
       is written.

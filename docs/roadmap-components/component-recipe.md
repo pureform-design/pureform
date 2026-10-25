@@ -19,7 +19,7 @@ when the list below looks out of date.
 5. **binding-core** (`packages/binding-core/src/components/<name>.ts`): which variants the
    binding passes through, and the usage entry in `usage.ts`; export it from `index.ts`. Reuse
    the shared helpers before writing new ones (`content.ts`, `button-group.ts`'s toggle group
-   helpers, `list-item-swipe.ts`; the r1 to r6 contexts list them).
+   helpers, `list-item-swipe.ts`; `docs/todo-later.md` and the design docs record the rest).
 6. **Bindings:** `packages/solid`, `packages/react`, `packages/react-native` each get
    `src/<name>/` with the component and a spec, an export in `package.json`, an entry in
    `vite.config.ts`, a line in the registry fixture, and the README. Build parts with
@@ -32,8 +32,8 @@ when the list below looks out of date.
    every binding and target, including direction and indication, and Storybook draws it), the browser suite's
    screenshots and Panda factory sampling, and the rn-web demo and Solid demo where a
    component belongs in a screen.
-9. **Docs:** the gap analysis (matrix row, verdicts, totals, §7), package READMEs, and the
-   output context.
+9. **Docs:** the gap analysis (matrix row, verdicts, totals, §7), package READMEs, `docs/todo-later.md`, and the
+   handoff notes (`/tmp/opencode/<id>.md`).
 10. **Verify:** in a fresh worktree run `bun install`, build, `bun install` again (it links the
     built CLI), and `omni run generate -f all` before anything else. Then targeted builds and tests for what you touched (the
     [conventions](conventions.md#parallel-work)); the whole run is the
