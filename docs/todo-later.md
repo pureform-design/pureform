@@ -75,7 +75,6 @@ Still open when the batch notes (`docs/roadmap-components/context/` and the firs
 - Bottom sheet: `onExpandedChange` also fires when an uncontrolled sheet reopens at another
   rest; undecided whether only drags and presses should fire it.
 - Toast exits with CSS `scale` rather than `overlayShrinkOut`.
-- Table sort: on an unsorted column the hover hint points up even with `sortStart: descending`.
 - Splitter: the web settle sets `flex-grow` on panes, overwriting an app's inline `transition`;
   the machines wrapper patches Zag internals (`resizeObserver` measure): recheck on Zag
   upgrades. Zag's long press is 700 ms; set 500 ms if Zag exposes it.
@@ -103,14 +102,11 @@ Still open when the batch notes (`docs/roadmap-components/context/` and the firs
 
 - Per-item keys: ButtonGroup, ChipSet, Toolbar and RadioGroup items take only `testId`;
   per-item `className`/`tokens` need `InnerPropsOf` on their item types, as List has.
-- FileUpload's `error` part isn't spread from keyed props; on Solid a string
-  `menuProps.style.root` on Toolbar is dropped while the menu is hidden; SplitButton/Toolbar
+- On Solid a string `menuProps.style.root` on Toolbar is dropped while the menu is hidden; SplitButton/Toolbar
   `menuProps` have no per-item functions.
 - React Native: triggers drawn as `Button` (dialog, menu, date picker) and the menu's
   `contextTrigger` have no part key; FabMenu items share test ids; NativeSelect has no option
-  parts; `TagsInput` ignores `chipProps.testId`; ColorPicker's hex `slotProps.input` merges
-  shallowly, so the picker's handlers replace the user's. No provider-level `slotProps` on
-  React Native (undecided whether it should have them).
+  parts. No provider-level `slotProps` on React Native (undecided whether it should have them).
 - Ripple's `ripple` elements take only the registry class, no `className`/`style`/`slotProps`.
 - Indication: the ripple's opacity comes from the theme's pressed opacity, not the surface's
   `statePressedOpacity`, so `indication` doesn't change it (`it.fails` in `indication.e2e.test.ts`).
