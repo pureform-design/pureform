@@ -183,9 +183,11 @@ function Picker(props: {
         () => dialog().open,
         (open) => {
             if (!open) return;
-            const dates = confirmed();
+            // ok to be untracked here, we're only concerned when open's value actually changes
+            const dates = untrack(confirmed);
+            const api = untrack(picker);
+
             setDraft(dates);
-            const api = picker();
             api.setView("day");
             if (dates[0]) api.setFocusedValue(parseDate(dates[0]));
         },
