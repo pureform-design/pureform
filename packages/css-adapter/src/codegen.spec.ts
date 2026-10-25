@@ -548,7 +548,6 @@ describe("generate with the CSS target", () => {
                 const css = stylesheet();
                 // Tokens the preset declares but no style reads yet.
                 const unread = new Set([
-                    "--pf-components-slider-stateLayerColor",
                     // A state layer that follows another slot has no drag state.
                     ...[
                         "iconButton",

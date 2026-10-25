@@ -96,8 +96,6 @@ Still open when the batch notes (`docs/roadmap-components/context/` and the firs
   rating's half star width; no Solid unit spec for server rendering a controlled textarea.
 - Select: no `multiple` (`Select<string[]>`) though component-architecture §9.4 describes it.
 - Ready-made snackbar: its action and close buttons don't take `interactionSource`.
-- Slider: `--pf-components-slider-stateLayerColor` is declared but read by no style (listed
-  `unread` in `codegen.spec.ts`); wire it or remove it.
 - Direction: the web `rtl` condition matches an ancestor, so an `ltr` part inside an `rtl` page
   matches both; `&:dir(rtl)` with Panda's condition overridden would fix it.
 

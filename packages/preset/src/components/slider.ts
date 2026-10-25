@@ -80,7 +80,6 @@ import type { ColorGroup, ColorGroups } from "./shared";
 const { tokens, ref } = componentTokens("slider", {
     activeColor: sys("primary"),
     trackColor: sys("secondaryContainer"),
-    stateLayerColor: sys("primary"),
     // The stops: on the active track, and on the inactive one.
     stopActiveColor: on("primary"),
     stopColor: on("secondaryContainer"),
