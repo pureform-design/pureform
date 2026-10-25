@@ -8,7 +8,7 @@ Follow the [conventions](../conventions.md), and use the omni MCP as much as pos
 ## Read first
 
 - Design doc: §4, §6, §10, §11 (mismatch detection).
-- Output contexts: p1e, p2c (factory shape).
+- Output contexts (`/tmp/opencode/<id>.md`, if they still exist): p1e, p2c (factory shape).
 
 ## Goal
 
@@ -33,9 +33,8 @@ The shared build step: load the config, ask each adapter for factory modules, an
 
 ## Output context (required)
 
-When done, write `docs/roadmap/context/p4a.md` in the format of
-[conventions](../conventions.md#finishing-the-output-context-required), commit it with
-the work, and tick this phase in the [roadmap](../README.md). It must cover at least:
+When done, write `/tmp/opencode/p4a.md` (not committed) in the format of
+[conventions](../conventions.md#finishing-the-output-context-required), and tick this phase in the [roadmap](../README.md). It must cover at least:
 
 - The adapter codegen interface, exactly.
 - The `generate()` API p4c and p4d call.

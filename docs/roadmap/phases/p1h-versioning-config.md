@@ -8,7 +8,7 @@ Follow the [conventions](../conventions.md), and use the omni MCP as much as pos
 ## Read first
 
 - Design doc: §11 ([doc](../../design/component-architecture.md)).
-- The output contexts of the phases this depends on, if any.
+- The output contexts (`/tmp/opencode/<id>.md`) of the phases this depends on, if they still exist.
 
 ## Goal
 
@@ -31,9 +31,8 @@ Set up cocogitto for the lockstep core train and independent bindings.
 
 ## Output context (required)
 
-When done, write `docs/roadmap/context/p1h.md` in the format of
-[conventions](../conventions.md#finishing-the-output-context-required), commit it with
-the work, and tick this phase in the [roadmap](../README.md). It must cover at least:
+When done, write `/tmp/opencode/p1h.md` (not committed) in the format of
+[conventions](../conventions.md#finishing-the-output-context-required), and tick this phase in the [roadmap](../README.md). It must cover at least:
 
 - Which packages are in the train, and how to add a new one.
 - How a release is cut.

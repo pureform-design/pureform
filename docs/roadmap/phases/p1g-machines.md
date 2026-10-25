@@ -8,7 +8,7 @@ Follow the [conventions](../conventions.md), and use the omni MCP as much as pos
 ## Read first
 
 - Design doc: §8, §9.4, §9.5 ([doc](../../design/component-architecture.md)).
-- The output contexts of the phases this depends on, if any.
+- The output contexts (`/tmp/opencode/<id>.md`) of the phases this depends on, if they still exist.
 
 ## Goal
 
@@ -35,9 +35,8 @@ Create the framework-free behavior package: Zag re-exports and pureform's own ma
 
 ## Output context (required)
 
-When done, write `docs/roadmap/context/p1g.md` in the format of
-[conventions](../conventions.md#finishing-the-output-context-required), commit it with
-the work, and tick this phase in the [roadmap](../README.md). It must cover at least:
+When done, write `/tmp/opencode/p1g.md` (not committed) in the format of
+[conventions](../conventions.md#finishing-the-output-context-required), and tick this phase in the [roadmap](../README.md). It must cover at least:
 
 - Each machine's props, the API its `connect` returns, and which parts it expects.
 - The form helpers' signatures, which p2a and p2b wire in.

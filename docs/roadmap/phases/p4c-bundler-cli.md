@@ -8,7 +8,7 @@ Follow the [conventions](../conventions.md), and use the omni MCP as much as pos
 ## Read first
 
 - Design doc: §6, §7, §10.
-- Output contexts: p4a, p4b-*.
+- Output contexts (`/tmp/opencode/<id>.md`, if they still exist): p4a, p4b-*.
 
 ## Goal
 
@@ -30,8 +30,7 @@ Expose generation through the bundler plugin and the `pureform` command.
 
 ## Output context (required)
 
-When done, write `docs/roadmap/context/p4c-bundler.md` and `docs/roadmap/context/p4c-cli.md`, one per subphase, in the format of
-[conventions](../conventions.md#finishing-the-output-context-required), commit it with
-the work, and tick this phase in the [roadmap](../README.md). It must cover at least:
+When done, write `/tmp/opencode/p4c-bundler.md` and `/tmp/opencode/p4c-cli.md`, one per subphase, in the format of
+[conventions](../conventions.md#finishing-the-output-context-required), and tick this phase in the [roadmap](../README.md). It must cover at least:
 
 - Plugin options and CLI usage, and how the demos are wired now.

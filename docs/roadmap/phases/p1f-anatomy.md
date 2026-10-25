@@ -8,7 +8,7 @@ Follow the [conventions](../conventions.md), and use the omni MCP as much as pos
 ## Read first
 
 - Design doc: §3, §9.1, §9.2 ([doc](../../design/component-architecture.md)).
-- The output contexts of the phases this depends on, if any.
+- The output contexts (`/tmp/opencode/<id>.md`) of the phases this depends on, if they still exist.
 
 ## Goal
 
@@ -32,9 +32,8 @@ Derive each component's parts, test ids, and part attributes from the preset's A
 
 ## Output context (required)
 
-When done, write `docs/roadmap/context/p1f.md` in the format of
-[conventions](../conventions.md#finishing-the-output-context-required), commit it with
-the work, and tick this phase in the [roadmap](../README.md). It must cover at least:
+When done, write `/tmp/opencode/p1f.md` (not committed) in the format of
+[conventions](../conventions.md#finishing-the-output-context-required), and tick this phase in the [roadmap](../README.md). It must cover at least:
 
 - The anatomy shape (types and an example), and how bindings consume it.
 - Generated or derived, and how to refresh it when the preset changes.

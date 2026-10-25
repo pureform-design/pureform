@@ -8,7 +8,7 @@ Follow the [conventions](../conventions.md), and use the omni MCP as much as pos
 ## Read first
 
 - Design doc: §5.1, §5.3, §5.8, §9.6, §12 step 7.
-- Output contexts: p2b, p4b-rn, p1f.
+- Output contexts (`/tmp/opencode/<id>.md`, if they still exist): p2b, p4b-rn, p1f.
 
 ## Goal
 
@@ -27,8 +27,7 @@ Move the React Native components out of `rn-web-demo` onto the shared anatomy an
 
 ## Output context (required)
 
-When done, write `docs/roadmap/context/p8.md` in the format of
-[conventions](../conventions.md#finishing-the-output-context-required), commit it with
-the work, and tick this phase in the [roadmap](../README.md). It must cover at least:
+When done, write `/tmp/opencode/p8.md` (not committed) in the format of
+[conventions](../conventions.md#finishing-the-output-context-required), and tick this phase in the [roadmap](../README.md). It must cover at least:
 
 - The package's API and how the demo uses it.

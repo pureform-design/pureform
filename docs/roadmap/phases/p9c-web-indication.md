@@ -8,7 +8,7 @@ Follow the [conventions](../conventions.md), and use the omni MCP as much as pos
 ## Read first
 
 - Design doc: §9.8, §5.1, §5.7, §5.8, §7.
-- Output contexts: p9a, p9b, p2a, p2b, p5b, p7, p6e.
+- Output contexts (`/tmp/opencode/<id>.md`, if they still exist): p9a, p9b, p2a, p2b, p5b, p7, p6e.
 
 ## Goal
 
@@ -51,9 +51,8 @@ the component prop, hoistable sources, and the ripple on by default.
 
 ## Output context (required)
 
-When done, write `docs/roadmap/context/p9c.md` in the format of
-[conventions](../conventions.md#finishing-the-output-context-required), commit it with
-the work, and tick this phase in the [roadmap](../README.md). It must cover at least:
+When done, write `/tmp/opencode/p9c.md` (not committed) in the format of
+[conventions](../conventions.md#finishing-the-output-context-required), and tick this phase in the [roadmap](../README.md). It must cover at least:
 
 - The public API per binding, with an example of a custom indication.
 - How p9e's suite should find each component's trigger, surface, and layer.

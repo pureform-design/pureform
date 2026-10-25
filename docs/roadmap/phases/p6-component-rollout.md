@@ -8,7 +8,7 @@ Follow the [conventions](../conventions.md), and use the omni MCP as much as pos
 ## Read first
 
 - Design doc: §8 (behavior per component), §9.
-- Output contexts: p3a, p3b, p3c, p1g.
+- Output contexts (`/tmp/opencode/<id>.md`, if they still exist): p3a, p3b, p3c, p1g.
 
 ## Goal
 
@@ -32,8 +32,7 @@ Parallel subphases, each with its own output context:
 
 ## Output context (required)
 
-When done, write `docs/roadmap/context/p6<letter>.md`, one per subphase (`p6a` to `p6e`), in the format of
-[conventions](../conventions.md#finishing-the-output-context-required), commit it with
-the work, and tick this phase in the [roadmap](../README.md). It must cover at least:
+When done, write `/tmp/opencode/p6<letter>.md`, one per subphase (`p6a` to `p6e`), in the format of
+[conventions](../conventions.md#finishing-the-output-context-required), and tick this phase in the [roadmap](../README.md). It must cover at least:
 
 - Per subphase: components built, machines added, deviations.

@@ -8,7 +8,7 @@ Follow the [conventions](../conventions.md), and use the omni MCP as much as pos
 ## Read first
 
 - Design doc: §9.1 to §9.6, §8.
-- Output contexts: p2a, p2c, p1f, p1g.
+- Output contexts (`/tmp/opencode/<id>.md`, if they still exist): p2a, p2c, p1f, p1g.
 
 ## Goal
 
@@ -30,9 +30,8 @@ Build the first two components end to end in Solid: compound parts and ready-mad
 
 ## Output context (required)
 
-When done, write `docs/roadmap/context/p3a.md` in the format of
-[conventions](../conventions.md#finishing-the-output-context-required), commit it with
-the work, and tick this phase in the [roadmap](../README.md). It must cover at least:
+When done, write `/tmp/opencode/p3a.md` (not committed) in the format of
+[conventions](../conventions.md#finishing-the-output-context-required), and tick this phase in the [roadmap](../README.md). It must cover at least:
 
 - The component file layout, so p6 copies it.
 - Anything p2a's helpers lacked and how it was solved.

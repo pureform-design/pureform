@@ -8,7 +8,7 @@ Follow the [conventions](../conventions.md), and use the omni MCP as much as pos
 ## Read first
 
 - Design doc: as p3a.
-- Output contexts: p2b, p2c, p1f, p1g.
+- Output contexts (`/tmp/opencode/<id>.md`, if they still exist): p2b, p2c, p1f, p1g.
 
 ## Goal
 
@@ -26,8 +26,7 @@ The same two components in React, behaviorally identical to p3a.
 
 ## Output context (required)
 
-When done, write `docs/roadmap/context/p3b.md` in the format of
-[conventions](../conventions.md#finishing-the-output-context-required), commit it with
-the work, and tick this phase in the [roadmap](../README.md). It must cover at least:
+When done, write `/tmp/opencode/p3b.md` (not committed) in the format of
+[conventions](../conventions.md#finishing-the-output-context-required), and tick this phase in the [roadmap](../README.md). It must cover at least:
 
 - The file layout and any API difference from p3a, with the reason.

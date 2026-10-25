@@ -8,7 +8,7 @@ Follow the [conventions](../conventions.md), and use the omni MCP as much as pos
 ## Read first
 
 - Design doc: §5.9 ([doc](../../design/component-architecture.md)).
-- The output contexts of the phases this depends on, if any.
+- The output contexts (`/tmp/opencode/<id>.md`) of the phases this depends on, if they still exist.
 
 ## Goal
 
@@ -32,9 +32,8 @@ Make the few physical styles flip in RTL, and guard against new ones.
 
 ## Output context (required)
 
-When done, write `docs/roadmap/context/p1c.md` in the format of
-[conventions](../conventions.md#finishing-the-output-context-required), commit it with
-the work, and tick this phase in the [roadmap](../README.md). It must cover at least:
+When done, write `/tmp/opencode/p1c.md` (not committed) in the format of
+[conventions](../conventions.md#finishing-the-output-context-required), and tick this phase in the [roadmap](../README.md). It must cover at least:
 
 - The physical-property spec: where it lives and how to allow an exception.
 - The mirrored-box test helper, for reuse in p3c and p6.

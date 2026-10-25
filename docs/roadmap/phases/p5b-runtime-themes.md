@@ -8,7 +8,7 @@ Follow the [conventions](../conventions.md), and use the omni MCP as much as pos
 ## Read first
 
 - Design doc: §5.6, §5.7 (runtime themes, `hydrate`).
-- Output contexts: p2a, p2b, p3c.
+- Output contexts (`/tmp/opencode/<id>.md`, if they still exist): p2a, p2b, p3c.
 
 ## Goal
 
@@ -29,8 +29,7 @@ Fill the provider's `theme`, `overrides`, and `hydrate` stubs.
 
 ## Output context (required)
 
-When done, write `docs/roadmap/context/p5b.md` in the format of
-[conventions](../conventions.md#finishing-the-output-context-required), commit it with
-the work, and tick this phase in the [roadmap](../README.md). It must cover at least:
+When done, write `/tmp/opencode/p5b.md` (not committed) in the format of
+[conventions](../conventions.md#finishing-the-output-context-required), and tick this phase in the [roadmap](../README.md). It must cover at least:
 
 - The provider's theme API and the head-tag mechanics per framework.

@@ -8,7 +8,7 @@ Follow the [conventions](../conventions.md), and use the omni MCP as much as pos
 ## Read first
 
 - Design doc: §5.1 ("How the web matches a state" and the review table), §9.2, §9.5 ([doc](../../design/component-architecture.md)).
-- The output contexts of the phases this depends on, if any.
+- The output contexts (`/tmp/opencode/<id>.md`) of the phases this depends on, if they still exist.
 
 ## Goal
 
@@ -42,9 +42,8 @@ Output changes on purpose, so the before-and-after equivalence check doesn't app
 
 ## Output context (required)
 
-When done, write `docs/roadmap/context/p1a.md` in the format of
-[conventions](../conventions.md#finishing-the-output-context-required), commit it with
-the work, and tick this phase in the [roadmap](../README.md). It must cover at least:
+When done, write `/tmp/opencode/p1a.md` (not committed) in the format of
+[conventions](../conventions.md#finishing-the-output-context-required), and tick this phase in the [roadmap](../README.md). It must cover at least:
 
 - The final selector per state and target.
 - The exported attribute-name constants and where they live: phases p2a and p2b set them.

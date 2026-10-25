@@ -8,7 +8,7 @@ Follow the [conventions](../conventions.md), and use the omni MCP as much as pos
 ## Read first
 
 - Design doc: §5.2, §5.4, §7 (allow-list).
-- Output contexts: p4a, p2c, p1e.
+- Output contexts (`/tmp/opencode/<id>.md`, if they still exist): p4a, p2c, p1e.
 
 ## Goal
 
@@ -35,8 +35,7 @@ Parallel subphases, one commit series each, each writing its own output context
 
 ## Output context (required)
 
-When done, write `docs/roadmap/context/p4b-<adapter>.md`, one per subphase (`p4b-panda`, `p4b-css`, `p4b-tailwind`, `p4b-rn`), in the format of
-[conventions](../conventions.md#finishing-the-output-context-required), commit it with
-the work, and tick this phase in the [roadmap](../README.md). It must cover at least:
+When done, write `/tmp/opencode/p4b-<adapter>.md`, one per subphase (`p4b-panda`, `p4b-css`, `p4b-tailwind`, `p4b-rn`), in the format of
+[conventions](../conventions.md#finishing-the-output-context-required), and tick this phase in the [roadmap](../README.md). It must cover at least:
 
 - Per adapter: the generated module shape and what it replaced.

@@ -8,7 +8,7 @@ Follow the [conventions](../conventions.md), and use the omni MCP as much as pos
 ## Read first
 
 - Design doc: as p2a.
-- Output contexts: p1a, p1b, p1e, p1f, p1g.
+- Output contexts (`/tmp/opencode/<id>.md`, if they still exist): p1a, p1b, p1e, p1f, p1g.
 
 ## Goal
 
@@ -29,9 +29,8 @@ Create `@pureform/react` with the same surface as p2a, built in parallel so shar
 
 ## Output context (required)
 
-When done, write `docs/roadmap/context/p2b.md` in the format of
-[conventions](../conventions.md#finishing-the-output-context-required), commit it with
-the work, and tick this phase in the [roadmap](../README.md). It must cover at least:
+When done, write `/tmp/opencode/p2b.md` (not committed) in the format of
+[conventions](../conventions.md#finishing-the-output-context-required), and tick this phase in the [roadmap](../README.md). It must cover at least:
 
 - Every export with its signature.
 - What moved into the shared packages, and what remains React-only.

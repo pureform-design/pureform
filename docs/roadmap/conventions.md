@@ -7,8 +7,10 @@ relaxes these.
 
 1. Read `docs/design/component-architecture.md` (the "design doc"), at least the sections
    the phase lists.
-2. Read the output context of every phase it depends on (`docs/roadmap/context/`). They
-   say what was actually built, which can differ from the design.
+2. Read the output context (handoff notes, `/tmp/opencode/<phase-id>.md`) of every phase it
+   depends on, if they still exist, plus `docs/todo-later.md`. They say what was actually
+   built, which can differ from the design. The committed contexts of finished phases were
+   pruned and are only in git history.
 3. Check `git log --oneline -20` for work since those contexts were written.
 
 ## Use the omni MCP first
@@ -95,9 +97,10 @@ phase file and the draft. See the [roadmap](README.md) for the full steps.
 
 ## Finishing: the output context (required)
 
-When a phase or subphase is done, write `docs/roadmap/context/<phase-id>.md` before the
-final commit, and commit it with the work. Later phases read it instead of the code to
-find their footing, so it must stand on its own:
+When a phase or subphase is done, write its output context to `/tmp/opencode/<phase-id>.md`
+before the final commit (never commit it), and move what must outlast it into the repo, per
+the component roadmap's [handoff-notes rule](../roadmap-components/conventions.md#handoff-notes). Later phases read it
+instead of the code to find their footing, so it must stand on its own:
 
 ```md
 # <phase-id>: <title> (output context)
@@ -129,4 +132,4 @@ Traps, conventions established, and anything the dependent phases must know.
 Before writing it, make sure the `README.md` of every package the phase created or
 changed is current.
 
-Then tick the phase in `docs/roadmap/README.md` and link its output context there.
+Then tick the phase in `docs/roadmap/README.md`.

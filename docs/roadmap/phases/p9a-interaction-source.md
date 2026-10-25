@@ -8,7 +8,7 @@ Follow the [conventions](../conventions.md), and use the omni MCP as much as pos
 ## Read first
 
 - Design doc: §9.8 (all of it), §5.1, §5.7, §8.
-- Output contexts: p1g, p2a, p2b, p6a, p6c, p6d, p6e, p8.
+- Output contexts (`/tmp/opencode/<id>.md`, if they still exist): p1g, p2a, p2b, p6a, p6c, p6d, p6e, p8.
 
 ## Goal
 
@@ -54,9 +54,8 @@ before-and-after equivalence check in Chromium.
 
 ## Output context (required)
 
-When done, write `docs/roadmap/context/p9a.md` in the format of
-[conventions](../conventions.md#finishing-the-output-context-required), commit it with
-the work, and tick this phase in the [roadmap](../README.md). It must cover at least:
+When done, write `/tmp/opencode/p9a.md` (not committed) in the format of
+[conventions](../conventions.md#finishing-the-output-context-required), and tick this phase in the [roadmap](../README.md). It must cover at least:
 
 - The interface commit's hash, and the exact types p9c and p9d implement.
 - What each machine emits, and how a binding passes a source in.

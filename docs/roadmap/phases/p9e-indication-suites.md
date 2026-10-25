@@ -8,7 +8,7 @@ Follow the [conventions](../conventions.md), and use the omni MCP as much as pos
 ## Read first
 
 - Design doc: §9.8 ("Testing"), §9.7.
-- Output contexts: p9c, p9d, p3c, p5a, p6e.
+- Output contexts (`/tmp/opencode/<id>.md`, if they still exist): p9c, p9d, p3c, p5a, p6e.
 
 ## Goal
 
@@ -44,9 +44,8 @@ show it in the demos.
 
 ## Output context (required)
 
-When done, write `docs/roadmap/context/p9e.md` in the format of
-[conventions](../conventions.md#finishing-the-output-context-required), commit it with
-the work, and tick this phase in the [roadmap](../README.md). It must cover at least:
+When done, write `/tmp/opencode/p9e.md` (not committed) in the format of
+[conventions](../conventions.md#finishing-the-output-context-required), and tick this phase in the [roadmap](../README.md). It must cover at least:
 
 - How a new interactive component joins the suite.
 - Anything the suite found in p9a to p9d and how it was fixed.

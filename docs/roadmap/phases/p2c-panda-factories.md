@@ -8,7 +8,7 @@ Follow the [conventions](../conventions.md), and use the omni MCP as much as pos
 ## Read first
 
 - Design doc: §5.2 (Panda), §6.
-- Output contexts: p1a, p1e.
+- Output contexts (`/tmp/opencode/<id>.md`, if they still exist): p1a, p1e.
 
 ## Goal
 
@@ -29,9 +29,8 @@ Produce the class factories the first components need on the Panda target, befor
 
 ## Output context (required)
 
-When done, write `docs/roadmap/context/p2c.md` in the format of
-[conventions](../conventions.md#finishing-the-output-context-required), commit it with
-the work, and tick this phase in the [roadmap](../README.md). It must cover at least:
+When done, write `/tmp/opencode/p2c.md` (not committed) in the format of
+[conventions](../conventions.md#finishing-the-output-context-required), and tick this phase in the [roadmap](../README.md). It must cover at least:
 
 - Where the hand-written factories live, their exact shape, and what p4b must generate to
   replace them.

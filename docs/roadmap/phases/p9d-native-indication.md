@@ -8,7 +8,7 @@ Follow the [conventions](../conventions.md), and use the omni MCP as much as pos
 ## Read first
 
 - Design doc: §9.8, §5.8, §5.9.
-- Output contexts: p9a, p9b, p8, p4b-rn, p1b.
+- Output contexts (`/tmp/opencode/<id>.md`, if they still exist): p9a, p9b, p8, p4b-rn, p1b.
 
 ## Goal
 
@@ -46,9 +46,8 @@ gain a ripple, which are checked against fixtures.
 
 ## Output context (required)
 
-When done, write `docs/roadmap/context/p9d.md` in the format of
-[conventions](../conventions.md#finishing-the-output-context-required), commit it with
-the work, and tick this phase in the [roadmap](../README.md). It must cover at least:
+When done, write `/tmp/opencode/p9d.md` (not committed) in the format of
+[conventions](../conventions.md#finishing-the-output-context-required), and tick this phase in the [roadmap](../README.md). It must cover at least:
 
 - The React Native API, and where it differs from the web's.
 - The focus-visible heuristic and its limits.

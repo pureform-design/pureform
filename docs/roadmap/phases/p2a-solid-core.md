@@ -8,7 +8,7 @@ Follow the [conventions](../conventions.md), and use the omni MCP as much as pos
 ## Read first
 
 - Design doc: §5.1, §5.3, §5.6 to §5.9, §6 (registry wiring), §9.1 to §9.6.
-- Output contexts: p1a, p1b, p1e, p1f, p1g, and the Zag port in `packages/solid/src/internal/zag` (design doc §8).
+- Output contexts (`/tmp/opencode/<id>.md`, if they still exist): p1a, p1b, p1e, p1f, p1g, and the Zag port in `packages/solid/src/internal/zag` (design doc §8).
 
 ## Goal
 
@@ -38,9 +38,8 @@ Give `@pureform/solid` everything a component needs, so p3a only wires anatomy t
 
 ## Output context (required)
 
-When done, write `docs/roadmap/context/p2a.md` in the format of
-[conventions](../conventions.md#finishing-the-output-context-required), commit it with
-the work, and tick this phase in the [roadmap](../README.md). It must cover at least:
+When done, write `/tmp/opencode/p2a.md` (not committed) in the format of
+[conventions](../conventions.md#finishing-the-output-context-required), and tick this phase in the [roadmap](../README.md). It must cover at least:
 
 - Every export with its signature, and a short example of a component built on them.
 - How state attributes are set, and from where.

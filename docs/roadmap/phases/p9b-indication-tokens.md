@@ -8,7 +8,7 @@ Follow the [conventions](../conventions.md), and use the omni MCP as much as pos
 ## Read first
 
 - Design doc: §9.8 ("Tokens" and "Where indication draws"), §5.4, §5.5, §5.6, §9.1.
-- Output contexts: p1a, p1d, p1f, p5b, p6a to p6e.
+- Output contexts (`/tmp/opencode/<id>.md`, if they still exist): p1a, p1d, p1f, p5b, p6a to p6e.
 
 ## Goal
 
@@ -49,9 +49,8 @@ the commit.
 
 ## Output context (required)
 
-When done, write `docs/roadmap/context/p9b.md` in the format of
-[conventions](../conventions.md#finishing-the-output-context-required), commit it with
-the work, and tick this phase in the [roadmap](../README.md). It must cover at least:
+When done, write `/tmp/opencode/p9b.md` (not committed) in the format of
+[conventions](../conventions.md#finishing-the-output-context-required), and tick this phase in the [roadmap](../README.md). It must cover at least:
 
 - The token names per component and their CSS var names per target.
 - Each component's indication entry, and any that differ from §9.8's table, with why.

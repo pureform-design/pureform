@@ -8,7 +8,7 @@ Follow the [conventions](../conventions.md), and use the omni MCP as much as pos
 ## Read first
 
 - Design doc: §7.
-- Output contexts: p4c, p5a.
+- Output contexts (`/tmp/opencode/<id>.md`, if they still exist): p4c, p5a.
 
 ## Goal
 
@@ -28,8 +28,7 @@ Ship only the components and variants an app uses.
 
 ## Output context (required)
 
-When done, write `docs/roadmap/context/p7.md` in the format of
-[conventions](../conventions.md#finishing-the-output-context-required), commit it with
-the work, and tick this phase in the [roadmap](../README.md). It must cover at least:
+When done, write `/tmp/opencode/p7.md` (not committed) in the format of
+[conventions](../conventions.md#finishing-the-output-context-required), and tick this phase in the [roadmap](../README.md). It must cover at least:
 
 - What pruning sees and misses, and the escape hatches.

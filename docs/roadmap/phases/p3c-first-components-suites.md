@@ -8,7 +8,7 @@ Follow the [conventions](../conventions.md), and use the omni MCP as much as pos
 ## Read first
 
 - Design doc: §5.7 (testing), §9.4, §9.5, §9.7, §13.
-- Output contexts: p3a, p3b, p1c (mirrored-box helper).
+- Output contexts (`/tmp/opencode/<id>.md`, if they still exist): p3a, p3b, p1c (mirrored-box helper).
 
 ## Goal
 
@@ -33,9 +33,8 @@ Put button and checkbox in `solid-demo` and prove the cross-cutting rules with s
 
 ## Output context (required)
 
-When done, write `docs/roadmap/context/p3c.md` in the format of
-[conventions](../conventions.md#finishing-the-output-context-required), commit it with
-the work, and tick this phase in the [roadmap](../README.md). It must cover at least:
+When done, write `/tmp/opencode/p3c.md` (not committed) in the format of
+[conventions](../conventions.md#finishing-the-output-context-required), and tick this phase in the [roadmap](../README.md). It must cover at least:
 
 - How to add a component to each shared suite (p6 does it for every component).
 - Anything the suites found in p2 or p3 and how it was fixed.

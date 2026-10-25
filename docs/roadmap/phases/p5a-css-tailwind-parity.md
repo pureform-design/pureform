@@ -8,7 +8,7 @@ Follow the [conventions](../conventions.md), and use the omni MCP as much as pos
 ## Read first
 
 - Design doc: §5.2, §5.6, §12 step 5.
-- Output contexts: p3c, p4b-css, p4b-tailwind, p4c.
+- Output contexts (`/tmp/opencode/<id>.md`, if they still exist): p3c, p4b-css, p4b-tailwind, p4c.
 
 ## Goal
 
@@ -26,8 +26,7 @@ Run the Solid components on the CSS and Tailwind targets, and move `css-demo` an
 
 ## Output context (required)
 
-When done, write `docs/roadmap/context/p5a.md` in the format of
-[conventions](../conventions.md#finishing-the-output-context-required), commit it with
-the work, and tick this phase in the [roadmap](../README.md). It must cover at least:
+When done, write `/tmp/opencode/p5a.md` (not committed) in the format of
+[conventions](../conventions.md#finishing-the-output-context-required), and tick this phase in the [roadmap](../README.md). It must cover at least:
 
 - Per target: setup steps for an app, and any difference in behavior.
