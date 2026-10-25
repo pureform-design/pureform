@@ -5,7 +5,7 @@
 import type { PureformPluginOptions } from "@pureform/bundler";
 import type { RnCodegenOptions } from "@pureform/rn-adapter/codegen";
 
-import { COMPONENTS } from "./pureform.config";
+import { COMPONENTS } from "./pureform.config.ts";
 
 export const codegen = {
     target: "native",

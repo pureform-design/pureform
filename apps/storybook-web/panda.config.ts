@@ -2,9 +2,16 @@ import { defineConfig } from "@pandacss/dev";
 import basePreset from "@pandacss/preset-base";
 import pandaPreset from "@pandacss/preset-panda";
 import typographyPreset from "@pandacss/preset-typography";
+import { compilePreset } from "@pureform/panda-adapter";
 
 import { staticCss } from "./.pureform/panda";
-import { pureformPreset } from "./panda.pureform";
+import { PREFIX } from "./pureform.codegen.ts";
+import pureformConfig from "./pureform.config.ts";
+
+export const pureformPreset = compilePreset(pureformConfig, {
+    name: "pureform",
+    prefix: PREFIX,
+});
 
 export default defineConfig({
     presets: [basePreset, pandaPreset, typographyPreset(), pureformPreset],

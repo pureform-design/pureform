@@ -40,7 +40,7 @@ export interface PureformPluginOptions<Options = Record<string, unknown>> {
     /** The folder to write, relative to the root. Default `.pureform`. */
     readonly outDir?: string;
     /** Check that the installed pureform packages agree in version. Default `true`. */
-    readonly trainCheck?: boolean;
+    readonly versionCheck?: boolean;
     /** The config's import rules: `true` (default), with these options, or `false`. */
     readonly imports?: boolean | ImportRuleOptions;
     /** Generate again when the config or a file it imports changes, in dev and watch builds.

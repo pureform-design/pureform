@@ -4,7 +4,7 @@ import solid from "@solidjs/vite-plugin";
 import tailwindcss from "@tailwindcss/vite";
 
 import packageJson from "./package.json" with { type: "json" };
-import { codegen } from "./pureform.codegen";
+import { codegen } from "./pureform.codegen.ts";
 
 export default createConfig({
     package: packageJson,

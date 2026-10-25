@@ -2,7 +2,7 @@ import { defineConfig } from "@pandacss/dev";
 import basePreset from "@pandacss/preset-base";
 
 import { staticCss } from "./.pureform/panda";
-import { pureformPreset } from "./panda.pureform";
+import { pureformPreset } from "./panda.pureform.ts";
 
 export default defineConfig({
     presets: [basePreset, pureformPreset],

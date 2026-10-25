@@ -27,7 +27,7 @@ where React Native allows.
   `@pureform/machines` (only its `/interaction` subpath's `InteractionEmitter`, which has no Zag
   or DOM code), and, as
   peers, `@pureform/styling` (the registry) and `@pureform/rn-adapter` (the factories' runtime,
-  the hooks that select and animate, and the engines' drawing). Both peers are core-train
+  the hooks that select and animate, and the engines' drawing). Both peers are core
   packages the app's generated registry imports too, so the app and the binding share one copy.
 - **Depended on by:** `apps/rn-web-demo`.
 - No Zag: React Native has no DOM for its machines. `Pressable`'s callbacks emit each

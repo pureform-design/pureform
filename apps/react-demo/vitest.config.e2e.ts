@@ -6,7 +6,7 @@ import e2eTestConfig from "@pureform/vitest-config/e2e";
 import { playwright } from "@vitest/browser-playwright";
 import { mergeConfig, type UserWorkspaceConfig } from "vitest/config";
 
-import baseConfig from "./vite.config";
+import baseConfig from "./vite.config.ts";
 
 const executablePath = process.env.CHROMIUM_PATH;
 

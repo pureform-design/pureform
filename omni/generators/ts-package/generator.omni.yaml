@@ -79,15 +79,15 @@ inputs:
     type: string
     message: How is this package versioned?
     allowed:
-      - name: Core train (one version with every core package)
-        value: core-train
-      - name: Binding (its own version, peering on the core train)
+      - name: Core (one version with every core package)
+        value: core
+      - name: Binding (its own version, peering on the core)
         value: binding
       - name: Tooling (internal, its own version)
         value: tooling
       - name: Not released
         value: none
-    default: core-train
+    default: core
 
   - name: package_version
     type: string
@@ -174,13 +174,13 @@ actions:
       - templates/vitest.config.unit.ts.tpl
       - templates/src/add.spec.ts.tpl
 
-  - if: "{{ inputs.release_group | default(value='none') == 'core-train' }}"
+  - if: "{{ inputs.release_group | default(value='none') == 'core' }}"
     type: prepend-content
     target: cog_config
     entries:
       - content: |2-
               "{{ vars.generated_dir }}/**",
-        pattern: "@anchor:new-core-train-package"
+        pattern: "@anchor:new-core-package"
 
   - if: "{{ inputs.release_group | default(value='none') == 'binding' or inputs.release_group | default(value='none') == 'tooling' }}"
     type: prepend-content

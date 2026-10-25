@@ -16,7 +16,6 @@
         "src",
         "pureform.config.ts",
         "pureform.codegen.ts",
-        "panda.pureform.ts",
         ".pureform/**/*.*"
     ]
 }

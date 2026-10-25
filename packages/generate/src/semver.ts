@@ -1,4 +1,4 @@
-// Just enough semver for the train check: compare versions, and test one against the ranges
+// Just enough semver for the version check: compare versions, and test one against the ranges
 // package.json files use (`^0.4`, `~1.2.3`, `>=1 <2`, `1.x`, `a || b`, `1.0.0 - 2.0.0`).
 // Prereleases sort before their release and aren't excluded from ranges.
 

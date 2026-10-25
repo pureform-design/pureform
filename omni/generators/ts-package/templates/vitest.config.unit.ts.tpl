@@ -1,5 +1,5 @@
 import { mergeConfig, type UserWorkspaceConfig } from "vitest/config";
-import baseConfig from "./vite.config";
+import baseConfig from "./vite.config.ts";
 import unitTestConfig from "@{{ vars.scope_name }}/vitest-config/unit";
 
 export default mergeConfig(mergeConfig(baseConfig, unitTestConfig), {

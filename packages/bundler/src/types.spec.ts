@@ -59,7 +59,7 @@ describe("types of .pureform/", () => {
         const options = {
             root,
             config: "pureform.config.ts",
-            trainCheck: false,
+            versionCheck: false,
             targets: {
                 web: { target: fakeAdapter() },
                 native: { target: fakeAdapter("native") },

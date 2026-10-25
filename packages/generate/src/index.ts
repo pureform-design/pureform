@@ -65,11 +65,15 @@ export { compareVersions, satisfies } from "./semver";
 export { componentShape } from "./shape";
 export {
     BINDING_PACKAGES,
-    checkTrain,
-    CORE_TRAIN_PACKAGES,
+    checkVersions as checkTrain,
+    CORE_PACKAGES as CORE_TRAIN_PACKAGES,
     findInstalled,
-} from "./train";
-export type { InstalledPackage, TrainCheck, TrainProblem } from "./train";
+} from "./version-check";
+export type {
+    InstalledPackage,
+    VersionCheck,
+    VersionProblem,
+} from "./version-check";
 export { keepsValue, narrowConfig, normalizeVariants } from "./usage";
 export type { Usage, VariantUsage } from "./usage";
 export { watchGenerate } from "./watch";

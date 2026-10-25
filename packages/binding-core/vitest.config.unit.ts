@@ -3,7 +3,7 @@
 import unitTestConfig from "@pureform/vitest-config/unit";
 import { mergeConfig, type UserWorkspaceConfig } from "vitest/config";
 
-import baseConfig from "./vite.config";
+import baseConfig from "./vite.config.ts";
 
 // Not UTC, so a date computed in UTC instead of locally shows up (the date pickers' "today").
 process.env.TZ = "Asia/Manila";

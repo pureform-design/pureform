@@ -3,9 +3,9 @@ import { dirname, join } from "node:path";
 
 import { checkRelease, type WorkspacePackage } from "./check";
 import {
-    CORE_TRAIN,
+    CORE_PACKAGE,
     parseCogPackages,
-    trainPaths,
+    corePackagesPaths,
     type CogPackage,
 } from "./cog";
 import {
@@ -80,19 +80,19 @@ export function checkRepository(root: string): string[] {
     return checkRelease(readCog(root), readWorkspace(root));
 }
 
-/** The package directories a cog.toml package versions: the train's, or its own path. */
+/** The package directories a cog.toml package versions: the core's, or its own path. */
 export function releasePaths(
     cog: readonly CogPackage[],
     name: string,
 ): string[] {
-    if (name === CORE_TRAIN) return trainPaths(cog);
+    if (name === CORE_PACKAGE) return corePackagesPaths(cog);
     const entry = cog.find((candidate) => candidate.name === name);
     if (!entry) throw new Error(`cog.toml has no package ${name}`);
     return [entry.path];
 }
 
 /**
- * Sets the version of a cog.toml package (every train package for `core-train`) in each
+ * Sets the version of a cog.toml package (every core package for `core`) in each
  * package.json, each `src/package-version.ts`, and bun.lock. Returns the files it changed, relative to the root.
  */
 export function setVersion(

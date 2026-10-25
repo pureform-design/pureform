@@ -11,7 +11,7 @@ different output.
   (`@pureform/<target>-adapter/codegen`) from the app's install.
 - **Depended on by:** `@pureform/bundler` and `@pureform/cli`, and each adapter's
   `/codegen` subpath, which implements the interface here.
-- Part of the core train: released at the same version as `core`, `styling`, and the
+- Part of the core: released at the same version as `core`, `styling`, and the
   adapters.
 
 Design: [§4 config](../../docs/design/component-architecture.md#4-pureformconfigts),
@@ -27,7 +27,7 @@ generateTargets(options)          one config, several targets, full and pruned o
   └─ the top of .pureform/: entries re-exporting the default target's full/, registry.d.ts
 
 generate(options)                 one target into one folder
-  ├─ train.ts           installed core-train packages share one version? bindings' peers agree?
+  ├─ version-check.ts           installed core packages share one version? bindings' peers agree?
   ├─ config.ts          loadConfig: jiti, fresh each call
   │    └─ imports.ts    import rules: only pureform packages and relative data files
   ├─ load-adapter.ts    "panda" → @pureform/panda-adapter/codegen (or an adapter object)
@@ -46,8 +46,8 @@ generate(options)                 one target into one folder
 | `config.ts`         | `loadConfig(path, options)`                                                                              |
 | `imports.ts`        | `scanConfigImports(entry, options)`, `formatImportViolations`, `resolveRelative`                         |
 | `usage.ts`          | Pruning's input: `Usage`, `VariantUsage`, `normalizeVariants`, `narrowConfig`                            |
-| `train.ts`          | `CORE_TRAIN_PACKAGES`, `findInstalled(root)`, `checkTrain(installed)`                                    |
-| `semver.ts`         | `compareVersions`, `satisfies`: just enough semver for the train check                                   |
+| `version-check.ts`  | `CORE_PACKAGES`, `findInstalled(root)`, `checkVersions(installed)`                                       |
+| `semver.ts`         | `compareVersions`, `satisfies`: just enough semver for the version check                                 |
 | `hash.ts`           | `stableStringify`, `hashOf`, the header (`GENERATED_MARK`, `headerHash`)                                 |
 | `registry-index.ts` | `registryIndex`, `registryDeclarations`                                                                  |
 | `write.ts`          | `writeFiles`, `compareFiles`                                                                             |
@@ -149,7 +149,7 @@ with `declarations: false`, and writes the declarations once at the top.
 
 Errors are `GenerateError`s with a `code`: `config-not-found`, `config-load`,
 `config-export`, `config-imports`, `adapter-not-found`, `adapter-invalid`,
-`adapter-output`, `components`, `train-mismatch`, `missing-output`.
+`adapter-output`, `components`, `version-mismatch`, `missing-output`.
 
 ### Pruning: `usage`
 
@@ -206,7 +206,7 @@ import { createRegistry } from "@pureform/styling";
 
 import { button } from "./web/button";
 
-/** The core train's version this registry was made with. */
+/** The core's version this registry was made with. */
 export const version = "0.4.1";
 
 export const registry = createRegistry(
@@ -231,7 +231,7 @@ export type Components = "button" | "checkbox";
   wanted (`extra`).
 - **The hash** covers the config, the target's name and platform, the adapter's options, the
   allow-list and lazy list (after pruning), the pruned variants when they narrow anything,
-  every installed train and binding package's version, and a format number for what
+  every installed core package and binding package's version, and a format number for what
   `generate` itself writes.
 
 ### The adapter codegen interface
@@ -283,15 +283,15 @@ fails on a Node built-in, a package that isn't `@pureform/*`, or `process.env`,
 `imports: { allow: ["lodash-es", /^@acme\//] }` allows pure-data packages; `imports: false`
 skips the check.
 
-### The train check
+### The version check
 
-Before generating, `generate` reads each installed core-train and binding package (the
-nearest `node_modules/<name>` from the root up). It fails when train packages differ in
+Before generating, `generate` reads each installed core package and binding package (the
+nearest `node_modules/<name>` from the root up). It fails when core packages differ in
 version, naming the ones behind the newest and the command line to install, or when a
-binding's peer range on a train package excludes the train's version. Ranges that aren't
-semver (`workspace:^`, `catalog:`) pass. `trainCheck: false` turns it off. The train's
+binding's peer range on a core package excludes the core's version. Ranges that aren't
+semver (`workspace:^`, `catalog:`) pass. `versionCheck: false` turns it off. The core's
 version goes into the generated registry (`createRegistry(…, { version })`), and the bindings warn
-in development when the running `@pureform/styling` differs (`trainVersionMismatch` in
+in development when the running `@pureform/styling` differs (`versionMismatch` in
 `@pureform/binding-core`).
 
 ### Missing output
@@ -357,7 +357,7 @@ them, follows the dependencies each run finds, and keeps watching after a failed
   least functions' source doesn't differ.
 - **Files without a header** (`header: false`, for JSON) can't be told from the app's, so
   they're never removed or reported as extra.
-- **`CORE_TRAIN_PACKAGES` is embedded**, since `cog.toml` isn't there in an app's install; a
-  test keeps it equal to `cog.toml`'s `core-train`.
+- **`CORE_PACKAGES` is embedded**, since `cog.toml` isn't there in an app's install; a
+  test keeps it equal to `cog.toml`'s `core`.
 - **semver is partial:** prereleases sort before their release but aren't excluded from
   ranges, unlike npm's rule.

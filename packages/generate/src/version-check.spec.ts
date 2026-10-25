@@ -1,7 +1,7 @@
 import { fileURLToPath } from "node:url";
 
 import {
-    CORE_TRAIN,
+    CORE_PACKAGE,
     findRoot,
     readCog,
     readWorkspace,
@@ -12,11 +12,11 @@ import { describe, expect, it } from "vitest";
 import { installed, tempRoot, writeTree } from "./__fixtures__/project";
 import {
     BINDING_PACKAGES,
-    checkTrain,
-    CORE_TRAIN_PACKAGES,
+    checkVersions,
+    CORE_PACKAGES,
     findInstalled,
-} from "./train";
-import type { InstalledPackage } from "./train";
+} from "./version-check";
+import type { InstalledPackage } from "./version-check";
 
 const pkg = (
     name: string,
@@ -35,15 +35,15 @@ describe("CORE_TRAIN_PACKAGES", () => {
         const names = new Map(
             readWorkspace(root).map((entry) => [entry.path, entry.name]),
         );
-        const train = releasePaths(readCog(root), CORE_TRAIN)
+        const train = releasePaths(readCog(root), CORE_PACKAGE)
             .map((path) => names.get(path))
             .sort();
-        expect([...CORE_TRAIN_PACKAGES]).toEqual(train);
+        expect([...CORE_PACKAGES]).toEqual(train);
     });
 
     it("leaves the bindings out", () => {
         for (const binding of BINDING_PACKAGES) {
-            expect(CORE_TRAIN_PACKAGES).not.toContain(binding);
+            expect(CORE_PACKAGES).not.toContain(binding);
         }
     });
 });
@@ -78,7 +78,7 @@ describe("findInstalled", () => {
 
 describe("checkTrain", () => {
     it("passes one version, and bindings whose ranges include it", () => {
-        const check = checkTrain([
+        const check = checkVersions([
             pkg("@pureform/core", "0.4.1"),
             pkg("@pureform/styling", "0.4.1"),
             pkg("@pureform/solid", "0.2.0", {
@@ -94,9 +94,9 @@ describe("checkTrain", () => {
     });
 
     it("passes nothing installed, and ranges that aren't semver", () => {
-        expect(checkTrain([]).version).toBeUndefined();
+        expect(checkVersions([]).version).toBeUndefined();
         expect(
-            checkTrain([
+            checkVersions([
                 pkg("@pureform/styling", "0.0.0-semantically-released"),
                 pkg("@pureform/solid", "0.0.0-semantically-released", {
                     "@pureform/styling": "workspace:^",
@@ -106,7 +106,7 @@ describe("checkTrain", () => {
     });
 
     it("names the train packages behind the newest, and the version to install", () => {
-        const check = checkTrain([
+        const check = checkVersions([
             pkg("@pureform/core", "0.3.2"),
             pkg("@pureform/styling", "0.4.1"),
             pkg("@pureform/preset", "0.4.0"),
@@ -139,7 +139,7 @@ describe("checkTrain", () => {
     });
 
     it("names a binding whose peer range excludes the train", () => {
-        const check = checkTrain([
+        const check = checkVersions([
             pkg("@pureform/styling", "0.5.0"),
             pkg("@pureform/react", "0.2.3", { "@pureform/styling": "^0.4" }),
         ]);

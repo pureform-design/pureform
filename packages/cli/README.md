@@ -11,7 +11,7 @@ doesn't pull in the plugin.
   (loading the codegen file), `@pureform/bundler` (the usage scan behind `--prune`).
 - **Depended on by:** apps' and fixtures' scripts (`apps/solid-demo`, `apps/react-demo`,
   `tests/panda-fixture`: their omni `generate` tasks).
-- Part of the core train: released at the same version as `core`, `styling`, and the adapters.
+- Part of the core: released at the same version as `core`, `styling`, and the adapters.
 
 Design: [§10 CLI](../../docs/design/component-architecture.md#10-cli),
 [§6 the generated registry](../../docs/design/component-architecture.md#6-the-generated-registry).
@@ -39,7 +39,7 @@ pureform generate --target panda --options '{"prefix":"pf"}' --components button
 | `--components <names>` | the codegen file's, else all                    | The allow-list, comma-separated                                                          |
 | `--lazy <names>`       | the codegen file's, else none                   | Components whose registry entries load on demand                                         |
 | `--out-dir <dir>`      | the codegen file's, else `.pureform`            | The folder written, relative to the root                                                 |
-| `--no-train-check`     | the check is on                                 | Skip checking that pureform packages share one version                                   |
+| `--no-version-check`   | the check is on                                 | Skip checking that pureform packages share one version                                   |
 
 Exit codes: 0 done (or up to date), 1 generation failed or `--check` found the output out of
 date, 2 called wrong (unknown command or flag, `--watch` with `--check`).

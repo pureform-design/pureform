@@ -6,7 +6,7 @@ import unitTestConfig from "@pureform/vitest-config/unit";
 import { playwright } from "@vitest/browser-playwright";
 import { mergeConfig, type UserWorkspaceConfig } from "vitest/config";
 
-import baseConfig from "./vite.config";
+import baseConfig from "./vite.config.ts";
 
 const executablePath = process.env.CHROMIUM_PATH;
 

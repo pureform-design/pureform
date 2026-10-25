@@ -43,7 +43,6 @@ describe("@pureform/bundler/client", () => {
                     'export const chip = registry.entry("chip").kind;',
                     'export const first: Components = "divider";',
                     "export const theme: string | undefined = themes[0];",
-                    "export const train: string = version;",
                     "// @ts-expect-error: not registered",
                     'registry.entry("nope");',
                     "// @ts-expect-error: not registered",

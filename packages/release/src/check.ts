@@ -1,4 +1,4 @@
-import { CORE_TRAIN, type CogPackage } from "./cog";
+import { CORE_PACKAGE, type CogPackage } from "./cog";
 
 export interface WorkspacePackage {
     /** The directory, relative to the repository root, with `/` separators. */
@@ -14,8 +14,8 @@ const RELEASED_DIR = "packages/";
 
 /**
  * Checks that cog.toml and the workspace agree: every package under `packages/` is in
- * exactly one release group (the core train or its own cog package), every cog entry
- * names a real package, the core train's packages share one version, and a package's
+ * exactly one release group (the core or its own cog package), every cog entry
+ * names a real package, the core's packages share one version, and a package's
  * `src/package-version.ts` matches its package.json. Returns the problems found, empty
  * when there are none.
  */
@@ -25,26 +25,26 @@ export function checkRelease(
 ): string[] {
     const issues: string[] = [];
     const byPath = new Map(workspace.map((entry) => [entry.path, entry]));
-    const train = cog.find((entry) => entry.name === CORE_TRAIN);
-    if (!train) return [`cog.toml has no ${CORE_TRAIN} package`];
+    const core = cog.find((entry) => entry.name === CORE_PACKAGE);
+    if (!core) return [`cog.toml has no ${CORE_PACKAGE} package`];
 
-    const trainPaths = new Set<string>();
-    for (const glob of train.include) {
+    const corePackagePaths = new Set<string>();
+    for (const glob of core.include) {
         const path = /^(.+)\/\*\*$/.exec(glob)?.[1];
         if (!path)
             issues.push(
-                `${CORE_TRAIN} includes "${glob}"; use "<package dir>/**"`,
+                `${CORE_PACKAGE} includes "${glob}"; use "<package dir>/**"`,
             );
         else if (!byPath.has(path))
             issues.push(
-                `${CORE_TRAIN} includes ${path}, which isn't a workspace package`,
+                `${CORE_PACKAGE} includes ${path}, which isn't a workspace package`,
             );
-        else trainPaths.add(path);
+        else corePackagePaths.add(path);
     }
 
     const ownPaths = new Set<string>();
     for (const entry of cog) {
-        if (entry.name === CORE_TRAIN) continue;
+        if (entry.name === CORE_PACKAGE) continue;
         const found = byPath.get(entry.path);
         if (!found) {
             issues.push(
@@ -57,9 +57,9 @@ export function checkRelease(
                 `cog.toml package ${entry.name} is named ${found.name} in ${entry.path}/package.json`,
             );
         }
-        if (trainPaths.has(entry.path)) {
+        if (corePackagePaths.has(entry.path)) {
             issues.push(
-                `${entry.name} is in the ${CORE_TRAIN} and has its own cog.toml package; keep one`,
+                `${entry.name} is in the ${CORE_PACKAGE} and has its own cog.toml package; keep one`,
             );
         }
         ownPaths.add(entry.path);
@@ -68,17 +68,17 @@ export function checkRelease(
     for (const entry of workspace) {
         if (
             entry.path.startsWith(RELEASED_DIR) &&
-            !trainPaths.has(entry.path) &&
+            !corePackagePaths.has(entry.path) &&
             !ownPaths.has(entry.path)
         ) {
             issues.push(
-                `${entry.name} (${entry.path}) is in no release group; add it to the ${CORE_TRAIN} or give it a cog.toml package`,
+                `${entry.name} (${entry.path}) is in no release group; add it to the ${CORE_PACKAGE} or give it a cog.toml package`,
             );
         }
     }
 
     const versions = new Map<string, string[]>();
-    for (const path of trainPaths) {
+    for (const path of corePackagePaths) {
         const entry = byPath.get(path);
         if (!entry) continue;
         versions.set(entry.version, [
@@ -91,7 +91,7 @@ export function checkRelease(
             ([version, names]) => `${version} (${names.join(", ")})`,
         );
         issues.push(
-            `the ${CORE_TRAIN}'s packages differ in version: ${listed.join("; ")}`,
+            `the ${CORE_PACKAGE}'s packages differ in version: ${listed.join("; ")}`,
         );
     }
 

@@ -24,7 +24,7 @@ import { closeServers, commands } from "./src/commands";
 import { generateRegistries } from "./src/targets/generated";
 import { TARGETS } from "./src/targets/targets";
 import type { TargetName } from "./src/targets/targets";
-import baseConfig from "./vite.config";
+import baseConfig from "./vite.config.ts";
 
 const executablePath = process.env.CHROMIUM_PATH;
 

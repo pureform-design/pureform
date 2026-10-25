@@ -1,5 +1,5 @@
-/** The cocogitto package that versions every core train package together. */
-export const CORE_TRAIN = "core-train";
+/** The cocogitto package that versions every core package together. */
+export const CORE_PACKAGE = "core";
 
 export interface CogPackage {
     name: string;
@@ -76,17 +76,18 @@ export function parseCogPackages(toml: string): CogPackage[] {
 }
 
 /**
- * The directories of the core train's packages, from its `include` globs (each one
+ * The directories of the core's packages, from its `include` globs (each one
  * `<dir>/**`). Throws when a glob has another shape.
  */
-export function trainPaths(packages: readonly CogPackage[]): string[] {
-    const train = packages.find((entry) => entry.name === CORE_TRAIN);
-    if (!train) throw new Error(`cog.toml has no ${CORE_TRAIN} package`);
-    return train.include.map((glob) => {
+export function corePackagesPaths(packages: readonly CogPackage[]): string[] {
+    const corePackage = packages.find((entry) => entry.name === CORE_PACKAGE);
+    if (!corePackage)
+        throw new Error(`cog.toml has no ${CORE_PACKAGE} package`);
+    return corePackage.include.map((glob) => {
         const match = /^(.+)\/\*\*$/.exec(glob);
         if (!match?.[1]) {
             throw new Error(
-                `${CORE_TRAIN} includes "${glob}"; use "<package dir>/**"`,
+                `${CORE_PACKAGE} includes "${glob}"; use "<package dir>/**"`,
             );
         }
         return match[1];

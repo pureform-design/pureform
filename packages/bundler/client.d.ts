@@ -18,7 +18,7 @@ declare module "virtual:pureform/registry" {
             | AnyFactory
             | LazyInput;
     }>;
-    /** The core train's version the registry was made with. */
+    /** The core's version the registry was made with. */
     export const version: string;
     /** The config's theme names. */
     export const themes: readonly string[];

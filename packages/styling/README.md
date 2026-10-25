@@ -92,7 +92,7 @@ registry.preload("card"); // start early; never rejects
 An entry's kind is fixed at creation, so the server and the client take the same path (§5.7).
 `entry` returns the same object on every call and throws for an unknown name.
 
-The generated registry passes the core train's version as a second argument,
+The generated registry passes the core's version as a second argument,
 `createRegistry({ button }, { version: "0.4.0" })`, and `registry.version` returns it. In
 development the bindings compare it with `VERSION`, this package's own version, and warn
 once when they differ (the registry is stale, or two copies of `@pureform/styling` are

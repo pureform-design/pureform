@@ -75,7 +75,7 @@ describe("resolveCodegenOptions", () => {
         const root = tempApp(["chip"], {
             options: { prefix: "x-", size: 1 },
             components: ["chip"],
-            trainCheck: true,
+            versionCheck: true,
         });
         const { options } = await resolveCodegenOptions(
             {
@@ -85,7 +85,7 @@ describe("resolveCodegenOptions", () => {
                 lazy: "b",
                 outDir: "out",
                 config: "other.config.ts",
-                trainCheck: false,
+                versionCheck: false,
                 check: true,
             },
             root,
@@ -98,7 +98,7 @@ describe("resolveCodegenOptions", () => {
             components: ["a", "b"],
             lazy: ["b"],
             outDir: "out",
-            trainCheck: false,
+            versionCheck: false,
             check: true,
         });
     });

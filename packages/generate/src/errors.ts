@@ -18,9 +18,9 @@ export type GenerateErrorCode =
     | "adapter-output"
     /** The `components` or `lazy` option names a component the config doesn't have. */
     | "components"
-    /** Installed core-train packages differ in version, or a binding's peer range excludes
-     *  the train. */
-    | "train-mismatch"
+    /** Installed core packages differ in version, or a binding's peer range excludes
+     *  the core. */
+    | "version-mismatch"
     /** `.pureform/` hasn't been generated. */
     | "missing-output";
 

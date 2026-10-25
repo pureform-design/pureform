@@ -1134,7 +1134,7 @@ export {
 } from "./provided-tokens";
 export type { ProvidedTokens } from "./provided-tokens";
 export { selectionSignature, withDefaults } from "./selection";
-export { trainVersionMismatch } from "./version";
+export { versionMismatch as trainVersionMismatch } from "./version";
 export { warnOnce } from "./warn";
 export {
     BADGE_ROOT_PROPS,

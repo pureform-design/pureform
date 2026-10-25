@@ -3,8 +3,8 @@ ignore_merge_commits = true
 ignore_fixup_commits = true
 disable_changelog = false
 disable_bump_commit = false
-# Versioning, as in docs/design/component-architecture.md: the core train is one package,
-# `core-train`, so its packages share one version and one tag. Bindings and tooling get
+# Versioning, as in docs/design/component-architecture.md: the core is one package,
+# `core`, so its packages share one version and one tag. Bindings and tooling get
 # their own tags. No global tag: cocogitto skips it when no package bumps, and it would
 # also count commits to apps, tests, and docs.
 generate_mono_repository_global_tag = false
@@ -14,7 +14,7 @@ skip_ci = "[skip ci]"
 skip_untracked = false
 pre_bump_hooks = []
 post_bump_hooks = []
-# Sets the version in package.json and bun.lock: every train package for `core-train`,
+# Sets the version in package.json and bun.lock: every package for `core`,
 # the package itself otherwise.
 pre_package_bump_hooks = [
     "bun \"$(git rev-parse --show-toplevel)/packages/release/src/cli.ts\" set-version {{package}} {{version}}",
@@ -37,9 +37,9 @@ authors = []
 
 [bump_profiles]
 
-# The core train: every package that shares the AST format, the generated registry, or the
+# The core: every package that shares the AST format, the generated registry, or the
 # factory types. A commit touching any of them bumps them all together.
-[monorepo.packages.core-train]
+[monorepo.packages.core]
 path = "."
 changelog_path = "CHANGELOG.md"
 include = [
@@ -64,10 +64,10 @@ include = [
     "packages/generate/**",
     "packages/bundler/**",
     "packages/cli/**",
-    # @anchor:new-core-train-package
+    # @anchor:new-core-package
 ]
 
-# Bindings: their own version, peering on a core train range.
+# Bindings: their own version, peering on a core range.
 [monorepo.packages."@pureform/solid"]
 path = "packages/solid"
 include = ["packages/solid/**"]

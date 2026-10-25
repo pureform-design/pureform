@@ -12,8 +12,8 @@ import react from "@vitejs/plugin-react";
 import type { Plugin } from "vite";
 
 import packageJson from "./package.json" with { type: "json" };
-import { codegen } from "./pureform.codegen";
-import config, { BRAND_TOKENS, BRANDS, COMPONENTS } from "./pureform.config";
+import { codegen } from "./pureform.codegen.ts";
+import config, { BRAND_TOKENS, BRANDS, COMPONENTS } from "./pureform.config.ts";
 
 const require = createRequire(import.meta.url);
 
@@ -41,7 +41,7 @@ const brandOverrides = () => {
         themes: Object.fromEntries(
             Object.entries(BRANDS).map(([name, seed]) => [
                 name,
-                { color: materialColor({ seed }) },
+                { color: materialColor({ seed: seed as `#{string}` }) },
             ]),
         ),
     });

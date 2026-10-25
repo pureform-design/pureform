@@ -19,8 +19,8 @@ import type { GenerateOptions, GenerateResult } from "./generate";
 import { hashOf, withHeader } from "./hash";
 import type { ImportRuleOptions } from "./imports";
 import { DECLARATIONS_FILE, INDEX_FILE } from "./registry-index";
-import { checkTrain, findInstalled } from "./train";
 import type { Usage } from "./usage";
+import { checkVersions, findInstalled } from "./version-check";
 import { compareFiles, writeFiles } from "./write";
 import type { FileResult, PlannedFile } from "./write";
 
@@ -71,8 +71,8 @@ export interface GenerateTargetsOptions<
     readonly usage?: Usage;
     /** Compare instead of writing. */
     readonly check?: boolean;
-    /** See `GenerateOptions.trainCheck`. Default `true`. */
-    readonly trainCheck?: boolean;
+    /** See `GenerateOptions.versionCheck`. Default `true`. */
+    readonly versionCheck?: boolean;
     /** See `GenerateOptions.imports`. Default `true`. */
     readonly imports?: boolean | ImportRuleOptions;
 }
@@ -237,10 +237,10 @@ export const generateTargets = async <Options = Record<string, unknown>>(
         }
     }
 
-    if (options.trainCheck !== false) {
-        const train = checkTrain(findInstalled(root));
-        if (train.message) {
-            throw new GenerateError("train-mismatch", train.message);
+    if (options.versionCheck !== false) {
+        const check = checkVersions(findInstalled(root));
+        if (check.message) {
+            throw new GenerateError("version-mismatch", check.message);
         }
     }
     const loaded =
@@ -264,7 +264,7 @@ export const generateTargets = async <Options = Record<string, unknown>>(
             config,
             root,
             outDir: join(outDir, name, kind),
-            trainCheck: false,
+            versionCheck: false,
             declarations: false,
             ...(kind === "pruned" &&
                 options.usage !== undefined && { usage: options.usage }),

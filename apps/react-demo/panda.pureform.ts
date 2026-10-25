@@ -3,8 +3,8 @@
 
 import { compilePreset } from "@pureform/panda-adapter";
 
-import { PREFIX } from "./pureform.codegen";
-import pureformConfig from "./pureform.config";
+import { PREFIX } from "./pureform.codegen.ts";
+import pureformConfig from "./pureform.config.ts";
 
 export { PREFIX, pureformConfig };
 

@@ -30,9 +30,9 @@ import {
 } from "./registry-index";
 import type { GeneratedEntry } from "./registry-index";
 import { componentShape } from "./shape";
-import { checkTrain, findInstalled } from "./train";
 import { normalizeVariants } from "./usage";
 import type { Usage } from "./usage";
+import { checkVersions, findInstalled } from "./version-check";
 import { compareFiles, readGenerated, writeFiles } from "./write";
 import type { FileResult, PlannedFile } from "./write";
 
@@ -64,9 +64,9 @@ export interface GenerateOptions<Options = Record<string, unknown>> {
     /** Compare instead of writing: the result lists what's out of date, and `ok` is whether
      *  nothing is. */
     readonly check?: boolean;
-    /** Fail when installed core-train packages differ in version, or a binding's peer range
-     *  excludes the train. Default `true`. */
-    readonly trainCheck?: boolean;
+    /** Fail when installed core packages differ in version, or a binding's peer range
+     *  excludes the core. Default `true`. */
+    readonly versionCheck?: boolean;
     /** Check the config's import rules when loading it from a path: `true` (default), with
      *  these options, or `false`. */
     readonly imports?: boolean | ImportRuleOptions;
@@ -81,8 +81,8 @@ export interface GenerateResult {
     readonly outDir: string;
     /** The hash in every generated file's header. */
     readonly hash: string;
-    /** The core train's version recorded in the generated registry. */
-    readonly trainVersion: string;
+    /** The core's version recorded in the generated registry. */
+    readonly version: string;
     /** Every file's status. In check mode without a matching hash, only the stale files: the
      *  adapter isn't run. */
     readonly files: readonly FileResult[];
@@ -274,11 +274,11 @@ export const generate = async <Options = Record<string, unknown>>(
     const outDir = resolve(root, options.outDir ?? DEFAULT_OUT_DIR);
 
     const installed = findInstalled(root);
-    const train = checkTrain(installed);
-    if (options.trainCheck !== false && train.message) {
-        throw new GenerateError("train-mismatch", train.message);
+    const check = checkVersions(installed);
+    if (options.versionCheck !== false && check.message) {
+        throw new GenerateError("version-mismatch", check.message);
     }
-    const trainVersion = train.version ?? VERSION;
+    const version = check.version ?? VERSION;
 
     const loaded =
         typeof options.config === "string"
@@ -365,7 +365,7 @@ export const generate = async <Options = Record<string, unknown>>(
             root,
             outDir,
             hash,
-            trainVersion,
+            version,
             files,
             changed,
             ok: options.check ? !changed : true,
@@ -435,7 +435,7 @@ export const generate = async <Options = Record<string, unknown>>(
         registryIndex(
             entries,
             Object.keys(config.themes ?? {}),
-            trainVersion,
+            version,
             output.themeAttribute,
             output.vars,
         ),

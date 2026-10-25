@@ -6,7 +6,7 @@ import { routePathFromFile } from "filesystem-routing";
 import { fileRoutes } from "filesystem-routing/vite";
 import { defineConfig } from "vitest/config";
 
-import { codegen } from "./pureform.codegen";
+import { codegen } from "./pureform.codegen.ts";
 
 export default defineConfig({
     // Turnkey streaming SSR under a third-party router: no index.html and no

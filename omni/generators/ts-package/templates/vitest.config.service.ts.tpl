@@ -1,6 +1,6 @@
 import serviceTestConfig from "@{{ vars.scope_name }}/vitest-config/service";
 import { mergeConfig, type UserWorkspaceConfig } from "vitest/config";
-import baseConfig from "./vite.config";
+import baseConfig from "./vite.config.ts";
 
 export default mergeConfig(mergeConfig(baseConfig, serviceTestConfig), {
     test: {

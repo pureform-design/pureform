@@ -44,7 +44,7 @@ Options:
   --components <names> The components to generate, comma-separated (default: all).
   --lazy <names>       The components whose registry entries load on demand.
   --out-dir <dir>      The folder to write, relative to the root (default: .pureform).
-  --no-train-check     Skip checking that the installed pureform packages share a version.
+  --no-version-check     Skip checking that the installed pureform packages share a version.
   -h, --help           Show this help.`;
 
 const defaultIO = (): CliIO => ({
@@ -76,7 +76,7 @@ export const parseGenerateFlags = (
                 components: { type: "string" },
                 lazy: { type: "string" },
                 "out-dir": { type: "string" },
-                "train-check": { type: "boolean" },
+                "version-check": { type: "boolean" },
                 help: { type: "boolean", short: "h" },
             },
         });
@@ -87,7 +87,7 @@ export const parseGenerateFlags = (
     }
     const {
         "out-dir": outDir,
-        "train-check": trainCheck,
+        "version-check": versionCheck,
         target,
         ...rest
     } = parsed.values;
@@ -105,7 +105,7 @@ export const parseGenerateFlags = (
     return {
         ...rest,
         ...(outDir === undefined ? {} : { outDir }),
-        ...(trainCheck === undefined ? {} : { trainCheck }),
+        ...(versionCheck === undefined ? {} : { versionCheck: versionCheck }),
         ...(target === undefined
             ? {}
             : { target: target as (typeof TARGETS)[number] }),

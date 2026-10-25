@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 
 import { describe, expect, test } from "vitest";
 
-import { CORE_TRAIN } from "./cog";
+import { CORE_PACKAGE } from "./cog";
 import {
     checkRepository,
     findRoot,
@@ -16,7 +16,7 @@ import {
 } from "./workspace";
 
 const COG = `
-[monorepo.packages.core-train]
+[monorepo.packages.core]
 path = "."
 include = [
     "packages/core/**",
@@ -74,9 +74,9 @@ const versionOf = (root: string, path: string) =>
         .version;
 
 describe("setVersion", () => {
-    test("sets every train package and its lockfile entries together", () => {
+    test("sets every core package and its lockfile entries together", () => {
         const root = fixture();
-        expect(setVersion(root, CORE_TRAIN, "0.2.0")).toEqual([
+        expect(setVersion(root, CORE_PACKAGE, "0.2.0")).toEqual([
             "packages/core/package.json",
             "packages/core/src/package-version.ts",
             "packages/theme/package.json",
@@ -109,7 +109,7 @@ describe("setVersion", () => {
     test("writes nothing in a dry run", () => {
         const root = fixture();
         expect(
-            setVersion(root, CORE_TRAIN, "0.2.0", { dryRun: true }),
+            setVersion(root, CORE_PACKAGE, "0.2.0", { dryRun: true }),
         ).toHaveLength(4);
         expect(versionOf(root, "packages/core")).toBe("0.1.0");
         expect(read(root, "bun.lock")).not.toContain("0.2.0");
@@ -153,14 +153,14 @@ describe("this repository", () => {
         expect(checkRepository(root)).toEqual([]);
     });
 
-    test("the core train holds the packages the design lists", () => {
+    test("the core holds the packages the design lists", () => {
         const names = new Map(
             readWorkspace(root).map((entry) => [entry.path, entry.name]),
         );
-        const train = releasePaths(readCog(root), CORE_TRAIN).map((path) =>
+        const core = releasePaths(readCog(root), CORE_PACKAGE).map((path) =>
             names.get(path),
         );
-        expect(train).toEqual(
+        expect(core).toEqual(
             expect.arrayContaining([
                 "@pureform/core",
                 "@pureform/theme",
@@ -186,7 +186,7 @@ describe("this repository", () => {
     test("bindings keep their own versions", () => {
         const names = new Set(readCog(root).map((entry) => entry.name));
         expect(names).toContain("@pureform/solid");
-        const train = releasePaths(readCog(root), CORE_TRAIN);
-        expect(train).not.toContain("packages/solid");
+        const core = releasePaths(readCog(root), CORE_PACKAGE);
+        expect(core).not.toContain("packages/solid");
     });
 });

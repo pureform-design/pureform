@@ -47,7 +47,7 @@ const registryOptions = (
     return `{ ${options.join(", ")} }`;
 };
 
-/** The registry index: every entry, static by default, the train's version and the target's
+/** The registry index: every entry, static by default, the core's version and the target's
  *  theme attribute, the theme names, and the component names as a type. */
 export const registryIndex = (
     entries: readonly GeneratedEntry[],
@@ -74,7 +74,7 @@ export const registryIndex = (
         'import { createRegistry } from "@pureform/styling";',
         ...(imports.length > 0 ? ["", ...imports] : []),
         "",
-        "/** The core train's version this registry was made with. */",
+        "/** The core's version this registry was made with. */",
         `export const version = ${JSON.stringify(version)};`,
         "",
         "export const registry = createRegistry(",

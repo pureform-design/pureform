@@ -56,8 +56,8 @@ export interface GenerateFlags {
     readonly components?: string;
     readonly lazy?: string;
     readonly outDir?: string;
-    /** `false` with `--no-train-check`. */
-    readonly trainCheck?: boolean;
+    /** `false` with `--no-version-check`. */
+    readonly versionCheck?: boolean;
 }
 
 /** The first of `CODEGEN_FILES` in `root`, if any. */
@@ -199,8 +199,8 @@ export const resolveCodegenOptions = async (
         ...optional("lazy", names(flags.lazy) ?? codegen.lazy),
         ...optional("outDir", outDir),
         ...optional(
-            "trainCheck",
-            flags.trainCheck === false ? false : codegen.trainCheck,
+            "versionCheck",
+            flags.versionCheck === false ? false : codegen.versionCheck,
         ),
         ...optional("imports", codegen.imports),
         ...(flags.check ? { check: true } : {}),

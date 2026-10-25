@@ -24,7 +24,7 @@ swipes, the indication host, element getters, the web's `File`) is in
 @pureform/react-native     @pureform/solid, @pureform/react   (hooks and components)
 ```
 
-It's in the core train (`cog.toml`'s `core-train`). A binding adds only what needs its
+It's in the core (`cog.toml`'s `core`). A binding adds only what needs its
 framework: context, memos, effects, and rendering. `@pureform/bundler` reads its `/usage` subpath
 to prune builds.
 
@@ -42,7 +42,7 @@ to prune builds.
 | `components/`            | One file per component's contract (`button.ts`, `checkbox.ts`, `switch.ts`, `radio-group.ts`, `chip.ts`, `icon-button.ts`, `fab.ts`), what ready-made components share about content (`content.ts`), and `VariantProp` (`variants.ts`)                               |
 | `motion.ts`              | `resolveReducedMotion`, `REDUCED_MOTION_QUERY`                                                                                                                                                                                                                       |
 | `icon-style.ts`          | `IconStyle`, `DEFAULT_ICON_STYLE`                                                                                                                                                                                                                                    |
-| `version.ts`             | `trainVersionMismatch`: the generated registry's recorded train version against the running `@pureform/styling`'s `VERSION`                                                                                                                                          |
+| `version.ts`             | `versionMismatch`: the generated registry's recorded version against the running `@pureform/styling`'s `VERSION`                                                                                                                                                     |
 | `warn.ts`                | `warnOnce`                                                                                                                                                                                                                                                           |
 | `platform.ts`            | `platformLanguage()`: `navigator.language` where there is one, without the DOM's types                                                                                                                                                                               |
 | `platform-globals.d.ts`  | The globals every platform has (`console.warn`, `setTimeout`, `queueMicrotask`), declared since the DOM lib is left out                                                                                                                                              |
@@ -778,8 +778,8 @@ items), and that no Solid or React source sets a listed group from anything but 
 - **Overrides** are a provider's own (inherited ones are on an ancestor's `style`), written as
   inline vars named by the registry's `vars`. An override changes its own var only: a token
   declared from it at the root (`--colors-brand: var(--colors-primary)`) keeps its value.
-- **Train version check:** `@pureform/generate` passes the core train's version to
-  `createRegistry`, and the providers call `trainVersionMismatch(registry)` in development; it
+- **Core version check:** `@pureform/generate` passes the core version to
+  `createRegistry`, and the providers call `versionMismatch(registry)` in development; it
   returns a warning when `registry.version` differs from `@pureform/styling`'s `VERSION`. A
   registry made by hand, with no version, passes.
 - **Reset reasons with Zag.** Zag's checkbox puts its state back to its value at creation during

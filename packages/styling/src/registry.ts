@@ -87,7 +87,7 @@ export interface VarOptions {
 
 /** What `createRegistry` takes besides the entries. */
 export interface RegistryOptions {
-    /** The core train's version the generated registry was made with. Bindings compare it with
+    /** The core's version the generated registry was made with. Bindings compare it with
      *  the running `@pureform/styling`'s `VERSION` in development. */
     version?: string;
     /** The attribute the target scopes named themes with, as its stylesheet matches it:
@@ -100,7 +100,7 @@ export interface RegistryOptions {
 }
 
 export interface Registry<E extends RegistryInput = RegistryInput> {
-    /** The core train's version the registry was made with, when it recorded one. */
+    /** The core's version the registry was made with, when it recorded one. */
     readonly version: string | undefined;
     /** The attribute the target scopes named themes with, when it has one. */
     readonly themeAttribute: string | undefined;
@@ -164,7 +164,7 @@ const lazyEntry = (name: string, input: LazyInput): LazyEntry => {
 /** A registry of factories by name: `createRegistry({ button, card: { lazy: () =>
  *  import("./web/card") } })`. A lazy loader's module gives its factory as the module itself,
  *  its default export, or its export named after the entry. A generated registry also passes the
- *  train's version, the target's theme attribute, and its var prefixes: `createRegistry({ button },
+ *  core's version, the target's theme attribute, and its var prefixes: `createRegistry({ button },
  *  { version, themeAttribute: "data-theme", vars: { prefix: "pf" } })`. */
 export const createRegistry = <const E extends RegistryInput>(
     input: E,

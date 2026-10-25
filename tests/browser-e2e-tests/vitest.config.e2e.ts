@@ -10,7 +10,7 @@ import { playwright } from "@vitest/browser-playwright";
 import { mergeConfig, type UserWorkspaceConfig } from "vitest/config";
 
 import { commands } from "./src/commands";
-import baseConfig from "./vite.config";
+import baseConfig from "./vite.config.ts";
 
 if (process.env.CHROMIUM_PATH) {
     console.warn(

@@ -14,7 +14,7 @@ components the app draws and the variant values it selects.
   `@pureform/core` (types).
 - **Depended on by:** apps' bundler configs (every app under `apps/`; `rn-web-demo` uses the Vite
   plugin with the `native` target).
-- Part of the core train: released at the same version as `core`, `styling`, and the adapters.
+- Part of the core: released at the same version as `core`, `styling`, and the adapters.
 
 Design: [§6 the generated registry](../../docs/design/component-architecture.md#6-the-generated-registry),
 [§7 tree shaking](../../docs/design/component-architecture.md#7-tree-shaking) (the allow-list and
@@ -66,27 +66,27 @@ export default defineConfig({
             options: { prefix: "pf" }, // the adapter's options
             components: ["button", "checkbox"], // optional allow-list (design doc §7)
             // config: "pureform.config.ts", lazy: [], outDir: ".pureform", root,
-            // trainCheck: true, imports: true, watch: true
+            // versionCheck: true, imports: true, watch: true
         }),
         pandacss(),
     ],
 });
 ```
 
-| Option       | Default                                   | What it does                                                                |
-| ------------ | ----------------------------------------- | --------------------------------------------------------------------------- |
-| `target`     | (`target` or `targets`)                   | One adapter: `@pureform/<target>-adapter/codegen`, or one                   |
-| `targets`    | (`target` or `targets`)                   | Several, by name: `{ web: { target, options, components, lazy, include } }` |
-| `options`    | `{}`                                      | The single target's build options; part of the output's hash                |
-| `config`     | the first `pureform.config.{ts,mts,…}`    | A path relative to the root, or the config object                           |
-| `components` | every component                           | The allow-list                                                              |
-| `lazy`       | none                                      | Components whose registry entries load on demand                            |
-| `root`       | Vite's `root`, else the working directory | The app's root                                                              |
-| `outDir`     | `.pureform`                               | The folder written, relative to the root                                    |
-| `trainCheck` | `true`                                    | Fail when installed pureform packages disagree in version                   |
-| `imports`    | `true`                                    | The config's import rules, or `{ allow }`, or `false`                       |
-| `watch`      | `true`                                    | Generate again in dev and watch builds when the config changes              |
-| `prune`      | `true` (Metro: `false`)                   | Usage-based pruning in builds, or `PruneOptions` (below)                    |
+| Option         | Default                                   | What it does                                                                |
+| -------------- | ----------------------------------------- | --------------------------------------------------------------------------- |
+| `target`       | (`target` or `targets`)                   | One adapter: `@pureform/<target>-adapter/codegen`, or one                   |
+| `targets`      | (`target` or `targets`)                   | Several, by name: `{ web: { target, options, components, lazy, include } }` |
+| `options`      | `{}`                                      | The single target's build options; part of the output's hash                |
+| `config`       | the first `pureform.config.{ts,mts,…}`    | A path relative to the root, or the config object                           |
+| `components`   | every component                           | The allow-list                                                              |
+| `lazy`         | none                                      | Components whose registry entries load on demand                            |
+| `root`         | Vite's `root`, else the working directory | The app's root                                                              |
+| `outDir`       | `.pureform`                               | The folder written, relative to the root                                    |
+| `versionCheck` | `true`                                    | Fail when installed pureform packages disagree in core version              |
+| `imports`      | `true`                                    | The config's import rules, or `{ allow }`, or `false`                       |
+| `watch`        | `true`                                    | Generate again in dev and watch builds when the config changes              |
+| `prune`        | `true` (Metro: `false`)                   | Usage-based pruning in builds, or `PruneOptions` (below)                    |
 
 The app reads the registry from the folder or from the virtual id:
 

@@ -343,7 +343,7 @@ describe("generate with the CSS target", () => {
             options,
             ...(components ? { components } : {}),
             check,
-            trainCheck: false,
+            versionCheck: false,
         });
 
     it("writes the factories, the stylesheet, the index, and the declarations", async () => {

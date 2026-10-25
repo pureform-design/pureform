@@ -1,7 +1,7 @@
 import integrationTestConfig from "@pureform/vitest-config/integration";
 import { mergeConfig, type UserWorkspaceConfig } from "vitest/config";
 
-import baseConfig from "./vite.config";
+import baseConfig from "./vite.config.ts";
 
 // Builds that run real tools, such as Metro bundling a fixture app.
 export default mergeConfig(mergeConfig(baseConfig, integrationTestConfig), {

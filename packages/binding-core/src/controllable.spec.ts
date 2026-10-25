@@ -9,7 +9,7 @@ import {
 } from "./controllable";
 import type { ChangeDetails, Controllable } from "./controllable";
 import { resolveReducedMotion } from "./motion";
-import { trainVersionMismatch } from "./version";
+import { versionMismatch } from "./version";
 import { warnOnce } from "./warn";
 
 describe("Controllable", () => {
@@ -127,24 +127,24 @@ describe("warnOnce", () => {
     });
 });
 
-describe("trainVersionMismatch", () => {
+describe("versionMismatch", () => {
     it("passes a registry that recorded no version", () => {
-        expect(trainVersionMismatch({})).toBeUndefined();
-        expect(trainVersionMismatch(undefined)).toBeUndefined();
+        expect(versionMismatch({})).toBeUndefined();
+        expect(versionMismatch(undefined)).toBeUndefined();
     });
 
     it("passes a registry made for the running version", () => {
         expect(
-            trainVersionMismatch(createRegistry({}, { version: VERSION })),
+            versionMismatch(createRegistry({}, { version: VERSION })),
         ).toBeUndefined();
     });
 
-    it("warns when the generated registry's recorded train version differs from the runtime's", () => {
-        const message = trainVersionMismatch(
+    it("warns when the generated registry's recorded core version differs from the runtime's", () => {
+        const message = versionMismatch(
             createRegistry({}, { version: "0.3.0" }),
             "0.4.1",
         );
-        expect(message).toContain("made for core-train 0.3.0");
+        expect(message).toContain("made for core 0.3.0");
         expect(message).toContain("@pureform/styling 0.4.1 is running");
         expect(message).toContain("pureform generate");
     });

@@ -54,7 +54,7 @@ describe("generate", () => {
         });
         expect(result.changed).toBe(true);
         expect(result.ok).toBe(true);
-        expect(result.trainVersion).toBe(VERSION);
+        expect(result.version).toBe(VERSION);
         for (const file of result.files) {
             expect(headerHash(read(root, file.path))).toBe(result.hash);
         }
@@ -100,7 +100,7 @@ describe("generate", () => {
                 'import { button } from "./web/button";',
                 'import { chip } from "./web/chip";',
                 "",
-                "/** The core train's version this registry was made with. */",
+                "/** The core's version this registry was made with. */",
                 `export const version = "${VERSION}";`,
                 "",
                 "export const registry = createRegistry(",
@@ -518,8 +518,8 @@ describe("generate", () => {
         });
     });
 
-    describe("the train check", () => {
-        it("fails before generating when installed train packages differ", async () => {
+    describe("the version check", () => {
+        it("fails before generating when installed core packages differ", async () => {
             const root = tempRoot();
             writeTree(root, {
                 ...installed("@pureform/core", "0.4.0"),
@@ -529,7 +529,7 @@ describe("generate", () => {
             const error = await rejection(
                 generate({ root, config: fixtureConfig(), target: adapter }),
             );
-            expect(isGenerateError(error, "train-mismatch")).toBe(true);
+            expect(isGenerateError(error, "version-mismatch")).toBe(true);
             expect((error as Error).message).toContain(
                 "Install them at 0.4.1:\n  @pureform/core@0.4.1",
             );
@@ -537,7 +537,7 @@ describe("generate", () => {
             expect(existsSync(join(root, ".pureform"))).toBe(false);
         });
 
-        it("records the installed train's version, and can be turned off", async () => {
+        it("records the installed core's version, and can be turned off", async () => {
             const root = tempRoot();
             writeTree(root, {
                 ...installed("@pureform/core", "0.4.0"),
@@ -547,9 +547,9 @@ describe("generate", () => {
                 root,
                 config: fixtureConfig(),
                 target: fakeAdapter(),
-                trainCheck: false,
+                versionCheck: false,
             });
-            expect(result.trainVersion).toBe("0.4.1");
+            expect(result.version).toBe("0.4.1");
             expect(read(root, "index.ts")).toContain(
                 'export const version = "0.4.1";',
             );

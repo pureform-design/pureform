@@ -1,26 +1,26 @@
 # @pureform/release
 
 Release tooling for this repository. Cocogitto (`cog.toml`) decides which packages bump and
-to what version; this package writes those versions. It sets every core train package to
+to what version; this package writes those versions. It sets every core package to
 one version together, sets a binding's or a tooling package's version alone, and checks that
 `cog.toml` and the workspace agree. It's internal tooling: private, never published, with no
 dependencies on other pureform packages. Only `@pureform/generate`'s tests use it, to keep its
-embedded list of train packages in step with `cog.toml`.
+embedded list of core packages in step with `cog.toml`.
 
 ## Release groups
 
 Every package under `packages/` is in exactly one group ([design doc, versioning](../../docs/design/component-architecture.md#11-versioning)):
 
-| Group      | Packages                                                                                                                                                                                                                   | Versioned as                                                    |
-| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
-| Core train | `core`, `theme`, `material`, `preset`, `css-lowering`, `css-adapter`, `panda-adapter`, `tailwind-adapter`, `rn-adapter`, `js-effects`, `utils`, `type-utils`, `styling`, `anatomy`, `machines`, `binding-core`, `generate` | one cog package, `core-train`: one version, tag `core-train-vX` |
-| Bindings   | `solid`, `react`, `react-native`                                                                                                                                                                                           | a cog package each: tag `@pureform/solid-vX`                    |
-| Tooling    | `tsconfig`, `vite-config`, `vitest-config`, `oxlint-config`, `oxfmt-config`, `release`                                                                                                                                     | a cog package each                                              |
+| Group    | Packages                                                                                                                                                                                                                   | Versioned as                                        |
+| -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| Core     | `core`, `theme`, `material`, `preset`, `css-lowering`, `css-adapter`, `panda-adapter`, `tailwind-adapter`, `rn-adapter`, `js-effects`, `utils`, `type-utils`, `styling`, `anatomy`, `machines`, `binding-core`, `generate` | one cog package, `core`: one version, tag `core-vX` |
+| Bindings | `solid`, `react`, `react-native`                                                                                                                                                                                           | a cog package each: tag `@pureform/solid-vX`        |
+| Tooling  | `tsconfig`, `vite-config`, `vitest-config`, `oxlint-config`, `oxfmt-config`, `release`                                                                                                                                     | a cog package each                                  |
 
 Apps (`apps/*`) and tests (`tests/*`) aren't released and aren't in `cog.toml`.
 
-The train is the `include` list of `[monorepo.packages.core-train]` in `cog.toml`: a commit
-touching any of those directories bumps the whole train. There is no global tag: cocogitto
+The core is the `include` list of `[monorepo.packages.core]` in `cog.toml`: a commit
+touching any of those directories bumps the whole core packages. There is no global tag: cocogitto
 skips the global bump when no package bumps, and would count commits to apps, tests, and docs
 toward it.
 
@@ -30,15 +30,15 @@ toward it.
 cog bump --auto
   └─ per bumped cog package: pre_package_bump_hooks
        └─ cli.ts set-version {{package}} {{version}}
-            ├─ cog.ts        reads cog.toml: the train's include globs, each package's path
-            ├─ workspace.ts  maps the cog package to directories (all train dirs, or one)
+            ├─ cog.ts        reads cog.toml: the core packages' include globs, each package's path
+            ├─ workspace.ts  maps the cog package to directories (all core pacakge dirs, or one)
             └─ version.ts    rewrites "version" in each package.json, src/package-version.ts,
                              and bun.lock entry
 ```
 
 | Module         | What it does                                                                                                                       |
 | -------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `cog.ts`       | `parseCogPackages(toml)`: the `[monorepo.packages.*]` sections; `trainPaths(packages)`.                                            |
+| `cog.ts`       | `parseCogPackages(toml)`: the `[monorepo.packages.*]` sections; `corePackagePaths(packages)`.                                      |
 | `version.ts`   | `setManifestVersion(json, v)`, `setLockVersion(lock, dir, v)`, `setSourceVersion(source, v)`: text edits that keep the formatting. |
 | `check.ts`     | `checkRelease(cog, workspace)`: the problems found, as messages.                                                                   |
 | `workspace.ts` | The file system side: `findRoot`, `readCog`, `readWorkspace`, `setVersion`, `checkRepository`.                                     |
@@ -51,7 +51,7 @@ re-resolves unrelated dependencies, which a release commit shouldn't carry.
 
 ```sh
 # What cog's hook runs, from any directory in the repository:
-bun packages/release/src/cli.ts set-version core-train 0.2.0
+bun packages/release/src/cli.ts set-version core 0.2.0
 bun packages/release/src/cli.ts set-version @pureform/solid 0.3.1 --dry-run
 
 # Check that cog.toml and the workspace agree (the unit tests run it too):
@@ -66,9 +66,9 @@ const issues = checkRepository(findRoot(process.cwd()));
 
 ### Cutting a release
 
-1. `cog bump --auto --dry-run` lists the tags it would create: `core-train-vX` when a train
+1. `cog bump --auto --dry-run` lists the tags it would create: `core-vX` when a core
    package changed, and one tag per changed binding or tooling package.
-2. `cog bump --auto` writes the changelogs (`CHANGELOG.md` for the train, each package's own
+2. `cog bump --auto` writes the changelogs (`CHANGELOG.md` for the core packages, each package's own
    otherwise), runs `set-version` for each bumped cog package, commits
    `chore(version): bump packages`, tags, and pushes each tag (`post_package_bump_hooks`).
 3. Push the commit (`git push origin main`), then publish.
@@ -77,10 +77,10 @@ const issues = checkRepository(findRoot(process.cwd()));
 
 ### Adding a package
 
-The `ts-package` generator asks for the release group and edits `cog.toml`: a train package
-goes into `core-train`'s `include` (at `# @anchor:new-core-train-package`), a binding or
-tooling package gets its own section, and an unreleased one gets nothing. A new train package
-must start at the train's current version; `check` fails until it does.
+The `ts-package` generator asks for the release group and edits `cog.toml`: a core package
+goes into `core`'s `include` (at `# @anchor:new-core-package`), a binding or
+tooling package gets its own section, and an unreleased one gets nothing. A new core package
+must start at the core packages' current version; `check` fails until it does.
 
 ### Versions read at runtime
 

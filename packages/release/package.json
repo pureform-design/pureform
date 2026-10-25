@@ -2,7 +2,7 @@
     "name": "@pureform/release",
     "version": "0.0.0-semantically-released",
     "private": true,
-    "description": "Release tooling: sets versions for the core train and each package, and checks cog.toml",
+    "description": "Release tooling: sets versions for the core and each package, and checks cog.toml",
     "type": "module",
     "exports": {
         ".": {

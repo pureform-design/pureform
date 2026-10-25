@@ -37,7 +37,7 @@ export const loadAdapter = async (
     } catch (error) {
         throw new GenerateError(
             "adapter-not-found",
-            `pureform: the "${target}" target needs ${name} (its /codegen subpath), which isn't installed for ${root}. Install ${name} at the core train's version.`,
+            `pureform: the "${target}" target needs ${name} (its /codegen subpath), which isn't installed for ${root}. Install ${name} at the core's version.`,
             { cause: error },
         );
     }

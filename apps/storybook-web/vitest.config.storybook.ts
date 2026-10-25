@@ -8,7 +8,7 @@ import { storybookTest } from "@storybook/addon-vitest/vitest-plugin";
 import { playwright } from "@vitest/browser-playwright";
 import { defineConfig } from "vitest/config";
 
-import config from "./stories.config";
+import config from "./stories.config.ts";
 
 const executablePath = process.env["CHROMIUM_PATH"];
 

@@ -15,7 +15,7 @@ tests check that neither `@pureform/react-native` nor `@pureform/rn-adapter` imp
 @pureform/solid, @pureform/react   (hooks and components)
 ```
 
-It's in the core train (`cog.toml`'s `core-train`). Apps don't import it: the web bindings
+It's in the core (`cog.toml`'s `core`). Apps don't import it: the web bindings
 re-export what an app needs (the built-in indications, for one).
 
 ## What goes here

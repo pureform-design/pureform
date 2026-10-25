@@ -25,7 +25,7 @@ describe("parseGenerateFlags", () => {
                 "chip",
                 "--out-dir",
                 "out",
-                "--no-train-check",
+                "--no-version-check",
             ]),
         ).toEqual({
             check: true,
@@ -37,7 +37,7 @@ describe("parseGenerateFlags", () => {
             components: "button,chip",
             lazy: "chip",
             outDir: "out",
-            trainCheck: false,
+            versionCheck: false,
         });
         expect(parseGenerateFlags([])).toEqual({});
     });

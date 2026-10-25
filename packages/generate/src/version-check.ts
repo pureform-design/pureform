@@ -8,8 +8,8 @@ import { dirname, join, resolve } from "node:path";
 import { compareVersions, isVersion, satisfies } from "./semver";
 
 /** The core train: the packages released in lockstep at one version. Kept in step with
- *  `cog.toml`'s `core-train` by a test. */
-export const CORE_TRAIN_PACKAGES = [
+ *  `cog.toml`'s `core` by a test. */
+export const CORE_PACKAGES = [
     "@pureform/anatomy",
     "@pureform/binding-core",
     "@pureform/binding-dom",
@@ -33,14 +33,14 @@ export const CORE_TRAIN_PACKAGES = [
     "@pureform/utils",
 ] as const;
 
-/** The bindings: versioned on their own, each peering on the train with a range. */
+/** The bindings: versioned on their own, each peering on the core with a range. */
 export const BINDING_PACKAGES = [
     "@pureform/solid",
     "@pureform/react",
     "@pureform/react-native",
 ] as const;
 
-const TRAIN = new Set<string>(CORE_TRAIN_PACKAGES);
+const CORE = new Set<string>(CORE_PACKAGES);
 
 /** A package as installed for the app. */
 export interface InstalledPackage {
@@ -55,7 +55,7 @@ export interface InstalledPackage {
  *  `node_modules/<name>` from `root` up. Packages that aren't installed are left out. */
 export const findInstalled = (
     root: string,
-    names: readonly string[] = [...CORE_TRAIN_PACKAGES, ...BINDING_PACKAGES],
+    names: readonly string[] = [...CORE_PACKAGES, ...BINDING_PACKAGES],
 ): InstalledPackage[] => {
     const found: InstalledPackage[] = [];
     for (const name of names) {
@@ -86,7 +86,7 @@ export const findInstalled = (
 };
 
 /** One problem the train check found. */
-export type TrainProblem =
+export type VersionProblem =
     | {
           readonly kind: "version";
           /** A train package not at the train's version. */
@@ -107,11 +107,11 @@ export type TrainProblem =
           readonly installed: string;
       };
 
-export interface TrainCheck {
+export interface VersionCheck {
     /** The train's version: the newest installed train package's, or `undefined` when none is
      *  installed. */
     readonly version: string | undefined;
-    readonly problems: readonly TrainProblem[];
+    readonly problems: readonly VersionProblem[];
     /** The problems as one message naming the versions to install, or `undefined` when
      *  there are none. */
     readonly message: string | undefined;
@@ -120,11 +120,11 @@ export interface TrainCheck {
 /** Checks installed packages: train packages behind the newest one's version, and bindings
  *  whose peer range on a train package excludes that version. Ranges that aren't semver
  *  (`workspace:^`) pass. */
-export const checkTrain = (
+export const checkVersions = (
     installed: readonly InstalledPackage[],
-): TrainCheck => {
+): VersionCheck => {
     const train = installed.filter(
-        (entry) => TRAIN.has(entry.name) && isVersion(entry.version),
+        (entry) => CORE.has(entry.name) && isVersion(entry.version),
     );
     const version = train
         .map((entry) => entry.version)
@@ -134,7 +134,7 @@ export const checkTrain = (
         return { version, problems: [], message: undefined };
     }
 
-    const problems: TrainProblem[] = [];
+    const problems: VersionProblem[] = [];
     for (const entry of train) {
         if (entry.version !== version) {
             problems.push({
@@ -146,11 +146,11 @@ export const checkTrain = (
         }
     }
     for (const entry of installed) {
-        if (TRAIN.has(entry.name)) continue;
+        if (CORE.has(entry.name)) continue;
         for (const [peer, range] of Object.entries(
             entry.peerDependencies ?? {},
         )) {
-            if (!TRAIN.has(peer)) continue;
+            if (!CORE.has(peer)) continue;
             if (satisfies(version, range) === false) {
                 problems.push({
                     kind: "peer",
@@ -163,12 +163,16 @@ export const checkTrain = (
             }
         }
     }
-    return { version, problems, message: trainMessage(version, problems) };
+    return {
+        version,
+        problems,
+        message: versionProblemMessage(version, problems),
+    };
 };
 
-const trainMessage = (
+const versionProblemMessage = (
     version: string,
-    problems: readonly TrainProblem[],
+    problems: readonly VersionProblem[],
 ): string | undefined => {
     if (problems.length === 0) return undefined;
     const lines = [

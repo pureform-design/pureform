@@ -192,7 +192,7 @@ const generateInto = async (
         options,
         ...extra,
         check,
-        trainCheck: false,
+        versionCheck: false,
     });
 
 const importGenerated = async (root: string): Promise<Generated> =>
@@ -442,7 +442,7 @@ describe("generate with the native target", () => {
                     config: preset,
                     target: codegen,
                     usage: { components: names, variants },
-                    trainCheck: false,
+                    versionCheck: false,
                 });
                 const pruned = await importGenerated(prunedRoot);
                 let count = 0;
