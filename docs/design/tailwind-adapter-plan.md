@@ -83,7 +83,7 @@ writing. That moves into a helper both use, rather than being copied.
 - **The theme references pureform's vars.** `@theme inline` maps Tailwind's namespaces
   (`--color-*`, `--radius-*`, `--spacing-*`, `--text-*`, `--font-*`, `--shadow-*`,
   `--breakpoint-*`, `--ease-*`) to the CSS adapter's vars (`--color-primary:
-var(--colors-primary)`), and utilities read those directly. There's one set of variables, and
+  var(--colors-primary)`), and utilities read those directly. There's one set of variables, and
   no `tokenRef` change was needed. Only semantic colors map by default; `palette` adds the raw
   palette. Spacing's vars already have Tailwind's names, so they go in a plain `@theme` by value
   instead of referencing themselves. Breakpoints are values too, since media queries can't read

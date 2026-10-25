@@ -68,7 +68,7 @@ src/*.e2e.test.ts            one suite per rule, written once, framework-free
   starts a Vite server in SSR mode with the binding's plugin, loads
   `src/bindings/<binding>/server.tsx`, and returns the HTML and the head: Solid's `useHead` tags
   (from `renderToString`'s `onHead`) and hydration bootstrap, or React's hoisted `<style
-precedence>` blocks (split off the front of its markup). Each awaits `preloadTheme` for a
+  precedence>` blocks (split off the front of its markup). Each awaits `preloadTheme` for a
   runtime theme first, as an app's request handler would. The test puts the head in the page
   (`applyHead`: scripts run, a theme block replaces an earlier one for the same scope) and the
   HTML in a host, then hydrates it. There's one server per binding and target (the
@@ -233,7 +233,7 @@ Type-check with `bun x tsc --noEmit -p tsconfig.json` (the React files carry a
   against its tab); `keyboard.focusable` is the selected tab, the only one Tab reaches. The
   navigation bar and rail share one case factory (`navigationCase`): Tab reaches the first
   destination, and Enter or Space choose it, so the state starts at the second (`from:
-"search"`). The list item's case renders it as a button (`as: "button"`, plain data), so it
+  "search"`). The list item's case renders it as a button (`as: "button"`, plain data), so it
   has a focusable element and a disabled state; the list's case is a list of links (Enter clicks
   the first, `keyboard.disables: false`). Neither has state.
 - **Time picker and time input** (`time-picker.ts`): `value` from 09:30 to 21:30 with a click on

@@ -194,11 +194,7 @@ function App(): JSX.Element {
                             defaultChecked="indeterminate"
                         />
                         <Checkbox aria-label="Unchecked" />
-                        <Switch
-                            aria-label="switch"
-                            icon="✓"
-                            defaultChecked
-                        />
+                        <Switch aria-label="switch" icon="✓" defaultChecked />
                     </div>
                 </Section>
                 <Section title="Media">

@@ -175,7 +175,7 @@ import { registry } from "./.pureform";
   `PureformProvider` holds a host; put your own around the provider to give it `insets` (the safe
   area's, which overlays keep clear of), or inside an app `Modal` whose content opens overlays.
   `placeOverlay` places a box against a trigger as the ready-made overlays do, `useDismiss(active,
-dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverlay()` is what an
+  dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverlay()` is what an
   app `Modal`'s `onRequestClose` calls.
 - **Icons:** icon parts provide `useIconStyle()` → `{ size, color, filled }` (`filled` is the
   slot's `FILL` axis, which selection returns beside the style). `Glyph` draws a text glyph in

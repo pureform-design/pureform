@@ -554,7 +554,7 @@ modal picker; the docked picker and the date input keep the text field's one.
   was considered, but it's unconfirmed that it queues instead of dropping, and it brings
   stacking and swiping we'd turn off.
 - **`toast`**: new, outside M3, skinned with M3 tokens. zag `toast`. Anatomy: `group, root,
-icon, title, description, actionTrigger, closeTrigger`, plus a `type` variant. Error maps
+  icon, title, description, actionTrigger, closeTrigger`, plus a `type` variant. Error maps
   to M3 error colours; success and warning need custom colour roles.
 - Both can share one "notify" API and the same colour tokens.
 - **Done (c3a, 2026-10-21):** the queue is our own (`@pureform/machines/snackbar`'s

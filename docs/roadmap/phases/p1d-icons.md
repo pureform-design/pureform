@@ -17,7 +17,7 @@ Add the icon-slot features the design needs from the preset.
 ## Scope
 
 - A `fill` token on icon slots (0 or 1), written as `font-variation-settings: "FILL"
-<fill>`, set by the states Material draws filled (the active navigation destination,
+  <fill>`, set by the states Material draws filled (the active navigation destination,
   …).
 - `mirror`: an icon slot flips with `scaleX(-1)` under `rtl` when marked
   (`data-pf-mirror`, or a variant; pick one and record it).

@@ -7,8 +7,8 @@ class on one element.
 ```ts
 // panda.config.ts
 import { defineConfig } from "@pandacss/dev";
-import { pureform } from "@pureform/preset";
 import { compilePreset } from "@pureform/panda-adapter";
+import { pureform } from "@pureform/preset";
 
 export default defineConfig({ presets: [compilePreset(pureform())] });
 ```

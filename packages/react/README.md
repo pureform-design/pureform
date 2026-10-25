@@ -522,7 +522,7 @@ import { RichTooltip } from "@pureform/react/rich-tooltip";
   bar's place inside Root. The `Surface` holds the `Header` (`Leading`, the `Input`, `Trailing`),
   the `Divider`, and the `Content`, with the suggestions drawn as menu items. Enter chooses the
   highlighted suggestion (`onSelect({ value, item })`) or submits the query (`onSubmit({
-inputValue })`); either closes it unless `closeOnSelect={false}`. The ready-made takes
+  inputValue })`); either closes it unless `closeOnSelect={false}`. The ready-made takes
   `trigger`, `leading`, `backLabel`, `trailing`, `clearLabel`, and children in place of the
   suggestions. Import it from `@pureform/react/search-view`.
 - **The snackbar** is its `Root`: a `role="status"` region, hidden once closed and its exit
@@ -584,7 +584,7 @@ inputValue })`); either closes it unless `closeOnSelect={false}`. The ready-made
   arrow keys left and right select the tab before or after, by direction, and Home and End the
   first and last (`activationMode="manual"` waits for Enter or Space). `value` is controllable
   (`string | null`). The ready-made takes `items` (`{ value, label?, "aria-label"?, icon?,
-mirrorIcon?, disabled?, content? }`; a tab without a label shows only its icon, named by its
+  mirrorIcon?, disabled?, content? }`; a tab without a label shows only its icon, named by its
   `aria-label`), puts `aria-label` and `aria-labelledby` on the tab list, turns on the `icon`
   variant when any tab has an icon (`inlineIcon` sets a primary tab's icon beside its label),
   selects the first enabled tab unless given a value, and renders a panel per item with `content`.
@@ -612,7 +612,7 @@ mirrorIcon?, disabled?, content? }`; a tab without a label shows only its icon, 
   fills its icon. A click asks to move; with links, the app's router follows the `href` as usual.
   `disabled` on Root or an item disables buttons and marks links `aria-disabled` (their click is
   stopped). The ready-made takes `items` (`{ value, label, icon?, mirrorIcon?, href?, disabled?
-}`).
+  }`).
 - **The list item** has no machine. Root is a `<div>` row, a link with `href`, or any element with
   `as` (`as="button"` gets `type="button"`); a link or a button is `interactive` (state layer, focus
   ring) unless told otherwise. `selected` sets `aria-current`, `disabled` a button's `disabled` or
@@ -1010,7 +1010,7 @@ const fieldsetDisabled = useFieldsetDisabled(input); // OR it into the machine's
   frame).
 - `useIconStyle(): IconStyle`: inside an icon part, its measured `{ size, color, filled }`,
   following the component's state; elsewhere `{ size: undefined, color: "currentColor",
-filled: false }`.
+  filled: false }`.
 - `cx(...values)` (from binding-core) joins class values as `clsx` does.
 
 ## Build and test

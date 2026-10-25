@@ -60,6 +60,7 @@ which write the stylesheet and the registry into `.pureform/`:
     // vite.config.ts
     import pureform from "@pureform/bundler/vite";
     import tailwindcss from "@tailwindcss/vite";
+
     import { codegen } from "./pureform.codegen";
 
     export default { plugins: [pureform(codegen), tailwindcss(), solid()] };

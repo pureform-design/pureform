@@ -132,9 +132,10 @@ says nothing about how it's built. Whatever consumes it decides that, through it
 options:
 
 ```ts
+import { compilePreset } from "@pureform/panda-adapter";
+
 // panda.config.ts
 import config from "./pureform.config";
-import { compilePreset } from "@pureform/panda-adapter";
 export default defineConfig({
     presets: [compilePreset(config, { prefix: "pf" })],
 });
@@ -625,7 +626,7 @@ color: {
   own variant-set tokens (the chained-token rule above still holds inside each component).
 - **Web (CSS, Tailwind, Panda):** each becomes the nested component's custom property on the
   providing slot's rule (`--pf-components-iconButton-accent: var(--pf-components-toolbar-content,
-…)`). Custom properties inherit, and `var()` in a custom property resolves on the element
+  …)`). Custom properties inherit, and `var()` in a custom property resolves on the element
   that declares it, so the nested component reads the container's value. None of the nested
   component's own tokens are registered as non-inheriting (`@property`) for this to hold; a
   provided token must not be one with a `valueType`.
@@ -703,7 +704,7 @@ color: {
     by a function `defineRuntimeTheme(name, load)` returns (`@pureform/styling`). The source loads
     its generator on demand and shares it across inputs; the generator turns the input into CSS
     vars per scheme, `{ light, dark }`, named by the registry's new `vars` (`{ prefix, tokenPrefix
-}`, which each codegen returns as `CodegenOutput.vars`). `@pureform/material/runtime-theme`'s
+  }`, which each codegen returns as `CodegenOutput.vars`). `@pureform/material/runtime-theme`'s
     `seedTheme({ seed, customSeeds?, overrides? })` is a few lines; its generator (the palette,
     `resolveTheme`, `themeVars`) is a separate chunk. It writes every color token and role, so a
     seed draws as a named theme with the same `materialColor` does (the suites check it against
@@ -954,7 +955,7 @@ The design makes one setting, followed by everything that moves, on every target
       `animatedPresence` drives a progress per step with `Animated.timing` (native driver on a
       device) and reports `finished`; `reanimatedPresence` gives each step a CSS keyframe
       animation (the exit `forwards`) and reports `onCSSAnimationEnd`. `usePresence(open,
-motion)` keeps the overlay present until the exit's end is reported, never on a timer; an
+      motion)` keeps the overlay present until the exit's end is reported, never on a timer; an
       interrupted step reports nothing, and the next starts from its own first frame, as the
       web's keyframes do. The select's `Modal` closes once its menu has faded out; the menu,
       dialog, snackbar, tooltip, and scrim take `open` and render nothing once gone. Scaling has
@@ -1005,7 +1006,7 @@ the components.
 
 - **The node.** `SpringNode { type: "spring", stiffness, damping, mass }` in `@pureform/core`:
   damping is the ratio ζ (1 critical, below bounces), mass defaults to 1. `spring({ stiffness,
-damping, mass? })` builds one; `spring({ duration, bounce })` converts a perceptual duration
+  damping, mass? })` builds one; `spring({ duration, bounce })` converts a perceptual duration
   and bounce at build time (SwiftUI's and Motion's formula). It isn't an easing: a spring sets a
   motion's duration and curve together, so a transition part or a keyframe animation takes a
   `Timing`, `{ duration, easing?, delay? }` or `{ spring, delay? }`. Giving a spring a duration
@@ -1043,7 +1044,7 @@ damping, mass? })` builds one; `spring({ duration, bounce })` converts a percept
   (tabs `indicatorSpring`, time picker `handSpring`, both `spatialDefault`; f1f), and a timing
   reads it with `ref(token)`. The web writes it as two vars, `<token>-duration` and
   `<token>-easing`: the timing reads `var(--components-tabs-indicatorSpring-duration,
-var(--springs-spatial-default-duration))` and the easing alike, and a theme's or a style's
+  var(--springs-spatial-default-duration))` and the easing alike, and a theme's or a style's
   `tokens` override sets both, as the role's vars when it aliases one, so a theme's change of
   that role still reaches it. React Native gives each of the five values its own key
   (`components.tabs.indicatorSpring.stiffness`, and so on) falling back to the role's, so the
@@ -1052,7 +1053,7 @@ var(--springs-spatial-default-duration))` and the easing alike, and a theme's or
   both (f2e). A factory instance passes one as a spring
   (`tokens: { indicatorSpring: spring({ ... }) }`): the web factory writes it as the two vars,
   React Native's as the five keys (f2e), or a role by name (`tokens: { indicatorSpring:
-"spatialSlow" }`): the role's two vars on the web, its five values on React Native. The
+  "spatialSlow" }`): the role's two vars on the web, its five values on React Native. The
   generated registry records which tokens are springs (`springs` beside `tokens`), so only a
   spring token takes a spring or a role, and a spring on another token is a type error (f2).
   At runtime too, React Native's factory takes a string as a role only on a spring token (the
@@ -1110,7 +1111,7 @@ var(--springs-spatial-default-duration))` and the easing alike, and a theme's or
   its tween, and the turn keeps `spatialFast`'s overshoot under expressive. Reduced motion keeps
   only the fade.
 - **Shared helpers (r7).** In the preset's `components/shared.ts`: `springTweens(role, moving,
-fades)` for a spring with tweened colors, `chevronTransition` (its `spatialFast` turn with the
+  fades)` for a spring with tweened colors, `chevronTransition` (its `spatialFast` turn with the
   color tween), `turnedOver(condition)` for the 180° turn itself (the expand indicator, the split
   button's chevron and the sort arrow; the select's arrow also moves by `translateY`, so it
   writes its own), and `shapeTransition(role, property)` for the corner (`cornerTransition`,
@@ -1164,7 +1165,7 @@ What's missing is one source of direction for JS, and a few styles that don't fl
   (`left`, `right`, `marginLeft`, `translateX`, …) unless it's symmetric or under a
   direction condition.
 - **Decided in building it:** the switch's centering is `when("rtl", translate(50%, -50%),
-translate(-50%, -50%))`; the linear progress's `rtl` keyframes are
+  translate(-50%, -50%))`; the linear progress's `rtl` keyframes are
   `linearProgressSlideRtl`, picked with `when("rtl", …)` on `animation`. The spec is
   `packages/preset/src/direction.spec.ts`; besides symmetric and direction-conditioned
   styles it takes an `ALLOWED` list of exceptions with reasons (the ripple, placed from
@@ -1190,6 +1191,7 @@ CSS and Tailwind adapters' Vite plugins:
 ```ts
 // generated: do not edit
 import { createRegistry } from "@pureform/styling";
+
 import { button } from "./web/button";
 export const registry = createRegistry({ button }); // static, for server rendering (§5.7)
 export const themes = ["teal"] as const;
@@ -2219,7 +2221,7 @@ function defineIndication(indication: Indication): Indication;
   render a `native` component that animates with Reanimated. It gets the source, so it
   draws from interactions rather than from guessed events.
 - **App surfaces.** For a clickable element of the app's own, `useIndication(source,
-{ centered })` returns the props for the surface and the layer element to render, so the
+  { centered })` returns the props for the surface and the layer element to render, so the
   app gets the provider's indication without a pureform component.
 
 #### Tokens: how the static half works without JS
@@ -2685,7 +2687,7 @@ draws it as wide as the content. What the implementations do:
   [`_tab.scss`](https://github.com/material-components/material-web/blob/main/tabs/internal/_tab.scss)):
   the host (`role="tab"`, `padding: 0 16px`, `inline-flex`, centered) renders a `.button` holding
   the focus ring (`inward`), the elevation, the ripple, and a `.content` wrapper (`position:
-relative`, inline flex, centered, the container's height, `gap: 8px`) around the icon slot and
+  relative`, inline flex, centered, the container's height, `gap: 8px`) around the icon slot and
   the label slot. The `.indicator` (`position: absolute; inset: auto 0 0 0`) goes inside
   `.content` unless `fullWidthIndicator`, a protected field only `md-secondary-tab` sets, which puts
   it in `.button` instead. `md-primary-tab` adds `inline-icon`; without it `.content.stacked` is a
@@ -2708,7 +2710,7 @@ relative`, inline flex, centered, the container's height, `gap: 8px`) around the
 - **Compose** (`Tab.kt`, `TabRow.kt` in androidx `compose/material3`): `Tab` and `LeadingIconTab`
   draw no indicator; the row measures each tab's content (its intrinsic width less 16dp of padding
   a side, at least 24dp: "Enforce minimum touch target of 24.dp") for `tabIndicatorOffset(…,
-matchContentSize = true)`, which `PrimaryTabRow` uses and `SecondaryTabRow` doesn't, and draws a
+  matchContentSize = true)`, which `PrimaryTabRow` uses and `SecondaryTabRow` doesn't, and draws a
   `HorizontalDivider` under the row.
 
 **The design.** Every implementation puts a content wrapper between the tab and its icon and label,

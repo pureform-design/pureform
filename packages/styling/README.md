@@ -77,6 +77,7 @@ nothing registered, both are `string`.
 
 ```ts
 import { createRegistry } from "@pureform/styling";
+
 import { button } from "./web/button";
 
 const registry = createRegistry({

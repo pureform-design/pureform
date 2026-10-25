@@ -228,7 +228,7 @@ From `main` (`6d8b5460`). Not pushed.
 - **React Native's disabled text field** is `disabled` on the web (`Platform.OS === "web"`;
   React Native Web forwards `disabled` to the input) rather than `editable={false}`, which
   React Native Web draws as `readonly`. Checked with `SB_RENDERERS=native … TextField -t
-Disabled`: the input no longer fails, but the **label** does (color-contrast): it's a plain
+  Disabled`: the input no longer fails, but the **label** does (color-contrast): it's a plain
   text element, not the input's `<label>`, so axe doesn't exempt it. The `TextField/Disabled`
   a11y todo stays, with that reason. The binding's unit specs (`components.spec.tsx -t ield`)
   pass.
@@ -441,7 +441,7 @@ From `main` (`a94bbe0b`). Not pushed.
   gets the flags from `isPresent(content)`. Composed parts keep the flags. React and Solid draw
   them in the container in the text field's order (leading icon, prefix, segments, suffix, label,
   trailing icon); React Native draws them like its text field. **Breaking:** `<DateInput
-leadingIcon />` (a flag) is now a node, so nothing is drawn for `true`.
+  leadingIcon />` (a flag) is now a node, so nothing is drawn for `true`.
 - **DockedDatePicker already did this** (Solid, React and React Native take the icons and
   affixes as content and omit the flags; its trailing icon is always on), so it needed no change.
 - **Deprecated options:** none of these components has any.
@@ -554,7 +554,7 @@ fixes, skips with reasons): `docs/roadmap-components/context/neutral-readers.md`
   for the root or any part (React Native's closed dialog is its trigger alone).
 - **Narrow per-renderer skips** (`parameters.pureform.skip[renderer][story]`, `RendererSkip` in
   `src/renderers/compose.ts`): `{ play: reason }` skips a story's play there, `{ a11y: { rule:
-reason } }` turns axe rules off there (set in the story's `beforeEach`, read by the a11y
+  reason } }` turns axe rules off there (set in the story's `beforeEach`, read by the a11y
   addon's `afterEach` from the same context). A renderer without the component runs no play.
 - **React Native's ARIA and keys fixed in the bindings** (the list is in neutral-readers.md):
   toggles say `aria-pressed` (ButtonGroup's buttons said `aria-checked` on `role=button`),
@@ -578,7 +578,7 @@ reason } }` turns axe rules off there (set in the story's `beforeEach`, read by 
   controllable, keyboard, forms, direction, overlays, accessibility and server rendering where
   the readers changed (720, 526, 748, 558, 420, 128, 42 passed).
 - `omni run build test -p @pureform/component-cases -p @pureform/machines -p
-@pureform/react-native` (React Native specs updated for the new ARIA; one table opacity timing
+  @pureform/react-native` (React Native specs updated for the new ARIA; one table opacity timing
   flake passed on `-f failed`). React and Solid carousel specs (12 each).
 - `bunx tsc --noEmit -p tsconfig.json` clean in component-cases, machines, react-native and the
   app (both tsconfigs). `omni run build -p @pureform/storybook-web` passes. No conflict markers.

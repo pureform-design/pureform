@@ -179,7 +179,11 @@ export interface UtilityArgNode {
  *  kind-safety (a path/var/arg is opaque to the type system). Re-exported from
  *  `value-map.ts` for `ValueNodeMap`. */
 export type RefNode =
-    AliasNode | DynamicNode | PlatformNode | ConditionalNode | UtilityArgNode;
+    | AliasNode
+    | DynamicNode
+    | PlatformNode
+    | ConditionalNode
+    | UtilityArgNode;
 
 /* ── Semantic value unions ───────────────────────────────
  * Guideline (narrowest-acceptable): a field that holds a value never types it as the full
@@ -321,7 +325,10 @@ export type DisplayKeyword = "flex" | "inlineFlex" | "none";
 /** Portable only: RN has no `fixed`/`sticky`. Author those web-side with `platform()`. */
 export type PositionKeyword = "relative" | "absolute" | "static";
 export type FlexDirectionKeyword =
-    "row" | "column" | "rowReverse" | "columnReverse";
+    | "row"
+    | "column"
+    | "rowReverse"
+    | "columnReverse";
 /** Portable only: RN `borderStyle` has no `double`. */
 export type LineStyleKeyword = "none" | "solid" | "dashed" | "dotted";
 export type TextAlignKeyword = "start" | "end" | "center" | "justify"; // logical; prefer start/end
@@ -349,7 +356,14 @@ export type ColorKeyword = "transparent";
  *  if needed (e.g. display-p3 to srgb) rather than assuming sRGB-hex. `hct`/`oklch` are
  *  `ui-utils`' generation spaces, preserved instead of flattened to hex. */
 export type ColorSpace =
-    "srgb" | "hsl" | "oklch" | "oklab" | "lab" | "lch" | "hct" | "display-p3";
+    | "srgb"
+    | "hsl"
+    | "oklch"
+    | "oklab"
+    | "lab"
+    | "lch"
+    | "hct"
+    | "display-p3";
 
 export interface ColorNode {
     type: "color";
@@ -437,7 +451,12 @@ export interface PlatformNode {
 
 /** Pointer / focus / interactivity states. */
 export type InteractionCondition =
-    "hover" | "focus" | "focusVisible" | "active" | "pressed" | "disabled";
+    | "hover"
+    | "focus"
+    | "focusVisible"
+    | "active"
+    | "pressed"
+    | "disabled";
 
 /** Form / selectable-control states. */
 export type FormCondition = "selected" | "checked" | "invalid" | "readOnly";
@@ -618,7 +637,9 @@ export interface FilterNode {
  *  engines). Usually stored as a token under `CoreConfig.easings` and referenced by alias.
  *  Leaf-kind "easing" (every variant shares `type: "easing"`; `kind` discriminates). */
 export type EasingNode =
-    KeywordEasingNode | CubicBezierEasingNode | StepsEasingNode;
+    | KeywordEasingNode
+    | CubicBezierEasingNode
+    | StepsEasingNode;
 
 /** Portable keyword easing (`ease-in-out`, …). */
 export interface KeywordEasingNode {
@@ -992,8 +1013,8 @@ import type {
     ColorValue,
     NumericValue,
 } from "../nodes";
-import { pct } from "./unit";
 import { transparent } from "./keyword/color";
+import { pct } from "./unit";
 
 const color = (
     space: ColorSpace,
@@ -1224,8 +1245,8 @@ export const clamp = (
 ```ts
 // src/ast/helpers/utility.ts: custom-utility argument placeholder
 import type { NumericValue, Unit, UtilityArgNode } from "../nodes";
-import { numeric } from "./scalar";
 import { mul } from "./math";
+import { numeric } from "./scalar";
 
 /** The call-site value inside a `DynamicUtilityDef` template (§4.2). `arg()` is the whole
  *  single arg; `arg("x")` / `arg(0)` is a named or positional member of an object- or array-
@@ -1329,7 +1350,8 @@ import type { ValueNodeMap } from "./value-map";
 // raw off-baseline escape. Each category widens by adding leaf keys as new kinds register in
 // `LeafNodeMap` (§4.1).
 type Color =
-    ValueNodeMap["color" | "colorMix" | "literal"] | KeywordNode<ColorKeyword>; // solid color (plus keyword)
+    | ValueNodeMap["color" | "colorMix" | "literal"]
+    | KeywordNode<ColorKeyword>; // solid color (plus keyword)
 type Background =
     | ValueNodeMap["color" | "colorMix" | "gradient" | "literal"]
     | KeywordNode<ColorKeyword>; // bg
@@ -1337,7 +1359,8 @@ type Dimension = ValueNodeMap["numeric" | "calc" | "mathFn" | "literal"]; // px/
 // A portable keyword from a per-property vocabulary (§4.1), plus a raw `literal` escape and a
 // ref. `V` narrows the acceptable tokens so `display: keyword("center")` is a type error.
 type Keyword<V extends string = string> =
-    KeywordNode<V> | ValueNodeMap["literal"];
+    | KeywordNode<V>
+    | ValueNodeMap["literal"];
 type Font = ValueNodeMap["fontFamily" | "literal"]; //  family stack or literal/alias
 type Shadow = ValueNodeMap["shadow"] | KeywordNode<"none">; // composite box-shadow / elevation (or `none` reset)
 type Gradient = ValueNodeMap["gradient" | "literal"];
@@ -1486,10 +1509,10 @@ export * from "./helpers/utility";
 self-documenting about what kind of node they build:
 
 ```ts
-import * as scalar from "@pureform/core/ast/helpers/scalar";
-import * as unit from "@pureform/core/ast/helpers/unit";
 import * as kw from "@pureform/core/ast/helpers/keyword";
 import * as ref from "@pureform/core/ast/helpers/ref";
+import * as scalar from "@pureform/core/ast/helpers/scalar";
+import * as unit from "@pureform/core/ast/helpers/unit";
 
 scalar.literal("100vh"); // raw escape; a baseline keyword uses kw.* instead
 kw.center;
@@ -1719,6 +1742,7 @@ sit beside the config builders from §4.7:
 ```ts
 // src/define.ts: spec / config builders (exported from the @pureform/core root)
 import { deepMerge } from "@pureform/utils";
+
 import { unitless } from "./ast";
 import type { NumericScalarNode } from "./ast";
 import type {
@@ -2585,7 +2609,7 @@ export function compileNodeToCSS(node: ValueNode, config: CoreConfig): string {
     - `getByPath(config, path)` returns the token entry (possibly a `meta(...)` envelope, so
       callers unwrap with `tokenValue`, §4.2), or throws a path-not-found error naming the full
       path and nearest existing ancestor (`semanticTokens.colors.brandX not found, nearest:
-semanticTokens.colors.brand`).
+      semanticTokens.colors.brand`).
     - **Cycle detection** uses a resolution stack keyed by canonical path. Revisiting a path
       already on the stack throws with the chain (`alias cycle: a -> b -> a`). This is required
       even when emitting `token(...)` refs, since Panda would choke on cyclic refs too, so chain
@@ -2880,7 +2904,7 @@ real (non-canonical-button) components.
   (§4.1 `color.ts`): over a concrete `ColorNode` it sets the `alpha` channel as before; over
   a ref / keyword / existing mix (no build-time channels) it lowers to
   `color-mix(in srgb, transparent, <c> <a*100>%)`, so `alpha(alias('tokens','colors','x'),
-0.3)` just works (covers `ripple-layer.ts`'s `token(colors.x)/30`). `a` is the resulting
+  0.3)` just works (covers `ripple-layer.ts`'s `token(colors.x)/30`). `a` is the resulting
   opacity (0 to 1) in both forms, and the overload returns `ColorNode` or `ColorMixNode`
   accordingly.
 - ~~**[OPEN] Token metadata.**~~ **[RESOLVED]** Any token value is now metadata-wrappable via
@@ -2908,7 +2932,7 @@ real (non-canonical-button) components.
   layers. Authored with the `stack([...names])` helper (§4.2) that spaces unitless values by
   `step` (default 100) in declared order, so authors never hand-pick numbers (what actually
   prevents z-index wars); hand entries are still allowed. Consumed via `alias('zIndices',
-<name>)` from `StyleMap.zIndex` (which stays `Dimension`, so raw numbers remain a legal
+  <name>)` from `StyleMap.zIndex` (which stays `Dimension`, so raw numbers remain a legal
   escape). Theme-overridable and metadata-wrappable like any token tier, and the adapter
   lowers it to Panda's `zIndex` token category.
 - ~~**[OPEN] RTL / direction.**~~ **[RESOLVED]** Two-part and logical-first. (1) `StyleMap`
@@ -3081,7 +3105,7 @@ axes) still stands as the one un-split slot noted above.
   even-narrower `NumericScalarNode` (no refs). See §4.1 `nodes.ts`.
 - **Style map:** the typed per-property style map (`ast/style.ts`) whose CSS-property keys
   each constrain their value to the kinds valid there (`color: ValueNodeMap["color" |
-"literal"]`), replacing the old `Record<string, ValueNode>`. See §4.1 and §4.2.
+  "literal"]`), replacing the old `Record<string, ValueNode>`. See §4.1 and §4.2.
 - **Shadow / elevation:** a composite `ShadowNode`, an ordered stack of box-shadow
   layers (Material elevation). Web joins them into one `box-shadow`, and native maps to its
   elevation model. See §4.1.
@@ -3137,6 +3161,13 @@ axes) still stands as the one un-split slot noted above.
 > scale built with `stack([...])` (`zIndices`, §4.2).
 
 ```ts
+import {
+    defineComponent,
+    defineDynamicUtility,
+    defineStaticUtility,
+    meta,
+    stack,
+} from "@pureform/core";
 // button.config.ts
 import {
     alias,
@@ -3158,13 +3189,6 @@ import {
     when,
 } from "@pureform/core/ast";
 import * as kw from "@pureform/core/ast/helpers/keyword";
-import {
-    defineComponent,
-    defineDynamicUtility,
-    defineStaticUtility,
-    meta,
-    stack,
-} from "@pureform/core";
 import type { CoreConfig } from "@pureform/core/types";
 
 export const buttonSystemConfig: CoreConfig = {

@@ -55,7 +55,7 @@ in the catalog, for oklch and mixing).
 - `resolveTheme(config, { scheme, theme })`: the token values for one scheme and named theme.
 - `resolve(templates, theme)`: plain style objects. Precomputing is running this ahead of time.
 - `@pureform/rn-adapter/react`: `PureformProvider` (scheme, theme, mode), `useComponentStyles(name,
-variants, state)`, and a `pressableState` helper mapping `Pressable`'s callback state.
+  variants, state)`, and a `pressableState` helper mapping `Pressable`'s callback state.
   React and React Native are peer dependencies of this entry only.
 
 `inlineStyles` (text styles and utilities written out in place) moves from the CSS adapter to

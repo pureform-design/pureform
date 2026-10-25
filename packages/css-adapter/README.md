@@ -78,6 +78,7 @@ config, theme providers, and color generation stay out of the bundle.
     // vite.config.ts
     import pureform from "@pureform/bundler/vite";
     import solid from "@solidjs/vite-plugin";
+
     import { codegen } from "./pureform.codegen";
 
     export default defineConfig({ plugins: [pureform(codegen), solid()] });

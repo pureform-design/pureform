@@ -56,7 +56,7 @@ What a platform can't do is a narrow skip in `stories.config.ts`, with its reaso
           non-boolean member (`boolean | "indeterminate"`, `12 | 24`) is a select of the
           stringified values, with `mapping` back to the real ones (`true`, `12`); functions,
           nodes, objects, arrays and unions with a non-literal member get none (`control:
-false` when the story has the arg, so Storybook doesn't infer one; left out
+          false` when the story has the arg, so Storybook doesn't infer one; left out
           otherwise);
         - a prop typed **`VariantProp<C, "group">`** (directly or through
           `XVariantProps["group"]`) is read before the alias resolves, and takes its group's
@@ -71,7 +71,7 @@ false` when the story has the arg, so Storybook doesn't infer one; left out
 
         Any other arg (a shared hook's `disabled` on a component without one, `aria-label` from
         the binding) gets `control: false`. `scripts/prop-controls.spec.ts` (`omni run test:unit
--p @pureform/storybook-web`) has a fixture per rule.
+      -p @pureform/storybook-web`) has a fixture per rule.
 
     - **`@pureform/component-cases`**: `props` gives `Default`, each of `examples` a story, the
       `state` a play test (read gives `from`, one `act`, read gives `to`) on the pinned `Light`
@@ -172,7 +172,7 @@ component's.
 2. Override what the data gets wrong in its `components` entry (`args`, `controls.exclude`, `parameters`,
    `stories`), or `skip` it with the reason when its case can't be drawn from props alone.
 3. Run its story tests: `bunx vitest run -c vitest.config.storybook.ts --project
-storybook/solid src/stories/generated/<Component>.stories.ts` (and `storybook/react`).
+   storybook/solid src/stories/generated/<Component>.stories.ts` (and `storybook/react`).
 
 For a story the generator can't express, write `src/stories/<Component>.stories.ts` with the
 same `title`; it replaces the generated one.
@@ -187,7 +187,7 @@ same `title`; it replaces the generated one.
 ## Adding a renderer
 
 1. Write its adapter, `src/<renderer>/adapter.ts`, without JSX: `mount(el, component, args,
-context)` renders the component under `context.decorators` (each called with the story and
+   context)` renders the component under `context.decorators` (each called with the story and
    `{ registry, theme, globals }`) and returns `update` and `unmount`.
 2. Give the binding a `storybook` export (`package.json` export and its build's entry) with
    at least the provider decorator, mapping the theme to its provider's props.

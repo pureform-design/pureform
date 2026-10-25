@@ -86,7 +86,7 @@ await generate({
 It writes, under `.pureform/`:
 
 - `web/<name>.ts` per component (only the allow-listed ones): `export const <name>:
-ClassFactory<"<name>">`. It imports the component's recipe from its own file
+  ClassFactory<"<name>">`. It imports the component's recipe from its own file
   (`styled-system/recipes/<file>`), caches one frozen result per selection with
   `selectionCache`, maps Panda's class string per slot to `{ class }` (a single-slot recipe's
   string becomes the root's), and adds instance tokens as the component's CSS vars on the root
@@ -140,7 +140,7 @@ and then their `styled-system/` from this preset (their `prepare` tasks). The br
   lists every variant of every generated component in `staticCss` (design doc §5.2). A pruned
   build (the bundler's `prune`, design doc §7) narrows each component it can to a rule listing
   every group, with the values in use or `["*"]`: `button: [{ variant: ["filled", "text"], size:
-["*"] }]`. Panda adds each group's default itself, and every compound variant of a generated
+  ["*"] }]`. Panda adds each group's default itself, and every compound variant of a generated
   recipe, so the rule needs neither. The factory modules don't change.
 - Pass the same `prefix` to `compilePreset` and to the codegen: the factories name instance
   tokens' vars with it.

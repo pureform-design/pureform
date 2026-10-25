@@ -342,7 +342,7 @@ import { RichTooltip } from "@pureform/solid/rich-tooltip";
   `aria-labelledby`, and each radio on its `ItemInput` (the ready-made uses each item's `label`).
   Variants on the group (`color`, `density`) are every radio's defaults; an `Item`'s own
   win. The group has no tokens of its own. The ready-made takes `items` (`{ value, label,
-disabled?, invalid?, testId? }`), `class`/`style`/`slotProps` keyed by the group's `root`, and
+  disabled?, invalid?, testId? }`), `class`/`style`/`slotProps` keyed by the group's `root`, and
   `radioProps`, every radio's `class`, `style`, `slotProps`, `unstyled`, `testId` and `tokens`,
   keyed by the radio's parts (an item's own `testId` wins). Arrow keys move and check, by direction, natively.
 - **The chip and icon button toggle** when given `selected` or `defaultSelected` (`aria-pressed`);
@@ -576,7 +576,7 @@ disabled?, invalid?, testId? }`), `class`/`style`/`slotProps` keyed by the group
   arrow keys left and right select the tab before or after, by direction, and Home and End the
   first and last (`activationMode="manual"` waits for Enter or Space). `value` is controllable
   (`string | null`). The ready-made takes `items` (`{ value, label?, "aria-label"?, icon?,
-mirrorIcon?, disabled?, content? }`; a tab without a label shows only its icon, named by its
+  mirrorIcon?, disabled?, content? }`; a tab without a label shows only its icon, named by its
   `aria-label`), puts `aria-label` and `aria-labelledby` on the tab list, turns on the `icon`
   variant when any tab has an icon (`inlineIcon` sets a primary tab's icon beside its label),
   selects the first enabled tab unless given a value, and renders a panel per item with `content`.
@@ -604,7 +604,7 @@ mirrorIcon?, disabled?, content? }`; a tab without a label shows only its icon, 
   fills its icon. A click asks to move; with links, the app's router follows the `href` as usual.
   `disabled` on Root or an item disables buttons and marks links `aria-disabled` (their click is
   stopped). The ready-made takes `items` (`{ value, label, icon?, mirrorIcon?, href?, disabled?
-}`).
+  }`).
 - **The list item** has no machine. Root is a `<div>` row, a link with `href`, or any element with
   `as` (`as="button"` gets `type="button"`); a link or a button is `interactive` (state layer, focus
   ring) unless told otherwise. `selected` sets `aria-current`, `disabled` a button's `disabled` or
@@ -956,7 +956,7 @@ The full example, with a ready-made `Button` over `slotPartProps`, is
 - Ready-made components take `class`, `style`, and `slotProps` keyed by part; `testId` and
   `unstyled` go to Root whole. `createSlotProps(props)` computes every part's props from them
   together, once: `slots("label")` is the label's, to spread from a variable (`const label =
-slots("label")`, then `{...label}`; a call inside a spread makes a memo of its own). When the
+  slots("label")`, then `{...label}`; a call inside a spread makes a memo of its own). When the
   three are literals the compiler passed as is (or absent), each part's props are a plain object;
   otherwise a live view of one memo, so a later change still reaches every part.
   `slotPartProps(props, part)` gives one part's, with a memo of its own.
@@ -1016,8 +1016,8 @@ const fieldsetDisabled = useFieldsetDisabled(inputElement); // OR it into the ma
   shows, and may return what undoes it (the dialog stacks its positioner there, in the next
   frame).
 - `useIconStyle(): Accessor<IconStyle>`: inside an icon part, its measured `{ size, color,
-filled }`, following the component's state; elsewhere `{ size: undefined, color:
-"currentColor", filled: false }`.
+  filled }`, following the component's state; elsewhere `{ size: undefined, color:
+  "currentColor", filled: false }`.
 
 ### `@pureform/solid/internal/zag`
 

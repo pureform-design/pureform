@@ -173,7 +173,7 @@ type VariantUsage = Readonly<
   only generated components and real groups, each narrowed group with its default, in the
   config's order, and no group that keeps every value. Adapters narrow their styles to it; the
   factory modules and the declarations don't change. `narrowConfig(config, components,
-variants)` gives the config with only those components and the values in use (their compound
+  variants)` gives the config with only those components and the values in use (their compound
   variants too), for adapters that compile styles from the config. `keepsValue` answers for one
   value.
 - The hash covers `variants` only when they narrow something, so a registry made with a usage that
