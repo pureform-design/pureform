@@ -7,26 +7,26 @@
 import { listItemAnatomy } from "@pureform/anatomy";
 import type { TestIdOverride } from "@pureform/anatomy";
 import {
-    isPresent,
-    LIST_ITEM_SWIPE_SLOP,
-    LIST_ITEM_SWIPE_WIDTH,
-    listItemLines,
-    listItemSelection,
-    listItemVariants,
-    swipeKeyAction,
-    swipeOffsetOf,
-    swipeRestOffset,
-    swipeSettlesOpen,
-    swipeTokens,
+  isPresent,
+  LIST_ITEM_SWIPE_SLOP,
+  LIST_ITEM_SWIPE_WIDTH,
+  listItemLines,
+  listItemSelection,
+  listItemVariants,
+  swipeKeyAction,
+  swipeOffsetOf,
+  swipeRestOffset,
+  swipeSettlesOpen,
+  swipeTokens,
 } from "@pureform/binding-core";
 import type {
-    InteractiveProps,
-    ListItemContentProps,
-    ListItemExpandProps,
-    ListItemSwipeProps,
-    ListItemPart,
-    ListItemVariantProps,
-    ListVariantProps,
+  InteractiveProps,
+  ListItemContentProps,
+  ListItemExpandProps,
+  ListItemSwipeProps,
+  ListItemPart,
+  ListItemVariantProps,
+  ListVariantProps,
 } from "@pureform/binding-core";
 import { createContext, use, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
@@ -41,300 +41,298 @@ import { useSidewaysPan } from "../sideways-pan";
 import { nativeSlots, withUnselectable } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
+import { resolveText } from "../resolve-text";
+import { ownText } from "../icon-style";
 
 const [INDICATION] = listItemAnatomy.indication!;
 
 /** What each part renders as, for its keyed `style` and `slotProps`. */
 export interface ListItemHosts {
-    readonly overline: "Text";
-    readonly headline: "Text";
-    readonly supportingText: "Text";
-    readonly trailingText: "Text";
-    readonly trailing: "View";
-    readonly leading: "View";
-    readonly indicator: "View";
-    readonly action: "View";
-    readonly content: "View";
-    readonly frame: "View";
-    readonly root: "View";
-    readonly region: "View";
+  readonly overline: "Text";
+  readonly headline: "Text";
+  readonly supportingText: "Text";
+  readonly trailingText: "Text";
+  readonly trailing: "View";
+  readonly leading: "View";
+  readonly indicator: "View";
+  readonly action: "View";
+  readonly content: "View";
+  readonly frame: "View";
+  readonly root: "View";
+  readonly region: "View";
 }
 
 export interface ListItemProps
-    extends
-        Omit<ListItemVariantProps, "swipeable">,
-        ListItemContentProps<ReactNode>,
-        ListItemExpandProps,
-        ListItemSwipeProps,
-        InteractiveProps,
-        NativeSlotProps<ListItemHosts> {
-    /** The current item, such as the page a navigation list is on. */
-    readonly selected?: boolean | undefined;
-    readonly disabled?: boolean | undefined;
-    /** Makes the item act. An expandable item (given a `region`) acts as well: it expands. On a
-     *  swipeable item (one with a `swipeAction`), a tap fires it and a drag doesn't. */
-    readonly onPress?: (() => void) | undefined;
-    /** Where the item leads: it's an interactive link, which a press opens (after `onPress`). */
-    readonly href?: string | undefined;
-    /** An interactive item's role in place of `button`: a selection list's options are `option`s,
-     *  marked with `aria-selected`. */
-    readonly role?: "option" | undefined;
-    readonly testId?: TestIdOverride<ListItemPart> | undefined;
+  extends
+    Omit<ListItemVariantProps, "swipeable">,
+    ListItemContentProps<ReactNode>,
+    ListItemExpandProps,
+    ListItemSwipeProps,
+    InteractiveProps,
+    NativeSlotProps<ListItemHosts> {
+  /** The current item, such as the page a navigation list is on. */
+  readonly selected?: boolean | undefined;
+  readonly disabled?: boolean | undefined;
+  /** Makes the item act. An expandable item (given a `region`) acts as well: it expands. On a
+   *  swipeable item (one with a `swipeAction`), a tap fires it and a drag doesn't. */
+  readonly onPress?: (() => void) | undefined;
+  /** Where the item leads: it's an interactive link, which a press opens (after `onPress`). */
+  readonly href?: string | undefined;
+  /** An interactive item's role in place of `button`: a selection list's options are `option`s,
+   *  marked with `aria-selected`. */
+  readonly role?: "option" | undefined;
+  readonly testId?: TestIdOverride<ListItemPart> | undefined;
 }
 
 /** A list's variants, its items' defaults: an item's own win. */
 export const ListDefaults = createContext<ListVariantProps | null>(null);
 
 function ListItemImpl(props: ListItemProps): ReactNode {
-    const list = use(ListDefaults);
-    const expandable = isPresent(props.region);
-    const [expanded, setExpanded] = useControllable<"expanded", boolean>(
-        "ListItem",
-        "expanded",
-        props.expanded,
-        props.defaultExpanded,
-        props.onExpandedChange,
-        false,
-    );
-    const swipeable = isPresent(props.swipeAction);
-    const link = !expandable && props.href !== undefined;
-    const interactive = expandable || link || props.onPress !== undefined;
-    // In a list, its item (`List`'s wrapper) is the `listitem`, as the web's `<li>` is; on its
-    // own, the row is.
-    const plainRole = list === null ? ("listitem" as const) : undefined;
-    const rtl = useDirection() === "rtl";
-    const width = props.swipeWidth ?? LIST_ITEM_SWIPE_WIDTH;
-    const [own, setOwn] = useState(props.defaultRevealed ?? false);
-    const revealed = props.revealed ?? own;
-    // Where a drag has the row, as its slid offset; `undefined` when it isn't held.
-    const [drag, setDrag] = useState<number | undefined>(undefined);
-    // How fast a released drag had the row sliding, in pixels per second, which the snap-back's
-    // spring carries on from; for the render after the release only.
-    const [fling, setFling] = useState<number | undefined>(undefined);
-    useEffect(() => {
-        if (fling !== undefined) setFling(undefined);
-    }, [fling]);
-    const offset = drag ?? swipeRestOffset(revealed, width);
-    const setRevealed = (next: boolean) => {
-        if (next === revealed) return;
-        if (props.revealed === undefined) setOwn(next);
-        props.onRevealedChange?.({ revealed: next });
-    };
-    // The responder is made once; it reads the latest render's values from here.
-    const latest = useRef({ offset, width, rtl, setRevealed });
-    latest.current = { offset, width, rtl, setRevealed };
-    const start = useRef(0);
-    const pan = useSidewaysPan({
-        slop: LIST_ITEM_SWIPE_SLOP,
-        start: () => {
-            start.current = latest.current.offset;
-        },
-        move: (dx) =>
-            setDrag(
-                swipeOffsetOf(
-                    start.current,
-                    0,
-                    dx,
-                    latest.current.width,
-                    latest.current.rtl,
-                ),
-            ),
-        release: (dx, vx) => {
-            const { width, rtl, setRevealed } = latest.current;
-            // `vx` is in pixels per millisecond, along the screen; the offset grows toward the
-            // inline start.
-            setFling(vx * 1000 * (rtl ? 1 : -1));
-            setRevealed(
-                swipeSettlesOpen(
-                    swipeOffsetOf(start.current, 0, dx, width, rtl),
-                    width,
-                ),
-            );
-            setDrag(undefined);
-        },
-        cancel: () => setDrag(undefined),
-    });
-    const indication = useSurfaceIndication(INDICATION!, {
-        indication: props.indication,
-        interactionSource: props.interactionSource,
-        disabled: props.disabled,
-        interactive,
-    });
-    const slots = useComponentSlots<ListItemPart>(
-        "listItem",
-        indication.select(
-            listItemSelection(
-                {
-                    ...listItemVariants(list, props),
-                    swipeable,
-                    lines: props.lines ?? listItemLines(props),
-                    ...(swipeable
-                        ? {
-                              tokens: {
-                                  ...props.tokens,
-                                  ...swipeTokens(offset, width),
-                              },
-                          }
-                        : {}),
-                },
-                interactive ? "button" : "div",
-            ),
+  const list = use(ListDefaults);
+  const expandable = isPresent(props.region);
+  const [expanded, setExpanded] = useControllable<"expanded", boolean>(
+    "ListItem",
+    "expanded",
+    props.expanded,
+    props.defaultExpanded,
+    props.onExpandedChange,
+    false,
+  );
+  const swipeable = isPresent(props.swipeAction);
+  const link = !expandable && props.href !== undefined;
+  const interactive = expandable || link || props.onPress !== undefined;
+  // In a list, its item (`List`'s wrapper) is the `listitem`, as the web's `<li>` is; on its
+  // own, the row is.
+  const plainRole = list === null ? ("listitem" as const) : undefined;
+  const rtl = useDirection() === "rtl";
+  const width = props.swipeWidth ?? LIST_ITEM_SWIPE_WIDTH;
+  const [own, setOwn] = useState(props.defaultRevealed ?? false);
+  const revealed = props.revealed ?? own;
+  // Where a drag has the row, as its slid offset; `undefined` when it isn't held.
+  const [drag, setDrag] = useState<number | undefined>(undefined);
+  // How fast a released drag had the row sliding, in pixels per second, which the snap-back's
+  // spring carries on from; for the render after the release only.
+  const [fling, setFling] = useState<number | undefined>(undefined);
+  useEffect(() => {
+    if (fling !== undefined) setFling(undefined);
+  }, [fling]);
+  const offset = drag ?? swipeRestOffset(revealed, width);
+  const setRevealed = (next: boolean) => {
+    if (next === revealed) return;
+    if (props.revealed === undefined) setOwn(next);
+    props.onRevealedChange?.({ revealed: next });
+  };
+  // The responder is made once; it reads the latest render's values from here.
+  const latest = useRef({ offset, width, rtl, setRevealed });
+  latest.current = { offset, width, rtl, setRevealed };
+  const start = useRef(0);
+  const pan = useSidewaysPan({
+    slop: LIST_ITEM_SWIPE_SLOP,
+    start: () => {
+      start.current = latest.current.offset;
+    },
+    move: (dx) =>
+      setDrag(
+        swipeOffsetOf(
+          start.current,
+          0,
+          dx,
+          latest.current.width,
+          latest.current.rtl,
         ),
-        interactive
-            ? indication.states({
-                  selected: props.selected ?? false,
-                  ...(expandable ? { expanded } : {}),
-                  ...(props.disabled ? { disabled: true } : {}),
-                  ...(props.mirrorLeading || props.mirrorTrailing
-                      ? { mirrored: true }
-                      : {}),
-              })
-            : swipeable && drag !== undefined
-              ? { pressed: true }
-              : {},
-        fling === undefined ? undefined : { swipeOffset: fling },
-    );
-    const { styles: s, selected, views: v } = slots;
-    const id = (part: ListItemPart) =>
-        testIdOf(listItemAnatomy, part, props.testId);
-    const slot = nativeSlots(props);
-    const line = (part: ListItemPart, value: ReactNode) => {
-        const Slot = v[part];
-        return isPresent(value) ? (
-            <Slot.Text
-                {...slot.props(part)}
-                selectable={false}
-                style={slot.style(part, s[part])}
-                testID={id(part)}
-            >
-                {value}
-            </Slot.Text>
-        ) : null;
-    };
-    const icon = iconParts(slots, id, slot);
-    const action = isPresent(props.swipeAction) ? (
-        <v.action.View
-            {...slot.props("action")}
-            aria-hidden={revealed ? undefined : true}
-            importantForAccessibility={
-                revealed ? "auto" : "no-hide-descendants"
-            }
-            pointerEvents={revealed ? "auto" : "none"}
-            style={slot.style("action", s.action)}
-            testID={id("action")}
-        >
-            {props.swipeAction}
-        </v.action.View>
+      ),
+    release: (dx, vx) => {
+      const { width, rtl, setRevealed } = latest.current;
+      // `vx` is in pixels per millisecond, along the screen; the offset grows toward the
+      // inline start.
+      setFling(vx * 1000 * (rtl ? 1 : -1));
+      setRevealed(
+        swipeSettlesOpen(
+          swipeOffsetOf(start.current, 0, dx, width, rtl),
+          width,
+        ),
+      );
+      setDrag(undefined);
+    },
+    cancel: () => setDrag(undefined),
+  });
+  const indication = useSurfaceIndication(INDICATION!, {
+    indication: props.indication,
+    interactionSource: props.interactionSource,
+    disabled: props.disabled,
+    interactive,
+  });
+  const slots = useComponentSlots<ListItemPart>(
+    "listItem",
+    indication.select(
+      listItemSelection(
+        {
+          ...listItemVariants(list, props),
+          swipeable,
+          lines: props.lines ?? listItemLines(props),
+          ...(swipeable
+            ? {
+                tokens: {
+                  ...props.tokens,
+                  ...swipeTokens(offset, width),
+                },
+              }
+            : {}),
+        },
+        interactive ? "button" : "div",
+      ),
+    ),
+    interactive
+      ? indication.states({
+          selected: props.selected ?? false,
+          ...(expandable ? { expanded } : {}),
+          ...(props.disabled ? { disabled: true } : {}),
+          ...(props.mirrorLeading || props.mirrorTrailing
+            ? { mirrored: true }
+            : {}),
+        })
+      : swipeable && drag !== undefined
+        ? { pressed: true }
+        : {},
+    fling === undefined ? undefined : { swipeOffset: fling },
+  );
+  const { styles: s, selected, views: v } = slots;
+  const id = (part: ListItemPart) =>
+    testIdOf(listItemAnatomy, part, props.testId);
+  const slot = nativeSlots(props);
+  const line = (part: ListItemPart, value: ReactNode) => {
+    const Slot = v[part];
+    return isPresent(value) ? (
+      <Slot.Text
+        {...slot.props(part)}
+        selectable={false}
+        style={slot.style(part, s[part])}
+        testID={id(part)}
+      >
+        {value}
+      </Slot.Text>
     ) : null;
-    const content = (
-        <>
-            {icon("leading", props.leading)}
-            <v.content.View
-                {...slot.props("content")}
-                style={slot.style("content", s.content)}
-                testID={id("content")}
-            >
-                {line("overline", props.overline)}
-                {line("headline", props.headline)}
-                {line("supportingText", props.supportingText)}
-            </v.content.View>
-            {icon("trailing", props.trailing)}
-            {line("trailingText", props.trailingText)}
-        </>
+  };
+  const icon = iconParts(slots, id, slot);
+  const action = isPresent(props.swipeAction) ? (
+    <v.action.View
+      {...slot.props("action")}
+      aria-hidden={revealed ? undefined : true}
+      importantForAccessibility={revealed ? "auto" : "no-hide-descendants"}
+      pointerEvents={revealed ? "auto" : "none"}
+      style={slot.style("action", s.action)}
+      testID={id("action")}
+    >
+      {props.swipeAction}
+    </v.action.View>
+  ) : null;
+  const content = (
+    <>
+      {icon("leading", props.leading)}
+      <v.content.View
+        {...slot.props("content")}
+        style={slot.style("content", s.content)}
+        testID={id("content")}
+      >
+        {line("overline", props.overline)}
+        {line("headline", props.headline)}
+        {line("supportingText", props.supportingText)}
+      </v.content.View>
+      {icon("trailing", props.trailing)}
+      {line("trailingText", props.trailingText)}
+    </>
+  );
+  // The arrow keys reveal and close a swipeable row's action, on the web.
+  const keys = swipeable
+    ? ({
+        onKeyDown: (event: { nativeEvent: { key?: string } }) => {
+          const next = swipeKeyAction(event.nativeEvent.key ?? "", rtl);
+          if (next) setRevealed(next === "reveal");
+        },
+      } as object)
+    : {};
+  // A swipeable item's frame: the row, which takes the drag, and the action after it (so it
+  // comes after the row in the accessibility order), drawn under the row.
+  const framed = (row: ReactNode) =>
+    swipeable ? (
+      <v.frame.View
+        {...slot.props("frame")}
+        {...slot.with("frame", pan)}
+        style={slot.style("frame", s.frame)}
+        testID={id("frame")}
+      >
+        {row}
+        {action}
+      </v.frame.View>
+    ) : (
+      row
     );
-    // The arrow keys reveal and close a swipeable row's action, on the web.
-    const keys = swipeable
-        ? ({
-              onKeyDown: (event: { nativeEvent: { key?: string } }) => {
-                  const next = swipeKeyAction(event.nativeEvent.key ?? "", rtl);
-                  if (next) setRevealed(next === "reveal");
-              },
-          } as object)
-        : {};
-    // A swipeable item's frame: the row, which takes the drag, and the action after it (so it
-    // comes after the row in the accessibility order), drawn under the row.
-    const framed = (row: ReactNode) =>
-        swipeable ? (
-            <v.frame.View
-                {...slot.props("frame")}
-                {...slot.with("frame", pan)}
-                style={slot.style("frame", s.frame)}
-                testID={id("frame")}
-            >
-                {row}
-                {action}
-            </v.frame.View>
-        ) : (
-            row
-        );
-    // A swipeable row that doesn't act only takes the drag. One that does takes the press too:
-    // a drag past the slop takes the touch from it, so only a tap presses it.
-    if (swipeable && !interactive)
-        return framed(
-            <v.root.View
-                {...slot.props("root")}
-                {...slot.with("root", keys)}
-                focusable
-                {...(plainRole ? { role: plainRole } : {})}
-                style={slot.style("root", withUnselectable(s.root))}
-                testID={id("root")}
-            >
-                {content}
-            </v.root.View>,
-        );
-    const onPress = expandable
-        ? () => {
-              setExpanded(!expanded);
-              props.onPress?.();
-          }
-        : link
-          ? () => {
-                props.onPress?.();
-                void Linking.openURL(props.href!);
-            }
-          : props.onPress;
-    const row = (
-        <v.root.Pressable
-            {...slot.props("root")}
-            {...(interactive ? indication.handlers : {})}
-            role={
-                interactive
-                    ? (props.role ?? (link ? "link" : "button"))
-                    : plainRole
-            }
-            {...(interactive && props.role === "option"
-                ? { "aria-selected": props.selected ?? false }
-                : {})}
-            {...(expandable ? { "aria-expanded": expanded } : {})}
-            {...(interactive
-                ? { onPress, disabled: props.disabled }
-                : { disabled: true })}
-            {...slot.with("root", keys)}
-            style={slot.style("root", withUnselectable(s.root))}
-            testID={id("root")}
-        >
-            {content}
-            {expandable ? icon("indicator", "⌄") : null}
-            {indication.layer(selected)}
-        </v.root.Pressable>
+  // A swipeable row that doesn't act only takes the drag. One that does takes the press too:
+  // a drag past the slop takes the touch from it, so only a tap presses it.
+  if (swipeable && !interactive)
+    return framed(
+      <v.root.View
+        {...slot.props("root")}
+        {...slot.with("root", keys)}
+        focusable
+        {...(plainRole ? { role: plainRole } : {})}
+        style={slot.style("root", withUnselectable(s.root))}
+        testID={id("root")}
+      >
+        {content}
+      </v.root.View>,
     );
-    if (!expandable) return framed(row);
-    return (
-        <>
-            {framed(row)}
-            {expandable ? (
-                <Expanding open={expanded}>
-                    <v.region.View
-                        {...slot.props("region")}
-                        style={slot.style("region", s.region)}
-                        testID={id("region")}
-                    >
-                        {props.region}
-                    </v.region.View>
-                </Expanding>
-            ) : null}
-        </>
-    );
+  const onPress = expandable
+    ? () => {
+        setExpanded(!expanded);
+        props.onPress?.();
+      }
+    : link
+      ? () => {
+          props.onPress?.();
+          void Linking.openURL(props.href!);
+        }
+      : props.onPress;
+  const row = (
+    <v.root.Pressable
+      {...slot.props("root")}
+      {...(interactive ? indication.handlers : {})}
+      role={
+        interactive ? (props.role ?? (link ? "link" : "button")) : plainRole
+      }
+      {...(interactive && props.role === "option"
+        ? { "aria-selected": props.selected ?? false }
+        : {})}
+      {...(expandable ? { "aria-expanded": expanded } : {})}
+      {...(interactive
+        ? { onPress, disabled: props.disabled }
+        : { disabled: true })}
+      {...slot.with("root", keys)}
+      style={slot.style("root", withUnselectable(s.root))}
+      testID={id("root")}
+    >
+      {content}
+      {expandable ? icon("indicator", "⌄") : null}
+      {indication.layer(selected)}
+    </v.root.Pressable>
+  );
+  if (!expandable) return framed(row);
+  return (
+    <>
+      {framed(row)}
+      {expandable ? (
+        <Expanding open={expanded}>
+          <v.region.View
+            {...slot.props("region")}
+            style={slot.style("region", s.region)}
+            testID={id("region")}
+          >
+            {resolveText(props.region, v.region, ownText(s.region))}
+          </v.region.View>
+        </Expanding>
+      ) : null}
+    </>
+  );
 }
 
 /** Material's list item: `<ListItem headline="Inbox" leading={<Glyph glyph="✉" />} />`. */
