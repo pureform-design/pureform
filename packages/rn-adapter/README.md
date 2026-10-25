@@ -109,6 +109,9 @@ scheme. Widths only count through the component's width and container conditions
 width meeting the same ones shares a table. `selected(selection)` gives the same lookup in the
 `Selected` shape the hooks read (`""` for a component without slots).
 
+The generated native data is written as `JSON.parse("…")`, not an object literal: engines parse
+it faster, and TypeScript doesn't infer a type for a 0.4 MB literal.
+
 ```ts
 import { nativeFactory } from "@pureform/rn-adapter/factory";
 

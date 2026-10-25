@@ -1078,6 +1078,11 @@ check the cross-cutting rules against Solid and React together (see that package
 
 ## Worth knowing
 
+- Never spread a Solid props object in a contract helper (`{ ...props }`): it reads every getter,
+  `children` included, so children render outside Root's context and the server throws. Read
+  named props only.
+- In Solid 2, `useContext` throws when there's no provider for a context created with
+  `undefined`, so an optional context needs a `null` default.
 - The overlays' ready-made triggers import the `Button` (`../button`), so a menu, tooltip, or
   dialog subpath brings the button's part code with it.
 - A dialog with no focusable element inside takes focus on its surface (`tabindex="-1"`); after

@@ -14,8 +14,8 @@
 
 ## Follow-ups from the component roadmap's batch notes
 
-Still open when the batch notes (`docs/roadmap-components/context/`, now only in git history)
-were pruned. Open questions already listed in
+Still open when the batch notes (`docs/roadmap-components/context/` and the first roadmap's
+`docs/roadmap/context/`, now only in git history) were pruned. Open questions already listed in
 [next.md §3](roadmap-components/next.md#3-open-questions-from-the-contexts) aren't repeated.
 
 ### Accessibility
@@ -27,6 +27,10 @@ were pruned. Open questions already listed in
   first star checked at 0).
 - FabMenu: items are both Tab stops and Zag's arrow-key highlight targets, and an arrow key
   moves focus back to the list (`focusMenu`); unify the two focus models.
+- Snackbar: announces only by showing a hidden `role="status"` region, which some screen
+  readers miss; inserting the message would be more reliable.
+- Screen reader ("virtual") clicks are never emitted; `"virtual"` is only a fallback pointer type
+  (binding-core `emitter.ts`).
 
 ### Menus
 
@@ -59,6 +63,10 @@ were pruned. Open questions already listed in
   on the Animated fallback `alternate` runs as `normal`. Unconfirmed.
 - Tabs/springs: a spring slide with a `delay` waits with `setTimeout`; a factory instance can't
   pass a spring token.
+- Reduced motion nested three deep (`reduce` in `full` in `reduce`) doesn't resolve: the
+  innermost `reduce` loses (preset `motion.ts` selectors go two levels).
+- Panda's `_motionSafe` and Tailwind's `motion-safe` follow only the system setting, not the
+  provider's motion.
 
 ### Components
 
@@ -90,6 +98,12 @@ were pruned. Open questions already listed in
   the peer is advertised; `ripple` stays in its usage for the Material Menu fallback.
 - Forms: no forms-suite case submitting FileUpload `File` entries; no geometry spec guards the
   rating's half star width; no Solid unit spec for server rendering a controlled textarea.
+- Select: no `multiple` (`Select<string[]>`) though component-architecture §9.4 describes it.
+- Ready-made snackbar: its action and close buttons don't take `interactionSource`.
+- Slider: `--pf-components-slider-stateLayerColor` is declared but read by no style (listed
+  `unread` in `codegen.spec.ts`); wire it or remove it.
+- Direction: the web `rtl` condition matches an ancestor, so an `ltr` part inside an `rtl` page
+  matches both; `&:dir(rtl)` with Panda's condition overridden would fix it.
 
 ### Slot props
 
@@ -104,6 +118,10 @@ were pruned. Open questions already listed in
   shallowly, so the picker's handlers replace the user's. No provider-level `slotProps` on
   React Native (undecided whether it should have them).
 - Ripple's `ripple` elements take only the registry class, no `className`/`style`/`slotProps`.
+- Indication: the ripple's opacity comes from the theme's pressed opacity, not the surface's
+  `statePressedOpacity`, so `indication` doesn't change it (`it.fails` in `indication.e2e.test.ts`).
+- Indication: a `components.<c>.<indication token>` override in a provider or named theme never
+  reaches the component; each root resets those tokens (`it.fails` in the same file).
 
 ### Tooling
 
@@ -116,3 +134,9 @@ were pruned. Open questions already listed in
   a generic `Indication<E>` is the alternative.
 - The plain `.pureform/` entry is typed from the first web target; multi-target code needing
   native factory types imports `.pureform/native`. Revisit if it confuses users.
+- Bundler pruning keeps every token, theme, `@property`, keyframes and shape, most of the CSS
+  left; dropping keyframes and shape paths no kept rule reads is the next step.
+- `pureform generate --watch` started before the codegen/glue file exists doesn't notice it
+  once created; restart it.
+- css-demo and tailwind-demo still draw components with `useClasses` although Solid components
+  exist for them.
