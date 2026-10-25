@@ -229,7 +229,7 @@ codegen hooks (`transformSource`) run in the script.
    React Native hook (`@pureform/react-native/storybook`) without the web adapters? Report the
    setup cost (Metro config, the app to host it, story format differences).
 
-## After r9: renderer-neutral case readers (done, [context.md](context.md#round-6-renderer-neutral-case-readers-branch-neutral-readers), [neutral-readers.md](../roadmap-components/context/neutral-readers.md))
+## After r9: renderer-neutral case readers (done, [context.md](context.md#round-6-renderer-neutral-case-readers-branch-neutral-readers))
 
 The shared cases read state only through ARIA (`role` with `aria-checked`, `aria-valuenow`,
 `aria-selected`, `aria-expanded`, accessible names, and the input's value where a textbox is the

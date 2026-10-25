@@ -86,7 +86,8 @@ the code's (`doc-counts.spec.ts`).
 ## 3. Open questions from the contexts
 
 Collected from every context's "Open questions"; those a later phase settled are left out.
-Grouped by area, with the context that raised each.
+Grouped by area, with the context that raised each (the contexts are in git history only,
+under `docs/roadmap-components/context/`; later follow-ups are in [todo-later.md](../todo-later.md)).
 
 ### Spec values still unconfirmed (m3.material.io unreadable)
 

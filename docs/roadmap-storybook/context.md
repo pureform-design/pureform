@@ -537,7 +537,7 @@ React Native are unchanged. Decided in r10: no change to the adapter.
 ## Round 6: renderer-neutral case readers (branch `neutral-readers`)
 
 From `main` (`040b9fc1`). Not pushed. Per component detail (reader changes, React Native ARIA
-fixes, skips with reasons): [neutral-readers.md](../roadmap-components/context/neutral-readers.md).
+fixes, skips with reasons): `docs/roadmap-components/context/neutral-readers.md` (git history; open items in [todo-later.md](../todo-later.md)).
 
 ### What changed
 
