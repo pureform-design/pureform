@@ -96,7 +96,8 @@ Still open when the batch notes (`docs/roadmap-components/context/` and the firs
 - Select: no `multiple` (`Select<string[]>`) though component-architecture §9.4 describes it.
 - Ready-made snackbar: its action and close buttons don't take `interactionSource`.
 - Direction: the web `rtl` condition matches an ancestor, so an `ltr` part inside an `rtl` page
-  matches both; `&:dir(rtl)` with Panda's condition overridden would fix it.
+  matches both; `&:dir(rtl)` with Panda's condition overridden would fix it
+  (css-lowering `conditions.ts`, panda-adapter `_rtl`, Tailwind's `rtl:` variant, snapshots).
 
 ### Slot props
 
