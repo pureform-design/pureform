@@ -1283,6 +1283,8 @@ Expressive has no equivalent.
   token, 4px), `indicator`, and `stopIndicator` (a dot at the track's end, `stopSize`). Turn on
   `indeterminate` when the amount is unknown: the dot goes and the track spans the bar, less a
   `gap` on each side of the sliding indicator (on the web; React Native draws the whole track).
+  `track={false}` keeps the stop dot (Compose draws it with the track); hide `stopIndicator`
+  through `unstyled` or `slotProps` for neither.
 - `circularProgress`: a `track` (the same two-half ring in `trackColor`, turned past the
   indicator and drawing the rest of the circle less a `gap` at each end, a length, 4px by
   default) under a ring drawn by two halves, each turning through its share of the

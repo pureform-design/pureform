@@ -1,6 +1,6 @@
 # Slot props standard: code sketch
 
-Draft for review. Names are provisional. See `docs/roadmap-components/context/audit-slot-props.md`.
+Agreed; names as built. The audit's lasting conclusions are in [component-architecture.md §9.3](component-architecture.md#93-configurability).
 
 Two rules:
 

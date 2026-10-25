@@ -299,6 +299,8 @@ trigger shows their labels joined by ", " (the placeholder when none):
 
 ## Worth knowing
 
+- **No layout animation on React Native Web:** `LayoutAnimation` does nothing there, so expand
+  and collapse jump on React Native Web; devices animate them.
 - **ARIA as the web's:** React Native Web draws the same roles and states the web bindings
   do, so the shared component cases read either (Storybook's `storybook/native` plays). A toggle
   (`Button`, `IconButton`, a filter `Chip`, given `selected` or `defaultSelected`) says

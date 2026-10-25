@@ -1649,6 +1649,16 @@ Agreed in [slot-props-sketch.md](slot-props-sketch.md); batches in the
   part-keyed value to the button's root; the button's own `<component>Props` reach its other parts.
 - **A scrim** (dialog and sheet backdrop) is a part of the overlay's own anatomy and takes the
   same keyed props.
+- **Keys and names** (from the slot-props audit): provider `slotProps` key by the part's
+  registry slot, not its name, so a part with `slot: null` gets nothing and a part can map to
+  another slot (the modal date picker's provider `datePicker.root` styles `content`). An
+  overlay's `root` is an unstyled wrapper; the styled surface is `content`. A string `testId`
+  prefix gives `${prefix}-${part.attribute}` (the attribute, not the part name). Under a nested
+  `as={Button}` one key can mix two recipes' parts, and `touchTarget`, `media` and `avatar` are
+  both parts and standalone components. `positioning` and `indication` look like slot props but
+  aren't.
+- **React Native cost:** keyed props add no per-render allocations (memoized on identity, as
+  `useSlotProps`); a user key spread over an animated engine style replaces it.
 
 ### 9.4 Controlled and uncontrolled state
 
@@ -1947,6 +1957,13 @@ icon only has to follow them.
   the generated registry, the stylesheet, and the visual suite's page), not from a demo, so a
   demo can change, prune, or rebuild without changing what the suites test. Each web demo has
   its own smoke test instead (its `test:e2e`: the page renders in Chromium without an error).
+- **Axe exceptions:** the Tree's stories turn off `label-content-name-mismatch`: a branch takes
+  its name from its row, but axe also counts its children's text. React Native branch rows use
+  `tabIndex={-1}` because React Native Web ignores `focusable={false}`.
+- **Select and autocomplete ARIA:** typing to find a match opens the select's list (APG; Zag's
+  select picks without opening); the autocomplete marks the highlighted option `aria-selected`,
+  not the chosen one. Text comes from each component's `translations`; there are no app-wide
+  locale messages.
 
 ### 9.8 Indication
 
