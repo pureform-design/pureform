@@ -1,7 +1,7 @@
 // How an interactive surface answers the user: the state layer, the ripple, and the focus
 // indicator, in Material's names, as one pluggable `Indication` that draws from the component's
 // interaction source. This module is the interface, the built-ins (Material's and none) without
-// their live halves, and how an indication's tokens are written. `@pureform/binding-dom` fills in
+// their live halves, and how an indication's tokens are written. `@pureform/binding-web` fills in
 // the built-ins' web halves and the wiring the web bindings share; React Native fills in the
 // native halves.
 
@@ -39,7 +39,7 @@ export interface IndicationTokens {
 }
 
 /** The elements an indication draws on, from the component's anatomy. `E` is the platform's
- *  element type (`HTMLElement` on the web, from `@pureform/binding-dom/indication`); `unknown`
+ *  element type (`HTMLElement` on the web, from `@pureform/binding-web/indication`); `unknown`
  *  here, so this package needs no DOM types. */
 export interface IndicationTarget<E = unknown> {
     /** The element whose interactions feed the source. */

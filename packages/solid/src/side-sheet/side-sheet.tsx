@@ -29,8 +29,8 @@ import type {
     SideSheetRootOwnProps,
     Unstyled,
 } from "@pureform/binding-core";
-import type { DialogFocusProps } from "@pureform/binding-dom";
-import { sideSheetDragToDismiss, springRoleVar } from "@pureform/binding-dom";
+import type { DialogFocusProps } from "@pureform/binding-web";
+import { sideSheetDragToDismiss, springRoleVar } from "@pureform/binding-web";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import { omit, onSettled, Show, untrack } from "solid-js";
 

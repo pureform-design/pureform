@@ -41,8 +41,8 @@ import type {
     SearchViewRootOwnProps,
     Unstyled,
 } from "@pureform/binding-core";
-import { searchViewDomDialogProps } from "@pureform/binding-dom";
-import { stackPositioner } from "@pureform/binding-dom";
+import { searchViewDomDialogProps } from "@pureform/binding-web";
+import { stackPositioner } from "@pureform/binding-web";
 import * as combobox from "@pureform/machines/combobox";
 import * as dialog from "@pureform/machines/dialog";
 import type { JSX, ValidComponent } from "@solidjs/web";

@@ -38,7 +38,7 @@ export type FileUploadErrorCode =
     | "FILE_INVALID"
     | "FILE_EXISTS";
 
-/** What the contract reads of a file: the web's `File` (`@pureform/binding-dom`'s
+/** What the contract reads of a file: the web's `File` (`@pureform/binding-web`'s
  *  `FileUploadDom*` types), or a platform's own. */
 export interface FileUploadItem {
     readonly name: string;

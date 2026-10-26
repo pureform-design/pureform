@@ -14,7 +14,7 @@ dependencies:
     - "@pureform/styling"
     - "@pureform/anatomy"
     - "@pureform/binding-core"
-    - "@pureform/binding-dom"
+    - "@pureform/binding-web"
     - "@pureform/component-cases"
     - "@pureform/panda-adapter"
     - "@pureform/preset"

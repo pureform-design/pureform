@@ -1,8 +1,9 @@
-# @pureform/binding-dom
+# @pureform/binding-web
 
 The web half of pureform's bindings, shared by `@pureform/solid` and `@pureform/react`:
-web-specific contracts and everything that needs a DOM type or API to compile or run. `@pureform/binding-core` holds the
-platform-free half and type-checks without the DOM lib; React Native imports only that, and its
+web-specific contracts and everything that needs a DOM type or API to compile or run.
+`@pureform/binding-core` holds the platform-free half and type-checks without the DOM lib;
+React Native imports only that, and its
 tests check that neither `@pureform/react-native` nor `@pureform/rn-adapter` imports this package.
 
 ## Where it sits
@@ -10,7 +11,7 @@ tests check that neither `@pureform/react-native` nor `@pureform/rn-adapter` imp
 ```
 @pureform/binding-core   (no framework, no DOM)
                  │
-@pureform/binding-dom    (this package; no framework)
+@pureform/binding-web    (this package; no framework)
                  │
 @pureform/solid, @pureform/react   (hooks and components)
 ```
@@ -20,7 +21,8 @@ re-export what an app needs (the built-in indications, for one).
 
 ## What goes here
 
-Anything that needs a DOM type or API: reading computed styles and layout, observers, pointer
+Web-specific policy, even when pure (such as the class/style slot customization resolver), and
+anything that needs a DOM type or API: reading computed styles and layout, observers, pointer
 drags and swipes, Web Animations, runtime themes as `<style>` blocks, the indication host, and the
 props only the web has. Pure logic (controllable state, settle and spring rules, menu groups and
 drill picks, tokens, the provider, the interaction state) stays in binding-core, and so do
@@ -33,6 +35,7 @@ token and `target` props.
 | ----------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `index.ts`                                                                                                              | The root entry: reduced motion, measuring an icon slot, checkbox, radio and text inputs kept in step, stacking positioners, scroll, the slider's inset icon, file inputs, and the modules below |
 | `components.ts`                                                                                                         | The web-only props of the components' contracts, as extensions of binding-core's, and the FAB menu's keys                                                                                       |
+| `slot-props.ts` | Pure resolution of web-only keyed customization, with lazy instance data; tracking and rendering belong to each framework binding |
 | `web-theme.ts`                                                                                                          | Runtime themes' `<style>` blocks, overrides as vars, and when to generate or keep the server's block                                                                                            |
 | `sheet-drag.ts`, `side-sheet-drag.ts`, `sideways-drag.ts`, `toast-swipe.ts`, `drag-click.ts`                            | Drags and swipes over pointer events                                                                                                                                                            |
 | `settle.ts`, `list-item-swipe-settle.ts`, `splitter-release.ts`                                                         | Settling a released element on its spring transition, from the release's speed                                                                                                                  |
@@ -57,7 +60,7 @@ or evaluate other parts. The binding owns when resolution happens: a Solid live 
 render. Ref attachment, icon contexts, indication layers, host selection, and optional content
 lifetimes stay in the framework bindings.
 
-### `@pureform/binding-dom`
+### `@pureform/binding-web`
 
 ```ts
 systemReducedMotion(): boolean;
@@ -128,7 +131,7 @@ type FileUploadDomRootOwnProps; FileUploadDomValueDetails; FileUploadDomContentP
 fabMenuListProps(content, getFab);                   // Tab from the last item to the FAB; focus follows the highlight
 ```
 
-### `@pureform/binding-dom/indication`
+### `@pureform/binding-web/indication`
 
 Exports `Indication`, `IndicationTarget` and `defineIndication` over `HTMLElement`: binding-core's
 are generic over the platform's element (`Indication<E>`), so loading this entry changes nothing
@@ -164,7 +167,7 @@ ripple draws, at a press. So a surface doesn't render again once its layer mount
 
 ## Building and testing
 
-- `task_run` `build` on `@pureform/binding-dom`: Vite library build, two entries (`index`,
+- `task_run` `build` on `@pureform/binding-web`: Vite library build, two entries (`index`,
   `indication`), with declarations.
 - `task_run` `test:unit`: Vitest in browser mode (Chromium; `CHROMIUM_PATH` from `.env.local`),
   with type checks. A browser command, `emulateReducedMotion`, flips the media query

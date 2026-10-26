@@ -7,8 +7,8 @@ import { isUnstyled, rippleSelection } from "@pureform/binding-core";
 import {
     RIPPLE_DOM_ROOT_PROPS,
     rippleDomMachineProps,
-} from "@pureform/binding-dom";
-import type { RippleDomRootOwnProps } from "@pureform/binding-dom";
+} from "@pureform/binding-web";
+import type { RippleDomRootOwnProps } from "@pureform/binding-web";
 import * as ripple from "@pureform/machines/ripple";
 import { normalizeProps } from "@zag-js/react";
 import { type ElementType, type ReactNode, useId } from "react";

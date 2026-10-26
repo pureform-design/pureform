@@ -29,7 +29,7 @@ import type {
     ToolbarRootOwnProps,
     Unstyled,
 } from "@pureform/binding-core";
-import { moveToolbarFocus, watchOverflow } from "@pureform/binding-dom";
+import { moveToolbarFocus, watchOverflow } from "@pureform/binding-web";
 import type {
     CSSProperties,
     ElementType,

@@ -28,8 +28,8 @@ import {
     DIALOG_FOCUS_PROPS,
     dialogFocusMachineProps,
     stackPositioner,
-} from "@pureform/binding-dom";
-import type { DialogFocusProps } from "@pureform/binding-dom";
+} from "@pureform/binding-web";
+import type { DialogFocusProps } from "@pureform/binding-web";
 import * as dialog from "@pureform/machines/dialog";
 import type { Selection } from "@pureform/styling";
 import { mergeProps, normalizeProps } from "@zag-js/react";

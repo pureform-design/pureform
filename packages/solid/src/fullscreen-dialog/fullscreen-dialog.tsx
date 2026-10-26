@@ -22,7 +22,7 @@ import type {
     FullscreenDialogRootOwnProps,
     Unstyled,
 } from "@pureform/binding-core";
-import type { DialogFocusProps } from "@pureform/binding-dom";
+import type { DialogFocusProps } from "@pureform/binding-web";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import { omit, Show } from "solid-js";
 

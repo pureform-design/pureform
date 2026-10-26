@@ -17,8 +17,8 @@ import type { PopoverContentProps } from "@pureform/binding-core";
 import {
     POPOVER_DOM_ROOT_PROPS,
     popoverDomMachineProps,
-} from "@pureform/binding-dom";
-import type { PopoverDomRootOwnProps } from "@pureform/binding-dom";
+} from "@pureform/binding-web";
+import type { PopoverDomRootOwnProps } from "@pureform/binding-web";
 import * as popover from "@pureform/machines/popover";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {

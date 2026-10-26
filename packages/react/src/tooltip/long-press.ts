@@ -1,7 +1,7 @@
 // A touch held on the trigger shows the tooltip (`tooltipLongPress`), for the plain and the rich
 // tooltip's triggers.
 
-import { tooltipLongPress } from "@pureform/binding-dom";
+import { tooltipLongPress } from "@pureform/binding-web";
 import { useCallback, useRef } from "react";
 
 /** A ref for the trigger that shows the tooltip on a long press. */

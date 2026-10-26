@@ -1,5 +1,5 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/omni-oss/json-schemas/refs/heads/main/project.json
-name: "@pureform/binding-dom"
+name: "@pureform/binding-web"
 
 extends:
   - "@workspace/omni/presets/ts-vite-lib.omni.yaml"

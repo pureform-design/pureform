@@ -22,7 +22,7 @@ where React Native allows.
 - **Depends on:** `@pureform/anatomy` (part names, test ids, and where each component shows
   indication), `@pureform/binding-core` (provider nesting, selections from props, controllable
   state, icon style types, the interaction source and the `Indication` interface; no DOM types or
-  APIs: it never imports `@pureform/binding-dom`, the web bindings' half, which `no-dom.spec.ts`
+  APIs: it never imports `@pureform/binding-web`, the web bindings' half, which `no-dom.spec.ts`
   checks),
   `@pureform/machines` (only its `/interaction` subpath's `InteractionEmitter`, which has no Zag
   or DOM code), and, as

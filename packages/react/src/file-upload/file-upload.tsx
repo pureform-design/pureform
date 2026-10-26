@@ -30,8 +30,8 @@ import type {
     FileUploadDomContentProps,
     FileUploadDomRootOwnProps,
     FileUploadDomValueDetails,
-} from "@pureform/binding-dom";
-import { writeInputFiles } from "@pureform/binding-dom";
+} from "@pureform/binding-web";
+import { writeInputFiles } from "@pureform/binding-web";
 import * as fileUpload from "@pureform/machines/file-upload";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";

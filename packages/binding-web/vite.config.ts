@@ -14,8 +14,8 @@ export default createConfig({
                 },
                 formats: ["es"],
                 fileName: (format, entryName) =>
-                    `${entryName || "binding-dom"}.${format === "cjs" ? "cjs" : "mjs"}`,
-                name: "BindingDom",
+                    `${entryName || "binding-web"}.${format === "cjs" ? "cjs" : "mjs"}`,
+                name: "BindingWeb",
             },
         },
     },

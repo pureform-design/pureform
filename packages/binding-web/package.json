@@ -1,7 +1,7 @@
 {
-    "name": "@pureform/binding-dom",
+    "name": "@pureform/binding-web",
     "version": "0.0.0-semantically-released",
-    "description": "The web half the Solid and React bindings share: everything that needs a DOM type or API",
+    "description": "The web half the Solid and React bindings share: web-specific contracts, policy, and DOM behavior",
     "type": "module",
     "sideEffects": false,
     "exports": {

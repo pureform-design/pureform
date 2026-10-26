@@ -23,7 +23,7 @@ import type {
     CarouselRootOwnProps,
     InteractionSourceProps,
 } from "@pureform/binding-core";
-import { carouselRowPadding, observeCarouselRow } from "@pureform/binding-dom";
+import { carouselRowPadding, observeCarouselRow } from "@pureform/binding-web";
 import * as carousel from "@pureform/machines/carousel";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {

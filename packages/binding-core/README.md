@@ -10,7 +10,7 @@ props Root takes and how they map onto the selection and the machine.
 It uses no DOM type or API: its `tsconfig.json` leaves the DOM lib out, so a leak fails the type
 check `test:unit` runs first. What needs the DOM (runtime themes as CSS, measuring, drags and
 swipes, the indication host, element getters, the web's `File`) is in
-[`@pureform/binding-dom`](../binding-dom/README.md), which only the web bindings import.
+[`@pureform/binding-web`](../binding-web/README.md), which only the web bindings import.
 
 ## Where it sits
 
@@ -19,7 +19,7 @@ swipes, the indication host, element getters, the web's `File`) is in
                  │
 @pureform/binding-core   (this package; no framework, no DOM)
                  │                     │
-                 │      @pureform/binding-dom   (the web half; no framework)
+                 │      @pureform/binding-web   (the web half; no framework)
                  │                     │
 @pureform/react-native     @pureform/solid, @pureform/react   (hooks and components)
 ```
@@ -48,7 +48,7 @@ to prune builds.
 | `platform-globals.d.ts`  | The globals every platform has (`console.warn`, `setTimeout`, `queueMicrotask`), declared since the DOM lib is left out                                                                                                                                              |
 | `usage.ts`               | `COMPONENT_USAGE` and the hook and provider names the bundler's pruning scan reads (on `/usage`)                                                                                                                                                                     |
 | `interaction.ts`         | The interaction source (on `/interaction`): `InteractionKinds`, `Interaction`, `InteractionState`, `createInteractionSource` and the state it keeps                                                                                                                  |
-| `indication.ts`          | The `Indication` interface (on `/indication`): what an indication sets and draws, `defineIndication`, generic over the platform's element (`Indication<E>`, `IndicationTarget<E>`; `@pureform/binding-dom` supplies `HTMLElement`); re-exports the two modules below |
+| `indication.ts`          | The `Indication` interface (on `/indication`): what an indication sets and draws, `defineIndication`, generic over the platform's element (`Indication<E>`, `IndicationTarget<E>`; `@pureform/binding-web` supplies `HTMLElement`); re-exports the two modules below |
 | `indication-material.ts` | `materialIndication({ ripple })` and `noIndication` without live halves (the bindings add them), `rippleClasses(registry)`                                                                                                                                           |
 | `indication-tokens.ts`   | An indication's tokens as CSS: theme-level overrides for a provider, instance tokens for a component, the focus indicator check                                                                                                                                      |
 
@@ -379,7 +379,7 @@ toastSelection(type, props);             // an unknown type selects `info`
 TOAST_STACK_STYLE;                       // Zag's --x, --y, --scale, --opacity, --height applied
 toastGroupStyle(style);                  // Zag's region style, physical insets, no z-index
 
-// Toolbar: the generated toolbarAnatomy (root); overflow.ts (toolbar-dom.ts is binding-dom's)
+// Toolbar: the generated toolbarAnatomy (root); overflow.ts (toolbar-dom.ts is binding-web's)
 interface ToolbarRootOwnProps            // placement, orientation, color, tokens, overflow, testId
 TOOLBAR_ROOT_PROPS; toolbarSelection(props); toolbarRootProps(props); // role, aria-orientation
 interface ToolbarItem<Node>              // value, label, icon?, disabled?, selected?, onClick?, …
@@ -534,7 +534,7 @@ codeFieldMachineProps(props);
 // list item (with an icon button to remove it, and a linear progress while the app reports one).
 // The accepted files are `value` (Zag's acceptedFiles), with defaultValue and onValueChange
 // ({ value, rejectedFiles }). Generic over the platform's file `F extends FileUploadItem`
-// ({ name, size, type }); binding-dom's FileUploadDom* types use the web's File. React Native has
+// ({ name, size, type }); binding-web's FileUploadDom* types use the web's File. React Native has
 // no picker or drop, so the app keeps `files` (FileUploadEntry).
 type FileUploadPart; interface FileUploadItem; interface FileUploadRootOwnProps<F> // color, tokens, value, accept,
 // maxFiles, maxFileSize, validate, progress, errorMessage, removeLabel, error, …
@@ -592,7 +592,7 @@ searchBarSelection(props); searchBarMachineProps(props); // the placeholder is t
 // Ripple: pureform's ripple machine
 type RipplePart; interface RippleRootOwnProps // tokens, disabled, effect, centered,
                                          // allowPropagation, id, testId, unstyled (the web's
-                                         // getSurfaceEl is binding-dom's RippleDomRootOwnProps)
+                                         // getSurfaceEl is binding-web's RippleDomRootOwnProps)
 RIPPLE_ROOT_PROPS; rippleSelection(props); rippleMachineProps(props); // effect → the machine's variant
 
 // Single-part components: Root is the component
@@ -670,7 +670,7 @@ isn't promised (today: at mount on the client, none on the server).
 
 The interface every indication implements, the built-ins without their live halves, and how
 their tokens are written (design doc §9.8). The web halves and the wiring the web bindings share
-are `@pureform/binding-dom/indication`'s; React Native adds its own. Apps import the built-ins
+are `@pureform/binding-web/indication`'s; React Native adds its own. Apps import the built-ins
 from their binding (`@pureform/solid`, `@pureform/react`, `@pureform/react-native`), which
 re-exports them with that binding's live half.
 
@@ -693,7 +693,7 @@ defineIndication(indication): Indication;
 
 // The built-ins, without live halves
 materialIndication(options?: { ripple?: "ink-well" | "ink-sparkle" | false }): Indication;
-//   "material", layer: true; no web or native half here: binding-dom's `materialIndication` (and
+//   "material", layer: true; no web or native half here: binding-web's `materialIndication` (and
 //   `webIndication`) and React Native's add them. The same object for the same options.
 //   { ripple: false } has no layer.
 noIndication: Indication;      // "none": the four state-layer opacities at 0; keeps the focus indicator
@@ -717,7 +717,7 @@ interactive component's contract takes `indication` and `interactionSource`
 `INTERACTIVE_PROPS`); a composite takes `indication` on Root and `interactionSource` per item.
 
 The host that wires an indication to a component's elements, and what's forwarded to it, is
-`@pureform/binding-dom/indication`'s `IndicationHost`.
+`@pureform/binding-web/indication`'s `IndicationHost`.
 
 ### `@pureform/binding-core/usage`
 
@@ -812,7 +812,7 @@ motion ends: a leaving page goes, an entering one becomes current), `pagesLeavin
 was), `LEAVING_PAGE_PROPS` (`inert`, `aria-hidden`) and `pageRootProps(pages)`
 (`data-transitioning` while a page leaves, which clips the root so a taller old page doesn't
 spill). `PageTransitionProps` (`transition: "none" | "fadeThrough" | "sharedAxis"`,
-`transitionScrim`) is on the ready-made tabs' and stepper's content props. binding-dom's
+`transitionScrim`) is on the ready-made tabs' and stepper's content props. binding-web's
 `whenAnimationsEnd(element, done)` tells a web binding when a page's motion has ended.
 
 ## Horizontal shared axis
@@ -833,7 +833,7 @@ tokens hold (an instance's `slideSpring`, `fadeDuration` and `fadeDelay` tokens 
 itemWidth?)` (Material's sizes at rest) and `carouselItemSizes(options, metrics)` (each item's
 slot, mask width and mask offset at a scroll position; the keylines turn round near the end so the
 last item ends large). `CAROUSEL_SIZES` holds the fixed small (40 to 56) and large (186) widths.
-`@pureform/binding-dom` adds `observeCarouselRow`, `measureCarouselRow` and `carouselRowPadding` (the
+`@pureform/binding-web` adds `observeCarouselRow`, `measureCarouselRow` and `carouselRowPadding` (the
 `padding` token's var, for Zag's `padding` prop, so the scroll padding renders on the server).
 
 ## Accordion and tree

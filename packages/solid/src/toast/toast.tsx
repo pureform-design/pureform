@@ -23,7 +23,7 @@ import type {
     ToastInstances,
     ToastType,
 } from "@pureform/binding-core";
-import { toastSwipeToDismiss } from "@pureform/binding-dom";
+import { toastSwipeToDismiss } from "@pureform/binding-web";
 import * as toast from "@pureform/machines/toast";
 import type { JSX } from "@solidjs/web";
 import {

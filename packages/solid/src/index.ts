@@ -25,11 +25,11 @@ export { noIndication } from "@pureform/binding-core/indication";
 export {
     defineIndication,
     materialIndication,
-} from "@pureform/binding-dom/indication";
+} from "@pureform/binding-web/indication";
 export type {
     Indication,
     IndicationTarget,
-} from "@pureform/binding-dom/indication";
+} from "@pureform/binding-web/indication";
 export type {
     IndicationContext,
     IndicationTokens,

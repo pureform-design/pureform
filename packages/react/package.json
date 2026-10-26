@@ -586,7 +586,7 @@
     "dependencies": {
         "@pureform/anatomy": "workspace:^",
         "@pureform/binding-core": "workspace:^",
-        "@pureform/binding-dom": "workspace:^",
+        "@pureform/binding-web": "workspace:^",
         "@pureform/machines": "workspace:^",
         "@zag-js/core": "catalog:",
         "@zag-js/react": "catalog:"

@@ -1,4 +1,4 @@
-// React Native's bindings stay off the web's half: `@pureform/binding-dom` needs the DOM, so
+// React Native's bindings stay off the web's half: `@pureform/binding-web` needs the DOM, so
 // neither the package nor its source may import it.
 
 import { describe, expect, it } from "vitest";
@@ -33,18 +33,18 @@ describe("@pureform/react-native without the DOM", () => {
         expect(Object.keys(SOURCES).length).toBeGreaterThan(10);
     });
 
-    it("never imports @pureform/binding-dom", () => {
+    it("never imports @pureform/binding-web", () => {
         const importing = Object.entries(SOURCES)
-            .filter(([, source]) => source.includes("@pureform/binding-dom"))
+            .filter(([, source]) => source.includes("@pureform/binding-web"))
             .map(([path]) => path);
         expect(importing).toEqual([]);
     });
 
-    it("doesn't depend on @pureform/binding-dom", () => {
+    it("doesn't depend on @pureform/binding-web", () => {
         expect(packageJson).toBeDefined();
         for (const field of DEPENDENCY_FIELDS) {
             expect(Object.keys(packageJson?.[field] ?? {})).not.toContain(
-                "@pureform/binding-dom",
+                "@pureform/binding-web",
             );
         }
     });

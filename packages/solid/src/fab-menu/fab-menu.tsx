@@ -20,7 +20,7 @@ import type {
     FabMenuRootOwnProps,
     InteractionSourceProps,
 } from "@pureform/binding-core";
-import { fabMenuListProps } from "@pureform/binding-dom";
+import { fabMenuListProps } from "@pureform/binding-web";
 import * as menu from "@pureform/machines/menu";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {

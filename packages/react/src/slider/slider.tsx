@@ -27,7 +27,7 @@ import type {
     SliderThumbInstance,
     SliderValue,
 } from "@pureform/binding-core";
-import { readSliderInsetIcon } from "@pureform/binding-dom";
+import { readSliderInsetIcon } from "@pureform/binding-web";
 import { setNativeDefault } from "@pureform/machines/form";
 import * as slider from "@pureform/machines/slider";
 import { normalizeProps } from "@zag-js/react";

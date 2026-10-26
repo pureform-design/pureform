@@ -860,7 +860,7 @@ manage focus, dismissal, and hiding the page themselves.
 dialog, scrim, and snackbar roots take their layer through `zIndex(name)`. In place, a surface's
 `z-index` stacks it only inside its positioner, so the positioner takes it: Zag's popper copies the
 content's computed `z-index` into the floating positioner's `--z-index` (menu, select, tooltip),
-and `stackPositioner` in `@pureform/binding-dom` does the same for the dialog's fixed
+and `stackPositioner` in `@pureform/binding-web` does the same for the dialog's fixed
 positioner once it shows, in the next animation frame. Read at once, as it was first, the surface's
 style forced a recalculation of the whole page, after Zag's dismissable layer had forced one to
 mirror the same `z-index` onto the backdrop and positioner; `@pureform/machines/dialog` turns that
@@ -984,7 +984,7 @@ The design makes one setting, followed by everything that moves, on every target
   `"full"`, else `"system"`, so an explicit `"system"` inside a `"reduce"` provider keeps
   `"reduce"` (it writes no attribute, and the CSS can't say "system"). `useReducedMotion()`
   starts from `false` for the system and subscribes after mount (`subscribeReducedMotion` in
-  `@pureform/binding-dom`).
+  `@pureform/binding-web`).
 - **Built (p8):** React Native's provider takes the same `motion` and resolves it the same way;
   under `"system"` it reads `AccessibilityInfo.isReduceMotionEnabled()` after mount and follows
   `reduceMotionChanged`, and passes the result to every selection as `reducedMotion`. The old
@@ -1121,7 +1121,7 @@ the components.
   React Native, `springTo` (`animate/curve.ts`) starts every `Animated.spring` (`animate()` in
   progress units resting within 0.001, `settle()` in pixels resting within 0.5), and
   `springFieldNodes` gives a spring value's five per-field nodes for the theme and lowering.
-  On the web, `swallowNextClick(element)` (`@pureform/binding-dom`) drops the click a drag
+  On the web, `swallowNextClick(element)` (`@pureform/binding-web`) drops the click a drag
   ends with (the sheet's handle, the list item's swipe in both bindings).
 - **Emphasized.** M3's emphasized easing is a two-segment path, which `cubic-bezier()` can't
   draw; with `linear()` it can. `MATERIAL_EASINGS.emphasized` samples the path from
@@ -1706,7 +1706,7 @@ component), Zag's shape, identical in Solid and React:
 - **Built (p3a):** the browser toggles a checkbox's native input before the machine hears of
   the click, and Zag writes the input only when its state changes, so a controlled checkbox
   whose owner ignored the change kept the toggle. The binding puts the input back
-  (`syncCheckedInput` in `@pureform/binding-dom`) in a microtask after the click, once the
+  (`syncCheckedInput` in `@pureform/binding-web`) in a microtask after the click, once the
   machine's send and the owner's update have run.
 - **Built (p3b), React:** the restore runs in a microtask after Zag's queued send, but the
   owner's update may render before or after it. So it doesn't read the machine (whose
@@ -2380,7 +2380,7 @@ and `useIndication(source, { centered })`. What differs from the web:
   holds the layer element. The card's action area does: it stays unpositioned inside the
   positioned container, so its layer (absolutely placed, `inset: 0`, corners inherited) spans the
   whole card, while only the action area is the button. The bindings render the layer in the part
-  holding it (`holdsLayer` in binding-dom), attach that part with the `layer` role, and the effect
+  holding it (`holdsLayer` in binding-web), attach that part with the `layer` role, and the effect
   finds the layer there (`IndicationInstance` reads it at each press). React Native renders the
   layer in its surface, the root, since its absolute views place against their parent.
 - **Entries that come and go.** `useComponent` takes `entryActive(entry)`: which of a component's
@@ -2455,7 +2455,7 @@ mounts (React's 1,000-item mount re-rendered every surface once before).
 - `@pureform/binding-core/indication`: `Indication`, `defineIndication`, the tokens, and the
   built-ins without live halves; no DOM types (`Indication<E>` leaves the element type to
   the platform).
-- `@pureform/binding-dom/indication`: the built-ins' web halves (the ripple, over
+- `@pureform/binding-web/indication`: the built-ins' web halves (the ripple, over
   `createRipple`), `webIndication`, and the `IndicationHost` the web bindings share. React
   Native's halves live in `@pureform/react-native`, over the motion engines.
 - `@pureform/machines`: the button, checkbox, switch, radio, slider, menu, and navigation
@@ -2632,7 +2632,7 @@ rather than vanishing from one and appearing under the other. What the implement
 **Decided:** the web keeps the per-tab indicator and slides it FLIP-style, as material-web and MDC
 do; React Native does the same through its motion engines.
 
-- **Web (`slideIndicator` in `@pureform/binding-dom`).** Root keeps each Indicator part's
+- **Web (`slideIndicator` in `@pureform/binding-web`).** Root keeps each Indicator part's
   element by its tab's value and, when the machine's value changes (a click, the keyboard, a
   controlled `value`), slides the new indicator in from where the old one is drawn: a Web
   Animation of `transform` from `translate(dx, dy) scaleX(old / new)` (centers, origin 50%) to

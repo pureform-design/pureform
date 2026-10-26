@@ -1,4 +1,4 @@
-// React Native's adapter stays off the web's half: `@pureform/binding-dom` needs the DOM, so
+// React Native's adapter stays off the web's half: `@pureform/binding-web` needs the DOM, so
 // neither the package nor its source may import it.
 
 import { readdirSync, readFileSync } from "node:fs";
@@ -25,22 +25,22 @@ const DEPENDENCY_FIELDS = [
 ] as const;
 
 describe("@pureform/rn-adapter without the DOM", () => {
-    it("never imports @pureform/binding-dom", () => {
+    it("never imports @pureform/binding-web", () => {
         const files = sources(join(ROOT, "src"));
         expect(files.length).toBeGreaterThan(10);
         const importing = files.filter((path) =>
-            readFileSync(path, "utf8").includes("@pureform/binding-dom"),
+            readFileSync(path, "utf8").includes("@pureform/binding-web"),
         );
         expect(importing).toEqual([]);
     });
 
-    it("doesn't depend on @pureform/binding-dom", () => {
+    it("doesn't depend on @pureform/binding-web", () => {
         const packageJson = JSON.parse(
             readFileSync(join(ROOT, "package.json"), "utf8"),
         ) as Partial<Record<string, Record<string, string>>>;
         for (const field of DEPENDENCY_FIELDS) {
             expect(Object.keys(packageJson[field] ?? {})).not.toContain(
-                "@pureform/binding-dom",
+                "@pureform/binding-web",
             );
         }
     });

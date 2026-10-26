@@ -9,7 +9,7 @@ machine to the registry, and comes ready-made and as compound parts.
 ## Where it sits
 
 ```
-@pureform/styling   anatomy   machines   binding-core, binding-dom   (framework-free)
+@pureform/styling   anatomy   machines   binding-core, binding-web   (framework-free)
         │              │          │            │
         └──────────────┴────┬─────┴────────────┘
                             │
@@ -19,8 +19,8 @@ machine to the registry, and comes ready-made and as compound parts.
 ```
 
 Anything that works without Solid lives in `@pureform/binding-core` (shared with
-`@pureform/react`, and `@pureform/react-native` for what isn't the web's) or, when it needs the
-DOM, in `@pureform/binding-dom` (shared with `@pureform/react`: runtime themes as CSS, drags and
+`@pureform/react`, and `@pureform/react-native` for what isn't the web's) or, when it is specific
+to the web, in `@pureform/binding-web` (shared with `@pureform/react`: slot customization, runtime themes as CSS, drags and
 swipes, the indication host, and web-only props such as dialogs' `initialFocusEl`, the ripple's
 `getSurfaceEl` and the file upload's `File`); this package adds context, memos, effects, and
 rendering. `@pureform/styling` is a peer, so the app's generated registry and the binding share
@@ -73,7 +73,7 @@ Root ── useComponent(anatomy, { selection, testId, unstyled }) ──► use
 ### Binding repeated parts
 
 `createSlotProps` resolves each requested part through the web customization resolver in
-`@pureform/binding-dom`, using a live `merge` for dynamic entries. Capture a part's props during
+`@pureform/binding-web`, using a live `merge` for dynamic entries. Capture a part's props during
 setup, then spread the result. A repeated part always supplies its instance accessor:
 
 ```tsx
@@ -354,7 +354,7 @@ import { RichTooltip } from "@pureform/solid/rich-tooltip";
   (`useTransitionPage()`, from either entry, says where the page around a part is). Both
   transitions keep their pages with binding-core's `page-transition` model.
 - **Scrollable tabs** (`scrollable`) scroll the newly selected tab into view
-  (`revealInRow` from `@pureform/binding-dom`).
+  (`revealInRow` from `@pureform/binding-web`).
 - **The radio group** is an unstyled `div` (`radioGroupAnatomy`, `data-scope="radio-group"`, test
   id `pf-radio-group-root`) holding a preset `radio` per item. Name the group with `aria-label` or
   `aria-labelledby`, and each radio on its `ItemInput` (the ready-made uses each item's `label`).
@@ -449,7 +449,7 @@ import { RichTooltip } from "@pureform/solid/rich-tooltip";
   ready-made's `container` names (`container-name`). Else the menu drills into it when a press or
   a key opened it; when the pointer resting on the item did, the item drills at the next press.
   A server's render cascades. `menuSubmenuRoom(menu, row, submenu, anchor, container)` and
-  `menuSubmenuBoundary` (`@pureform/binding-dom`) replace `watchMenuSubmenuRoom` and the
+  `menuSubmenuBoundary` (`@pureform/binding-web`) replace `watchMenuSubmenuRoom` and the
   old two-argument `menuSubmenuRoom`. Composed menus cascade.
 - **The tooltip** opens on hover after `openDelay` (400 ms), on keyboard focus, and on a touch held
   on the trigger (500 ms, as React Native's long press; a plain one goes 1.5 s after), and points the

@@ -31,9 +31,9 @@ import {
     overrideVars,
     serverThemeCss,
     unloadedThemeMessage,
-} from "@pureform/binding-dom";
-import type { ThemeBlock } from "@pureform/binding-dom";
-import type { Indication } from "@pureform/binding-dom/indication";
+} from "@pureform/binding-web";
+import type { ThemeBlock } from "@pureform/binding-web";
+import type { Indication } from "@pureform/binding-web/indication";
 import { isRuntimeTheme, themeScope } from "@pureform/styling";
 import type { ThemeSchemeVars } from "@pureform/styling";
 import { isDev, isServer, useHead } from "@solidjs/web";

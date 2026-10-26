@@ -16,7 +16,7 @@ import type {
     CheckboxRootOwnProps,
     CheckedState,
 } from "@pureform/binding-core";
-import { syncCheckedInput } from "@pureform/binding-dom";
+import { syncCheckedInput } from "@pureform/binding-web";
 import * as checkbox from "@pureform/machines/checkbox";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";

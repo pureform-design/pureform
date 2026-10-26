@@ -48,8 +48,8 @@ import {
     menuSubmenuRoom,
     noteMenuSubmenuPresses,
     springRoleVar,
-} from "@pureform/binding-dom";
-import type { MenuDrillSnapshot } from "@pureform/binding-dom";
+} from "@pureform/binding-web";
+import type { MenuDrillSnapshot } from "@pureform/binding-web";
 import * as menu from "@pureform/machines/menu";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {

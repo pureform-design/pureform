@@ -27,8 +27,8 @@ import {
     radioInputs,
     setRadioDefaults,
     syncRadioInputs,
-} from "@pureform/binding-dom";
-import type { Indication } from "@pureform/binding-dom/indication";
+} from "@pureform/binding-web";
+import type { Indication } from "@pureform/binding-web/indication";
 import * as radioGroup from "@pureform/machines/radio-group";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {

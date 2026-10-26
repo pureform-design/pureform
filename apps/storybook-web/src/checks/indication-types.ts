@@ -1,12 +1,12 @@
 // Storybook type-checks the web and React Native bindings in one program. Importing
-// `@pureform/binding-dom/indication` must not retype React Native's indication elements, so an
+// `@pureform/binding-web/indication` must not retype React Native's indication elements, so an
 // indication written for each platform and a platform-neutral one all type-check together.
 
 import type { Indication as CoreIndication } from "@pureform/binding-core/indication";
 import type {
     Indication as DomIndication,
     IndicationTarget as DomTarget,
-} from "@pureform/binding-dom/indication";
+} from "@pureform/binding-web/indication";
 import type { Indication as NativeIndication } from "@pureform/react-native";
 
 type Equal<A, B> =

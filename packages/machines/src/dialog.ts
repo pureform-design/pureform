@@ -4,7 +4,7 @@
 // Mirroring reads the surface's computed `z-index` as the dialog opens, which forces a style
 // recalculation of the whole page, and the layer then writes the body's `pointer-events`, so the
 // next frame recalculates the page again. The bindings stack the positioner themselves, in the
-// next frame (`stackPositioner` from `@pureform/binding-dom`); the backdrop takes its layer
+// next frame (`stackPositioner` from `@pureform/binding-web`); the backdrop takes its layer
 // from the scrim's styles.
 
 import type { Machine as AnyMachine, Params, Scope } from "@zag-js/core";

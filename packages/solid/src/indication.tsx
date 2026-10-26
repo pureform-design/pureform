@@ -21,18 +21,18 @@ import type {
     InteractionState,
     MutableInteractionSource,
 } from "@pureform/binding-core/interaction";
-import { systemReducedMotion } from "@pureform/binding-dom";
-import type { Indication } from "@pureform/binding-dom/indication";
+import { systemReducedMotion } from "@pureform/binding-web";
+import type { Indication } from "@pureform/binding-web/indication";
 import {
     DEFAULT_INDICATION,
     holdsLayer,
     IndicationHost,
     NOT_FORWARDED,
-} from "@pureform/binding-dom/indication";
+} from "@pureform/binding-web/indication";
 import type {
     ForwardedStates,
     IndicationRole,
-} from "@pureform/binding-dom/indication";
+} from "@pureform/binding-web/indication";
 import {
     InteractionEmitter,
     pressableItemProps,

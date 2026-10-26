@@ -29,7 +29,7 @@ import type {
     TabsRootOwnProps,
     TabsTabInstance,
 } from "@pureform/binding-core";
-import { revealInRow, slideIndicator } from "@pureform/binding-dom";
+import { revealInRow, slideIndicator } from "@pureform/binding-web";
 import * as tabs from "@pureform/machines/tabs";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {

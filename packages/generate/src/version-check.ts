@@ -12,7 +12,7 @@ import { compareVersions, isVersion, satisfies } from "./semver";
 export const CORE_PACKAGES = [
     "@pureform/anatomy",
     "@pureform/binding-core",
-    "@pureform/binding-dom",
+    "@pureform/binding-web",
     "@pureform/bundler",
     "@pureform/cli",
     "@pureform/component-cases",

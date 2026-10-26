@@ -4,7 +4,7 @@
 
 import { fieldControlProps } from "@pureform/binding-core";
 import type { FieldStateProps, PlainTextProps } from "@pureform/binding-core";
-import { syncTextInput } from "@pureform/binding-dom";
+import { syncTextInput } from "@pureform/binding-web";
 import { type Accessor, createSignal, flush, untrack } from "solid-js";
 
 import { useControllable } from "../controllable";

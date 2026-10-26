@@ -166,7 +166,7 @@
       "dependencies": {
         "@pureform/anatomy": "workspace:^",
         "@pureform/binding-core": "workspace:^",
-        "@pureform/binding-dom": "workspace:^",
+        "@pureform/binding-web": "workspace:^",
         "@pureform/component-cases": "workspace:^",
         "@pureform/react": "workspace:^",
         "@pureform/react-native": "workspace:^",
@@ -278,8 +278,8 @@
         "vitest": "catalog:",
       },
     },
-    "packages/binding-dom": {
-      "name": "@pureform/binding-dom",
+    "packages/binding-web": {
+      "name": "@pureform/binding-web",
       "version": "0.0.0-semantically-released",
       "dependencies": {
         "@pureform/anatomy": "workspace:^",
@@ -591,7 +591,7 @@
       "dependencies": {
         "@pureform/anatomy": "workspace:^",
         "@pureform/binding-core": "workspace:^",
-        "@pureform/binding-dom": "workspace:^",
+        "@pureform/binding-web": "workspace:^",
         "@pureform/machines": "workspace:^",
         "@zag-js/core": "catalog:",
         "@zag-js/react": "catalog:",
@@ -746,7 +746,7 @@
       "dependencies": {
         "@pureform/anatomy": "workspace:^",
         "@pureform/binding-core": "workspace:^",
-        "@pureform/binding-dom": "workspace:^",
+        "@pureform/binding-web": "workspace:^",
         "@pureform/machines": "workspace:^",
         "@zag-js/core": "catalog:",
         "@zag-js/types": "catalog:",
@@ -1620,7 +1620,7 @@
 
     "@pureform/binding-core": ["@pureform/binding-core@workspace:packages/binding-core"],
 
-    "@pureform/binding-dom": ["@pureform/binding-dom@workspace:packages/binding-dom"],
+    "@pureform/binding-web": ["@pureform/binding-web@workspace:packages/binding-web"],
 
     "@pureform/browser-e2e-tests": ["@pureform/browser-e2e-tests@workspace:tests/browser-e2e-tests"],
 

@@ -1,7 +1,7 @@
 // The framework-free pieces every pureform binding shares: what the provider takes and how nested
 // providers combine, selections over defaults, part attributes and props merging, controllable
 // state, and reduced motion. It uses no DOM type or API: the web's half is
-// `@pureform/binding-dom`.
+// `@pureform/binding-web`.
 
 export { cx } from "./class-names";
 export type { ClassDictionary, ClassValue } from "./class-names";

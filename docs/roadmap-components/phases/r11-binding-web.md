@@ -1,16 +1,16 @@
-# r11 binding-dom split
+# r11 binding-web split
 
 Depends on: fix-storybook-8.
 
 `@pureform/binding-core` becomes platform-neutral (React, Solid, React Native); a new
-`@pureform/binding-dom` holds everything that needs a DOM type or API (React, Solid only).
+`@pureform/binding-web` holds everything that needs a DOM type or API (React, Solid only).
 
 ## Rule
 
-Anything that needs a DOM type or API to compile or run goes in `binding-dom`. `binding-core`
+Anything that needs a DOM type or API to compile or run goes in `binding-web`. `binding-core`
 type-checks without the DOM lib, so a leak fails `tsc`.
 
-## Moves to binding-dom
+## Moves to binding-web
 
 - All of today's `@pureform/binding-core/dom` entry (drags and swipes, menu drill motion,
   `menuSubmenuRoom`, scroll-focus, collapse, reveal, slide, carousel-row, toolbar-dom,
@@ -34,11 +34,11 @@ type-checks without the DOM lib, so a leak fails `tsc`.
 
 ## Migration
 
-- No shims: `@pureform/binding-core/dom` is removed; imports rewritten to `@pureform/binding-dom`.
+- No shims: `@pureform/binding-core/dom` is removed; imports rewritten to `@pureform/binding-web`.
 - React and Solid import both; React Native imports only `binding-core`.
 
 ## Guards
 
 - `binding-core` tsconfig without the `dom` lib.
-- A check that `react-native` (and `rn-adapter`) never import `binding-dom`.
+- A check that `react-native` (and `rn-adapter`) never import `binding-web`.
 - Full gate green.

@@ -11,7 +11,7 @@ through `@zag-js/react`'s `useMachine`.
 ## Where it sits
 
 ```
-@pureform/styling   anatomy   machines   binding-core, binding-dom   (framework-free)
+@pureform/styling   anatomy   machines   binding-core, binding-web   (framework-free)
         │              │          │            │
         └──────────────┴────┬─────┴────────────┘
                             │
@@ -21,8 +21,8 @@ through `@zag-js/react`'s `useMachine`.
 ```
 
 Anything that works without React lives in `@pureform/binding-core` (shared with
-`@pureform/solid`, and `@pureform/react-native` for what isn't the web's) or, when it needs the
-DOM, in `@pureform/binding-dom` (shared with `@pureform/solid`: runtime themes as CSS, drags and
+`@pureform/solid`, and `@pureform/react-native` for what isn't the web's) or, when it is specific
+to the web, in `@pureform/binding-web` (shared with `@pureform/solid`: slot customization, runtime themes as CSS, drags and
 swipes, the indication host, and web-only props such as dialogs' `initialFocusEl`, the ripple's
 `getSurfaceEl` and the file upload's `File`); this package adds context, memos, effects, and
 rendering. `@pureform/styling` is a peer, so the app's generated registry and the binding share
@@ -337,7 +337,7 @@ import { RichTooltip } from "@pureform/react/rich-tooltip";
   (`useTransitionPage()`, from either entry, says where the page around a part is). Both
   transitions keep their pages with binding-core's `page-transition` model.
 - **Scrollable tabs** (`scrollable`) scroll the newly selected tab into view
-  (`revealInRow` from `@pureform/binding-dom`).
+  (`revealInRow` from `@pureform/binding-web`).
 - **The text field and text area** float their label over a native `<input>` or `<textarea>`
   (its placeholder is one space by default, so the CSS sees when it holds a value; the container
   also gets `data-pf-filled`). The ready-made takes `label`, `supportingText`, `leadingIcon`,
@@ -426,7 +426,7 @@ import { RichTooltip } from "@pureform/react/rich-tooltip";
   ready-made's `container` names (`container-name`). Else the menu drills into it when a press or
   a key opened it; when the pointer resting on the item did, the item drills at the next press.
   A server's render cascades. `menuSubmenuRoom(menu, row, submenu, anchor, container)` and
-  `menuSubmenuBoundary` (`@pureform/binding-dom`) replace `watchMenuSubmenuRoom` and the
+  `menuSubmenuBoundary` (`@pureform/binding-web`) replace `watchMenuSubmenuRoom` and the
   old two-argument `menuSubmenuRoom`. Composed menus cascade.
 - **The tooltip** opens on hover after `openDelay` (400 ms), on keyboard focus, and on a touch held
   on the trigger (500 ms, as React Native's long press; a plain one goes 1.5 s after), and points the

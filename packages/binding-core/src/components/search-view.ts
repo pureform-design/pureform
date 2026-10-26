@@ -181,7 +181,7 @@ export const searchViewLabel = (props: SearchViewBehaviorProps): string =>
 
 /** Zag's dialog props for the view, besides `id`, `dir` and the controllable `open`: modal, so
  *  focus stays in it and goes back to the search bar once it closes. The web adds the input that
- *  takes focus as it opens (`@pureform/binding-dom`'s `searchViewDomDialogProps`). */
+ *  takes focus as it opens (`@pureform/binding-web`'s `searchViewDomDialogProps`). */
 export const searchViewDialogProps = (props: SearchViewBehaviorProps) => ({
     modal: true,
     role: "dialog" as const,

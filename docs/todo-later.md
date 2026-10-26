@@ -120,7 +120,7 @@ Still open when the batch notes (`docs/roadmap-components/context/` and the firs
   run didn't write; write atomically or clear `web/` first.
 - Open choices: run the node type checks in `build` (now only `check:types`); rename
   `tsconfig.project.json`; Vite/Vitest config files aren't type-checked by any tsconfig.
-- The `IndicationPlatform` augmentation from `@pureform/binding-dom/indication` puts
+- The `IndicationPlatform` augmentation from `@pureform/binding-web/indication` puts
   `HTMLElement` into any program loading it, including mixed web + React Native type checks;
   a generic `Indication<E>` is the alternative.
 - The plain `.pureform/` entry is typed from the first web target; multi-target code needing

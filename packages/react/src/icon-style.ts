@@ -5,7 +5,7 @@
 
 import { DEFAULT_ICON_STYLE, sameIconStyle } from "@pureform/binding-core";
 import type { IconStyle } from "@pureform/binding-core";
-import { observeIconStyle } from "@pureform/binding-dom";
+import { observeIconStyle } from "@pureform/binding-web";
 import { createContext, useContext, useEffect, useState } from "react";
 
 /** The element of the icon part around the caller, once mounted; `null` before, and outside

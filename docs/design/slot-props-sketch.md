@@ -27,7 +27,7 @@ export type InnerProps<
 `CustomizeProps<C>` is the set each renderer already defines for its own parts:
 
 ```ts
-// React and Solid (binding-dom)
+// React and Solid (binding-web)
 interface CustomizeProps<C> {
     readonly className?: string | SlotKeyed<C, string>; // Solid: `class`
     readonly style?: SlotKeyed<C, Style>;

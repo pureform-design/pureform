@@ -20,8 +20,8 @@ import type {
     AppBarRootOwnProps,
     AppBarScrollState,
 } from "@pureform/binding-core";
-import { subscribeScroll } from "@pureform/binding-dom";
-import type { ScrollTarget } from "@pureform/binding-dom";
+import { subscribeScroll } from "@pureform/binding-web";
+import type { ScrollTarget } from "@pureform/binding-web";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {
     type Accessor,

@@ -10,7 +10,7 @@ import type {
     PageState,
     TransitionPage,
 } from "@pureform/binding-core";
-import { whenAnimationsEnd } from "@pureform/binding-dom";
+import { whenAnimationsEnd } from "@pureform/binding-web";
 import type { JSX } from "@solidjs/web";
 import {
     type Accessor,

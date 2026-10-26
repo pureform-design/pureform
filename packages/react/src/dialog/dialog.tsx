@@ -21,7 +21,7 @@ import type {
     DialogRootOwnProps,
     Unstyled,
 } from "@pureform/binding-core";
-import type { DialogFocusProps } from "@pureform/binding-dom";
+import type { DialogFocusProps } from "@pureform/binding-web";
 import { type ElementType, type ReactNode } from "react";
 
 import { Button } from "../button";

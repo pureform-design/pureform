@@ -16,7 +16,7 @@
     "dependencies": {
         "@pureform/anatomy": "workspace:^",
         "@pureform/binding-core": "workspace:^",
-        "@pureform/binding-dom": "workspace:^",
+        "@pureform/binding-web": "workspace:^",
         "@pureform/component-cases": "workspace:^",
         "@pureform/react": "workspace:^",
         "@pureform/react-native": "workspace:^",

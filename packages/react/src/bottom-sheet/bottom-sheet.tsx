@@ -35,13 +35,13 @@ import type {
     SheetRest,
     Unstyled,
 } from "@pureform/binding-core";
-import type { DialogFocusProps } from "@pureform/binding-dom";
+import type { DialogFocusProps } from "@pureform/binding-web";
 import {
     dragToDismiss,
     focusableWhileOverflowing,
     springRoleVar,
-} from "@pureform/binding-dom";
-import type { SheetDrag } from "@pureform/binding-dom";
+} from "@pureform/binding-web";
+import type { SheetDrag } from "@pureform/binding-web";
 import { mergeProps, normalizeProps } from "@zag-js/react";
 import {
     type ElementType,

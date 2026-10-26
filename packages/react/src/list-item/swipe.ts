@@ -13,7 +13,7 @@ import {
     swipeTokens,
 } from "@pureform/binding-core";
 import type { ListItemSwipeProps } from "@pureform/binding-core";
-import { createSwipeSettle, swallowNextClick } from "@pureform/binding-dom";
+import { createSwipeSettle, swallowNextClick } from "@pureform/binding-web";
 import type { KeyboardEvent, PointerEvent } from "react";
 import { useRef, useState } from "react";
 

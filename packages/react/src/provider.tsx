@@ -32,8 +32,8 @@ import {
     overrideVars,
     serverThemeCss,
     unloadedThemeMessage,
-} from "@pureform/binding-dom";
-import type { ThemeBlock } from "@pureform/binding-dom";
+} from "@pureform/binding-web";
+import type { ThemeBlock } from "@pureform/binding-web";
 import { isRuntimeTheme, themeScope } from "@pureform/styling";
 import type { ThemeSchemeVars } from "@pureform/styling";
 import {

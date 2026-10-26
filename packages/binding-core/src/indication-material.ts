@@ -1,6 +1,6 @@
 // The built-in indications, without their live halves. Material's draws the state layer and the
 // focus indicator through the preset's styles, at the theme's values, and holds a layer element
-// for the ripple, which each platform draws (`@pureform/binding-dom` on the web, the engine's
+// for the ripple, which each platform draws (`@pureform/binding-web` on the web, the engine's
 // press ripple on React Native); no indication sets the state layer's opacities to 0 and keeps
 // the focus indicator.
 
@@ -53,7 +53,7 @@ const materialIndications = new Map<MaterialRipple, Indication>();
 
 /** Material's indication, the default: the state layer at the theme's opacities, a layer element
  *  inside each surface for the ripple, and the focus indicator. This is the platform-neutral one,
- *  with no live half: the bindings draw its ripple (`@pureform/binding-dom`'s
+ *  with no live half: the bindings draw its ripple (`@pureform/binding-web`'s
  *  `materialIndication` on the web, React Native's own). The same object for the same options. */
 export const materialIndication = (
     options: MaterialIndicationOptions = {},

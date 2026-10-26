@@ -31,8 +31,8 @@ import type {
     FileUploadDomContentProps,
     FileUploadDomRootOwnProps,
     FileUploadDomValueDetails,
-} from "@pureform/binding-dom";
-import { writeInputFiles } from "@pureform/binding-dom";
+} from "@pureform/binding-web";
+import { writeInputFiles } from "@pureform/binding-web";
 import * as fileUpload from "@pureform/machines/file-upload";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {

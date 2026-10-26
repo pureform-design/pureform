@@ -25,10 +25,10 @@ import type {
 } from "@pureform/binding-core";
 import { componentIndicationTokens } from "@pureform/binding-core/indication";
 import type { InteractionSource } from "@pureform/binding-core/interaction";
-import { resolveWebSlotCustomization } from "@pureform/binding-dom";
-import type { WebSlotCustomization } from "@pureform/binding-dom";
-import type { Indication } from "@pureform/binding-dom/indication";
-import { indicationRoles } from "@pureform/binding-dom/indication";
+import { resolveWebSlotCustomization } from "@pureform/binding-web";
+import type { WebSlotCustomization } from "@pureform/binding-web";
+import type { Indication } from "@pureform/binding-web/indication";
+import { indicationRoles } from "@pureform/binding-web/indication";
 import type {
     ClassSlots,
     ComponentName,
