@@ -7,7 +7,7 @@
 // props stay the same, and nothing at all for a part the user doesn't customize.
 
 import type { ComponentAnatomy } from "@pureform/anatomy";
-import { forInstance, isPerInstance } from "@pureform/binding-core";
+import { createSlotReader, isPerInstance } from "@pureform/binding-core";
 import type { InnerProps, PerInstance } from "@pureform/binding-core";
 import { StyleSheet } from "react-native";
 import type {
@@ -165,14 +165,15 @@ const build = (
     keyOf: (part: string) => string,
 ): PartSlots => {
     const userProps = (part: string, instance?: unknown) =>
-        (forInstance(slotProps[keyOf(part)], instance) as Dict | undefined) ??
-        EMPTY;
+        (createSlotReader(keyOf(part), () => instance)(slotProps) as
+            | Dict
+            | undefined) ?? EMPTY;
     const keyed = [style, slotProps];
     return {
         props: userProps,
         each: (part) => isPerInstance(keyed, keyOf(part)),
         style: (part, own, instance) => {
-            const user = forInstance(style[keyOf(part)], instance);
+            const user = createSlotReader(keyOf(part), () => instance)(style);
             if (user == null) return own;
             const base = (own ?? EMPTY) as object;
             return cached(styles, base, user as object, () => ({

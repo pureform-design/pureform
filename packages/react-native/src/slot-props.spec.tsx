@@ -1,7 +1,7 @@
 import { dialogOverlayAnatomy } from "@pureform/anatomy";
 import type { ReactNode } from "react";
 import { View } from "react-native";
-import { beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { PureformProvider } from ".";
@@ -76,6 +76,58 @@ describe("nativeSlots", () => {
         const keyOf = overlayKeys(dialogOverlayAnatomy);
         expect(keyOf("root")).toBe("content");
         expect(keyOf("headline")).toBe("headline");
+    });
+
+    it("resolves only the requested channel and part for the current copy", () => {
+        const style = vi.fn<(copy: { index: number }) => { opacity: number }>(
+            (copy) => ({ opacity: copy.index / 10 }),
+        );
+        const props = vi.fn<
+            (copy: { index: number }) => { accessibilityLabel: string }
+        >((copy) => ({ accessibilityLabel: `copy-${copy.index}` }));
+        const other = vi.fn<() => never>(() => {
+            throw new Error("unused part");
+        });
+        const slots = nativeSlots({
+            style: { root: style, label: other },
+            slotProps: { root: props, label: other },
+        });
+        expect(slots.each("root")).toBe(true);
+        expect(props).not.toHaveBeenCalled();
+        expect(style).not.toHaveBeenCalled();
+        expect(slots.props("root", { index: 1 })).toEqual({
+            accessibilityLabel: "copy-1",
+        });
+        expect(style).not.toHaveBeenCalled();
+        expect(slots.style("root", {}, { index: 2 })).toEqual({ opacity: 0.2 });
+        expect(props).toHaveBeenCalledTimes(1);
+        expect(slots.props("root", { index: 3 })).toEqual({
+            accessibilityLabel: "copy-3",
+        });
+        expect(other).not.toHaveBeenCalled();
+    });
+
+    it("keeps per-instance handlers lazy and preserves cached handler and spread identities", () => {
+        const user = vi.fn<() => void>();
+        const own = vi.fn<() => void>();
+        const input = { onPress: user };
+        const props = vi.fn<() => typeof input>(() => input);
+        const style = vi.fn<() => never>(() => {
+            throw new Error("unused channel");
+        });
+        const slots = nativeSlots({
+            style: { root: style },
+            slotProps: { root: props },
+        });
+        const handler = slots.on("root", "onPress", own);
+        expect(slots.on("root", "onPress", own)).toBe(handler);
+        const handlers = { onPress: own };
+        const merged = slots.with("root", handlers);
+        expect(slots.with("root", handlers)).toBe(merged);
+        handler();
+        expect(own).toHaveBeenCalledTimes(1);
+        expect(user).toHaveBeenCalledTimes(1);
+        expect(style).not.toHaveBeenCalled();
     });
 });
 

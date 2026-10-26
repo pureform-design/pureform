@@ -1,7 +1,7 @@
 // The web bindings' customization channels, independent of React renders or Solid tracking.
 // Native styles and host props deliberately do not pass through this web contract.
 
-import { forInstance } from "@pureform/binding-core";
+import { createSlotReader } from "@pureform/binding-core";
 
 type Dict = Readonly<Record<string, unknown>>;
 
@@ -29,17 +29,8 @@ export function resolveWebSlotCustomization(
     part: string,
     instance?: () => unknown,
 ): ResolvedWebSlotCustomization {
-    let read = false;
-    let value: unknown;
-    const one = (keyed: object | undefined) => {
-        const entry = (keyed as Dict | undefined)?.[part];
-        if (typeof entry !== "function") return entry;
-        if (!read) {
-            value = instance?.();
-            read = true;
-        }
-        return forInstance(entry, value);
-    };
+    const read = createSlotReader(part, instance);
+    const one = (keyed: object | undefined) => read(keyed as Dict | undefined);
     const props = one(input.slotProps) as Dict | undefined;
     const classes = one(input.class);
     const style = one(input.style);

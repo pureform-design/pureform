@@ -37,6 +37,7 @@ to prune builds.
 | `entries.ts`             | `classEntry` (the provider registry's entry), and the class hooks' errors about lazy entries                                                                                                                                                                         |
 | `parts.ts`               | `partSources` (a part's props, in merge order), `stateAttributes`, `partClasses`, `forSlot`, `isUnstyled`, `isIconPart`, `InnerProps`, `overDefaults`, `PerInstance`, `forInstance`, `isPerInstance`, `ItemInstance`                                                 |
 | `props.ts`               | `combineProps`: one part's props from several sources, with the binding's rules for classes and styles                                                                                                                                                               |
+| `slot-reader.ts` | `createSlotReader`: platform-neutral keyed lookup with lazy instance data shared within one resolution; no customization channels or merge policy |
 | `class-names.ts`         | `cx`: a `clsx`-compatible class joiner, for bindings whose class prop is a string (React)                                                                                                                                                                            |
 | `controllable.ts`        | `Controllable<N, T>`, the controlled/uncontrolled warning, and `reason: "reset"` tracking                                                                                                                                                                            |
 | `components/`            | One file per component's contract (`button.ts`, `checkbox.ts`, `switch.ts`, `radio-group.ts`, `chip.ts`, `icon-button.ts`, `fab.ts`), what ready-made components share about content (`content.ts`), and `VariantProp` (`variants.ts`)                               |
@@ -93,6 +94,8 @@ overDefaults(listItemProps, item);      // a child's own over its container's de
                                         // style/slotProps/tokens merge per part; either as-is when the other is empty
 forInstance(className.row, row);        // a repeated part's value for one copy (PerInstance<V, I>)
 isPerInstance([className, style], "row"); // whether any keyed value of the part is a function of the copy
+const read = createSlotReader("row", () => row); // fresh for each render or reactive evaluation
+read(styles); read(slotProps);          // only the requested channels; instance built at most once
 combineProps(sources, rules): Record<string, unknown>;
 outsideRootMessage("Button", "Label");   // the error for a compound part outside its Root
 

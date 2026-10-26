@@ -1103,6 +1103,7 @@ export type {
 } from "./parts";
 export { combineProps, mergeStyleObjects } from "./props";
 export type { CombineRules } from "./props";
+export { createSlotReader } from "./slot-reader";
 export {
     providerAttributes,
     requireRegistry,

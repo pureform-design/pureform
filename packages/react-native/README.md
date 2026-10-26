@@ -39,6 +39,11 @@ See the [design doc](../../docs/design/component-architecture.md), §5.1, §5.3,
 
 ## Architecture
 
+`slot-props.ts` uses `binding-core`'s `createSlotReader` to resolve only the channel and part a
+caller requests, with a fresh reader for each call. Native host types, style flattening, handler
+precedence (including `onLayout`), and identity caches remain local; no web customization contract
+is imported.
+
 | Module                                                                  | What it holds                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `provider.tsx`                                                          | `PureformProvider`, `usePureform`, `useRegistry`, `useDirection`, `useMotion`, `useEngine`                                                                                                                                                                                                                                                                                                                                                    |

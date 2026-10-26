@@ -54,7 +54,9 @@ token and `target` props.
 each binding still owns class/style/handler merging. This is a web contract, not the contract
 for React Native hosts or native styles, and does not extend `binding-core`.
 
-The resolver is pure. Its instance argument is a lazy function, evaluated at most once per
+The resolver uses `binding-core`'s platform-neutral `createSlotReader` for keyed lookup and lazy
+instance resolution. The channel names, normalization, and `unstyled` rules remain web policy.
+Its instance argument is a lazy function, evaluated at most once per
 resolution and only when a channel is a function of the repeated part's copy. It does not scan
 or evaluate other parts. The binding owns when resolution happens: a Solid live merge or a React
 render. Ref attachment, icon contexts, indication layers, host selection, and optional content
