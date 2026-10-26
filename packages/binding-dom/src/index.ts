@@ -15,6 +15,12 @@ import { DEFAULT_ICON_STYLE, sameIconStyle } from "@pureform/binding-core";
 import type { IconStyle } from "@pureform/binding-core";
 import { REDUCED_MOTION_QUERY } from "@pureform/binding-core";
 
+export { resolveWebSlotCustomization } from "./slot-props";
+export type {
+    WebSlotCustomization,
+    ResolvedWebSlotCustomization,
+} from "./slot-props";
+
 /** Whether the system asks for reduced motion now; `false` where there's no `matchMedia`. */
 export const systemReducedMotion = (): boolean =>
     typeof matchMedia === "function" &&

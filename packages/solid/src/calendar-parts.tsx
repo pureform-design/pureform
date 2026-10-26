@@ -261,10 +261,9 @@ export function calendarParts(use: (name: string) => CalendarContext) {
             disabled: state().disabled,
         });
         const slots = props.slots;
-        const rootSlot = slots?.(
-            "cell",
-            slots.each("cell") ? instance : undefined,
-        ) as CalendarPartProps | undefined;
+        const rootSlot = slots?.("cell", instance) as
+            | CalendarPartProps
+            | undefined;
         const source = useOwnInteractionSource(() => props.interactionSource);
         const handlers = useInteractionHandlers(
             source,
@@ -355,16 +354,11 @@ export function calendarParts(use: (name: string) => CalendarContext) {
                 <Weekdays {...weekdays}>
                     <For each={picker().weekDays} keyed={false}>
                         {(weekday, index) => {
-                            const label = slots?.(
-                                "weekday",
-                                slots.each("weekday")
-                                    ? () => ({
-                                          index,
-                                          long: weekday().long,
-                                          narrow: weekday().narrow,
-                                      })
-                                    : undefined,
-                            );
+                            const label = slots?.("weekday", () => ({
+                                index,
+                                long: weekday().long,
+                                narrow: weekday().narrow,
+                            }));
                             return (
                                 <Weekday aria-label={weekday().long} {...label}>
                                     {weekday().narrow}
@@ -376,12 +370,7 @@ export function calendarParts(use: (name: string) => CalendarContext) {
                 <Grid {...grid}>
                     <For each={picker().weeks} keyed={false}>
                         {(week, index) => {
-                            const row = slots?.(
-                                "week",
-                                slots.each("week")
-                                    ? () => ({ index })
-                                    : undefined,
-                            );
+                            const row = slots?.("week", () => ({ index }));
                             return (
                                 <Week {...row}>
                                     <For each={week()} keyed={false}>

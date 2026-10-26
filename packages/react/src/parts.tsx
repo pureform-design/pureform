@@ -11,8 +11,6 @@ import type {
     TestIdOverride,
 } from "@pureform/anatomy";
 import {
-    forInstance,
-    forSlot,
     isIconPart,
     isPerInstance,
     isUnstyled,
@@ -29,6 +27,7 @@ import type {
 } from "@pureform/binding-core";
 import { componentIndicationTokens } from "@pureform/binding-core/indication";
 import type { InteractionSource } from "@pureform/binding-core/interaction";
+import { resolveWebSlotCustomization } from "@pureform/binding-dom";
 import type { Indication } from "@pureform/binding-dom/indication";
 import { holdsLayer, indicationRoles } from "@pureform/binding-dom/indication";
 import type {
@@ -418,20 +417,23 @@ export const slotPartProps = <A extends ComponentAnatomy>(
     part: PartName<A>,
     instance?: unknown,
 ): PartProps => {
-    const one = (keyed: object | undefined) =>
-        forInstance(
-            (keyed as Readonly<Record<string, unknown>> | undefined)?.[part],
-            instance,
-        );
-    const unstyled =
-        typeof props.unstyled === "object" ? one(props.unstyled) : undefined;
-    return combinePartProps([
-        one(props.slotProps) as Readonly<Record<string, unknown>> | undefined,
+    const resolved = resolveWebSlotCustomization(
         {
-            className: one(props.className),
-            style: one(props.style),
+            slotProps: props.slotProps,
+            class: props.className,
+            style: props.style,
+            unstyled: props.unstyled,
+        },
+        part,
+        () => instance,
+    );
+    return combinePartProps([
+        resolved.props,
+        {
+            className: resolved.class,
+            style: resolved.style,
             // Only a copy's own `unstyled` (Root reads the rest).
-            unstyled: unstyled === true ? true : undefined,
+            unstyled: resolved.unstyled,
         },
     ]) as PartProps;
 };

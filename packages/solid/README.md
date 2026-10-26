@@ -70,6 +70,24 @@ Root ── useComponent(anatomy, { selection, testId, unstyled }) ──► use
 
 ## Public API
 
+### Binding repeated parts
+
+`createSlotProps` resolves each requested part through the web customization resolver in
+`@pureform/binding-dom`, using a live `merge` for dynamic entries. Capture a part's props during
+setup, then spread the result. A repeated part always supplies its instance accessor:
+
+```tsx
+const slots = createSlotProps(props);
+const cell = slots("cell", () => ({ value: props.value, selected: selected() }));
+return <Cell {...cell} />;
+```
+
+The accessor is only read when customization needs an instance. `slots.each()` has been removed:
+do not use reactive customization metadata to decide which accessors to install during setup.
+Slots can change from plain values to per-instance functions and back without remounting parts.
+Only provably static primitive entries bypass the live merge; getters and object-valued entries
+keep the reactive path.
+
 ### Components
 
 One subpath per component, so an app's bundle keeps only what it imports. Each export is the

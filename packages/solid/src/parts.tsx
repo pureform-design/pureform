@@ -11,9 +11,6 @@ import type {
     TestIdOverride,
 } from "@pureform/anatomy";
 import {
-    forInstance,
-    forSlot,
-    isPerInstance,
     isIconPart,
     isPresent,
     isUnstyled,
@@ -23,13 +20,13 @@ import {
 import type {
     InnerProps,
     PartStates,
-    PartInstances,
-    SlotKeyed,
     SlotKeyedEach,
     Unstyled,
 } from "@pureform/binding-core";
 import { componentIndicationTokens } from "@pureform/binding-core/indication";
 import type { InteractionSource } from "@pureform/binding-core/interaction";
+import { resolveWebSlotCustomization } from "@pureform/binding-dom";
+import type { WebSlotCustomization } from "@pureform/binding-dom";
 import type { Indication } from "@pureform/binding-dom/indication";
 import { indicationRoles } from "@pureform/binding-dom/indication";
 import type {
@@ -63,6 +60,16 @@ import { useProvidedTokens } from "./provided-tokens";
 import { usePureform } from "./provider";
 
 type Dict = Readonly<Record<string, unknown>>;
+
+// Anatomy decides this once, not a reactive condition. Parts without an indication or icon
+// context do not need to retain their host element.
+const createPartRef = (enabled: boolean) => {
+    if (!enabled) return [undefined, undefined] as const;
+    const [element, setElement] = createSignal<Element | undefined>(undefined, {
+        ownedWrite: true,
+    });
+    return [element, setElement] as const;
+};
 
 /** The registry name an anatomy's component is registered under. */
 export type ComponentOf<A extends ComponentAnatomy> = A["name"] & ComponentName;
@@ -194,12 +201,7 @@ const createPartScope = <A extends ComponentAnatomy>(
             const indicated = indication !== undefined && roles.length > 0;
             const icon = isIconPart(anatomy, part);
             // The element, for the parts that follow it: an indication's, and an icon's context.
-            const [element, setElement] =
-                indicated || icon
-                    ? createSignal<Element | undefined>(undefined, {
-                          ownedWrite: true,
-                      })
-                    : [undefined, undefined];
+            const [element, setElement] = createPartRef(indicated || icon);
             // The element's props, and a function that makes it.
             const draw = (
                 Part: ReturnType<typeof tag>,
@@ -240,14 +242,6 @@ const createPartScope = <A extends ComponentAnatomy>(
                     </Part>
                 );
             };
-            if (!optional) {
-                // A function, so an icon part's children render inside its context.
-                const node = draw(Tag!, () => user?.children);
-                if (!icon) return node();
-                return (
-                    <IconPartContext value={element!}>{node()}</IconPartContext>
-                );
-            }
             // The children built once, inside the icon's context, then the element only while
             // they're there.
             const gated = () => {
@@ -258,9 +252,16 @@ const createPartScope = <A extends ComponentAnatomy>(
                     </Show>
                 );
             };
-            if (!icon) return gated();
-            return (
-                <IconPartContext value={element!}>{gated()}</IconPartContext>
+            // Both branches are static setup choices. Only the optional branch's Show tracks
+            // presence; an icon's content is evaluated inside its context in either case.
+            const node = optional ? gated : draw(Tag!, () => user?.children);
+            // This branches on anatomy, never reactive state. Show would add an unnecessary
+            // lifetime boundary and change hydration ownership.
+            // eslint-disable-next-line solid/components-return-once
+            return icon ? (
+                <IconPartContext value={element!}>{node()}</IconPartContext>
+            ) : (
+                node()
             );
         },
     };
@@ -330,15 +331,17 @@ export interface SlotKeyedProps<
     Extra extends string = never,
     I = {},
 > {
-    readonly class?: SlotKeyedEach<PartName<A> | Extra, JSX.ClassValue, I>;
-    readonly style?: SlotKeyedEach<
-        PartName<A> | Extra,
-        JSX.CSSProperties | string,
-        I
-    >;
-    readonly testId?: TestIdOverride<PartName<A>>;
-    readonly slotProps?: SlotKeyedEach<PartName<A> | Extra, PartProps, I>;
-    readonly unstyled?: Unstyled<PartName<A>, I>;
+    readonly class?:
+        | SlotKeyedEach<PartName<A> | Extra, JSX.ClassValue, I>
+        | undefined;
+    readonly style?:
+        | SlotKeyedEach<PartName<A> | Extra, JSX.CSSProperties | string, I>
+        | undefined;
+    readonly testId?: TestIdOverride<PartName<A>> | undefined;
+    readonly slotProps?:
+        | SlotKeyedEach<PartName<A> | Extra, PartProps, I>
+        | undefined;
+    readonly unstyled?: Unstyled<PartName<A>, I> | undefined;
 }
 
 /** Everything that customizes a component's parts without choosing its variants: the slot-keyed
@@ -357,28 +360,28 @@ export type InnerPropsOf<A extends ComponentAnatomy> = InnerProps<
 
 /** One part's props from a ready-made component's slot-keyed props: its `slotProps` entry with
  *  its `class` and `style` merged in. `testId` and `unstyled` go to Root whole. A component with
- *  several parts reads them all through one `createSlotProps`. */
+ *  several parts binds them through one `createSlotProps`. */
 export const slotPartProps = <A extends ComponentAnatomy>(
     props: SlotKeyedProps<A>,
     part: PartName<A>,
-): PartProps => merge(() => onePart(props, part)) as PartProps;
+): PartProps => {
+    const resolved = merge(() => onePart(props, part));
+    return resolved as PartProps;
+};
 
 const onePart = (
-    props: SlotKeyedProps<ComponentAnatomy, never, PartInstances>,
+    props: WebSlotCustomization,
     part: string,
-    instance?: unknown,
+    instance?: Accessor<unknown>,
 ): Dict => {
-    const one = (keyed: object | undefined) =>
-        forInstance((keyed as Dict | undefined)?.[part], instance);
-    const unstyled =
-        typeof props.unstyled === "object" ? one(props.unstyled) : undefined;
+    const resolved = resolveWebSlotCustomization(props, part, instance);
     return combinePartProps([
-        one(props.slotProps) as Dict | undefined,
+        resolved.props,
         {
-            class: one(props.class),
-            style: one(props.style),
+            class: resolved.class,
+            style: resolved.style,
             // Only a copy's own `unstyled` (Root reads the rest).
-            unstyled: unstyled === true ? true : undefined,
+            unstyled: resolved.unstyled,
         },
     ]);
 };
@@ -386,8 +389,9 @@ const onePart = (
 /** A part drawn as a `Button` or `IconButton` (`as={Button}`): its `class` and `style` are plain
  *  values for the part, but the button keys them by its own parts, so they go to its root
  *  (`slotProps.root`), which the button's own `class` and `style` keys then join. */
-export const asRoot = (props: PartProps): PartProps =>
-    merge(omit(props as Dict, "class", "style"), {
+export const asRoot = (props: PartProps): PartProps => {
+    const rest = omit(props as Dict, "class", "style");
+    const resolved = merge(rest, {
         get slotProps() {
             const { class: value, style, slotProps } = props as Dict;
             if (value == null && style == null) return slotProps;
@@ -397,79 +401,13 @@ export const asRoot = (props: PartProps): PartProps =>
                 root: combinePartProps([keyed.root, { class: value, style }]),
             };
         },
-    }) as PartProps;
-
-const NO_PROPS: Dict = Object.freeze({});
-
-interface EveryPart {
-    /** Each part's props, but the repeated parts' given a function of the copy. */
-    readonly parts: Readonly<Record<string, Dict>>;
-    /** The repeated parts given a function of the copy, resolved per copy. */
-    readonly each: ReadonlySet<string>;
-}
-
-const NO_SLOTS: EveryPart = Object.freeze({
-    parts: Object.freeze({}),
-    each: new Set<string>(),
-});
-
-// Every part the slot-keyed props name, each with its props combined.
-const everyPart = (
-    props: SlotKeyedProps<ComponentAnatomy, never, PartInstances>,
-): EveryPart => {
-    const { slotProps, class: classes, style } = props;
-    const unstyled =
-        typeof props.unstyled === "object" ? props.unstyled : undefined;
-    if (!slotProps && !classes && !style && !unstyled) return NO_SLOTS;
-    const named = [slotProps, classes, style, unstyled];
-    const parts: Record<string, Dict> = {};
-    const each = new Set<string>();
-    for (const keyed of named) {
-        if (!keyed || typeof keyed !== "object") continue;
-        for (const part of Object.keys(keyed)) {
-            if (Object.hasOwn(parts, part) || each.has(part)) continue;
-            if (isPerInstance(named, part)) each.add(part);
-            else if (keyed !== unstyled) parts[part] = onePart(props, part);
-        }
-    }
-    return { parts, each };
+    });
+    return resolved as PartProps;
 };
 
-// A live view of one part's entry: a merge or a spread reads it as a source whose keys can change,
-// as it reads a store, since it answers for `$PROXY`. Symbols, which merges ask for as they build,
-// aren't read through, so building one in a component body reads nothing reactive.
-class SlotView {
-    constructor(readonly read: Accessor<Dict>) {}
-}
-
-const entry = (view: SlotView): Dict => view.read();
-
-const SLOT_VIEW: ProxyHandler<SlotView> = {
-    get: (view, key, receiver) => {
-        if (typeof key === "symbol")
-            return key === $PROXY ? receiver : undefined;
-        return entry(view)[key];
-    },
-    has: (view, key) =>
-        typeof key === "symbol" ? key === $PROXY : key in entry(view),
-    ownKeys: (view) => Object.keys(entry(view)),
-    getOwnPropertyDescriptor: (view, key) => {
-        if (typeof key === "symbol") return undefined;
-        const props = entry(view);
-        return Object.hasOwn(props, key)
-            ? { configurable: true, enumerable: true, value: props[key] }
-            : undefined;
-    },
-    set: () => true,
-    deleteProperty: () => true,
-};
-
-/** A ready-made component's slot-keyed props for each of its parts, computed together: `slots(
- *  "label")` is the label's `slotProps` entry with its `class` and `style` merged in, to spread.
- *  Spread one from a variable (`const label = slots("label")`, then `{...label}`): a call in a
- *  spread makes a memo of its own. When `class`, `style`, and `slotProps` can't change (absent, or
- *  plain data the compiler passed as is), each is a plain object; otherwise a live view of one
- *  memo. `testId` and `unstyled` go to Root whole. */
+/** Bind each consumed part to one live merge. Call during setup, then spread the result from a
+ *  variable. Repeated parts always pass an instance accessor; it is read only when a channel
+ *  needs it. No reactive metadata decides which computations are installed during setup. */
 export function createSlotProps<
     A extends ComponentAnatomy,
     Extra extends string = never,
@@ -480,37 +418,13 @@ export function createSlotProps<
         readonly unstyled?: unknown;
     },
 ): SlotPropsOf<PartName<A> | Extra, I> {
-    const keyed = props as SlotKeyedProps<
-        ComponentAnatomy,
-        never,
-        PartInstances
-    >;
-    const view = (read: Accessor<Dict>) =>
-        new Proxy(new SlotView(read), SLOT_VIEW) as PartProps;
-    if (untrack(() => SLOT_KEYED.every((key) => isFixed(keyed, key)))) {
-        const { parts, each } = untrack(() => everyPart(keyed));
-        return Object.assign(
-            (part: string, instance?: Accessor<unknown>) =>
-                each.has(part)
-                    ? view(createMemo(() => onePart(keyed, part, instance?.())))
-                    : ((parts[part] ?? NO_PROPS) as PartProps),
-            { each: (part: string) => each.has(part) },
-        ) as SlotPropsOf<PartName<A> | Extra, I>;
-    }
-    const every = createMemo(() => everyPart(keyed));
-    return Object.assign(
-        (part: string, instance?: Accessor<unknown>) =>
-            view(
-                instance
-                    ? createMemo(() =>
-                          every().each.has(part)
-                              ? onePart(keyed, part, instance())
-                              : (every().parts[part] ?? NO_PROPS),
-                      )
-                    : () => every().parts[part] ?? NO_PROPS,
-            ),
-        { each: (part: string) => every().each.has(part) },
-    ) as SlotPropsOf<PartName<A> | Extra, I>;
+    return (part: string, instance?: Accessor<unknown>) => {
+        if (untrack(() => isStaticSlot(props, part))) {
+            return untrack(() => onePart(props, part)) as PartProps;
+        }
+        const resolved = merge(() => onePart(props, part, instance));
+        return resolved as PartProps;
+    };
 }
 
 /** A ready-made's parts' slot-keyed props: `slots("label")` to spread on a part; a repeated part's
@@ -521,35 +435,33 @@ export interface SlotPropsOf<P extends string, I = {}> {
         part: K,
         ...instance: K extends keyof I ? [instance?: Accessor<I[K]>] : []
     ): PartProps;
-    /** Whether a function of the copy was passed for this repeated part. */
-    readonly each: (part: keyof I & P) => boolean;
 }
-
-const SLOT_KEYED = ["class", "style", "slotProps", "unstyled"] as const;
 
 // Whether a prop is a literal the compiler passed as is, or left out. Only on the props object the
 // compiler made: the server and the client build merges differently, and must pick the same parts.
 const isLiteral = (props: object, key: string): boolean =>
     !($PROXY in props) && isStatic(props, key);
 
-// Whether a slot-keyed prop can't change: a literal holding plain data, with no getter or store
-// anywhere inside.
-const isFixed = (
-    props: SlotKeyedProps<ComponentAnatomy>,
-    key: (typeof SLOT_KEYED)[number],
-): boolean => isLiteral(props, key) && isPlainData(props[key], 0);
-
-const isPlainData = (value: unknown, depth: number): boolean => {
-    if (value === null || typeof value !== "object") return true;
-    if (depth > 4 || $PROXY in value) return false;
-    const prototype = Object.getPrototypeOf(value);
-    if (prototype !== Object.prototype && prototype !== Array.prototype) {
-        return false;
-    }
-    for (const key of Object.keys(value)) {
-        const descriptor = Object.getOwnPropertyDescriptor(value, key)!;
+// No recursive data inspection or whole-component classification: only an absent entry or a
+// primitive own data property can bypass the memo. Objects may hide reactive descendants, and
+// functions may need a changing instance, so both always use the live path. This keeps ordinary
+// uncustomized rows within their setup budget without making dynamic slots choose a setup path.
+const isStaticSlot = (props: object, part: string): boolean => {
+    for (const key of ["class", "style", "slotProps", "unstyled"]) {
+        if (!isLiteral(props, key)) return false;
+        const keyed = (props as Dict)[key];
+        if (keyed == null || typeof keyed === "boolean") continue;
+        if (typeof keyed !== "object" || $PROXY in keyed) return false;
+        if (Object.getPrototypeOf(keyed) !== Object.prototype) return false;
+        const descriptor = Object.getOwnPropertyDescriptor(keyed, part);
+        if (!descriptor) continue;
         if (descriptor.get || descriptor.set) return false;
-        if (!isPlainData(descriptor.value, depth + 1)) return false;
+        const value: unknown = descriptor.value;
+        if (
+            typeof value === "function" ||
+            (value !== null && typeof value === "object")
+        )
+            return false;
     }
     return true;
 };
@@ -606,12 +518,13 @@ export function iconParts<A extends ComponentAnatomy, P extends IconPartProps>(
         const kept = mirror
             ? ["unstyled", "mirror", ...own]
             : ["unstyled", ...own];
+        const rest = omit(props, ...(kept as (keyof P)[]));
         return scope.render(part, {
             element: "span",
             machine: () => machine(props),
             ...(mirror ? { states: () => ({ mirrored: props.mirror }) } : {}),
             unstyled: () => props.unstyled,
-            props: omit(props, ...(kept as (keyof P)[])),
+            props: rest,
             optional,
         });
     };
@@ -652,10 +565,11 @@ export const plainParts =
     ) =>
         function Part(props: P): JSX.Element {
             const { scope } = use(label);
+            const rest = omit(props, "unstyled");
             return scope.render(part, {
                 element,
                 unstyled: () => props.unstyled,
-                props: omit(props, "unstyled"),
+                props: rest,
             });
         };
 
@@ -669,10 +583,11 @@ export const machinePart =
     (part: PartName<A>, label: string, machine: (context: C) => object) =>
         function Part(props: PlainPartProps): JSX.Element {
             const value = use(label);
+            const rest = omit(props, "unstyled");
             return value.scope.render(part, {
                 element,
                 machine: () => machine(value),
                 unstyled: () => props.unstyled,
-                props: omit(props, "unstyled"),
+                props: rest,
             });
         };

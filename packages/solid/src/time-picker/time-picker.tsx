@@ -196,16 +196,11 @@ function SelectorContent(
                             machine: () =>
                                 api().getScrollItemProps(props.of, item),
                             ...slotted(
-                                props.slots?.(
-                                    "scrollItem",
-                                    props.slots.each("scrollItem")
-                                        ? () => ({
-                                              view: props.of,
-                                              value: item.value,
-                                              selected: item.offset === 0,
-                                          })
-                                        : undefined,
-                                ),
+                                props.slots?.("scrollItem", () => ({
+                                    view: props.of,
+                                    value: item.value,
+                                    selected: item.offset === 0,
+                                })),
                                 () => item.text,
                             ),
                         })
@@ -285,15 +280,10 @@ function Dial(props: TimePickerDialProps): JSX.Element {
                                     machine: () =>
                                         api().getDialLabelProps(label),
                                     ...slotted(
-                                        slots?.(
-                                            "dialLabel",
-                                            slots.each("dialLabel")
-                                                ? () => ({
-                                                      value: label.value,
-                                                      selected: label.selected,
-                                                  })
-                                                : undefined,
-                                        ),
+                                        slots?.("dialLabel", () => ({
+                                            value: label.value,
+                                            selected: label.selected,
+                                        })),
                                         () => label.text,
                                     ),
                                 })

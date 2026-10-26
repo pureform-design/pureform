@@ -1,7 +1,7 @@
 # @pureform/binding-dom
 
 The web half of pureform's bindings, shared by `@pureform/solid` and `@pureform/react`:
-everything that needs a DOM type or API to compile or run. `@pureform/binding-core` holds the
+web-specific contracts and everything that needs a DOM type or API to compile or run. `@pureform/binding-core` holds the
 platform-free half and type-checks without the DOM lib; React Native imports only that, and its
 tests check that neither `@pureform/react-native` nor `@pureform/rn-adapter` imports this package.
 
@@ -43,6 +43,19 @@ token and `target` props.
 | `indication-host.ts`                                                                                                    | `IndicationHost`: ties an anatomy's indication entries to a component's elements, runs the effect after mount, and tracks forwarded hover and press                                             |
 
 ## Public API
+
+### Slot customization boundary
+
+`slot-props.ts` resolves the web ready-made components' keyed `slotProps`, class, style, and
+`unstyled` channels for one part. React normalizes `className` to the resolver's `class` channel;
+each binding still owns class/style/handler merging. This is a web contract, not the contract
+for React Native hosts or native styles, and does not extend `binding-core`.
+
+The resolver is pure. Its instance argument is a lazy function, evaluated at most once per
+resolution and only when a channel is a function of the repeated part's copy. It does not scan
+or evaluate other parts. The binding owns when resolution happens: a Solid live merge or a React
+render. Ref attachment, icon contexts, indication layers, host selection, and optional content
+lifetimes stay in the framework bindings.
 
 ### `@pureform/binding-dom`
 
