@@ -162,7 +162,7 @@ function ReadyMade(props: DialogProps): JSX.Element {
     const backdrop = slots("backdrop");
     const own = omit(props, ...READY_MADE_PROPS) as DialogRootProps;
     const root = slots("root") as object;
-    const trigger = slots("trigger") as object;
+    const trigger = slots("trigger");
     const positioner = slots("positioner");
     const content = slots("content");
     const icon = slots("icon");

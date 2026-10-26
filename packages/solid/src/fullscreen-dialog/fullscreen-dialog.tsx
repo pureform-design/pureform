@@ -148,13 +148,13 @@ function ReadyMade(props: FullscreenDialogProps): JSX.Element {
     const slots = createSlotProps(props);
     const own = omit(props, ...READY_MADE_PROPS) as FullscreenDialogRootProps;
     const root = slots("root") as object;
-    const trigger = slots("trigger") as object;
+    const trigger = slots("trigger");
     const positioner = slots("positioner");
     const content = slots("content");
     const header = slots("header");
-    const closeTrigger = slots("closeTrigger") as object;
+    const closeTrigger = slots("closeTrigger");
     const headline = slots("headline");
-    const confirmAction = slots("confirmAction") as object;
+    const confirmAction = slots("confirmAction");
     const body = slots("body");
     return (
         <Root {...own} {...root}>

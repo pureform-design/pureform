@@ -229,7 +229,7 @@ function ReadyMade(props: TooltipProps): JSX.Element {
     const slots = createSlotProps(props);
     const own = omit(props, ...READY_MADE_PROPS) as TooltipRootProps;
     const root = slots("root") as object;
-    const trigger = slots("trigger") as object;
+    const trigger = slots("trigger");
     const positioner = slots("positioner");
     const content = slots("content");
     const caret = slots("caret");

@@ -424,7 +424,7 @@ function ReadyMadeContent(props: {
                             own.modeToggleLabel ?? "Switch to text input"
                         }
                         onClick={() => own.onModeToggle?.()}
-                        {...asRoot(slots("modeToggle") as object)}
+                        {...asRoot(slots("modeToggle"))}
                     />
                 </Show>
             </Header>
@@ -480,7 +480,7 @@ function ReadyMade(props: DatePickerProps): JSX.Element {
                 <Trigger
                     as={Button}
                     label={props.trigger}
-                    {...asRoot(slots("trigger") as object)}
+                    {...asRoot(slots("trigger"))}
                 />
             </Show>
             <Backdrop {...backdrop} />

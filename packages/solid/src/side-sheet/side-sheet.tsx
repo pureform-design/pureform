@@ -220,13 +220,13 @@ function ReadyMade(props: SideSheetProps): JSX.Element {
     const backdrop = slots("backdrop");
     const own = omit(props, ...READY_MADE_PROPS) as SideSheetRootProps;
     const root = slots("root") as object;
-    const trigger = slots("trigger") as object;
+    const trigger = slots("trigger");
     const positioner = slots("positioner");
     const content = slots("content");
     const header = slots("header");
-    const backButton = slots("backButton") as object;
+    const backButton = slots("backButton");
     const headline = slots("headline");
-    const closeTrigger = slots("closeTrigger") as object;
+    const closeTrigger = slots("closeTrigger");
     const body = slots("body");
     const actions = slots("actions");
     return (

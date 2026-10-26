@@ -867,7 +867,7 @@ function ReadyMade(props: MenuProps): JSX.Element {
         "onOpenChange",
     ) as MenuRootProps;
     const root = slots("root") as object;
-    const trigger = slots("trigger") as object;
+    const trigger = slots("trigger");
     const contextTrigger = slots("contextTrigger") as object;
     const positioner = slots("positioner");
     const content = slots("content");

@@ -275,11 +275,9 @@ function ReadyMade(props: SplitterProps): JSX.Element {
                             {(next: Accessor<SplitterPane<JSX.Element>>) => (
                                 <ResizeTrigger
                                     {...(slots("resizeTrigger") as object)}
-                                    indicatorProps={
-                                        slots(
-                                            "resizeTriggerIndicator",
-                                        ) as object
-                                    }
+                                    indicatorProps={slots(
+                                        "resizeTriggerIndicator",
+                                    )}
                                     id={splitterTriggerId(pane().id, next().id)}
                                     label={props.resizeLabel}
                                 />

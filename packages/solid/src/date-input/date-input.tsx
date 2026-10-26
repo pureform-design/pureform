@@ -356,7 +356,7 @@ function ReadyMadeContent(props: {
                         icon={<CalendarIcon />}
                         aria-label={own.modeToggleLabel ?? "Switch to calendar"}
                         onClick={() => own.onModeToggle?.()}
-                        {...asRoot(slots("modeToggle") as object)}
+                        {...asRoot(slots("modeToggle"))}
                     />
                 </Show>
             </Header>

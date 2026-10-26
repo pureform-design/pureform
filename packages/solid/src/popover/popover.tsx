@@ -237,7 +237,7 @@ function ReadyMade(props: PopoverProps): JSX.Element {
     const slots = createSlotProps(props);
     const own = omit(props, ...READY_MADE_PROPS) as PopoverRootProps;
     const root = slots("root") as object;
-    const trigger = slots("trigger") as object;
+    const trigger = slots("trigger");
     const positioner = slots("positioner");
     const content = slots("content");
     const caret = slots("caret");

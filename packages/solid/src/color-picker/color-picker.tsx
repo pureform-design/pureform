@@ -56,7 +56,7 @@ import type {
     SlotKeyedProps,
     SlotPropsOf,
 } from "../parts";
-import { combinePartProps } from "../props";
+import { combinePartProps, mergePartProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 import { TextField } from "../text-field";
@@ -385,10 +385,7 @@ function HexField(props: ColorPickerHexFieldProps): JSX.Element {
     };
     const slotProps = createMemo(() => ({
         ...props.slotProps,
-        input: combinePartProps([
-            own,
-            props.slotProps?.input as Record<string, unknown> | undefined,
-        ]),
+        input: mergePartProps(own, props.slotProps?.input ?? {}),
     }));
     return (
         <TextField
