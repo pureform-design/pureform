@@ -20,10 +20,10 @@ import {
 } from "vitest/config";
 
 import machinesPackage from "../../packages/machines/package.json" with { type: "json" };
-import { closeServers, commands } from "./src/commands";
-import { generateRegistries } from "./src/targets/generated";
-import { TARGETS } from "./src/targets/targets";
-import type { TargetName } from "./src/targets/targets";
+import { closeServers, commands } from "./src/commands.ts";
+import { generateRegistries } from "./src/targets/generated.ts";
+import { TARGETS } from "./src/targets/targets.ts";
+import type { TargetName } from "./src/targets/targets.ts";
 import baseConfig from "./vite.config.ts";
 
 const executablePath = process.env.CHROMIUM_PATH;
