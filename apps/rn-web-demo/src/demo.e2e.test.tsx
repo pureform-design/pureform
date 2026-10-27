@@ -71,6 +71,9 @@ const chip = (label: string) =>
         (element) => element.textContent === label,
     )!;
 
+// The snackbar surface; its persistent live region (`role=status`) stays mounted when closed.
+const SNACKBAR = '[data-testid="pf-snackbar-root"]';
+
 const press = async (element: HTMLElement) => {
     await userEvent.click(element);
     // Off the element again, unless the press removed it (a menu item closing its menu).
@@ -285,7 +288,7 @@ describe("rn-web-demo", () => {
         // The surfaces shown in the page, besides the overlays.
         const menus = count("[role=menu]");
         const tooltips = count("[role=tooltip]");
-        const statuses = count("[role=status]");
+        const statuses = count(SNACKBAR);
         const dialogs = count('[data-testid="pf-dialog-content"]');
 
         // The menu opens under its trigger, over what follows it, and picking an item closes it.
@@ -318,17 +321,15 @@ describe("rn-web-demo", () => {
 
         // The snackbar comes from the queue, with the page's choice, and its action closes it.
         await press(named("Archive"));
-        expect(count("[role=status]")).toBe(statuses + 1);
-        const snackbar = [...document.querySelectorAll("[role=status]")].at(
-            -1,
-        )!;
+        expect(count(SNACKBAR)).toBe(statuses + 1);
+        const snackbar = [...document.querySelectorAll(SNACKBAR)].at(-1)!;
         expect(snackbar.textContent).toContain("Archived (copy)");
         await press(
             snackbar.querySelector<HTMLElement>(
                 '[data-testid="pf-snackbar-action"]',
             )!,
         );
-        expect(count("[role=status]")).toBe(statuses);
+        expect(count(SNACKBAR)).toBe(statuses);
 
         // The dialog opens modal over a scrim; Escape closes it, and so does Cancel.
         await press(named("Discard"));
