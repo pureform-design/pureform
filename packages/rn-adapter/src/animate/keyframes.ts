@@ -41,24 +41,35 @@ export const runKeyframes = (
             easing: (t: number) => t,
             useNativeDriver: false,
         });
-    const once = alternate
-        ? Animated.sequence([leg(end), leg(start)])
-        : Animated.sequence([
-              Animated.timing(progress, {
-                  toValue: start,
-                  duration: 0,
-                  useNativeDriver: false,
-              }),
-              leg(end),
-          ]);
-    const loop = Animated.loop(once, {
-        iterations:
-            animation.iterations < 0
-                ? -1
-                : alternate
-                  ? Math.ceil(animation.iterations / 2)
-                  : animation.iterations,
-    });
+    const reset = () =>
+        Animated.timing(progress, {
+            toValue: start,
+            duration: 0,
+            useNativeDriver: false,
+        });
+    const once = Animated.sequence([
+        reset(),
+        leg(end),
+        ...(alternate ? [leg(start)] : []),
+    ]);
+    const count =
+        animation.iterations < 0
+            ? -1
+            : alternate
+              ? Math.floor(animation.iterations / 2)
+              : animation.iterations;
+    const runs: Animated.CompositeAnimation[] = [];
+    if (count !== 0) runs.push(Animated.loop(once, { iterations: count }));
+    // Iterations count individual legs, not forward/reverse pairs. An odd finite count must
+    // finish at end, not run an extra return leg. CSS/WAAPI and Reanimated already count legs.
+    if (
+        alternate &&
+        animation.iterations > 0 &&
+        animation.iterations % 2 === 1
+    ) {
+        runs.push(Animated.sequence([reset(), leg(end)]));
+    }
+    const loop = Animated.sequence(runs);
     return animation.delay > 0
         ? Animated.sequence([Animated.delay(animation.delay), loop])
         : loop;

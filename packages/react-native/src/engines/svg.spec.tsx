@@ -179,7 +179,10 @@ describe("the Animated SVG engine on the web", () => {
                 ? false
                 : supports.apply(CSS, args as never)) as never;
         try {
-            const draw = (direction: "normal" | "alternate") => (
+            const draw = (
+                direction: "normal" | "alternate",
+                iterations: number,
+            ) => (
                 <View style={{ width: 100, height: 100 }}>
                     <SvgDrawing
                         drawing={{
@@ -189,7 +192,7 @@ describe("the Animated SVG engine on the web", () => {
                                 duration: 120,
                                 delay: 0,
                                 easing: LINEAR,
-                                iterations: 2,
+                                iterations,
                                 direction,
                                 frames: [
                                     { offset: 0, shape: square(0) },
@@ -201,14 +204,19 @@ describe("the Animated SVG engine on the web", () => {
                 </View>
             );
             const box = { width: 100, height: 100 };
-            const ends = async (direction: "normal" | "alternate") => {
-                const view = await mount(draw(direction));
+            const ends = async (
+                direction: "normal" | "alternate",
+                iterations = 2,
+            ) => {
+                const view = await mount(draw(direction, iterations));
                 for (let i = 0; i < 12; i++) await settle(50);
                 return view.querySelector("svg path")!.getAttribute("d");
             };
             // Twice there: it ends on the last frame. There and back: on the first.
             expect(await ends("normal")).toBe(shapePath(square(20), box));
             expect(await ends("alternate")).toBe(shapePath(square(0), box));
+            expect(await ends("alternate", 1)).toBe(shapePath(square(20), box));
+            expect(await ends("alternate", 3)).toBe(shapePath(square(20), box));
         } finally {
             CSS.supports = supports;
         }
