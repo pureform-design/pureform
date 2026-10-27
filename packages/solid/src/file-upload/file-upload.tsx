@@ -47,7 +47,6 @@ import {
     merge,
     omit,
     Show,
-    untrack,
 } from "solid-js";
 
 import { Button } from "../button";
@@ -154,14 +153,13 @@ function Root(props: FileUploadRootProps): JSX.Element {
         ...fileUploadValueProps(value.machineProps()),
     }));
     const api = createMemo(() => fileUpload.connect(service, normalizeProps));
-    // Zag writes the files into the input when they change, not the default at mount.
-    createEffect(hidden, (input) => {
-        if (input)
-            writeInputFiles(
-                input,
-                untrack(() => api().acceptedFiles),
-            );
-    });
+    // Owner-driven changes must reach FormData too. Native has no HTML file input to sync.
+    createEffect(
+        () => [hidden(), api().acceptedFiles] as const,
+        ([input, files]) => {
+            if (input) writeInputFiles(input, files);
+        },
+    );
     useFormReset(hidden, {
         // A file input has no default to write: the browser's reset empties it.
         resetsTo: () => "",

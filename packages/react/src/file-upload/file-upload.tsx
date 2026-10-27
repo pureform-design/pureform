@@ -147,11 +147,11 @@ function Root(props: FileUploadRootProps): ReactNode {
         ...fileUploadValueProps(value.machineProps),
     });
     const api = fileUpload.connect(service, normalizeProps);
-    // Zag writes the files into the input when they change, not the default at mount.
+    // Keep browser submission in sync with owner-driven changes too, including clearing files.
+    // Native uses picked-file records and has no HTML file input to synchronize.
     useEffect(() => {
         if (hidden) writeInputFiles(hidden, api.acceptedFiles);
-        // oxlint-disable-next-line react-hooks/exhaustive-deps -- only a new hidden input takes the files; later changes write them as they happen
-    }, [hidden]);
+    }, [hidden, api.acceptedFiles]);
     useFormReset(hidden, {
         // A file input has no default to write: the browser's reset empties it.
         resetsTo: "",

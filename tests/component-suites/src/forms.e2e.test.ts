@@ -56,7 +56,14 @@ describe("FileUpload binary submission", () => {
         const mounted = harness.mount(
             {
                 component: "FileUpload",
-                props: { name: "attachments", maxFiles: 2 },
+                props: {
+                    name: "attachments",
+                    maxFiles: 2,
+                    value: [],
+                    onValueChange: (details: { value: File[] }) => {
+                        void mounted.update({ value: details.value });
+                    },
+                },
             },
             host,
         );
@@ -92,6 +99,18 @@ describe("FileUpload binary submission", () => {
         expect(first[0]!.type).toBe("text/plain");
         expect(await first[0]!.text()).toBe("first\n<bytes>");
         await mounted.update({ value: [] });
+        await vi.waitFor(() =>
+            expect(
+                [
+                    ...host.querySelector<HTMLInputElement>(
+                        'input[type="file"]',
+                    )!.files!,
+                ].map((file) => file.name),
+            ).not.toContain("first.txt"),
+        );
+        expect((await payload()).map((file) => file.name)).not.toContain(
+            "first.txt",
+        );
         await mounted.update({
             value: [
                 new File([new Uint8Array([0, 127, 255])], "replacement.bin", {
