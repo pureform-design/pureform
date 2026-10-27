@@ -43,6 +43,7 @@ import type { ComponentScope, SlotKeyedProps } from "./parts";
 import { combinePartProps } from "./props";
 import type { PartProps } from "./props";
 import { useDirection } from "./provider";
+import { textareaServerProps } from "./textarea-props";
 
 type Anatomy = typeof textFieldAnatomy | typeof textAreaAnatomy;
 
@@ -216,7 +217,11 @@ export function createTextInput<A extends Anatomy>(config: TextInputConfig<A>) {
             machine: () =>
                 combinePartProps([
                     (config.element === "textarea"
-                        ? api().getTextAreaProps()
+                        ? textareaServerProps(
+                              api().getTextAreaProps() as Readonly<
+                                  Record<string, unknown>
+                              >,
+                          )
                         : api().getInputProps()) as Readonly<
                         Record<string, unknown>
                     >,

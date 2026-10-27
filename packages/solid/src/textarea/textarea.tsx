@@ -11,6 +11,7 @@ import { merge, omit } from "solid-js";
 
 import { usePlainText } from "../field/plain-text";
 import { useComponent } from "../parts";
+import { textareaServerProps } from "../textarea-props";
 
 /** The textarea's props: as the input's, with the textarea's own. */
 export interface TextareaProps
@@ -39,7 +40,7 @@ export function Textarea(props: TextareaProps): JSX.Element {
     return scope.render("root", {
         element: "textarea",
         as: () => props.as,
-        machine: text.machine,
+        machine: () => textareaServerProps(text.machine()),
         ref: text.ref,
         props: merged,
     });

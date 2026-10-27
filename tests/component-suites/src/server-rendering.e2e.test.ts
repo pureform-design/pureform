@@ -61,34 +61,38 @@ const stateful = COMPONENTS.filter((component) => component.state);
 
 // Both web bindings serialize textarea values as content, not value attributes. Native has no
 // HTML textarea/hydration boundary; its controlled TextInput behavior is covered in Native tests.
-describe("controlled Textarea content", () => {
-    const value = 'First line\n<escaped> & "quoted"';
-    const scene: Scene = { component: "Textarea", props: { value } };
+describe.each(["Textarea", "TextArea"] as const)(
+    "controlled Textarea content (%s)",
+    (component) => {
+        it.each(['First line\n<escaped> & "quoted"', "\nLeading newline", ""])(
+            "preserves server content through hydration and owner updates (%j)",
+            async (value) => {
+                const scene: Scene = { component, props: { value } };
+                const server = await serverRendered(scene);
+                const rendered = server.querySelector("textarea")!;
+                expect(rendered.textContent).toBe(value);
+                expect(rendered.value).toBe(value);
+                expect(rendered.querySelector("escaped")).toBeNull();
+                server.remove();
 
-    it("escapes server content and preserves it through hydration and owner updates", async () => {
-        const server = await serverRendered(scene);
-        const rendered = server.querySelector("textarea")!;
-        expect(rendered.textContent).toBe(value);
-        expect(rendered.value).toBe(value);
-        expect(rendered.querySelector("escaped")).toBeNull();
-        server.remove();
-
-        const host = await serverRendered(scene);
-        const original = host.querySelector("textarea")!;
-        const console = watchConsole();
-        try {
-            const mounted = await harness.hydrate(scene, host);
-            await harness.settle();
-            expect(host.querySelector("textarea")).toBe(original);
-            expect(original.value).toBe(value);
-            await mounted.update({ value: "Updated\n& <text>" });
-            expect(original.value).toBe("Updated\n& <text>");
-            expect(console.logged).toEqual([]);
-        } finally {
-            console.stop();
-        }
-    });
-});
+                const host = await serverRendered(scene);
+                const original = host.querySelector("textarea")!;
+                const console = watchConsole();
+                try {
+                    const mounted = await harness.hydrate(scene, host);
+                    await harness.settle();
+                    expect(host.querySelector("textarea")).toBe(original);
+                    expect(original.value).toBe(value);
+                    await mounted.update({ value: "Updated\n& <text>" });
+                    expect(original.value).toBe("Updated\n& <text>");
+                    expect(console.logged).toEqual([]);
+                } finally {
+                    console.stop();
+                }
+            },
+        );
+    },
+);
 
 describe.each(stateful)("$component, state", (component) => {
     const state = component.state!;
