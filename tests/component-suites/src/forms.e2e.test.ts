@@ -48,6 +48,67 @@ const submit = (
     });
 };
 
+// Actual HTML File/FormData submission is web-only; Native FileUpload uses picked-file records,
+// not a browser file input. Run this against both web bindings and every stylesheet target.
+describe("FileUpload binary submission", () => {
+    it("submits file bytes and replaces removed files without stale entries", async () => {
+        const { host, form } = inForm();
+        const mounted = harness.mount(
+            {
+                component: "FileUpload",
+                props: { name: "attachments", maxFiles: 2 },
+            },
+            host,
+        );
+        const choose = async (files: File[]) => {
+            const input =
+                host.querySelector<HTMLInputElement>('input[type="file"]')!;
+            const transfer = new DataTransfer();
+            for (const file of files) transfer.items.add(file);
+            input.files = transfer.files;
+            input.dispatchEvent(new Event("change", { bubbles: true }));
+            await harness.settle();
+        };
+        const payload = async () => {
+            let data: FormData | undefined;
+            const collect = (event: SubmitEvent) => {
+                event.preventDefault();
+                data = new FormData(form, event.submitter);
+            };
+            form.addEventListener("submit", collect, { once: true });
+            await userEvent.click(
+                form.querySelector<HTMLButtonElement>("[data-submit]")!,
+            );
+            expect(data).toBeDefined();
+            return data!.getAll("attachments") as File[];
+        };
+        await choose([
+            new File(["first\n<bytes>"], "first.txt", { type: "text/plain" }),
+        ]);
+        const first = await payload();
+        expect(first).toHaveLength(1);
+        expect(first[0]).toBeInstanceOf(File);
+        expect(first[0]!.name).toBe("first.txt");
+        expect(first[0]!.type).toBe("text/plain");
+        expect(await first[0]!.text()).toBe("first\n<bytes>");
+        await mounted.update({ value: [] });
+        await mounted.update({
+            value: [
+                new File([new Uint8Array([0, 127, 255])], "replacement.bin", {
+                    type: "application/octet-stream",
+                }),
+            ],
+        });
+        const replacement = await payload();
+        expect(replacement).toHaveLength(1);
+        expect(replacement[0]!.name).toBe("replacement.bin");
+        expect(replacement[0]!.type).toBe("application/octet-stream");
+        expect([
+            ...new Uint8Array(await replacement[0]!.arrayBuffer()),
+        ]).toEqual([0, 127, 255]);
+    });
+});
+
 describe.each(controls)("$component", (component) => {
     const form = component.form;
     const aria = (host: HTMLElement) => form.aria?.(host) ?? form.control(host);
