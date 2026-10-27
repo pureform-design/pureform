@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { configWith } from "../__fixtures__/config";
 import { fabMenu } from "./fab-menu";
+import { OWN_SIZE } from "./shared";
 import { splitButton } from "./split-button";
 
 const recipe = () =>
@@ -11,6 +12,11 @@ const recipe = () =>
 const EXPANDED = "&:is([aria-expanded=true], :has([aria-expanded=true]))";
 
 describe("split button", () => {
+    it("keeps its intrinsic width in a Native column without changing web alignment", () => {
+        expect(splitButton.recipe.base?.root?.width).toEqual(OWN_SIZE.width);
+        expect(recipe()?.base?.root?.width).toBe("auto");
+    });
+
     it("validates against a full pureform config", () => {
         expect(() => configWith(splitButton)).not.toThrow();
     });
@@ -59,6 +65,11 @@ describe("split button", () => {
 describe("FAB menu", () => {
     const fab = () =>
         compilePreset(configWith(fabMenu)).theme?.slotRecipes?.fabMenu;
+
+    it("keeps its intrinsic width in a Native column without changing web alignment", () => {
+        expect(fabMenu.recipe.base?.root?.width).toEqual(OWN_SIZE.width);
+        expect(fab()?.base?.root?.width).toBe("auto");
+    });
 
     it("validates against a full pureform config", () => {
         expect(() => configWith(fabMenu)).not.toThrow();

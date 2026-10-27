@@ -221,6 +221,7 @@ exports[`FAB menu > compiles to a stable Panda slot recipe 1`] = `
       "--components-fabMenu-statePressedOpacity": "token(opacity.statePressed)",
       "display": "inline-flex",
       "position": "relative",
+      "width": "auto",
       "zIndex": "token(zIndex.menu)",
     },
   },
@@ -392,6 +393,7 @@ exports[`split button > compiles to a stable Panda slot recipe 1`] = `
       "display": "inline-flex",
       "flexDirection": "row",
       "gap": "var(--components-splitButton-gap, 2px)",
+      "width": "auto",
     },
     "trailingButton": {
       "&:is(:disabled, [aria-disabled=true])": {

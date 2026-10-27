@@ -39,6 +39,33 @@ const query = (id: string) =>
     document.querySelector<HTMLElement>(`[data-testid="${id}"]`);
 
 describe("SplitButton", () => {
+    it("hugs its buttons in a stretching column", async () => {
+        await render(
+            <SplitButton
+                label="Save"
+                items={[{ value: "draft", label: "Draft" }]}
+            />,
+        );
+        expect(box(byTestId(split.root)).width).toBeCloseTo(
+            box(byTestId(split.leadingButton)).width +
+                box(byTestId(split.trailingButton)).width +
+                2,
+            0,
+        );
+        expect(box(byTestId(split.root)).width).toBeLessThan(280);
+    });
+
+    it("still allows an explicit full-width root", async () => {
+        await render(
+            <SplitButton
+                label="Save"
+                items={[]}
+                style={{ root: { width: "100%" } }}
+            />,
+        );
+        expect(box(byTestId(split.root)).width).toBeCloseTo(280, 0);
+    });
+
     it("draws two buttons 2px apart, runs the action, and opens the menu under the trailing one", async () => {
         const actions: string[] = [];
         await render(
@@ -73,6 +100,23 @@ describe("SplitButton", () => {
 });
 
 describe("FabMenu", () => {
+    it("hugs its FAB in a stretching column", async () => {
+        await render(<FabMenu icon="+" fabLabel="Create" items={[]} />);
+        expect(box(byTestId(fab.root)).width).toBeCloseTo(56, 0);
+    });
+
+    it("still allows an explicit full-width root", async () => {
+        await render(
+            <FabMenu
+                icon="+"
+                fabLabel="Create"
+                items={[]}
+                style={{ root: { width: "100%" } }}
+            />,
+        );
+        expect(box(byTestId(fab.root)).width).toBeCloseTo(280, 0);
+    });
+
     it("opens its items above the FAB and turns the FAB into the close button", async () => {
         const picked: string[] = [];
         await render(

@@ -41,6 +41,7 @@ import {
     groupTokens,
     iconBox,
     INDICATION_ROOT,
+    OWN_SIZE,
     keysOf,
     pressableRoot,
     sizeTokenName,
@@ -192,6 +193,7 @@ export const createSplitButton = <
                 base: {
                     root: {
                         ...INDICATION_ROOT,
+                        ...OWN_SIZE,
                         display: inlineFlex,
                         flexDirection: row,
                         gap: ref("gap"),
