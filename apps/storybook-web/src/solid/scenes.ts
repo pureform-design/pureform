@@ -8,7 +8,7 @@ import { GridList as SolidGridList } from "@pureform/solid/grid-list";
 import { createToaster, Toaster } from "@pureform/solid/toast";
 import type { ToastData } from "@pureform/solid/toast";
 import type { JSX } from "@solidjs/web";
-import { createComponent, For, omit, untrack } from "solid-js";
+import { createComponent, For, merge, omit, untrack } from "solid-js";
 
 import { ADD_TOAST_LABEL, addedToast } from "../renderers/scenes";
 import type { SceneTile } from "../renderers/scenes";
@@ -29,10 +29,10 @@ export function Toast(
             onClick: () => toaster.create(addedToast(++added)),
             label: ADD_TOAST_LABEL,
         } as never),
-        createComponent(Toaster, {
-            toaster,
-            ...(omit(props, "toasts") as object),
-        } as never),
+        createComponent(
+            Toaster,
+            merge(omit(props, "toasts"), { toaster }) as never,
+        ),
     ] as unknown as JSX.Element;
 }
 
@@ -51,41 +51,43 @@ export function GridList(
                 },
             } as never,
         );
-    return createComponent(SolidGridList, {
-        ...(omit(props, "tiles") as object),
-        get children() {
-            return createComponent(For, {
-                get each() {
-                    return props.tiles ?? [];
-                },
-                children: (tile: SceneTile) =>
-                    el("Tile", {}, [
-                        el("Content", {}, [
-                            createComponent(
-                                part["Media"] as never,
-                                {
-                                    src: tile.src,
-                                    alt: "",
-                                } as never,
-                            ),
-                            tile.header
-                                ? el(
-                                      "Header",
-                                      {},
-                                      el("Headline", {}, tile.header),
-                                  )
-                                : null,
-                            tile.footer
-                                ? el("Footer", {}, [
-                                      el("Headline", {}, tile.footer),
-                                      tile.subhead
-                                          ? el("Subhead", {}, tile.subhead)
-                                          : null,
-                                  ])
-                                : null,
+    return createComponent(
+        SolidGridList,
+        merge(omit(props, "tiles"), {
+            get children() {
+                return createComponent(For, {
+                    get each() {
+                        return props.tiles ?? [];
+                    },
+                    children: (tile: SceneTile) =>
+                        el("Tile", {}, [
+                            el("Content", {}, [
+                                createComponent(
+                                    part["Media"] as never,
+                                    {
+                                        src: tile.src,
+                                        alt: "",
+                                    } as never,
+                                ),
+                                tile.header
+                                    ? el(
+                                          "Header",
+                                          {},
+                                          el("Headline", {}, tile.header),
+                                      )
+                                    : null,
+                                tile.footer
+                                    ? el("Footer", {}, [
+                                          el("Headline", {}, tile.footer),
+                                          tile.subhead
+                                              ? el("Subhead", {}, tile.subhead)
+                                              : null,
+                                      ])
+                                    : null,
+                            ]),
                         ]),
-                    ]),
-            } as never);
-        },
-    } as never);
+                } as never);
+            },
+        }) as never,
+    );
 }
