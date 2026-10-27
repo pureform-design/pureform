@@ -2,8 +2,8 @@
 // hidden input that submits the value, half values, a read-only display, and arrow keys that
 // move by a star, by direction. A star is filled by its `fill` part, or half by `halfFill`. The
 // state is the checked star's place among the radios: the stars preview the one under the
-// pointer (so a click moves the pointer off after), and with nothing chosen the first star is
-// checked to take focus, so ARIA reads 0 as 1 (the cases never read a 0).
+// pointer (so a click moves the pointer off after). With nothing chosen no star is checked;
+// the first star is still the keyboard entry point.
 
 import { testIds } from "@pureform/anatomy";
 
@@ -23,7 +23,6 @@ const hidden = (host: HTMLElement) =>
 /** The checked star's place, from 1. */
 const read = (host: HTMLElement): number => {
     const checked = items(host).findIndex((item) => checkedOf(item) === true);
-    if (checked < 0) throw new Error("no star is checked");
     return checked + 1;
 };
 
@@ -70,7 +69,7 @@ export const rating: ComponentCase = {
             { key: " ", does: "nothing" },
             { key: "{Enter}", does: "nothing" },
         ],
-        // From 2, so a step down reads 1 rather than a 0 ARIA can't tell from 1.
+        // Start inside the range so arrows exercise a step in either direction.
         arrows: {
             ltr: [
                 { key: "{ArrowLeft}", does: "change", to: 1, props: FROM_2 },

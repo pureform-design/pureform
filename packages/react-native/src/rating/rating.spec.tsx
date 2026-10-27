@@ -29,6 +29,15 @@ const all = (id: string) => [
 ];
 
 describe("Rating on React Native", () => {
+    it("selects a whole star with Enter when the press has no native coordinates", async () => {
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", number>) => void>();
+        await withRegistry(<Rating allowHalf onValueChange={onValueChange} />);
+        await interact(() => all(ids.item)[2]!.focus());
+        await interact(() => userEvent.keyboard("{Enter}"));
+        expect(onValueChange).toHaveBeenLastCalledWith({ value: 3 });
+    });
+
     it.each(["ltr", "rtl"] as const)(
         "clips and picks half stars in %s",
         async (dir) => {

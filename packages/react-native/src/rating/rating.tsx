@@ -95,7 +95,7 @@ function RatingImpl(props: RatingProps): ReactNode {
         // A key's press (React Native Web's Enter) has no position.
         // Native Web's Pressable delivers a click, not a responder's locationX. Measure against
         // currentTarget (the item), never offsetX, which is relative to the clicked glyph child.
-        const click = event.nativeEvent as typeof event.nativeEvent & {
+        const click = (event.nativeEvent ?? {}) as typeof event.nativeEvent & {
             clientX?: number;
             detail?: number;
         };
