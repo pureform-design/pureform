@@ -18,7 +18,7 @@ import type {
     PageKey,
     TransitionPage,
 } from "@pureform/binding-core";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { StyleSheet, View } from "react-native";
 import type { StyleProp, ViewStyle } from "react-native";
@@ -65,11 +65,17 @@ function Page({
     children,
 }: PageProps): ReactNode {
     const engine = useEngine();
-    // The first page is still; the others enter, and leave once closed. An entered page stays
-    // `entering` (it doesn't settle), so its presence stays open.
+    // Keep the driver's presence open after settling the page model. Switching to undefined
+    // would replace the driver and can restart or discard in-flight motion. The initial page
+    // alone starts still. Both Native engines use their own completion signal.
+    const [moves] = useState(page.state !== "current");
     const presence = useOverlayPresence(
-        page.state === "current" ? undefined : page.state === "entering",
+        page.state === "leaving" ? false : moves ? true : undefined,
         "fadeThrough",
+        undefined,
+        () => {
+            if (page.state === "entering") gone(page);
+        },
     );
     const leave = useRef(() => gone(page));
     // oxlint-disable-next-line react/refs -- the latest value for callbacks and gestures that run after render

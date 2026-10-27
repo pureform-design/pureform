@@ -467,6 +467,7 @@ export function useOverlayPresence(
     open: boolean | undefined,
     motion: OverlayMotionName,
     delay?: OverlayDelay,
+    onEntered?: () => void,
 ): Presence {
     const engine = useEngine();
     const tokens = useTokens();
@@ -514,11 +515,15 @@ export function useOverlayPresence(
     if (shownNow && !present) setPresent(true);
     const shown = shownNow || present;
     const latest = useRef(phase);
+    const entered = useRef(onEntered);
     useLayoutEffect(() => {
         latest.current = phase;
+        entered.current = onEntered;
     });
     const done = useCallback((ended: PresencePhase) => {
         if (ended === "exit" && latest.current === "exit") setPresent(false);
+        if (ended === "enter" && latest.current === "enter")
+            entered.current?.();
     }, []);
     // A sized motion's enter waits for its first measure, unseen meanwhile; then the engine's
     // view takes over from its first frame.

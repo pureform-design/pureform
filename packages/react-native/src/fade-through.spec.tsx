@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Text, View } from "react-native";
-import { beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 
 import { PureformProvider, overlayMotion, useTokens } from ".";
 import { animated } from "./engine";
@@ -10,6 +10,21 @@ import { FadeThrough } from "./fade-through";
 import { presetRegistry } from "./testing/registry";
 import type { TestRegistry } from "./testing/registry";
 import { mount, outside, settle, until } from "./testing/render";
+
+const model = vi.hoisted(() => ({ states: [] as string[] }));
+vi.mock("./page-transition", async (original) => {
+    const actual = await original<typeof import("./page-transition")>();
+    return {
+        ...actual,
+        useTransitionPages<C>(
+            ...args: Parameters<typeof actual.useTransitionPages<C>>
+        ) {
+            const result = actual.useTransitionPages(...args);
+            model.states = result.pages.map((page) => page.state);
+            return result;
+        },
+    };
+});
 
 let registry: TestRegistry;
 
@@ -117,6 +132,11 @@ describe("FadeThrough", () => {
             await until(() =>
                 expect(frame(pages()[0]!)).toEqual({ opacity: 1, scale: 1 }),
             );
+            await until(() => expect(model.states).toEqual(["current"]));
+            const entered = pages()[0]!;
+            await settle(50);
+            expect(pages()[0]).toBe(entered);
+            expect(frame(entered)).toEqual({ opacity: 1, scale: 1 });
         });
     }
 
