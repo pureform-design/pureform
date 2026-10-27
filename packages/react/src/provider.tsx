@@ -199,6 +199,7 @@ const useThemeBlock = (
                 server: isServer,
                 existing: serverThemeCss,
             }),
+        // oxlint-disable-next-line react-hooks/exhaustive-deps -- keyed by the theme's scope: a new object for the same theme changes nothing
         [scope, registry, hydrate],
     );
     const block = loaded && loaded.scope === scope ? loaded : initial;
@@ -220,6 +221,7 @@ const useThemeBlock = (
         return () => {
             active = false;
         };
+        // oxlint-disable-next-line react-hooks/exhaustive-deps -- the block already follows the theme's scope
     }, [block, registry, hydrate]);
     return block;
 };

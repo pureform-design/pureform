@@ -166,6 +166,7 @@ function DragHandle({
         useComponentState().registry,
         "spatialDefault",
     );
+    // oxlint-disable-next-line react/refs -- the latest value for callbacks that run after render, not read while rendering
     latestRoot.current = rootProps;
     // Where it rests, and whether it can move between partly and fully open.
     const [rest, setRest] = useState<{
@@ -222,9 +223,10 @@ function DragHandle({
                 stop();
             };
         },
-        [surface, latestApi, asker, onClose],
+        [surface, latestApi, asker, onClose, spring],
     );
     const close = api.getCloseTriggerProps();
+    // oxlint-disable-next-line react/refs -- the callback reads the ref when it runs, after render
     return scope.render("dragHandle", {
         element: "button",
         as: (as as ElementType | undefined) ?? DragHandleComponent,

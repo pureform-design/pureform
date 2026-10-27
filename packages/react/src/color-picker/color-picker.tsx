@@ -98,6 +98,7 @@ function Root(props: ColorPickerRootProps): ReactNode {
             ? last.current
             : colorPicker.parse(css);
     const latest = useRef(props);
+    // oxlint-disable-next-line react/refs -- the latest value for callbacks that run after render, not read while rendering
     latest.current = props;
     const service = useMachine(colorPicker.machine, {
         id: props.id ?? generated,
@@ -107,6 +108,7 @@ function Root(props: ColorPickerRootProps): ReactNode {
         disabled: props.disabled,
         readOnly: props.readOnly,
         name: props.name,
+        // oxlint-disable-next-line react/refs -- colorOf reads, while rendering, the last color the machine reported (written only in onValueChange), so a controlled hex keeps its hue
         value: value.controlled ? colorOf(value.value!) : undefined,
         defaultValue: colorPicker.parse(
             value.defaultValue ?? COLOR_PICKER_DEFAULT,
@@ -352,11 +354,13 @@ function HexField(props: ColorPickerHexFieldProps): ReactNode {
         if (next !== undefined && next !== hex) settle(next);
     };
     const commitRef = useRef(commit);
+    // oxlint-disable-next-line react/refs -- the latest value for callbacks that run after render, not read while rendering
     commitRef.current = commit;
     // The field's own handlers on the input, before the user's there.
     const slotProps = useMemo(
         () => ({
             ...props.slotProps,
+            // oxlint-disable-next-line react/refs -- the callback reads the ref when it runs, after render
             input: combinePartProps([
                 {
                     onBlur: () => commitRef.current(),
@@ -407,6 +411,7 @@ function EyeDropperTrigger(
 ): ReactNode {
     const { api } = context.use("EyeDropperTrigger");
     const [supported, setSupported] = useState(false);
+    // oxlint-disable-next-line react/set-state-in-effect -- feature detection after hydration, so the server and the first client render agree
     useEffect(() => setSupported(hasEyeDropper()), []);
     if (!supported) return null;
     const { icon, ...rest } = props;

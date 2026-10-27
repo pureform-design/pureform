@@ -94,7 +94,9 @@ function Root(props: SplitterRootProps): ReactNode {
     const dir = useDirection();
     const rootRef = useRef<HTMLElement>(null);
     const latest = useRef(props);
+    // oxlint-disable-next-line react/refs -- the latest value for callbacks that run after render, not read while rendering
     latest.current = props;
+    // oxlint-disable-next-line react/refs -- one mutable drag record kept for the component's life; only handlers write it
     const drag = useRef<Drag>({
         trigger: null,
         velocity: createDragVelocity(),

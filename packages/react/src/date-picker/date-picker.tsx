@@ -169,6 +169,7 @@ function Calendar({
         if (open) setDraft(confirmed);
     }
     const draftKey = draft.join(",");
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- keyed by the contents' key on purpose, not the array's identity
     const zagValue = useMemo(() => draft.map(parseIso), [draftKey]);
     const service = useMachine(datePicker.machine, {
         id,
@@ -186,6 +187,7 @@ function Calendar({
         if (!open) return;
         picker.setView("day");
         picker.setFocusedValue(parseIso(draft[0] ?? todayIso()));
+        // oxlint-disable-next-line react-hooks/exhaustive-deps -- only opening resets the view and the focused day
     }, [open]);
     const close = () => dialogApi.setOpen(false);
     return (

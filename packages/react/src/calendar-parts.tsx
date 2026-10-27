@@ -122,6 +122,7 @@ export function useDateValue(
         { readonly value: readonly string[] }
     >(component, "value", props);
     const valueKey = value.value?.join(",");
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- keyed by the contents' key on purpose, not the array's identity
     const zagValue = useMemo(() => value.value?.map(parseIso), [valueKey]);
     const [zagDefault] = useState(() => value.defaultValue?.map(parseIso));
     return {

@@ -162,6 +162,7 @@ function Root(props: SearchViewRootProps): ReactNode {
     const view = useMachine(dialog.machine, {
         id,
         dir,
+        // oxlint-disable-next-line react/refs -- the callback reads the ref when it runs, after render
         ...searchViewDomDialogProps(props, () => input.current),
         ...open.machineProps,
     });

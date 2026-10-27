@@ -150,6 +150,7 @@ function Root(props: FileUploadRootProps): ReactNode {
     // Zag writes the files into the input when they change, not the default at mount.
     useEffect(() => {
         if (hidden) writeInputFiles(hidden, api.acceptedFiles);
+        // oxlint-disable-next-line react-hooks/exhaustive-deps -- only a new hidden input takes the files; later changes write them as they happen
     }, [hidden]);
     useFormReset(hidden, {
         // A file input has no default to write: the browser's reset empties it.
@@ -278,8 +279,10 @@ function Preview({
 }): ReactNode {
     const { api } = context.use("Item");
     const [url, setUrl] = useState<string | undefined>(undefined);
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- one object URL per file; the api is new each render
     useEffect(() => api.createFileUrl(file, setUrl), [file]);
     return url === undefined ? null : (
+        // oxlint-disable-next-line jsx-a11y/alt-text -- Zag's preview image props carry `alt` ("preview of <name>")
         <img
             {...(api.getItemPreviewImageProps({ file, type, url }) as object)}
             style={{ width: "100%", height: "100%", objectFit: "cover" }}

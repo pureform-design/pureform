@@ -56,6 +56,7 @@ export const outside = <T,>(initial: T) => {
     const handle = { set: (_value: T) => {} };
     function Holder(props: { children: (value: T) => ReactNode }): ReactNode {
         const [value, setValue] = useState(initial);
+        // oxlint-disable-next-line react/immutability -- the test harness captures what it drives from outside the component
         handle.set = setValue;
         return props.children(value);
     }
@@ -92,7 +93,11 @@ export class Errored extends Component<
         return this.state.error === undefined ? (
             this.props.children
         ) : (
-            <p data-testid="error">{String(this.state.error)}</p>
+            <p data-testid="error">
+                {this.state.error instanceof Error
+                    ? String(this.state.error)
+                    : JSON.stringify(this.state.error)}
+            </p>
         );
     }
 }

@@ -38,6 +38,8 @@ export type CopyButtonProps = Omit<
     | "onSelectedChange"
     | "toggle"
     | "position"
+    // The behavior's `onCopy` (the copied value) replaces the DOM's clipboard event handler.
+    | "onCopy"
 > &
     CopyButtonBehaviorProps &
     CopyButtonContentProps<ReactNode>;
@@ -69,6 +71,7 @@ export function CopyButton(props: CopyButtonProps): ReactNode {
                     if (!event.defaultPrevented) api.copy();
                 }}
             />
+            {/* oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- a visually hidden live region; <output> would join an enclosing form's elements */}
             <span role="status" style={COPY_ANNOUNCEMENT_STYLE}>
                 {copyAnnouncement(props, api.copied)}
             </span>

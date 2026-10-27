@@ -82,6 +82,7 @@ function Root(props: SnackbarRootProps): ReactNode {
     // Once it has shown and gone again, its exit is over.
     const shown = useRef(false);
     const onExitComplete = useRef(props.onExitComplete);
+    // oxlint-disable-next-line react/refs -- the latest value for callbacks that run after render, not read while rendering
     onExitComplete.current = props.onExitComplete;
     useEffect(() => {
         if (presence.present) shown.current = true;

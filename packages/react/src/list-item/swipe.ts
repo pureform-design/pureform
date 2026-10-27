@@ -58,7 +58,9 @@ export function useSwipe(
     const swallow = useRef<() => void>(undefined);
     const { registry } = useComponentState();
     const latestRegistry = useRef(registry);
+    // oxlint-disable-next-line react/refs -- the latest value for callbacks that run after render, not read while rendering
     latestRegistry.current = registry;
+    // oxlint-disable-next-line react/refs -- the callback reads the ref when it runs, after render
     const [settle] = useState(() =>
         createSwipeSettle(() => latestRegistry.current),
     );

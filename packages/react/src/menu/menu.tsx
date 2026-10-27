@@ -315,6 +315,7 @@ function Content({ unstyled, ...props }: MenuPartProps): ReactNode {
                 presence.ref(null);
             };
         },
+        // oxlint-disable-next-line react-hooks/exhaustive-deps -- presence.ref is the stable callback; presence itself is new each render
         [presence.ref],
     );
     return scope.render("content", {
@@ -686,6 +687,7 @@ function AutoSubmenu(props: { readonly value: string }): null {
         const pressed = menuSubmenuPressed(row, menu);
         auto.drill(props.value, pressed);
         if (pressed) menu.focus();
+        // oxlint-disable-next-line react-hooks/exhaustive-deps -- measured once each time the submenu opens
     }, [api.open]);
     return null;
 }
@@ -700,7 +702,7 @@ function HighlightOnDrill(props: {
     const { level, first } = props;
     useEffect(() => {
         if (level !== "" && first !== undefined) api.setHighlightedValue(first);
-        // Only a new level moves the highlight.
+        // oxlint-disable-next-line react-hooks/exhaustive-deps -- only a new level moves the highlight
     }, [level]);
     return null;
 }
@@ -725,6 +727,7 @@ function DrillMotion(props: {
         if (!snapshot || !contentId.current) return;
         const content = document.getElementById(contentId.current);
         menuDrillTo(content, snapshot, menuDrillTiming(content, spring));
+        // oxlint-disable-next-line react-hooks/exhaustive-deps -- the step runs once per new level; the refs and spring are read as it runs
     }, [level]);
     return null;
 }
@@ -771,6 +774,7 @@ function ReadyMade(props: MenuProps): ReactNode {
     // Out of any submenu once it closes.
     useEffect(() => {
         if (props.open === false) {
+            // oxlint-disable-next-line react/set-state-in-effect -- a closed menu forgets its drill path once the app closes it
             setPath([]);
             setDrills(new Set());
         }

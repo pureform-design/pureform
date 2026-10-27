@@ -10,6 +10,7 @@ export function useTooltipLongPress(
     interactive: boolean,
 ): (element: HTMLElement | null) => (() => void) | undefined {
     const latest = useRef({ setOpen, interactive });
+    // oxlint-disable-next-line react/refs -- the latest value for callbacks that run after render, not read while rendering
     latest.current = { setOpen, interactive };
     return useCallback(
         (element: HTMLElement | null) =>

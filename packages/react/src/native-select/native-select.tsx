@@ -159,6 +159,7 @@ function Root(props: NativeSelectRootProps): ReactNode {
         interactionSource: source,
     });
     const { as, ...rest } = omitProps(props, NATIVE_SELECT_ROOT_PROPS);
+    // oxlint-disable-next-line react/refs -- the callback reads the ref when it runs, after render
     const selectProps = combinePartProps([
         nativeSelectProps(
             { ...props, id: props.id ?? (field ? undefined : id) },

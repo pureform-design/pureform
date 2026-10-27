@@ -255,6 +255,7 @@ function Root(props: AutocompleteRootProps): ReactNode {
         if (!textAfterValue.current) return;
         textAfterValue.current = false;
         queueMicrotask(resetText);
+        // oxlint-disable-next-line react-hooks/exhaustive-deps -- runs when the value changes (by its key); resetText is this render's
     }, [valueKey]);
     // An error blocks submitting, as the input's custom validity.
     useEffect(() => {

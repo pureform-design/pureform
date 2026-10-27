@@ -251,6 +251,7 @@ function Label({ unstyled, ...props }: TabsPartProps): ReactNode {
 function Indicator({ unstyled, ...props }: TabsPartProps): ReactNode {
     const { scope, indicators } = context.use("Indicator");
     const { value } = tabContext.use("Indicator");
+    // oxlint-disable-next-line react/preserve-manual-memoization -- the package isn't built with React Compiler; this callback ref is memoized by hand
     const ref = useCallback(
         (element: HTMLElement | null) => {
             if (!element) return;
@@ -259,6 +260,7 @@ function Indicator({ unstyled, ...props }: TabsPartProps): ReactNode {
                 indicators.delete(element);
             };
         },
+        // oxlint-disable-next-line react/preserve-manual-memoization -- the package isn't built with React Compiler; this callback ref is memoized by hand
         [indicators, value],
     );
     return scope.render("indicator", {

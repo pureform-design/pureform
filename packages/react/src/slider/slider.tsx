@@ -233,6 +233,7 @@ function InsetIcon({ unstyled, ...props }: SliderPartProps): ReactNode {
             last: measures,
         });
         setMeasures((last) => (sameSliderInsetIcon(read, last) ? last : read));
+        // oxlint-disable-next-line react-hooks/exhaustive-deps -- keyed by the percents' key, not the array's identity
     }, [length, overflowing, percentsKey, vertical, root.centered, measures]);
     return scope.render("insetIcon", {
         element: "span",
@@ -327,9 +328,11 @@ function Input({
     ...props
 }: SliderThumbPartProps): ReactNode {
     const { scope, api, setInput } = context.use("Input");
+    // oxlint-disable-next-line react/preserve-manual-memoization -- the package isn't built with React Compiler; this callback ref is memoized by hand
     const ref = useCallback(
         (element: HTMLElement | null) =>
             setInput(index, element as HTMLInputElement | null),
+        // oxlint-disable-next-line react/preserve-manual-memoization -- the package isn't built with React Compiler; this callback ref is memoized by hand
         [setInput, index],
     );
     return scope.render("input", {

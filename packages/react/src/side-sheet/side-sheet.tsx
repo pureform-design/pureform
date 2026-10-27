@@ -126,12 +126,14 @@ function Content(props: SideSheetPartProps): ReactNode {
     } = context.use("Content");
     const dir = useDirection();
     const rtl = useRef(dir === "rtl");
+    // oxlint-disable-next-line react/refs -- the latest value for callbacks that run after render, not read while rendering
     rtl.current = dir === "rtl";
     const coplanar = useRef(false);
     const spring = springRoleVar(
         useComponentState().registry,
         "spatialDefault",
     );
+    // oxlint-disable-next-line react/refs -- the latest value for callbacks that run after render, not read while rendering
     coplanar.current = sideSheetSelection(root).coplanar === true;
     // After a drag closed it: once that render has committed, a sheet still open (one the app
     // kept open) settles back.
@@ -155,7 +157,7 @@ function Content(props: SideSheetPartProps): ReactNode {
             () => (coplanar.current ? element.parentElement : undefined),
             spring,
         );
-    }, [surface, latestApi, asker, onClose]);
+    }, [surface, latestApi, asker, onClose, spring]);
     return <Surface {...props} />;
 }
 

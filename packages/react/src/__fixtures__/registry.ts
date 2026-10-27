@@ -62,7 +62,9 @@ export const checkbox: ClassFactory<CheckboxShape> = (s) =>
     );
 
 export const chip: ClassFactory<ChipShape> = (s) => ({
-    root: { class: `chip chip--${String(s.variant ?? "assist")}` },
+    root: {
+        class: `chip chip--${typeof s.variant === "string" ? s.variant : "assist"}`,
+    },
     label: { class: "chip__label" },
 });
 
@@ -95,7 +97,12 @@ const named =
     ): ClassFactory<ComponentShape> =>
     (s) => {
         const selected = Object.entries(s)
-            .filter(([key, value]) => key !== "tokens" && value !== undefined)
+            .filter(
+                (entry): entry is [string, string | boolean] =>
+                    entry[0] !== "tokens" &&
+                    (typeof entry[1] === "string" ||
+                        typeof entry[1] === "boolean"),
+            )
             .map(([key, value]) => `${component}--${key}-${String(value)}`);
         return Object.fromEntries(
             slots.map((slot) => [

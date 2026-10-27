@@ -41,6 +41,7 @@ export function useClasses<N extends ComponentName>(
     );
     const signature = selectionSignature(selected);
     // `selected` is a new object every render; its signature says when it changed.
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- keyed by the contents' key on purpose, not the array's identity (the selection's signature)
     return useMemo(() => factory(selected), [factory, signature]);
 }
 

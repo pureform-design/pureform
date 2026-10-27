@@ -126,8 +126,10 @@ export function useIndicationScope(
     const state = useComponentState();
     const indication = resolveIndication(options.indication, state);
     const latest = useRef(state);
+    // oxlint-disable-next-line react/refs -- the latest value for callbacks that run after render, not read while rendering
     latest.current = state;
     const [host] = useState(
+        // oxlint-disable-next-line react/refs -- the callback reads the ref when it runs, after render
         () =>
             new IndicationHost(entries, {
                 reducedMotion: () =>
@@ -194,6 +196,7 @@ export function usePartIndication(part: PartIndication | undefined): {
     const activeKey = active
         ?.map(({ entry, role }) => `${entry}:${role}`)
         .join();
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- keyed by the contents' key on purpose, not the array's identity
     const roles = useMemo(() => active, [part?.roles, activeKey]);
     const ref = useCallback(
         (element: HTMLElement | null) => {
@@ -331,8 +334,10 @@ export function useIndication(
         unstyled: false,
     });
     const latest = useRef(source);
+    // oxlint-disable-next-line react/refs -- the latest value for callbacks that run after render, not read while rendering
     latest.current = source;
     const [emitter] = useState(
+        // oxlint-disable-next-line react/refs -- the callback reads the ref when it runs, after render
         () => new InteractionEmitter(() => latest.current),
     );
     useEffect(() => () => emitter.end(), [emitter]);

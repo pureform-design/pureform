@@ -39,6 +39,7 @@ export function usePresence(
         if (!shown || !node.current) return;
         api.setNode(node.current);
         return show.current?.(node.current) ?? undefined;
+        // oxlint-disable-next-line react-hooks/exhaustive-deps -- runs each time the surface shows; the api is new each render
     }, [shown]);
     return { present: overlayPresent(open, api.present), ref };
 }

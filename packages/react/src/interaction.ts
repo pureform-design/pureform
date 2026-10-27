@@ -78,8 +78,10 @@ export function useInteractionHandlers(
 ): Readonly<Record<string, unknown>> {
     // The emitter reads the latest source at each emit.
     const latest = useRef(source);
+    // oxlint-disable-next-line react/refs -- the latest value for callbacks that run after render, not read while rendering
     latest.current = source;
     const [emitter] = useState(
+        // oxlint-disable-next-line react/refs -- the callback reads the ref when it runs, after render
         () => new InteractionEmitter(() => latest.current),
     );
     useEffect(() => () => emitter.end(), [emitter]);

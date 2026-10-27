@@ -190,9 +190,11 @@ function Root(props: CarouselRootProps): ReactNode {
 /** The row of items, which scrolls and snaps to each. */
 function ItemGroup({ unstyled, ...props }: CarouselPartProps): ReactNode {
     const { scope, api, setMetrics } = context.use("ItemGroup");
+    // oxlint-disable-next-line react/preserve-manual-memoization -- the package isn't built with React Compiler; this callback ref is memoized by hand
     const ref = useCallback(
         (element: HTMLElement | null) =>
             element ? observeCarouselRow(element, setMetrics) : undefined,
+        // oxlint-disable-next-line react/preserve-manual-memoization -- the package isn't built with React Compiler; this callback ref is memoized by hand
         [setMetrics],
     );
     return scope.render("itemGroup", {

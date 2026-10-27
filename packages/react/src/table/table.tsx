@@ -10,6 +10,7 @@ import type { checkboxAnatomy, PartName } from "@pureform/anatomy";
 import {
     isPresent,
     TABLE_ROOT_PROPS,
+    tableCellText,
     tableCellValue,
     tableRowPart,
     tableRowValue,
@@ -467,12 +468,7 @@ function ReadyMadeParts<Row>(
                                     >
                                         {column.cell
                                             ? column.cell(entry.row)
-                                            : String(
-                                                  tableCellValue(
-                                                      column,
-                                                      entry.row,
-                                                  ) ?? "",
-                                              )}
+                                            : tableCellText(column, entry.row)}
                                     </Cell>
                                 );
                             })}

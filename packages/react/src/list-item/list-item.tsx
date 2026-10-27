@@ -151,6 +151,7 @@ function Root(props: ListItemRootProps): ReactNode {
         element,
     );
     const source = useOwnInteractionSource(props.interactionSource);
+    // oxlint-disable-next-line react/immutability -- hands Root's source to Expandable's ref, which the machine reads when it emits, after render
     if (expand) expand.root.current = source;
     const handlers = useInteractionHandlers(
         source,

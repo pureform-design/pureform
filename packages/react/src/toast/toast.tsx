@@ -157,6 +157,7 @@ function Root({
     });
     const machine = api.getRootProps() as { style?: CSSProperties };
     const latest = useRef(api);
+    // oxlint-disable-next-line react/refs -- the latest value for callbacks that run after render, not read while rendering
     latest.current = api;
     const swipe = useCallback(
         (element: HTMLElement | null) =>
@@ -172,6 +173,7 @@ function Root({
     );
     return (
         <context.Provider value={{ scope, api }}>
+            {/* oxlint-disable-next-line react/refs -- the callback reads the ref when it runs, after render */}
             {scope.render("root", {
                 element: "div",
                 ref: swipe,

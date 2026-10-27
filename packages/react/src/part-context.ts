@@ -9,7 +9,7 @@ export interface PartContext<T> {
     /** Provide it from Root: `<context.Provider value={{ scope, api }}>`. */
     readonly Provider: Context<T | null>;
     /** Read it from a part; throws outside Root. `part` names the part in the error. */
-    use(part: string): T;
+    readonly use: (part: string) => T;
 }
 
 /** Creates the context a compound component's Root shares with its parts. `component` names it
@@ -22,7 +22,7 @@ export function createPartContext<T>(
     const Provider = createContext<T | null>(null);
     return {
         Provider,
-        use(part) {
+        use: (part) => {
             const value = use(Provider);
             if (value === null)
                 throw new Error(outsideRootMessage(component, part, root));

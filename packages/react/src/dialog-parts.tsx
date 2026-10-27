@@ -153,6 +153,7 @@ export function dialogParts<
         useEffect(() => () => asker.cancel(), [asker]);
         const latestApi = useRef<dialog.Api<PropTypes>>(null!);
         const latestProps = useRef(props);
+        // oxlint-disable-next-line react/refs -- the latest value for callbacks that run after render, not read while rendering
         latestProps.current = props;
         const closeNow = useCallback(
             () => latestApi.current.setOpen(false),
@@ -175,11 +176,13 @@ export function dialogParts<
                 options.onClose?.(props),
                 { ...props, modal: options.modal?.(props) ?? true },
                 asker,
+                // oxlint-disable-next-line react/refs -- the callback reads the ref when it runs, after render
                 closeNow,
             ),
             ...open.machineProps,
         });
         const api = dialog.connect(service, normalizeProps);
+        // oxlint-disable-next-line react/refs -- the latest value for callbacks that run after render, not read while rendering
         latestApi.current = api;
         const positioner = useRef<HTMLElement | null>(null);
         const surface = useRef<HTMLElement | null>(null);
@@ -337,11 +340,14 @@ export function dialogParts<
     function Content({ unstyled, ...props }: DialogChromePartProps): ReactNode {
         const { scope, api, presence, surface } = context.use("Content");
         const { ref: presenceRef } = presence;
+        // oxlint-disable-next-line react/preserve-manual-memoization -- the package isn't built with React Compiler; this callback ref is memoized by hand
         const ref = useCallback(
             (element: HTMLElement | null) => {
+                // oxlint-disable-next-line react/immutability -- a ref Root shares for the surface element; refs are written outside render
                 surface.current = element;
                 presenceRef(element);
             },
+            // oxlint-disable-next-line react/preserve-manual-memoization -- the package isn't built with React Compiler; this callback ref is memoized by hand
             [surface, presenceRef],
         );
         const machine = presentProps(api.getContentProps(), presence.present);

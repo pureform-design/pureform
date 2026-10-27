@@ -41,10 +41,10 @@ export interface ControllableState<N extends string, T, D extends object> {
     /** For the form's `reset` event (`useFormReset`'s `onBeforeReset`): until the next task,
      *  callbacks the machine's own reset causes report `reason: "reset"` when uncontrolled, and
      *  are dropped when controlled, since Zag resets to the value at creation. Stable. */
-    beforeReset(): void;
+    readonly beforeReset: () => void;
     /** Runs `update` (sending the machine the default, in `useFormReset`'s `onReset`) so the
      *  callbacks it causes report `reason: "reset"`. Stable. */
-    reset(update: () => void): void;
+    readonly reset: (update: () => void) => void;
 }
 
 /** Maps a component's controllable props onto its machine. `component` names it in the

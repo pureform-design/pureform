@@ -122,6 +122,7 @@ function Root(props: RadioGroupRootProps): ReactNode {
     const api = radioGroup.connect(service, normalizeProps);
     // The form follows the first radio, which also names a form outside the group's.
     const [firstInput, setFirstInput] = useState<HTMLInputElement | null>(null);
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- follows the first radio after every render; the same element bails out of the update
     useLayoutEffect(() => {
         setFirstInput(radioInputs(root)[0] ?? null);
     });
