@@ -18,12 +18,13 @@ import type {
     MotionSetting,
 } from "@pureform/binding-core";
 import type { Indication } from "@pureform/binding-core/indication";
-import { overridesFor } from "@pureform/rn-adapter/factory";
+import { isEasing, overridesFor } from "@pureform/rn-adapter/factory";
 import type {
     NativeFactory,
     Overrides,
     Scheme,
     Styles,
+    ThemeValue,
     ThemeValues,
 } from "@pureform/rn-adapter/factory";
 import { StylesProvider } from "@pureform/rn-adapter/react";
@@ -168,6 +169,37 @@ const changes = new WeakMap<object, Map<string, ThemeValues>>();
 
 const NO_VALUES: ThemeValues = Object.freeze({});
 
+// Generated JSON gives equal curves distinct objects in each theme. Only an actual value
+// change should mask an outer provider's override; object identity and key order aren't changes.
+const sameThemeValue = (a: ThemeValue | undefined, b: ThemeValue): boolean => {
+    if (a === b) return true;
+    if (!isEasing(a) || !isEasing(b)) return false;
+    switch (a.kind) {
+        case "keyword":
+            return b.kind === "keyword" && a.name === b.name;
+        case "cubicBezier":
+            return (
+                b.kind === "cubicBezier" &&
+                a.points.every((point, i) => point === b.points[i])
+            );
+        case "linear":
+            return (
+                b.kind === "linear" &&
+                a.points.length === b.points.length &&
+                a.points.every(
+                    ([output, input], i) =>
+                        output === b.points[i]![0] && input === b.points[i]![1],
+                )
+            );
+        case "steps":
+            return (
+                b.kind === "steps" &&
+                a.steps.count === b.steps.count &&
+                (a.steps.jump ?? "end") === (b.steps.jump ?? "end")
+            );
+    }
+};
+
 const themeChanges = (
     themes: Readonly<Record<string, ThemeValues>>,
     theme: string | undefined,
@@ -185,7 +217,7 @@ const themeChanges = (
     changed = {};
     if (own && base) {
         for (const [token, value] of Object.entries(own)) {
-            if (base[token] !== value) changed[token] = value;
+            if (!sameThemeValue(base[token], value)) changed[token] = value;
         }
     }
     byKey.set(key, changed);
