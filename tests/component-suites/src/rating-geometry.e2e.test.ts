@@ -9,13 +9,13 @@ describe.each(["ltr", "rtl"] as const)(
     "Rating half-star geometry (%s)",
     (dir) => {
         it("clips half the star and selects each side of its midpoint", async () => {
-        const onValueChange = vi.fn<(details: { value: number }) => void>();
+            const onValueChange = vi.fn<(details: { value: number }) => void>();
             const mounted = harness.mount({
                 component: "Rating",
                 provider: { dir },
                 props: {
                     allowHalf: true,
-                    defaultValue: 2.5,
+                    value: 2.5,
                     name: "quality",
                     onValueChange,
                 },

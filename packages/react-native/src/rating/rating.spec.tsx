@@ -29,13 +29,17 @@ const all = (id: string) => [
 ];
 
 describe("Rating on React Native", () => {
-    it("selects a whole star with Enter when the press has no native coordinates", async () => {
+    it("does not toggle the chosen star on Enter or Space", async () => {
         const onValueChange =
             vi.fn<(details: ChangeDetails<"value", number>) => void>();
-        await withRegistry(<Rating allowHalf onValueChange={onValueChange} />);
+        await withRegistry(
+            <Rating allowHalf defaultValue={3} onValueChange={onValueChange} />,
+        );
         await interact(() => all(ids.item)[2]!.focus());
         await interact(() => userEvent.keyboard("{Enter}"));
-        expect(onValueChange).toHaveBeenLastCalledWith({ value: 3 });
+        await interact(() => userEvent.keyboard(" "));
+        expect(onValueChange).not.toHaveBeenCalled();
+        expect(all(ids.item)[2]!.getAttribute("aria-checked")).toBe("true");
     });
 
     it.each(["ltr", "rtl"] as const)(

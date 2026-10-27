@@ -91,6 +91,13 @@ function RatingImpl(props: RatingProps): ReactNode {
     const text = props.valueText ?? defaultText;
     const star = props.icon ?? <Glyph glyph="★" />;
     const pick = (index: number, event: GestureResponderEvent) => {
+        // Match the web Rating contract: Enter/Space do not toggle a radio's chosen value.
+        // Native Web invokes onPress with the raw keyup event rather than a nativeEvent wrapper.
+        const input = (event.nativeEvent ?? event) as {
+            type?: string;
+            key?: string;
+        };
+        if (input.key !== undefined || input.type?.startsWith("key")) return;
         const width = widths.current[index];
         // A key's press (React Native Web's Enter) has no position.
         // Native Web's Pressable delivers a click, not a responder's locationX. Measure against
