@@ -283,8 +283,10 @@ export function useNativeInteraction(
     disabled = false,
 ): NativeInteraction {
     const latest = useRef(source);
+    // oxlint-disable-next-line react/refs -- the latest value for callbacks and gestures that run after render
     latest.current = source;
     const [interaction] = useState(
+        // oxlint-disable-next-line react/refs -- the handler reads the ref when it runs, after render
         () => new NativeInteraction(() => latest.current),
     );
     useEffect(() => () => interaction.end(), [interaction]);

@@ -114,6 +114,7 @@ export const useIndicatorSlides = (
             ? { x: tab.x + tabContent.x + indicator.x, width: indicator.width }
             : undefined;
     };
+    // oxlint-disable react/refs -- the indicator's motion, carried from render to render as the value changes; computed once per change
     const current = state.current;
     if (current.value !== value) {
         const previous = current.value;
@@ -161,6 +162,7 @@ export const useIndicatorSlides = (
         state.current = { value, ...(running ? { running } : {}) };
     }
     const running = state.current.running;
+    // oxlint-enable react/refs
     return {
         motionOf: (of) => (running?.value === of ? running.motion : undefined),
         onLayout,

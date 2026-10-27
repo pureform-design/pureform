@@ -25,8 +25,10 @@ export function ProvidedTokens(props: {
     const key = JSON.stringify(props.tokens ?? {});
     const merged = useMemo(
         () => mergeProvidedTokens(outer, props.tokens),
+        // oxlint-disable-next-line react-hooks/exhaustive-deps -- keyed by the tokens' contents, not the object's identity
         [outer, key],
     );
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- keyed by the tokens' contents, not the object's identity
     const overrides = useMemo(() => providedTokenPaths(props.tokens), [key]);
     return createElement(
         ProvidedTokensContext.Provider,

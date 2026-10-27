@@ -81,6 +81,7 @@ function PaginatorImpl(props: PaginatorProps): ReactNode {
     );
     // The page size a page change reports: the new one, when the change comes with it.
     const reported = useRef(pageSize);
+    // oxlint-disable-next-line react/refs -- the latest value for callbacks and gestures that run after render
     reported.current = pageSize;
     const [rawPage, setPage] = useControllable(
         "Paginator",

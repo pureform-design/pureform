@@ -27,7 +27,9 @@ export function useSidewaysPan(
     hooks: SidewaysPanHooks,
 ): GestureResponderHandlers {
     const latest = useRef(hooks);
+    // oxlint-disable-next-line react/refs -- the latest value for callbacks and gestures that run after render
     latest.current = hooks;
+    // oxlint-disable-next-line react/refs -- the handler reads the ref when it runs, after render
     const [pan] = useState(() =>
         PanResponder.create({
             onMoveShouldSetPanResponderCapture: (_event, gesture) =>

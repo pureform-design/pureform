@@ -364,6 +364,7 @@ function TreeImpl(props: TreeProps): ReactNode {
     const rows = useRef(new Map<string, Focusable>()).current;
     // A row to move focus to once it's shown (a branch's first child, as it expands).
     const [focusTo, setFocusTo] = useState<string>();
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- after each render, a row waiting for focus takes it; done clears it
     useEffect(() => {
         if (focusTo === undefined) return;
         const row = rows.get(focusTo);

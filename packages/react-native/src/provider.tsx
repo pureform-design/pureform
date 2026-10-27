@@ -329,6 +329,7 @@ export function PureformProvider(props: PureformProviderProps): ReactNode {
             width: props.width ?? base.width,
             timeScale: props.timeScale ?? base.timeScale,
         };
+        // oxlint-disable-next-line react-hooks/exhaustive-deps -- keyed by the overrides' contents, not the object's identity
     }, [
         parent,
         rootScheme,

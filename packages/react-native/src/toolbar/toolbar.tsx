@@ -156,6 +156,7 @@ function ToolbarImpl(props: ToolbarProps): ReactNode {
             ? items.length
             : overflowCount({
                   sizes: items.map(
+                      // oxlint-disable-next-line react/refs -- sizes measured at layout; a measure that changes them renders again
                       (item) => sizes.current.get(item.value) ?? 0,
                   ),
                   available: room - own.padding,

@@ -19,7 +19,7 @@ import { interactionStates, useInteraction } from "../interaction";
 import { testIdOf, useControllable, withEngine } from "../parts";
 import { nativeSlots, withUnselectable } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
-import { useComponentSlots } from "../styles";
+import { colorText, useComponentSlots } from "../styles";
 
 /** What each part renders as, for its keyed `style` and `slotProps`. */
 export interface SearchBarHosts {
@@ -102,9 +102,7 @@ function SearchBarImpl(props: SearchBarProps): ReactNode {
                 editable={!props.disabled}
                 placeholder={placeholder}
                 // A placeholder's color is a prop, so it takes the plain value.
-                placeholderTextColor={String(
-                    selected.styles.input?.color ?? "",
-                )}
+                placeholderTextColor={colorText(selected.styles.input?.color)}
                 aria-label={placeholder}
                 style={slot.style("input", s.input)}
                 testID={id("input")}

@@ -133,18 +133,23 @@ const compose = (own: Handler, user: Handler): Handler =>
 export interface PartSlots {
     /** The user's props for `part`, to spread first on its element, so what the component sets
      *  after wins. The same object while `slotProps` is. */
-    props(part: string, instance?: unknown): object;
+    readonly props: (part: string, instance?: unknown) => object;
     /** `own` (the part's own style) with the user's style for `part` over it; `own` itself when
      *  there's none. */
-    style<S>(part: string, own: S, instance?: unknown): S;
+    readonly style: <S>(part: string, own: S, instance?: unknown) => S;
     /** A handler the component sets on `part`, run before the user's own of that name; `own`
      *  itself when the user has none. */
-    on<F>(part: string, name: string, own: F, instance?: unknown): F;
+    readonly on: <F>(
+        part: string,
+        name: string,
+        own: F,
+        instance?: unknown,
+    ) => F;
     /** Props the component spreads on `part` (its press handlers), with the user's handlers of
      *  the same names composed after its own; `own` itself when the user has none. */
-    with<O>(part: string, own: O, instance?: unknown): O;
+    readonly with: <O>(part: string, own: O, instance?: unknown) => O;
     /** Whether a function of the copy was passed for this repeated part, so its copy is needed. */
-    each(part: string): boolean;
+    readonly each: (part: string) => boolean;
 }
 
 const never = () => false;

@@ -83,6 +83,7 @@ export function Expanding(props: ExpandingProps): ReactNode {
             springTo(0, "closed");
         }
         // Only `open` starts a change; the spring is read as it starts.
+        // oxlint-disable-next-line react-hooks/exhaustive-deps -- runs as `open` changes; the spring and Animated value are read as it runs
     }, [props.open]);
     useEffect(() => () => height.stopAnimation(), [height]);
     const onLayout = (event: LayoutChangeEvent) => {

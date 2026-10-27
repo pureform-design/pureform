@@ -68,7 +68,7 @@ function FieldImpl(props: FieldProps): ReactNode {
     });
     const value = useMemo<FieldContextValue>(
         () => ({ state, register }),
-        // `state` is rebuilt every render; its fields are what matter.
+        // oxlint-disable-next-line react-hooks/exhaustive-deps -- `state` is rebuilt every render; its fields are what matter
         [
             ids,
             register,

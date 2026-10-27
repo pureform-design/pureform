@@ -316,6 +316,7 @@ function SliderImpl(props: SliderProps): ReactNode {
         setMeasures((last) =>
             sameSliderInsetIcon(measured, last) ? last : measured,
         );
+        // oxlint-disable-next-line react-hooks/exhaustive-deps -- keyed by the measure's fields, not the object's identity
     }, [measured?.size, measured?.padding, measured?.clearance]);
     const rtl = useDirection() === "rtl";
     const snap = (raw: number) =>

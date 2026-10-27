@@ -72,6 +72,7 @@ function Page({
         "fadeThrough",
     );
     const leave = useRef(() => gone(page));
+    // oxlint-disable-next-line react/refs -- the latest value for callbacks and gestures that run after render
     leave.current = () => gone(page);
     useEffect(() => {
         if (!presence.present) leave.current();

@@ -56,8 +56,11 @@ const useShownLabel = (
 ): string => {
     const kept = useRef<SelectItem | null>(null);
     const found = items.find((item) => item.value === value);
+    // oxlint-disable-next-line react/refs -- keeps a picked item's label while it's out of the items, until the value changes
     if (found) kept.current = found;
+    // oxlint-disable-next-line react/refs -- keeps a picked item's label while it's out of the items, until the value changes
     else if (kept.current?.value !== value) kept.current = null;
+    // oxlint-disable-next-line react/refs -- keeps a picked item's label while it's out of the items, until the value changes
     return kept.current?.label ?? "";
 };
 
@@ -222,6 +225,7 @@ export function Select(props: SelectProps): ReactNode {
             />
             <Pressable
                 ref={combobox as never}
+                // oxlint-disable-next-line jsx-a11y/role-has-required-aria-props -- aria-controls is spread in below while the menu is shown
                 role="combobox"
                 {...(typeof props.label === "string"
                     ? { "aria-label": props.label }
@@ -265,6 +269,7 @@ export function Select(props: SelectProps): ReactNode {
                         }}
                     >
                         <MenuKeys
+                            // oxlint-disable-next-line jsx-a11y/no-autofocus -- an opened menu takes focus, as the menu pattern asks
                             autoFocus
                             search={search}
                             onKey={(key) => {

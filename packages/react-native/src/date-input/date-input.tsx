@@ -41,7 +41,7 @@ import { useControllable, withEngine } from "../parts";
 import { useDirection } from "../provider";
 import { nativeSlots } from "../slot-props";
 import type { InnerPropsOf, NativeSlotProps, PartSlots } from "../slot-props";
-import { useComponentSlots } from "../styles";
+import { colorText, useComponentSlots } from "../styles";
 import { partId } from "../text-input";
 
 const NONE: readonly string[] = [];
@@ -75,7 +75,7 @@ interface SegmentOptions {
 }
 
 // One segment, with its own focus: the focused one shows the focus color behind its digits.
-function Segment(options: SegmentOptions): ReactNode {
+function Segment({ inputRef, ...options }: SegmentOptions): ReactNode {
     const { slot } = options;
     const [focused, setFocused] = useState(false);
     const tokens = useTokens();
@@ -103,7 +103,7 @@ function Segment(options: SegmentOptions): ReactNode {
             </Text>
             <v.segment.TextInput
                 {...slot.props("segment")}
-                ref={options.inputRef}
+                ref={inputRef}
                 value={options.text}
                 onChangeText={slot.on(
                     "segment",
@@ -144,10 +144,10 @@ function Segment(options: SegmentOptions): ReactNode {
                 placeholder={options.placeholder}
                 // In the segment's own color, as the web's: the focused empty segment's
                 // placeholder reads on the focus color.
-                placeholderTextColor={String(
-                    selected.styles.segment?.color ??
-                        tokens["colors.onSurfaceVariant"],
-                )}
+                placeholderTextColor={
+                    colorText(selected.styles.segment?.color) ??
+                    colorText(tokens["colors.onSurfaceVariant"])
+                }
                 role="spinbutton"
                 aria-label={SEGMENT_LABEL[options.kind]}
                 aria-valuemin={1}
@@ -230,8 +230,11 @@ function DateInputImpl(props: DateInputProps): ReactNode {
     const [seen, setSeen] = useState(value[0]);
     if (seen !== value[0]) {
         setSeen(value[0]);
+        // oxlint-disable-next-line react/refs -- the digits last written, rewritten as the value changes from outside
         if (dateFromSegments(latest.current) !== (value[0] ?? null)) {
+            // oxlint-disable-next-line react/refs -- the digits last written, rewritten as the value changes from outside
             latest.current = dateSegmentTexts(value[0]);
+            // oxlint-disable-next-line react/refs -- the digits last written, rewritten as the value changes from outside
             setTexts(latest.current);
         }
     }

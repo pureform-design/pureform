@@ -129,6 +129,7 @@ function RatingImpl(props: RatingProps): ReactNode {
                 testID={id("control")}
             >
                 {Array.from({ length: count }, (_, at) => at + 1).map(
+                    // oxlint-disable-next-line react/refs -- the handler reads the ref when it runs, after render
                     (index) => {
                         const reached = Math.ceil(value) === index;
                         const half = reached && value - index === -0.5;

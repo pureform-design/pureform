@@ -249,6 +249,7 @@ function SurfaceImpl(props: SurfaceProps): ReactNode {
                         key: each,
                         text: String(each),
                         selected: each === year,
+                        // oxlint-disable-next-line react/purity -- marks this year in the year grid; read as the grid renders
                         current: each === new Date().getFullYear(),
                         disabled: !!props.disabled,
                     }))}

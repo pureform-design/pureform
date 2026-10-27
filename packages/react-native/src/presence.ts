@@ -503,6 +503,7 @@ export function useOverlayPresence(
         );
     }, []);
     // Kept while it's the same, so a render doesn't start a step over.
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- kept while the motion is the same by value, so a render doesn't restart a step
     const resolved = useMemo(() => computed, [JSON.stringify(computed)]);
     const moves = open !== undefined;
     const driver = useMemo<PresenceDriver | undefined>(
@@ -533,7 +534,7 @@ export function useOverlayPresence(
         const step = resolved[phase];
         if (Math.max(step.duration, step.fade?.duration ?? 0) <= 0) done(phase);
         return stop;
-    }, [driver, resolved, phase, shown, measuring]);
+    }, [driver, resolved, phase, shown, measuring, done]);
     if (!driver) return { present: shownNow, style: STILL, props: STILL };
     if (measuring)
         return { present: shown, style: UNSEEN, props: { onLayout } };

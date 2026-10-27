@@ -134,6 +134,7 @@ function PopoverSurface(
             {isPresent(props.heading) ? (
                 <v.title.Text
                     {...slot.props("title")}
+                    // oxlint-disable-next-line jsx-a11y/role-has-required-aria-props -- React Native has no aria-level; the heading role is all a Text carries
                     role="heading"
                     style={slot.style("title", s.title)}
                     testID={id("title")}

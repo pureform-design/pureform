@@ -149,6 +149,7 @@ function useToastSwipe(closable: boolean, dismiss: () => void) {
     const [x] = useState(() => new Animated.Value(0));
     const [width, setWidth] = useState(0);
     const latestWidth = useRef(0);
+    // oxlint-disable-next-line react/refs -- the latest value for callbacks and gestures that run after render
     latestWidth.current = width;
     const [held, setHeld] = useState(false);
     const reducedMotion = useReducedMotion();

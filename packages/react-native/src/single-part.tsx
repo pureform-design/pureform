@@ -54,7 +54,7 @@ import { useOverlayPresence } from "./presence";
 import { useEngine } from "./provider";
 import { nativeSlots } from "./slot-props";
 import type { NativeSlotProps, PartSlots } from "./slot-props";
-import { useSelectedStyles } from "./styles";
+import { colorText, useSelectedStyles } from "./styles";
 
 // The one style of a component: under `root` where it has slots, else `""`.
 const rootOf = (selected: Selected): Style =>
@@ -85,7 +85,7 @@ export function Text(props: TextProps): ReactNode {
         <NativeText
             {...slot.props("root")}
             style={slot.style("root", [
-                { color: String(tokens["colors.onSurface"]) },
+                { color: colorText(tokens["colors.onSurface"]) },
                 rootOf(selected) as TextStyle,
             ])}
             testID={testIdOf(textAnatomy, "root", props.testId)}
@@ -254,7 +254,8 @@ export function Icon(props: IconProps): ReactNode {
     );
     const tokens = useTokens();
     const own = rootOf(selected);
-    const style = { color: String(tokens["colors.onSurface"]), ...own };
+    const color = colorText(tokens["colors.onSurface"]);
+    const style = { ...(color === undefined ? {} : { color }), ...own };
     return (
         <View
             {...slot.props("root")}
@@ -472,6 +473,7 @@ function MediaImpl(props: MediaProps): ReactNode {
             current = false;
         };
         // `key` stands for `remote`, a new object each render.
+        // oxlint-disable-next-line react-hooks/exhaustive-deps -- keyed by the remote source's contents, not the object's identity
     }, [key]);
     // A source's own width and height size an `Image` whose style doesn't: the aspect sizes it.
     if (style.height === undefined) style.height = "auto";

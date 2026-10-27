@@ -213,6 +213,7 @@ function BottomSheetImpl(
     });
     // Whether it's still open: the modal's state, or as a surface, its `open`.
     const shown = useRef(true);
+    // oxlint-disable-next-line react/refs -- the latest value for callbacks and gestures that run after render
     shown.current = (props.shown ?? props.open) !== false;
     // Each time it opens, it starts where it rests: partly open when it can, once it's laid out.
     const placing = useRef(false);
@@ -298,6 +299,7 @@ function BottomSheetImpl(
     const from = useRef(0);
     const pan = useMemo(
         () =>
+            // oxlint-disable-next-line react/refs -- the handler reads the ref when it runs, after render
             PanResponder.create({
                 onMoveShouldSetPanResponder: (_, gesture) =>
                     Math.abs(gesture.dy) > 4 &&

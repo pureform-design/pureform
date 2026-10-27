@@ -64,6 +64,7 @@ function useScrollState(props: AppBarProps): AppBarScrollState {
     const fromOffset = appBarScrollState(props.scrollOffset ?? 0, {
         size: props.size,
         behavior: props.scrollBehavior,
+        // oxlint-disable-next-line react/refs -- the committed state of the last render, read for hysteresis; written in an effect
         previous: previous.current,
     });
     useEffect(() => {

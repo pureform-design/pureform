@@ -101,7 +101,7 @@ export interface FieldOptions
     readonly inputProps?: TextInputProps | undefined;
 }
 
-function FieldImpl(props: FieldOptions): ReactNode {
+function FieldImpl({ container, ...props }: FieldOptions): ReactNode {
     const [ownFocus, setFocused] = useState(false);
     const [value, setValue] = useControllable(
         props.name,
@@ -208,7 +208,7 @@ function FieldImpl(props: FieldOptions): ReactNode {
         >
             <v.container.View
                 {...slot.props("container")}
-                ref={props.container as never}
+                ref={container as never}
                 style={slot.style("container", s.container)}
                 testID={id("container")}
             >

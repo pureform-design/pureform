@@ -128,6 +128,7 @@ function Page(props: {
             if (finished) onSettle(page);
         });
         return () => run.stop();
+        // oxlint-disable-next-line react-hooks/exhaustive-deps -- runs as the page (or direction) changes; the motion is read as it runs
     }, [page]);
     const offset = moving ? offsetOf(page, motion.rtl) * motion.width : 0;
     const entering = page.state === "entering";
@@ -199,6 +200,7 @@ function Scrim(props: {
         if (run) run.start();
         else shown.setValue(1);
         return () => run?.stop();
+        // oxlint-disable-next-line react-hooks/exhaustive-deps -- runs as the page (or direction) changes; the motion is read as it runs
     }, [props.direction]);
     return (
         <Animated.View

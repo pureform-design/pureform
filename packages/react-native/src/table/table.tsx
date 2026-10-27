@@ -8,6 +8,7 @@
 import { dataTableAnatomy } from "@pureform/anatomy";
 import {
     isPresent,
+    tableCellText,
     tableCellValue,
     tableRowPart,
     tableRowValue,
@@ -276,7 +277,7 @@ function BodyRow<Row>(props: {
                 >
                     {column.cell
                         ? column.cell(props.row)
-                        : String(tableCellValue(column, props.row) ?? "")}
+                        : tableCellText(column, props.row)}
                 </CellContent>
             ))}
         </RowView>

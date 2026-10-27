@@ -115,6 +115,7 @@ function TooltipOverlay<S extends object>({
     // delay.
     const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
     const latestOpen = useRef(open);
+    // oxlint-disable-next-line react/refs -- the latest value for callbacks and gestures that run after render
     latestOpen.current = open;
     const cancel = () => clearTimeout(timer.current);
     const show = useStableCallback((by: Cause, delay: number = 0) => {
@@ -163,7 +164,7 @@ function TooltipOverlay<S extends object>({
                 }
                 return undefined;
             }),
-        [source, openDelay, closeDelay, closeOnClick, interactive],
+        [source, openDelay, closeDelay, closeOnClick, interactive, show, hide],
     );
     const onLongPress = useStableCallback(() => {
         longPressed.current = true;

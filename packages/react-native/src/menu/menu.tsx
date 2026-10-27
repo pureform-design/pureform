@@ -337,6 +337,7 @@ function MenuItemImpl(props: ItemProps): ReactNode {
                 ? {}
                 : { "aria-checked": item.checked ?? false })}
             disabled={item.disabled}
+            // oxlint-disable-next-line react/refs -- the handler reads the ref when it runs, after render
             onPress={slot.on("item", "onPress", () => {
                 if (item.type !== undefined)
                     item.onCheckedChange?.(
@@ -475,6 +476,7 @@ function DrillSize(props: {
         size.setValue({ x: natural.current.width, y: natural.current.height });
         pending.current = true;
         setMoving(true);
+        // oxlint-disable-next-line react-hooks/exhaustive-deps -- runs once per level or opening; the spring and Animated values are read as it runs
     }, [props.level]);
     useEffect(() => () => size.stopAnimation(), [size]);
     return (
@@ -533,6 +535,7 @@ function FadeIn(props: { readonly children: ReactNode }): ReactNode {
         if (!spring) return;
         springing(opacity, 1, spring).start();
         return () => opacity.stopAnimation();
+        // oxlint-disable-next-line react-hooks/exhaustive-deps -- runs once per level or opening; the spring and Animated values are read as it runs
     }, []);
     return <Animated.View style={{ opacity }}>{props.children}</Animated.View>;
 }
@@ -564,6 +567,7 @@ function Flip(props: {
             springing(offset, { x: 0, y: 0 }, spring).start();
         });
         return () => offset.stopAnimation();
+        // oxlint-disable-next-line react-hooks/exhaustive-deps -- runs once per level or opening; the spring and Animated values are read as it runs
     }, [props.from]);
     return (
         <Animated.View
@@ -608,6 +612,7 @@ function MenuImpl(
     // fails; they're kept in refs, so caching them renders nothing.
     const box = useRef<{ left: number; right: number } | undefined>(undefined);
     const cachedFrame = useRef(props.containerFrame ?? inherited);
+    // oxlint-disable-next-line react/refs -- the latest value for callbacks and gestures that run after render
     cachedFrame.current = props.containerFrame ?? inherited;
     const cacheBox = () =>
         surface.current?.measureInWindow((x, _y, width) => {
@@ -784,6 +789,7 @@ function MenuImpl(
     // Out of any submenu once it closes.
     useEffect(() => {
         if (props.open === false) {
+            // oxlint-disable-next-line react/set-state-in-effect -- a closed menu forgets its drill path and measures once the app closes it
             setMeasuring(undefined);
             setPath([]);
             setFlip(undefined);
@@ -795,12 +801,14 @@ function MenuImpl(
     // The cascaded submenu grows in and fades out as the menu does: the last one shown stays
     // while it goes.
     const lastBeside = useRef(beside);
+    // oxlint-disable-next-line react/refs -- the last side the submenu showed beside, kept while it leaves
     if (beside) lastBeside.current = beside;
     const cascade = useOverlayPresence(beside !== undefined, "popup");
     if (!presence.present) return null;
     const id = (part: Part) =>
         testIdOf(menuOverlayAnatomy, KEYS(part) as Key, props.testId);
     const slot = nativeSlots(props, KEYS);
+    // oxlint-disable-next-line react/refs -- the last side the submenu showed beside, kept while it leaves
     const shownBeside = lastBeside.current;
     // During a drill step, the row its label moves into takes it (`flip`), and the others fade
     // in (`FadeIn`, remounted for each step's level).
@@ -968,6 +976,7 @@ function MenuImpl(
                 // outside both.
                 <Portal layer="menu">
                     <Anchored
+                        // oxlint-disable-next-line react/refs -- the last side the submenu showed beside, kept while it leaves
                         anchor={shownBeside.row}
                         positioning={submenuPositioning(rtl ? "rtl" : "ltr")}
                         placement="right-start"
@@ -989,6 +998,7 @@ function MenuImpl(
                                 }}
                             >
                                 <MenuKeys
+                                    // oxlint-disable-next-line jsx-a11y/no-autofocus -- an opened menu takes focus, as the menu pattern asks
                                     autoFocus={shownBeside.from !== undefined}
                                     onKey={(key) => {
                                         // Back out to the item: the arrow toward the inline start,
@@ -1107,6 +1117,7 @@ export function MenuKeys(props: {
             all.find((item) => item.getAttribute("aria-selected") === "true") ??
             all[0]
         )?.focus();
+        // oxlint-disable-next-line react-hooks/exhaustive-deps -- focuses an item once, as the keys mount; the search is read as it runs
     }, []);
     const onKeyDown = (event: {
         nativeEvent: {
@@ -1180,7 +1191,7 @@ export const typeahead = (now: () => number = () => Date.now()) => {
         text = time - at > 500 ? key : text + key;
         at = time;
         const lower = text.toLocaleLowerCase();
-        return [...lower].every((letter) => letter === lower[0])
+        return lower.split("").every((letter) => letter === lower[0])
             ? lower[0]!
             : lower;
     };
@@ -1214,6 +1225,7 @@ function Popup(props: {
 }): ReactNode {
     return (
         <MenuKeys
+            // oxlint-disable-next-line jsx-a11y/no-autofocus -- an opened menu takes focus, as the menu pattern asks
             autoFocus
             onKey={(key) => {
                 if (key === "Tab") props.onClose();

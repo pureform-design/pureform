@@ -232,6 +232,7 @@ function Popup(
                         key: each,
                         text: String(each),
                         selected: each === year,
+                        // oxlint-disable-next-line react/purity -- marks this year in the year grid; read as the grid renders
                         current: each === new Date().getFullYear(),
                         disabled: !!props.disabled,
                     }))}
@@ -270,6 +271,7 @@ export function DockedDatePicker(props: DockedDatePickerProps): ReactNode {
     );
     const shownText = value[0] ? formatDateText(value[0], locale) : "";
     const [text, setText] = useState(shownText);
+    // oxlint-disable-next-line react/set-state-in-effect -- the field's text follows the shown value when it changes from outside
     useEffect(() => setText(shownText), [shownText]);
     const engine = useEngine();
     const { presence, container, anchor, show, close, trigger } = useFieldPopup(

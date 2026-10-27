@@ -130,6 +130,7 @@ function useDrag(
     const ref = useRef<ComponentRef<typeof View>>(null);
     const box = useRef<Box>({ x: 0, y: 0, width: 0, height: 0 });
     const latest = useRef({ enabled, move, end });
+    // oxlint-disable-next-line react/refs -- the latest value for callbacks and gestures that run after render
     latest.current = { enabled, move, end };
     const measure = () =>
         ref.current?.measure((_x, _y, width, height, pageX, pageY) => {
@@ -142,7 +143,9 @@ function useDrag(
             colorPickerFraction(pageY - y, height),
         );
     };
+    // oxlint-disable-next-line react/refs -- the handler reads the ref when it runs, after render
     const pan = useRef(
+        // oxlint-disable-next-line react/refs -- the handler reads the ref when it runs, after render
         PanResponder.create({
             onStartShouldSetPanResponder: () => latest.current.enabled,
             onMoveShouldSetPanResponder: () => latest.current.enabled,
@@ -229,6 +232,7 @@ function Area(props: PartsProps): ReactNode {
                 drag.onLayout(event);
                 setSize(event.nativeEvent.layout);
             }}
+            // oxlint-disable-next-line react/refs -- the handler reads the ref when it runs, after render
             {...slot.with("area", drag.pan.panHandlers)}
             style={slot.style("area", withUnselectable(s.area))}
             testID={id("area")}
@@ -356,6 +360,7 @@ function ChannelSlider(props: PartsProps & { readonly channel: Channel }) {
                 drag.onLayout(event);
                 setWidth(event.nativeEvent.layout.width);
             }}
+            // oxlint-disable-next-line react/refs -- the handler reads the ref when it runs, after render
             {...slot.with("channelSlider", drag.pan.panHandlers, each)}
             style={slot.style(
                 "channelSlider",
@@ -520,6 +525,7 @@ function ColorPickerImpl(props: ColorPickerProps): ReactNode {
     const color =
         colorPickerHexOf(own) === colorPickerHex(hex) ? own : hsba(hex);
     const latest = useRef(color);
+    // oxlint-disable-next-line react/refs -- the latest value for callbacks and gestures that run after render
     latest.current = color;
     const set = (next: Color) => {
         setOwn(next);
@@ -545,6 +551,7 @@ function ColorPickerImpl(props: ColorPickerProps): ReactNode {
     };
     const [dropper, setDropper] = useState(false);
     useEffect(() => {
+        // oxlint-disable-next-line react/set-state-in-effect -- feature detection after mount, so the server and the first client render agree
         if (Platform.OS === "web") setDropper(hasEyeDropper());
     }, []);
     const openDropper = () => {
@@ -610,10 +617,12 @@ function ColorPickerImpl(props: ColorPickerProps): ReactNode {
                                         autoCorrect: false,
                                         maxLength: 8,
                                         onBlur: after(
+                                            // oxlint-disable-next-line react/refs -- the handler reads the ref when it runs, after render
                                             commit,
                                             userInput?.onBlur,
                                         ),
                                         onSubmitEditing: after(
+                                            // oxlint-disable-next-line react/refs -- the handler reads the ref when it runs, after render
                                             commit,
                                             userInput?.onSubmitEditing,
                                         ),

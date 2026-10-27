@@ -24,6 +24,7 @@ export function useTransitionPages<C>(
     const [pages, setPages] = useState(() => startPages(key));
     const next = change(pages, key);
     if (next !== pages) setPages(next);
+    // oxlint-disable-next-line react/refs -- a stable mutable cache of each page's content, kept across renders
     const contents = useRef(new Map<PageKey, C>()).current;
     keepContents(contents, next, key, content);
     const [settle] = useState(

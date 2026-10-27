@@ -42,6 +42,7 @@ import type { NativeInteraction, PressableHandlers } from "./interaction";
 import { withEngine } from "./parts";
 import { useEngine, usePureform } from "./provider";
 import type { PureformState } from "./provider";
+import { colorText } from "./styles";
 
 // Material's ripple: the engine's press ripples in the surface's content color (the theme's
 // `onSurface` where the surface sets none) and corners, clipped to the shape it draws, from each
@@ -53,15 +54,17 @@ function MaterialRippleImpl(props: NativeIndicationProps): ReactNode {
     const radius = style["borderRadius"];
     const ripples = engine.useRipple({
         clip: props.surface.drawing as Drawing | undefined,
-        color: String(
-            style["color"] ?? tokens["colors.onSurface"] ?? "rgb(0, 0, 0)",
-        ),
+        color:
+            colorText(style["color"]) ??
+            colorText(tokens["colors.onSurface"]) ??
+            "rgb(0, 0, 0)",
         ...(typeof radius === "number" || typeof radius === "string"
             ? { radius }
             : {}),
         ...(props.centered ? { centered: true } : {}),
     });
     const latest = useRef(ripples);
+    // oxlint-disable-next-line react/refs -- the latest value for callbacks and gestures that run after render
     latest.current = ripples;
     useEffect(() => {
         const held = new Set<number>();

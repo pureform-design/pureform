@@ -151,6 +151,7 @@ function QueuedSnackbar(props: {
         ) {
             AccessibilityInfo.announceForAccessibility(options.supportingText);
         }
+        // oxlint-disable-next-line react-hooks/exhaustive-deps -- announced once, as the snackbar shows
     }, []);
     return (
         <View

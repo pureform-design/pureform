@@ -123,6 +123,7 @@ function SelectionListImpl(props: SelectionListProps): ReactNode {
                                         | undefined,
                                     item as ListItemProps,
                                 )}
+                                // oxlint-disable-next-line jsx-a11y/role-has-required-aria-props -- ListItem's `selected` sets the option's selected state
                                 role="option"
                                 selected={value.includes(key)}
                                 disabled={disabled || props.disabled}

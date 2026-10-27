@@ -382,6 +382,7 @@ function Dial(props: {
             return undefined;
         }
         return settle(degrees, 0, spring, to * 360);
+        // oxlint-disable-next-line react-hooks/exhaustive-deps -- runs as the hand turns or a drag starts or ends; the rest is read as it runs
     }, [hand.turn, dragTurn !== undefined]);
     const rotate = degrees.interpolate({
         inputRange: [0, 360],

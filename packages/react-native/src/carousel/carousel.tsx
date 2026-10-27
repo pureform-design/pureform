@@ -236,6 +236,7 @@ function CarouselImpl(props: CarouselProps): ReactNode {
                     scroll: 0,
                 },
             ),
+        // oxlint-disable-next-line react-hooks/exhaustive-deps -- keyed by the metrics' fields, not the object's identity
         [
             props.layout,
             props.items,
@@ -248,12 +249,13 @@ function CarouselImpl(props: CarouselProps): ReactNode {
     );
     // Where each item's slot starts along the row: the offsets it snaps to.
     const offsets = useMemo(() => {
+        const starts: number[] = [];
         let at = 0;
-        return sizes.map((size) => {
-            const start = at;
+        for (const size of sizes) {
+            starts.push(at);
             at += size.slot + gap;
-            return start;
-        });
+        }
+        return starts;
     }, [sizes, gap]);
     const pageOf = (x: number) =>
         offsets.reduce(

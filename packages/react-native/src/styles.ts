@@ -232,3 +232,8 @@ export const inFlowInline = <S extends Readonly<Record<string, unknown>>>(
                   : {}),
           }
         : style;
+
+/** A color as a prop takes it (`placeholderTextColor`, a text's `color`): a style or theme value
+ *  that is a color's text, else `undefined`. A theme value may also be a number or a curve. */
+export const colorText = (value: unknown): string | undefined =>
+    typeof value === "string" ? value : undefined;

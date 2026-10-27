@@ -114,6 +114,7 @@ function ListItemImpl(props: ListItemProps): ReactNode {
     // spring carries on from; for the render after the release only.
     const [fling, setFling] = useState<number | undefined>(undefined);
     useEffect(() => {
+        // oxlint-disable-next-line react/set-state-in-effect -- a fling is consumed once the row has moved
         if (fling !== undefined) setFling(undefined);
     }, [fling]);
     const offset = drag ?? swipeRestOffset(revealed, width);
@@ -124,6 +125,7 @@ function ListItemImpl(props: ListItemProps): ReactNode {
     };
     // The responder is made once; it reads the latest render's values from here.
     const latest = useRef({ offset, width, rtl, setRevealed });
+    // oxlint-disable-next-line react/refs -- the latest value for callbacks and gestures that run after render
     latest.current = { offset, width, rtl, setRevealed };
     const start = useRef(0);
     const pan = useSidewaysPan({

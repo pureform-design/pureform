@@ -35,7 +35,8 @@ export interface InkOptions extends RippleOptions {
     readonly clip?: Drawing | undefined;
 }
 
-/** What runs a component's motion and draws its shapes. */
+/** What runs a component's motion and draws its shapes. Its functions are hooks and plain
+ *  functions, called without the engine as `this`. */
 export interface MotionEngine {
     /** The engine's name; components start over when it changes, since its hooks differ. */
     readonly name: string;
@@ -45,6 +46,7 @@ export interface MotionEngine {
      *  `variants`, `state`, and the instance's `tokens` by theme key, moving tokens starting at
      *  `velocities` (by theme key, in their units per second). */
     useStyles(
+        this: void,
         name: string,
         variants: Record<string, string | boolean | undefined>,
         state: State,
@@ -52,16 +54,17 @@ export interface MotionEngine {
         velocities?: TokenVelocities,
     ): MotionStyles;
     /** Press ripples for a surface. */
-    useRipple(options: InkOptions): Ripples;
+    useRipple(this: void, options: InkOptions): Ripples;
     /** What runs one overlay's enter and exit, telling when each step ends. Without it,
      *  overlays show and go at once. */
-    presence?(): PresenceDriver;
+    presence?(this: void): PresenceDriver;
     /** Whether the engine's slide runs a real spring (`useSlide` takes the motion's `spring`),
      *  rather than its duration and curve. */
     readonly slideSpring?: boolean;
     /** The style that slides an active indicator into its place from where another was drawn,
      *  for each new `motion` (a hook). Without it, the indicator moves at once. */
     useSlide?(
+        this: void,
         motion: SlideMotion | undefined,
     ): Record<string, unknown> | undefined;
     /** The engine's views, which take its animated styles. */

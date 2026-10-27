@@ -252,6 +252,7 @@ function SideSheetDrag(props: {
     // Toward the edge: right, or left under right to left.
     const outward = useDirection() === "rtl" ? -1 : 1;
     const latestOutward = useRef(outward);
+    // oxlint-disable-next-line react/refs -- the latest value for callbacks and gestures that run after render
     latestOutward.current = outward;
     const tokens = useTokens();
     const reducedMotion = useReducedMotion();
@@ -271,6 +272,7 @@ function SideSheetDrag(props: {
     });
     // Each time it opens, it starts open, wherever a drag let it go last time.
     const shown = useRef(props.open);
+    // oxlint-disable-next-line react/refs -- the latest value for callbacks and gestures that run after render
     shown.current = props.open;
     useEffect(() => {
         if (!props.open) return;

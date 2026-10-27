@@ -371,6 +371,7 @@ function NativeSelectImpl(props: NativeSelectProps): ReactNode {
         <Pressable
             {...slot.props("select")}
             {...(onPress ? indication.handlers : {})}
+            // oxlint-disable-next-line jsx-a11y/role-has-required-aria-props -- React Native's picker has no list element for aria-controls to name
             role="combobox"
             {...(label ? { "aria-label": label } : {})}
             {...(labelledBy ? { "aria-labelledby": labelledBy } : {})}
@@ -403,6 +404,7 @@ function NativeSelectImpl(props: NativeSelectProps): ReactNode {
                 style={slot.style("root", s.root)}
                 testID={id("root")}
             >
+                {/* oxlint-disable-next-line react/static-components -- nativeMenu() returns the same optional module's component every render */}
                 <NativeMenu
                     actions={menuActions(items, chosen, multiple)}
                     onPressAction={({ nativeEvent }) =>

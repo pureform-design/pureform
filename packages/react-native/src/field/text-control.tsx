@@ -11,7 +11,7 @@ import { Platform } from "react-native";
 import type { TextInputProps } from "react-native";
 
 import { useControllable } from "../parts";
-import { useComponentSlots } from "../styles";
+import { colorText, useComponentSlots } from "../styles";
 import { useField } from "./context";
 
 /** React Native Web draws a field that isn't editable as `readonly`; a disabled one is
@@ -84,7 +84,7 @@ export function useTextControl(
             {...(WEB && control.disabled ? ({ disabled: true } as object) : {})}
             placeholderTextColor={
                 rest.placeholderTextColor ??
-                String(tokens["colors.onSurfaceVariant"])
+                colorText(tokens["colors.onSurfaceVariant"])
             }
             onFocus={(event: never) => {
                 setFocused(true);

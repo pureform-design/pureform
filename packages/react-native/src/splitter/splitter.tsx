@@ -38,7 +38,7 @@ import { testIdOf, withEngine } from "../parts";
 import { useDirection, usePureform } from "../provider";
 import { nativeSlots, withUnselectable } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
-import { useComponentSlots } from "../styles";
+import { colorText, useComponentSlots } from "../styles";
 
 /** The splitter's parts: `"root" | "panel" | "resizeTrigger" | "resizeTriggerIndicator"`. */
 type Part = PartName<typeof splitterAnatomy>;
@@ -116,6 +116,7 @@ function ResizeTrigger(props: TriggerProps): ReactNode {
     const limits = splitterLimits(splitter.panes, props.room);
     // The responder is made once; it reads the latest render's values from here.
     const latest = useRef({ ...props, limits });
+    // oxlint-disable-next-line react/refs -- the latest value for callbacks and gestures that run after render
     latest.current = { ...props, limits };
     const start = useRef<readonly number[]>(props.sizes);
     const along = (dx: number, dy: number) => {
@@ -123,6 +124,7 @@ function ResizeTrigger(props: TriggerProps): ReactNode {
         return horizontal ? (rtl ? -dx : dx) : dy;
     };
     const pan = useRef(
+        // oxlint-disable-next-line react/refs -- the handler reads the ref when it runs, after render
         PanResponder.create({
             onStartShouldSetPanResponder: () => true,
             onMoveShouldSetPanResponder: () => true,
@@ -221,6 +223,7 @@ function ResizeTrigger(props: TriggerProps): ReactNode {
                     ),
             )}
             {...({ onKeyDown } as object)}
+            // oxlint-disable-next-line react/refs -- the handler reads the ref when it runs, after render
             {...slot.with("resizeTrigger", pan.panHandlers)}
             {...(props.onLayout === undefined
                 ? {}
@@ -379,7 +382,7 @@ function SplitterImpl(props: SplitterProps): ReactNode {
                                 <v.panel.Text
                                     style={{
                                         // Nothing inherits on React Native.
-                                        color: String(
+                                        color: colorText(
                                             tokens["colors.onSurface"],
                                         ),
                                         ...ownText(s.panel),

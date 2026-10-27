@@ -117,6 +117,7 @@ export const outside = <T,>(initial: T) => {
     const handle = { set: (_value: T) => {} };
     function Holder(props: { children: (value: T) => ReactNode }): ReactNode {
         const [value, setValue] = useState(initial);
+        // oxlint-disable-next-line react/immutability -- the test harness captures what it drives from outside the component
         handle.set = setValue;
         return props.children(value);
     }

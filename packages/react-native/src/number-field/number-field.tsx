@@ -154,6 +154,7 @@ function TriggerImpl(options: TriggerOptions): ReactNode {
                     : (props.incrementLabel ?? NUMBER_FIELD_LABELS.increment)
             }
             disabled={disabled}
+            // oxlint-disable-next-line react/refs -- the handler reads the ref when it runs, after render
             onPressIn={slot.on(part, "onPressIn", (event: unknown) => {
                 indication.handlers.onPressIn?.(event as never);
                 if (disabled) return;
@@ -166,6 +167,7 @@ function TriggerImpl(options: TriggerOptions): ReactNode {
                     );
                 }, NUMBER_FIELD_SPIN_DELAY);
             })}
+            // oxlint-disable-next-line react/refs -- the handler reads the ref when it runs, after render
             onPressOut={slot.on(part, "onPressOut", (event: unknown) => {
                 indication.handlers.onPressOut?.(event as never);
                 stop();
@@ -205,6 +207,7 @@ function NumberFieldImpl(props: NumberFieldProps): ReactNode {
     };
     // A held button steps from the latest value, not the one its press began with.
     const latest = useRef(number);
+    // oxlint-disable-next-line react/refs -- the latest value for callbacks and gestures that run after render
     latest.current = number;
     const stepBy = (direction: 1 | -1) => {
         const next = numberFieldStep(latest.current, direction, range);

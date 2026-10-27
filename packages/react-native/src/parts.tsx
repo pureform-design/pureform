@@ -69,6 +69,7 @@ export function useControllable<N extends string, T>(
         controlled,
         warnOnce,
     );
+    // oxlint-disable-next-line react/refs -- a dev-only check that the value stays controlled or uncontrolled across renders
     if (isDev) track.current(controlled);
     const current = controlled ? value : own;
     return [
@@ -95,5 +96,6 @@ export function useStableCallback<A extends unknown[], R>(
 /** `selection`, or the one from an earlier render while it selects the same (variants and tokens
  *  compared by value), so rows given it can skip rendering. */
 export function useStableSelection<S extends object>(selection: S): S {
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- kept while the selection's signature is the same, so rows can skip rendering
     return useMemo(() => selection, [selectionSignature(selection)]);
 }

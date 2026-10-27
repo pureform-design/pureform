@@ -101,7 +101,7 @@ interface CellOptions {
 const WEB = Platform.OS === "web";
 
 // One cell, with its own states: the filled indicator and stroke follow its focus.
-function CellImpl(options: CellOptions): ReactNode {
+function CellImpl({ inputRef, ...options }: CellOptions): ReactNode {
     const { props, index } = options;
     const slot = nativeSlots(props);
     const cell: CodeFieldCellInstance | undefined = slot.each("input")
@@ -124,7 +124,7 @@ function CellImpl(options: CellOptions): ReactNode {
     return (
         <v.input.TextInput
             {...slot.props("input", cell)}
-            ref={options.inputRef}
+            ref={inputRef}
             value={options.value}
             onChangeText={slot.on(
                 "input",
