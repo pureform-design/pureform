@@ -24,6 +24,6 @@
     }
   },
   // The base config includes `src` only; `.pureform/` holds the registry and the
-  // declarations that type it.
-  "include": ["src/**/*.*", ".pureform/**/*.*"]
+  // declarations that type it, and `vitest-e2e-context.d.ts` what the smoke test injects.
+  "include": ["src/**/*.*", ".pureform/**/*.*", "vitest-e2e-context.d.ts"]
 }

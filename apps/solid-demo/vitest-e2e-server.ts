@@ -1,8 +1,8 @@
 // The smoke test's global setup: starts the demo's own dev server (`vite.config.ts`, server
 // rendering and all) on a free port, compiles the pages the tests visit, and provides its URL and
-// CHROMIUM_PATH to the test (`src/demo.e2e.test.ts` types them). It runs in Vitest's main process,
-// which loads the workspace packages' builds, as `vite dev` does; test workers resolve their
-// sources instead.
+// CHROMIUM_PATH to the test (`vitest-e2e-context.d.ts` types them). It runs in Vitest's main
+// process, which loads the workspace packages' builds, as `vite dev` does; test workers resolve
+// their sources instead.
 
 import { fileURLToPath } from "node:url";
 

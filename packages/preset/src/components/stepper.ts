@@ -229,6 +229,9 @@ export const createStepper = <D extends string = MaterialDensity>(
                     },
                     separator: connectorLine,
                     content: {
+                        // Set rather than inherited: React Native's text takes no color from
+                        // the views around it.
+                        color: ref("activeContent"),
                         paddingBlockStart: ref("contentPadding"),
                         paddingBlockEnd: ref("contentPadding"),
                         paddingInlineStart: ref("contentPadding"),

@@ -6,6 +6,8 @@
         "pureform.config.ts",
         "vite.config.ts",
         "vitest.config.e2e.ts",
-        "vitest.config.unit.ts"
+        "vitest.config.unit.ts",
+        "vitest-e2e-server.ts",
+        "vitest-e2e-context.d.ts"
     ]
 }

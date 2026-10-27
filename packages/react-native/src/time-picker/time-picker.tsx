@@ -388,7 +388,13 @@ function Dial(props: {
         outputRange: ["0deg", "360deg"],
     });
     // The handle sits at the hand's tip: centred on the dial, moved out along the turned hand.
-    const [width, setWidth] = useState(0);
+    // Until the dial's first layout (a frame after it mounts), its styled width (the theme's dial
+    // size) places it: drawn at the centre, it would leave the selected label's light content
+    // over the bare dial.
+    const dialStyle = slot.style("dial", s.dial);
+    const [measured, setWidth] = useState(0);
+    const styled = (dialStyle as { width?: unknown } | undefined)?.width;
+    const width = measured || (typeof styled === "number" ? styled : 0);
     const reach = (hand.radius / 100) * width;
     return (
         <v.dial.View
@@ -427,7 +433,7 @@ function Dial(props: {
             onResponderTerminate={slot.on("dial", "onResponderTerminate", () =>
                 setDragTurn(undefined),
             )}
-            style={slot.style("dial", s.dial)}
+            style={dialStyle}
             testID={id("dial")}
         >
             <Animated.View

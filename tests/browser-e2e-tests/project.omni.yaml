@@ -37,9 +37,12 @@ cache:
         - "../panda-fixture/pureform.codegen.ts"
 
 tasks:
-  # Imports the Panda fixture's and the demos' generated output, which no task here writes.
+  # Imports the Panda fixture's sources and generated output (`.pureform/`, `styled-system/`),
+  # which its `prepare` task writes.
   check:types:
-    enabled: false
+    dependencies:
+      append:
+        - ^prepare
 
   test:e2e:
     enabled: true

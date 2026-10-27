@@ -95,6 +95,9 @@ describe("HorizontalSharedAxis on React Native", () => {
             30_000,
         );
         expect(scrim()).toBeNull();
+        // Each page settles on its own spring, so the entering one can come to rest a frame
+        // after the leaving one goes; the root clips until it has.
+        await until(() => expect(pages()[0]!.style.transform).toBe(""), 30_000);
         expect(getComputedStyle(pages()[0]!.parentElement!).overflow).not.toBe(
             "hidden",
         );

@@ -55,6 +55,15 @@ tasks:
       append:
         - prepare
 
+  # `tsconfig.node.json` checks the smoke test's global setup, and both tsconfigs what it provides.
+  check:types:
+    cache:
+      key:
+        files:
+          append:
+            - "./vitest-e2e-server.ts"
+            - "./vitest-e2e-context.d.ts"
+
   # Writes `.pureform/` (ignored by git) from `pureform.config.ts` with the built Panda adapter's
   # codegen, for Panda's codegen and `tsc`; `vite dev` and `vite build` write it themselves.
   generate:

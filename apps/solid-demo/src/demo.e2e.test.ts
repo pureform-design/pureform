@@ -6,15 +6,6 @@ import { chromium } from "playwright";
 import type { Browser, Page } from "playwright";
 import { afterAll, beforeAll, expect, inject, it } from "vitest";
 
-declare module "vitest" {
-    interface ProvidedContext {
-        /** The demo's dev server, started and warmed up by `vitest-e2e-server.ts`. */
-        demoUrl: string;
-        /** A system Chromium to use instead of Playwright's download, or "". */
-        chromiumPath: string;
-    }
-}
-
 let browser: Browser | undefined;
 
 const url = (path: string) => new URL(path, inject("demoUrl")).href;

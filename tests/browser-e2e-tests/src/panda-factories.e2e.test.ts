@@ -290,7 +290,6 @@ describe.each(NAMES)("the %s factory", (name) => {
 // Tokens the preset declares but none of its styles read (a gap in the preset, not in the
 // factories): setting them has no effect.
 const UNREAD = [
-    "--pf-components-slider-stateLayerColor",
     // A state layer that follows another slot has no drag state.
     ...[
         "iconButton",

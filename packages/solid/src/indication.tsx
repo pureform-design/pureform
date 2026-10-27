@@ -188,6 +188,22 @@ export function usePartIndication(
         NOT_FORWARDED,
         { ownedWrite: true },
     );
+    // What the effect attached, kept while what it attaches to is the same: the effect runs again
+    // when any of its reads notify (the source is read through props that change often, a
+    // machine's), and subscribing again would lose the hover and press already forwarded, which
+    // a source counts from the interactions it sees (a highlight's hover is emitted once).
+    // Not memos: every row would pay for their nodes.
+    let attached:
+        | { readonly on: Attached; readonly detach: () => void }
+        | undefined;
+    const detach = () => {
+        const last = attached;
+        attached = undefined;
+        if (!last) return;
+        last.detach();
+        setForwarded(NOT_FORWARDED);
+    };
+    onCleanup(detach);
     // Created on the server too, where it doesn't run, so hydration finds the same nodes. The
     // layer isn't tracked: the indication finds it in the surface when it draws.
     createEffect(
@@ -197,7 +213,10 @@ export function usePartIndication(
                 element() as HTMLElement | undefined,
                 roles.filter(({ entry }) => scope.entryActive(entry)),
             ] as const,
-        ([current, el, active]) => {
+        (next) => {
+            if (attached && sameAttached(attached.on, next)) return;
+            detach();
+            const [current, el, active] = next;
             if (!current || !el || active.length === 0) return;
             const cleanups = active.map(({ entry, role }) =>
                 scope.host.instance(entry, current).attach(role, el),
@@ -210,9 +229,11 @@ export function usePartIndication(
                         .subscribeForwarded(setForwarded),
                 );
             }
-            return () => {
-                for (const cleanup of cleanups) cleanup();
-                setForwarded(NOT_FORWARDED);
+            attached = {
+                on: next,
+                detach: () => {
+                    for (const cleanup of cleanups) cleanup();
+                },
             };
         },
     );
@@ -233,6 +254,20 @@ export function usePartIndication(
             ) : undefined,
     };
 }
+
+type Attached = readonly [
+    InteractionSource | undefined,
+    HTMLElement | undefined,
+    readonly { readonly entry: number; readonly role: IndicationRole }[],
+];
+
+const sameAttached = (a: Attached, b: Attached): boolean =>
+    a[0] === b[0] &&
+    a[1] === b[1] &&
+    a[2].length === b[2].length &&
+    a[2].every(
+        (one, i) => one.entry === b[2][i]!.entry && one.role === b[2][i]!.role,
+    );
 
 /** A part's states with a forwarded hover or press added. */
 const withForwarded = (

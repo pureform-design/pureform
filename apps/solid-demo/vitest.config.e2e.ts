@@ -9,6 +9,13 @@ export default mergeConfig(e2eTestConfig, {
     test: {
         environment: "node",
         globalSetup: ["./vitest-e2e-server.ts"],
+        // Off: with it, Vitest's main process (5.0.5) loads the global setup's transformed code as
+        // bytes, not a string, and the source-map lookup its `Error.prepareStackTrace` hook does
+        // for a stack with a frame in the setup throws (`code.charCodeAt is not a function`). Every
+        // stack captured while the setup runs (jiti loading `pureform.config.ts`, Playwright's API
+        // calls) has one, so the setup failed. The test workers read the cache as text and aren't
+        // affected; one setup and one test file lose little without it.
+        fsModuleCache: false,
         testTimeout: 60_000,
         // Launching Chromium, on a loaded machine.
         hookTimeout: 60_000,

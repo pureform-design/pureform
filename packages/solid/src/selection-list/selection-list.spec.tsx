@@ -76,6 +76,22 @@ describe("SelectionList", () => {
         expect(inbox?.className).toContain("list-item--density--1");
     });
 
+    it("shows the highlighted option as hovered, as the highlight moves", async () => {
+        withRegistry(() => (
+            <SelectionList aria-label="Folders" items={ITEMS} />
+        ));
+        await settle();
+        const hovered = () =>
+            options().map((option) => option.hasAttribute("data-pf-hover"));
+        expect(hovered()).toEqual([false, false, false]);
+        byTestId(testIds.list.root).focus();
+        await settle();
+        expect(hovered()).toEqual([true, false, false]);
+        await userEvent.keyboard("{ArrowDown}");
+        await settle();
+        expect(hovered()).toEqual([false, true, false]);
+    });
+
     it("selects several with clicks, and reports each change", async () => {
         const onValueChange = vi.fn();
         withRegistry(() => (

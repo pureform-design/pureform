@@ -42,6 +42,9 @@ Through the omni MCP (or `omni run`): `test:e2e`, which first runs the Panda fix
 (`bun x playwright install chromium`) and ignores `CHROMIUM_PATH`, with a warning: a system
 Chromium draws text differently, and the screenshots would differ.
 
+`check:types` runs `tsc` over the suites (and the fixture files they import) after the same
+`prepare`, since they import its generated `.pureform/` and `styled-system/`.
+
 Text in the screenshots draws the same on every machine: Chromium starts with the repo's
 fontconfig (`fonts.conf`, through `FONTCONFIG_FILE`), which reads the system fonts but no user
 config (`~/.config/fontconfig`) and turns hinting and subpixel rendering off, and with flags that

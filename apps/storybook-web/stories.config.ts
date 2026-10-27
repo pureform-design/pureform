@@ -159,19 +159,7 @@ export default defineStories({
         Table: { parameters: keyClicks("KeyEnter", "KeySpace") },
         Tabs: { parameters: keyClicks("KeyEnter", "KeySpace") },
         Toolbar: { parameters: keyClicks("KeyEnter", "KeySpace") },
-        TimePicker: {
-            parameters: native({
-                KeyEnter: { play: NO_BUBBLING },
-                // The chosen minute is white over the dial's handle, a sibling drawn under it
-                // rather than its ancestor, so axe reads the dial's surface as its background.
-                TheMinutes: {
-                    a11y: {
-                        "color-contrast":
-                            "The chosen label's background is the dial's handle, a sibling under it, which axe doesn't see.",
-                    },
-                },
-            }),
-        },
+        TimePicker: { parameters: native({ KeyEnter: { play: NO_BUBBLING } }) },
         CodeField: { parameters: native({ Disabled: DISABLED_TEXT }) },
         NumberField: { parameters: native({ Disabled: DISABLED_TEXT }) },
         TagsInput: { parameters: native({ Disabled: DISABLED_TEXT }) },

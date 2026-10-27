@@ -12,6 +12,7 @@ import {
     byTestId,
     computed,
     drag,
+    laidOut,
     mount,
     outside,
     settle,
@@ -89,9 +90,32 @@ describe("time picker", () => {
         expect(am!.getAttribute("aria-pressed")).toBe("false");
     });
 
+    it("draws the handle over the selected label from its first frame, before the dial's layout reports", async () => {
+        await render(
+            <TimePicker
+                defaultValue="09:30"
+                hourCycle={12}
+                defaultView="minute"
+            />,
+        );
+        const centre = (element: HTMLElement) => {
+            const box = element.getBoundingClientRect();
+            return [box.x + box.width / 2, box.y + box.height / 2];
+        };
+        const label = all("pf-time-picker-dial-label").find(
+            (each) => each.textContent === "30",
+        )!;
+        const [hx, hy] = centre(byTestId("pf-time-picker-dial-handle"));
+        const [lx, ly] = centre(label);
+        expect(Math.abs(hx! - lx!)).toBeLessThan(1);
+        expect(Math.abs(hy! - ly!)).toBeLessThan(1);
+    });
+
     it("turns the hand with a dragging touch itself, onto the value once let go", async () => {
         await render(<TimePicker defaultValue="02:00" hourCycle={12} />);
         const dial = byTestId("pf-time-picker-dial");
+        // A touch reads where it is from the dial's size, which its layout reports.
+        await laidOut(dial);
         const track = byTestId("pf-time-picker-dial-track");
         const box = dial.getBoundingClientRect();
         const r = box.width * 0.4;
