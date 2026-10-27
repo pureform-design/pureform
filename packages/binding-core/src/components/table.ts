@@ -128,7 +128,7 @@ export interface TableColumn<Row, Node> {
 export interface TableContentProps<Row, Node> {
     readonly columns?: readonly TableColumn<Row, Node>[] | undefined;
     readonly rows?: readonly Row[] | undefined;
-    /** A row's value, its key and what the selection holds. @default its string, number or bigint `id`, else its index */
+    /** A row's value, its key and what the selection holds. @default its stringified `id` (except a plain object's default text), else its index */
     readonly rowValue?: ((row: Row, index: number) => string) | undefined;
 }
 
@@ -160,7 +160,8 @@ export const tableCellText = <Row>(
     return value == null ? "" : String(value);
 };
 
-/** A row's value: `rowValue`, else its string, number or bigint `id`, else its index. */
+/** A row's value: `rowValue`, else its stringified `id`, else its index. Plain objects whose
+ *  default text is `[object Object]` fall back to the index rather than sharing that key. */
 export const tableRowValue = <Row>(
     row: Row,
     index: number,
@@ -168,11 +169,12 @@ export const tableRowValue = <Row>(
 ): string => {
     if (rowValue) return rowValue(row, index);
     const id = (row as Record<string, unknown> | null)?.["id"];
-    return typeof id === "string" ||
-        typeof id === "number" ||
-        typeof id === "bigint"
-        ? String(id)
-        : String(index);
+    if (id === undefined || id === null) return String(index);
+    // oxlint-disable-next-line typescript/no-base-to-string -- custom IDs may implement toString or Symbol.toPrimitive; the default object text is rejected below
+    const value = String(id);
+    return typeof id === "object" && value === "[object Object]"
+        ? String(index)
+        : value;
 };
 
 /** The table's registry selection. */
