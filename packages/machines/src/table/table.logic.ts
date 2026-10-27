@@ -69,6 +69,8 @@ export const compareValues = (
     const x = number(a);
     const y = number(b);
     if (x !== undefined && y !== undefined) return x - y;
+    // Anything but a number or date sorts by its text; an object without a `toString` is the same text as any other, so it keeps its place.
+    // oxlint-disable-next-line typescript/no-base-to-string -- see above
     return collator.compare(String(a), String(b));
 };
 

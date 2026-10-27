@@ -128,7 +128,7 @@ export interface TableColumn<Row, Node> {
 export interface TableContentProps<Row, Node> {
     readonly columns?: readonly TableColumn<Row, Node>[] | undefined;
     readonly rows?: readonly Row[] | undefined;
-    /** A row's value, its key and what the selection holds. @default its `id`, else its index */
+    /** A row's value, its key and what the selection holds. @default its string, number or bigint `id`, else its index */
     readonly rowValue?: ((row: Row, index: number) => string) | undefined;
 }
 
@@ -148,7 +148,19 @@ export const tableCellValue = <Row>(
         ? column.value(row)
         : (row as Record<string, unknown> | null)?.[column.id];
 
-/** A row's value: `rowValue`, else its `id`, else its index. */
+/** A cell's text where its column has no `cell`: its value as `String` gives it, `""` for none.
+ *  A value of another kind than text, a number or a date wants a `cell` (or a `value` that gives
+ *  its text). */
+export const tableCellText = <Row>(
+    column: Pick<TableColumn<Row, unknown>, "id" | "value">,
+    row: Row,
+): string => {
+    const value = tableCellValue(column, row);
+    // oxlint-disable-next-line typescript/no-base-to-string -- any value shows as `String` gives it: a date its own text, an object without one the default
+    return value == null ? "" : String(value);
+};
+
+/** A row's value: `rowValue`, else its string, number or bigint `id`, else its index. */
 export const tableRowValue = <Row>(
     row: Row,
     index: number,
@@ -156,7 +168,11 @@ export const tableRowValue = <Row>(
 ): string => {
     if (rowValue) return rowValue(row, index);
     const id = (row as Record<string, unknown> | null)?.["id"];
-    return id === undefined || id === null ? String(index) : String(id);
+    return typeof id === "string" ||
+        typeof id === "number" ||
+        typeof id === "bigint"
+        ? String(id)
+        : String(index);
 };
 
 /** The table's registry selection. */

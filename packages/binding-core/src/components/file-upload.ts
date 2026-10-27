@@ -226,7 +226,7 @@ const ERROR_MESSAGES: Readonly<Record<string, string>> = {
 export const fileUploadErrorText = <F>(
     errors: readonly string[],
     file: F,
-    errorMessage?: ((code: string, file: F) => string) | undefined,
+    errorMessage?: (code: string, file: F) => string,
 ): string =>
     errors
         .map(

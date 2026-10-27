@@ -21,8 +21,7 @@ export const parseColor = (value: string): Rgba => {
     if (text === "transparent") return [0, 0, 0, 0];
     const hex = HEX.exec(text)?.[1];
     if (hex) {
-        const full =
-            hex.length <= 4 ? [...hex].map((c) => c + c).join("") : hex;
+        const full = hex.length <= 4 ? hex.replace(/./g, "$&$&") : hex;
         const n = (i: number) => Number.parseInt(full.slice(i, i + 2), 16);
         return [n(0), n(2), n(4), full.length === 8 ? n(6) / 255 : 1];
     }

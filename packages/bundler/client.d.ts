@@ -16,6 +16,7 @@ declare module "virtual:pureform/registry" {
 
     /** The generated registry, for `PureformProvider` on React Native. */
     export const registry: Registry<{
+        // oxlint-disable-next-line typescript/no-redundant-type-constituents -- `ComponentRegistry` is empty until the app's `.pureform/registry.d.ts` augments it.
         readonly [N in keyof ComponentRegistry & string]:
             | AnyFactory
             | LazyInput;
@@ -25,5 +26,6 @@ declare module "virtual:pureform/registry" {
     /** The config's theme names. */
     export const themes: readonly string[];
     /** The registered components' names. */
+    // oxlint-disable-next-line typescript/no-redundant-type-constituents -- `ComponentRegistry` is empty until the app's `.pureform/registry.d.ts` augments it.
     export type Components = keyof ComponentRegistry & string;
 }

@@ -172,7 +172,11 @@ const staticValues = (input: Node | null | undefined): Values => {
         case "Literal": {
             const value = node.value;
             if (value === null) return new Set();
-            if (["string", "number", "boolean"].includes(typeof value)) {
+            if (
+                typeof value === "string" ||
+                typeof value === "number" ||
+                typeof value === "boolean"
+            ) {
                 return new Set([String(value)]);
             }
             return ALL;

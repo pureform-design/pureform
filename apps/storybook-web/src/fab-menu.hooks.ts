@@ -7,19 +7,19 @@ import { expect, waitFor } from "storybook/test";
 import type { StoryName } from "./renderers/hooks";
 
 const inView = async (canvas: HTMLElement) => {
-    const list = await waitFor(() => {
+    const list = await waitFor(async () => {
         const found = canvas.querySelector<HTMLElement>(
             '[data-testid="pf-fab-menu-list"]',
         );
-        expect(found).not.toBeNull();
+        await expect(found).not.toBeNull();
         return found!;
     });
-    await waitFor(() => {
+    await waitFor(async () => {
         const box = list.getBoundingClientRect();
-        expect(box.height).toBeGreaterThan(0);
-        expect(box.top).toBeGreaterThanOrEqual(0);
-        expect(box.left).toBeGreaterThanOrEqual(0);
-        expect(box.right).toBeLessThanOrEqual(
+        await expect(box.height).toBeGreaterThan(0);
+        await expect(box.top).toBeGreaterThanOrEqual(0);
+        await expect(box.left).toBeGreaterThanOrEqual(0);
+        await expect(box.right).toBeLessThanOrEqual(
             document.documentElement.clientWidth,
         );
     });

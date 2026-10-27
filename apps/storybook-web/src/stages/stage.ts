@@ -5,13 +5,17 @@
 
 import type { Decorator } from "@storybook/html-vite";
 
+/** Inline style properties, as an object literal gives them: a declaration's fields without the
+ *  iteration over its property names, which spreading would ignore. */
+type StyleProps = Partial<Omit<CSSStyleDeclaration, typeof Symbol.iterator>>;
+
 /** The attribute the ripple's `getSurfaceEl` looks for. */
 export const STAGE_ATTRIBUTE = "data-pf-stage";
 
 /** A frame around the story's element, with `content` before it (so it's behind a layer that
  *  stacks above it). The frame is positioned, so an absolutely placed layer fills it. */
 export const stage = (
-    style: Partial<CSSStyleDeclaration>,
+    style: StyleProps,
     content: () => HTMLElement,
 ): Decorator => {
     return (story) => {
@@ -37,7 +41,7 @@ export const stage = (
 export const text = (
     tag: string,
     content: string,
-    style: Partial<CSSStyleDeclaration> = {},
+    style: StyleProps = {},
 ): HTMLElement => {
     const node = document.createElement(tag);
     node.textContent = content;
@@ -48,7 +52,7 @@ export const text = (
 /** A frame of a given size that the story's element fills, for a component that fills its
  *  parent: without one it takes the canvas's whole width, or no height at all. */
 export const frame =
-    (style: Partial<CSSStyleDeclaration>): Decorator =>
+    (style: StyleProps): Decorator =>
     (story) => {
         const el = story() as HTMLElement;
         const box = document.createElement("div");

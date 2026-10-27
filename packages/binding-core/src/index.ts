@@ -558,6 +558,7 @@ export type {
 export {
     TABLE_CONTENT_PROPS,
     TABLE_ROOT_PROPS,
+    tableCellText,
     tableCellValue,
     tableRowPart,
     tableRowValue,

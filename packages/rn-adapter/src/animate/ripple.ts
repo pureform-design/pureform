@@ -93,6 +93,7 @@ export const useRippleMotion = (
             toValue: 0,
             duration: timing.fade,
             delay: ripple.release,
+            // oxlint-disable-next-line typescript/unbound-method -- React Native's easings are plain functions typed as methods; none reads `this`
             easing: Easing.linear,
             useNativeDriver: driver,
         }).start(({ finished }) => finished && done());

@@ -242,6 +242,7 @@ function Section(props: { title: string; children: ReactNode }) {
 
 function Page(props: { controls: ReactNode }) {
     const tokens = useTokens();
+    const surface = tokens["colors.surface"];
     const [checked, setChecked] = useState(true);
     const [on, setOn] = useState(true);
     const [moved, setMoved] = useState(false);
@@ -262,7 +263,8 @@ function Page(props: { controls: ReactNode }) {
         <ScrollView
             style={{
                 flex: 1,
-                backgroundColor: String(tokens["colors.surface"]),
+                backgroundColor:
+                    typeof surface === "string" ? surface : undefined,
             }}
             contentContainerStyle={styles.page}
         >

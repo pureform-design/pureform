@@ -115,8 +115,7 @@ export const colorPickerHex = (text: string): string | undefined => {
     const match = HEX.exec(text.trim());
     if (!match) return undefined;
     let digits = match[1]!.toLowerCase();
-    if (digits.length <= 4)
-        digits = [...digits].map((digit) => digit + digit).join("");
+    if (digits.length <= 4) digits = digits.replace(/./g, "$&$&");
     if (digits.length === 8 && digits.endsWith("ff"))
         digits = digits.slice(0, 6);
     return `#${digits}`;

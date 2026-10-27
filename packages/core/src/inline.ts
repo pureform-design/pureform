@@ -52,8 +52,12 @@ const utilityStyle = (
 ): StyleMap => {
     if (!def) throw new Error(`unknown utility "${name}"`);
     if (def.kind === "static") {
-        const style = def.values[arg as string];
-        if (!style) throw new Error(`utility "${name}" has no value "${arg}"`);
+        const style = typeof arg === "string" ? def.values[arg] : undefined;
+        if (!style) {
+            throw new Error(
+                `utility "${name}" has no value ${JSON.stringify(arg)}`,
+            );
+        }
         return style;
     }
     return Object.fromEntries(

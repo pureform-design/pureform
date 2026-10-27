@@ -91,6 +91,7 @@ const browserRun = (
 ): Run => {
     const ease = curve(transition.easing);
     const first = animations[0];
+    // oxlint-disable-next-line promise/no-callback-in-promise -- `Run` reports its end through `done`, and `finished` is the only signal the browser gives for it
     if (first) first.finished.then(done, () => {});
     else done();
     return {

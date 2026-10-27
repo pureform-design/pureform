@@ -54,10 +54,10 @@ const PureformContext = createContext<Context | undefined>(undefined);
  *  gives factories over its `styles`. */
 export interface StyleSource {
     /** A component's factory, by name. Called while rendering, so it may suspend. */
-    factory(name: string): NativeFactory;
+    factory(this: void, name: string): NativeFactory;
     /** Each theme's token values and formulas by theme key, as every factory's `styles` holds
      *  them. Called while rendering, so it may suspend. */
-    themeValues(): Pick<Styles, "themes" | "formulas">;
+    themeValues(this: void): Pick<Styles, "themes" | "formulas">;
 }
 
 /** A source over styles from `precompute` or `runtimeStyles`. */

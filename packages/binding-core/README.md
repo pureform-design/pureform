@@ -402,7 +402,7 @@ timeMachineProps(props); timePickerSelection(props); timeInputSelection(props);
 interface TableRootOwnProps               // stickyHeader, density, tokens, sort/defaultSort/onSortChange, sortStart, sortClearable, selectionMode, selection/defaultSelection/onSelectionChange, rowValues, translations, striped, id, testId, unstyled
 interface TableColumn<Row, Node>          // id, header?, footer?, sortable?, cell?(row), value?(row)
 TABLE_ROOT_PROPS; TABLE_CONTENT_PROPS;    // columns, rows, rowValue
-tableMachineProps(props); tableSelection(props); tableRowPart(index, striped); tableCellValue(column, row); tableRowValue(row, index, rowValue);
+tableMachineProps(props); tableSelection(props); tableRowPart(index, striped); tableCellValue(column, row); tableCellText(column, row); tableRowValue(row, index, rowValue);
 toolbarKeyTarget(key, index, count, orientation, dir); // arrows along the bar, Home, End
 overflowCount({ sizes, available, gap, trigger }); // how many elements stay in the row
 watchOverflow({ root, elements, trigger, vertical, onCount }); moveToolbarFocus(root, key, o, dir);

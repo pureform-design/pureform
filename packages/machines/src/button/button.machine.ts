@@ -113,6 +113,7 @@ export const machine = createMachine<ButtonSchema>({
             },
         );
         // A new source: the state follows it from now on.
+        // oxlint-disable-next-line typescript/unbound-method -- `subscribe` is never called here: its identity is the source's key
         track([() => sourceKey(prop("interactionSource")?.subscribe)], () => {
             action(["followSource"]);
         });

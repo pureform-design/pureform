@@ -121,7 +121,7 @@ export interface NativeStyleFactory<C extends ComponentRef> {
     (selection: NativeSelection<C>): NativeSlots<C>;
     /** The same selection as the hooks take it: styles, transitions, animations, parents,
      *  and drawings by slot (`""` for a component without slots). */
-    selected(selection: NativeSelection<C>): Selected;
+    selected(this: void, selection: NativeSelection<C>): Selected;
 }
 
 /** A component's `StyleFactory`: called directly, in the base theme's light scheme; through

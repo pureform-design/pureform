@@ -437,7 +437,10 @@ export const colorWith = (value: Value, current: string): string => {
                           swap(inner),
                       ]),
                   );
-    return String(evaluate(swap(value), {}));
+    const out = evaluate(swap(value), {});
+    if (typeof out !== "string")
+        throw new Error(`not a color: ${JSON.stringify(value)}`);
+    return out;
 };
 
 // A value with its tokens read and its arithmetic kept.
@@ -464,7 +467,12 @@ export const pixels = (value: Value, size: number): number => {
         );
     };
     const out = evaluate(sized(value), {});
-    const n = typeof out === "number" ? out : Number.parseFloat(String(out));
+    const n =
+        typeof out === "number"
+            ? out
+            : typeof out === "string"
+              ? Number.parseFloat(out)
+              : Number.NaN;
     if (Number.isNaN(n))
         throw new Error(`not a length: ${JSON.stringify(value)}`);
     return n;

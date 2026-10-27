@@ -58,12 +58,14 @@ export interface SpringRoleRegistry {}
 /** A spring role's name, such as `"spatialSlow"`, or any string while none is registered. */
 export type SpringRole = [keyof SpringRoleRegistry] extends [never]
     ? string
-    : keyof SpringRoleRegistry & string;
+    : // oxlint-disable-next-line typescript/no-redundant-type-constituents -- `& string` drops the number and symbol keys `keyof` may add; redundant only while a registry is augmented
+      keyof SpringRoleRegistry & string;
 
 /** A registered component's name, or any string while nothing is registered. */
 export type ComponentName = [keyof ComponentRegistry] extends [never]
     ? string
-    : keyof ComponentRegistry & string;
+    : // oxlint-disable-next-line typescript/no-redundant-type-constituents -- `& string` drops the number and symbol keys `keyof` may add; redundant only while a registry is augmented
+      keyof ComponentRegistry & string;
 
 /** What the generic types take: a component's name, or its shape. */
 export type ComponentRef = ComponentName | ComponentShape;
@@ -146,6 +148,7 @@ export type SpringTokenOf<C extends ComponentRef> =
 export type InstanceSpringValue = SpringNode | SpringRole;
 
 /** Any token's value on an instance: a `TokenValue`, or an `InstanceSpringValue`. */
+// oxlint-disable-next-line typescript/no-redundant-type-constituents -- redundant only while the registry is augmented, and TokenValue then takes any string; the name keeps the role names documented
 export type InstanceTokenValue = TokenValue | InstanceSpringValue;
 
 /** The `dynamic` tokens an instance sets, such as a circular progress's `value`. A spring

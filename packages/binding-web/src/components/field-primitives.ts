@@ -19,7 +19,7 @@ export const nativeSelectProps = (
         readonly "aria-describedby"?: string | undefined;
     },
     fieldsetDisabled = false,
-    field?: FieldState | undefined,
+    field?: FieldState,
 ) => {
     const control = fieldControlProps(field, props);
     return {

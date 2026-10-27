@@ -196,6 +196,7 @@ export const codeFieldEnter = (
     text: string,
     type: CodeFieldType,
 ): { readonly cells: string[]; readonly focus: number } => {
+    // oxlint-disable-next-line typescript/no-misused-spread -- only ASCII letters and digits pass the filter, so no kept character spans more than one code point
     const chars = [...text].filter((char) => codeFieldAccepts(char, type));
     if (chars.length === 0) return { cells: [...cells], focus: index };
     // A whole code pasted into any cell fills from the first.

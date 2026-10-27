@@ -15,14 +15,20 @@ export type MachineProps<T extends MachineSchema> = {
     [K in keyof T["props"]]?: T["props"][K] | undefined;
 };
 
+/** The type of a machine's callback prop, to type a mock passed as it. */
+export type MachineCallback<
+    T extends MachineSchema,
+    K extends keyof T["props"],
+> = NonNullable<T["props"][K]>;
+
 export interface Running<T extends MachineSchema, Api> {
     readonly runner: VanillaMachine<T>;
     readonly service: Service<T>;
     /** The API from the latest render. */
-    api(): Api;
+    readonly api: () => Api;
     /** Replace the props (unlike `updateProps`, an `undefined` clears a prop). */
-    setProps(next: MachineProps<T>): void;
-    stop(): void;
+    readonly setProps: (next: MachineProps<T>) => void;
+    readonly stop: () => void;
 }
 
 export function run<

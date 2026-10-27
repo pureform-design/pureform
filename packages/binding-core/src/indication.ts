@@ -107,8 +107,10 @@ export interface Indication<E = unknown> {
      * Web: the live half. It runs after mount, at the latest before the first interaction
      * reaches it; it's not promised to run at mount, nor on the first interaction, so it may
      * move later. It runs again when the indication or its elements change. Returns its cleanup.
+     * It runs without the indication as `this`: a binding may copy it onto another indication.
      */
     web?(
+        this: void,
         target: IndicationTarget<E>,
         source: InteractionSource,
         context: IndicationContext,

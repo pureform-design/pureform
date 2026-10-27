@@ -86,8 +86,10 @@ export type PlacedGradient =
 const degrees = (angle: Value | undefined): number => {
     if (angle === undefined) return 180;
     if (typeof angle === "number") return angle;
-    const n = Number.parseFloat(angle as string);
-    const unit = String(angle).replace(/^[-\d.e+]+/, "");
+    if (typeof angle !== "string")
+        throw new Error(`not an angle: ${JSON.stringify(angle)}`);
+    const n = Number.parseFloat(angle);
+    const unit = angle.replace(/^[-\d.e+]+/, "");
     return unit === "turn"
         ? n * 360
         : unit === "rad"

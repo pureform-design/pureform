@@ -49,9 +49,9 @@ export const storyTheme = (
     return {
         scheme: scheme === "light" || scheme === "dark" ? scheme : undefined,
         name:
-            theme === undefined || theme === "default"
-                ? undefined
-                : String(theme),
+            typeof theme === "string" && theme !== "default"
+                ? theme
+                : undefined,
     };
 };
 

@@ -155,7 +155,9 @@ const conditionStates = (
             const value = lowerNode(node, { ...ctx, property: "width" })[0]!
                 .value;
             if (typeof value !== "number") {
-                throw new Unsupported(`a viewport bound of "${String(value)}"`);
+                throw new Unsupported(
+                    `a viewport bound of ${JSON.stringify(value)}`,
+                );
             }
             return value;
         };

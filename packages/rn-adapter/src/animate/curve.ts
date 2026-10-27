@@ -12,6 +12,7 @@ export const curve = (easing: EasingValue) => {
     if (easing.kind === "linear")
         return (x: number) => linearEasingAt(easing.points, x);
     const points = easingPoints(easing);
+    // oxlint-disable-next-line typescript/unbound-method -- React Native's easings are plain functions typed as methods; none reads `this`
     return points === "linear" ? Easing.linear : Easing.bezier(...points);
 };
 

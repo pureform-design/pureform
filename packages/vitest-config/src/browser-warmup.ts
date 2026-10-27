@@ -75,7 +75,9 @@ async function warmUp(project: TestProject) {
         while (optimizer) {
             const discovered = Object.values(optimizer.metadata.discovered);
             if (discovered.length === 0) break;
-            await Promise.all(discovered.map((dep) => dep.processing));
+            await Promise.all(
+                discovered.flatMap((dep) => dep.processing ?? []),
+            );
         }
         // A new bundle that changed the old ones invalidated every module; compile them again.
         if (optimizer?.metadata.browserHash === hash) return;
