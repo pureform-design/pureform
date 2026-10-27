@@ -35,7 +35,7 @@ describe("Snackbar, ready-made", () => {
         await settle();
         const root = byTestId(ids.root);
         expect(root.className).toBe("snackbar");
-        expect(root.getAttribute("role")).toBe("status");
+        expect(root.getAttribute("role")).toBe("group");
         expect(root.hidden).toBe(false);
         expect(byTestId(ids.supportingText).textContent).toBe(
             "Message archived",

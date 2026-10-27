@@ -457,3 +457,4 @@ export type {
     RippleDomProps,
     RippleDomRootOwnProps,
 } from "./components";
+export { SNACKBAR_ANNOUNCEMENT_STYLE } from "./snackbar-announcement";

@@ -16,7 +16,11 @@ import type {
     SnackbarOpenChangeDetails,
     SnackbarRootOwnProps,
 } from "@pureform/binding-core";
-import { presentProps, snackbarMachineProps } from "@pureform/binding-web";
+import {
+    presentProps,
+    snackbarMachineProps,
+    SNACKBAR_ANNOUNCEMENT_STYLE,
+} from "@pureform/binding-web";
 import * as snackbar from "@pureform/machines/snackbar";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {
@@ -24,6 +28,7 @@ import {
     createEffect,
     createMemo,
     createUniqueId,
+    createSignal,
     omit,
     Show,
 } from "solid-js";
@@ -46,6 +51,7 @@ type Anatomy = typeof snackbarAnatomy;
 interface SnackbarContextValue {
     readonly scope: ComponentScope<Anatomy>;
     readonly api: Accessor<snackbar.Api<PropTypes>>;
+    readonly announce: (message: string) => void;
 }
 
 const context = createPartContext<SnackbarContextValue>("Snackbar");
@@ -79,6 +85,13 @@ function Root(props: SnackbarRootProps): JSX.Element {
         ...open.machineProps(),
     }));
     const api = createMemo(() => snackbar.connect(service, normalizeProps));
+    const [announcement, announce] = createSignal("");
+    createEffect(
+        () => api().open,
+        (shown) => {
+            if (!shown) announce("");
+        },
+    );
     const presence = usePresence(() => api().open);
     // Once it has shown and gone again, its exit is over.
     let shown = false;
@@ -100,7 +113,7 @@ function Root(props: SnackbarRootProps): JSX.Element {
     });
     const rest = omit(props, "as", ...SNACKBAR_ROOT_PROPS);
     return (
-        <context.Provider value={{ scope, api }}>
+        <context.Provider value={{ scope, api, announce }}>
             {scope.render("root", {
                 element: "div",
                 as: () => props.as,
@@ -109,16 +122,43 @@ function Root(props: SnackbarRootProps): JSX.Element {
                     presentProps(api().getRootProps(), presence.present()),
                 props: rest,
             })}
+            <output
+                aria-live="polite"
+                aria-atomic="true"
+                style={SNACKBAR_ANNOUNCEMENT_STYLE}
+            >
+                {announcement()}
+            </output>
         </context.Provider>
     );
 }
 
 /** The message. */
 function SupportingText(props: SnackbarPartProps): JSX.Element {
-    const { scope, api } = context.use("SupportingText");
+    const { scope, api, announce } = context.use("SupportingText");
+    let element: HTMLElement | undefined;
+    createEffect(
+        () => api().open,
+        (shown) => {
+            if (!shown || !element) return;
+            const text = element;
+            const update = () => announce(text.textContent ?? "");
+            update();
+            const observer = new MutationObserver(update);
+            observer.observe(text, {
+                subtree: true,
+                childList: true,
+                characterData: true,
+            });
+            return () => observer.disconnect();
+        },
+    );
     const rest = omit(props, "unstyled");
     return scope.render("supportingText", {
         element: "span",
+        ref: (node) => {
+            element = node;
+        },
         machine: () => api().getSupportingTextProps(),
         unstyled: () => props.unstyled,
         props: rest,

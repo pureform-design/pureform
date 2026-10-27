@@ -15,7 +15,11 @@ import type {
     SnackbarOpenChangeDetails,
     SnackbarRootOwnProps,
 } from "@pureform/binding-core";
-import { presentProps, snackbarMachineProps } from "@pureform/binding-web";
+import {
+    presentProps,
+    snackbarMachineProps,
+    SNACKBAR_ANNOUNCEMENT_STYLE,
+} from "@pureform/binding-web";
 import * as snackbar from "@pureform/machines/snackbar";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";
@@ -25,6 +29,7 @@ import {
     useEffect,
     useId,
     useRef,
+    useState,
 } from "react";
 
 import { useControllable } from "../controllable";
@@ -45,6 +50,7 @@ type Anatomy = typeof snackbarAnatomy;
 interface SnackbarContextValue {
     readonly scope: ComponentScope<Anatomy>;
     readonly api: snackbar.Api<PropTypes>;
+    readonly announce: (message: string) => void;
 }
 
 const context = createPartContext<SnackbarContextValue>("Snackbar");
@@ -78,6 +84,7 @@ function Root(props: SnackbarRootProps): ReactNode {
         ...open.machineProps,
     });
     const api = snackbar.connect(service, normalizeProps);
+    const [announcement, announce] = useState("");
     const presence = usePresence(api.open);
     // Once it has shown and gone again, its exit is over.
     const shown = useRef(false);
@@ -99,7 +106,7 @@ function Root(props: SnackbarRootProps): ReactNode {
     });
     const { as, ...rest } = omitProps(props, SNACKBAR_ROOT_PROPS);
     return (
-        <context.Provider value={{ scope, api }}>
+        <context.Provider value={{ scope, api, announce }}>
             {scope.render("root", {
                 element: "div",
                 as,
@@ -107,15 +114,37 @@ function Root(props: SnackbarRootProps): ReactNode {
                 machine: presentProps(api.getRootProps(), presence.present),
                 props: rest,
             })}
+            <output
+                aria-live="polite"
+                aria-atomic="true"
+                style={SNACKBAR_ANNOUNCEMENT_STYLE}
+            >
+                {api.open ? announcement : ""}
+            </output>
         </context.Provider>
     );
 }
 
 /** The message. */
 function SupportingText({ unstyled, ...props }: SnackbarPartProps): ReactNode {
-    const { scope, api } = context.use("SupportingText");
+    const { scope, api, announce } = context.use("SupportingText");
+    const [element, setElement] = useState<HTMLElement | null>(null);
+    useEffect(() => {
+        if (!api.open || !element) return;
+        const text = element;
+        const update = () => announce(text.textContent ?? "");
+        update();
+        const observer = new MutationObserver(update);
+        observer.observe(text, {
+            subtree: true,
+            childList: true,
+            characterData: true,
+        });
+        return () => observer.disconnect();
+    }, [api.open, element, announce, props.children]);
     return scope.render("supportingText", {
         element: "span",
+        ref: setElement,
         machine: api.getSupportingTextProps(),
         unstyled,
         props,

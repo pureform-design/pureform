@@ -30,7 +30,8 @@ export function connect<T extends PropTypes>(
                 ...parts.root.attrs,
                 id: dom.getRootId(scope),
                 dir: prop("dir"),
-                role: "status",
+                // Bindings keep a separate live region mounted outside this hidden surface.
+                role: "group",
                 hidden: !open,
                 "data-state": dataState,
                 onPointerEnter(event: { pointerType: string }) {

@@ -10,15 +10,9 @@ import type {
 } from "@pureform/binding-core";
 import * as snackbar from "@pureform/machines/snackbar";
 import { useTokens } from "@pureform/rn-adapter/react";
-import {
-    useEffect,
-    useLayoutEffect,
-    useMemo,
-    useRef,
-    useSyncExternalStore,
-} from "react";
+import { useLayoutEffect, useMemo, useRef, useSyncExternalStore } from "react";
 import type { ReactNode } from "react";
-import { AccessibilityInfo, Platform, Pressable, View } from "react-native";
+import { Pressable, View } from "react-native";
 
 import { useLayer } from "../layer";
 import { useHeldTimeout } from "../overlay";
@@ -143,16 +137,6 @@ function QueuedSnackbar(props: {
     useLayoutEffect(() => {
         if (!presence.present) queue.gone(item.id);
     }, [presence.present, queue, item.id]);
-    useEffect(() => {
-        // VoiceOver has no live regions; TalkBack and the web read the snackbar's own.
-        if (
-            Platform.OS === "ios" &&
-            typeof options.supportingText === "string"
-        ) {
-            AccessibilityInfo.announceForAccessibility(options.supportingText);
-        }
-        // oxlint-disable-next-line react-hooks/exhaustive-deps -- announced once, as the snackbar shows
-    }, []);
     return (
         <View
             pointerEvents="box-none"

@@ -12,7 +12,8 @@ import type {
     SnackbarPart,
     SnackbarVariantProps,
 } from "@pureform/binding-core";
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
+import { AccessibilityInfo, Platform, Text } from "react-native";
 
 import { testIdOf, useControllable, withEngine } from "../parts";
 import { useOverlayPresence } from "../presence";
@@ -108,6 +109,34 @@ function SnackbarImpl(props: SnackbarProps): ReactNode {
         true,
     );
     const open = managed ? own : undefined;
+    const announcement = open === false ? null : props.supportingText;
+    useEffect(() => {
+        // iOS has no Android-style live region. The queue uses this same surface, so announce
+        // here once for both queued and standalone snackbars, never once in each layer.
+        if (
+            open !== false &&
+            Platform.OS === "ios" &&
+            typeof props.supportingText === "string"
+        ) {
+            AccessibilityInfo.announceForAccessibility(props.supportingText);
+        }
+    }, [open, props.supportingText]);
+    const announcer = (
+        <Text
+            role="status"
+            aria-live="polite"
+            aria-atomic
+            accessibilityLiveRegion="polite"
+            style={{
+                position: "absolute",
+                width: 1,
+                height: 1,
+                overflow: "hidden",
+            }}
+        >
+            {announcement}
+        </Text>
+    );
     const presence = useOverlayPresence(open, "popup");
     const close = () => {
         if (managed && own) setOwn(false);
@@ -115,7 +144,7 @@ function SnackbarImpl(props: SnackbarProps): ReactNode {
     const id = (part: SnackbarPart) =>
         testIdOf(snackbarAnatomy, part, props.testId);
     const slot = nativeSlots(props);
-    if (!presence.present) return null;
+    if (!presence.present) return announcer;
     // The engine's view where it enters and leaves, the slot's own while it's still.
     const Root = open === undefined ? v.root : engine;
     // Escape inside it closes it, on the web.
@@ -123,57 +152,58 @@ function SnackbarImpl(props: SnackbarProps): ReactNode {
         if (event.nativeEvent.key === "Escape") close();
     };
     return (
-        <Root.View
-            {...slot.props("root")}
-            {...slot.with("root", presence.props)}
-            {...({ onKeyDown } as object)}
-            role="status"
-            aria-live="polite"
-            style={slot.style("root", { ...s.root, ...presence.style })}
-            testID={id("root")}
-        >
-            <v.supportingText.Text
-                {...slot.props("supportingText")}
-                style={slot.style("supportingText", s.supportingText)}
-                testID={id("supportingText")}
+        <>
+            {announcer}
+            <Root.View
+                {...slot.props("root")}
+                {...slot.with("root", presence.props)}
+                {...({ onKeyDown } as object)}
+                style={slot.style("root", { ...s.root, ...presence.style })}
+                testID={id("root")}
             >
-                {props.supportingText}
-            </v.supportingText.Text>
-            <v.actions.View
-                {...slot.props("actions")}
-                style={slot.style("actions", s.actions)}
-                testID={id("actions")}
-            >
-                {isPresent(props.action) ? (
+                <v.supportingText.Text
+                    {...slot.props("supportingText")}
+                    style={slot.style("supportingText", s.supportingText)}
+                    testID={id("supportingText")}
+                >
+                    {props.supportingText}
+                </v.supportingText.Text>
+                <v.actions.View
+                    {...slot.props("actions")}
+                    style={slot.style("actions", s.actions)}
+                    testID={id("actions")}
+                >
+                    {isPresent(props.action) ? (
+                        <SnackbarButton
+                            snackbar={props}
+                            part="action"
+                            label={
+                                typeof props.action === "string"
+                                    ? props.action
+                                    : undefined
+                            }
+                            onPress={() => {
+                                props.onAction?.();
+                                close();
+                            }}
+                        >
+                            {props.action}
+                        </SnackbarButton>
+                    ) : null}
                     <SnackbarButton
                         snackbar={props}
-                        part="action"
-                        label={
-                            typeof props.action === "string"
-                                ? props.action
-                                : undefined
-                        }
+                        part="close"
+                        label={props.closeLabel ?? "Dismiss"}
                         onPress={() => {
-                            props.onAction?.();
+                            props.onClose?.();
                             close();
                         }}
                     >
-                        {props.action}
+                        {props.closeIcon ?? "×"}
                     </SnackbarButton>
-                ) : null}
-                <SnackbarButton
-                    snackbar={props}
-                    part="close"
-                    label={props.closeLabel ?? "Dismiss"}
-                    onPress={() => {
-                        props.onClose?.();
-                        close();
-                    }}
-                >
-                    {props.closeIcon ?? "×"}
-                </SnackbarButton>
-            </v.actions.View>
-        </Root.View>
+                </v.actions.View>
+            </Root.View>
+        </>
     );
 }
 

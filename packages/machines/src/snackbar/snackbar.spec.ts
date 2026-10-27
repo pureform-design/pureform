@@ -46,7 +46,7 @@ describe("snackbar machine", () => {
     it("shows as a status, hidden while closed", async () => {
         const { api, root, stop } = bar({ defaultOpen: true });
         expect(api().open).toBe(true);
-        expect(root.getAttribute("role")).toBe("status");
+        expect(root.getAttribute("role")).toBe("group");
         expect(root.hidden).toBe(false);
         api().setOpen(false);
         await settle();
