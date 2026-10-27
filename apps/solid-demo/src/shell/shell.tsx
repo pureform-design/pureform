@@ -63,6 +63,7 @@ export function Shell(props: { children: JSX.Element }): JSX.Element {
         >
             <PureformProvider theme={densityTheme(settings())}>
                 <PureformProvider theme={color()}>
+                    {/* oxlint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- delegated handler for in-app links: a link already activates from the keyboard, as a click */}
                     <div class={surface} onClick={onClick}>
                         {props.children}
                         <SettingsPanel />

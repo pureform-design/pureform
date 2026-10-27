@@ -229,6 +229,7 @@ function Transactions() {
                     }
                 />
             </div>
+            {/* oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- a labelled row of toggle chips: none of the suggested elements (address, details, fieldset, hgroup, optgroup) fit, and a fieldset would bring its default border and padding */}
             <div class={filters} role="group" aria-label="Show">
                 <For each={KINDS}>
                     {(option) => (

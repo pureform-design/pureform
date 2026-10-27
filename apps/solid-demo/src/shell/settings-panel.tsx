@@ -161,6 +161,7 @@ function ChipSetting<K extends keyof Settings>(props: {
             <Text textStyle="titleSmall" as="h3" id={id}>
                 {props.label}
             </Text>
+            {/* oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- a labelled row of toggle chips: none of the suggested elements (address, details, fieldset, hgroup, optgroup) fit, and a fieldset would bring its default border and padding */}
             <div class={chips} role="group" aria-labelledby={id}>
                 <For each={props.options}>
                     {(option) => {
@@ -201,6 +202,7 @@ function ColorSetting(): JSX.Element {
             <Text textStyle="titleSmall" as="h3" id={id}>
                 Color
             </Text>
+            {/* oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- a labelled row of toggle chips: none of the suggested elements (address, details, fieldset, hgroup, optgroup) fit, and a fieldset would bring its default border and padding */}
             <div class={chips} role="group" aria-labelledby={id}>
                 <For each={COLORS}>
                     {(color) => (

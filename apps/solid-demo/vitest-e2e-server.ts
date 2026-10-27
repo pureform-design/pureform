@@ -10,6 +10,11 @@ import { chromium } from "playwright";
 import { createServer, type ViteDevServer } from "vite";
 import type { TestProject } from "vitest/node";
 
+// What `project.provide` takes. `tsconfig.node.json` includes it too, but the type-aware lint
+// checks this file in a program of its own (it reads a file's project from `tsconfig.json` and
+// the projects that references), so the file names it.
+import type {} from "./vitest-e2e-context";
+
 const root = fileURLToPath(new URL(".", import.meta.url));
 
 /** The pages the tests open. */
@@ -97,7 +102,9 @@ async function warmUp(
                         optimizer.metadata.discovered,
                     );
                     if (pending.length === 0) break;
-                    await Promise.all(pending.map((dep) => dep.processing));
+                    await Promise.all(
+                        pending.flatMap((dep) => dep.processing ?? []),
+                    );
                 }
                 await page.waitForLoadState("networkidle", {
                     timeout: Math.max(deadline - Date.now(), 1),

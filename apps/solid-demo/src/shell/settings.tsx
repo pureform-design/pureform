@@ -13,9 +13,9 @@ import type { Settings } from "../lib/settings";
 export interface SettingsState {
     readonly settings: Accessor<Settings>;
     /** Changes some settings: the page follows at once, and the cookie keeps them. */
-    update(patch: Partial<Settings>): void;
+    readonly update: (patch: Partial<Settings>) => void;
     /** Back to the defaults. */
-    reset(): void;
+    readonly reset: () => void;
 }
 
 const SettingsContext = createContext<SettingsState>();

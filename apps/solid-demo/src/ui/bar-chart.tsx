@@ -94,6 +94,7 @@ export function BarChart(props: {
     return (
         <figure
             class={figure}
+            // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- the figure is one image for assistive technology, though it holds the chart's own elements, so it cannot be an img
             role="img"
             aria-label={`${props.label}. ${props.description}`}
         >

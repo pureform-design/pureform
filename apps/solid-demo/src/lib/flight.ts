@@ -171,16 +171,19 @@ export async function runFlightRecipes(
     const { getServerFunction } =
         await import("@solidjs/web/server-functions/server");
     await Promise.all(
-        recipes.map(([queryKey, recipe]) => {
+        recipes.flatMap(([queryKey, recipe]) => {
             // Already collected (or being collected) by a loader: covered.
-            if (queryClient.getQueryCache().get(hashKey(queryKey))) return;
-            return queryClient
-                .prefetchQuery({
-                    queryKey,
-                    queryFn: () => getServerFunction(recipe.id)(...recipe.args),
-                    retry: false,
-                })
-                .catch(() => undefined);
+            if (queryClient.getQueryCache().get(hashKey(queryKey))) return [];
+            return [
+                queryClient
+                    .prefetchQuery({
+                        queryKey,
+                        queryFn: () =>
+                            getServerFunction(recipe.id)(...recipe.args),
+                        retry: false,
+                    })
+                    .catch(() => undefined),
+            ];
         }),
     );
 }

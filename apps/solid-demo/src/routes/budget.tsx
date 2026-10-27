@@ -276,7 +276,8 @@ function BudgetLayout() {
                                     variant="text"
                                     label="Restore"
                                     onClick={() => {
-                                        reset.mutate();
+                                        // `mutate` handles its promise's rejection itself: the mutation's state holds the error.
+                                        void reset.mutate();
                                         setConfirmReset(false);
                                     }}
                                 />
