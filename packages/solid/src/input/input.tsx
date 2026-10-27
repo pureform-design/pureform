@@ -32,11 +32,12 @@ export function Input(props: InputProps): JSX.Element {
         testId: () => props.testId,
         unstyled: () => props.unstyled,
     });
+    const merged = merge(omit(props, "as", ...INPUT_ROOT_PROPS), text.control);
     return scope.render("root", {
         element: "input",
         as: () => props.as,
         machine: text.machine,
         ref: text.ref,
-        props: merge(omit(props, "as", ...INPUT_ROOT_PROPS), text.control),
+        props: merged,
     });
 }

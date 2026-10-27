@@ -69,32 +69,35 @@ export interface AffixFieldContext {
 export function affixFieldParts(use: (name: string) => AffixFieldContext) {
     function Label(props: SelectFieldPartProps): JSX.Element {
         const { scope, api } = use("Label");
+        const rest = omit(props, "unstyled");
         return scope.render("label", {
             element: "label",
             machine: () => api().getLabelProps(),
             unstyled: () => props.unstyled,
-            props: omit(props, "unstyled"),
+            props: rest,
         });
     }
 
     function LeadingIcon(props: SelectFieldIconProps): JSX.Element {
         const { scope } = use("LeadingIcon");
+        const rest = omit(props, "unstyled", "mirror");
         return scope.render("leadingIcon", {
             element: "span",
             machine: () => ({ "aria-hidden": "true" }),
             states: () => ({ mirrored: props.mirror }),
             unstyled: () => props.unstyled,
-            props: omit(props, "unstyled", "mirror"),
+            props: rest,
         });
     }
 
     const affix = (part: "prefixText" | "suffixText", name: string) =>
         function Affix(props: SelectFieldPartProps): JSX.Element {
             const { scope } = use(name);
+            const rest = omit(props, "unstyled");
             return scope.render(part, {
                 element: "span",
                 unstyled: () => props.unstyled,
-                props: omit(props, "unstyled"),
+                props: rest,
             });
         };
 
@@ -105,11 +108,12 @@ export function affixFieldParts(use: (name: string) => AffixFieldContext) {
                 return errorText() ?? props.children;
             },
         };
+        const merged = merge(omit(props, "unstyled"), children);
         return scope.render("supportingText", {
             element: "span",
             machine: () => ({ id: supportingTextId() }),
             unstyled: () => props.unstyled,
-            props: merge(omit(props, "unstyled"), children),
+            props: merged,
         });
     }
 
@@ -131,24 +135,26 @@ export function selectFieldParts<I extends SelectFieldItem>(
 
     function Positioner(props: SelectFieldPartProps): JSX.Element {
         const { menu, api, presence } = context.use("Positioner");
+        const rest = omit(props, "unstyled");
         return menu.render("positioner", {
             element: "div",
             machine: () =>
                 presentProps(api().getPositionerProps(), presence.present()),
             unstyled: () => props.unstyled,
-            props: omit(props, "unstyled"),
+            props: rest,
         });
     }
 
     function Content(props: SelectFieldPartProps): JSX.Element {
         const { menu, api, presence } = context.use("Content");
+        const rest = omit(props, "unstyled");
         return menu.render("root", {
             element: "div",
             ref: presence.ref,
             machine: () =>
                 presentProps(api().getContentProps(), presence.present()),
             unstyled: () => props.unstyled,
-            props: omit(props, "unstyled"),
+            props: rest,
         });
     }
 
@@ -156,11 +162,12 @@ export function selectFieldParts<I extends SelectFieldItem>(
         props: SelectFieldPartProps & { readonly id: string },
     ): JSX.Element {
         const { menu, api } = context.use("ItemGroup");
+        const rest = omit(props, "unstyled", "id");
         return menu.render("itemGroup", {
             element: "div",
             machine: () => api().getItemGroupProps({ id: props.id }),
             unstyled: () => props.unstyled,
-            props: omit(props, "unstyled", "id"),
+            props: rest,
         });
     }
 
@@ -168,12 +175,13 @@ export function selectFieldParts<I extends SelectFieldItem>(
         props: SelectFieldPartProps & { readonly htmlFor: string },
     ): JSX.Element {
         const { menu, api } = context.use("ItemGroupLabel");
+        const rest = omit(props, "unstyled", "htmlFor");
         return menu.render("itemGroupLabel", {
             element: "div",
             machine: () =>
                 api().getItemGroupLabelProps({ htmlFor: props.htmlFor }),
             unstyled: () => props.unstyled,
-            props: omit(props, "unstyled", "htmlFor"),
+            props: rest,
         });
     }
 
@@ -186,6 +194,7 @@ export function selectFieldParts<I extends SelectFieldItem>(
             () => props.item.value,
             () => props.item.interactionSource,
         );
+        const rest = omit(props, "unstyled", "item");
         return (
             <itemContext.Provider value={{ item }}>
                 {menu.render("item", {
@@ -198,7 +207,7 @@ export function selectFieldParts<I extends SelectFieldItem>(
                             .highlighted,
                     }),
                     unstyled: () => props.unstyled,
-                    props: omit(props, "unstyled", "item"),
+                    props: rest,
                 })}
             </itemContext.Provider>
         );
@@ -207,11 +216,12 @@ export function selectFieldParts<I extends SelectFieldItem>(
     function ItemLabel(props: SelectFieldPartProps): JSX.Element {
         const { menu, api } = context.use("ItemLabel");
         const { item } = itemContext.use("ItemLabel");
+        const rest = omit(props, "unstyled");
         return menu.render("itemLabel", {
             element: "span",
             machine: () => api().getItemTextProps({ item: item() as never }),
             unstyled: () => props.unstyled,
-            props: omit(props, "unstyled"),
+            props: rest,
         });
     }
 

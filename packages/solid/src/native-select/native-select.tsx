@@ -213,12 +213,13 @@ function Root(props: NativeSelectRootProps): JSX.Element {
             },
             handlers(),
         ]);
+    const rest = omit(props, "as", ...NATIVE_SELECT_ROOT_PROPS);
     return (
         <context.Provider value={{ scope, setSelect, chosen, selectProps }}>
             {scope.render("root", {
                 element: "span",
                 as: () => props.as,
-                props: omit(props, "as", ...NATIVE_SELECT_ROOT_PROPS),
+                props: rest,
             })}
         </context.Provider>
     );
@@ -229,47 +230,51 @@ function Root(props: NativeSelectRootProps): JSX.Element {
  *  and Root's `id`). */
 function Select(props: NativeSelectSelectProps): JSX.Element {
     const { scope, setSelect, selectProps } = context.use("Select");
+    const merged = merge(omit(props, "unstyled"), {
+        get "aria-describedby"() {
+            return joinIdRefs(
+                props["aria-describedby"],
+                selectProps()["aria-describedby"] as string | undefined,
+            );
+        },
+    });
     return scope.render("select", {
         element: "select",
         machine: selectProps,
         ref: (element) => setSelect(element as HTMLSelectElement),
         unstyled: () => props.unstyled,
         // Its own descriptions join the Field's rather than replacing them.
-        props: merge(omit(props, "unstyled"), {
-            get "aria-describedby"() {
-                return joinIdRefs(
-                    props["aria-describedby"],
-                    selectProps()["aria-describedby"] as string | undefined,
-                );
-            },
-        }),
+        props: merged,
     });
 }
 
 /** The chevron, hidden from assistive technology: the platform's own arrow is turned off. */
 function Icon(props: NativeSelectPartProps): JSX.Element {
     const { scope } = context.use("Icon");
+    const rest = omit(props, "unstyled");
     return scope.render("icon", {
         element: "span",
         machine: () => ({ "aria-hidden": "true" }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** A group of options, an `<optgroup>` with its `label`. */
 function Group(props: NativeSelectGroupProps): JSX.Element {
     const { scope } = context.use("Group");
+    const rest = omit(props, "unstyled");
     return scope.render("group", {
         element: "optgroup",
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** An option: an `<option>` with its `value`. */
 function Option(props: NativeSelectOptionProps): JSX.Element {
     const { scope, chosen } = context.use("Option");
+    const rest = omit(props, "unstyled");
     return scope.render("option", {
         element: "option",
         machine: () => {
@@ -283,7 +288,7 @@ function Option(props: NativeSelectOptionProps): JSX.Element {
             };
         },
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 

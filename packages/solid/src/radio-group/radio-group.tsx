@@ -140,6 +140,7 @@ function Root(props: RadioGroupRootProps): JSX.Element {
     const scope = useUnstyledComponent(radioGroupAnatomy, {
         testId: () => props.testId,
     });
+    const rest = omit(props, "as", ...RADIO_GROUP_ROOT_PROPS);
     return (
         <groupContext.Provider
             value={{
@@ -158,7 +159,7 @@ function Root(props: RadioGroupRootProps): JSX.Element {
                 as: () => props.as,
                 machine: () => radioGroupRootProps(api().getRootProps()),
                 ref: setRoot,
-                props: omit(props, "as", ...RADIO_GROUP_ROOT_PROPS),
+                props: rest,
             })}
         </groupContext.Provider>
     );
@@ -183,6 +184,7 @@ function Item(props: RadioGroupItemProps): JSX.Element {
         indication,
         interactionSource: source,
     });
+    const rest = omit(props, "as", ...RADIO_PROPS);
     return (
         <itemContext.Provider value={{ scope, item }}>
             {scope.render("root", {
@@ -190,7 +192,7 @@ function Item(props: RadioGroupItemProps): JSX.Element {
                 as: () => props.as,
                 machine: () => radioItemProps(api().getItemProps(item())),
                 states: () => ({ pressed: api().getItemState(item()).active }),
-                props: omit(props, "as", ...RADIO_PROPS),
+                props: rest,
             })}
         </itemContext.Provider>
     );
@@ -199,10 +201,11 @@ function Item(props: RadioGroupItemProps): JSX.Element {
 /** The 48px touch target around a radio. Empty. */
 function ItemTouchTarget(props: RadioGroupPartProps): JSX.Element {
     const { scope } = itemContext.use("ItemTouchTarget");
+    const rest = omit(props, "unstyled");
     return scope.render("touchTarget", {
         element: "span",
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -223,6 +226,7 @@ function ItemInput(props: RadioGroupPartProps): JSX.Element {
             );
         });
     };
+    const rest = omit(props, "unstyled");
     return scope.render("input", {
         element: "input",
         machine: () =>
@@ -231,7 +235,7 @@ function ItemInput(props: RadioGroupPartProps): JSX.Element {
                 { onClick },
             ]),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -239,21 +243,23 @@ function ItemInput(props: RadioGroupPartProps): JSX.Element {
 function ItemRing(props: RadioGroupPartProps): JSX.Element {
     const { api } = groupContext.use("ItemRing");
     const { scope, item } = itemContext.use("ItemRing");
+    const rest = omit(props, "unstyled");
     return scope.render("ring", {
         element: "span",
         machine: () => radioRingProps(api().getItemControlProps(item())),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** The dot, which the CSS shows when the radio is checked. Empty. */
 function ItemDot(props: RadioGroupPartProps): JSX.Element {
     const { scope } = itemContext.use("ItemDot");
+    const rest = omit(props, "unstyled");
     return scope.render("dot", {
         element: "span",
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -305,11 +311,9 @@ function ReadyMade(props: RadioGroupProps): JSX.Element {
     const input = slot("input");
     const ring = slot("ring");
     const dot = slot("dot");
+    const own = omit(props, ...READY_MADE_PROPS) as RadioGroupRootProps;
     return (
-        <Root
-            {...(omit(props, ...READY_MADE_PROPS) as RadioGroupRootProps)}
-            {...(group as object)}
-        >
+        <Root {...own} {...(group as object)}>
             <For
                 each={props.items ?? []}
                 keyed={(item: RadioGroupItem) => item.value}

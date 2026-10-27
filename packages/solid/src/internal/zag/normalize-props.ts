@@ -46,6 +46,7 @@ const RENAMED: Record<string, string> = {
 export const normalizeProps = createNormalizer<PropTypes>((props: Dict) => {
     const normalized: Dict = {};
     for (const key in props) {
+        // oxlint-disable-next-line solid/reactivity -- Zag's normalizer gets a plain props object, not a component's props
         const value = props[key];
         if (key === "readOnly" && value === false) continue;
         if (key === "style" && isObject(value)) {

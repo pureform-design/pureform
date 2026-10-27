@@ -46,11 +46,12 @@ function Root(props: RippleProps): JSX.Element {
         ...rippleDomMachineProps(props),
     }));
     const api = createMemo(() => ripple.connect(service, normalizeProps));
+    const rest = omit(props, "as", ...RIPPLE_DOM_ROOT_PROPS);
     return scope.render("root", {
         element: "span",
         as: () => props.as,
         machine: () => api().getLayerProps(),
-        props: omit(props, "as", ...RIPPLE_DOM_ROOT_PROPS),
+        props: rest,
     });
 }
 

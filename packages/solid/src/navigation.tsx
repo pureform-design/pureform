@@ -177,6 +177,7 @@ export function createNavigation<C extends NavigationComponent>(config: {
         const open = useControllable<"open", boolean>(
             config.component,
             "open",
+            // oxlint-disable-next-line solid/reactivity -- the parent's own props, passed once and never replaced
             props.own,
         );
         const service = useMachine(dialog.machine, () => ({
@@ -247,7 +248,10 @@ export function createNavigation<C extends NavigationComponent>(config: {
                             ),
                         ),
                     unstyled: () => scrimProps?.unstyled,
-                    props: scrimProps ? omit(scrimProps, "unstyled") : {},
+                    props: scrimProps
+                        ? // oxlint-disable-next-line solid/reactivity -- an optional slot's props, passed straight to render
+                          omit(scrimProps, "unstyled")
+                        : {},
                 })}
                 <div {...positioner()}>
                     <div {...content()}>{props.children}</div>
@@ -263,6 +267,7 @@ export function createNavigation<C extends NavigationComponent>(config: {
             () => (props as { readonly modal?: boolean | undefined }).modal,
         );
         if (modal) {
+            // oxlint-disable-next-line solid/components-return-once -- `modal` is read once at setup (untracked), as documented
             return (
                 <Modal own={props}>
                     <Nav {...props} />
@@ -298,13 +303,14 @@ export function createNavigation<C extends NavigationComponent>(config: {
             unstyled: () => props.unstyled,
             indication: () => props.indication,
         });
+        const rest = omit(props, "as", ...NAVIGATION_ROOT_PROPS);
         return (
             <context.Provider value={{ scope, api, sources }}>
                 {scope.render("root", {
                     element: "nav",
                     as: () => props.as,
                     machine: () => api().getRootProps(),
-                    props: omit(props, "as", ...NAVIGATION_ROOT_PROPS),
+                    props: rest,
                 })}
             </context.Provider>
         );
@@ -323,6 +329,7 @@ export function createNavigation<C extends NavigationComponent>(config: {
             () => props.value,
             () => props.interactionSource,
         );
+        const rest = omit(props, "unstyled", ...NAVIGATION_ITEM_PROPS);
         return (
             <itemContext.Provider value={{ value: () => props.value, source }}>
                 {scope.render("item", {
@@ -340,7 +347,7 @@ export function createNavigation<C extends NavigationComponent>(config: {
                             ),
                         ]),
                     unstyled: () => props.unstyled,
-                    props: omit(props, "unstyled", ...NAVIGATION_ITEM_PROPS),
+                    props: rest,
                 })}
             </itemContext.Provider>
         );
@@ -349,26 +356,28 @@ export function createNavigation<C extends NavigationComponent>(config: {
     /** The rail's header, above the destinations: its menu button and FAB. */
     function Header(props: NavigationPartProps): JSX.Element {
         const { scope, api } = context.use("Header");
+        const rest = omit(props, "unstyled");
         return (
             scope as unknown as ComponentScope<typeof navigationRailAnatomy>
         ).render("header", {
             element: "div",
             machine: () => api().getHeaderProps(),
             unstyled: () => props.unstyled,
-            props: omit(props, "unstyled"),
+            props: rest,
         });
     }
 
     /** The rail's section label, over a run of destinations: shown while the rail is expanded. */
     function SectionLabel(props: NavigationPartProps): JSX.Element {
         const { scope, api } = context.use("SectionLabel");
+        const rest = omit(props, "unstyled");
         return (
             scope as unknown as ComponentScope<typeof navigationRailAnatomy>
         ).render("sectionLabel", {
             element: "div",
             machine: () => api().getSectionLabelProps(),
             unstyled: () => props.unstyled,
-            props: omit(props, "unstyled"),
+            props: rest,
         });
     }
 
@@ -376,11 +385,12 @@ export function createNavigation<C extends NavigationComponent>(config: {
     function Indicator(props: NavigationPartProps): JSX.Element {
         const { scope } = context.use("Indicator");
         const { source } = itemContext.use("Indicator");
+        const rest = omit(props, "unstyled");
         return scope.render("indicator", {
             element: "span",
             interactionSource: source,
             unstyled: () => props.unstyled,
-            props: omit(props, "unstyled"),
+            props: rest,
         });
     }
 
@@ -388,10 +398,11 @@ export function createNavigation<C extends NavigationComponent>(config: {
     function ActiveIndicator(props: NavigationPartProps): JSX.Element {
         const { scope } = context.use("ActiveIndicator");
         itemContext.use("ActiveIndicator");
+        const rest = omit(props, "unstyled");
         return scope.render("activeIndicator", {
             element: "span",
             unstyled: () => props.unstyled,
-            props: omit(props, "unstyled"),
+            props: rest,
         });
     }
 
@@ -400,12 +411,13 @@ export function createNavigation<C extends NavigationComponent>(config: {
     function Icon(props: NavigationIconProps): JSX.Element {
         const { scope, api } = context.use("Icon");
         itemContext.use("Icon");
+        const rest = omit(props, "unstyled", "mirror");
         return scope.render("icon", {
             element: "span",
             machine: () => api().getIconProps(),
             states: () => ({ mirrored: props.mirror }),
             unstyled: () => props.unstyled,
-            props: omit(props, "unstyled", "mirror"),
+            props: rest,
         });
     }
 
@@ -413,11 +425,12 @@ export function createNavigation<C extends NavigationComponent>(config: {
     function Label(props: NavigationPartProps): JSX.Element {
         const { scope, api } = context.use("Label");
         itemContext.use("Label");
+        const rest = omit(props, "unstyled");
         return scope.render("label", {
             element: "span",
             machine: () => api().getLabelProps(),
             unstyled: () => props.unstyled,
-            props: omit(props, "unstyled"),
+            props: rest,
         });
     }
 
@@ -442,6 +455,7 @@ export function createNavigation<C extends NavigationComponent>(config: {
             NavigationInstances<JSX.Element>
         >;
     }): JSX.Element {
+        // oxlint-disable-next-line solid/reactivity -- the row's accessor and the slot props function, both fixed for the row
         const { item, slots } = props;
         const { api } = context.use("Item");
         const copy = () => ({

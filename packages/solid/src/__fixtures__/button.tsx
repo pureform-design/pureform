@@ -71,6 +71,7 @@ export function Root(props: RootProps) {
         testId: () => props.testId,
         unstyled: () => props.unstyled,
     });
+    const rest = omit(props, ...ROOT_PROPS);
     return (
         <ButtonContext value={{ scope, api }}>
             {scope.render("root", {
@@ -78,7 +79,7 @@ export function Root(props: RootProps) {
                 as: () => props.as,
                 machine: () => api().getRootProps(),
                 states: () => ({ pressed: api().pressed }),
-                props: omit(props, ...ROOT_PROPS),
+                props: rest,
             })}
         </ButtonContext>
     );
@@ -90,11 +91,12 @@ export interface PartComponentProps extends PartProps {
 
 export function Label(props: PartComponentProps) {
     const { scope, api } = useContext(ButtonContext);
+    const rest = omit(props, "unstyled");
     return scope.render("label", {
         element: "span",
         machine: () => api().getLabelProps(),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -102,12 +104,13 @@ export function Icon(
     props: PartComponentProps & { mirror?: boolean | undefined },
 ) {
     const { scope, api } = useContext(ButtonContext);
+    const rest = omit(props, "unstyled", "mirror");
     return scope.render("icon", {
         element: "span",
         machine: () => api().getIconProps(),
         states: () => ({ mirrored: props.mirror }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "mirror"),
+        props: rest,
     });
 }
 

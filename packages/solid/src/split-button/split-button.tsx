@@ -102,6 +102,7 @@ function Root(props: SplitButtonRootProps): JSX.Element {
         indication: () => props.indication,
     });
     const menuRoot = createMenuSlotProps(props)("root") as object;
+    const rest = omit(props, "as", "menuProps", ...SPLIT_BUTTON_ROOT_PROPS);
     return (
         <context.Provider value={{ scope, disabled: () => !!props.disabled }}>
             <Menu.Root
@@ -124,12 +125,7 @@ function Root(props: SplitButtonRootProps): JSX.Element {
                 {scope.render("root", {
                     element: "div",
                     as: () => props.as,
-                    props: omit(
-                        props,
-                        "as",
-                        "menuProps",
-                        ...SPLIT_BUTTON_ROOT_PROPS,
-                    ),
+                    props: rest,
                 })}
             </Menu.Root>
         </context.Provider>
@@ -173,7 +169,11 @@ function TrailingButtonPart(
                 handlers(),
             ]),
         unstyled: () => props.unstyled as boolean | undefined,
-        props: { children: props.children } as object,
+        props: {
+            get children() {
+                return props.children;
+            },
+        },
     });
 }
 
@@ -186,12 +186,13 @@ function TrailingButton(props: SplitButtonButtonProps): JSX.Element {
  *  technology. */
 function TrailingIcon(props: SplitButtonIconProps): JSX.Element {
     const { scope } = context.use("TrailingIcon");
+    const rest = omit(props, "unstyled", "mirror");
     return scope.render("trailingIcon", {
         element: "span",
         machine: () => ({ "aria-hidden": "true" }),
         states: () => ({ mirrored: props.mirror }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "mirror"),
+        props: rest,
     });
 }
 

@@ -108,6 +108,7 @@ function Root(props: SwitchRootProps): JSX.Element {
         indication: () => props.indication,
         interactionSource: source,
     });
+    const rest = omit(props, "as", ...SWITCH_ROOT_PROPS);
     return (
         <context.Provider
             value={{
@@ -124,7 +125,7 @@ function Root(props: SwitchRootProps): JSX.Element {
                 states: () => ({
                     pressed: service.context.get("active") as boolean,
                 }),
-                props: omit(props, "as", ...SWITCH_ROOT_PROPS),
+                props: rest,
             })}
         </context.Provider>
     );
@@ -133,10 +134,11 @@ function Root(props: SwitchRootProps): JSX.Element {
 /** The 48px touch target around the control. Empty. */
 function TouchTarget(props: SwitchPartProps): JSX.Element {
     const { scope } = context.use("TouchTarget");
+    const rest = omit(props, "unstyled");
     return scope.render("touchTarget", {
         element: "span",
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -158,6 +160,7 @@ function Input(props: SwitchPartProps): JSX.Element {
             );
         });
     };
+    const rest = omit(props, "unstyled");
     return scope.render("input", {
         element: "input",
         machine: () =>
@@ -167,49 +170,53 @@ function Input(props: SwitchPartProps): JSX.Element {
             ]),
         ref: (element) => setInput(element as HTMLInputElement),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** The track, which holds the state layer and the handle, hidden from assistive technology. */
 function Track(props: SwitchPartProps): JSX.Element {
     const { scope, api } = context.use("Track");
+    const rest = omit(props, "unstyled");
     return scope.render("track", {
         element: "span",
         machine: () => api().getControlProps(),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** The circle behind the handle that shows hover, focus, and press. Empty. */
 function StateLayer(props: SwitchPartProps): JSX.Element {
     const { scope } = context.use("StateLayer");
+    const rest = omit(props, "unstyled");
     return scope.render("stateLayer", {
         element: "span",
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** The handle, which slides along the track and grows when on. */
 function Handle(props: SwitchPartProps): JSX.Element {
     const { scope, api } = context.use("Handle");
+    const rest = omit(props, "unstyled");
     return scope.render("handle", {
         element: "span",
         machine: () => api().getThumbProps(),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** The handle's icon, shown while the switch is on. Render it only when there's an icon. */
 function Icon(props: SwitchPartProps): JSX.Element {
     const { scope } = context.use("Icon");
+    const rest = omit(props, "unstyled");
     return scope.render("icon", {
         element: "span",
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 

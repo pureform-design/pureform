@@ -104,28 +104,29 @@ function Root(props: RatingRootProps): JSX.Element {
         testId: () => props.testId,
         unstyled: () => props.unstyled,
     });
+    const merged = merge(omit(props, "as", ...RATING_ROOT_PROPS), {
+        get children() {
+            return (
+                <>
+                    {props.children}
+                    {/* Its value follows the rating: Zag's sets it once. */}
+                    <input
+                        {...api().getHiddenInputProps()}
+                        ref={setInput}
+                        name={props.name}
+                        value={api().value}
+                    />
+                </>
+            );
+        },
+    });
     return (
         <context.Provider value={{ scope, api }}>
             {scope.render("root", {
                 element: "div",
                 as: () => props.as,
                 machine: () => api().getRootProps(),
-                props: merge(omit(props, "as", ...RATING_ROOT_PROPS), {
-                    get children() {
-                        return (
-                            <>
-                                {props.children}
-                                {/* Its value follows the rating: Zag's sets it once. */}
-                                <input
-                                    {...api().getHiddenInputProps()}
-                                    ref={setInput}
-                                    name={props.name}
-                                    value={api().value}
-                                />
-                            </>
-                        );
-                    },
-                }),
+                props: merged,
             })}
         </context.Provider>
     );
@@ -134,44 +135,48 @@ function Root(props: RatingRootProps): JSX.Element {
 /** The label, a `<label>` that names the group and moves focus to a star. */
 function Label(props: RatingPartProps): JSX.Element {
     const { scope, api } = context.use("Label");
+    const rest = omit(props, "unstyled");
     return scope.render("label", {
         element: "label",
         machine: () => api().getLabelProps(),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** The row of stars, a `radiogroup`. */
 function Control(props: RatingPartProps): JSX.Element {
     const { scope, api } = context.use("Control");
+    const rest = omit(props, "unstyled");
     return scope.render("control", {
         element: "div",
         machine: () => api().getControlProps(),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** One star, a `radio`. Holds an Icon, and a Fill or HalfFill once the value reaches it. */
 function Item(props: RatingItemProps): JSX.Element {
     const { scope, api } = context.use("Item");
+    const rest = omit(props, "unstyled", "index");
     return scope.render("item", {
         element: "span",
         machine: () => api().getItemProps({ index: props.index }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "index"),
+        props: rest,
     });
 }
 
 const star = (part: "icon" | "fill" | "halfFill", name: string) =>
     function Star(props: RatingPartProps): JSX.Element {
         const { scope } = context.use(name);
+        const rest = omit(props, "unstyled");
         return scope.render(part, {
             element: "span",
             machine: () => ({ "aria-hidden": "true" }),
             unstyled: () => props.unstyled,
-            props: omit(props, "unstyled"),
+            props: rest,
         });
     };
 
@@ -206,6 +211,7 @@ function Stars(props: {
     readonly slots: SlotPropsOf<PartName<Anatomy>, RatingInstances>;
 }): JSX.Element {
     const { api } = context.use("Rating");
+    // oxlint-disable-next-line solid/reactivity -- the parent's slot props function, passed once and never replaced
     const slots = props.slots;
     return (
         <For each={api().items}>

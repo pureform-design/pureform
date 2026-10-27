@@ -98,6 +98,7 @@ function Root(props: TooltipRootProps): JSX.Element {
         testId: () => props.testId,
         unstyled: () => props.unstyled,
     });
+    const rest = omit(props, "as", ...TOOLTIP_ROOT_PROPS);
     return (
         <context.Provider
             value={{
@@ -110,7 +111,7 @@ function Root(props: TooltipRootProps): JSX.Element {
             {scope.render("root", {
                 element: "div",
                 as: () => props.as,
-                props: omit(props, "as", ...TOOLTIP_ROOT_PROPS),
+                props: rest,
             })}
         </context.Provider>
     );
@@ -124,13 +125,14 @@ function Trigger(props: TooltipTriggerProps): JSX.Element {
         (open) => api().setOpen(open),
         interactive,
     );
+    const rest = omit(props, "unstyled", "as");
     return scope.render("trigger", {
         element: "button",
         ref: longPress,
         as: () => props.as,
         machine: () => api().getTriggerProps(),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "as"),
+        props: rest,
     });
 }
 
@@ -140,6 +142,7 @@ function Trigger(props: TooltipTriggerProps): JSX.Element {
  *  the pointer from a trigger there and close the tooltip. The registry doesn't style it. */
 function Positioner(props: TooltipPartProps): JSX.Element {
     const { scope, api, presence, interactive } = context.use("Positioner");
+    const rest = omit(props, "unstyled");
     return scope.render("positioner", {
         element: "div",
         machine: () => {
@@ -158,30 +161,32 @@ function Positioner(props: TooltipPartProps): JSX.Element {
                   };
         },
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** The tooltip's surface, holding its text. It stays while its exit animation runs. */
 function Content(props: TooltipPartProps): JSX.Element {
     const { scope, api, presence } = context.use("Content");
+    const rest = omit(props, "unstyled");
     return scope.render("content", {
         element: "div",
         ref: presence.ref,
         machine: () =>
             presentProps(api().getContentProps(), presence.present()),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** The tooltip's text. */
 function SupportingText(props: TooltipPartProps): JSX.Element {
     const { scope } = context.use("SupportingText");
+    const rest = omit(props, "unstyled");
     return scope.render("supportingText", {
         element: "span",
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -189,6 +194,11 @@ function SupportingText(props: TooltipPartProps): JSX.Element {
  *  in the surface's color. */
 function Caret(props: TooltipPartProps): JSX.Element {
     const { scope, api } = context.use("Caret");
+    const merged = merge(omit(props, "unstyled"), {
+        get children() {
+            return <div {...api().getArrowTipProps()} />;
+        },
+    });
     return scope.render("caret", {
         element: "div",
         machine: () => {
@@ -202,11 +212,7 @@ function Caret(props: TooltipPartProps): JSX.Element {
             };
         },
         unstyled: () => props.unstyled,
-        props: merge(omit(props, "unstyled"), {
-            get children() {
-                return <div {...api().getArrowTipProps()} />;
-            },
-        }),
+        props: merged,
     });
 }
 

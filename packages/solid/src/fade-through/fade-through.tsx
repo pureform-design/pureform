@@ -60,43 +60,44 @@ export function FadeThrough(props: FadeThroughProps): JSX.Element {
             ? (given as (value: PageKey) => JSX.Element)(value)
             : (given as JSX.Element);
     };
+    const merged = merge(
+        omit(props, "as", "children", ...FADE_THROUGH_ROOT_PROPS),
+        {
+            get children() {
+                return (
+                    <For
+                        each={pages()}
+                        keyed={(page: TransitionPage) => page.key}
+                    >
+                        {(page) => (
+                            <TransitionPageView
+                                page={page}
+                                settle={settle}
+                                content={content}
+                                render={(ref, shown) =>
+                                    scope.render("page", {
+                                        element: "div",
+                                        ref,
+                                        machine: () =>
+                                            fadeThroughPageProps(page()),
+                                        props: {
+                                            get children() {
+                                                return shown;
+                                            },
+                                        },
+                                    })
+                                }
+                            />
+                        )}
+                    </For>
+                );
+            },
+        },
+    );
     return scope.render("root", {
         element: "div",
         as: () => props.as,
         machine: () => pageRootProps(pages()),
-        props: merge(
-            omit(props, "as", "children", ...FADE_THROUGH_ROOT_PROPS),
-            {
-                get children() {
-                    return (
-                        <For
-                            each={pages()}
-                            keyed={(page: TransitionPage) => page.key}
-                        >
-                            {(page) => (
-                                <TransitionPageView
-                                    page={page}
-                                    settle={settle}
-                                    content={content}
-                                    render={(ref, shown) =>
-                                        scope.render("page", {
-                                            element: "div",
-                                            ref,
-                                            machine: () =>
-                                                fadeThroughPageProps(page()),
-                                            props: {
-                                                get children() {
-                                                    return shown;
-                                                },
-                                            },
-                                        })
-                                    }
-                                />
-                            )}
-                        </For>
-                    );
-                },
-            },
-        ),
+        props: merged,
     });
 }

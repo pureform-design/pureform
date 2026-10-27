@@ -42,28 +42,29 @@ export function Label(props: LabelProps): JSX.Element {
         testId: () => props.testId,
         unstyled: () => props.unstyled,
     });
+    const merged = merge(omit(props, "as", "slotProps", ...LABEL_ROOT_PROPS), {
+        get children() {
+            const merged = merge(() => props.slotProps?.requiredIndicator, {
+                children: REQUIRED_MARK,
+            });
+            return (
+                <>
+                    {props.children}
+                    <Show when={state().required}>
+                        {scope.render("requiredIndicator", {
+                            element: "span",
+                            machine: () => ({ "aria-hidden": "true" }),
+                            props: merged,
+                        })}
+                    </Show>
+                </>
+            );
+        },
+    });
     return scope.render("root", {
         element: "label",
         as: () => props.as,
         machine: () => fieldLabelProps(field?.state(), state()),
-        props: merge(omit(props, "as", "slotProps", ...LABEL_ROOT_PROPS), {
-            get children() {
-                return (
-                    <>
-                        {props.children}
-                        <Show when={state().required}>
-                            {scope.render("requiredIndicator", {
-                                element: "span",
-                                machine: () => ({ "aria-hidden": "true" }),
-                                props: merge(
-                                    () => props.slotProps?.requiredIndicator,
-                                    { children: REQUIRED_MARK },
-                                ),
-                            })}
-                        </Show>
-                    </>
-                );
-            },
-        }),
+        props: merged,
     });
 }

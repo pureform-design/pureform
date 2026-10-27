@@ -102,6 +102,7 @@ function Root(props: NumberFieldRootProps): JSX.Element {
         unstyled: () => props.unstyled,
         indication: () => props.indication,
     });
+    const rest = omit(props, "as", ...NUMBER_FIELD_ROOT_PROPS);
     return (
         <context.Provider
             value={{
@@ -115,7 +116,7 @@ function Root(props: NumberFieldRootProps): JSX.Element {
                 element: "div",
                 as: () => props.as,
                 machine: () => api().getRootProps(),
-                props: omit(props, "as", ...NUMBER_FIELD_ROOT_PROPS),
+                props: rest,
             })}
         </context.Provider>
     );
@@ -125,17 +126,19 @@ function Root(props: NumberFieldRootProps): JSX.Element {
  *  control. It reads its states from the input inside it. */
 function Container(props: NumberFieldPartProps): JSX.Element {
     const { scope, api } = context.use("Container");
+    const rest = omit(props, "unstyled");
     return scope.render("container", {
         element: "div",
         states: () => ({ filled: !api().empty }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** The native input, a `spinbutton`. The label names it. */
 function Input(props: NumberFieldPartProps): JSX.Element {
     const { scope, api, placeholder } = context.use("Input");
+    const rest = omit(props, "unstyled");
     return scope.render("input", {
         element: "input",
         machine: () => ({
@@ -143,40 +146,43 @@ function Input(props: NumberFieldPartProps): JSX.Element {
             placeholder: placeholder(),
         }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** The floating label: a `<label>` for the input. */
 function Label(props: NumberFieldPartProps): JSX.Element {
     const { scope, api } = context.use("Label");
+    const rest = omit(props, "unstyled");
     return scope.render("label", {
         element: "label",
         machine: () => api().getLabelProps(),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** An icon at the start of the field. Turn on Root's `leadingIcon` with it. */
 function LeadingIcon(props: NumberFieldIconProps): JSX.Element {
     const { scope } = context.use("LeadingIcon");
+    const rest = omit(props, "unstyled", "mirror");
     return scope.render("leadingIcon", {
         element: "span",
         machine: () => ({ "aria-hidden": "true" }),
         states: () => ({ mirrored: props.mirror }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "mirror"),
+        props: rest,
     });
 }
 
 const affix = (part: "prefixText" | "suffixText", name: string) =>
     function Affix(props: NumberFieldPartProps): JSX.Element {
         const { scope } = context.use(name);
+        const rest = omit(props, "unstyled");
         return scope.render(part, {
             element: "span",
             unstyled: () => props.unstyled,
-            props: omit(props, "unstyled"),
+            props: rest,
         });
     };
 
@@ -188,11 +194,12 @@ const SuffixText = affix("suffixText", "SuffixText");
 /** The group holding the decrement and increment buttons, at the container's end. */
 function Control(props: NumberFieldPartProps): JSX.Element {
     const { scope, api } = context.use("Control");
+    const rest = omit(props, "unstyled");
     return scope.render("control", {
         element: "div",
         machine: () => api().getControlProps(),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -260,6 +267,7 @@ function Content(props: {
     readonly slots: (part: string) => PartProps;
 }): JSX.Element {
     const { error } = context.use("Root");
+    // oxlint-disable-next-line solid/reactivity -- the parent's own props, passed once and never replaced
     const own = props.own;
     return (
         <>

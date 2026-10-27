@@ -109,6 +109,7 @@ function Root(props: CheckboxRootProps): JSX.Element {
         indication: () => props.indication,
         interactionSource: source,
     });
+    const rest = omit(props, "as", ...CHECKBOX_ROOT_PROPS);
     return (
         <context.Provider
             value={{
@@ -125,7 +126,7 @@ function Root(props: CheckboxRootProps): JSX.Element {
                 states: () => ({
                     pressed: service.context.get("active") as boolean,
                 }),
-                props: omit(props, "as", ...CHECKBOX_ROOT_PROPS),
+                props: rest,
             })}
         </context.Provider>
     );
@@ -134,10 +135,11 @@ function Root(props: CheckboxRootProps): JSX.Element {
 /** The 48px touch target around the control. Empty. */
 function TouchTarget(props: CheckboxPartProps): JSX.Element {
     const { scope } = context.use("TouchTarget");
+    const rest = omit(props, "unstyled");
     return scope.render("touchTarget", {
         element: "span",
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -158,6 +160,7 @@ function Input(props: CheckboxPartProps): JSX.Element {
             );
         });
     };
+    const rest = omit(props, "unstyled");
     return scope.render("input", {
         element: "input",
         machine: () =>
@@ -167,40 +170,43 @@ function Input(props: CheckboxPartProps): JSX.Element {
             ]),
         ref: (element) => setInput(element as HTMLInputElement),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** The box that holds both marks, hidden from assistive technology. */
 function Box(props: CheckboxPartProps): JSX.Element {
     const { scope, api } = context.use("Box");
+    const rest = omit(props, "unstyled");
     return scope.render("box", {
         element: "span",
         machine: () => api().getControlProps(),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** The check mark, which the CSS draws and shows when checked. Empty. */
 function CheckIcon(props: CheckboxPartProps): JSX.Element {
     const { scope, api } = context.use("CheckIcon");
+    const rest = omit(props, "unstyled");
     return scope.render("checkIcon", {
         element: "span",
         machine: () => checkboxMarkProps(api().getIndicatorProps()),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** The dash, which the CSS draws and shows when indeterminate. Empty. */
 function IndeterminateIcon(props: CheckboxPartProps): JSX.Element {
     const { scope, api } = context.use("IndeterminateIcon");
+    const rest = omit(props, "unstyled");
     return scope.render("indeterminateIcon", {
         element: "span",
         machine: () => checkboxMarkProps(api().getIndicatorProps()),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 

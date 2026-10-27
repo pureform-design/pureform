@@ -166,6 +166,25 @@ function Root(props: ColorPickerRootProps): JSX.Element {
             api().getHiddenInputProps() as Record<string, unknown>;
         return rest;
     };
+    const merged = merge(
+        omit(props, "as", "children", ...COLOR_PICKER_ROOT_PROPS),
+        {
+            get children() {
+                return (
+                    <>
+                        {props.children}
+                        <input
+                            {...hidden()}
+                            ref={setInput}
+                            form={props.form}
+                            value={hex()}
+                            readonly
+                        />
+                    </>
+                );
+            },
+        },
+    );
     return (
         <context.Provider
             value={{
@@ -181,25 +200,7 @@ function Root(props: ColorPickerRootProps): JSX.Element {
                 element: "div",
                 as: () => props.as,
                 machine: () => api().getRootProps(),
-                props: merge(
-                    omit(props, "as", "children", ...COLOR_PICKER_ROOT_PROPS),
-                    {
-                        get children() {
-                            return (
-                                <>
-                                    {props.children}
-                                    <input
-                                        {...hidden()}
-                                        ref={setInput}
-                                        form={props.form}
-                                        value={hex()}
-                                        readonly
-                                    />
-                                </>
-                            );
-                        },
-                    },
-                ),
+                props: merged,
             })}
         </context.Provider>
     );
@@ -215,11 +216,12 @@ const machinePart =
     ) =>
     (props: ColorPickerPartProps): JSX.Element => {
         const { scope, api } = context.use(label);
+        const rest = omit(props, "unstyled");
         return scope.render(part, {
             element,
             machine: () => machine(api()),
             unstyled: () => props.unstyled,
-            props: omit(props, "unstyled"),
+            props: rest,
         });
     };
 
@@ -253,7 +255,8 @@ export type ColorPickerSlots = SlotPropsOf<
 const inner = (props: PartProps | undefined) => {
     if (!props) return {};
     const own = props as PartProps & { readonly unstyled?: boolean };
-    return { unstyled: () => own.unstyled, props: omit(own, "unstyled") };
+    const rest = omit(own, "unstyled");
+    return { unstyled: () => own.unstyled, props: rest };
 };
 
 /** A part's props that draws other parts inside it: its own, and the ready-made's slot props for
@@ -266,28 +269,29 @@ export interface ColorPickerOuterPartProps extends ColorPickerPartProps {
  *  keys move. */
 function Area(props: ColorPickerOuterPartProps): JSX.Element {
     const { scope, api } = context.use("Area");
+    const merged = merge(omit(props, "unstyled", "slots"), {
+        get children() {
+            return (
+                <>
+                    {scope.render("areaBackground", {
+                        element: "div",
+                        machine: () => api().getAreaBackgroundProps(),
+                        ...inner(props.slots?.("areaBackground")),
+                    })}
+                    {scope.render("areaThumb", {
+                        element: "div",
+                        machine: () => api().getAreaThumbProps(),
+                        ...inner(props.slots?.("areaThumb")),
+                    })}
+                </>
+            );
+        },
+    });
     return scope.render("area", {
         element: "div",
         machine: () => api().getAreaProps(),
         unstyled: () => props.unstyled,
-        props: merge(omit(props, "unstyled", "slots"), {
-            get children() {
-                return (
-                    <>
-                        {scope.render("areaBackground", {
-                            element: "div",
-                            machine: () => api().getAreaBackgroundProps(),
-                            ...inner(props.slots?.("areaBackground")),
-                        })}
-                        {scope.render("areaThumb", {
-                            element: "div",
-                            machine: () => api().getAreaThumbProps(),
-                            ...inner(props.slots?.("areaThumb")),
-                        })}
-                    </>
-                );
-            },
-        }),
+        props: merged,
     });
 }
 
@@ -302,51 +306,51 @@ function ChannelSlider(props: ColorPickerChannelSliderProps): JSX.Element {
     const { scope, api } = context.use("ChannelSlider");
     const slider = () => ({ channel: props.channel, format: "hsba" }) as const;
     const each = () => ({ channel: props.channel });
+    const merged = merge(omit(props, "channel", "unstyled", "slots"), {
+        get children() {
+            return (
+                <>
+                    <Show when={props.channel === "alpha"}>
+                        {scope.render("transparencyGrid", {
+                            element: "div",
+                            machine: () =>
+                                api().getTransparencyGridProps({
+                                    size: "8px",
+                                }),
+                            ...inner(props.slots?.("transparencyGrid", each)),
+                        })}
+                    </Show>
+                    {scope.render("channelSliderTrack", {
+                        element: "div",
+                        machine: () =>
+                            api().getChannelSliderTrackProps(slider()),
+                        ...inner(props.slots?.("channelSliderTrack", each)),
+                    })}
+                    {scope.render("channelSliderThumb", {
+                        element: "div",
+                        machine: () =>
+                            combinePartProps([
+                                api().getChannelSliderThumbProps(slider()),
+                                { style: COLOR_PICKER_THUMB_CENTRE },
+                            ]),
+                        ...inner(props.slots?.("channelSliderThumb", each)),
+                    })}
+                </>
+            );
+        },
+    });
     return scope.render("channelSlider", {
         element: "div",
         machine: () => api().getChannelSliderProps(slider()),
         unstyled: () => props.unstyled,
-        props: merge(omit(props, "channel", "unstyled", "slots"), {
-            get children() {
-                return (
-                    <>
-                        <Show when={props.channel === "alpha"}>
-                            {scope.render("transparencyGrid", {
-                                element: "div",
-                                machine: () =>
-                                    api().getTransparencyGridProps({
-                                        size: "8px",
-                                    }),
-                                ...inner(
-                                    props.slots?.("transparencyGrid", each),
-                                ),
-                            })}
-                        </Show>
-                        {scope.render("channelSliderTrack", {
-                            element: "div",
-                            machine: () =>
-                                api().getChannelSliderTrackProps(slider()),
-                            ...inner(props.slots?.("channelSliderTrack", each)),
-                        })}
-                        {scope.render("channelSliderThumb", {
-                            element: "div",
-                            machine: () =>
-                                combinePartProps([
-                                    api().getChannelSliderThumbProps(slider()),
-                                    { style: COLOR_PICKER_THUMB_CENTRE },
-                                ]),
-                            ...inner(props.slots?.("channelSliderThumb", each)),
-                        })}
-                    </>
-                );
-            },
-        }),
+        props: merged,
     });
 }
 
 /** The value's swatch. */
 function ValueSwatch(props: ColorPickerPartProps): JSX.Element {
     const { scope, api } = context.use("ValueSwatch");
+    const rest = omit(props, "unstyled");
     return scope.render("valueSwatch", {
         element: "div",
         machine: () => ({
@@ -354,7 +358,7 @@ function ValueSwatch(props: ColorPickerPartProps): JSX.Element {
             "aria-hidden": "true",
         }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -439,6 +443,7 @@ function EyeDropperTrigger(
             onClick: () => void;
             disabled?: boolean;
         };
+    const rest = omit(props, "icon");
     return (
         <Show when={supported()}>
             <IconButton
@@ -446,7 +451,7 @@ function EyeDropperTrigger(
                 aria-label="Pick a color from the screen"
                 disabled={trigger().disabled}
                 onClick={() => trigger().onClick()}
-                {...(omit(props, "icon") as object)}
+                {...(rest as object)}
             />
         </Show>
     );
@@ -465,6 +470,23 @@ export interface ColorPickerSwatchTriggerProps extends ColorPickerOuterPartProps
 function SwatchTrigger(props: ColorPickerSwatchTriggerProps): JSX.Element {
     const { scope, api } = context.use("SwatchTrigger");
     const swatch = () => ({ value: props.value, disabled: props.disabled });
+    const merged = merge(
+        omit(props, "value", "disabled", "unstyled", "slots", "index"),
+        {
+            get children() {
+                return scope.render("swatch", {
+                    element: "div",
+                    machine: () => api().getSwatchProps({ value: props.value }),
+                    ...inner(
+                        props.slots?.("swatch", () => ({
+                            color: props.value,
+                            index: props.index ?? 0,
+                        })),
+                    ),
+                });
+            },
+        },
+    );
     return scope.render("swatchTrigger", {
         element: "button",
         machine: () => ({
@@ -475,24 +497,7 @@ function SwatchTrigger(props: ColorPickerSwatchTriggerProps): JSX.Element {
             ),
         }),
         unstyled: () => props.unstyled,
-        props: merge(
-            omit(props, "value", "disabled", "unstyled", "slots", "index"),
-            {
-                get children() {
-                    return scope.render("swatch", {
-                        element: "div",
-                        machine: () =>
-                            api().getSwatchProps({ value: props.value }),
-                        ...inner(
-                            props.slots?.("swatch", () => ({
-                                color: props.value,
-                                index: props.index ?? 0,
-                            })),
-                        ),
-                    });
-                },
-            },
-        ),
+        props: merged,
     });
 }
 

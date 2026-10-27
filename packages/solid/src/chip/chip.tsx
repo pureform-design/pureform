@@ -72,6 +72,7 @@ function Root(props: ChipRootProps): JSX.Element {
         indication: () => props.indication,
         interactionSource: source,
     });
+    const rest = omit(props, "as", ...CHIP_ROOT_PROPS);
     return (
         <context.Provider value={{ scope, api }}>
             {scope.render("root", {
@@ -79,7 +80,7 @@ function Root(props: ChipRootProps): JSX.Element {
                 as: () => props.as,
                 machine: () => api().getRootProps(),
                 states: () => ({ pressed: api().pressed }),
-                props: omit(props, "as", ...CHIP_ROOT_PROPS),
+                props: rest,
             })}
         </context.Provider>
     );
@@ -88,10 +89,11 @@ function Root(props: ChipRootProps): JSX.Element {
 /** The 48px touch target around the chip. Empty. */
 function TouchTarget(props: ChipPartProps): JSX.Element {
     const { scope } = context.use("TouchTarget");
+    const rest = omit(props, "unstyled");
     return scope.render("touchTarget", {
         element: "span",
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -128,11 +130,12 @@ const { Part: TrailingIcon, Optional: OptionalTrailingIcon } = iconParts<
 /** The chip's text. */
 function Label(props: ChipPartProps): JSX.Element {
     const { scope, api } = context.use("Label");
+    const rest = omit(props, "unstyled");
     return scope.render("label", {
         element: "span",
         machine: () => api().getLabelProps(),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 

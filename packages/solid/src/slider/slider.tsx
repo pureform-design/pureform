@@ -146,6 +146,7 @@ function Root(props: SliderRootProps): JSX.Element {
         inputs[index] = input;
         if (index === 0) setFirst(input);
     };
+    const rest = omit(props, "as", ...SLIDER_ROOT_PROPS);
     return (
         <context.Provider value={{ scope, api, props, setInput }}>
             {scope.render("root", {
@@ -153,7 +154,7 @@ function Root(props: SliderRootProps): JSX.Element {
                 as: () => props.as,
                 machine: () => api().getRootProps(),
                 states: () => ({ pressed: api().dragging }),
-                props: omit(props, "as", ...SLIDER_ROOT_PROPS),
+                props: rest,
             })}
         </context.Provider>
     );
@@ -166,11 +167,12 @@ const drawn = (
 ) =>
     function Drawn(props: SliderPartProps): JSX.Element {
         const { scope, api } = context.use(name);
+        const rest = omit(props, "unstyled");
         return scope.render(part, {
             element: part === "markerGroup" ? "div" : "span",
             machine: () => machine(api()),
             unstyled: () => props.unstyled,
-            props: omit(props, "unstyled"),
+            props: rest,
         });
     };
 
@@ -229,6 +231,7 @@ function InsetIcon(props: SliderPartProps): JSX.Element {
             if (!sameSliderInsetIcon(read, last)) setMeasures(read);
         },
     );
+    const rest = omit(props, "unstyled");
     return scope.render("insetIcon", {
         element: "span",
         ref: (element: HTMLElement) => {
@@ -254,7 +257,7 @@ function InsetIcon(props: SliderPartProps): JSX.Element {
         machine: () => api().getInsetIconProps(),
         states: () => ({ overflowing: overflowing() }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 /** Holds the stops (`Marker`). */
@@ -277,6 +280,7 @@ function Marker(props: SliderMarkerProps): JSX.Element {
             sliderStopActive(props.value, api().value, root),
         ),
     );
+    const rest = omit(props, "unstyled", "value");
     return scope.render("marker", {
         element: "span",
         machine: () => ({
@@ -284,7 +288,7 @@ function Marker(props: SliderMarkerProps): JSX.Element {
             style: style(),
         }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "value"),
+        props: rest,
     });
 }
 
@@ -300,6 +304,7 @@ const thumbPart = (
         const style = useOwnTokens(() =>
             sliderThumbTokens(api().percents[index()] ?? 0),
         );
+        const rest = omit(props, "unstyled", "index");
         return scope.render(part, {
             element,
             machine: () => ({
@@ -315,7 +320,7 @@ const thumbPart = (
                       }
                     : undefined,
             unstyled: () => props.unstyled,
-            props: omit(props, "unstyled", "index"),
+            props: rest,
         });
     };
 
@@ -348,12 +353,13 @@ function ValueIndicator(props: SliderThumbPartProps): JSX.Element {
 function Input(props: SliderThumbPartProps): JSX.Element {
     const { scope, api, setInput } = context.use("Input");
     const index = () => props.index ?? 0;
+    const rest = omit(props, "unstyled", "index");
     return scope.render("input", {
         element: "input",
         machine: () => api().getInputProps(index()),
         ref: (element) => setInput(index(), element as HTMLInputElement),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "index"),
+        props: rest,
     });
 }
 
@@ -390,6 +396,7 @@ function Thumb(props: {
     readonly valueIndicator: boolean | undefined;
 }): JSX.Element {
     const { api } = context.use("Slider");
+    // oxlint-disable-next-line solid/reactivity -- the parent's slot props function, passed once and never replaced
     const slots = props.slots;
     const thumb = createMemo((): SliderThumbInstance => ({
         index: props.index,

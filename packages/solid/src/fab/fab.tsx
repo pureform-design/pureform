@@ -70,6 +70,7 @@ function Root(props: FabRootProps): JSX.Element {
         indication: () => props.indication,
         interactionSource: source,
     });
+    const rest = omit(props, "as", ...FAB_ROOT_PROPS);
     return (
         <context.Provider value={{ scope, api }}>
             {scope.render("root", {
@@ -77,7 +78,7 @@ function Root(props: FabRootProps): JSX.Element {
                 as: () => props.as,
                 machine: () => api().getRootProps(),
                 states: () => ({ pressed: api().pressed }),
-                props: omit(props, "as", ...FAB_ROOT_PROPS),
+                props: rest,
             })}
         </context.Provider>
     );
@@ -86,10 +87,11 @@ function Root(props: FabRootProps): JSX.Element {
 /** The 48px touch target around a small FAB. Empty. */
 function TouchTarget(props: FabPartProps): JSX.Element {
     const { scope } = context.use("TouchTarget");
+    const rest = omit(props, "unstyled");
     return scope.render("touchTarget", {
         element: "span",
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -97,33 +99,36 @@ function TouchTarget(props: FabPartProps): JSX.Element {
  *  label. */
 function Container(props: FabPartProps): JSX.Element {
     const { scope } = context.use("Container");
+    const rest = omit(props, "unstyled");
     return scope.render("container", {
         element: "span",
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** The icon's box, hidden from assistive technology. */
 function Icon(props: FabIconProps): JSX.Element {
     const { scope, api } = context.use("Icon");
+    const rest = omit(props, "unstyled", "mirror");
     return scope.render("icon", {
         element: "span",
         machine: () => api().getIconProps(),
         states: () => ({ mirrored: props.mirror }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "mirror"),
+        props: rest,
     });
 }
 
 /** The extended FAB's text. */
 function Label(props: FabPartProps): JSX.Element {
     const { scope, api } = context.use("Label");
+    const rest = omit(props, "unstyled");
     return scope.render("label", {
         element: "span",
         machine: () => api().getLabelProps(),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 

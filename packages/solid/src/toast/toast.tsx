@@ -30,6 +30,7 @@ import {
     createMemo,
     createUniqueId,
     For,
+    merge,
     omit,
     onSettled,
     Show,
@@ -100,6 +101,19 @@ function Group(props: ToastGroupProps): JSX.Element {
         unstyled: () => props.unstyled,
         indication: () => props.indication,
     });
+    const merged = merge(omit(props, "toaster", "children", ...TOASTER_PROPS), {
+        get children() {
+            return (
+                <For
+                    each={api().getToasts() as ToastData[]}
+                    keyed={(item: ToastData) => item.id}
+                >
+                    {/* oxlint-disable-next-line solid/reactivity -- passes the row's accessors on, read where tracked */}
+                    {(item, index) => props.children(item, index)}
+                </For>
+            );
+        },
+    });
     return (
         <groupContext.Provider value={{ service, props }}>
             {scope.render("group", {
@@ -113,19 +127,7 @@ function Group(props: ToastGroupProps): JSX.Element {
                         ),
                     };
                 },
-                props: {
-                    ...omit(props, "toaster", "children", ...TOASTER_PROPS),
-                    get children() {
-                        return (
-                            <For
-                                each={api().getToasts() as ToastData[]}
-                                keyed={(item: ToastData) => item.id}
-                            >
-                                {(item, index) => props.children(item, index)}
-                            </For>
-                        );
-                    },
-                },
+                props: merged,
             })}
         </groupContext.Provider>
     );
@@ -167,6 +169,17 @@ function Root(props: ToastRootProps): JSX.Element {
             resume: () => api().resume(),
         });
     });
+    const merged = merge(omit(props, "toast", "index", "unstyled"), {
+        get children() {
+            return (
+                <>
+                    <div {...api().getGhostBeforeProps()} />
+                    {props.children}
+                    <div {...api().getGhostAfterProps()} />
+                </>
+            );
+        },
+    });
     return (
         <context.Provider value={{ scope, api }}>
             {scope.render("root", {
@@ -188,18 +201,7 @@ function Root(props: ToastRootProps): JSX.Element {
                         },
                     };
                 },
-                props: {
-                    ...omit(props, "toast", "index", "unstyled"),
-                    get children() {
-                        return (
-                            <>
-                                <div {...api().getGhostBeforeProps()} />
-                                {props.children}
-                                <div {...api().getGhostAfterProps()} />
-                            </>
-                        );
-                    },
-                },
+                props: merged,
             })}
         </context.Provider>
     );
@@ -213,33 +215,36 @@ export interface ToastPartProps extends PartProps {
 /** The icon, in the type's color. */
 function Icon(props: ToastPartProps): JSX.Element {
     const { scope, api } = context.use("Icon");
+    const rest = omit(props, "unstyled");
     return scope.render("icon", {
         element: "span",
         machine: () => api().getIconProps(),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** The title, which names the toast. */
 function Title(props: ToastPartProps): JSX.Element {
     const { scope, api } = context.use("Title");
+    const rest = omit(props, "unstyled");
     return scope.render("title", {
         element: "div",
         machine: () => api().getTitleProps(),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** The description, which describes it. */
 function Description(props: ToastPartProps): JSX.Element {
     const { scope, api } = context.use("Description");
+    const rest = omit(props, "unstyled");
     return scope.render("description", {
         element: "div",
         machine: () => api().getDescriptionProps(),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 

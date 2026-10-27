@@ -142,6 +142,7 @@ export function calendarParts(use: (name: string) => CalendarContext) {
             const children = {
                 get children() {
                     return (
+                        // oxlint-disable-next-line solid/components-return-once -- a live props getter the part reads, not a component body
                         props.children ??
                         (direction === "prev" ? (
                             <ChevronStartIcon />
@@ -151,21 +152,23 @@ export function calendarParts(use: (name: string) => CalendarContext) {
                     );
                 },
             };
+            const merged = merge(
+                omit(props, "unstyled", "mirror", "unit", "children", "as"),
+                children,
+            );
             return scope.render(name(direction), {
                 element: "button",
                 as: () => props.as,
                 machine,
                 states: () => ({ mirrored: props.mirror ?? true }),
                 unstyled: () => props.unstyled,
-                props: merge(
-                    omit(props, "unstyled", "mirror", "unit", "children", "as"),
-                    children,
-                ),
+                props: merged,
             });
         };
 
     function Weekdays(props: CalendarPartProps): JSX.Element {
         const { scope, picker } = use("Weekdays");
+        const rest = omit(props, "unstyled");
         return scope.render(name("weekdays"), {
             element: "div",
             machine: () => ({
@@ -173,12 +176,13 @@ export function calendarParts(use: (name: string) => CalendarContext) {
                 role: "row",
             }),
             unstyled: () => props.unstyled,
-            props: omit(props, "unstyled"),
+            props: rest,
         });
     }
 
     function Weekday(props: CalendarPartProps): JSX.Element {
         const { scope, picker } = use("Weekday");
+        const rest = omit(props, "unstyled");
         return scope.render(name("weekday"), {
             element: "span",
             machine: () => ({
@@ -186,7 +190,7 @@ export function calendarParts(use: (name: string) => CalendarContext) {
                 role: "columnheader",
             }),
             unstyled: () => props.unstyled,
-            props: omit(props, "unstyled"),
+            props: rest,
         });
     }
 
@@ -197,6 +201,7 @@ export function calendarParts(use: (name: string) => CalendarContext) {
     ) =>
         function Table(props: CalendarTableProps): JSX.Element {
             const { scope, picker } = use(display);
+            const rest = omit(props, "unstyled", "view", "columns");
             return scope.render(name(part), {
                 element: "div",
                 machine: () =>
@@ -205,12 +210,13 @@ export function calendarParts(use: (name: string) => CalendarContext) {
                         columns: props.columns ?? defaults.columns,
                     }),
                 unstyled: () => props.unstyled,
-                props: omit(props, "unstyled", "view", "columns"),
+                props: rest,
             });
         };
 
     function Week(props: CalendarTableProps): JSX.Element {
         const { scope, picker } = use("Week");
+        const rest = omit(props, "unstyled", "view", "columns");
         return scope.render(name("week"), {
             element: "div",
             machine: () => ({
@@ -218,7 +224,7 @@ export function calendarParts(use: (name: string) => CalendarContext) {
                 role: "row",
             }),
             unstyled: () => props.unstyled,
-            props: omit(props, "unstyled", "view", "columns"),
+            props: rest,
         });
     }
 
@@ -260,6 +266,7 @@ export function calendarParts(use: (name: string) => CalendarContext) {
             outside: view() === "day" && state().outsideRange,
             disabled: state().disabled,
         });
+        // oxlint-disable-next-line solid/reactivity -- the parent's slot props function, passed once and never replaced
         const slots = props.slots;
         const rootSlot = slots?.("cell", instance) as
             | CalendarPartProps
@@ -308,6 +315,18 @@ export function calendarParts(use: (name: string) => CalendarContext) {
                 );
             },
         };
+        const merged = merge(
+            omit(
+                props,
+                "unstyled",
+                "interactionSource",
+                "view",
+                "value",
+                "children",
+                "slots",
+            ),
+            content,
+        );
         const trigger = cell.render("trigger", {
             element: "div",
             interactionSource: source,
@@ -317,25 +336,15 @@ export function calendarParts(use: (name: string) => CalendarContext) {
                     handlers(),
                 ]),
             unstyled: () => props.unstyled,
-            props: merge(
-                omit(
-                    props,
-                    "unstyled",
-                    "interactionSource",
-                    "view",
-                    "value",
-                    "children",
-                    "slots",
-                ),
-                content,
-            ),
+            props: merged,
         });
         return cell.render("root", {
             element: "div",
             machine: () => cellProps()[0],
             unstyled: () => rootSlot?.unstyled,
             props: rootSlot
-                ? merge(omit(rootSlot, "unstyled"), { children: trigger })
+                ? // oxlint-disable-next-line solid/reactivity -- an optional slot's props, passed straight to render
+                  merge(omit(rootSlot, "unstyled"), { children: trigger })
                 : { children: trigger },
         });
     }
@@ -346,6 +355,7 @@ export function calendarParts(use: (name: string) => CalendarContext) {
         readonly slots?: CalendarSlots | undefined;
     }): JSX.Element {
         const { picker } = use("DayCalendar");
+        // oxlint-disable-next-line solid/reactivity -- the parent's slot props function, passed once and never replaced
         const slots = props.slots;
         const weekdays = slots?.("weekdays");
         const grid = slots?.("grid");

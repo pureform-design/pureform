@@ -71,13 +71,14 @@ function Root(props: TimePickerRootProps): JSX.Element {
     });
     const mode = () =>
         props.mode === "scroll" ? ("scroll" as const) : ("dial" as const);
+    const rest = omit(props, "as", ...TIME_PICKER_ROOT_PROPS);
     return (
         <context.Provider value={{ scope, api, mode }}>
             {scope.render("root", {
                 element: "div",
                 as: () => props.as,
                 machine: () => api().getRootProps(),
-                props: omit(props, "as", ...TIME_PICKER_ROOT_PROPS),
+                props: rest,
             })}
             <Show when={props.name}>
                 <input {...api().getHiddenInputProps()} />
@@ -125,11 +126,15 @@ export interface TimePickerDialProps extends TimePickerPartProps {
 // A slot's props as a part's render options.
 const slotted = (slot: PartProps | undefined, children?: () => JSX.Element) => {
     const own = slot as TimePickerPartProps | undefined;
-    const rest = own ? omit(own, "unstyled") : {};
+    const rest = own
+        ? // oxlint-disable-next-line solid/reactivity -- an optional slot's props, passed straight to render
+          omit(own, "unstyled")
+        : {};
     return {
         unstyled: () => own?.unstyled,
         props: children
-            ? merge(rest, {
+            ? // oxlint-disable-next-line solid/reactivity -- an optional slot's props, passed straight to render
+              merge(rest, {
                   get children() {
                       return children();
                   },
@@ -182,9 +187,11 @@ function SelectorContent(
     props: TimePickerSelectorProps & { readonly of: TimePickerView },
 ): JSX.Element {
     const { scope, api, mode } = context.use("Selector");
+    // oxlint-disable-next-line solid/reactivity -- of is fixed per selector, given by HourSelector or MinuteSelector
     const Part = props.of === "hour" ? HourSelectorPart : MinuteSelectorPart;
+    const rest = omit(props, "of", "slots");
     return (
-        <Part {...omit(props, "of", "slots")}>
+        <Part {...rest}>
             <Show
                 when={mode() === "scroll"}
                 fallback={api().scrollItems(props.of)[1]!.text}
@@ -215,11 +222,12 @@ function SelectorContent(
  *  given children. */
 function PeriodSelector(props: TimePickerPartProps): JSX.Element {
     const { scope, api } = context.use("PeriodSelector");
+    const rest = omit(props, "unstyled");
     return scope.render("periodSelector", {
         element: "div",
         machine: () => api().getPeriodSelectorProps(),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -249,50 +257,51 @@ function Period(props: TimePickerPeriodProps): JSX.Element {
  *  placed from the time. A clock doesn't mirror, so it draws the same under `rtl`. */
 function Dial(props: TimePickerDialProps): JSX.Element {
     const { scope, api } = context.use("Dial");
+    // oxlint-disable-next-line solid/reactivity -- the parent's slot props function, passed once and never replaced
     const slots = props.slots;
+    const merged = merge(omit(props, "unstyled", "slots"), {
+        get children() {
+            return (
+                <>
+                    {scope.render("dialTrack", {
+                        element: "span",
+                        machine: () => api().getDialTrackProps(),
+                        ...slotted(slots?.("dialTrack")),
+                    })}
+                    {scope.render("dialHandle", {
+                        element: "span",
+                        machine: () => api().getDialHandleProps(),
+                        ...slotted(slots?.("dialHandle")),
+                    })}
+                    {scope.render("dialCenter", {
+                        element: "span",
+                        machine: () => api().getDialCenterProps(),
+                        ...slotted(slots?.("dialCenter")),
+                    })}
+                    <For each={api().dialLabels}>
+                        {(label) =>
+                            scope.render("dialLabel", {
+                                element: "span",
+                                machine: () => api().getDialLabelProps(label),
+                                ...slotted(
+                                    slots?.("dialLabel", () => ({
+                                        value: label.value,
+                                        selected: label.selected,
+                                    })),
+                                    () => label.text,
+                                ),
+                            })
+                        }
+                    </For>
+                </>
+            );
+        },
+    });
     return scope.render("dial", {
         element: "div",
         machine: () => api().getDialProps(),
         unstyled: () => props.unstyled,
-        props: merge(omit(props, "unstyled", "slots"), {
-            get children() {
-                return (
-                    <>
-                        {scope.render("dialTrack", {
-                            element: "span",
-                            machine: () => api().getDialTrackProps(),
-                            ...slotted(slots?.("dialTrack")),
-                        })}
-                        {scope.render("dialHandle", {
-                            element: "span",
-                            machine: () => api().getDialHandleProps(),
-                            ...slotted(slots?.("dialHandle")),
-                        })}
-                        {scope.render("dialCenter", {
-                            element: "span",
-                            machine: () => api().getDialCenterProps(),
-                            ...slotted(slots?.("dialCenter")),
-                        })}
-                        <For each={api().dialLabels}>
-                            {(label) =>
-                                scope.render("dialLabel", {
-                                    element: "span",
-                                    machine: () =>
-                                        api().getDialLabelProps(label),
-                                    ...slotted(
-                                        slots?.("dialLabel", () => ({
-                                            value: label.value,
-                                            selected: label.selected,
-                                        })),
-                                        () => label.text,
-                                    ),
-                                })
-                            }
-                        </For>
-                    </>
-                );
-            },
-        }),
+        props: merged,
     });
 }
 

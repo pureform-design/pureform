@@ -126,6 +126,7 @@ function Root(props: AccordionRootProps): JSX.Element {
         unstyled: () => props.unstyled,
         indication: () => props.indication,
     });
+    const rest = omit(props, "as", ...ACCORDION_ROOT_PROPS);
     return (
         <context.Provider
             value={{ scope, api, disabled: () => props.disabled, sources }}
@@ -134,7 +135,7 @@ function Root(props: AccordionRootProps): JSX.Element {
                 element: "div",
                 as: () => props.as,
                 machine: () => api().getRootProps(),
-                props: omit(props, "as", ...ACCORDION_ROOT_PROPS),
+                props: rest,
             })}
         </context.Provider>
     );
@@ -144,13 +145,14 @@ function Root(props: AccordionRootProps): JSX.Element {
 function Item(props: AccordionItemProps): JSX.Element {
     const { scope, api, disabled } = context.use("Item");
     const item = () => accordionItemProps(props, disabled());
+    const rest = omit(props, "unstyled", "value", "disabled");
     return (
         <itemContext.Provider value={{ props: item }}>
             {scope.render("item", {
                 element: "div",
                 machine: () => api().getItemProps(item()),
                 unstyled: () => props.unstyled,
-                props: omit(props, "unstyled", "value", "disabled"),
+                props: rest,
             })}
         </itemContext.Provider>
     );
@@ -165,12 +167,13 @@ function Trigger(props: AccordionTriggerProps): JSX.Element {
         () => item().value,
         () => props.interactionSource,
     );
+    const rest = omit(props, "unstyled", "interactionSource");
     return scope.render("trigger", {
         element: "button",
         interactionSource: source,
         machine: () => api().getItemTriggerProps(item()),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "interactionSource"),
+        props: rest,
     });
 }
 
@@ -178,12 +181,13 @@ function Trigger(props: AccordionTriggerProps): JSX.Element {
 function Content(props: AccordionPartProps): JSX.Element {
     const { scope, api } = context.use("Content");
     const { props: item } = itemContext.use("Content");
+    const rest = omit(props, "unstyled");
     return scope.render("content", {
         element: "div",
         ref: useCollapsible(),
         machine: () => api().getItemContentProps(item()),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -202,15 +206,17 @@ const leading = iconParts<Anatomy, AccordionIconProps>(
 function Indicator(props: AccordionPartProps): JSX.Element {
     const { scope, api } = context.use("Indicator");
     const { props: item } = itemContext.use("Indicator");
+    const merged = merge(omit(props, "unstyled"), {
+        get children() {
+            // oxlint-disable-next-line solid/components-return-once -- a live props getter the part reads, not a component body
+            return props.children ?? <ExpandIcon />;
+        },
+    });
     return scope.render("indicator", {
         element: "span",
         machine: () => api().getItemIndicatorProps(item()),
         unstyled: () => props.unstyled,
-        props: merge(omit(props, "unstyled"), {
-            get children() {
-                return props.children ?? <ExpandIcon />;
-            },
-        }),
+        props: merged,
     });
 }
 
@@ -269,6 +275,7 @@ function Items(props: {
     >;
 }): JSX.Element {
     const { api } = context.use("Accordion");
+    // oxlint-disable-next-line solid/reactivity -- the parent's slot props function, passed once and never replaced
     const slots = props.slots;
     return (
         <For

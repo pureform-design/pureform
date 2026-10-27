@@ -33,10 +33,11 @@ export function ErrorText(props: ErrorTextProps): JSX.Element {
         testId: () => props.testId,
         unstyled: () => props.unstyled,
     });
+    const rest = omit(props, "as", ...ERROR_TEXT_ROOT_PROPS);
     return scope.render("root", {
         element: "span",
         as: () => props.as,
         machine: () => ({ id: field?.state().ids.error }),
-        props: omit(props, "as", ...ERROR_TEXT_ROOT_PROPS),
+        props: rest,
     });
 }

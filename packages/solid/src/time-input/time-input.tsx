@@ -63,13 +63,14 @@ function Root(props: TimeInputRootProps): JSX.Element {
         unstyled: () => props.unstyled,
         indication: () => props.indication,
     });
+    const rest = omit(props, "as", ...TIME_INPUT_ROOT_PROPS);
     return (
         <context.Provider value={{ scope, api }}>
             {scope.render("root", {
                 element: "div",
                 as: () => props.as,
                 machine: () => api().getRootProps(),
-                props: omit(props, "as", ...TIME_INPUT_ROOT_PROPS),
+                props: rest,
             })}
             <Show when={props.name}>
                 <input {...api().getHiddenInputProps()} />
@@ -105,48 +106,45 @@ export interface TimeInputFieldProps extends TimeInputPartProps {
 const field = (of: TimePickerView, name: string) =>
     function Field(props: TimeInputFieldProps): JSX.Element {
         const { scope, api } = context.use(name);
+        const merged = merge(
+            omit(props, "unstyled", "label", "inputProps", "labelProps"),
+            {
+                get children() {
+                    const merged = merge(
+                        omit(props.labelProps ?? {}, "unstyled"),
+                        {
+                            get children() {
+                                return isPresent(props.label)
+                                    ? props.label
+                                    : api().translations[of];
+                            },
+                        },
+                    );
+                    const rest = omit(props.inputProps ?? {}, "unstyled");
+                    return (
+                        <>
+                            {scope.render("input", {
+                                element: "input",
+                                machine: () => api().getInputProps(of),
+                                unstyled: () => props.inputProps?.unstyled,
+                                props: rest,
+                            })}
+                            {scope.render("fieldLabel", {
+                                element: "span",
+                                machine: () => api().getFieldLabelProps(of),
+                                unstyled: () => props.labelProps?.unstyled,
+                                props: merged,
+                            })}
+                        </>
+                    );
+                },
+            },
+        );
         return scope.render(of === "hour" ? "hourField" : "minuteField", {
             element: "label",
             machine: () => api().getFieldProps(of),
             unstyled: () => props.unstyled,
-            props: merge(
-                omit(props, "unstyled", "label", "inputProps", "labelProps"),
-                {
-                    get children() {
-                        return (
-                            <>
-                                {scope.render("input", {
-                                    element: "input",
-                                    machine: () => api().getInputProps(of),
-                                    unstyled: () => props.inputProps?.unstyled,
-                                    props: omit(
-                                        props.inputProps ?? {},
-                                        "unstyled",
-                                    ),
-                                })}
-                                {scope.render("fieldLabel", {
-                                    element: "span",
-                                    machine: () => api().getFieldLabelProps(of),
-                                    unstyled: () => props.labelProps?.unstyled,
-                                    props: merge(
-                                        omit(
-                                            props.labelProps ?? {},
-                                            "unstyled",
-                                        ),
-                                        {
-                                            get children() {
-                                                return isPresent(props.label)
-                                                    ? props.label
-                                                    : api().translations[of];
-                                            },
-                                        },
-                                    ),
-                                })}
-                            </>
-                        );
-                    },
-                },
-            ),
+            props: merged,
         });
     };
 
@@ -211,40 +209,42 @@ function ReadyMadeParts(
     },
 ): JSX.Element {
     const { api } = context.use("TimeInput");
-    const input = props.slots("input");
-    const fieldLabel = props.slots("fieldLabel");
+    // oxlint-disable-next-line solid/reactivity -- the parent's slot props function, passed once and never replaced
+    const slots = props.slots;
+    const input = slots("input");
+    const fieldLabel = slots("fieldLabel");
     return (
         <>
-            <Headline {...props.slots("headline")}>
+            <Headline {...slots("headline")}>
                 {isPresent(props.headline)
                     ? props.headline
                     : TIME_INPUT_HEADLINE}
             </Headline>
-            <Body {...props.slots("body")}>
+            <Body {...slots("body")}>
                 <HourField
-                    {...props.slots("hourField")}
+                    {...slots("hourField")}
                     inputProps={input}
                     labelProps={fieldLabel}
                 />
-                <Separator {...props.slots("separator")}>:</Separator>
+                <Separator {...slots("separator")}>:</Separator>
                 <MinuteField
-                    {...props.slots("minuteField")}
+                    {...slots("minuteField")}
                     inputProps={input}
                     labelProps={fieldLabel}
                 />
                 <Show when={api().hourCycle === 12}>
-                    <PeriodSelector {...props.slots("periodSelector")}>
-                        <Period period="am" {...props.slots("period")}>
+                    <PeriodSelector {...slots("periodSelector")}>
+                        <Period period="am" {...slots("period")}>
                             {api().periodNames.am}
                         </Period>
-                        <Period period="pm" {...props.slots("period")}>
+                        <Period period="pm" {...slots("period")}>
                             {api().periodNames.pm}
                         </Period>
                     </PeriodSelector>
                 </Show>
             </Body>
             <Show when={isPresent(props.actions)}>
-                <Actions {...props.slots("actions")}>{props.actions}</Actions>
+                <Actions {...slots("actions")}>{props.actions}</Actions>
             </Show>
         </>
     );

@@ -148,13 +148,14 @@ function Root(props: TreeRootProps): JSX.Element {
         indication: () => props.indication,
     });
     const naming = { labelled: false };
+    const rest = omit(props, "as", "items", ...TREE_ROOT_PROPS);
     return (
         <context.Provider value={{ scope, api, sources, naming }}>
             {scope.render("root", {
                 element: "div",
                 as: () => props.as,
                 machine: () => api().getRootProps(),
-                props: omit(props, "as", "items", ...TREE_ROOT_PROPS),
+                props: rest,
             })}
         </context.Provider>
     );
@@ -164,11 +165,12 @@ function Root(props: TreeRootProps): JSX.Element {
 function Label(props: TreePartProps): JSX.Element {
     const { scope, api, naming } = context.use("Label");
     naming.labelled = true;
+    const rest = omit(props, "unstyled");
     return scope.render("label", {
         element: "span",
         machine: () => api().getLabelProps(),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -177,11 +179,12 @@ function Label(props: TreePartProps): JSX.Element {
  *  typing goes to the next row starting with it. Name it with a `Label` or `aria-label`. */
 function TreeElement(props: TreePartProps): JSX.Element {
     const { scope, api, naming } = context.use("Tree");
+    const rest = omit(props, "unstyled");
     return scope.render("tree", {
         element: "div",
         machine: () => treeNaming(api().getTreeProps(), naming.labelled),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -190,13 +193,14 @@ function TreeElement(props: TreePartProps): JSX.Element {
 function Branch(props: TreeNodeProps): JSX.Element {
     const { scope, api } = context.use("Branch");
     const ref = () => ({ node: props.node, indexPath: props.indexPath });
+    const rest = omit(props, "unstyled", "node", "indexPath");
     return (
         <nodeContext.Provider value={{ ref, branch: true }}>
             {scope.render("branch", {
                 element: "div",
                 machine: () => api().getBranchProps(ref()),
                 unstyled: () => props.unstyled,
-                props: omit(props, "unstyled", "node", "indexPath"),
+                props: rest,
             })}
         </nodeContext.Provider>
     );
@@ -213,12 +217,13 @@ const row = (
         () => ref().node.value,
         () => props.interactionSource,
     );
+    const rest = omit(props, "unstyled", "interactionSource");
     return scope.render("node", {
         element: "div",
         interactionSource: source,
         machine: () => machine(api(), ref()),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "interactionSource"),
+        props: rest,
     });
 };
 
@@ -233,13 +238,10 @@ function BranchControl(props: TreeRowProps): JSX.Element {
 /** A leaf: its row, selected with a click or Enter. */
 function Item(props: TreeNodeProps & InteractionSourceProps): JSX.Element {
     const ref = () => ({ node: props.node, indexPath: props.indexPath });
+    const rest = omit(props, "node", "indexPath") as TreeRowProps;
     return (
         <nodeContext.Provider value={{ ref, branch: false }}>
-            {row(
-                "Item",
-                omit(props, "node", "indexPath") as TreeRowProps,
-                (api, node) => api.getItemProps(node),
-            )}
+            {row("Item", rest, (api, node) => api.getItemProps(node))}
         </nodeContext.Provider>
     );
 }
@@ -248,12 +250,13 @@ function Item(props: TreeNodeProps & InteractionSourceProps): JSX.Element {
 function Group(props: TreePartProps): JSX.Element {
     const { scope, api } = context.use("Group");
     const { ref } = nodeContext.use("Group");
+    const rest = omit(props, "unstyled");
     return scope.render("group", {
         element: "div",
         ref: useCollapsible(),
         machine: () => api().getBranchContentProps(ref()),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -261,6 +264,7 @@ function Group(props: TreePartProps): JSX.Element {
 function Text(props: TreePartProps): JSX.Element {
     const { scope, api } = context.use("Text");
     const { ref, branch } = nodeContext.use("Text");
+    const rest = omit(props, "unstyled");
     return scope.render("text", {
         element: "span",
         machine: () =>
@@ -268,7 +272,7 @@ function Text(props: TreePartProps): JSX.Element {
                 ? api().getBranchTextProps(ref())
                 : api().getItemTextProps(ref()),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -277,15 +281,17 @@ function Text(props: TreePartProps): JSX.Element {
 function Indicator(props: TreePartProps): JSX.Element {
     const { scope, api } = context.use("Indicator");
     const { ref } = nodeContext.use("Indicator");
+    const merged = merge(omit(props, "unstyled"), {
+        get children() {
+            // oxlint-disable-next-line solid/components-return-once -- a live props getter the part reads, not a component body
+            return props.children ?? <ExpandIcon />;
+        },
+    });
     return scope.render("indicator", {
         element: "span",
         machine: () => api().getBranchIndicatorProps(ref()),
         unstyled: () => props.unstyled,
-        props: merge(omit(props, "unstyled"), {
-            get children() {
-                return props.children ?? <ExpandIcon />;
-            },
-        }),
+        props: merged,
     });
 }
 

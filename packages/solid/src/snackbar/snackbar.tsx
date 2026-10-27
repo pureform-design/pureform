@@ -98,6 +98,7 @@ function Root(props: SnackbarRootProps): JSX.Element {
         unstyled: () => props.unstyled,
         indication: () => props.indication,
     });
+    const rest = omit(props, "as", ...SNACKBAR_ROOT_PROPS);
     return (
         <context.Provider value={{ scope, api }}>
             {scope.render("root", {
@@ -106,7 +107,7 @@ function Root(props: SnackbarRootProps): JSX.Element {
                 ref: presence.ref,
                 machine: () =>
                     presentProps(api().getRootProps(), presence.present()),
-                props: omit(props, "as", ...SNACKBAR_ROOT_PROPS),
+                props: rest,
             })}
         </context.Provider>
     );
@@ -115,11 +116,12 @@ function Root(props: SnackbarRootProps): JSX.Element {
 /** The message. */
 function SupportingText(props: SnackbarPartProps): JSX.Element {
     const { scope, api } = context.use("SupportingText");
+    const rest = omit(props, "unstyled");
     return scope.render("supportingText", {
         element: "span",
         machine: () => api().getSupportingTextProps(),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -127,11 +129,12 @@ function SupportingText(props: SnackbarPartProps): JSX.Element {
  *  text. */
 function Actions(props: SnackbarPartProps): JSX.Element {
     const { scope, api } = context.use("Actions");
+    const rest = omit(props, "unstyled");
     return scope.render("actions", {
         element: "span",
         machine: () => api().getActionsProps(),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 

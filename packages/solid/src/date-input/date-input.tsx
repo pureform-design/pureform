@@ -143,6 +143,10 @@ function Root(props: DateInputRootProps): JSX.Element {
             );
         },
     };
+    const merged = merge(
+        omit(props, "as", "children", ...DATE_INPUT_ROOT_PROPS),
+        children,
+    );
     return (
         <context.Provider
             value={{
@@ -160,10 +164,7 @@ function Root(props: DateInputRootProps): JSX.Element {
                 element: "div",
                 as: () => props.as,
                 machine: () => api().getRootProps(),
-                props: merge(
-                    omit(props, "as", "children", ...DATE_INPUT_ROOT_PROPS),
-                    children,
-                ),
+                props: merged,
             })}
         </context.Provider>
     );
@@ -184,22 +185,24 @@ const SelectedDate = inline<DateInputPartProps>("selectedDate", "SelectedDate");
 /** The button that switches to the calendar: `as={IconButton}` draws it as one. */
 function ModeToggle(props: DateInputTriggerProps): JSX.Element {
     const { scope } = context.use("ModeToggle");
+    const rest = omit(props, "unstyled", "as");
     return scope.render("modeToggle", {
         element: "button",
         as: () => props.as,
         machine: () => ({ type: "button" }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "as"),
+        props: rest,
     });
 }
 
 /** The line under the header, an `<hr>`. */
 function Divider(props: DateInputPartProps): JSX.Element {
     const { scope } = context.use("Divider");
+    const rest = omit(props, "unstyled");
     return scope.render("divider", {
         element: "hr",
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 /** The text field: the container and the supporting text. */
@@ -209,12 +212,13 @@ const Field = block<DateInputPartProps>("field", "Field");
  *  the label stays floated over the segments. */
 function Container(props: DateInputPartProps): JSX.Element {
     const { scope, api } = context.use("Container");
+    const rest = omit(props, "unstyled");
     return scope.render("container", {
         element: "div",
         machine: () => api().getControlProps(),
         states: () => ({ filled: true }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -227,11 +231,12 @@ const PrefixText: (props: DateInputPartProps) => JSX.Element = field.PrefixText;
 /** The group of segments, named by the label. */
 function Input(props: DateInputInputProps): JSX.Element {
     const { scope, api } = context.use("Input");
+    const rest = omit(props, "unstyled", "index");
     return scope.render("input", {
         element: "div",
         machine: () => api().getSegmentGroupProps({ index: props.index }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "index"),
+        props: rest,
     });
 }
 
@@ -244,6 +249,10 @@ function Segment(props: DateInputSegmentProps): JSX.Element {
             return props.children ?? props.segment.text;
         },
     };
+    const merged = merge(
+        omit(props, "unstyled", "segment", "index", "children"),
+        children,
+    );
     return scope.render("segment", {
         element: "span",
         machine: () =>
@@ -252,10 +261,7 @@ function Segment(props: DateInputSegmentProps): JSX.Element {
                 index: props.index,
             }),
         unstyled: () => props.unstyled,
-        props: merge(
-            omit(props, "unstyled", "segment", "index", "children"),
-            children,
-        ),
+        props: merged,
     });
 }
 
@@ -268,12 +274,13 @@ const Label: (props: DateInputPartProps) => JSX.Element = field.Label;
 /** An icon at the end of the field. Turn on Root's `trailingIcon` with it. */
 function TrailingIcon(props: DateInputIconProps): JSX.Element {
     const { scope } = context.use("TrailingIcon");
+    const rest = omit(props, "unstyled", "mirror");
     return scope.render("trailingIcon", {
         element: "span",
         machine: () => ({ "aria-hidden": "true" }),
         states: () => ({ mirrored: props.mirror }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "mirror"),
+        props: rest,
     });
 }
 
@@ -335,7 +342,9 @@ function ReadyMadeContent(props: {
     readonly slots: (part: PartName<Anatomy>) => PartProps;
 }): JSX.Element {
     const { api, value, locale, supportingTextId } = context.use("Root");
+    // oxlint-disable-next-line solid/reactivity -- the parent's own props, passed once and never replaced
     const own = props.own;
+    // oxlint-disable-next-line solid/reactivity -- the parent's slot props function, passed once and never replaced
     const slots = props.slots;
     const indexes = () => (own.selectionMode === "range" ? [0, 1] : [0]);
     return (

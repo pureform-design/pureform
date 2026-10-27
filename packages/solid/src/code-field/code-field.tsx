@@ -103,25 +103,23 @@ function Root(props: CodeFieldRootProps): JSX.Element {
         testId: () => props.testId,
         unstyled: () => props.unstyled,
     });
+    const merged = merge(omit(props, "as", ...CODE_FIELD_ROOT_PROPS), {
+        get children() {
+            return (
+                <>
+                    {props.children}
+                    <input {...api().getHiddenInputProps()} ref={setHidden} />
+                </>
+            );
+        },
+    });
     return (
         <context.Provider value={{ scope, api, error: () => props.error }}>
             {scope.render("root", {
                 element: "div",
                 as: () => props.as,
                 machine: () => api().getRootProps(),
-                props: merge(omit(props, "as", ...CODE_FIELD_ROOT_PROPS), {
-                    get children() {
-                        return (
-                            <>
-                                {props.children}
-                                <input
-                                    {...api().getHiddenInputProps()}
-                                    ref={setHidden}
-                                />
-                            </>
-                        );
-                    },
-                }),
+                props: merged,
             })}
         </context.Provider>
     );
@@ -130,33 +128,36 @@ function Root(props: CodeFieldRootProps): JSX.Element {
 /** The label above the cells: a `<label>` that focuses the first empty cell. */
 function Label(props: CodeFieldPartProps): JSX.Element {
     const { scope, api } = context.use("Label");
+    const rest = omit(props, "unstyled");
     return scope.render("label", {
         element: "label",
         machine: () => api().getLabelProps(),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** The row of cells. */
 function Control(props: CodeFieldPartProps): JSX.Element {
     const { scope, api } = context.use("Control");
+    const rest = omit(props, "unstyled");
     return scope.render("control", {
         element: "div",
         machine: () => api().getControlProps(),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** One cell: a native input for one character. */
 function Input(props: CodeFieldInputProps): JSX.Element {
     const { scope, api } = context.use("Input");
+    const rest = omit(props, "unstyled", "index");
     return scope.render("input", {
         element: "input",
         machine: () => api().getInputProps({ index: props.index }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "index"),
+        props: rest,
     });
 }
 
@@ -187,6 +188,7 @@ function Content(props: {
     readonly slots: SlotPropsOf<PartName<Anatomy>, CodeFieldInstances>;
 }): JSX.Element {
     const { api, error } = context.use("Root");
+    // oxlint-disable-next-line solid/reactivity -- the parent's own props, passed once and never replaced
     const own = props.own;
     return (
         <>

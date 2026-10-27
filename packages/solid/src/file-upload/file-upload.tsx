@@ -180,26 +180,27 @@ function Root(props: FileUploadRootProps): JSX.Element {
         testId: () => props.testId,
         unstyled: () => props.unstyled,
     });
+    const merged = merge(omit(props, "as", ...FILE_UPLOAD_ROOT_PROPS), {
+        get children() {
+            return (
+                <>
+                    {props.children}
+                    <input
+                        {...api().getHiddenInputProps()}
+                        form={props.form}
+                        ref={setHidden}
+                    />
+                </>
+            );
+        },
+    });
     return (
         <context.Provider value={{ scope, api, props }}>
             {scope.render("root", {
                 element: "div",
                 as: () => props.as,
                 machine: () => api().getRootProps(),
-                props: merge(omit(props, "as", ...FILE_UPLOAD_ROOT_PROPS), {
-                    get children() {
-                        return (
-                            <>
-                                {props.children}
-                                <input
-                                    {...api().getHiddenInputProps()}
-                                    form={props.form}
-                                    ref={setHidden}
-                                />
-                            </>
-                        );
-                    },
-                }),
+                props: merged,
             })}
         </context.Provider>
     );
@@ -208,11 +209,12 @@ function Root(props: FileUploadRootProps): JSX.Element {
 /** The label above the drop zone: a `<label>` for the file input, so a press opens the dialog. */
 function Label(props: FileUploadPartProps): JSX.Element {
     const { scope, api } = context.use("Label");
+    const rest = omit(props, "unstyled");
     return scope.render("label", {
         element: "label",
         machine: () => api().getLabelProps(),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -220,35 +222,38 @@ function Label(props: FileUploadPartProps): JSX.Element {
  *  the supporting text and the trigger. */
 function Dropzone(props: FileUploadPartProps): JSX.Element {
     const { scope, api } = context.use("Dropzone");
+    const rest = omit(props, "unstyled");
     return scope.render("dropzone", {
         element: "div",
         // The trigger inside opens the dialog; the zone itself only takes drops.
         machine: () => api().getDropzoneProps({ disableClick: true }),
         states: () => ({ dragged: api().dragging }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** The drop zone's icon. */
 function Icon(props: FileUploadIconProps): JSX.Element {
     const { scope } = context.use("Icon");
+    const rest = omit(props, "unstyled", "mirror");
     return scope.render("icon", {
         element: "span",
         machine: () => ({ "aria-hidden": "true" }),
         states: () => ({ mirrored: props.mirror }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "mirror"),
+        props: rest,
     });
 }
 
 /** The drop zone's headline. */
 function Headline(props: FileUploadPartProps): JSX.Element {
     const { scope } = context.use("Headline");
+    const rest = omit(props, "unstyled");
     return scope.render("headline", {
         element: "span",
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -268,21 +273,23 @@ function Trigger(props: Omit<ButtonProps, "onClick">): JSX.Element {
 /** The list of files. */
 function ItemGroup(props: FileUploadPartProps): JSX.Element {
     const { scope, api } = context.use("ItemGroup");
+    const rest = omit(props, "unstyled");
     return scope.render("itemGroup", {
         element: "ul",
         machine: () => api().getItemGroupProps(),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** A rejected file's reason, as the drop zone's error color draws it. */
 function ErrorText(props: FileUploadPartProps): JSX.Element {
     const { scope } = context.use("Error");
+    const rest = omit(props, "unstyled");
     return scope.render("error", {
         element: "span",
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -300,6 +307,7 @@ function Preview(props: {
     return (
         <Show when={url()}>
             {(source) => (
+                // oxlint-disable-next-line jsx-a11y/alt-text -- Zag's preview image props carry `alt` ("preview of <name>")
                 <img
                     {...(api().getItemPreviewImageProps({
                         file: props.file,
@@ -336,111 +344,107 @@ function Item(props: FileUploadItemProps): JSX.Element {
     const image = () => !rejected() && isPreviewable(props.file);
     const upload = () =>
         fileUploadProgress(
+            // oxlint-disable-next-line solid/reactivity -- called at once by fileUploadProgress, inside the upload accessor
             props.progress === undefined ? undefined : () => props.progress,
             props.file,
         );
+    const merged = merge(
+        omit(
+            props,
+            "unstyled",
+            "file",
+            "type",
+            "errors",
+            "progress",
+            "icon",
+            "removeIcon",
+            "children",
+            "errorProps",
+            "listItemProps",
+            "iconButtonProps",
+            "linearProgressProps",
+        ),
+        {
+            get children() {
+                return (
+                    // oxlint-disable-next-line solid/components-return-once -- a live props getter the part reads, not a component body
+                    props.children ?? (
+                        <>
+                            <ListItem
+                                {...overDefaults<
+                                    InnerPropsOf<typeof listItemAnatomy>
+                                >(
+                                    {
+                                        ...itemTestId(root.testId),
+                                        slotProps: {
+                                            headline:
+                                                api().getItemNameProps(item()),
+                                            supportingText:
+                                                api().getItemSizeTextProps(
+                                                    item(),
+                                                ),
+                                        } as object,
+                                    },
+                                    props.listItemProps ?? {},
+                                )}
+                                leadingType={image() ? "thumbnail" : "icon"}
+                                leading={
+                                    image() ? (
+                                        <Preview
+                                            file={props.file}
+                                            type={item().type}
+                                        />
+                                    ) : (
+                                        (props.icon ?? <FileIcon />)
+                                    )
+                                }
+                                headline={props.file.name}
+                                supportingText={
+                                    rejected() ? (
+                                        <ErrorText {...props.errorProps}>
+                                            {fileUploadErrorText(
+                                                props.errors ?? [],
+                                                props.file,
+                                                root.errorMessage,
+                                            )}
+                                        </ErrorText>
+                                    ) : (
+                                        api().getFileSize(props.file)
+                                    )
+                                }
+                                trailingControl
+                                trailing={
+                                    <IconButton
+                                        {...props.iconButtonProps}
+                                        {...(api().getItemDeleteTriggerProps(
+                                            item(),
+                                        ) as object)}
+                                        aria-label={
+                                            root.removeLabel?.(props.file) ??
+                                            `Remove ${props.file.name}`
+                                        }
+                                        icon={props.removeIcon ?? <CloseIcon />}
+                                    />
+                                }
+                            />
+                            <Show when={upload().shown}>
+                                <LinearProgress
+                                    {...props.linearProgressProps}
+                                    value={upload().value}
+                                    aria-label={`Uploading ${props.file.name}`}
+                                />
+                            </Show>
+                        </>
+                    )
+                );
+            },
+        },
+    );
     return scope.render("item", {
         element: "li",
         machine: () => api().getItemProps(item()),
         unstyled: () => props.unstyled,
-        props: merge(
-            omit(
-                props,
-                "unstyled",
-                "file",
-                "type",
-                "errors",
-                "progress",
-                "icon",
-                "removeIcon",
-                "children",
-                "errorProps",
-                "listItemProps",
-                "iconButtonProps",
-                "linearProgressProps",
-            ),
-            {
-                get children() {
-                    return (
-                        props.children ?? (
-                            <>
-                                <ListItem
-                                    {...overDefaults<
-                                        InnerPropsOf<typeof listItemAnatomy>
-                                    >(
-                                        {
-                                            ...itemTestId(root.testId),
-                                            slotProps: {
-                                                headline:
-                                                    api().getItemNameProps(
-                                                        item(),
-                                                    ),
-                                                supportingText:
-                                                    api().getItemSizeTextProps(
-                                                        item(),
-                                                    ),
-                                            } as object,
-                                        },
-                                        props.listItemProps ?? {},
-                                    )}
-                                    leadingType={image() ? "thumbnail" : "icon"}
-                                    leading={
-                                        image() ? (
-                                            <Preview
-                                                file={props.file}
-                                                type={item().type}
-                                            />
-                                        ) : (
-                                            (props.icon ?? <FileIcon />)
-                                        )
-                                    }
-                                    headline={props.file.name}
-                                    supportingText={
-                                        rejected() ? (
-                                            <ErrorText {...props.errorProps}>
-                                                {fileUploadErrorText(
-                                                    props.errors ?? [],
-                                                    props.file,
-                                                    root.errorMessage,
-                                                )}
-                                            </ErrorText>
-                                        ) : (
-                                            api().getFileSize(props.file)
-                                        )
-                                    }
-                                    trailingControl
-                                    trailing={
-                                        <IconButton
-                                            {...props.iconButtonProps}
-                                            {...(api().getItemDeleteTriggerProps(
-                                                item(),
-                                            ) as object)}
-                                            aria-label={
-                                                root.removeLabel?.(
-                                                    props.file,
-                                                ) ?? `Remove ${props.file.name}`
-                                            }
-                                            icon={
-                                                props.removeIcon ?? (
-                                                    <CloseIcon />
-                                                )
-                                            }
-                                        />
-                                    }
-                                />
-                                <Show when={upload().shown}>
-                                    <LinearProgress
-                                        {...props.linearProgressProps}
-                                        value={upload().value}
-                                        aria-label={`Uploading ${props.file.name}`}
-                                    />
-                                </Show>
-                            </>
-                        )
-                    );
-                },
-            },
-        ),
+        props: merged,
     });
 }
 
@@ -478,7 +482,9 @@ function Content(props: {
     readonly slots: SlotPropsOf<PartName<Anatomy>, Instances>;
 }): JSX.Element {
     const { api, props: root } = context.use("Root");
+    // oxlint-disable-next-line solid/reactivity -- the parent's own props, passed once and never replaced
     const own = props.own;
+    // oxlint-disable-next-line solid/reactivity -- the parent's slot props function, passed once and never replaced
     const slots = props.slots;
     return (
         <>

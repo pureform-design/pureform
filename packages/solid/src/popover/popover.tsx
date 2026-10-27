@@ -96,12 +96,13 @@ function Root(props: PopoverRootProps): JSX.Element {
         testId: () => props.testId,
         unstyled: () => props.unstyled,
     });
+    const rest = omit(props, "as", ...POPOVER_DOM_ROOT_PROPS);
     return (
         <context.Provider value={{ scope, api, presence }}>
             {scope.render("root", {
                 element: "div",
                 as: () => props.as,
-                props: omit(props, "as", ...POPOVER_DOM_ROOT_PROPS),
+                props: rest,
             })}
         </context.Provider>
     );
@@ -110,12 +111,13 @@ function Root(props: PopoverRootProps): JSX.Element {
 /** The button that opens the popover, or closes it while it's open. */
 function Trigger(props: PopoverTriggerProps): JSX.Element {
     const { scope, api } = context.use("Trigger");
+    const rest = omit(props, "unstyled", "as");
     return scope.render("trigger", {
         element: "button",
         as: () => props.as,
         machine: () => api().getTriggerProps(),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "as"),
+        props: rest,
     });
 }
 
@@ -123,6 +125,7 @@ function Trigger(props: PopoverTriggerProps): JSX.Element {
  *  over. The registry doesn't style it. */
 function Positioner(props: PopoverPartProps): JSX.Element {
     const { scope, api, presence } = context.use("Positioner");
+    const rest = omit(props, "unstyled");
     return scope.render("positioner", {
         element: "div",
         machine: () =>
@@ -131,52 +134,56 @@ function Positioner(props: PopoverPartProps): JSX.Element {
                 presence.present(),
             ),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** The popover's surface. It stays while its exit animation runs. */
 function Content(props: PopoverPartProps): JSX.Element {
     const { scope, api, presence } = context.use("Content");
+    const rest = omit(props, "unstyled");
     return scope.render("content", {
         element: "div",
         ref: presence.ref,
         machine: () =>
             presentProps(api().getContentProps(), presence.present()),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** The heading, which names the popover. */
 function Title(props: PopoverPartProps): JSX.Element {
     const { scope, api } = context.use("Title");
+    const rest = omit(props, "unstyled");
     return scope.render("title", {
         element: "h2",
         machine: () => api().getTitleProps(),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** What the popover holds, which describes it. */
 function Body(props: PopoverPartProps): JSX.Element {
     const { scope, api } = context.use("Body");
+    const rest = omit(props, "unstyled");
     return scope.render("body", {
         element: "div",
         machine: () => api().getDescriptionProps(),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** The buttons at the end. */
 function Actions(props: PopoverPartProps): JSX.Element {
     const { scope } = context.use("Actions");
+    const rest = omit(props, "unstyled");
     return scope.render("actions", {
         element: "div",
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -184,12 +191,13 @@ function Actions(props: PopoverPartProps): JSX.Element {
  *  doesn't style it. */
 function CloseTrigger(props: PopoverTriggerProps): JSX.Element {
     const { scope, api } = context.use("CloseTrigger");
+    const rest = omit(props, "unstyled", "as");
     return scope.render("closeTrigger", {
         element: "button",
         as: () => props.as,
         machine: () => api().getCloseTriggerProps(),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "as"),
+        props: rest,
     });
 }
 
@@ -197,6 +205,11 @@ function CloseTrigger(props: PopoverTriggerProps): JSX.Element {
  *  in the surface's color. */
 function Caret(props: PopoverPartProps): JSX.Element {
     const { scope, api } = context.use("Caret");
+    const merged = merge(omit(props, "unstyled"), {
+        get children() {
+            return <div {...api().getArrowTipProps()} />;
+        },
+    });
     return scope.render("caret", {
         element: "div",
         machine: () => {
@@ -210,11 +223,7 @@ function Caret(props: PopoverPartProps): JSX.Element {
             };
         },
         unstyled: () => props.unstyled,
-        props: merge(omit(props, "unstyled"), {
-            get children() {
-                return <div {...api().getArrowTipProps()} />;
-            },
-        }),
+        props: merged,
     });
 }
 

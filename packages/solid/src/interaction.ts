@@ -108,11 +108,12 @@ export const useMachineButton = (
 ) => {
     const source = useOwnInteractionSource(() => props.interactionSource);
     const handlers = useInteractionHandlers(source, disabled);
+    const rest = omit(props, "unstyled", "interactionSource");
     return {
         element: "button",
         interactionSource: source,
         machine: () => combinePartProps([...machine(), handlers()]),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "interactionSource"),
+        props: rest,
     } as const;
 };

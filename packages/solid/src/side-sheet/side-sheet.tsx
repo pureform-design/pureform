@@ -86,6 +86,7 @@ const chrome = dialogParts({
             sideSheetSelection(props).coplanar === true,
         ),
     contentLayout: sideSheetContentLayout,
+    // oxlint-disable-next-line solid/reactivity -- a callback the shared part calls where it tracks, not a component
     onClose: (props) => props.onClose,
 });
 

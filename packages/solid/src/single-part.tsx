@@ -49,16 +49,17 @@ export function createSinglePart<
                     NonNullable<ComponentOptions<A>["unstyled"]>
                 >,
         });
+        const rest = omit(
+            props as Record<string, unknown>,
+            "as",
+            ...config.ownProps,
+        );
         return scope.render(root, {
             element: "span",
             as: element,
             machine: () => config.machine?.(props, element()),
             states: () => config.states?.(props),
-            props: omit(
-                props as Record<string, unknown>,
-                "as",
-                ...config.ownProps,
-            ),
+            props: rest,
         });
     };
 }

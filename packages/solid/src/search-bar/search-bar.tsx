@@ -105,13 +105,14 @@ function Root(props: SearchBarRootProps): JSX.Element {
         testId: () => props.testId,
         unstyled: () => props.unstyled,
     });
+    const rest = omit(props, "as", ...SEARCH_BAR_ROOT_PROPS);
     return (
         <context.Provider value={{ scope, api, setInput }}>
             {scope.render("root", {
                 element: "label",
                 as: () => props.as,
                 machine: () => api().getRootProps(),
-                props: omit(props, "as", ...SEARCH_BAR_ROOT_PROPS),
+                props: rest,
             })}
         </context.Provider>
     );
@@ -120,12 +121,13 @@ function Root(props: SearchBarRootProps): JSX.Element {
 /** An icon before the input, such as a magnifier, hidden from assistive technology. */
 function Leading(props: SearchBarIconProps): JSX.Element {
     const { scope } = context.use("Leading");
+    const rest = omit(props, "unstyled", "mirror");
     return scope.render("leading", {
         element: "span",
         machine: () => ({ "aria-hidden": "true" }),
         states: () => ({ mirrored: props.mirror }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "mirror"),
+        props: rest,
     });
 }
 
@@ -146,6 +148,7 @@ function Input(props: SearchBarPartProps): JSX.Element {
             );
         });
     };
+    const rest = omit(props, "unstyled");
     return scope.render("input", {
         element: "input",
         machine: () =>
@@ -155,7 +158,7 @@ function Input(props: SearchBarPartProps): JSX.Element {
             ]),
         ref: (element) => setInput(element as HTMLInputElement),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -163,11 +166,12 @@ function Input(props: SearchBarPartProps): JSX.Element {
  *  (`aria-hidden`); an action in it stays reachable. */
 function Trailing(props: SearchBarIconProps): JSX.Element {
     const { scope } = context.use("Trailing");
+    const rest = omit(props, "unstyled", "mirror");
     return scope.render("trailing", {
         element: "span",
         states: () => ({ mirrored: props.mirror }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "mirror"),
+        props: rest,
     });
 }
 

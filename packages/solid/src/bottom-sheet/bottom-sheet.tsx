@@ -101,6 +101,7 @@ const chrome = dialogParts({
     positionerLayout: (present, props) =>
         bottomSheetPositionerLayout(present, sheetModal(props)),
     contentLayout: sheetContentLayout,
+    // oxlint-disable-next-line solid/reactivity -- a callback the shared part calls where it tracks, not a component
     onClose: (props) => props.onClose,
 });
 
@@ -160,6 +161,14 @@ function DragHandle(props: BottomSheetTriggerProps): JSX.Element {
             stop?.rest(lastRest);
         },
     );
+    const merged = merge(
+        {
+            get "aria-label"() {
+                return sheetDragHandleLabel(rest().rest, rest().movable);
+            },
+        },
+        omit(props, "unstyled", "as"),
+    );
     return scope.render("dragHandle", {
         element: "button",
         as: () => props.as ?? DragHandleComponent,
@@ -207,14 +216,7 @@ function DragHandle(props: BottomSheetTriggerProps): JSX.Element {
                 normalizeProps.element(sheetDragHandleLayout),
             ),
         unstyled: () => props.unstyled,
-        props: merge(
-            {
-                get "aria-label"() {
-                    return sheetDragHandleLabel(rest().rest, rest().movable);
-                },
-            },
-            omit(props, "unstyled", "as"),
-        ),
+        props: merged,
     });
 }
 
@@ -228,6 +230,7 @@ function Body(props: BottomSheetPartProps): JSX.Element {
         gone = true;
         stop?.();
     });
+    const rest = omit(props, "unstyled");
     return scope.render("body", {
         element: "div",
         ref: (element: HTMLElement) => {
@@ -239,7 +242,7 @@ function Body(props: BottomSheetPartProps): JSX.Element {
         },
         machine: () => api().getDescriptionProps(),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 

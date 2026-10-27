@@ -49,13 +49,14 @@ function Root(props: LoadingIndicatorRootProps): JSX.Element {
         testId: () => props.testId,
         unstyled: () => props.unstyled,
     });
+    const rest = omit(props, "as", ...LOADING_INDICATOR_ROOT_PROPS);
     return (
         <context.Provider value={{ scope }}>
             {scope.render("root", {
                 element: "div",
                 as: () => props.as,
                 machine: () => loadingIndicatorRootProps(),
-                props: omit(props, "as", ...LOADING_INDICATOR_ROOT_PROPS),
+                props: rest,
             })}
         </context.Provider>
     );

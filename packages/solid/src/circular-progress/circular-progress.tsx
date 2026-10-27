@@ -54,13 +54,14 @@ function Root(props: CircularProgressRootProps): JSX.Element {
         testId: () => props.testId,
         unstyled: () => props.unstyled,
     });
+    const rest = omit(props, "as", ...PROGRESS_ROOT_PROPS);
     return (
         <context.Provider value={{ scope }}>
             {scope.render("root", {
                 element: "div",
                 as: () => props.as,
                 machine: () => progressRootProps(props),
-                props: omit(props, "as", ...PROGRESS_ROOT_PROPS),
+                props: rest,
             })}
         </context.Provider>
     );

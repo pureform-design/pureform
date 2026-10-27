@@ -40,21 +40,23 @@ export function DragHandle(props: DragHandleProps): JSX.Element {
         testId: () => props.testId as TestIdOverride<keyof Anatomy["parts"]>,
         unstyled: () => props.unstyled as Unstyled<keyof Anatomy["parts"]>,
     });
+    const merged = merge(
+        omit(props, "as", "slotProps", ...DRAG_HANDLE_ROOT_PROPS),
+        {
+            get children() {
+                const handle = merge(() => props.slotProps?.handle, {});
+                return scope.render("handle", {
+                    element: "span",
+                    machine: () => ({ "aria-hidden": "true" }),
+                    props: handle,
+                });
+            },
+        },
+    );
     return scope.render("root", {
         element: "button",
         as: () => props.as,
         machine: () => ({ type: "button" }),
-        props: merge(
-            omit(props, "as", "slotProps", ...DRAG_HANDLE_ROOT_PROPS),
-            {
-                get children() {
-                    return scope.render("handle", {
-                        element: "span",
-                        machine: () => ({ "aria-hidden": "true" }),
-                        props: merge(() => props.slotProps?.handle, {}),
-                    });
-                },
-            },
-        ),
+        props: merged,
     });
 }

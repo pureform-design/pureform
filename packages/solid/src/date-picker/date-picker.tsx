@@ -115,9 +115,11 @@ const chrome = dialogParts({
     rootProps: DATE_PICKER_ROOT_PROPS,
     selection: (props: DatePickerRootProps) => datePickerSelection(props),
     machineProps: (props: DatePickerRootProps) => ({
+        /* oxlint-disable solid/reactivity -- a callback the shared part calls where it tracks, not a component */
         closeOnEscape: props.closeOnEscape,
         closeOnInteractOutside: props.closeOnInteractOutside,
         restoreFocus: props.restoreFocus,
+        /* oxlint-enable solid/reactivity */
         // Focus goes to the chosen day (or today), the one in the tab order, as it opens.
         initialFocusEl: openDay,
     }),
@@ -143,6 +145,7 @@ function Picker(props: {
     readonly children?: JSX.Element;
 }): JSX.Element {
     const { scope, api: dialog } = chrome.context.use("Root");
+    // oxlint-disable-next-line solid/reactivity -- the dialog Root's own props, passed once and never replaced
     const root = props.root;
     const id = createUniqueId();
     const dir = useDirection();
@@ -275,10 +278,11 @@ const ModeToggle: (props: DatePickerTriggerProps) => JSX.Element =
 /** The line under the header, an `<hr>`. */
 function Divider(props: DatePickerPartProps): JSX.Element {
     const { scope } = pickerContext.use("Divider");
+    const rest = omit(props, "unstyled");
     return scope.render("divider", {
         element: "hr",
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -291,6 +295,7 @@ function ViewTrigger(props: DatePickerPartProps): JSX.Element {
     const children = {
         get children() {
             return (
+                // oxlint-disable-next-line solid/components-return-once -- a live props getter the part reads, not a component body
                 props.children ?? (
                     <>
                         {new Intl.DateTimeFormat(locale(), {
@@ -308,6 +313,7 @@ function ViewTrigger(props: DatePickerPartProps): JSX.Element {
             );
         },
     };
+    const merged = merge(omit(props, "unstyled", "children"), children);
     return scope.render("viewTrigger", {
         element: "button",
         machine: () => {
@@ -321,7 +327,7 @@ function ViewTrigger(props: DatePickerPartProps): JSX.Element {
             };
         },
         unstyled: () => props.unstyled,
-        props: merge(omit(props, "unstyled", "children"), children),
+        props: merged,
     });
 }
 
@@ -404,7 +410,9 @@ function ReadyMadeContent(props: {
     readonly slots: SlotPropsOf<PartName<Anatomy> | Extra, CalendarInstances>;
 }): JSX.Element {
     const { picker, draft, locale } = pickerContext.use("Root");
+    // oxlint-disable-next-line solid/reactivity -- the parent's own props, passed once and never replaced
     const own = props.own;
+    // oxlint-disable-next-line solid/reactivity -- the parent's slot props function, passed once and never replaced
     const slots = props.slots;
     return (
         <>

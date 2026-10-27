@@ -25,10 +25,10 @@ interface Watch {
 /** A machine's watches, and `run` for the machine's own writes. */
 export interface Tracker {
     /** Registers a watch: Zag's `track`. */
-    track(deps: unknown[], effect: VoidFunction): void;
+    readonly track: (deps: unknown[], effect: VoidFunction) => void;
     /** Runs `fn`, then every watch whose dependencies it changed. Nested runs check once, when
      *  the outermost ends. */
-    run(fn: VoidFunction): void;
+    readonly run: (fn: VoidFunction) => void;
 }
 
 export function createTracker(stopped: () => boolean): Tracker {
@@ -64,7 +64,7 @@ export function createTracker(stopped: () => boolean): Tracker {
     };
 
     return {
-        track(deps, effect) {
+        track: (deps, effect) => {
             const watch: Watch = { deps, effect };
             watches.push(watch);
             createEffect(
@@ -75,7 +75,7 @@ export function createTracker(stopped: () => boolean): Tracker {
                 },
             );
         },
-        run(fn) {
+        run: (fn) => {
             depth++;
             try {
                 fn();

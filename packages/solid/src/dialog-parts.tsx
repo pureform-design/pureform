@@ -186,6 +186,12 @@ export function dialogParts<
                 testId: () => partAsRoot<string>(props.testId, "backdrop"),
                 unstyled: () => partAsRoot<boolean>(props.unstyled, "backdrop"),
             });
+        const rest = omit(
+            props,
+            "as",
+            ...(options.rootProps as []),
+            ...DIALOG_FOCUS_PROPS,
+        );
         return (
             <context.Provider
                 value={{
@@ -210,12 +216,7 @@ export function dialogParts<
                 {scope.render(name("root"), {
                     element: "div",
                     as: () => props.as,
-                    props: omit(
-                        props,
-                        "as",
-                        ...(options.rootProps as []),
-                        ...DIALOG_FOCUS_PROPS,
-                    ),
+                    props: rest,
                 })}
             </context.Provider>
         );
@@ -231,11 +232,12 @@ export function dialogParts<
         ) =>
         (props: DialogChromePartProps): JSX.Element => {
             const { scope, api } = context.use(display);
+            const rest = omit(props, "unstyled");
             return scope.render(name(key), {
                 element,
                 ...(machine ? { machine: () => machine(api()) } : {}),
                 unstyled: () => props.unstyled,
-                props: omit(props, "unstyled"),
+                props: rest,
             });
         };
 
@@ -248,12 +250,13 @@ export function dialogParts<
         ) =>
         (props: DialogChromeTriggerProps): JSX.Element => {
             const { scope, api } = context.use(display);
+            const rest = omit(props, "unstyled", "as");
             return scope.render(name(key), {
                 element: "button",
                 as: () => props.as,
                 ...(machine ? { machine: () => machine(api()) } : {}),
                 unstyled: () => props.unstyled,
-                props: omit(props, "unstyled", "as"),
+                props: rest,
             });
         };
 
@@ -266,6 +269,7 @@ export function dialogParts<
         (key: string, display: string) =>
         (props: DialogChromeTriggerProps): JSX.Element => {
             const { scope, api, requestClose, onClose } = context.use(display);
+            const rest = omit(props, "unstyled", "as");
             return scope.render(name(key), {
                 element: "button",
                 as: () => props.as,
@@ -276,7 +280,7 @@ export function dialogParts<
                         requestClose,
                     ),
                 unstyled: () => props.unstyled,
-                props: omit(props, "unstyled", "as"),
+                props: rest,
             });
         };
 
@@ -288,6 +292,7 @@ export function dialogParts<
             props: root,
         } = context.use("Backdrop");
         const modal = () => options.modal?.(root) ?? true;
+        const rest = omit(props, "unstyled");
         return backdrop!.render("root", {
             element: "div",
             machine: () =>
@@ -298,7 +303,7 @@ export function dialogParts<
                     ),
                 ),
             unstyled: () => props.unstyled,
-            props: omit(props, "unstyled"),
+            props: rest,
         });
     }
 
@@ -310,6 +315,7 @@ export function dialogParts<
             props: root,
             setPositioner,
         } = context.use("Positioner");
+        const rest = omit(props, "unstyled");
         return scope.render(name("positioner"), {
             element: "div",
             ref: setPositioner,
@@ -321,13 +327,14 @@ export function dialogParts<
                     ),
                 ),
             unstyled: () => props.unstyled,
-            props: omit(props, "unstyled"),
+            props: rest,
         });
     }
 
     function Content(props: DialogChromePartProps): JSX.Element {
         const { scope, api, presence, setSurface } = context.use("Content");
         const layout = options.contentLayout;
+        const rest = omit(props, "unstyled");
         return scope.render(name("content"), {
             element: "div",
             ref: setSurface,
@@ -342,7 +349,7 @@ export function dialogParts<
                       )
                     : presentProps(api().getContentProps(), presence.present()),
             unstyled: () => props.unstyled,
-            props: omit(props, "unstyled"),
+            props: rest,
         });
     }
 

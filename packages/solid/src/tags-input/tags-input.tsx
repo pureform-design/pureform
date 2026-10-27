@@ -146,6 +146,24 @@ function Root(props: TagsInputRootProps): JSX.Element {
         unstyled: () => props.chipProps?.unstyled,
         indication: () => props.indication,
     });
+    const merged = merge(
+        omit(props, "as", "chipProps", ...TAGS_INPUT_ROOT_PROPS),
+        {
+            get children() {
+                return (
+                    <>
+                        {props.children}
+                        {/* Its value follows the tags: Zag's sets it once. */}
+                        <input
+                            {...api().getHiddenInputProps()}
+                            ref={setHidden}
+                            value={api().valueAsString}
+                        />
+                    </>
+                );
+            },
+        },
+    );
     return (
         <context.Provider
             value={{ scope, chips, api, sources, error: () => props.error }}
@@ -154,24 +172,7 @@ function Root(props: TagsInputRootProps): JSX.Element {
                 element: "div",
                 as: () => props.as,
                 machine: () => api().getRootProps(),
-                props: merge(
-                    omit(props, "as", "chipProps", ...TAGS_INPUT_ROOT_PROPS),
-                    {
-                        get children() {
-                            return (
-                                <>
-                                    {props.children}
-                                    {/* Its value follows the tags: Zag's sets it once. */}
-                                    <input
-                                        {...api().getHiddenInputProps()}
-                                        ref={setHidden}
-                                        value={api().valueAsString}
-                                    />
-                                </>
-                            );
-                        },
-                    },
-                ),
+                props: merged,
             })}
         </context.Provider>
     );
@@ -181,6 +182,7 @@ function Root(props: TagsInputRootProps): JSX.Element {
  *  as filled while it holds a chip, so the label floats. */
 function Container(props: TagsInputPartProps): JSX.Element {
     const { scope, api } = context.use("Container");
+    const rest = omit(props, "unstyled");
     return scope.render("container", {
         element: "div",
         machine: () => api().getContainerProps(),
@@ -188,41 +190,44 @@ function Container(props: TagsInputPartProps): JSX.Element {
             filled: tagsInputFilled(api().count, api().inputValue),
         }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** The native input the values are typed into. The label names it. */
 function Input(props: TagsInputPartProps): JSX.Element {
     const { scope, api } = context.use("Input");
+    const rest = omit(props, "unstyled");
     return scope.render("input", {
         element: "input",
         machine: () => api().getInputProps(),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** The floating label: a `<label>` for the input. */
 function Label(props: TagsInputPartProps): JSX.Element {
     const { scope, api } = context.use("Label");
+    const rest = omit(props, "unstyled");
     return scope.render("label", {
         element: "label",
         machine: () => api().getLabelProps(),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 const icon = (part: "leadingIcon" | "trailingIcon", name: string) =>
     function Icon(props: TagsInputIconProps): JSX.Element {
         const { scope } = context.use(name);
+        const rest = omit(props, "unstyled", "mirror");
         return scope.render(part, {
             element: "span",
             machine: () => ({ "aria-hidden": "true" }),
             states: () => ({ mirrored: props.mirror }),
             unstyled: () => props.unstyled,
-            props: omit(props, "unstyled", "mirror"),
+            props: rest,
         });
     };
 
@@ -250,6 +255,14 @@ function Chip(props: TagsInputChipProps): JSX.Element {
         () => api().getItemState(item()).id,
         () => props.interactionSource,
     );
+    const rest = omit(
+        props,
+        "unstyled",
+        "value",
+        "index",
+        "disabled",
+        "interactionSource",
+    );
     return (
         <chipContext.Provider value={{ item }}>
             {/* Zag's item, unstyled around the chip, keeps focus in it from blurring the field. */}
@@ -262,14 +275,7 @@ function Chip(props: TagsInputChipProps): JSX.Element {
                         hover: api().getItemState(item()).highlighted,
                     }),
                     unstyled: () => props.unstyled,
-                    props: omit(
-                        props,
-                        "unstyled",
-                        "value",
-                        "index",
-                        "disabled",
-                        "interactionSource",
-                    ),
+                    props: rest,
                 })}
             </div>
         </chipContext.Provider>
@@ -279,22 +285,24 @@ function Chip(props: TagsInputChipProps): JSX.Element {
 /** The 48px touch target around a chip. Empty. */
 function ChipTouchTarget(props: TagsInputPartProps): JSX.Element {
     const { chips } = context.use("ChipTouchTarget");
+    const rest = omit(props, "unstyled");
     return chips.render("touchTarget", {
         element: "span",
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 const decoration = (part: "avatar" | "icon", name: string) =>
     function Decoration(props: TagsInputIconProps): JSX.Element {
         const { chips, api } = context.use(name);
+        const rest = omit(props, "unstyled", "mirror");
         return chips.render(part, {
             element: "span",
             machine: () => api().getChipDecorationProps(),
             states: () => ({ mirrored: props.mirror }),
             unstyled: () => props.unstyled,
-            props: omit(props, "unstyled", "mirror"),
+            props: rest,
         });
     };
 
@@ -307,15 +315,16 @@ const ChipIcon = decoration("icon", "ChipIcon");
 function ChipLabel(props: TagsInputPartProps): JSX.Element {
     const { chips, api } = context.use("ChipLabel");
     const { item } = chipContext.use("ChipLabel");
+    const merged = merge(omit(props, "unstyled"), {
+        get children() {
+            return props.children ?? item().value;
+        },
+    });
     return chips.render("label", {
         element: "span",
         machine: () => api().getChipLabelProps(item()),
         unstyled: () => props.unstyled,
-        props: merge(omit(props, "unstyled"), {
-            get children() {
-                return props.children ?? item().value;
-            },
-        }),
+        props: merged,
     });
 }
 
@@ -366,6 +375,7 @@ function Content(props: {
     readonly slots: (part: string) => PartProps;
 }): JSX.Element {
     const { api, error } = context.use("Root");
+    // oxlint-disable-next-line solid/reactivity -- the parent's own props, passed once and never replaced
     const own = props.own;
     const avatar = (value: string) => own.chipAvatar?.(value);
     const chipIcon = (value: string) => own.chipIcon?.(value);

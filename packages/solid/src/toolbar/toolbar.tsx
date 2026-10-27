@@ -76,6 +76,15 @@ function Root(props: ToolbarRootProps): JSX.Element {
         isUnstyled(props.unstyled, "root")
             ? unstyledToolbarProvidedTokens(props, state().defaults)
             : undefined;
+    const merged = merge(omit(props, "as", "unstyled", ...TOOLBAR_ROOT_PROPS), {
+        get children() {
+            return (
+                <ProvidedTokens tokens={provided()}>
+                    {props.children}
+                </ProvidedTokens>
+            );
+        },
+    });
     return scope.render("root", {
         element: "div",
         as: () => props.as,
@@ -91,15 +100,7 @@ function Root(props: ToolbarRootProps): JSX.Element {
                 if (moved) event.preventDefault();
             },
         }),
-        props: merge(omit(props, "as", "unstyled", ...TOOLBAR_ROOT_PROPS), {
-            get children() {
-                return (
-                    <ProvidedTokens tokens={provided()}>
-                        {props.children}
-                    </ProvidedTokens>
-                );
-            },
-        }),
+        props: merged,
     });
 }
 
@@ -250,12 +251,9 @@ function ReadyMade(props: ToolbarProps): JSX.Element {
     const shown = () => count() ?? items().length;
     const overflowing = () =>
         !!props.overflow && (count() === undefined || shown() < items().length);
+    const own = omit(props, ...READY_MADE_PROPS) as ToolbarRootProps;
     return (
-        <Root
-            {...(omit(props, ...READY_MADE_PROPS) as ToolbarRootProps)}
-            {...(rootSlot as object)}
-            ref={setRoot}
-        >
+        <Root {...own} {...(rootSlot as object)} ref={setRoot}>
             <For each={items()} keyed={(item) => item.value}>
                 {(item, index) => (
                     <Element

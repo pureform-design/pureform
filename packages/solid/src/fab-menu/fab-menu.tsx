@@ -122,6 +122,7 @@ function Root(props: FabMenuRootProps): JSX.Element {
         unstyled: () => props.unstyled,
         indication: () => props.indication,
     });
+    const rest = omit(props, "as", ...FAB_MENU_ROOT_PROPS);
     return (
         <context.Provider
             value={{ scope, api, sources, presence, setItemCount }}
@@ -129,7 +130,7 @@ function Root(props: FabMenuRootProps): JSX.Element {
             {scope.render("root", {
                 element: "div",
                 as: () => props.as,
-                props: omit(props, "as", ...FAB_MENU_ROOT_PROPS),
+                props: rest,
             })}
         </context.Provider>
     );
@@ -151,6 +152,7 @@ function List(props: FabMenuPartProps): JSX.Element {
         observer.observe(element, { childList: true });
         return () => observer.disconnect();
     });
+    const rest = omit(props, "unstyled");
     return scope.render("list", {
         element: "div",
         ref: (element: HTMLElement) => {
@@ -166,7 +168,7 @@ function List(props: FabMenuPartProps): JSX.Element {
                 presence.present(),
             ),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -182,12 +184,21 @@ function Item(props: FabMenuItemProps): JSX.Element {
         valueText: props.valueText,
         disabled: props.disabled,
     });
+    const rest = omit(
+        props,
+        "unstyled",
+        "value",
+        "valueText",
+        "disabled",
+        "interactionSource",
+    );
     return scope.render("item", {
         element: "div",
         interactionSource: source,
         machine: () => ({
             ...api().getItemProps(item()),
             ...normalizeProps.element(
+                // oxlint-disable-next-line solid/reactivity -- the item's onFocus handler
                 fabMenuItemFocusProps(props.disabled, () =>
                     api().setHighlightedValue(props.value),
                 ),
@@ -195,36 +206,31 @@ function Item(props: FabMenuItemProps): JSX.Element {
         }),
         states: () => ({ hover: api().getItemState(item()).highlighted }),
         unstyled: () => props.unstyled,
-        props: omit(
-            props,
-            "unstyled",
-            "value",
-            "valueText",
-            "disabled",
-            "interactionSource",
-        ),
+        props: rest,
     });
 }
 
 /** An item's icon, hidden from assistive technology. */
 function ItemIcon(props: FabMenuIconProps): JSX.Element {
     const { scope } = context.use("ItemIcon");
+    const rest = omit(props, "unstyled", "mirror");
     return scope.render("itemIcon", {
         element: "span",
         machine: () => ({ "aria-hidden": "true" }),
         states: () => ({ mirrored: props.mirror }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "mirror"),
+        props: rest,
     });
 }
 
 /** An item's label. */
 function ItemLabel(props: FabMenuPartProps): JSX.Element {
     const { scope } = context.use("ItemLabel");
+    const rest = omit(props, "unstyled");
     return scope.render("itemLabel", {
         element: "span",
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -268,6 +274,7 @@ function ReadyMade(props: FabMenuProps): JSX.Element {
     const list = slots("list");
     const closeTrigger = slots("closeTrigger");
     return (
+        // oxlint-disable-next-line solid/reactivity -- the context's accessor, which the items read where tracked
         <ReadyMadeItemCount value={() => (props.items ?? []).length}>
             <Root {...own} {...root}>
                 <List {...list}>

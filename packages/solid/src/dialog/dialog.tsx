@@ -72,6 +72,7 @@ const chrome = dialogParts({
     selection: (props: DialogRootProps) => dialogSelection(props),
     machineProps: dialogMachineProps,
     positionerLayout: (present) => dialogPositionerLayout(present),
+    // oxlint-disable-next-line solid/reactivity -- a callback the shared part calls where it tracks, not a component
     onClose: (props) => props.onClose,
 });
 
@@ -98,12 +99,13 @@ const Content: (props: DialogPartProps) => JSX.Element = chrome.Content;
 /** An icon above the headline, hidden from assistive technology. Turn on Root's `icon` with it. */
 function Icon(props: DialogIconProps): JSX.Element {
     const { scope } = context.use("Icon");
+    const rest = omit(props, "unstyled", "mirror");
     return scope.render("icon", {
         element: "span",
         machine: () => ({ "aria-hidden": "true" }),
         states: () => ({ mirrored: props.mirror }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "mirror"),
+        props: rest,
     });
 }
 

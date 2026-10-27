@@ -229,6 +229,7 @@ function Root(props: SearchViewRootProps): JSX.Element {
             props.menuProps?.unstyled as Unstyled<PartName<MenuAnatomy>>,
         indication: () => props.indication,
     });
+    const rest = omit(props, "as", "menuProps", ...SEARCH_VIEW_ROOT_PROPS);
     return (
         <context.Provider
             value={{
@@ -255,12 +256,7 @@ function Root(props: SearchViewRootProps): JSX.Element {
                 element: "div",
                 as: () => props.as,
                 machine: () => ({ style: SEARCH_VIEW_ROOT_STYLE }),
-                props: omit(
-                    props,
-                    "as",
-                    "menuProps",
-                    ...SEARCH_VIEW_ROOT_PROPS,
-                ),
+                props: rest,
             })}
         </context.Provider>
     );
@@ -273,6 +269,7 @@ function Root(props: SearchViewRootProps): JSX.Element {
  *  ready-made's search bar is inert. The registry doesn't style it. */
 function Trigger(props: SearchViewPartProps): JSX.Element {
     const { scope, view, query, label, disabled } = context.use("Trigger");
+    const rest = omit(props, "unstyled");
     return scope.render("trigger", {
         element: "button",
         machine: () =>
@@ -293,7 +290,7 @@ function Trigger(props: SearchViewPartProps): JSX.Element {
                 },
             }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -303,6 +300,7 @@ function Trigger(props: SearchViewPartProps): JSX.Element {
 function Positioner(props: SearchViewPartProps): JSX.Element {
     const { scope, view, variant, presence, setPositioner } =
         context.use("Positioner");
+    const rest = omit(props, "unstyled");
     return scope.render("positioner", {
         element: "div",
         ref: setPositioner,
@@ -314,30 +312,32 @@ function Positioner(props: SearchViewPartProps): JSX.Element {
                 ),
             ),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** The view's surface, a modal dialog. It stays while its exit animation runs. */
 function Surface(props: SearchViewPartProps): JSX.Element {
     const { scope, view, presence } = context.use("Surface");
+    const rest = omit(props, "unstyled");
     return scope.render("surface", {
         element: "div",
         ref: presence.ref,
         machine: () =>
             presentProps(view().getContentProps(), presence.present()),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** The row at the top: the leading icon, the input, and the trailing icons. */
 function Header(props: SearchViewPartProps): JSX.Element {
     const { scope } = context.use("Header");
+    const rest = omit(props, "unstyled");
     return scope.render("header", {
         element: "div",
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -345,11 +345,12 @@ function Header(props: SearchViewPartProps): JSX.Element {
  *  view). */
 function Leading(props: SearchViewIconProps): JSX.Element {
     const { scope } = context.use("Leading");
+    const rest = omit(props, "unstyled", "mirror");
     return scope.render("leading", {
         element: "span",
         states: () => ({ mirrored: props.mirror }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "mirror"),
+        props: rest,
     });
 }
 
@@ -358,6 +359,7 @@ function Leading(props: SearchViewIconProps): JSX.Element {
  *  closes the view. */
 function Input(props: SearchViewPartProps): JSX.Element {
     const { scope, query, setInput, submit } = context.use("Input");
+    const rest = omit(props, "unstyled");
     return scope.render("input", {
         element: "input",
         machine: () =>
@@ -376,40 +378,43 @@ function Input(props: SearchViewPartProps): JSX.Element {
             ),
         ref: (element) => setInput(element as HTMLInputElement),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** After the input: icons or icon buttons, such as clear. */
 function Trailing(props: SearchViewIconProps): JSX.Element {
     const { scope } = context.use("Trailing");
+    const rest = omit(props, "unstyled", "mirror");
     return scope.render("trailing", {
         element: "span",
         states: () => ({ mirrored: props.mirror }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "mirror"),
+        props: rest,
     });
 }
 
 /** The line between the header and the content (none in the contained view). */
 function Divider(props: SearchViewPartProps): JSX.Element {
     const { scope } = context.use("Divider");
+    const rest = omit(props, "unstyled");
     return scope.render("divider", {
         element: "div",
         machine: () => ({ role: "presentation" }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** The suggestions: the combobox's listbox, or any content (results, recent searches). */
 function Content(props: SearchViewPartProps): JSX.Element {
     const { scope, query } = context.use("Content");
+    const rest = omit(props, "unstyled");
     return scope.render("content", {
         element: "div",
         machine: () => query().getContentProps(),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -421,6 +426,7 @@ function Item(props: SearchViewItemProps): JSX.Element {
         () => props.item.value,
         () => props.item.interactionSource,
     );
+    const rest = omit(props, "unstyled", "item");
     return (
         <itemContext.Provider value={{ item }}>
             {menu.render("item", {
@@ -431,7 +437,7 @@ function Item(props: SearchViewItemProps): JSX.Element {
                     hover: query().getItemState({ item: item() }).highlighted,
                 }),
                 unstyled: () => props.unstyled,
-                props: omit(props, "unstyled", "item"),
+                props: rest,
             })}
         </itemContext.Provider>
     );
@@ -443,11 +449,12 @@ const itemPart = (
 ) =>
     function ItemPart(props: SearchViewIconProps): JSX.Element {
         const { menu } = context.use(name);
+        const rest = omit(props, "unstyled", "mirror");
         return menu.render(part, {
             element: "span",
             states: () => ({ mirrored: props.mirror }),
             unstyled: () => props.unstyled,
-            props: omit(props, "unstyled", "mirror"),
+            props: rest,
         });
     };
 
@@ -464,11 +471,12 @@ const ItemTrailing = itemPart("itemTrailing", "ItemTrailing");
 function ItemLabel(props: SearchViewPartProps): JSX.Element {
     const { menu, query } = context.use("ItemLabel");
     const { item } = itemContext.use("ItemLabel");
+    const rest = omit(props, "unstyled");
     return menu.render("itemLabel", {
         element: "span",
         machine: () => query().getItemTextProps({ item: item() }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -507,7 +515,9 @@ function ReadyMadeContent(props: {
     readonly slots: ReturnType<typeof createSlotProps<Anatomy>>;
 }): JSX.Element {
     const { view, query, matches } = context.use("Root");
+    // oxlint-disable-next-line solid/reactivity -- the parent's own props, passed once and never replaced
     const own = props.own;
+    // oxlint-disable-next-line solid/reactivity -- the parent's slot props function, passed once and never replaced
     const slots = props.slots;
     const menuSlots = createSlotProps<
         MenuAnatomy,

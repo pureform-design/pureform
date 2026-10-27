@@ -101,12 +101,13 @@ function Root(props: AppBarRootProps): JSX.Element {
         testId: () => props.testId,
         unstyled: () => props.unstyled,
     });
+    const rest = omit(props, "as", "scrollTarget", ...APP_BAR_ROOT_PROPS);
     return (
         <context.Provider value={{ scope, state }}>
             {scope.render("root", {
                 element: "header",
                 as: () => props.as,
-                props: omit(props, "as", "scrollTarget", ...APP_BAR_ROOT_PROPS),
+                props: rest,
             })}
         </context.Provider>
     );
@@ -115,11 +116,12 @@ function Root(props: AppBarRootProps): JSX.Element {
 /** The navigation button before the headline, such as a back or menu icon button. */
 function Leading(props: AppBarLeadingProps): JSX.Element {
     const { scope } = context.use("Leading");
+    const rest = omit(props, "unstyled", "mirror");
     return scope.render("leading", {
         element: "div",
         states: () => ({ mirrored: props.mirror }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "mirror"),
+        props: rest,
     });
 }
 
@@ -127,40 +129,44 @@ function Leading(props: AppBarLeadingProps): JSX.Element {
  *  Trailing, so it takes a line of its own (the ready-made does). */
 function Content(props: AppBarPartProps): JSX.Element {
     const { scope } = context.use("Content");
+    const rest = omit(props, "unstyled");
     return scope.render("content", {
         element: "div",
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** The screen's title, a heading. */
 function Headline(props: AppBarPartProps): JSX.Element {
     const { scope } = context.use("Headline");
+    const rest = omit(props, "unstyled");
     return scope.render("headline", {
         element: "h1",
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** A line under the headline. */
 function Subtitle(props: AppBarPartProps): JSX.Element {
     const { scope } = context.use("Subtitle");
+    const rest = omit(props, "unstyled");
     return scope.render("subtitle", {
         element: "p",
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** Actions after the headline: icon buttons, an avatar, or an overflow menu. */
 function Trailing(props: AppBarPartProps): JSX.Element {
     const { scope } = context.use("Trailing");
+    const rest = omit(props, "unstyled");
     return scope.render("trailing", {
         element: "div",
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 

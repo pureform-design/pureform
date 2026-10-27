@@ -32,11 +32,15 @@ export function Textarea(props: TextareaProps): JSX.Element {
         testId: () => props.testId,
         unstyled: () => props.unstyled,
     });
+    const merged = merge(
+        omit(props, "as", ...TEXTAREA_ROOT_PROPS),
+        text.control,
+    );
     return scope.render("root", {
         element: "textarea",
         as: () => props.as,
         machine: text.machine,
         ref: text.ref,
-        props: merge(omit(props, "as", ...TEXTAREA_ROOT_PROPS), text.control),
+        props: merged,
     });
 }

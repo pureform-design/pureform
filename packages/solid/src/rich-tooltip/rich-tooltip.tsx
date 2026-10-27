@@ -98,6 +98,7 @@ function Root(props: RichTooltipRootProps): JSX.Element {
         testId: () => props.testId,
         unstyled: () => props.unstyled,
     });
+    const rest = omit(props, "as", ...RICH_TOOLTIP_ROOT_PROPS);
     return (
         <context.Provider
             value={{
@@ -110,7 +111,7 @@ function Root(props: RichTooltipRootProps): JSX.Element {
             {scope.render("root", {
                 element: "div",
                 as: () => props.as,
-                props: omit(props, "as", ...RICH_TOOLTIP_ROOT_PROPS),
+                props: rest,
             })}
         </context.Provider>
     );
@@ -124,13 +125,14 @@ function Trigger(props: RichTooltipTriggerProps): JSX.Element {
         (open) => api().setOpen(open),
         interactive,
     );
+    const rest = omit(props, "unstyled", "as");
     return scope.render("trigger", {
         element: "button",
         ref: longPress,
         as: () => props.as,
         machine: () => api().getTriggerProps(),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "as"),
+        props: rest,
     });
 }
 
@@ -140,6 +142,7 @@ function Trigger(props: RichTooltipTriggerProps): JSX.Element {
  *  the pointer from a trigger there and close the tooltip. The registry doesn't style it. */
 function Positioner(props: RichTooltipPartProps): JSX.Element {
     const { scope, api, presence, interactive } = context.use("Positioner");
+    const rest = omit(props, "unstyled");
     return scope.render("positioner", {
         element: "div",
         machine: () => {
@@ -158,50 +161,54 @@ function Positioner(props: RichTooltipPartProps): JSX.Element {
                   };
         },
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** The tooltip's surface, holding its text. It stays while its exit animation runs. */
 function Content(props: RichTooltipPartProps): JSX.Element {
     const { scope, api, presence } = context.use("Content");
+    const rest = omit(props, "unstyled");
     return scope.render("content", {
         element: "div",
         ref: presence.ref,
         machine: () =>
             presentProps(api().getContentProps(), presence.present()),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** The rich tooltip's title. */
 function Subhead(props: RichTooltipPartProps): JSX.Element {
     const { scope } = context.use("Subhead");
+    const rest = omit(props, "unstyled");
     return scope.render("subhead", {
         element: "span",
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** The rich tooltip's text. */
 function SupportingText(props: RichTooltipPartProps): JSX.Element {
     const { scope } = context.use("SupportingText");
+    const rest = omit(props, "unstyled");
     return scope.render("supportingText", {
         element: "span",
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** The rich tooltip's actions: text buttons. */
 function Actions(props: RichTooltipPartProps): JSX.Element {
     const { scope } = context.use("Actions");
+    const rest = omit(props, "unstyled");
     return scope.render("actions", {
         element: "div",
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -209,6 +216,11 @@ function Actions(props: RichTooltipPartProps): JSX.Element {
  *  in the surface's color. */
 function Caret(props: RichTooltipPartProps): JSX.Element {
     const { scope, api } = context.use("Caret");
+    const merged = merge(omit(props, "unstyled"), {
+        get children() {
+            return <div {...api().getArrowTipProps()} />;
+        },
+    });
     return scope.render("caret", {
         element: "div",
         machine: () => {
@@ -222,11 +234,7 @@ function Caret(props: RichTooltipPartProps): JSX.Element {
             };
         },
         unstyled: () => props.unstyled,
-        props: merge(omit(props, "unstyled"), {
-            get children() {
-                return <div {...api().getArrowTipProps()} />;
-            },
-        }),
+        props: merged,
     });
 }
 

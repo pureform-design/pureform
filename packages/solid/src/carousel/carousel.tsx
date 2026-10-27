@@ -148,6 +148,7 @@ function Root(props: CarouselRootProps): JSX.Element {
             measured,
         );
     });
+    const rest = omit(props, "as", "slideCount", ...CAROUSEL_ROOT_PROPS);
     return (
         <context.Provider
             value={{
@@ -168,7 +169,7 @@ function Root(props: CarouselRootProps): JSX.Element {
                 element: "div",
                 as: () => props.as,
                 machine: () => api().getRootProps(),
-                props: omit(props, "as", "slideCount", ...CAROUSEL_ROOT_PROPS),
+                props: rest,
             })}
         </context.Provider>
     );
@@ -179,6 +180,7 @@ function ItemGroup(props: CarouselPartProps): JSX.Element {
     const { scope, api, setMetrics } = context.use("ItemGroup");
     let stop: (() => void) | undefined;
     onCleanup(() => stop?.());
+    const rest = omit(props, "unstyled");
     return scope.render("itemGroup", {
         element: "div",
         ref: (element) => {
@@ -187,7 +189,7 @@ function ItemGroup(props: CarouselPartProps): JSX.Element {
         },
         machine: () => api().getItemGroupProps(),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -201,6 +203,7 @@ function Item(props: CarouselItemProps): JSX.Element {
             setAspectRatio(at, ratio);
         },
     );
+    const rest = omit(props, "unstyled", "index", "aspectRatio");
     return (
         <itemContext.Provider value={{ index }}>
             {scope.render("item", {
@@ -217,7 +220,7 @@ function Item(props: CarouselItemProps): JSX.Element {
                     };
                 },
                 unstyled: () => props.unstyled,
-                props: omit(props, "unstyled", "index", "aspectRatio"),
+                props: rest,
             })}
         </itemContext.Provider>
     );
@@ -232,6 +235,7 @@ function Mask(props: CarouselMaskProps): JSX.Element {
         () => String(index()),
         () => props.interactionSource,
     );
+    const rest = omit(props, "unstyled", "disabled", "interactionSource");
     return scope.render("mask", {
         element: "div",
         interactionSource: source,
@@ -250,7 +254,7 @@ function Mask(props: CarouselMaskProps): JSX.Element {
             };
         },
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "disabled", "interactionSource"),
+        props: rest,
     });
 }
 
@@ -258,6 +262,7 @@ function Mask(props: CarouselMaskProps): JSX.Element {
 function Content(props: CarouselPartProps): JSX.Element {
     const { scope, api, size, initial } = context.use("Content");
     const { index } = itemContext.use("Content");
+    const rest = omit(props, "unstyled");
     return scope.render("content", {
         element: "div",
         machine: () => {
@@ -268,7 +273,7 @@ function Content(props: CarouselPartProps): JSX.Element {
             };
         },
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 

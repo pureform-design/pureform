@@ -11,7 +11,7 @@ import type {
 } from "@pureform/binding-core";
 import * as snackbar from "@pureform/machines/snackbar";
 import type { JSX } from "@solidjs/web";
-import { createSignal, For, onCleanup } from "solid-js";
+import { createEffect, createSignal, For } from "solid-js";
 
 import { Snackbar } from "./snackbar";
 
@@ -46,7 +46,11 @@ export function SnackbarHost(props: SnackbarHostProps): JSX.Element {
     const [items, setItems] = createSignal(queue().items(), {
         equals: false,
     });
-    onCleanup(queue().subscribe(() => setItems(queue().items())));
+    // A new queue is followed, as React's `useSyncExternalStore` does: its items, then its changes.
+    createEffect(queue, (current) => {
+        setItems(current.items());
+        return current.subscribe(() => setItems(current.items()));
+    });
     const shown = () => items().slice(0, 1);
     return (
         <div
@@ -61,10 +65,12 @@ export function SnackbarHost(props: SnackbarHostProps): JSX.Element {
         >
             <For each={shown()} keyed={(item) => item.id}>
                 {(item) => {
+                    // oxlint-disable-next-line solid/reactivity -- For is keyed by id, so a row's id never changes
                     const { id } = item();
                     return (
                         <Snackbar
                             {...item().options}
+                            // oxlint-disable-next-line solid/style-prop -- a part-keyed style record, not CSS properties
                             style={{ root: { "pointer-events": "auto" } }}
                             open={item().closing === undefined}
                             onOpenChange={(details) => {

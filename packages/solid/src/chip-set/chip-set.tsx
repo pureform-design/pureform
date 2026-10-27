@@ -81,6 +81,7 @@ function Root(props: ChipSetRootProps): JSX.Element {
         testId: () => props.testId,
         unstyled: () => props.unstyled,
     });
+    const rest = omit(props, "as", ...CHIP_SET_ROOT_PROPS);
     return (
         <context.Provider value={{ api, props }}>
             {scope.render("root", {
@@ -90,7 +91,7 @@ function Root(props: ChipSetRootProps): JSX.Element {
                     props.selectable
                         ? buttonGroupRootProps(api().getRootProps())
                         : { role: "group" },
-                props: omit(props, "as", ...CHIP_SET_ROOT_PROPS),
+                props: rest,
             })}
         </context.Provider>
     );
@@ -180,11 +181,9 @@ function ReadyMade(props: ChipSetProps): JSX.Element {
         interactionSource: item.interactionSource,
     });
     const root = createSlotProps(props)("root");
+    const own = omit(props, ...READY_MADE_PROPS) as ChipSetRootProps;
     return (
-        <Root
-            {...(omit(props, ...READY_MADE_PROPS) as ChipSetRootProps)}
-            {...(root as object)}
-        >
+        <Root {...own} {...(root as object)}>
             <For each={entries()} keyed={(entry) => entry.key}>
                 {(entry, index) => (
                     <SetChip

@@ -11,6 +11,7 @@ import {
     isPresent,
     TABLE_CONTENT_PROPS,
     TABLE_ROOT_PROPS,
+    tableCellText,
     tableCellValue,
     tableRowPart,
     tableRowValue,
@@ -131,6 +132,7 @@ function Root(props: TableRootProps): JSX.Element {
         unstyled: () => props.unstyled,
         indication: () => props.indication,
     });
+    const rest = omit(props, "as", "checkboxProps", ...TABLE_ROOT_PROPS);
     return (
         <context.Provider
             value={{
@@ -144,7 +146,7 @@ function Root(props: TableRootProps): JSX.Element {
                 element: "table",
                 as: () => props.as,
                 machine: () => api().getRootProps(),
-                props: omit(props, "as", "checkboxProps", ...TABLE_ROOT_PROPS),
+                props: rest,
             })}
         </context.Provider>
     );
@@ -179,13 +181,14 @@ const FooterCell = part("footerCell", "FooterCell", "td", (api) =>
 /** The header row; its selection cell is the select-all checkbox. */
 function HeaderRow(props: TablePartProps): JSX.Element {
     const { scope, api } = context.use("HeaderRow");
+    const rest = omit(props, "unstyled");
     return (
         <RowContext value={{}}>
             {scope.render("headerRow", {
                 element: "tr",
                 machine: () => api().getHeaderRowProps(),
                 unstyled: () => props.unstyled,
-                props: omit(props, "unstyled"),
+                props: rest,
             })}
         </RowContext>
     );
@@ -201,13 +204,14 @@ export interface TableRowProps extends TablePartProps {
 /** A body row: `aria-selected` in a table with a selection. */
 function Row(props: TableRowProps): JSX.Element {
     const { scope, api, striped } = context.use("Row");
+    const rest = omit(props, "unstyled", "value", "index");
     return (
         <RowContext value={{ value: () => props.value }}>
             {scope.render(tableRowPart(props.index ?? 0, striped()), {
                 element: "tr",
                 machine: () => api().getRowProps({ value: props.value }),
                 unstyled: () => props.unstyled,
-                props: omit(props, "unstyled", "value", "index"),
+                props: rest,
             })}
         </RowContext>
     );
@@ -222,6 +226,7 @@ export interface TableHeaderCellProps extends TablePartProps {
 /** A column's header, a `<th>`: `aria-sort` on a sortable one. */
 function HeaderCell(props: TableHeaderCellProps): JSX.Element {
     const { scope, api } = context.use("HeaderCell");
+    const rest = omit(props, "unstyled", "column", "sortable");
     return scope.render("headerCell", {
         element: "th",
         machine: () =>
@@ -230,7 +235,7 @@ function HeaderCell(props: TableHeaderCellProps): JSX.Element {
                 sortable: props.sortable,
             }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "column", "sortable"),
+        props: rest,
     });
 }
 
@@ -264,15 +269,16 @@ function SelectionCell(props: TablePartProps): JSX.Element {
             />
         );
     };
+    const merged = merge(omit(props, "unstyled"), {
+        get children() {
+            return isPresent(props.children) ? props.children : box();
+        },
+    });
     return scope.render("selectionCell", {
         element: untrack(header) ? "th" : "td",
         machine: () => api().getSelectionCellProps({ header: header() }),
         unstyled: () => props.unstyled,
-        props: merge(omit(props, "unstyled"), {
-            get children() {
-                return isPresent(props.children) ? props.children : box();
-            },
-        }),
+        props: merged,
     });
 }
 
@@ -297,50 +303,51 @@ function SortHeader(props: TableSortHeaderProps): JSX.Element {
             >,
         ],
     );
+    // oxlint-disable-next-line solid/reactivity -- useMachineButton's props: one live merge, never replaced
+    const merged = merge(button.props, {
+        get children() {
+            const indicator = merge(
+                omit(props.indicatorProps ?? {}, "unstyled"),
+                { children: <ArrowUpwardIcon /> },
+            );
+            const label = merge(omit(props.labelProps ?? {}, "unstyled"), {
+                get children() {
+                    return props.children;
+                },
+            });
+            return (
+                <>
+                    {scope.render("sortLabel", {
+                        element: "span",
+                        machine: () =>
+                            api().getSortLabelProps({
+                                column: props.column,
+                            }),
+                        unstyled: () => props.labelProps?.unstyled,
+                        props: label,
+                    })}
+                    {scope.render("sortIndicator", {
+                        element: "span",
+                        machine: () =>
+                            api().getSortIndicatorProps({
+                                column: props.column,
+                            }),
+                        states: () => ({
+                            descending:
+                                api().arrowDirection(props.column) ===
+                                "descending",
+                        }),
+                        unstyled: () => props.indicatorProps?.unstyled,
+                        props: indicator,
+                    })}
+                </>
+            );
+        },
+    });
     return scope.render("sortHeader", {
         ...button,
         states: () => ({ filled: api().sort?.column === props.column }),
-        props: merge(button.props, {
-            get children() {
-                return (
-                    <>
-                        {scope.render("sortLabel", {
-                            element: "span",
-                            machine: () =>
-                                api().getSortLabelProps({
-                                    column: props.column,
-                                }),
-                            unstyled: () => props.labelProps?.unstyled,
-                            props: merge(
-                                omit(props.labelProps ?? {}, "unstyled"),
-                                {
-                                    get children() {
-                                        return props.children;
-                                    },
-                                },
-                            ),
-                        })}
-                        {scope.render("sortIndicator", {
-                            element: "span",
-                            machine: () =>
-                                api().getSortIndicatorProps({
-                                    column: props.column,
-                                }),
-                            states: () => ({
-                                descending:
-                                    api().arrowDirection(props.column) ===
-                                    "descending",
-                            }),
-                            unstyled: () => props.indicatorProps?.unstyled,
-                            props: merge(
-                                omit(props.indicatorProps ?? {}, "unstyled"),
-                                { children: <ArrowUpwardIcon /> },
-                            ),
-                        })}
-                    </>
-                );
-            },
-        }),
+        props: merged,
     });
 }
 
@@ -404,6 +411,7 @@ function ReadyMadeParts<Row>(
               )
             : entries;
     });
+    // oxlint-disable-next-line solid/reactivity -- the parent's slot props function, passed once and never replaced
     const slots = props.slots;
     const columnOf =
         (column: string, columnIndex: () => number) =>
@@ -417,6 +425,7 @@ function ReadyMadeParts<Row>(
                     </Show>
                     <For each={columns()}>
                         {(column, columnIndex) => {
+                            // oxlint-disable-next-line solid/reactivity -- passes the row's accessor on, read where tracked
                             const header = columnOf(column.id, columnIndex);
                             return (
                                 <HeaderCell
@@ -487,11 +496,9 @@ function ReadyMadeParts<Row>(
                                         >
                                             {column.cell
                                                 ? column.cell(entry.row)
-                                                : String(
-                                                      tableCellValue(
-                                                          column,
-                                                          entry.row,
-                                                      ) ?? "",
+                                                : tableCellText(
+                                                      column,
+                                                      entry.row,
                                                   )}
                                         </Cell>
                                     )}

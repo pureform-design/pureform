@@ -27,6 +27,7 @@ const Root = createSinglePart({
     ownProps: ICON_ROOT_PROPS,
     selection: iconSelection,
     machine: (props) => iconRootProps(props),
+    // oxlint-disable-next-line solid/reactivity -- a callback the shared part calls where it tracks, not a component
     states: (props) => ({ mirrored: props.mirror }),
 });
 

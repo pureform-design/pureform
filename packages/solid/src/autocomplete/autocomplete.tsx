@@ -243,6 +243,7 @@ function Root(props: AutocompleteRootProps): JSX.Element {
             props.menuProps?.unstyled as Unstyled<PartName<MenuAnatomy>>,
         indication: () => props.indication,
     });
+    const rest = omit(props, "as", "menuProps", ...AUTOCOMPLETE_ROOT_PROPS);
     return (
         <context.Provider
             value={{
@@ -261,12 +262,7 @@ function Root(props: AutocompleteRootProps): JSX.Element {
                 element: "div",
                 as: () => props.as,
                 machine: () => api().getRootProps(),
-                props: omit(
-                    props,
-                    "as",
-                    "menuProps",
-                    ...AUTOCOMPLETE_ROOT_PROPS,
-                ),
+                props: rest,
             })}
         </context.Provider>
     );
@@ -275,11 +271,12 @@ function Root(props: AutocompleteRootProps): JSX.Element {
 /** The filled or outlined box holding the icons, the input, and the label. */
 function Container(props: AutocompletePartProps): JSX.Element {
     const { scope, api } = context.use("Container");
+    const rest = omit(props, "unstyled");
     return scope.render("container", {
         element: "div",
         machine: () => api().getControlProps(),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -287,12 +284,13 @@ function Container(props: AutocompletePartProps): JSX.Element {
  *  them, Enter chooses one, and Escape closes the list. */
 function Input(props: AutocompletePartProps): JSX.Element {
     const { scope, api, setInput } = context.use("Input");
+    const rest = omit(props, "unstyled");
     return scope.render("input", {
         element: "input",
         machine: () => api().getInputProps(),
         ref: (element) => setInput(element as HTMLInputElement),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -331,12 +329,13 @@ const Content: (props: AutocompletePartProps) => JSX.Element = field.Content;
  *  isn't in the tab order: the input has the keys. */
 function TrailingIcon(props: AutocompleteIconProps): JSX.Element {
     const { scope, api } = context.use("TrailingIcon");
+    const rest = omit(props, "unstyled", "mirror");
     return scope.render("trailingIcon", {
         element: "span",
         machine: () => autocompleteTriggerProps(api().getTriggerProps()),
         states: () => ({ mirrored: props.mirror }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "mirror"),
+        props: rest,
     });
 }
 
@@ -395,15 +394,18 @@ function ReadyMadeContent(props: {
     readonly slots: (part: PartName<Anatomy>) => PartProps;
 }): JSX.Element {
     const { matches, supportingTextId, errorText } = context.use("Root");
+    // oxlint-disable-next-line solid/reactivity -- the parent's own props, passed once and never replaced
     const own = props.own;
-    const container = props.slots("container");
-    const leadingIcon = props.slots("leadingIcon");
-    const prefixText = props.slots("prefixText");
-    const suffixText = props.slots("suffixText");
-    const input = props.slots("input");
-    const label = props.slots("label");
-    const trailingIcon = props.slots("trailingIcon");
-    const supportingText = props.slots("supportingText");
+    // oxlint-disable-next-line solid/reactivity -- the parent's slot props function, passed once and never replaced
+    const slots = props.slots;
+    const container = slots("container");
+    const leadingIcon = slots("leadingIcon");
+    const prefixText = slots("prefixText");
+    const suffixText = slots("suffixText");
+    const input = slots("input");
+    const label = slots("label");
+    const trailingIcon = slots("trailingIcon");
+    const supportingText = slots("supportingText");
     const groups = createMemo(() => selectItemGroups(matches()));
     const menuSlots = createSlotProps<
         MenuAnatomy,
@@ -510,6 +512,7 @@ function ReadyMadeContent(props: {
                                         id={`${groupId}-${index}`}
                                     >
                                         <ItemGroupLabel
+                                            // oxlint-disable-next-line solid/no-react-specific-props -- a component prop for Zag's getItemGroupLabelProps({ htmlFor }), not the DOM attribute
                                             htmlFor={`${groupId}-${index}`}
                                             {...menuItemGroupLabel}
                                         >

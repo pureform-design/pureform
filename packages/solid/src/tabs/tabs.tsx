@@ -162,6 +162,7 @@ function Root(props: TabsRootProps): JSX.Element {
             });
         },
     );
+    const rest = omit(props, "as", ...TABS_ROOT_PROPS);
     return (
         <context.Provider
             value={{
@@ -176,7 +177,7 @@ function Root(props: TabsRootProps): JSX.Element {
                 element: "div",
                 as: () => props.as,
                 machine: () => api().getRootProps(),
-                props: omit(props, "as", ...TABS_ROOT_PROPS),
+                props: rest,
             })}
         </context.Provider>
     );
@@ -185,21 +186,23 @@ function Root(props: TabsRootProps): JSX.Element {
 /** The tab list: the arrow keys move between its tabs, by direction. Name it with `aria-label`. */
 function List(props: TabsPartProps): JSX.Element {
     const { scope, api } = context.use("List");
+    const rest = omit(props, "unstyled");
     return scope.render("list", {
         element: "div",
         machine: () => api().getListProps(),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** A tab's content, around its icon, label, and indicator: a primary tab's indicator spans it. */
 function TabContent(props: TabsPartProps): JSX.Element {
     const { scope } = context.use("Tab");
+    const rest = omit(props, "unstyled");
     return scope.render("tabContent", {
         element: "span",
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -212,6 +215,27 @@ function Tab(props: TabsTabProps): JSX.Element {
         () => props.value,
         () => props.interactionSource,
     );
+    const merged = merge(
+        omit(
+            props,
+            "unstyled",
+            "value",
+            "disabled",
+            "controls",
+            "interactionSource",
+            "tabContentProps",
+            "children",
+        ),
+        {
+            get children() {
+                return (
+                    <TabContent {...props.tabContentProps}>
+                        {props.children}
+                    </TabContent>
+                );
+            },
+        },
+    );
     return (
         <tabContext.Provider value={{ value: () => props.value }}>
             {scope.render("tab", {
@@ -222,27 +246,7 @@ function Tab(props: TabsTabProps): JSX.Element {
                         controls: props.controls ?? true,
                     }),
                 unstyled: () => props.unstyled,
-                props: merge(
-                    omit(
-                        props,
-                        "unstyled",
-                        "value",
-                        "disabled",
-                        "controls",
-                        "interactionSource",
-                        "tabContentProps",
-                        "children",
-                    ),
-                    {
-                        get children() {
-                            return (
-                                <TabContent {...props.tabContentProps}>
-                                    {props.children}
-                                </TabContent>
-                            );
-                        },
-                    },
-                ),
+                props: merged,
             })}
         </tabContext.Provider>
     );
@@ -252,12 +256,13 @@ function Tab(props: TabsTabProps): JSX.Element {
 function Icon(props: TabsIconProps): JSX.Element {
     const { scope } = context.use("Icon");
     tabContext.use("Icon");
+    const rest = omit(props, "unstyled", "mirror");
     return scope.render("icon", {
         element: "span",
         machine: () => ({ "aria-hidden": "true" }),
         states: () => ({ mirrored: props.mirror }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "mirror"),
+        props: rest,
     });
 }
 
@@ -265,10 +270,11 @@ function Icon(props: TabsIconProps): JSX.Element {
 function Label(props: TabsPartProps): JSX.Element {
     const { scope } = context.use("Label");
     tabContext.use("Label");
+    const rest = omit(props, "unstyled");
     return scope.render("label", {
         element: "span",
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -281,6 +287,7 @@ function Indicator(props: TabsPartProps): JSX.Element {
     onCleanup(() => {
         if (element) indicators.delete(element);
     });
+    const rest = omit(props, "unstyled");
     return scope.render("indicator", {
         element: "span",
         ref: (el) => {
@@ -288,7 +295,7 @@ function Indicator(props: TabsPartProps): JSX.Element {
             indicators.set(el, value);
         },
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -297,6 +304,7 @@ function Content(props: TabsContentPartProps): JSX.Element {
     const { scope, api } = context.use("Content");
     // A panel leaving in a page transition stays drawn while it goes.
     const page = useTransitionPage();
+    const rest = omit(props, "unstyled", "value");
     return scope.render("content", {
         element: "div",
         machine: () =>
@@ -307,7 +315,7 @@ function Content(props: TabsContentPartProps): JSX.Element {
                   }
                 : api().getContentProps({ value: props.value }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "value"),
+        props: rest,
     });
 }
 
@@ -373,7 +381,9 @@ function ReadyMadeTabs(
     },
 ): JSX.Element {
     const { api } = context.use("Tabs");
+    // oxlint-disable-next-line solid/reactivity -- the parent's items accessor, passed once and never replaced
     const items = props.items;
+    // oxlint-disable-next-line solid/reactivity -- the parent's slot props function, passed once and never replaced
     const slots = props.slotsOf;
     const panels = createMemo(() => tabsHavePanels(items()));
     const list = slots("list");
@@ -396,6 +406,7 @@ function ReadyMadeTabs(
                     keyed={(item: TabsItem<JSX.Element>) => item.value}
                 >
                     {(item) => {
+                        // oxlint-disable-next-line solid/reactivity -- passes the row's accessor on, read where tracked
                         const tab = tabOf(item);
                         return (
                             <Tab

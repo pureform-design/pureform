@@ -115,13 +115,14 @@ function Root(props: PaginatorRootProps): JSX.Element {
         testId: () => props.testId,
         unstyled: () => props.unstyled,
     });
+    const rest = omit(props, "as", ...PAGINATOR_ROOT_PROPS);
     return (
         <context.Provider value={{ scope, api, props }}>
             {scope.render("root", {
                 element: "div",
                 as: () => props.as,
                 machine: () => api().getRootProps(),
-                props: omit(props, "as", ...PAGINATOR_ROOT_PROPS),
+                props: rest,
             })}
         </context.Provider>
     );
@@ -153,15 +154,16 @@ function RangeLabel(props: PaginatorPartProps): JSX.Element {
             paginatorRange(api().page, api().pageSize, api().count),
             root.translations,
         );
+    const merged = merge(omit(props, "unstyled", "children"), {
+        get children() {
+            return props.children ?? text();
+        },
+    });
     return scope.render("rangeLabel", {
         element: "span",
         machine: () => api().getRangeLabelProps(),
         unstyled: () => props.unstyled,
-        props: merge(omit(props, "unstyled", "children"), {
-            get children() {
-                return props.children ?? text();
-            },
-        }),
+        props: merged,
     });
 }
 
@@ -198,14 +200,9 @@ const trigger = (kind: TriggerKind) =>
             }[kind]();
             return paginatorTriggerProps(zag, root.disabled);
         };
-        return scope.render(part, {
-            element: "button",
-            as: () => props.as,
-            machine,
-            states: () => ({ mirrored: props.mirror ?? true }),
-            unstyled: () => props.unstyled,
-            // The ready-made icon button draws its `icon`, not children.
-            props: merge(omit(props, "unstyled", "mirror", "as", "children"), {
+        const merged = merge(
+            omit(props, "unstyled", "mirror", "as", "children"),
+            {
                 get children() {
                     return props.as === IconButton
                         ? undefined
@@ -216,7 +213,16 @@ const trigger = (kind: TriggerKind) =>
                         ? (props.children ?? GLYPHS[kind]())
                         : undefined;
                 },
-            }),
+            },
+        );
+        return scope.render(part, {
+            element: "button",
+            as: () => props.as,
+            machine,
+            states: () => ({ mirrored: props.mirror ?? true }),
+            unstyled: () => props.unstyled,
+            // The ready-made icon button draws its `icon`, not children.
+            props: merged,
         });
     };
 

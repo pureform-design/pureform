@@ -139,13 +139,14 @@ function Root(props: StepperRootProps): JSX.Element {
         unstyled: () => props.unstyled,
         indication: () => props.indication,
     });
+    const rest = omit(props, "as", ...STEPPER_ROOT_PROPS);
     return (
         <context.Provider value={{ scope, api, sources }}>
             {scope.render("root", {
                 element: "div",
                 as: () => props.as,
                 machine: () => api().getRootProps(),
-                props: omit(props, "as", ...STEPPER_ROOT_PROPS),
+                props: rest,
             })}
         </context.Provider>
     );
@@ -155,24 +156,26 @@ function Root(props: StepperRootProps): JSX.Element {
  *  Name it with `aria-label`. */
 function List(props: StepperPartProps): JSX.Element {
     const { scope, api } = context.use("List");
+    const rest = omit(props, "unstyled");
     return scope.render("list", {
         element: "div",
         machine: () => api().getListProps(),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** A step: its header, its connector to the next, and (in a column) its content. */
 function Item(props: StepperItemProps): JSX.Element {
     const { scope, api } = context.use("Item");
+    const rest = omit(props, "unstyled", "index");
     return (
         <itemContext.Provider value={{ index: () => props.index }}>
             {scope.render("item", {
                 element: "div",
                 machine: () => api().getItemProps({ index: props.index }),
                 unstyled: () => props.unstyled,
-                props: omit(props, "unstyled", "index"),
+                props: rest,
             })}
         </itemContext.Provider>
     );
@@ -192,6 +195,15 @@ function Trigger(props: StepperTriggerProps): JSX.Element {
             props,
             api().getItemState({ index: index() }).completed,
         );
+    const rest = omit(
+        props,
+        "unstyled",
+        "error",
+        "editable",
+        "disabled",
+        "controls",
+        "interactionSource",
+    );
     return scope.render("trigger", {
         element: "button",
         interactionSource: source,
@@ -205,15 +217,7 @@ function Trigger(props: StepperTriggerProps): JSX.Element {
                 { controls: props.controls ?? true },
             ),
         unstyled: () => props.unstyled,
-        props: omit(
-            props,
-            "unstyled",
-            "error",
-            "editable",
-            "disabled",
-            "controls",
-            "interactionSource",
-        ),
+        props: rest,
     });
 }
 
@@ -222,11 +226,12 @@ function Trigger(props: StepperTriggerProps): JSX.Element {
 function Indicator(props: StepperPartProps): JSX.Element {
     const { scope, api } = context.use("Indicator");
     const { index } = itemContext.use("Indicator");
+    const rest = omit(props, "unstyled");
     return scope.render("indicator", {
         element: "span",
         machine: () => api().getIndicatorProps({ index: index() }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -242,11 +247,12 @@ const Caption = plain<StepperPartProps>("caption", "Caption");
 function Separator(props: StepperPartProps): JSX.Element {
     const { scope, api } = context.use("Separator");
     const { index } = itemContext.use("Separator");
+    const rest = omit(props, "unstyled");
     return scope.render("separator", {
         element: "div",
         machine: () => api().getSeparatorProps({ index: index() }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -256,9 +262,11 @@ function Content(props: StepperContentPartProps): JSX.Element {
     const { scope, api } = context.use("Content");
     // Whether it names its step is fixed: a row's content is outside the items.
     const named = untrack(() => props.index !== undefined);
+    // oxlint-disable-next-line solid/reactivity -- which accessor is chosen once (named is read untracked); it's called where tracked
     const index = named ? () => props.index! : itemContext.use("Content").index;
     // A step's content leaving in a page transition stays drawn while it goes.
     const page = useTransitionPage();
+    const rest = omit(props, "unstyled", "index");
     return scope.render("content", {
         element: "div",
         ref: useCollapsible(),
@@ -270,7 +278,7 @@ function Content(props: StepperContentPartProps): JSX.Element {
                   }
                 : api().getContentProps({ index: index() }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "index"),
+        props: rest,
     });
 }
 
@@ -428,6 +436,7 @@ function Steps(
     },
 ): JSX.Element {
     const { api } = context.use("Stepper");
+    // oxlint-disable-next-line solid/reactivity -- the parent's slot props function, passed once and never replaced
     const slots = props.slotsOf;
     const list = slots("list");
     const vertical = () => props.orientation === "vertical";
@@ -442,6 +451,7 @@ function Steps(
             >
                 <For each={props.items} keyed={false}>
                     {(entry: Accessor<StepperItem<JSX.Element>>, index) => {
+                        // oxlint-disable-next-line solid/reactivity -- passes the row's accessor on, read where tracked
                         const step = stepInstance(api, entry, index);
                         return (
                             <Item index={index} {...slots("item", step)}>

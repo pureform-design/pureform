@@ -240,12 +240,13 @@ function useMenu(
 /** The menu's root, a `<div>` around the trigger and the menu. The registry doesn't style it. */
 function Root(props: MenuRootProps): JSX.Element {
     const value = useMenu(props);
+    const rest = omit(props, "as", ...MENU_ROOT_PROPS);
     return (
         <context.Provider value={value}>
             {value.scope.render("root", {
                 element: "div",
                 as: () => props.as,
-                props: omit(props, "as", ...MENU_ROOT_PROPS),
+                props: rest,
             })}
         </context.Provider>
     );
@@ -256,12 +257,13 @@ function Root(props: MenuRootProps): JSX.Element {
 function Submenu(props: MenuRootProps): JSX.Element {
     const parent = context.use("Submenu");
     const value = useMenu(props, parent);
+    const rest = omit(props, "as", ...MENU_ROOT_PROPS);
     return (
         <context.Provider value={value}>
             {value.scope.render("root", {
                 element: "div",
                 as: () => props.as,
-                props: omit(props, "as", ...MENU_ROOT_PROPS),
+                props: rest,
             })}
         </context.Provider>
     );
@@ -278,12 +280,13 @@ export const MENU_TRIGGER_ATTRIBUTES = [
 /** The button that opens the menu: a click, Enter, Space, or the arrow keys up and down. */
 function Trigger(props: MenuTriggerProps): JSX.Element {
     const { scope, api } = context.use("Trigger");
+    const rest = omit(props, "unstyled", "as");
     return scope.render("trigger", {
         element: "button",
         as: () => props.as,
         machine: () => api().getTriggerProps(),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "as"),
+        props: rest,
     });
 }
 
@@ -292,12 +295,13 @@ function Trigger(props: MenuTriggerProps): JSX.Element {
  *  keeps its own behaviour. The registry doesn't style it. */
 function ContextTrigger(props: MenuTriggerProps): JSX.Element {
     const { scope, api } = context.use("ContextTrigger");
+    const rest = omit(props, "unstyled", "as");
     return scope.render("contextTrigger", {
         element: "div",
         as: () => props.as,
         machine: () => api().getContextTriggerProps(),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "as"),
+        props: rest,
     });
 }
 
@@ -305,6 +309,7 @@ function ContextTrigger(props: MenuTriggerProps): JSX.Element {
  *  registry doesn't style it. */
 function Positioner(props: MenuPartProps): JSX.Element {
     const { scope, api, presence } = context.use("Positioner");
+    const rest = omit(props, "unstyled");
     return scope.render("positioner", {
         element: "div",
         machine: () =>
@@ -313,7 +318,7 @@ function Positioner(props: MenuPartProps): JSX.Element {
                 presence.present(),
             ),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -324,6 +329,7 @@ function Content(props: MenuPartProps): JSX.Element {
     // Its groups' first and last are marked from the DOM, so composed menus round them too.
     let stop: (() => void) | undefined;
     onCleanup(() => stop?.());
+    const rest = omit(props, "unstyled");
     return scope.render("content", {
         element: "div",
         ref: (element: HTMLElement) => {
@@ -334,13 +340,14 @@ function Content(props: MenuPartProps): JSX.Element {
         machine: () =>
             presentProps(api().getContentProps(), presence.present()),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** A group of items, named by the ItemGroupLabel whose `htmlFor` is its `id`. */
 function ItemGroup(props: MenuItemGroupProps): JSX.Element {
     const { scope, api } = context.use("ItemGroup");
+    const rest = omit(props, "unstyled", "id", "first", "last");
     return scope.render("itemGroup", {
         element: "div",
         machine: () =>
@@ -350,18 +357,19 @@ function ItemGroup(props: MenuItemGroupProps): JSX.Element {
                 last: props.last,
             }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "id", "first", "last"),
+        props: rest,
     });
 }
 
 /** A group's label. */
 function ItemGroupLabel(props: MenuItemGroupLabelProps): JSX.Element {
     const { scope, api } = context.use("ItemGroupLabel");
+    const rest = omit(props, "unstyled", "htmlFor");
     return scope.render("itemGroupLabel", {
         element: "div",
         machine: () => api().getItemGroupLabelProps({ htmlFor: props.htmlFor }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "htmlFor"),
+        props: rest,
     });
 }
 
@@ -392,6 +400,7 @@ function Item(props: MenuItemProps): JSX.Element {
                   checked: checked ?? false,
               }).highlighted;
     };
+    const rest = omit(props, "unstyled", ...MENU_ITEM_PROPS);
     return (
         <itemContext.Provider value={{ value: () => props.value }}>
             {scope.render("item", {
@@ -400,7 +409,7 @@ function Item(props: MenuItemProps): JSX.Element {
                 machine: () => menuItemMachineProps(api(), item()),
                 states: () => ({ hover: highlighted() }),
                 unstyled: () => props.unstyled,
-                props: omit(props, "unstyled", ...MENU_ITEM_PROPS),
+                props: rest,
             })}
         </itemContext.Provider>
     );
@@ -417,6 +426,7 @@ function TriggerItem(props: MenuPartProps): JSX.Element {
     }
     const value = () => child.api().getTriggerProps().id as string;
     const source = parent.sources.item(value, () => undefined);
+    const rest = omit(props, "unstyled");
     return (
         <context.Provider value={parent}>
             <itemContext.Provider value={{ value }}>
@@ -431,7 +441,7 @@ function TriggerItem(props: MenuPartProps): JSX.Element {
                             child.api().open,
                     }),
                     unstyled: () => props.unstyled,
-                    props: omit(props, "unstyled"),
+                    props: rest,
                 })}
             </itemContext.Provider>
         </context.Provider>
@@ -442,12 +452,13 @@ function TriggerItem(props: MenuPartProps): JSX.Element {
 function ItemLeading(props: MenuIconProps): JSX.Element {
     const { scope } = context.use("ItemLeading");
     itemContext.use("ItemLeading");
+    const rest = omit(props, "unstyled", "mirror");
     return scope.render("itemLeading", {
         element: "span",
         machine: () => ({ "aria-hidden": "true" }),
         states: () => ({ mirrored: props.mirror }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "mirror"),
+        props: rest,
     });
 }
 
@@ -455,10 +466,11 @@ function ItemLeading(props: MenuIconProps): JSX.Element {
 function ItemContent(props: MenuPartProps): JSX.Element {
     const { scope } = context.use("ItemContent");
     itemContext.use("ItemContent");
+    const rest = omit(props, "unstyled");
     return scope.render("itemContent", {
         element: "span",
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -466,10 +478,11 @@ function ItemContent(props: MenuPartProps): JSX.Element {
 function ItemSupportingText(props: MenuPartProps): JSX.Element {
     const { scope } = context.use("ItemSupportingText");
     itemContext.use("ItemSupportingText");
+    const rest = omit(props, "unstyled");
     return scope.render("itemSupportingText", {
         element: "span",
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -477,10 +490,11 @@ function ItemSupportingText(props: MenuPartProps): JSX.Element {
 function ItemLabel(props: MenuPartProps): JSX.Element {
     const { scope } = context.use("ItemLabel");
     itemContext.use("ItemLabel");
+    const rest = omit(props, "unstyled");
     return scope.render("itemLabel", {
         element: "span",
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -488,12 +502,13 @@ function ItemLabel(props: MenuPartProps): JSX.Element {
 function ItemTrailing(props: MenuIconProps): JSX.Element {
     const { scope } = context.use("ItemTrailing");
     itemContext.use("ItemTrailing");
+    const rest = omit(props, "unstyled", "mirror");
     return scope.render("itemTrailing", {
         element: "span",
         machine: () => ({ "aria-hidden": "true" }),
         states: () => ({ mirrored: props.mirror }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "mirror"),
+        props: rest,
     });
 }
 
@@ -501,10 +516,11 @@ function ItemTrailing(props: MenuIconProps): JSX.Element {
 function ItemTrailingText(props: MenuPartProps): JSX.Element {
     const { scope } = context.use("ItemTrailingText");
     itemContext.use("ItemTrailingText");
+    const rest = omit(props, "unstyled");
     return scope.render("itemTrailingText", {
         element: "span",
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -966,6 +982,7 @@ function ReadyMade(props: MenuProps): JSX.Element {
                                 <ItemGroup {...itemGroup} id={group().id}>
                                     <Show when={isPresent(group().label)}>
                                         <ItemGroupLabel
+                                            // oxlint-disable-next-line solid/no-react-specific-props -- a component prop for Zag's getItemGroupLabelProps({ htmlFor }), not the DOM attribute
                                             htmlFor={group().id}
                                             {...itemGroupLabel}
                                         >

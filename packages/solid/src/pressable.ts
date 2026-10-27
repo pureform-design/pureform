@@ -45,8 +45,6 @@ export function usePressable(
         ...machineProps(),
         ...selected.machineProps(),
     }));
-    return {
-        api: createMemo(() => button.connect(service, normalizeProps)),
-        source,
-    };
+    const api = createMemo(() => button.connect(service, normalizeProps));
+    return { api, source };
 }

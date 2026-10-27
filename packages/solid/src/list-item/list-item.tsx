@@ -199,6 +199,7 @@ function Root(props: ListItemRootProps): JSX.Element {
         interactionSource: source,
         interactive,
     });
+    const rest = omit(props, "as", ...LIST_ITEM_ROOT_PROPS);
     return (
         <context.Provider value={{ scope }}>
             {scope.render("root", {
@@ -219,7 +220,7 @@ function Root(props: ListItemRootProps): JSX.Element {
                 ...(swipe
                     ? { states: () => ({ pressed: swipe.dragging() }) }
                     : {}),
-                props: omit(props, "as", ...LIST_ITEM_ROOT_PROPS),
+                props: rest,
             })}
         </context.Provider>
     );
@@ -230,6 +231,7 @@ const iconPart = (part: "leading" | "trailing", name: string) =>
         (use) => ({
             scope: context.use(use).scope,
             machine: (props) =>
+                // oxlint-disable-next-line solid/reactivity -- a callback the shared part calls where it tracks, not a component
                 props.control ? undefined : { "aria-hidden": "true" },
         }),
         name,
@@ -251,10 +253,11 @@ const textPart = (
 ) =>
     function TextPart(props: ListItemPartProps): JSX.Element {
         const { scope } = context.use(name);
+        const rest = omit(props, "unstyled");
         return scope.render(part, {
             element,
             unstyled: () => props.unstyled,
-            props: omit(props, "unstyled"),
+            props: rest,
         });
     };
 
@@ -304,19 +307,20 @@ function Frame(props: ListItemFrameProps): JSX.Element {
         testId: () => props.testId,
     });
     // The swipe's tokens go on the frame, which Root and Action inherit.
+    const rest = omit(
+        props,
+        "unstyled",
+        "position",
+        "testId",
+        ...LIST_ITEM_FRAME_PROPS,
+    );
     return (
         <frameContext.Provider value={{ scope, swipe }}>
             {scope.render("frame", {
                 element: "div",
                 machine: () => ({ style: scope.classes().root?.style }),
                 unstyled: () => props.unstyled,
-                props: omit(
-                    props,
-                    "unstyled",
-                    "position",
-                    "testId",
-                    ...LIST_ITEM_FRAME_PROPS,
-                ),
+                props: rest,
             })}
         </frameContext.Provider>
     );
@@ -326,11 +330,12 @@ function Frame(props: ListItemFrameProps): JSX.Element {
  *  out of reach of assistive technology and the keyboard until it's revealed. */
 function Action(props: ListItemPartProps): JSX.Element {
     const { scope, swipe } = frameContext.use("Action");
+    const rest = omit(props, "unstyled");
     return scope.render("action", {
         element: "div",
         machine: () => ({ inert: !swipe.revealed() }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 // The ready-made's parts for content that can come and go: the leading and trailing parts build
@@ -345,15 +350,17 @@ const OptionalTrailingText = whenPresent(TrailingText);
  *  while the item is expanded, hidden from assistive technology. */
 function Indicator(props: ListItemPartProps): JSX.Element {
     const { scope } = context.use("Indicator");
+    const merged = merge(omit(props, "unstyled"), {
+        get children() {
+            // oxlint-disable-next-line solid/components-return-once -- a live props getter the part reads, not a component body
+            return props.children ?? <ExpandIcon />;
+        },
+    });
     return scope.render("indicator", {
         element: "span",
         machine: () => ({ "aria-hidden": "true" }),
         unstyled: () => props.unstyled,
-        props: merge(omit(props, "unstyled"), {
-            get children() {
-                return props.children ?? <ExpandIcon />;
-            },
-        }),
+        props: merged,
     });
 }
 
@@ -401,21 +408,22 @@ function Expandable(props: ListItemExpandableProps): JSX.Element {
  *  while collapsed, named by Root. */
 function Region(props: ListItemPartProps): JSX.Element {
     const expand = expandContext.use("Region");
+    const merged = merge(omit(props, "unstyled", "children"), {
+        get children() {
+            return (
+                <expandContext.Provider value={null}>
+                    {props.children}
+                </expandContext.Provider>
+            );
+        },
+    });
     return expand.scope.render("region", {
         element: "div",
         ref: useCollapsible(),
         machine: () => expand.api().getItemContentProps(expandItem(undefined)),
         unstyled: () => props.unstyled,
         // The items inside are its content, not more headers.
-        props: merge(omit(props, "unstyled", "children"), {
-            get children() {
-                return (
-                    <expandContext.Provider value={null}>
-                        {props.children}
-                    </expandContext.Provider>
-                );
-            },
-        }),
+        props: merged,
     });
 }
 
@@ -457,6 +465,7 @@ function ReadyMade(props: ListItemProps): JSX.Element {
         swipeable
             ? inFrame(props, slots, () => row(props, slots, expandable))
             : row(props, slots, expandable);
+    // oxlint-disable-next-line solid/components-return-once -- `expandable` is read once at setup (untracked); a Show would add a row's memo
     if (!expandable) return framed();
     const region = slots("region");
     return (

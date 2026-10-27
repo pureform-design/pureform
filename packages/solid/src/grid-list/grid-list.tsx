@@ -61,6 +61,7 @@ function Root(props: GridListRootProps): JSX.Element {
         testId: () => props.testId,
         unstyled: () => props.unstyled,
     });
+    const rest = omit(props, "as", ...GRID_LIST_ROOT_PROPS);
     return (
         <context.Provider value={{ scope }}>
             {scope.render("root", {
@@ -71,7 +72,7 @@ function Root(props: GridListRootProps): JSX.Element {
                     props.as === "ul" || props.as === "ol"
                         ? undefined
                         : gridListRootProps(),
-                props: omit(props, "as", ...GRID_LIST_ROOT_PROPS),
+                props: rest,
             })}
         </context.Provider>
     );
@@ -81,22 +82,24 @@ function Root(props: GridListRootProps): JSX.Element {
  *  width with the gutter as padding. Put a `Content` in it. */
 function Tile(props: GridListTileProps): JSX.Element {
     const { scope } = context.use("Tile");
+    const rest = omit(props, "as", "unstyled");
     return scope.render("tile", {
         element: "div",
         as: () => props.as,
         machine: () => (props.as === "li" ? undefined : gridListTileProps()),
         unstyled: () => props.unstyled,
-        props: omit(props, "as", "unstyled"),
+        props: rest,
     });
 }
 
 /** The tile's picture, an `<img>` that fills it and crops to cover. Give it `alt`. */
 function Media(props: GridListMediaProps): JSX.Element {
     const { scope } = context.use("Media");
+    const rest = omit(props, "unstyled");
     return scope.render("media", {
         element: "img",
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 

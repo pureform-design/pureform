@@ -29,12 +29,13 @@ export const pickerAction =
             );
             if (!event.defaultPrevented) run();
         };
+        const rest = omit(props, "as", "onClick");
         return (
             <Dynamic
                 component={props.as ?? "button"}
                 type="button"
                 disabled={off?.()}
-                {...omit(props, "as", "onClick")}
+                {...rest}
                 onClick={onClick}
             />
         );

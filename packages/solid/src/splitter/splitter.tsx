@@ -151,6 +151,7 @@ function Root(props: SplitterRootProps): JSX.Element {
                 ? -event.clientX
                 : event.clientX
             : event.clientY;
+    const rest = omit(props, "as", ...SPLITTER_ROOT_PROPS);
     return (
         <context.Provider value={{ scope, api, drag, along, measure }}>
             {scope.render("root", {
@@ -160,7 +161,7 @@ function Root(props: SplitterRootProps): JSX.Element {
                     root = element;
                 },
                 machine: () => api().getRootProps(),
-                props: omit(props, "as", ...SPLITTER_ROOT_PROPS),
+                props: rest,
             })}
         </context.Provider>
     );
@@ -169,11 +170,12 @@ function Root(props: SplitterRootProps): JSX.Element {
 /** A pane. Its content scrolls natively when it overflows. */
 function Panel(props: SplitterPanelProps): JSX.Element {
     const { scope, api } = context.use("Panel");
+    const rest = omit(props, "id", "unstyled");
     return scope.render("panel", {
         element: "div",
         machine: () => api().getPanelProps({ id: props.id }),
         unstyled: () => props.unstyled,
-        props: omit(props, "id", "unstyled"),
+        props: rest,
     });
 }
 
@@ -181,6 +183,23 @@ function Panel(props: SplitterPanelProps): JSX.Element {
 function ResizeTrigger(props: SplitterResizeTriggerProps): JSX.Element {
     const { scope, api, drag, along, measure } = context.use("ResizeTrigger");
     const trigger = () => ({ id: props.id, disabled: props.disabled });
+    const merged = merge(
+        omit(props, "id", "label", "disabled", "unstyled", "indicatorProps"),
+        {
+            get children() {
+                const indicator = omit(props.indicatorProps ?? {}, "unstyled");
+                return scope.render("resizeTriggerIndicator", {
+                    element: "div",
+                    machine: () => ({
+                        ...api().getResizeTriggerIndicator(trigger()),
+                        "aria-hidden": "true",
+                    }),
+                    unstyled: () => props.indicatorProps?.unstyled,
+                    props: indicator,
+                });
+            },
+        },
+    );
     return scope.render("resizeTrigger", {
         element: "div",
         machine: () =>
@@ -210,29 +229,7 @@ function ResizeTrigger(props: SplitterResizeTriggerProps): JSX.Element {
                 },
             ]),
         unstyled: () => props.unstyled,
-        props: merge(
-            omit(
-                props,
-                "id",
-                "label",
-                "disabled",
-                "unstyled",
-                "indicatorProps",
-            ),
-            {
-                get children() {
-                    return scope.render("resizeTriggerIndicator", {
-                        element: "div",
-                        machine: () => ({
-                            ...api().getResizeTriggerIndicator(trigger()),
-                            "aria-hidden": "true",
-                        }),
-                        unstyled: () => props.indicatorProps?.unstyled,
-                        props: omit(props.indicatorProps ?? {}, "unstyled"),
-                    });
-                },
-            },
-        ),
+        props: merged,
     });
 }
 

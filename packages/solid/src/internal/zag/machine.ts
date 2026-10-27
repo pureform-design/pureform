@@ -328,7 +328,7 @@ export function useMachine<T extends MachineSchema>(
             "transition",
             sent.type,
             chosen.target || current,
-            `(${chosen.actions})`,
+            `(${chosen.actions?.join(",")})`,
         );
 
         if (target !== current) state.set(target);

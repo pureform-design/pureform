@@ -69,6 +69,7 @@ const chrome = dialogParts({
         fullscreenDialogSelection(props),
     machineProps: dialogMachineProps,
     positionerLayout: (present) => fullscreenDialogPositionerLayout(present),
+    // oxlint-disable-next-line solid/reactivity -- a callback the shared part calls where it tracks, not a component
     onClose: (props) => props.onClose,
 });
 

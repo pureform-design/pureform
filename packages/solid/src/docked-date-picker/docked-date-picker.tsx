@@ -140,6 +140,7 @@ function Root(props: DockedDatePickerRootProps): JSX.Element {
         testId: () => props.testId,
         unstyled: () => props.unstyled,
     });
+    const rest = omit(props, "as", ...DOCKED_DATE_PICKER_ROOT_PROPS);
     return (
         <context.Provider
             value={{
@@ -157,7 +158,7 @@ function Root(props: DockedDatePickerRootProps): JSX.Element {
                 element: "div",
                 as: () => props.as,
                 machine: () => api().getRootProps(),
-                props: omit(props, "as", ...DOCKED_DATE_PICKER_ROOT_PROPS),
+                props: rest,
             })}
         </context.Provider>
     );
@@ -167,12 +168,13 @@ function Root(props: DockedDatePickerRootProps): JSX.Element {
  *  input holds text, so the label floats. */
 function Container(props: DockedDatePickerPartProps): JSX.Element {
     const { scope, api, filled } = context.use("Container");
+    const rest = omit(props, "unstyled");
     return scope.render("container", {
         element: "div",
         machine: () => api().getControlProps(),
         states: () => ({ filled: filled() }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -182,6 +184,7 @@ function Input(props: DockedDatePickerPartProps): JSX.Element {
     const { scope, api, setText } = context.use("Input");
     let element: HTMLInputElement | undefined;
     const read = () => setText(element?.value ?? "");
+    const rest = omit(props, "unstyled");
     return scope.render("input", {
         element: "input",
         ref: (node) => {
@@ -193,7 +196,7 @@ function Input(props: DockedDatePickerPartProps): JSX.Element {
                 { onInput: read, onFocusOut: () => setTimeout(read) },
             ]),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -219,15 +222,20 @@ function TrailingIcon(props: DockedDatePickerIconProps): JSX.Element {
     const { scope, api } = context.use("TrailingIcon");
     const children = {
         get children() {
+            // oxlint-disable-next-line solid/components-return-once -- a live props getter the part reads, not a component body
             return props.children ?? <CalendarIcon />;
         },
     };
+    const merged = merge(
+        omit(props, "unstyled", "mirror", "children"),
+        children,
+    );
     return scope.render("trailingIcon", {
         element: "button",
         machine: () => api().getTriggerProps(),
         states: () => ({ mirrored: props.mirror }),
         unstyled: () => props.unstyled,
-        props: merge(omit(props, "unstyled", "mirror", "children"), children),
+        props: merged,
     });
 }
 
@@ -235,25 +243,27 @@ function TrailingIcon(props: DockedDatePickerIconProps): JSX.Element {
  *  The registry doesn't style it. */
 function Positioner(props: DockedDatePickerPartProps): JSX.Element {
     const { scope, api, presence } = context.use("Positioner");
+    const rest = omit(props, "unstyled");
     return scope.render("positioner", {
         element: "div",
         machine: () =>
             presentProps(api().getPositionerProps(), presence.present()),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** The calendar's popup. It stays while its exit animation runs. */
 function Content(props: DockedDatePickerPartProps): JSX.Element {
     const { scope, api, presence } = context.use("Content");
+    const rest = omit(props, "unstyled");
     return scope.render("content", {
         element: "div",
         ref: presence.ref,
         machine: () =>
             presentProps(api().getContentProps(), presence.present()),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -274,6 +284,7 @@ const viewButton = (
         const children = {
             get children() {
                 return (
+                    // oxlint-disable-next-line solid/components-return-once -- a live props getter the part reads, not a component body
                     props.children ?? (
                         <>
                             {view === "month"
@@ -296,6 +307,7 @@ const viewButton = (
                 );
             },
         };
+        const merged = merge(omit(props, "unstyled", "children"), children);
         return scope.render(part, {
             element: "button",
             machine: () => ({
@@ -306,7 +318,7 @@ const viewButton = (
                     api().setView(api().view === view ? "day" : view),
             }),
             unstyled: () => props.unstyled,
-            props: merge(omit(props, "unstyled", "children"), children),
+            props: merged,
         });
     };
 
@@ -381,7 +393,9 @@ function ReadyMadeContent(props: {
     readonly slots: SlotPropsOf<PartName<Anatomy> | "cell", CalendarInstances>;
 }): JSX.Element {
     const { api, supportingTextId, locale } = context.use("Root");
+    // oxlint-disable-next-line solid/reactivity -- the parent's own props, passed once and never replaced
     const own = props.own;
+    // oxlint-disable-next-line solid/reactivity -- the parent's slot props function, passed once and never replaced
     const slots = props.slots;
     const view = () => api().view;
     return (

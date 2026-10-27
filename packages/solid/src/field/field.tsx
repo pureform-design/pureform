@@ -92,51 +92,49 @@ export function Field(props: FieldProps): JSX.Element {
         testId: () => props.testId,
         unstyled: () => props.unstyled,
     });
+    const merged = merge(
+        omit(
+            props,
+            "as",
+            "children",
+            "labelProps",
+            "inputProps",
+            "descriptionProps",
+            "errorTextProps",
+            ...FIELD_ROOT_PROPS,
+        ),
+        {
+            get children() {
+                // oxlint-disable-next-line solid/components-return-once -- a live props getter the part reads, not a component body
+                return readyMade() ? (
+                    <>
+                        <Show when={isPresent(props.label)}>
+                            <Label {...props.labelProps}>{props.label}</Label>
+                        </Show>
+                        <Input {...props.inputProps} />
+                        <Show when={isPresent(props.description)}>
+                            <Description {...props.descriptionProps}>
+                                {props.description}
+                            </Description>
+                        </Show>
+                        <Show when={isPresent(props.error)}>
+                            <ErrorText {...props.errorTextProps}>
+                                {props.error}
+                            </ErrorText>
+                        </Show>
+                    </>
+                ) : (
+                    props.children
+                );
+            },
+        },
+    );
     return (
         <FieldContext value={{ state, describe }}>
             {scope.render("root", {
                 element: "div",
                 as: () => props.as,
-                props: merge(
-                    omit(
-                        props,
-                        "as",
-                        "children",
-                        "labelProps",
-                        "inputProps",
-                        "descriptionProps",
-                        "errorTextProps",
-                        ...FIELD_ROOT_PROPS,
-                    ),
-                    {
-                        get children() {
-                            return readyMade() ? (
-                                <>
-                                    <Show when={isPresent(props.label)}>
-                                        <Label {...props.labelProps}>
-                                            {props.label}
-                                        </Label>
-                                    </Show>
-                                    <Input {...props.inputProps} />
-                                    <Show when={isPresent(props.description)}>
-                                        <Description
-                                            {...props.descriptionProps}
-                                        >
-                                            {props.description}
-                                        </Description>
-                                    </Show>
-                                    <Show when={isPresent(props.error)}>
-                                        <ErrorText {...props.errorTextProps}>
-                                            {props.error}
-                                        </ErrorText>
-                                    </Show>
-                                </>
-                            ) : (
-                                props.children
-                            );
-                        },
-                    },
-                ),
+                props: merged,
             })}
         </FieldContext>
     );

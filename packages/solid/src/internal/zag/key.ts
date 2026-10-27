@@ -11,6 +11,7 @@ export function Key<T>(props: {
     fallback?: JSX.Element;
     children: (v: Accessor<T>, i: Accessor<number>) => JSX.Element;
 }): JSX.Element {
+    // oxlint-disable-next-line solid/reactivity -- the key is read once, as For reads keyed once
     const { by } = props;
     const keyed = typeof by === "function" ? by : (v: T) => v[by];
     return createComponent(For, {

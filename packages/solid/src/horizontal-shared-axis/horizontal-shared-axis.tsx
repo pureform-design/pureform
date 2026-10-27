@@ -61,56 +61,57 @@ function Root(props: HorizontalSharedAxisProps): JSX.Element {
             return undefined;
         return now.find((page) => page.state === "entering")?.direction;
     });
+    const merged = merge(
+        omit(props, "as", "children", ...HORIZONTAL_SHARED_AXIS_ROOT_PROPS),
+        {
+            get children() {
+                return (
+                    <>
+                        <For
+                            each={pages()}
+                            keyed={(page: TransitionPage) => page.key}
+                        >
+                            {(page) => (
+                                <TransitionPageView
+                                    page={page}
+                                    settle={settle}
+                                    content={content}
+                                    render={(ref, shown) =>
+                                        scope.render("page", {
+                                            element: "div",
+                                            ref,
+                                            machine: () =>
+                                                sharedAxisPageProps(page()),
+                                            props: {
+                                                get children() {
+                                                    return shown;
+                                                },
+                                            },
+                                        })
+                                    }
+                                />
+                            )}
+                        </For>
+                        {/* Over the page underneath while both show; the pages' stacking places it. */}
+                        <Show when={scrimDirection()}>
+                            {(direction) =>
+                                scope.render("scrim", {
+                                    element: "div",
+                                    machine: () =>
+                                        sharedAxisScrimProps(direction()),
+                                })
+                            }
+                        </Show>
+                    </>
+                );
+            },
+        },
+    );
     return scope.render("root", {
         element: "div",
         as: () => props.as,
         machine: () => pageRootProps(pages(), true),
-        props: merge(
-            omit(props, "as", "children", ...HORIZONTAL_SHARED_AXIS_ROOT_PROPS),
-            {
-                get children() {
-                    return (
-                        <>
-                            <For
-                                each={pages()}
-                                keyed={(page: TransitionPage) => page.key}
-                            >
-                                {(page) => (
-                                    <TransitionPageView
-                                        page={page}
-                                        settle={settle}
-                                        content={content}
-                                        render={(ref, shown) =>
-                                            scope.render("page", {
-                                                element: "div",
-                                                ref,
-                                                machine: () =>
-                                                    sharedAxisPageProps(page()),
-                                                props: {
-                                                    get children() {
-                                                        return shown;
-                                                    },
-                                                },
-                                            })
-                                        }
-                                    />
-                                )}
-                            </For>
-                            {/* Over the page underneath while both show; the pages' stacking places it. */}
-                            <Show when={scrimDirection()}>
-                                {(direction) =>
-                                    scope.render("scrim", {
-                                        element: "div",
-                                        machine: () =>
-                                            sharedAxisScrimProps(direction()),
-                                    })
-                                }
-                            </Show>
-                        </>
-                    );
-                },
-            },
-        ),
+        props: merged,
     });
 }
 

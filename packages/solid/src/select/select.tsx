@@ -199,6 +199,7 @@ function Root(props: SelectRootProps): JSX.Element {
             props.menuProps?.unstyled as Unstyled<PartName<MenuAnatomy>>,
         indication: () => props.indication,
     });
+    const rest = omit(props, "as", "menuProps", ...SELECT_ROOT_PROPS);
     return (
         <context.Provider
             value={{
@@ -219,7 +220,7 @@ function Root(props: SelectRootProps): JSX.Element {
                 element: "div",
                 as: () => props.as,
                 machine: () => api().getRootProps(),
-                props: omit(props, "as", "menuProps", ...SELECT_ROOT_PROPS),
+                props: rest,
             })}
         </context.Provider>
     );
@@ -228,11 +229,12 @@ function Root(props: SelectRootProps): JSX.Element {
 /** The filled or outlined box holding the icons, the input, and the label. */
 function Container(props: SelectPartProps): JSX.Element {
     const { scope, api } = context.use("Container");
+    const rest = omit(props, "unstyled");
     return scope.render("container", {
         element: "div",
         machine: () => api().getControlProps(),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -252,6 +254,7 @@ function Input(props: SelectPartProps): JSX.Element {
             if (input && input.defaultValue !== text) input.defaultValue = text;
         },
     );
+    const rest = omit(props, "unstyled");
     return scope.render("input", {
         element: "input",
         machine: () =>
@@ -262,7 +265,7 @@ function Input(props: SelectPartProps): JSX.Element {
             ),
         ref: (input) => setElement(input as HTMLInputElement),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -296,12 +299,13 @@ const Content: (props: SelectPartProps) => JSX.Element = field.Content;
 /** The arrow at the end, which turns over while the list is open. */
 function TrailingIcon(props: SelectIconProps): JSX.Element {
     const { scope, api } = context.use("TrailingIcon");
+    const rest = omit(props, "unstyled", "mirror");
     return scope.render("trailingIcon", {
         element: "span",
         machine: () => api().getIndicatorProps(),
         states: () => ({ mirrored: props.mirror }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "mirror"),
+        props: rest,
     });
 }
 
@@ -310,31 +314,29 @@ function TrailingIcon(props: SelectIconProps): JSX.Element {
 function HiddenSelect(props: SelectPartProps): JSX.Element {
     const { scope, api, items, resetsTo, setHiddenSelect } =
         context.use("HiddenSelect");
+    const merged = merge(omit(props, "unstyled"), {
+        get children() {
+            return (
+                <For each={items()} keyed={(item: SelectItem) => item.value}>
+                    {(item) => (
+                        <option
+                            value={item().value}
+                            disabled={item().disabled}
+                            defaultSelected={item().value === resetsTo()}
+                        >
+                            {item().label}
+                        </option>
+                    )}
+                </For>
+            );
+        },
+    });
     return scope.render("hiddenSelect", {
         element: "select",
         machine: () => selectHiddenSelectProps(api().getHiddenSelectProps()),
         ref: (element) => setHiddenSelect(element as HTMLSelectElement),
         unstyled: () => props.unstyled,
-        props: merge(omit(props, "unstyled"), {
-            get children() {
-                return (
-                    <For
-                        each={items()}
-                        keyed={(item: SelectItem) => item.value}
-                    >
-                        {(item) => (
-                            <option
-                                value={item().value}
-                                disabled={item().disabled}
-                                defaultSelected={item().value === resetsTo()}
-                            >
-                                {item().label}
-                            </option>
-                        )}
-                    </For>
-                );
-            },
-        }),
+        props: merged,
     });
 }
 
@@ -391,16 +393,19 @@ function ReadyMadeContent(props: {
     readonly slots: (part: PartName<Anatomy>) => PartProps;
 }): JSX.Element {
     const { items, supportingTextId, errorText } = context.use("Root");
+    // oxlint-disable-next-line solid/reactivity -- the parent's own props, passed once and never replaced
     const own = props.own;
-    const container = props.slots("container");
-    const leadingIcon = props.slots("leadingIcon");
-    const prefixText = props.slots("prefixText");
-    const suffixText = props.slots("suffixText");
-    const input = props.slots("input");
-    const label = props.slots("label");
-    const trailingIcon = props.slots("trailingIcon");
-    const supportingText = props.slots("supportingText");
-    const hiddenSelect = props.slots("hiddenSelect") as object;
+    // oxlint-disable-next-line solid/reactivity -- the parent's slot props function, passed once and never replaced
+    const slots = props.slots;
+    const container = slots("container");
+    const leadingIcon = slots("leadingIcon");
+    const prefixText = slots("prefixText");
+    const suffixText = slots("suffixText");
+    const input = slots("input");
+    const label = slots("label");
+    const trailingIcon = slots("trailingIcon");
+    const supportingText = slots("supportingText");
+    const hiddenSelect = slots("hiddenSelect") as object;
     const groups = createMemo(() => selectItemGroups(items()));
     const menuSlots = createSlotProps<
         MenuAnatomy,
@@ -504,6 +509,7 @@ function ReadyMadeContent(props: {
                                         id={`${groupId}-${index}`}
                                     >
                                         <ItemGroupLabel
+                                            // oxlint-disable-next-line solid/no-react-specific-props -- a component prop for Zag's getItemGroupLabelProps({ htmlFor }), not the DOM attribute
                                             htmlFor={`${groupId}-${index}`}
                                             {...menuItemGroupLabel}
                                         >

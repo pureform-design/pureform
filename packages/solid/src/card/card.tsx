@@ -94,6 +94,7 @@ function Root(props: CardRootProps): JSX.Element {
         // Root's own entry while it acts, its action area's otherwise.
         entryActive: (entry) => cardEntryActive(interactive())(entry),
     });
+    const rest = omit(props, "as", ...CARD_ROOT_PROPS);
     return (
         <context.Provider
             value={{ scope, source, disabled: () => !!props.disabled }}
@@ -108,7 +109,7 @@ function Root(props: CardRootProps): JSX.Element {
                               handlers(),
                           ])
                         : cardRootProps(props, element()),
-                props: omit(props, "as", ...CARD_ROOT_PROPS),
+                props: rest,
             })}
         </context.Provider>
     );
@@ -118,11 +119,12 @@ function Root(props: CardRootProps): JSX.Element {
  *  hit area. Empty. */
 function TouchTarget(props: CardPartProps): JSX.Element {
     const { scope } = context.use("TouchTarget");
+    const rest = omit(props, "unstyled");
     return scope.render("touchTarget", {
         element: "span",
         machine: () => ({ "aria-hidden": "true" }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -140,6 +142,7 @@ function ActionArea(props: CardActionAreaProps): JSX.Element {
     );
     const disabled = () => props.disabled ?? card.disabled();
     const handlers = useInteractionHandlers(card.source, disabled);
+    const rest = omit(props, "as", "unstyled", "disabled");
     return card.scope.render("actionArea", {
         element: "button",
         as: () => (element() === "button" ? undefined : element()),
@@ -149,7 +152,7 @@ function ActionArea(props: CardActionAreaProps): JSX.Element {
                 handlers(),
             ]),
         unstyled: () => props.unstyled,
-        props: omit(props, "as", "unstyled", "disabled"),
+        props: rest,
     });
 }
 
@@ -306,6 +309,7 @@ function ReadyMade(props: CardProps): JSX.Element {
             </Show>
         </>
     );
+    const actionAreaProps = omit(own, "interactive", ...CARD_ROOT_PROPS);
     return (
         <Show
             when={layout().actionArea}
@@ -327,7 +331,7 @@ function ReadyMade(props: CardProps): JSX.Element {
             >
                 <Show when={layout().headerOutside}>{header(true)}</Show>
                 <ActionArea
-                    {...omit(own, "interactive", ...CARD_ROOT_PROPS)}
+                    {...actionAreaProps}
                     disabled={props.disabled}
                     {...slots("actionArea")}
                 >

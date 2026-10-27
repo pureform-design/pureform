@@ -78,6 +78,7 @@ function Root(props: IconButtonRootProps): JSX.Element {
         indication: () => props.indication,
         interactionSource: source,
     });
+    const rest = omit(props, "as", ...ICON_BUTTON_ROOT_PROPS);
     return (
         <context.Provider value={{ scope, api }}>
             {scope.render("root", {
@@ -85,7 +86,7 @@ function Root(props: IconButtonRootProps): JSX.Element {
                 as: () => props.as,
                 machine: () => api().getRootProps(),
                 states: () => ({ pressed: api().pressed }),
-                props: omit(props, "as", ...ICON_BUTTON_ROOT_PROPS),
+                props: rest,
             })}
         </context.Provider>
     );
@@ -94,42 +95,46 @@ function Root(props: IconButtonRootProps): JSX.Element {
 /** The 48px touch target around a smaller button. Empty. */
 function TouchTarget(props: IconButtonPartProps): JSX.Element {
     const { scope } = context.use("TouchTarget");
+    const rest = omit(props, "unstyled");
     return scope.render("touchTarget", {
         element: "span",
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** The container, which takes the fill and the shape, and holds the icon. */
 function Container(props: IconButtonPartProps): JSX.Element {
     const { scope } = context.use("Container");
+    const rest = omit(props, "unstyled");
     return scope.render("container", {
         element: "span",
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** The icon's box, hidden from assistive technology. */
 function Icon(props: IconButtonIconProps): JSX.Element {
     const { scope, api } = context.use("Icon");
+    const rest = omit(props, "unstyled", "mirror");
     return scope.render("icon", {
         element: "span",
         machine: () => api().getIconProps(),
         states: () => ({ mirrored: props.mirror }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "mirror"),
+        props: rest,
     });
 }
 
 /** The outline an outlined icon button draws over its container. Empty. */
 function Outline(props: IconButtonPartProps): JSX.Element {
     const { scope } = context.use("Outline");
+    const rest = omit(props, "unstyled");
     return scope.render("outline", {
         element: "span",
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 

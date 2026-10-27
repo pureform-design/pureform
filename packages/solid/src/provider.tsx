@@ -126,6 +126,7 @@ export function PureformProvider(props: PureformProviderProps): JSX.Element {
         { name: "provider.components" },
     );
     // The theme's fields resolve each over the parent's same field, as `resolveProvider` does.
+    // oxlint-disable-next-line solid/reactivity -- fieldsOf calls it inside the memos it makes
     const view = fieldsOf((key) => {
         switch (key) {
             case "theme":

@@ -71,13 +71,14 @@ function Root(props: AvatarRootProps): JSX.Element {
         testId: () => props.testId,
         unstyled: () => props.unstyled,
     });
+    const rest = omit(props, "as", ...AVATAR_ROOT_PROPS);
     return (
         <context.Provider value={{ scope, props, loaded, setLoaded }}>
             {scope.render("root", {
                 element: "span",
                 as: () => props.as,
                 machine: () => avatarRootProps(props),
-                props: omit(props, "as", ...AVATAR_ROOT_PROPS),
+                props: rest,
             })}
         </context.Provider>
     );
@@ -99,17 +100,19 @@ function Image(props: AvatarImageProps): JSX.Element {
         }),
     }));
     const api = createMemo(() => avatar.connect(service, normalizeProps));
+    const rest = omit(props, "unstyled");
     return scope.render("image", {
         element: "img",
         machine: () => ({ ...api().getImageProps(), alt: "" }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
 /** What stands in for the picture, initials or an icon, until it has loaded and if it fails. */
 function Fallback(props: AvatarPartProps): JSX.Element {
     const { scope, loaded } = context.use("Fallback");
+    const rest = omit(props, "unstyled");
     return scope.render("fallback", {
         element: "span",
         machine: () => ({
@@ -117,7 +120,7 @@ function Fallback(props: AvatarPartProps): JSX.Element {
             "data-state": loaded() ? "hidden" : "visible",
         }),
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 

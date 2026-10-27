@@ -54,6 +54,7 @@ function Root(props: ListRootProps): JSX.Element {
         testId: () => props.testId,
         unstyled: () => props.unstyled,
     });
+    const rest = omit(props, "as", ...LIST_ROOT_PROPS);
     return (
         <context.Provider value={{ scope }}>
             <ListDefaults
@@ -66,7 +67,7 @@ function Root(props: ListRootProps): JSX.Element {
                 {scope.render("root", {
                     element: "ul",
                     as: () => props.as,
-                    props: omit(props, "as", ...LIST_ROOT_PROPS),
+                    props: rest,
                 })}
             </ListDefaults>
         </context.Provider>
@@ -76,10 +77,11 @@ function Root(props: ListRootProps): JSX.Element {
 /** The `<li>` around a list item. */
 function Item(props: ListItemWrapperProps): JSX.Element {
     const { scope } = context.use("Item");
+    const rest = omit(props, "unstyled");
     return scope.render("item", {
         element: "li",
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: rest,
     });
 }
 
@@ -150,22 +152,21 @@ function ReadyMade(props: ListProps): JSX.Element {
         props.variant === "segmented"
             ? listItemPosition(index, entries().length, true)
             : undefined;
+    const own = omit(props, ...READY_MADE_PROPS) as ListRootProps;
     return (
-        <Root
-            {...(omit(props, ...READY_MADE_PROPS) as ListRootProps)}
-            {...root}
-        >
+        <Root {...own} {...root}>
             <For each={entries()} keyed={(entry) => entry.key}>
                 {(entry, index) => {
-                    const own = createMemo(
-                        () =>
-                            overDefaults(
-                                props.listItemProps as
-                                    | ListItemProps
-                                    | undefined,
-                                omit(entry().item, "value") as ListItemProps,
-                            ) as ListItemProps,
-                    );
+                    const own = createMemo(() => {
+                        const item = omit(
+                            entry().item,
+                            "value",
+                        ) as ListItemProps;
+                        return overDefaults(
+                            props.listItemProps as ListItemProps | undefined,
+                            item,
+                        ) as ListItemProps;
+                    });
                     return (
                         <Item
                             {...slots("item", () => ({

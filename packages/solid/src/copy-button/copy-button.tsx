@@ -37,6 +37,8 @@ export type CopyButtonProps = Omit<
     | "onSelectedChange"
     | "toggle"
     | "position"
+    // The behavior's `onCopy` (the copied value) replaces the DOM's clipboard event handler.
+    | "onCopy"
 > &
     CopyButtonBehaviorProps &
     CopyButtonContentProps<JSX.Element>;
@@ -51,33 +53,28 @@ export function CopyButton(props: CopyButtonProps): JSX.Element {
     }));
     const api = createMemo(() => clipboard.connect(service, normalizeProps));
     const rest = omit(props, ...COPY_BUTTON_OWN_PROPS, "onClick");
+    const button = merge(rest, {
+        get "aria-label"() {
+            return api().getTriggerProps()["aria-label"] ?? COPY_LABEL;
+        },
+        get "data-copied"() {
+            return api().copied ? "" : undefined;
+        },
+        get icon() {
+            // oxlint-disable-next-line solid/components-return-once -- a live props getter the part reads, not a component body
+            return api().copied
+                ? (props.copiedIcon ?? <CheckIcon />)
+                : (props.icon ?? <CopyIcon />);
+        },
+        onClick: (event: MouseEvent) => {
+            (props.onClick as ((e: MouseEvent) => void) | undefined)?.(event);
+            if (!event.defaultPrevented) api().copy();
+        },
+    }) as IconButtonProps;
     return (
         <>
-            <IconButton
-                {...(merge(rest, {
-                    get "aria-label"() {
-                        return (
-                            api().getTriggerProps()["aria-label"] ?? COPY_LABEL
-                        );
-                    },
-                    get "data-copied"() {
-                        return api().copied ? "" : undefined;
-                    },
-                    get icon() {
-                        return api().copied
-                            ? (props.copiedIcon ?? <CheckIcon />)
-                            : (props.icon ?? <CopyIcon />);
-                    },
-                    onClick: (event: MouseEvent) => {
-                        (
-                            props.onClick as
-                                | ((e: MouseEvent) => void)
-                                | undefined
-                        )?.(event);
-                        if (!event.defaultPrevented) api().copy();
-                    },
-                }) as IconButtonProps)}
-            />
+            <IconButton {...button} />
+            {/* oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- a visually hidden live region; <output> would join an enclosing form's elements */}
             <span role="status" style={COPY_ANNOUNCEMENT_STYLE}>
                 {copyAnnouncement(props, api().copied)}
             </span>

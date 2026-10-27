@@ -159,6 +159,11 @@ export function createTextInput<A extends Anatomy>(config: TextInputConfig<A>) {
             testId: () => props.testId as never,
             unstyled: () => props.unstyled as never,
         });
+        const rest = omit(
+            props as Record<string, unknown>,
+            "as",
+            ...config.rootProps,
+        );
         return (
             <context.Provider
                 value={{ scope, api, setInput, secure: () => !!props.secure }}
@@ -167,11 +172,7 @@ export function createTextInput<A extends Anatomy>(config: TextInputConfig<A>) {
                     element: "div",
                     as: () => props.as,
                     machine: () => api().getRootProps(),
-                    props: omit(
-                        props as Record<string, unknown>,
-                        "as",
-                        ...config.rootProps,
-                    ),
+                    props: rest,
                 })}
             </context.Provider>
         );
@@ -181,11 +182,12 @@ export function createTextInput<A extends Anatomy>(config: TextInputConfig<A>) {
      *  states from the input inside it. */
     function Container(props: TextInputPartProps): JSX.Element {
         const { scope, api } = context.use("Container");
+        const rest = omit(props, "unstyled");
         return scope.render("container", {
             element: "div",
             states: () => ({ filled: api().filled }),
             unstyled: () => props.unstyled,
-            props: omit(props, "unstyled"),
+            props: rest,
         });
     }
 
@@ -208,6 +210,7 @@ export function createTextInput<A extends Anatomy>(config: TextInputConfig<A>) {
                 );
             });
         };
+        const rest = omit(props, "unstyled");
         return scope.render("input", {
             element: config.element,
             machine: () =>
@@ -222,18 +225,19 @@ export function createTextInput<A extends Anatomy>(config: TextInputConfig<A>) {
             ref: (element) =>
                 setInput(element as HTMLInputElement | HTMLTextAreaElement),
             unstyled: () => props.unstyled,
-            props: omit(props, "unstyled"),
+            props: rest,
         });
     }
 
     /** The floating label: a `<label>` for the input. */
     function Label(props: TextInputPartProps): JSX.Element {
         const { scope, api } = context.use("Label");
+        const rest = omit(props, "unstyled");
         return scope.render("label", {
             element: "label",
             machine: () => api().getLabelProps(),
             unstyled: () => props.unstyled,
-            props: omit(props, "unstyled"),
+            props: rest,
         });
     }
 
@@ -243,6 +247,7 @@ export function createTextInput<A extends Anatomy>(config: TextInputConfig<A>) {
             // A secure field's trailing icon is the button that shows or hides the text.
             // The element is chosen once, as `secure` is a field's kind rather than its state.
             const toggles = untrack(() => part === "trailingIcon" && secure());
+            const rest = omit(props, "unstyled", "mirror");
             return scope.render(part, {
                 element: toggles ? "button" : "span",
                 machine: () =>
@@ -254,7 +259,7 @@ export function createTextInput<A extends Anatomy>(config: TextInputConfig<A>) {
                         : { "aria-hidden": "true" },
                 states: () => ({ mirrored: props.mirror }),
                 unstyled: () => props.unstyled,
-                props: omit(props, "unstyled", "mirror"),
+                props: rest,
             });
         };
 
@@ -267,6 +272,7 @@ export function createTextInput<A extends Anatomy>(config: TextInputConfig<A>) {
     const affix = (part: "prefixText" | "suffixText", name: string) =>
         function Affix(props: TextInputPartProps): JSX.Element {
             const { scope, api } = context.use(name);
+            const rest = omit(props, "unstyled");
             return scope.render(part as never, {
                 element: "span",
                 machine: () =>
@@ -274,7 +280,7 @@ export function createTextInput<A extends Anatomy>(config: TextInputConfig<A>) {
                         ? api().getPrefixTextProps()
                         : api().getSuffixTextProps(),
                 unstyled: () => props.unstyled,
-                props: omit(props, "unstyled"),
+                props: rest,
             });
         };
 
@@ -292,11 +298,12 @@ export function createTextInput<A extends Anatomy>(config: TextInputConfig<A>) {
                 return props.children ?? api().counterText;
             },
         };
+        const merged = merge(omit(props, "unstyled"), children);
         return scope.render("counter", {
             element: "span",
             machine: () => api().getCounterProps(),
             unstyled: () => props.unstyled,
-            props: merge(omit(props, "unstyled"), children),
+            props: merged,
         });
     }
 
@@ -308,11 +315,12 @@ export function createTextInput<A extends Anatomy>(config: TextInputConfig<A>) {
                 return api().errorText ?? props.children;
             },
         };
+        const merged = merge(omit(props, "unstyled"), children);
         return scope.render("supportingText", {
             element: "span",
             machine: () => api().getSupportingTextProps(),
             unstyled: () => props.unstyled,
-            props: merge(omit(props, "unstyled"), children),
+            props: merged,
         });
     }
 
@@ -331,16 +339,19 @@ export function createTextInput<A extends Anatomy>(config: TextInputConfig<A>) {
         readonly slots: (part: string) => PartProps;
     }): JSX.Element {
         const { api, secure } = context.use("Root");
+        // oxlint-disable-next-line solid/reactivity -- the parent's own props, passed once and never replaced
         const own = props.own;
-        const container = props.slots("container");
-        const leadingIcon = props.slots("leadingIcon");
-        const prefixText = props.slots("prefixText");
-        const suffixText = props.slots("suffixText");
-        const counter = props.slots("counter");
-        const input = props.slots("input");
-        const label = props.slots("label");
-        const trailingIcon = props.slots("trailingIcon");
-        const supportingText = props.slots("supportingText");
+        // oxlint-disable-next-line solid/reactivity -- the parent's slot props function, passed once and never replaced
+        const slots = props.slots;
+        const container = slots("container");
+        const leadingIcon = slots("leadingIcon");
+        const prefixText = slots("prefixText");
+        const suffixText = slots("suffixText");
+        const counter = slots("counter");
+        const input = slots("input");
+        const label = slots("label");
+        const trailingIcon = slots("trailingIcon");
+        const supportingText = slots("supportingText");
         const showsSupporting = createMemo(
             () =>
                 isPresent(own.supportingText) || api().errorText !== undefined,
