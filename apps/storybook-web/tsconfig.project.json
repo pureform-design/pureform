@@ -9,15 +9,17 @@
         "allowImportingTsExtensions": true,
         "paths": { "$*": ["./styled-system/*"] }
     },
-    // The Solid folder has its own config (Solid's JSX); `.pureform/` holds the registry.
+    // The Solid folder has its own config (Solid's JSX); `.pureform/` holds the registry. A
+    // dotted folder needs a glob to be read as one; Storybook's Node config, `main.ts`, is
+    // `tsconfig.node.json`'s.
     "include": [
         "src",
-        ".storybook",
+        ".storybook/*.ts",
         "scripts/**/*.ts",
         "stories.config.ts",
         "vitest.config.storybook.ts",
         "vitest.config.unit.ts",
         ".pureform/**/*.*"
     ],
-    "exclude": ["src/solid"]
+    "exclude": ["src/solid", ".storybook/main.ts"]
 }

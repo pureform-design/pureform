@@ -1,0 +1,12 @@
+{
+    "extends": ["@pureform/tsconfig/base.json"],
+    "compilerOptions": {
+        "composite": true,
+        "emitDeclarationOnly": true,
+        "outDir": "./node_modules/.cache/tsconfig.client-web",
+        "skipLibCheck": false,
+        "types": []
+    },
+    "include": [],
+    "files": ["client-web.d.ts"]
+}

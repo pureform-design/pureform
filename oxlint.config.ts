@@ -1,6 +1,10 @@
 import { createConfig } from "@pureform/oxlint-config/base";
+import { ignorePatterns } from "@pureform/oxlint-config/ignores";
 import { defineConfig } from "oxlint";
 
+// The workspace's root config. Its `options` apply only while it is the root, so a package's lint
+// runs from the workspace root (`check:lint`); a package config (`packages/react`'s) is nested
+// under it and adds its plugins and rules.
 export default defineConfig({
     options: {
         reportUnusedDisableDirectives: "deny",
@@ -8,48 +12,5 @@ export default defineConfig({
         typeCheck: true,
     },
     extends: [createConfig()],
-    ignorePatterns: [
-        "./**/__generated__/**/*",
-        "./**/gen/**/*",
-        "./**/routeTree.gen.ts",
-        "./**/styled-system/**/*",
-        "./**/styled-system-studio/**/*",
-        "**/.pureform/**",
-        "./**/.cache/**/*",
-        "./**/.git/**/*",
-        "./**/.svn/**/*",
-        "./**/node_modules/**/*",
-        "./**/dist/**/*",
-        "./**/bin/**/*",
-        "./**/build/**/*",
-        "./**/_build/**/*",
-        "./**/_server/**/*",
-        "./**/coverage/**/*",
-        "./**/public/*.*",
-        "./**/.next/*.*",
-        "./**/out/*.*",
-        "./**/output/*.*",
-        "./**/.output/*.*",
-        "./**/.obj/*.*",
-        "./**/.turbo/*.*",
-        "**/turbo.lock",
-        "**/yarn.lock",
-        "**/package-lock.json",
-        "**/pnpm-lock.yaml",
-        "**/pnpm-workspace.yaml",
-        "**/yarn-error.log",
-        "**/lerna.json",
-        "**/bun.lock",
-        "**/tsconfig.json",
-        "**/tsconfig.tsbuildinfo",
-        "**/*.tsbuildinfo",
-        "**/*.config.js",
-        "./**/*.gen.*",
-        "./**/*.generated.*",
-        "./**/bin/**/*",
-        "**/render/html/template.html",
-        "./.omni/**/*",
-        "**/CHANGELOG.md",
-        "./CHANGELOG.root.md",
-    ],
+    ignorePatterns,
 });

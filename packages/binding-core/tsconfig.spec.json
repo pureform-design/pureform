@@ -1,11 +1,11 @@
 {
     "extends": ["./tsconfig.json"],
     "compilerOptions": {
+        "composite": true,
+        "emitDeclarationOnly": true,
+        "outDir": "./node_modules/.cache/tsconfig.spec",
         "types": ["vite/client"]
     },
-    "include": [
-        "${configDir}/src/**/*.spec.ts",
-        "${configDir}/src/platform-globals.d.ts"
-    ],
+    "include": ["${configDir}/src/**/*.*"],
     "exclude": []
 }

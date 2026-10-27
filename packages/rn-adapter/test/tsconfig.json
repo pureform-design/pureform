@@ -1,0 +1,7 @@
+{
+    "extends": ["@pureform/tsconfig/base.json"],
+    "compilerOptions": {
+        "noEmit": true
+    },
+    "include": ["${configDir}/**/*.ts"]
+}
