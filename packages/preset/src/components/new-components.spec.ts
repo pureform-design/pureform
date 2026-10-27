@@ -306,6 +306,7 @@ describe("progress", () => {
             asin: (n: number) => Math.asin(n) / deg,
             atan2: (y: number, x: number) => Math.atan2(y, x) / deg,
         };
+        // oxlint-disable-next-line typescript/no-implied-eval -- evaluates a calc() this test's own recipe produced, with only the math helpers in scope
         return new Function("f", `return ${js};`)(f) as number;
     };
     const rotation = (transform: unknown) =>
@@ -366,11 +367,15 @@ describe("progress", () => {
         expect(indeterminate?.stopIndicator).toEqual({ display: "none" });
         expect(indeterminate?.track?.insetInlineStart).toBe("0px");
         expect(indeterminate?.track?.backgroundColor).toBe("transparent");
-        expect(String(indeterminate?.trackBefore?.insetInlineStart)).toMatch(
-            /^calc\(-100% - var\(--components-linearProgress-gap/,
+        expect(indeterminate?.trackBefore?.insetInlineStart).toEqual(
+            expect.stringMatching(
+                /^calc\(-100% - var\(--components-linearProgress-gap/,
+            ),
         );
-        expect(String(indeterminate?.trackAfter?.insetInlineStart)).toContain(
-            "var(--components-linearProgress-indeterminateWidth",
+        expect(indeterminate?.trackAfter?.insetInlineStart).toEqual(
+            expect.stringContaining(
+                "var(--components-linearProgress-indeterminateWidth",
+            ),
         );
         expect(indeterminate?.trackAfter?.borderRadius).toBeDefined();
     });

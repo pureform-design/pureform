@@ -83,10 +83,12 @@ const expectProvided = (seen: Record<string, string>) => {
 };
 
 describe("a vibrant toolbar's and an app bar's icon buttons", () => {
+    // oxlint-disable-next-line vitest/expect-expect -- the assertions are in the expectProvided helper
     it("take its content color on Panda", async () => {
         expectProvided(await colors(pandaFns, [pandaCss]));
     });
 
+    // oxlint-disable-next-line vitest/expect-expect -- the assertions are in the expectProvided helper
     it.each(["CSS", "Tailwind"] as Adapter[])(
         "take its content color on %s",
         async (adapter) => {

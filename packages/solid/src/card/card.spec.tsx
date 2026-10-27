@@ -206,7 +206,7 @@ describe("the ready-made Card's sections", () => {
     });
 
     it("moves its action to the action area beside its actions", async () => {
-        const click = vi.fn();
+        const click = vi.fn<(event: MouseEvent) => void>();
         withRegistry(() => (
             <Card
                 as="button"

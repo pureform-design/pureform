@@ -43,8 +43,10 @@ describe("tree", () => {
     });
 
     it("maps the bindings' controllable props onto Zag's names", () => {
-        const onExpandedValueChange = vi.fn();
-        const onSelectedValueChange = vi.fn();
+        const onExpandedValueChange =
+            vi.fn<(details: { expandedValue: string[] }) => void>();
+        const onSelectedValueChange =
+            vi.fn<(details: { selectedValue: string[] }) => void>();
         expect(
             treeControlProps(
                 { defaultExpandedValue: ["src"], onExpandedValueChange },

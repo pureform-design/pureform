@@ -56,7 +56,8 @@ describe("DockedDatePicker, ready-made", () => {
     });
 
     it("sets the value from a typed date once the field loses focus", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: { readonly value: readonly string[] }) => void>();
         withRegistry(() => (
             <DockedDatePicker
                 label="Date"
@@ -80,7 +81,8 @@ describe("DockedDatePicker, ready-made", () => {
     });
 
     it("opens from the trigger, and closes on choosing a day", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: { readonly value: readonly string[] }) => void>();
         withRegistry(() => (
             <DockedDatePicker
                 label="Date"
@@ -121,6 +123,7 @@ describe("DockedDatePicker, ready-made", () => {
                 class={{
                     cell: (each) => (each.selected ? "chosen" : "plain"),
                 }}
+                // oxlint-disable-next-line solid/style-prop -- a part-keyed style record, not CSS properties
                 style={{ cell: { opacity: 0.5 } }}
             />
         ));

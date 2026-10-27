@@ -43,12 +43,12 @@ describe("dragToDismiss", () => {
         sheet.append(handle);
         document.body.append(sheet);
         // As a binding does: once it has rendered the close, a sheet still open was kept.
-        const dismiss = vi.fn((kept: () => void) =>
+        const dismiss = vi.fn<(kept: () => void) => void>((kept) =>
             queueMicrotask(() => {
                 if (sheet.getAttribute("data-state") !== "closed") kept();
             }),
         );
-        const click = vi.fn();
+        const click = vi.fn<(event: Event) => void>();
         document.addEventListener("click", click);
         stop = dragToDismiss(handle, () => sheet, dismiss, onClose, asker);
         return { sheet, handle, dismiss, click };
@@ -115,7 +115,7 @@ describe("dragToDismiss", () => {
     });
 
     it("asks onClose first: false settles it back without closing", () => {
-        const onClose = vi.fn(() => false);
+        const onClose = vi.fn<() => boolean>(() => false);
         const { sheet, handle, dismiss } = setup(onClose);
         handle.dispatchEvent(pointer("pointerdown", 100, 0));
         handle.dispatchEvent(pointer("pointermove", 350, 1000));
@@ -192,7 +192,7 @@ describe("dragToDismiss", () => {
         handle.dispatchEvent(pointer("pointermove", 350, 1000));
         handle.dispatchEvent(pointer("pointerup", 350, 2000));
         const first = answer;
-        const escape = vi.fn();
+        const escape = vi.fn<() => void>();
         asker.ask(() => new Promise<boolean>(() => {}), escape, escape);
         first(true);
         await nextChange();
@@ -234,7 +234,7 @@ describe("a sheet that rests partly open", () => {
         const handle = document.createElement("button");
         sheet.append(handle);
         document.body.append(sheet);
-        const dismiss = vi.fn();
+        const dismiss = vi.fn<(kept: () => void) => void>();
         const rests: string[] = [];
         stop = dragToDismiss(
             handle,
@@ -313,7 +313,7 @@ describe("a sheet that rests partly open", () => {
         drag(handle, 20, 20);
         expect(sheet.style.translate).toBe(`0px ${partial}px`);
         expect(dismiss).not.toHaveBeenCalled();
-        const click = vi.fn();
+        const click = vi.fn<(event: Event) => void>();
         sheet.addEventListener("click", click);
         // A press: the drag's own click came and went.
         const press = () => {
@@ -333,7 +333,7 @@ describe("a sheet that rests partly open", () => {
         const { sheet, handle, rests } = await setup(false);
         expect(sheet.style.translate).toBe("");
         expect(rests).toEqual(["expanded false"]);
-        const click = vi.fn();
+        const click = vi.fn<(event: Event) => void>();
         sheet.addEventListener("click", click);
         handle.click();
         expect(click).toHaveBeenCalledTimes(1);
@@ -402,8 +402,8 @@ describe("settleTransition", () => {
 describe("closeAsker", () => {
     it("answers yes without onClose, and acts on a boolean at once", () => {
         const asker = closeAsker();
-        const yes = vi.fn();
-        const no = vi.fn();
+        const yes = vi.fn<() => void>();
+        const no = vi.fn<() => void>();
         asker.ask(undefined, yes, no);
         asker.ask(() => false, yes, no);
         expect(yes).toHaveBeenCalledTimes(1);
@@ -412,8 +412,8 @@ describe("closeAsker", () => {
 
     it("acts on a promise when it settles, a rejection as no, unless cancelled", async () => {
         const asker = closeAsker();
-        const yes = vi.fn();
-        const no = vi.fn();
+        const yes = vi.fn<() => void>();
+        const no = vi.fn<() => void>();
         asker.ask(() => Promise.reject(new Error("no")), yes, no);
         await Promise.resolve();
         await Promise.resolve();
@@ -427,11 +427,11 @@ describe("closeAsker", () => {
 });
 
 describe("askingDismissProps", () => {
-    const event = () => ({ preventDefault: vi.fn() });
+    const event = () => ({ preventDefault: vi.fn<() => void>() });
 
     it("stops Zag's close on Escape and a press outside, asking first", () => {
-        const close = vi.fn();
-        const onClose = vi.fn(() => true);
+        const close = vi.fn<() => void>();
+        const onClose = vi.fn<() => boolean>(() => true);
         const props = askingDismissProps(onClose, {}, closeAsker(), close);
         const escape = event();
         props.onEscapeKeyDown!(escape);
@@ -444,8 +444,8 @@ describe("askingDismissProps", () => {
     });
 
     it("asks only where Zag would close, and adds nothing without onClose", () => {
-        const close = vi.fn();
-        const onClose = vi.fn(() => true);
+        const close = vi.fn<() => void>();
+        const onClose = vi.fn<() => boolean>(() => true);
         const props = askingDismissProps(
             onClose,
             { closeOnEscape: false, modal: false },

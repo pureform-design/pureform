@@ -56,7 +56,11 @@ describe("Toaster, ready-made", () => {
         await settle();
 
         const types = all(ids.root).map((root) => root.dataset.type);
-        expect(types.sort()).toEqual(["custom", "error", "warning"]);
+        expect(types.sort((a = "", b = "") => a.localeCompare(b))).toEqual([
+            "custom",
+            "error",
+            "warning",
+        ]);
         expect(
             all(ids.root).find((root) => root.dataset.type === "custom")!
                 .className,
@@ -65,7 +69,7 @@ describe("Toaster, ready-made", () => {
 
     it("runs the action, then dismisses", async () => {
         const toaster = show();
-        const onClick = vi.fn();
+        const onClick = vi.fn<() => void>();
         toaster.info({
             title: "Archived",
             duration: Infinity,

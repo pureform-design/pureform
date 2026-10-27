@@ -1,5 +1,6 @@
 import { compositeTestIds, testIds } from "@pureform/anatomy";
 import { screen } from "@testing-library/react";
+import type { ComponentProps } from "react";
 import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
@@ -64,8 +65,11 @@ describe("SplitButton, ready-made", () => {
     });
 
     it("runs the action from the leading button and opens the menu from the trailing one", async () => {
-        const onAction = vi.fn();
-        const onSelect = vi.fn();
+        const onAction = vi.fn<() => void>();
+        const onSelect =
+            vi.fn<
+                NonNullable<ComponentProps<typeof SplitButton>["onSelect"]>
+            >();
         withRegistry(
             <SplitButton
                 label="Save"
@@ -142,7 +146,8 @@ describe("FabMenu, ready-made", () => {
     });
 
     it("opens, turns the FAB into the close button, and reports the chosen item", async () => {
-        const onSelect = vi.fn();
+        const onSelect =
+            vi.fn<NonNullable<ComponentProps<typeof FabMenu>["onSelect"]>>();
         withRegistry(
             <FabMenu
                 icon="+"

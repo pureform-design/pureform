@@ -1,4 +1,5 @@
 import { testIds } from "@pureform/anatomy";
+import type { ComponentProps } from "react";
 import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
@@ -77,7 +78,10 @@ describe("ColorPicker", () => {
     });
 
     it("picks a swatch, reporting hex", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<
+                NonNullable<ComponentProps<typeof ColorPicker>["onValueChange"]>
+            >();
         withRegistry(
             <ColorPicker
                 swatches={["#006a6a"]}
@@ -94,7 +98,12 @@ describe("ColorPicker", () => {
     });
 
     it("sets the color from the hex field on Enter, and puts back text that isn't one", async () => {
-        const onValueChangeEnd = vi.fn();
+        const onValueChangeEnd =
+            vi.fn<
+                NonNullable<
+                    ComponentProps<typeof ColorPicker>["onValueChangeEnd"]
+                >
+            >();
         withRegistry(<ColorPicker onValueChangeEnd={onValueChangeEnd} />);
         await userEvent.click(hexInput());
         await userEvent.clear(hexInput());
@@ -114,7 +123,9 @@ describe("ColorPicker", () => {
 
     it("runs the user's hex input handlers after its own", async () => {
         const calls: string[] = [];
-        const onValueChangeEnd = vi.fn(() => calls.push("picker"));
+        const onValueChangeEnd = vi.fn<
+            NonNullable<ComponentProps<typeof ColorPicker>["onValueChangeEnd"]>
+        >(() => calls.push("picker"));
         withRegistry(
             <ColorPicker
                 onValueChangeEnd={onValueChangeEnd}
@@ -196,7 +207,10 @@ describe("ColorPicker", () => {
     });
 
     it("moves the hue with the arrow keys", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<
+                NonNullable<ComponentProps<typeof ColorPicker>["onValueChange"]>
+            >();
         withRegistry(
             <ColorPicker
                 defaultValue="#ff0000"

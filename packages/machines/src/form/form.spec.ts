@@ -30,7 +30,9 @@ const $ = <E extends Element = HTMLInputElement>(selector: string) =>
     document.querySelector<E>(selector)!;
 
 const formData = (form: HTMLFormElement) =>
-    [...new FormData(form)].map(([k, v]) => `${k}=${String(v)}`).join("&");
+    [...new FormData(form)]
+        .map(([k, v]) => `${k}=${typeof v === "string" ? v : v.name}`)
+        .join("&");
 
 describe("setNativeDefault", () => {
     it("sets what each native control resets to", () => {
@@ -156,7 +158,7 @@ describe("trackFormReset", () => {
 
     it("skips a reset a listener prevents", async () => {
         html(`<form><input id="text"></form>`);
-        const onReset = vi.fn();
+        const onReset = vi.fn<() => void>();
         cleanups.push(trackFormReset($("#text"), { onReset }));
         $("form").addEventListener("reset", (e) => e.preventDefault());
         $<HTMLFormElement>("form").reset();
@@ -166,7 +168,7 @@ describe("trackFormReset", () => {
 
     it("follows a control outside its form", async () => {
         html(`<form id="f"></form><input id="text" form="f">`);
-        const onReset = vi.fn();
+        const onReset = vi.fn<() => void>();
         cleanups.push(trackFormReset($("#text"), { onReset }));
         $<HTMLFormElement>("form").reset();
         await settle();
@@ -175,7 +177,7 @@ describe("trackFormReset", () => {
 
     it("stops when cleaned up, including a pending reset", async () => {
         html(`<form><input id="text"></form>`);
-        const onReset = vi.fn();
+        const onReset = vi.fn<() => void>();
         const stop = trackFormReset($("#text"), { onReset });
         $<HTMLFormElement>("form").reset();
         stop();
@@ -272,7 +274,7 @@ describe("trackFieldsetDisabled", () => {
 
     it("reports once without a fieldset", () => {
         html(`<input id="probe">`);
-        const onChange = vi.fn();
+        const onChange = vi.fn<(disabled: boolean) => void>();
         trackFieldsetDisabled($("#probe"), onChange)();
         expect(onChange).toHaveBeenCalledExactlyOnceWith(false);
     });
@@ -281,8 +283,8 @@ describe("trackFieldsetDisabled", () => {
 describe("trackFormControl", () => {
     it("tracks both halves in Zag's shape", async () => {
         html(`<form><fieldset><input id="probe"></fieldset></form>`);
-        const onFieldsetDisabledChange = vi.fn();
-        const onFormReset = vi.fn();
+        const onFieldsetDisabledChange = vi.fn<(disabled: boolean) => void>();
+        const onFormReset = vi.fn<() => void>();
         cleanups.push(
             trackFormControl($("#probe"), {
                 onFieldsetDisabledChange,
@@ -337,7 +339,8 @@ describe("wired into Zag's checkbox", () => {
     }
 
     it("puts an uncontrolled checkbox back to its default", async () => {
-        const onCheckedChange = vi.fn();
+        const onCheckedChange =
+            vi.fn<NonNullable<checkbox.Props["onCheckedChange"]>>();
         const { input, form, api } = mountCheckbox({
             defaultChecked: false,
             onCheckedChange,
@@ -359,7 +362,8 @@ describe("wired into Zag's checkbox", () => {
     });
 
     it("asks a controlled checkbox's owner, and keeps its state", async () => {
-        const onCheckedChange = vi.fn();
+        const onCheckedChange =
+            vi.fn<NonNullable<checkbox.Props["onCheckedChange"]>>();
         const { input, form, api } = mountCheckbox({
             checked: true,
             defaultChecked: false,

@@ -1,5 +1,6 @@
 import { testIds } from "@pureform/anatomy";
 import { render, screen } from "@testing-library/react";
+import type { ComponentProps } from "react";
 import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
@@ -82,7 +83,10 @@ describe("CodeField, ready-made", () => {
     });
 
     it("moves to the next cell as it's typed, and back with Backspace", async () => {
-        const onValueComplete = vi.fn();
+        const onValueComplete =
+            vi.fn<
+                NonNullable<ComponentProps<typeof CodeField>["onValueComplete"]>
+            >();
         withRegistry(
             <CodeField label="Code" onValueComplete={onValueComplete} />,
         );

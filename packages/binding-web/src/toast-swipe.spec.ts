@@ -19,9 +19,9 @@ describe("toastSwipeToDismiss", () => {
         document.body.append(toast);
         const options = {
             closable: () => closable,
-            dismiss: vi.fn(),
-            pause: vi.fn(),
-            resume: vi.fn(),
+            dismiss: vi.fn<() => void>(),
+            pause: vi.fn<() => void>(),
+            resume: vi.fn<() => void>(),
         };
         cleanup = toastSwipeToDismiss(toast, options);
         return { toast, button, ...options };

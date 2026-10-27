@@ -15,9 +15,9 @@ export interface Mounted {
     readonly host: HTMLElement;
     /** Sets props from outside, as an owner would, and waits for the render. A key set to
      *  `undefined` is passed as `undefined`. Safe to call from a component's callback. */
-    update(props: SceneProps): Promise<void>;
+    readonly update: (props: SceneProps) => Promise<void>;
     /** Removes the scene. Called for every mounted scene after each test. */
-    unmount(): void;
+    readonly unmount: () => void;
 }
 
 /** An app's interaction source, observed through the binding's `useInteractionState`. */

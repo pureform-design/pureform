@@ -62,7 +62,9 @@ describe("types", () => {
 
     it("checks part names and per-part test ids", () => {
         // @ts-expect-error: the button has no such part
-        expect(() => partTestId(buttonAnatomy, "container")).toThrow();
+        expect(() => partTestId(buttonAnatomy, "container")).toThrow(
+            /button has no part "container"/,
+        );
         // @ts-expect-error: test ids by part take the component's parts only
         partTestId(buttonAnatomy, "root", { container: "x" });
     });

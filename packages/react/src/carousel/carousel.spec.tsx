@@ -1,5 +1,6 @@
 import { testIds } from "@pureform/anatomy";
 import { carouselKeylines } from "@pureform/binding-core";
+import type { ComponentProps } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
@@ -125,7 +126,10 @@ describe("Carousel", () => {
 
     it("scrolls at once under reduced motion, and smoothly otherwise", async () => {
         for (const motion of ["reduce", "full"] as const) {
-            const onPageChange = vi.fn();
+            const onPageChange =
+                vi.fn<
+                    NonNullable<ComponentProps<typeof Carousel>["onPageChange"]>
+                >();
             render(
                 { layout: "uncontained", itemWidth: 100, onPageChange },
                 { motion },
@@ -137,8 +141,12 @@ describe("Carousel", () => {
             // Eight 100px items in a 360px row end 440px in.
             if (motion === "reduce") {
                 await frames(1);
+                // oxlint-disable-next-line vitest/no-conditional-expect -- each motion's branch asserts its outcome
                 expect(byTestId(ids.itemGroup).scrollLeft).toBe(440);
-            } else expect(scrolled).toBeLessThan(440);
+            } else {
+                // oxlint-disable-next-line vitest/no-conditional-expect -- each motion's branch asserts its outcome
+                expect(scrolled).toBeLessThan(440);
+            }
             await frames(30);
             expect(onPageChange).toHaveBeenCalled();
             document.body.innerHTML = "";

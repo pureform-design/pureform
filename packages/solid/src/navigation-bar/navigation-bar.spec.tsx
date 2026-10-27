@@ -5,6 +5,7 @@ import { userEvent } from "vitest/browser";
 
 import { NavigationBar } from ".";
 import type { NavigationBarProps } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { navigationRegistry } from "../__fixtures__/registry";
 import { NavigationRail } from "../navigation-rail";
@@ -66,7 +67,8 @@ describe("NavigationBar, ready-made", () => {
     });
 
     it("moves with a click and reports it once; controlled, it asks", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", string | null>) => void>();
         withRegistry(() => (
             <NavigationBar
                 aria-label="Main"
@@ -84,7 +86,8 @@ describe("NavigationBar, ready-made", () => {
         expect(items()[1]!.getAttribute("aria-current")).toBe("true");
         document.body.innerHTML = "";
 
-        const asked = vi.fn();
+        const asked =
+            vi.fn<(details: ChangeDetails<"value", string | null>) => void>();
         withRegistry(() => (
             <NavigationBar
                 aria-label="Main"
@@ -269,7 +272,8 @@ describe("NavigationRail", () => {
     });
 
     it("as a modal, sits in a dialog over the scrim, and closes with Escape", async () => {
-        const onOpenChange = vi.fn();
+        const onOpenChange =
+            vi.fn<(details: ChangeDetails<"open", boolean>) => void>();
         withRegistry(() => (
             <NavigationRail
                 aria-label="Main"
@@ -307,6 +311,7 @@ describe("NavigationBar and NavigationRail, keyed by destination", () => {
                     item: ({ item, selected }) =>
                         selected ? `current-${item.value}` : undefined,
                 }}
+                // oxlint-disable-next-line solid/style-prop -- a part-keyed style record, not CSS properties
                 style={{ label: ({ index }) => ({ opacity: index / 4 }) }}
                 slotProps={{
                     icon: ({ index }) => ({ title: `icon ${index}` }),
@@ -335,6 +340,7 @@ describe("NavigationBar and NavigationRail, keyed by destination", () => {
                 defaultOpen
                 testId={{ scrim: "rail-scrim", dialog: "rail-dialog" }}
                 class={{ scrim: "dim", dialog: "sheet" }}
+                // oxlint-disable-next-line solid/style-prop -- a part-keyed style record, not CSS properties
                 style={{ scrim: { opacity: 0.5 } }}
                 slotProps={{ dialog: { title: "Main menu" } }}
             />

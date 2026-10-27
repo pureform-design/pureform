@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { Switch } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { togglesRegistry } from "../__fixtures__/registry";
 import { Errored, interact, mount, quietly, settle } from "../testing/render";
@@ -59,7 +60,8 @@ describe("Switch, ready-made", () => {
     });
 
     it("toggles with a click and Space, reporting each change once", async () => {
-        const onCheckedChange = vi.fn();
+        const onCheckedChange =
+            vi.fn<(details: ChangeDetails<"checked", boolean>) => void>();
         withRegistry(
             <Switch aria-label="Wi-Fi" onCheckedChange={onCheckedChange} />,
         );

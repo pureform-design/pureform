@@ -93,6 +93,7 @@ describe("useStyleFactory", () => {
         function Probe(props: { n: number }) {
             factories.add(useStyleFactory("button"));
             const renders = useRef(0);
+            // oxlint-disable-next-line react/refs -- the test counts renders
             renders.current += 1;
             return <pre>{props.n}</pre>;
         }
@@ -113,9 +114,10 @@ describe("useComponentSlots", () => {
                 indeterminate: false,
                 tokens: { value: 40 },
             });
+            const width = selected.styles.indicator?.width;
             return (
                 <pre data-testid="probe">
-                    {String(selected.styles.indicator?.width)}
+                    {typeof width === "string" ? width : JSON.stringify(width)}
                 </pre>
             );
         }

@@ -80,6 +80,7 @@ const VARIANTS = [
 describe.runIf(import.meta.env.VITE_PUREFORM_BENCH)(
     `indication benchmark (${ITEMS} list items, median of ${RUNS})`,
     () => {
+        // oxlint-disable-next-line vitest/expect-expect -- a benchmark: it reports timings and has nothing to assert
         it("mounts with and without the layer, with eager and given sources", async () => {
             // A warm-up of each, then the runs interleaved, so drift hits every variant alike.
             for (const [, indication, sources] of VARIANTS) {

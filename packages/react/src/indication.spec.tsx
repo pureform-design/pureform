@@ -68,7 +68,7 @@ const byTestId = <E extends HTMLElement = HTMLElement>(id: string): E => {
 
 // Events dispatched inside `act`, so React applies what they cause.
 const dispatch = (target: EventTarget, event: Event) =>
-    act(() => {
+    act(async () => {
         target.dispatchEvent(event);
     });
 
@@ -269,7 +269,9 @@ describe("indication", () => {
         let source!: MutableInteractionSource;
         let pressed = false;
         function Shared(): ReactNode {
+            // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
             source = useInteractionSource();
+            // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
             pressed = useInteractionState(source).pressed;
             return (
                 <>
@@ -294,12 +296,12 @@ describe("indication", () => {
         expect(layerOf(a)?.children).toHaveLength(1);
         expect(layerOf(b)?.children).toHaveLength(1);
 
-        await act(() => source.emit({ type: "hoverEnter" }));
+        await act(async () => source.emit({ type: "hoverEnter" }));
         await settle();
         expect(a.hasAttribute("data-pf-hover")).toBe(true);
         expect(b.hasAttribute("data-pf-hover")).toBe(true);
         await dispatch(window, pointer("pointerup"));
-        await act(() => source.emit({ type: "hoverExit" }));
+        await act(async () => source.emit({ type: "hoverExit" }));
         await settle();
         expect(pressed).toBe(false);
         expect(b.hasAttribute("data-pf-active")).toBe(false);
@@ -309,6 +311,7 @@ describe("indication", () => {
     it("gives an app's own surface the provider's indication with useIndication", async () => {
         let source!: MutableInteractionSource;
         function Surface(): ReactNode {
+            // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
             source = useInteractionSource();
             const indication = useIndication(source, { centered: true });
             return (
@@ -340,7 +343,7 @@ describe("indication", () => {
         await settle();
         expect(source.state.pressed).toBe(false);
 
-        await act(() =>
+        await act(async () =>
             source.emit({
                 type: "press",
                 id: -1,
@@ -349,6 +352,6 @@ describe("indication", () => {
             }),
         );
         expect(surface.hasAttribute("data-pf-active")).toBe(true);
-        await act(() => source.emit({ type: "release", id: -1 }));
+        await act(async () => source.emit({ type: "release", id: -1 }));
     });
 });

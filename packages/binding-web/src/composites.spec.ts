@@ -42,6 +42,10 @@ import { describe, expect, it } from "vitest";
 
 import { partAttributes } from "./anatomy";
 
+// Slots are names, or null for a part with none; any one order serves to compare two lists.
+const byName = (a: string | null, b: string | null): number =>
+    (a ?? "").localeCompare(b ?? "");
+
 describe("composites", () => {
     it.each([
         ["the select's menu", selectMenuAnatomy, menuAnatomy],
@@ -133,7 +137,9 @@ describe("composites", () => {
             const slots = Object.values(parts)
                 .filter((part) => part.styled)
                 .map(partSlot);
-            expect(slots.sort()).toEqual([...preset.partNames].sort());
+            expect(slots.sort(byName)).toEqual(
+                [...preset.partNames].sort(byName),
+            );
             expect(partSlot(parts.content!)).toBe("root");
             expect(partSlot(parts.root!)).toBeNull();
             for (const name of ["root", "trigger", "positioner"]) {
@@ -143,12 +149,13 @@ describe("composites", () => {
                 expect(parts[name]!.testId).toBe(
                     (ids as Record<string, string>)[name],
                 );
-                if (parts[name]!.styled && name !== "content") {
-                    expect(parts[name]!.mirror).toBe(
-                        (preset.parts as ComponentAnatomy["parts"])[name]!
-                            .mirror,
-                    );
-                }
+            }
+            for (const name of overlay.partNames.filter(
+                (name) => parts[name]!.styled && name !== "content",
+            )) {
+                expect(parts[name]!.mirror).toBe(
+                    (preset.parts as ComponentAnatomy["parts"])[name]!.mirror,
+                );
             }
             expect(partAttributes(overlay, "root")["data-testid"]).toBe(
                 preset.parts.root.testId,
@@ -188,19 +195,23 @@ describe("composites", () => {
         const slots = Object.values(parts)
             .filter((part) => part.styled)
             .map(partSlot);
-        expect(slots.sort()).toEqual([...searchViewAnatomy.partNames].sort());
+        expect(slots.sort(byName)).toEqual(
+            [...searchViewAnatomy.partNames].sort(byName),
+        );
         expect(partSlot(parts.surface!)).toBe("root");
         expect(partSlot(parts.root!)).toBeNull();
         for (const name of ["root", "trigger", "positioner"])
             expect(parts[name]!.styled).toBe(false);
         for (const name of searchViewOverlayAnatomy.partNames) {
             expect(parts[name]!.testId).toBe(compositeTestIds.searchView[name]);
-            if (parts[name]!.styled && name !== "surface")
-                expect(parts[name]!.mirror).toBe(
-                    (searchViewAnatomy.parts as ComponentAnatomy["parts"])[
-                        name
-                    ]!.mirror,
-                );
+        }
+        for (const name of searchViewOverlayAnatomy.partNames.filter(
+            (name) => parts[name]!.styled && name !== "surface",
+        )) {
+            expect(parts[name]!.mirror).toBe(
+                (searchViewAnatomy.parts as ComponentAnatomy["parts"])[name]!
+                    .mirror,
+            );
         }
     });
 
@@ -254,18 +265,20 @@ describe("composites", () => {
         const slots = Object.values(parts)
             .filter((part) => part.styled)
             .map(partSlot);
-        expect(slots.sort()).toEqual([...tabsAnatomy.partNames].sort());
+        expect(slots.sort(byName)).toEqual(
+            [...tabsAnatomy.partNames].sort(byName),
+        );
         expect(partSlot(parts.list!)).toBe("root");
         expect(partSlot(parts.root!)).toBeNull();
         expect(parts.content!.styled).toBe(false);
+        const presetParts = tabsAnatomy.parts as ComponentAnatomy["parts"];
         for (const name of tabsCompositeAnatomy.partNames) {
             expect(parts[name]!.testId).toBe(compositeTestIds.tabs[name]);
-            const preset = (tabsAnatomy.parts as ComponentAnatomy["parts"])[
-                name
-            ];
-            if (preset && name !== "root") {
-                expect(parts[name]!.mirror).toBe(preset.mirror);
-            }
+        }
+        for (const name of tabsCompositeAnatomy.partNames.filter(
+            (name) => presetParts[name] && name !== "root",
+        )) {
+            expect(parts[name]!.mirror).toBe(presetParts[name]!.mirror);
         }
         expect(
             partAttributes(tabsCompositeAnatomy, "root")["data-testid"],
@@ -301,7 +314,9 @@ describe("composites", () => {
             const slots = Object.values(parts)
                 .filter((part) => part.styled)
                 .map(partSlot);
-            expect(slots.sort()).toEqual([...preset.partNames].sort());
+            expect(slots.sort(byName)).toEqual(
+                [...preset.partNames].sort(byName),
+            );
             expect(partSlot(parts.content!)).toBe("root");
             expect(partSlot(parts.body!)).toBe("content");
             for (const name of ["root", "trigger", "positioner"]) {

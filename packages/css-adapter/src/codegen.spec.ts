@@ -292,8 +292,8 @@ describe("the CSS codegen", () => {
 
     it("gives a single-slot component's class to the root", async () => {
         const { files } = await run();
-        expect(files["web/icon.ts"]).toMatchSnapshot();
-        expect(files["web/divider.ts"]).toMatchSnapshot();
+        expect(files["web/icon.ts"]).toMatchSnapshot("icon");
+        expect(files["web/divider.ts"]).toMatchSnapshot("divider");
     });
 
     it("names each token's var by its dynamic path, else the component's var", async () => {
@@ -430,6 +430,7 @@ describe("generate with the CSS target", () => {
             { timeout: 60_000 },
             async () => {
                 let count = 0;
+                const mismatches: unknown[] = [];
                 for (const [name, spec] of Object.entries(preset.components)) {
                     const factory = factoryOf(generated, name);
                     const old = runtimeSlots(spec, options);
@@ -441,11 +442,17 @@ describe("generate with the CSS target", () => {
                     for (const selection of selections(groups)) {
                         const result = factory(selection);
                         const expected = old(selection);
+                        // Comparing serialized forms first keeps this hot loop fast; only differences are kept.
                         if (
                             JSON.stringify(slotClasses(result)) !==
                             JSON.stringify(expected)
                         ) {
-                            expect(slotClasses(result)).toEqual(expected);
+                            mismatches.push({
+                                name,
+                                selection,
+                                actual: slotClasses(result),
+                                expected,
+                            });
                         }
                         const typed = Object.fromEntries(
                             Object.entries(selection).map(([group, value]) => [
@@ -468,6 +475,7 @@ describe("generate with the CSS target", () => {
                     );
                     expect(Object.isFrozen(factory({}).root)).toBe(true);
                 }
+                expect(mismatches).toEqual([]);
                 expect(count).toBeGreaterThan(20_000);
             },
         );
@@ -551,9 +559,9 @@ describe("generate with the CSS target", () => {
             async () => {
                 const css = stylesheet();
                 // Tokens the preset declares but no style reads yet.
-                const unread = new Set([
+                const unread = new Set(
                     // A state layer that follows another slot has no drag state.
-                    ...[
+                    [
                         "iconButton",
                         "fab",
                         "checkbox",
@@ -566,39 +574,43 @@ describe("generate with the CSS target", () => {
                     ].map(
                         (name) => `--pf-components-${name}-stateDraggedOpacity`,
                     ),
-                ]);
+                );
                 for (const [name, spec] of Object.entries(preset.components)) {
                     const factory = factoryOf(generated, name);
                     expect(factory({ tokens: {} })).toBe(factory({}));
                     const springs = new Set(componentShape(spec).springs);
-                    for (const [token, cssVar] of Object.entries(
+                    const vars = Object.entries(
                         tokenVars(name, spec, options.prefix),
+                    );
+                    for (const [token, cssVar] of vars.filter(([token]) =>
+                        springs.has(token),
                     )) {
-                        if (springs.has(token)) {
-                            // A spring token takes a role's name, as the role's vars: its curve and its exact parameters.
-                            expect(
-                                factory({ tokens: { [token]: "spatialSlow" } })
-                                    .root!.style,
-                            ).toEqual({
-                                [`${cssVar}-duration`]:
-                                    "var(--springs-spatial-slow-duration)",
-                                [`${cssVar}-easing`]:
-                                    "var(--springs-spatial-slow-easing)",
-                                [`${cssVar}-stiffness`]:
-                                    "var(--springs-spatial-slow-stiffness)",
-                                [`${cssVar}-damping`]:
-                                    "var(--springs-spatial-slow-damping)",
-                                [`${cssVar}-mass`]:
-                                    "var(--springs-spatial-slow-mass)",
-                            });
-                            expect(css).toContain(
-                                "--springs-spatial-slow-duration:",
-                            );
-                            expect(css.includes(`var(${cssVar}-duration`)).toBe(
-                                true,
-                            );
-                            continue;
-                        }
+                        // A spring token takes a role's name, as the role's vars: its curve and its exact parameters.
+                        expect(
+                            factory({ tokens: { [token]: "spatialSlow" } })
+                                .root!.style,
+                        ).toEqual({
+                            [`${cssVar}-duration`]:
+                                "var(--springs-spatial-slow-duration)",
+                            [`${cssVar}-easing`]:
+                                "var(--springs-spatial-slow-easing)",
+                            [`${cssVar}-stiffness`]:
+                                "var(--springs-spatial-slow-stiffness)",
+                            [`${cssVar}-damping`]:
+                                "var(--springs-spatial-slow-damping)",
+                            [`${cssVar}-mass`]:
+                                "var(--springs-spatial-slow-mass)",
+                        });
+                        expect(css).toContain(
+                            "--springs-spatial-slow-duration:",
+                        );
+                        expect(css.includes(`var(${cssVar}-duration`)).toBe(
+                            true,
+                        );
+                    }
+                    for (const [token, cssVar] of vars.filter(
+                        ([token]) => !springs.has(token),
+                    )) {
                         expect(
                             factory({ tokens: { [token]: "3px" } }).root!.style,
                         ).toEqual({ [cssVar]: "3px" });

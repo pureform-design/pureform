@@ -221,7 +221,7 @@ describe("slider", () => {
     });
 
     it("gives the owner its value in the shape it gave", () => {
-        const onValueChange = vi.fn();
+        const onValueChange = vi.fn<(details: { value: number }) => void>();
         const single = sliderControllableProps({
             value: undefined,
             defaultValue: 40,

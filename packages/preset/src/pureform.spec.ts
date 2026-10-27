@@ -439,6 +439,7 @@ describe("pureform with typed()", () => {
 });
 
 describe("component tokens with typed()", () => {
+    // oxlint-disable-next-line vitest/expect-expect -- type-level test: the @ts-expect-error directive, checked by the typecheck, is the assertion
     it("are offered for every default component", () => {
         const pf = typed(pureform());
         pf.alias("components", "button", "radius");

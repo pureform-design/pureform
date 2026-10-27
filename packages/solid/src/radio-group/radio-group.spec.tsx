@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { RadioGroup } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { togglesRegistry } from "../__fixtures__/registry";
 import { byTestId, mount, settle } from "../testing/mount";
@@ -73,7 +74,8 @@ describe("RadioGroup, ready-made", () => {
     });
 
     it("checks a radio on a click, reporting the change once", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", string | null>) => void>();
         withRegistry(() => (
             <RadioGroup
                 aria-label="Size"

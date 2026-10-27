@@ -191,8 +191,8 @@ describe("the Panda codegen", () => {
 
     it("wraps a single-slot recipe's class string as the root's", async () => {
         const { files } = await run();
-        expect(files["web/icon.ts"]).toMatchSnapshot();
-        expect(files["web/divider.ts"]).toMatchSnapshot();
+        expect(files["web/icon.ts"]).toMatchSnapshot("icon");
+        expect(files["web/divider.ts"]).toMatchSnapshot("divider");
     });
 
     it("names each token's var by its dynamic path, else the component's var", async () => {

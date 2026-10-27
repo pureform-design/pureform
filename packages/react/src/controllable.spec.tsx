@@ -88,7 +88,8 @@ const resetForm = () => interact(async () => formOf().reset());
 
 describe("useControllable", () => {
     it("lets uncontrolled state change on its own, calling back once", async () => {
-        const onCheckedChange = vi.fn();
+        const onCheckedChange =
+            vi.fn<(details: ChangeDetails<"checked", CheckedState>) => void>();
         mount(<Checkbox defaultChecked onCheckedChange={onCheckedChange} />);
         await settle();
         expect(inputOf().checked).toBe(true);
@@ -99,10 +100,12 @@ describe("useControllable", () => {
     });
 
     it("asks to change controlled state, and moves only with the prop", async () => {
-        const onCheckedChange = vi.fn();
+        const onCheckedChange =
+            vi.fn<(details: ChangeDetails<"checked", CheckedState>) => void>();
         let setChecked!: (checked: boolean) => void;
         function App() {
             const [checked, set] = useState(false);
+            // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
             setChecked = set;
             return (
                 <Checkbox checked={checked} onCheckedChange={onCheckedChange} />
@@ -123,6 +126,7 @@ describe("useControllable", () => {
         let setInitial!: (initial: boolean) => void;
         function App() {
             const [initial, set] = useState(true);
+            // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
             setInitial = set;
             return <Checkbox defaultChecked={initial} />;
         }
@@ -139,6 +143,7 @@ describe("useControllable", () => {
         let setChecked!: (checked: boolean | undefined) => void;
         function App() {
             const [checked, set] = useState<boolean | undefined>(false);
+            // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
             setChecked = set;
             return <Checkbox checked={checked} />;
         }
@@ -160,7 +165,8 @@ describe("useControllable", () => {
 
 describe("useFormReset", () => {
     it("puts uncontrolled state back to its default, reporting the reset", async () => {
-        const onCheckedChange = vi.fn();
+        const onCheckedChange =
+            vi.fn<(details: ChangeDetails<"checked", CheckedState>) => void>();
         mount(
             <form data-testid="form">
                 <Checkbox
@@ -191,7 +197,8 @@ describe("useFormReset", () => {
     });
 
     it("asks controlled state to reset, and leaves the input where the prop says", async () => {
-        const onCheckedChange = vi.fn();
+        const onCheckedChange =
+            vi.fn<(details: ChangeDetails<"checked", CheckedState>) => void>();
         mount(
             <form data-testid="form">
                 <Checkbox
@@ -216,7 +223,8 @@ describe("useFormReset", () => {
 
 describe("useFormReset, controlled", () => {
     it("reports the default, not the value the machine was created with", async () => {
-        const onCheckedChange = vi.fn();
+        const onCheckedChange =
+            vi.fn<(details: ChangeDetails<"checked", CheckedState>) => void>();
         function App() {
             const [checked, setChecked] = useState(false);
             return (
@@ -249,10 +257,12 @@ describe("useFormReset, controlled", () => {
     });
 
     it("reports nothing when the value is already the default", async () => {
-        const onCheckedChange = vi.fn();
+        const onCheckedChange =
+            vi.fn<(details: ChangeDetails<"checked", CheckedState>) => void>();
         let setChecked!: (checked: boolean) => void;
         function App() {
             const [checked, set] = useState(true);
+            // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
             setChecked = set;
             return (
                 <form data-testid="form">
@@ -279,6 +289,7 @@ describe("useFieldsetDisabled", () => {
         let setDisabled!: (disabled: boolean) => void;
         function App() {
             const [disabled, set] = useState(true);
+            // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
             setDisabled = set;
             return (
                 <fieldset disabled={disabled}>

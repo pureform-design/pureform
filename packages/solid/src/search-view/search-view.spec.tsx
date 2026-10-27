@@ -1,8 +1,10 @@
 import { compositeTestIds, testIds } from "@pureform/anatomy";
+import type { ComponentProps } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { SearchView } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { overlaysRegistry } from "../__fixtures__/registry";
 import { byTestId, mount, settle } from "../testing/mount";
@@ -101,7 +103,8 @@ describe("SearchView, ready-made", () => {
     });
 
     it("opens from the bar, takes focus, traps it, and gives it back on Escape", async () => {
-        const onOpenChange = vi.fn();
+        const onOpenChange =
+            vi.fn<(details: ChangeDetails<"open", boolean>) => void>();
         withRegistry(() => (
             <>
                 <button type="button">Before</button>
@@ -149,7 +152,8 @@ describe("SearchView, ready-made", () => {
     });
 
     it("chooses a suggestion with the keys, then closes and shows it in the bar", async () => {
-        const onSelect = vi.fn();
+        const onSelect =
+            vi.fn<NonNullable<ComponentProps<typeof SearchView>["onSelect"]>>();
         withRegistry(() => (
             <SearchView
                 placeholder="Search"
@@ -171,7 +175,8 @@ describe("SearchView, ready-made", () => {
     });
 
     it("submits the query on Enter with nothing highlighted, and clears it", async () => {
-        const onSubmit = vi.fn();
+        const onSubmit =
+            vi.fn<NonNullable<ComponentProps<typeof SearchView>["onSubmit"]>>();
         withRegistry(() => (
             <SearchView
                 placeholder="Search"

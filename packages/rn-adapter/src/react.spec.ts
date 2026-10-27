@@ -62,6 +62,12 @@ const rootStyle = (
     ) as Record<string, unknown>;
 };
 
+// A rendered value as text: strings and numbers as they are, anything else as JSON.
+const text = (value: unknown): string =>
+    typeof value === "string" || typeof value === "number"
+        ? String(value)
+        : JSON.stringify(value);
+
 describe("PureformProvider and useComponentStyles", () => {
     it("give a component's styles for the scheme", () => {
         const light = rootStyle({ styles: precomputed, scheme: "light" });
@@ -96,7 +102,7 @@ describe("PureformProvider and useComponentStyles", () => {
 
     it("give the theme's tokens, with overrides", () => {
         const Probe = () =>
-            createElement("i", null, String(useTokens()["colors.primary"]));
+            createElement("i", null, text(useTokens()["colors.primary"]));
         const html = renderToString(
             createElement(
                 PureformProvider,
@@ -135,7 +141,7 @@ describe("PureformProvider and useComponentStyles", () => {
             createElement(
                 "i",
                 null,
-                String(
+                text(
                     useComponentStyles(
                         "linearProgress",
                         {},
@@ -158,8 +164,10 @@ describe("PureformProvider and useComponentStyles", () => {
     });
 
     it("need a provider", () => {
-        const Probe = () =>
-            createElement("i", null, String(useComponentStyles("button")));
+        const Probe = () => {
+            useComponentStyles("button");
+            return null;
+        };
         expect(() => renderToString(createElement(Probe))).toThrow(
             "needs a PureformProvider",
         );

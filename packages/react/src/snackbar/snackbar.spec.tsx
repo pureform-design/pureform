@@ -1,5 +1,6 @@
 import { testIds } from "@pureform/anatomy";
 import { screen } from "@testing-library/react";
+import type { ComponentProps } from "react";
 import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
@@ -58,8 +59,11 @@ describe("Snackbar, ready-made", () => {
     });
 
     it("reports the action, then asks to close with its reason", async () => {
-        const onAction = vi.fn();
-        const onOpenChange = vi.fn();
+        const onAction = vi.fn<() => void>();
+        const onOpenChange =
+            vi.fn<
+                NonNullable<ComponentProps<typeof Snackbar>["onOpenChange"]>
+            >();
         withRegistry(
             <Snackbar
                 open
@@ -84,7 +88,10 @@ describe("Snackbar, ready-made", () => {
     });
 
     it("closes itself after its duration", async () => {
-        const onOpenChange = vi.fn();
+        const onOpenChange =
+            vi.fn<
+                NonNullable<ComponentProps<typeof Snackbar>["onOpenChange"]>
+            >();
         withRegistry(
             <Snackbar
                 defaultOpen

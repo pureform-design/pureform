@@ -11,6 +11,8 @@ type Button = {
     tokens: "accent";
 };
 
+type ButtonSelection = Selection<Button> & States<Button>;
+
 const order: SelectionOrder = {
     variants: ["variant", "toggle"],
     states: ["pressed", "disabled"],
@@ -45,7 +47,11 @@ describe("selectionKey", () => {
 
 describe("selectionCache", () => {
     const setup = () => {
-        const compute = vi.fn((s: Selection<Button> & States<Button>) => ({
+        const compute = vi.fn<
+            (s: ButtonSelection) => {
+                root: { style: { opacity: number }; key: ButtonSelection };
+            }
+        >((s) => ({
             root: { style: { opacity: s.disabled ? 0.38 : 1 }, key: { ...s } },
         }));
         return { compute, cached: selectionCache(order, compute) };
@@ -93,7 +99,7 @@ describe("selectionCache", () => {
     });
 
     it("caches an undefined result too", () => {
-        const compute = vi.fn(() => undefined);
+        const compute = vi.fn<() => undefined>(() => undefined);
         const cached = selectionCache(order, compute);
         cached({});
         cached({});

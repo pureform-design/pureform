@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { Dialog } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { overlaysRegistry } from "../__fixtures__/registry";
 import { Button } from "../button";
@@ -33,7 +34,9 @@ describe("Dialog, ready-made", () => {
                 headline="Discard draft?"
                 class={{ trigger: "my-trigger", backdrop: "my-backdrop" }}
                 style={{
+                    // oxlint-disable-next-line solid/style-prop -- a part-keyed style record, not CSS properties
                     trigger: { color: "red" },
+                    // oxlint-disable-next-line solid/style-prop -- a part-keyed style record, not CSS properties
                     backdrop: { opacity: "0.5" },
                 }}
                 slotProps={{ backdrop: { title: "yes" } }}
@@ -77,7 +80,8 @@ describe("Dialog, ready-made", () => {
     });
 
     it("opens from its trigger, takes focus, closes with Escape, and gives focus back", async () => {
-        const onOpenChange = vi.fn();
+        const onOpenChange =
+            vi.fn<(details: ChangeDetails<"open", boolean>) => void>();
         withRegistry(() => (
             <Dialog
                 trigger="Discard"
@@ -116,7 +120,8 @@ describe("Dialog, ready-made", () => {
 
 describe("Dialog, compound", () => {
     it("closes from a close trigger drawn as a button", async () => {
-        const onOpenChange = vi.fn();
+        const onOpenChange =
+            vi.fn<(details: ChangeDetails<"open", boolean>) => void>();
         withRegistry(() => (
             <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
                 <Dialog.Backdrop />
@@ -146,9 +151,10 @@ describe("Dialog, compound", () => {
 
 describe("Dialog, onClose", () => {
     it("asks onClose before Escape, the scrim or its close trigger closes it, refused and then allowed", async () => {
-        const onOpenChange = vi.fn();
+        const onOpenChange =
+            vi.fn<(details: ChangeDetails<"open", boolean>) => void>();
         let answer = false;
-        const onClose = vi.fn(() => answer);
+        const onClose = vi.fn<() => boolean | Promise<boolean>>(() => answer);
         withRegistry(() => (
             <Dialog
                 trigger="Discard"
@@ -179,7 +185,7 @@ describe("Dialog, onClose", () => {
     });
 
     it("doesn't ask onClose when a controlled open closes it", async () => {
-        const onClose = vi.fn(() => false);
+        const onClose = vi.fn<() => boolean | Promise<boolean>>(() => false);
         const [open, setOpen] = createSignal(true);
         withRegistry(() => (
             <Dialog

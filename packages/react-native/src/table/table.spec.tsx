@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react";
 import type { ReactNode } from "react";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
@@ -57,7 +58,8 @@ describe("table", () => {
     });
 
     it("sorts by a header's button and shows the arrow", async () => {
-        const onSortChange = vi.fn();
+        const onSortChange =
+            vi.fn<NonNullable<ComponentProps<typeof Table>["onSortChange"]>>();
         await render(
             <Table
                 columns={COLUMNS}
@@ -103,7 +105,10 @@ describe("table", () => {
     });
 
     it("selects rows and fills them with the selected container", async () => {
-        const onSelectionChange = vi.fn();
+        const onSelectionChange =
+            vi.fn<
+                (details: { readonly selection: readonly string[] }) => void
+            >();
         await render(
             <Table
                 columns={COLUMNS}

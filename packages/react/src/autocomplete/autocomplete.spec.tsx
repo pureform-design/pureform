@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { Autocomplete } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { textInputsRegistry } from "../__fixtures__/registry";
 import { interact, mount, settle } from "../testing/render";
@@ -58,7 +59,8 @@ describe("Autocomplete, ready-made", () => {
     });
 
     it("filters the suggestions as the text changes, and chooses one with the keys", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", string | null>) => void>();
         withRegistry(
             <Autocomplete
                 label="City"
@@ -98,6 +100,7 @@ describe("Autocomplete, ready-made", () => {
         const handle = { set: (_text: string) => {} };
         function Controlled(): ReactNode {
             const [text, setText] = useState("Lyon");
+            // oxlint-disable-next-line react/immutability -- the test harness captures what it drives from outside the component
             handle.set = setText;
             return (
                 <Autocomplete
@@ -161,7 +164,8 @@ describe("Autocomplete, ready-made", () => {
     });
 
     it("puts the text back on a form reset after a suggestion was chosen", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", string | null>) => void>();
         withRegistry(
             <form>
                 <Autocomplete

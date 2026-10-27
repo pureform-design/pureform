@@ -77,6 +77,7 @@ describe("DatePicker, ready-made", () => {
                 locale="en-US"
                 defaultOpen
                 class={{ prev: "my-prev", next: "my-next", backdrop: "my-dim" }}
+                // oxlint-disable-next-line solid/style-prop -- a part-keyed style record, not CSS properties
                 style={{ prev: { color: "red" } }}
             />
         ));
@@ -121,7 +122,8 @@ describe("DatePicker, ready-made", () => {
     });
 
     it("commits the chosen day with OK, and closes", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: { readonly value: readonly string[] }) => void>();
         withRegistry(() => (
             <DatePicker
                 trigger="Pick"
@@ -144,7 +146,8 @@ describe("DatePicker, ready-made", () => {
     });
 
     it("drops the draft with Cancel", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: { readonly value: readonly string[] }) => void>();
         withRegistry(() => (
             <DatePicker
                 trigger="Pick"
@@ -255,6 +258,7 @@ describe("DatePicker, ready-made", () => {
                     grid: "days",
                 }}
                 style={{
+                    // oxlint-disable-next-line solid/style-prop -- a part-keyed style record, not CSS properties
                     weekday: (day) =>
                         day.index === 0 ? { opacity: 0.5 } : undefined,
                 }}
@@ -310,7 +314,7 @@ describe("DatePicker, ready-made", () => {
     });
 
     it("mirrors the chevrons under rtl, and shows the mode toggle only when given", async () => {
-        const onModeToggle = vi.fn();
+        const onModeToggle = vi.fn<() => void>();
         withRegistry(
             () => (
                 <DatePicker

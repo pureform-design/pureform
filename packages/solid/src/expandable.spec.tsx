@@ -2,6 +2,7 @@ import { accordionAnatomy, treeAnatomy } from "@pureform/anatomy";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
+import type { ChangeDetails } from ".";
 import { PureformProvider } from ".";
 import { displayRegistry } from "./__fixtures__/registry";
 import { Accordion } from "./accordion";
@@ -80,7 +81,8 @@ describe("Accordion", () => {
     });
 
     it("expands and collapses an item from its header, and moves between headers with the arrow keys", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", string[]>) => void>();
         withRegistry(() => (
             <Accordion items={ITEMS} onValueChange={onValueChange} />
         ));
@@ -142,6 +144,7 @@ describe("Accordion, per item", () => {
                     root: "list",
                 }}
                 style={{
+                    // oxlint-disable-next-line solid/style-prop -- a part-keyed style record, not CSS properties
                     title: (item) => ({ opacity: item.index === 2 ? 0.5 : 1 }),
                 }}
                 slotProps={{
@@ -205,8 +208,14 @@ describe("Tree", () => {
     });
 
     it("expands with the right arrow and walks the rows by direction, selecting with Enter", async () => {
-        const onExpandedValueChange = vi.fn();
-        const onSelectedValueChange = vi.fn();
+        const onExpandedValueChange =
+            vi.fn<
+                (details: ChangeDetails<"expandedValue", string[]>) => void
+            >();
+        const onSelectedValueChange =
+            vi.fn<
+                (details: ChangeDetails<"selectedValue", string[]>) => void
+            >();
         withRegistry(
             () => (
                 <Tree
@@ -324,6 +333,7 @@ describe("Tree", () => {
                     tree: "files",
                 }}
                 style={{
+                    // oxlint-disable-next-line solid/style-prop -- a part-keyed style record, not CSS properties
                     text: (node) => ({ opacity: node.depth === 2 ? 0.5 : 1 }),
                 }}
                 slotProps={{

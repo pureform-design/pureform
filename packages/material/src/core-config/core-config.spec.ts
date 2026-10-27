@@ -156,10 +156,9 @@ describe("elevation", () => {
 
     it("stacks three shadow layers for a raised level", () => {
         const boxShadow = elevation().semanticTokens.shadows?.level2;
-        expect(boxShadow && "layers" in boxShadow).toBe(true);
-        if (boxShadow && "layers" in boxShadow) {
-            expect(boxShadow.layers).toHaveLength(3);
-        }
+        const layers =
+            boxShadow && "layers" in boxShadow ? boxShadow.layers : undefined;
+        expect(layers).toHaveLength(3);
     });
 
     it("draws each layer from the shadow color and its opacity token", () => {

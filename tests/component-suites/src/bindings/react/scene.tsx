@@ -1,3 +1,4 @@
+// oxlint-disable-next-line jsdoc/check-tag-names -- `@jsxImportSource` is the JSX runtime pragma, not a JSDoc tag
 /** @jsxImportSource react */
 // A scene in React: the ready-made component inside `PureformProvider` with the target's registry.
 // The browser (`harness.tsx`) and the server (`server.tsx`) render the same view.

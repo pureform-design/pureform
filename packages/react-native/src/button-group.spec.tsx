@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
+import type { ChangeDetails } from ".";
 import { Glyph, PureformProvider } from ".";
 import { ButtonGroup } from "./button-group";
 import { presetRegistry } from "./testing/registry";
@@ -59,7 +60,8 @@ describe("ButtonGroup", () => {
     });
 
     it("keeps one button on in a single-select group", async () => {
-        const change = vi.fn();
+        const change =
+            vi.fn<(details: ChangeDetails<"value", string[]>) => void>();
         await render(
             <ButtonGroup
                 selectable="single"

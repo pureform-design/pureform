@@ -4,6 +4,7 @@ import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { Stepper } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { animated } from "../engine";
 import { reanimated } from "../engines/reanimated";
@@ -112,7 +113,8 @@ describe.each([animated, reanimated])("the stepper with $name", (engine) => {
     });
 
     it("goes to a pressed step and reports it, unless linear", async () => {
-        const onStepChange = vi.fn();
+        const onStepChange =
+            vi.fn<(details: ChangeDetails<"step", number>) => void>();
         await render(<Stepper items={ITEMS} onStepChange={onStepChange} />);
         await settle();
         await interact(() => userEvent.click(all("pf-stepper-trigger")[2]!));

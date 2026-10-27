@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { IconButton } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { togglesRegistry } from "../__fixtures__/registry";
 import { interact, mount, settle } from "../testing/render";
@@ -44,7 +45,8 @@ describe("IconButton, ready-made", () => {
     });
 
     it("draws as a toggle once given selected or defaultSelected, and toggles", async () => {
-        const onSelectedChange = vi.fn();
+        const onSelectedChange =
+            vi.fn<(details: ChangeDetails<"selected", boolean>) => void>();
         withRegistry(
             <IconButton
                 icon="★"

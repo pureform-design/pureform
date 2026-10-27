@@ -1,6 +1,6 @@
 import { testIds } from "@pureform/anatomy";
 import { screen } from "@testing-library/react";
-import type { ReactNode } from "react";
+import type { ReactNode, SubmitEventHandler } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
@@ -121,9 +121,10 @@ describe("DateInput, ready-made", () => {
     });
 
     it("takes typed digits as the ISO value, and confirms it", async () => {
-        const onValueChange = vi.fn();
-        const onConfirm = vi.fn();
-        const onCancel = vi.fn();
+        const onValueChange =
+            vi.fn<(details: { readonly value: readonly string[] }) => void>();
+        const onConfirm = vi.fn<(value: readonly string[]) => void>();
+        const onCancel = vi.fn<() => void>();
         withRegistry(
             <DateInput
                 locale="en-US"
@@ -152,11 +153,11 @@ describe("DateInput, ready-made", () => {
     });
 
     it("draws Cancel and OK as type=button, so they don't submit a form", async () => {
-        const onSubmit = vi.fn((event: { preventDefault(): void }) =>
+        const onSubmit = vi.fn<SubmitEventHandler<HTMLFormElement>>((event) =>
             event.preventDefault(),
         );
-        const onConfirm = vi.fn();
-        const onCancel = vi.fn();
+        const onConfirm = vi.fn<(value: readonly string[]) => void>();
+        const onCancel = vi.fn<() => void>();
         withRegistry(
             <form onSubmit={onSubmit}>
                 <DateInput
@@ -180,7 +181,7 @@ describe("DateInput, ready-made", () => {
     });
 
     it("shows the mode toggle with onModeToggle, and an error instead of the format", async () => {
-        const onModeToggle = vi.fn();
+        const onModeToggle = vi.fn<() => void>();
         withRegistry(
             <DateInput
                 locale="en-US"
@@ -203,8 +204,8 @@ describe("DateInput, ready-made", () => {
 
 describe("DateInput, composed", () => {
     it("runs the actions through CancelTrigger and ConfirmTrigger, unless onClick prevents it", async () => {
-        const onConfirm = vi.fn();
-        const onCancel = vi.fn();
+        const onConfirm = vi.fn<(value: readonly string[]) => void>();
+        const onCancel = vi.fn<() => void>();
         withRegistry(
             <DateInput.Root
                 defaultValue={["2026-08-17"]}

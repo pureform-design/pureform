@@ -33,7 +33,7 @@ describe("own size on React Native", () => {
             const width = style.width;
             expect(
                 width === "fit-content" || typeof width === "number",
-                `${name}: ${String(width)}`,
+                `${name}: ${JSON.stringify(width)}`,
             ).toBe(true);
         });
     }

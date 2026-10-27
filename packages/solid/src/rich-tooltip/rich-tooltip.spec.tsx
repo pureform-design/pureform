@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { RichTooltip } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { overlaysRegistry } from "../__fixtures__/registry";
 import { byTestId, mount, settle, until } from "../testing/mount";
@@ -61,7 +62,9 @@ describe("RichTooltip, ready-made", () => {
     it("opens on hover after its delay and describes the trigger", async () => {
         const openDelay = 100;
         let openedAt = 0;
-        const onOpenChange = vi.fn(({ open }: { open: boolean }) => {
+        const onOpenChange = vi.fn<
+            (details: ChangeDetails<"open", boolean>) => void
+        >(({ open }: { open: boolean }) => {
             if (open) openedAt = performance.now();
         });
         withRegistry(() => (

@@ -4,8 +4,8 @@
 // and a toggle icon button takes Material's selected colors.
 
 import * as pandaRecipes from "$recipes";
-import { STATE_ATTRIBUTES } from "@pureform/web-contracts";
 import { classesFor } from "@pureform/css-adapter";
+import { STATE_ATTRIBUTES } from "@pureform/web-contracts";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { commands } from "vitest/browser";
 
@@ -224,7 +224,7 @@ describe.each(Object.keys(STYLINGS) as (keyof typeof STYLINGS)[])(
         // Material's toggle icon buttons: a selected filled or tonal toggle looks like the
         // plain button, as does a selected standard toggle's icon; unselected, each differs.
         // A selected outlined toggle fills and drops its outline.
-        it.each(FILLS)("draws a %s toggle's selected colors", (variant) => {
+        const toggleColors = (variant: string) => {
             const styles = render(
                 [
                     iconButton({ variant }, "", "", "plain-"),
@@ -250,22 +250,37 @@ describe.each(Object.keys(STYLINGS) as (keyof typeof STYLINGS)[])(
                 content: value(styles[`${prefix}root`]!, "color"),
             });
             const [plain, on, off] = ["plain-", "on-", "off-"].map(colors);
-            expect(on).not.toEqual(off);
-            if (variant === "filled" || variant === "tonal") {
+            return { styles, plain: plain!, on: on!, off: off! };
+        };
+
+        it.each(FILLS)(
+            "draws a %s toggle's selected colors unlike its unselected",
+            (variant) => {
+                const { on, off } = toggleColors(variant);
+                expect(on).not.toEqual(off);
+            },
+        );
+
+        it.each(["filled", "tonal"])(
+            "draws a selected %s toggle like the plain button",
+            (variant) => {
+                const { plain, on, off } = toggleColors(variant);
                 expect(on).toEqual(plain);
-                expect(off!.container).not.toBe(plain!.container);
-            }
-            if (variant === "standard") {
-                expect(on!.content).toBe(plain!.content);
-                expect(on!.container).toBe("rgba(0, 0, 0, 0)");
-            }
-            if (variant === "outlined") {
-                expect(on!.container).not.toBe("rgba(0, 0, 0, 0)");
-                expect(value(styles["on-outline"]!, "display")).toBe("none");
-                expect(value(styles["off-outline"]!, "display")).not.toBe(
-                    "none",
-                );
-            }
+                expect(off.container).not.toBe(plain.container);
+            },
+        );
+
+        it("draws a selected standard toggle's icon like the plain button's", () => {
+            const { plain, on } = toggleColors("standard");
+            expect(on.content).toBe(plain.content);
+            expect(on.container).toBe("rgba(0, 0, 0, 0)");
+        });
+
+        it("fills a selected outlined toggle and drops its outline", () => {
+            const { styles, on } = toggleColors("outlined");
+            expect(on.container).not.toBe("rgba(0, 0, 0, 0)");
+            expect(value(styles["on-outline"]!, "display")).toBe("none");
+            expect(value(styles["off-outline"]!, "display")).not.toBe("none");
         });
     },
 );

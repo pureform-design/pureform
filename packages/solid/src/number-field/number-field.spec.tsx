@@ -1,4 +1,5 @@
 import { testIds } from "@pureform/anatomy";
+import type { ComponentProps } from "solid-js";
 import { createSignal } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
@@ -58,7 +59,10 @@ describe("NumberField, ready-made", () => {
     });
 
     it("steps with the buttons and the arrow keys, stopping at the limits", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<
+                NonNullable<ComponentProps<typeof NumberField>["onValueChange"]>
+            >();
         withRegistry(() => (
             <NumberField
                 label="Quantity"

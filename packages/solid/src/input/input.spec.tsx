@@ -7,6 +7,7 @@ import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { Input } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { displayRegistry } from "../__fixtures__/registry";
 import { byTestId, mount, settle } from "../testing/mount";
@@ -28,8 +29,9 @@ describe.each([
     const element = () => byTestId<HTMLInputElement>(root);
 
     it("changes on its own uncontrolled, reporting once, and still calls onInput", async () => {
-        const onValueChange = vi.fn();
-        const onInput = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", string>) => void>();
+        const onInput = vi.fn<(event: InputEvent) => void>();
         await withRegistry(() => (
             <Control
                 aria-label="Name"
@@ -48,7 +50,8 @@ describe.each([
     });
 
     it("asks when controlled, goes back if the owner doesn't move, and follows the prop", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", string>) => void>();
         const [value, setValue] = createSignal("Ada");
         await withRegistry(() => (
             <Control
@@ -80,11 +83,13 @@ describe.each([
         await userEvent.type(element(), "!");
         await settle();
         expect(element().value).toBe("Ada!");
+        // oxlint-disable-next-line solid/reactivity -- the test asserts the signal's current value
         expect(value()).toBe("Ada!");
     });
 
     it("goes back to its default on a form reset uncontrolled, reporting the reason", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", string>) => void>();
         await withRegistry(() => (
             <form data-testid="form">
                 <Control
@@ -109,7 +114,8 @@ describe.each([
     });
 
     it("reports its default on a form reset controlled, and waits for the owner", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", string>) => void>();
         await withRegistry(() => (
             <form data-testid="form">
                 <Control

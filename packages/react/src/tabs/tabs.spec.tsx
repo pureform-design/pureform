@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { Tabs } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { navigationRegistry } from "../__fixtures__/registry";
 import { Errored, mount, outside, quietly, settle } from "../testing/render";
@@ -83,7 +84,8 @@ describe("Tabs, ready-made", () => {
     });
 
     it("selects with a click and the arrow keys, by direction, and reports each change", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", string | null>) => void>();
         withRegistry(
             <Tabs
                 aria-label="Trips"
@@ -216,7 +218,8 @@ describe("Tabs, ready-made", () => {
 
 describe("Tabs, composed", () => {
     it("asks when controlled, and throws for a part outside its tab", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", string | null>) => void>();
         withRegistry(
             <Tabs.Root value="a" onValueChange={onValueChange}>
                 <Tabs.List aria-label="Letters">
@@ -343,6 +346,7 @@ describe("Tabs, scrollable", () => {
         let select!: (value: string) => void;
         function Scrolling() {
             const [value, setValue] = useState<string | null>("tab0");
+            // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
             select = setValue;
             return (
                 <Tabs

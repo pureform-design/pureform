@@ -4,7 +4,7 @@ import { userEvent } from "vitest/browser";
 
 import * as slider from ".";
 import { run, settle } from "../testing/vanilla";
-import type { MachineProps } from "../testing/vanilla";
+import type { MachineCallback, MachineProps } from "../testing/vanilla";
 
 afterEach(() => {
     document.body.innerHTML = "";
@@ -58,7 +58,8 @@ describe("slider machine", () => {
     });
 
     it("steps with the arrows, the up and down ones too when horizontal", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<MachineCallback<slider.Schema, "onValueChange">>();
         const { api, handles, stop } = render({
             defaultValue: [40],
             onValueChange,

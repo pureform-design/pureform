@@ -1,3 +1,4 @@
+// oxlint-disable-next-line jsdoc/check-tag-names -- `@jsxImportSource` is the JSX runtime pragma, not a JSDoc tag
 /** @jsxImportSource react */
 // The React harness: mounts and hydrates scenes with `react-dom/client`, and sets props through
 // state, as an owner would. React schedules its work as it would in an app (not in `act`), and

@@ -1,5 +1,6 @@
 import { testIds } from "@pureform/anatomy";
 import { screen } from "@testing-library/react";
+import type { ComponentProps } from "react";
 import { type ReactNode, useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
@@ -61,7 +62,10 @@ describe("NumberField, ready-made", () => {
     });
 
     it("steps with the buttons and the arrow keys, stopping at the limits", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<
+                NonNullable<ComponentProps<typeof NumberField>["onValueChange"]>
+            >();
         withRegistry(
             <NumberField
                 label="Quantity"

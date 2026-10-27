@@ -1,4 +1,5 @@
 import { testIds } from "@pureform/anatomy";
+import type { ComponentProps } from "solid-js";
 import { createSignal } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
@@ -53,7 +54,8 @@ describe("Table", () => {
     });
 
     it("sorts by a header's button, saying so in aria-sort, and from the keyboard", async () => {
-        const onSortChange = vi.fn();
+        const onSortChange =
+            vi.fn<NonNullable<ComponentProps<typeof Table>["onSortChange"]>>();
         withRegistry(() => (
             <Table
                 columns={COLUMNS}
@@ -83,7 +85,10 @@ describe("Table", () => {
     });
 
     it("selects rows by their checkboxes and all of them by the header's", async () => {
-        const onSelectionChange = vi.fn();
+        const onSelectionChange =
+            vi.fn<
+                (details: { readonly selection: readonly string[] }) => void
+            >();
         const [selection, setSelection] = createSignal<readonly string[]>([]);
         withRegistry(() => (
             <Table
@@ -107,6 +112,7 @@ describe("Table", () => {
         expect(boxes()[0]!.getAttribute("aria-label")).toBe("Select all rows");
         await userEvent.click(boxes()[2]!);
         await settle();
+        // oxlint-disable-next-line solid/reactivity -- the test asserts the signal's current value
         expect(selection()).toEqual(["he"]);
         expect(
             all(ids.row).map((row) => row.getAttribute("aria-selected")),
@@ -114,9 +120,11 @@ describe("Table", () => {
         expect(boxes()[0]!.indeterminate).toBe(true);
         await userEvent.click(boxes()[0]!);
         await settle();
+        // oxlint-disable-next-line solid/reactivity -- the test asserts the signal's current value
         expect(selection()).toEqual(["he", "h", "li"]);
         await userEvent.click(boxes()[0]!);
         await settle();
+        // oxlint-disable-next-line solid/reactivity -- the test asserts the signal's current value
         expect(selection()).toEqual([]);
     });
 
@@ -161,6 +169,7 @@ describe("Table", () => {
                     body: "rows",
                 }}
                 style={{
+                    // oxlint-disable-next-line solid/style-prop -- a part-keyed style record, not CSS properties
                     sortIndicator: (header) => ({
                         opacity: header.columnIndex === 0 ? 0.5 : 1,
                     }),

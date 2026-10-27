@@ -37,7 +37,8 @@ describe("CORE_TRAIN_PACKAGES", () => {
         );
         const train = releasePaths(readCog(root), CORE_PACKAGE)
             .map((path) => names.get(path))
-            .sort();
+            .filter((name): name is string => name !== undefined)
+            .sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
         expect([...CORE_PACKAGES]).toEqual(train);
     });
 

@@ -156,6 +156,7 @@ const ITEMS: [string, (spec: SlottedComponentSpec) => unknown, string][] = [
 ];
 
 describe("items", () => {
+    // oxlint-disable-next-line vitest/expect-expect -- the assertions are in the showsFocusRing helper
     it.each(ITEMS)("%s's item shows the focus ring", (name, item) => {
         showsFocusRing(name, item(slotted(name)) as Record<string, unknown>);
     });
@@ -167,16 +168,11 @@ describe("items", () => {
                 default?: { value?: number; unit?: string; path?: string[] };
             };
             // Either the theme's touch target itself, or a fixed size of at least 44px.
-            if (node.default?.path) {
-                expect(node.default.path).toEqual([
-                    "tokens",
-                    "sizes",
-                    "touchTarget",
-                ]);
-            } else {
-                expect(node.default?.unit).toBe("px");
-                expect(node.default?.value).toBeGreaterThanOrEqual(44);
-            }
+            const { path, unit, value } = node.default ?? {};
+            const meetsTouchTarget = path
+                ? path.join(".") === "tokens.sizes.touchTarget"
+                : unit === "px" && value !== undefined && value >= 44;
+            expect(meetsTouchTarget, JSON.stringify(node.default)).toBe(true);
         },
     );
 });

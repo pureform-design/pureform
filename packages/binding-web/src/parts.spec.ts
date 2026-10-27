@@ -268,7 +268,7 @@ describe("combineProps", () => {
     });
 
     it("lets the binding call its own handler shapes", () => {
-        const handler = vi.fn();
+        const handler = vi.fn<(data: string, event: unknown) => void>();
         const merged = combineProps(
             [{ onClick: () => {} }, { onClick: [handler, "data"] }],
             {
@@ -455,8 +455,8 @@ describe("overDefaults", () => {
 
 describe("per-instance values", () => {
     it("resolves a function of the copy, and passes a plain value through", () => {
-        const fn = vi.fn((cell: { index: number }) =>
-            cell.index > 0 ? "late" : undefined,
+        const fn = vi.fn<(cell: { index: number }) => string | undefined>(
+            (cell) => (cell.index > 0 ? "late" : undefined),
         );
         expect(forInstance(fn, { index: 1 })).toBe("late");
         expect(forInstance(fn, { index: 0 })).toBeUndefined();

@@ -463,6 +463,7 @@ describe("the provider's default", () => {
     it("writes its theme-level tokens in the overrides, and its focus indicator color on each component", async () => {
         let tokens: Record<string, unknown> = {};
         function Probe() {
+            // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
             tokens = useTokens();
             return null;
         }
@@ -615,6 +616,7 @@ describe("a shared source", () => {
         let state: InteractionState | undefined;
         function Shared() {
             const source = useInteractionSource();
+            // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
             state = useInteractionState(source);
             return (
                 <>
@@ -708,6 +710,7 @@ describe("useIndication", () => {
         let state: InteractionState | undefined;
         function Surface(): ReactNode {
             const source = useInteractionSource();
+            // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
             state = useInteractionState(source);
             const { surface, layer } = useIndication(source, {
                 style: { color: "rgb(0, 0, 255)", borderRadius: 8 },

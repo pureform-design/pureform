@@ -3,7 +3,7 @@ import { userEvent } from "vitest/browser";
 
 import * as timePicker from ".";
 import { run, settle } from "../testing/vanilla";
-import type { MachineProps } from "../testing/vanilla";
+import type { MachineCallback, MachineProps } from "../testing/vanilla";
 
 afterEach(() => {
     document.body.innerHTML = "";
@@ -144,7 +144,8 @@ const picker = (props: MachineProps<timePicker.Schema>) => {
 
 describe("time picker machine", () => {
     it("holds the time with controllable-state semantics", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<MachineCallback<timePicker.Schema, "onValueChange">>();
         const { api, stop } = picker({ defaultValue: "09:30", onValueChange });
         expect(api().value).toBe("09:30");
         expect(api().period).toBe("am");

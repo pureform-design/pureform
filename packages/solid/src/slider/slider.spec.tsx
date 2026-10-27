@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { Slider } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { displayRegistry } from "../__fixtures__/registry";
 import { byTestId, mount, settle } from "../testing/mount";
@@ -47,7 +48,8 @@ describe("Slider", () => {
     });
 
     it("moves with the keyboard and reports a number, the tokens following", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", 5>) => void>();
         withRegistry(() => (
             <Slider
                 aria-label="Volume"
@@ -68,7 +70,8 @@ describe("Slider", () => {
 
     it("stays put while controlled until the owner takes the change", async () => {
         const [value, setValue] = createSignal(40);
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", number>) => void>();
         withRegistry(() => (
             <Slider
                 aria-label="Volume"
@@ -90,7 +93,8 @@ describe("Slider", () => {
     });
 
     it("draws a range: two handles, each placed by its own token", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", number[]>) => void>();
         withRegistry(() => (
             <Slider
                 aria-label={["From", "To"]}

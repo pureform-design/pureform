@@ -6,6 +6,7 @@ import { page, userEvent } from "vitest/browser";
 
 import { Checkbox } from ".";
 import type { CheckedState } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import type { PureformProviderProps } from "..";
 import { fakeRegistry } from "../__fixtures__/registry";
@@ -171,7 +172,8 @@ describe("Checkbox, ready-made", () => {
 
 describe("Checkbox, pointer and keyboard", () => {
     it("toggles uncontrolled state on a click, reporting each change once", async () => {
-        const onCheckedChange = vi.fn();
+        const onCheckedChange =
+            vi.fn<(details: ChangeDetails<"checked", CheckedState>) => void>();
         withRegistry(
             <Checkbox aria-label="Terms" onCheckedChange={onCheckedChange} />,
         );
@@ -195,7 +197,8 @@ describe("Checkbox, pointer and keyboard", () => {
     });
 
     it("toggles on Space, marking the press while the key is down", async () => {
-        const onCheckedChange = vi.fn();
+        const onCheckedChange =
+            vi.fn<(details: ChangeDetails<"checked", CheckedState>) => void>();
         withRegistry(
             <Checkbox
                 aria-label="Terms"
@@ -240,7 +243,8 @@ describe("Checkbox, pointer and keyboard", () => {
     });
 
     it("ignores the user while read-only, and says so", async () => {
-        const onCheckedChange = vi.fn();
+        const onCheckedChange =
+            vi.fn<(details: ChangeDetails<"checked", CheckedState>) => void>();
         withRegistry(
             <Checkbox
                 aria-label="Terms"
@@ -269,7 +273,8 @@ describe("Checkbox, pointer and keyboard", () => {
 describe("Checkbox, controlled", () => {
     it("asks to change, and moves only with the prop", async () => {
         const checked = outside<CheckedState>(false);
-        const onCheckedChange = vi.fn();
+        const onCheckedChange =
+            vi.fn<(details: ChangeDetails<"checked", CheckedState>) => void>();
         withRegistry(
             <checked.Holder>
                 {(value) => (
@@ -301,6 +306,7 @@ describe("Checkbox, controlled", () => {
         function Owner() {
             const [checked, setChecked] =
                 useState<CheckedState>("indeterminate");
+            // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
             current = checked;
             return (
                 <Checkbox
@@ -353,7 +359,8 @@ describe("Checkbox, forms", () => {
     });
 
     it("resets uncontrolled state to its default, reporting the reset", async () => {
-        const onCheckedChange = vi.fn();
+        const onCheckedChange =
+            vi.fn<(details: ChangeDetails<"checked", CheckedState>) => void>();
         withRegistry(
             <form data-testid="form">
                 <Checkbox
@@ -378,7 +385,8 @@ describe("Checkbox, forms", () => {
     });
 
     it("asks controlled state to reset, leaving the input where the prop says", async () => {
-        const onCheckedChange = vi.fn();
+        const onCheckedChange =
+            vi.fn<(details: ChangeDetails<"checked", CheckedState>) => void>();
         withRegistry(
             <form data-testid="form">
                 <Checkbox
@@ -429,7 +437,8 @@ describe("Checkbox, forms", () => {
 
 describe("Checkbox, compound parts", () => {
     it("compose under Root, the input taking its own props", async () => {
-        const onCheckedChange = vi.fn();
+        const onCheckedChange =
+            vi.fn<(details: ChangeDetails<"checked", CheckedState>) => void>();
         withRegistry(
             <Checkbox.Root
                 testId="c"

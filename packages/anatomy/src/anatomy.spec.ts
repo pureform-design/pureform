@@ -151,18 +151,16 @@ describe("the written anatomy", () => {
             for (const part of Object.values(parts)) {
                 // An expandable list item's region is its row's sibling: the row is a button. A
                 // swipeable one's frame holds its row and its action, side by side.
-                if (
+                const topLevel =
                     part.name === root ||
                     [
                         "listItem.region",
                         "listItem.frame",
                         "listItem.action",
-                    ].includes(`${name}.${part.name}`)
-                ) {
-                    expect(part.parent, `${name}.${part.name}`).toBeNull();
-                } else {
-                    expect(part.parent, `${name}.${part.name}`).not.toBeNull();
-                }
+                    ].includes(`${name}.${part.name}`);
+                expect(part.parent === null, `${name}.${part.name}`).toBe(
+                    topLevel,
+                );
             }
         }
     });

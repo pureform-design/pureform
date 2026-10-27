@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { Popover } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { overlaysRegistry } from "../__fixtures__/registry";
 import { Button } from "../button";
@@ -65,7 +66,8 @@ describe("Popover, ready-made", () => {
     });
 
     it("opens from a press, and closes with Escape, giving focus back to its trigger", async () => {
-        const onOpenChange = vi.fn();
+        const onOpenChange =
+            vi.fn<(details: ChangeDetails<"open", boolean>) => void>();
         withRegistry(() => (
             <Popover
                 trigger="Filters"

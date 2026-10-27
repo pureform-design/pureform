@@ -26,8 +26,8 @@ const withRegistry = (view: React.ReactNode) =>
 
 describe("CopyButton on React Native", () => {
     it("copies through the app's function, then shows it copied", async () => {
-        const copy = vi.fn();
-        const onCopy = vi.fn();
+        const copy = vi.fn<(value: string) => void | Promise<void>>();
+        const onCopy = vi.fn<(value: string) => void>();
         await withRegistry(
             <CopyButton
                 value="secret"
@@ -49,9 +49,12 @@ describe("CopyButton on React Native", () => {
     });
 
     it("shows nothing and calls onCopyError when the copy is denied", async () => {
-        const copy = vi.fn(() => Promise.reject(new Error("denied")));
-        const onCopy = vi.fn();
-        const onCopyError = vi.fn();
+        const copy = vi.fn<(value: string) => void | Promise<void>>(() =>
+            Promise.reject(new Error("denied")),
+        );
+        const onCopy = vi.fn<(value: string) => void>();
+        const onCopyError =
+            vi.fn<(details: { value: string; error: Error }) => void>();
         await withRegistry(
             <CopyButton
                 value="secret"

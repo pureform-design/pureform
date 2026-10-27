@@ -118,7 +118,8 @@ describe("select", () => {
         expect(toZagValue("m")).toEqual(["m"]);
         expect(fromZagValue([])).toBeNull();
         expect(fromZagValue(["m"])).toBe("m");
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: { value: string | null }) => void>();
         const props = selectValueProps({
             value: undefined,
             defaultValue: "s",

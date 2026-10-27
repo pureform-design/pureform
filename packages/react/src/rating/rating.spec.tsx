@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { Rating } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { ratingRegistry } from "../__fixtures__/registry";
 import { mount, settle } from "../testing/render";
@@ -55,7 +56,8 @@ describe("Rating, ready-made", () => {
     });
 
     it("sets the value by pressing a star and by the arrow keys, and reports it", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", number>) => void>();
         withRegistry(<Rating onValueChange={onValueChange} count={4} />);
         await settle();
         await userEvent.click(items()[2] as HTMLElement);
@@ -71,7 +73,8 @@ describe("Rating, ready-made", () => {
     });
 
     it("takes no input while read-only or disabled", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", number>) => void>();
         withRegistry(
             <Rating readOnly defaultValue={1} onValueChange={onValueChange} />,
         );

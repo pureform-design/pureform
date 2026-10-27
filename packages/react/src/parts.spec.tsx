@@ -1,5 +1,10 @@
 import { screen } from "@testing-library/react";
-import { type ReactNode, useState } from "react";
+import {
+    type KeyboardEventHandler,
+    type MouseEventHandler,
+    type ReactNode,
+    useState,
+} from "react";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
@@ -125,8 +130,8 @@ describe("parts", () => {
     });
 
     it("run the machine's handlers and the user's, and pass the user's ref", async () => {
-        const onClick = vi.fn();
-        const onKeyDown = vi.fn();
+        const onClick = vi.fn<MouseEventHandler<HTMLElement>>();
+        const onKeyDown = vi.fn<KeyboardEventHandler<HTMLElement>>();
         let ref: HTMLElement | null = null;
         withRegistry(
             <Root
@@ -156,6 +161,7 @@ describe("parts", () => {
         let setMirror!: (mirror: boolean) => void;
         function App() {
             const [mirror, set] = useState(true);
+            // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
             setMirror = set;
             return (
                 <Root>
@@ -311,7 +317,7 @@ describe("mergeRefs", () => {
     it("sets every ref, and clears them or runs their cleanups on detach", () => {
         const object = { current: null as HTMLElement | null };
         const calls: unknown[] = [];
-        const cleanup = vi.fn();
+        const cleanup = vi.fn<() => void>();
         const merged = mergeRefs<HTMLElement>(
             object,
             (value) => {

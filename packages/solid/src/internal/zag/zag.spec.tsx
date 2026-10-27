@@ -35,6 +35,7 @@ const BOX = {
 const overlaid = <P extends { style?: unknown }>(
     props: P,
 ): Omit<P, "style"> => {
+    // oxlint-disable-next-line solid/reactivity -- Zag's plain props object, not a component's props
     const { style, ...rest } = props;
     void style;
     return rest;
@@ -57,7 +58,9 @@ const mount = (view: () => unknown) => {
 const settle = () => new Promise((resolve) => setTimeout(resolve, 0));
 
 const formData = (form: HTMLFormElement) =>
-    [...new FormData(form)].map(([k, v]) => `${k}=${v}`).join("&");
+    [...new FormData(form)]
+        .map(([k, v]) => `${k}=${typeof v === "string" ? v : v.name}`)
+        .join("&");
 
 type CheckboxProps = Partial<checkbox.Props>;
 
@@ -85,7 +88,8 @@ const byTestId = (id: string) =>
 
 describe("checkbox through the overlaid native input", () => {
     it("toggles on a pointer click, calls back once, and submits", async () => {
-        const onCheckedChange = vi.fn();
+        const onCheckedChange =
+            vi.fn<(details: checkbox.CheckedChangeDetails) => void>();
         mount(() => (
             <form data-testid="form">
                 <Checkbox machine={{ onCheckedChange }} />
@@ -121,7 +125,8 @@ describe("checkbox through the overlaid native input", () => {
 
     it("follows a controlled prop, and only asks to change", async () => {
         const [checked, setChecked] = createSignal(false);
-        const onCheckedChange = vi.fn();
+        const onCheckedChange =
+            vi.fn<(details: checkbox.CheckedChangeDetails) => void>();
         mount(() => (
             <Checkbox machine={{ checked: checked(), onCheckedChange }} />
         ));
@@ -160,7 +165,7 @@ function Switch(props: {
 
 describe("switch through the overlaid native input", () => {
     it("toggles on a click and from the keyboard", async () => {
-        const onCheckedChange = vi.fn();
+        const onCheckedChange = vi.fn<(d: { checked: boolean }) => void>();
         mount(() => <Switch onCheckedChange={onCheckedChange} />);
         await settle();
         const root = byTestId("sw");
@@ -191,6 +196,7 @@ function RadioGroup(props: {
     const api = createMemo(() => radio.connect(service, normalizeProps));
     return (
         <div {...api().getRootProps()}>
+            {/* oxlint-disable-next-line solid/prefer-for -- a fixed fixture list, rendered once and never recreated */}
             {["a", "b", "c"].map((value) => (
                 <label
                     data-testid={`rg-${value}`}
@@ -210,7 +216,7 @@ function RadioGroup(props: {
 
 describe("radio group through the overlaid native inputs", () => {
     it("selects on a click and moves with the arrow keys", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange = vi.fn<(d: { value: string | null }) => void>();
         mount(() => (
             <form data-testid="form">
                 <RadioGroup onValueChange={onValueChange} />
@@ -328,8 +334,8 @@ describe("the port's pieces", () => {
     });
 
     it("merges classes and handlers, and lets later sources win otherwise", () => {
-        const first = vi.fn();
-        const second = vi.fn();
+        const first = vi.fn<() => void>();
+        const second = vi.fn<() => void>();
         const merged = mergeProps(
             { class: "a", onClick: first, id: "one" },
             () => ({ class: "b", onClick: second, id: "two" }),

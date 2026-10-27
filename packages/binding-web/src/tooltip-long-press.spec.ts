@@ -35,7 +35,7 @@ describe("tooltipLongPress", () => {
         vi.useFakeTimers();
         const trigger = document.createElement("button");
         document.body.append(trigger);
-        const setOpen = vi.fn();
+        const setOpen = vi.fn<(open: boolean) => void>();
         cleanup = tooltipLongPress(trigger, {
             setOpen,
             interactive: () => interactive,
@@ -59,7 +59,7 @@ describe("tooltipLongPress", () => {
 
     it("keeps an interactive tooltip after the press, and the touch's leave from the trigger", () => {
         const { trigger, setOpen } = mount(true);
-        const leaves = vi.fn();
+        const leaves = vi.fn<(event: Event) => void>();
         trigger.addEventListener("pointerleave", leaves);
         trigger.addEventListener("pointerout", leaves);
         pointer(trigger, "pointerdown");
@@ -90,7 +90,7 @@ describe("tooltipLongPress", () => {
 
     it("keeps the press's click and the browser's long-press menu from the trigger", () => {
         const { trigger } = mount();
-        const clicks = vi.fn();
+        const clicks = vi.fn<(event: Event) => void>();
         trigger.addEventListener("click", clicks);
         pointer(trigger, "pointerdown");
         vi.advanceTimersByTime(TOOLTIP_LONG_PRESS_MS);

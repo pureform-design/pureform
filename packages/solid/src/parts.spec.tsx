@@ -66,6 +66,7 @@ describe("parts", () => {
         withRegistry(() => (
             <Root
                 tokens={{ radius: "6px" }}
+                // oxlint-disable-next-line solid/style-prop -- a string style on purpose: the merge must accept one
                 style="margin-top: 8px; color: red"
             >
                 x
@@ -119,8 +120,8 @@ describe("parts", () => {
     });
 
     it("run the machine's handlers and the user's, and pass the user's ref", async () => {
-        const onClick = vi.fn();
-        const onKeyDown = vi.fn();
+        const onClick = vi.fn<(event: MouseEvent) => void>();
+        const onKeyDown = vi.fn<(event: KeyboardEvent) => void>();
         let ref: HTMLElement | undefined;
         withRegistry(() => (
             <Root
@@ -204,6 +205,7 @@ describe("ready-made components", () => {
                 label="Save"
                 variant="text"
                 class={{ root: ["wide", { busy: true }], label: "caps" }}
+                // oxlint-disable-next-line solid/style-prop -- a part-keyed style record, not CSS properties
                 style={{ root: { "margin-top": "8px" } }}
                 testId={{ root: "save", label: "save-label" }}
                 slotProps={{ label: { "aria-live": "polite", class: "slot" } }}

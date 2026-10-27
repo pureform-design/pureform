@@ -165,7 +165,9 @@ describe.each([animated, reanimated])("with $name", (engine) => {
             expect(isBetween(middle.right, from.right, to.right)).toBe(true);
             if (variant === "primary") {
                 // Flights is wider than Cars: the slide resizes it on the way.
+                // oxlint-disable-next-line vitest/no-conditional-expect -- only the primary variant resizes on the way
                 expect(from.width).toBeGreaterThan(to.width + 4);
+                // oxlint-disable-next-line vitest/no-conditional-expect -- only the primary variant resizes on the way
                 expect(isBetween(middle.width, from.width, to.width)).toBe(
                     true,
                 );
@@ -197,8 +199,11 @@ describe.each([animated, reanimated])("with $name", (engine) => {
                 expectAligned(index);
             }
             if (!("label" in items[0]!)) {
+                // oxlint-disable-next-line vitest/no-conditional-expect -- only the icon-only case has no label
                 expect(partOf(0, "label")).toBeNull();
+                // oxlint-disable-next-line vitest/no-conditional-expect -- only the icon-only case has no label
                 expect(boxOf(indicatorOf(0)).width).toBeCloseTo(24, 0);
+                // oxlint-disable-next-line vitest/no-conditional-expect -- only the icon-only case has no label
                 expect(tabOf(0).getAttribute("aria-label")).toBe("flights");
             }
         },

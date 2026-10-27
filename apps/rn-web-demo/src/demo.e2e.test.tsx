@@ -54,7 +54,10 @@ const first = (id: string) => {
 };
 
 // A color as the browser computes it.
-const computedColor = (color: string) => {
+const computedColor = (color: unknown) => {
+    if (typeof color !== "string") {
+        throw new Error(`not a color string: ${JSON.stringify(color)}`);
+    }
     const probe = document.createElement("i");
     probe.style.color = color;
     document.body.append(probe);
@@ -128,11 +131,11 @@ describe("rn-web-demo", () => {
     it("draws each component with its generated factory's styles", () => {
         const button = registry.entry("button").factory({}).root.style;
         expect(getComputedStyle(first("pf-button-root")).backgroundColor).toBe(
-            computedColor(String(button.backgroundColor)),
+            computedColor(button.backgroundColor),
         );
         const label = registry.entry("button").factory({}).label.style;
         expect(getComputedStyle(first("pf-button-label")).color).toBe(
-            computedColor(String(label.color)),
+            computedColor(label.color),
         );
         const avatar = registry.entry("avatar").factory({ size: "small" })
             .root.style;

@@ -70,7 +70,7 @@ describe("sideSheetDragToDismiss", () => {
         sheet.style.height = "400px";
         sheet.setAttribute("data-state", "open");
         document.body.append(sheet);
-        const dismiss = vi.fn((kept: () => void) =>
+        const dismiss = vi.fn<(kept: () => void) => void>((kept) =>
             queueMicrotask(() => {
                 if (sheet.getAttribute("data-state") !== "closed") kept();
             }),
@@ -118,7 +118,7 @@ describe("sideSheetDragToDismiss", () => {
     });
 
     it("leaves a mouse to select text, and asks onClose first", () => {
-        const onClose = vi.fn(() => false);
+        const onClose = vi.fn<() => boolean>(() => false);
         const { sheet, dismiss } = setup(false, onClose);
         sheet.dispatchEvent(pointer("pointerdown", 100, 100, 0, "mouse"));
         sheet.dispatchEvent(pointer("pointermove", 300, 100, 100, "mouse"));

@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { Button } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { fakeRegistry } from "../__fixtures__/registry";
 import { byTestId, mount, settle } from "../testing/mount";
@@ -64,6 +65,7 @@ describe("Button, ready-made", () => {
             <Button
                 label="Save"
                 class={{ root: ["wide", { busy: true }], label: "caps" }}
+                // oxlint-disable-next-line solid/style-prop -- a part-keyed style record, not CSS properties
                 style={{ root: { "margin-top": "8px" } }}
                 slotProps={{ label: { title: "the label" } }}
                 tokens={{ radius: "6px" }}
@@ -122,7 +124,7 @@ describe("Button, ready-made", () => {
     });
 
     it("forwards the element's own props, handlers, and id to the root", async () => {
-        const onClick = vi.fn();
+        const onClick = vi.fn<(event: MouseEvent) => void>();
         withRegistry(() => (
             <Button
                 label="Save"
@@ -142,7 +144,7 @@ describe("Button, ready-made", () => {
 
 describe("Button, keyboard and pointer", () => {
     it("clicks on Enter and Space, marking the press while the key is down", async () => {
-        const onClick = vi.fn();
+        const onClick = vi.fn<(event: MouseEvent) => void>();
         withRegistry(() => <Button label="Save" onClick={onClick} />);
         await settle();
         const root = byTestId(ids.root);
@@ -175,7 +177,7 @@ describe("Button, keyboard and pointer", () => {
     });
 
     it("ignores clicks while disabled, by its prop or a disabled fieldset", async () => {
-        const onClick = vi.fn();
+        const onClick = vi.fn<(event: MouseEvent) => void>();
         const [disabled, setDisabled] = createSignal(true);
         withRegistry(() => (
             <>
@@ -201,7 +203,8 @@ describe("Button, keyboard and pointer", () => {
 
 describe("Button, toggle", () => {
     it("toggles uncontrolled selection, reporting each change once", async () => {
-        const onSelectedChange = vi.fn();
+        const onSelectedChange =
+            vi.fn<(details: ChangeDetails<"selected", boolean>) => void>();
         withRegistry(() => (
             <Button
                 label="Bold"
@@ -227,7 +230,8 @@ describe("Button, toggle", () => {
 
     it("asks to change controlled selection, and moves only with the prop", async () => {
         const [selected, setSelected] = createSignal(false);
-        const onSelectedChange = vi.fn();
+        const onSelectedChange =
+            vi.fn<(details: ChangeDetails<"selected", boolean>) => void>();
         withRegistry(() => (
             <Button
                 label="Bold"

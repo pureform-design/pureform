@@ -1,5 +1,6 @@
 import { testIds } from "@pureform/anatomy";
 import { createInteractionSource } from "@pureform/binding-core/interaction";
+import type { ComponentProps } from "react";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
@@ -32,7 +33,7 @@ const background = (id: string) =>
 
 describe("Card on React Native", () => {
     it("is one button around its children with onPress, as before", async () => {
-        const press = vi.fn();
+        const press = vi.fn<() => void>();
         await withRegistry(
             <Card onPress={press} headline="Basic plan" supportingText="$4" />,
         );
@@ -47,8 +48,9 @@ describe("Card on React Native", () => {
     });
 
     it("moves onPress to the action area beside other controls, the root no button", async () => {
-        const press = vi.fn();
-        const upgrade = vi.fn();
+        const press = vi.fn<() => void>();
+        const upgrade =
+            vi.fn<NonNullable<ComponentProps<typeof Button>["onPress"]>>();
         await withRegistry(
             <Card
                 onPress={press}

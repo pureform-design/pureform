@@ -1,4 +1,5 @@
 import { compositeTestIds, testIds } from "@pureform/anatomy";
+import type { ComponentProps } from "solid-js";
 import { createSignal, Errored } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
@@ -57,7 +58,10 @@ describe("Paginator, ready-made", () => {
     });
 
     it("steps with the buttons and reports the page", async () => {
-        const onPageChange = vi.fn();
+        const onPageChange =
+            vi.fn<
+                NonNullable<ComponentProps<typeof Paginator>["onPageChange"]>
+            >();
         withRegistry(() => (
             <Paginator
                 count={95}
@@ -112,6 +116,7 @@ describe("Paginator, ready-made", () => {
         expect(range()).toBe("21 – 30 of 95");
         await userEvent.click(byTestId(ids.prevTrigger));
         await settle();
+        // oxlint-disable-next-line solid/reactivity -- the test asserts the signal's current value
         expect(page()).toBe(2);
         expect(range()).toBe("11 – 20 of 95");
         setPage(10);
@@ -120,7 +125,12 @@ describe("Paginator, ready-made", () => {
     });
 
     it("changes the page size with the select, keeping the first item shown", async () => {
-        const onPageSizeChange = vi.fn();
+        const onPageSizeChange =
+            vi.fn<
+                NonNullable<
+                    ComponentProps<typeof Paginator>["onPageSizeChange"]
+                >
+            >();
         withRegistry(() => (
             <Paginator
                 count={95}

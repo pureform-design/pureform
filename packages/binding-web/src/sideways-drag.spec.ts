@@ -15,10 +15,13 @@ describe("sidewaysDrag", () => {
         const hooks = {
             slop: 8,
             accepts: () => accepts,
-            down: vi.fn(),
-            start: vi.fn(),
-            move: vi.fn(),
-            release: vi.fn(),
+            down: vi.fn<(event: PointerEvent) => void>(),
+            start: vi.fn<(event: PointerEvent) => void>(),
+            move: vi.fn<(dx: number, event: PointerEvent) => void>(),
+            release:
+                vi.fn<
+                    (dx: number, velocity: number, cancelled: boolean) => void
+                >(),
         };
         cleanup = sidewaysDrag(element, hooks);
         return { element, ...hooks };

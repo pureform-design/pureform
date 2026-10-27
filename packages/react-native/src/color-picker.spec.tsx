@@ -1,4 +1,5 @@
 import { testIds } from "@pureform/anatomy";
+import type { ComponentProps } from "react";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
@@ -56,7 +57,10 @@ describe("ColorPicker on React Native", () => {
     });
 
     it("picks a swatch, reporting hex", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<
+                NonNullable<ComponentProps<typeof ColorPicker>["onValueChange"]>
+            >();
         await withRegistry(
             <ColorPicker
                 swatches={["#006a6a"]}
@@ -73,8 +77,16 @@ describe("ColorPicker on React Native", () => {
     });
 
     it("moves saturation and brightness with a drag on the area", async () => {
-        const onValueChange = vi.fn();
-        const onValueChangeEnd = vi.fn();
+        const onValueChange =
+            vi.fn<
+                NonNullable<ComponentProps<typeof ColorPicker>["onValueChange"]>
+            >();
+        const onValueChangeEnd =
+            vi.fn<
+                NonNullable<
+                    ComponentProps<typeof ColorPicker>["onValueChangeEnd"]
+                >
+            >();
         await withRegistry(
             <ColorPicker
                 defaultValue="#ff0000"
@@ -97,7 +109,12 @@ describe("ColorPicker on React Native", () => {
     });
 
     it("sets the color from the hex field on submit, and puts back text that isn't one", async () => {
-        const onValueChangeEnd = vi.fn();
+        const onValueChangeEnd =
+            vi.fn<
+                NonNullable<
+                    ComponentProps<typeof ColorPicker>["onValueChangeEnd"]
+                >
+            >();
         await withRegistry(<ColorPicker onValueChangeEnd={onValueChangeEnd} />);
         await userEvent.clear(hexInput());
         await userEvent.type(hexInput(), "abc{Enter}");
@@ -118,7 +135,9 @@ describe("ColorPicker on React Native", () => {
 
     it("runs the user's hex input handlers after its own", async () => {
         const calls: string[] = [];
-        const onValueChangeEnd = vi.fn(() => calls.push("picker"));
+        const onValueChangeEnd = vi.fn<
+            NonNullable<ComponentProps<typeof ColorPicker>["onValueChangeEnd"]>
+        >(() => calls.push("picker"));
         await withRegistry(
             <ColorPicker
                 onValueChangeEnd={onValueChangeEnd}

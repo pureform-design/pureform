@@ -1,4 +1,5 @@
 import { testIds } from "@pureform/anatomy";
+import type { ComponentProps } from "solid-js";
 import { flush, createSignal } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
@@ -46,6 +47,7 @@ describe("CodeField, ready-made", () => {
                     input: (cell) => (cell.value ? "filled" : undefined),
                     control: "row",
                 }}
+                // oxlint-disable-next-line solid/style-prop -- a part-keyed style record, not CSS properties
                 style={{ input: (cell) => ({ opacity: (cell.index + 1) / 4 }) }}
                 slotProps={{
                     input: (cell) => ({ title: `cell ${cell.index}` }),
@@ -84,7 +86,10 @@ describe("CodeField, ready-made", () => {
     });
 
     it("moves to the next cell as it's typed, and back with Backspace", async () => {
-        const onValueComplete = vi.fn();
+        const onValueComplete =
+            vi.fn<
+                NonNullable<ComponentProps<typeof CodeField>["onValueComplete"]>
+            >();
         withRegistry(() => (
             <CodeField label="Code" onValueComplete={onValueComplete} />
         ));

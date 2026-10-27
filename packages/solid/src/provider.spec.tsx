@@ -126,14 +126,17 @@ describe("PureformProvider", () => {
         const runs = { dir: 0, motion: 0, overrides: 0 };
         function Probe() {
             const state = usePureform();
+            // oxlint-disable-next-line solid/reactivity -- probe memo: its runs are counted, its value is never read
             createMemo(() => {
                 runs.dir++;
                 return state().dir;
             });
+            // oxlint-disable-next-line solid/reactivity -- probe memo: its runs are counted, its value is never read
             createMemo(() => {
                 runs.motion++;
                 return state().motion;
             });
+            // oxlint-disable-next-line solid/reactivity -- probe memo: its runs are counted, its value is never read
             createMemo(() => {
                 runs.overrides++;
                 return state().overrides;
@@ -349,10 +352,12 @@ describe("PureformProvider runs", () => {
         const seen: [unknown, unknown][] = [];
         function Probe() {
             const state = usePureform();
+            // oxlint-disable-next-line solid/reactivity -- probe memo: its runs are counted, its value is never read
             createMemo(() => {
                 runs.slotProps++;
                 return state().slotProps;
             });
+            // oxlint-disable-next-line solid/reactivity -- probe memo: its runs are counted, its value is never read
             createMemo(() => {
                 seen.push([state().theme, state().overrides]);
             });

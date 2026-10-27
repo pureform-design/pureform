@@ -95,7 +95,8 @@ describe("DatePicker", () => {
     });
 
     it("commits the draft on OK and drops it on Cancel", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: { readonly value: readonly string[] }) => void>();
         await render(
             <DatePicker
                 trigger="Pick a date"
@@ -244,7 +245,8 @@ describe("DockedDatePicker", () => {
     });
 
     it("reads typed text on blur", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: { readonly value: readonly string[] }) => void>();
         await render(
             <DockedDatePicker
                 label="Date"
@@ -262,7 +264,8 @@ describe("DockedDatePicker", () => {
     });
 
     it("opens the calendar and closes on a chosen day", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: { readonly value: readonly string[] }) => void>();
         await render(
             <DockedDatePicker
                 label="Date"
@@ -353,7 +356,8 @@ describe("DateInput", () => {
     });
 
     it("moves on from a full segment, back from an empty one, and along the row and up and down with the arrow keys", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: { readonly value: readonly string[] }) => void>();
         await render(
             <DateInput locale="en-US" onValueChange={onValueChange} />,
         );
@@ -424,8 +428,8 @@ describe("DateInput", () => {
     });
 
     it("confirms the typed date", async () => {
-        const onConfirm = vi.fn();
-        const onCancel = vi.fn();
+        const onConfirm = vi.fn<(value: readonly string[]) => void>();
+        const onCancel = vi.fn<() => void>();
         await render(
             <DateInput
                 locale="en-US"
@@ -464,7 +468,7 @@ describe("DateInput", () => {
     });
 
     it("has no date while the text isn't a whole one", async () => {
-        const onConfirm = vi.fn();
+        const onConfirm = vi.fn<(value: readonly string[]) => void>();
         await render(<DateInput locale="en-US" onConfirm={onConfirm} />);
         await interact(() => userEvent.click(segments()[0]!));
         await interact(() => userEvent.keyboard("0817"));
@@ -476,6 +480,7 @@ describe("DateInput", () => {
         let setOutside: (value: readonly string[]) => void = () => {};
         function Controlled() {
             const [value, setValue] = useState<readonly string[]>([]);
+            // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
             setOutside = setValue;
             return (
                 <DateInput

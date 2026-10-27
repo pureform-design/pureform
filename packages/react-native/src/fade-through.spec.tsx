@@ -58,6 +58,7 @@ describe("FadeThrough", () => {
     it("takes the theme's springs and durations, the fade in waiting for the fade out", async () => {
         let tokens!: import("@pureform/rn-adapter/factory").ThemeValues;
         function Read(): ReactNode {
+            // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
             tokens = useTokens();
             return null;
         }

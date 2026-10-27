@@ -173,8 +173,8 @@ describe("a progress value", () => {
         await frames();
         const done = reduced ? arc() : await drawnOtherThan(arc, soon);
         expect(done).not.toBe(rest);
-        if (reduced) expect(soon).toBe(done);
-        else expect(soon).not.toBe(done);
+        // Reduced motion draws the end at once; otherwise the arc is still moving after `soon`.
+        expect(Object.is(soon, done)).toBe(reduced);
     });
 });
 

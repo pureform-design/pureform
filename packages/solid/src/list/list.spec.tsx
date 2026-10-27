@@ -29,6 +29,7 @@ describe("List, ready-made", () => {
                     item: ({ item }) => `row-${item.value}`,
                     root: "rows",
                 }}
+                // oxlint-disable-next-line solid/style-prop -- a part-keyed style record, not CSS properties
                 style={{ item: ({ index }) => ({ opacity: index ? 0.5 : 1 }) }}
                 slotProps={{ item: ({ index }) => ({ title: `row ${index}` }) }}
                 unstyled={{ item: ({ index }) => index === 0 }}

@@ -70,12 +70,16 @@ describe("fab menu items", () => {
     });
 
     it("drops the stagger under reduced motion", () => {
-        for (const [key, rule] of Object.entries(list())) {
-            if (!key.startsWith("&")) continue;
-            const reduced = (
-                rule.animation as unknown as Record<string, string>
-            )._motionReduce;
-            if (reduced) expect(reduced).not.toContain("calc(");
-        }
+        const reduced = Object.entries(list())
+            .filter(([key]) => key.startsWith("&"))
+            .map(
+                ([, rule]) =>
+                    (rule.animation as unknown as Record<string, string>)
+                        ._motionReduce,
+            )
+            .filter((animation): animation is string => Boolean(animation));
+        expect(
+            reduced.filter((animation) => animation.includes("calc(")),
+        ).toEqual([]);
     });
 });

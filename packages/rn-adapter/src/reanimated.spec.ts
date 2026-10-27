@@ -6,8 +6,12 @@ import { cssEasing } from "./reanimated";
 import { LINEAR } from "./values";
 
 vi.mock("react-native-reanimated", () => ({
-    cubicBezier: vi.fn((...points: number[]) => ({ bezier: points })),
-    linear: vi.fn((...points: unknown[]) => ({ linear: points })),
+    cubicBezier: vi.fn<(...points: number[]) => { bezier: number[] }>(
+        (...points) => ({ bezier: points }),
+    ),
+    linear: vi.fn<(...points: unknown[]) => { linear: unknown[] }>(
+        (...points) => ({ linear: points }),
+    ),
 }));
 
 describe("Reanimated's native timing API", () => {

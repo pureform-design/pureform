@@ -8,6 +8,7 @@ import { Toolbar } from ".";
 import { ProvidedTokens, PureformProvider, useTokens } from "..";
 import { AppBar } from "../app-bar";
 import { IconButton } from "../icon-button";
+import { colorText } from "../styles";
 import { presetRegistry } from "../testing/registry";
 import type { TestRegistry } from "../testing/registry";
 import { byTestId, interact, mount, settle, until } from "../testing/render";
@@ -148,9 +149,12 @@ describe("provided tokens", () => {
     let onSurfaceVariant = "";
     const Probe = () => {
         const tokens = useTokens();
-        onContainer = String(tokens["colors.onPrimaryContainer"]);
-        onSurface = String(tokens["colors.onSurface"]);
-        onSurfaceVariant = String(tokens["colors.onSurfaceVariant"]);
+        // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
+        onContainer = colorText(tokens["colors.onPrimaryContainer"]) ?? "";
+        // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
+        onSurface = colorText(tokens["colors.onSurface"]) ?? "";
+        // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
+        onSurfaceVariant = colorText(tokens["colors.onSurfaceVariant"]) ?? "";
         return null;
     };
 

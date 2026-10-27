@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { TagsInput } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { textInputsRegistry } from "../__fixtures__/registry";
 import { byTestId, mount, settle } from "../testing/mount";
@@ -66,7 +67,8 @@ describe("TagsInput, ready-made", () => {
     });
 
     it("adds typed text on Enter, and removes a chip with its button", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", string[]>) => void>();
         withRegistry(() => (
             <TagsInput
                 label="Tags"

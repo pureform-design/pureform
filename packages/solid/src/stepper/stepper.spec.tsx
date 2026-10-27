@@ -1,4 +1,5 @@
 import { testIds } from "@pureform/anatomy";
+import type { ComponentProps } from "solid-js";
 import { Errored } from "solid-js";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
@@ -114,7 +115,10 @@ describe("Stepper, ready-made", () => {
     });
 
     it("goes to a step with a click, and reports it", async () => {
-        const onStepChange = vi.fn();
+        const onStepChange =
+            vi.fn<
+                NonNullable<ComponentProps<typeof Stepper>["onStepChange"]>
+            >();
         render({ onStepChange });
         await settle();
         await userEvent.click(triggers()[2]!);
@@ -193,6 +197,7 @@ describe("Stepper, composed", () => {
                         list: "steps",
                     }}
                     style={{
+                        // oxlint-disable-next-line solid/style-prop -- a part-keyed style record, not CSS properties
                         label: (step) => ({ opacity: step.error ? 0.5 : 1 }),
                     }}
                     slotProps={{
@@ -218,7 +223,7 @@ describe("Stepper, composed", () => {
     });
 
     it("renders the parts under Root, with next and previous triggers", async () => {
-        const onStepComplete = vi.fn();
+        const onStepComplete = vi.fn<() => void>();
         mount(() => (
             <PureformProvider registry={displayRegistry()}>
                 <Stepper.Root count={2} onStepComplete={onStepComplete}>

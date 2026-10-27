@@ -1,10 +1,11 @@
 import { compositeTestIds, testIds } from "@pureform/anatomy";
 import { screen } from "@testing-library/react";
-import type { ReactNode } from "react";
+import type { ReactNode, SubmitEventHandler } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { DatePicker } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { datePickersRegistry } from "../__fixtures__/registry";
 import { interact, mount, settle, until } from "../testing/render";
@@ -107,7 +108,8 @@ describe("DatePicker, ready-made", () => {
     });
 
     it("commits the chosen day with OK and closes; Cancel drops the draft", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: { readonly value: readonly string[] }) => void>();
         withRegistry(
             <DatePicker
                 trigger="Pick"
@@ -135,10 +137,11 @@ describe("DatePicker, ready-made", () => {
     });
 
     it("draws Cancel and OK as type=button, so they don't submit a form", async () => {
-        const onSubmit = vi.fn((event: { preventDefault(): void }) =>
+        const onSubmit = vi.fn<SubmitEventHandler<HTMLFormElement>>((event) =>
             event.preventDefault(),
         );
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: { readonly value: readonly string[] }) => void>();
         withRegistry(
             <form onSubmit={onSubmit}>
                 <DatePicker
@@ -162,7 +165,8 @@ describe("DatePicker, ready-made", () => {
     });
 
     it("moves between days with the arrows, chooses with Enter, closes with Escape", async () => {
-        const onOpenChange = vi.fn();
+        const onOpenChange =
+            vi.fn<(details: ChangeDetails<"open", boolean>) => void>();
         withRegistry(
             <DatePicker
                 trigger="Pick"
@@ -237,7 +241,7 @@ describe("DatePicker, ready-made", () => {
     });
 
     it("switches to the years and back, and shows the mode toggle with onModeToggle", async () => {
-        const onModeToggle = vi.fn();
+        const onModeToggle = vi.fn<() => void>();
         withRegistry(
             <DatePicker
                 locale="en-US"

@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { SideSheet } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { overlaysRegistry } from "../__fixtures__/registry";
 import { Button } from "../button";
@@ -60,7 +61,8 @@ describe("SideSheet, ready-made", () => {
     });
 
     it("traps focus while open, closes with its close button, and gives focus back", async () => {
-        const onOpenChange = vi.fn();
+        const onOpenChange =
+            vi.fn<(details: ChangeDetails<"open", boolean>) => void>();
         withRegistry(
             <>
                 <button type="button">Outside</button>
@@ -91,7 +93,7 @@ describe("SideSheet, ready-made", () => {
     });
 
     it("shows a mirrored back button given onBack", async () => {
-        const onBack = vi.fn();
+        const onBack = vi.fn<() => void>();
         withRegistry(
             <SideSheet defaultOpen headline="Filters" onBack={onBack} />,
         );
@@ -129,9 +131,10 @@ describe("SideSheet, ready-made", () => {
 
 describe("SideSheet, onClose", () => {
     it("asks onClose before Escape, the scrim or its close trigger closes it, refused and then allowed", async () => {
-        const onOpenChange = vi.fn();
+        const onOpenChange =
+            vi.fn<(details: ChangeDetails<"open", boolean>) => void>();
         let answer = false;
-        const onClose = vi.fn(() => answer);
+        const onClose = vi.fn<() => boolean | Promise<boolean>>(() => answer);
         withRegistry(
             <SideSheet
                 defaultOpen
@@ -162,10 +165,11 @@ describe("SideSheet, onClose", () => {
     });
 
     it("doesn't ask onClose when a controlled open closes it", async () => {
-        const onClose = vi.fn(() => false);
+        const onClose = vi.fn<() => boolean | Promise<boolean>>(() => false);
         let setOpen: (open: boolean) => void = () => {};
         function App() {
             const [open, setOpenState] = useState(true);
+            // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
             setOpen = setOpenState;
             return (
                 <>

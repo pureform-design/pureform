@@ -1,4 +1,5 @@
 import { testIds } from "@pureform/anatomy";
+import type { ComponentProps } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
@@ -121,7 +122,10 @@ describe("Stepper, ready-made", () => {
     });
 
     it("goes to a step with a click, and reports it", async () => {
-        const onStepChange = vi.fn();
+        const onStepChange =
+            vi.fn<
+                NonNullable<ComponentProps<typeof Stepper>["onStepChange"]>
+            >();
         render({ onStepChange });
         await settle();
         await userEvent.click(triggers()[2]!);
@@ -225,7 +229,7 @@ describe("Stepper, composed", () => {
     });
 
     it("renders the parts under Root, with next and previous triggers", async () => {
-        const onStepComplete = vi.fn();
+        const onStepComplete = vi.fn<() => void>();
         mount(
             <PureformProvider registry={displayRegistry()}>
                 <Stepper.Root count={2} onStepComplete={onStepComplete}>

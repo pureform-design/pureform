@@ -3,7 +3,7 @@ import { userEvent } from "vitest/browser";
 
 import * as stepper from ".";
 import { run, settle } from "../testing/vanilla";
-import type { MachineProps } from "../testing/vanilla";
+import type { MachineCallback, MachineProps } from "../testing/vanilla";
 
 afterEach(() => {
     document.body.innerHTML = "";
@@ -160,7 +160,8 @@ describe("stepper machine", () => {
     });
 
     it("goes to the step of a pressed header with Enter or Space", async () => {
-        const onStepChange = vi.fn();
+        const onStepChange =
+            vi.fn<MachineCallback<stepper.Schema, "onStepChange">>();
         const { trigger, api } = render({ onStepChange });
         await settle();
         trigger(0).focus();

@@ -1,4 +1,5 @@
 import { compositeTestIds, testIds } from "@pureform/anatomy";
+import type { ComponentProps } from "react";
 import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
@@ -60,7 +61,10 @@ describe("Paginator, ready-made", () => {
     });
 
     it("steps with the buttons and reports the page", async () => {
-        const onPageChange = vi.fn();
+        const onPageChange =
+            vi.fn<
+                NonNullable<ComponentProps<typeof Paginator>["onPageChange"]>
+            >();
         withRegistry(
             <Paginator
                 count={95}
@@ -112,7 +116,11 @@ describe("Paginator, ready-made", () => {
                         page={page}
                         onPageChange={(details) => setPage(details.page)}
                     />
-                    <button data-testid="jump" onClick={() => setPage(10)} />
+                    <button
+                        data-testid="jump"
+                        aria-label="Go to page 10"
+                        onClick={() => setPage(10)}
+                    />
                 </>
             );
         }
@@ -128,7 +136,12 @@ describe("Paginator, ready-made", () => {
     });
 
     it("changes the page size with the select, keeping the first item shown", async () => {
-        const onPageSizeChange = vi.fn();
+        const onPageSizeChange =
+            vi.fn<
+                NonNullable<
+                    ComponentProps<typeof Paginator>["onPageSizeChange"]
+                >
+            >();
         withRegistry(
             <Paginator
                 count={95}

@@ -255,30 +255,33 @@ describe.each(NAMES)("the %s factory", (name) => {
     it("sets each instance token as the component's CSS var on the root", () => {
         const tokens = (pureformConfig.components[name]!.tokens ??
             {}) as unknown as Record<string, DynamicNode>;
-        for (const [token, node] of Object.entries(tokens)) {
+        const isSpring = (node: DynamicNode) =>
+            node.default?.type === "spring" ||
+            (node.default?.type === "alias" &&
+                node.default.path?.[0] === "springs");
+        const entries = Object.entries(tokens);
+        for (const [token, node] of entries.filter(([, node]) =>
+            isSpring(node),
+        )) {
             const variable = varName(node.path, PREFIX);
-            const fallback = node.default;
-            if (
-                fallback?.type === "spring" ||
-                (fallback?.type === "alias" && fallback.path?.[0] === "springs")
-            ) {
-                // A spring token takes a role's name, as the role's vars: its curve and its exact parameters.
-                expect(
-                    factory({ tokens: { [token]: "spatialSlow" } }).root.style,
-                    token,
-                ).toEqual({
-                    [`${variable}-duration`]:
-                        "var(--springs-spatial-slow-duration)",
-                    [`${variable}-easing`]:
-                        "var(--springs-spatial-slow-easing)",
-                    [`${variable}-stiffness`]:
-                        "var(--springs-spatial-slow-stiffness)",
-                    [`${variable}-damping`]:
-                        "var(--springs-spatial-slow-damping)",
-                    [`${variable}-mass`]: "var(--springs-spatial-slow-mass)",
-                });
-                continue;
-            }
+            // A spring token takes a role's name, as the role's vars: its curve and its exact parameters.
+            expect(
+                factory({ tokens: { [token]: "spatialSlow" } }).root.style,
+                token,
+            ).toEqual({
+                [`${variable}-duration`]:
+                    "var(--springs-spatial-slow-duration)",
+                [`${variable}-easing`]: "var(--springs-spatial-slow-easing)",
+                [`${variable}-stiffness`]:
+                    "var(--springs-spatial-slow-stiffness)",
+                [`${variable}-damping`]: "var(--springs-spatial-slow-damping)",
+                [`${variable}-mass`]: "var(--springs-spatial-slow-mass)",
+            });
+        }
+        for (const [token, node] of entries.filter(
+            ([, node]) => !isSpring(node),
+        )) {
+            const variable = varName(node.path, PREFIX);
             const slots = factory({ tokens: { [token]: "1px" } });
             expect(slots.root.style, token).toEqual({ [variable]: "1px" });
             expect(slots.root.class).toBe(factory({}).root.class);
@@ -289,20 +292,18 @@ describe.each(NAMES)("the %s factory", (name) => {
 
 // Tokens the preset declares but none of its styles read (a gap in the preset, not in the
 // factories): setting them has no effect.
+// A state layer that follows another slot has no drag state.
 const UNREAD = [
-    // A state layer that follows another slot has no drag state.
-    ...[
-        "iconButton",
-        "fab",
-        "checkbox",
-        "radio",
-        "switchControl",
-        "slider",
-        "navigationBar",
-        "navigationRail",
-        "nativeSelect",
-    ].map((name) => `--pf-components-${name}-stateDraggedOpacity`),
-];
+    "iconButton",
+    "fab",
+    "checkbox",
+    "radio",
+    "switchControl",
+    "slider",
+    "navigationBar",
+    "navigationRail",
+    "nativeSelect",
+].map((name) => `--pf-components-${name}-stateDraggedOpacity`);
 
 describe("instance tokens", () => {
     it("are vars Panda's stylesheet reads", () => {

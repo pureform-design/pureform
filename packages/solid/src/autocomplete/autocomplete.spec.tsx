@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { Autocomplete } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { textInputsRegistry } from "../__fixtures__/registry";
 import { byTestId, mount, settle } from "../testing/mount";
@@ -56,7 +57,8 @@ describe("Autocomplete, ready-made", () => {
     });
 
     it("filters the suggestions as the text changes, and chooses one with the keys", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", string | null>) => void>();
         withRegistry(() => (
             <Autocomplete
                 label="City"

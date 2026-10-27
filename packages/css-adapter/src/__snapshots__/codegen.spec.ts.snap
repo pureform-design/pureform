@@ -1,26 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`the CSS codegen > gives a single-slot component's class to the root 1`] = `
-"import { selectionCache } from "@pureform/styling";
-import type { Selection } from "@pureform/styling";
-import type { ClassFactory, ClassSlots } from "@pureform/styling-web";
-
-const classes = selectionCache<Selection<"icon">, ClassSlots<"icon">>(
-    {
-        variants: ["filled"],
-    },
-    (s) => ({
-        root: {
-            class: \`icon\${s.filled === undefined ? "" : \` icon--filled_\${s.filled}\`}\`,
-        },
-    }),
-);
-
-export const icon: ClassFactory<"icon"> = classes;
-"
-`;
-
-exports[`the CSS codegen > gives a single-slot component's class to the root 2`] = `
+exports[`the CSS codegen > gives a single-slot component's class to the root > divider 1`] = `
 "import { selectionCache } from "@pureform/styling";
 import type { Selection } from "@pureform/styling";
 import type { ClassFactory, ClassSlots } from "@pureform/styling-web";
@@ -37,6 +17,26 @@ const classes = selectionCache<Selection<"divider">, ClassSlots<"divider">>(
 );
 
 export const divider: ClassFactory<"divider"> = classes;
+"
+`;
+
+exports[`the CSS codegen > gives a single-slot component's class to the root > icon 1`] = `
+"import { selectionCache } from "@pureform/styling";
+import type { Selection } from "@pureform/styling";
+import type { ClassFactory, ClassSlots } from "@pureform/styling-web";
+
+const classes = selectionCache<Selection<"icon">, ClassSlots<"icon">>(
+    {
+        variants: ["filled"],
+    },
+    (s) => ({
+        root: {
+            class: \`icon\${s.filled === undefined ? "" : \` icon--filled_\${s.filled}\`}\`,
+        },
+    }),
+);
+
+export const icon: ClassFactory<"icon"> = classes;
 "
 `;
 

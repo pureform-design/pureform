@@ -42,7 +42,7 @@ describe("Controllable", () => {
 
 describe("createControlTracker", () => {
     it("warns once when the value prop switches", () => {
-        const warn = vi.fn();
+        const warn = vi.fn<(message: string) => void>();
         const track = createControlTracker("Checkbox", "checked", true, warn);
         track(true);
         expect(warn).not.toHaveBeenCalled();
@@ -103,7 +103,7 @@ describe("createChangeReason", () => {
 
     it("passes the same details object when not resetting", () => {
         const details = { value: "a" };
-        const callback = vi.fn();
+        const callback = vi.fn<(details: { value: string }) => void>();
         createChangeReason().report(callback, details);
         expect(callback.mock.calls[0]![0]).toBe(details);
     });
@@ -120,7 +120,7 @@ describe("resolveReducedMotion", () => {
 
 describe("warnOnce", () => {
     it("warns once per message", () => {
-        const warn = vi.fn();
+        const warn = vi.fn<(message: string) => void>();
         warnOnce("pureform: test message", warn);
         warnOnce("pureform: test message", warn);
         expect(warn).toHaveBeenCalledTimes(1);

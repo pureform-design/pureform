@@ -36,6 +36,7 @@ let show: (value: string) => void = () => {};
 
 function Pages() {
     const [value, setValue] = useState("home");
+    // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
     show = (next) => act(() => setValue(next));
     return (
         <PureformProvider registry={navigationRegistry()}>
@@ -96,6 +97,7 @@ describe("FadeThrough", () => {
         let set: (value: string) => void = () => {};
         function ByValue() {
             const [value, setValue] = useState("home");
+            // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
             set = (next) => act(() => setValue(next));
             return (
                 <PureformProvider registry={navigationRegistry()}>

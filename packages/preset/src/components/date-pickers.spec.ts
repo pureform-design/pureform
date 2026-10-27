@@ -130,7 +130,9 @@ describe("datePicker", () => {
     it("lines the weekdays up with the cells", () => {
         const base = recipe("datePicker", datePicker)?.base;
         expect(base?.weekday?.width).toBe(base?.weekday?.height);
-        expect(String(base?.weekday?.width)).toContain("cellSize");
+        expect(base?.weekday?.width).toEqual(
+            expect.stringContaining("cellSize"),
+        );
     });
 
     it("compiles to a stable Panda slot recipe", () => {

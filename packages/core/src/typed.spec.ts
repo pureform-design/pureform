@@ -65,7 +65,10 @@ describe("typed alias", () => {
     });
 
     it("takes any name under a known root with no config", () => {
-        typed().alias("tokens", "anything", "here");
+        expect(typed().alias("tokens", "anything", "here")).toEqual({
+            type: "alias",
+            path: ["tokens", "anything", "here"],
+        });
     });
 });
 
@@ -162,6 +165,7 @@ describe("typed slot component", () => {
         variants: { size: ["small"] },
     } as const;
 
+    // oxlint-disable-next-line vitest/expect-expect -- type-level test: the @ts-expect-error directives, checked by the typecheck, are the assertions
     it("rejects an unknown token", () => {
         pf.slotComponent({
             name: "chip",
@@ -174,6 +178,7 @@ describe("typed slot component", () => {
         });
     });
 
+    // oxlint-disable-next-line vitest/expect-expect -- type-level test: the @ts-expect-error directives, checked by the typecheck, are the assertions
     it("rejects an unknown slot in a condition", () => {
         pf.slotComponent({
             name: "chip",
@@ -194,6 +199,7 @@ describe("typed slot component", () => {
         });
     });
 
+    // oxlint-disable-next-line vitest/expect-expect -- type-level test: the @ts-expect-error directives, checked by the typecheck, are the assertions
     it("rejects styling an unknown slot", () => {
         pf.slotComponent({
             name: "chip",
@@ -214,6 +220,7 @@ describe("typed slot component", () => {
         });
     });
 
+    // oxlint-disable-next-line vitest/expect-expect -- type-level test: the @ts-expect-error directives, checked by the typecheck, are the assertions
     it("rejects styling an unknown variant value", () => {
         pf.slotComponent({
             name: "chip",
@@ -236,6 +243,7 @@ describe("typed slot component", () => {
         });
     });
 
+    // oxlint-disable-next-line vitest/expect-expect -- type-level test: the @ts-expect-error directives, checked by the typecheck, are the assertions
     it("rejects an unknown variant value", () => {
         pf.slotComponent({
             name: "chip",
@@ -397,6 +405,7 @@ describe("typed dynamic", () => {
         );
     });
 
+    // oxlint-disable-next-line vitest/expect-expect -- type-level test: the @ts-expect-error directives, checked by the typecheck, are the assertions
     it("checks the tier", () => {
         // @ts-expect-error not a tier
         pf.dynamic(["theme", "brand"]);
@@ -415,7 +424,11 @@ describe("typed dynamic", () => {
     });
 
     it("leaves component names open when the config has none", () => {
-        pf.dynamic(["components", "anything", "bg"]);
+        expect(pf.dynamic(["components", "anything", "bg"]).path).toEqual([
+            "components",
+            "anything",
+            "bg",
+        ]);
     });
 });
 
@@ -426,6 +439,7 @@ describe("typed when", () => {
         );
     });
 
+    // oxlint-disable-next-line vitest/expect-expect -- type-level test: the @ts-expect-error directives, checked by the typecheck, are the assertions
     it("checks breakpoints in its conditions", () => {
         pf.when()
             .on(pf.viewport({ until: "lg" }), px(2))
@@ -562,6 +576,7 @@ describe("variant tokens", () => {
         });
     });
 
+    // oxlint-disable-next-line vitest/expect-expect -- type-level test: the @ts-expect-error directives, checked by the typecheck, are the assertions
     it("take only the component's own token names", () => {
         pf.slotComponent({
             name: "chip",

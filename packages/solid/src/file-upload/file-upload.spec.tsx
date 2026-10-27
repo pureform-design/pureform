@@ -1,4 +1,5 @@
 import { testIds } from "@pureform/anatomy";
+import type { ComponentProps } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
@@ -49,7 +50,10 @@ describe("FileUpload, ready-made", () => {
     });
 
     it("lists the files chosen, each a list item with its size and a remove button", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<
+                NonNullable<ComponentProps<typeof FileUpload>["onValueChange"]>
+            >();
         withRegistry(() => (
             <FileUpload
                 label="Files"
@@ -134,7 +138,10 @@ describe("FileUpload, ready-made", () => {
 
     it("submits its default files, and a form reset puts them back", async () => {
         const defaults = file("a.txt");
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<
+                NonNullable<ComponentProps<typeof FileUpload>["onValueChange"]>
+            >();
         withRegistry(() => (
             <form data-testid="form">
                 <FileUpload
@@ -186,6 +193,7 @@ describe("FileUpload, ready-made", () => {
                     item: (row) => `${row.type}-${row.index}`,
                     error: "why",
                 }}
+                // oxlint-disable-next-line solid/style-prop -- a part-keyed style record, not CSS properties
                 style={{ error: (row) => ({ opacity: row.index / 2 }) }}
                 slotProps={{ item: (row) => ({ title: row.item.name }) }}
                 unstyled={{ error: (row) => row.type === "rejected" }}

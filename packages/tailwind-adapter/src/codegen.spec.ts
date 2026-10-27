@@ -359,6 +359,7 @@ describe("generate with the Tailwind target", () => {
             { timeout: 60_000 },
             async () => {
                 let count = 0;
+                const mismatches: unknown[] = [];
                 for (const [name, spec] of Object.entries(preset.components)) {
                     const factory = factoryOf(generated, name);
                     const old = runtimeSlots(spec, options);
@@ -367,14 +368,21 @@ describe("generate with the Tailwind target", () => {
                     )) {
                         const result = slotClasses(factory(selection));
                         const expected = old(selection);
+                        // Comparing serialized forms first keeps this hot loop fast; only differences are kept.
                         if (
                             JSON.stringify(result) !== JSON.stringify(expected)
                         ) {
-                            expect(result).toEqual(expected);
+                            mismatches.push({
+                                name,
+                                selection,
+                                actual: result,
+                                expected,
+                            });
                         }
                         count++;
                     }
                 }
+                expect(mismatches).toEqual([]);
                 expect(count).toBeGreaterThan(20_000);
             },
         );

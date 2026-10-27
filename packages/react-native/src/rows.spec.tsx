@@ -1,9 +1,6 @@
 import { Profiler, useId, useState } from "react";
-import type {
-    ComponentProps,
-    ProfilerOnRenderCallback,
-    ReactNode,
-} from "react";
+import type { ProfilerOnRenderCallback, ReactNode } from "react";
+import type { PressableProps } from "react-native";
 import { beforeAll, describe, expect, it } from "vitest";
 import { userEvent } from "vitest/browser";
 
@@ -38,9 +35,7 @@ let renders: string[] = [];
 const record: ProfilerOnRenderCallback = (id) => {
     renders.push(id);
 };
-const ProfiledPressable = (
-    props: ComponentProps<typeof animated.Pressable> & { testID: string },
-) => (
+const ProfiledPressable = (props: PressableProps & { testID: string }) => (
     <Profiler id={`${props.testID}#${useId()}`} onRender={record}>
         <animated.Pressable {...props} />
     </Profiler>

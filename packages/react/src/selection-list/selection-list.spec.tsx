@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { SelectionList } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { navigationRegistry } from "../__fixtures__/registry";
 import { mount, settle } from "../testing/render";
@@ -82,7 +83,8 @@ describe("SelectionList", () => {
     });
 
     it("selects several with clicks, and reports each change", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", string[]>) => void>();
         withRegistry(
             <SelectionList
                 selectionMode="multiple"

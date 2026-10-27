@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { TagsInput } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { textInputsRegistry } from "../__fixtures__/registry";
 import { mount, settle } from "../testing/render";
@@ -70,7 +71,8 @@ describe("TagsInput, ready-made", () => {
     });
 
     it("adds typed text on Enter, and removes a chip with its button", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", string[]>) => void>();
         withRegistry(
             <TagsInput
                 label="Tags"
@@ -100,6 +102,7 @@ describe("TagsInput, ready-made", () => {
         const handle = { set: (_value: string[]) => {} };
         function Controlled(): ReactNode {
             const [value, setValue] = useState(["a"]);
+            // oxlint-disable-next-line react/immutability -- the test harness captures what it drives from outside the component
             handle.set = setValue;
             return <TagsInput label="Tags" value={value} />;
         }

@@ -462,6 +462,7 @@ describe("generate with the native target", () => {
                         if (
                             json(factory(selection)) !== json(over(selection))
                         ) {
+                            // oxlint-disable-next-line vitest/no-conditional-expect -- serialising is the fast path over hundreds of combinations; the deep comparison runs only where it differs
                             expect(factory(selection)).toEqual(over(selection));
                         }
                         count++;
@@ -491,6 +492,7 @@ describe("generate with the native target", () => {
                     )) {
                         const result = json(factory(selection));
                         if (result !== json(over(selection))) {
+                            // oxlint-disable-next-line vitest/no-conditional-expect -- serialising is the fast path over tens of thousands of combinations; the deep comparison runs only where it differs
                             expect(factory(selection)).toEqual(over(selection));
                         }
                         count++;

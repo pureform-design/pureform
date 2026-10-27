@@ -457,7 +457,7 @@ describe("FabMenu", () => {
     // last; Enter presses the item that has focus (fix-storybook-5a).
     it("takes Tab through its enabled items one by one, then to the FAB", async () => {
         const host = hostIn(`<div><div data-host></div></div>`);
-        const onSelect = vi.fn();
+        const onSelect = vi.fn<(details: { value: string }) => void>();
         mountCase(
             fabMenuCase,
             { ...fabMenuCase.overlay!.props, defaultOpen: true, onSelect },
@@ -567,6 +567,7 @@ describe("Overlays inside a dialog or a sheet", () => {
             );
     };
 
+    // oxlint-disable-next-line vitest/expect-expect -- the assertions are in the drawnWhole helper
     it.each([
         [
             "Dialog",

@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react";
 import type { ReactNode } from "react";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
@@ -40,7 +41,10 @@ describe("NumberField", () => {
     });
 
     it("steps with the buttons, stopping and disabling at the limits", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<
+                NonNullable<ComponentProps<typeof NumberField>["onValueChange"]>
+            >();
         await render(
             <NumberField
                 label="Quantity"
@@ -101,7 +105,10 @@ describe("CodeField", () => {
     });
 
     it("moves on as it's typed and back on Backspace, and reports the whole code", async () => {
-        const onValueComplete = vi.fn();
+        const onValueComplete =
+            vi.fn<
+                NonNullable<ComponentProps<typeof CodeField>["onValueComplete"]>
+            >();
         await render(
             <CodeField label="Code" onValueComplete={onValueComplete} />,
         );

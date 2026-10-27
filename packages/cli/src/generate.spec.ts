@@ -161,7 +161,9 @@ describe("pureform generate", () => {
                 "Run `pureform generate` to update it.",
             );
             expect(result.stderr).toContain("  missing fake/full/index.ts");
-            expect(() => outputFile(root, "fake/full/index.ts")).toThrow();
+            expect(() => outputFile(root, "fake/full/index.ts")).toThrow(
+                /ENOENT/,
+            );
         });
 
         it("passes on fresh output", async () => {

@@ -1,4 +1,5 @@
 import { testIds } from "@pureform/anatomy";
+import type { ComponentProps } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
@@ -53,8 +54,11 @@ describe("Snackbar, ready-made", () => {
     });
 
     it("reports the action, then asks to close with its reason", async () => {
-        const onAction = vi.fn();
-        const onOpenChange = vi.fn();
+        const onAction = vi.fn<() => void>();
+        const onOpenChange =
+            vi.fn<
+                NonNullable<ComponentProps<typeof Snackbar>["onOpenChange"]>
+            >();
         withRegistry(() => (
             <Snackbar
                 open
@@ -79,7 +83,10 @@ describe("Snackbar, ready-made", () => {
     });
 
     it("closes itself after its duration", async () => {
-        const onOpenChange = vi.fn();
+        const onOpenChange =
+            vi.fn<
+                NonNullable<ComponentProps<typeof Snackbar>["onOpenChange"]>
+            >();
         withRegistry(() => (
             <Snackbar
                 defaultOpen
@@ -87,6 +94,7 @@ describe("Snackbar, ready-made", () => {
                 supportingText="Saved"
                 onOpenChange={onOpenChange}
                 // The pointer may rest where the last test left it, which holds the snackbar open.
+                // oxlint-disable-next-line solid/style-prop -- a part-keyed style record, not CSS properties
                 style={{ root: { "pointer-events": "none" } }}
             />
         ));

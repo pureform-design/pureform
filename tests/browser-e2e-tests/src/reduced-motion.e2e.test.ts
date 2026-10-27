@@ -6,8 +6,8 @@
 // drops position, size, and shape, or is `none` when nothing else is left.
 
 import * as pandaRecipes from "$recipes";
-import { MOTION_ATTRIBUTE } from "@pureform/web-contracts";
 import { classesFor } from "@pureform/css-adapter";
+import { MOTION_ATTRIBUTE } from "@pureform/web-contracts";
 import { afterAll, describe, expect, it } from "vitest";
 import { commands } from "vitest/browser";
 
@@ -244,23 +244,27 @@ describe.each(Object.keys(STYLINGS) as (keyof typeof STYLINGS)[])(
                 scenario,
             );
             expect(reducedMedia).toBe(scenario.system === "reduce");
-            for (const component of FIXTURES.map(idOf)) {
-                const expected =
+            const results = FIXTURES.map(idOf).map((component) => ({
+                component,
+                expected:
                     EXPECTED[component as keyof typeof EXPECTED][
                         scenario.reduced ? "reduced" : "full"
-                    ];
-                const value = values[component]!;
-                if (expected === "none") {
-                    expect(value, component).toEqual({
-                        property: "none",
-                        duration: "0s",
-                    });
-                } else {
-                    expect(value.property, component).toBe(expected);
-                    expect(value.duration, component).not.toMatch(
-                        /^0s(, 0s)*$/,
-                    );
-                }
+                    ],
+                value: values[component]!,
+            }));
+            for (const { component, value } of results.filter(
+                ({ expected }) => expected === "none",
+            )) {
+                expect(value, component).toEqual({
+                    property: "none",
+                    duration: "0s",
+                });
+            }
+            for (const { component, expected, value } of results.filter(
+                ({ expected }) => expected !== "none",
+            )) {
+                expect(value.property, component).toBe(expected);
+                expect(value.duration, component).not.toMatch(/^0s(, 0s)*$/);
             }
         });
     },

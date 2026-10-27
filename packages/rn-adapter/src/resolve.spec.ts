@@ -560,11 +560,11 @@ describe("evaluate", () => {
         };
         expect(evaluate(ratio, theme)).toBeCloseTo(8 / 44, 6);
         const angle = evaluate({ $math: "asin", args: [ratio] }, theme);
-        expect(Number.parseFloat(String(angle))).toBeCloseTo(
+        expect(angle).toMatch(/deg$/);
+        expect(Number.parseFloat(angle as string)).toBeCloseTo(
             (Math.asin(8 / 44) * 180) / Math.PI,
             5,
         );
-        expect(String(angle)).toMatch(/deg$/);
         expect(evaluate({ $math: "sin", args: ["30deg"] }, {})).toBeCloseTo(
             0.5,
             9,

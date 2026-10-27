@@ -1,12 +1,13 @@
 // The plain form primitives: Field connects the label, the control, the description and the error.
 
 import { testIds } from "@pureform/anatomy";
-import type { ReactNode } from "react";
+import type { ChangeEventHandler, ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { Description, ErrorText, Field, Input, Label, Textarea } from ".";
 import { FieldContext, useField } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { displayRegistry } from "../__fixtures__/registry";
 import { mount, settle } from "../testing/render";
@@ -157,6 +158,7 @@ describe("Field", () => {
     it("shares its state through FieldContext, for other controls", async () => {
         let seen: string | undefined;
         const Probe = () => {
+            // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
             seen = useField()?.state.ids.control;
             return null;
         };
@@ -172,8 +174,9 @@ describe("Field", () => {
 
 describe("Input and Textarea, value", () => {
     it("uncontrolled: keeps its own text and reports each change", async () => {
-        const onValueChange = vi.fn();
-        const onChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", string>) => void>();
+        const onChange = vi.fn<ChangeEventHandler<HTMLInputElement>>();
         await withRegistry(
             <Input
                 aria-label="Name"
@@ -192,7 +195,8 @@ describe("Input and Textarea, value", () => {
     });
 
     it("controlled: asks, and stays until the owner moves it", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", string>) => void>();
         await withRegistry(
             <Textarea
                 aria-label="Bio"
@@ -212,7 +216,8 @@ describe("Input and Textarea, value", () => {
     });
 
     it("a form reset puts it back, reported with reason reset", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", string>) => void>();
         await withRegistry(
             <form data-testid="form">
                 <Input

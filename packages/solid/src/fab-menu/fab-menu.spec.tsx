@@ -34,6 +34,7 @@ describe("FabMenu, ready-made", () => {
                     list: "actions",
                 }}
                 style={{
+                    // oxlint-disable-next-line solid/style-prop -- a part-keyed style record, not CSS properties
                     itemIcon: ({ index }) => ({ opacity: index ? 0.5 : 1 }),
                 }}
                 slotProps={{

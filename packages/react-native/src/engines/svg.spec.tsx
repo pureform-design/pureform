@@ -53,6 +53,7 @@ describe("the Animated SVG engine on the web", () => {
         let commits = 0;
         function App() {
             const [changed, setChanged] = useState(false);
+            // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
             change = () => setChanged(true);
             return (
                 <View style={{ width: 100, height: 100 }}>
@@ -132,6 +133,7 @@ describe("the Animated SVG engine on the web", () => {
         let change!: () => void;
         function App(props: { readonly to: string }) {
             const [changed, setChanged] = useState(false);
+            // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
             change = () => setChanged(true);
             return (
                 <View style={{ width: 100, height: 100 }}>

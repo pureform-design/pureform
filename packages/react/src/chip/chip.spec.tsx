@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { Chip } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { togglesRegistry } from "../__fixtures__/registry";
 import { interact, mount, settle } from "../testing/render";
@@ -52,7 +53,8 @@ describe("Chip, ready-made", () => {
     });
 
     it("toggles as a filter chip, reported with aria-pressed", async () => {
-        const onSelectedChange = vi.fn();
+        const onSelectedChange =
+            vi.fn<(details: ChangeDetails<"selected", boolean>) => void>();
         withRegistry(
             <Chip
                 label="Vegan"

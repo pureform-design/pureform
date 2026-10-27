@@ -1,4 +1,5 @@
 import { testIds } from "@pureform/anatomy";
+import type { ComponentProps } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
@@ -89,6 +90,7 @@ describe("Splitter", () => {
             <Splitter
                 panes={panes}
                 class={{ resizeTriggerIndicator: "grip" }}
+                // oxlint-disable-next-line solid/style-prop -- a part-keyed style record, not CSS properties
                 style={{ resizeTriggerIndicator: { opacity: 0.5 } }}
                 slotProps={{ resizeTriggerIndicator: { title: "pill" } }}
             />
@@ -101,7 +103,10 @@ describe("Splitter", () => {
     });
 
     it("resizes by the arrow keys without snapping", async () => {
-        const onSizeChange = vi.fn();
+        const onSizeChange =
+            vi.fn<
+                NonNullable<ComponentProps<typeof Splitter>["onSizeChange"]>
+            >();
         withRegistry(() => (
             <Splitter
                 panes={panes}
@@ -123,7 +128,10 @@ describe("Splitter", () => {
         const errors: unknown[] = [];
         const onError = (event: ErrorEvent) => errors.push(event.error);
         window.addEventListener("error", onError);
-        const onSizeChange = vi.fn();
+        const onSizeChange =
+            vi.fn<
+                NonNullable<ComponentProps<typeof Splitter>["onSizeChange"]>
+            >();
         mount(() => (
             <PureformProvider registry={displayRegistry()}>
                 <div style={{ width: "400px", height: "200px" }}>
@@ -158,7 +166,10 @@ describe("Splitter", () => {
     });
 
     it("snaps a dragged divider to the nearest anchor when let go", async () => {
-        const onSizeChange = vi.fn();
+        const onSizeChange =
+            vi.fn<
+                NonNullable<ComponentProps<typeof Splitter>["onSizeChange"]>
+            >();
         withRegistry(() => (
             <Splitter
                 panes={panes}
@@ -176,7 +187,10 @@ describe("Splitter", () => {
     });
 
     it("rests where it's let go without anchors", async () => {
-        const onSizeChange = vi.fn();
+        const onSizeChange =
+            vi.fn<
+                NonNullable<ComponentProps<typeof Splitter>["onSizeChange"]>
+            >();
         withRegistry(() => (
             <Splitter
                 panes={panes}

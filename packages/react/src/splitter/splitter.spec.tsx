@@ -1,4 +1,5 @@
 import { testIds } from "@pureform/anatomy";
+import type { ComponentProps } from "react";
 import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
@@ -98,7 +99,10 @@ describe("Splitter", () => {
     });
 
     it("resizes by the arrow keys without snapping", async () => {
-        const onSizeChange = vi.fn();
+        const onSizeChange =
+            vi.fn<
+                NonNullable<ComponentProps<typeof Splitter>["onSizeChange"]>
+            >();
         withRegistry(
             <Splitter
                 panes={panes}
@@ -117,7 +121,10 @@ describe("Splitter", () => {
     });
 
     it("snaps a dragged divider to the nearest anchor when let go", async () => {
-        const onSizeChange = vi.fn();
+        const onSizeChange =
+            vi.fn<
+                NonNullable<ComponentProps<typeof Splitter>["onSizeChange"]>
+            >();
         withRegistry(
             <Splitter
                 panes={panes}
@@ -135,7 +142,10 @@ describe("Splitter", () => {
     });
 
     it("rests where it's let go without anchors", async () => {
-        const onSizeChange = vi.fn();
+        const onSizeChange =
+            vi.fn<
+                NonNullable<ComponentProps<typeof Splitter>["onSizeChange"]>
+            >();
         withRegistry(
             <Splitter
                 panes={panes}

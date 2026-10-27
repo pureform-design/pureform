@@ -3,6 +3,7 @@ import { userEvent } from "vitest/browser";
 
 import * as button from ".";
 import { run, settle } from "../testing/vanilla";
+import type { MachineCallback } from "../testing/vanilla";
 
 let cleanup: (() => void) | undefined;
 afterEach(() => {
@@ -189,7 +190,8 @@ describe("button machine", () => {
 
     describe("disabled", () => {
         it("disables the native button and ignores presses", async () => {
-            const onSelectedChange = vi.fn();
+            const onSelectedChange =
+                vi.fn<MachineCallback<button.Schema, "onSelectedChange">>();
             const { root, api } = mount({
                 disabled: true,
                 defaultSelected: false,
@@ -251,7 +253,8 @@ describe("button machine", () => {
         });
 
         it("toggles on click when uncontrolled, reporting each change", async () => {
-            const onSelectedChange = vi.fn();
+            const onSelectedChange =
+                vi.fn<MachineCallback<button.Schema, "onSelectedChange">>();
             const { root, api } = mount({
                 defaultSelected: false,
                 onSelectedChange,
@@ -285,7 +288,8 @@ describe("button machine", () => {
         });
 
         it("only asks to change when controlled", async () => {
-            const onSelectedChange = vi.fn();
+            const onSelectedChange =
+                vi.fn<MachineCallback<button.Schema, "onSelectedChange">>();
             const { root, api, setProps } = mount({
                 selected: false,
                 onSelectedChange,
@@ -307,7 +311,8 @@ describe("button machine", () => {
         });
 
         it("sets and toggles through the API", async () => {
-            const onSelectedChange = vi.fn();
+            const onSelectedChange =
+                vi.fn<MachineCallback<button.Schema, "onSelectedChange">>();
             const { api } = mount({ defaultSelected: false, onSelectedChange });
             api().setSelected(true);
             await settle();
@@ -324,7 +329,8 @@ describe("button machine", () => {
         });
 
         it("never selects a plain button", async () => {
-            const onSelectedChange = vi.fn();
+            const onSelectedChange =
+                vi.fn<MachineCallback<button.Schema, "onSelectedChange">>();
             const { root, api } = mount({ onSelectedChange });
             await userEvent.click(root);
             api().setSelected(true);

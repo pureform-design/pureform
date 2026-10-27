@@ -1,3 +1,4 @@
+// oxlint-disable-next-line jsdoc/check-tag-names -- `@jsxImportSource` is the JSX runtime pragma, not a JSDoc tag
 /** @jsxImportSource react */
 // Renders a scene to HTML on the server, through React DOM's server build. Loaded in Node by the
 // `renderOnServer` command.

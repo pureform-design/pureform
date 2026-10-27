@@ -52,7 +52,25 @@ export const iconButton: ClassFactory<"iconButton"> = (s) =>
 "
 `;
 
-exports[`the Panda codegen > wraps a single-slot recipe's class string as the root's 1`] = `
+exports[`the Panda codegen > wraps a single-slot recipe's class string as the root's > divider 1`] = `
+"import { selectionCache } from "@pureform/styling";
+import type { Selection } from "@pureform/styling";
+import type { ClassFactory, ClassSlots } from "@pureform/styling-web";
+
+import { divider as recipe } from "../../styled-system/recipes/divider";
+
+const classes = selectionCache<Selection<"divider">, ClassSlots<"divider">>(
+    {
+        variants: [],
+    },
+    (s) => ({ root: { class: recipe(s) } }),
+);
+
+export const divider: ClassFactory<"divider"> = classes;
+"
+`;
+
+exports[`the Panda codegen > wraps a single-slot recipe's class string as the root's > icon 1`] = `
 "import { selectionCache } from "@pureform/styling";
 import type { Selection } from "@pureform/styling";
 import type { ClassFactory, ClassSlots } from "@pureform/styling-web";
@@ -73,23 +91,5 @@ const classes = selectionCache<Selection<"icon">, ClassSlots<"icon">>(
 );
 
 export const icon: ClassFactory<"icon"> = classes;
-"
-`;
-
-exports[`the Panda codegen > wraps a single-slot recipe's class string as the root's 2`] = `
-"import { selectionCache } from "@pureform/styling";
-import type { Selection } from "@pureform/styling";
-import type { ClassFactory, ClassSlots } from "@pureform/styling-web";
-
-import { divider as recipe } from "../../styled-system/recipes/divider";
-
-const classes = selectionCache<Selection<"divider">, ClassSlots<"divider">>(
-    {
-        variants: [],
-    },
-    (s) => ({ root: { class: recipe(s) } }),
-);
-
-export const divider: ClassFactory<"divider"> = classes;
 "
 `;

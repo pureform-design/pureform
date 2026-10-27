@@ -4,6 +4,7 @@ import { View } from "react-native";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
+import type { ChangeDetails } from ".";
 import { PureformContainer, PureformProvider, placeOverlay } from ".";
 import { BottomSheet } from "./bottom-sheet";
 import { Button } from "./button";
@@ -293,6 +294,7 @@ describe.each([animated, reanimated])("the menu with $name", (engine) => {
         let move: (to: number) => void = () => undefined;
         const Moving = () => {
             const [x, setX] = useState(-300);
+            // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
             move = setX;
             return (
                 <PureformContainer
@@ -336,6 +338,7 @@ describe.each([animated, reanimated])("the menu with $name", (engine) => {
         let move: (to: number) => void = () => undefined;
         const Moving = () => {
             const [x, setX] = useState(0);
+            // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
             move = setX;
             return (
                 <PureformContainer
@@ -579,6 +582,7 @@ describe.each([animated, reanimated])(
     (engine) => {
         let snackbars!: Snackbars;
         function Grab(): ReactNode {
+            // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
             snackbars = useSnackbar();
             return null;
         }
@@ -803,7 +807,7 @@ describe.each([animated, reanimated])("the toaster with $name", (engine) => {
 
     it("runs the action, then closes; a loading toast stays", async () => {
         const toaster = createToaster();
-        const onClick = vi.fn();
+        const onClick = vi.fn<() => void>();
         await render(<Toaster toaster={toaster} closeLabel="Close" />, engine);
         await interact(() => {
             toaster.loading({ title: "Uploading", duration: 100 });
@@ -1803,7 +1807,8 @@ describe("the sheets", () => {
     it.each([false, true])(
         "drags a standard side sheet (coplanar: %s) closed, asking through onOpenChange",
         async (coplanar) => {
-            const onOpenChange = vi.fn();
+            const onOpenChange =
+                vi.fn<(details: ChangeDetails<"open", boolean>) => void>();
             await render(
                 <SideSheet
                     modal={false}
@@ -1868,6 +1873,7 @@ describe("the sheets", () => {
 it("stacks open overlays by their layers: a menu, then a snackbar, then a tooltip", async () => {
     let snackbars!: Snackbars;
     function Grab(): ReactNode {
+        // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
         snackbars = useSnackbar();
         return null;
     }
@@ -1985,6 +1991,7 @@ describe("onClose on the dialog, the full-screen dialog and the side sheet", () 
             await interact(() => userEvent.keyboard("{Escape}"));
             if (scrim) {
                 const beside = document.elementFromPoint(4, 4) as HTMLElement;
+                // oxlint-disable-next-line vitest/no-conditional-expect -- only an overlay with a scrim has a scrim to press beside it
                 expect(surface(testId)!.contains(beside)).toBe(false);
                 await interact(() =>
                     userEvent.click(beside, { position: { x: 4, y: 4 } }),

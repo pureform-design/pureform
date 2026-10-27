@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { SearchBar } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { displayRegistry } from "../__fixtures__/registry";
 import { interact, mount, settle } from "../testing/render";
@@ -49,7 +50,8 @@ describe("SearchBar", () => {
     });
 
     it("takes typing and reports it", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", string>) => void>();
         withRegistry(
             <SearchBar aria-label="Search" onValueChange={onValueChange} />,
         );

@@ -52,7 +52,9 @@ describe("parseGenerateFlags", () => {
         expect(() => parseGenerateFlags(["--watch", "--check"])).toThrow(
             "don't go together",
         );
-        expect(() => parseGenerateFlags(["extra"])).toThrow();
+        expect(() => parseGenerateFlags(["extra"])).toThrow(
+            /Unexpected argument .extra./,
+        );
     });
 });
 

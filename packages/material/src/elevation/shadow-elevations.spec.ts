@@ -76,13 +76,15 @@ describe("ShadowElevations", () => {
     it("should throw when trying to get a shadow elevation with an invalid elevation", () => {
         const se = ShadowElevations.create();
 
-        expect(() => se.get("invalid" as BaseElevation)).toThrow();
+        expect(() => se.get("invalid" as BaseElevation)).toThrow(
+            "Invalid elevation: invalid",
+        );
     });
 
     it("should throw when trying to get a shadow elevation with an negative pixel", () => {
         const se = ShadowElevations.create();
 
-        expect(() => se.getAtPixel(-1)).toThrow();
+        expect(() => se.getAtPixel(-1)).toThrow("Invalid elevation pixel");
     });
 
     it("should have 6 elevation levels by default", () => {

@@ -34,17 +34,18 @@ const focusWithTab = async (
  *  component without its state (a plain button); a change or nothing, with its state. */
 const pressAndCheck = async (
     component: Keyed,
-    { key, does, to, props = {}, focuses }: KeyCase,
+    keyCase: KeyCase,
     dir: "ltr" | "rtl" = "ltr",
 ) => {
+    const { key, does, to, props = {} } = keyCase;
     const state = does === "click" ? undefined : component.state;
     if (does === "change" && !state) {
         throw new Error(
             `${component.component} has no state for a key to change`,
         );
     }
-    const onClick = vi.fn();
-    const onChange = vi.fn();
+    const onClick = vi.fn<() => void>();
+    const onChange = vi.fn<(details: Record<string, unknown>) => void>();
     const names = state && stateNames(state.prop);
     const { host } = await focusWithTab(
         component,
@@ -83,7 +84,9 @@ const pressAndCheck = async (
         expect(onChange).toHaveBeenCalledTimes(does === "change" ? 1 : 0);
     }
     expect(document.activeElement).toBe(
-        (focuses ?? component.keyboard.focusable)(host),
+        keyCase.focuses
+            ? keyCase.focuses(host)
+            : component.keyboard.focusable(host),
     );
 };
 
@@ -125,6 +128,7 @@ describe.each(KEYED)("$component", (component) => {
         },
     );
 
+    // oxlint-disable-next-line vitest/expect-expect -- the assertions are in the pressAndCheck helper
     it.each(component.keyboard.keys)("$key: $does", async (key) => {
         await pressAndCheck(component, key);
     });
@@ -140,6 +144,7 @@ describe.each(KEYED)("$component, arrow keys", (component) => {
             { key: "{ArrowUp}", does: "nothing" },
             { key: "{ArrowDown}", does: "nothing" },
         ];
+        // oxlint-disable-next-line vitest/expect-expect -- the assertions are in the pressAndCheck helper
         it.each(arrows)("$key: $does", async (key) => {
             await pressAndCheck(component, key, dir);
         });

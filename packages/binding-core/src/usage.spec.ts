@@ -285,33 +285,34 @@ describe("COMPONENT_USAGE", () => {
         }
     });
 
-    for (const binding of ["solid", "react", "react-native"] as const) {
-        if (binding !== "react-native")
-            it(`lists every entry the ${binding} components draw`, () => {
-                for (const [subpath, { entries }] of Object.entries(
-                    COMPONENT_USAGE,
-                )) {
-                    const drawn = drawnBy(
-                        binding,
-                        [
-                            ...sources(binding, subpath),
-                            // The calendar's parts draw each picker's cells.
-                            ...(SHARED["calendar-parts.tsx"]!.includes(subpath)
-                                ? [
-                                      SOURCES[
-                                          `../../${binding}/src/calendar-parts.tsx`
-                                      ]!,
-                                  ]
-                                : []),
-                        ].join("\n"),
-                    );
-                    const own = Object.keys(entries).filter(
-                        (entry) => !NATIVE_ONLY[subpath]?.includes(entry),
-                    );
-                    expect(own.sort(), subpath).toEqual([...drawn].sort());
-                }
-            });
+    for (const binding of ["solid", "react"] as const) {
+        it(`lists every entry the ${binding} components draw`, () => {
+            for (const [subpath, { entries }] of Object.entries(
+                COMPONENT_USAGE,
+            )) {
+                const drawn = drawnBy(
+                    binding,
+                    [
+                        ...sources(binding, subpath),
+                        // The calendar's parts draw each picker's cells.
+                        ...(SHARED["calendar-parts.tsx"]!.includes(subpath)
+                            ? [
+                                  SOURCES[
+                                      `../../${binding}/src/calendar-parts.tsx`
+                                  ]!,
+                              ]
+                            : []),
+                    ].join("\n"),
+                );
+                const own = Object.keys(entries).filter(
+                    (entry) => !NATIVE_ONLY[subpath]?.includes(entry),
+                );
+                expect(own.sort(), subpath).toEqual([...drawn].sort());
+            }
+        });
+    }
 
+    for (const binding of ["solid", "react", "react-native"] as const) {
         it(`sets no listed group from anything but its own prop in the ${binding} components`, () => {
             for (const [subpath, { entries }] of Object.entries(
                 COMPONENT_USAGE,

@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { ButtonGroup } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { buttonGroupRegistry } from "../__fixtures__/registry";
 import { mount, settle } from "../testing/render";
@@ -68,7 +69,8 @@ describe("ButtonGroup, ready-made", () => {
     });
 
     it("keeps one button on in a single-select group", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", string[]>) => void>();
         withRegistry(
             <ButtonGroup
                 connected

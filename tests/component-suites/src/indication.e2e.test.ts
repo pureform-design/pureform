@@ -22,7 +22,7 @@ import { COMPONENTS } from "./components";
 import type { ComponentCase, IndicationCase } from "./components";
 import { animationsDone } from "./harness/animations";
 import type { Mounted } from "./harness/harness";
-import { hydrate } from "./harness/hydration";
+import { expectNoChanges, hydrate } from "./harness/hydration";
 import { CUSTOM_PRESSED } from "./harness/indications";
 import type {
     Scene,
@@ -317,6 +317,7 @@ describe.each(INDICATED)("$component", (component) => {
             expect(shown.before).toBe("none");
             // A highlighted item isn't focused: the menu keeps focus.
             if (!indication.focus || indication.focusMoves)
+                // oxlint-disable-next-line vitest/no-conditional-expect -- whether the focus indicator draws is a fact of the component's case
                 expect(shown.indicator).not.toBe("none");
         });
 
@@ -448,7 +449,7 @@ describe.each(INDICATED)("$component", (component) => {
         expect(parts().surface.hasAttribute(CUSTOM_PRESSED)).toBe(false);
     });
 
-    describe.runIf(indication.source)("with a source", () => {
+    describe.runIf(indication.source !== undefined)("with a source", () => {
         const sourceProps = (source: MutableInteractionSource) =>
             indication.source!(source);
 
@@ -520,6 +521,7 @@ describe.each(INDICATED)("$component", (component) => {
             const before = outline(button);
             await focusByKeyboard(component, mounted.host, parts);
             if (!indication.focus || indication.focusMoves) {
+                // oxlint-disable-next-line vitest/no-conditional-expect -- whether focus moves with the source is a fact of the component's case
                 expect(observed.state()).toMatchObject({
                     focused: true,
                     focusVisible: true,
@@ -551,7 +553,7 @@ describe.each(INDICATED)("$component", (component) => {
             },
         );
 
-        it.runIf(indication.itemDisabled)(
+        it.runIf(indication.itemDisabled !== undefined)(
             "disabling its item while it's pressed ends the press",
             async () => {
                 const observed = harness.observe();
@@ -604,18 +606,20 @@ describe.each(INDICATED)("$component", (component) => {
             provider: { indication: "custom" },
         });
         expect(logged).toEqual([]);
-        if (!component.measured) expect(changes).toEqual([]);
+        expectNoChanges(component, changes);
         // The layer rendered on the server, where the surface shows closed: in the surface, or
         // in the part the entry names to hold it.
         const surface = host.querySelector(
             byPart(indication.anatomy, entry.layer ?? entry.surface),
         );
+        /* oxlint-disable vitest/no-conditional-expect -- whether the server renders the layer is a fact of the component's case */
         if (!indication.props && !indication.open) {
             expect(surface).not.toBeNull();
             expect(
                 surface!.querySelector(":scope > [data-ripple-layer]"),
             ).not.toBeNull();
         }
+        /* oxlint-enable vitest/no-conditional-expect */
     });
 });
 
@@ -650,6 +654,7 @@ describe("known gaps", () => {
 
     // Each interactive component's root sets its indication tokens back to the theme's, so an
     // override of `components.<component>.<token>` above it doesn't reach it.
+    // oxlint-disable-next-line vitest/expect-expect -- the assertions are in the expectDiffers helper
     it.fails("a provider's override of a component's indication token reaches it", async () => {
         const hovered = async (provider?: SceneProvider) => {
             const { mounted, parts } = await mountIndicated(button, entry, {

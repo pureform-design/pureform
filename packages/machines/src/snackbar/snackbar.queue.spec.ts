@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import * as snackbar from ".";
 import { run } from "../testing/vanilla";
+import type { MachineCallback } from "../testing/vanilla";
 
 interface Options extends snackbar.QueueOptions {
     readonly text: string;
@@ -73,7 +74,8 @@ describe("snackbar queue", () => {
 
     it("lets a waiting snackbar leave unseen, and tells the shown one why it closes", () => {
         const queue = snackbar.createQueue<Options>();
-        const onOpenChange = vi.fn();
+        const onOpenChange =
+            vi.fn<MachineCallback<snackbar.Schema, "onOpenChange">>();
         const first = queue.show({ text: "first", onOpenChange });
         const second = queue.show({ text: "second" });
         queue.dismiss(second);
@@ -101,7 +103,8 @@ describe("snackbar queue", () => {
         vi.useFakeTimers();
         const queue = snackbar.createQueue<Options>();
         const shown = host(queue);
-        const onOpenChange = vi.fn();
+        const onOpenChange =
+            vi.fn<MachineCallback<snackbar.Schema, "onOpenChange">>();
         queue.show({ text: "first", duration: 1000, onOpenChange });
         queue.show({ text: "second", duration: 3000 });
         queue.show({ text: "third", duration: null });

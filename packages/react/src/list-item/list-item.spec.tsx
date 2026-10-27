@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { ListItem } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { navigationRegistry } from "../__fixtures__/registry";
 import { List } from "../list";
@@ -99,6 +100,7 @@ describe("ListItem, ready-made", () => {
         let restyle!: () => void;
         function Row() {
             const [later, setLater] = useState(false);
+            // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
             restyle = () => setLater(true);
             return (
                 <ListItem
@@ -295,6 +297,7 @@ describe("ListItem, expandable", () => {
         let set!: (value: boolean) => void;
         function Controlled() {
             const [expanded, setExpanded] = useState(true);
+            // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
             set = setExpanded;
             return (
                 <ListItem
@@ -405,7 +408,8 @@ describe("a swipeable ListItem", () => {
     });
 
     it("reveals the action when dragged toward the start past half, and closes when dragged back", async () => {
-        const onRevealedChange = vi.fn();
+        const onRevealedChange =
+            vi.fn<(details: ChangeDetails<"revealed", boolean>) => void>();
         withRegistry(
             <ListItem
                 headline="Message"
@@ -467,7 +471,8 @@ describe("a swipeable ListItem", () => {
     });
 
     it("stays closed when the drag falls short of half", async () => {
-        const onRevealedChange = vi.fn();
+        const onRevealedChange =
+            vi.fn<(details: ChangeDetails<"revealed", boolean>) => void>();
         withRegistry(
             <ListItem
                 headline="Message"
@@ -486,7 +491,8 @@ describe("a swipeable ListItem", () => {
     });
 
     it("takes the arrow keys and Escape on the focused row", async () => {
-        const onRevealedChange = vi.fn();
+        const onRevealedChange =
+            vi.fn<(details: ChangeDetails<"revealed", boolean>) => void>();
         withRegistry(
             <ListItem
                 headline="Message"
@@ -516,7 +522,8 @@ describe("a swipeable ListItem", () => {
     });
 
     it("swipes an expandable item too: its action beside the button, the region after", async () => {
-        const onRevealedChange = vi.fn();
+        const onRevealedChange =
+            vi.fn<(details: ChangeDetails<"revealed", boolean>) => void>();
         withRegistry(
             <ListItem
                 headline="Folders"

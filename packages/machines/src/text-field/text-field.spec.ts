@@ -3,7 +3,7 @@ import { userEvent } from "vitest/browser";
 
 import * as textField from ".";
 import { run, settle } from "../testing/vanilla";
-import type { MachineProps } from "../testing/vanilla";
+import type { MachineCallback, MachineProps } from "../testing/vanilla";
 
 afterEach(() => {
     document.body.innerHTML = "";
@@ -29,7 +29,8 @@ const field = (
 
 describe("text field machine", () => {
     it("holds the value with controllable-state semantics", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<MachineCallback<textField.Schema, "onValueChange">>();
         const { api, stop } = field({ defaultValue: "Ada", onValueChange });
         expect(api().value).toBe("Ada");
         expect(api().filled).toBe(true);
@@ -41,7 +42,8 @@ describe("text field machine", () => {
     });
 
     it("takes the user's typing, and writes changes from outside to the input", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<MachineCallback<textField.Schema, "onValueChange">>();
         const { api, input, stop } = field({ onValueChange });
         expect(input.placeholder).toBe(" ");
         await userEvent.type(input, "Ada");
@@ -80,7 +82,8 @@ describe("text field machine", () => {
     });
 
     it("leaves a form reset to the binding, which calls reset", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<MachineCallback<textField.Schema, "onValueChange">>();
         const { api, input, host, stop } = field(
             { defaultValue: "Ada", onValueChange },
             "<form><input data-input></form>",

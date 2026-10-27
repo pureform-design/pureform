@@ -3,7 +3,7 @@ import { userEvent } from "vitest/browser";
 
 import * as navigation from ".";
 import { run, settle } from "../testing/vanilla";
-import type { MachineProps } from "../testing/vanilla";
+import type { MachineCallback, MachineProps } from "../testing/vanilla";
 
 afterEach(() => {
     document.body.innerHTML = "";
@@ -73,7 +73,8 @@ describe("navigation machine", () => {
     });
 
     it("moves to the destination clicked and reports it once", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<MachineCallback<navigation.Schema, "onValueChange">>();
         const { api, item, stop } = nav({
             defaultValue: "home",
             onValueChange,
@@ -89,7 +90,8 @@ describe("navigation machine", () => {
     });
 
     it("asks when controlled, and moves only with the prop", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<MachineCallback<navigation.Schema, "onValueChange">>();
         const { api, item, setProps, stop } = nav({
             value: "home",
             onValueChange,
@@ -108,7 +110,8 @@ describe("navigation machine", () => {
     });
 
     it("ignores a disabled destination, and every one when disabled", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<MachineCallback<navigation.Schema, "onValueChange">>();
         const one = nav({ defaultValue: "home", onValueChange }, ["search"]);
         expect(one.item("search").getAttribute("aria-disabled")).toBe("true");
         // The browser's click: `aria-disabled` keeps Playwright from clicking it.

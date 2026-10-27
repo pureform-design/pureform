@@ -38,7 +38,10 @@ describe("List's and SelectionList's item by item on React Native", () => {
                 }}
                 slotProps={{
                     item: ({ item }) => ({
-                        accessibilityHint: String(item.headline),
+                        accessibilityHint:
+                            typeof item.headline === "string"
+                                ? item.headline
+                                : undefined,
                     }),
                 }}
             />,

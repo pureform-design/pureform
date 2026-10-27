@@ -103,7 +103,13 @@ describe("NativeSelect, ready-made", () => {
     });
 
     it("shows the default, reports a change, and follows a controlled value", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<
+                (details: {
+                    readonly value: string;
+                    readonly reason?: "reset" | undefined;
+                }) => void
+            >();
         withRegistry(
             <>
                 <NativeSelect
@@ -134,7 +140,13 @@ describe("NativeSelect, ready-made", () => {
     });
 
     it("reports a form reset with its reason, and puts the select back", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<
+                (details: {
+                    readonly value: string;
+                    readonly reason?: "reset" | undefined;
+                }) => void
+            >();
         withRegistry(
             <form data-testid="form">
                 <NativeSelect
@@ -250,7 +262,13 @@ const SIZES = [
 
 describe("NativeSelect, multiple", () => {
     it("chooses several options, reporting them as an array", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<
+                (details: {
+                    readonly value: readonly string[];
+                    readonly reason?: "reset" | undefined;
+                }) => void
+            >();
         withRegistry(
             <NativeSelect
                 aria-label="Sizes"
@@ -272,7 +290,13 @@ describe("NativeSelect, multiple", () => {
     });
 
     it("submits every chosen value, and resets to the default", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<
+                (details: {
+                    readonly value: readonly string[];
+                    readonly reason?: "reset" | undefined;
+                }) => void
+            >();
         withRegistry(
             <form data-testid="form">
                 <NativeSelect

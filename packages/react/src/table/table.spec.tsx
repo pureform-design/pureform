@@ -1,4 +1,5 @@
 import { testIds } from "@pureform/anatomy";
+import type { ComponentProps } from "react";
 import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
@@ -71,7 +72,8 @@ describe("Table", () => {
     });
 
     it("sorts by a header's button, saying so in aria-sort, and from the keyboard", async () => {
-        const onSortChange = vi.fn();
+        const onSortChange =
+            vi.fn<NonNullable<ComponentProps<typeof Table>["onSortChange"]>>();
         withRegistry(
             <Table
                 columns={COLUMNS}
@@ -99,7 +101,8 @@ describe("Table", () => {
     });
 
     it("selects rows by their checkboxes and all of them by the header's", async () => {
-        const onSelectionChange = vi.fn();
+        const onSelectionChange =
+            vi.fn<(selection: readonly string[]) => void>();
         withRegistry(<Controlled onSelectionChange={onSelectionChange} />);
         await settle();
         const boxes = () => [

@@ -36,6 +36,7 @@ describe("NativeSelect, ready-made", () => {
                     icon: "chevron",
                 }}
                 style={{
+                    // oxlint-disable-next-line solid/style-prop -- a part-keyed style record, not CSS properties
                     option: ({ index }) => ({ opacity: index < 0 ? 0.5 : 1 }),
                 }}
                 slotProps={{
@@ -98,7 +99,13 @@ describe("NativeSelect, ready-made", () => {
     });
 
     it("shows the default, reports a change, and follows a controlled value", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<
+                (details: {
+                    readonly value: string;
+                    readonly reason?: "reset" | undefined;
+                }) => void
+            >();
         withRegistry(() => (
             <>
                 <NativeSelect
@@ -129,7 +136,13 @@ describe("NativeSelect, ready-made", () => {
     });
 
     it("reports a form reset with its reason, and puts the select back", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<
+                (details: {
+                    readonly value: string;
+                    readonly reason?: "reset" | undefined;
+                }) => void
+            >();
         withRegistry(() => (
             <form data-testid="form">
                 <NativeSelect
@@ -180,7 +193,13 @@ describe("NativeSelect, multiple", () => {
     ];
 
     it("chooses several, reports an array, submits each, and resets to its default", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<
+                (details: {
+                    readonly value: readonly string[];
+                    readonly reason?: "reset" | undefined;
+                }) => void
+            >();
         withRegistry(() => (
             <form data-testid="form">
                 <NativeSelect
@@ -216,7 +235,13 @@ describe("NativeSelect, multiple", () => {
     });
 
     it("goes back to the owner's value when controlled, and reports the default on a reset", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<
+                (details: {
+                    readonly value: readonly string[];
+                    readonly reason?: "reset" | undefined;
+                }) => void
+            >();
         withRegistry(() => (
             <form data-testid="form">
                 <NativeSelect

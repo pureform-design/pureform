@@ -95,7 +95,8 @@ const inputOf = () => byTestId<HTMLInputElement>("cb-input");
 
 describe("useControllable", () => {
     it("lets uncontrolled state change on its own, calling back once", async () => {
-        const onCheckedChange = vi.fn();
+        const onCheckedChange =
+            vi.fn<(details: ChangeDetails<"checked", CheckedState>) => void>();
         mount(() => (
             <Checkbox defaultChecked onCheckedChange={onCheckedChange} />
         ));
@@ -110,7 +111,8 @@ describe("useControllable", () => {
 
     it("asks to change controlled state, and moves only with the prop", async () => {
         const [checked, setChecked] = createSignal(false);
-        const onCheckedChange = vi.fn();
+        const onCheckedChange =
+            vi.fn<(details: ChangeDetails<"checked", CheckedState>) => void>();
         mount(() => (
             <Checkbox checked={checked()} onCheckedChange={onCheckedChange} />
         ));
@@ -157,7 +159,8 @@ describe("useControllable", () => {
 
 describe("useFormReset", () => {
     it("puts uncontrolled state back to its default, reporting the reset", async () => {
-        const onCheckedChange = vi.fn();
+        const onCheckedChange =
+            vi.fn<(details: ChangeDetails<"checked", CheckedState>) => void>();
         mount(() => (
             <form data-testid="form">
                 <Checkbox
@@ -191,7 +194,8 @@ describe("useFormReset", () => {
     });
 
     it("asks controlled state to reset, and leaves the input where the prop says", async () => {
-        const onCheckedChange = vi.fn();
+        const onCheckedChange =
+            vi.fn<(details: ChangeDetails<"checked", CheckedState>) => void>();
         mount(() => (
             <form data-testid="form">
                 <Checkbox
@@ -218,7 +222,9 @@ describe("useFormReset", () => {
 describe("useFormReset, controlled", () => {
     it("reports the default, not the value the machine was created with", async () => {
         const [checked, setChecked] = createSignal(false);
-        const onCheckedChange = vi.fn((details: { checked: CheckedState }) =>
+        const onCheckedChange = vi.fn<
+            (details: ChangeDetails<"checked", CheckedState>) => void
+        >((details: { checked: CheckedState }) =>
             setChecked(details.checked === true),
         );
         mount(() => (
@@ -249,7 +255,8 @@ describe("useFormReset, controlled", () => {
 
     it("reports nothing when the value is already the default", async () => {
         const [checked, setChecked] = createSignal(true);
-        const onCheckedChange = vi.fn();
+        const onCheckedChange =
+            vi.fn<(details: ChangeDetails<"checked", CheckedState>) => void>();
         mount(() => (
             <form data-testid="form">
                 <Checkbox

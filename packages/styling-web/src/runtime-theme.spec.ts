@@ -26,7 +26,9 @@ describe("defineRuntimeTheme", () => {
     });
 
     it("loads the generator once, on demand", async () => {
-        const load = vi.fn(() => Promise.resolve({ default: generate }));
+        const load = vi.fn<() => Promise<{ default: typeof generate }>>(() =>
+            Promise.resolve({ default: generate }),
+        );
         const seedTheme = defineRuntimeTheme<Seed>("seed", load);
         const theme = seedTheme({ seed: "#006a60" });
         expect(load).not.toHaveBeenCalled();

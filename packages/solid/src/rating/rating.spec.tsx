@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { Rating } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { ratingRegistry } from "../__fixtures__/registry";
 import { byTestId, mount, settle } from "../testing/mount";
@@ -52,7 +53,8 @@ describe("Rating, ready-made", () => {
     });
 
     it("sets the value by pressing a star and by the arrow keys, and reports it", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", number>) => void>();
         withRegistry(() => <Rating onValueChange={onValueChange} count={4} />);
         await settle();
         await userEvent.click(items()[2] as HTMLElement);
@@ -68,7 +70,8 @@ describe("Rating, ready-made", () => {
     });
 
     it("takes no input while read-only or disabled", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", number>) => void>();
         withRegistry(() => (
             <Rating readOnly defaultValue={1} onValueChange={onValueChange} />
         ));
@@ -97,6 +100,7 @@ describe("Rating, ready-made", () => {
                     item: (star) => (star.fill === "full" ? "lit" : undefined),
                     control: "row",
                 }}
+                // oxlint-disable-next-line solid/style-prop -- a part-keyed style record, not CSS properties
                 style={{ icon: (star) => ({ opacity: star.index / 4 }) }}
                 slotProps={{
                     item: (star) => ({ title: `star ${star.index}` }),

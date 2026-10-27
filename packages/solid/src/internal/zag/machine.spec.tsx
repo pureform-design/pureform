@@ -110,7 +110,7 @@ describe("a machine's watches", () => {
     });
 
     it("don't run for the values they start with", async () => {
-        const onStepChange = vi.fn();
+        const onStepChange = vi.fn<(step: number | undefined) => void>();
         const { seen } = run(() => ({
             defaultCount: 3,
             step: 1,
@@ -122,8 +122,9 @@ describe("a machine's watches", () => {
     });
 
     it("run when a prop they read changes", async () => {
-        const onStepChange = vi.fn();
+        const onStepChange = vi.fn<(step: number | undefined) => void>();
         const [step, setStep] = createSignal(1);
+        // oxlint-disable-next-line solid/reactivity -- run passes it to useMachine as the machine's props
         run(() => ({ step: step(), onStepChange }));
         await settle();
         setStep(2);
@@ -134,9 +135,10 @@ describe("a machine's watches", () => {
 
     it("follow a controlled value once the prop changes", async () => {
         const [count, setCount] = createSignal(1);
-        const onCountChange = vi.fn((next: number, _prev?: number) =>
-            setCount(next),
-        );
+        const onCountChange = vi.fn<
+            (count: number, prev: number | undefined) => void
+        >((next: number, _prev?: number) => setCount(next));
+        // oxlint-disable-next-line solid/reactivity -- run passes it to useMachine as the machine's props
         const { host, send } = run(() => ({ count: count(), onCountChange }));
         await settle();
         expect(host.textContent).toBe("1 2");
@@ -150,7 +152,8 @@ describe("a machine's watches", () => {
 
 describe("a bindable", () => {
     it("keeps its own value when uncontrolled, and reports each change once", async () => {
-        const onCountChange = vi.fn();
+        const onCountChange =
+            vi.fn<(count: number, prev: number | undefined) => void>();
         const { host, send } = run(() => ({ defaultCount: 1, onCountChange }));
         await settle();
         send({ type: "INC" });
@@ -163,7 +166,8 @@ describe("a bindable", () => {
     });
 
     it("only asks to change when controlled", async () => {
-        const onCountChange = vi.fn();
+        const onCountChange =
+            vi.fn<(count: number, prev: number | undefined) => void>();
         const { host, send } = run(() => ({ count: 1, onCountChange }));
         await settle();
         send({ type: "INC" });

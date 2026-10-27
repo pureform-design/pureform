@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
 import { Accordion } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { animated } from "../engine";
 import { presetRegistry } from "../testing/registry";
@@ -32,7 +33,8 @@ const all = (id: string) => [
 
 describe("Accordion", () => {
     it("expands an item from its header, one at a time, turning its indicator over", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", string[]>) => void>();
         await render(
             <Accordion
                 items={[
@@ -152,8 +154,14 @@ describe("Expanding parts", () => {
 
 describe("Tree", () => {
     it("expands a branch and selects a node from its row, indenting its children", async () => {
-        const onExpandedValueChange = vi.fn();
-        const onSelectedValueChange = vi.fn();
+        const onExpandedValueChange =
+            vi.fn<
+                (details: ChangeDetails<"expandedValue", string[]>) => void
+            >();
+        const onSelectedValueChange =
+            vi.fn<
+                (details: ChangeDetails<"selectedValue", string[]>) => void
+            >();
         await render(
             <Tree
                 aria-label="Files"

@@ -57,6 +57,7 @@ describe("PureformProvider", () => {
         let update!: () => void;
         function App() {
             const [changed, setChanged] = useState(false);
+            // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
             update = () => setChanged(true);
             return (
                 <PureformProvider
@@ -82,6 +83,7 @@ describe("PureformProvider", () => {
         let pick!: (theme: string | undefined) => void;
         function App() {
             const [theme, setTheme] = useState<string | undefined>("teal");
+            // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
             pick = setTheme;
             return (
                 <PureformProvider
@@ -304,6 +306,7 @@ describe("PureformProvider re-rendering", () => {
         const renders = { button: 0 };
         const seen: [unknown, unknown][] = [];
         function Counted(props: ComponentProps<"button">) {
+            // oxlint-disable-next-line react/immutability -- the test counts renders in an outside counter
             renders.button++;
             return <button {...props} />;
         }
@@ -425,6 +428,7 @@ describe("useClasses", () => {
         let setVariant!: (variant: "filled" | undefined) => void;
         function App() {
             const [variant, set] = useState<"filled" | undefined>(undefined);
+            // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
             setVariant = set;
             return (
                 <PureformProvider registry={registry} defaults={defaults}>
@@ -450,6 +454,7 @@ describe("useClasses", () => {
         let rerender!: () => void;
         function Probe() {
             const [count, setCount] = useState(0);
+            // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
             rerender = () => setCount((n) => n + 1);
             const classes = useClasses("button", {
                 variant: count < 2 ? "text" : "filled",
@@ -475,6 +480,7 @@ describe("useClasses", () => {
         let setVariant!: (variant: "assist" | "filter") => void;
         function Chip() {
             const [variant, set] = useState<"assist" | "filter">("assist");
+            // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
             setVariant = set;
             const classes = useClasses<string>("chip", { variant });
             return <span data-testid="chip" className={classes.root!.class} />;
@@ -518,6 +524,7 @@ describe("useClassFactory", () => {
         let classes = "";
         function Probe() {
             const factory = useClassFactory<string>("button");
+            // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
             classes = factory({ variant: "text" }).root!.class;
             return null;
         }
@@ -578,6 +585,7 @@ describe("useLazyClassFactory", () => {
         let classes = "";
         function Probe() {
             const factory = useLazyClassFactory<string>("button");
+            // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
             classes = factory({}).root!.class;
             return null;
         }

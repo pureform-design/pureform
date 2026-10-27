@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react";
 import { Pressable, View } from "react-native";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
@@ -30,9 +31,11 @@ beforeAll(async () => {
 
 describe("TouchTarget", () => {
     it("grows an 18px pressable's area to 48px, centred on it, and a press on it presses", async () => {
-        const onPress = vi.fn();
+        const onPress =
+            vi.fn<NonNullable<ComponentProps<typeof Pressable>["onPress"]>>();
         let slop: object | undefined;
         function Slop() {
+            // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
             slop = useTouchTargetSlop(18, 24);
             return null;
         }
@@ -116,11 +119,13 @@ describe("the small pressables' hit slop", () => {
             expect(slop, id).toBeDefined();
             // Grown to 48 each way where it's smaller (a chip's width aside).
             if (box.height < 47.5)
+                // oxlint-disable-next-line vitest/no-conditional-expect -- only a part smaller than 48 grows
                 expect(box.height + slop.top! + slop.bottom!, id).toBeCloseTo(
                     48,
                     0,
                 );
             if (box.width < 47.5 && id !== "pf-chip-root")
+                // oxlint-disable-next-line vitest/no-conditional-expect -- only a part smaller than 48 grows
                 expect(box.width + slop.left! + slop.right!, id).toBeCloseTo(
                     48,
                     0,

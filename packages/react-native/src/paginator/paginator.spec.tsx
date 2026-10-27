@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react";
 import type { ReactNode } from "react";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
@@ -35,7 +36,10 @@ const press = (part: string) =>
 
 describe("Paginator", () => {
     it("shows the range and steps with the buttons", async () => {
-        const onPageChange = vi.fn();
+        const onPageChange =
+            vi.fn<
+                NonNullable<ComponentProps<typeof Paginator>["onPageChange"]>
+            >();
         await render(
             <Paginator
                 count={95}

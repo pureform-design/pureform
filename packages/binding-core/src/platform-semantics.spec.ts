@@ -21,7 +21,7 @@ import {
     splitButtonPositioning,
     toasterOptions,
 } from ".";
-import type { ProviderOptions, ProviderState } from ".";
+import type { MergePartProps, ProviderOptions, ProviderState } from ".";
 import { defineIndication, noIndication } from "./indication";
 
 describe("portable provider", () => {
@@ -64,7 +64,7 @@ describe("portable provider", () => {
         const parent = resolveProvider<{ value: number }>(undefined, {
             slotProps: { button: { root: { value: 1 }, label: untouched } },
         });
-        const merge = vi.fn((a: { value: number }, b: { value: number }) => ({
+        const merge = vi.fn<MergePartProps<{ value: number }>>((a, b) => ({
             value: a.value + b.value,
         }));
         const child = resolveProvider(
@@ -97,12 +97,16 @@ describe("neutral defaults traversal", () => {
         });
     });
     it("skips undefined own keys and defers both repeated-part readers", () => {
-        const base = vi.fn((i: { index: number }) => ({ a: i.index, b: 1 }));
-        const own = vi.fn((i: { index: number }) => ({
+        const base = vi.fn<(i: { index: number }) => { a: number; b: number }>(
+            (i) => ({ a: i.index, b: 1 }),
+        );
+        const own = vi.fn<
+            (i: { index: number }) => { a: undefined; c: number }
+        >((i) => ({
             a: undefined,
             c: i.index + 2,
         }));
-        const merge = vi.fn(policy);
+        const merge = vi.fn<typeof policy>(policy);
         const result = overDefaults(
             { parts: { row: base, root: { a: 1 } }, other: 1 },
             { parts: { row: own, root: { b: 2 } }, other: undefined },

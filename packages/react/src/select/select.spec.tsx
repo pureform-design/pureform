@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { Select } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { textInputsRegistry } from "../__fixtures__/registry";
 import { interact, mount, outside, settle } from "../testing/render";
@@ -47,6 +48,7 @@ const controlled = (initial: string | null) => {
     const handle = { set: (_value: string | null) => {} };
     function Controlled(props: { items: typeof ITEMS }): ReactNode {
         const [value, setValue] = useState(initial);
+        // oxlint-disable-next-line react/immutability -- the test harness captures what it drives from outside the component
         handle.set = setValue;
         return (
             <Select
@@ -142,7 +144,8 @@ describe("Select, ready-made", () => {
     });
 
     it("opens with a click and chooses an option, reporting the change once", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", string | null>) => void>();
         withRegistry(
             <Select label="Size" items={ITEMS} onValueChange={onValueChange} />,
         );
@@ -160,7 +163,8 @@ describe("Select, ready-made", () => {
     });
 
     it("opens on the first option starting with what's typed on the closed field, choosing nothing (APG)", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", string | null>) => void>();
         const items = [
             { value: "s", label: "Small" },
             { value: "m", label: "Medium" },
@@ -283,7 +287,8 @@ describe("Select, ready-made", () => {
 
     it("controlled: asks to change, and moves only with the prop", async () => {
         const value = outside<string | null>("m");
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", string | null>) => void>();
         withRegistry(
             <value.Holder>
                 {(current) => (
@@ -312,7 +317,8 @@ describe("Select, ready-made", () => {
     });
 
     it("submits, and resets to its default with the form", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", string | null>) => void>();
         withRegistry(
             <form>
                 <Select

@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import * as select from "./select";
 import { run, settle } from "./testing/vanilla";
+import type { MachineCallback } from "./testing/vanilla";
 
 interface Item {
     readonly value: string;
@@ -93,7 +94,8 @@ describe("select.machine's selected items", () => {
     });
 
     it("are reported with a chosen value, and kept for a controlled value", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<MachineCallback<select.Schema, "onValueChange">>();
         const control = mount({
             value: ["m"],
             collection: collection(SMALL, MEDIUM),

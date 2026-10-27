@@ -155,6 +155,7 @@ describe("slot condition validation", () => {
         ).toThrow("only valid inside a slotted component's recipe");
     });
 
+    // oxlint-disable-next-line vitest/expect-expect -- type-level test: the @ts-expect-error directives, checked by the typecheck, are the assertions
     it("types structure against the declared slots", () => {
         defineSlotComponent({
             name: "typed",

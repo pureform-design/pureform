@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { BottomSheet } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { overlaysRegistry } from "../__fixtures__/registry";
 import { DragHandle } from "../drag-handle";
@@ -61,7 +62,8 @@ describe("BottomSheet, ready-made", () => {
     });
 
     it("traps focus while open, closes from its drag handle, and gives focus back", async () => {
-        const onOpenChange = vi.fn();
+        const onOpenChange =
+            vi.fn<(details: ChangeDetails<"open", boolean>) => void>();
         withRegistry(
             <>
                 <button type="button">Outside</button>
@@ -93,7 +95,8 @@ describe("BottomSheet, ready-made", () => {
     });
 
     it("closes when dragged down by its handle", async () => {
-        const onOpenChange = vi.fn();
+        const onOpenChange =
+            vi.fn<(details: ChangeDetails<"open", boolean>) => void>();
         withRegistry(
             <BottomSheet
                 defaultOpen
@@ -121,8 +124,10 @@ describe("BottomSheet, ready-made", () => {
     });
 
     it("rests partly open when it can, and moves between partly and fully open", async () => {
-        const onExpandedChange = vi.fn();
-        const onOpenChange = vi.fn();
+        const onExpandedChange =
+            vi.fn<(details: ChangeDetails<"expanded", boolean>) => void>();
+        const onOpenChange =
+            vi.fn<(details: ChangeDetails<"open", boolean>) => void>();
         withRegistry(
             <BottomSheet
                 defaultOpen
@@ -149,7 +154,8 @@ describe("BottomSheet, ready-made", () => {
     });
 
     it("follows a controlled expanded, opens fully when told, and scrolls its body by keyboard", async () => {
-        const onExpandedChange = vi.fn();
+        const onExpandedChange =
+            vi.fn<(details: ChangeDetails<"expanded", boolean>) => void>();
         function Controlled() {
             const [expanded, setExpanded] = useState(true);
             return (
@@ -217,9 +223,10 @@ describe("BottomSheet, ready-made", () => {
     });
 
     it("asks onClose before Escape, the scrim, the handle's press, or a drag closes it", async () => {
-        const onOpenChange = vi.fn();
+        const onOpenChange =
+            vi.fn<(details: ChangeDetails<"open", boolean>) => void>();
         let answer = false;
-        const onClose = vi.fn(() => answer);
+        const onClose = vi.fn<() => boolean | Promise<boolean>>(() => answer);
         withRegistry(
             <BottomSheet
                 defaultOpen

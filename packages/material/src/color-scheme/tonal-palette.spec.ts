@@ -50,21 +50,21 @@ describe("TonalPalette", () => {
     it("should throw when trying to get a hex color from a tone outside of the range", () => {
         const tp = TonalPalette.fromArgb(GREEN_ARGB);
 
-        expect(() => tp.toneHex(-1)).toThrow();
-        expect(() => tp.toneHex(101)).toThrow();
+        expect(() => tp.toneHex(-1)).toThrow(/Invalid tone: -1/);
+        expect(() => tp.toneHex(101)).toThrow(/Invalid tone: 101/);
     });
 
     it("should throw when trying to get an ARGB int color from a tone outside of the range", () => {
         const tp = TonalPalette.fromArgb(GREEN_ARGB);
 
-        expect(() => tp.toneArgb(-1)).toThrow();
-        expect(() => tp.toneArgb(101)).toThrow();
+        expect(() => tp.toneArgb(-1)).toThrow(/Invalid tone: -1/);
+        expect(() => tp.toneArgb(101)).toThrow(/Invalid tone: 101/);
     });
 
     it("should throw when trying to get an HCT color from a tone outside of the range", () => {
         const tp = TonalPalette.fromArgb(GREEN_ARGB);
 
-        expect(() => tp.toneHct(-1)).toThrow();
-        expect(() => tp.toneHct(101)).toThrow();
+        expect(() => tp.toneHct(-1)).toThrow(/Invalid tone: -1/);
+        expect(() => tp.toneHct(101)).toThrow(/Invalid tone: 101/);
     });
 });

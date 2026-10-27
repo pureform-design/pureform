@@ -119,6 +119,7 @@ describe.each([animated, reanimated])("the carousel with $name", (engine) => {
                 behavior: motion === "reduce" ? "auto" : "smooth",
             });
             if (motion === "reduce") {
+                // oxlint-disable-next-line vitest/no-conditional-expect -- only reduced motion lands at once
                 expect(group.scrollLeft).toBe(2 * (100 + GAP));
             }
             document.body.innerHTML = "";

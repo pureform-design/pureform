@@ -20,7 +20,6 @@ function Label(props: Props & { readonly index?: number }) {
     >(props);
     const instance = () => ({ index: props.index ?? 0 });
     // createSlotProps invokes this accessor inside its live merge, not during setup.
-    // eslint-disable-next-line solid/reactivity
     const label = slots("label", instance);
     return <span data-testid="label" {...label} />;
 }

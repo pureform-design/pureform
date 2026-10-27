@@ -35,7 +35,7 @@ describe.each(stateful)("$component", (component) => {
     });
 
     it("uncontrolled: changes on its own and reports the change once", async () => {
-        const onChange = vi.fn();
+        const onChange = vi.fn<(details: Record<string, unknown>) => void>();
         const { host } = mount({
             [names.defaultValue]: state.from,
             [names.onChange]: onChange,
@@ -57,7 +57,7 @@ describe.each(stateful)("$component", (component) => {
     });
 
     it("controlled: asks to change, and doesn't move until the prop does", async () => {
-        const onChange = vi.fn();
+        const onChange = vi.fn<(details: Record<string, unknown>) => void>();
         const { host } = mount({
             [names.value]: state.from,
             [names.onChange]: onChange,
@@ -81,9 +81,11 @@ describe.each(stateful)("$component", (component) => {
 
     it("controlled: moves when the owner takes the change", async () => {
         let scene!: Mounted;
-        const onChange = vi.fn((details: Record<string, unknown>) => {
-            void scene.update({ [names.value]: details[state.prop] });
-        });
+        const onChange = vi.fn<(details: Record<string, unknown>) => void>(
+            (details) => {
+                void scene.update({ [names.value]: details[state.prop] });
+            },
+        );
         scene = mount({
             [names.value]: state.from,
             [names.onChange]: onChange,
@@ -95,7 +97,7 @@ describe.each(stateful)("$component", (component) => {
     });
 
     it("controlled: a prop change moves it without calling back", async () => {
-        const onChange = vi.fn();
+        const onChange = vi.fn<(details: Record<string, unknown>) => void>();
         const scene = mount({
             [names.value]: state.from,
             [names.onChange]: onChange,

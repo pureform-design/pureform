@@ -3,6 +3,7 @@ import { beforeAll, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { Rating } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { presetRegistry } from "../testing/registry";
 import type { TestRegistry } from "../testing/registry";
@@ -47,7 +48,8 @@ describe("Rating on React Native", () => {
     });
 
     it("sets the value by a press, and takes none while read-only", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", number>) => void>();
         await withRegistry(
             <>
                 <Rating testId="live" count={4} onValueChange={onValueChange} />

@@ -58,7 +58,8 @@ describe("DockedDatePicker, ready-made", () => {
     });
 
     it("sets the value from a typed date once the field loses focus", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: { readonly value: readonly string[] }) => void>();
         withRegistry(
             <DockedDatePicker
                 label="Date"
@@ -81,7 +82,8 @@ describe("DockedDatePicker, ready-made", () => {
     });
 
     it("opens with the trigger and closes on a choice", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: { readonly value: readonly string[] }) => void>();
         withRegistry(
             <DockedDatePicker
                 label="Date"

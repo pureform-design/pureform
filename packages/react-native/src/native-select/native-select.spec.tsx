@@ -51,7 +51,13 @@ const ITEMS = [
 
 describe("NativeSelect on React Native", () => {
     it("renders a real <select> on the web, with its groups, and takes a choice", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<
+                (details: {
+                    readonly value: string;
+                    readonly reason?: "reset" | undefined;
+                }) => void
+            >();
         await withRegistry(
             <NativeSelect
                 aria-label="Size"
@@ -89,7 +95,13 @@ describe("NativeSelect on React Native", () => {
     it("falls back to the Material menu where the platform menu isn't installed, and says so", async () => {
         Platform.OS = "ios";
         const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<
+                (details: {
+                    readonly value: string;
+                    readonly reason?: "reset" | undefined;
+                }) => void
+            >();
         await withRegistry(
             <NativeSelect
                 aria-label="Size"
@@ -173,7 +185,13 @@ describe("NativeSelect on React Native", () => {
     });
 
     it("chooses several on the web with multiple", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<
+                (details: {
+                    readonly value: readonly string[];
+                    readonly reason?: "reset" | undefined;
+                }) => void
+            >();
         await withRegistry(
             <NativeSelect
                 aria-label="Size"
@@ -195,7 +213,13 @@ describe("NativeSelect on React Native", () => {
     it("toggles checkbox items in the Material menu with multiple, staying open", async () => {
         Platform.OS = "ios";
         const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<
+                (details: {
+                    readonly value: readonly string[];
+                    readonly reason?: "reset" | undefined;
+                }) => void
+            >();
         await withRegistry(
             <NativeSelect
                 aria-label="Size"

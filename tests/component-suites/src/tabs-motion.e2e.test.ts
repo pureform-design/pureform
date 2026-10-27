@@ -69,6 +69,7 @@ const slides = (host: HTMLElement) =>
 
 // Each slide starts paused, so the tests set its time: under load, the click or key and the
 // settling after it can outlast a slide.
+// oxlint-disable-next-line typescript/unbound-method -- kept to be called on the element, through `apply`
 const animate = Element.prototype.animate;
 
 beforeAll(() => {
@@ -177,6 +178,7 @@ describe.each(["primary", "secondary"])("%s tabs", (variant) => {
             const middle = boxOf(indicator);
             expect(isBetween(middle.left, from.left, to.left)).toBe(true);
             expect(isBetween(middle.right, from.right, to.right)).toBe(true);
+            /* oxlint-disable vitest/no-conditional-expect -- only the primary indicator resizes; the variant is the test's parameter */
             if (variant === "primary") {
                 // Flights is wider than Cars: the slide resizes the indicator on the way.
                 expect(from.width).toBeGreaterThan(to.width + 4);
@@ -184,6 +186,7 @@ describe.each(["primary", "secondary"])("%s tabs", (variant) => {
                     true,
                 );
             }
+            /* oxlint-enable vitest/no-conditional-expect */
 
             slide.finish();
             expectAligned(host, "cars", variant);
@@ -270,6 +273,7 @@ describe("a primary indicator", () => {
             expect(tabOf(host, "flights").getBoundingClientRect().height).toBe(
                 height,
             );
+            /* oxlint-disable vitest/no-conditional-expect -- only icon-only tabs have the least width and an aria-label; the items are the test's parameter */
             if (!("label" in items[0]!)) {
                 // Only the icon, 24px: the indicator's least width.
                 expect(boxOf(indicatorOf(host, "flights")).width).toBeCloseTo(
@@ -280,6 +284,7 @@ describe("a primary indicator", () => {
                     "flights",
                 );
             }
+            /* oxlint-enable vitest/no-conditional-expect */
         },
     );
 

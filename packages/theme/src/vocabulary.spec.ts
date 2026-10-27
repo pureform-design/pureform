@@ -25,6 +25,7 @@ describe("a theme's config with typed()", () => {
         pf.apply({ shadowElevation: "level3", filterElevation: "level1" });
     });
 
+    // oxlint-disable-next-line vitest/expect-expect -- type-level test: the @ts-expect-error directives, checked by the typecheck, are the assertions
     it("rejects names the theme doesn't have", () => {
         // @ts-expect-error not a color group of this theme
         pf.alias("semanticTokens", "colors", "tertiary");

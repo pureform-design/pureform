@@ -59,10 +59,12 @@ describe("Native defaults", () => {
                 row?: PerInstance<StyleProp<ViewStyle>, { index: number }>;
             };
         };
-        const base = vi.fn(({ index }: { index: number }) => [
-            { margin: index, padding: 2 },
-        ]);
-        const own = vi.fn(() => [{ padding: 6 }]);
+        const base = vi.fn<
+            (instance: { index: number }) => StyleProp<ViewStyle> | undefined
+        >(({ index }: { index: number }) => [{ margin: index, padding: 2 }]);
+        const own = vi.fn<
+            (instance: { index: number }) => StyleProp<ViewStyle> | undefined
+        >(() => [{ padding: 6 }]);
         const defaults: Props = {
             tokens: { a: 1, b: 2 },
             style: { row: base },

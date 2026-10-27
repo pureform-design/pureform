@@ -1,10 +1,12 @@
 import { act } from "@testing-library/react";
+import type { ComponentProps } from "react";
 import { useState } from "react";
 import type { ReactNode } from "react";
 import { Dimensions, Image, Linking, View } from "react-native";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
 
+import type { ChangeDetails } from ".";
 import { Glyph, PureformProvider, useIconStyle } from ".";
 import { AppBar } from "./app-bar";
 import { Autocomplete } from "./autocomplete";
@@ -303,7 +305,10 @@ describe("badge", () => {
 
 describe("controlled and uncontrolled state", () => {
     it("checks an uncontrolled checkbox and reports it", async () => {
-        const change = vi.fn();
+        const change =
+            vi.fn<
+                NonNullable<ComponentProps<typeof Checkbox>["onCheckedChange"]>
+            >();
         await render(<Checkbox aria-label="Agree" onCheckedChange={change} />);
         const root = byTestId("pf-checkbox-root");
         expect(root.getAttribute("aria-checked")).toBe("false");
@@ -313,7 +318,8 @@ describe("controlled and uncontrolled state", () => {
     });
 
     it("keeps a controlled switch until its prop changes", async () => {
-        const change = vi.fn();
+        const change =
+            vi.fn<(details: ChangeDetails<"checked", boolean>) => void>();
         await render(
             <Switch
                 aria-label="Wi-Fi"
@@ -328,7 +334,8 @@ describe("controlled and uncontrolled state", () => {
     });
 
     it("picks a radio in its group", async () => {
-        const change = vi.fn();
+        const change =
+            vi.fn<(details: ChangeDetails<"value", string | null>) => void>();
         await render(
             <RadioGroup
                 items={[
@@ -347,8 +354,10 @@ describe("controlled and uncontrolled state", () => {
     });
 
     it("toggles a button and a chip given defaultSelected, reported with aria-pressed", async () => {
-        const button = vi.fn();
-        const chip = vi.fn();
+        const button =
+            vi.fn<(details: ChangeDetails<"selected", boolean>) => void>();
+        const chip =
+            vi.fn<(details: ChangeDetails<"selected", boolean>) => void>();
         await render(
             <View>
                 <Button
@@ -428,7 +437,8 @@ describe("controlled and uncontrolled state", () => {
     });
 
     it("opens a select's menu and picks from it", async () => {
-        const change = vi.fn();
+        const change =
+            vi.fn<(details: ChangeDetails<"value", string | null>) => void>();
         await render(
             <Select
                 label="Size"
@@ -490,6 +500,7 @@ describe("icons", () => {
     it("give an icon its slot's size and color", async () => {
         let style: ReturnType<typeof useIconStyle> | undefined;
         function Probe() {
+            // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
             style = useIconStyle();
             return null;
         }
@@ -506,6 +517,7 @@ describe("icons", () => {
     it("fill the current destination's icon", async () => {
         const fills: Record<string, boolean> = {};
         function Probe(props: { name: string }) {
+            // oxlint-disable-next-line react/immutability -- the test harness captures what it drives from outside the component
             fills[props.name] = useIconStyle().filled;
             return null;
         }
@@ -674,8 +686,9 @@ describe("file upload", () => {
     });
 
     it("asks the app to pick through the trigger, and to remove through a file's button", async () => {
-        const picked = vi.fn();
-        const removed = vi.fn();
+        const picked = vi.fn<() => void>();
+        const removed =
+            vi.fn<NonNullable<ComponentProps<typeof FileUpload>["onRemove"]>>();
         await render(
             <FileUpload
                 label="Files"
@@ -941,7 +954,7 @@ describe("lists, menus, and selects", () => {
     });
 
     it("toggles a checkbox item and fills it while checked", async () => {
-        const changed = vi.fn();
+        const changed = vi.fn<(checked: boolean) => void>();
         const Toggling = () => {
             const [checked, setChecked] = useState(false);
             return (
@@ -1031,7 +1044,8 @@ describe("lists, menus, and selects", () => {
     });
 
     it("filters an autocomplete's suggestions as it's typed in, and picks one", async () => {
-        const change = vi.fn();
+        const change =
+            vi.fn<(details: ChangeDetails<"value", string | null>) => void>();
         await render(
             <Autocomplete
                 label="City"
@@ -1070,8 +1084,10 @@ describe("lists, menus, and selects", () => {
     });
 
     it("opens a search view, filters, selects, and closes", async () => {
-        const select = vi.fn();
-        const submit = vi.fn();
+        const select =
+            vi.fn<NonNullable<ComponentProps<typeof SearchView>["onSelect"]>>();
+        const submit =
+            vi.fn<NonNullable<ComponentProps<typeof SearchView>["onSubmit"]>>();
         await render(
             <SearchView
                 placeholder="Search mail"
@@ -1250,7 +1266,8 @@ describe("nested rows", () => {
     });
 
     it("drills into a menu item's submenu, and back out", async () => {
-        const onSelect = vi.fn();
+        const onSelect =
+            vi.fn<NonNullable<ComponentProps<typeof Menu>["onSelect"]>>();
         await render(
             <Menu
                 submenu="drill"
@@ -1297,7 +1314,8 @@ describe("nested rows", () => {
         );
 
     it("cascades a menu item's submenu beside its row", async () => {
-        const onSelect = vi.fn();
+        const onSelect =
+            vi.fn<NonNullable<ComponentProps<typeof Menu>["onSelect"]>>();
         await render(
             <Menu submenu="cascade" items={SHARE} onSelect={onSelect} />,
         );
@@ -1490,8 +1508,9 @@ describe("nested rows", () => {
     });
 
     it("presses a swipeable item on a tap, not a drag, and isolates its frame", async () => {
-        const onPress = vi.fn();
-        const onRevealedChange = vi.fn();
+        const onPress = vi.fn<() => void>();
+        const onRevealedChange =
+            vi.fn<(details: ChangeDetails<"revealed", boolean>) => void>();
         await render(
             <ListItem
                 headline="Message"
@@ -1521,7 +1540,8 @@ describe("c7c: avatar picture, swipe, inset icon, search bar width", () => {
         "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 
     it("shows an avatar's fallback until its picture loads, and keeps it when it fails", async () => {
-        const onStatusChange = vi.fn();
+        const onStatusChange =
+            vi.fn<(details: { readonly status: "loaded" | "error" }) => void>();
         await render(
             <>
                 <Avatar
@@ -1891,7 +1911,13 @@ describe("media", () => {
 
     it("measures a remote source with its headers where React Native can", async () => {
         const headers = { Authorization: "Bearer token" };
-        const withHeaders = vi.fn(
+        const withHeaders = vi.fn<
+            (
+                _uri: string,
+                _headers: Record<string, string>,
+                done: (width: number, height: number) => void,
+            ) => void
+        >(
             (
                 _uri: string,
                 _headers: Record<string, string>,

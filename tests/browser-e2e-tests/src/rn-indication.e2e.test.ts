@@ -373,8 +373,8 @@ const mouse = async (
 // whether a fade is still running.
 const { InteractionManager } = ReactNative as unknown as {
     InteractionManager: {
-        createInteractionHandle(): number;
-        clearInteractionHandle(handle: number): void;
+        createInteractionHandle: () => number;
+        clearInteractionHandle: (handle: number) => void;
     };
 };
 const tweens = new Set<number>();
@@ -734,7 +734,7 @@ describe.each(CASES)("$name", (rnCase) => {
         },
     );
 
-    describe.runIf(rnCase.source)("with a source", () => {
+    describe.runIf(rnCase.source !== undefined)("with a source", () => {
         it("a shared source shows a press on another component, and useInteractionState reports it", async () => {
             const observed = observe();
             const { parts } = await mountCase(rnCase, entry, {
@@ -833,7 +833,7 @@ describe.each(CASES)("$name", (rnCase) => {
             },
         );
 
-        it.runIf(rnCase.itemDisabled)(
+        it.runIf(rnCase.itemDisabled !== undefined)(
             "disabling its item while it's pressed ends the press",
             async () => {
                 const observed = observe();

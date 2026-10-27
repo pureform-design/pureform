@@ -5,6 +5,7 @@ import {
     createInteractionSources,
     IDLE_INTERACTION_STATE,
     type Interaction,
+    type InteractionListener,
     type InteractionState,
 } from "./interaction";
 
@@ -162,7 +163,7 @@ describe("createInteractionSource", () => {
 
     it("stops telling a subscriber once it unsubscribes", () => {
         const source = createInteractionSource();
-        const listener = vi.fn();
+        const listener = vi.fn<InteractionListener>();
         const unsubscribe = source.subscribe(listener);
         source.emit({ type: "hoverEnter" });
         unsubscribe();
@@ -172,8 +173,8 @@ describe("createInteractionSource", () => {
 
     it("tells the subscribers there were when an interaction was emitted", () => {
         const source = createInteractionSource();
-        const late = vi.fn();
-        const second = vi.fn();
+        const late = vi.fn<InteractionListener>();
+        const second = vi.fn<InteractionListener>();
         source.subscribe(() => {
             source.subscribe(late);
         });
@@ -187,7 +188,7 @@ describe("createInteractionSource", () => {
     it("lets a subscriber that attaches late read what came before from the state", () => {
         const source = createInteractionSource();
         source.emit(press(1));
-        const listener = vi.fn();
+        const listener = vi.fn<InteractionListener>();
         source.subscribe(listener);
         expect(source.state.pressed).toBe(true);
         source.emit({ type: "release", id: 1 });

@@ -1,6 +1,7 @@
 // The single-part components: Root is the whole component.
 
 import { testIds } from "@pureform/anatomy";
+import type { ComponentProps } from "react";
 import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 
@@ -58,7 +59,10 @@ describe("Avatar", () => {
     });
 
     it("keeps its fallback when the picture fails", async () => {
-        const onStatusChange = vi.fn();
+        const onStatusChange =
+            vi.fn<
+                NonNullable<ComponentProps<typeof Avatar>["onStatusChange"]>
+            >();
         withRegistry(
             <Avatar
                 src="/missing-avatar.png"

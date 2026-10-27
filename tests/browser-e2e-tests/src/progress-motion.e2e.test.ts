@@ -207,14 +207,13 @@ describe.each(Object.keys(STYLINGS) as (keyof typeof STYLINGS)[])(
                 near(center(c.trackHeadCap!), at(100 - apart));
                 const gap = (a: readonly number[], b: readonly number[]) =>
                     Math.hypot(a[0]! - b[0]!, a[1]! - b[1]!) - thickness;
-                expect(
+                const gaps = [
                     gap(center(c.tailCap!), center(c.trackHeadCap!)),
-                ).toBeCloseTo(4, 0);
-                if (!wavy) {
-                    expect(
-                        gap(center(c.headCap!), center(c.trackTailCap!)),
-                    ).toBeCloseTo(4, 0);
-                }
+                    ...(wavy
+                        ? []
+                        : [gap(center(c.headCap!), center(c.trackTailCap!))]),
+                ];
+                for (const between of gaps) expect(between).toBeCloseTo(4, 0);
             },
         );
 

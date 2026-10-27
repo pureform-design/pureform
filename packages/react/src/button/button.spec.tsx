@@ -1,10 +1,11 @@
 import { buttonAnatomy, testIds } from "@pureform/anatomy";
 import { screen } from "@testing-library/react";
-import type { ReactNode } from "react";
+import type { MouseEventHandler, ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { Button } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import type { PureformProviderProps } from "..";
 import { fakeRegistry } from "../__fixtures__/registry";
@@ -140,7 +141,7 @@ describe("Button, ready-made", () => {
     });
 
     it("forwards the element's own props, handlers, ref, and id to the root", async () => {
-        const onClick = vi.fn();
+        const onClick = vi.fn<MouseEventHandler<HTMLElement>>();
         const ref = { current: null as HTMLElement | null };
         withRegistry(
             <Button
@@ -163,7 +164,7 @@ describe("Button, ready-made", () => {
 
 describe("Button, keyboard and pointer", () => {
     it("clicks on Enter and Space, marking the press while the key is down", async () => {
-        const onClick = vi.fn();
+        const onClick = vi.fn<MouseEventHandler<HTMLElement>>();
         withRegistry(<Button label="Save" onClick={onClick} />);
         await settle();
         const root = byTestId(ids.root);
@@ -193,7 +194,7 @@ describe("Button, keyboard and pointer", () => {
     });
 
     it("ignores clicks while disabled, by its prop or a disabled fieldset", async () => {
-        const onClick = vi.fn();
+        const onClick = vi.fn<MouseEventHandler<HTMLElement>>();
         const disabled = outside(true);
         withRegistry(
             <>
@@ -223,7 +224,8 @@ describe("Button, keyboard and pointer", () => {
 
 describe("Button, toggle", () => {
     it("toggles uncontrolled selection, reporting each change once", async () => {
-        const onSelectedChange = vi.fn();
+        const onSelectedChange =
+            vi.fn<(details: ChangeDetails<"selected", boolean>) => void>();
         withRegistry(
             <Button
                 label="Bold"
@@ -247,7 +249,8 @@ describe("Button, toggle", () => {
 
     it("asks to change controlled selection, and moves only with the prop", async () => {
         const selected = outside(false);
-        const onSelectedChange = vi.fn();
+        const onSelectedChange =
+            vi.fn<(details: ChangeDetails<"selected", boolean>) => void>();
         withRegistry(
             <selected.Holder>
                 {(value) => (

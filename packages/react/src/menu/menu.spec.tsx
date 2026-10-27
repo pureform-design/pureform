@@ -1,10 +1,12 @@
 import { compositeTestIds } from "@pureform/anatomy";
 import { screen } from "@testing-library/react";
+import type { ComponentProps } from "react";
 import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
 
 import { Menu } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { overlaysRegistry } from "../__fixtures__/registry";
 import { Button } from "../button";
@@ -66,8 +68,10 @@ describe("Menu, ready-made", () => {
     });
 
     it("opens with a click, highlights with the arrow keys, and reports the chosen item", async () => {
-        const onSelect = vi.fn();
-        const onOpenChange = vi.fn();
+        const onSelect =
+            vi.fn<NonNullable<ComponentProps<typeof Menu>["onSelect"]>>();
+        const onOpenChange =
+            vi.fn<(details: ChangeDetails<"open", boolean>) => void>();
         withRegistry(
             <Menu
                 trigger="Edit"
@@ -224,7 +228,7 @@ describe("Menu, groups and toggles", () => {
     });
 
     it("toggles a checkbox item, reporting the change", async () => {
-        const onCheckedChange = vi.fn();
+        const onCheckedChange = vi.fn<(checked: boolean) => void>();
         withRegistry(
             <Menu
                 trigger="View"
@@ -259,7 +263,8 @@ describe("Menu, groups and toggles", () => {
 
 describe("Menu, compound", () => {
     it("composes its parts, with any component as the trigger", async () => {
-        const onSelect = vi.fn();
+        const onSelect =
+            vi.fn<NonNullable<ComponentProps<typeof Menu.Root>["onSelect"]>>();
         withRegistry(
             <Menu.Root onSelect={onSelect}>
                 <Menu.Trigger as={Button} label="More" variant="text" />
@@ -413,7 +418,8 @@ describe("Menu, submenus", () => {
     });
 
     it("opens the submenu with the arrow toward the end, reports its items' choice, and closes back", async () => {
-        const onSelect = vi.fn();
+        const onSelect =
+            vi.fn<NonNullable<ComponentProps<typeof Menu>["onSelect"]>>();
         withRegistry(
             <Menu
                 trigger="Edit"
@@ -503,8 +509,10 @@ describe("Menu, submenus", () => {
         );
 
     it("drills into a submenu in the menu's place, under a row that goes back", async () => {
-        const onSelect = vi.fn();
-        const onOpenChange = vi.fn();
+        const onSelect =
+            vi.fn<NonNullable<ComponentProps<typeof Menu>["onSelect"]>>();
+        const onOpenChange =
+            vi.fn<(details: ChangeDetails<"open", boolean>) => void>();
         withRegistry(
             <Menu
                 trigger="Edit"

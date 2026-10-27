@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { Select } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { textInputsRegistry } from "../__fixtures__/registry";
 import { byTestId, mount, settle } from "../testing/mount";
@@ -106,7 +107,8 @@ describe("Select, ready-made", () => {
     });
 
     it("opens with a click and chooses an option, reporting the change once", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", string | null>) => void>();
         withRegistry(() => (
             <Select label="Size" items={ITEMS} onValueChange={onValueChange} />
         ));
@@ -125,7 +127,8 @@ describe("Select, ready-made", () => {
     });
 
     it("opens on the first option starting with what's typed on the closed field, choosing nothing (APG)", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", string | null>) => void>();
         const items = [
             { value: "s", label: "Small" },
             { value: "m", label: "Medium" },
@@ -209,7 +212,8 @@ describe("Select, ready-made", () => {
 
     it("controlled: asks to change, and moves only with the prop", async () => {
         const [value, setValue] = createSignal<string | null>("m");
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", string | null>) => void>();
         withRegistry(() => (
             <Select
                 label="Size"
@@ -264,6 +268,7 @@ describe("Select, ready-made", () => {
         await userEvent.click(item("s"));
         await settle();
         release();
+        // oxlint-disable-next-line solid/reactivity -- the test asserts the signal's current value
         expect(value()).toBe("s");
         expect(input.value).toBe("Small");
         const relays = warn.mock.calls.filter(([message]) =>
@@ -346,7 +351,8 @@ describe("Select, ready-made", () => {
     });
 
     it("submits, and resets to its default with the form", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", string | null>) => void>();
         withRegistry(() => (
             <form>
                 <Select

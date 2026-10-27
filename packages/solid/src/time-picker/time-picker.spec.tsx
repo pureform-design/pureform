@@ -1,4 +1,5 @@
 import { testIds } from "@pureform/anatomy";
+import type { ComponentProps } from "solid-js";
 import { createSignal } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
@@ -49,7 +50,10 @@ describe("TimePicker", () => {
     });
 
     it("is controllable, and the period and the dial change it", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<
+                NonNullable<ComponentProps<typeof TimePicker>["onValueChange"]>
+            >();
         const [value, setValue] = createSignal("09:30");
         withRegistry(() => (
             <TimePicker
@@ -70,6 +74,7 @@ describe("TimePicker", () => {
         byTestId(ids.dial).focus();
         await userEvent.keyboard("{ArrowUp}");
         await settle();
+        // oxlint-disable-next-line solid/reactivity -- the test asserts the signal's current value
         expect(value()).toBe("22:30");
         expect(byTestId(ids.hourSelector).textContent).toBe("10");
     });
@@ -116,6 +121,7 @@ describe("TimePicker, slot props", () => {
                     dialLabel: (label) => (label.selected ? "on" : undefined),
                     dialTrack: "track",
                 }}
+                // oxlint-disable-next-line solid/style-prop -- a part-keyed style record, not CSS properties
                 style={{ dialHandle: { opacity: 0.5 } }}
                 slotProps={{
                     dialLabel: (label) => ({ title: `h${label.value}` }),
@@ -180,7 +186,10 @@ describe("TimeInput, slot props", () => {
 
 describe("TimeInput", () => {
     it("takes a typed time, with the period selector in a 12-hour cycle", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<
+                NonNullable<ComponentProps<typeof TimeInput>["onValueChange"]>
+            >();
         withRegistry(() => (
             <TimeInput
                 defaultValue="14:00"

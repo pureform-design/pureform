@@ -148,6 +148,7 @@ describe("registered components", () => {
         }>();
     });
 
+    // oxlint-disable-next-line vitest/expect-expect -- type-level test: the @ts-expect-error directive, checked by the typecheck, is the assertion
     it("rejects a name that isn't registered", () => {
         // @ts-expect-error not a registered component
         type Missing = Variants<"missing">;

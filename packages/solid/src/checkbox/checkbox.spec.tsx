@@ -5,6 +5,7 @@ import { page, userEvent } from "vitest/browser";
 
 import { Checkbox } from ".";
 import type { CheckedState } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { fakeRegistry } from "../__fixtures__/registry";
 import { byTestId, mount, settle } from "../testing/mount";
@@ -89,6 +90,7 @@ describe("Checkbox, ready-made", () => {
             <Checkbox
                 aria-label="Terms"
                 class={{ root: "mine", box: ["boxed", { on: true }] }}
+                // oxlint-disable-next-line solid/style-prop -- a part-keyed style record, not CSS properties
                 style={{ box: { "border-width": "3px" } }}
                 slotProps={{ input: { title: "the input" } }}
                 tokens={{ boxSize: "30px" }}
@@ -147,6 +149,7 @@ describe("Checkbox, ready-made", () => {
     it("sets the input's ids for a label elsewhere, and the root's id", async () => {
         withRegistry(() => (
             <>
+                {/* oxlint-disable-next-line jsx-a11y/label-has-associated-control -- the Checkbox's input takes this id: the association under test */}
                 <label for="terms">Terms</label>
                 <Checkbox id="terms-root" ids={{ input: "terms" }} />
             </>
@@ -162,7 +165,8 @@ describe("Checkbox, ready-made", () => {
 
 describe("Checkbox, pointer and keyboard", () => {
     it("toggles uncontrolled state on a click, reporting each change once", async () => {
-        const onCheckedChange = vi.fn();
+        const onCheckedChange =
+            vi.fn<(details: ChangeDetails<"checked", CheckedState>) => void>();
         withRegistry(() => (
             <Checkbox aria-label="Terms" onCheckedChange={onCheckedChange} />
         ));
@@ -186,7 +190,8 @@ describe("Checkbox, pointer and keyboard", () => {
     });
 
     it("toggles on Space, marking the press while the key is down", async () => {
-        const onCheckedChange = vi.fn();
+        const onCheckedChange =
+            vi.fn<(details: ChangeDetails<"checked", CheckedState>) => void>();
         withRegistry(() => (
             <Checkbox
                 aria-label="Terms"
@@ -234,7 +239,8 @@ describe("Checkbox, pointer and keyboard", () => {
     });
 
     it("ignores the user while read-only, and says so", async () => {
-        const onCheckedChange = vi.fn();
+        const onCheckedChange =
+            vi.fn<(details: ChangeDetails<"checked", CheckedState>) => void>();
         withRegistry(() => (
             <Checkbox
                 aria-label="Terms"
@@ -264,7 +270,8 @@ describe("Checkbox, pointer and keyboard", () => {
 describe("Checkbox, controlled", () => {
     it("asks to change, and moves only with the prop", async () => {
         const [checked, setChecked] = createSignal<CheckedState>(false);
-        const onCheckedChange = vi.fn();
+        const onCheckedChange =
+            vi.fn<(details: ChangeDetails<"checked", CheckedState>) => void>();
         withRegistry(() => (
             <Checkbox
                 aria-label="Terms"
@@ -301,6 +308,7 @@ describe("Checkbox, controlled", () => {
         await settle();
         await userEvent.click(inputOf());
         await settle();
+        // oxlint-disable-next-line solid/reactivity -- the test asserts the signal's current value
         expect(checked()).toBe(true);
         expect(inputOf().checked).toBe(true);
         expect(inputOf().indeterminate).toBe(false);
@@ -346,7 +354,8 @@ describe("Checkbox, forms", () => {
     });
 
     it("resets uncontrolled state to its default, reporting the reset", async () => {
-        const onCheckedChange = vi.fn();
+        const onCheckedChange =
+            vi.fn<(details: ChangeDetails<"checked", CheckedState>) => void>();
         withRegistry(() => (
             <form data-testid="form">
                 <Checkbox
@@ -373,7 +382,8 @@ describe("Checkbox, forms", () => {
     });
 
     it("asks controlled state to reset, leaving the input where the prop says", async () => {
-        const onCheckedChange = vi.fn();
+        const onCheckedChange =
+            vi.fn<(details: ChangeDetails<"checked", CheckedState>) => void>();
         withRegistry(() => (
             <form data-testid="form">
                 <Checkbox
@@ -422,7 +432,8 @@ describe("Checkbox, forms", () => {
 
 describe("Checkbox, compound parts", () => {
     it("compose under Root, the input taking its own props", async () => {
-        const onCheckedChange = vi.fn();
+        const onCheckedChange =
+            vi.fn<(details: ChangeDetails<"checked", CheckedState>) => void>();
         withRegistry(() => (
             <Checkbox.Root
                 testId="c"

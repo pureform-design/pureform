@@ -1,8 +1,10 @@
 import { testIds } from "@pureform/anatomy";
+import { createSignal } from "solid-js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { createSnackbarQueue, SnackbarHost } from ".";
+import type { SnackbarOptions } from ".";
 import { PureformProvider } from "..";
 import { overlaysRegistry } from "../__fixtures__/registry";
 import { byTestId, mount, settle } from "../testing/mount";
@@ -38,6 +40,27 @@ const text = () =>
         ?.textContent ?? null;
 
 describe("SnackbarHost", () => {
+    it("follows a new queue: its snackbars, not the old one's", async () => {
+        const first = createSnackbarQueue();
+        const second = createSnackbarQueue();
+        const [queue, setQueue] = createSignal(first);
+        mount(() => (
+            <PureformProvider registry={overlaysRegistry()}>
+                <SnackbarHost queue={queue()} />
+            </PureformProvider>
+        ));
+        first.show({ supportingText: "old" });
+        await vi.waitFor(() => expect(text()).toBe("old"));
+        second.show({ supportingText: "new" });
+        setQueue(second);
+        await vi.waitFor(() => expect(text()).toBe("new"));
+        first.show({ supportingText: "stale" });
+        await settle();
+        expect(text()).toBe("new");
+        second.dismiss();
+        await vi.waitFor(() => expect(text()).toBeNull());
+    });
+
     it("shows one snackbar at a time, in order, each once the one before closes", async () => {
         const queue = host();
         queue.show({ supportingText: "first", closeLabel: "Dismiss" });
@@ -56,7 +79,8 @@ describe("SnackbarHost", () => {
     it("times each in turn, from when it shows", async () => {
         vi.useFakeTimers();
         const queue = host();
-        const onOpenChange = vi.fn();
+        const onOpenChange =
+            vi.fn<NonNullable<SnackbarOptions["onOpenChange"]>>();
         queue.show({ supportingText: "first", duration: 1000, onOpenChange });
         queue.show({ supportingText: "second", duration: 2000 });
         await vi.advanceTimersByTimeAsync(10);

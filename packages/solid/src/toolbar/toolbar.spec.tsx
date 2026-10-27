@@ -90,7 +90,8 @@ describe("Toolbar, ready-made", () => {
     });
 
     it("makes an element with selected a toggle", async () => {
-        const onSelectedChange = vi.fn();
+        const onSelectedChange =
+            vi.fn<(details: { readonly selected: boolean }) => void>();
         withRegistry(() => (
             <Toolbar
                 items={[
@@ -233,7 +234,7 @@ describe("Toolbar, overflow", () => {
     });
 
     it("moves what doesn't fit into the overflow menu, and runs its click there", async () => {
-        const onClick = vi.fn();
+        const onClick = vi.fn<() => void>();
         withRegistry(
             () => (
                 <Toolbar

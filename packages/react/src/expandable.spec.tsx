@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
+import type { ChangeDetails } from ".";
 import { PureformProvider } from ".";
 import { displayRegistry } from "./__fixtures__/registry";
 import { Accordion } from "./accordion";
@@ -81,7 +82,8 @@ describe("Accordion", () => {
     });
 
     it("expands and collapses an item from its header, and moves between headers with the arrow keys", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", string[]>) => void>();
         withRegistry(() => (
             <Accordion items={ITEMS} onValueChange={onValueChange} />
         ));
@@ -206,8 +208,14 @@ describe("Tree", () => {
     });
 
     it("expands with the right arrow and walks the rows by direction, selecting with Enter", async () => {
-        const onExpandedValueChange = vi.fn();
-        const onSelectedValueChange = vi.fn();
+        const onExpandedValueChange =
+            vi.fn<
+                (details: ChangeDetails<"expandedValue", string[]>) => void
+            >();
+        const onSelectedValueChange =
+            vi.fn<
+                (details: ChangeDetails<"selectedValue", string[]>) => void
+            >();
         withRegistry(
             () => (
                 <Tree

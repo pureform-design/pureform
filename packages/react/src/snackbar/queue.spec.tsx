@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { createSnackbarQueue, SnackbarHost } from ".";
+import type { SnackbarOptions } from ".";
 import { PureformProvider } from "..";
 import { overlaysRegistry } from "../__fixtures__/registry";
 import { mount, settle } from "../testing/render";
@@ -59,7 +60,8 @@ describe("SnackbarHost", () => {
     it("times each in turn, from when it shows", async () => {
         vi.useFakeTimers();
         const queue = host();
-        const onOpenChange = vi.fn();
+        const onOpenChange =
+            vi.fn<NonNullable<SnackbarOptions["onOpenChange"]>>();
         queue.show({ supportingText: "first", duration: 1000, onOpenChange });
         queue.show({ supportingText: "second", duration: 2000 });
         await vi.advanceTimersByTimeAsync(10);

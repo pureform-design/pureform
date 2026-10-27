@@ -12,19 +12,15 @@ import { runInNewContext } from "node:vm";
 
 import { afterAll, describe, expect, it } from "vitest";
 
+import type { PrecomputedStyles } from "../src";
 import { withPureform } from "../src/metro";
 import { OPTIONS_ENV } from "../src/metro-options";
 
 const fixture = resolve(__dirname, "metro");
 const require = createRequire(join(fixture, "index.js"));
 const Metro = require("metro") as typeof import("metro");
-const { getDefaultConfig } = require("@react-native/metro-config") as {
-    getDefaultConfig: (root: string) => {
-        serializer: {
-            getPolyfills: (options: { platform: string }) => string[];
-        };
-    };
-};
+const { getDefaultConfig } =
+    require("@react-native/metro-config") as typeof import("@react-native/metro-config");
 
 const out = mkdtempSync(join(tmpdir(), "pureform-metro-"));
 afterAll(() => rmSync(out, { recursive: true, force: true }));
@@ -88,9 +84,7 @@ describe("withPureform", () => {
         expect(code).not.toMatch(/chroma|lowerRn|createJiti/);
 
         // The bundle runs as the app would, and leaves the styles on its global.
-        const app = {} as {
-            pureformStyles?: { themes: object; components: object };
-        };
+        const app = {} as { pureformStyles?: PrecomputedStyles };
         runInNewContext(code, app);
         expect(app.pureformStyles!.mode).toBe("precomputed");
         expect(Object.keys(app.pureformStyles!.templates)).toEqual(["button"]);

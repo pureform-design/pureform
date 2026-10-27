@@ -19,7 +19,9 @@ const card: ClassFactory<{ slots: "root" }> = () => ({
 
 describe("createWebRegistry", () => {
     it("serves entries as the neutral registry does", async () => {
-        const lazy = vi.fn(async () => ({ card }));
+        const lazy = vi.fn<() => Promise<{ card: typeof card }>>(async () => ({
+            card,
+        }));
         const registry = createWebRegistry(
             { chip, card: { lazy } },
             { version: "0.4.0" },
@@ -54,7 +56,9 @@ describe("createWebRegistry", () => {
             LazyEntry<typeof chip>
         >();
         // @ts-expect-error a name the registry doesn't have
-        expect(() => registry.entry("missing")).toThrow();
+        expect(() => registry.entry("missing")).toThrow(
+            /no component "missing" in the registry/,
+        );
     });
 
     it("is frozen", () => {

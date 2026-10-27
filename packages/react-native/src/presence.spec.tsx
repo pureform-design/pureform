@@ -144,6 +144,7 @@ describe("the overlay motions", () => {
     it("waits a delay before a step, and not under reduced motion", async () => {
         let tokens!: import("@pureform/rn-adapter/factory").ThemeValues;
         function Read(): ReactNode {
+            // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
             tokens = useTokens();
             return null;
         }
@@ -194,6 +195,7 @@ describe("the overlay motions", () => {
     it("take the theme's durations and curves, the time scale, and fades under reduced motion", async () => {
         let tokens!: import("@pureform/rn-adapter/factory").ThemeValues;
         function Read(): ReactNode {
+            // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
             tokens = useTokens();
             return null;
         }

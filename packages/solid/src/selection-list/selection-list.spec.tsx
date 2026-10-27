@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { SelectionList } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { navigationRegistry } from "../__fixtures__/registry";
 import { byTestId, mount, settle } from "../testing/mount";
@@ -34,6 +35,7 @@ describe("SelectionList", () => {
                 aria-label="Folders"
                 items={ITEMS}
                 class={{ item: ({ item }) => `row-${item.value}` }}
+                // oxlint-disable-next-line solid/style-prop -- a part-keyed style record, not CSS properties
                 style={{ item: ({ index }) => ({ opacity: index ? 0.5 : 1 }) }}
                 slotProps={{ item: ({ index }) => ({ title: `row ${index}` }) }}
                 unstyled={{ item: ({ index }) => index === 0 }}
@@ -93,7 +95,8 @@ describe("SelectionList", () => {
     });
 
     it("selects several with clicks, and reports each change", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", string[]>) => void>();
         withRegistry(() => (
             <SelectionList
                 selectionMode="multiple"

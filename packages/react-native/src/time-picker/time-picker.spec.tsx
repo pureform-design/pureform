@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react";
 import type { ReactNode } from "react";
 import { View } from "react-native";
 import { beforeAll, describe, expect, it, vi } from "vitest";
@@ -71,7 +72,10 @@ describe("time picker", () => {
     });
 
     it("changes the period, and draws the selected one filled", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<
+                NonNullable<ComponentProps<typeof TimePicker>["onValueChange"]>
+            >();
         await render(
             <TimePicker
                 defaultValue="09:30"
@@ -225,7 +229,10 @@ describe("time picker, by copy", () => {
 
 describe("time input", () => {
     it("takes a typed minute", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<
+                NonNullable<ComponentProps<typeof TimeInput>["onValueChange"]>
+            >();
         await render(
             <TimeInput
                 defaultValue="14:00"

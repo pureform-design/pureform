@@ -1,4 +1,5 @@
 import { testIds } from "@pureform/anatomy";
+import type { ComponentProps } from "react";
 import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
@@ -49,7 +50,10 @@ describe("TimePicker", () => {
     });
 
     it("is controllable, and the period and the dial change it", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<
+                NonNullable<ComponentProps<typeof TimePicker>["onValueChange"]>
+            >();
         function Controlled() {
             const [value, setValue] = useState("09:30");
             return (
@@ -162,7 +166,10 @@ describe("TimePicker, slot props", () => {
 
 describe("TimeInput", () => {
     it("takes a typed time, with the period selector in a 12-hour cycle", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<
+                NonNullable<ComponentProps<typeof TimeInput>["onValueChange"]>
+            >();
         withRegistry(
             <TimeInput
                 defaultValue="14:00"

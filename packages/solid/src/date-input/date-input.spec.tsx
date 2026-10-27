@@ -43,7 +43,9 @@ describe("DateInput, ready-made", () => {
         expect(
             document.querySelector<HTMLInputElement>('input[name="when"]'),
         ).not.toBeNull();
-        expect(() => byTestId(ids.modeToggle)).toThrow();
+        expect(() => byTestId(ids.modeToggle)).toThrow(
+            `no element with data-testid="${ids.modeToggle}"`,
+        );
     });
 
     it("draws the icons and affixes only when given, as content", async () => {
@@ -110,9 +112,10 @@ describe("DateInput, ready-made", () => {
     });
 
     it("turns typed digits into the ISO date, and confirms it", async () => {
-        const onValueChange = vi.fn();
-        const onConfirm = vi.fn();
-        const onCancel = vi.fn();
+        const onValueChange =
+            vi.fn<(details: { readonly value: readonly string[] }) => void>();
+        const onConfirm = vi.fn<(value: readonly string[]) => void>();
+        const onCancel = vi.fn<() => void>();
         withRegistry(() => (
             <DateInput
                 locale="en-US"
@@ -140,8 +143,9 @@ describe("DateInput, ready-made", () => {
     });
 
     it("takes a range's end typed before its start", async () => {
-        const onValueChange = vi.fn();
-        const onConfirm = vi.fn();
+        const onValueChange =
+            vi.fn<(details: { readonly value: readonly string[] }) => void>();
+        const onConfirm = vi.fn<(value: readonly string[]) => void>();
         withRegistry(() => (
             <DateInput
                 locale="en-US"
@@ -173,7 +177,7 @@ describe("DateInput, ready-made", () => {
     });
 
     it("shows an error in place of the format, and the mode toggle when given", async () => {
-        const onModeToggle = vi.fn();
+        const onModeToggle = vi.fn<() => void>();
         withRegistry(() => (
             <DateInput
                 locale="en-US"

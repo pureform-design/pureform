@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
+import type { ChangeDetails } from ".";
 import { PureformProvider } from ".";
 import { Autocomplete } from "./autocomplete";
 import { animated } from "./engine";
@@ -93,7 +94,10 @@ describe.each(ENGINES)("with $name", (engine) => {
         });
 
         it("takes the web's select's keys", async () => {
-            const change = vi.fn();
+            const change =
+                vi.fn<
+                    (details: ChangeDetails<"value", string | null>) => void
+                >();
             await render(
                 <Select
                     label="Size"
@@ -147,7 +151,10 @@ describe.each(ENGINES)("with $name", (engine) => {
         ];
 
         it("opens on the first option starting with what's typed on the field, and goes on typing in the list", async () => {
-            const change = vi.fn();
+            const change =
+                vi.fn<
+                    (details: ChangeDetails<"value", string | null>) => void
+                >();
             await render(
                 <Select
                     label="Size"
@@ -202,7 +209,10 @@ describe.each(ENGINES)("with $name", (engine) => {
         });
 
         it("keeps focus in the input, highlighting options with the arrows and choosing with Enter", async () => {
-            const change = vi.fn();
+            const change =
+                vi.fn<
+                    (details: ChangeDetails<"value", string | null>) => void
+                >();
             await render(
                 <Autocomplete
                     label="City"

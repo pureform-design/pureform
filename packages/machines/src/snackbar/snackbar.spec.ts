@@ -3,7 +3,7 @@ import { userEvent } from "vitest/browser";
 
 import * as snackbar from ".";
 import { run, settle } from "../testing/vanilla";
-import type { MachineProps } from "../testing/vanilla";
+import type { MachineCallback, MachineProps } from "../testing/vanilla";
 
 // The pointer stays wherever an earlier spec left it, often on the page's top left corner where
 // the snackbar lands, which holds its time. It waits in the viewport's far corner instead.
@@ -57,7 +57,8 @@ describe("snackbar machine", () => {
 
     it("closes after its duration, with the reason", async () => {
         vi.useFakeTimers();
-        const onOpenChange = vi.fn();
+        const onOpenChange =
+            vi.fn<MachineCallback<snackbar.Schema, "onOpenChange">>();
         const { api, stop } = bar({
             defaultOpen: true,
             duration: 1000,
@@ -84,7 +85,8 @@ describe("snackbar machine", () => {
     });
 
     it("holds its time while focus is inside, and counts again from the start once it leaves", async () => {
-        const onOpenChange = vi.fn();
+        const onOpenChange =
+            vi.fn<MachineCallback<snackbar.Schema, "onOpenChange">>();
         const { api, action, stop } = bar({
             defaultOpen: true,
             duration: 100,
@@ -108,8 +110,9 @@ describe("snackbar machine", () => {
     });
 
     it("reports the action, then closes", async () => {
-        const onAction = vi.fn();
-        const onOpenChange = vi.fn();
+        const onAction = vi.fn<MachineCallback<snackbar.Schema, "onAction">>();
+        const onOpenChange =
+            vi.fn<MachineCallback<snackbar.Schema, "onOpenChange">>();
         const { api, action, stop } = bar({
             defaultOpen: true,
             onAction,
@@ -127,7 +130,8 @@ describe("snackbar machine", () => {
     });
 
     it("closes from the close button and Escape", async () => {
-        const onOpenChange = vi.fn();
+        const onOpenChange =
+            vi.fn<MachineCallback<snackbar.Schema, "onOpenChange">>();
         const { api, close, stop } = bar({ defaultOpen: true, onOpenChange });
         await userEvent.click(close);
         await settle();
@@ -150,7 +154,8 @@ describe("snackbar machine", () => {
     });
 
     it("controlled: asks, and moves only with the prop", async () => {
-        const onOpenChange = vi.fn();
+        const onOpenChange =
+            vi.fn<MachineCallback<snackbar.Schema, "onOpenChange">>();
         const props = { open: true, onOpenChange };
         const { api, close, setProps, stop } = bar(props);
         await userEvent.click(close);

@@ -1,6 +1,6 @@
 import { testIds } from "@pureform/anatomy";
 import { createInteractionSource } from "@pureform/binding-core/interaction";
-import type { ReactNode } from "react";
+import type { MouseEventHandler, ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { Card } from ".";
@@ -178,7 +178,7 @@ describe("the ready-made Card's sections", () => {
     });
 
     it("moves its action to the action area beside its actions", async () => {
-        const click = vi.fn();
+        const click = vi.fn<MouseEventHandler<HTMLElement>>();
         withRegistry(
             <Card
                 as="button"

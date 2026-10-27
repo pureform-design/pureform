@@ -2,6 +2,7 @@
 // server renders a scene, the page takes its HTML, and the binding hydrates it, recording what it
 // logged and changed.
 
+import { expect } from "vitest";
 import { commands } from "vitest/browser";
 
 import { harness } from "#binding";
@@ -9,6 +10,13 @@ import { harness } from "#binding";
 import { hostIn, watchConsole } from "./page";
 import type { Scene } from "./scene";
 import { applyHead, renderOnServer } from "./server";
+
+/** Expects hydration to have changed nothing, unless the component is measured: it sizes itself
+ *  once mounted, so only the rest must keep every attribute. */
+export const expectNoChanges = (
+    component: { readonly measured?: true | undefined },
+    changes: readonly unknown[],
+) => expect(component.measured ? [] : changes).toEqual([]);
 
 /** Every element under `host` with its attributes, in document order. */
 const snapshot = (host: HTMLElement) =>

@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { Tabs } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { navigationRegistry } from "../__fixtures__/registry";
 import { byTestId, mount, settle } from "../testing/mount";
@@ -76,7 +77,8 @@ describe("Tabs, ready-made", () => {
     });
 
     it("selects with a click and the arrow keys, by direction, and reports each change", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", string | null>) => void>();
         withRegistry(
             () => (
                 <Tabs
@@ -168,6 +170,7 @@ describe("Tabs, ready-made", () => {
                     list: "trips",
                 }}
                 style={{
+                    // oxlint-disable-next-line solid/style-prop -- a part-keyed style record, not CSS properties
                     label: (tab) => ({ opacity: tab.index === 2 ? 0.5 : 1 }),
                 }}
                 slotProps={{
@@ -206,6 +209,7 @@ describe("Tabs, ready-made", () => {
     it("makes each panel's content once when the items are written in place", async () => {
         const made: string[] = [];
         const Panel = (props: { name: string }) => {
+            // oxlint-disable-next-line solid/reactivity -- the probe records each panel's setup, so it reads the name once
             made.push(props.name);
             return <p>{props.name}</p>;
         };
@@ -238,7 +242,8 @@ describe("Tabs, ready-made", () => {
 
 describe("Tabs, composed", () => {
     it("asks when controlled, and throws for a part outside its tab", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", string | null>) => void>();
         withRegistry(() => (
             <Tabs.Root value="a" onValueChange={onValueChange}>
                 <Tabs.List aria-label="Letters">
@@ -322,6 +327,7 @@ describe("Tabs, the indicator's slide", () => {
     it("slides the new tab's indicator in from the old one's, not on mount", async () => {
         document.head.append(style);
         const [value, setValue] = createSignal("a");
+        // oxlint-disable-next-line solid/reactivity -- withRegistry renders it, where it tracks
         withRegistry(() => letters(value));
         await settle();
         const [a, b] = [
@@ -350,6 +356,7 @@ describe("Tabs, the indicator's slide", () => {
     it("changes at once when the old tab has no indicator", async () => {
         document.head.append(style);
         const [value, setValue] = createSignal("a");
+        // oxlint-disable-next-line solid/reactivity -- withRegistry renders it, where it tracks
         withRegistry(() => letters(value, ["b"]));
         await settle();
         setValue("b");

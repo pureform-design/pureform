@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { ChipSet } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { chipSetRegistry } from "../__fixtures__/registry";
 import { byTestId, mount, settle } from "../testing/mount";
@@ -47,7 +48,8 @@ describe("ChipSet, ready-made", () => {
     });
 
     it("keeps one filter chip on in a single-select set", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", string[]>) => void>();
         withRegistry(() => (
             <ChipSet
                 selectable="single"

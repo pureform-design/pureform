@@ -12,7 +12,7 @@ const chip = ({ size = "small" }: Selection<Chip>) => ({
     label: { class: "chip__label" },
 });
 
-const card = (_: Selection<{ slots: "root" }>) => ({
+const card = () => ({
     root: { class: "card" },
 });
 
@@ -55,13 +55,19 @@ describe("createRegistry", () => {
                 StaticEntry<typeof chip>
             >();
             // @ts-expect-error a name the registry doesn't have
-            expect(() => registry.entry("card")).toThrow();
+            expect(() => registry.entry("card")).toThrow(
+                /no component "card" in the registry/,
+            );
         });
     });
 
     describe("lazy entries", () => {
         it("loads the factory once, on demand", async () => {
-            const lazy = vi.fn(async () => ({ card }));
+            const lazy = vi.fn<() => Promise<{ card: typeof card }>>(
+                async () => ({
+                    card,
+                }),
+            );
             const registry = createRegistry({ card: { lazy } });
             const entry = registry.entry("card");
             expect(entry.kind).toBe("lazy");
@@ -121,7 +127,11 @@ describe("createRegistry", () => {
 
     describe("preload", () => {
         it("starts the load, which a later load shares", async () => {
-            const lazy = vi.fn(async () => ({ card }));
+            const lazy = vi.fn<() => Promise<{ card: typeof card }>>(
+                async () => ({
+                    card,
+                }),
+            );
             const registry = createRegistry({ card: { lazy } });
             const preloading = registry.preload("card");
             expect(lazy).toHaveBeenCalledTimes(1);

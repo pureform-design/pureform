@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { TextField } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { textInputsRegistry } from "../__fixtures__/registry";
 import { byTestId, mount, settle } from "../testing/mount";
@@ -69,7 +70,8 @@ describe("TextField, ready-made", () => {
     });
 
     it("takes typing, reports each change once, and marks the container filled", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", string>) => void>();
         withRegistry(() => (
             <TextField label="Name" onValueChange={onValueChange} />
         ));
@@ -91,7 +93,8 @@ describe("TextField, ready-made", () => {
 
     it("controlled: shows the typed text only once the owner takes it", async () => {
         const [value, setValue] = createSignal("Ada");
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", string>) => void>();
         withRegistry(() => (
             <TextField
                 label="Name"
@@ -151,7 +154,8 @@ describe("TextField, ready-made", () => {
     });
 
     it("resets to its default with the form, reported with reason reset", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", string>) => void>();
         withRegistry(() => (
             <form>
                 <TextField

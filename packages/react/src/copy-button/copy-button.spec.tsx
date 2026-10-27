@@ -43,7 +43,7 @@ describe("CopyButton", () => {
     });
 
     it("copies the value, swaps the icon and the name, and calls onCopy", async () => {
-        const onCopy = vi.fn();
+        const onCopy = vi.fn<(value: string) => void>();
         withRegistry(
             <CopyButton
                 value="secret"
@@ -91,8 +91,9 @@ describe("CopyButton", () => {
             new Error("denied"),
         );
         vi.spyOn(document, "execCommand").mockReturnValue(false);
-        const onCopy = vi.fn();
-        const onCopyError = vi.fn();
+        const onCopy = vi.fn<(value: string) => void>();
+        const onCopyError =
+            vi.fn<(details: { value: string; error: Error }) => void>();
         withRegistry(
             <CopyButton
                 value="secret"

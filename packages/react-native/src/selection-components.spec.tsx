@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
+import type { ChangeDetails } from ".";
 import { PureformProvider } from ".";
 import { ChipSet } from "./chip-set";
 import { SelectionList } from "./selection-list";
@@ -57,7 +58,8 @@ describe("ChipSet", () => {
     ];
 
     it("keeps one chip on in a single-select set", async () => {
-        const change = vi.fn();
+        const change =
+            vi.fn<(details: ChangeDetails<"value", string[]>) => void>();
         await render(
             <ChipSet
                 selectable="single"
@@ -73,7 +75,8 @@ describe("ChipSet", () => {
     });
 
     it("turns on any number of chips in a multiple-select set", async () => {
-        const change = vi.fn();
+        const change =
+            vi.fn<(details: ChangeDetails<"value", string[]>) => void>();
         await render(
             <ChipSet
                 selectable="multiple"
@@ -96,7 +99,8 @@ describe("SelectionList", () => {
     ];
 
     it("selects any number of options in a multiple-select list", async () => {
-        const change = vi.fn();
+        const change =
+            vi.fn<(details: ChangeDetails<"value", string[]>) => void>();
         await render(
             <SelectionList
                 selectionMode="multiple"
@@ -113,7 +117,8 @@ describe("SelectionList", () => {
     });
 
     it("selects one option at a time by default", async () => {
-        const change = vi.fn();
+        const change =
+            vi.fn<(details: ChangeDetails<"value", string[]>) => void>();
         await render(
             <SelectionList
                 defaultValue={["x"]}

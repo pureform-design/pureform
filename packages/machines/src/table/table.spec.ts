@@ -3,7 +3,7 @@ import { userEvent } from "vitest/browser";
 
 import * as table from ".";
 import { run, settle } from "../testing/vanilla";
-import type { MachineProps } from "../testing/vanilla";
+import type { MachineCallback, MachineProps } from "../testing/vanilla";
 
 afterEach(() => {
     document.body.innerHTML = "";
@@ -131,7 +131,8 @@ const mount = (props: MachineProps<table.Schema> = {}) => {
 
 describe("the table machine", () => {
     it("sorts from the header's button, by click and by keyboard, and says so in aria-sort", async () => {
-        const onSortChange = vi.fn();
+        const onSortChange =
+            vi.fn<MachineCallback<table.Schema, "onSortChange">>();
         const { header, sortButton, api, stop } = mount({ onSortChange });
         expect(header.getAttribute("role")).toBe("columnheader");
         expect(header.getAttribute("aria-sort")).toBe("none");
@@ -166,7 +167,8 @@ describe("the table machine", () => {
         expect(plain.api().selection).toEqual([]);
         plain.stop();
 
-        const onSelectionChange = vi.fn();
+        const onSelectionChange =
+            vi.fn<MachineCallback<table.Schema, "onSelectionChange">>();
         const { row, api, stop } = mount({
             selectionMode: "multiple",
             onSelectionChange,

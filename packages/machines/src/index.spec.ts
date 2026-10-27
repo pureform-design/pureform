@@ -171,37 +171,42 @@ describe("@pureform/machines", () => {
             tagsInput: zagTagsInput,
             treeView: zagTreeView,
         };
-        for (const [name, own] of Object.entries(zag)) {
-            const ours = machines[name as keyof typeof zag];
-            // The select's closed field opens on typing (APG), its one change of state.
-            if (name === "select") {
-                const { focused, ...rest } = ours.machine.states as Record<
-                    string,
-                    { on?: Record<string, unknown> }
-                >;
-                const zagStates = own.machine.states as Record<
-                    string,
-                    { on?: Record<string, unknown> }
-                >;
-                for (const [state, node] of Object.entries(rest))
-                    expect(node, state).toBe(zagStates[state]);
-                const { "TRIGGER.TYPEAHEAD": typed, ...on } = focused!.on!;
-                expect(on).toEqual(
-                    Object.fromEntries(
-                        Object.entries(zagStates.focused!.on!).filter(
-                            ([event]) => event !== "TRIGGER.TYPEAHEAD",
-                        ),
-                    ),
-                );
-                expect(JSON.stringify(typed)).toContain('"target":"open"');
-            } else expect(ours.machine.states, name).toBe(own.machine.states);
+        const named = Object.entries(zag).map(
+            ([name, own]) =>
+                [name, own, machines[name as keyof typeof zag]] as const,
+        );
+        for (const [name, own, ours] of named) {
             expect(ours.machine.on, name).toBe(own.machine.on);
-            // The select's context leaves its selected items to a computed value.
-            if (name !== "select")
-                expect(ours.machine.context, name).toBe(own.machine.context);
             expect(ours.machine, name).not.toBe(own.machine);
             expect(ours.connect, name).not.toBe(own.connect);
         }
+        // The select's context leaves its selected items to a computed value.
+        for (const [name, own, ours] of named.filter(
+            ([name]) => name !== "select",
+        )) {
+            expect(ours.machine.states, name).toBe(own.machine.states);
+            expect(ours.machine.context, name).toBe(own.machine.context);
+        }
+        // The select's closed field opens on typing (APG), its one change of state.
+        const { focused, ...rest } = machines.select.machine.states as Record<
+            string,
+            { on?: Record<string, unknown> }
+        >;
+        const zagStates = zagSelect.machine.states as Record<
+            string,
+            { on?: Record<string, unknown> }
+        >;
+        for (const [state, node] of Object.entries(rest))
+            expect(node, state).toBe(zagStates[state]);
+        const { "TRIGGER.TYPEAHEAD": typed, ...on } = focused!.on!;
+        expect(on).toEqual(
+            Object.fromEntries(
+                Object.entries(zagStates.focused!.on!).filter(
+                    ([event]) => event !== "TRIGGER.TYPEAHEAD",
+                ),
+            ),
+        );
+        expect(JSON.stringify(typed)).toContain('"target":"open"');
         expect(machines.radioGroup.itemProps).toBe(zagRadioGroup.itemProps);
         expect(machines.select.collection).toBe(zagSelect.collection);
         expect(machines.selectionList.collection).toBe(zagListbox.collection);

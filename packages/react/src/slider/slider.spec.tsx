@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { Slider } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { displayRegistry } from "../__fixtures__/registry";
 import { interact, mount, outside, settle } from "../testing/render";
@@ -49,7 +50,8 @@ describe("Slider", () => {
     });
 
     it("moves with the keyboard and reports a number, the token following", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", 5>) => void>();
         withRegistry(
             <Slider
                 aria-label="Volume"
@@ -68,7 +70,8 @@ describe("Slider", () => {
 
     it("stays put while controlled until the owner takes the change", async () => {
         const value = outside(40);
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", number>) => void>();
         withRegistry(
             <value.Holder>
                 {(current) => (
@@ -148,6 +151,7 @@ describe("Slider", () => {
         let set!: (value: number) => void;
         function Wrapper() {
             const [value, setValue] = useState(40);
+            // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
             set = setValue;
             return (
                 <div style={{ width: "400px" }}>

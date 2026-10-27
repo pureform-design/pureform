@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { NavigationBar } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { navigationRegistry } from "../__fixtures__/registry";
 import { NavigationRail } from "../navigation-rail";
@@ -73,7 +74,8 @@ describe("NavigationBar, ready-made", () => {
     });
 
     it("moves with a click and reports it once; controlled, it asks", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", string | null>) => void>();
         withRegistry(
             <NavigationBar
                 aria-label="Main"
@@ -91,7 +93,8 @@ describe("NavigationBar, ready-made", () => {
         expect(items()[1]!.getAttribute("aria-current")).toBe("true");
         cleanup();
 
-        const asked = vi.fn();
+        const asked =
+            vi.fn<(details: ChangeDetails<"value", string | null>) => void>();
         withRegistry(
             <NavigationBar
                 aria-label="Main"
@@ -220,7 +223,8 @@ describe("NavigationRail", () => {
     });
 
     it("as a modal, sits in a dialog over the scrim, and closes with Escape", async () => {
-        const onOpenChange = vi.fn();
+        const onOpenChange =
+            vi.fn<(details: ChangeDetails<"open", boolean>) => void>();
         withRegistry(
             <NavigationRail
                 aria-label="Main"

@@ -4,6 +4,7 @@ import { beforeAll, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { Description, ErrorText, Field, Input, Label, Textarea } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { presetRegistry } from "../testing/registry";
 import type { TestRegistry } from "../testing/registry";
@@ -104,8 +105,9 @@ describe("Field", () => {
 
 describe("Input and Textarea's value", () => {
     it("keeps its own text uncontrolled, and reports each change once", async () => {
-        const onValueChange = vi.fn();
-        const onChangeText = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", string>) => void>();
+        const onChangeText = vi.fn<(text: string) => unknown>();
         await render(
             <Textarea
                 defaultValue="a"
@@ -125,7 +127,8 @@ describe("Input and Textarea's value", () => {
     });
 
     it("only moves with the prop controlled", async () => {
-        const onValueChange = vi.fn();
+        const onValueChange =
+            vi.fn<(details: ChangeDetails<"value", string>) => void>();
         await render(<Input value="fixed" onValueChange={onValueChange} />);
         const input = byTestId("pf-input-root") as HTMLInputElement;
         await interact(() => userEvent.type(input, "x"));

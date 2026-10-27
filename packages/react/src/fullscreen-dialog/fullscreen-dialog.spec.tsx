@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { FullscreenDialog } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { overlaysRegistry } from "../__fixtures__/registry";
 import { Button } from "../button";
@@ -71,7 +72,8 @@ describe("FullscreenDialog, ready-made", () => {
     });
 
     it("opens from its trigger, takes focus, closes with its close trigger, and gives focus back", async () => {
-        const onOpenChange = vi.fn();
+        const onOpenChange =
+            vi.fn<(details: ChangeDetails<"open", boolean>) => void>();
         withRegistry(
             <FullscreenDialog
                 trigger="New event"
@@ -97,7 +99,8 @@ describe("FullscreenDialog, ready-made", () => {
     });
 
     it("closes with Escape", async () => {
-        const onOpenChange = vi.fn();
+        const onOpenChange =
+            vi.fn<(details: ChangeDetails<"open", boolean>) => void>();
         withRegistry(
             <FullscreenDialog
                 defaultOpen
@@ -149,9 +152,10 @@ describe("FullscreenDialog, compound", () => {
 
 describe("FullscreenDialog, onClose", () => {
     it("asks onClose before Escape or its close trigger closes it, refused and then allowed", async () => {
-        const onOpenChange = vi.fn();
+        const onOpenChange =
+            vi.fn<(details: ChangeDetails<"open", boolean>) => void>();
         let answer = false;
-        const onClose = vi.fn(() => answer);
+        const onClose = vi.fn<() => boolean | Promise<boolean>>(() => answer);
         withRegistry(
             <FullscreenDialog
                 defaultOpen
@@ -176,10 +180,11 @@ describe("FullscreenDialog, onClose", () => {
     });
 
     it("doesn't ask onClose when a controlled open closes it", async () => {
-        const onClose = vi.fn(() => false);
+        const onClose = vi.fn<() => boolean | Promise<boolean>>(() => false);
         let setOpen: (open: boolean) => void = () => {};
         function App() {
             const [open, setOpenState] = useState(true);
+            // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
             setOpen = setOpenState;
             return (
                 <>

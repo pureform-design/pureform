@@ -98,6 +98,7 @@ describe("withPureform", () => {
         }
     });
 
+    // oxlint-disable-next-line vitest/expect-expect -- `eventually` is the assertion: it throws when the regenerated file never appears
     it("generates again when the config changes", async () => {
         const root = tempApp("chip");
         await withPureform({ projectRoot: root }, { target: fakeAdapter() });

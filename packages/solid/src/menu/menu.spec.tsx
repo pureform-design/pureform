@@ -1,9 +1,11 @@
 import { compositeTestIds } from "@pureform/anatomy";
+import type { ComponentProps } from "solid-js";
 import { createSignal, Errored, For } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
 
 import { Menu } from ".";
+import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { overlaysRegistry } from "../__fixtures__/registry";
 import { Button } from "../button";
@@ -63,8 +65,10 @@ describe("Menu, ready-made", () => {
     });
 
     it("opens with a click, highlights with the arrow keys, and reports the chosen item", async () => {
-        const onSelect = vi.fn();
-        const onOpenChange = vi.fn();
+        const onSelect =
+            vi.fn<NonNullable<ComponentProps<typeof Menu>["onSelect"]>>();
+        const onOpenChange =
+            vi.fn<(details: ChangeDetails<"open", boolean>) => void>();
         withRegistry(() => (
             <Menu
                 trigger="Edit"
@@ -237,7 +241,7 @@ describe("Menu, groups and toggleable items", () => {
     });
 
     it("toggles a checkbox item, reporting the change", async () => {
-        const onCheckedChange = vi.fn();
+        const onCheckedChange = vi.fn<(checked: boolean) => void>();
         const [checked, setChecked] = createSignal(false);
         withRegistry(() => (
             <Menu
@@ -272,7 +276,8 @@ describe("Menu, groups and toggleable items", () => {
 
 describe("Menu, compound", () => {
     it("composes its parts, with any component as the trigger", async () => {
-        const onSelect = vi.fn();
+        const onSelect =
+            vi.fn<NonNullable<ComponentProps<typeof Menu.Root>["onSelect"]>>();
         withRegistry(() => (
             <Menu.Root onSelect={onSelect}>
                 <Menu.Trigger as={Button} label="More" variant="text" />
@@ -424,6 +429,7 @@ describe("Menu, submenus", () => {
                     content: "surface",
                 }}
                 style={{
+                    // oxlint-disable-next-line solid/style-prop -- a part-keyed style record, not CSS properties
                     itemLabel: ({ index }) => ({ opacity: index ? 0.5 : 1 }),
                 }}
                 slotProps={{ item: ({ index }) => ({ title: `row ${index}` }) }}
@@ -482,7 +488,8 @@ describe("Menu, submenus", () => {
     });
 
     it("opens the submenu with the arrow toward the end, and reports its items' choice", async () => {
-        const onSelect = vi.fn();
+        const onSelect =
+            vi.fn<NonNullable<ComponentProps<typeof Menu>["onSelect"]>>();
         withRegistry(() => (
             <Menu
                 trigger="Edit"
@@ -538,7 +545,8 @@ describe("Menu, submenus", () => {
         );
 
     it("drills into a submenu in the menu's place, under a row that goes back", async () => {
-        const onSelect = vi.fn();
+        const onSelect =
+            vi.fn<NonNullable<ComponentProps<typeof Menu>["onSelect"]>>();
         withRegistry(() => (
             <Menu
                 trigger="Edit"

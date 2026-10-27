@@ -99,7 +99,8 @@ describe.each(controls)("$component", (component) => {
 
         it("uncontrolled: goes back to the default, reported with reason reset", async () => {
             const { host, form: element } = inForm();
-            const onChange = vi.fn();
+            const onChange =
+                vi.fn<(details: Record<string, unknown>) => void>();
             mountCase(
                 component,
                 {
@@ -126,9 +127,11 @@ describe.each(controls)("$component", (component) => {
         it("controlled: asks for the default, and moves when the owner takes it", async () => {
             const { host, form: element } = inForm();
             let scene!: Mounted;
-            const onChange = vi.fn((details: Record<string, unknown>) => {
-                void scene.update({ [names.value]: details[state.prop] });
-            });
+            const onChange = vi.fn<(details: Record<string, unknown>) => void>(
+                (details) => {
+                    void scene.update({ [names.value]: details[state.prop] });
+                },
+            );
             scene = mountCase(
                 component,
                 {
@@ -151,7 +154,8 @@ describe.each(controls)("$component", (component) => {
 
         it("controlled: stays put when the owner ignores the reset", async () => {
             const { host, form: element } = inForm();
-            const onChange = vi.fn();
+            const onChange =
+                vi.fn<(details: Record<string, unknown>) => void>();
             mountCase(
                 component,
                 {
@@ -206,6 +210,7 @@ describe.each(controls)("$component", (component) => {
             expect(entries).toEqual([]);
         });
 
+        // oxlint-disable-next-line vitest/expect-expect -- the assertions are in the expectDisabled helper
         it("a disabled fieldset around an enabled one disables it", async () => {
             const { host } = inForm(
                 `<fieldset disabled><fieldset><div data-host></div></fieldset></fieldset>`,
@@ -214,6 +219,7 @@ describe.each(controls)("$component", (component) => {
             await expectDisabled(host, true);
         });
 
+        // oxlint-disable-next-line vitest/expect-expect -- the assertions are in the expectDisabled helper
         it("the first legend of a disabled fieldset stays enabled", async () => {
             const { host } = inForm(
                 `<fieldset disabled><legend><div data-host></div></legend></fieldset>`,
@@ -222,6 +228,7 @@ describe.each(controls)("$component", (component) => {
             await expectDisabled(host, false);
         });
 
+        // oxlint-disable-next-line vitest/expect-expect -- the assertions are in the expectDisabled helper
         it("follows the fieldset when it changes", async () => {
             const { host } = inForm(
                 `<fieldset><div data-host></div></fieldset>`,
@@ -243,7 +250,8 @@ describe.each(controls)("$component", (component) => {
                 const { host } = inForm(
                     `<fieldset disabled><div data-host></div></fieldset>`,
                 );
-                const onChange = vi.fn();
+                const onChange =
+                    vi.fn<(details: Record<string, unknown>) => void>();
                 mountCase(
                     component,
                     {
