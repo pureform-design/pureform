@@ -135,10 +135,17 @@ function FullscreenDialogImpl(
         props["aria-label"] ??
         (typeof props.headline === "string" ? props.headline : undefined);
     const close = props.close ?? NEEDS_CLOSE;
-    const confirm =
+    const action =
         typeof props.confirmAction === "function"
             ? props.confirmAction({ close })
             : props.confirmAction;
+    // A label is a text Button, as on the web: a View can't hold a bare string.
+    const confirm =
+        typeof action === "string" || typeof action === "number" ? (
+            <Button variant="text" label={action} />
+        ) : (
+            action
+        );
     return (
         <Root.View
             {...slot.props("root")}
