@@ -4,6 +4,7 @@
 // `/reanimated`, and `/reanimated-svg` add the others, so an app only imports
 // react-native-svg and Reanimated when it picks an engine that needs them.
 
+import { claimEvent } from "@pureform/machines/interaction";
 import {
     animatedPresence,
     useAnimatedComponentStyles,
@@ -19,7 +20,7 @@ import type {
 import type { Drawing, State, ThemeValues } from "@pureform/rn-adapter/factory";
 import type { TokenVelocities } from "@pureform/rn-adapter/react";
 import type { SvgDrawingProps } from "@pureform/rn-adapter/svg";
-import { createElement } from "react";
+import { createElement, useEffect, useRef } from "react";
 import type { ComponentType, ReactNode } from "react";
 import { Animated, Pressable, TextInput } from "react-native";
 
@@ -79,10 +80,56 @@ export interface MotionEngine {
 /** A pressable that starts a press at once, as React Native does on a device. React Native Web
  *  holds a press's start for 50ms by default, which delays the pressed state and the ripple. */
 export const pressNow = (Base: ComponentType<any>): ComponentType<any> =>
-    function PressNow(props: object): ReactNode {
+    function PressNow(props: {
+        disabled?: boolean;
+        onPress?: (event: any) => void;
+        onPressIn?: (event: any) => void;
+        onPressOut?: (event: any) => void;
+    }): ReactNode {
+        const recent = useRef(false);
+        const timer = useRef<ReturnType<typeof setTimeout> | undefined>(
+            undefined,
+        );
+        useEffect(() => () => clearTimeout(timer.current), []);
         // React Native's types call it unstable_pressDelay, and React Native Web reads
         // delayPressIn.
-        return createElement(Base, { delayPressIn: 0, ...props });
+        return createElement(Base, {
+            delayPressIn: 0,
+            ...props,
+            onPressIn: (event: unknown) => {
+                clearTimeout(timer.current);
+                recent.current = true;
+                props.onPressIn?.(event);
+            },
+            onPressOut: (event: unknown) => {
+                props.onPressOut?.(event);
+                timer.current = setTimeout(() => {
+                    recent.current = false;
+                }, 0);
+            },
+            onPress: (event: any) => {
+                const native = event?.nativeEvent ?? event;
+                // Native Web's click-only activation bypasses Pressable's press-in/out path.
+                // Actual devices already provide that path. Preserve the action, and synthesize
+                // only the missing interaction pair, not another activation callback.
+                if (
+                    !props.disabled &&
+                    native?.type === "click" &&
+                    native.detail === 0 &&
+                    !recent.current &&
+                    claimEvent(event)
+                ) {
+                    const virtual = {
+                        ...event,
+                        nativeEvent: { type: "click" },
+                    };
+                    props.onPressIn?.(virtual);
+                    props.onPressOut?.(virtual);
+                }
+                recent.current = false;
+                props.onPress?.(event);
+            },
+        });
     };
 
 /** React Native's Animated, on the JavaScript thread, with no SVG: shapes take their rounded

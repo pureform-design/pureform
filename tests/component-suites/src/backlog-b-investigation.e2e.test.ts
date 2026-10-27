@@ -145,41 +145,50 @@ describe("backlog B investigation", () => {
         }
     });
 
-    it("B8: reopening an identical Snackbar changes visibility, not message content", async () => {
+    it("B8: a persistent live region receives only the message on each opening", async () => {
         const mounted = harness.mount({
             component: "Snackbar",
-            props: { open: false, supportingText: "Saved", duration: 0 },
+            props: {
+                open: false,
+                supportingText: "Saved",
+                duration: 0,
+                action: "Undo",
+                closeLabel: "Dismiss",
+            },
         });
         await harness.settle();
-        const region =
-            mounted.host.querySelector<HTMLElement>('[role="status"]')!;
-        const message = region.querySelector(
-            `[data-testid="${testIds.snackbar.supportingText}"]`,
-        )!;
-        expect(region.hidden).toBe(true);
-        expect(message.textContent).toBe("Saved");
+        const region = mounted.host.querySelector<HTMLElement>("output")!;
+        expect(region.hidden).toBe(false);
+        expect(region.textContent).toBe("");
+        expect(region.getAttribute("aria-atomic")).toBe("true");
         const records: MutationRecord[] = [];
         const observer = new MutationObserver((changes) =>
             records.push(...changes),
         );
-        observer.observe(message, {
+        observer.observe(region, {
             subtree: true,
             childList: true,
             characterData: true,
         });
         try {
             await mounted.update({ open: true });
-            expect(region.hidden).toBe(false);
+            expect(region.textContent).toBe("Saved");
             await mounted.update({ open: false });
+            expect(region.textContent).toBe("");
             await mounted.update({ open: true });
-            expect(mounted.host.querySelector('[role="status"]')).toBe(region);
-            expect(records).toHaveLength(0);
+            expect(mounted.host.querySelector("output")).toBe(region);
+            expect(region.textContent).toBe("Saved");
+            expect(records.length).toBeGreaterThanOrEqual(3);
+            await mounted.update({ supportingText: "Changed" });
+            await harness.settle();
+            expect(region.textContent).toBe("Changed");
+            expect(mounted.host.querySelectorAll("output")).toHaveLength(1);
         } finally {
             observer.disconnect();
         }
     });
 
-    it("B9: a click-only activation runs Button onClick but emits no press/release", async () => {
+    it("B9: click-only activation runs Button onClick and emits one virtual pair", async () => {
         const [source] = harness.sources(1);
         const seen: string[] = [];
         let clicks = 0;
@@ -199,8 +208,7 @@ describe("backlog B investigation", () => {
             mounted.host.querySelector("button")!.click();
             await harness.settle();
             expect(clicks).toBe(1);
-            expect(seen).not.toContain("press");
-            expect(seen).not.toContain("release");
+            expect(seen).toEqual(["press", "release"]);
         } finally {
             stop();
         }

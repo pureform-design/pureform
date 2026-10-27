@@ -112,9 +112,10 @@ export function connect<T extends PropTypes>(
                     emitter.blur(event.currentTarget);
                     send({ type: "BLUR" });
                 },
-                onClick() {
-                    if (disabled || !toggle) return;
-                    send({ type: "SELECTED.TOGGLE" });
+                onClick(event) {
+                    if (disabled) return;
+                    emitter.click(event, event.currentTarget);
+                    if (toggle) send({ type: "SELECTED.TOGGLE" });
                 },
             });
         },

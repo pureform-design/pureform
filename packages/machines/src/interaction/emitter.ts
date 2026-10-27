@@ -64,6 +64,8 @@ export class InteractionEmitter {
     #focused: boolean | undefined;
     #dragging = false;
     #untrack: (() => void) | undefined;
+    #clickPending = false;
+    #clickTimer: ReturnType<typeof setTimeout> | undefined;
 
     constructor(source: () => MutableInteractionSource | undefined) {
         this.source = source;
@@ -84,6 +86,10 @@ export class InteractionEmitter {
     /** Starts a press, unless one is in progress. */
     press(origin: PressOrigin, pointer: PointerKind, element?: unknown): void {
         if (this.#press) return;
+        if (pointer !== "virtual") {
+            clearTimeout(this.#clickTimer);
+            this.#clickPending = true;
+        }
         const id = ++lastPressId;
         this.#press = { id, pointer };
         this.#emit({ type: "press", id, origin, pointer }, element);
@@ -106,6 +112,27 @@ export class InteractionEmitter {
         if (!press) return;
         this.#press = undefined;
         this.#emit({ type, id: press.id }, element);
+        if (press.pointer !== "virtual") {
+            clearTimeout(this.#clickTimer);
+            this.#clickTimer = setTimeout(() => {
+                this.#clickPending = false;
+            }, 0);
+        }
+    }
+
+    /** Click-only activation (AT or programmatic .click()). Physical clicks have a positive
+     *  detail; keyboard clicks follow a press already emitted in this event turn. Claim even a
+     *  deduplicated click so an outer surface cannot manufacture a second press for it. */
+    click(event: { readonly detail?: number }, element?: unknown): void {
+        if (!claimEvent(event)) return;
+        const duplicate =
+            this.#press !== undefined ||
+            this.#clickPending ||
+            (event.detail ?? 0) > 0;
+        this.#clickPending = false;
+        if (duplicate) return;
+        this.press("center", "virtual", element);
+        this.release(element);
     }
 
     /** A primary pointer going down on `element`, unless an inner surface claimed it: starts a
@@ -208,6 +235,8 @@ export class InteractionEmitter {
         this.dragStop(element);
         this.hoverExit(element);
         this.blur(element);
+        clearTimeout(this.#clickTimer);
+        this.#clickPending = false;
     }
 
     #ending = false;

@@ -48,6 +48,10 @@ export function checkableInteraction<
                         if (disabled || event.key !== " ") return;
                         emitter.keyDown(event, event.currentTarget);
                     },
+                    onClick(event) {
+                        if (!disabled)
+                            emitter.click(event, event.currentTarget);
+                    },
                     onKeyUp(event) {
                         if (event.key !== " ") return;
                         emitter.keyUp(event.currentTarget);

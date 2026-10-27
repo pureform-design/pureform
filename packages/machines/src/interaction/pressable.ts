@@ -23,6 +23,9 @@ export function pressableItemProps<P, T extends PropTypes>(
     return chainProps(
         props,
         normalize.element({
+            onClick(event) {
+                if (!disabled) emitter.click(event, event.currentTarget);
+            },
             onPointerDown(event) {
                 if (disabled) return;
                 emitter.pointerDown(event, event.currentTarget);

@@ -372,7 +372,7 @@ describe("backlog B investigation on Native Web", () => {
         },
     );
 
-    it("B8: a closed Native Snackbar has no persistent live region", async () => {
+    it("B8: Native Snackbar keeps an empty live region while closed", async () => {
         const open = outside(false);
         await mount(
             <PureformProvider registry={registry} motion="reduce">
@@ -383,7 +383,8 @@ describe("backlog B investigation on Native Web", () => {
                 </open.Holder>
             </PureformProvider>,
         );
-        expect(document.querySelector('[role="status"]')).toBeNull();
+        const region = document.querySelector('[role="status"]')!;
+        expect(region.textContent).toBe("");
         await open.set(true);
         await until(() =>
             expect(
@@ -395,9 +396,14 @@ describe("backlog B investigation on Native Web", () => {
                 .querySelector('[role="status"]')
                 ?.getAttribute("aria-live"),
         ).toBe("polite");
+        await open.set(false);
+        expect(region.textContent).toBe("");
+        await open.set(true);
+        expect(document.querySelector('[role="status"]')).toBe(region);
+        expect(region.textContent).toBe("Saved");
     });
 
-    it("B9: click-only Button activation runs onPress without a source press", async () => {
+    it("B9: click-only Button activation runs onPress with one source press/release", async () => {
         const source = createInteractionSource();
         const seen: string[] = [];
         let clicks = 0;
@@ -416,8 +422,7 @@ describe("backlog B investigation on Native Web", () => {
             );
             await interact(() => byTestId("pf-button-root").click());
             expect(clicks).toBe(1);
-            expect(seen).not.toContain("press");
-            expect(seen).not.toContain("release");
+            expect(seen).toEqual(["press", "release"]);
         } finally {
             stop();
         }

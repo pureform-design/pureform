@@ -110,6 +110,10 @@ export function connect<T extends PropTypes>(
             return chainProps(
                 api.getItemHiddenInputProps(props),
                 normalize.element({
+                    onClick(event) {
+                        if (!disabled)
+                            emitter.click(event, event.currentTarget);
+                    },
                     onKeyDown(event) {
                         if (disabled || event.key !== " ") return;
                         emitter.keyDown(event, event.currentTarget);

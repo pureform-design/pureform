@@ -90,6 +90,77 @@ function mountButton(
 }
 
 describe("button", () => {
+    it("emits one virtual pair for each click-only activation", async () => {
+        const { source, types, seen } = recorded();
+        const { root } = mountButton({
+            id: "virtual",
+            interactionSource: source,
+        });
+        root.click();
+        root.click();
+        await settle();
+        expect(types()).toEqual([
+            "press:virtual",
+            "release",
+            "press:virtual",
+            "release",
+        ]);
+        expect(seen[0]).toMatchObject({ origin: "center" });
+        expect(source.state.pressed).toBe(false);
+    });
+
+    it("does not duplicate pointer/keyboard-generated clicks or emit while disabled", async () => {
+        const { source, types } = recorded();
+        const { root, setProps } = mountButton({
+            id: "dedup",
+            interactionSource: source,
+        });
+        root.dispatchEvent(pointer("pointerdown"));
+        await settle();
+        window.dispatchEvent(pointer("pointerup"));
+        root.dispatchEvent(
+            new MouseEvent("click", { bubbles: true, detail: 1 }),
+        );
+        await settle();
+        expect(types().filter((type) => type.startsWith("press:"))).toEqual([
+            "press:mouse",
+        ]);
+        root.dispatchEvent(key("keydown", "Enter"));
+        await settle();
+        root.dispatchEvent(
+            new MouseEvent("click", { bubbles: true, detail: 0 }),
+        );
+        root.dispatchEvent(key("keyup", "Enter"));
+        await settle();
+        expect(types().filter((type) => type.startsWith("press:"))).toEqual([
+            "press:mouse",
+            "press:keyboard",
+        ]);
+        setProps({ id: "dedup", interactionSource: source, disabled: true });
+        await settle();
+        root.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+        expect(
+            types().filter((type) => type.startsWith("press:")),
+        ).toHaveLength(2);
+    });
+
+    it("claims a nested click-only activation at the inner surface", async () => {
+        const outer = recorded();
+        const inner = recorded();
+        const parent = mountButton({
+            id: "parent",
+            interactionSource: outer.source,
+        });
+        const child = mountButton(
+            { id: "child", interactionSource: inner.source },
+            parent.root,
+        );
+        child.root.click();
+        await settle();
+        expect(inner.types()).toEqual(["press:virtual", "release"]);
+        expect(outer.types()).toEqual([]);
+    });
+
     it("emits a mouse press from where it went down, and its release", async () => {
         const { source, seen, origins, types } = recorded();
         const { root } = mountButton({ id: "a", interactionSource: source });
