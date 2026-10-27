@@ -8,7 +8,14 @@ import { PureformProvider } from "..";
 import { animated } from "../engine";
 import { presetRegistry } from "../testing/registry";
 import type { TestRegistry } from "../testing/registry";
-import { byTestId, computed, mount, settle, until } from "../testing/render";
+import {
+    byTestId,
+    computed,
+    mount,
+    pointerAway,
+    settle,
+    until,
+} from "../testing/render";
 
 let registry: TestRegistry;
 
@@ -67,6 +74,8 @@ describe("table", () => {
                 onSortChange={onSortChange}
             />,
         );
+        // An earlier test's pointer can rest over the header, which hints its arrow.
+        await pointerAway();
         // Reduced motion retains opacity transitions; wait for the initial fade as for sorting.
         await until(() =>
             expect(computed("pf-data-table-sort-indicator").opacity).toBe("0"),

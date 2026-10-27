@@ -93,6 +93,10 @@ export const pressNow = (Base: ComponentType<any>): ComponentType<any> =>
         useEffect(() => () => clearTimeout(timer.current), []);
         // React Native's types call it unstable_pressDelay, and React Native Web reads
         // delayPressIn.
+        // Without a press handler there's nothing to activate, so it stays as given.
+        if (!props.onPress) {
+            return createElement(Base, { delayPressIn: 0, ...props });
+        }
         return createElement(Base, {
             delayPressIn: 0,
             ...props,
