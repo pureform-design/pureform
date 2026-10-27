@@ -80,6 +80,7 @@ import { fullscreenDialog } from "./components/fullscreen-dialog";
 import { gridList } from "./components/grid-list";
 import {
     createHorizontalSharedAxis,
+    sharedAxisScrimOpacityOf,
     SHARED_AXIS_KEYFRAMES,
 } from "./components/horizontal-shared-axis";
 import { createIcon } from "./components/icon";
@@ -468,6 +469,10 @@ export const pureform = <
     const colors: [string, ColorContract<string>][] = [
         ["base theme", theme.color],
     ];
+    const scrimOpacities: Record<
+        string,
+        ReturnType<typeof sharedAxisScrimOpacityOf>
+    > = {};
     for (const [name, overrides] of Object.entries(options.themes ?? {})) {
         const variant = resolveTheme(
             { ...providers, ...overrides } as ThemeProviders<
@@ -495,6 +500,7 @@ export const pureform = <
             corners[name] = variant.shape.corner ?? "round";
         }
         themes[name] = themeOverride(theme.config, variant.config);
+        scrimOpacities[name] = sharedAxisScrimOpacityOf(variant.color);
         colors.push([`theme "${name}"`, variant.color]);
     }
 
@@ -513,6 +519,21 @@ export const pureform = <
                 entry[1] !== undefined,
         ),
     );
+
+    // This derived token belongs to each effective theme, not the base color contract. Keeping
+    // it in theme overrides makes CSS/Panda/Tailwind and Native consume the same luminance rule.
+    // A replaced/customized component owns its tokens; do not overwrite its explicit defaults.
+    if (components["horizontalSharedAxis"] === defaults.horizontalSharedAxis) {
+        for (const [name, scrimOpacity] of Object.entries(scrimOpacities)) {
+            themes[name] = {
+                ...themes[name],
+                components: {
+                    ...themes[name]?.components,
+                    horizontalSharedAxis: { tokens: { scrimOpacity } },
+                },
+            };
+        }
+    }
 
     for (const [name, corner] of Object.entries(corners)) {
         const overrides = Object.fromEntries(

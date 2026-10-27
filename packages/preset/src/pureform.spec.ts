@@ -1,5 +1,5 @@
 import { typed } from "@pureform/core";
-import { px } from "@pureform/core/ast";
+import { pct, px, when } from "@pureform/core/ast";
 import {
     materialColor,
     materialElevation,
@@ -202,6 +202,43 @@ describe("pureform", () => {
 });
 
 describe("pureform color options", () => {
+    it("does not impose derived opacity on a customized shared-axis component", () => {
+        const config = pureform({
+            themes: { custom: { color: materialColor() } },
+            components: ({ defaults }) => ({
+                ...defaults,
+                horizontalSharedAxis: {
+                    ...defaults.horizontalSharedAxis,
+                    tokens: {
+                        ...defaults.horizontalSharedAxis.tokens,
+                        scrimOpacity: pct(35),
+                    },
+                },
+            }),
+        });
+        expect(
+            config.themes?.["custom"]?.components?.["horizontalSharedAxis"],
+        ).toBeUndefined();
+    });
+
+    it("derives named-theme shared-axis opacity from that theme's surface", () => {
+        const config = pureform({
+            themes: {
+                inverted: {
+                    color: materialColor({
+                        overrides: {
+                            surface: { light: "#000000", dark: "#FFFFFF" },
+                        },
+                    }),
+                },
+            },
+        });
+        expect(
+            config.themes?.["inverted"]?.components?.["horizontalSharedAxis"]
+                ?.tokens?.["scrimOpacity"],
+        ).toEqual(when("dark", pct(20), pct(80)));
+    });
+
     const config = pureform({
         color: materialColor({
             customSeeds: { coral: "#FF7F50" },

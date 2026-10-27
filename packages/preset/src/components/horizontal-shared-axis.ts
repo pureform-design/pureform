@@ -62,7 +62,7 @@ export const sharedAxisScrimOpacity = (surfaceLuminance: number): number =>
 
 // The opacity in each scheme from the surface's luminance there, or the scheme's own when the
 // surface isn't a plain color.
-const scrimOpacityOf = (
+export const sharedAxisScrimOpacityOf = (
     color: Pick<ColorContract<string>, "roles" | "primitives"> | undefined,
 ): ValueNode => {
     const at = (scheme: Scheme) => {
@@ -132,7 +132,7 @@ export const createHorizontalSharedAxis = (
         fadeDuration: numeric(90, "ms"),
         fadeDelay: numeric(50, "ms"),
         scrimColor: sys("scrim"),
-        scrimOpacity: scrimOpacityOf(color),
+        scrimOpacity: sharedAxisScrimOpacityOf(color),
     });
 
     // The entering page waits its delay unseen (`both`); the leaving one holds its last frame
