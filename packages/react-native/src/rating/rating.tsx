@@ -93,7 +93,22 @@ function RatingImpl(props: RatingProps): ReactNode {
     const pick = (index: number, event: GestureResponderEvent) => {
         const width = widths.current[index];
         // A key's press (React Native Web's Enter) has no position.
-        const x = event.nativeEvent?.locationX;
+        // Native Web's Pressable delivers a click, not a responder's locationX. Measure against
+        // currentTarget (the item), never offsetX, which is relative to the clicked glyph child.
+        const click = event.nativeEvent as typeof event.nativeEvent & {
+            clientX?: number;
+            detail?: number;
+        };
+        const host = event.currentTarget as unknown as {
+            getBoundingClientRect?: () => { left: number };
+        };
+        const bounds =
+            click.detail && click.clientX !== undefined
+                ? host.getBoundingClientRect?.()
+                : undefined;
+        const x =
+            event.nativeEvent?.locationX ??
+            (bounds ? click.clientX! - bounds.left : undefined);
         const first =
             props.allowHalf && width !== undefined && x !== undefined
                 ? rtl

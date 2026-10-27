@@ -7,7 +7,7 @@ import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { presetRegistry } from "../testing/registry";
 import type { TestRegistry } from "../testing/registry";
-import { byTestId, interact, mount } from "../testing/render";
+import { byTestId, interact, laidOut, mount } from "../testing/render";
 
 const ids = testIds.rating;
 
@@ -29,6 +29,59 @@ const all = (id: string) => [
 ];
 
 describe("Rating on React Native", () => {
+    it.each(["ltr", "rtl"] as const)(
+        "clips and picks half stars in %s",
+        async (dir) => {
+            const onValueChange =
+                vi.fn<(details: ChangeDetails<"value", number>) => void>();
+            await mount(
+                <PureformProvider registry={registry} motion="reduce" dir={dir}>
+                    {/* Native Web's logical start/end use its host locale context, unlike device Yoga. */}
+                    <Rating
+                        allowHalf
+                        value={2.5}
+                        onValueChange={onValueChange}
+                        slotProps={{
+                            // oxlint-disable-next-line unicorn/no-useless-spread -- dir is a Native Web host extension.
+                            root: { ...{ dir }, accessibilityLabel: "Rating" },
+                        }}
+                    />
+                </PureformProvider>,
+            );
+            const star = all(ids.item)[2]!;
+            await laidOut(star);
+            const box = star.getBoundingClientRect();
+            const icon = star
+                .querySelector<HTMLElement>(`[data-testid="${ids.icon}"]`)!
+                .getBoundingClientRect();
+            const half = all(ids.halfFill)[0]!.getBoundingClientRect();
+            expect(half.width).toBeCloseTo(icon.width / 2, 0);
+            expect(dir === "ltr" ? half.left : half.right).toBeCloseTo(
+                dir === "ltr" ? icon.left : icon.right,
+                0,
+            );
+            // Use another star so pressing the existing value does not exercise toggle-to-zero.
+            const target = all(ids.item)[3]!;
+            const targetBox = target.getBoundingClientRect();
+            for (const [fraction, value] of [
+                [0.25, 3.5],
+                [0.75, 4],
+                [0.45, 3.5],
+                [0.55, 4],
+            ] as const) {
+                const x =
+                    targetBox.width * (dir === "ltr" ? fraction : 1 - fraction);
+                await interact(() =>
+                    userEvent.click(target, {
+                        position: { x, y: targetBox.height / 2 },
+                    }),
+                );
+                expect(onValueChange).toHaveBeenLastCalledWith({ value });
+            }
+            expect(box.width).toBeGreaterThan(0);
+        },
+    );
+
     it.each([undefined, 0])(
         "has no checked star for an unset or zero value (%s)",
         async (value) => {
