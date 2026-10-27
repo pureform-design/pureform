@@ -35,7 +35,7 @@ const confirmButtons = () => [
 
 describe("FullscreenDialog's confirm action on React Native", () => {
     // A string in a View throws on a device; the test setup fails on React Native Web's warning.
-    it.each(["Save", 3])(
+    it.each(["Save", 3, 0])(
         "draws a label (%s) as a text Button in its slot",
         async (label) => {
             await withRegistry(
@@ -60,6 +60,23 @@ describe("FullscreenDialog's confirm action on React Native", () => {
             expect(
                 style(buttons[0]!.querySelector('[data-testid$="-label"]')!),
             ).toEqual(style(byTestId("text-label")));
+        },
+    );
+
+    it.each(["", () => "", undefined, null, false])(
+        "omits an absent confirm action (%s)",
+        async (confirmAction) => {
+            await withRegistry(
+                <FullscreenDialog
+                    headline="New event"
+                    confirmAction={confirmAction}
+                >
+                    Fill in the details.
+                </FullscreenDialog>,
+            );
+            expect(
+                document.querySelector(`[data-testid="${CONFIRM}"]`),
+            ).toBeNull();
         },
     );
 

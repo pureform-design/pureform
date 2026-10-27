@@ -141,7 +141,8 @@ function FullscreenDialogImpl(
             : props.confirmAction;
     // A label is a text Button, as on the web: a View can't hold a bare string.
     const confirm =
-        typeof action === "string" || typeof action === "number" ? (
+        action === "" ? null : typeof action === "string" ||
+          typeof action === "number" ? (
             <Button variant="text" label={action} />
         ) : (
             action
