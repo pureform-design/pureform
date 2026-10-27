@@ -59,6 +59,37 @@ describe.each(["light", "dark"] as const)("%s color scheme", (scheme) => {
 
 const stateful = COMPONENTS.filter((component) => component.state);
 
+// Both web bindings serialize textarea values as content, not value attributes. Native has no
+// HTML textarea/hydration boundary; its controlled TextInput behavior is covered in Native tests.
+describe("controlled Textarea content", () => {
+    const value = 'First line\n<escaped> & "quoted"';
+    const scene: Scene = { component: "Textarea", props: { value } };
+
+    it("escapes server content and preserves it through hydration and owner updates", async () => {
+        const server = await serverRendered(scene);
+        const rendered = server.querySelector("textarea")!;
+        expect(rendered.textContent).toBe(value);
+        expect(rendered.value).toBe(value);
+        expect(rendered.querySelector("escaped")).toBeNull();
+        server.remove();
+
+        const host = await serverRendered(scene);
+        const original = host.querySelector("textarea")!;
+        const console = watchConsole();
+        try {
+            const mounted = await harness.hydrate(scene, host);
+            await harness.settle();
+            expect(host.querySelector("textarea")).toBe(original);
+            expect(original.value).toBe(value);
+            await mounted.update({ value: "Updated\n& <text>" });
+            expect(original.value).toBe("Updated\n& <text>");
+            expect(console.logged).toEqual([]);
+        } finally {
+            console.stop();
+        }
+    });
+});
+
 describe.each(stateful)("$component, state", (component) => {
     const state = component.state!;
     const names = stateNames(state.prop);
