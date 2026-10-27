@@ -158,6 +158,7 @@ function SnackbarImpl(props: SnackbarProps): ReactNode {
                 {...slot.props("root")}
                 {...slot.with("root", presence.props)}
                 {...({ onKeyDown } as object)}
+                role="group"
                 style={slot.style("root", { ...s.root, ...presence.style })}
                 testID={id("root")}
             >

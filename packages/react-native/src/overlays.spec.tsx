@@ -587,7 +587,9 @@ describe.each([animated, reanimated])(
             return null;
         }
         const roots = () => [
-            ...document.querySelectorAll<HTMLElement>('[role="status"]'),
+            ...document.querySelectorAll<HTMLElement>(
+                '[data-testid="pf-snackbar-root"]',
+            ),
         ];
 
         it("shows one at a time at the bottom, each after the one before has gone", async () => {
@@ -606,7 +608,10 @@ describe.each([animated, reanimated])(
             expect(roots().map((root) => root.textContent)).toEqual([
                 expect.stringContaining("First"),
             ]);
-            expect(roots()[0]!.getAttribute("aria-live")).toBe("polite");
+            // Its message is announced by the persistent live region, not the animated surface.
+            const region = document.querySelector('[role="status"]')!;
+            expect(region.getAttribute("aria-live")).toBe("polite");
+            expect(region.textContent).toBe("First");
             // At the bottom of the host's layer, over the page.
             expect(
                 window.innerHeight - box(roots()[0]!).bottom,

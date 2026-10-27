@@ -542,7 +542,13 @@ describe.each(ENGINES)("with $name", (engine) => {
         const leaving = record(snackbar);
         await open.set(false);
         await until(() => {
-            expect(document.querySelector('[role="status"]')).toBeNull();
+            // The surface leaves; the live region stays mounted, emptied.
+            expect(
+                document.querySelector('[data-testid="pf-snackbar-root"]'),
+            ).toBeNull();
+            expect(document.querySelector('[role="status"]')?.textContent).toBe(
+                "",
+            );
             expect(document.querySelector('[role="tooltip"]')).toBeNull();
         });
         leaving.stop();
