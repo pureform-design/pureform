@@ -8,6 +8,7 @@ import type { ComponentAnatomy, TestIdOverride } from "@pureform/anatomy";
 import {
     calendarCellSelection,
     calendarCellSelectionOf,
+    isCurrentCalendarPeriod,
     weekdayLabels,
 } from "@pureform/binding-core";
 import type {
@@ -171,7 +172,12 @@ const listInstance = (
         view,
         value,
         selected: state.selected,
-        today: false,
+        today: isCurrentCalendarPeriod(
+            view,
+            state.value.year,
+            state.value.month,
+        ),
+        // Month/year lists have no overflow-day cells; availability is reported by disabled.
         outside: false,
         disabled: state.disabled,
     };
@@ -437,6 +443,11 @@ export function calendarParts(context: PartContext<CalendarContext>) {
             ]);
             label = state.valueText;
             selection = state.selected ? "selected" : "none";
+            today = isCurrentCalendarPeriod(
+                view,
+                state.value.year,
+                state.value.month,
+            );
             disabled = state.disabled;
         }
         const source = useOwnInteractionSource(interactionSource);

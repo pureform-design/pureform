@@ -487,6 +487,7 @@ export {
     pickerWeekStart,
     selectedDateText,
     todayIso,
+    isCurrentCalendarPeriod,
     weekdayLabels,
     weekStartOf,
 } from "./components/date-picker";

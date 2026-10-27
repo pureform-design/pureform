@@ -6,6 +6,7 @@
 import { datePickerAnatomy, datePickerOverlayAnatomy } from "@pureform/anatomy";
 import type { PartName } from "@pureform/anatomy";
 import {
+    isCurrentCalendarPeriod,
     addMonths,
     chooseDate,
     datePickerSelection,
@@ -249,8 +250,7 @@ function SurfaceImpl(props: SurfaceProps): ReactNode {
                         key: each,
                         text: String(each),
                         selected: each === year,
-                        // oxlint-disable-next-line react/purity -- marks this year in the year grid; read as the grid renders
-                        current: each === new Date().getFullYear(),
+                        current: isCurrentCalendarPeriod("year", each),
                         disabled: !!props.disabled,
                     }))}
                     onChoose={(each) => {

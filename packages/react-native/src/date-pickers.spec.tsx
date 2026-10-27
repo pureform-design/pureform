@@ -234,6 +234,33 @@ describe("DatePicker", () => {
 });
 
 describe("DockedDatePicker", () => {
+    it("exposes the current month to cell styling", async () => {
+        const now = new Date();
+        const seen = new Map<number | string, boolean>();
+        await render(
+            <DockedDatePicker
+                locale="en-US"
+                defaultValue={[`${now.getFullYear()}-01-15`]}
+                style={{
+                    cell: (cell) => {
+                        if (cell.view === "month")
+                            seen.set(cell.value, cell.today);
+                        return undefined;
+                    },
+                }}
+            />,
+        );
+        await interact(() =>
+            userEvent.click(byTestId("pf-docked-date-picker-trigger")),
+        );
+        await until(() => byTestId("pf-docked-date-picker-month-button"));
+        await interact(() =>
+            userEvent.click(byTestId("pf-docked-date-picker-month-button")),
+        );
+        expect(seen.get(now.getMonth() + 1)).toBe(true);
+        expect([...seen.values()].filter(Boolean)).toHaveLength(1);
+    });
+
     it("shows the format hint in the input only once focused, not under its resting label", async () => {
         await render(<DockedDatePicker label="Date" locale="en-US" />);
         const input = byTestId(

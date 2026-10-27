@@ -108,6 +108,16 @@ export const todayIso = (now: Date = new Date()): string =>
         day: now.getDate(),
     });
 
+/** Month cells are current only in the current year, not every displayed January/February/etc. */
+export const isCurrentCalendarPeriod = (
+    view: "month" | "year",
+    year: number,
+    month?: number,
+    now: Date = new Date(),
+): boolean =>
+    year === now.getFullYear() &&
+    (view === "year" || month === now.getMonth() + 1);
+
 // Regions whose week starts on Sunday, Saturday or Friday when the platform can't say (CLDR's
 // `firstDay`); the rest start on Monday.
 const SUNDAY_FIRST = new Set(

@@ -14,6 +14,7 @@ import {
     formatDateText,
     formatIsoDate,
     isPresent,
+    isCurrentCalendarPeriod,
     parseDateText,
     pickerLocale,
     pickerWeekStart,
@@ -213,7 +214,11 @@ function Popup(
                             { month: "long" },
                         ),
                         selected: index + 1 === monthNumber,
-                        current: false,
+                        current: isCurrentCalendarPeriod(
+                            "month",
+                            year,
+                            index + 1,
+                        ),
                         disabled: !!props.disabled,
                     }))}
                     onChoose={(chosen) => {
@@ -232,8 +237,7 @@ function Popup(
                         key: each,
                         text: String(each),
                         selected: each === year,
-                        // oxlint-disable-next-line react/purity -- marks this year in the year grid; read as the grid renders
-                        current: each === new Date().getFullYear(),
+                        current: isCurrentCalendarPeriod("year", each),
                         disabled: !!props.disabled,
                     }))}
                     onChoose={(chosen) => {

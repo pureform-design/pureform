@@ -9,6 +9,7 @@ import type { ComponentAnatomy, PartName } from "@pureform/anatomy";
 import {
     calendarCellSelection,
     calendarCellSelectionOf,
+    isCurrentCalendarPeriod,
 } from "@pureform/binding-core";
 import type {
     CalendarCellInstance,
@@ -261,8 +262,14 @@ export function calendarParts(use: (name: string) => CalendarContext) {
             value: props.value,
             selected: selection() !== "none",
             today:
-                view() === "day" &&
-                (state() as datePicker.DayTableCellState).today,
+                view() === "day"
+                    ? (state() as datePicker.DayTableCellState).today
+                    : isCurrentCalendarPeriod(
+                          view() as "month" | "year",
+                          state().value.year,
+                          state().value.month,
+                      ),
+            // Month/year lists have no overflow-day cells; disabled reports availability.
             outside: view() === "day" && state().outsideRange,
             disabled: state().disabled,
         });
@@ -281,9 +288,7 @@ export function calendarParts(use: (name: string) => CalendarContext) {
                 calendarCellSelectionOf({
                     view: view(),
                     selection: selection(),
-                    today:
-                        view() === "day" &&
-                        (state() as datePicker.DayTableCellState).today,
+                    today: instance().today,
                     outside: view() === "day" && state().outsideRange,
                 }),
             interactionSource: source,
