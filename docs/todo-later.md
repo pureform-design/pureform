@@ -1,5 +1,10 @@
 # Parked for later
 
+Relevance review: 2026-10-27, after the platform-boundary refactor. See
+[the follow-up plan](todo-later-plan.md) for priorities
+and verification gates. Items below are not all reproduced bugs: device checks, design
+questions, and older reports awaiting reproduction remain explicitly deferred.
+
 - **Hover flicker** (Solid, React): the highlight flickers when hovering items in the Menu Default
   story (open with its button) and, intermittently, navigation bar items. Seen in a desktop
   browser; not reproduced headless (fix-storybook-6a swept 1px at a time). Needs a screen
@@ -20,20 +25,17 @@ Still open when the batch notes (`docs/roadmap-components/context/` and the firs
 
 ### Accessibility
 
-- Open roles: should the web search view trigger (a plain `div`) get one; should React Native's
-  select be a listbox rather than a menu; a never-set rating reads as one star (Zag marks the
-  first star checked at 0).
-- FabMenu: items are both Tab stops and Zag's arrow-key highlight targets, and an arrow key
-  moves focus back to the list (`focusMenu`); unify the two focus models.
+- Rating: recheck whether a never-set rating reads as one star (the old report says Zag marks
+  the first star checked at 0).
 - Snackbar: announces only by showing a hidden `role="status"` region, which some screen
   readers miss; inserting the message would be more reliable.
 - Screen reader ("virtual") clicks are never emitted; `"virtual"` is only a fallback pointer type
-  (binding-core `emitter.ts`).
+  (machines `interaction/emitter.ts`).
 
 ### Menus
 
-- Menu `submenu="auto"`: the room check uses the parent menu's width, so a submenu wider than
-  its parent can still flip and overlap; it measures once per open plus on window resize.
+- Menu `submenu="auto"`: recheck resizing, scrolling and changing content while open,
+  and separately verify Native measuring before adding live observers.
 - React Native drill: height animates but width jumps; the whole row moves rather than its
   label; other rows don't fade. React Native's cascading submenu isn't in the arrow-key loop on
   React Native Web.
@@ -42,12 +44,11 @@ Still open when the batch notes (`docs/roadmap-components/context/` and the firs
 
 ### Motion and progress
 
-- Page transitions: a change during a change jumps: the page model keeps two pages, so the
-  entering page becomes the leaving one and restarts (binding-core `page-transition.ts`).
+- Page transitions: recheck visual continuity when an entering page becomes a leaving one.
 - Fade through: web drops `data-state` once settled, React Native keeps `entering`. Uses theme
   roles (`short2`/`short4`, `spatialDefault`) rather than Compose's 90/210 ms and default spring.
-- Horizontal shared axis: is the `scrim` wanted outside predictive back? A named theme with
-  another surface keeps the base theme's scrim opacity unless it sets `scrimOpacity`.
+- Horizontal shared axis: verify whether a named theme with another surface still needs to set
+  `scrimOpacity` explicitly.
 - FAB menu: items scale from their own centre, not from the FAB (no `transform-origin` in
   preset `fab-menu.ts`); a composed `FabMenu.Root` counts items after mount, so server
   rendering falls back to eight steps until hydration.
@@ -55,12 +56,11 @@ Still open when the batch notes (`docs/roadmap-components/context/` and the firs
   at one wavelength per second. Indeterminate wavy runs a flat track under the whole bar
   without Compose's gaps; on React Native the linear indeterminate track has no gap window
   (needs two views).
-- `ReanimatedSvgDrawing` may not run `drawing.keyframes` (loading indicator would only turn);
-  on the Animated fallback `alternate` runs as `normal`. Unconfirmed.
+- SVG device validation: verify actual path updates and finite odd iteration counts on devices.
 - Tabs/springs: a spring slide with a `delay` waits with `setTimeout`; a factory instance can't
   pass a spring token.
 - Reduced motion nested three deep (`reduce` in `full` in `reduce`) doesn't resolve: the
-  innermost `reduce` loses (preset `motion.ts` selectors go two levels).
+  innermost `reduce` loses (`css-lowering/src/motion.ts` selectors go two levels).
 - Panda's `_motionSafe` and Tailwind's `motion-safe` follow only the system setting, not the
   provider's motion.
 
@@ -74,16 +74,10 @@ Still open when the batch notes (`docs/roadmap-components/context/` and the firs
   after the close request, so an async confirm settles back first.
 - Bottom sheet: `onExpandedChange` also fires when an uncontrolled sheet reopens at another
   rest; undecided whether only drags and presses should fire it.
-- Toast exits with CSS `scale` rather than `overlayShrinkOut`.
-- Splitter: the web settle sets `flex-grow` on panes, overwriting an app's inline `transition`;
-  the machines wrapper patches Zag internals (`resizeObserver` measure): recheck on Zag
+- Splitter: the machines wrapper patches Zag internals (`resizeObserver` measure): recheck on Zag
   upgrades. Zag's long press is 700 ms; set 500 ms if Zag exposes it.
 - Chip: the pill radius is a root token now, so a theme's `components.chip.radius` no longer
   reaches the round corner.
-- `OWN_SIZE`: Radio, the split button root and the FAB menu don't use it, so they may stretch
-  in a React Native column.
-- React Native date input: segments read `value` once (an outside change doesn't update them);
-  separators are tighter than the web's.
 - Docked date picker: the `actions` part is defined but never rendered by the React and Solid
   ready-mades; React Native hardcodes `testID="pf-docked-date-picker-trigger"`.
 - Calendar cells: on the web, month/year cells always report `today`/`outside` false; React
@@ -116,13 +110,11 @@ Still open when the batch notes (`docs/roadmap-components/context/` and the firs
 
 ### Tooling
 
-- tailwind-demo `generate`: overlapping runs can leave `.pureform/index.ts` naming files that
-  run didn't write; write atomically or clear `web/` first.
-- Open choices: run the node type checks in `build` (now only `check:types`); rename
-  `tsconfig.project.json`; Vite/Vitest config files aren't type-checked by any tsconfig.
-- The `IndicationPlatform` augmentation from `@pureform/binding-web/indication` puts
-  `HTMLElement` into any program loading it, including mixed web + React Native type checks;
-  a generic `Indication<E>` is the alternative.
+- tailwind-demo `generate`: reproduce overlapping runs with different plans: pruning may still
+  remove another run's files. Prefer per-output serialization or a transactional swap, not clearing
+  app-owned files.
+- Open choices: run the node type checks in `build` (now in `check:types`); rename
+  `tsconfig.project.json`.
 - The plain `.pureform/` entry is typed from the first web target; multi-target code needing
   native factory types imports `.pureform/native`. Revisit if it confuses users.
 - Bundler pruning keeps every token, theme, `@property`, keyframes and shape, most of the CSS
