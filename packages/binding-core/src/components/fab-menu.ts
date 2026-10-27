@@ -7,6 +7,7 @@ import type {
     PartName,
     TestIdOverride,
 } from "@pureform/anatomy";
+import { fabMenuAnatomy as anatomy, partTestId } from "@pureform/anatomy";
 import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { ItemInstance, Unstyled } from "../parts";
@@ -70,6 +71,8 @@ export const fabMenuPositioning = (
 
 /** One item of the ready-made FAB menu, as data. */
 export interface FabMenuItem<Node = unknown> extends InteractionSourceProps {
+    /** Override this copy's item/icon/label IDs; omitted parts retain Root's IDs. */
+    readonly testId?: TestIdOverride<FabMenuPart> | undefined;
     readonly value: string;
     readonly label: Node;
     /** The text typeahead matches, when the label isn't plain text. */
@@ -79,6 +82,15 @@ export interface FabMenuItem<Node = unknown> extends InteractionSourceProps {
     /** Flip the icon under `rtl`, for an icon that points. */
     readonly mirrorIcon?: boolean | undefined;
 }
+
+export const fabMenuItemTestId = (
+    item: FabMenuItem,
+    part: FabMenuPart,
+    fallback?: TestIdOverride<FabMenuPart>,
+): string =>
+    typeof item.testId === "string"
+        ? partTestId(anatomy, part, item.testId)
+        : (item.testId?.[part] ?? partTestId(anatomy, part, fallback));
 
 /** What the ready-made FAB menu renders inside Root, in the framework's node type. */
 export interface FabMenuContentProps<Node> {

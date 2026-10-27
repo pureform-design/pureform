@@ -8,6 +8,7 @@ import { isPresent, snackbarSelection } from "@pureform/binding-core";
 import type {
     ChangeDetails,
     IndicationProps,
+    InteractionSourceProps,
     SnackbarPart,
     SnackbarVariantProps,
 } from "@pureform/binding-core";
@@ -17,7 +18,7 @@ import { testIdOf, useControllable, withEngine } from "../parts";
 import { useOverlayPresence } from "../presence";
 import { useEngine } from "../provider";
 import { nativeSlots } from "../slot-props";
-import type { NativeSlotProps } from "../slot-props";
+import type { NativeSlotProps, NativePartProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 import { SurfaceButton } from "../surface-button";
 
@@ -34,7 +35,14 @@ export interface SnackbarProps
     extends
         SnackbarVariantProps,
         IndicationProps,
-        NativeSlotProps<SnackbarHosts> {
+        Omit<NativeSlotProps<SnackbarHosts>, "slotProps"> {
+    readonly slotProps?: Omit<
+        NonNullable<NativeSlotProps<SnackbarHosts>["slotProps"]>,
+        "action" | "close"
+    > & {
+        readonly action?: NativePartProps<"Pressable"> & InteractionSourceProps;
+        readonly close?: NativePartProps<"Pressable"> & InteractionSourceProps;
+    };
     /** The message. */
     readonly supportingText?: ReactNode;
     /** The action's label. */

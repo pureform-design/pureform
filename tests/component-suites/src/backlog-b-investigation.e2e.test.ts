@@ -7,6 +7,36 @@ import { userEvent } from "vitest/browser";
 import { harness } from "#binding";
 
 describe("backlog B investigation", () => {
+    it("B3: FabMenu item ID overrides apply to every web target", async () => {
+        const mounted = harness.mount({
+            component: "FabMenu",
+            props: {
+                open: true,
+                fabLabel: "Create",
+                icon: "+",
+                testId: "menu",
+                items: [
+                    { value: "one", label: "One", icon: "1", testId: "first" },
+                    { value: "two", label: "Two", testId: { item: "second" } },
+                ],
+            },
+        });
+        await harness.settle();
+        expect(
+            mounted.host.querySelector('[data-testid="first-item"]')
+                ?.textContent,
+        ).toContain("One");
+        expect(
+            mounted.host.querySelector('[data-testid="first-item-icon"]'),
+        ).not.toBeNull();
+        expect(
+            mounted.host.querySelector('[data-testid="second"]')?.textContent,
+        ).toBe("Two");
+        expect(
+            mounted.host.querySelector('[data-testid="menu-item-label"]')
+                ?.textContent,
+        ).toBe("Two");
+    });
     it.each(["ListItem", "Slider"] as const)(
         "B1: records focus outline and clipping for %s",
         async (component) => {

@@ -5,6 +5,7 @@
 import { fabMenuAnatomy } from "@pureform/anatomy";
 import type { TestIdOverride } from "@pureform/anatomy";
 import {
+    fabMenuItemTestId,
     fabMenuPositioning,
     fabMenuSelection,
     isPresent,
@@ -114,7 +115,7 @@ function FabMenuItemImpl(props: {
         }),
     );
     const id = (part: FabMenuPart) =>
-        testIdOf(fabMenuAnatomy, part, props.testId);
+        fabMenuItemTestId(item, part, props.testId);
     const slot = props.slot;
     const copy =
         slot.each("item") || slot.each("itemIcon") || slot.each("itemLabel")

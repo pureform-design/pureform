@@ -255,6 +255,7 @@ export {
     FAB_MENU_CONTENT_PROPS,
     FAB_MENU_ROOT_PROPS,
     fabMenuItemProps,
+    fabMenuItemTestId,
     fabMenuPositioning,
     fabMenuSelection,
 } from "./components/fab-menu";

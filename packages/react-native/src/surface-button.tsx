@@ -8,7 +8,9 @@ import type {
     PartName,
     TestIdOverride,
 } from "@pureform/anatomy";
+import type { InteractionSourceProps } from "@pureform/binding-core";
 import type { Indication } from "@pureform/binding-core/indication";
+import { useMemo } from "react";
 import type { ReactNode } from "react";
 
 import { IconSlot, iconSlot } from "./icon-style";
@@ -43,11 +45,23 @@ export function SurfaceButton<A extends ComponentAnatomy>(
     props: SurfaceButtonProps<A>,
 ): ReactNode {
     const slot = props.slot ?? nativeSlots(undefined);
+    const user = slot.props(
+        props.part,
+        props.instance,
+    ) as InteractionSourceProps;
+    // A source belongs to the surface's indication, not to the platform Pressable host.
+    const hostProps = useMemo(() => {
+        const { interactionSource: _source, ...host } = user;
+        return host;
+    }, [user]);
     const indication = useSurfaceIndication(
         props.anatomy.indication!.findLast(
             (entry: IndicationAnatomy) => entry.trigger === props.part,
         )!,
-        { indication: props.indication },
+        {
+            indication: props.indication,
+            interactionSource: user.interactionSource,
+        },
     );
     const {
         styles: s,
@@ -61,7 +75,7 @@ export function SurfaceButton<A extends ComponentAnatomy>(
     const Surface = v[props.part];
     return (
         <Surface.Pressable
-            {...slot.props(props.part, props.instance)}
+            {...hostProps}
             {...slot.with(props.part, indication.handlers, props.instance)}
             role="button"
             {...(props.label === undefined

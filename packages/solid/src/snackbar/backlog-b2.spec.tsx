@@ -3,9 +3,8 @@ import { expect, it } from "vitest";
 
 import { Snackbar } from ".";
 
-it("B2: the web runtime slot route is not represented in ready-made Snackbar types", () => {
+it("types the ready-made and composed Snackbar source routes", () => {
     const slots: NonNullable<ComponentProps<typeof Snackbar>["slotProps"]> = {
-        // @ts-expect-error Ready-made slots expose element props, not SnackbarButtonProps.
         action: { interactionSource: undefined },
     };
     const composed: ComponentProps<typeof Snackbar.Action> = {

@@ -7,6 +7,7 @@ import {
     FAB_MENU_CONTENT_PROPS,
     FAB_MENU_ROOT_PROPS,
     fabMenuItemProps,
+    fabMenuItemTestId,
     fabMenuSelection,
     isPresent,
 } from "@pureform/binding-core";
@@ -291,16 +292,47 @@ function ReadyMade(props: FabMenuProps): JSX.Element {
                                 <Item
                                     {...fabMenuItemProps(item())}
                                     {...slots("item", copy)}
+                                    {...(item().testId === undefined
+                                        ? {}
+                                        : {
+                                              "data-testid": fabMenuItemTestId(
+                                                  item(),
+                                                  "item",
+                                                  props.testId,
+                                              ),
+                                          })}
                                 >
                                     <Show when={isPresent(item().icon)}>
                                         <ItemIcon
                                             mirror={item().mirrorIcon}
                                             {...slots("itemIcon", copy)}
+                                            {...(item().testId === undefined
+                                                ? {}
+                                                : {
+                                                      "data-testid":
+                                                          fabMenuItemTestId(
+                                                              item(),
+                                                              "itemIcon",
+                                                              props.testId,
+                                                          ),
+                                                  })}
                                         >
                                             {item().icon}
                                         </ItemIcon>
                                     </Show>
-                                    <ItemLabel {...slots("itemLabel", copy)}>
+                                    <ItemLabel
+                                        {...slots("itemLabel", copy)}
+                                        {...(item().testId === undefined
+                                            ? {}
+                                            : {
+                                                  "data-testid":
+                                                      fabMenuItemTestId(
+                                                          item(),
+                                                          "itemLabel",
+                                                          props.testId,
+                                                      ),
+                                              })}
+                                    >
                                         {item().label}
                                     </ItemLabel>
                                 </Item>

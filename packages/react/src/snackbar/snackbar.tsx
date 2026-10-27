@@ -163,8 +163,16 @@ const Close = snackbarButton("close", "Close");
 export interface SnackbarProps
     extends
         Omit<SnackbarRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
-        SlotKeyedProps<Anatomy>,
-        SnackbarContentProps<ReactNode> {}
+        Omit<SlotKeyedProps<Anatomy>, "slotProps">,
+        SnackbarContentProps<ReactNode> {
+    readonly slotProps?: Omit<
+        NonNullable<SlotKeyedProps<Anatomy>["slotProps"]>,
+        "action" | "close"
+    > & {
+        readonly action?: SnackbarButtonProps;
+        readonly close?: SnackbarButtonProps;
+    };
+}
 
 /** The ready-made snackbar: the message, the action when given a label, and the close button when
  *  given a name. */

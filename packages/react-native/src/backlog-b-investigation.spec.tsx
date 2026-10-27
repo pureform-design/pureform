@@ -49,27 +49,75 @@ beforeAll(async () => {
 });
 
 describe("backlog B investigation on Native Web", () => {
-    it("B2: ready-made Snackbar sources are not part of its typed API", () => {
+    it("B2: Snackbar takes button sources through typed slotProps, not new root props", () => {
         const props: ComponentProps<typeof Snackbar> = {
             // @ts-expect-error The ready-made has no per-action interaction source prop.
             actionInteractionSource: undefined,
         };
         const slots: NonNullable<ComponentProps<typeof Snackbar>["slotProps"]> =
             {
-                // @ts-expect-error A Native host's props do not take an interaction source either.
                 action: { interactionSource: undefined },
             };
         expect(props).toHaveProperty("actionInteractionSource");
         expect(slots).toHaveProperty("action");
     });
 
-    it("B3: FabMenu has shared item IDs and no typed per-item ID override", async () => {
+    it("B2: Snackbar action and close sources stay independent and can be replaced", async () => {
+        const action = createInteractionSource();
+        const close = createInteractionSource();
+        const replacement = createInteractionSource();
+        const heard = [action, close, replacement].map(() => [] as string[]);
+        const stops = [action, close, replacement].map((source, index) =>
+            source.subscribe((event) => heard[index]!.push(event.type)),
+        );
+        const source = outside(action);
+        try {
+            await mount(
+                <PureformProvider registry={registry} motion="reduce">
+                    <source.Holder>
+                        {(current) => (
+                            <Snackbar
+                                open
+                                supportingText="Saved"
+                                action="Undo"
+                                slotProps={{
+                                    action: { interactionSource: current },
+                                    close: { interactionSource: close },
+                                }}
+                            />
+                        )}
+                    </source.Holder>
+                </PureformProvider>,
+            );
+            await interact(() =>
+                userEvent.click(byTestId("pf-snackbar-action")),
+            );
+            expect(heard[0]).toContain("press");
+            expect(heard[1]).not.toContain("press");
+            await source.set(replacement);
+            const count = heard[0]!.filter((event) => event === "press").length;
+            await interact(() =>
+                userEvent.click(byTestId("pf-snackbar-action")),
+            );
+            expect(heard[0]!.filter((event) => event === "press")).toHaveLength(
+                count,
+            );
+            expect(heard[2]).toContain("press");
+            await interact(() =>
+                userEvent.click(byTestId("pf-snackbar-close")),
+            );
+            expect(heard[1]).toContain("press");
+        } finally {
+            for (const stop of stops) stop();
+        }
+    });
+
+    it("B3: FabMenu accepts per-item prefixes and partial ID maps", async () => {
         const item: NonNullable<
             ComponentProps<typeof FabMenu>["items"]
         >[number] = {
             value: "one",
             label: "One",
-            // @ts-expect-error FabMenuItem has no individual testId override.
             testId: "requested-one",
         };
         expect(item).toHaveProperty("testId");
@@ -80,8 +128,12 @@ describe("backlog B investigation on Native Web", () => {
                     fabLabel="Create"
                     icon="+"
                     items={[
-                        { value: "one", label: "One" },
-                        { value: "two", label: "Two" },
+                        item,
+                        {
+                            value: "two",
+                            label: "Two",
+                            testId: { item: "chosen" },
+                        },
                     ]}
                 />
             </PureformProvider>,
@@ -95,10 +147,9 @@ describe("backlog B investigation on Native Web", () => {
             [...document.querySelectorAll('[role="menuitem"]')].map((item) =>
                 item.getAttribute("data-testid"),
             ),
-        ).toEqual(["pf-fab-menu-item", "pf-fab-menu-item"]);
-        expect(
-            document.querySelector('[data-testid="requested-one"]'),
-        ).toBeNull();
+        ).toEqual(["requested-one-item", "chosen"]);
+        expect(byTestId("requested-one-item-label").textContent).toBe("One");
+        expect(byTestId("pf-fab-menu-item-label").textContent).toBe("Two");
     });
 
     it("B3: NativeSelect has no option slot key or per-option test IDs on Native Web", async () => {
@@ -122,7 +173,7 @@ describe("backlog B investigation on Native Web", () => {
         ).toBeNull();
     });
 
-    it("B3: DatePicker's trigger honors customization but the docked trigger ignores the ID prefix", async () => {
+    it("B3: DatePicker and docked triggers honor prefixes/maps and keep default IDs", async () => {
         await mount(
             <PureformProvider registry={registry}>
                 <DatePicker
@@ -131,14 +182,18 @@ describe("backlog B investigation on Native Web", () => {
                     style={{ trigger: { opacity: 0.5 } }}
                 />
                 <DockedDatePicker label="Booking" testId="booking" />
+                <DockedDatePicker label="Default" />
+                <DockedDatePicker
+                    label="Mapped"
+                    testId={{ trigger: "mapped-trigger" }}
+                />
             </PureformProvider>,
         );
         expect(getComputedStyle(byTestId("custom-date")).opacity).toBe("0.5");
         expect(byTestId("booking-root")).toBeTruthy();
         expect(byTestId("pf-docked-date-picker-trigger")).toBeTruthy();
-        expect(
-            document.querySelector('[data-testid="booking-trigger"]'),
-        ).toBeNull();
+        expect(byTestId("booking-trigger")).toBeTruthy();
+        expect(byTestId("mapped-trigger")).toBeTruthy();
     });
 
     it.each([animated, reanimated])(

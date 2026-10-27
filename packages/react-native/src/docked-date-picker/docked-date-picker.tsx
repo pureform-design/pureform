@@ -5,7 +5,7 @@
 // year buttons switch the calendar to a list of months or years.
 
 import { dockedDatePickerAnatomy } from "@pureform/anatomy";
-import type { PartName } from "@pureform/anatomy";
+import type { PartName, TestIdOverride } from "@pureform/anatomy";
 import {
     addMonths,
     chooseDate,
@@ -79,10 +79,15 @@ export interface DockedDatePickerProps
     extends
         Omit<
             DockedDatePickerRootOwnProps,
-            "unstyled" | "leadingIcon" | "prefixText" | "suffixText"
+            "unstyled" | "leadingIcon" | "prefixText" | "suffixText" | "testId"
         >,
         DockedDatePickerContentProps<ReactNode>,
-        NativeSlotProps<DockedDatePickerHosts, CalendarInstances> {}
+        NativeSlotProps<DockedDatePickerHosts, CalendarInstances> {
+    /** Native overlays a separate Pressable over trailingIcon; it has its own trigger ID. */
+    readonly testId?: TestIdOverride<
+        PartName<typeof dockedDatePickerAnatomy> | "trigger"
+    >;
+}
 
 type CalendarView = "day" | "month" | "year";
 
@@ -346,7 +351,12 @@ export function DockedDatePicker(props: DockedDatePickerProps): ReactNode {
                 onLayout={trigger.onLayout}
                 onPress={() => (open ? close() : show())}
                 style={trigger.style}
-                testID="pf-docked-date-picker-trigger"
+                testID={
+                    typeof props.testId === "string"
+                        ? `${props.testId}-trigger`
+                        : (props.testId?.trigger ??
+                          "pf-docked-date-picker-trigger")
+                }
             />
             {presence.present && anchor ? (
                 <Portal layer="menu">

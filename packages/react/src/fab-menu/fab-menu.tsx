@@ -6,6 +6,7 @@ import { fabMenuAnatomy } from "@pureform/anatomy";
 import {
     FAB_MENU_ROOT_PROPS,
     fabMenuItemProps,
+    fabMenuItemTestId,
     fabMenuSelection,
     isPresent,
 } from "@pureform/binding-core";
@@ -251,16 +252,46 @@ function ReadyMade(props: FabMenuProps): ReactNode {
                                 key={item.value}
                                 {...fabMenuItemProps(item)}
                                 {...slot("item", copy)}
+                                {...(item.testId === undefined
+                                    ? {}
+                                    : {
+                                          "data-testid": fabMenuItemTestId(
+                                              item,
+                                              "item",
+                                              props.testId,
+                                          ),
+                                      })}
                             >
                                 {isPresent(item.icon) ? (
                                     <ItemIcon
                                         mirror={item.mirrorIcon}
                                         {...slot("itemIcon", copy)}
+                                        {...(item.testId === undefined
+                                            ? {}
+                                            : {
+                                                  "data-testid":
+                                                      fabMenuItemTestId(
+                                                          item,
+                                                          "itemIcon",
+                                                          props.testId,
+                                                      ),
+                                              })}
                                     >
                                         {item.icon}
                                     </ItemIcon>
                                 ) : null}
-                                <ItemLabel {...slot("itemLabel", copy)}>
+                                <ItemLabel
+                                    {...slot("itemLabel", copy)}
+                                    {...(item.testId === undefined
+                                        ? {}
+                                        : {
+                                              "data-testid": fabMenuItemTestId(
+                                                  item,
+                                                  "itemLabel",
+                                                  props.testId,
+                                              ),
+                                          })}
+                                >
                                     {item.label}
                                 </ItemLabel>
                             </Item>

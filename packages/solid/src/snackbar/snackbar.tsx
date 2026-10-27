@@ -169,8 +169,16 @@ const Close = snackbarButton("close", "Close");
 export interface SnackbarProps
     extends
         Omit<SnackbarRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
-        SlotKeyedProps<Anatomy>,
-        SnackbarContentProps<JSX.Element> {}
+        Omit<SlotKeyedProps<Anatomy>, "slotProps">,
+        SnackbarContentProps<JSX.Element> {
+    readonly slotProps?: Omit<
+        NonNullable<SlotKeyedProps<Anatomy>["slotProps"]>,
+        "action" | "close"
+    > & {
+        readonly action?: SnackbarButtonProps;
+        readonly close?: SnackbarButtonProps;
+    };
+}
 
 const READY_MADE_PROPS = [
     "class",
