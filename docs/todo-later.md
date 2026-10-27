@@ -25,8 +25,6 @@ Still open when the batch notes (`docs/roadmap-components/context/` and the firs
 
 ### Accessibility
 
-- Rating: recheck whether a never-set rating reads as one star (the old report says Zag marks
-  the first star checked at 0).
 - Snackbar: announces only by showing a hidden `role="status"` region, which some screen
   readers miss; inserting the message would be more reliable.
 - Screen reader ("virtual") clicks are never emitted; `"virtual"` is only a fallback pointer type

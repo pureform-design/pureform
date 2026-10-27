@@ -16,17 +16,15 @@ than exposing typed button interaction sources; calendar month/year cells initia
 and `outside` false; Select's shared API has no multiple-value mode. These are separate changes,
 not one accessibility rewrite.
 
-1. Reproduce zero-value Rating announcements in React/Solid and check Native parity. Assert no
-   checked star at zero, while preserving half-star pointer geometry, form value and keyboard entry.
-2. Verify Snackbar announcements with an initially mounted closed region and repeated identical
+1. Verify Snackbar announcements with an initially mounted closed region and repeated identical
    messages. If missed, keep the live region mounted and insert/update message content on show;
    prevent duplicate announcements and preserve exit/pause behavior.
-3. Reproduce virtual clicks through the interaction machines (`machines/src/interaction/emitter.ts`).
+2. Reproduce virtual clicks through the interaction machines (`machines/src/interaction/emitter.ts`).
    Add click-only AT coverage, with no duplicate press after pointer or keyboard activation.
-4. Design typed per-button interaction-source forwarding for ready-made Snackbar across bindings;
+3. Design typed per-button interaction-source forwarding for ready-made Snackbar across bindings;
    test source isolation, source replacement and composed-part parity.
-5. Add calendar current-month/current-year and range-boundary tests before changing cell flags.
-6. Treat Select multiple mode as an API project: define scalar/array discrimination, deselection,
+4. Add calendar current-month/current-year and range-boundary tests before changing cell flags.
+5. Treat Select multiple mode as an API project: define scalar/array discrimination, deselection,
    labels, form serialization and keyboard/AT behavior across all bindings before implementation.
 
 **Exit gate:** targeted interaction tests plus React/Solid/Native suites and a recorded AT matrix.
