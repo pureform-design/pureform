@@ -10,6 +10,27 @@ The Native Snackbar queue already explicitly announces string messages on iOS th
 `AccessibilityInfo.announceForAccessibility`. The fix batch will test that path separately;
 neither a DOM live-region assertion nor an API spy establishes actual spoken output.
 
+## Outcome of the follow-up fixes
+
+The table below records what was found _before_ fixing. Afterwards, on this branch:
+
+- **B2:** Snackbar `slotProps.action`/`close` accept an `interactionSource` on React, Solid and
+  Native (isolated sources, replaceable); tested.
+- **B3:** FabMenu items take an optional `testId` (prefix or partial map; defaults unchanged)
+  on all three bindings, and the Native DockedDatePicker trigger follows `testId` (`<prefix>-trigger`
+  or `testId.trigger`). NativeSelect option parts stay deferred.
+- **B7:** Native FadeThrough settles its page model after its own enter completes, without
+  switching the presence driver, so nothing restarts; tested on both engines.
+- **B8:** React, Solid and Native keep a persistent live region (`<output>` on web) that receives
+  the message when it opens; the animated surface is `role="group"`. On iOS the surface makes the
+  single `announceForAccessibility` call, shared by queued and standalone snackbars. Verified by
+  DOM mutations and API spies only, **not** by actual speech.
+- **B9:** click-only activation (`detail === 0`, no pointer or key press in progress) emits one
+  virtual press/release, claimed at the innermost surface; pointer and keyboard clicks are
+  deduplicated. Covered for buttons, checkables, radios, pressable items and highlighted menu
+  items, and for Native Web's `Pressable`. Real assistive-technology delivery is unverified.
+- **B1, B4–B6:** unchanged (not reproduced, or intentional behavior); see the decisions below.
+
 ## Results
 
 | Item | Result                                                               | Evidence and recommendation                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
