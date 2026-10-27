@@ -4,7 +4,75 @@ Reviewed 2026-10-27 against `main` after the platform-boundary refactor. This is
 audit, not a claim that every historical visual report has been reproduced. Keep device-only
 and subjective behavior out of speculative quick fixes.
 
-## Next actions, in priority order
+## Execution order: smallest fixes to architectural changes
+
+Effort estimates are relative, not promises: an unreproduced report can move groups after
+investigation. Work through one numbered item at a time. For each item, confirm relevance,
+recommend a concrete approach, add a regression, implement, validate and remove the resolved
+backlog entry. Pause for agreement on public API or behavioral decisions. Device-dependent
+verification is a separate lane and must not block unrelated fixes.
+
+### B. Bounded component fixes — moderate implementation/testing
+
+| Order | Item                                                                            | Recommended approach                                                                                                                               |
+| ----- | ------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| B1    | Swipeable row / Slider focus-ring clipping                                      | Add styled geometry tests; separate clipping surfaces from focus outlines rather than weakening clipping globally. Include Slider reader coverage. |
+| B2    | Ready-made Snackbar button interaction sources                                  | Reuse existing nested-button prop conventions; test independent sources and replacement. Confirm any new public prop shape first.                  |
+| B3    | Native trigger/context-trigger IDs, FabMenu item IDs, NativeSelect option parts | Audit existing part/instance conventions, then fix one component at a time. Preserve defaults where possible.                                      |
+| B4    | Native cascading-menu arrow navigation                                          | Reproduce focus traversal and close/return behavior, then connect the existing submenu path to the keyboard loop.                                  |
+| B5    | Native sheet travel distance / async refusal                                    | Test measured sheet bounds and delayed confirmation separately; preserve drag cancellation and settled position.                                   |
+| B6    | Delayed tab springs / factory spring tokens                                     | Separate cancellation bugs from token API gaps; reuse the existing spring representation and motion lifecycle.                                     |
+| B7    | Native FadeThrough settled state                                                | Test entering-to-settled state without restarting presence. Keep theme-based durations unless a spec decision says otherwise.                      |
+| B8    | Snackbar announcements                                                          | Keep a live region mounted and update its content if reproduction confirms missed announcements; validate with real screen readers.                |
+| B9    | Virtual-click interactions                                                      | Add click-only regressions and deduplicate pointer/keyboard-generated clicks before emitting a virtual press/release.                              |
+
+### C. Cross-cutting fixes — broad regression surface
+
+| Order | Item                                                           | Recommended approach                                                                                                              |
+| ----- | -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| C1    | Nested RTL/LTR selectors                                       | Prefer effective element direction; update CSS/Panda/Tailwind together with nested-direction geometry tests.                      |
+| C2    | Arbitrarily nested reduced motion / provider-aware motion-safe | Establish nearest-provider semantics across all adapters; test system/full/reduce combinations and SSR before choosing selectors. |
+| C3    | Ripple opacity / provider indication-token overrides           | Fix the two existing expected-failure regressions at token resolution, without changing override precedence or caches.            |
+| C4    | Ripple class/style/slot forwarding                             | Audit ownership and use the existing part merge contract across web bindings.                                                     |
+| C5    | Concurrent generation with different plans                     | Reproduce missing exports after both runs complete; prefer per-output serialization over broad deletion.                          |
+| C6    | Interrupted page transitions                                   | Preserve in-flight visual progress and leaving-page identity; test rapid direction changes before altering the page lifecycle.    |
+| C7    | Native drill width / label translation / sibling fades         | Implement from measured geometry and existing springs after visual reproduction; validate both engines.                           |
+| C8    | Linear wavy progress motion and gaps                           | Specify track-relative geometry and gap windows, then implement consistent web/Native rendering.                                  |
+
+### D. Explicit product/API decisions — agree on the contract first
+
+| Order | Item                                                                            | Recommendation / decision needed                                                                                                                 |
+| ----- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| D1    | Chip/InputChip radius precedence                                                | Recommend explicit theme radius overrides win over derived defaults; confirm how density affects an explicit radius.                             |
+| D2    | Slider handle-clearance theming                                                 | Recommend a component token with the current clearance as default; confirm naming and scope.                                                     |
+| D3    | DockedDatePicker ready-made actions and trigger props                           | Decide whether action content belongs in the ready-made and how trigger customization is exposed; do not merely render an empty Actions wrapper. |
+| D4    | BottomSheet onExpandedChange on reopen                                          | Decide whether it reports every effective rest change or only user-driven changes.                                                               |
+| D5    | Live submenu adaptation                                                         | Decide whether an open menu changes cascade/drill mode on resize/scroll/content changes; add observers only for that contract.                   |
+| D6    | FAB-menu transform origin / composed SSR item count                             | Specify the intended growth pivot and choose an explicit count or server-safe composition contract.                                              |
+| D7    | Per-item styling on ButtonGroup/ChipSet/Toolbar/RadioGroup; menu prop functions | Recommend existing InnerPropsOf and instance-function conventions, with one consistent cross-binding type contract.                              |
+| D8    | NativeSelect value typing and fallback ripple API                               | Align with the chosen cross-binding discriminated/union convention; keep optional native-menu claims gated on device tests.                      |
+| D9    | Node checks in build / tsconfig naming                                          | Recommend retaining explicit check:types gating unless build guarantees require otherwise; avoid a naming-only migration without a benefit.      |
+| D10   | Default generated target imports                                                | Recommend documenting explicit native imports and adding a mixed-target fixture before redesigning entries.                                      |
+| D11   | Compose timing parity                                                           | Decide whether exact Compose timings or theme roles are the contract; recommend retaining theme roles by default.                                |
+
+### E. Large API/architecture projects — separate designs and milestones
+
+| Order | Item                                                   | Recommended approach                                                                                                            |
+| ----- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| E1    | Select multiple-value mode                             | Design scalar/array discrimination, selection UX, accessibility and form serialization together across bindings.                |
+| E2    | Provider-level Native slotProps                        | Decide whether the API is needed; if yes, design provider/instance/slot merge precedence and typed hosts before implementation. |
+| E3    | Pruning keyframes/shapes, then tokens/themes/@property | Start with measured output and conservative reachability; separate asset pruning from runtime theme/token pruning.              |
+
+### Verification lane — needs external evidence, not speculative fixes
+
+- **Hover flicker:** obtain a recording, browser/OS and pointing-device details before changing highlight ownership.
+- **iOS/Android:** NativeSelect multiple/keepsMenuPresented, native SVG/ripple/morph paths, toast swipe,
+  measureInWindow submenu bounds and Android touch slop. Check both supported engines where applicable.
+- **Screen readers:** confirm Snackbar and virtual-click results on actual AT, not DOM attributes alone.
+- **Dependency maintenance:** recheck Splitter's internal patches and long-press options when Zag changes;
+  do not fork timing behavior without upstream support.
+
+## Detailed acceptance criteria by area
 
 Each work item starts with a failing regression or a recorded reproduction. If it no longer
 reproduces, retire it with the test/source evidence instead of changing behavior.
@@ -12,8 +80,7 @@ reproduces, retire it with the test/source evidence instead of changing behavior
 ### 1. Accessibility and input correctness
 
 **Source-supported gaps:** ready-made web Snackbar still forwards generic slot props rather
-than exposing typed button interaction sources; calendar month/year cells initialize `today`
-and `outside` false; Select's shared API has no multiple-value mode. These are separate changes,
+than exposing typed button interaction sources; Select's shared API has no multiple-value mode. These are separate changes,
 not one accessibility rewrite.
 
 1. Verify Snackbar announcements with an initially mounted closed region and repeated identical
@@ -23,7 +90,7 @@ not one accessibility rewrite.
    Add click-only AT coverage, with no duplicate press after pointer or keyboard activation.
 3. Design typed per-button interaction-source forwarding for ready-made Snackbar across bindings;
    test source isolation, source replacement and composed-part parity.
-4. Add calendar current-month/current-year and range-boundary tests before changing cell flags.
+4. Add calendar range-boundary coverage before changing range semantics.
 5. Treat Select multiple mode as an API project: define scalar/array discrimination, deselection,
    labels, form serialization and keyboard/AT behavior across all bindings before implementation.
 
@@ -43,17 +110,17 @@ Actions but do not render that part in ready-mades; Native docked picker trigger
    Panda and Tailwind adapters, then update snapshots and mirrored keyboard/geometry tests.
 3. Check Chip round-radius overrides in provider/named themes and density variants. Define whether
    explicit radius or density-derived pill radius wins, then use the same policy for InputChip.
-4. Reproduce SwipeableListRow/Slider focus-ring clipping and Slider keyboard value-indicator
-   visibility in a styled browser fixture. Resolve themed handle clearance and add reader coverage.
-5. Recheck interrupted page transitions, settled Native FadeThrough state and named-theme scrim
-   opacity. Compare default and custom motion themes rather than hardcoding Compose timings.
+4. Reproduce SwipeableListRow/Slider focus-ring clipping in a styled browser fixture. Resolve
+   themed handle clearance and add reader coverage.
+5. Recheck interrupted page transitions and settled Native FadeThrough state.
+   Compare default and custom motion themes rather than hardcoding Compose timings.
 6. Check FAB-menu transform origin and composed SSR item count; choose an explicit count contract
    or server-safe composition strategy, with hydration and variable-item-count tests.
 7. Reproduce linear-wavy track motion/gaps across determinate and indeterminate modes. Implement
    Native gap windows only after geometry tests specify both visible track segments.
 8. Test delayed tab springs and factory spring-token support separately; preserve cancellation
-   on unmount/replacement. Verify SVG finite odd alternate iteration counts and Reanimated path
-   updates on devices, not merely prop presence on Native Web.
+   on unmount/replacement. Verify Reanimated path updates on devices, not merely prop presence
+   on Native Web.
 9. For DockedDatePicker, first decide whether the ready-made should expose action content at all
    (composed Actions already works); then define trigger slot/test-ID semantics without silently
    duplicating the trailing-icon ID.
@@ -86,18 +153,16 @@ above. No API expansion should be made solely because the old note requests it.
 
 1. Audit per-item `className`/`class`, `tokens`, style functions and test IDs on ButtonGroup,
    ChipSet, Toolbar and RadioGroup against List's `InnerPropsOf` pattern. Compile usage tests first.
-2. Reproduce Solid Toolbar's hidden-menu string `style.root` handling and audit SplitButton/Toolbar
-   per-item menu functions. Test post-mount updates to avoid reintroducing eager Solid reads.
+2. Audit SplitButton/Toolbar per-item menu functions. Test post-mount updates to avoid
+   reintroducing eager Solid reads.
 3. Audit Native trigger/context-trigger part keys, FabMenu item IDs and NativeSelect option parts.
    Decide provider-level Native `slotProps` separately; test instance/provider merge precedence
    before adding any provider API.
 4. Audit Ripple's class/style/slot forwarding. Keep the two existing `it.fails` cases in
    `tests/component-suites/src/indication.e2e.test.ts` as explicit known failures until component
    indication opacity and provider/named-theme token resets are fixed and pass normally.
-5. Add or locate FileUpload submission with actual File entries, half-star width geometry and
-   controlled Solid Textarea SSR tests; the local Textarea spec currently only tests client mount.
-6. Recheck NativeSelect value-type differences and fallback `ripple` usage against device findings.
-7. Review Splitter's Zag resizeObserver patches and long-press options on upgrades.
+5. Recheck NativeSelect value-type differences and fallback `ripple` usage against device findings.
+6. Review Splitter's Zag resizeObserver patches and long-press options on upgrades.
 
 **Exit gate:** cross-binding usage/type tests, reactive updates, merge precedence, stable IDs,
 and no new SSR/hydration or reactive-node-budget regressions.

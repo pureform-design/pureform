@@ -45,8 +45,6 @@ Still open when the batch notes (`docs/roadmap-components/context/` and the firs
 - Page transitions: recheck visual continuity when an entering page becomes a leaving one.
 - Fade through: web drops `data-state` once settled, React Native keeps `entering`. Uses theme
   roles (`short2`/`short4`, `spatialDefault`) rather than Compose's 90/210 ms and default spring.
-- Horizontal shared axis: verify whether a named theme with another surface still needs to set
-  `scrimOpacity` explicitly.
 - FAB menu: items scale from their own centre, not from the FAB (no `transform-origin` in
   preset `fab-menu.ts`); a composed `FabMenu.Root` counts items after mount, so server
   rendering falls back to eight steps until hydration.
@@ -54,7 +52,7 @@ Still open when the batch notes (`docs/roadmap-components/context/` and the firs
   at one wavelength per second. Indeterminate wavy runs a flat track under the whole bar
   without Compose's gaps; on React Native the linear indeterminate track has no gap window
   (needs two views).
-- SVG device validation: verify actual path updates and finite odd iteration counts on devices.
+- SVG device validation: verify actual path updates on devices.
 - Tabs/springs: a spring slide with a `delay` waits with `setTimeout`; a factory instance can't
   pass a spring token.
 - Reduced motion nested three deep (`reduce` in `full` in `reduce`) doesn't resolve: the
@@ -66,8 +64,7 @@ Still open when the batch notes (`docs/roadmap-components/context/` and the firs
 
 - Swipeable list row: its focus ring draws inside (the frame clips it).
 - Slider: the icon button's focus ring inside it is clipped to 1px; handle clearance isn't
-  themed; no styled web test for the slider reader. The value indicator doesn't show on
-  keyboard focus as M3 does.
+  themed; no styled web test for the slider reader.
 - React Native sheets slide by the window's size, not their own; "refused" is decided one frame
   after the close request, so an async confirm settles back first.
 - Bottom sheet: `onExpandedChange` also fires when an uncontrolled sheet reopens at another
@@ -78,13 +75,9 @@ Still open when the batch notes (`docs/roadmap-components/context/` and the firs
   reaches the round corner.
 - Docked date picker: the `actions` part is defined but never rendered by the React and Solid
   ready-mades; React Native hardcodes `testID="pf-docked-date-picker-trigger"`.
-- Calendar cells: on the web, month/year cells always report `today`/`outside` false; React
-  Native marks the current year.
 - NativeSelect: value typing differs (React/React Native a union, Solid a discriminated type);
   `@react-native-menu/menu` paths (`multiple`, `keepsMenuPresented`) need a device check before
   the peer is advertised; `ripple` stays in its usage for the Material Menu fallback.
-- Forms: no forms-suite case submitting FileUpload `File` entries; no geometry spec guards the
-  rating's half star width; no Solid unit spec for server rendering a controlled textarea.
 - Select: no `multiple` (`Select<string[]>`) though component-architecture §9.4 describes it.
 - Ready-made snackbar: its action and close buttons don't take `interactionSource`.
 - Direction: the web `rtl` condition matches an ancestor, so an `ltr` part inside an `rtl` page
@@ -95,8 +88,7 @@ Still open when the batch notes (`docs/roadmap-components/context/` and the firs
 
 - Per-item keys: ButtonGroup, ChipSet, Toolbar and RadioGroup items take only `testId`;
   per-item `className`/`tokens` need `InnerPropsOf` on their item types, as List has.
-- On Solid a string `menuProps.style.root` on Toolbar is dropped while the menu is hidden; SplitButton/Toolbar
-  `menuProps` have no per-item functions.
+- SplitButton/Toolbar `menuProps` have no per-item functions.
 - React Native: triggers drawn as `Button` (dialog, menu, date picker) and the menu's
   `contextTrigger` have no part key; FabMenu items share test ids; NativeSelect has no option
   parts. No provider-level `slotProps` on React Native (undecided whether it should have them).
