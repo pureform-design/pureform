@@ -1,4 +1,5 @@
 import { compositeTestIds, testIds } from "@pureform/anatomy";
+import { createSignal } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
@@ -51,6 +52,45 @@ const elements = (root: string = testIds.toolbar.root) =>
     ].filter((element) => element.style.display !== "none");
 
 describe("Toolbar, ready-made", () => {
+    // Solid accepts CSS strings; React and Native accept style objects, so this string-merge
+    // regression belongs here. Exercise both hidden and visible overflow roots after updates.
+    it("preserves reactive string menu root styles while hiding an unneeded overflow", async () => {
+        const [style, setStyle] = createSignal(
+            "--toolbar-menu-probe: first; color: rgb(1, 2, 3)",
+        );
+        withRegistry(
+            () => (
+                <Toolbar
+                    overflow
+                    items={ITEMS}
+                    menuProps={{ style: { root: style() } }}
+                />
+            ),
+            400,
+        );
+        await frames();
+        const root = document.querySelector<HTMLElement>(
+            "[data-pf-toolbar-overflow]",
+        )!;
+        expect(root.style.display).toBe("none");
+        expect(root.style.getPropertyValue("--toolbar-menu-probe")).toBe(
+            "first",
+        );
+        setStyle("--toolbar-menu-probe: second; color: rgb(4, 5, 6)");
+        await frames();
+        expect(root.style.getPropertyValue("--toolbar-menu-probe")).toBe(
+            "second",
+        );
+        expect(root.style.color).toBe("rgb(4, 5, 6)");
+        (document.querySelector("[data-room]") as HTMLElement).style.width =
+            "100px";
+        await frames();
+        expect(root.style.display).not.toBe("none");
+        expect(root.style.getPropertyValue("--toolbar-menu-probe")).toBe(
+            "second",
+        );
+    });
+
     it("renders a toolbar of icon buttons and text buttons in its variants", async () => {
         withRegistry(() => (
             <Toolbar
