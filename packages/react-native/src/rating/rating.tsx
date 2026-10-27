@@ -144,9 +144,7 @@ function RatingImpl(props: RatingProps): ReactNode {
                             <v.item.Pressable
                                 {...slot.props("item", each)}
                                 key={index}
-                                aria-checked={
-                                    reached || (value <= 0 && index === 1)
-                                }
+                                aria-checked={reached}
                                 aria-disabled={props.disabled}
                                 aria-label={text(index)}
                                 disabled={!interactive}

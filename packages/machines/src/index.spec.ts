@@ -44,7 +44,7 @@ describe("@pureform/machines", () => {
         );
     });
 
-    it("re-exports Zag's clipboard with a copy that never rejects and shows copied once written, and its rating group with the fieldset rule and the parts the preset draws", () => {
+    it("re-exports Zag's clipboard with safe copying, and its rating group with the fieldset rule, unrated semantics and preset parts", () => {
         expect(machines.clipboard.machine.states.idle).toBe(
             zagClipboard.machine.states.idle,
         );
@@ -67,7 +67,7 @@ describe("@pureform/machines", () => {
             zagRatingGroup.machine.states,
         );
         expect(machines.ratingGroup.machine).not.toBe(zagRatingGroup.machine);
-        expect(machines.ratingGroup.connect).toBe(zagRatingGroup.connect);
+        expect(machines.ratingGroup.connect).not.toBe(zagRatingGroup.connect);
         expect(machines.ratingGroup.anatomy.keys()).toEqual([
             "root",
             "label",

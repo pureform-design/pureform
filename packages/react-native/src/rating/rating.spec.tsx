@@ -29,6 +29,17 @@ const all = (id: string) => [
 ];
 
 describe("Rating on React Native", () => {
+    it.each([undefined, 0])(
+        "has no checked star for an unset or zero value (%s)",
+        async (value) => {
+            await withRegistry(<Rating value={value} />);
+            expect(
+                all(ids.item).map((item) => item.getAttribute("aria-checked")),
+            ).toEqual(Array(5).fill("false"));
+            expect(all(ids.fill)).toHaveLength(0);
+        },
+    );
+
     it("renders a labelled radio group with a radio per star and the filled stars the value reaches", async () => {
         await withRegistry(<Rating label="Quality" defaultValue={2} />);
         expect(byTestId(ids.control).getAttribute("role")).toBe("radiogroup");

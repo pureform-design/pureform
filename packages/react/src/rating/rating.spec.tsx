@@ -27,6 +27,24 @@ const count = (part: string) =>
     document.querySelectorAll(`[data-testid="${part}"]`).length;
 
 describe("Rating, ready-made", () => {
+    it.each([undefined, 0])(
+        "has no checked star for an unset or zero value (%s)",
+        async (value) => {
+            withRegistry(<Rating value={value} name="quality" />);
+            await settle();
+            expect(
+                items().map((item) => item.getAttribute("aria-checked")),
+            ).toEqual(Array(5).fill("false"));
+            expect(count(ids.fill)).toBe(0);
+            expect(
+                document.querySelector<HTMLInputElement>(
+                    'input[name="quality"]',
+                )?.value,
+            ).toBe("0");
+            expect(items()[0]?.getAttribute("tabindex")).toBe("0");
+        },
+    );
+
     it("renders a radiogroup of stars, labelled, in the anatomy's structure", async () => {
         withRegistry(
             <Rating label="Quality" defaultValue={2} color="tertiary" />,
