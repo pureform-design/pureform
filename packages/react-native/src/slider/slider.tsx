@@ -547,7 +547,9 @@ function SliderImpl(props: SliderProps): ReactNode {
                     showValue={
                         !!props.valueIndicator &&
                         index === active &&
-                        !!indication.state.dragged
+                        !props.disabled &&
+                        (!!indication.state.dragged ||
+                            !!indication.state.focused)
                     }
                     layer={
                         index === active

@@ -284,7 +284,11 @@ export function connect<T extends PropTypes>(
             const own = withoutStyle(
                 api.getDraggingIndicatorProps({ index }),
             ) as Record<string, unknown>;
-            const open = index === focusedIndex && dragging;
+            // Keyboard focus needs the same value feedback as dragging, for either web binding.
+            const open =
+                !disabled &&
+                index === focusedIndex &&
+                (dragging || service.state.matches("focus"));
             return normalize.element({
                 ...own,
                 ...parts.valueIndicator.attrs,

@@ -1,11 +1,12 @@
 import { testIds } from "@pureform/anatomy";
 import { beforeAll, describe, expect, it } from "vitest";
+import { userEvent } from "vitest/browser";
 
 import { Slider } from ".";
 import { PureformProvider } from "..";
 import { presetRegistry } from "../testing/registry";
 import type { TestRegistry } from "../testing/registry";
-import { mount } from "../testing/render";
+import { interact, mount } from "../testing/render";
 
 const ids = testIds.slider;
 
@@ -27,6 +28,20 @@ const all = (id: string) => [
 ];
 
 describe("Slider on React Native", () => {
+    it("shows keyboard value feedback and removes it on blur", async () => {
+        await withRegistry(
+            <Slider valueIndicator defaultValue={[40]} aria-label="Volume" />,
+        );
+        const root = all(ids.root)[0]!;
+        expect(all(ids.valueIndicator)).toHaveLength(0);
+        await interact(() => root.focus());
+        expect(all(ids.valueIndicator)).toHaveLength(1);
+        await interact(() => userEvent.keyboard("{ArrowRight}"));
+        expect(all(ids.valueIndicator)[0]!.textContent).toBe("41");
+        await interact(() => root.blur());
+        expect(all(ids.valueIndicator)).toHaveLength(0);
+    });
+
     it("takes a function of each thumb and marker in their style and slotProps", async () => {
         await withRegistry(
             <Slider
