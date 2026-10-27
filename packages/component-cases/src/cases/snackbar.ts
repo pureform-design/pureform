@@ -4,7 +4,6 @@
 
 import { snackbarAnatomy, testIds } from "@pureform/anatomy";
 
-import { allByRole } from "../aria";
 import type { ActOptions, ComponentCase } from "../types";
 import { byTestId } from "../types";
 import { userEvent } from "../user-event";
@@ -20,9 +19,10 @@ const action = (host: HTMLElement) =>
 const close = (host: HTMLElement) =>
     byTestId<HTMLButtonElement>(host, ids.close);
 
-/** Whether it's open: its status region is drawn, and isn't on its way out. */
+/** Whether it's open: its surface is drawn, and isn't on its way out. The persistent live
+ *  region (`role="status"`) stays mounted while it's closed, so it can't tell. */
 const read = (host: HTMLElement): boolean =>
-    allByRole(host, "status").some(
+    [...host.querySelectorAll<HTMLElement>(`[data-testid="${ids.root}"]`)].some(
         (element) => visible(element) && !leavingOnWeb(element),
     );
 
