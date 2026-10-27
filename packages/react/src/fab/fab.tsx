@@ -5,7 +5,6 @@
 import { fabAnatomy } from "@pureform/anatomy";
 import {
     FAB_ROOT_PROPS,
-    fabMachineProps,
     fabSelection,
     hasAccessibleName,
     isPresent,
@@ -17,6 +16,7 @@ import type {
     FabRootOwnProps,
     IconOnlyName,
 } from "@pureform/binding-core";
+import { fabMachineProps } from "@pureform/binding-web";
 import type * as button from "@pureform/machines/button";
 import type { PropTypes } from "@zag-js/react";
 import type { ElementType, ReactNode } from "react";

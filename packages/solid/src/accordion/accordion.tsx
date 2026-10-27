@@ -9,7 +9,6 @@ import {
     ACCORDION_CONTENT_PROPS,
     ACCORDION_ROOT_PROPS,
     accordionItemProps,
-    accordionMachineProps,
     accordionSelection,
 } from "@pureform/binding-core";
 import type {
@@ -20,6 +19,7 @@ import type {
     AccordionRootOwnProps,
     InteractionSourceProps,
 } from "@pureform/binding-core";
+import { accordionMachineProps } from "@pureform/binding-web";
 import * as accordion from "@pureform/machines/accordion";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {

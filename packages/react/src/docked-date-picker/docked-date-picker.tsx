@@ -10,12 +10,10 @@ import type { ComponentAnatomy, PartName } from "@pureform/anatomy";
 import {
     DOCKED_DATE_PICKER_ROOT_PROPS,
     dateFormatHint,
-    dateMachineProps,
     dockedDatePickerSelection,
     isPresent,
     pickerLocale,
     pickerWeekStart,
-    presentProps,
 } from "@pureform/binding-core";
 import type {
     CalendarInstances,
@@ -23,6 +21,7 @@ import type {
     DockedDatePickerRootOwnProps,
     Unstyled,
 } from "@pureform/binding-core";
+import { dateMachineProps, presentProps } from "@pureform/binding-web";
 import * as datePicker from "@pureform/machines/date-picker";
 import { normalizeProps } from "@zag-js/react";
 import {

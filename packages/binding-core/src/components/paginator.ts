@@ -187,24 +187,3 @@ export const paginatorRangeLabel = (
     if (range.count === 0) return "0 of 0";
     return `${range.start} – ${range.end} of ${range.count}`;
 };
-
-/** Zag's props from Root's, besides the controllable page and page size (the binding's
- *  `useControllable`) and `id`: the item count and the words the triggers carry. */
-export const paginatorMachineProps = (props: PaginatorBehaviorProps) => ({
-    count: props.count ?? 0,
-    translations: {
-        rootLabel: props.translations?.rootLabel,
-        firstTriggerLabel: props.translations?.firstPage,
-        prevTriggerLabel: props.translations?.previousPage,
-        nextTriggerLabel: props.translations?.nextPage,
-        lastTriggerLabel: props.translations?.lastPage,
-    },
-});
-
-/** A trigger's props from Zag's, when the whole paginator is disabled: the buttons are never
- *  enabled, whatever page it's on. */
-export const paginatorTriggerProps = <P extends object>(
-    props: P,
-    disabled: boolean | undefined,
-): P =>
-    disabled ? ({ ...props, disabled: true, "data-disabled": "" } as P) : props;

@@ -2,8 +2,8 @@
 // controls take theirs (`value`, `defaultValue`, `onValueChange`), with the form reset. The
 // element's own handlers (`onInput`, …) still run beside it.
 
-import { fieldControlProps } from "@pureform/binding-core";
 import type { FieldStateProps, PlainTextProps } from "@pureform/binding-core";
+import { fieldControlProps } from "@pureform/binding-web";
 import { syncTextInput } from "@pureform/binding-web";
 import { type Accessor, createSignal, flush, untrack } from "solid-js";
 

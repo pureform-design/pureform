@@ -5,7 +5,7 @@
 import { fabMenuAnatomy } from "@pureform/anatomy";
 import type { TestIdOverride } from "@pureform/anatomy";
 import {
-    fabMenuMachineProps,
+    fabMenuPositioning,
     fabMenuSelection,
     isPresent,
 } from "@pureform/binding-core";
@@ -267,7 +267,7 @@ function FabMenuImpl(props: FabMenuProps): ReactNode {
                 <Portal layer="menu">
                     <Anchored
                         anchor={measured.rect}
-                        positioning={fabMenuMachineProps(props).positioning}
+                        positioning={fabMenuPositioning(props)}
                         placement="top-end"
                         gutter={8}
                         onPressOutside={close}

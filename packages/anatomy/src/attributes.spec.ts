@@ -1,13 +1,6 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
 
-import {
-    kebabCase,
-    PART_ATTRIBUTE,
-    partAttributes,
-    partTestId,
-    SCOPE_ATTRIBUTE,
-    TEST_ID_ATTRIBUTE,
-} from "./attributes";
+import { kebabCase, partTestId } from "./attributes";
 import {
     anatomy,
     buttonAnatomy,
@@ -49,30 +42,6 @@ describe("partTestId", () => {
     it("throws for an unknown part", () => {
         expect(() => partTestId(buttonAnatomy, "nope" as "root")).toThrow(
             'pureform: button has no part "nope" (it has root, label, icon, secondaryIcon, touchTarget)',
-        );
-    });
-});
-
-describe("partAttributes", () => {
-    it("names the scope, the part, and the test id", () => {
-        expect(partAttributes(iconButtonAnatomy, "touchTarget")).toEqual({
-            [SCOPE_ATTRIBUTE]: "icon-button",
-            [PART_ATTRIBUTE]: "touch-target",
-            [TEST_ID_ATTRIBUTE]: "pf-icon-button-touch-target",
-        });
-        expect(partAttributes(buttonAnatomy, "label", "save")).toEqual({
-            "data-scope": "button",
-            "data-pf-part": "label",
-            "data-testid": "save-label",
-        });
-    });
-
-    it("gives every instance without a test id the same frozen attributes", () => {
-        const attributes = partAttributes(buttonAnatomy, "label");
-        expect(partAttributes(buttonAnatomy, "label")).toBe(attributes);
-        expect(Object.isFrozen(attributes)).toBe(true);
-        expect(partAttributes(buttonAnatomy, "label", "save")).not.toBe(
-            attributes,
         );
     });
 });

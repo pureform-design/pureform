@@ -2,7 +2,7 @@
 // module `apps/storybook-web` reads (see its README): decorators that wrap every story in Solid,
 // starting with the provider. No JSX, so a type check with another renderer's JSX can read it.
 
-import type { AnyRegistry } from "@pureform/binding-core";
+import type { AnyWebRegistry } from "@pureform/styling-web";
 import type { JSX } from "@solidjs/web";
 import { createComponent } from "solid-js";
 
@@ -17,7 +17,7 @@ export interface StoryTheme {
 
 /** What a decorator reads. Its fields are reactive: read them where they're used. */
 export interface StoryContext {
-    readonly registry: AnyRegistry;
+    readonly registry: AnyWebRegistry;
     readonly theme: StoryTheme;
     readonly globals: Readonly<Record<string, unknown>>;
 }

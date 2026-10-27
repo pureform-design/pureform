@@ -4,13 +4,13 @@
 // the carousel's `padding` token, given to Zag's machine so both render from the server on.
 
 import type { CarouselMetrics } from "@pureform/binding-core";
-import type { Registry } from "@pureform/styling";
-import { tokenVar } from "@pureform/styling/theme-vars";
+import type { WebRegistry } from "@pureform/styling-web";
+import { tokenVar } from "@pureform/styling-web/theme-vars";
 
 /** The row's padding for Zag's `padding` prop: the carousel's `padding` token, as the registry's
  *  target names its var. `undefined` without a registry. */
 export const carouselRowPadding = (
-    registry: Pick<Registry, "vars"> | undefined,
+    registry: Pick<WebRegistry, "vars"> | undefined,
 ): string | undefined => {
     if (!registry) return undefined;
     const name = tokenVar("components.carousel.padding", registry.vars);

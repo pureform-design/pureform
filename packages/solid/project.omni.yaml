@@ -10,6 +10,7 @@ dependencies:
     - "@pureform/vite-config"
     - "@pureform/vitest-config"
     - "@pureform/styling"
+    - "@pureform/styling-web"
     - "@pureform/anatomy"
     - "@pureform/machines"
     - "@pureform/binding-core"

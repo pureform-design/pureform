@@ -9,10 +9,8 @@
 import { fullscreenDialogOverlayAnatomy } from "@pureform/anatomy";
 import type { TestIdOverride } from "@pureform/anatomy";
 import {
-    dialogMachineProps,
     FULLSCREEN_DIALOG_CONTENT_PROPS,
     FULLSCREEN_DIALOG_ROOT_PROPS,
-    fullscreenDialogPositionerLayout,
     fullscreenDialogSelection,
     isPresent,
 } from "@pureform/binding-core";
@@ -22,6 +20,10 @@ import type {
     FullscreenDialogRootOwnProps,
     Unstyled,
 } from "@pureform/binding-core";
+import {
+    dialogMachineProps,
+    fullscreenDialogPositionerLayout,
+} from "@pureform/binding-web";
 import type { DialogFocusProps } from "@pureform/binding-web";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import { omit, Show } from "solid-js";

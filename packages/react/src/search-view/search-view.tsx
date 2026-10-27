@@ -14,17 +14,12 @@ import type { PartName, TestIdOverride } from "@pureform/anatomy";
 import {
     isPresent,
     opensSearchView,
-    presentProps,
     SEARCH_VIEW_COLLECTION,
     SEARCH_VIEW_ROOT_PROPS,
-    SEARCH_VIEW_ROOT_STYLE,
-    SEARCH_VIEW_TRIGGER_STYLE,
     searchViewCarriedKey,
-    searchViewComboboxProps,
     searchViewLabel,
     searchViewMatches,
     searchViewMenuSelection,
-    searchViewPositionerLayout,
     searchViewSelection,
 } from "@pureform/binding-core";
 import type {
@@ -36,6 +31,13 @@ import type {
     SearchViewRootOwnProps,
     Unstyled,
 } from "@pureform/binding-core";
+import {
+    presentProps,
+    SEARCH_VIEW_ROOT_STYLE,
+    SEARCH_VIEW_TRIGGER_STYLE,
+    searchViewComboboxProps,
+    searchViewPositionerLayout,
+} from "@pureform/binding-web";
 import { searchViewDomDialogProps } from "@pureform/binding-web";
 import { stackPositioner } from "@pureform/binding-web";
 import * as combobox from "@pureform/machines/combobox";

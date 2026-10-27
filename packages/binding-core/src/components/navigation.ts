@@ -183,68 +183,6 @@ export const navigationSelection = <C extends NavigationComponent>(
     } as unknown as Selection<C>;
 };
 
-/** Zag's dialog props for a modal rail, from Root's, besides `id`, `dir`, and the controllable
- *  `open`. The rail's `aria-label` names the dialog too. */
-export const navigationModalMachineProps = (
-    props: NavigationModalProps & {
-        readonly "aria-label"?: string | undefined;
-    },
-) => ({
-    modal: true,
-    closeOnEscape: props.closeOnEscape,
-    closeOnInteractOutside: props.closeOnInteractOutside,
-    "aria-label": props["aria-label"],
-});
-
-/** What a modal rail's positioner adds to Zag's props: hidden while closed, and fixed along the
- *  start edge of the viewport, the rail's full height. Normalize it with the framework's
- *  `normalizeProps` and merge it after Zag's. */
-export const navigationModalPositionerLayout = (open: boolean) => ({
-    hidden: !open,
-    style: {
-        position: "fixed",
-        insetBlock: "0",
-        insetInlineStart: "0",
-        display: "flex",
-    } as const,
-});
-
-/** What a modal rail's dialog surface adds to Zag's props: hidden while closed, the rail's full
- *  height. */
-export const navigationModalContentLayout = (open: boolean) => ({
-    hidden: !open,
-    style: { display: "flex", height: "100%", outline: "none" } as const,
-});
-
-/** The navigation machine's props from Root's, besides `id`, `dir`, and the controllable `value`.
- *  Root's `id` becomes the machine's root id. */
-export const navigationMachineProps = (props: NavigationBehaviorProps) => ({
-    disabled: props.disabled,
-    ids: { root: props.id ?? props.ids?.root, item: props.ids?.item },
-});
-
-/** The machine's item props for a destination: a link to a page says `aria-current="page"`, a
- *  button `"true"`. */
-export const navigationItemMachineProps = (item: NavigationItemOwnProps) => ({
-    value: item.value,
-    disabled: item.disabled,
-    current: item.href === undefined ? ("true" as const) : ("page" as const),
-});
-
-/** The element a destination renders: a link with an `href`, else a button. */
-export const navigationItemElement = (item: NavigationItemOwnProps) =>
-    item.href === undefined ? ("button" as const) : ("a" as const);
-
-/** A destination's own element props: a button's `type` and `disabled`. A disabled link keeps its
- *  `href`, marked `aria-disabled`, and the machine stops its click. */
-export const navigationItemElementProps = (
-    item: NavigationItemOwnProps,
-    disabled: boolean,
-) =>
-    item.href === undefined
-        ? { type: "button" as const, disabled: disabled || undefined }
-        : {};
-
 /** What a ready-made navigation component's destination is, for a function of the copy in its
  *  `item`, `indicator`, `activeIndicator`, `icon` and `label` keys: its index and data, and
  *  whether it's the current one. */

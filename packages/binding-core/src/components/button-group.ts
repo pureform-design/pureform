@@ -148,38 +148,6 @@ export const buttonGroupPosition = (
     connected: boolean | undefined,
 ): ButtonGroupPosition => (connected ? tilePosition(index, count) : "single");
 
-/** Zag's toggle group props from Root's, besides `id`, `dir`, and the controllable `value` (the
- *  binding's `useControllable`). */
-export const buttonGroupMachineProps = (props: ButtonGroupBehaviorProps) => ({
-    multiple: props.selectable === "multiple",
-    deselectable: props.deselectable ?? true,
-    disabled: props.disabled,
-    orientation: "horizontal" as const,
-});
-
-/** Zag's root props for the group element: without its inline `style`, an outline reset the
- *  preset doesn't need. */
-export const buttonGroupRootProps = <P extends object>(
-    props: P,
-): Omit<P, "style"> => {
-    const { style: _style, ...rest } = props as P & { style?: unknown };
-    return rest;
-};
-
-/** Zag's item props for a button in a selectable group, without what the button sets itself:
- *  its `id` and `disabled` (the button's own props), and `type`. */
-export const buttonGroupItemProps = <P extends object>(
-    props: P,
-): Omit<P, "id" | "disabled" | "type"> => {
-    const {
-        id: _id,
-        disabled: _disabled,
-        type: _type,
-        ...rest
-    } = props as P & { id?: unknown; disabled?: unknown; type?: unknown };
-    return rest;
-};
-
 /** A toggle group's value after pressing `value`, where no machine keeps it (React Native): on
  *  or off in a multiple-select group; alone, or off when deselectable, in a single-select one. */
 export const toggleSelection = (
@@ -192,30 +160,6 @@ export const toggleSelection = (
     if (multiple)
         return on ? current.filter((v) => v !== value) : [...current, value];
     return on ? (deselectable ? [] : [...current]) : [value];
-};
-
-/** What an item of a selectable group (a grouped button, a set's chip) takes from Zag's toggle
- *  group: its item props (`buttonGroupItemProps`), its `id` and `disabled`, and `selected` as
- *  its pressed state, which the group changes, not the item. */
-export const toggleGroupItemProps = <I extends object, P extends object>(
-    api: {
-        getItemProps(item: I): P;
-        getItemState(item: I): {
-            readonly id: string;
-            readonly disabled: boolean;
-            readonly pressed: boolean;
-        };
-    },
-    item: I,
-) => {
-    const state = api.getItemState(item);
-    return {
-        ...buttonGroupItemProps(api.getItemProps(item)),
-        id: state.id,
-        disabled: state.disabled,
-        selected: state.pressed,
-        onSelectedChange: () => {},
-    };
 };
 
 /** The variants a grouped button takes from its group, under its own. */

@@ -249,33 +249,3 @@ export const textAreaSelection = (
     trailingIcon: props.trailingIcon,
     tokens: props.tokens,
 });
-
-/** The text field machine's props from Root's, besides `id`, `dir`, and the controllable `value`
- *  (the binding's `useControllable`). */
-export const textFieldMachineProps = (
-    props: TextFieldBehaviorProps & { readonly secure?: boolean | undefined },
-) => ({
-    disabled: props.disabled,
-    invalid: props.invalid,
-    error: props.error,
-    validate: props.validate,
-    required: props.required,
-    readOnly: props.readOnly,
-    placeholder: props.placeholder,
-    name: props.name,
-    form: props.form,
-    counterMax: props.counterMax,
-    secure: props.secure,
-    revealLabel: props.revealLabel,
-    ids: {
-        root: props.id ?? props.ids?.root,
-        input: props.ids?.input,
-        label: props.ids?.label,
-        supportingText: props.ids?.supportingText,
-        counter: props.ids?.counter,
-    },
-});
-
-/** The native input's default: what a form reset shows (`ControllableState.resetsTo`). */
-export const textFieldNativeDefault = (resetsTo: string | undefined): string =>
-    resetsTo ?? "";

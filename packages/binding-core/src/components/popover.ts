@@ -110,24 +110,3 @@ export const POPOVER_CONTENT_PROPS = [
 export const popoverSelection = (
     props: PopoverVariantProps,
 ): Selection<"popover"> => ({ tokens: props.tokens });
-
-/** Zag's popover props from Root's, besides `id`, `dir`, and the controllable `open`. It's
- *  rendered in place, so Zag isn't told it's portalled. */
-export const popoverMachineProps = (props: PopoverBehaviorProps) => ({
-    modal: props.modal,
-    portalled: false,
-    autoFocus: props.autoFocus,
-    closeOnInteractOutside: props.closeOnInteractOutside,
-    closeOnEscape: props.closeOnEscape,
-    restoreFocus: props.restoreFocus,
-    positioning: { placement: "bottom-start" as const, ...props.positioning },
-    ids: {
-        trigger: props.ids?.trigger,
-        positioner: props.ids?.positioner,
-        content: props.ids?.content,
-        title: props.ids?.title,
-        description: props.ids?.body,
-        closeTrigger: props.ids?.closeTrigger,
-        arrow: props.ids?.caret,
-    },
-});

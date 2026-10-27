@@ -78,21 +78,23 @@ export {
     useThemeVars,
 } from "./provider";
 export type { PureformProviderProps, PureformState } from "./provider";
-export { preloadTheme } from "@pureform/styling";
-export type { RuntimeTheme, ThemeSchemeVars } from "@pureform/styling";
+export { preloadTheme } from "@pureform/styling-web";
+export type { RuntimeTheme, ThemeSchemeVars } from "@pureform/styling-web";
 
 export type {
     ChangeDetails,
     ChangeReason,
     Controllable,
     Direction,
-    ProviderTheme,
-    ThemeHydration,
-    ThemeOverrides,
-    IconStyle,
     MotionSetting,
     PartStates,
     PerInstance,
     SlotKeyed,
     Unstyled,
 } from "@pureform/binding-core";
+export type {
+    IconStyle,
+    ProviderTheme,
+    ThemeHydration,
+    ThemeOverrides,
+} from "@pureform/binding-web";

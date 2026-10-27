@@ -12,6 +12,7 @@ dependencies:
     - "@pureform/core"
     - "@pureform/css-lowering"
     - "@pureform/styling"
+    - "@pureform/styling-web"
     - "@pureform/generate"
     - "@pureform/material"
     - "@pureform/preset"

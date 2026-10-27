@@ -16,7 +16,6 @@ import {
     colorPickerSelection,
     colorPickerSwatchLabel,
     hasEyeDropper,
-    overDefaults,
 } from "@pureform/binding-core";
 import type {
     ColorPickerChannelInstance,
@@ -36,6 +35,7 @@ import type {
     TextInputProps,
 } from "react-native";
 
+import { overDefaults } from "../defaults";
 import { IconButton } from "../icon-button";
 import type { IconButtonProps } from "../icon-button/icon-button";
 import { Glyph } from "../icon-style";

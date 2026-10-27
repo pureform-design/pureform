@@ -31,7 +31,7 @@ That's how an app uses this target: through the bundler plugin (`@pureform/bundl
 ```
 @pureform/core ──► @pureform/css-lowering ──► @pureform/css-adapter ──► @pureform/tailwind-adapter
                                                   │
-                     @pureform/styling ◄──────────┤ (componentClasses, re-exported as /runtime)
+                 @pureform/styling-web ◄──────────┤ (componentClasses, re-exported as /runtime)
                      @pureform/generate ◄─────────┘ (/codegen: the interface and defineCodegen)
 ```
 
@@ -47,7 +47,7 @@ Tailwind's components layer and reuses the codegen's factory modules.
 | `serialize.ts`       | Lowered style objects to nested CSS, with color scheme and reduced motion rules expanded. |
 | `options.ts`         | `CssOptions`, the lowering context, and class prefixing.                                  |
 | `classes.ts`         | `manifestOf` (a component's classes, variants, defaults) and `classesFor`.                |
-| `runtime.ts`         | Re-exports `componentClasses` from `@pureform/styling`.                                   |
+| `runtime.ts`         | Re-exports `componentClasses` from `@pureform/styling-web`.                               |
 | `codegen.ts`         | The `/codegen` entry: `codegen`, the CSS target's adapter for `@pureform/generate`.       |
 | `codegen/factory.ts` | One component's `ClassFactory` module source, and its instance tokens' vars.              |
 
@@ -144,7 +144,8 @@ registry
 ```
 
 Each factory module writes its classes out as a template per slot, so it needs no class name
-runtime or manifest, only `selectionCache` and `withTokenStyle` from `@pureform/styling`:
+runtime or manifest, only `selectionCache` from `@pureform/styling` and `withTokenStyle` from
+`@pureform/styling-web` (the generated index makes the registry with `createWebRegistry`):
 
 ```ts
 const classes = selectionCache<Selection<"button">, ClassSlots<"button">>(
@@ -207,7 +208,7 @@ export const button: ClassFactory<"button"> = (s) =>
 
 `DEFAULT_THEME_ATTRIBUTE` and `themeAttributeOf(options)` give the theme attribute in effect.
 
-The class name runtime, `componentClasses`, lives in [`@pureform/styling`](../styling/README.md).
+The class name runtime, `componentClasses`, lives in [`@pureform/styling-web`](../styling-web/README.md).
 `@pureform/css-adapter/runtime` re-exports it (with `ComponentManifest`, `ComponentClasses`,
 `Choice`); `classesFor(config)` builds on it. The generated factories don't need it.
 
@@ -265,7 +266,7 @@ Interaction and form states are matched on the element, so a state change costs 
 native pseudo-class first (`:hover`, `:checked`, `:disabled`, …), then an ARIA attribute
 (`aria-checked`, `aria-selected`, `aria-disabled`, …), and only where neither covers it one of
 pureform's attributes (`data-pf-hover`, `data-pf-active`, `data-pf-dragging`,
-`data-pf-filled`; the names are `STATE_ATTRIBUTES` in `@pureform/core`). A behavior library's
+`data-pf-filled`; the names are `STATE_ATTRIBUTES` in `@pureform/web-contracts`). A behavior library's
 own attributes (`data-state`, `data-hover`, …) aren't matched. The full table is in
 [`@pureform/css-lowering`](../css-lowering/README.md#how-states-match).
 

@@ -5,13 +5,30 @@
 // arrays and objects (a transform list) hold values too. Everything is JSON, so templates and
 // precomputed styles can be written to a module.
 
-import type { ValueType } from "@pureform/core/ast";
+import type { EasingNode, ValueType } from "@pureform/core/ast";
 
 import { formatColor, parseColor } from "./rgba";
 import { mixIn } from "./spaces";
 import type { MixSpace } from "./spaces";
 
 export type Concrete = number | string;
+
+/** Portable timing curves, never CSS strings. Steps retain Native's linear fallback. */
+export type Easing = EasingNode;
+export const LINEAR: Easing = {
+    type: "easing",
+    kind: "keyword",
+    name: "linear",
+};
+
+export const isEasing = (value: unknown): value is Easing =>
+    typeof value === "object" &&
+    value !== null &&
+    "type" in value &&
+    value.type === "easing";
+
+/** Timing tokens may be curves; interpolatable style values remain numbers or strings. */
+export type ThemeValue = Concrete | Easing;
 
 /** A color layered over the background color, which selection composites into it: React
  *  Native's stand-in for a one-color background image. */
@@ -40,13 +57,13 @@ export interface Spring {
 }
 
 /** How one property moves to a new value: React Native's name for it, milliseconds, and a
- *  `cubic-bezier(...)`, `linear(...)`, or `linear` curve. A spring's duration and curve are
+ *  structured easing curve. A spring's duration and curve are
  *  sampled from it, for an engine that runs CSS's timing (Reanimated); an engine with springs
  *  (Animated) runs `spring` instead. */
 export interface Transition {
     property: string;
     duration: number;
-    easing: string;
+    easing: Easing;
     delay: number;
     spring?: Spring;
     /** A token's type, for a tween of the token itself. */
@@ -70,7 +87,7 @@ export const ANIMATION = "animation";
 export interface Animation {
     name: string;
     duration: number;
-    easing: string;
+    easing: Easing;
     delay: number;
     /** A spring timing's physics; the frames run over its sampled duration and curve. */
     spring?: Spring;
@@ -147,11 +164,16 @@ export interface ShadowLayer {
     inset?: boolean;
 }
 
-export type Value = Concrete | Expr | Value[] | { [key: string]: Value };
+export type Value =
+    | Concrete
+    | Easing
+    | Expr
+    | Value[]
+    | { [key: string]: Value };
 
 /** Token values by reference (`colors.primary`) and component token values by path
  *  (`components.button.container`), for one scheme and named theme. */
-export type ThemeValues = Record<string, Concrete>;
+export type ThemeValues = Record<string, ThemeValue>;
 
 export const isExpr = (value: unknown): value is Expr =>
     typeof value === "object" &&
@@ -289,14 +311,15 @@ const TRIG: Record<"sin" | "tan" | "asin" | "atan2", (q: Quantity[]) => Value> =
 
 /** Where evaluation reads tokens: a theme's values, or a lookup that works one out when it's
  *  read (`withSetTokens` evaluates the tokens a selection sets that way). */
-export type Tokens = ThemeValues | ((key: string) => Concrete | undefined);
+export type Tokens = ThemeValues | ((key: string) => ThemeValue | undefined);
 
-const read = (theme: Tokens, key: string): Concrete | undefined =>
+const read = (theme: Tokens, key: string): ThemeValue | undefined =>
     typeof theme === "function" ? theme(key) : theme[key];
 
 /** Evaluate a value against a theme. */
 export const evaluate = (value: Value, theme: Tokens): Value => {
     if (typeof value !== "object") return value;
+    if (isEasing(value)) return value;
     if (Array.isArray(value)) return value.map((v) => evaluate(v, theme));
     if (!isExpr(value)) {
         return Object.fromEntries(

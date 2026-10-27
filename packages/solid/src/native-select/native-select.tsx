@@ -11,7 +11,6 @@ import {
     NATIVE_SELECT_ROOT_PROPS,
     joinIdRefs,
     nativeSelectGroups,
-    nativeSelectProps,
     nativeSelectSelection,
     nativeSelectValue,
     nativeSelectValues,
@@ -26,6 +25,7 @@ import type {
     NativeSelectValueKeys,
     NativeSelectValueProps,
 } from "@pureform/binding-core";
+import { nativeSelectProps } from "@pureform/binding-web";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {
     type Accessor,

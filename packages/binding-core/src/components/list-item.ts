@@ -147,31 +147,19 @@ export const LIST_ITEM_CONTENT_PROPS = [
     "region",
 ] as const satisfies readonly (keyof ListItemContentProps<unknown>)[];
 
-/** The element Root renders: a link with an `href`, else `as`, else a `<div>`. */
-export const listItemElement = <E>(props: {
-    readonly href?: string | undefined;
-    readonly as?: E | undefined;
-}): E | "a" | "div" => (props.href !== undefined ? "a" : (props.as ?? "div"));
-
-/** Whether an element is clickable as it is: a link or a button. */
-const isInteractiveElement = (element: unknown) =>
-    element === "a" || element === "button";
-
-/** Whether the list item is interactive: `interactive`, else whether Root renders a link or a
- *  button. Only then does it show indication. */
+/** Own interaction semantics over the binding's inferred behavior. */
 export const isInteractiveListItem = (
     props: Pick<ListItemVariantProps, "interactive">,
-    element: unknown,
-): boolean => props.interactive ?? isInteractiveElement(element);
+    interactive: boolean,
+): boolean => props.interactive ?? interactive;
 
-/** The registry selection from Root's props: `interactive` defaults to whether Root renders a
- *  link or a button. */
+/** The registry selection from Root's props and explicit interaction semantics. */
 export const listItemSelection = (
     props: ListItemVariantProps,
-    element: unknown,
+    interactive: boolean,
 ): Selection<"listItem"> => ({
     lines: props.lines,
-    interactive: isInteractiveListItem(props, element),
+    interactive: isInteractiveListItem(props, interactive),
     leadingType: props.leadingType,
     position: props.position,
     swipeable: props.swipeable,
@@ -180,26 +168,6 @@ export const listItemSelection = (
     color: props.color,
     tokens: props.tokens,
 });
-
-/** Root's element props from its state: `aria-current` while selected, and the disabled state as
- *  a button's `disabled` or `aria-disabled`; a button also gets `type="button"`. */
-export const listItemRootProps = (
-    props: ListItemStateProps,
-    element: unknown,
-) => {
-    const button = element === "button";
-    return {
-        type: button ? ("button" as const) : undefined,
-        "aria-current": props.selected
-            ? element === "a"
-                ? ("page" as const)
-                : ("true" as const)
-            : undefined,
-        disabled: button && props.disabled ? true : undefined,
-        "aria-disabled":
-            !button && props.disabled ? ("true" as const) : undefined,
-    };
-};
 
 /** The ready-made list item's `lines`, when not given: one line of text, two with an overline or
  *  supporting text, three with both. */
@@ -218,24 +186,3 @@ export const LIST_ITEM_EXPAND_PROPS = [
     "defaultExpanded",
     "onExpandedChange",
 ] as const satisfies readonly (keyof ListItemExpandProps)[];
-
-/** The value of an expandable item's single accordion item, on the web bindings. */
-export const LIST_ITEM_EXPAND_VALUE = "item";
-
-/** Zag's accordion props for an expandable item, one item that opens and closes, from the item's
- *  `expanded`, `defaultExpanded` and `onExpandedChange`. */
-export const listItemExpandMachineProps = (props: ListItemExpandProps) => ({
-    collapsible: true,
-    multiple: false,
-    value:
-        props.expanded === undefined
-            ? undefined
-            : props.expanded
-              ? [LIST_ITEM_EXPAND_VALUE]
-              : [],
-    defaultValue: props.defaultExpanded ? [LIST_ITEM_EXPAND_VALUE] : [],
-    onValueChange: (details: { value: string[] }) =>
-        props.onExpandedChange?.({
-            expanded: details.value.includes(LIST_ITEM_EXPAND_VALUE),
-        }),
-});

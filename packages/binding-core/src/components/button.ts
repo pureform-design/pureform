@@ -125,18 +125,6 @@ export const buttonSelection = (
     tokens: props.tokens,
 });
 
-/** The button machine's props from Root's, besides `id`, `dir`, and the controllable `selected`
- *  (the binding's `useControllable`). Root's `id` becomes the machine's root id. */
-export const buttonMachineProps = (props: ButtonBehaviorProps) => ({
-    disabled: props.disabled,
-    type: props.type,
-    name: props.name,
-    value: props.value,
-    form: props.form,
-    toggle: props.toggle,
-    ids: { root: props.id ?? props.ids?.root, label: props.ids?.label },
-});
-
 /** What the ready-made button renders inside Root, in the framework's node type. */
 export interface ButtonContentProps<Node> {
     /** The label's content. */

@@ -5,7 +5,6 @@
 
 import { iconButtonAnatomy } from "@pureform/anatomy";
 import {
-    buttonMachineProps,
     hasAccessibleName,
     ICON_BUTTON_CONTENT_PROPS,
     ICON_BUTTON_ROOT_PROPS,
@@ -18,6 +17,7 @@ import type {
     IconButtonRootOwnProps,
     IconOnlyName,
 } from "@pureform/binding-core";
+import { buttonMachineProps } from "@pureform/binding-web";
 import type * as button from "@pureform/machines/button";
 import { isDev } from "@solidjs/web";
 import type { JSX, ValidComponent } from "@solidjs/web";

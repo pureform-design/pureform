@@ -10,7 +10,6 @@ import {
     isPresent,
     NUMBER_FIELD_CONTENT_PROPS,
     NUMBER_FIELD_ROOT_PROPS,
-    numberFieldMachineProps,
     numberFieldPlaceholder,
     numberFieldSelection,
 } from "@pureform/binding-core";
@@ -19,6 +18,7 @@ import type {
     NumberFieldRootOwnProps,
     NumberFieldValueDetails,
 } from "@pureform/binding-core";
+import { numberFieldMachineProps } from "@pureform/binding-web";
 import * as numberInput from "@pureform/machines/number-input";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {

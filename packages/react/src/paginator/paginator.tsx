@@ -9,19 +9,21 @@ import type { PartName, selectAnatomy } from "@pureform/anatomy";
 import {
     DEFAULT_PAGE_SIZE,
     PAGINATOR_ROOT_PROPS,
-    paginatorMachineProps,
     paginatorPageSizes,
     paginatorRange,
     paginatorRangeLabel,
     paginatorSelection,
     paginatorSizeItems,
-    paginatorTriggerProps,
 } from "@pureform/binding-core";
 import type {
     PaginatorPageDetails,
     PaginatorPageSizeDetails,
     PaginatorRootOwnProps,
 } from "@pureform/binding-core";
+import {
+    paginatorMachineProps,
+    paginatorTriggerProps,
+} from "@pureform/binding-web";
 import * as paginator from "@pureform/machines/paginator";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";

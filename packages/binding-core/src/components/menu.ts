@@ -341,21 +341,6 @@ export const menuGrouped = (
         Pick<MenuContentProps<unknown>, "groups">,
 ): boolean => props.grouped ?? (props.groups?.length ?? 0) > 0;
 
-/** Zag's menu props from Root's, besides `id`, `dir`, and the controllable `open`. */
-export const menuMachineProps = (props: MenuBehaviorProps) => ({
-    onSelect: props.onSelect,
-    closeOnSelect: props.closeOnSelect,
-    loopFocus: props.loopFocus,
-    typeahead: props.typeahead,
-    positioning: { placement: "bottom-start" as const, ...props.positioning },
-    "aria-label": props["aria-label"],
-    ids: {
-        trigger: props.ids?.trigger,
-        positioner: props.ids?.positioner,
-        content: props.ids?.content,
-    },
-});
-
 /** Zag's item props for one item from the ready-made menu's data. */
 export const menuItemProps = (item: MenuItem) => ({
     value: item.value,
@@ -391,43 +376,6 @@ export const MENU_ITEM_PROPS = [
     "onCheckedChange",
     "interactionSource",
 ] as const satisfies readonly (keyof MenuItemBehaviorProps)[];
-
-/** Zag's item props, a toggleable item's (`getOptionItemProps`) when it has a type. */
-export const menuItemMachineProps = <P>(
-    api: {
-        getItemProps(item: {
-            value: string;
-            valueText?: string | undefined;
-            disabled?: boolean | undefined;
-            closeOnSelect?: boolean | undefined;
-        }): P;
-        getOptionItemProps(item: {
-            value: string;
-            valueText?: string | undefined;
-            disabled?: boolean | undefined;
-            closeOnSelect?: boolean | undefined;
-            type: "checkbox" | "radio";
-            checked: boolean;
-            onCheckedChange?: ((checked: boolean) => void) | undefined;
-        }): P;
-    },
-    item: MenuItemBehaviorProps,
-): P => {
-    const base = {
-        value: item.value,
-        valueText: item.valueText,
-        disabled: item.disabled,
-        closeOnSelect: item.closeOnSelect,
-    };
-    return item.type === undefined
-        ? api.getItemProps(base)
-        : api.getOptionItemProps({
-              ...base,
-              type: item.type,
-              checked: item.checked ?? false,
-              onCheckedChange: item.onCheckedChange,
-          });
-};
 
 /** What a ready-made menu's row is, for a function of the copy in its `item`, `itemLeading`,
  *  `itemContent`, `itemLabel`, `itemSupportingText`, `itemTrailing` and `itemTrailingText` keys:

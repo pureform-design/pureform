@@ -5,12 +5,9 @@
 import { fabMenuAnatomy } from "@pureform/anatomy";
 import {
     FAB_MENU_ROOT_PROPS,
-    fabMenuItemFocusProps,
     fabMenuItemProps,
-    fabMenuMachineProps,
     fabMenuSelection,
     isPresent,
-    presentProps,
 } from "@pureform/binding-core";
 import type {
     FabMenuContentProps,
@@ -18,6 +15,8 @@ import type {
     FabMenuRootOwnProps,
     InteractionSourceProps,
 } from "@pureform/binding-core";
+import { fabMenuItemFocusProps } from "@pureform/binding-web";
+import { fabMenuMachineProps, presentProps } from "@pureform/binding-web";
 import { fabMenuListProps } from "@pureform/binding-web";
 import * as menu from "@pureform/machines/menu";
 import { normalizeProps } from "@zag-js/react";

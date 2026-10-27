@@ -1,11 +1,32 @@
 import { Animated } from "react-native";
 import { describe, expect, it, vi } from "vitest";
 
+import { LINEAR } from "../values";
 import { animate, curve } from "./curve";
 
 describe("curve", () => {
+    it("keeps omitted and duplicate stops, and steps' linear fallback", () => {
+        const easing = curve({
+            type: "easing",
+            kind: "linear",
+            points: [[0], [1.2, 50], [0.8, 50], [1]],
+        });
+        expect(easing(0.25)).toBeCloseTo(0.6, 10);
+        expect(easing(0.5)).toBe(1.2);
+        expect(easing(0.75)).toBeCloseTo(0.9, 10);
+        const steps = curve({
+            type: "easing",
+            kind: "steps",
+            steps: { count: 2 },
+        });
+        expect(steps(0.3)).toBe(0.3);
+    });
     it("runs a linear() curve through its points", () => {
-        const ease = curve("linear(0, 1.2 50%, 1)");
+        const ease = curve({
+            type: "easing",
+            kind: "linear",
+            points: [[0], [1.2, 50], [1]],
+        });
         expect(ease(0)).toBe(0);
         expect(ease(0.25)).toBeCloseTo(0.6, 10);
         expect(ease(0.5)).toBeCloseTo(1.2, 10);
@@ -14,7 +35,11 @@ describe("curve", () => {
     });
 
     it("keeps cubic Béziers", () => {
-        const ease = curve("cubic-bezier(0.42, 0, 0.58, 1)");
+        const ease = curve({
+            type: "easing",
+            kind: "cubicBezier",
+            points: [0.42, 0, 0.58, 1],
+        });
         expect(ease(0.5)).toBeCloseTo(0.5, 3);
     });
 });
@@ -28,7 +53,7 @@ describe("animate", () => {
             progress,
             {
                 duration: 300,
-                easing: "linear(0, 1)",
+                easing: { type: "easing", kind: "linear", points: [[0], [1]] },
                 delay: 10,
                 spring: {
                     type: "spring",
@@ -49,7 +74,7 @@ describe("animate", () => {
                 delay: 10,
             }),
         );
-        animate(progress, { duration: 300, easing: "linear" }, false);
+        animate(progress, { duration: 300, easing: LINEAR }, false);
         expect(timing).toHaveBeenCalledWith(
             progress,
             expect.objectContaining({ toValue: 1, duration: 300 }),

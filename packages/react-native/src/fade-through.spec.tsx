@@ -56,7 +56,7 @@ const render = async (
 
 describe("FadeThrough", () => {
     it("takes the theme's springs and durations, the fade in waiting for the fade out", async () => {
-        let tokens!: Record<string, string | number>;
+        let tokens!: import("@pureform/rn-adapter/factory").ThemeValues;
         function Read(): ReactNode {
             tokens = useTokens();
             return null;

@@ -4,10 +4,7 @@
 // press ripple on React Native); no indication sets the state layer's opacities to 0 and keeps
 // the focus indicator.
 
-import type { SlotClasses } from "@pureform/styling";
-
 import type { Indication } from "./indication";
-import type { AnyRegistry } from "./provider";
 
 /** The ripple Material's indication draws: the ink well, the newer sparkle, or none. */
 export type MaterialRipple = "ink-well" | "ink-sparkle" | false;
@@ -17,37 +14,6 @@ export interface MaterialIndicationOptions {
     /** The ripple a press draws. @default "ink-well" */
     readonly ripple?: MaterialRipple | undefined;
 }
-
-/** The ripple's slots, from the registry's `ripple` entry: the layer (`root`) and each ripple
- *  element (`ripple`). */
-export interface RippleClasses {
-    readonly root?: SlotClasses | undefined;
-    readonly ripple?: SlotClasses | undefined;
-}
-
-const rippleClassCache = new WeakMap<AnyRegistry, RippleClasses | null>();
-
-/** The ripple's classes from the registry's `ripple` entry; `undefined` when the registry has no
- *  static `ripple` entry (left out, or loaded on demand). The same object for a registry. */
-export const rippleClasses = (
-    registry: AnyRegistry | undefined,
-): RippleClasses | undefined => {
-    if (!registry) return undefined;
-    let classes = rippleClassCache.get(registry);
-    if (classes === undefined) {
-        classes = null;
-        if (registry.has("ripple")) {
-            const entry = registry.entry("ripple");
-            if (entry.kind === "static") {
-                classes = (
-                    entry.factory as (selection: object) => RippleClasses
-                )({});
-            }
-        }
-        rippleClassCache.set(registry, classes);
-    }
-    return classes ?? undefined;
-};
 
 const materialIndications = new Map<MaterialRipple, Indication>();
 

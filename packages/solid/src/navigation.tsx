@@ -13,18 +13,10 @@ import type {
     TestIdOverride,
 } from "@pureform/anatomy";
 import {
-    dialogBackdropLayout,
     isPresent,
     NAVIGATION_CONTENT_PROPS,
     NAVIGATION_ITEM_PROPS,
     NAVIGATION_ROOT_PROPS,
-    navigationItemElement,
-    navigationItemElementProps,
-    navigationItemMachineProps,
-    navigationMachineProps,
-    navigationModalContentLayout,
-    navigationModalMachineProps,
-    navigationModalPositionerLayout,
     navigationSections,
     navigationSelection,
 } from "@pureform/binding-core";
@@ -38,6 +30,16 @@ import type {
     Unstyled,
 } from "@pureform/binding-core";
 import type { InteractionSource } from "@pureform/binding-core/interaction";
+import {
+    dialogBackdropLayout,
+    navigationItemElement,
+    navigationItemElementProps,
+    navigationItemMachineProps,
+    navigationMachineProps,
+    navigationModalContentLayout,
+    navigationModalMachineProps,
+    navigationModalPositionerLayout,
+} from "@pureform/binding-web";
 import * as dialog from "@pureform/machines/dialog";
 import * as navigation from "@pureform/machines/navigation";
 import type { Selection } from "@pureform/styling";

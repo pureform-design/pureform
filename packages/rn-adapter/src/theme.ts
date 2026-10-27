@@ -12,8 +12,8 @@ import {
     springTokenValues,
 } from "./lower";
 import type { RnOptions } from "./lower";
-import { dependencies, evaluate } from "./values";
-import type { Concrete, ThemeValues, Value } from "./values";
+import { dependencies, evaluate, isEasing } from "./values";
+import type { ThemeValue, ThemeValues, Value } from "./values";
 
 export type Scheme = "light" | "dark";
 
@@ -91,8 +91,7 @@ const tokenNodes = (
     return nodes;
 };
 
-/** Resolve a scheme's token values, in the base theme or a named one. Tokens React Native
- *  can't use (easings, for one) are left out. */
+/** Resolve a scheme's token values, including structured timing curves. */
 export const resolveTheme = (
     config: CoreConfig,
     options: ThemeOptions,
@@ -106,7 +105,7 @@ export const resolveTheme = (
     const nodes = tokenNodes(config, override, options.target ?? "rn");
     const values: ThemeValues = {};
     const pending = new Set<string>();
-    const get = (key: string): Concrete | undefined => {
+    const get = (key: string): ThemeValue | undefined => {
         if (key in values) return values[key];
         const node = nodes.get(key);
         if (!node) return undefined;
@@ -119,7 +118,11 @@ export const resolveTheme = (
             if (formulas && dependencies(template).size > 0) {
                 formulas[key] = template;
             }
-            if (typeof value === "number" || typeof value === "string")
+            if (
+                typeof value === "number" ||
+                typeof value === "string" ||
+                isEasing(value)
+            )
                 values[key] = value;
             return values[key];
         } finally {
@@ -134,7 +137,7 @@ export const resolveTheme = (
         try {
             get(key);
         } catch {
-            // Not a React Native value: an easing, a duration in a unit it has no use for.
+            // Not a React Native value, e.g. a duration in a unit it has no use for.
         }
     }
     return values;

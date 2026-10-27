@@ -7,18 +7,20 @@ import { richTooltipOverlayAnatomy } from "@pureform/anatomy";
 import {
     isInteractiveRichTooltip,
     isPresent,
-    overlayPositionerProps,
-    presentProps,
     RICH_TOOLTIP_CONTENT_PROPS,
     RICH_TOOLTIP_ROOT_PROPS,
-    richTooltipMachineProps,
     richTooltipSelection,
-    CARET_STYLE,
 } from "@pureform/binding-core";
 import type {
     RichTooltipContentProps,
     RichTooltipRootOwnProps,
 } from "@pureform/binding-core";
+import {
+    overlayPositionerProps,
+    presentProps,
+    richTooltipMachineProps,
+    CARET_STYLE,
+} from "@pureform/binding-web";
 import * as tooltip from "@pureform/machines/tooltip";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {

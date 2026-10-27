@@ -6,8 +6,8 @@ import type {
     CssVars,
     ThemeGenerator,
     ThemeSchemeVars,
-} from "@pureform/styling";
-import { themeVars } from "@pureform/styling/theme-vars";
+} from "@pureform/styling-web";
+import { themeVars } from "@pureform/styling-web/theme-vars";
 import { resolveTheme } from "@pureform/theme";
 
 import {

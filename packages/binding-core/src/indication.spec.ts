@@ -2,9 +2,43 @@ import { describe, expect, expectTypeOf, it } from "vitest";
 
 import {
     defineIndication,
+    DEFAULT_INDICATION,
+    materialIndication,
+    noIndication,
     type Indication,
     type NativeIndicationProps,
 } from "./indication";
+
+describe("neutral built-in indications", () => {
+    it("keeps the default and option identities without platform live halves", () => {
+        expect(materialIndication()).toBe(DEFAULT_INDICATION);
+        expect(materialIndication({ ripple: "ink-well" })).toBe(
+            DEFAULT_INDICATION,
+        );
+        for (const ripple of ["ink-well", "ink-sparkle", false] as const) {
+            const indication = materialIndication({ ripple });
+            expect(materialIndication({ ripple })).toBe(indication);
+            expect(Object.isFrozen(indication)).toBe(true);
+            expect(indication).not.toHaveProperty("web");
+            expect(indication).not.toHaveProperty("native");
+            expect(!!indication.layer).toBe(ripple !== false);
+        }
+    });
+
+    it("keeps noIndication's frozen neutral token defaults", () => {
+        expect(Object.isFrozen(noIndication)).toBe(true);
+        expect(Object.isFrozen(noIndication.tokens)).toBe(true);
+        expect(noIndication).toEqual({
+            name: "none",
+            tokens: {
+                stateHoverOpacity: 0,
+                stateFocusOpacity: 0,
+                statePressedOpacity: 0,
+                stateDraggedOpacity: 0,
+            },
+        });
+    });
+});
 
 describe("defineIndication", () => {
     it("returns the indication it's given", () => {

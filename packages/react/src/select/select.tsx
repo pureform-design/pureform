@@ -11,15 +11,10 @@ import {
     SELECT_COLLECTION,
     SELECT_ROOT_PROPS,
     selectGroupedItems,
-    selectHiddenSelectProps,
     selectItemGroups,
-    selectInputProps,
-    selectMachineProps,
     selectMenuSelection,
     selectSelection,
     selectSupportingTextId,
-    selectValueProps,
-    toZagValue,
 } from "@pureform/binding-core";
 import type {
     Direction,
@@ -30,6 +25,13 @@ import type {
     SelectRootOwnProps,
     Unstyled,
 } from "@pureform/binding-core";
+import {
+    selectHiddenSelectProps,
+    selectInputProps,
+    selectMachineProps,
+    selectValueProps,
+    toZagValue,
+} from "@pureform/binding-web";
 import * as select from "@pureform/machines/select";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";

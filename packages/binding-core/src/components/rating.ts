@@ -101,20 +101,6 @@ export const ratingSelection = (
     tokens: props.tokens,
 });
 
-/** The rating machine's props from Root's, besides `id`, `dir`, and the controllable `value`. */
-export const ratingMachineProps = (props: RatingBehaviorProps) => ({
-    count: props.count,
-    allowHalf: props.allowHalf,
-    readOnly: props.readOnly,
-    disabled: props.disabled,
-    required: props.required,
-    name: props.name,
-    form: props.form,
-    translations: props.valueText
-        ? { ratingValueText: props.valueText }
-        : undefined,
-});
-
 /** What a ready-made rating's star is, for a function of the copy in its `item`, `icon`, `fill`
  *  and `halfFill` keys: `className={{ item: (star) => (star.fill === "full" ? "lit" : undefined) }}`. */
 export interface RatingStarInstance {

@@ -11,7 +11,6 @@ import {
     SPLIT_BUTTON_CONTENT_PROPS,
     SPLIT_BUTTON_MENU_LABEL,
     SPLIT_BUTTON_ROOT_PROPS,
-    splitButtonMachineProps,
     splitButtonSelection,
 } from "@pureform/binding-core";
 import type {
@@ -19,6 +18,7 @@ import type {
     SplitButtonContentProps,
     SplitButtonRootOwnProps,
 } from "@pureform/binding-core";
+import { splitButtonMachineProps } from "@pureform/binding-web";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import { type Accessor, omit } from "solid-js";
 

@@ -20,6 +20,7 @@
         "@pureform/preset": "workspace:^",
         "@pureform/solid": "workspace:^",
         "@pureform/styling": "workspace:^",
+        "@pureform/styling-web": "workspace:^",
         "@pureform/theme": "workspace:^",
         "@remix-run/cookie": "catalog:",
         "@solidjs/meta": "catalog:",

@@ -5,21 +5,19 @@
 // `.pureform/native/<name>.ts` modules are one of these each, over that component's
 // precomputed styles. Free of React and of the lowering.
 
-import {
-    dampingCoefficient,
-    formatLinearEasing,
-    sampleSpring,
-} from "@pureform/core";
+import { dampingCoefficient, sampleSpring } from "@pureform/core";
 import type { SpringNode } from "@pureform/core/ast";
 import { deepFreeze, selectionCache, selectionKey } from "@pureform/styling";
 import type {
     ComponentRef,
     ComponentState,
-    Selection,
+    InstanceTokens,
     SelectionOrder,
     SlotOf,
     SlotStyle,
     States,
+    Variants,
+    VariantValue,
 } from "@pureform/styling";
 
 import type { ComponentStyles } from "./lower";
@@ -37,13 +35,15 @@ import type { Scheme } from "./theme";
 import { ANIMATION, SHAPE, SPRING_FIELDS, TOKEN, TRANSITION } from "./values";
 import type {
     Animation,
-    Concrete,
+    Easing,
+    ThemeValue,
     ThemeValues,
     Transition,
     Value,
 } from "./values";
 
 export { overridesFor } from "./resolve";
+export { isEasing, LINEAR } from "./values";
 export type {
     Overrides,
     PrecomputedStyles,
@@ -55,6 +55,8 @@ export type { Scheme } from "./theme";
 export type {
     Animation,
     Concrete,
+    Easing,
+    ThemeValue,
     ThemeValues,
     Transition,
     Value,
@@ -86,8 +88,17 @@ export interface AnyComponent {
     tokens: string;
 }
 
+/** Native timing overrides can carry a curve without widening interpolatable token values. */
+export type NativeInstanceTokens<C extends ComponentRef> = {
+    [T in keyof InstanceTokens<C>]?: InstanceTokens<C>[T] | Easing;
+};
+
 /** What a native factory takes: variants, states, and the instance's tokens. */
-export type NativeSelection<C extends ComponentRef> = Selection<C> & States<C>;
+export type NativeSelection<C extends ComponentRef> = {
+    [G in keyof Variants<C>]?: string extends G
+        ? VariantValue<string> | NativeInstanceTokens<C> | undefined
+        : Variants<C>[G];
+} & States<C> & { tokens?: NativeInstanceTokens<C> | undefined };
 
 /** Where a component renders: what a provider holds. */
 export interface Environment {
@@ -281,11 +292,11 @@ const isSpring = (value: unknown): value is SpringNode =>
 
 // A spring's five theme values: its sampled duration (ms) and curve, and its physics, with the
 // damping as Animated's coefficient.
-const springValues = (spring: SpringNode): Record<string, number | string> => {
+const springValues = (spring: SpringNode): ThemeValues => {
     const { duration, points } = sampleSpring(spring);
     return {
         duration,
-        easing: formatLinearEasing(points),
+        easing: { type: "easing", kind: "linear", points },
         stiffness: spring.stiffness,
         damping: dampingCoefficient(spring),
         mass: spring.mass,
@@ -320,7 +331,7 @@ export const nativeFactory = <C extends ComponentRef = AnyComponent>(
     const springTokens = new Set(springs);
     const tokenKeys = (
         given: object,
-        theme: (key: string) => Concrete | undefined,
+        theme: (key: string) => ThemeValue | undefined,
     ): Overrides => {
         const rename = (values: object) =>
             Object.fromEntries(

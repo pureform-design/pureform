@@ -2,16 +2,17 @@ import { describe, expect, expectTypeOf, it, vi } from "vitest";
 
 import { createRegistry } from "./registry";
 import type { LazyEntry, StaticEntry } from "./registry";
-import type { ClassFactory } from "./types";
+import type { Selection } from "./types";
 
 type Chip = { variants: { size: "small" | "large" }; slots: "root" | "label" };
 
-const chip: ClassFactory<Chip> = ({ size = "small" }) => ({
+// Factories of any target: the registry only stores and loads them.
+const chip = ({ size = "small" }: Selection<Chip>) => ({
     root: { class: `chip chip--${size}` },
     label: { class: "chip__label" },
 });
 
-const card: ClassFactory<{ slots: "root" }> = () => ({
+const card = (_: Selection<{ slots: "root" }>) => ({
     root: { class: "card" },
 });
 
@@ -51,7 +52,7 @@ describe("createRegistry", () => {
 
         it("types the entry as static, with its factory", () => {
             expectTypeOf(registry.entry("chip")).toEqualTypeOf<
-                StaticEntry<ClassFactory<Chip>>
+                StaticEntry<typeof chip>
             >();
             // @ts-expect-error a name the registry doesn't have
             expect(() => registry.entry("card")).toThrow();
@@ -157,44 +158,15 @@ describe("createRegistry", () => {
         );
     });
 
-    describe("themeAttributes", () => {
-        it("gives the target's attribute for a named theme", () => {
-            const registry = createRegistry(
-                { chip },
-                { themeAttribute: "data-theme" },
-            );
-            expect(registry.themeAttribute).toBe("data-theme");
-            expect(registry.themeAttributes("teal")).toEqual({
-                "data-theme": "teal",
-            });
-            expect(Object.isFrozen(registry.themeAttributes("teal"))).toBe(
-                true,
-            );
-        });
-
-        it("gives nothing for the base theme", () => {
-            const registry = createRegistry(
-                { chip },
-                { themeAttribute: "data-theme" },
-            );
-            expect(registry.themeAttributes(undefined)).toEqual({});
-            expect(registry.themeAttributes("")).toEqual({});
-        });
-
-        it("gives nothing on a target without one", () => {
-            const registry = createRegistry({ chip });
-            expect(registry.themeAttribute).toBeUndefined();
-            expect(registry.themeAttributes("teal")).toEqual({});
-        });
-    });
-
-    it("records how the target names its vars", () => {
-        expect(createRegistry({ chip }).vars).toEqual({});
-        const registry = createRegistry(
-            { chip },
-            { vars: { prefix: "pf", tokenPrefix: "x" } },
-        );
-        expect(registry.vars).toEqual({ prefix: "pf", tokenPrefix: "x" });
-        expect(Object.isFrozen(registry.vars)).toBe(true);
+    it("is frozen, with no target's options", () => {
+        const registry = createRegistry({ chip });
+        expect(Object.isFrozen(registry)).toBe(true);
+        expect(Object.keys(registry).sort()).toEqual([
+            "entry",
+            "has",
+            "names",
+            "preload",
+            "version",
+        ]);
     });
 });

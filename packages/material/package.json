@@ -30,7 +30,7 @@
     "dependencies": {
         "@material/material-color-utilities": "catalog:",
         "@pureform/core": "workspace:^",
-        "@pureform/styling": "workspace:^",
+        "@pureform/styling-web": "workspace:^",
         "@pureform/theme": "workspace:^",
         "@pureform/utils": "workspace:^",
         "chroma-js": "catalog:"

@@ -31,23 +31,106 @@ token and `target` props.
 
 ## Architecture
 
-| Module                                                                                                                  | What it holds                                                                                                                                                                                   |
-| ----------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `index.ts`                                                                                                              | The root entry: reduced motion, measuring an icon slot, checkbox, radio and text inputs kept in step, stacking positioners, scroll, the slider's inset icon, file inputs, and the modules below |
-| `components.ts`                                                                                                         | The web-only props of the components' contracts, as extensions of binding-core's, and the FAB menu's keys                                                                                       |
-| `slot-props.ts` | Pure resolution of web-only keyed customization, with lazy instance data; tracking and rendering belong to each framework binding |
-| `web-theme.ts`                                                                                                          | Runtime themes' `<style>` blocks, overrides as vars, and when to generate or keep the server's block                                                                                            |
-| `sheet-drag.ts`, `side-sheet-drag.ts`, `sideways-drag.ts`, `toast-swipe.ts`, `drag-click.ts`                            | Drags and swipes over pointer events                                                                                                                                                            |
-| `settle.ts`, `list-item-swipe-settle.ts`, `splitter-release.ts`                                                         | Settling a released element on its spring transition, from the release's speed                                                                                                                  |
-| `menu-drill-motion.ts`, `menu-groups.ts`, `menu-submenu-room.ts`                                                        | The menu's drill motion, group edges, and a submenu's room                                                                                                                                      |
-| `collapse.ts`, `reveal.ts`, `slide.ts`, `scroll-focus.ts`, `carousel-row.ts`, `toolbar-dom.ts`, `tooltip-long-press.ts` | Collapsing, revealing in a row, the sliding indicator, focusable overflow, the carousel's row, the toolbar's overflow and focus, the tooltip's long press                                       |
-| `indication.ts`                                                                                                         | The `/indication` entry: `Indication<HTMLElement>`, `IndicationTarget` and `defineIndication` for the web, and re-exports the two modules below                                                 |
-| `indication-material.ts`                                                                                                | Material's web half (the ripple, over `createRipple` from `@pureform/js-effects`): `materialIndication`, `webIndication`, `DEFAULT_INDICATION`                                                  |
-| `indication-host.ts`                                                                                                    | `IndicationHost`: ties an anatomy's indication entries to a component's elements, runs the effect after mount, and tracks forwarded hover and press                                             |
+| Module                                                                                                                  | What it holds                                                                                                                                                                                               |
+| ----------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `index.ts`                                                                                                              | The root entry: reduced motion, measuring an icon slot, checkbox, radio and text inputs kept in step, stacking positioners, scroll, the slider's inset icon, file inputs, and the modules below             |
+| `components.ts`, `components/`                                                                                          | Web-only prop extensions, HTML element inference, Zag assembly, layout/hidden-select/form-reset projection, data attributes, CSS constants and the FAB menu's keys                                          |
+| `slot-props.ts`                                                                                                         | Pure resolution of web-only keyed customization, with lazy instance data; tracking and rendering belong to each framework binding                                                                           |
+| `anatomy.ts`                                                                                                            | `partAttributes`: HTML projection of portable anatomy identities and test ids, with shared frozen defaults                                                                                                  |
+| `parts.ts`                                                                                                              | `stateAttributes`, `StateAttributes`, `partSources`, `PartSourcesInput`, `partClasses`, `spreadableProps`, and `outsideRootMessage`: web state encoding, class lookup, diagnostics, and part-source order   |
+| `class-names.ts`                                                                                                        | `cx`, `ClassValue`, and `ClassDictionary`: a `clsx`-compatible class joiner                                                                                                                                 |
+| `entries.ts`                                                                                                            | `classEntry`, `lazyFactoryError`, and `serverLazyFactoryMessage`: web class-hook lookup and diagnostics                                                                                                     |
+| `props.ts`                                                                                                              | `combineProps`, `CombineRules`, and `mergeStyleObjects`: web class/style/handler merging                                                                                                                    |
+| `provider.ts`                                                                                                           | `WebProviderOptions`, `WebProviderState`, `resolveWebProvider`, `ROOT_WEB_PROVIDER`, theme types and own-vs-inherited HTML projection                                                                       |
+| `defaults.ts`                                                                                                           | `overDefaults`: neutral traversal with web class/style/slot-props policy                                                                                                                                    |
+| `indication-tokens.ts`                                                                                                  | CSS length/percentage conversion, provider overrides and instance indication tokens (on `/indication`)                                                                                                      |
+| `web-theme.ts`                                                                                                          | Runtime themes' `<style>` blocks, overrides as vars, and when to generate or keep the server's block                                                                                                        |
+| `sheet-drag.ts`, `side-sheet-drag.ts`, `sideways-drag.ts`, `toast-swipe.ts`, `drag-click.ts`                            | Drags and swipes over pointer events                                                                                                                                                                        |
+| `settle.ts`, `list-item-swipe-settle.ts`, `splitter-release.ts`                                                         | Settling a released element on its spring transition, from the release's speed                                                                                                                              |
+| `menu-drill-motion.ts`, `menu-groups.ts`, `menu-submenu-room.ts`                                                        | The menu's drill motion, group edges, and a submenu's room                                                                                                                                                  |
+| `collapse.ts`, `reveal.ts`, `slide.ts`, `scroll-focus.ts`, `carousel-row.ts`, `toolbar-dom.ts`, `tooltip-long-press.ts` | Collapsing, revealing in a row, the sliding indicator, focusable overflow, the carousel's row, the toolbar's overflow and focus, the tooltip's long press                                                   |
+| `indication.ts`                                                                                                         | The `/indication` entry: `Indication<HTMLElement>`, `IndicationTarget` and `defineIndication` for the web, and re-exports the two modules below                                                             |
+| `indication-material.ts`                                                                                                | Material's web half (the ripple, over `createRipple` from `@pureform/js-effects`): `materialIndication`, `webIndication`, `DEFAULT_INDICATION`, and cached `rippleClasses`/`RippleClasses` on `/indication` |
+| `indication-host.ts`                                                                                                    | `IndicationHost`: ties an anatomy's indication entries to a component's elements, runs the effect after mount, and tracks forwarded hover and press                                                         |
 
 ## Public API
 
+Wire names (`STATE_ATTRIBUTES`, `MOTION_ATTRIBUTE`, `REDUCED_MOTION_QUERY`, and anatomy
+attribute constants/types) come from [`@pureform/web-contracts`](../web-contracts/README.md).
+Core and binding-core do not re-export them. CSS lowering shares this leaf contract, not this
+binding package.
+
+```ts
+import {
+    partAttributes,
+    stateAttributes,
+    partSources,
+    providerAttributes,
+    themeAttributeOf,
+    themeAttributes,
+} from "@pureform/binding-web";
+
+partAttributes(anatomy, part, testId); // data-scope, data-pf-part, data-testid
+stateAttributes({ pressed: true }); // { "data-pf-active": "" }
+partSources({
+    anatomy,
+    part,
+    machine,
+    states,
+    testId,
+    classes,
+    slotProps,
+    props,
+});
+// machine, anatomy, states, registry classes/style, provider slot props, user props
+providerAttributes(own, state); // own theme/motion attributes, resolved direction
+themeAttributeOf(registry); // target's attribute, else data-theme
+themeAttributes(theme, registry); // target's named theme or runtime theme scope
+
+cx("a", ["b", { c: true }]); // "a b c"; ClassValue and ClassDictionary are web types
+classEntry(state, name); // the provider registry's ClassFactory entry
+lazyFactoryError(name);
+serverLazyFactoryMessage(name);
+partClasses(anatomy, part, slots, unstyled); // by the styling slot, including aliases
+spreadableProps(props); // omits children and ref, which the binding places itself
+outsideRootMessage("Button", "Label"); // compound-part diagnostic
+combineProps(sources, rules); // CombineRules supplied by React or Solid
+mergeStyleObjects(styles); // later keys win
+```
+
+`combineProps` takes sources in order (machine, part attributes, states, registry, provider,
+user): classes collect under the first of `rules.classKeys` and join with `rules.joinClasses`
+(Solid: an array; React: a string), styles join with `rules.joinStyles`, `on*` handlers run in
+order unless replaced by a later non-handler, and other keys take the last defined value.
+`rippleClasses(registry)` on `@pureform/binding-web/indication` returns the static `ripple`
+entry's slots with stable identity. Successes, missing entries, and lazy entries are cached per
+registry; lazy entries are never loaded by this helper, even after preloading elsewhere.
+
 ### Slot customization boundary
+
+`overDefaults(defaults, own)` is the web wrapper: classes join (including root/keyed mixing),
+styles and slot props merge shallowly per part, and tokens merge shallowly (a child's explicit
+`undefined` inside them still wins, as before). Empty sides retain
+identity; repeated-part functions are not evaluated until the part requests an instance. It
+does not change the separate prop/handler merge precedence of `combineProps`.
+
+### Provider and presentation boundary
+
+`WebProviderOptions<P>` extends the neutral provider options with `theme`, `overrides` and
+`hydrate`, and narrows `registry` to `@pureform/styling-web`'s `AnyWebRegistry` (its theme
+attribute and var prefixes). `resolveWebProvider` inherits those over the neutral registry/direction/motion/defaults/
+slots/indication state. `providerAttributes` projects only **own** theme and explicit motion,
+but resolved direction; `system` continues to inherit the nearest explicit motion setting.
+React and Solid retain their theme-independent component contexts and reactive budgets.
+
+`ProviderTheme`, `ThemeName`, `ThemeOverrides` and `ThemeHydration` are exported here, not by
+binding-core. `IconStyle` here narrows the neutral optional color to a string;
+`DEFAULT_ICON_STYLE` uses `currentColor`, and measurement reads CSS pixels. React/Solid's public
+icon and provider theme types remain web types. Native imports neither extension.
+
+See the [phase-3 export ledger](../../docs/design/platform-boundaries-phase3-exports.md) for all
+moved component adapters. Shared semantic contracts remain in binding-core; ARIA names alone
+are not a reason to move a portable helper.
 
 `slot-props.ts` resolves the web ready-made components' keyed `slotProps`, class, style, and
 `unstyled` channels for one part. React normalizes `className` to the resolver's `class` channel;

@@ -5,13 +5,13 @@ import { buttonAnatomy } from "@pureform/anatomy";
 import {
     BUTTON_CONTENT_PROPS,
     BUTTON_ROOT_PROPS,
-    buttonMachineProps,
     buttonSelection,
 } from "@pureform/binding-core";
 import type {
     ButtonContentProps,
     ButtonRootOwnProps,
 } from "@pureform/binding-core";
+import { buttonMachineProps } from "@pureform/binding-web";
 import * as button from "@pureform/machines/button";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {

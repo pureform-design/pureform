@@ -110,26 +110,3 @@ export const isInteractiveTooltip = (
     props: Pick<TooltipBehaviorProps, "interactive">,
     byDefault = false,
 ): boolean => props.interactive ?? byDefault;
-
-/** Zag's tooltip props from Root's, besides `id`, `dir`, and the controllable `open`. */
-export const tooltipMachineProps = (
-    props: TooltipBehaviorProps,
-    interactiveByDefault = false,
-) => ({
-    openDelay: props.openDelay,
-    closeDelay: props.closeDelay,
-    disabled: props.disabled,
-    interactive: isInteractiveTooltip(props, interactiveByDefault),
-    closeOnEscape: props.closeOnEscape,
-    closeOnClick: props.closeOnClick,
-    positioning: { placement: "bottom" as const, ...props.positioning },
-    ids: {
-        trigger: props.ids?.trigger,
-        positioner: props.ids?.positioner,
-        content: props.ids?.content,
-    },
-});
-
-/** The caret's style: Zag's arrow tip paints `var(--arrow-background)`, so the caret takes the
- *  surface's color (its slot's `color`) through `currentColor`. */
-export const CARET_STYLE = { "--arrow-background": "currentColor" } as const;

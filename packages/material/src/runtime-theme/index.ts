@@ -2,7 +2,7 @@
 // seed: "#006A60" })}>`. This module is small; the color math loads with the generator, the first
 // time a theme needs generating (on the server, or on the client when the theme changes).
 
-import { defineRuntimeTheme } from "@pureform/styling";
+import { defineRuntimeTheme } from "@pureform/styling-web";
 
 import type { MaterialColorOptions } from "../providers";
 import type { HexColor } from "../types";

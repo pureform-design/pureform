@@ -185,6 +185,8 @@ import { registry } from "./.pureform";
 - **Icons:** icon parts provide `useIconStyle()` → `{ size, color, filled }` (`filled` is the
   slot's `FILL` axis, which selection returns beside the style). `Glyph` draws a text glyph in
   the slot's type and color, moving with it; a string given as an icon is drawn as one.
+  `size` is in Native logical units. `color` is `string | undefined`: outside a slot, or when its
+  style supplies none, no color is chosen. Native never falls back to CSS `currentColor`.
 - **Indication:** the provider's `indication` (inherited) and each interactive component's
   `indication` prop pick how it shows hover, focus, and press: `materialIndication({ ripple })`
   (the default), `noIndication` (state layer opacities 0, no ripple, focus indicator kept), or the

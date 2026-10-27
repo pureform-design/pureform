@@ -73,6 +73,9 @@
         },
         "./client": {
             "types": "./client.d.ts"
+        },
+        "./client-web": {
+            "types": "./client-web.d.ts"
         }
     },
     "dependencies": {
@@ -87,6 +90,7 @@
     "devDependencies": {
         "@pureform/css-adapter": "workspace:^",
         "@pureform/preset": "workspace:^",
+        "@pureform/styling-web": "workspace:^",
         "@pureform/tsconfig": "workspace:^",
         "@pureform/vite-config": "workspace:^",
         "@pureform/vitest-config": "workspace:^",
@@ -95,5 +99,13 @@
         "typescript": "catalog:",
         "vite": "catalog:",
         "vitest": "catalog:"
+    },
+    "peerDependencies": {
+        "@pureform/styling-web": "workspace:^"
+    },
+    "peerDependenciesMeta": {
+        "@pureform/styling-web": {
+            "optional": true
+        }
     }
 }

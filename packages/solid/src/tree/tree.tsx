@@ -12,7 +12,6 @@ import {
     TREE_ROOT_PROPS,
     treeCollectionOptions,
     treeControlProps,
-    treeMachineProps,
     treeNaming,
     treeSelection,
 } from "@pureform/binding-core";
@@ -24,6 +23,7 @@ import type {
     TreeNodeInstance,
     TreeRootOwnProps,
 } from "@pureform/binding-core";
+import { treeMachineProps } from "@pureform/binding-web";
 import * as treeView from "@pureform/machines/tree-view";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {

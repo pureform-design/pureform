@@ -13,8 +13,6 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Controllable } from "../controllable";
 import type { ItemInstance, Unstyled } from "../parts";
-import { fieldControlProps } from "./field-primitives";
-import type { FieldState } from "./field-primitives";
 import type { InteractiveProps } from "./indication";
 import { selectItemGroups } from "./select";
 import type { SelectItemGroup } from "./select";
@@ -163,36 +161,6 @@ export const NATIVE_SELECT_ATTRIBUTE_PROPS = [
 export const nativeSelectSelection = (
     props: NativeSelectVariantProps,
 ): Selection<"nativeSelect"> => ({ tokens: props.tokens });
-
-/** The `<select>`'s own props from Root's and the Field around it, if any (its own props win):
- *  what it submits, validates and is disabled by, its id, and its descriptions. The root's
- *  `data-disabled` follows the same `disabled`. */
-export const nativeSelectProps = (
-    props: Pick<
-        NativeSelectBehaviorProps,
-        | "disabled"
-        | "invalid"
-        | "required"
-        | "name"
-        | "form"
-        | "id"
-        | "multiple"
-    > & {
-        /** Its own descriptions, which the field's join after. */
-        readonly "aria-describedby"?: string | undefined;
-    },
-    fieldsetDisabled = false,
-    field?: FieldState | undefined,
-) => {
-    const control = fieldControlProps(field, props);
-    return {
-        ...control,
-        name: props.name,
-        form: props.form,
-        multiple: props.multiple || undefined,
-        disabled: control.disabled || fieldsetDisabled || undefined,
-    };
-};
 
 /** The value as a list of chosen values: `""` (nothing chosen) is none. */
 export const nativeSelectValues = (

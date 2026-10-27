@@ -1,6 +1,6 @@
 # @pureform/anatomy
 
-Each preset component's parts, the attributes every part carries, and its default test ids,
+Each preset component's portable part identities, nesting, and default test ids,
 generated from the preset's AST. It knows no framework: `@pureform/solid`, `@pureform/react`, and
 later `@pureform/react-native` read it to render one element per part, and tests read its
 `testIds` instead of hard-coding strings (design doc §9.1, §9.2).
@@ -23,7 +23,7 @@ generator and the drift test read it, and nothing at runtime does.
 | `types.ts`      | `ComponentAnatomy`, `PartAnatomy`, `ExtraPart`, `PartName`.                                                     |
 | `generated.ts`  | Generated. One constant per component (`buttonAnatomy`), `anatomy` by name, and `testIds`.                      |
 | `components.ts` | Types over the generated anatomy: `Anatomies`, `AnatomyName`, `PartOf`.                                         |
-| `attributes.ts` | The attribute names, `kebabCase`, `partTestId`, `partAttributes`.                                               |
+| `attributes.ts` | Portable `kebabCase`, `partTestId`, `TestIdOverride`, `TEST_ID_PREFIX`, and `partSlot`. |
 | `derive.ts`     | The `/derive` subpath: `deriveAnatomy`, `deriveAnatomies`, `renderAnatomyModule`.                               |
 | `extras.ts`     | `EXTRA_PARTS`: parts that aren't AST slots (the select's `hiddenSelect`).                                       |
 | `composites.ts` | Written by hand: anatomies outside the preset's slots (`radioGroupAnatomy`, `selectMenuAnatomy`, the overlays). |
@@ -41,7 +41,7 @@ interface ComponentAnatomy<
     P extends string = string,
 > {
     readonly name: N; // "iconButton": the name in the config
-    readonly scope: string; // "icon-button": the value of data-scope
+    readonly scope: string; // "icon-button": component identity scope
     readonly root: P; // the outermost part, "root" for every preset component
     readonly partNames: readonly P[]; // the AST's slots in order, then extra parts
     readonly parts: { readonly [K in P]: PartAnatomy<P> };
@@ -59,12 +59,12 @@ interface IndicationAnatomy<P extends string = string> {
 
 interface PartAnatomy<P extends string = string> {
     readonly name: P; // "touchTarget"
-    readonly attribute: string; // "touch-target": the value of data-pf-part
+    readonly attribute: string; // "touch-target": serialized part identity (not an HTML attribute name)
     readonly testId: string; // "pf-icon-button-touch-target"
     readonly parent: P | null; // from the AST's structure
     readonly children: readonly P[];
     readonly styled: boolean; // false for extra parts, which the registry doesn't style
-    readonly mirror: boolean; // an icon slot: takes `mirror`, sets data-pf-mirror
+    readonly mirror: boolean; // an icon slot: takes `mirror`, reports the mirrored state
     readonly slot?: string | null; // the registry slot that draws it, when not its name; null: none
 }
 ```
@@ -120,10 +120,10 @@ interface PartAnatomy<P extends string = string> {
 ```ts
 import {
     buttonAnatomy,
-    partAttributes,
     partTestId,
     testIds,
 } from "@pureform/anatomy";
+import { partAttributes } from "@pureform/binding-web";
 
 buttonAnatomy.parts.icon.mirror; // true
 testIds.button.label; // "pf-button-label"
@@ -143,13 +143,14 @@ partTestId(buttonAnatomy, "label", { root: "save" }); // "pf-button-label"
 | `anatomy`                                                                          | Every preset component's anatomy, by name.                       |
 | `testIds`                                                                          | Default test ids by component and part.                          |
 | `partTestId(component, part, testId?)`                                             | A part's test id under Root's `testId` (a `TestIdOverride`).     |
-| `partAttributes(component, part, testId?)`                                         | `data-scope`, `data-pf-part`, `data-testid` for a part.          |
-| `PART_ATTRIBUTE`, `SCOPE_ATTRIBUTE`, `TEST_ID_ATTRIBUTE`, `TEST_ID_PREFIX`         | The attribute names, and `"pf"`.                                 |
+| `TEST_ID_PREFIX` | `"pf"`, the portable default test-id prefix. |
 | `kebabCase(name)`                                                                  | `touchTarget` → `touch-target`.                                  |
 | `partSlot(part)`                                                                   | The registry slot a part is drawn by: its `slot`, else its name. |
 | `ComponentAnatomy`, `PartAnatomy`, `IndicationAnatomy`, `PartName<A>`, `ExtraPart` | The shape.                                                       |
 | `Anatomies`, `AnatomyName`, `PartOf<N>`                                            | Types over the preset's components: `PartOf<"button">`.          |
 
+HTML construction (`partAttributes`) is exported by `@pureform/binding-web`; the attribute
+constants and `PartAttributes` type are exported by `@pureform/web-contracts`.
 React Native takes the test id as `testID`: use `partTestId` there, not `partAttributes`.
 
 ### `@pureform/anatomy/derive`

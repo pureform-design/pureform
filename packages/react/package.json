@@ -594,6 +594,7 @@
     "devDependencies": {
         "@pureform/oxlint-config": "workspace:^",
         "@pureform/styling": "workspace:^",
+        "@pureform/styling-web": "workspace:^",
         "@pureform/tsconfig": "workspace:^",
         "@pureform/vite-config": "workspace:^",
         "@pureform/vitest-config": "workspace:^",
@@ -614,6 +615,7 @@
     },
     "peerDependencies": {
         "@pureform/styling": "workspace:^",
+        "@pureform/styling-web": "workspace:^",
         "react": "^19.0.0",
         "react-dom": "^19.0.0"
     }

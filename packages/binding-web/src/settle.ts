@@ -7,15 +7,11 @@
 // one settle, as React Native's `settle()` carries the release velocity. The bottom sheet and the
 // list item's swipe settle this way.
 
-import {
-    formatLinearEasing,
-    parseLinearEasing,
-    sampleSpring,
-    springFromCurve,
-} from "@pureform/core";
+import { sampleSpring, springFromCurve } from "@pureform/core";
 import type { SpringNode } from "@pureform/core/ast";
-import type { Registry } from "@pureform/styling";
-import { tokenVar } from "@pureform/styling/theme-vars";
+import { formatLinearEasing, parseLinearEasing } from "@pureform/css-lowering";
+import type { WebRegistry } from "@pureform/styling-web";
+import { tokenVar } from "@pureform/styling-web/theme-vars";
 
 // Splits a computed list at its top-level commas (a `linear()` holds its own).
 const splitList = (text: string): string[] => {
@@ -44,7 +40,7 @@ const seconds = (text: string) => {
  *  registry's target names it, for `settleTransition`'s `spring`. `undefined` without a
  *  registry. */
 export const springRoleVar = (
-    registry: Pick<Registry, "vars"> | undefined,
+    registry: Pick<WebRegistry, "vars"> | undefined,
     role: string,
 ): string | undefined => registry && tokenVar(`springs.${role}`, registry.vars);
 

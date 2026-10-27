@@ -1,10 +1,10 @@
 // What the time picker and the time input share: the machine with its controllable time.
 
-import { timeMachineProps } from "@pureform/binding-core";
 import type {
     TimePickerRootOwnProps,
     TimeValueChangeDetails,
 } from "@pureform/binding-core";
+import { timeMachineProps } from "@pureform/binding-web";
 import * as timePicker from "@pureform/machines/time-picker";
 import { type Accessor, createMemo, createUniqueId } from "solid-js";
 

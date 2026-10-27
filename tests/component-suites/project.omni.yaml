@@ -12,6 +12,7 @@ dependencies:
     - "@pureform/anatomy"
     - "@pureform/component-cases"
     - "@pureform/styling"
+    - "@pureform/styling-web"
     - "@pureform/material"
     - "@pureform/solid"
     - "@pureform/react"

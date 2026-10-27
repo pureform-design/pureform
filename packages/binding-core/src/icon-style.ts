@@ -1,21 +1,19 @@
-// What `useIconStyle()` returns: an icon slot's size and color as numbers and strings, for icon
-// components that take them as props rather than following `1em` and `currentColor`.
+// Portable icon presentation. Bindings choose units, measurement and color inheritance.
 
-/** An icon slot's size in pixels, its color, and whether it draws a filled icon. */
+/** An icon slot's size, optional color, and whether it draws a filled icon. */
 export interface IconStyle {
-    /** The slot's icon size in pixels; `undefined` until measured (on the server, and before the
-     *  part mounts). */
+    /** Size in the binding's logical units; unspecified when unavailable. */
     readonly size: number | undefined;
-    /** The slot's color: a computed color once measured, `currentColor` before. */
-    readonly color: string;
+    /** Unspecified means the platform or icon supplies its own color. */
+    readonly color: string | undefined;
     /** Whether the slot asks for a filled icon (Material Symbols' `FILL` axis at 1). */
     readonly filled: boolean;
 }
 
-/** What `useIconStyle()` gives outside an icon part, and before the part is measured. */
+/** Presentation when no icon slot supplies values. */
 export const DEFAULT_ICON_STYLE: IconStyle = Object.freeze({
     size: undefined,
-    color: "currentColor",
+    color: undefined,
     filled: false,
 });
 

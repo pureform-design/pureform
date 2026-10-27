@@ -2,22 +2,28 @@
 // geometry, and the life of a press. The web's ripple() and React Native's useRipple() each
 // draw it their own way on top.
 
+/** The two control points of a ripple's cubic grow curve. */
+export type RippleCurve = [number, number, number, number];
+
 /** How long a ripple grows and fades, and the grow curve. A release waits for at least half
  *  the grow, so a quick tap still shows most of the ripple. */
-export type RippleTiming = {
+export type RippleTiming<Curve = RippleCurve> = {
     /** Grow duration, in ms. */
     grow: number;
     /** Fade duration, in ms. */
     fade: number;
-    /** CSS easing for the grow, such as `cubic-bezier(0.2, 0, 0, 1)`. */
-    easing: string;
+    /** The drawing target's grow curve (CSS on the web, a structured curve on Native). */
+    easing: Curve;
 };
 
-/** Material's ripple timing, for a surface that declares none. */
+/** Material's grow curve, independent of its drawing target's timing representation. */
+export const DEFAULT_RIPPLE_CURVE: RippleCurve = [0.2, 0, 0, 1];
+
+/** Material's semantic ripple timing, for a surface that declares none. */
 export const DEFAULT_RIPPLE_TIMING: RippleTiming = {
     grow: 450,
     fade: 375,
-    easing: "cubic-bezier(0.2, 0, 0, 1)",
+    easing: DEFAULT_RIPPLE_CURVE,
 };
 
 /** How long a touch waits before it ripples, so a scroll that starts there cancels it. */
@@ -72,7 +78,7 @@ export function ripplePress(now: () => number = () => Date.now()) {
     };
     return {
         /** Hold a newly drawn ripple, releasing any before it. */
-        begin(handle: RippleHandle, timing: RippleTiming) {
+        begin(handle: RippleHandle, timing: Pick<RippleTiming, "grow">) {
             end();
             held = { handle, at: now(), minimum: timing.grow / 2 };
         },

@@ -8,13 +8,11 @@ import { paginatorAnatomy } from "@pureform/anatomy";
 import type { PartName, selectAnatomy } from "@pureform/anatomy";
 import {
     PAGINATOR_ROOT_PROPS,
-    paginatorMachineProps,
     paginatorPageSizes,
     paginatorRange,
     paginatorRangeLabel,
     paginatorSelection,
     paginatorSizeItems,
-    paginatorTriggerProps,
     DEFAULT_PAGE_SIZE,
 } from "@pureform/binding-core";
 import type {
@@ -22,6 +20,10 @@ import type {
     PaginatorPageSizeDetails,
     PaginatorRootOwnProps,
 } from "@pureform/binding-core";
+import {
+    paginatorMachineProps,
+    paginatorTriggerProps,
+} from "@pureform/binding-web";
 import * as paginator from "@pureform/machines/paginator";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {

@@ -10,7 +10,6 @@ export default createConfig({
             lib: {
                 entry: {
                     index: "src/index.ts",
-                    "theme-vars": "src/theme-vars.ts",
                 },
                 formats: ["es"],
                 fileName: (format, entryName) =>

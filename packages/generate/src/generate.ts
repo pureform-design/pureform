@@ -436,6 +436,7 @@ export const generate = async <Options = Record<string, unknown>>(
             entries,
             Object.keys(config.themes ?? {}),
             version,
+            adapter.platform,
             output.themeAttribute,
             output.vars,
         ),

@@ -4,7 +4,7 @@
 // value }`) rather than a flat string. Each key is a selector or an at-rule, or the target's
 // own key where it has one (Panda's `_dark`, a named breakpoint), through the context's hooks.
 
-import { STATE_ATTRIBUTES, getByPath, tokenValue } from "@pureform/core";
+import { getByPath, tokenValue } from "@pureform/core";
 import type {
     Condition,
     ConditionalNode,
@@ -13,6 +13,10 @@ import type {
     NumericScalarNode,
     ValueNode,
 } from "@pureform/core/ast";
+import {
+    STATE_ATTRIBUTES,
+    REDUCED_MOTION_QUERY,
+} from "@pureform/web-contracts";
 
 import { compileNodeToCSS } from "./compile-node";
 import type { LowerCtx } from "./context";
@@ -73,7 +77,7 @@ const MEDIA_RULE: Record<string, string> = {
     portrait: "@media (orientation: portrait)",
     touch: "@media (pointer: coarse)",
     mouse: "@media (pointer: fine)",
-    reducedMotion: "@media (prefers-reduced-motion: reduce)",
+    reducedMotion: `@media ${REDUCED_MOTION_QUERY}`,
     clipShape: "@supports (clip-path: shape(from 0 0, line to 0 0))",
     cornerShape: "@supports (corner-shape: squircle)",
 };

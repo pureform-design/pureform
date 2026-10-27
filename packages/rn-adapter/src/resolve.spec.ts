@@ -29,6 +29,7 @@ import {
 import { select, selectWithTransitions } from "./select";
 import { resolveTheme } from "./theme";
 import { evaluate } from "./values";
+import { LINEAR } from "./values";
 
 // A button whose container color is a component token, with a hover state layer mixed over
 // it, a label inheriting the root's color, and a teal theme.
@@ -458,7 +459,7 @@ describe("selectWithTransitions", () => {
             {
                 property: "color",
                 duration: 100,
-                easing: "cubic-bezier(0.25, 0.1, 0.25, 1)",
+                easing: { type: "easing", kind: "keyword", name: "ease" },
                 delay: 0,
             },
         ]);
@@ -602,6 +603,37 @@ describe("evaluate", () => {
 });
 
 describe("evaluateSetTokens", () => {
+    it("retains structured easing aliases, overrides, and identity", () => {
+        const curve: import("./values").Easing = {
+            type: "easing",
+            kind: "cubicBezier",
+            points: [0.2, 0, 0, 1],
+        };
+        const styles = {
+            themes: {
+                "base:light": {
+                    "easings.base": LINEAR,
+                    "easings.alias": LINEAR,
+                },
+            },
+            formulas: {
+                "base:light": { "easings.alias": { $ref: "easings.base" } },
+            },
+        };
+        const given = { "easings.base": curve };
+        const derived = withDerived(styles, "base:light", given);
+        expect(derived["easings.alias"]).toBe(curve);
+        expect(
+            evaluateSetTokens(
+                { "easings.set": { $ref: "easings.alias" } },
+                {
+                    styles,
+                    key: "base:light",
+                    overrides: given,
+                },
+            )["easings.set"],
+        ).toBe(curve);
+    });
     const ref = (key: string) => ({ $ref: key });
     const plus = (key: string, n: number) => ({
         $calc: "+" as const,

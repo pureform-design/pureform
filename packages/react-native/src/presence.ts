@@ -21,6 +21,7 @@ import type {
     Spring,
 } from "@pureform/rn-adapter/animated";
 import type { ThemeValues } from "@pureform/rn-adapter/factory";
+import { isEasing, LINEAR } from "@pureform/rn-adapter/factory";
 import { useReducedMotion, useTokens } from "@pureform/rn-adapter/react";
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { LayoutChangeEvent } from "react-native";
@@ -335,7 +336,7 @@ const timingOf = (
         const spring = themeSpring(role, tokens, timeScale);
         return {
             duration: numberOf(field("duration"), 0) * timeScale,
-            easing: typeof easing === "string" ? easing : "linear",
+            easing: isEasing(easing) ? easing : LINEAR,
             ...(spring ? { spring } : {}),
             ...delay,
         };
@@ -344,7 +345,7 @@ const timingOf = (
     return {
         duration:
             numberOf(tokens[`durations.${given.duration}`], 0) * timeScale,
-        easing: typeof easing === "string" ? easing : "linear",
+        easing: isEasing(easing) ? easing : LINEAR,
         ...delay,
     };
 };

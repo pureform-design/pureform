@@ -11,7 +11,6 @@ import type {
 import {
     isPresent,
     isUnstyled,
-    overDefaults,
     TOOLBAR_OVERFLOW_LABEL,
     TOOLBAR_ROOT_PROPS,
     toolbarMenuItems,
@@ -20,7 +19,6 @@ import {
     toolbarOverflowTestId,
     toolbarRootProps,
     toolbarSelection,
-    unstyledToolbarProvidedTokens,
 } from "@pureform/binding-core";
 import type {
     ToolbarContentProps,
@@ -29,6 +27,10 @@ import type {
     ToolbarRootOwnProps,
     Unstyled,
 } from "@pureform/binding-core";
+import {
+    overDefaults,
+    unstyledToolbarProvidedTokens,
+} from "@pureform/binding-web";
 import { moveToolbarFocus, watchOverflow } from "@pureform/binding-web";
 import type {
     CSSProperties,

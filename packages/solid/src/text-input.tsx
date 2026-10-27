@@ -9,14 +9,14 @@ import {
     isPresent,
     TEXT_FIELD_AFFIX_PROPS,
     TEXT_FIELD_CONTENT_PROPS,
-    textFieldMachineProps,
-    textFieldNativeDefault,
 } from "@pureform/binding-core";
 import type {
     TextFieldAffixProps,
     TextFieldBehaviorProps,
     TextFieldContentProps,
 } from "@pureform/binding-core";
+import { textFieldNativeDefault } from "@pureform/binding-web";
+import { textFieldMachineProps } from "@pureform/binding-web";
 import { syncTextInput } from "@pureform/binding-web";
 import * as textField from "@pureform/machines/text-field";
 import type { Selection } from "@pureform/styling";

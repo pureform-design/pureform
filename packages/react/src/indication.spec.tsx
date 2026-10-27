@@ -1,5 +1,5 @@
 import { testIds } from "@pureform/anatomy";
-import { createRegistry, withTokenStyle } from "@pureform/styling";
+import { createWebRegistry, withTokenStyle } from "@pureform/styling-web";
 import { act } from "@testing-library/react";
 import { Profiler } from "react";
 import type { ReactNode } from "react";
@@ -38,7 +38,7 @@ const VARS: Record<string, `--${string}`> = Object.fromEntries(
 
 // A button whose factory writes its instance tokens on its root, and the ripple.
 const registry = () =>
-    createRegistry(
+    createWebRegistry(
         {
             button: (selection: { tokens?: Record<string, string> }) =>
                 withTokenStyle(

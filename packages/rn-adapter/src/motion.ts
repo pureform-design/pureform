@@ -6,19 +6,28 @@ import { springState, valueTypeMoves } from "@pureform/core";
 
 import { formatColor, mixSrgb, parseColor } from "./rgba";
 import { SHAPE, TOKEN } from "./values";
-import type { Concrete, Spring, ThemeValues, Transition } from "./values";
+import type {
+    Concrete,
+    Easing,
+    Spring,
+    ThemeValues,
+    Transition,
+} from "./values";
 
-/** A transition's curve as Bézier points, or `linear` (also for a `linear(...)` curve, whose
- *  points `parseLinearEasing` from `@pureform/core` reads). */
+const EASINGS = {
+    linear: [0, 0, 1, 1],
+    ease: [0.25, 0.1, 0.25, 1],
+    easeIn: [0.42, 0, 1, 1],
+    easeOut: [0, 0, 0.58, 1],
+    easeInOut: [0.42, 0, 0.58, 1],
+} satisfies Record<string, [number, number, number, number]>;
+
+/** Bézier control points, or linear for sampled curves and Native's steps fallback. */
 export const easingPoints = (
-    easing: string,
+    easing: Easing,
 ): [number, number, number, number] | "linear" => {
-    const inner = /^cubic-bezier\(([^)]*)\)$/.exec(easing.trim())?.[1];
-    if (!inner) return "linear";
-    const points = inner.split(",").map(Number.parseFloat);
-    return points.length === 4 && points.every(Number.isFinite)
-        ? (points as [number, number, number, number])
-        : "linear";
+    if (easing.kind === "cubicBezier") return easing.points;
+    return easing.kind === "keyword" ? EASINGS[easing.name] : "linear";
 };
 
 const NUMBER = /-?\d*\.?\d+(?:e[-+]?\d+)?/gi;
@@ -235,6 +244,8 @@ export const movingTokens = (
             a !== undefined &&
             b !== undefined &&
             a !== b &&
+            typeof a !== "object" &&
+            typeof b !== "object" &&
             interpolates(animatable(a), animatable(b))
         );
     });
@@ -250,8 +261,8 @@ export const tokensAt = (
     const next = { ...to };
     for (const [token] of moving) {
         next[token] = blend(
-            animatable(from[token]!),
-            animatable(to[token]!),
+            animatable(from[token]! as Concrete),
+            animatable(to[token]! as Concrete),
             t,
         );
     }
@@ -289,12 +300,12 @@ export interface PresenceFrame {
     readonly translateY?: number;
 }
 
-/** How long a step takes: milliseconds, on a curve as transitions take it (`cubic-bezier(...)`,
- *  `linear(...)`, or `linear`), after an optional delay. A spring also carries its physics, which
+/** How long a step takes: milliseconds, on a structured curve, after an optional delay.
+ *  A spring also carries its physics, which
  *  an engine with springs runs in place of the sampled duration and curve. */
 export interface PresenceTiming {
     readonly duration: number;
-    readonly easing: string;
+    readonly easing: Easing;
     readonly spring?: Spring | undefined;
     /** Milliseconds to wait first, showing the step's first frame meanwhile. */
     readonly delay?: number | undefined;
@@ -402,7 +413,7 @@ export interface SlideMotion {
     readonly from: SlideOffset;
     readonly duration: number;
     readonly delay: number;
-    readonly easing: string;
+    readonly easing: Easing;
     /** The spring the slide runs on, for an engine with springs (it runs it in place of
      *  `duration` and `easing`); the slide's progress goes from 0 to 1 on it. */
     readonly spring?: Spring | undefined;

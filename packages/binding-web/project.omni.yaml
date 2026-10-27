@@ -10,10 +10,13 @@ dependencies:
     - "@pureform/vite-config"
     - "@pureform/vitest-config"
     - "@pureform/core"
+    - "@pureform/css-lowering"
     - "@pureform/styling"
+    - "@pureform/styling-web"
     - "@pureform/anatomy"
     - "@pureform/js-effects"
     - "@pureform/binding-core"
+    - "@pureform/web-contracts"
 
 tasks:
   test:unit:

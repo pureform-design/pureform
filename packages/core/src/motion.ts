@@ -1,17 +1,11 @@
-// Reduced motion: the attribute the web bindings set for an app's own motion setting, and which
-// transitions move something, which reduced motion stops. Color, opacity, and elevation fades
-// keep running, since they don't move anything.
+// Reduced motion: which transitions move something, which reduced motion stops. Color, opacity,
+// and elevation fades keep running, since they don't move anything.
 
 import type { DynamicNode, ValueType } from "./ast";
 
 /** How much motion an app asks for: the system's preference, or reduced or full whatever the
  *  system says. */
 export type MotionSetting = "system" | "reduce" | "full";
-
-/** The attribute a provider writes on its element when its motion setting isn't `"system"`:
- *  `data-pf-motion="reduce"` or `data-pf-motion="full"`. The web adapters' `reducedMotion`
- *  condition reads it from an ancestor, over the system's `prefers-reduced-motion`. */
-export const MOTION_ATTRIBUTE = "data-pf-motion";
 
 // Properties whose transitions fade rather than move: colors, opacity, and elevation.
 const FADES = new Set([

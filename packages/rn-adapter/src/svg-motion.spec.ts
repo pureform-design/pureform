@@ -52,7 +52,7 @@ describe("keyframed shapes", () => {
             {
                 duration: 100,
                 delay: 0,
-                easing: "linear",
+                easing: { type: "easing", kind: "keyword", name: "linear" },
                 iterations: -1,
                 direction: "alternate",
                 frames: [{ offset: 0.5, shape: square(20) }],
@@ -74,7 +74,7 @@ describe("keyframed shapes", () => {
                 {
                     duration: 100,
                     delay: 0,
-                    easing: "linear",
+                    easing: { type: "easing", kind: "keyword", name: "linear" },
                     iterations: 1,
                     direction: "normal",
                     frames: [{ offset: 1, shape: triangle }],

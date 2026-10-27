@@ -4,7 +4,6 @@
 import { buttonAnatomy } from "@pureform/anatomy";
 import {
     BUTTON_ROOT_PROPS,
-    buttonMachineProps,
     buttonSelection,
     isPresent,
 } from "@pureform/binding-core";
@@ -12,6 +11,7 @@ import type {
     ButtonContentProps,
     ButtonRootOwnProps,
 } from "@pureform/binding-core";
+import { buttonMachineProps } from "@pureform/binding-web";
 import * as button from "@pureform/machines/button";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";

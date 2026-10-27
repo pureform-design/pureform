@@ -103,20 +103,24 @@ const filesOf = async (
     );
 };
 
-// Temp app roots that can import what they generate: `@pureform/styling` links to this
-// workspace's package.
-const STYLING = fileURLToPath(new URL("../../styling", import.meta.url));
+// Temp app roots that can import what they generate: `@pureform/styling` and
+// `@pureform/styling-web` link to this workspace's packages.
+const RUNTIMES = ["styling", "styling-web"].map(
+    (name) =>
+        [
+            name,
+            fileURLToPath(new URL(`../../${name}`, import.meta.url)),
+        ] as const,
+);
 const roots: string[] = [];
 
 const appRoot = (): string => {
     const root = mkdtempSync(join(tmpdir(), "pureform-tailwind-"));
     roots.push(root);
     mkdirSync(join(root, "node_modules", "@pureform"), { recursive: true });
-    symlinkSync(
-        STYLING,
-        join(root, "node_modules", "@pureform", "styling"),
-        "dir",
-    );
+    for (const [name, path] of RUNTIMES) {
+        symlinkSync(path, join(root, "node_modules", "@pureform", name), "dir");
+    }
     return root;
 };
 

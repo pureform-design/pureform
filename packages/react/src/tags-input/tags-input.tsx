@@ -11,7 +11,6 @@ import {
     TAGS_INPUT_ROOT_PROPS,
     tagsInputChipTestId,
     tagsInputFilled,
-    tagsInputMachineProps,
     tagsInputSelection,
 } from "@pureform/binding-core";
 import type {
@@ -19,6 +18,7 @@ import type {
     TagsInputContentProps,
     TagsInputRootOwnProps,
 } from "@pureform/binding-core";
+import { tagsInputMachineProps } from "@pureform/binding-web";
 import * as tagsInput from "@pureform/machines/tags-input";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";

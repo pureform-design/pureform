@@ -1,6 +1,7 @@
 // Target-neutral CSS lowering shared by pureform's adapters: value nodes to CSS, conditions to
 // selectors and at-rules, style maps to nested style objects, and runtime theme vars.
 export { compileNodeToCSS } from "./compile-node";
+export { formatLinearEasing, parseLinearEasing } from "./easing";
 export { compileConditional, compileValue, conditionKey } from "./conditions";
 export type { CondObject } from "./conditions";
 export {

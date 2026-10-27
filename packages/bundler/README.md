@@ -11,7 +11,8 @@ components the app draws and the variant values it selects.
 - **Depends on:** `@pureform/generate` (generation, the runner and watcher), `unplugin` (one
   plugin for every bundler), `@pureform/binding-core/usage` (what each component draws),
   `@pureform/anatomy` (anatomy names), `oxc-parser` (the scan), `@pureform/styling` and
-  `@pureform/core` (types).
+  `@pureform/core` (types). `@pureform/styling-web` is an optional peer, for the
+  `/client-web` types' `WebRegistry`; a React Native app never needs it.
 - **Depended on by:** apps' bundler configs (every app under `apps/`; `rn-web-demo` uses the Vite
   plugin with the `native` target).
 - Part of the core: released at the same version as `core`, `styling`, and the adapters.
@@ -44,14 +45,15 @@ vite.ts, rollup.ts, rolldown.ts, esbuild.ts   one unplugin instance per bundler
        index.ts      findUsage (scan + the prune options), describePruning
 ```
 
-| Module        | What it does                                                                                                                                                     |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `options.ts`  | `PureformPluginOptions`, `PluginTarget`, `PruneOptions`, `REGISTRY_ID`, `generateOptions`, `pruneOptions`, `includes`, `aliasesReactNativeWeb`, `describeResult` |
-| `prune/`      | `scanUsage`, `findUsage`, `describePruning`                                                                                                                      |
-| `plugin.ts`   | `unpluginFactory`, `pureform` (the unplugin instance)                                                                                                            |
-| `vite.ts` …   | `pureform` for one bundler, also the default export                                                                                                              |
-| `metro.ts`    | `withPureform(metroConfig, options)`                                                                                                                             |
-| `client.d.ts` | ambient types for `virtual:pureform/registry` (`@pureform/bundler/client`)                                                                                       |
+| Module            | What it does                                                                                                                                                     |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `options.ts`      | `PureformPluginOptions`, `PluginTarget`, `PruneOptions`, `REGISTRY_ID`, `generateOptions`, `pruneOptions`, `includes`, `aliasesReactNativeWeb`, `describeResult` |
+| `prune/`          | `scanUsage`, `findUsage`, `describePruning`                                                                                                                      |
+| `plugin.ts`       | `unpluginFactory`, `pureform` (the unplugin instance)                                                                                                            |
+| `vite.ts` …       | `pureform` for one bundler, also the default export                                                                                                              |
+| `metro.ts`        | `withPureform(metroConfig, options)`                                                                                                                             |
+| `client.d.ts`     | ambient types for `virtual:pureform/registry`: the neutral registry (`@pureform/bundler/client`)                                                                 |
+| `client-web.d.ts` | the same id typed as a web registry (`@pureform/bundler/client-web`)                                                                                             |
 
 ## Public API
 
@@ -147,9 +149,13 @@ export const codegen = {
 plugins: [pureform(codegen), pandacss()];
 ```
 
-For TypeScript, add `"@pureform/bundler/client"` to `types` (the registry typed by the
-generated `registry.d.ts`, which the tsconfig must include), or map the id to the index with
-`paths` (`"virtual:pureform/registry": ["./.pureform/index.ts"]`) for the index's own types,
+For TypeScript, add one of the client types to `types` (the registry typed by the generated
+`registry.d.ts`, which the tsconfig must include): `"@pureform/bundler/client-web"` for a web
+target (CSS, Tailwind, Panda), whose registry is a `WebRegistry` carrying the theme attribute and
+var prefixes the web providers read (install `@pureform/styling-web`), or
+`"@pureform/bundler/client"` for React Native, whose registry is the neutral `Registry` and
+loads no web package. Use one, never both: each declares the module. Or map the id to the index
+with `paths` (`"virtual:pureform/registry": ["./.pureform/index.ts"]`) for the index's own types,
 without the client types (an ambient module wins over `paths`).
 
 ### Metro

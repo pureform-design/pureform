@@ -14,7 +14,7 @@ import type { IndicationProps, InteractionSourceProps } from "./indication";
 import type { MenuBehaviorProps } from "./menu";
 import {
     MENU_BUTTON_BEHAVIOR_PROPS,
-    menuButtonMachineProps,
+    menuButtonPositioning,
 } from "./menu-button";
 import type { VariantProp } from "./variants";
 
@@ -63,8 +63,10 @@ export const fabMenuSelection = (
 });
 
 /** The FAB menu's items open above the FAB, at its end. */
-export const fabMenuMachineProps = (props: MenuBehaviorProps) =>
-    menuButtonMachineProps(props, "top-end");
+
+export const fabMenuPositioning = (
+    props: Pick<MenuBehaviorProps, "positioning">,
+) => menuButtonPositioning(props, "top-end");
 
 /** One item of the ready-made FAB menu, as data. */
 export interface FabMenuItem<Node = unknown> extends InteractionSourceProps {
@@ -104,17 +106,6 @@ export const fabMenuItemProps = (item: FabMenuItem) => ({
     valueText: item.valueText,
     disabled: item.disabled,
     interactionSource: item.interactionSource,
-});
-
-/** An item's own props (React's names), which make each item a stop of its own for Tab, as
- *  Compose's FAB menu items are: tabbable unless disabled, and highlighted while focused, so
- *  Enter and Space press the item that has focus. */
-export const fabMenuItemFocusProps = (
-    disabled: boolean | undefined,
-    highlight: () => void,
-) => ({
-    tabIndex: disabled ? -1 : 0,
-    onFocus: highlight,
 });
 
 /** The ready-made FAB menu's repeated parts, each to its item (`ItemInstance`: its index and

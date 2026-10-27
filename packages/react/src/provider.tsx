@@ -6,23 +6,21 @@
 // provider's element and `usePureform()` use, so switching a theme doesn't render them again.
 
 import {
-    providerAttributes,
     requireRegistry,
     resolveProvider,
     ROOT_PROVIDER,
     trainVersionMismatch,
     warnOnce,
 } from "@pureform/binding-core";
+import type { Direction, MotionSetting } from "@pureform/binding-core";
 import type {
-    AnyRegistry,
-    Direction,
-    MotionSetting,
-    ProviderOptions,
-    ProviderState,
+    WebProviderOptions as ProviderOptions,
+    WebProviderState as ProviderState,
     ProviderTheme,
     ThemeHydration,
-} from "@pureform/binding-core";
-import { providerIndicationOverrides } from "@pureform/binding-core/indication";
+} from "@pureform/binding-web";
+import { resolveWebProvider, ROOT_WEB_PROVIDER } from "@pureform/binding-web";
+import { providerAttributes } from "@pureform/binding-web";
 import {
     THEME_PRECEDENCE,
     generatedBlock,
@@ -34,8 +32,9 @@ import {
     unloadedThemeMessage,
 } from "@pureform/binding-web";
 import type { ThemeBlock } from "@pureform/binding-web";
-import { isRuntimeTheme, themeScope } from "@pureform/styling";
-import type { ThemeSchemeVars } from "@pureform/styling";
+import { providerIndicationOverrides } from "@pureform/binding-web/indication";
+import { isRuntimeTheme, themeScope } from "@pureform/styling-web";
+import type { AnyWebRegistry, ThemeSchemeVars } from "@pureform/styling-web";
 import {
     createContext,
     type CSSProperties,
@@ -55,7 +54,7 @@ import type { PartProps } from "./props";
 /** What components read from the nearest provider. */
 export type PureformState = ProviderState<PartProps>;
 
-const PureformContext = createContext<PureformState>(ROOT_PROVIDER);
+const PureformContext = createContext<PureformState>(ROOT_WEB_PROVIDER);
 
 /** The part of the state components read: everything but the theme, the overrides, and the
  *  hydration, which reach them as CSS. */
@@ -127,7 +126,11 @@ export function PureformProvider({
         indication,
     ]);
     const state = useMemo((): PureformState => {
-        const resolved = resolveProvider(parent, { theme, overrides, hydrate });
+        const resolved = resolveWebProvider(parent, {
+            theme,
+            overrides,
+            hydrate,
+        });
         return {
             ...components,
             theme: resolved.theme,
@@ -182,7 +185,7 @@ export function PureformProvider({
 // new object for the same theme changes nothing.
 const useThemeBlock = (
     theme: ProviderTheme | undefined,
-    registry: AnyRegistry | undefined,
+    registry: AnyWebRegistry | undefined,
     hydrate: ThemeHydration,
 ): ThemeBlock | undefined => {
     const runtime = isRuntimeTheme(theme) ? theme : undefined;
@@ -236,7 +239,7 @@ export const useComponentState = (): ComponentState =>
     useContext(ComponentContext);
 
 /** The nearest provider's registry. Throws when no provider has one. */
-export const useRegistry = (): AnyRegistry =>
+export const useRegistry = (): AnyWebRegistry =>
     requireRegistry(useComponentState());
 
 /** The direction in effect: pass it to every machine as `dir`. */

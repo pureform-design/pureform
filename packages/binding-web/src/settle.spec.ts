@@ -1,5 +1,6 @@
-import { formatLinearEasing, sampleSpring } from "@pureform/core";
+import { sampleSpring } from "@pureform/core";
 import type { SpringNode } from "@pureform/core/ast";
+import { formatLinearEasing } from "@pureform/css-lowering";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { createSwipeSettle } from "./list-item-swipe-settle";

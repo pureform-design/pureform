@@ -179,36 +179,6 @@ export const SEARCH_VIEW_COLLECTION = {
 export const searchViewLabel = (props: SearchViewBehaviorProps): string =>
     props["aria-label"] ?? props.placeholder ?? "Search";
 
-/** Zag's dialog props for the view, besides `id`, `dir` and the controllable `open`: modal, so
- *  focus stays in it and goes back to the search bar once it closes. The web adds the input that
- *  takes focus as it opens (`@pureform/binding-web`'s `searchViewDomDialogProps`). */
-export const searchViewDialogProps = (props: SearchViewBehaviorProps) => ({
-    modal: true,
-    role: "dialog" as const,
-    restoreFocus: true,
-    "aria-label": searchViewLabel(props),
-    ids: { content: props.ids?.surface },
-});
-
-/** Zag's combobox props for the query, besides `id`, `dir`, the collection and the controllable
- *  `inputValue`: always open while the view is, and leaving dismissal to the view's dialog. */
-export const searchViewComboboxProps = (
-    props: SearchViewBehaviorProps,
-    open: boolean,
-) => ({
-    open,
-    disableLayer: true,
-    allowCustomValue: true,
-    selectionBehavior: "replace" as const,
-    placeholder: props.placeholder ?? "",
-    disabled: props.disabled,
-    ids: {
-        root: props.id ?? props.ids?.root,
-        input: props.ids?.input,
-        content: props.ids?.content,
-    },
-});
-
 /** Whether a key pressed in the search bar opens the view: Enter, the down arrow, or a
  *  character. */
 export const opensSearchView = (event: {
@@ -224,52 +194,7 @@ export const opensSearchView = (event: {
         !event.metaKey &&
         !event.altKey);
 
-/** Where the positioner puts the view: over the viewport for `fullScreen`; at the top of Root,
- *  over the search bar's place, for `docked` and `contained`. Hidden once the view is gone. */
-export const searchViewPositionerLayout = (
-    variant: string | undefined,
-    present: boolean,
-) => ({
-    hidden: !present,
-    style:
-        variant === "docked" || variant === "contained"
-            ? ({
-                  position: "absolute",
-                  top: "0",
-                  left: "0",
-                  right: "0",
-                  display: "flex",
-                  boxSizing: "border-box",
-              } as const)
-            : ({
-                  position: "fixed",
-                  inset: "0",
-                  display: "flex",
-                  alignItems: "stretch",
-                  boxSizing: "border-box",
-              } as const),
-});
-
-/** Root's own layout: positioned, so a docked view drops over the search bar inside it. */
-export const SEARCH_VIEW_ROOT_STYLE = { position: "relative" } as const;
-
 /** The character a key pressed on the search bar carries into the view's query: a printable
  *  one, but not Space, which opens the view like any button's press. */
 export const searchViewCarriedKey = (key: string): string | undefined =>
     key.length === 1 && key !== " " ? key : undefined;
-
-/** The web's trigger, a native `<button>` around the search bar: none of the button's own look,
- *  laid out as the block the bar was. */
-export const SEARCH_VIEW_TRIGGER_STYLE = {
-    display: "block",
-    boxSizing: "border-box",
-    width: "100%",
-    margin: "0",
-    padding: "0",
-    border: "0",
-    background: "none",
-    font: "inherit",
-    color: "inherit",
-    textAlign: "inherit",
-    cursor: "pointer",
-} as const;

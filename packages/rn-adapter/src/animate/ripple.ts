@@ -3,13 +3,14 @@
 
 import {
     DEFAULT_RIPPLE_TIMING,
+    DEFAULT_RIPPLE_CURVE,
     rippleGeometry,
     ripplePress,
 } from "@pureform/js-effects/core";
 import type {
     Point,
     RippleGeometry,
-    RippleTiming,
+    RippleTiming as SharedRippleTiming,
 } from "@pureform/js-effects/core";
 import {
     createElement,
@@ -25,7 +26,16 @@ import { Animated, Easing, Platform, View } from "react-native";
 import { animatable, blend } from "../motion";
 import { useReducedMotion, useComponentState, useTokens } from "../react";
 import type { Style } from "../select";
+import type { Easing as EasingValue } from "../values";
+import { browserEasing } from "./browser-easing";
 import { NATIVE_DRIVER, curve } from "./curve";
+
+type RippleTiming = SharedRippleTiming<EasingValue>;
+const DEFAULT_EASING: EasingValue = {
+    type: "easing",
+    kind: "cubicBezier",
+    points: DEFAULT_RIPPLE_CURVE,
+};
 
 // Material's pressed state opacity, where the ripple component declares none.
 const PRESSED_OPACITY = 0.1;
@@ -145,7 +155,7 @@ export const useBrowserRipple = (
     useLayoutEffect(() => {
         node(ref.current)?.animate?.(grow, {
             duration: timing.grow,
-            easing: timing.easing,
+            easing: browserEasing(timing.easing),
             fill: "forwards",
         });
     }, []);
@@ -341,7 +351,7 @@ export const useRippleDrawn = (
     const timing: RippleTiming = {
         grow: timed("transform")?.duration || DEFAULT_RIPPLE_TIMING.grow,
         fade: timed("opacity")?.duration || DEFAULT_RIPPLE_TIMING.fade,
-        easing: timed("transform")?.easing ?? DEFAULT_RIPPLE_TIMING.easing,
+        easing: timed("transform")?.easing ?? DEFAULT_EASING,
     };
     const opacity = tokens["components.ripple.opacity"];
     const color = drawing.surfaceColor

@@ -5,12 +5,9 @@
 import { chipSetAnatomy } from "@pureform/anatomy";
 import type { chipAnatomy } from "@pureform/anatomy";
 import {
-    buttonGroupRootProps,
-    toggleGroupItemProps,
     CHIP_SET_CONTENT_PROPS,
     CHIP_SET_ROOT_PROPS,
     chipSetChipVariants,
-    chipSetMachineProps,
     chipSetSelection,
 } from "@pureform/binding-core";
 import type {
@@ -18,6 +15,11 @@ import type {
     ChipSetItem,
     ChipSetRootOwnProps,
 } from "@pureform/binding-core";
+import {
+    buttonGroupRootProps,
+    toggleGroupItemProps,
+    chipSetMachineProps,
+} from "@pureform/binding-web";
 import * as toggleGroup from "@pureform/machines/button-group";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {

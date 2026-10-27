@@ -1,5 +1,5 @@
 import { pureform } from "@pureform/preset";
-import { componentClasses as stylingComponentClasses } from "@pureform/styling";
+import { componentClasses as stylingComponentClasses } from "@pureform/styling-web";
 import { describe, expect, expectTypeOf, it } from "vitest";
 
 import { classesFor } from "./classes";

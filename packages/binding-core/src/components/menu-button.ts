@@ -3,24 +3,18 @@
 // where each component places its menu.
 
 import type { MenuBehaviorProps } from "./menu";
-import { menuMachineProps } from "./menu";
 import type { OverlayPlacement } from "./overlay";
 
-/** The menu machine's props from a menu button's Root (the split button's, the FAB menu's): the
- *  menu's, opening at `placement` unless `positioning` says otherwise. */
-export const menuButtonMachineProps = (
-    props: MenuBehaviorProps,
+/** A menu button's placement defaults without constructing machine props. */
+export const menuButtonPositioning = (
+    props: Pick<MenuBehaviorProps, "positioning">,
     placement: OverlayPlacement,
-) => {
-    const machine = menuMachineProps(props);
-    return {
-        ...machine,
-        positioning: {
-            ...machine.positioning,
-            placement: props.positioning?.placement ?? placement,
-        },
-    };
-};
+) => ({
+    placement,
+    ...props.positioning,
+    // An unspecified placement takes the button's default, including an explicit undefined.
+    ...(props.positioning?.placement === undefined ? { placement } : {}),
+});
 
 /** The keys of `MenuBehaviorProps`, which a menu button's Root keeps off its element. */
 export const MENU_BUTTON_BEHAVIOR_PROPS = [

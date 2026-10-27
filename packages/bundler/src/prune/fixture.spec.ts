@@ -22,7 +22,7 @@ const PACKAGES = resolve(__dirname, "../../..");
 const fixture = (): string => {
     const root = mkdtempSync(join(tmpdir(), "pureform-prune-"));
     mkdirSync(join(root, "node_modules/@pureform"), { recursive: true });
-    for (const name of ["styling", "css-adapter", "preset"]) {
+    for (const name of ["styling", "styling-web", "css-adapter", "preset"]) {
         symlinkSync(
             join(PACKAGES, name),
             join(root, "node_modules/@pureform", name),

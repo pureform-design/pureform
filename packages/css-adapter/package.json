@@ -43,7 +43,8 @@
         "@pureform/core": "workspace:^",
         "@pureform/css-lowering": "workspace:^",
         "@pureform/generate": "workspace:^",
-        "@pureform/styling": "workspace:^"
+        "@pureform/styling": "workspace:^",
+        "@pureform/styling-web": "workspace:^"
     },
     "devDependencies": {
         "@pureform/material": "workspace:^",

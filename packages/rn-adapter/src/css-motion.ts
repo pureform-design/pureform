@@ -3,17 +3,17 @@
 // data: the Reanimated entry turns the curves into its easing objects.
 
 import { TOKEN } from "./values";
-import type { Animation, Transition } from "./values";
+import type { Animation, Easing, Transition } from "./values";
 
-/** CSS's transition and animation properties for a style, with curves as CSS writes them. */
+/** Reanimated's CSS-like motion properties, retaining portable structured curves. */
 export interface CssMotion {
     transitionProperty?: string[];
     transitionDuration?: number[];
-    transitionTimingFunction?: string[];
+    transitionTimingFunction?: Easing[];
     transitionDelay?: number[];
     animationName?: Record<string, Record<string, unknown>>;
     animationDuration?: number;
-    animationTimingFunction?: string;
+    animationTimingFunction?: Easing;
     animationDelay?: number;
     animationIterationCount?: number | "infinite";
     animationDirection?:

@@ -13,7 +13,6 @@ import {
     NATIVE_SELECT_ROOT_PROPS,
     joinIdRefs,
     nativeSelectGroups,
-    nativeSelectProps,
     nativeSelectSelection,
     nativeSelectValue,
     sameNativeSelectValue,
@@ -27,6 +26,7 @@ import type {
     NativeSelectValueKeys,
     NativeSelectValueProps,
 } from "@pureform/binding-core";
+import { nativeSelectProps } from "@pureform/binding-web";
 import {
     type ChangeEvent,
     type ElementType,

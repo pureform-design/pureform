@@ -4,21 +4,22 @@
 // loads (on the server too, so the server renders its classes).
 
 import {
-    classEntry,
-    lazyFactoryError,
     selectionSignature,
-    serverLazyFactoryMessage,
     warnOnce,
     withDefaults,
 } from "@pureform/binding-core";
+import {
+    classEntry,
+    lazyFactoryError,
+    serverLazyFactoryMessage,
+} from "@pureform/binding-web";
 import type {
-    ClassFactory,
-    ClassSlots,
     ComponentName,
     LazyComponentName,
     Selection,
     StaticComponentName,
 } from "@pureform/styling";
+import type { ClassFactory, ClassSlots } from "@pureform/styling-web";
 import { use, useMemo } from "react";
 
 import { isDev, isServer } from "./env";

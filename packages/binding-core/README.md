@@ -3,9 +3,10 @@
 The framework- and platform-free half of pureform's bindings. Everything `@pureform/solid`,
 `@pureform/react`, and `@pureform/react-native` would otherwise write twice lives here:
 what `PureformProvider` takes and how nested providers combine, selections over the provider's
-defaults, a part's state attributes and how its props merge, controllable state, reduced
+defaults, portable part states and keyed customization, controllable state, reduced
 motion, the interaction source and the indication interface, and each component's contract: the
-props Root takes and how they map onto the selection and the machine.
+props Root takes, portable state, selection, content, and gesture calculations. HTML/Zag prop
+assembly lives in binding-web, even when it needs no browser API.
 
 It uses no DOM type or API: its `tsconfig.json` leaves the DOM lib out, so a leak fails the type
 check `test:unit` runs first. What needs the DOM (runtime themes as CSS, measuring, drags and
@@ -30,18 +31,21 @@ to prune builds.
 
 ## Architecture
 
+Web encoders live in `@pureform/binding-web`: `stateAttributes`/`StateAttributes`,
+`partSources`/`PartSourcesInput`, `providerAttributes`/`ProviderAttributes`, `themeAttributes`,
+and `themeAttributeOf`. Class lookup/merge helpers (`cx`, `classEntry`, `combineProps`,
+`partClasses`), web diagnostics, and ripple-class resolution also live in binding-web, not here.
+Wire constants and types live in `@pureform/web-contracts`; this package depends on neither.
+
 | Module                   | What it holds                                                                                                                                                                                                                                                        |
 | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `provider.ts`            | `ProviderOptions`, `ProviderState`, `resolveProvider` (nesting), `providerAttributes`, `themeAttributes`, `requireRegistry`                                                                                                                                          |
+| `provider.ts`            | `ProviderOptions`, `ProviderState`, `resolveProvider` (nesting), `requireRegistry`                                                                                                                                                                                   |
 | `selection.ts`           | `withDefaults`: a selection over the provider's defaults; `selectionSignature` to memoize on one                                                                                                                                                                     |
-| `entries.ts`             | `classEntry` (the provider registry's entry), and the class hooks' errors about lazy entries                                                                                                                                                                         |
-| `parts.ts`               | `partSources` (a part's props, in merge order), `stateAttributes`, `partClasses`, `forSlot`, `isUnstyled`, `isIconPart`, `InnerProps`, `overDefaults`, `PerInstance`, `forInstance`, `isPerInstance`, `ItemInstance`                                                 |
-| `props.ts`               | `combineProps`: one part's props from several sources, with the binding's rules for classes and styles                                                                                                                                                               |
-| `slot-reader.ts` | `createSlotReader`: platform-neutral keyed lookup with lazy instance data shared within one resolution; no customization channels or merge policy |
-| `class-names.ts`         | `cx`: a `clsx`-compatible class joiner, for bindings whose class prop is a string (React)                                                                                                                                                                            |
+| `parts.ts`               | `PartStates`, `forSlot`, `isUnstyled`, `isIconPart`, `partAsRoot`, `InnerProps`, `overDefaults`, `PerInstance`, `forInstance`, `isPerInstance`, `ItemInstance`                                                                                                       |
+| `slot-reader.ts`         | `createSlotReader`: platform-neutral keyed lookup with lazy instance data shared within one resolution; no customization channels or merge policy                                                                                                                    |
 | `controllable.ts`        | `Controllable<N, T>`, the controlled/uncontrolled warning, and `reason: "reset"` tracking                                                                                                                                                                            |
 | `components/`            | One file per component's contract (`button.ts`, `checkbox.ts`, `switch.ts`, `radio-group.ts`, `chip.ts`, `icon-button.ts`, `fab.ts`), what ready-made components share about content (`content.ts`), and `VariantProp` (`variants.ts`)                               |
-| `motion.ts`              | `resolveReducedMotion`, `REDUCED_MOTION_QUERY`                                                                                                                                                                                                                       |
+| `motion.ts`              | `resolveReducedMotion`, `MotionSetting`                                                                                                                                                                                                                              |
 | `icon-style.ts`          | `IconStyle`, `DEFAULT_ICON_STYLE`                                                                                                                                                                                                                                    |
 | `version.ts`             | `versionMismatch`: the generated registry's recorded version against the running `@pureform/styling`'s `VERSION`                                                                                                                                                     |
 | `warn.ts`                | `warnOnce`                                                                                                                                                                                                                                                           |
@@ -50,8 +54,8 @@ to prune builds.
 | `usage.ts`               | `COMPONENT_USAGE` and the hook and provider names the bundler's pruning scan reads (on `/usage`)                                                                                                                                                                     |
 | `interaction.ts`         | The interaction source (on `/interaction`): `InteractionKinds`, `Interaction`, `InteractionState`, `createInteractionSource` and the state it keeps                                                                                                                  |
 | `indication.ts`          | The `Indication` interface (on `/indication`): what an indication sets and draws, `defineIndication`, generic over the platform's element (`Indication<E>`, `IndicationTarget<E>`; `@pureform/binding-web` supplies `HTMLElement`); re-exports the two modules below |
-| `indication-material.ts` | `materialIndication({ ripple })` and `noIndication` without live halves (the bindings add them), `rippleClasses(registry)`                                                                                                                                           |
-| `indication-tokens.ts`   | An indication's tokens as CSS: theme-level overrides for a provider, instance tokens for a component, the focus indicator check                                                                                                                                      |
+| `indication-material.ts` | `materialIndication({ ripple })`, `noIndication`, and `DEFAULT_INDICATION` without live halves (the bindings add them)                                                                                                                                               |
+| `indication-tokens.ts`   | Portable token names/paths and the focus indicator check; CSS conversion belongs to binding-web `/indication`                                                                                                                                                        |
 
 No entry uses a DOM type or API or CSS lowering, so React Native can import every one.
 
@@ -64,40 +68,24 @@ No entry uses a DOM type or API or CSS lowering, so React Native can import ever
 type Direction = "ltr" | "rtl";
 interface ProviderOptions<P> {           // P: the binding's props for one part
     registry?; dir?; motion?; defaults?; slotProps?;
-    theme?: ProviderTheme;               // a name from the config, or a RuntimeTheme
-    overrides?: ThemeOverrides;          // { "colors.primary": "#006a60" }: vars in the element's style
-    hydrate?: "reuse" | "regenerate";    // how the client gets a server-rendered runtime theme
+    indication?;
 }
-interface ProviderState<P> { registry; dir; motion; defaults; slotProps; theme; overrides; hydrate }
-const ROOT_PROVIDER: ProviderState<never>;           // ltr, system, reuse, nothing else
+interface ProviderState<P> { registry; dir; motion; defaults; slotProps; indication; focusIndicatorColor }
+const ROOT_PROVIDER: ProviderState<never>;           // ltr, system, empty defaults/slots
 resolveProvider(parent, own, merge?): ProviderState<P>;
-providerAttributes(own, state): { dir; "data-pf-motion": "reduce" | "full" | undefined; ...themeAttributes };
-themeAttributes(theme, registry);        // { "data-theme": "teal" } or { "data-theme": "pf-1x2y3z" }
-themeAttributeOf(registry): string;      // the registry's theme attribute, else "data-theme"
 requireRegistry(state): AnyRegistry;     // throws, naming PureformProvider, when there's none
 withDefaults(defaults, selection): Selection<C>;
 selectionSignature(selection): string;   // equal exactly when two selections select the same
-classEntry(state, name): RegistryEntry<ClassFactory<N>>;
-lazyFactoryError(name): Error; serverLazyFactoryMessage(name): string;
 
 // Parts
-stateAttributes({ pressed: true, hover: false }) // { "data-pf-active": "", "data-pf-hover": undefined }
-partClasses(anatomy, part, slots, unstyled?): SlotClasses | undefined; // by the part's slot
-partSources({ anatomy, part, machine, states, testId, unstyled, partUnstyled, classes, slotProps, props })
-    // [machine, part attributes, state attributes, registry, provider slotProps, user props]
-    // the registry's classes and the provider's slotProps are the part's slot's (partSlot):
-    // a menu's `content` part reads the menu's `root` slot
-spreadableProps(props);                  // without children and ref
-cx("a", ["b", { c: true }]);             // "a b c", as clsx joins
 forSlot(slotKeyed, slot); isUnstyled(unstyled, part); isIconPart(anatomy, part);
-overDefaults(listItemProps, item);      // a child's own over its container's defaults: classes join,
-                                        // style/slotProps/tokens merge per part; either as-is when the other is empty
+overDefaults(listItemProps, item, mergeKey); // skips undefined own keys; the platform merges keys both set
+mergeKeyedDefaults(base, own, mergePart); // part by part; per-instance readers stay lazy
+mergeShallowDefaults(base, own);         // shallow, own keys win; what tokens use
 forInstance(className.row, row);        // a repeated part's value for one copy (PerInstance<V, I>)
 isPerInstance([className, style], "row"); // whether any keyed value of the part is a function of the copy
 const read = createSlotReader("row", () => row); // fresh for each render or reactive evaluation
 read(styles); read(slotProps);          // only the requested channels; instance built at most once
-combineProps(sources, rules): Record<string, unknown>;
-outsideRootMessage("Button", "Label");   // the error for a compound part outside its Root
 
 // Controllable state
 type Controllable<"checked", boolean>    // checked, defaultChecked, onCheckedChange({ checked, reason? })
@@ -108,21 +96,38 @@ createChangeReason(): { during(update); untilNextTask({ drop? }); report(callbac
 
 // Motion and icons
 resolveReducedMotion(setting, systemReduces): boolean;
-DEFAULT_ICON_STYLE; // { size: undefined, color: "currentColor", filled: false }
+DEFAULT_ICON_STYLE; // { size: undefined, color: undefined, filled: false }
 ```
 
-How a provider resolves: the registry, `dir`, `theme`, and `hydrate` are inherited unless set;
-`motion` is the nearest `"reduce"` or `"full"`, else `"system"` (the CSS does the same, since a
-`"system"` provider writes no attribute); `defaults` merge per component, the inner provider's
+How a provider resolves: registry, `dir`, and indication are inherited unless set;
+`motion` is the nearest `"reduce"` or `"full"`, else `"system"`; `defaults` merge per component, the inner provider's
 defined values winning, tokens too; `slotProps` merge per component and slot through the
-binding's `merge`; `overrides` merge by key.
+binding's `merge`. Focus color inherits independently from the nearest indication setting it.
+Theme/scheme/override inheritance belongs to each platform, not this state.
 
-`combineProps` takes sources in order (machine, part attributes, states, registry, provider,
-user): classes collect under the first of `rules.classKeys` and join with `rules.joinClasses`
-(Solid: an array; React: a string), styles join with `rules.joinStyles`, `on*` handlers all
-run in order, and any other key takes the last value that isn't `undefined`.
+Web class/prop assembly and its merge rules are documented in
+[`@pureform/binding-web`](../binding-web/README.md). Its `overDefaults` supplies web class/style
+policy; Native supplies its own policy using `StyleSheet.flatten`. Neither policy is imported
+here. `IconStyle` has an optional color and platform-defined size units; only web supplies
+`currentColor` and CSS-pixel measurement.
 
 ### Component contracts
+
+**Ownership of the catalogue below:** it describes the combined component API. All
+`*MachineProps`, HTML element inference, layout/hidden/data-attribute adapters, form-reset
+projection and CSS constants listed below now come from **binding-web**, not this package.
+The [phase-3 export ledger](../../docs/design/platform-boundaries-phase3-exports.md) is the exact
+import map. Shared semantic ARIA helpers (roles, naming, progress values and ID references)
+remain portable, including for React Native's ARIA support.
+
+New neutral entry points are `fieldControlState(field, own)` (boolean states, `id`, `describedBy`),
+`cardSelection`/`cardLayout` and `listItemSelection` with an explicit interaction boolean,
+`selectionListDefaults`, `menuButtonPositioning`, `fabMenuPositioning`, and
+`splitButtonPositioning`. Web wrappers infer interaction from HTML elements. Native does not
+fake `button`/`div` values or decode `aria-invalid` to recover state.
+
+`ToasterOptions.offsets` and the neutral toaster defaults use numbers (logical units); the web
+extension retains CSS strings. Styling's registry/factory types are still shared until phase 4.
 
 Each component the bindings build has a file in `src/components/` that both bindings read, so
 their props and behavior can't drift:
@@ -701,7 +706,6 @@ materialIndication(options?: { ripple?: "ink-well" | "ink-sparkle" | false }): I
 //   { ripple: false } has no layer.
 noIndication: Indication;      // "none": the four state-layer opacities at 0; keeps the focus indicator
 DEFAULT_INDICATION;            // materialIndication()
-rippleClasses(registry): { root?, ripple? } | undefined; // the registry's static `ripple` entry
 
 // Tokens as the web writes them
 providerIndicationOverrides(indication): ThemeOverrides | undefined;
@@ -761,11 +765,15 @@ items), and that no Solid or React source sets a listed group from anything but 
 
 ## Worth knowing
 
-- **Themes:** a provider's own `theme` (a name from the config) becomes the registry's
+- **Registry type:** `ProviderOptions<P, R>`/`ProviderState<P, R>` and `resolveProvider` take
+  the registry type `R` (default the neutral `AnyRegistry` from `@pureform/styling`);
+  `requireRegistry` returns that `R`. Web providers instantiate it with `@pureform/styling-web`'s
+  `AnyWebRegistry`; nothing here imports styling-web, CSS lowering, or web contracts.
+- **Themes (web):** a provider's own `theme` (a name from the config) becomes the web registry's
   `themeAttributes(theme)` on its element, so the target decides the attribute (`data-theme`,
   `data-panda-theme`) and no binding hard-codes a selector. An inherited theme writes nothing:
   the ancestor's attribute already scopes it.
-- **Runtime themes** (`RuntimeTheme` from `@pureform/styling`, such as `seedTheme` from
+- **Runtime themes** (`RuntimeTheme` from `@pureform/styling-web`, such as `seedTheme` from
   `@pureform/material/runtime-theme`): the provider writes the theme attribute with the theme's
   scope, `pf-<hash>` of its input, and one `<style>` block with both schemes' vars under
   `[attr="pf-<hash>"]`. The decision of when to generate is shared:

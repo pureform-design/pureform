@@ -148,30 +148,6 @@ export const stepperSelection = (
     tokens: props.tokens,
 });
 
-/** Zag's steps props from Root's, besides `id`, `dir` and the controllable `step`. Root's `id`
- *  becomes Zag's root id. */
-export const stepperMachineProps = (
-    props: StepperBehaviorProps & StepperVariantProps,
-) => ({
-    count: props.count,
-    linear: props.linear,
-    isStepValid: props.isStepValid,
-    isStepSkippable: props.isStepSkippable,
-    onStepInvalid: props.onStepInvalid,
-    onStepComplete: props.onStepComplete,
-    // Zag's `orientation` is the variant's; a value the registry doesn't know lays out as a row.
-    orientation:
-        props.orientation === "vertical"
-            ? ("vertical" as const)
-            : ("horizontal" as const),
-    ids: {
-        root: props.id ?? props.ids?.root,
-        list: props.ids?.list,
-        triggerId: props.ids?.trigger,
-        contentId: props.ids?.content,
-    },
-});
-
 /** Zag's trigger props for one step, without the `aria-controls` that names its content when the
  *  step has none. */
 export const stepperTriggerProps = <P extends object>(

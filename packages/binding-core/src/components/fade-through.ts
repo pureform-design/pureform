@@ -12,8 +12,7 @@ import type {
 import type { Selection } from "@pureform/styling";
 
 import type { Unstyled } from "../parts";
-import { LEAVING_PAGE_PROPS } from "./page-transition";
-import type { PageKey, TransitionPage } from "./page-transition";
+import type { PageKey } from "./page-transition";
 
 /** The fade through's parts: `"root"` and `"page"`. */
 export type FadeThroughPart = PartName<typeof fadeThroughAnatomy>;
@@ -41,15 +40,3 @@ export const FADE_THROUGH_ROOT_PROPS = [
 
 /** The registry selection: the fade through has no variants or tokens. */
 export const fadeThroughSelection = (): Selection<"fadeThrough"> => ({});
-
-/** A page's attributes: entering `data-state="open"`, leaving `"closed"` (and out of reach,
- *  hidden from assistive technology); the page shown first has none, so it doesn't animate. A
- *  fade through doesn't settle its entering pages, so an entered page keeps `"open"`. */
-export const fadeThroughPageProps = (
-    page: TransitionPage,
-): Readonly<Record<string, string | boolean>> =>
-    page.state === "leaving"
-        ? { "data-state": "closed", ...LEAVING_PAGE_PROPS }
-        : page.state === "entering"
-          ? { "data-state": "open" }
-          : {};

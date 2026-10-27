@@ -82,18 +82,3 @@ export const FULLSCREEN_DIALOG_CONTENT_PROPS = [
 export const fullscreenDialogSelection = (
     props: FullscreenDialogVariantProps,
 ): Selection<"fullscreenDialog"> => ({ tokens: props.tokens });
-
-/** What the positioner adds to Zag's props: hidden once the dialog is gone (closed, and its exit
- *  animation over), and fixed over the viewport, which the dialog fills. Normalize it with the
- *  framework's `normalizeProps` and merge it after Zag's. Once it shows, `stackPositioner` (from
- *  `/dom`) stacks it at the surface's layer, in the next frame. */
-export const fullscreenDialogPositionerLayout = (present: boolean) => ({
-    hidden: !present,
-    style: {
-        position: "fixed",
-        inset: "0",
-        display: "flex",
-        alignItems: "stretch",
-        boxSizing: "border-box",
-    } as const,
-});

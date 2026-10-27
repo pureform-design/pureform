@@ -106,13 +106,13 @@ export interface CodegenOutput {
     readonly components: readonly ComponentModule[];
     /** Other files, written alongside. */
     readonly files?: readonly GeneratedFile[];
-    /** The attribute the target's stylesheet scopes named themes with (`data-theme`). The index
-     *  passes it to the registry, whose `themeAttributes(name)` providers write. Leave it out on
-     *  targets without selectors. */
+    /** The attribute the target's stylesheet scopes named themes with (`data-theme`). A web
+     *  target's index passes it to its web registry (`@pureform/styling-web`), whose
+     *  `themeAttributes(name)` providers write. A native target's index ignores it. */
     readonly themeAttribute?: string;
-    /** How the target's stylesheet names its CSS vars. The index passes it to the registry, so
-     *  providers can write token overrides and runtime themes under the same names. Leave it
-     *  out on targets without CSS vars. */
+    /** How the target's stylesheet names its CSS vars. A web target's index passes it to its
+     *  web registry, so providers can write token overrides and runtime themes under the same
+     *  names. A native target's index ignores it. */
     readonly vars?: CodegenVars;
 }
 

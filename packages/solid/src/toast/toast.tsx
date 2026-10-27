@@ -9,20 +9,19 @@ import { toastAnatomy } from "@pureform/anatomy";
 import {
     isPresent,
     isToastType,
-    TOAST_STACK_STYLE,
     TOASTER_PROPS,
-    toasterOptions,
-    toastGroupStyle,
     toastSelection,
 } from "@pureform/binding-core";
 import type {
     InteractionSourceProps,
-    ToasterOptions,
     ToasterOwnProps,
     ToastInstance,
     ToastInstances,
     ToastType,
 } from "@pureform/binding-core";
+import { TOAST_STACK_STYLE, toastGroupStyle } from "@pureform/binding-web";
+import { toasterOptions } from "@pureform/binding-web";
+import type { ToasterOptions } from "@pureform/binding-web";
 import { toastSwipeToDismiss } from "@pureform/binding-web";
 import * as toast from "@pureform/machines/toast";
 import type { JSX } from "@solidjs/web";

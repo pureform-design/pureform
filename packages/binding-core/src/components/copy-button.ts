@@ -55,39 +55,8 @@ export const COPY_BUTTON_OWN_PROPS = [
 export const COPY_LABEL = "Copy to clipboard";
 export const COPIED_LABEL = "Copied to clipboard";
 
-/** The live region that announces the copy: there to be read, not seen. Its keys are the same in
- *  React's and Solid's `style`. */
-export const COPY_ANNOUNCEMENT_STYLE = {
-    position: "absolute",
-    width: "1px",
-    height: "1px",
-    margin: "-1px",
-    padding: "0",
-    overflow: "hidden",
-    clip: "rect(0 0 0 0)",
-    border: "0",
-} as const;
-
 /** The live region's text: `copiedLabel` while copied, else nothing. */
 export const copyAnnouncement = (
     props: Pick<CopyButtonBehaviorProps, "copiedLabel">,
     copied: boolean,
 ): string => (copied ? (props.copiedLabel ?? COPIED_LABEL) : "");
-
-/** The clipboard machine's props from the copy button's: the value, the timeout, the names,
- *  `onCopy` once copied and `onCopyError` when the write is denied. */
-export const copyButtonMachineProps = (props: CopyButtonBehaviorProps) => ({
-    value: props.value,
-    timeout: props.timeout,
-    translations: {
-        triggerLabel: (copied: boolean) =>
-            copied
-                ? (props.copiedLabel ?? COPIED_LABEL)
-                : (props.label ?? COPY_LABEL),
-    },
-    onStatusChange: ({ copied }: { copied: boolean }) => {
-        if (copied) props.onCopy?.(props.value);
-    },
-    onCopyError: (details: { value: string; error: Error }) =>
-        props.onCopyError?.(details),
-});

@@ -4,7 +4,7 @@
 // module `apps/storybook-web` reads (see its README): decorators that wrap every story in React,
 // starting with the provider. No JSX, so a type check with another renderer's JSX can read it.
 
-import type { AnyRegistry } from "@pureform/binding-core";
+import type { AnyWebRegistry } from "@pureform/styling-web";
 import { createElement } from "react";
 import type { ReactNode } from "react";
 
@@ -18,7 +18,7 @@ export interface StoryTheme {
 }
 
 export interface StoryContext {
-    readonly registry: AnyRegistry;
+    readonly registry: AnyWebRegistry;
     readonly theme: StoryTheme;
     readonly globals: Readonly<Record<string, unknown>>;
 }

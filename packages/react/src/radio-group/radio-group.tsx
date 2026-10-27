@@ -7,12 +7,6 @@ import { radioAnatomy, radioGroupAnatomy } from "@pureform/anatomy";
 import {
     RADIO_GROUP_ROOT_PROPS,
     RADIO_PROPS,
-    radioGroupMachineProps,
-    radioGroupResetValue,
-    radioGroupRootProps,
-    radioInputProps,
-    radioItemProps,
-    radioRingProps,
     radioSelection,
 } from "@pureform/binding-core";
 import type {
@@ -21,6 +15,14 @@ import type {
     RadioGroupVariantProps,
     RadioOwnProps,
 } from "@pureform/binding-core";
+import { radioGroupResetValue } from "@pureform/binding-web";
+import {
+    radioGroupMachineProps,
+    radioGroupRootProps,
+    radioInputProps,
+    radioItemProps,
+    radioRingProps,
+} from "@pureform/binding-web";
 import {
     radioInputs,
     setRadioDefaults,

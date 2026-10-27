@@ -3,22 +3,20 @@
 // async one, which suspends to the nearest `<Loading>` and resolves to classes (plain data, which
 // Solid serializes for hydration), never to the factory.
 
+import { warnOnce, withDefaults } from "@pureform/binding-core";
 import {
     classEntry,
     lazyFactoryError,
     serverLazyFactoryMessage,
-    warnOnce,
-    withDefaults,
-} from "@pureform/binding-core";
+} from "@pureform/binding-web";
 import type {
-    ClassFactory,
-    ClassSlots,
     ComponentName,
     LazyComponentName,
     RegistryEntry,
     Selection,
     StaticComponentName,
 } from "@pureform/styling";
+import type { ClassFactory, ClassSlots } from "@pureform/styling-web";
 import { isDev, isServer } from "@solidjs/web";
 import { type Accessor, createMemo, untrack } from "solid-js";
 

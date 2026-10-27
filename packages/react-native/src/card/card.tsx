@@ -93,7 +93,7 @@ function Root(props: CardRootProps): ReactNode {
     );
     const slots = useComponentSlots<CardPart>(
         "card",
-        indication.select(cardSelection(props, acts ? "button" : "div")),
+        indication.select(cardSelection(props, acts)),
         acts || hasArea
             ? indication.states(props.disabled ? { disabled: true } : {})
             : {},
@@ -267,7 +267,7 @@ export interface CardProps extends CardRootProps, CardContentProps<ReactNode> {}
  *  area around the media, header, and content, so each control stays its own. */
 function CardImpl(props: CardProps): ReactNode {
     const acts = props.onPress !== undefined;
-    const layout = cardLayout(props, acts ? "button" : "div");
+    const layout = cardLayout(props, acts);
     const padded = props.padded ?? (layout.sections ? false : undefined);
     const header = layout.header ? (
         <Header>

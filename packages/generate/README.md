@@ -201,15 +201,15 @@ Every file starts with the same header:
 ```
 
 ```ts
-// index.ts
-import { createRegistry } from "@pureform/styling";
+// index.ts (a web target; a native one imports createRegistry from @pureform/styling)
+import { createWebRegistry } from "@pureform/styling-web";
 
 import { button } from "./web/button";
 
 /** The core's version this registry was made with. */
 export const version = "0.4.1";
 
-export const registry = createRegistry(
+export const registry = createWebRegistry(
     {
         button,
         checkbox: { lazy: () => import("./web/checkbox") },
@@ -263,12 +263,14 @@ export const codegen = defineCodegen<{ prefix?: string }>({
 The context also carries `variants` in a pruned build (empty or absent otherwise): narrow the
 stylesheet, `staticCss`, or precomputed tables to it, never the modules (see Pruning above).
 
-`themeAttribute` is the attribute the target's stylesheet matches named themes with; the index
-passes it to `createRegistry`, whose `themeAttributes(name)` providers write on their element.
-Leave it out on targets without selectors (React Native). `vars` (`CodegenVars`: the component
-var `prefix` and the `tokenPrefix`) is how the stylesheet names its CSS vars; the index passes the
-defined ones to `createRegistry` as `vars`, which providers name token overrides and runtime
-theme vars with. Leave it out on targets without CSS vars.
+The adapter's `platform` picks the registry: a web target's index calls `@pureform/styling-web`'s
+`createWebRegistry`, a native target's calls `@pureform/styling`'s neutral `createRegistry` with
+just `{ version }`. Both make the same entries; the declarations augment `@pureform/styling` for
+every target. `themeAttribute` is the attribute the target's stylesheet matches named themes with;
+a web index passes it to `createWebRegistry`, whose `themeAttributes(name)` providers write on
+their element. `vars` (`CodegenVars`: the component var `prefix` and the `tokenPrefix`) is how the
+stylesheet names its CSS vars; a web index passes the defined ones as `vars`, which providers name
+token overrides and runtime theme vars with. A native index ignores both.
 
 The context gives the config, the components to generate, the adapter's options, the root
 and output folder, `shape(name)` (groups, defaults, slots, tokens from the config), and

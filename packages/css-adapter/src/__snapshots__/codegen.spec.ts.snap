@@ -2,7 +2,8 @@
 
 exports[`the CSS codegen > gives a single-slot component's class to the root 1`] = `
 "import { selectionCache } from "@pureform/styling";
-import type { ClassFactory, ClassSlots, Selection } from "@pureform/styling";
+import type { Selection } from "@pureform/styling";
+import type { ClassFactory, ClassSlots } from "@pureform/styling-web";
 
 const classes = selectionCache<Selection<"icon">, ClassSlots<"icon">>(
     {
@@ -21,7 +22,8 @@ export const icon: ClassFactory<"icon"> = classes;
 
 exports[`the CSS codegen > gives a single-slot component's class to the root 2`] = `
 "import { selectionCache } from "@pureform/styling";
-import type { ClassFactory, ClassSlots, Selection } from "@pureform/styling";
+import type { Selection } from "@pureform/styling";
+import type { ClassFactory, ClassSlots } from "@pureform/styling-web";
 
 const classes = selectionCache<Selection<"divider">, ClassSlots<"divider">>(
     {
@@ -39,8 +41,10 @@ export const divider: ClassFactory<"divider"> = classes;
 `;
 
 exports[`the CSS codegen > writes each slot's classes over the selection, and adds instance tokens 1`] = `
-"import { selectionCache, withTokenStyle } from "@pureform/styling";
-import type { ClassFactory, ClassSlots, Selection } from "@pureform/styling";
+"import { selectionCache } from "@pureform/styling";
+import type { Selection } from "@pureform/styling";
+import { withTokenStyle } from "@pureform/styling-web";
+import type { ClassFactory, ClassSlots } from "@pureform/styling-web";
 
 const vars = {
     radius: "--pf-components-iconButton-radius",

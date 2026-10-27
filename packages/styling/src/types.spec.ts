@@ -4,14 +4,11 @@
 import { describe, expectTypeOf, it } from "vitest";
 
 import type {
-    ClassFactory,
-    ClassSlots,
     ComponentName,
     ComponentState,
     InstanceTokens,
     LazyComponentName,
     Selection,
-    SlotClasses,
     SlotOf,
     StateOf,
     States,
@@ -139,30 +136,6 @@ describe("registered components", () => {
         // @ts-expect-error a plain value on a spring token
         const plain: Selection<"button"> = { tokens: { move: 200 } };
         void [springs, role, misplaced, unknown, plain];
-    });
-
-    it("types the web factory: variants in, classes per slot out", () => {
-        expectTypeOf<ClassFactory<"button">>()
-            .parameter(0)
-            .toEqualTypeOf<Selection<"button">>();
-        expectTypeOf<ReturnType<ClassFactory<"button">>>().toEqualTypeOf<
-            ClassSlots<"button">
-        >();
-        expectTypeOf<ClassSlots<"button">>().toEqualTypeOf<{
-            readonly root: SlotClasses;
-            readonly label: SlotClasses;
-        }>();
-        const button: ClassFactory<"button"> = () => ({
-            root: { class: "a", style: { "--x": "1" } },
-            label: { class: "b" },
-        });
-        // @ts-expect-error a slot is missing
-        const partial: ClassFactory<"button"> = () => ({
-            root: { class: "a" },
-        });
-        // @ts-expect-error states aren't in a web selection
-        button({ pressed: true });
-        void partial;
     });
 
     it("types the native factory: variants and states in, styles per slot out", () => {

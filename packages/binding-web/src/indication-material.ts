@@ -3,10 +3,8 @@
 // Material indications have no live half; `webIndication` gives them this one, as React Native
 // gives them its own.
 
-import {
-    materialIndication as neutralMaterialIndication,
-    rippleClasses,
-} from "@pureform/binding-core/indication";
+import type { AnyRegistry } from "@pureform/binding-core";
+import { materialIndication as neutralMaterialIndication } from "@pureform/binding-core/indication";
 import type {
     Indication as CoreIndication,
     IndicationContext,
@@ -14,8 +12,40 @@ import type {
 } from "@pureform/binding-core/indication";
 import { createRipple } from "@pureform/js-effects";
 import type { RippleController } from "@pureform/js-effects";
+import type { SlotClasses } from "@pureform/styling-web";
 
 import type { Indication } from "./indication";
+
+/** The ripple's slots, from the registry's `ripple` entry: the layer (`root`) and each ripple
+ *  element (`ripple`). */
+export interface RippleClasses {
+    readonly root?: SlotClasses | undefined;
+    readonly ripple?: SlotClasses | undefined;
+}
+
+const rippleClassCache = new WeakMap<AnyRegistry, RippleClasses | null>();
+
+/** The ripple's classes from the registry's `ripple` entry; `undefined` when the registry has no
+ *  static `ripple` entry (left out, or loaded on demand). The same object for a registry. */
+export const rippleClasses = (
+    registry: AnyRegistry | undefined,
+): RippleClasses | undefined => {
+    if (!registry) return undefined;
+    let classes = rippleClassCache.get(registry);
+    if (classes === undefined) {
+        classes = null;
+        if (registry.has("ripple")) {
+            const entry = registry.entry("ripple");
+            if (entry.kind === "static") {
+                classes = (
+                    entry.factory as (selection: object) => RippleClasses
+                )({});
+            }
+        }
+        rippleClassCache.set(registry, classes);
+    }
+    return classes ?? undefined;
+};
 
 // Draws the ripple in the target's layer from each press the source hears, whichever surface it
 // came from; the controller is made on the first press.

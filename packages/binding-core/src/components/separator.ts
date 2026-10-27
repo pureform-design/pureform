@@ -48,7 +48,3 @@ export const separatorSelection = (
     orientation: props.orientation,
     tokens: props.tokens,
 });
-
-/** Root's element props: an `<hr>` is a separator already; any other element gets the role. */
-export const separatorRootProps = (element: unknown) =>
-    element === "hr" ? {} : { role: "separator" as const };

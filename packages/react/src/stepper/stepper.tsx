@@ -9,7 +9,6 @@ import {
     isPresent,
     STEPPER_ROOT_PROPS,
     stepperIndicator,
-    stepperMachineProps,
     stepperSelection,
     stepperTriggerDisabled,
     stepperTriggerProps,
@@ -22,6 +21,7 @@ import type {
     StepperRootOwnProps,
     StepperStepInstance,
 } from "@pureform/binding-core";
+import { stepperMachineProps } from "@pureform/binding-web";
 import * as stepper from "@pureform/machines/stepper";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";

@@ -1,6 +1,14 @@
 import { describe, expect, it } from "vitest";
 
 import { cssMotion } from "./css-motion";
+import { LINEAR } from "./values";
+import type { Easing } from "./values";
+
+const bezier: Easing = {
+    type: "easing",
+    kind: "cubicBezier",
+    points: [0.2, 0, 0, 1],
+};
 
 describe("cssMotion", () => {
     it("lists a slot's transitions as CSS's, leaving out what it draws with SVG", () => {
@@ -9,26 +17,26 @@ describe("cssMotion", () => {
                 {
                     property: "backgroundColor",
                     duration: 150,
-                    easing: "linear",
+                    easing: LINEAR,
                     delay: 0,
                 },
                 {
                     property: "clipPath",
                     duration: 300,
-                    easing: "linear",
+                    easing: LINEAR,
                     delay: 0,
                 },
                 {
                     property: "transform",
                     duration: 300,
-                    easing: "cubic-bezier(0.2, 0, 0, 1)",
+                    easing: bezier,
                     delay: 50,
                 },
             ]),
         ).toEqual({
             transitionProperty: ["backgroundColor", "transform"],
             transitionDuration: [150, 300],
-            transitionTimingFunction: ["linear", "cubic-bezier(0.2, 0, 0, 1)"],
+            transitionTimingFunction: [LINEAR, bezier],
             transitionDelay: [0, 50],
         });
         expect(cssMotion([])).toEqual({});
@@ -39,7 +47,7 @@ describe("cssMotion", () => {
             cssMotion([], {
                 name: "spin",
                 duration: 1000,
-                easing: "linear",
+                easing: LINEAR,
                 delay: 0,
                 iterations: -1,
                 direction: "alternateReverse",
@@ -56,7 +64,7 @@ describe("cssMotion", () => {
                 "100%": { opacity: 1 },
             },
             animationDuration: 1000,
-            animationTimingFunction: "linear",
+            animationTimingFunction: LINEAR,
             animationDelay: 0,
             animationIterationCount: "infinite",
             animationDirection: "alternate-reverse",

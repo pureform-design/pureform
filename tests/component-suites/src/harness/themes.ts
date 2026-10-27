@@ -4,8 +4,8 @@
 
 import { seedTheme } from "@pureform/material/runtime-theme";
 import type { SeedThemeInput } from "@pureform/material/runtime-theme";
-import { defineRuntimeTheme } from "@pureform/styling";
-import type { RuntimeTheme } from "@pureform/styling";
+import { defineRuntimeTheme } from "@pureform/styling-web";
+import type { RuntimeTheme } from "@pureform/styling-web";
 
 import type { SceneProvider } from "./scene";
 

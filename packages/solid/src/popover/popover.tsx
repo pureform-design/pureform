@@ -7,13 +7,15 @@
 import { popoverOverlayAnatomy } from "@pureform/anatomy";
 import {
     isPresent,
-    overlayPositionerProps,
-    presentProps,
     POPOVER_CONTENT_PROPS,
     popoverSelection,
-    CARET_STYLE,
 } from "@pureform/binding-core";
 import type { PopoverContentProps } from "@pureform/binding-core";
+import {
+    overlayPositionerProps,
+    presentProps,
+    CARET_STYLE,
+} from "@pureform/binding-web";
 import {
     POPOVER_DOM_ROOT_PROPS,
     popoverDomMachineProps,

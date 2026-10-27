@@ -2,7 +2,6 @@
 // CSS's animation properties, which Reanimated runs on the UI thread. Put the styles on
 // Reanimated's views (`Animated.View` from react-native-reanimated).
 
-import { parseLinearEasing } from "@pureform/core";
 import { useMemo } from "react";
 import { I18nManager, Platform } from "react-native";
 import { cubicBezier, linear } from "react-native-reanimated";
@@ -19,7 +18,7 @@ import type {
 import type { TokenVelocities } from "./motion";
 import { useComponentState } from "./react";
 import type { State } from "./select";
-import type { ThemeValues } from "./values";
+import type { Easing, ThemeValues } from "./values";
 
 export { cssMotion } from "./css-motion";
 export type { CssMotion } from "./css-motion";
@@ -33,14 +32,11 @@ export type {
     SlideMotion,
 } from "./motion";
 
-/** A CSS curve as Reanimated's: a cubic Bézier or a `linear(...)` curve (a sampled spring) as
- *  its easing object, `linear` as is. Reanimated's CSS animations have no springs, so a spring
- *  runs here as its sampled duration and curve, the web's. */
-export const cssEasing = (curve: string) => {
-    const stops = parseLinearEasing(curve);
-    if (stops) {
+/** A portable curve as Reanimated's native CSS-like animation API. */
+export const cssEasing = (curve: Easing) => {
+    if (curve.kind === "linear") {
         return linear(
-            ...stops.map(([output, input]) =>
+            ...curve.points.map(([output, input]) =>
                 input === undefined
                     ? output
                     : ([output, `${input}%`] as [number, `${number}%`]),

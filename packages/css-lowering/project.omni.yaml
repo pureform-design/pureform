@@ -10,6 +10,7 @@ dependencies:
     - "@pureform/vite-config"
     - "@pureform/vitest-config"
     - "@pureform/core"
+    - "@pureform/web-contracts"
 
 tasks:
   test:unit:

@@ -16,9 +16,7 @@ import { MotionConfigError, validateConfig } from "./path";
 import {
     dampingCoefficient,
     springFromCurve,
-    formatLinearEasing,
     linearEasingAt,
-    parseLinearEasing,
     sampleCubicPath,
     sampleSpring,
     settleTime,
@@ -154,20 +152,6 @@ describe("linear() easings", () => {
         expect(linearEasingAt(points, 0.375)).toBeCloseTo(0.25, 10);
         expect(linearEasingAt(points, 0.75)).toBeCloseTo(0.5, 10);
         expect(linearEasingAt(points, 1)).toBe(1);
-    });
-
-    it("formats and parses", () => {
-        const points = linearEasing(0, [0.4, 20], [1.05, 60.5], 1).points;
-        const text = formatLinearEasing(points);
-        expect(text).toBe("linear(0, 0.4 20%, 1.05 60.5%, 1)");
-        expect(parseLinearEasing(text)).toEqual(points);
-        expect(parseLinearEasing("linear(0, 0.5 10% 20%, 1)")).toEqual([
-            [0],
-            [0.5, 10],
-            [0.5, 20],
-            [1],
-        ]);
-        expect(parseLinearEasing("cubic-bezier(0, 0, 1, 1)")).toBeUndefined();
     });
 
     it("samples a cubic path within its precision", () => {

@@ -88,46 +88,23 @@ export const CARD_CONTENT_PROPS = [
     "footer",
 ] as const satisfies readonly (keyof CardContentProps<unknown>)[];
 
-/** The element Root renders: a link with an `href`, else `as`, else a `<div>`. The action area
- *  picks its element the same way. */
-export const cardElement = <E>(props: {
-    readonly href?: string | undefined;
-    readonly as?: E | undefined;
-}): E | "a" | "div" => (props.href !== undefined ? "a" : (props.as ?? "div"));
-
-/** Whether a card is interactive: `interactive` when given, else whether Root renders a link or a
- *  button. */
+/** Own interaction semantics over the binding's inferred behavior. */
 export const isInteractiveCard = (
     props: Pick<CardVariantProps, "interactive">,
-    element: unknown,
-): boolean => props.interactive ?? (element === "a" || element === "button");
+    interactive: boolean,
+): boolean => props.interactive ?? interactive;
 
-/** The registry selection from Root's props and element. */
+/** The registry selection from Root's props and explicit interaction semantics. */
 export const cardSelection = (
     props: CardVariantProps,
-    element: unknown,
+    interactive: boolean,
 ): Selection<"card"> => ({
     variant: props.variant,
-    interactive: isInteractiveCard(props, element),
+    interactive: isInteractiveCard(props, interactive),
     padded: props.padded,
     actionsAlign: props.actionsAlign,
     tokens: props.tokens,
 });
-
-/** Root's element props from its state: a button gets `type="button"`, and the disabled state is
- *  a button's `disabled` or `aria-disabled`. The action area's are the same. */
-export const cardRootProps = (
-    props: Pick<CardRootOwnProps, "disabled">,
-    element: unknown,
-) => {
-    const button = element === "button";
-    return {
-        type: button ? ("button" as const) : undefined,
-        disabled: button && props.disabled ? true : undefined,
-        "aria-disabled":
-            !button && props.disabled ? ("true" as const) : undefined,
-    };
-};
 
 /** Whether a card's indication entry shows now: the root's while Root acts, the action area's
  *  otherwise (an action area inside an acting Root would be a control inside a control). */
@@ -153,13 +130,13 @@ export interface CardLayout {
     readonly supportingText: boolean;
 }
 
-/** The ready-made card's layout from its props and Root's element (`cardElement`). In order: the
+/** The ready-made card's layout from its props and interaction semantics. In order: the
  *  media, the header, the content, the actions, and the footer. With an action area, it wraps the
  *  media, header, and content, or only the media and content when the header holds a control,
  *  and the header comes first. */
 export const cardLayout = (
     props: CardContentProps<unknown> & Pick<CardVariantProps, "interactive">,
-    element: unknown,
+    interactive: boolean,
 ): CardLayout => {
     const given = (key: keyof CardContentProps<unknown>) =>
         isPresent(props[key]);
@@ -170,7 +147,7 @@ export const cardLayout = (
         given("headerAction");
     const sections = CARD_CONTENT_PROPS.some(given);
     const actionArea =
-        isInteractiveCard(props, element) &&
+        isInteractiveCard(props, interactive) &&
         (given("actions") || given("headerAction"));
     return {
         sections,

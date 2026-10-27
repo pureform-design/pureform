@@ -95,7 +95,7 @@ describe("generate", () => {
         });
         expect(body(read(root, "index.ts"))).toBe(
             [
-                'import { createRegistry } from "@pureform/styling";',
+                'import { createWebRegistry } from "@pureform/styling-web";',
                 "",
                 'import { button } from "./web/button";',
                 'import { chip } from "./web/chip";',
@@ -103,7 +103,7 @@ describe("generate", () => {
                 "/** The core's version this registry was made with. */",
                 `export const version = "${VERSION}";`,
                 "",
-                "export const registry = createRegistry(",
+                "export const registry = createWebRegistry(",
                 "    {",
                 "        button,",
                 "        chip,",
@@ -155,6 +155,33 @@ describe("generate", () => {
         });
         expect(body(read(root, "index.ts"))).toContain(
             '    { version, themeAttribute: "data-theme", vars: { prefix: "pf" } },\n);',
+        );
+    });
+
+    it("writes the neutral registry for a native target, without web options", async () => {
+        const root = tempRoot();
+        const adapter = fakeAdapter("native");
+        await generate({
+            root,
+            config: fixtureConfig(),
+            target: defineCodegen({
+                ...adapter,
+                codegen: async (context) => ({
+                    ...(await adapter.codegen(context)),
+                    themeAttribute: "data-theme",
+                    vars: { prefix: "pf" },
+                }),
+            }),
+        });
+        const index = body(read(root, "index.ts"));
+        expect(index).toContain(
+            'import { createRegistry } from "@pureform/styling";',
+        );
+        expect(index).toContain("export const registry = createRegistry(");
+        expect(index).toContain("    { version },\n);");
+        expect(index).not.toContain("styling-web");
+        expect(body(read(root, "registry.d.ts"))).toContain(
+            'declare module "@pureform/styling" {',
         );
     });
 

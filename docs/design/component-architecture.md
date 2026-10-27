@@ -89,8 +89,10 @@ Ryzen 5 5600 under Node 26; `--jitless` stands in for Hermes, which has no JIT):
 
 @pureform/binding-core      NEW (p2a). What every binding shares without a framework:
                             provider options and nesting, selections over defaults,
-                            part attributes and props merging, controllable state,
-                            reduced motion, measuring an icon slot.
+                            keyed part values, controllable state, reduced motion,
+                            icon slot style. No DOM, HTML, CSS, or Zag: the web half
+                            (part attributes, class and props merging, Zag/HTML props)
+                            is @pureform/binding-web, over @pureform/web-contracts.
 
 @pureform/solid             NEW. Solid 2 bindings: provider, useClasses, compound
                             components. Includes internal Zag glue for Solid 2 (§8).
@@ -204,8 +206,11 @@ doesn't infer variant types, so the generator writes them from the config. `Styl
 takes the style and drawing types as parameters, since `styling` can't import `rn-adapter`.
 `selectionCache` is the per-selection cache of §2, and `withTokenStyle` adds instance tokens
 as CSS vars. `componentClasses` moved here from the CSS adapter (which re-exports it);
-`themeVars` stays in `css-lowering`, which it needs, and `@pureform/styling/theme-vars`
-re-exports it.
+`themeVars` stays in `css-lowering`, which it needs, and `@pureform/styling-web/theme-vars`
+re-exports it. Since the platform-boundary refactor, `styling` keeps only the neutral types, the
+registry, and the caches, and depends on `core` alone; `ClassFactory` and its output types,
+`withTokenStyle`, `componentClasses`, runtime CSS themes, the web registry's theme attribute and
+var prefixes, and `/theme-vars` live in `@pureform/styling-web`.
 
 On the web, interaction states are not part of the selection. The browser and the
 bindings mark them on the element, and the generated CSS matches them, so a press changes
@@ -252,7 +257,7 @@ slot-state table the preset mostly uses):
 - **Panda** maps conditions to its built-in keys (`_hover`, `_checked`, …), whose
   selectors include Zag's attributes. pureform's recipes stop using those keys and emit
   the same selectors as the other targets; an app's own `_hover` keeps Panda's meaning.
-- **The `data-pf-*` names** are exported as `STATE_ATTRIBUTES` from `@pureform/core`
+- **The `data-pf-*` names** are exported as `STATE_ATTRIBUTES` from `@pureform/web-contracts`
   (`hover`, `pressed`, `dragged`, `filled` to their attributes); `css-lowering` builds its
   selectors from them and the bindings set them.
 - **Output changes on purpose**, so it's checked against fixtures (an element in each
@@ -676,9 +681,10 @@ color: {
     Built (p5a): `themeAttributes(name)` is on the registry, `registry.themeAttributes("teal")`,
     rather than on each factory: the attribute is the target's, not a component's. Each
     adapter's codegen returns its `themeAttribute` (`data-panda-theme`, or the CSS and Tailwind
-    `themeAttribute` option, default `data-theme`; none on React Native), the generated index
-    passes it to `createRegistry`, and `PureformProvider`'s `theme` writes the attributes on its
-    element (an inherited theme writes nothing, its ancestor's attribute already scopes it).
+    `themeAttribute` option, default `data-theme`; none on React Native), a web target's
+    generated index passes it to `createWebRegistry` (`@pureform/styling-web`), and
+    `PureformProvider`'s `theme` writes the attributes on its element (an inherited theme writes
+    nothing, its ancestor's attribute already scopes it).
 
     Nested themes combine: a theme's block holds only the tokens that differ from the base (the
     preset's `themes`), so a theme for shape inside one for color draws both. React Native's
@@ -701,7 +707,7 @@ color: {
   apps that don't use it don't ship the color math.
 
     Built (p5b): a provider's `theme` takes a name or a `RuntimeTheme`, `{ source, input }`, made
-    by a function `defineRuntimeTheme(name, load)` returns (`@pureform/styling`). The source loads
+    by a function `defineRuntimeTheme(name, load)` returns (now `@pureform/styling-web`). The source loads
     its generator on demand and shares it across inputs; the generator turns the input into CSS
     vars per scheme, `{ light, dark }`, named by the registry's new `vars` (`{ prefix, tokenPrefix
   }`, which each codegen returns as `CodegenOutput.vars`). `@pureform/material/runtime-theme`'s
@@ -710,7 +716,7 @@ color: {
     seed draws as a named theme with the same `materialColor` does (the suites check it against
     teal), and nothing else. `overrides` take React Native's keys (`"colors.primary"`,
     `"components.button.container"`, or a `--var`), named by `tokenVar` from
-    `@pureform/styling/theme-vars`; only the provider's own are written, and a token declared from
+    `@pureform/styling-web/theme-vars`; only the provider's own are written, and a token declared from
     an overridden one at the root keeps its value. `useThemeVars()` in each binding gives the
     nearest runtime theme's generated vars.
 
@@ -1189,11 +1195,12 @@ modules of §5.2 to `.pureform/`, and an index, also served as the virtual modul
 CSS and Tailwind adapters' Vite plugins:
 
 ```ts
-// generated: do not edit
-import { createRegistry } from "@pureform/styling";
+// generated: do not edit (a web target; a React Native one calls createRegistry from
+// "@pureform/styling" with `{ version }` alone)
+import { createWebRegistry } from "@pureform/styling-web";
 
 import { button } from "./web/button";
-export const registry = createRegistry({ button }); // static, for server rendering (§5.7)
+export const registry = createWebRegistry({ button }); // static, for server rendering (§5.7)
 export const themes = ["teal"] as const;
 export type Components = "button" | "checkbox"; // augments typing
 ```
@@ -1241,9 +1248,10 @@ Built (p4c-bundler) in `@pureform/bundler`: one unplugin plugin (`/vite`, `/roll
 `lazy`, `config`, `outDir`, `root`) plus `watch`. In Vite it generates in the `config` hook, so
 the generated registry exists before any plugin's `configResolved` (Panda's reads
 `.pureform/panda.ts` there); elsewhere in `buildStart`. It regenerates on `watchChange` of the
-config or a file it imports, resolves `virtual:pureform/registry` to `<outDir>/index.ts` (types from
-`@pureform/bundler/client`), and raises the missing-output error for that id or a relative import
-into a missing folder. Metro gets `withPureform(config, options)` from `/metro` instead of
+config or a file it imports, resolves `virtual:pureform/registry` to `<outDir>/index.ts` (types
+from `@pureform/bundler/client-web` on a web target, `@pureform/bundler/client` on React Native),
+and raises the missing-output error for that id or a relative import into a missing folder.
+Metro gets `withPureform(config, options)` from `/metro` instead of
 a plugin: it generates before Metro starts, keeps a watcher, and adds the id to
 `resolveRequest`. The regeneration loop (`createGenerateRunner`, `watchGenerate`) lives in
 `@pureform/generate`, for the CLI's `--watch` too. No app in the repo commits `.pureform/`
@@ -1505,7 +1513,9 @@ leaves through `usePresence` with the engine, and leaves the host only once its 
   slot is a part, the touch target included (`Button.TouchTarget`). The ready-made button takes
   `label`, `icon` (its part renders only when given), and `mirrorIcon`, not children. Root's own
   props, how they map onto the selection and the machine, and the adjustments to Zag's part
-  props live in `@pureform/binding-core` (`src/components/`), so React reads the same lists.
+  props live in `@pureform/binding-core` (`src/components/`), so React reads the same lists
+  (since the platform-boundary refactor, the Zag/HTML prop adapters are `@pureform/binding-web`'s
+  `src/components/`, and binding-core keeps the portable lists and selections).
   Root's `id` is the machine's root id, since the machines find their elements by id. Variant
   props are typed `VariantProp<"button", "variant">`: the app's registered values, or any value
   while nothing is registered.
@@ -1592,14 +1602,14 @@ leaves through `usePresence` with the engine, and leaves the host only once its 
   sources above, plus the provider's `slotProps` between the registry and the user, and whose
   `render(name, { element, as, machine, states, props })` renders it. Classes join registry
   first (Solid's array form), styles merge (a string style is parsed), handlers all run, other
-  keys take the last defined value. `combineProps` in `@pureform/binding-core` holds these
+  keys take the last defined value. `combineProps` in `@pureform/binding-web` holds these
   rules, with the class and style joins passed in, so React shares them. Polymorphism is the
   `as` prop only, no render prop. An icon part provides its element to `useIconStyle()`, which
   measures it after mount and re-reads when the component's attributes change, a transition in
   it ends, or it resizes.
 - **Built (p2b), React:** the same `useComponent` scope, with values instead of accessors. The
-  merge order is binding-core's `partSources`, shared with Solid; React joins classes into one
-  `className` string with `cx` (`clsx`-compatible, in binding-core) and merges style objects.
+  merge order is binding-web's `partSources`, shared with Solid; React joins classes into one
+  `className` string with `cx` (`clsx`-compatible, in binding-web) and merges style objects.
   Ready-made components take `className` keyed by slot, not `class`, as React props do.
 
 ### 9.3 Configurability
@@ -2318,7 +2328,8 @@ From today's preset:
   layer and the scan can see it.
 
 **Built (p9c), the web:** `@pureform/binding-core/indication` holds `materialIndication({ ripple })`
-(its `web` subscribes to the source and draws through `createRipple` from `@pureform/js-effects`,
+(since the platform-boundary refactor, `@pureform/binding-web/indication` adds the web half and
+the tokens as CSS; its `web` subscribes to the source and draws through `createRipple` from `@pureform/js-effects`,
 which `ripple()` now runs on too; the controller is made on the first press) and `noIndication`, the
 tokens as CSS, and `IndicationHost`, which both web bindings use to tie the anatomy's entries to a
 component's elements. `useComponent` takes `indication`, `interactionSource`, and `interactive`, and

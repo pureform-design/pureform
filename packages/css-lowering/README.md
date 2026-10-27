@@ -66,7 +66,7 @@ never take a target's own key, so every adapter styles the same elements.
 
 Each state matches the native pseudo-class first, then an ARIA attribute, and only where
 neither covers it one of pureform's `data-pf-*` attributes, whose names come from
-`STATE_ATTRIBUTES` in `@pureform/core`. A behavior library's attributes (Zag's `data-state`,
+`STATE_ATTRIBUTES` in `@pureform/web-contracts`. A behavior library's attributes (Zag's `data-state`,
 `data-hover`, `data-readonly`, …) are never matched, so swapping or upgrading it can't change
 styling.
 
@@ -127,7 +127,7 @@ web adapters do. Each rule is a path from the styled element:
 | `[data-pf-motion=reduce] &:not([data-pf-motion=reduce] [data-pf-motion=full] *)` | a `reduce` provider, with no `full` in it |
 
 `ROOT_REDUCED_MOTION_RULES` are the same for the root's own rule. The attribute's name is
-`MOTION_ATTRIBUTE` from `@pureform/core`. Nested providers resolve to the nearer one for two
+`MOTION_ATTRIBUTE` from `@pureform/web-contracts`. Nested providers resolve to the nearer one for two
 levels; a third level (`reduce` in `full` in `reduce`) isn't told apart.
 
 ## Build and test

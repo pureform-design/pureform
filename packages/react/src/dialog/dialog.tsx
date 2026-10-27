@@ -10,8 +10,6 @@ import { dialogBackdropAnatomy, dialogOverlayAnatomy } from "@pureform/anatomy";
 import type { TestIdOverride } from "@pureform/anatomy";
 import {
     DIALOG_ROOT_PROPS,
-    dialogMachineProps,
-    dialogPositionerLayout,
     dialogSelection,
     isPresent,
 } from "@pureform/binding-core";
@@ -21,6 +19,10 @@ import type {
     DialogRootOwnProps,
     Unstyled,
 } from "@pureform/binding-core";
+import {
+    dialogMachineProps,
+    dialogPositionerLayout,
+} from "@pureform/binding-web";
 import type { DialogFocusProps } from "@pureform/binding-web";
 import { type ElementType, type ReactNode } from "react";
 

@@ -6,22 +6,21 @@
 // the provider's element and `usePureform()` use, so switching a theme runs no component again.
 
 import {
-    providerAttributes,
     requireRegistry,
     resolveProvider,
     ROOT_PROVIDER,
     trainVersionMismatch,
     warnOnce,
 } from "@pureform/binding-core";
+import type { Direction, MotionSetting } from "@pureform/binding-core";
+import type { ProviderOptions, ProviderState } from "@pureform/binding-core";
 import type {
-    AnyRegistry,
-    Direction,
-    MotionSetting,
-    ProviderOptions,
-    ProviderState,
+    WebProviderOptions,
+    WebProviderState,
     ThemeOverrides,
-} from "@pureform/binding-core";
-import { providerIndicationOverrides } from "@pureform/binding-core/indication";
+} from "@pureform/binding-web";
+import { ROOT_WEB_PROVIDER } from "@pureform/binding-web";
+import { providerAttributes } from "@pureform/binding-web";
 import {
     THEME_BLOCK_ATTRIBUTE,
     generatedBlock,
@@ -33,9 +32,10 @@ import {
     unloadedThemeMessage,
 } from "@pureform/binding-web";
 import type { ThemeBlock } from "@pureform/binding-web";
+import { providerIndicationOverrides } from "@pureform/binding-web/indication";
 import type { Indication } from "@pureform/binding-web/indication";
-import { isRuntimeTheme, themeScope } from "@pureform/styling";
-import type { ThemeSchemeVars } from "@pureform/styling";
+import { isRuntimeTheme, themeScope } from "@pureform/styling-web";
+import type { AnyWebRegistry, ThemeSchemeVars } from "@pureform/styling-web";
 import { isDev, isServer, useHead } from "@solidjs/web";
 import type { JSX } from "@solidjs/web";
 import {
@@ -53,10 +53,10 @@ import { mergePartProps, mergeStyles } from "./props";
 import type { PartProps } from "./props";
 
 /** What components read from the nearest provider. */
-export type PureformState = ProviderState<PartProps>;
+export type PureformState = WebProviderState<PartProps>;
 
 const PureformContext = createContext<Accessor<PureformState>>(
-    () => ROOT_PROVIDER,
+    () => ROOT_WEB_PROVIDER,
 );
 
 const ThemeVarsContext = createContext<Accessor<ThemeSchemeVars | undefined>>(
@@ -65,7 +65,7 @@ const ThemeVarsContext = createContext<Accessor<ThemeSchemeVars | undefined>>(
 
 export interface PureformProviderProps
     extends
-        ProviderOptions<PartProps>,
+        WebProviderOptions<PartProps>,
         Omit<JSX.HTMLAttributes<HTMLDivElement>, "dir"> {
     children?: JSX.Element;
 }
@@ -95,11 +95,11 @@ export function PureformProvider(props: PureformProviderProps): JSX.Element {
     // come from one object (`{...options()}`) that changes with the theme.
     let lastBase: object = {};
     let lastOwn: object = {};
-    let last: PureformState | undefined;
+    let last: ProviderState<PartProps, AnyWebRegistry> | undefined;
     const components = createMemo(
         () => {
             const base = componentFieldsOf(parent());
-            const own: ProviderOptions<PartProps> = {
+            const own: ProviderOptions<PartProps, AnyWebRegistry> = {
                 registry: props.registry,
                 dir: props.dir,
                 motion: props.motion,
@@ -116,7 +116,11 @@ export function PureformProvider(props: PureformProviderProps): JSX.Element {
             }
             lastBase = base;
             lastOwn = own;
-            last = resolveProvider(base as PureformState, own, mergePartProps);
+            last = resolveProvider(
+                base as ProviderState<PartProps, AnyWebRegistry>,
+                own,
+                mergePartProps,
+            );
             return last;
         },
         { name: "provider.components" },
@@ -232,7 +236,9 @@ const fieldsOf = (
     resolve: (key: keyof PureformState) => unknown,
 ): PureformState => {
     const view = {};
-    for (const key of Object.keys(ROOT_PROVIDER) as (keyof PureformState)[]) {
+    for (const key of Object.keys(
+        ROOT_WEB_PROVIDER,
+    ) as (keyof PureformState)[]) {
         const field = createMemo(() => resolve(key), {
             name: `provider.${key}`,
             ...(RECORD_FIELDS.has(key) && {
@@ -323,7 +329,7 @@ export const usePureform = (): Accessor<PureformState> =>
     useContext(PureformContext);
 
 /** The nearest provider's registry. Reading it throws when no provider has one. */
-export const useRegistry = (): Accessor<AnyRegistry> => {
+export const useRegistry = (): Accessor<AnyWebRegistry> => {
     const state = usePureform();
     return () => requireRegistry(state());
 };

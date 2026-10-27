@@ -9,15 +9,14 @@ import {
     SWITCH_CONTENT_PROPS,
     SWITCH_INPUT_LABEL_PROPS,
     SWITCH_ROOT_PROPS,
-    switchInputProps,
-    switchMachineProps,
-    switchNativeDefault,
     switchSelection,
 } from "@pureform/binding-core";
 import type {
     SwitchContentProps,
     SwitchRootOwnProps,
 } from "@pureform/binding-core";
+import { switchNativeDefault } from "@pureform/binding-web";
+import { switchInputProps, switchMachineProps } from "@pureform/binding-web";
 import { syncCheckedInput } from "@pureform/binding-web";
 import * as switchControl from "@pureform/machines/switch";
 import type { JSX, ValidComponent } from "@solidjs/web";

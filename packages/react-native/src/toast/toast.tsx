@@ -52,8 +52,11 @@ export type ToastStore = toast.Store<ReactNode>;
 export type ToastData = toast.Props<ReactNode>;
 
 /** A new toaster, with pureform's defaults (bottom end, at most 3, 5 s each). Make it once. */
-export const createToaster = (options?: ToasterOptions): ToastStore =>
-    toast.createStore(toasterOptions(options));
+export const createToaster = (options?: ToasterOptions): ToastStore => {
+    const resolved = toasterOptions(options);
+    // The shared store's transport is CSS-based; Native never reads its layout projection.
+    return toast.createStore({ ...resolved, offsets: `${resolved.offsets}px` });
+};
 
 /** What each part renders as, for its keyed `style` and `slotProps`. */
 export interface ToasterHosts {

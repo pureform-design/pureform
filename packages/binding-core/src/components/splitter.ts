@@ -142,39 +142,6 @@ export const splitterOrientation = (
 ): "horizontal" | "vertical" =>
     props.orientation === "vertical" ? "vertical" : "horizontal";
 
-/** The machine's props from Root's, besides the sizes (`splitterSizeProps`). */
-export const splitterMachineProps = (
-    props: Pick<
-        SplitterRootOwnProps,
-        "id" | "orientation" | "panels" | "keyboardResizeBy"
-    >,
-) => ({
-    id: props.id,
-    orientation: splitterOrientation(props),
-    panels: props.panels.map((panel) => ({ ...panel })),
-    keyboardResizeBy: props.keyboardResizeBy,
-});
-
-/** The machine's size props from the controllable ones (`size`, `defaultSize`, `onSizeChange`).
- *  Without either size, the panes share the room from the first render, so the server draws
- *  what the browser does. */
-export const splitterSizeProps = (
-    props: Pick<SplitterRootOwnProps, "size" | "defaultSize" | "onSizeChange">,
-    panels: readonly SplitterPanelData[],
-) => ({
-    size: props.size === undefined ? undefined : [...props.size],
-    defaultSize:
-        props.defaultSize === undefined
-            ? props.size === undefined
-                ? splitterInitialSizes(panels, undefined, 0)
-                : undefined
-            : [...props.defaultSize],
-    onResize:
-        props.onSizeChange &&
-        ((details: { size: number[] }) =>
-            props.onSizeChange?.({ size: details.size })),
-});
-
 /** The divider between `before` and `after`, as the machine names it. */
 export const splitterTriggerId = (before: string, after: string) =>
     `${before}:${after}` as const;
@@ -308,13 +275,3 @@ export const splitterSnap = (options: {
         ]!;
     return splitterMoveBy(sizes, index, to - at, limits);
 };
-
-/** The divider's element props beside the machine's: named by `label`, marked pressed while
- *  dragged so the pill stays grown when the pointer leaves it. */
-export const splitterTriggerProps = (options: {
-    readonly label?: string | undefined;
-    readonly dragging: boolean;
-}) => ({
-    "aria-label": options.label ?? "Resize panes",
-    "data-pf-active": options.dragging ? "" : undefined,
-});

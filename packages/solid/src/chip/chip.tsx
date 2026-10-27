@@ -4,7 +4,6 @@
 import { chipAnatomy } from "@pureform/anatomy";
 import {
     BUTTON_CONTENT_PROPS,
-    buttonMachineProps,
     CHIP_CONTENT_PROPS,
     CHIP_ROOT_PROPS,
     chipSelection,
@@ -14,6 +13,7 @@ import type {
     ChipContentProps,
     ChipRootOwnProps,
 } from "@pureform/binding-core";
+import { buttonMachineProps } from "@pureform/binding-web";
 import type * as button from "@pureform/machines/button";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import { type Accessor, omit } from "solid-js";

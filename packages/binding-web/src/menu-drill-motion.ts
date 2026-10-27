@@ -8,7 +8,8 @@
 // the vars the web writes its parameters to (`menuDrillTiming`), as React Native springs it.
 // Under reduced motion nothing moves.
 
-import { formatLinearEasing, sampleSpring } from "@pureform/core";
+import { sampleSpring } from "@pureform/core";
+import { formatLinearEasing } from "@pureform/css-lowering";
 
 import { springFromVars } from "./settle";
 

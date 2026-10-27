@@ -14,16 +14,12 @@ import {
     MENU_ITEM_PROPS,
     MENU_ROOT_PROPS,
     menuGrouped,
-    menuItemMachineProps,
     menuDrillLevel,
     menuDrillPathTo,
     menuDrillPick,
     menuItemProps,
-    menuMachineProps,
     menuSelection,
     menuSubmenuMode,
-    overlayPositionerProps,
-    presentProps,
     submenuPositioning,
 } from "@pureform/binding-core";
 import type {
@@ -37,6 +33,12 @@ import type {
     MenuSelectDetails,
     MenuVariantProps,
 } from "@pureform/binding-core";
+import {
+    menuItemMachineProps,
+    menuMachineProps,
+    overlayPositionerProps,
+    presentProps,
+} from "@pureform/binding-web";
 import {
     markMenuGroupEdges,
     menuDrillFrom,

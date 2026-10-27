@@ -223,34 +223,6 @@ export const NUMBER_FIELD_FORMAT: Intl.NumberFormatOptions = {
     maximumFractionDigits: 20,
 };
 
-/** The number input machine's props from Root's, besides `id`, `dir`, and the controllable
- *  `value` (the binding's `useControllable`). An error marks the field invalid. */
-export const numberFieldMachineProps = (props: NumberFieldBehaviorProps) => ({
-    min: props.min,
-    max: props.max,
-    step: props.step,
-    largeStep: props.largeStep,
-    allowOverflow: props.allowOverflow,
-    allowMouseWheel: props.allowMouseWheel,
-    spinOnPress: props.spinOnPress,
-    locale: numberFieldLocale(props),
-    formatOptions: props.formatOptions ?? NUMBER_FIELD_FORMAT,
-    disabled: props.disabled,
-    invalid: props.error !== undefined ? true : props.invalid,
-    required: props.required,
-    readOnly: props.readOnly,
-    name: props.name,
-    form: props.form,
-    translations: {
-        ...(props.decrementLabel !== undefined
-            ? { decrementLabel: props.decrementLabel }
-            : {}),
-        ...(props.incrementLabel !== undefined
-            ? { incrementLabel: props.incrementLabel }
-            : {}),
-    },
-});
-
 /** The input's placeholder: the given one, else a single space so the label can float. */
 export const numberFieldPlaceholder = (placeholder: string | undefined) =>
     placeholder ?? " ";

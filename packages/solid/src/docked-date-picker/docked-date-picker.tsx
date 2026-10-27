@@ -8,13 +8,11 @@ import { dockedDatePickerOverlayAnatomy } from "@pureform/anatomy";
 import type { PartName } from "@pureform/anatomy";
 import {
     dateFormatHint,
-    dateMachineProps,
     DOCKED_DATE_PICKER_CONTENT_PROPS,
     DOCKED_DATE_PICKER_ROOT_PROPS,
     dockedDatePickerSelection,
     isPresent,
     pickerLocale,
-    presentProps,
 } from "@pureform/binding-core";
 import type {
     CalendarInstances,
@@ -22,6 +20,7 @@ import type {
     DockedDatePickerContentProps,
     DockedDatePickerRootOwnProps,
 } from "@pureform/binding-core";
+import { dateMachineProps, presentProps } from "@pureform/binding-web";
 import * as datePicker from "@pureform/machines/date-picker";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {

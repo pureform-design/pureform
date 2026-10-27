@@ -1,4 +1,5 @@
-import { formatLinearEasing, sampleSpring } from "@pureform/core";
+import { sampleSpring } from "@pureform/core";
+import { formatLinearEasing } from "@pureform/css-lowering";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {

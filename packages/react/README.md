@@ -25,8 +25,9 @@ Anything that works without React lives in `@pureform/binding-core` (shared with
 to the web, in `@pureform/binding-web` (shared with `@pureform/solid`: slot customization, runtime themes as CSS, drags and
 swipes, the indication host, and web-only props such as dialogs' `initialFocusEl`, the ripple's
 `getSurfaceEl` and the file upload's `File`); this package adds context, memos, effects, and
-rendering. `@pureform/styling` is a peer, so the app's generated registry and the binding share
-one copy. See the [design doc](../../docs/design/component-architecture.md), §3, §5, and §9.
+rendering. `@pureform/styling` and `@pureform/styling-web` are peers, so the app's generated
+registry and the binding share one copy. The provider takes a web registry
+(`AnyWebRegistry`, from `createWebRegistry`). See the [design doc](../../docs/design/component-architecture.md), §3, §5, and §9.
 
 ## Architecture
 
@@ -71,7 +72,7 @@ Root ── useComponent(anatomy, { selection, testId, unstyled }) ──► use
   └─ context { scope, api } ──► Label, Icon, … call scope.render with their part
 ```
 
-The merge order comes from binding-core's `partSources`, the rules from `combineProps`; this
+The merge order comes from binding-web's `partSources`, the rules from `combineProps`; this
 package only says how React joins classes (into `className`, `clsx`-style) and styles.
 
 ## Public API
@@ -1011,7 +1012,7 @@ const fieldsetDisabled = useFieldsetDisabled(input); // OR it into the machine's
 - `useIconStyle(): IconStyle`: inside an icon part, its measured `{ size, color, filled }`,
   following the component's state; elsewhere `{ size: undefined, color: "currentColor",
   filled: false }`.
-- `cx(...values)` (from binding-core) joins class values as `clsx` does.
+- `cx(...values)` (from binding-web, still re-exported by React) joins class values as `clsx` does.
 
 ## Build and test
 

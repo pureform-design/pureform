@@ -62,14 +62,3 @@ export const RIPPLE_ROOT_PROPS = [
 export const rippleSelection = (
     props: RippleVariantProps,
 ): Selection<"ripple"> => ({ tokens: props.tokens });
-
-/** The ripple machine's props from Root's, besides `reducedMotion` (the binding's) and
- *  `rippleClass` (the `ripple` slot's classes). Its timing is the layer's transition, which the
- *  ripple's tokens set. */
-export const rippleMachineProps = (props: RippleBehaviorProps) => ({
-    disabled: props.disabled,
-    variant: props.effect,
-    centered: props.centered,
-    allowPropagation: props.allowPropagation,
-    ids: { layer: props.id },
-});

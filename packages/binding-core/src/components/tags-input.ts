@@ -170,28 +170,6 @@ export const tagsInputChipTestId = (
 ): string | undefined =>
     typeof testId === "string" ? `${testId}-chip` : undefined;
 
-/** The tags input machine's props from Root's, besides `id`, `dir`, and the controllable `value`
- *  (the binding's `useControllable`). An error marks the field invalid. */
-export const tagsInputMachineProps = (props: TagsInputBehaviorProps) => ({
-    disabled: props.disabled,
-    invalid: props.invalid || props.error !== undefined || undefined,
-    required: props.required,
-    readOnly: props.readOnly,
-    placeholder: props.placeholder ?? " ",
-    name: props.name,
-    form: props.form,
-    max: props.max,
-    maxLength: props.maxLength,
-    delimiter: props.delimiter,
-    addOnPaste: props.addOnPaste,
-    allowDuplicates: props.allowDuplicates,
-    blurBehavior: props.blurBehavior,
-    validate: props.validate,
-    translations: props.removeLabel
-        ? { deleteTagTriggerLabel: props.removeLabel }
-        : undefined,
-});
-
 /** The tags input's own value, and whether the container counts as filled (a chip, or text):
  *  the label floats over either. */
 export const tagsInputFilled = (count: number, inputValue: string): boolean =>

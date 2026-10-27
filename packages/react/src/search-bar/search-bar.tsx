@@ -8,14 +8,14 @@ import {
     SEARCH_BAR_CONTENT_PROPS,
     SEARCH_BAR_INPUT_PROPS,
     SEARCH_BAR_ROOT_PROPS,
-    searchBarMachineProps,
     searchBarSelection,
-    textFieldNativeDefault,
 } from "@pureform/binding-core";
 import type {
     SearchBarContentProps,
     SearchBarRootOwnProps,
 } from "@pureform/binding-core";
+import { textFieldNativeDefault } from "@pureform/binding-web";
+import { searchBarMachineProps } from "@pureform/binding-web";
 import { syncTextInput } from "@pureform/binding-web";
 import * as textField from "@pureform/machines/text-field";
 import { normalizeProps } from "@zag-js/react";

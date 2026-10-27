@@ -12,6 +12,7 @@ dependencies:
     - "@pureform/react-native"
     - "@pureform/rn-adapter"
     - "@pureform/styling"
+    - "@pureform/styling-web"
     - "@pureform/anatomy"
     - "@pureform/binding-core"
     - "@pureform/binding-web"

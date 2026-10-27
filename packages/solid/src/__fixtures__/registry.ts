@@ -1,12 +1,9 @@
 // A fake registry for the specs: button and checkbox classes that name the selection, so a test can
 // read what the factory was given, plus a lazy chip whose loader the test controls.
 
-import { createRegistry, withTokenStyle } from "@pureform/styling";
-import type {
-    ClassFactory,
-    ComponentShape,
-    Selection,
-} from "@pureform/styling";
+import type { ComponentShape, Selection } from "@pureform/styling";
+import { createWebRegistry, withTokenStyle } from "@pureform/styling-web";
+import type { ClassFactory } from "@pureform/styling-web";
 
 export type ButtonShape = {
     variants: { variant: "filled" | "text"; size: "small" | "large" };
@@ -86,7 +83,7 @@ export const deferredLoader = () => {
 };
 
 export const fakeRegistry = (lazy: () => Promise<unknown>) =>
-    createRegistry({ button, checkbox, chip: { lazy } });
+    createWebRegistry({ button, checkbox, chip: { lazy } });
 
 /** A static factory whose root class names the component and its selection
  *  (`icon-button icon-button--variant-filled icon-button--toggle-true`), and each other slot
@@ -115,7 +112,7 @@ const named =
 
 /** The toggles' fake factories, all static: the switch, radio, chip, icon button, and FAB. */
 export const togglesRegistry = () =>
-    createRegistry({
+    createWebRegistry({
         switchControl: named("switch", [
             "root",
             "touchTarget",
@@ -159,7 +156,7 @@ const FIELD_SLOTS = [
 /** The text inputs' fake factories, all static: the text field, text area, select, tags input
  *  with its input chips, and the menu the select draws its list with. */
 export const textInputsRegistry = () =>
-    createRegistry({
+    createWebRegistry({
         textField: named("text-field", FIELD_SLOTS),
         textArea: named("text-area", FIELD_SLOTS),
         select: named("select", FIELD_SLOTS),
@@ -205,7 +202,7 @@ export const textInputsRegistry = () =>
 /** The overlays' fake factories, all static: the menu, tooltip, dialog, full-screen dialog,
  *  scrim, and snackbar, and the buttons their ready-made triggers and close triggers draw. */
 export const overlaysRegistry = () =>
-    createRegistry({
+    createWebRegistry({
         menu: named("menu", [
             "root",
             "itemGroup",
@@ -333,7 +330,7 @@ const NAV_SLOTS = [
 /** Navigation and lists' fake factories, all static: the tabs, navigation bar and rail, list,
  *  and list item. */
 export const navigationRegistry = () =>
-    createRegistry({
+    createWebRegistry({
         tabs: named("tabs", [
             "root",
             "tab",
@@ -386,7 +383,7 @@ const valued =
 /** The file upload's fake factories, all static: the file upload, and the button, list item, icon
  *  button and linear progress it draws its trigger and files with. */
 export const fileUploadRegistry = () =>
-    createRegistry({
+    createWebRegistry({
         fileUpload: named("file-upload", [
             "root",
             "label",
@@ -437,7 +434,7 @@ export const fileUploadRegistry = () =>
 /** The display components' fake factories, all static: the progress indicators and slider (with
  *  their `value` token), card, search bar, ripple, and the single-part components. */
 export const displayRegistry = () =>
-    createRegistry({
+    createWebRegistry({
         checkbox,
         linearProgress: valued("linear-progress", [
             "root",
@@ -648,7 +645,7 @@ export const displayRegistry = () =>
 
 /** The button group's fake factories: the group, and the buttons and icon buttons in it. */
 export const buttonGroupRegistry = () =>
-    createRegistry({
+    createWebRegistry({
         buttonGroup: named("button-group", ["root"]),
         button: named("button", [
             "root",
@@ -668,7 +665,7 @@ export const buttonGroupRegistry = () =>
 
 /** The toolbar's fake factories: the bar, its icon buttons and buttons, and the overflow menu. */
 export const toolbarRegistry = () =>
-    createRegistry({
+    createWebRegistry({
         toolbar: named("toolbar", ["root"]),
         button: named("button", [
             "root",
@@ -707,7 +704,7 @@ export const toolbarRegistry = () =>
 /** An icon button whose factory writes its `accent` token to Root as `--accent`, for the
  *  `ProvidedTokens` specs. */
 export const providedTokensRegistry = () =>
-    createRegistry({
+    createWebRegistry({
         iconButton: ((s) =>
             withTokenStyle(
                 named("icon-button", [
@@ -725,7 +722,7 @@ export const providedTokensRegistry = () =>
 /** The date pickers' fake factories, all static: the modal and docked date pickers, the date
  *  input, the calendar cell, and the scrim and buttons the ready-made pickers draw. */
 export const datePickersRegistry = () =>
-    createRegistry({
+    createWebRegistry({
         datePicker: named("date-picker", [
             "root",
             "header",
@@ -789,7 +786,7 @@ export const datePickersRegistry = () =>
 /** The paginator's fake factories: the row, its icon-button triggers, and the select with its
  *  menu. */
 export const paginatorRegistry = () =>
-    createRegistry({
+    createWebRegistry({
         paginator: named("paginator", [
             "root",
             "pageSize",
@@ -821,7 +818,7 @@ export const paginatorRegistry = () =>
 
 /** The chip set's fake factories: the set, and the chips in it. */
 export const chipSetRegistry = () =>
-    createRegistry({
+    createWebRegistry({
         chipSet: named("chip-set", ["root"]),
         chip: named("chip", [
             "root",
@@ -835,7 +832,7 @@ export const chipSetRegistry = () =>
 /** The color picker's fake factories: the picker, the text field its hex field is, and the icon
  *  button its eye dropper is. */
 export const colorPickerRegistry = () =>
-    createRegistry({
+    createWebRegistry({
         colorPicker: named("colorPicker", [
             "root",
             "label",
@@ -866,7 +863,7 @@ export const colorPickerRegistry = () =>
 
 /** The rating's fake factory: its parts, with the root's selected variants in its class. */
 export const ratingRegistry = () =>
-    createRegistry({
+    createWebRegistry({
         rating: named("rating", [
             "root",
             "label",
@@ -880,7 +877,7 @@ export const ratingRegistry = () =>
 
 /** The native select's fake factory: its parts, and the field's pieces around it. */
 export const nativeSelectRegistry = () =>
-    createRegistry({
+    createWebRegistry({
         nativeSelect: named("nativeSelect", [
             "root",
             "select",

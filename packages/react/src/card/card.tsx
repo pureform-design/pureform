@@ -9,12 +9,7 @@ import { cardAnatomy } from "@pureform/anatomy";
 import {
     CARD_CONTENT_PROPS,
     CARD_ROOT_PROPS,
-    cardElement,
     cardEntryActive,
-    cardLayout,
-    cardRootProps,
-    cardSelection,
-    isInteractiveCard,
     isPresent,
 } from "@pureform/binding-core";
 import type {
@@ -22,6 +17,13 @@ import type {
     CardRootOwnProps,
 } from "@pureform/binding-core";
 import type { MutableInteractionSource } from "@pureform/binding-core/interaction";
+import {
+    cardElement,
+    cardRootProps,
+    cardLayout,
+    cardSelection,
+    isInteractiveCard,
+} from "@pureform/binding-web";
 import type { ElementType, ReactNode } from "react";
 
 import {

@@ -142,7 +142,7 @@ describe("the overlay motions", () => {
     });
 
     it("waits a delay before a step, and not under reduced motion", async () => {
-        let tokens!: Record<string, string | number>;
+        let tokens!: import("@pureform/rn-adapter/factory").ThemeValues;
         function Read(): ReactNode {
             tokens = useTokens();
             return null;
@@ -192,7 +192,7 @@ describe("the overlay motions", () => {
     });
 
     it("take the theme's durations and curves, the time scale, and fades under reduced motion", async () => {
-        let tokens!: Record<string, string | number>;
+        let tokens!: import("@pureform/rn-adapter/factory").ThemeValues;
         function Read(): ReactNode {
             tokens = useTokens();
             return null;
@@ -203,6 +203,11 @@ describe("the overlay motions", () => {
             </PureformProvider>,
         );
         const popup = overlayMotion("popup", tokens, false);
+        expect(popup.enter.easing).toBe(tokens["springs.spatialFast.easing"]);
+        expect(popup.enter.easing).toMatchObject({
+            type: "easing",
+            kind: "linear",
+        });
         // The growth on the fast spatial spring, its fade alongside on the fast effects spring.
         expect(popup.enter).toMatchObject({
             from: { opacity: 0, scale: 0.8 },

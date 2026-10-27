@@ -1,37 +1,37 @@
 # @pureform/styling
 
-The runtime every binding and generated factory uses to get a component's styles: the factory
-types, a small registry of factories by name, a per-selection cache, and helpers for class
-strings and instance tokens. It knows no framework and no target. `@pureform/solid`,
-`@pureform/react`, and the generated `.pureform/` modules build on it (design doc §5); adapters
-stay build time and never ship in a bundle, this package is what does.
+The runtime every binding and generated factory uses to get a component's styles: the component
+and factory types, a small registry of factories by name, and a per-selection cache. It knows no
+framework and no target. `@pureform/solid`, `@pureform/react`, `@pureform/react-native`, and the
+generated `.pureform/` modules build on it (design doc §5); adapters stay build time and never
+ship in a bundle, this package is what does.
 
-It depends on `@pureform/core` for types, and on `@pureform/css-lowering` only for the
-`/theme-vars` subpath.
+It depends on `@pureform/core` alone, for types and nothing else; it has no CSS or web
+dependency, so React Native reaches no web package through it. The web half (the class factory's
+output types, instance tokens as CSS vars, `componentClasses`, runtime CSS themes, `tokenVar` and
+`themeVars`, and the web registry with its theme attribute and var prefixes) is
+[`@pureform/styling-web`](../styling-web/README.md), which depends on this package. Generated
+declarations still augment this package's `ComponentRegistry` and `SpringRoleRegistry`.
 
 ## Architecture
 
 ```
 generated .d.ts ──augments──► ComponentRegistry ──► Variants, SlotOf, States, InstanceTokens
                                                           │
-generated factory module ──uses──► selectionCache ◄───────┤ ClassFactory (web)
-   (.pureform/web/button.ts)       withTokenStyle         │ StyleFactory (React Native)
-                                   joinClasses            │
+generated factory module ──uses──► selectionCache ◄───────┤ StyleFactory (React Native)
+   (.pureform/native/button.ts)                           │ ClassFactory (web: styling-web)
+                                                          │
 generated index ──► createRegistry({ button, card: { lazy } }) ──► entry(name), preload(name)
-                                                                        │
-                                                bindings' useClasses / useStyles
+                    (web: styling-web's createWebRegistry,               │
+                     the same entries plus web options)   bindings' useClasses / useStyles
 ```
 
-| Module                 | What it does                                                                 |
-| ---------------------- | ---------------------------------------------------------------------------- |
-| `types.ts`             | `ComponentRegistry` and the types derived from it: selections and factories. |
-| `registry.ts`          | `createRegistry`: static and lazy entries, `entry`, `preload`.               |
-| `package-version.ts`   | `VERSION`, this package's version (set by `@pureform/release`).              |
-| `cache.ts`             | `selectionCache`: a factory's results per selection key, frozen.             |
-| `tokens.ts`            | Instance tokens as CSS vars, and `joinClasses`.                              |
-| `component-classes.ts` | `componentClasses`, the CSS adapter's manifest-driven class function.        |
-| `runtime-theme.ts`     | Runtime themes: `defineRuntimeTheme`, `themeScope`, `preloadTheme`.          |
-| `theme-vars.ts`        | The `/theme-vars` subpath: `themeVars` from css-lowering, and `tokenVar`.    |
+| Module               | What it does                                                                 |
+| -------------------- | ---------------------------------------------------------------------------- |
+| `types.ts`           | `ComponentRegistry` and the types derived from it: selections and factories. |
+| `registry.ts`        | `createRegistry`: static and lazy entries, `entry`, `preload`.               |
+| `package-version.ts` | `VERSION`, this package's version (set by `@pureform/release`).              |
+| `cache.ts`           | `selectionCache`: a factory's results per selection key, frozen.             |
 
 ## Public API
 
@@ -61,7 +61,6 @@ declare module "@pureform/styling" {
 | `States<C>`               | `{ pressed?: boolean; disabled?: boolean }`                               |
 | `InstanceTokens<C>`       | `{ accent?: string \| number }`                                           |
 | `Selection<C>`            | `Variants<C> & { tokens?: InstanceTokens<C> }`                            |
-| `ClassFactory<C>`         | `(s: Selection<C>) => { root: { class, style? }; label: … }`              |
 | `StyleFactory<C, Style?>` | `(s: Selection<C> & States<C>) => { root: { style, drawing? }; … }`       |
 
 Every group and token also takes `undefined`, which means its default, so a component can pass
@@ -99,97 +98,49 @@ development the bindings compare it with `VERSION`, this package's own version, 
 once when they differ (the registry is stale, or two copies of `@pureform/styling` are
 installed).
 
-It also passes the attribute the target scopes named themes with, and
-`registry.themeAttributes(name)` gives the attributes that put an element and everything under
-it in that theme. Providers write them on their element; an app can spread them anywhere:
-
-```ts
-const registry = createRegistry({ button }, { themeAttribute: "data-theme" });
-registry.themeAttributes("teal"); // { "data-theme": "teal" }, frozen
-registry.themeAttributes(undefined); // {}: the base theme
-```
-
-Panda's generated registry passes `data-panda-theme`, the CSS and Tailwind targets their
-`themeAttribute` option (default `data-theme`), and React Native nothing, so its `themeAttributes`
-is always empty.
-
-The generated registry also records how the target names its CSS vars,
-`vars: { prefix, tokenPrefix }` (from the adapter's options), as `registry.vars` (`{}` when it
-recorded none). Providers name token overrides and runtime theme vars with it.
-
-### Runtime themes
-
-A runtime theme is generated while the app runs rather than compiled into the stylesheet: a
-source (a named generator, loaded on demand) and its input (JSON). Pass one as a provider's
-`theme`:
-
-```ts
-import {
-    defineRuntimeTheme,
-    preloadTheme,
-    themeScope,
-} from "@pureform/styling";
-
-const seedTheme = defineRuntimeTheme<{ seed: string }>(
-    "my-seed",
-    () => import("./generate"),
-);
-const theme = seedTheme({ seed: "#006A60" }); // { source, input }, frozen
-themeScope(theme); // "pf-1x2y3z": a hash of the source's name and the input
-await preloadTheme(theme); // on the server, before rendering
-theme.source.loaded; // the generator once loaded, else undefined
-```
-
-A generator, `(input, vars: VarOptions) => { light, dark? }`, returns CSS vars named the target's
-way (`light` applies in both schemes, `dark` holds what differs). It must be pure: the server and
-the client run it apart. `@pureform/material/runtime-theme`'s `seedTheme` is the one pureform
-ships.
+A web target's index makes `@pureform/styling-web`'s `createWebRegistry` instead: the same
+entries (the same objects, typed the same way) plus the target's theme attribute and CSS var
+prefixes. A React Native target's index makes this neutral registry, frozen, with neither.
 
 ### Writing a factory
 
 ```ts
-import { joinClasses, selectionCache, withTokenStyle } from "@pureform/styling";
-import type { ClassFactory, ClassSlots, Selection } from "@pureform/styling";
+import { selectionCache } from "@pureform/styling";
+import type {
+    Selection,
+    StyleFactory,
+    StyleSlots,
+    States,
+} from "@pureform/styling";
 
-const classes = selectionCache<Selection<"button">, ClassSlots<"button">>(
+export const button: StyleFactory<"button"> = selectionCache<
+    Selection<"button"> & States<"button">,
+    StyleSlots<"button">
+>(
     {
-        variants: ["variant", "toggle"],
-        defaults: { variant: "filled", toggle: "false" },
+        variants: ["variant"],
+        states: ["pressed"],
+        defaults: { variant: "filled" },
     },
-    (s) => ({
-        root: {
-            class: joinClasses(
-                "pf-button__root",
-                `pf-button__root--variant_${s.variant}`,
-            ),
-        },
-        label: { class: "pf-button__label" },
-    }),
+    (s) => ({ root: { style: { opacity: s.pressed ? 0.9 : 1 } } }),
 );
-export const button: ClassFactory<"button"> = (s) =>
-    withTokenStyle(classes(s), s.tokens, {
-        accent: "--components-button-accent",
-    });
 ```
 
 - `selectionCache(order, compute)` keys a selection by its groups (defaults filled, booleans
   as `"true"`/`"false"`) then a bit per state, computes a key once, and deep-freezes the
   result. Tokens aren't in the key. `.size` and `.clear()` are there for tests.
-- `withTokenStyle(slots, tokens, vars, slot = "root")` adds an instance's tokens as CSS vars
-  to one slot's `style`, and returns `slots` itself when there are none.
-- Full examples: `src/__fixtures__/web-button.ts` and `src/__fixtures__/native-button.ts`.
+- A web factory (`ClassFactory`, `withTokenStyle`, `joinClasses`) is written with
+  `@pureform/styling-web`; see its README and `src/__fixtures__/web-button.ts` there.
+- Full native example: `src/__fixtures__/native-button.ts`.
 
-### Moved here
+### Moved to `@pureform/styling-web`
 
-- `componentClasses`, `ComponentManifest`, `ComponentClasses`, `Choice`: the CSS adapter's
-  class name runtime. `@pureform/css-adapter/runtime` re-exports them, and its generated
-  modules still import from there.
-- `@pureform/styling/theme-vars` re-exports `themeVars` and `ThemeVarsOptions` from
-  `@pureform/css-lowering`, where they still live (they need its lowering), and adds
-  `tokenVar(path, vars)`: a token path's CSS var (`"colors.primary"` → `--colors-primary`,
-  `"components.button.container"` → `--pf-components-button-container` with `prefix: "pf"`; a
-  `--var` passes through). The root entry doesn't import it, so React Native doesn't pull in CSS
-  lowering.
+`TokenStyle`, `SlotClasses`, `ClassSlots`, `ClassFactory`, `CssVars`, `componentClasses` (and
+`Choice`, `ComponentClasses`, `ComponentManifest`), `joinClasses`, `tokenStyle`, `withTokenStyle`,
+`TokenVars`, `SpringVars`, the runtime themes (`defineRuntimeTheme`, `isRuntimeTheme`,
+`preloadTheme`, `themeScope` and their types), `ThemeAttributes`, `VarOptions`, the registry's
+`themeAttribute`/`themeAttributes`/`vars`, and the `/theme-vars` subpath (now
+`@pureform/styling-web/theme-vars`). There are no compatibility re-exports here.
 
 ## Build and test
 
@@ -203,13 +154,7 @@ tests live only there.
 - Nothing here reads a DOM, a global, or a framework: factories must stay pure (§5.7). The
   registry itself isn't module-level state in an app; the provider holds it.
 - A key joins values with `|`, so a variant value can't contain one.
-- `tokenStyle` turns a number into its string: pass a length with its unit. A spring
-  (`spring({ ... })`, for a spring-valued token such as tabs' `indicatorSpring`) becomes the
-  token's two vars, `<var>-duration` and `<var>-easing`, sampled as a theme's springs are.
-  A spring role's name (`"spatialSlow"`) on a spring token reads the role's two vars, given
-  the factory's `springs` (each spring token's role var prefix, which the web adapters
-  generate under the registry's `tokenPrefix`; the Panda codegen defaults it to Panda's own
-  `prefix`, its `pandaPrefix`). The registry's `springs` (beside `tokens`) types it: `InstanceTokens` gives a
+- The registry's `springs` (beside `tokens`) types spring tokens: `InstanceTokens` gives a
   spring token `InstanceSpringValue` (a spring or a `SpringRole`, from `SpringRoleRegistry`)
-  and every other token a `TokenValue`.
+  and every other token a `TokenValue`. How a target writes them is the target's.
 - The hooks (`useClasses`, `useClassFactory`, `useStyles`) are the bindings'.

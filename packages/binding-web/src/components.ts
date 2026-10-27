@@ -2,13 +2,31 @@
 // web's `File`) as extensions of binding-core's (`DialogFocusProps` beside `DialogRootOwnProps`),
 // and the handlers that reach into the DOM (the FAB menu's keys).
 
+import { POPOVER_ROOT_PROPS, RIPPLE_ROOT_PROPS } from "@pureform/binding-core";
+
 import {
-    POPOVER_ROOT_PROPS,
     popoverMachineProps,
-    RIPPLE_ROOT_PROPS,
     rippleMachineProps,
     searchViewDialogProps,
-} from "@pureform/binding-core";
+} from "./components/machines";
+
+export * from "./components/card";
+export * from "./components/copy-button";
+export * from "./components/field-primitives";
+export * from "./components/layout";
+export * from "./components/list-item";
+export * from "./components/machines";
+export * from "./components/menu";
+export * from "./components/navigation";
+export * from "./components/page-transition";
+export * from "./components/paginator";
+export * from "./components/props";
+export * from "./components/radio-group";
+export * from "./components/search-view";
+export * from "./components/select";
+export * from "./components/toast";
+export * from "./components/toolbar";
+export * from "./components/tooltip";
 import type {
     FileUploadBehaviorProps,
     FileUploadContentProps,

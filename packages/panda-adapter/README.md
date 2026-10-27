@@ -146,6 +146,6 @@ and then their `styled-system/` from this preset (their `prepare` tasks). The br
   tokens' vars with it.
 - `prefix` (Panda's own class prefix, `pandaPrefix` here) doesn't change the recipe functions;
   the codegen takes it only to name the token vars (its `tokenPrefix` default).
-- The generated modules import `@pureform/styling`, and `panda.ts` imports a type from
-  `@pandacss/dev`; the app needs both.
+- The generated modules import `@pureform/styling` and `@pureform/styling-web`, and `panda.ts`
+  imports a type from `@pandacss/dev`; the app needs all three.
 - Slot conditions select slots by class, so pass your Panda `prefix` as `pandaPrefix`.

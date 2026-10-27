@@ -2,7 +2,7 @@
 // taking the field's states and pureform's controllable value alongside React Native's own props.
 
 import type { TestIdOverride } from "@pureform/anatomy";
-import { fieldControlProps } from "@pureform/binding-core";
+import { fieldControlState } from "@pureform/binding-core";
 import type { PlainTextProps } from "@pureform/binding-core";
 import { useTokens } from "@pureform/rn-adapter/react";
 import { useState } from "react";
@@ -40,7 +40,7 @@ export function useTextControl(
 ): ReactNode {
     const field = useField()?.state;
     const [focused, setFocused] = useState(false);
-    const control = fieldControlProps(field, props);
+    const control = fieldControlState(field, props);
     const tokens = useTokens();
     // Uncontrolled, it keeps its own text; controlled, it shows `value` and only moves with it.
     // React Native has no form to reset it.
@@ -55,7 +55,7 @@ export function useTextControl(
     const { styles: s, views: v } = useComponentSlots<"root">(name, selection, {
         focus: focused,
         focusVisible: focused,
-        invalid: control["aria-invalid"] === "true",
+        invalid: control.invalid,
         disabled: control.disabled ?? false,
     });
     const {
@@ -78,8 +78,8 @@ export function useTextControl(
                 rest.onChangeText?.(next);
             }}
             {...(field ? { "aria-labelledby": field.ids.label } : {})}
-            aria-invalid={control["aria-invalid"] === "true"}
-            aria-required={control.required}
+            aria-invalid={control.invalid}
+            aria-required={control.required || undefined}
             editable={(WEB || !control.disabled) && rest.editable !== false}
             {...(WEB && control.disabled ? ({ disabled: true } as object) : {})}
             placeholderTextColor={

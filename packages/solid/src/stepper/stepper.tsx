@@ -11,7 +11,6 @@ import {
     STEPPER_LIST_LABEL_PROPS,
     STEPPER_ROOT_PROPS,
     stepperIndicator,
-    stepperMachineProps,
     stepperSelection,
     stepperTriggerDisabled,
     stepperTriggerProps,
@@ -26,6 +25,7 @@ import type {
     StepperRootOwnProps,
     StepperStepInstance,
 } from "@pureform/binding-core";
+import { stepperMachineProps } from "@pureform/binding-web";
 import * as stepper from "@pureform/machines/stepper";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {

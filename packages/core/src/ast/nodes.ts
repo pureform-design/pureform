@@ -523,7 +523,7 @@ export interface ContainerSizeCondition {
  *  class before the styled slot, a descendant's through `:has()` along the structure's path
  *  (`:has(> .card__actionArea:hover)`), so a part only follows the descendant the structure
  *  places in it. A native binding passes the component's state to each slot. The web reads each state from a native pseudo-class or an ARIA attribute where
- *  one covers it, and otherwise from the `data-pf-*` attributes in `STATE_ATTRIBUTES`
+ *  one covers it, and otherwise from the `data-pf-*` attributes in web-contracts' `STATE_ATTRIBUTES`
  *  (`data-pf-hover`, `data-pf-active`, `data-pf-filled`). */
 export interface SlotCondition {
     type: "slot";

@@ -7,9 +7,7 @@ import { fadeThroughAnatomy } from "@pureform/anatomy";
 import {
     changePages,
     FADE_THROUGH_ROOT_PROPS,
-    fadeThroughPageProps,
     fadeThroughSelection,
-    pageRootProps,
 } from "@pureform/binding-core";
 import type {
     FadeThroughRootOwnProps,
@@ -17,6 +15,7 @@ import type {
     PageKey,
     TransitionPage,
 } from "@pureform/binding-core";
+import { fadeThroughPageProps, pageRootProps } from "@pureform/binding-web";
 import type { ElementType, ReactNode } from "react";
 
 import { TransitionPageView, useTransitionPages } from "../page-transition";

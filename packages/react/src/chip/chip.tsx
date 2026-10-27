@@ -3,7 +3,6 @@
 
 import { chipAnatomy } from "@pureform/anatomy";
 import {
-    buttonMachineProps,
     CHIP_ROOT_PROPS,
     chipSelection,
     isPresent,
@@ -13,6 +12,7 @@ import type {
     ChipContentProps,
     ChipRootOwnProps,
 } from "@pureform/binding-core";
+import { buttonMachineProps } from "@pureform/binding-web";
 import type * as button from "@pureform/machines/button";
 import type { PropTypes } from "@zag-js/react";
 import type { ElementType, ReactNode } from "react";

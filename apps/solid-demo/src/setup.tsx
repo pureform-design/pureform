@@ -1,5 +1,5 @@
 import { preloadTheme } from "@pureform/solid";
-import { isRuntimeTheme } from "@pureform/styling";
+import { isRuntimeTheme } from "@pureform/styling-web";
 // The per-request SSR seam (`start.setup` in vite.config.ts): the generated
 // server entry awaits this default export after the middleware chain and
 // renders the returned component in App's place, inside the Document. Each

@@ -1,7 +1,7 @@
 // The files `generate` writes itself, around the adapter's modules: the registry index the app
 // hands to `PureformProvider`, and the declarations that type it.
 
-import type { CodegenVars, ComponentShape } from "./adapter";
+import type { CodegenVars, ComponentShape, Platform } from "./adapter";
 
 /** The registry index's file, relative to `outDir`. */
 export const INDEX_FILE = "index.ts";
@@ -47,15 +47,27 @@ const registryOptions = (
     return `{ ${options.join(", ")} }`;
 };
 
-/** The registry index: every entry, static by default, the core's version and the target's
- *  theme attribute, the theme names, and the component names as a type. */
+// Each platform's registry: the neutral one for native targets, the web one (with the target's
+// theme attribute and var prefixes) for web targets.
+const REGISTRY_IMPORT: Readonly<
+    Record<Platform, [name: string, from: string]>
+> = {
+    native: ["createRegistry", "@pureform/styling"],
+    web: ["createWebRegistry", "@pureform/styling-web"],
+};
+
+/** The registry index: every entry, static by default, the core's version and, on the web, the
+ *  target's theme attribute and var prefixes, the theme names, and the component names as a
+ *  type. A native target's index makes the neutral registry and takes neither. */
 export const registryIndex = (
     entries: readonly GeneratedEntry[],
     themes: readonly string[],
     version: string,
+    platform: Platform,
     themeAttribute?: string,
     vars?: CodegenVars,
 ): string => {
+    const [create, from] = REGISTRY_IMPORT[platform];
     const imports = entries
         .filter((entry) => !entry.lazy)
         .map(
@@ -71,17 +83,17 @@ export const registryIndex = (
     });
     const names = entries.map((entry) => JSON.stringify(entry.name));
     return [
-        'import { createRegistry } from "@pureform/styling";',
+        `import { ${create} } from ${JSON.stringify(from)};`,
         ...(imports.length > 0 ? ["", ...imports] : []),
         "",
         "/** The core's version this registry was made with. */",
         `export const version = ${JSON.stringify(version)};`,
         "",
-        "export const registry = createRegistry(",
+        `export const registry = ${create}(`,
         ...(registry.length > 0
             ? ["    {", ...registry, "    },"]
             : ["    {},"]),
-        `    ${registryOptions(themeAttribute, vars)},`,
+        `    ${platform === "web" ? registryOptions(themeAttribute, vars) : "{ version }"},`,
         ");",
         "",
         `export const themes = [${themes.map((theme) => JSON.stringify(theme)).join(", ")}] as const;`,

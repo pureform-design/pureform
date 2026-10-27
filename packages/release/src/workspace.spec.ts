@@ -163,6 +163,7 @@ describe("this repository", () => {
         expect(core).toEqual(
             expect.arrayContaining([
                 "@pureform/core",
+                "@pureform/web-contracts",
                 "@pureform/theme",
                 "@pureform/material",
                 "@pureform/preset",
@@ -175,6 +176,7 @@ describe("this repository", () => {
                 "@pureform/utils",
                 "@pureform/type-utils",
                 "@pureform/styling",
+                "@pureform/styling-web",
                 "@pureform/anatomy",
                 "@pureform/machines",
                 "@pureform/binding-core",

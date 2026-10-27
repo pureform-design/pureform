@@ -4,10 +4,10 @@
 import { separatorAnatomy } from "@pureform/anatomy";
 import {
     SEPARATOR_ROOT_PROPS,
-    separatorRootProps,
     separatorSelection,
 } from "@pureform/binding-core";
 import type { SeparatorRootOwnProps } from "@pureform/binding-core";
+import { separatorRootProps } from "@pureform/binding-web";
 import type { JSX, ValidComponent } from "@solidjs/web";
 
 import type { PartProps } from "../props";

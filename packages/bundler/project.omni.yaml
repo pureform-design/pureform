@@ -16,12 +16,14 @@ dependencies:
     - "@pureform/generate"
     - "@pureform/preset"
     - "@pureform/styling"
+    - "@pureform/styling-web"
 
 cache:
   key:
     files:
       append:
         - client.d.ts
+        - client-web.d.ts
 
 tasks:
   test:unit:

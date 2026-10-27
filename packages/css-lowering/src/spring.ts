@@ -6,7 +6,6 @@
 // sampling, so every web adapter writes the same curve.
 
 import {
-    formatLinearEasing,
     getByPath,
     isSpringToken,
     sampleSpring,
@@ -24,6 +23,7 @@ import type { Token } from "@pureform/core/types";
 
 import type { LowerCtx } from "./context";
 import { varName } from "./css";
+import { formatLinearEasing } from "./easing";
 
 /** The tokens a spring is written as on the web: its settle duration in ms and its curve as a
  *  `linear()` easing, which transitions read, and its own parameters, which a settle from a

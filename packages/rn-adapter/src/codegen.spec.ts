@@ -539,7 +539,8 @@ describe("generate with the native target", () => {
                             [token]:
                                 typeof now === "number"
                                     ? now + 3
-                                    : now.startsWith("rgba")
+                                    : typeof now === "string" &&
+                                        now.startsWith("rgba")
                                       ? "rgba(10, 20, 30, 0.5)"
                                       : now,
                         };

@@ -9,7 +9,6 @@ import type { PartName } from "@pureform/anatomy";
 import {
     CODE_FIELD_CONTENT_PROPS,
     CODE_FIELD_ROOT_PROPS,
-    codeFieldMachineProps,
     codeFieldSelection,
     isPresent,
 } from "@pureform/binding-core";
@@ -19,6 +18,7 @@ import type {
     CodeFieldRootOwnProps,
     CodeFieldValueDetails,
 } from "@pureform/binding-core";
+import { codeFieldMachineProps } from "@pureform/binding-web";
 import * as pinInput from "@pureform/machines/pin-input";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {

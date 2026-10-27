@@ -98,15 +98,8 @@ export const selectionListOptions = (
         disabled: !!item.disabled,
     }));
 
-/** Zag's listbox props from Root's, besides `id`, `dir`, the collection, and the controllable
- *  `value`. */
-export const selectionListMachineProps = (
-    props: SelectionListBehaviorProps,
-) => ({
+/** Portable defaults consumed by both platform selection implementations. */
+export const selectionListDefaults = (props: SelectionListBehaviorProps) => ({
     selectionMode: props.selectionMode ?? ("single" as const),
     deselectable: props.deselectable,
-    loopFocus: props.loopFocus,
-    disabled: props.disabled,
-    orientation: "vertical" as const,
-    typeahead: true,
 });

@@ -155,23 +155,6 @@ export const codeFieldSelection = (
 
 /** The pin input machine's props from Root's, besides `id`, `dir`, and the controllable `value`
  *  (the binding's `useControllable`). An error marks the cells invalid. */
-export const codeFieldMachineProps = (props: CodeFieldBehaviorProps) => ({
-    count: props.length ?? CODE_FIELD_LENGTH,
-    type: props.type ?? "numeric",
-    otp: props.otp,
-    mask: props.mask,
-    onValueComplete: props.onValueComplete,
-    blurOnComplete: props.blurOnComplete,
-    selectOnFocus: props.selectOnFocus,
-    placeholder: props.placeholder ?? "",
-    disabled: props.disabled,
-    invalid: props.error !== undefined ? true : props.invalid,
-    required: props.required,
-    readOnly: props.readOnly,
-    name: props.name,
-    form: props.form,
-    translations: props.cellLabel ? { inputLabel: props.cellLabel } : undefined,
-});
 
 // React Native: no Zag machine, so the value arithmetic is here.
 

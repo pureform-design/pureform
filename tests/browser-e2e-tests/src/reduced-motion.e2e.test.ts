@@ -6,7 +6,7 @@
 // drops position, size, and shape, or is `none` when nothing else is left.
 
 import * as pandaRecipes from "$recipes";
-import { MOTION_ATTRIBUTE } from "@pureform/core";
+import { MOTION_ATTRIBUTE } from "@pureform/web-contracts";
 import { classesFor } from "@pureform/css-adapter";
 import { afterAll, describe, expect, it } from "vitest";
 import { commands } from "vitest/browser";

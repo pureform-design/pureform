@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { dynamic, px } from "./ast";
-import { MOTION_ATTRIBUTE, transitionMoves, valueTypeMoves } from "./motion";
+import { transitionMoves, valueTypeMoves } from "./motion";
 
 describe("transitionMoves", () => {
     it("keeps color, opacity, and elevation fades", () => {
@@ -58,8 +58,4 @@ describe("valueTypeMoves", () => {
         expect(valueTypeMoves(undefined)).toBe(false);
         expect(valueTypeMoves("number")).toBe(true);
     });
-});
-
-it("names the motion attribute", () => {
-    expect(MOTION_ATTRIBUTE).toBe("data-pf-motion");
 });

@@ -16,7 +16,6 @@ import {
 import type { PartName, TestIdOverride } from "@pureform/anatomy";
 import {
     isPresent,
-    overDefaults,
     opensSearchView,
     searchViewCarriedKey,
     searchViewLabel,
@@ -38,6 +37,7 @@ import { useId, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 
+import { overDefaults } from "../defaults";
 import { IconButton } from "../icon-button/icon-button";
 import type { IconButtonProps } from "../icon-button/icon-button";
 import { MenuItems } from "../menu/menu";

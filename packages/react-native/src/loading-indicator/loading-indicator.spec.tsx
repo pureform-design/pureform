@@ -140,7 +140,11 @@ describe("LoadingIndicator", () => {
                         keyframes: {
                             duration: 400,
                             delay: 0,
-                            easing: "linear",
+                            easing: {
+                                type: "easing",
+                                kind: "keyword",
+                                name: "linear",
+                            },
                             iterations: -1,
                             direction: "alternate",
                             frames: [

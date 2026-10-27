@@ -13,7 +13,7 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Controllable } from "../controllable";
 import type { ItemInstance, Unstyled } from "../parts";
-import { isPresent, withoutControls } from "./content";
+import { isPresent } from "./content";
 import type { IndicationProps, InteractionSourceProps } from "./indication";
 import { PAGE_TRANSITION_PROPS } from "./page-transition";
 import type { PageTransitionProps } from "./page-transition";
@@ -140,30 +140,6 @@ export const tabsSelection = (props: TabsVariantProps): Selection<"tabs"> => ({
     color: props.color,
     tokens: props.tokens,
 });
-
-/** Zag's tabs props from Root's, besides `id`, `dir`, and the controllable `value`. Root's `id`
- *  becomes Zag's root id. */
-export const tabsMachineProps = (props: TabsBehaviorProps) => ({
-    activationMode: props.activationMode,
-    loopFocus: props.loopFocus,
-    ids: {
-        root: props.id ?? props.ids?.root,
-        list: props.ids?.list,
-        trigger: props.ids?.trigger,
-        content: props.ids?.content,
-    },
-});
-
-/** Zag's tab props for one tab: without `data-ssr`, which Zag drops once it starts, so the
- *  server's markup and the hydrated page would disagree; without `aria-controls` when the tab has
- *  no panel to name. `disabled` is the tab's own or the tabs'. */
-export const tabsTriggerProps = <P extends object>(
-    props: P,
-    { controls }: { readonly controls: boolean },
-): Omit<P, "data-ssr"> => {
-    const { "data-ssr": _ssr, ...rest } = props as P & { "data-ssr"?: unknown };
-    return withoutControls(rest, controls);
-};
 
 /** Zag's item props for one tab, from the tab's props and the tabs' `disabled`. */
 export const tabsItemProps = (

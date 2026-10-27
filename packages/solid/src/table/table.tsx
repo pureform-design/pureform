@@ -12,7 +12,6 @@ import {
     TABLE_CONTENT_PROPS,
     TABLE_ROOT_PROPS,
     tableCellValue,
-    tableMachineProps,
     tableRowPart,
     tableRowValue,
     tableSelection,
@@ -27,6 +26,7 @@ import type {
     TableRowInstance,
     TableSort,
 } from "@pureform/binding-core";
+import { tableMachineProps } from "@pureform/binding-web";
 import * as table from "@pureform/machines/table";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {

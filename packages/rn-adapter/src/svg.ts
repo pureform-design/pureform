@@ -19,6 +19,7 @@ import { Animated, Platform } from "react-native";
 import Svg, { Circle, Defs, G, Path } from "react-native-svg";
 import type { PathProps } from "react-native-svg";
 
+import { browserEasing } from "./animate/browser-easing";
 import { animate, curve } from "./animate/curve";
 import { runKeyframes } from "./animate/keyframes";
 import {
@@ -156,7 +157,11 @@ const browserMorph = (
     if (cssPathAnimates()) {
         return element.animate(
             [{ d: `path("${pathOf(0)}")` }, { d: `path("${pathOf(1)}")` }],
-            { ...timing, easing: transition.easing, fill: "backwards" },
+            {
+                ...timing,
+                easing: browserEasing(transition.easing),
+                fill: "backwards",
+            },
         );
     }
     const animation = element.ownerDocument.createElementNS(
@@ -355,7 +360,7 @@ const useShapeKeyframes = (
                               frames.map((frame) => ({
                                   offset: frame.offset,
                                   d: `path("${frame.d}")`,
-                                  easing: keyframes.easing,
+                                  easing: browserEasing(keyframes.easing),
                               })),
                               {
                                   duration: keyframes.duration,
@@ -451,7 +456,7 @@ const useCrossFade = (
         const timing = {
             duration: transition.duration,
             delay: transition.delay,
-            easing: transition.easing,
+            easing: browserEasing(transition.easing),
             fill: "backwards" as const,
         };
         // The old fill's fade, sampled in the transition's progress, which its easing gives.

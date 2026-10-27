@@ -7,8 +7,8 @@ prune, and rebuild without touching what the suites read.
 
 - **Depends on:** `@pureform/panda-adapter` (the preset and the codegen), `@pureform/preset`,
   `@pureform/material`, `@pureform/theme`, `@pureform/core` (the config), `@pureform/cli` (the
-  `generate` task), `@pureform/styling` and `@pureform/js-effects` (what the generated registry and
-  the page import at run time), and Panda.
+  `generate` task), `@pureform/styling`, `@pureform/styling-web` and `@pureform/js-effects` (what
+  the generated registry and the page import at run time), and Panda.
 - **Used by:** `tests/component-suites` (the Panda target's registry and stylesheet, and the
   config the CSS and Tailwind targets are generated from) and `tests/browser-e2e-tests` (the
   config, the preset, the registry, the stylesheet, and the page).

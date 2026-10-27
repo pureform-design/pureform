@@ -3,19 +3,20 @@
 // binding owns the form reset and the fieldset rule rather than Zag.
 
 import { checkboxAnatomy } from "@pureform/anatomy";
-import {
-    CHECKBOX_ROOT_PROPS,
-    checkboxInputProps,
-    checkboxMachineProps,
-    checkboxMarkProps,
-    checkboxNativeDefault,
-    checkboxResetState,
-    checkboxSelection,
-} from "@pureform/binding-core";
+import { CHECKBOX_ROOT_PROPS, checkboxSelection } from "@pureform/binding-core";
 import type {
     CheckboxRootOwnProps,
     CheckedState,
 } from "@pureform/binding-core";
+import {
+    checkboxNativeDefault,
+    checkboxResetState,
+} from "@pureform/binding-web";
+import {
+    checkboxInputProps,
+    checkboxMachineProps,
+    checkboxMarkProps,
+} from "@pureform/binding-web";
 import { syncCheckedInput } from "@pureform/binding-web";
 import * as checkbox from "@pureform/machines/checkbox";
 import { normalizeProps } from "@zag-js/react";

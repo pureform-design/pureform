@@ -119,16 +119,3 @@ export const searchBarSelection = (
     scrolled: props.scrolled,
     tokens: props.tokens,
 });
-
-/** The text field machine's props from Root's, besides `id`, `dir`, and the controllable `value`
- *  (the binding's `useControllable`). The placeholder is the input's own: a search bar has no
- *  floating label. */
-export const searchBarMachineProps = (props: SearchBarBehaviorProps) => ({
-    disabled: props.disabled,
-    required: props.required,
-    readOnly: props.readOnly,
-    placeholder: props.placeholder ?? "",
-    name: props.name,
-    form: props.form,
-    ids: { root: props.id ?? props.ids?.root, input: props.ids?.input },
-});

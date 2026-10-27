@@ -6,9 +6,7 @@
 import { snackbarAnatomy } from "@pureform/anatomy";
 import {
     isPresent,
-    presentProps,
     SNACKBAR_ROOT_PROPS,
-    snackbarMachineProps,
     snackbarSelection,
 } from "@pureform/binding-core";
 import type {
@@ -17,6 +15,7 @@ import type {
     SnackbarOpenChangeDetails,
     SnackbarRootOwnProps,
 } from "@pureform/binding-core";
+import { presentProps, snackbarMachineProps } from "@pureform/binding-web";
 import * as snackbar from "@pureform/machines/snackbar";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";

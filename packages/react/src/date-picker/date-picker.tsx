@@ -16,9 +16,7 @@ import type {
 } from "@pureform/anatomy";
 import {
     DATE_PICKER_ROOT_PROPS,
-    dateMachineProps,
     datePickerSelection,
-    dialogPositionerLayout,
     isPresent,
     pickerLocale,
     pickerWeekStart,
@@ -32,6 +30,10 @@ import type {
     DatePickerRootOwnProps,
     Unstyled,
 } from "@pureform/binding-core";
+import {
+    dateMachineProps,
+    dialogPositionerLayout,
+} from "@pureform/binding-web";
 import * as datePicker from "@pureform/machines/date-picker";
 import type * as dialog from "@pureform/machines/dialog";
 import { normalizeProps } from "@zag-js/react";

@@ -1,10 +1,10 @@
 import { testIds } from "@pureform/anatomy";
 import {
-    createRegistry,
+    createWebRegistry,
     defineRuntimeTheme,
     themeScope,
-} from "@pureform/styling";
-import type { ThemeGenerator } from "@pureform/styling";
+} from "@pureform/styling-web";
+import type { ThemeGenerator } from "@pureform/styling-web";
 import { screen } from "@testing-library/react";
 import { type ComponentProps, type ReactNode, Suspense, useState } from "react";
 import { describe, expect, it } from "vitest";
@@ -75,7 +75,7 @@ describe("PureformProvider", () => {
     });
 
     it("writes its theme's attributes from the registry, and follows a changed theme", async () => {
-        const registry = createRegistry(
+        const registry = createWebRegistry(
             { button },
             { themeAttribute: "data-theme" },
         );
@@ -150,7 +150,10 @@ describe("PureformProvider", () => {
     });
 
     it("writes its own token overrides as vars in its style", () => {
-        const registry = createRegistry({ button }, { vars: { prefix: "pf" } });
+        const registry = createWebRegistry(
+            { button },
+            { vars: { prefix: "pf" } },
+        );
         mount(
             <PureformProvider
                 data-testid="p"
@@ -186,7 +189,7 @@ describe("PureformProvider", () => {
             light: { "--colors-primary": input.seed },
             dark: { "--colors-primary": "black" },
         });
-        const registry = createRegistry(
+        const registry = createWebRegistry(
             { button },
             { themeAttribute: "data-theme" },
         );
@@ -281,7 +284,7 @@ describe("PureformProvider", () => {
 
 describe("PureformProvider re-rendering", () => {
     type Options = Omit<PureformProviderProps, "registry" | "children">;
-    const registry = createRegistry(
+    const registry = createWebRegistry(
         { button },
         { themeAttribute: "data-theme", vars: { prefix: "pf" } },
     );

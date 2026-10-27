@@ -5,9 +5,7 @@
 
 import type { listAnatomy, listItemAnatomy } from "@pureform/anatomy";
 import {
-    overDefaults,
     SELECTION_LIST_CONTENT_PROPS,
-    selectionListMachineProps,
     selectionListOptions,
 } from "@pureform/binding-core";
 import type {
@@ -15,6 +13,7 @@ import type {
     SelectionListItem,
     SelectionListRootOwnProps,
 } from "@pureform/binding-core";
+import { overDefaults, selectionListMachineProps } from "@pureform/binding-web";
 import * as selectionList from "@pureform/machines/selection-list";
 import { normalizeProps } from "@zag-js/react";
 import { type ReactNode, useId, useMemo } from "react";

@@ -1,12 +1,13 @@
-// The anatomy's shape: a component's parts, how they nest, and the attributes each one carries.
+// Portable anatomy identities, part nesting, styling slots, and test ids.
 
 /** One part of a component: an element a binding renders. */
 export interface PartAnatomy<P extends string = string> {
     /** The part's name: its AST slot's name, or an extra part's (`hiddenSelect`). */
     readonly name: P;
-    /** The value of `data-pf-part`: the name in kebab case (`touch-target`). */
+    /** The stable serialized part identity (`touch-target`), shared by test ids and bindings.
+     *  This is an identity value, not an HTML attribute name. Composites can remap it. */
     readonly attribute: string;
-    /** The default `data-testid`: `pf-<component>-<part>`, in kebab case. */
+    /** The default test id: `pf-<component>-<part>`, in kebab case. */
     readonly testId: string;
     /** The part directly around it in the AST's `structure`, or `null` for the outermost. */
     readonly parent: P | null;
@@ -14,8 +15,7 @@ export interface PartAnatomy<P extends string = string> {
     readonly children: readonly P[];
     /** Whether the registry styles it: `true` for an AST slot, `false` for an extra part. */
     readonly styled: boolean;
-    /** Whether it's an icon that flips under `rtl` when marked: the part takes a `mirror` prop
-     *  and sets `data-pf-mirror` (or the `mirrored` state on React Native). */
+    /** Whether it's an icon that flips under `rtl` when marked with the `mirrored` state. */
     readonly mirror: boolean;
     /** The registry slot that styles it and takes the provider's `slotProps`, when that isn't
      *  its name, or `null` for none: a menu's surface is its `content` part, drawn by the menu's
@@ -48,7 +48,7 @@ export interface ComponentAnatomy<
 > {
     /** The component's name in the config (`iconButton`). */
     readonly name: N;
-    /** The value of `data-scope`: the name in kebab case (`icon-button`). */
+    /** The component identity scope in kebab case (`icon-button`). */
     readonly scope: string;
     /** The outermost part. */
     readonly root: P;

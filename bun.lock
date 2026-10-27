@@ -20,6 +20,7 @@
       "dependencies": {
         "@pureform/solid": "workspace:^",
         "@pureform/styling": "workspace:^",
+        "@pureform/styling-web": "workspace:^",
         "@solidjs/web": "catalog:",
         "solid-js": "catalog:",
       },
@@ -47,6 +48,7 @@
       "dependencies": {
         "@pureform/react": "workspace:^",
         "@pureform/styling": "workspace:^",
+        "@pureform/styling-web": "workspace:^",
         "react": "catalog:",
         "react-dom": "catalog:",
       },
@@ -122,6 +124,7 @@
         "@pureform/preset": "workspace:^",
         "@pureform/solid": "workspace:^",
         "@pureform/styling": "workspace:^",
+        "@pureform/styling-web": "workspace:^",
         "@pureform/theme": "workspace:^",
         "@remix-run/cookie": "catalog:",
         "@solidjs/meta": "catalog:",
@@ -173,6 +176,7 @@
         "@pureform/rn-adapter": "workspace:^",
         "@pureform/solid": "workspace:^",
         "@pureform/styling": "workspace:^",
+        "@pureform/styling-web": "workspace:^",
         "@solidjs/web": "catalog:",
         "react": "catalog:",
         "react-dom": "catalog:",
@@ -219,6 +223,7 @@
       "dependencies": {
         "@pureform/solid": "workspace:^",
         "@pureform/styling": "workspace:^",
+        "@pureform/styling-web": "workspace:^",
         "@solidjs/web": "catalog:",
         "solid-js": "catalog:",
       },
@@ -285,8 +290,11 @@
         "@pureform/anatomy": "workspace:^",
         "@pureform/binding-core": "workspace:^",
         "@pureform/core": "workspace:^",
+        "@pureform/css-lowering": "workspace:^",
         "@pureform/js-effects": "workspace:^",
         "@pureform/styling": "workspace:^",
+        "@pureform/styling-web": "workspace:^",
+        "@pureform/web-contracts": "workspace:^",
       },
       "devDependencies": {
         "@pureform/tsconfig": "workspace:^",
@@ -315,6 +323,7 @@
       "devDependencies": {
         "@pureform/css-adapter": "workspace:^",
         "@pureform/preset": "workspace:^",
+        "@pureform/styling-web": "workspace:^",
         "@pureform/tsconfig": "workspace:^",
         "@pureform/vite-config": "workspace:^",
         "@pureform/vitest-config": "workspace:^",
@@ -324,6 +333,12 @@
         "vite": "catalog:",
         "vitest": "catalog:",
       },
+      "peerDependencies": {
+        "@pureform/styling-web": "workspace:^",
+      },
+      "optionalPeers": [
+        "@pureform/styling-web",
+      ],
     },
     "packages/cli": {
       "name": "@pureform/cli",
@@ -383,6 +398,7 @@
         "@pureform/css-lowering": "workspace:^",
         "@pureform/generate": "workspace:^",
         "@pureform/styling": "workspace:^",
+        "@pureform/styling-web": "workspace:^",
       },
       "devDependencies": {
         "@pureform/material": "workspace:^",
@@ -401,6 +417,7 @@
       "version": "0.0.0-semantically-released",
       "dependencies": {
         "@pureform/core": "workspace:^",
+        "@pureform/web-contracts": "workspace:^",
       },
       "devDependencies": {
         "@pureform/tsconfig": "workspace:^",
@@ -510,7 +527,7 @@
       "dependencies": {
         "@material/material-color-utilities": "catalog:",
         "@pureform/core": "workspace:^",
-        "@pureform/styling": "workspace:^",
+        "@pureform/styling-web": "workspace:^",
         "@pureform/theme": "workspace:^",
         "@pureform/utils": "workspace:^",
         "chroma-js": "catalog:",
@@ -599,6 +616,7 @@
       "devDependencies": {
         "@pureform/oxlint-config": "workspace:^",
         "@pureform/styling": "workspace:^",
+        "@pureform/styling-web": "workspace:^",
         "@pureform/tsconfig": "workspace:^",
         "@pureform/vite-config": "workspace:^",
         "@pureform/vitest-config": "workspace:^",
@@ -619,6 +637,7 @@
       },
       "peerDependencies": {
         "@pureform/styling": "workspace:^",
+        "@pureform/styling-web": "workspace:^",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
       },
@@ -755,6 +774,7 @@
       "devDependencies": {
         "@pureform/oxlint-config": "workspace:^",
         "@pureform/styling": "workspace:^",
+        "@pureform/styling-web": "workspace:^",
         "@pureform/tsconfig": "workspace:^",
         "@pureform/vite-config": "workspace:^",
         "@pureform/vitest-config": "workspace:^",
@@ -774,6 +794,7 @@
       },
       "peerDependencies": {
         "@pureform/styling": "workspace:^",
+        "@pureform/styling-web": "workspace:^",
         "@solidjs/web": "2.0.0-rc.15",
         "solid-js": "2.0.0-rc.15",
       },
@@ -783,7 +804,24 @@
       "version": "0.0.0-semantically-released",
       "dependencies": {
         "@pureform/core": "workspace:^",
+      },
+      "devDependencies": {
+        "@pureform/tsconfig": "workspace:^",
+        "@pureform/vite-config": "workspace:^",
+        "@pureform/vitest-config": "workspace:^",
+        "@types/node": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:",
+      },
+    },
+    "packages/styling-web": {
+      "name": "@pureform/styling-web",
+      "version": "0.0.0-semantically-released",
+      "dependencies": {
+        "@pureform/core": "workspace:^",
         "@pureform/css-lowering": "workspace:^",
+        "@pureform/styling": "workspace:^",
       },
       "devDependencies": {
         "@pureform/tsconfig": "workspace:^",
@@ -904,6 +942,22 @@
         "vitest": "catalog:",
       },
     },
+    "packages/web-contracts": {
+      "name": "@pureform/web-contracts",
+      "version": "0.0.0-semantically-released",
+      "dependencies": {
+        "@pureform/core": "workspace:^",
+      },
+      "devDependencies": {
+        "@pureform/tsconfig": "workspace:^",
+        "@pureform/vite-config": "workspace:^",
+        "@pureform/vitest-config": "workspace:^",
+        "@types/node": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:",
+      },
+    },
     "tests/browser-e2e-tests": {
       "name": "@pureform/browser-e2e-tests",
       "version": "0.0.0-semantically-released",
@@ -922,10 +976,12 @@
         "@pureform/react-native": "workspace:^",
         "@pureform/rn-adapter": "workspace:^",
         "@pureform/styling": "workspace:^",
+        "@pureform/styling-web": "workspace:^",
         "@pureform/tailwind-adapter": "workspace:^",
         "@pureform/tsconfig": "workspace:^",
         "@pureform/vite-config": "workspace:^",
         "@pureform/vitest-config": "workspace:^",
+        "@pureform/web-contracts": "workspace:^",
         "@solidjs/vite-plugin": "catalog:",
         "@solidjs/web": "catalog:",
         "@tailwindcss/node": "catalog:",
@@ -961,6 +1017,7 @@
         "@pureform/react": "workspace:^",
         "@pureform/solid": "workspace:^",
         "@pureform/styling": "workspace:^",
+        "@pureform/styling-web": "workspace:^",
         "@pureform/tailwind-adapter": "workspace:^",
         "@pureform/tsconfig": "workspace:^",
         "@pureform/vite-config": "workspace:^",
@@ -991,6 +1048,7 @@
         "@pureform/js-effects": "workspace:^",
         "@pureform/preset": "workspace:^",
         "@pureform/styling": "workspace:^",
+        "@pureform/styling-web": "workspace:^",
         "@solidjs/web": "catalog:",
         "solid-js": "catalog:",
       },
@@ -1676,6 +1734,8 @@
 
     "@pureform/styling": ["@pureform/styling@workspace:packages/styling"],
 
+    "@pureform/styling-web": ["@pureform/styling-web@workspace:packages/styling-web"],
+
     "@pureform/tailwind-adapter": ["@pureform/tailwind-adapter@workspace:packages/tailwind-adapter"],
 
     "@pureform/tailwind-demo": ["@pureform/tailwind-demo@workspace:apps/tailwind-demo"],
@@ -1691,6 +1751,8 @@
     "@pureform/vite-config": ["@pureform/vite-config@workspace:packages/vite-config"],
 
     "@pureform/vitest-config": ["@pureform/vitest-config@workspace:packages/vitest-config"],
+
+    "@pureform/web-contracts": ["@pureform/web-contracts@workspace:packages/web-contracts"],
 
     "@react-native/asset-utils": ["@react-native/asset-utils@0.88.0", "", {}, "sha512-Bj1DxQt5f4OrjdlgSVkZT37Z3hx5hUIN5AUDSqL/e99vgtTcqj5vnm067epZL1EF/QiqsniZO8Q1GSkItOakDg=="],
 

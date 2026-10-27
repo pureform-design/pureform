@@ -4,12 +4,7 @@
 // conditional value object by the sibling compiler in `conditions.ts`; if one reaches
 // here (a string-only context) it falls back to its `base` value.
 
-import {
-    formatLinearEasing,
-    getByPath,
-    sampleSpring,
-    tokenValue,
-} from "@pureform/core";
+import { getByPath, sampleSpring, tokenValue } from "@pureform/core";
 import type { Timing, ValueNode } from "@pureform/core/ast";
 
 import type { LowerCtx } from "./context";
@@ -20,6 +15,7 @@ import {
     KEYWORD_CSS,
     varName,
 } from "./css";
+import { formatLinearEasing } from "./easing";
 import { compileSpring } from "./spring";
 
 // A timing's duration and easing, either given or from its spring; then its delay.

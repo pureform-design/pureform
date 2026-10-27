@@ -226,7 +226,16 @@ describe("movingSlots", () => {
         })),
     });
     const transition = (property: string) => [
-        { property, duration: 100, easing: "linear", delay: 0 },
+        {
+            property,
+            duration: 100,
+            easing: {
+                type: "easing",
+                kind: "keyword",
+                name: "linear",
+            } as const,
+            delay: 0,
+        },
     ];
 
     it("names the slots with a transition of a style property or an animation, in any case", () => {
@@ -412,6 +421,11 @@ describe("nativeFactory", () => {
         expect(moved).toMatchObject({
             property: "transform",
             duration: sampleSpring(slow).duration,
+            easing: {
+                type: "easing",
+                kind: "linear",
+                points: sampleSpring(slow).points,
+            },
             spring: {
                 type: "spring",
                 stiffness: 200,
@@ -437,6 +451,7 @@ describe("nativeFactory", () => {
         expect(moved).toMatchObject({
             property: "transform",
             duration: theme["springs.spatialSlow.duration"],
+            easing: theme["springs.spatialSlow.easing"],
             spring: {
                 type: "spring",
                 stiffness: theme["springs.spatialSlow.stiffness"],
@@ -446,6 +461,10 @@ describe("nativeFactory", () => {
         expect(theme["springs.spatialSlow.stiffness"]).not.toBe(
             theme["springs.spatialDefault.stiffness"],
         );
+        expect(moved!.easing).toBe(theme["springs.spatialSlow.easing"]);
+        expect(
+            tabs.selected({ tokens: { indicatorSpring: "spatialSlow" } }),
+        ).toBe(tabs.selected({ tokens: { indicatorSpring: "spatialSlow" } }));
     });
 
     it("takes a role's name only on a spring token", () => {

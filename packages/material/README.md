@@ -9,7 +9,7 @@ Material palette in the browser or on the server.
 ## Where it sits
 
 ```
-@pureform/core, @pureform/theme (contracts), @pureform/styling (runtime themes' shape)
+@pureform/core, @pureform/theme (contracts), @pureform/styling-web (runtime themes' shape)
                  │
 @pureform/material   (this package)
                  │
@@ -63,7 +63,7 @@ is `"outer"`. The color math and config pieces are exported too.
 
 ```tsx
 import { seedTheme } from "@pureform/material/runtime-theme";
-import { preloadTheme } from "@pureform/styling";
+import { preloadTheme } from "@pureform/styling-web";
 
 const theme = seedTheme({ seed: "#006A60" }); // also customSeeds, overrides, as materialColor
 await preloadTheme(theme); // on the server, before rendering

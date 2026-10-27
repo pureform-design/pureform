@@ -1,7 +1,7 @@
 // The context a compound component's Root shares with its parts: its scope and its machine's
 // API. A part outside Root throws, naming both.
 
-import { outsideRootMessage } from "@pureform/binding-core";
+import { outsideRootMessage } from "@pureform/binding-web";
 import { type Context, createContext, use } from "react";
 
 /** A Root's context, and the means for its parts to read it. */

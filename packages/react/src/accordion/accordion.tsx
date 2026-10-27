@@ -8,7 +8,6 @@ import type { PartName } from "@pureform/anatomy";
 import {
     ACCORDION_ROOT_PROPS,
     accordionItemProps,
-    accordionMachineProps,
     accordionSelection,
     isPresent,
 } from "@pureform/binding-core";
@@ -20,6 +19,7 @@ import type {
     AccordionRootOwnProps,
     InteractionSourceProps,
 } from "@pureform/binding-core";
+import { accordionMachineProps } from "@pureform/binding-web";
 import * as accordion from "@pureform/machines/accordion";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";

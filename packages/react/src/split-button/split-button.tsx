@@ -10,7 +10,6 @@ import {
     isPresent,
     SPLIT_BUTTON_MENU_LABEL,
     SPLIT_BUTTON_ROOT_PROPS,
-    splitButtonMachineProps,
     splitButtonSelection,
 } from "@pureform/binding-core";
 import type {
@@ -18,6 +17,7 @@ import type {
     SplitButtonContentProps,
     SplitButtonRootOwnProps,
 } from "@pureform/binding-core";
+import { splitButtonMachineProps } from "@pureform/binding-web";
 import type { ElementType, ReactNode } from "react";
 
 import { DropDownArrow } from "../glyphs";

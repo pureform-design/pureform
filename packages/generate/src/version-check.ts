@@ -27,10 +27,12 @@ export const CORE_PACKAGES = [
     "@pureform/preset",
     "@pureform/rn-adapter",
     "@pureform/styling",
+    "@pureform/styling-web",
     "@pureform/tailwind-adapter",
     "@pureform/theme",
     "@pureform/type-utils",
     "@pureform/utils",
+    "@pureform/web-contracts",
 ] as const;
 
 /** The bindings: versioned on their own, each peering on the core with a range. */

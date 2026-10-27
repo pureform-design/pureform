@@ -13,7 +13,6 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Controllable } from "../controllable";
 import type { Unstyled } from "../parts";
-import { buttonGroupMachineProps } from "./button-group";
 import type { ChipVariantProps } from "./chip";
 import type { IndicationProps, InteractionSourceProps } from "./indication";
 
@@ -114,12 +113,6 @@ export const chipSetSelection = (
     singleLine: props.singleLine || undefined,
     tokens: props.tokens,
 });
-
-/** Zag's toggle group props from Root's, besides `id`, `dir`, and the controllable `value`: the
- *  button group's, as both are selectable rows of toggles. */
-export const chipSetMachineProps: (
-    props: ChipSetBehaviorProps,
-) => ReturnType<typeof buttonGroupMachineProps> = buttonGroupMachineProps;
 
 /** The variants a chip takes from its set, under its own. */
 export const chipSetChipVariants = (

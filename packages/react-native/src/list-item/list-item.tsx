@@ -179,7 +179,7 @@ function ListItemImpl(props: ListItemProps): ReactNode {
                           }
                         : {}),
                 },
-                interactive ? "button" : "div",
+                interactive,
             ),
         ),
         interactive

@@ -12,20 +12,16 @@ import {
     AUTOCOMPLETE_ROOT_PROPS,
     autocompleteFilterText,
     autocompleteInitialText,
-    autocompleteMachineProps,
     autocompleteMatches,
     autocompleteMenuSelection,
     autocompleteSelection,
     autocompleteSupportingTextId,
-    autocompleteTriggerProps,
     isPresent,
     SELECT_COLLECTION,
     SELECT_CONTENT_PROPS,
     SELECT_INPUT_LABEL_PROPS,
     selectGroupedItems,
     selectItemGroups,
-    selectValueProps,
-    toZagValue,
 } from "@pureform/binding-core";
 import type {
     AutocompleteItem,
@@ -35,6 +31,12 @@ import type {
     SelectContentProps,
     Unstyled,
 } from "@pureform/binding-core";
+import {
+    autocompleteMachineProps,
+    autocompleteTriggerProps,
+    selectValueProps,
+    toZagValue,
+} from "@pureform/binding-web";
 import * as combobox from "@pureform/machines/combobox";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {

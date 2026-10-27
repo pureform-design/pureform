@@ -9,7 +9,6 @@ import { numberFieldAnatomy } from "@pureform/anatomy";
 import {
     isPresent,
     NUMBER_FIELD_ROOT_PROPS,
-    numberFieldMachineProps,
     numberFieldPlaceholder,
     numberFieldSelection,
 } from "@pureform/binding-core";
@@ -18,6 +17,7 @@ import type {
     NumberFieldRootOwnProps,
     NumberFieldValueDetails,
 } from "@pureform/binding-core";
+import { numberFieldMachineProps } from "@pureform/binding-web";
 import * as numberInput from "@pureform/machines/number-input";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";

@@ -11,6 +11,7 @@
     "dependencies": {
         "@pureform/react": "workspace:^",
         "@pureform/styling": "workspace:^",
+        "@pureform/styling-web": "workspace:^",
         "react": "catalog:",
         "react-dom": "catalog:"
     },

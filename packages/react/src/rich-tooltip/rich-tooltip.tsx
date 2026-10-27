@@ -7,17 +7,19 @@ import { richTooltipOverlayAnatomy } from "@pureform/anatomy";
 import {
     isInteractiveRichTooltip,
     isPresent,
-    overlayPositionerProps,
-    presentProps,
     RICH_TOOLTIP_ROOT_PROPS,
-    richTooltipMachineProps,
     richTooltipSelection,
-    CARET_STYLE,
 } from "@pureform/binding-core";
 import type {
     RichTooltipContentProps,
     RichTooltipRootOwnProps,
 } from "@pureform/binding-core";
+import {
+    overlayPositionerProps,
+    presentProps,
+    richTooltipMachineProps,
+    CARET_STYLE,
+} from "@pureform/binding-web";
 import * as tooltip from "@pureform/machines/tooltip";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";

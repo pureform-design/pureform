@@ -115,13 +115,6 @@ export const carouselSelection = (
     tokens: props.tokens,
 });
 
-/** Zag's carousel props from Root's, besides `id`, `dir`, `slideCount` and the controllable
- *  `page`. Root's `id` becomes Zag's root id. */
-export const carouselMachineProps = (props: CarouselBehaviorProps) => ({
-    allowMouseDrag: props.allowMouseDrag,
-    ids: props.id === undefined ? undefined : { root: props.id },
-});
-
 /** What the layout reads from the row, in pixels. */
 export interface CarouselMetrics {
     /** The row's width inside its padding. */
@@ -287,13 +280,6 @@ export const carouselItemSizes = (
         return { slot, mask, offset: start - x };
     });
 };
-
-/** The sizes the items take before the row is measured (on the server, and the first paint): a
- *  large item each, or the row's width full screen. */
-export const carouselInitialStyle = (
-    layout: unknown,
-    itemWidth: number = CAROUSEL_SIZES.itemWidth,
-): string | undefined => (layout === "fullScreen" ? "100%" : `${itemWidth}px`);
 
 /** What a ready-made carousel's item is, for a function of the item in its `item`, `mask` and
  *  `content` keys: its `index` and the user's `item`. */

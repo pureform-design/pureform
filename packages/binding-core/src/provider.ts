@@ -3,21 +3,18 @@
 // inherited unless set, and defaults and slot props merge per component.
 
 import type { MotionSetting } from "@pureform/core";
-import { MOTION_ATTRIBUTE } from "@pureform/core";
 import type {
-    AnyRuntimeTheme,
     ComponentName,
     Registry,
     Selection,
     SlotOf,
     TokenValue,
 } from "@pureform/styling";
-import { isRuntimeTheme, themeScope } from "@pureform/styling";
 
 import type { Indication } from "./indication";
 import { withDefaults } from "./selection";
 
-/** Text direction, which the provider writes on its element and passes to every machine. */
+/** Text direction for content and interactions. */
 export type Direction = "ltr" | "rtl";
 
 /** Any registry, whatever its entries. */
@@ -34,69 +31,40 @@ export type ProviderSlotProps<P> = {
     readonly [N in ComponentName]?: { readonly [S in SlotOf<N>]?: P };
 };
 
-/** A static theme's name, as the config names it. */
-export type ThemeName = string;
-
-/** What a provider's `theme` takes: a named theme from the config, or a runtime theme
- *  (`seedTheme({ seed })` from `@pureform/material/runtime-theme`). */
-export type ProviderTheme = ThemeName | AnyRuntimeTheme;
-
-/** Token values set for everything under the provider, by token path, as React Native's
- *  overrides take them: `{ "colors.primary": "#006a60", "components.button.container": "…" }`.
- *  A key that's already a CSS var (`--brand`) is written as is. */
-export type ThemeOverrides = Readonly<Record<string, TokenValue | undefined>>;
-
-/** How the client gets a server-rendered runtime theme: keep the server's block, or generate it
- *  again while hydrating. */
-export type ThemeHydration = "reuse" | "regenerate";
-
-/** A provider's own options. Every one is optional; left out, it's inherited. */
-export interface ProviderOptions<P = object> {
+/** A provider's own options. Every one is optional; left out, it's inherited. `R` is the
+ *  registry the platform's provider takes: a web binding takes the web registry. */
+export interface ProviderOptions<
+    P = object,
+    R extends AnyRegistry = AnyRegistry,
+> {
     /** The generated registry (`.pureform`'s `registry`), or a fake one in tests. */
-    readonly registry?: AnyRegistry | undefined;
+    readonly registry?: R | undefined;
     /** Text direction. `"ltr"` at the root. */
     readonly dir?: Direction | undefined;
-    /** How much motion to allow. `"system"` follows `prefers-reduced-motion`, or the nearest
+    /** How much motion to allow. `"system"` follows the platform's setting, or the nearest
      *  provider that says `"reduce"` or `"full"`. */
     readonly motion?: MotionSetting | undefined;
     /** Default variants and tokens per component. */
     readonly defaults?: ComponentDefaults | undefined;
     /** Props per component and slot. */
     readonly slotProps?: ProviderSlotProps<P> | undefined;
-    /** The theme for everything under the provider: a named theme from the config, or a runtime
-     *  theme. The provider writes the target's theme attribute on its element (`data-theme`,
-     *  `data-panda-theme`): the name, or a runtime theme's scope (`pf-<hash>` of its input), whose
-     *  vars it writes in one `<style>` block in the document's head. */
-    readonly theme?: ProviderTheme | undefined;
-    /** Token values for everything under the provider, written as CSS vars in its element's
-     *  `style` (on the server too). Scheme-independent; for a scheme-aware palette use a runtime
-     *  theme. An override changes its own var only: tokens declared from it at the root keep
-     *  their value. */
-    readonly overrides?: ThemeOverrides | undefined;
-    /** How the client gets a server-rendered runtime theme: `"reuse"` (the default) keeps the
-     *  server's block and generates nothing until the theme changes; `"regenerate"` runs the
-     *  generator again while hydrating, for code that reads the theme's vars. */
-    readonly hydrate?: ThemeHydration | undefined;
     /** How interactive components under the provider show hover, focus, and press: Material's
      *  (`materialIndication()`, the default), `noIndication`, or the app's own
-     *  (`defineIndication`). A component's own `indication` prop overrides it. Its tokens are
-     *  written as theme-level vars on the provider's element, so they reach every component under
-     *  it, on the server too. */
+     *  (`defineIndication`). A component's own `indication` prop overrides it. */
     readonly indication?: Indication | undefined;
 }
 
 /** What a provider resolves to: its own options over its parent's. */
-export interface ProviderState<P = object> {
-    readonly registry: AnyRegistry | undefined;
+export interface ProviderState<
+    P = object,
+    R extends AnyRegistry = AnyRegistry,
+> {
+    readonly registry: R | undefined;
     readonly dir: Direction;
-    /** The setting in effect: the nearest `"reduce"` or `"full"`, else `"system"`. This is what
-     *  the CSS follows too. */
+    /** The setting in effect: the nearest `"reduce"` or `"full"`, else `"system"`. */
     readonly motion: MotionSetting;
     readonly defaults: ComponentDefaults;
     readonly slotProps: ProviderSlotProps<P>;
-    readonly theme: ProviderTheme | undefined;
-    readonly overrides: ThemeOverrides;
-    readonly hydrate: ThemeHydration;
     /** The nearest provider's `indication`; `undefined` for the binding's default. */
     readonly indication: Indication | undefined;
     /** The focus indicator's color the nearest indication that sets one chooses. It has no
@@ -105,15 +73,12 @@ export interface ProviderState<P = object> {
 }
 
 /** What components see with no provider above them. */
-export const ROOT_PROVIDER: ProviderState<never> = Object.freeze({
+export const ROOT_PROVIDER: ProviderState<never, never> = Object.freeze({
     registry: undefined,
     dir: "ltr",
     motion: "system",
     defaults: Object.freeze({}),
     slotProps: Object.freeze({}),
-    theme: undefined,
-    overrides: Object.freeze({}),
-    hydrate: "reuse",
     indication: undefined,
     focusIndicatorColor: undefined,
 });
@@ -176,13 +141,13 @@ const mergeSlotProps = <P>(
 
 /** A provider's state: its own options over its parent's (`ROOT_PROVIDER` at the root). Slot
  *  props for the same part merge with `merge`, a shallow merge by default; bindings pass theirs,
- *  which joins classes and styles. */
-export const resolveProvider = <P>(
-    parent: ProviderState<P> | undefined,
-    own: ProviderOptions<P>,
+ *  which defines platform-specific precedence. */
+export const resolveProvider = <P, R extends AnyRegistry = AnyRegistry>(
+    parent: ProviderState<P, R> | undefined,
+    own: ProviderOptions<P, R>,
     merge: MergePartProps<P> = shallowMerge,
-): ProviderState<P> => {
-    const base = (parent ?? ROOT_PROVIDER) as ProviderState<P>;
+): ProviderState<P, R> => {
+    const base: ProviderState<P, R> = parent ?? ROOT_PROVIDER;
     return {
         registry: own.registry ?? base.registry,
         dir: own.dir ?? base.dir,
@@ -192,11 +157,6 @@ export const resolveProvider = <P>(
                 : base.motion,
         defaults: mergeDefaults(base.defaults, own.defaults),
         slotProps: mergeSlotProps(base.slotProps, own.slotProps, merge),
-        theme: own.theme ?? base.theme,
-        overrides: own.overrides
-            ? { ...base.overrides, ...own.overrides }
-            : base.overrides,
-        hydrate: own.hydrate ?? base.hydrate,
         indication: own.indication ?? base.indication,
         focusIndicatorColor:
             own.indication?.tokens?.focusIndicatorColor ??
@@ -204,53 +164,10 @@ export const resolveProvider = <P>(
     };
 };
 
-/** The attributes a provider writes on its element: the direction, the motion setting, and its
- *  theme's attributes, which depend on the target. */
-export interface ProviderAttributes {
-    readonly dir: Direction;
-    readonly [MOTION_ATTRIBUTE]: "reduce" | "full" | undefined;
-    readonly [themeAttribute: string]: string | undefined;
-}
-
-/** The attribute a registry's target scopes themes with; `data-theme` when it has none, which
- *  still scopes runtime themes, whose blocks the provider writes itself. */
-export const themeAttributeOf = (
-    registry: Pick<Registry, "themeAttribute"> | undefined,
-): string => registry?.themeAttribute ?? "data-theme";
-
-/** The attributes that scope a theme to an element: the registry's for a named theme, and the
- *  theme attribute with the scope as its value for a runtime one. */
-export const themeAttributes = (
-    theme: ProviderTheme | undefined,
-    registry: AnyRegistry | undefined,
-): Readonly<Record<string, string>> | undefined => {
-    if (theme === undefined) return undefined;
-    if (isRuntimeTheme(theme)) {
-        return { [themeAttributeOf(registry)]: themeScope(theme) };
-    }
-    return registry?.themeAttributes(theme);
-};
-
-/** A provider's attributes: the direction in effect, its own motion setting unless it's
- *  `"system"` (the CSS reads `data-pf-motion` from the nearest ancestor that has it), and its
- *  own theme's attributes (an inherited theme's are on an ancestor already). */
-export const providerAttributes = (
-    own: Pick<ProviderOptions, "motion" | "theme">,
-    state: Pick<ProviderState, "dir"> &
-        Partial<Pick<ProviderState, "registry">>,
-): ProviderAttributes => ({
-    ...themeAttributes(own.theme, state.registry),
-    dir: state.dir,
-    [MOTION_ATTRIBUTE]:
-        own.motion === "reduce" || own.motion === "full"
-            ? own.motion
-            : undefined,
-});
-
 /** The provider's registry, or an error naming what's missing. */
-export const requireRegistry = (
-    state: Pick<ProviderState, "registry">,
-): AnyRegistry => {
+export const requireRegistry = <R extends AnyRegistry>(state: {
+    readonly registry: R | undefined;
+}): R => {
     if (state.registry) return state.registry;
     throw new Error(
         "pureform: no registry. Wrap the app in <PureformProvider registry={registry}>, with the registry from `.pureform` (run `pureform generate` or the bundler plugin).",

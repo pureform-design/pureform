@@ -77,11 +77,6 @@ export const avatarSelection = (
     tokens: props.tokens,
 });
 
-/** The machine's props from Root's. */
-export const avatarMachineProps = (
-    props: Pick<AvatarRootOwnProps, "id" | "onStatusChange">,
-) => ({ id: props.id, onStatusChange: props.onStatusChange });
-
 /** Root's element props: `role="img"` named by `label`, or hidden from assistive technology
  *  without one. The picture inside is decorative, since the root names it. */
 export const avatarRootProps = (props: Pick<AvatarRootOwnProps, "label">) =>

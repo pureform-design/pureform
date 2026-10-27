@@ -2,16 +2,17 @@
 // as, the inline vars overrides become, and the decisions both bindings make about when to
 // generate a theme and when to keep the server's block.
 
-import type { ThemeHydration, ThemeOverrides } from "@pureform/binding-core";
-import { themeAttributeOf } from "@pureform/binding-core";
 import type {
     AnyRuntimeTheme,
     CssVars,
-    Registry,
     ThemeSchemeVars,
-} from "@pureform/styling";
-import { themeScope } from "@pureform/styling";
-import { tokenVar } from "@pureform/styling/theme-vars";
+    WebRegistry,
+} from "@pureform/styling-web";
+import { themeScope } from "@pureform/styling-web";
+import { tokenVar } from "@pureform/styling-web/theme-vars";
+
+import type { ThemeHydration, ThemeOverrides } from "./provider";
+import { themeAttributeOf } from "./provider";
 
 /** The attribute every runtime theme's `<style>` block carries, its scope as the value, so the
  *  client can find the server's block. */
@@ -55,7 +56,7 @@ export const themeCss = (selector: string, vars: ThemeSchemeVars): string => {
  *  there are none. Paths that name no var are left out. */
 export const overrideVars = (
     overrides: ThemeOverrides | undefined,
-    registry: Pick<Registry, "vars"> | undefined,
+    registry: Pick<WebRegistry, "vars"> | undefined,
 ): CssVars | undefined => {
     if (!overrides) return undefined;
     let style: Record<`--${string}`, string> | undefined;
@@ -78,21 +79,21 @@ export interface ThemeBlock {
 /** The theme's vars when its generator is loaded, else `undefined`. */
 export const generateThemeVars = (
     theme: AnyRuntimeTheme,
-    registry: Registry | undefined,
+    registry: Pick<WebRegistry, "themeAttribute" | "vars"> | undefined,
 ): ThemeSchemeVars | undefined =>
     theme.source.loaded?.(theme.input, registry?.vars ?? {});
 
 /** Loads the theme's generator and runs it. */
 export const loadThemeVars = async (
     theme: AnyRuntimeTheme,
-    registry: Registry | undefined,
+    registry: Pick<WebRegistry, "themeAttribute" | "vars"> | undefined,
 ): Promise<ThemeSchemeVars> =>
     (await theme.source.load())(theme.input, registry?.vars ?? {});
 
 /** A block from generated vars. */
 export const generatedBlock = (
     theme: AnyRuntimeTheme,
-    registry: Registry | undefined,
+    registry: Pick<WebRegistry, "themeAttribute" | "vars"> | undefined,
     vars: ThemeSchemeVars,
 ): ThemeBlock => {
     const scope = themeScope(theme);
@@ -117,7 +118,7 @@ export interface InitialBlockOptions {
  *  generator is loaded, and the provider loads it otherwise (`needsThemeLoad`). */
 export const initialThemeBlock = (
     theme: AnyRuntimeTheme,
-    registry: Registry | undefined,
+    registry: Pick<WebRegistry, "themeAttribute" | "vars"> | undefined,
     options: InitialBlockOptions,
 ): ThemeBlock => {
     const scope = themeScope(theme);

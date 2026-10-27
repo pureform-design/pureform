@@ -11,11 +11,47 @@ import {
     sliderTrackTokens,
 } from "@pureform/binding-core";
 import type { SliderInsetIconMeasures } from "@pureform/binding-core";
-import { DEFAULT_ICON_STYLE, sameIconStyle } from "@pureform/binding-core";
-import type { IconStyle } from "@pureform/binding-core";
-import { REDUCED_MOTION_QUERY } from "@pureform/binding-core";
+import { sameIconStyle } from "@pureform/binding-core";
+import type { IconStyle as PortableIconStyle } from "@pureform/binding-core";
+import { REDUCED_MOTION_QUERY } from "@pureform/web-contracts";
 
 export { resolveWebSlotCustomization } from "./slot-props";
+export * from "./components";
+export { overDefaults } from "./defaults";
+export { partAttributes } from "./anatomy";
+export { cx } from "./class-names";
+export type { ClassDictionary, ClassValue } from "./class-names";
+export {
+    classEntry,
+    lazyFactoryError,
+    serverLazyFactoryMessage,
+} from "./entries";
+export { combineProps, mergeStyleObjects } from "./props";
+export type { CombineRules } from "./props";
+export {
+    outsideRootMessage,
+    partClasses,
+    partSources,
+    spreadableProps,
+    stateAttributes,
+} from "./parts";
+export type { PartSourcesInput, StateAttributes } from "./parts";
+export {
+    providerAttributes,
+    resolveWebProvider,
+    ROOT_WEB_PROVIDER,
+    themeAttributeOf,
+    themeAttributes,
+} from "./provider";
+export type {
+    ProviderAttributes,
+    ProviderTheme,
+    ThemeHydration,
+    ThemeName,
+    ThemeOverrides,
+    WebProviderOptions,
+    WebProviderState,
+} from "./provider";
 export type {
     WebSlotCustomization,
     ResolvedWebSlotCustomization,
@@ -40,6 +76,17 @@ export const subscribeReducedMotion = (
     query.addEventListener("change", listener);
     return () => query.removeEventListener("change", listener);
 };
+
+/** Web presentation has a CSS inheritance fallback, even before measurement. */
+export interface IconStyle extends PortableIconStyle {
+    readonly color: string;
+}
+
+export const DEFAULT_ICON_STYLE: IconStyle = Object.freeze({
+    size: undefined,
+    color: "currentColor",
+    filled: false,
+});
 
 const FILL = /"FILL"\s+(-?[\d.]+)/;
 

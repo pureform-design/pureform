@@ -13,10 +13,7 @@ import type {
 import {
     askingDismissProps,
     closeAsker,
-    closeTriggerProps,
-    dialogBackdropLayout,
     partAsRoot,
-    presentProps,
 } from "@pureform/binding-core";
 import type {
     CloseAsker,
@@ -24,6 +21,11 @@ import type {
     Controllable,
     Unstyled,
 } from "@pureform/binding-core";
+import {
+    closeTriggerProps,
+    dialogBackdropLayout,
+    presentProps,
+} from "@pureform/binding-web";
 import {
     DIALOG_FOCUS_PROPS,
     dialogFocusMachineProps,

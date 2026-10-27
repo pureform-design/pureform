@@ -1,7 +1,7 @@
 // Renders a scene to HTML on the server, through Solid's server build. Loaded in Node by the
 // `renderOnServer` command.
 
-import { isRuntimeTheme, preloadTheme } from "@pureform/styling";
+import { isRuntimeTheme, preloadTheme } from "@pureform/styling-web";
 import { generateHydrationScript, renderToString } from "@solidjs/web";
 
 import type { Scene } from "../../harness/scene";

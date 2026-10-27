@@ -4,7 +4,7 @@
 // and change no attribute (classes, `style`, `data-*`, `aria-*`, and the rest); then the
 // component must respond. Controlled and default state render on the server.
 
-import { themeScope } from "@pureform/styling";
+import { themeScope } from "@pureform/styling-web";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { commands } from "vitest/browser";
 

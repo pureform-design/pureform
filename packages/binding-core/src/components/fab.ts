@@ -85,17 +85,6 @@ export const fabSelection = (props: FabVariantProps): Selection<"fab"> => ({
     tokens: props.tokens,
 });
 
-/** The button machine's props from Root's, besides `id` and `dir`: never a toggle. */
-export const fabMachineProps = (props: FabBehaviorProps) => ({
-    disabled: props.disabled,
-    type: props.type,
-    name: props.name,
-    value: props.value,
-    form: props.form,
-    toggle: false,
-    ids: { root: props.id ?? props.ids?.root, label: props.ids?.label },
-});
-
 /** What the ready-made FAB renders inside Root, in the framework's node type. */
 export interface FabContentProps<Node> {
     /** The icon, in the container. */

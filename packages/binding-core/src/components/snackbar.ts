@@ -122,18 +122,6 @@ export const snackbarSelection = (
     tokens: props.tokens,
 });
 
-/** The snackbar machine's props from Root's, besides `dir` and the controllable `open`. */
-export const snackbarMachineProps = (props: SnackbarBehaviorProps) => ({
-    duration: props.duration,
-    onAction: props.onAction,
-    ids: {
-        root: props.id ?? props.ids?.root,
-        supportingText: props.ids?.supportingText,
-        action: props.ids?.action,
-        close: props.ids?.close,
-    },
-});
-
 /** A snackbar to show through a queue (`createSnackbarQueue`, React Native's `useSnackbar`): its
  *  content, its layout, how long it stays, and who to tell. */
 export interface SnackbarQueueOptions<Node>

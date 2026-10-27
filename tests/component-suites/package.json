@@ -15,6 +15,7 @@
         "@pureform/react": "workspace:^",
         "@pureform/solid": "workspace:^",
         "@pureform/styling": "workspace:^",
+        "@pureform/styling-web": "workspace:^",
         "@pureform/tailwind-adapter": "workspace:^",
         "@pureform/tsconfig": "workspace:^",
         "@pureform/vite-config": "workspace:^",

@@ -111,8 +111,12 @@ export const factoryModule = (input: FactoryModuleInput): string => {
                 "    },",
             ];
     return [
-        `import { selectionCache${vars.length > 0 ? ", withTokenStyle" : ""} } from "@pureform/styling";`,
-        'import type { ClassFactory, ClassSlots, Selection } from "@pureform/styling";',
+        'import { selectionCache } from "@pureform/styling";',
+        'import type { Selection } from "@pureform/styling";',
+        ...(vars.length > 0
+            ? ['import { withTokenStyle } from "@pureform/styling-web";']
+            : []),
+        'import type { ClassFactory, ClassSlots } from "@pureform/styling-web";',
         "",
         `import { ${name} as recipe } from ${JSON.stringify(input.recipe)};`,
         "",

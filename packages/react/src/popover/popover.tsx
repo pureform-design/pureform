@@ -5,14 +5,13 @@
 // focus to its trigger; with `modal`, focus stays inside and the rest of the page is out of reach.
 
 import { popoverOverlayAnatomy } from "@pureform/anatomy";
+import { isPresent, popoverSelection } from "@pureform/binding-core";
+import type { PopoverContentProps } from "@pureform/binding-core";
 import {
-    isPresent,
     overlayPositionerProps,
     presentProps,
-    popoverSelection,
     CARET_STYLE,
-} from "@pureform/binding-core";
-import type { PopoverContentProps } from "@pureform/binding-core";
+} from "@pureform/binding-web";
 import {
     POPOVER_DOM_ROOT_PROPS,
     popoverDomMachineProps,

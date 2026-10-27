@@ -28,6 +28,7 @@ import {
     slowSpring,
 } from "@pureform/rn-adapter/animated";
 import type { AnimatedTiming, Spring } from "@pureform/rn-adapter/animated";
+import { LINEAR } from "@pureform/rn-adapter/factory";
 import { useReducedMotion, useTokens } from "@pureform/rn-adapter/react";
 import { useLayoutEffect, useState } from "react";
 import type { ReactNode } from "react";
@@ -279,7 +280,7 @@ export function HorizontalSharedAxis(
         ? undefined
         : springOf(own.slideSpring, tokens, timeScale);
     const slide: AnimatedTiming | undefined = spring
-        ? { duration: 0, easing: "linear", spring }
+        ? { duration: 0, easing: LINEAR, spring }
         : undefined;
     const motion: Motion = {
         slide,
@@ -287,7 +288,7 @@ export function HorizontalSharedAxis(
             duration:
                 msOf(own.fadeDuration, SHARED_AXIS_FADE.duration) * timeScale,
             delay: msOf(own.fadeDelay, SHARED_AXIS_FADE.delay) * timeScale,
-            easing: "linear",
+            easing: LINEAR,
         },
         width,
         rtl,

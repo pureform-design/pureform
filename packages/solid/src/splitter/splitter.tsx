@@ -8,12 +8,9 @@ import { splitterAnatomy } from "@pureform/anatomy";
 import {
     createDragVelocity,
     SPLITTER_ROOT_PROPS,
-    splitterMachineProps,
     splitterOrientation,
     splitterSelection,
-    splitterSizeProps,
     splitterTriggerId,
-    splitterTriggerProps,
 } from "@pureform/binding-core";
 import type {
     SplitterContentProps,
@@ -22,6 +19,11 @@ import type {
     SplitterSize,
     SplitterSizeDetails,
 } from "@pureform/binding-core";
+import {
+    splitterMachineProps,
+    splitterSizeProps,
+    splitterTriggerProps,
+} from "@pureform/binding-web";
 import { splitterRelease } from "@pureform/binding-web";
 import type { PropTypes } from "@pureform/machines";
 import * as splitter from "@pureform/machines/splitter";

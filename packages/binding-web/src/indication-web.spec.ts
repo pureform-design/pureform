@@ -1,11 +1,7 @@
 import { resolveProvider } from "@pureform/binding-core";
 import {
-    componentIndicationTokens,
     dropsFocusIndicator,
-    indicationTokenValues,
     noIndication,
-    providerIndicationOverrides,
-    rippleClasses,
 } from "@pureform/binding-core/indication";
 import type { IndicationContext } from "@pureform/binding-core/indication";
 import { createInteractionSource } from "@pureform/binding-core/interaction";
@@ -14,11 +10,17 @@ import { createRegistry } from "@pureform/styling";
 import { afterEach, describe, expect, expectTypeOf, it, vi } from "vitest";
 
 import {
+    componentIndicationTokens,
+    indicationTokenValues,
+    providerIndicationOverrides,
+} from "./indication";
+import {
     DEFAULT_INDICATION,
     IndicationHost,
     holdsLayer,
     indicationRoles,
     materialIndication,
+    rippleClasses,
     surfaceLayer,
 } from "./indication";
 import { defineIndication } from "./indication";

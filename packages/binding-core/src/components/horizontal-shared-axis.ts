@@ -11,7 +11,7 @@ import type {
 import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Unstyled } from "../parts";
-import { changePages, LEAVING_PAGE_PROPS } from "./page-transition";
+import { changePages } from "./page-transition";
 import type { PageDirection, TransitionPage } from "./page-transition";
 
 /** The shared axis's parts: `"root"`, `"page"`, `"scrim"`. */
@@ -82,21 +82,3 @@ export const sharedAxisChange = (
         direction: shown && sharedAxisDirection(Number(shown.key), index),
     });
 };
-
-/** A page's attributes: its state and direction for the styles, and a leaving page inert and
- *  hidden from assistive technology. */
-export const sharedAxisPageProps = (
-    page: TransitionPage,
-): Record<string, string | boolean | undefined> => ({
-    "data-state": page.state,
-    "data-direction": page.direction,
-    ...(page.state === "leaving" ? LEAVING_PAGE_PROPS : {}),
-});
-
-/** The scrim's attributes while a change runs: its direction, hidden from assistive technology. */
-export const sharedAxisScrimProps = (
-    direction: SharedAxisDirection,
-): Record<string, string> => ({
-    "data-direction": direction,
-    "aria-hidden": "true",
-});

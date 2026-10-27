@@ -7,7 +7,6 @@ import { ratingAnatomy } from "@pureform/anatomy";
 import type { PartName } from "@pureform/anatomy";
 import {
     RATING_ROOT_PROPS,
-    ratingMachineProps,
     ratingSelection,
     starFill,
 } from "@pureform/binding-core";
@@ -17,6 +16,7 @@ import type {
     RatingRootOwnProps,
     RatingStarInstance,
 } from "@pureform/binding-core";
+import { ratingMachineProps } from "@pureform/binding-web";
 import * as ratingGroup from "@pureform/machines/rating-group";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {

@@ -40,14 +40,3 @@ export interface OverlayPositioning {
  *  go at once when none runs. */
 export const overlayPresent = (open: boolean, present: boolean): boolean =>
     open || present;
-
-/** A part's props, hidden once the overlay is gone (`present`, from `overlayPresent`), so the
- *  closed overlay takes no room in the layout or the page's measurements. Zag hides its parts the
- *  moment the overlay closes; this keeps them while the exit animation runs. */
-export const presentProps = <P extends object>(
-    props: P,
-    present: boolean,
-): P & { readonly hidden: boolean } => ({ ...props, hidden: !present });
-
-/** A positioner's props, hidden once the overlay is gone. */
-export const overlayPositionerProps = presentProps;

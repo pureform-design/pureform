@@ -15,8 +15,10 @@ export const staticCss = {
 `;
 
 exports[`the Panda codegen > maps slot classes, converts boolean groups, and adds instance tokens 1`] = `
-"import { selectionCache, withTokenStyle } from "@pureform/styling";
-import type { ClassFactory, ClassSlots, Selection } from "@pureform/styling";
+"import { selectionCache } from "@pureform/styling";
+import type { Selection } from "@pureform/styling";
+import { withTokenStyle } from "@pureform/styling-web";
+import type { ClassFactory, ClassSlots } from "@pureform/styling-web";
 
 import { iconButton as recipe } from "../../styled-system/recipes/icon-button";
 
@@ -52,7 +54,8 @@ export const iconButton: ClassFactory<"iconButton"> = (s) =>
 
 exports[`the Panda codegen > wraps a single-slot recipe's class string as the root's 1`] = `
 "import { selectionCache } from "@pureform/styling";
-import type { ClassFactory, ClassSlots, Selection } from "@pureform/styling";
+import type { Selection } from "@pureform/styling";
+import type { ClassFactory, ClassSlots } from "@pureform/styling-web";
 
 import { icon as recipe } from "../../styled-system/recipes/icon";
 
@@ -75,7 +78,8 @@ export const icon: ClassFactory<"icon"> = classes;
 
 exports[`the Panda codegen > wraps a single-slot recipe's class string as the root's 2`] = `
 "import { selectionCache } from "@pureform/styling";
-import type { ClassFactory, ClassSlots, Selection } from "@pureform/styling";
+import type { Selection } from "@pureform/styling";
+import type { ClassFactory, ClassSlots } from "@pureform/styling-web";
 
 import { divider as recipe } from "../../styled-system/recipes/divider";
 

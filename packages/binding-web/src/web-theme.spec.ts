@@ -1,9 +1,9 @@
 import {
-    createRegistry,
+    createWebRegistry,
     defineRuntimeTheme,
     themeScope,
-} from "@pureform/styling";
-import type { ThemeGenerator } from "@pureform/styling";
+} from "@pureform/styling-web";
+import type { ThemeGenerator } from "@pureform/styling-web";
 import { afterEach, describe, expect, it } from "vitest";
 
 import {
@@ -27,7 +27,7 @@ const generate: ThemeGenerator<Seed> = (input, vars) => ({
     dark: { "--colors-surface": "black" },
 });
 
-const registry = createRegistry(
+const registry = createWebRegistry(
     {},
     { themeAttribute: "data-theme", vars: { prefix: "pf" } },
 );
@@ -159,7 +159,7 @@ describe("initialThemeBlock", () => {
 
     it("names vars with the registry's prefixes", async () => {
         const theme = fresh()({ seed: "#006a60" });
-        const prefixed = createRegistry({}, { vars: { tokenPrefix: "x" } });
+        const prefixed = createWebRegistry({}, { vars: { tokenPrefix: "x" } });
         expect((await loadThemeVars(theme, prefixed)).light).toHaveProperty(
             "--x-colors-primary",
         );

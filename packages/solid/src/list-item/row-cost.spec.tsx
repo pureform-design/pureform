@@ -1,8 +1,9 @@
 // A budget for what one row of a list costs to set up: a ready-made interactive list item, as an
 // app's list draws its rows, so the per-instance cost can't creep back unnoticed.
 
-import { createRegistry } from "@pureform/styling";
-import type { ClassFactory, ComponentShape } from "@pureform/styling";
+import type { ComponentShape } from "@pureform/styling";
+import { createWebRegistry } from "@pureform/styling-web";
+import type { ClassFactory } from "@pureform/styling-web";
 import { createSignal, DEV, flush, For } from "solid-js";
 import { describe, expect, it } from "vitest";
 
@@ -23,7 +24,7 @@ const named =
         ) as never;
 
 const registry = () =>
-    createRegistry({
+    createWebRegistry({
         list: named("list", ["root", "item"]),
         listItem: named("list-item", [
             "root",

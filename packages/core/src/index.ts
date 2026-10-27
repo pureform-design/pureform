@@ -6,6 +6,5 @@ export { inlineStyles, mergeStyles } from "./inline";
 export * from "./motion";
 export * from "./path";
 export * from "./spring";
-export * from "./state-attributes";
 export * from "./typed";
 export type * from "./types";

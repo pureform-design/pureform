@@ -1,3 +1,4 @@
+import { LINEAR } from "@pureform/rn-adapter/factory";
 import { shapePath, SvgDrawing } from "@pureform/rn-adapter/svg";
 import { act } from "@testing-library/react";
 import { Profiler, useState } from "react";
@@ -40,7 +41,7 @@ const square = (inset: number) => ({
     ],
 });
 
-const TIMING = { duration: 400, easing: "linear", delay: 0 };
+const TIMING = { duration: 400, easing: LINEAR, delay: 0 };
 const transitions = {
     shape: { property: "shape", ...TIMING },
     fill: { property: "fill", ...TIMING },
@@ -185,7 +186,7 @@ describe("the Animated SVG engine on the web", () => {
                             keyframes: {
                                 duration: 120,
                                 delay: 0,
-                                easing: "linear",
+                                easing: LINEAR,
                                 iterations: 2,
                                 direction,
                                 frames: [

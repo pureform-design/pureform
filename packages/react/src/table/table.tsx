@@ -11,7 +11,6 @@ import {
     isPresent,
     TABLE_ROOT_PROPS,
     tableCellValue,
-    tableMachineProps,
     tableRowPart,
     tableRowValue,
     tableSelection,
@@ -26,6 +25,7 @@ import type {
     TableRowInstance,
     TableSort,
 } from "@pureform/binding-core";
+import { tableMachineProps } from "@pureform/binding-web";
 import * as table from "@pureform/machines/table";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";

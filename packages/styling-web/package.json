@@ -1,0 +1,45 @@
+{
+    "name": "@pureform/styling-web",
+    "version": "0.0.0-semantically-released",
+    "description": "The web half of the style runtime: class factory outputs, instance tokens as CSS vars, runtime CSS themes, and the web registry",
+    "type": "module",
+    "sideEffects": false,
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": {
+                "development": "./src/index.ts",
+                "default": "./dist/index.mjs"
+            },
+            "require": {
+                "development": "./src/index.ts",
+                "default": "./dist/index.mjs"
+            }
+        },
+        "./theme-vars": {
+            "types": "./dist/theme-vars.d.ts",
+            "import": {
+                "development": "./src/theme-vars.ts",
+                "default": "./dist/theme-vars.mjs"
+            },
+            "require": {
+                "development": "./src/theme-vars.ts",
+                "default": "./dist/theme-vars.mjs"
+            }
+        }
+    },
+    "dependencies": {
+        "@pureform/core": "workspace:^",
+        "@pureform/css-lowering": "workspace:^",
+        "@pureform/styling": "workspace:^"
+    },
+    "devDependencies": {
+        "@pureform/tsconfig": "workspace:^",
+        "@pureform/vite-config": "workspace:^",
+        "@pureform/vitest-config": "workspace:^",
+        "@types/node": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:"
+    }
+}

@@ -6,11 +6,8 @@
 
 import * as pandaRecipes from "$recipes";
 import { varName } from "@pureform/css-lowering";
-import type {
-    ClassFactory,
-    ComponentShape,
-    SlotClasses,
-} from "@pureform/styling";
+import type { ComponentShape } from "@pureform/styling";
+import type { ClassFactory, SlotClasses } from "@pureform/styling-web";
 import { describe, expect, it } from "vitest";
 
 import { registry } from "../../panda-fixture/.pureform";

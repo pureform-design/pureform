@@ -33,11 +33,11 @@ const select = (
         case "app-bar:appBar":
             return core.appBarSelection(p, core.APP_BAR_AT_REST);
         case "card:card":
-            return core.cardSelection(p, "div");
+            return core.cardSelection(p, false);
         case "list-item:listItem":
         case "list:listItem":
         case "selection-list:listItem":
-            return core.listItemSelection(p, "div");
+            return core.listItemSelection(p, false);
         case "circular-progress:circularProgress":
         case "linear-progress:linearProgress":
             return core.progressSelection(p);

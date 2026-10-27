@@ -10,17 +10,11 @@
 import { listItemAnatomy } from "@pureform/anatomy";
 import type { PartName, TestIdOverride } from "@pureform/anatomy";
 import {
-    isInteractiveListItem,
     isPresent,
     isUnstyled,
-    LIST_ITEM_EXPAND_VALUE,
     LIST_ITEM_FRAME_PROPS,
-    listItemExpandMachineProps,
     LIST_ITEM_ROOT_PROPS,
-    listItemElement,
     listItemLines,
-    listItemRootProps,
-    listItemSelection,
     listItemVariants,
 } from "@pureform/binding-core";
 import type {
@@ -33,6 +27,14 @@ import type {
     Unstyled,
 } from "@pureform/binding-core";
 import type { MutableInteractionSource } from "@pureform/binding-core/interaction";
+import {
+    LIST_ITEM_EXPAND_VALUE,
+    listItemExpandMachineProps,
+    listItemElement,
+    listItemRootProps,
+    isInteractiveListItem,
+    listItemSelection,
+} from "@pureform/binding-web";
 import * as accordion from "@pureform/machines/accordion";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";

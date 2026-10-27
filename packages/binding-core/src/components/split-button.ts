@@ -13,7 +13,7 @@ import type { IndicationProps } from "./indication";
 import type { MenuBehaviorProps, MenuItem } from "./menu";
 import {
     MENU_BUTTON_BEHAVIOR_PROPS,
-    menuButtonMachineProps,
+    menuButtonPositioning,
 } from "./menu-button";
 import type { VariantProp } from "./variants";
 
@@ -68,8 +68,10 @@ export const splitButtonSelection = (
 });
 
 /** The split button's menu opens under the trailing button, at its end. */
-export const splitButtonMachineProps = (props: MenuBehaviorProps) =>
-    menuButtonMachineProps(props, "bottom-end");
+
+export const splitButtonPositioning = (
+    props: Pick<MenuBehaviorProps, "positioning">,
+) => menuButtonPositioning(props, "bottom-end");
 
 /** What the ready-made split button renders inside Root, in the framework's node type. */
 export interface SplitButtonContentProps<Node> {

@@ -23,8 +23,9 @@ Anything that works without Solid lives in `@pureform/binding-core` (shared with
 to the web, in `@pureform/binding-web` (shared with `@pureform/react`: slot customization, runtime themes as CSS, drags and
 swipes, the indication host, and web-only props such as dialogs' `initialFocusEl`, the ripple's
 `getSurfaceEl` and the file upload's `File`); this package adds context, memos, effects, and
-rendering. `@pureform/styling` is a peer, so the app's generated registry and the binding share
-one copy. See the [design doc](../../docs/design/component-architecture.md), §3, §5, §8, and §9.
+rendering. `@pureform/styling` and `@pureform/styling-web` are peers, so the app's generated
+registry and the binding share one copy. The provider takes a web registry
+(`AnyWebRegistry`, from `createWebRegistry`). See the [design doc](../../docs/design/component-architecture.md), §3, §5, §8, and §9.
 
 ## Architecture
 
@@ -78,7 +79,10 @@ setup, then spread the result. A repeated part always supplies its instance acce
 
 ```tsx
 const slots = createSlotProps(props);
-const cell = slots("cell", () => ({ value: props.value, selected: selected() }));
+const cell = slots("cell", () => ({
+    value: props.value,
+    selected: selected(),
+}));
 return <Cell {...cell} />;
 ```
 

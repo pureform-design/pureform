@@ -11,6 +11,7 @@ dependencies:
     - "@pureform/solid"
     - "@pureform/js-effects"
     - "@pureform/styling"
+    - "@pureform/styling-web"
     - "@pureform/generate"
     - "@pureform/bundler"
     - "@pureform/cli"

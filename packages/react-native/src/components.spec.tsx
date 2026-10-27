@@ -499,7 +499,7 @@ describe("icons", () => {
         expect(style!.color).toMatch(/^rgba?\(/);
         expect(style!.filled).toBe(false);
         expect(computed("pf-button-label").color).toBe(
-            style!.color.replace("rgba(", "rgb(").replace(/, 1\)$/, ")"),
+            style!.color?.replace("rgba(", "rgb(").replace(/, 1\)$/, ")"),
         );
     });
 

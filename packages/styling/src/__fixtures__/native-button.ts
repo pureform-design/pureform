@@ -4,7 +4,17 @@
 
 import { selectionCache } from "../index";
 import type { Selection, StyleFactory, StyleSlots, States } from "../index";
-import type { ButtonShape } from "./web-button";
+
+export type ButtonShape = {
+    variants: {
+        variant: "filled" | "text";
+        size: "small" | "medium";
+        toggle: "true" | "false";
+    };
+    slots: "root" | "label";
+    states: "pressed" | "disabled";
+    tokens: "accent";
+};
 
 const background = { filled: "#6750a4", text: "transparent" };
 

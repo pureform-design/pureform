@@ -159,17 +159,6 @@ export const tableRowValue = <Row>(
     return id === undefined || id === null ? String(index) : String(id);
 };
 
-/** The machine's props from the behavior props (less the controllable sort and selection, which
- *  the bindings map themselves). */
-export const tableMachineProps = (props: TableBehaviorProps) => ({
-    sortStart: props.sortStart,
-    sortClearable: props.sortClearable,
-    selectionMode: props.selectionMode,
-    rows: props.rowValues ? [...props.rowValues] : undefined,
-    translations: props.translations,
-    ids: { root: props.id },
-});
-
 /** The table's registry selection. */
 export const tableSelection = (
     props: TableVariantProps,

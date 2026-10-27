@@ -934,6 +934,7 @@
     "devDependencies": {
         "@pureform/oxlint-config": "workspace:^",
         "@pureform/styling": "workspace:^",
+        "@pureform/styling-web": "workspace:^",
         "@pureform/tsconfig": "workspace:^",
         "@pureform/vite-config": "workspace:^",
         "@pureform/vitest-config": "workspace:^",
@@ -953,6 +954,7 @@
     },
     "peerDependencies": {
         "@pureform/styling": "workspace:^",
+        "@pureform/styling-web": "workspace:^",
         "@solidjs/web": "2.0.0-rc.15",
         "solid-js": "2.0.0-rc.15"
     }

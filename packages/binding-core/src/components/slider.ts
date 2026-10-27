@@ -9,7 +9,7 @@ import type {
 } from "@pureform/anatomy";
 import type { InstanceTokens, Selection } from "@pureform/styling";
 
-import type { ChangeReason, Controllable } from "../controllable";
+import type { Controllable } from "../controllable";
 import type { Unstyled } from "../parts";
 import type { InteractiveProps } from "./indication";
 import type { VariantProp } from "./variants";
@@ -240,7 +240,7 @@ export const sliderInsetIconOverflows = (
     length: number,
     percents: readonly number[],
     centered = false,
-    icon: Partial<SliderInsetIconMeasures> | undefined = undefined,
+    icon?: Partial<SliderInsetIconMeasures>,
 ): boolean => {
     if (length <= 0) return false;
     const { activeStart, activeEnd, startGap, endGap } = sliderTrackTokens(
@@ -375,59 +375,3 @@ export const sliderStopActive = (
     }
     return value <= last;
 };
-
-/** The slider machine's props from Root's, besides `id` (the machine's, `machineId`), `dir`, and
- *  the controllable value. The root is also Zag's control, so both ids are the root's. */
-export const sliderMachineProps = (
-    props: SliderBehaviorProps & SliderVariantProps,
-    machineId: string,
-) => {
-    const root = props.id ?? props.ids?.root ?? `slider:${machineId}`;
-    return {
-        min: props.min,
-        max: props.max,
-        step: props.step,
-        largeStep: props.largeStep,
-        minStepsBetweenThumbs: props.minStepsBetweenThumbs,
-        origin: props.centered ? ("center" as const) : ("start" as const),
-        orientation: (props.orientation === "vertical"
-            ? "vertical"
-            : "horizontal") as "vertical" | "horizontal",
-        disabled: props.disabled,
-        readOnly: props.readOnly,
-        invalid: props.invalid,
-        name: props.name,
-        form: props.form,
-        ids: {
-            root,
-            control: root,
-            thumb: props.ids?.handle,
-            hiddenInput: props.ids?.input,
-        },
-    };
-};
-
-/** The controllable value's machine props (`useControllable`'s) as the machine takes them: lists,
- *  with the change reported in the shape the owner gave. */
-export const sliderControllableProps = <
-    D extends { readonly value: SliderValue; readonly reason?: ChangeReason },
->(props: {
-    readonly value: SliderValue | undefined;
-    readonly defaultValue: SliderValue | undefined;
-    readonly onValueChange: (details: D) => void;
-}) => {
-    const given = props.value ?? props.defaultValue;
-    return {
-        value: sliderValues(props.value),
-        defaultValue: sliderValues(props.defaultValue),
-        onValueChange: ({ value }: { value: number[] }) =>
-            props.onValueChange({ value: sliderValueShape(value, given) } as D),
-    };
-};
-
-/** The native inputs' default: what a form reset shows (`ControllableState.resetsTo`), else
- *  `min`, the machine's default, one per thumb, joined by commas. */
-export const sliderNativeDefault = (
-    resetsTo: SliderValue | undefined,
-    min: number | undefined,
-): string => (sliderValues(resetsTo) ?? [min ?? 0]).join(",");

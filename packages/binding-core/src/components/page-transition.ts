@@ -92,22 +92,6 @@ export const keepContents = <C>(
     }
 };
 
-/** The attributes a leaving page takes: out of reach and hidden from assistive technology. */
-export const LEAVING_PAGE_PROPS = {
-    inert: true,
-    "aria-hidden": "true",
-} as const;
-
-/** The root's attributes while a page leaves (or, with `whileMoving`, while any page moves, for
- *  a transition whose entering page slides too): `data-transitioning`, which clips the root. */
-export const pageRootProps = (
-    pages: readonly TransitionPage[],
-    whileMoving = false,
-): Readonly<Record<string, string>> =>
-    (whileMoving ? pagesMoving(pages) : pagesLeaving(pages))
-        ? { "data-transitioning": "" }
-        : {};
-
 /** How a component with pages (the ready-made tabs, a horizontal stepper) moves between them. */
 export interface PageTransitionProps {
     /** `"sharedAxis"` slides and fades the pages along the x axis, in their order (Material's

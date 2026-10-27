@@ -1,16 +1,16 @@
 // Easing curves for Animated, and whether it can run on the native thread.
 
-import { linearEasingAt, parseLinearEasing } from "@pureform/core";
+import { linearEasingAt } from "@pureform/core";
 import { Animated, Easing, Platform } from "react-native";
 
 import { easingPoints } from "../motion";
-import type { Spring } from "../values";
+import type { Easing as EasingValue, Spring } from "../values";
 
 /** A transition's or animation's curve as an Animated easing: a cubic Bézier, a `linear(...)`
  *  curve interpolated through its points, or linear. */
-export const curve = (easing: string) => {
-    const stops = parseLinearEasing(easing);
-    if (stops) return (x: number) => linearEasingAt(stops, x);
+export const curve = (easing: EasingValue) => {
+    if (easing.kind === "linear")
+        return (x: number) => linearEasingAt(easing.points, x);
     const points = easingPoints(easing);
     return points === "linear" ? Easing.linear : Easing.bezier(...points);
 };
@@ -19,7 +19,7 @@ export const curve = (easing: string) => {
  *  its duration and curve through `Animated.timing`. */
 export interface AnimatedTiming {
     readonly duration: number;
-    readonly easing: string;
+    readonly easing: EasingValue;
     readonly delay?: number | undefined;
     readonly spring?: Spring | undefined;
 }

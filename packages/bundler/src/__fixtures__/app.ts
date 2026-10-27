@@ -31,7 +31,8 @@ export const configSource = (...names: string[]): string =>
 
 const partsSource = `const part = (name) => ({ kind: "component", name, recipe: { base: {} } });\nexport const parts = { chip: part("chip"), divider: part("divider"), badge: part("badge") };\n`;
 
-/** A fresh app root with a config of `names` and `@pureform/styling` linked in. */
+/** A fresh app root with a config of `names` and `@pureform/styling` and
+ *  `@pureform/styling-web` linked in. */
 export const tempApp = (...names: string[]): string => {
     const root = mkdtempSync(join(tmpdir(), "pureform-bundler-"));
     writeTree(root, {
@@ -40,10 +41,12 @@ export const tempApp = (...names: string[]): string => {
         "main.ts": `import { registry, themes } from "virtual:pureform/registry";\nexport const names = registry.names;\nexport const classes = registry.names.map((name) => registry.entry(name).factory({}));\nexport { themes };\n`,
     });
     mkdirSync(join(root, "node_modules/@pureform"), { recursive: true });
-    symlinkSync(
-        resolve(__dirname, "../../../styling"),
-        join(root, "node_modules/@pureform/styling"),
-    );
+    for (const name of ["styling", "styling-web"]) {
+        symlinkSync(
+            resolve(__dirname, "../../..", name),
+            join(root, "node_modules/@pureform", name),
+        );
+    }
     return root;
 };
 

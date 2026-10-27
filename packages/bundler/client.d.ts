@@ -1,8 +1,10 @@
 // Types for `virtual:pureform/registry`, the generated index the bundler plugin serves. Add
-// "@pureform/bundler/client" to `types` in tsconfig.json. The registry's components are typed
-// by `.pureform/registry.d.ts` (include `.pureform/**/*` in tsconfig.json). For the index's own
-// types instead, map the id with `paths` and leave this file out:
-// `"virtual:pureform/registry": ["./.pureform/index.ts"]`.
+// "@pureform/bundler/client" to `types` in tsconfig.json, or "@pureform/bundler/client-web" for a
+// web target (never both: each declares the module). This one types the neutral registry, which
+// every target's index satisfies and a React Native target's index makes, and imports no web
+// package. The registry's components are typed by `.pureform/registry.d.ts` (include
+// `.pureform/**/*` in tsconfig.json). For the index's own types instead, map the id with `paths`
+// and leave this file out: `"virtual:pureform/registry": ["./.pureform/index.ts"]`.
 
 declare module "virtual:pureform/registry" {
     import type {
@@ -12,7 +14,7 @@ declare module "virtual:pureform/registry" {
         Registry,
     } from "@pureform/styling";
 
-    /** The generated registry, for `PureformProvider`. */
+    /** The generated registry, for `PureformProvider` on React Native. */
     export const registry: Registry<{
         readonly [N in keyof ComponentRegistry & string]:
             | AnyFactory

@@ -176,19 +176,6 @@ export const TIME_CONTENT_PROPS = [
 export const TIME_PICKER_HEADLINE = "Select time";
 export const TIME_INPUT_HEADLINE = "Enter time";
 
-/** The machine's props from the behavior props (less the controllable value, which the bindings
- *  map themselves). */
-export const timeMachineProps = (props: TimeBehaviorProps) => ({
-    hourCycle: props.hourCycle,
-    locale: props.locale,
-    translations: props.translations,
-    disabled: props.disabled,
-    readOnly: props.readOnly,
-    name: props.name,
-    form: props.form,
-    ids: { root: props.id },
-});
-
 /** The time picker's registry selection. */
 export const timePickerSelection = (
     props: TimePickerVariantProps,

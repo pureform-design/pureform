@@ -7,15 +7,14 @@ import { switchControlAnatomy } from "@pureform/anatomy";
 import {
     isPresent,
     SWITCH_ROOT_PROPS,
-    switchInputProps,
-    switchMachineProps,
-    switchNativeDefault,
     switchSelection,
 } from "@pureform/binding-core";
 import type {
     SwitchContentProps,
     SwitchRootOwnProps,
 } from "@pureform/binding-core";
+import { switchNativeDefault } from "@pureform/binding-web";
+import { switchInputProps, switchMachineProps } from "@pureform/binding-web";
 import { syncCheckedInput } from "@pureform/binding-web";
 import * as switchControl from "@pureform/machines/switch";
 import { normalizeProps } from "@zag-js/react";

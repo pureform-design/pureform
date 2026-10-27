@@ -8,7 +8,7 @@ import type { PartName, TestIdOverride, treeAnatomy } from "@pureform/anatomy";
 import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Controllable } from "../controllable";
-import type { ItemInstance, Unstyled } from "../parts";
+import type { Unstyled } from "../parts";
 import type { IndicationProps, InteractionSourceProps } from "./indication";
 import type { VariantProp } from "./variants";
 
@@ -104,13 +104,6 @@ export const treeSelection = (props: TreeVariantProps): Selection<"tree"> => ({
     density: props.density,
     color: props.color,
     tokens: props.tokens,
-});
-
-/** Zag's tree view props from Root's, besides `id`, `dir`, the collection and the controllable
- *  values. */
-export const treeMachineProps = (props: TreeBehaviorProps) => ({
-    selectionMode: props.selectionMode,
-    expandOnClick: props.expandOnClick,
 });
 
 /** Zag's controllable props from the bindings' (`expandedValue`, `selectedValue` and their

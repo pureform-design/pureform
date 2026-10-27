@@ -235,7 +235,7 @@ describe("pureform.rolldown", () => {
         await bundle.close();
         expect(output[0].code).toContain('class: "chip"');
         expect(outputFile(root, "fake/pruned/index.ts")).toContain(
-            "createRegistry",
+            "createWebRegistry",
         );
     });
 });

@@ -18,7 +18,7 @@ import type {
     AnyComponent,
     NativeSelection,
 } from "@pureform/rn-adapter/factory";
-import { tokenVar } from "@pureform/styling/theme-vars";
+import { tokenVar } from "@pureform/styling-web/theme-vars";
 import { describe, expect, it } from "vitest";
 import { commands } from "vitest/browser";
 

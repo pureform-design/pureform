@@ -3,11 +3,7 @@
 // tiles, which rounds its corners.
 
 import { listAnatomy } from "@pureform/anatomy";
-import {
-    listItemPosition,
-    listSelection,
-    overDefaults,
-} from "@pureform/binding-core";
+import { listItemPosition, listSelection } from "@pureform/binding-core";
 import type {
     ListContentProps,
     ListInstances,
@@ -18,6 +14,7 @@ import type {
 import { useMemo } from "react";
 import type { ReactNode } from "react";
 
+import { overDefaults } from "../defaults";
 import { ListDefaults, ListItem } from "../list-item/list-item";
 import type { ListItemProps } from "../list-item/list-item";
 import { testIdOf, withEngine } from "../parts";

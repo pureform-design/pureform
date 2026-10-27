@@ -28,7 +28,6 @@ import type {
 } from "@pureform/rn-adapter/factory";
 import { StylesProvider } from "@pureform/rn-adapter/react";
 import type { StyleSource } from "@pureform/rn-adapter/react";
-import { isRuntimeTheme } from "@pureform/styling";
 import type { TokenValue } from "@pureform/styling";
 import {
     createContext,
@@ -259,7 +258,7 @@ export function PureformProvider(props: PureformProviderProps): ReactNode {
     const parent = useContext(PureformContext);
     const systemScheme = useColorScheme();
     const window = useWindowDimensions();
-    if (isRuntimeTheme(props.theme)) {
+    if (props.theme !== undefined && typeof props.theme !== "string") {
         throw new Error(
             "pureform: runtime themes are web only; React Native takes a named theme from the config, or overrides.",
         );

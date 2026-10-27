@@ -13,7 +13,7 @@
 //   ripple reaches full size.
 
 import {
-    DEFAULT_RIPPLE_TIMING,
+    DEFAULT_RIPPLE_TIMING as SEMANTIC_RIPPLE_TIMING,
     TOUCH_DELAY_MS,
     rippleGeometry,
     ripplePress,
@@ -22,8 +22,17 @@ import type {
     Point,
     RippleGeometry,
     RippleHandle,
-    RippleTiming,
+    RippleTiming as SharedRippleTiming,
 } from "./ripple-core";
+
+/** Browser ripple timing carries the grow curve in CSS notation. */
+export type RippleTiming<Curve = string> = SharedRippleTiming<Curve>;
+
+/** Material's browser ripple timing, for a surface that declares none. */
+export const DEFAULT_RIPPLE_TIMING: RippleTiming = {
+    ...SEMANTIC_RIPPLE_TIMING,
+    easing: `cubic-bezier(${SEMANTIC_RIPPLE_TIMING.easing.join(", ")})`,
+};
 
 // Split a computed list on top-level commas, keeping `cubic-bezier(a, b, c, d)` whole.
 const splitList = (value: string): string[] => {

@@ -1,7 +1,6 @@
 // The registry: each component's factory by name, static or loaded on demand. An entry's kind is
-// fixed when the registry is created, so the server and the client take the same path.
-
-import type { VarPrefix } from "@pureform/css-lowering";
+// fixed when the registry is created, so the server and the client take the same path. A web
+// target's registry adds its theme attribute and var prefixes (`@pureform/styling-web`).
 
 /** Any factory: a function of a selection. */
 export type AnyFactory = (selection: never) => unknown;
@@ -73,44 +72,16 @@ export type LazyEntryName<E extends RegistryInput> = Exclude<
     StaticEntryName<E>
 >;
 
-/** The attributes that put an element and everything under it in a named theme: `{
- *  "data-theme": "teal" }`. Empty for the base theme, and on targets without selectors. */
-export type ThemeAttributes = Readonly<Record<string, string>>;
-
-/** How the target names its CSS vars, as its stylesheet was compiled: the component var prefix
- *  (`"pf"` gives `--pf-components-button-container`) and the token var prefix (`"pf"` gives
- *  `--pf-colors-primary`). Both default to none. */
-export interface VarOptions {
-    readonly prefix?: VarPrefix;
-    readonly tokenPrefix?: string;
-}
-
 /** What `createRegistry` takes besides the entries. */
 export interface RegistryOptions {
     /** The core's version the generated registry was made with. Bindings compare it with
      *  the running `@pureform/styling`'s `VERSION` in development. */
     version?: string;
-    /** The attribute the target scopes named themes with, as its stylesheet matches it:
-     *  `data-panda-theme` for Panda, the `themeAttribute` option (default `data-theme`) for the
-     *  CSS and Tailwind targets. Left out on targets without selectors (React Native). */
-    themeAttribute?: string;
-    /** How the target names its CSS vars, for providers that write token overrides and runtime
-     *  themes. Left out on targets without CSS vars (React Native). */
-    vars?: VarOptions;
 }
 
 export interface Registry<E extends RegistryInput = RegistryInput> {
     /** The core's version the registry was made with, when it recorded one. */
     readonly version: string | undefined;
-    /** The attribute the target scopes named themes with, when it has one. */
-    readonly themeAttribute: string | undefined;
-    /** The attributes that apply a named theme to an element and everything under it, the way
-     *  the target's stylesheet scopes it: `{ "data-theme": "teal" }` on the CSS target. Empty for
-     *  no name (the base theme) and on targets without one. Providers write them on their
-     *  element; an app can spread them on any element. */
-    themeAttributes(name: string | undefined): ThemeAttributes;
-    /** How the target names its CSS vars. Empty when the registry recorded none. */
-    readonly vars: VarOptions;
     /** Every entry's name, in the order given. */
     readonly names: readonly (keyof E & string)[];
     /** Whether the registry has an entry by this name. */
@@ -122,9 +93,6 @@ export interface Registry<E extends RegistryInput = RegistryInput> {
      *  component loads the entry itself. Throws for an unknown name. */
     preload(name: keyof E & string): Promise<void>;
 }
-
-const NO_ATTRIBUTES: ThemeAttributes = Object.freeze({});
-const NO_VARS: VarOptions = Object.freeze({});
 
 const isLazy = (input: AnyFactory | LazyInput): input is LazyInput =>
     typeof input === "object" && input !== null && "lazy" in input;
@@ -164,8 +132,7 @@ const lazyEntry = (name: string, input: LazyInput): LazyEntry => {
 /** A registry of factories by name: `createRegistry({ button, card: { lazy: () =>
  *  import("./web/card") } })`. A lazy loader's module gives its factory as the module itself,
  *  its default export, or its export named after the entry. A generated registry also passes the
- *  core's version, the target's theme attribute, and its var prefixes: `createRegistry({ button },
- *  { version, themeAttribute: "data-theme", vars: { prefix: "pf" } })`. */
+ *  core's version: `createRegistry({ button }, { version })`. */
 export const createRegistry = <const E extends RegistryInput>(
     input: E,
     options: RegistryOptions = {},
@@ -184,11 +151,6 @@ export const createRegistry = <const E extends RegistryInput>(
         );
     }
     const names = Object.freeze([...entries.keys()]);
-    const { themeAttribute } = options;
-    const themeAttributes = (name: string | undefined): ThemeAttributes =>
-        themeAttribute && name
-            ? Object.freeze({ [themeAttribute]: name })
-            : NO_ATTRIBUTES;
     const get = (name: string): RegistryEntry => {
         const found = entries.get(name);
         if (found) return found;
@@ -198,9 +160,6 @@ export const createRegistry = <const E extends RegistryInput>(
     };
     return Object.freeze({
         version: options.version,
-        themeAttribute,
-        themeAttributes,
-        vars: options.vars ? Object.freeze({ ...options.vars }) : NO_VARS,
         names,
         has: (name: string): name is keyof E & string => entries.has(name),
         entry: (name: string) => get(name),

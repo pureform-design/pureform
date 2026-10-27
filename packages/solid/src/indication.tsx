@@ -10,7 +10,6 @@ import type { PartStates } from "@pureform/binding-core";
 import {
     droppedFocusIndicatorMessage,
     dropsFocusIndicator,
-    rippleClasses,
 } from "@pureform/binding-core/indication";
 import {
     createInteractionSource as createSource,
@@ -28,6 +27,7 @@ import {
     holdsLayer,
     IndicationHost,
     NOT_FORWARDED,
+    rippleClasses,
 } from "@pureform/binding-web/indication";
 import type {
     ForwardedStates,

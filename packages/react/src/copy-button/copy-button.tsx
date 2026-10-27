@@ -4,16 +4,18 @@
 // `onCopyError` instead. It's drawn by the `iconButton` registry entry.
 
 import {
-    COPY_ANNOUNCEMENT_STYLE,
     COPY_BUTTON_OWN_PROPS,
     COPY_LABEL,
     copyAnnouncement,
-    copyButtonMachineProps,
 } from "@pureform/binding-core";
 import type {
     CopyButtonBehaviorProps,
     CopyButtonContentProps,
 } from "@pureform/binding-core";
+import {
+    COPY_ANNOUNCEMENT_STYLE,
+    copyButtonMachineProps,
+} from "@pureform/binding-web";
 import * as clipboard from "@pureform/machines/clipboard";
 import { normalizeProps } from "@zag-js/react";
 import { type ReactNode, useId } from "react";

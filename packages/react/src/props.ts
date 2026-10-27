@@ -1,8 +1,8 @@
 // React's rules for merging a part's props: classes join into one `className` string (as `clsx`
 // joins them), and styles merge as objects, later properties winning.
 
-import { combineProps, cx } from "@pureform/binding-core";
-import type { ClassValue, CombineRules } from "@pureform/binding-core";
+import { combineProps, cx } from "@pureform/binding-web";
+import type { ClassValue, CombineRules } from "@pureform/binding-web";
 import type { CSSProperties, HTMLAttributes, Ref } from "react";
 
 /** The props a part takes, as one element's attributes, with its `ref`. */

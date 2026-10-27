@@ -12,7 +12,6 @@ import {
     DATE_INPUT_ROOT_PROPS,
     dateFormatHint,
     dateInputSelection,
-    dateMachineProps,
     isPresent,
     pickerLocale,
     selectedDateText,
@@ -21,6 +20,7 @@ import type {
     DateInputContentProps,
     DateInputRootOwnProps,
 } from "@pureform/binding-core";
+import { dateMachineProps } from "@pureform/binding-web";
 import * as dateInput from "@pureform/machines/date-input";
 import { toISO } from "@pureform/machines/date-picker";
 import { normalizeProps } from "@zag-js/react";

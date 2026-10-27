@@ -10,7 +10,7 @@ import type { Selected, State } from "./select";
 import { readColorFunction } from "./spaces";
 import type { Scheme } from "./theme";
 import { dependencies, evaluate, isExpr } from "./values";
-import type { Concrete, ThemeValues, Value } from "./values";
+import type { ThemeValue, ThemeValues, Value } from "./values";
 
 export type Templates = Record<string, ComponentStyles>;
 export type Resolved = Record<string, ComponentStyles<Value>>;
@@ -177,7 +177,7 @@ export const withDerived = (
         for (const [token, formula, keys] of reads) {
             if (token in overrides || !keys.some((k) => changed.has(k)))
                 continue;
-            const value = evaluate(formula, theme) as Concrete;
+            const value = evaluate(formula, theme) as ThemeValue;
             if (theme[token] === value) continue;
             theme[token] = out[token] = value;
             if (!changed.has(token)) again = true;
@@ -333,9 +333,9 @@ export const evaluateSetTokens = (
     const formulas = where.styles.formulas?.[where.key] ?? {};
     const given = where.tokens ?? {};
     const overrides = where.overrides ?? {};
-    const done = new Map<string, Concrete | undefined>();
+    const done = new Map<string, ThemeValue | undefined>();
     const reading: string[] = [];
-    const read = (key: string): Concrete | undefined => {
+    const read = (key: string): ThemeValue | undefined => {
         if (key in given) return given[key];
         if (done.has(key)) return done.get(key);
         const formula = Object.hasOwn(set, key)
@@ -352,7 +352,7 @@ export const evaluateSetTokens = (
         }
         reading.push(key);
         try {
-            const value = evaluate(formula, read) as Concrete;
+            const value = evaluate(formula, read) as ThemeValue;
             done.set(key, value);
             return value;
         } finally {

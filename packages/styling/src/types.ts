@@ -1,6 +1,6 @@
 // The types every binding and generated factory shares. A component is named by a key of
 // `ComponentRegistry`, which the generated `.d.ts` augments from the app's config, or described
-// inline by a `ComponentShape`.
+// inline by a `ComponentShape`. The web factory's output types are `@pureform/styling-web`'s.
 
 import type {
     FormCondition,
@@ -165,26 +165,6 @@ export type InstanceTokens<C extends ComponentRef> = {
 export type Selection<C extends ComponentRef> = Variants<C> & {
     tokens?: InstanceTokens<C> | undefined;
 };
-
-/** CSS custom properties for an element's `style`. */
-export type TokenStyle = Readonly<Record<`--${string}`, string>>;
-
-/** One slot's classes on the web, and the CSS vars for instance tokens where it has any. */
-export interface SlotClasses {
-    readonly class: string;
-    readonly style?: TokenStyle;
-}
-
-/** Each slot's classes. */
-export type ClassSlots<C extends ComponentRef> = {
-    readonly [S in SlotOf<C>]: SlotClasses;
-};
-
-/** Web: class strings per slot, plus CSS vars for instance tokens. States aren't in the
- *  selection: the element carries them and the CSS matches them. */
-export type ClassFactory<C extends ComponentRef> = (
-    selection: Selection<C>,
-) => ClassSlots<C>;
 
 /** One slot's resolved style on React Native, and what it draws with SVG, where it does. */
 export interface SlotStyle<Style = object, Drawing = object> {

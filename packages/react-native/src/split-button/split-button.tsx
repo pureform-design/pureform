@@ -8,7 +8,7 @@ import type { TestIdOverride } from "@pureform/anatomy";
 import {
     isPresent,
     SPLIT_BUTTON_MENU_LABEL,
-    splitButtonMachineProps,
+    splitButtonPositioning,
     splitButtonSelection,
 } from "@pureform/binding-core";
 import type {
@@ -198,7 +198,7 @@ function SplitButtonImpl(props: SplitButtonProps): ReactNode {
             defaultOpen={props.defaultOpen}
             onOpenChange={props.onOpenChange}
             closeOnSelect={props.closeOnSelect}
-            positioning={splitButtonMachineProps(props).positioning}
+            positioning={splitButtonPositioning(props)}
             onSelect={props.onSelect}
             aria-label={props["aria-label"]}
             indication={props.indication}

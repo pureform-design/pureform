@@ -3,8 +3,9 @@
 // mount and follows the component's state changes. Outside an icon part, and on the server, it
 // gives `DEFAULT_ICON_STYLE`.
 
-import { DEFAULT_ICON_STYLE, sameIconStyle } from "@pureform/binding-core";
-import type { IconStyle } from "@pureform/binding-core";
+import { sameIconStyle } from "@pureform/binding-core";
+import { DEFAULT_ICON_STYLE } from "@pureform/binding-web";
+import type { IconStyle } from "@pureform/binding-web";
 import { observeIconStyle } from "@pureform/binding-web";
 import {
     type Accessor,

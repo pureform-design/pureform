@@ -6,8 +6,7 @@ import { listAnatomy } from "@pureform/anatomy";
 import {
     listItemPosition,
     listSelection,
-    overDefaults,
-    selectionListMachineProps,
+    selectionListDefaults,
 } from "@pureform/binding-core";
 import type {
     ListPart,
@@ -19,6 +18,7 @@ import type {
 import { useMemo } from "react";
 import type { ReactNode } from "react";
 
+import { overDefaults } from "../defaults";
 import { ListDefaults, ListItem } from "../list-item/list-item";
 import type { ListItemProps } from "../list-item/list-item";
 import type { ListItemDefaults } from "../list/list";
@@ -64,7 +64,7 @@ function SelectionListImpl(props: SelectionListProps): ReactNode {
         props.onValueChange,
         [] as string[],
     );
-    const { selectionMode, deselectable } = selectionListMachineProps(props);
+    const { selectionMode, deselectable } = selectionListDefaults(props);
     const press = (key: string) => {
         const on = value.includes(key);
         if (selectionMode === "multiple")

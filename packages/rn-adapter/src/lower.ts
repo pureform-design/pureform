@@ -8,7 +8,6 @@
 
 import {
     dampingCoefficient,
-    formatLinearEasing,
     getByPath,
     inlineStyles,
     sampleSpring,
@@ -19,7 +18,6 @@ import type {
     Condition,
     ConditionalNode,
     NumericScalarNode,
-    EasingNode,
     SpringNode,
     SpringValue,
     StyleMap,
@@ -290,25 +288,6 @@ const lowerNumeric = (value: number, unit: string, ctx: Ctx): Value => {
         default:
             return `${value}${unit}`;
     }
-};
-
-// CSS's named curves, as cubic Béziers.
-const EASINGS: Record<string, [number, number, number, number]> = {
-    linear: [0, 0, 1, 1],
-    ease: [0.25, 0.1, 0.25, 1],
-    easeIn: [0.42, 0, 1, 1],
-    easeOut: [0, 0, 0.58, 1],
-    easeInOut: [0.42, 0, 0.58, 1],
-};
-
-/** An easing as `cubic-bezier(...)` or `linear(...)`, or `linear` for steps, which Animated has
- *  no curve for. */
-const easingCurve = (node: EasingNode): string => {
-    if (node.kind === "steps") return "linear";
-    if (node.kind === "linear") return formatLinearEasing(node.points);
-    const points =
-        node.kind === "cubicBezier" ? node.points : EASINGS[node.name]!;
-    return `cubic-bezier(${points.join(", ")})`;
 };
 
 /** What a spring is on React Native, beside its sampled duration and curve: its stiffness, mass,
@@ -701,7 +680,7 @@ export const lowerNode = (node: ValueNode, ctx: Ctx): Cased => {
             );
         }
         case "easing":
-            return plain(easingCurve(node));
+            return plain(node);
         case "animation": {
             const frames = keyframes(node.name, ctx);
             return product(

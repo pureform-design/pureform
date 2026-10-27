@@ -11,7 +11,7 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Unstyled } from "../parts";
 import type { TooltipBehaviorProps } from "./tooltip";
-import { isInteractiveTooltip, tooltipMachineProps } from "./tooltip";
+import { isInteractiveTooltip } from "./tooltip";
 
 /** The rich tooltip's parts: the tooltip's, and `"subhead" | "actions"`. */
 export type RichTooltipPart = PartName<typeof richTooltipOverlayAnatomy>;
@@ -78,7 +78,3 @@ export const richTooltipSelection = (
 export const isInteractiveRichTooltip = (
     props: Pick<TooltipBehaviorProps, "interactive">,
 ): boolean => isInteractiveTooltip(props, true);
-
-/** Zag's tooltip props from Root's, interactive unless told otherwise. */
-export const richTooltipMachineProps = (props: TooltipBehaviorProps) =>
-    tooltipMachineProps(props, true);

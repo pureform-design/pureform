@@ -14,7 +14,6 @@ import {
     isIconPart,
     isPresent,
     isUnstyled,
-    partSources,
     withProvidedTokens,
 } from "@pureform/binding-core";
 import type {
@@ -23,19 +22,19 @@ import type {
     SlotKeyedEach,
     Unstyled,
 } from "@pureform/binding-core";
-import { componentIndicationTokens } from "@pureform/binding-core/indication";
 import type { InteractionSource } from "@pureform/binding-core/interaction";
+import { partSources } from "@pureform/binding-web";
 import { resolveWebSlotCustomization } from "@pureform/binding-web";
 import type { WebSlotCustomization } from "@pureform/binding-web";
+import { componentIndicationTokens } from "@pureform/binding-web/indication";
 import type { Indication } from "@pureform/binding-web/indication";
 import { indicationRoles } from "@pureform/binding-web/indication";
 import type {
-    ClassSlots,
     ComponentName,
     InstanceTokens,
     Selection,
-    SlotClasses,
 } from "@pureform/styling";
+import type { ClassSlots, SlotClasses } from "@pureform/styling-web";
 import { dynamic } from "@solidjs/web";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {

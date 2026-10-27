@@ -16,9 +16,7 @@ import type {
 import {
     DATE_PICKER_CONTENT_PROPS,
     DATE_PICKER_ROOT_PROPS,
-    dateMachineProps,
     datePickerSelection,
-    dialogPositionerLayout,
     isPresent,
     pickerLocale,
     selectedDateText,
@@ -30,6 +28,10 @@ import type {
     DatePickerRootOwnProps,
     Unstyled,
 } from "@pureform/binding-core";
+import {
+    dateMachineProps,
+    dialogPositionerLayout,
+} from "@pureform/binding-web";
 import * as datePicker from "@pureform/machines/date-picker";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {

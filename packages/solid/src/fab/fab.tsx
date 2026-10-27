@@ -6,7 +6,6 @@ import { fabAnatomy } from "@pureform/anatomy";
 import {
     FAB_CONTENT_PROPS,
     FAB_ROOT_PROPS,
-    fabMachineProps,
     fabSelection,
     hasAccessibleName,
     isPresent,
@@ -18,6 +17,7 @@ import type {
     FabRootOwnProps,
     IconOnlyName,
 } from "@pureform/binding-core";
+import { fabMachineProps } from "@pureform/binding-web";
 import type * as button from "@pureform/machines/button";
 import { isDev } from "@solidjs/web";
 import type { JSX, ValidComponent } from "@solidjs/web";

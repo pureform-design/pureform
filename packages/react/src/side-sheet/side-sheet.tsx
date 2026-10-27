@@ -14,12 +14,8 @@ import {
 import type { TestIdOverride } from "@pureform/anatomy";
 import {
     isPresent,
-    sideSheetBodyLayout,
-    sideSheetContentLayout,
-    sheetMachineProps,
     sheetModal,
     SIDE_SHEET_ROOT_PROPS,
-    sideSheetPositionerLayout,
     sideSheetSelection,
 } from "@pureform/binding-core";
 import type {
@@ -28,6 +24,12 @@ import type {
     SideSheetRootOwnProps,
     Unstyled,
 } from "@pureform/binding-core";
+import {
+    sideSheetBodyLayout,
+    sideSheetContentLayout,
+    sheetMachineProps,
+    sideSheetPositionerLayout,
+} from "@pureform/binding-web";
 import type { DialogFocusProps } from "@pureform/binding-web";
 import { sideSheetDragToDismiss, springRoleVar } from "@pureform/binding-web";
 import {

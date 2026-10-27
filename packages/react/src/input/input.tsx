@@ -2,12 +2,9 @@
 // controllable `value`, and the Field's id, states and descriptions when it's in one.
 
 import { inputAnatomy } from "@pureform/anatomy";
-import {
-    fieldControlProps,
-    INPUT_ROOT_PROPS,
-    inputSelection,
-} from "@pureform/binding-core";
+import { INPUT_ROOT_PROPS, inputSelection } from "@pureform/binding-core";
 import type { InputRootOwnProps } from "@pureform/binding-core";
+import { fieldControlProps } from "@pureform/binding-web";
 import type { ElementType, InputHTMLAttributes, ReactNode, Ref } from "react";
 
 import { useField } from "../field/context";

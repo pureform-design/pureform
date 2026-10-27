@@ -1,6 +1,6 @@
-import { STATE_ATTRIBUTES } from "@pureform/core";
 import type { PortableCondition, SlotState } from "@pureform/core/ast";
 import type { CoreConfig } from "@pureform/core/types";
+import { STATE_ATTRIBUTES } from "@pureform/web-contracts";
 import { describe, expect, it } from "vitest";
 
 import { conditionKey } from "./conditions";

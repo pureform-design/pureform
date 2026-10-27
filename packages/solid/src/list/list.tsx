@@ -9,13 +9,13 @@ import {
     LIST_ROOT_PROPS,
     listItemPosition,
     listSelection,
-    overDefaults,
 } from "@pureform/binding-core";
 import type {
     ListInstances,
     ListItemData,
     ListRootOwnProps,
 } from "@pureform/binding-core";
+import { overDefaults } from "@pureform/binding-web";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import { createMemo, For, omit } from "solid-js";
 

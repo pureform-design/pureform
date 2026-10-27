@@ -18,14 +18,28 @@ import {
     startVelocity,
     stops,
 } from "./motion";
+import { LINEAR } from "./values";
 
 describe("easingPoints", () => {
-    it("reads Bézier points, and takes anything else as linear", () => {
-        expect(easingPoints("cubic-bezier(0.2, 0, 0, 1)")).toEqual([
-            0.2, 0, 0, 1,
-        ]);
-        expect(easingPoints("linear")).toBe("linear");
-        expect(easingPoints("cubic-bezier(1, 2)")).toBe("linear");
+    it("reads structured Bézier and keyword curves, keeping steps linear", () => {
+        expect(
+            easingPoints({
+                type: "easing",
+                kind: "cubicBezier",
+                points: [0.2, 0, 0, 1],
+            }),
+        ).toEqual([0.2, 0, 0, 1]);
+        expect(easingPoints(LINEAR)).toEqual([0, 0, 1, 1]);
+        expect(
+            easingPoints({ type: "easing", kind: "keyword", name: "easeOut" }),
+        ).toEqual([0, 0, 0.58, 1]);
+        expect(
+            easingPoints({
+                type: "easing",
+                kind: "steps",
+                steps: { count: 2 },
+            }),
+        ).toBe("linear");
     });
 });
 
@@ -176,7 +190,7 @@ describe("sameUnits", () => {
 });
 
 describe("token tweens", () => {
-    const timing = { property: "", duration: 100, easing: "linear", delay: 0 };
+    const timing = { property: "", duration: 100, easing: LINEAR, delay: 0 };
     const transitions = new Map(
         ["n", "color", "length", "angle", "mixed", "word"].map((k) => [
             k,
@@ -224,6 +238,20 @@ describe("token tweens", () => {
         });
     });
 
+    it("never treats theme easing nodes as interpolatable style values", () => {
+        const next = { ...LINEAR };
+        expect(
+            movingTokens(
+                { curve: LINEAR },
+                { curve: next },
+                new Map([["curve", timing]]),
+            ),
+        ).toEqual([]);
+        expect(
+            tokensAt({ curve: LINEAR }, { curve: next }, [], 0.5).curve,
+        ).toBe(next);
+    });
+
     it("start a moving token's clock at its velocity over the distance it moves", () => {
         const moving = movingTokens(from, to, transitions);
         expect(startVelocity(from, to, moving, undefined)).toBe(0);
@@ -239,7 +267,7 @@ describe("presenceFrames", () => {
                 from: { opacity: 0, scale: 0.8 },
                 to: { opacity: 1 },
                 duration: 150,
-                easing: "linear",
+                easing: LINEAR,
             }),
         ).toEqual([
             { opacity: 0, transform: [{ translateY: 0 }, { scale: 0.8 }] },
@@ -253,7 +281,7 @@ describe("presenceFrames", () => {
                 from: { opacity: 0, translateX: 320 },
                 to: { opacity: 1, translateX: 0 },
                 duration: 150,
-                easing: "linear",
+                easing: LINEAR,
             }),
         ).toEqual([
             {
@@ -277,7 +305,7 @@ describe("presenceFrames", () => {
                 from: { opacity: 1, translateY: 0 },
                 to: { opacity: 0 },
                 duration: 100,
-                easing: "linear",
+                easing: LINEAR,
             }),
         ).toEqual([{ opacity: 1 }, { opacity: 0 }]);
     });
@@ -310,7 +338,7 @@ describe("an indicator's slide", () => {
                 from: { translateX: -230, scaleX: 0.4 },
                 duration: 250,
                 delay: 0,
-                easing: "linear",
+                easing: LINEAR,
             }),
         ).toEqual([
             { transform: [{ translateX: -230 }, { scaleX: 0.4 }] },

@@ -12,7 +12,6 @@ import type {
 } from "@pureform/anatomy";
 import type { InstanceTokens, Selection } from "@pureform/styling";
 
-import type { ControllableMachineProps } from "../controllable";
 import type { ItemInstance, Unstyled } from "../parts";
 import type { InteractiveProps } from "./indication";
 import type { VariantProp } from "./variants";
@@ -212,28 +211,6 @@ export const fileUploadSelection = (
 
 /** The file upload machine's props from Root's, besides `id`, `dir` and the files (see
  *  `fileUploadValueProps`). An error marks the drop zone invalid. */
-export const fileUploadMachineProps = <F extends FileUploadItem>(
-    props: FileUploadBehaviorProps<F>,
-) => ({
-    onFileAccept: props.onFileAccept,
-    onFileReject: props.onFileReject,
-    disabled: props.disabled,
-    readOnly: props.readOnly,
-    required: props.required,
-    invalid: props.invalid || props.error !== undefined || undefined,
-    accept: props.accept,
-    maxFiles: props.maxFiles,
-    maxFileSize: props.maxFileSize,
-    minFileSize: props.minFileSize,
-    allowDrop: props.allowDrop,
-    directory: props.directory,
-    capture: props.capture,
-    validate: props.validate,
-    name: props.name,
-    translations: {
-        deleteFile: props.removeLabel ?? ((file: F) => `Remove ${file.name}`),
-    },
-});
 
 const ERROR_MESSAGES: Readonly<Record<string, string>> = {
     TOO_MANY_FILES: "Too many files",
@@ -322,20 +299,3 @@ export const formatFileSize = (bytes: number): string => {
     }
     return `${Number(value.toFixed(value < 10 ? 1 : 0))} ${units[unit]}`;
 };
-
-/** The files' controllable props (`useControllable`'s `value`, `defaultValue`, `onValueChange`)
- *  in Zag's names: `acceptedFiles`, `defaultAcceptedFiles`, `onFileChange`. */
-export const fileUploadValueProps = <F extends FileUploadItem>(
-    value: ControllableMachineProps<"value", F[], FileUploadValueDetails<F>>,
-) => ({
-    acceptedFiles: value.value,
-    defaultAcceptedFiles: value.defaultValue,
-    onFileChange: (details: {
-        acceptedFiles: F[];
-        rejectedFiles: { file: F; errors: string[] }[];
-    }) =>
-        value.onValueChange({
-            value: details.acceptedFiles,
-            rejectedFiles: details.rejectedFiles,
-        }),
-});

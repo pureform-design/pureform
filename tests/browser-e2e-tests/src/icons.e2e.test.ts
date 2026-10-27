@@ -4,7 +4,7 @@
 // and a toggle icon button takes Material's selected colors.
 
 import * as pandaRecipes from "$recipes";
-import { STATE_ATTRIBUTES } from "@pureform/core";
+import { STATE_ATTRIBUTES } from "@pureform/web-contracts";
 import { classesFor } from "@pureform/css-adapter";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { commands } from "vitest/browser";

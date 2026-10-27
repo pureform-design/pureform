@@ -13,12 +13,9 @@ import type {
     listItemAnatomy,
 } from "@pureform/anatomy";
 import {
-    overDefaults,
     FILE_UPLOAD_ROOT_PROPS,
     fileUploadErrorText,
     fileUploadItemTestId,
-    fileUploadMachineProps,
-    fileUploadValueProps,
     fileUploadProgress,
     fileUploadSelection,
     isPresent,
@@ -26,6 +23,11 @@ import {
 } from "@pureform/binding-core";
 import type { FileUploadInstances } from "@pureform/binding-core";
 import type { MutableInteractionSource } from "@pureform/binding-core/interaction";
+import {
+    overDefaults,
+    fileUploadMachineProps,
+    fileUploadValueProps,
+} from "@pureform/binding-web";
 import type {
     FileUploadDomContentProps,
     FileUploadDomRootOwnProps,

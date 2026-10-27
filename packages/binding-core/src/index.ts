@@ -3,12 +3,9 @@
 // state, and reduced motion. It uses no DOM type or API: the web's half is
 // `@pureform/binding-web`.
 
-export { cx } from "./class-names";
-export type { ClassDictionary, ClassValue } from "./class-names";
 export {
     BUTTON_CONTENT_PROPS,
     BUTTON_ROOT_PROPS,
-    buttonMachineProps,
     buttonSelection,
 } from "./components/button";
 export type {
@@ -22,12 +19,8 @@ export type {
 export {
     BUTTON_GROUP_CONTENT_PROPS,
     BUTTON_GROUP_ROOT_PROPS,
-    buttonGroupItemProps,
-    toggleGroupItemProps,
     toggleSelection,
-    buttonGroupMachineProps,
     buttonGroupPosition,
-    buttonGroupRootProps,
     buttonGroupSelection,
     groupedButtonVariants,
 } from "./components/button-group";
@@ -44,11 +37,6 @@ export type {
 export {
     CHECKBOX_INPUT_LABEL_PROPS,
     CHECKBOX_ROOT_PROPS,
-    checkboxInputProps,
-    checkboxMachineProps,
-    checkboxMarkProps,
-    checkboxNativeDefault,
-    checkboxResetState,
     checkboxSelection,
 } from "./components/checkbox";
 export type {
@@ -74,7 +62,6 @@ export {
     CHIP_SET_CONTENT_PROPS,
     CHIP_SET_ROOT_PROPS,
     chipSetChipVariants,
-    chipSetMachineProps,
     chipSetSelection,
 } from "./components/chip-set";
 export type {
@@ -89,7 +76,7 @@ export type {
 export {
     SELECTION_LIST_CONTENT_PROPS,
     SELECTION_LIST_ROOT_PROPS,
-    selectionListMachineProps,
+    selectionListDefaults,
     selectionListOptions,
 } from "./components/selection-list";
 export type {
@@ -113,12 +100,8 @@ export {
 export type { IconOnlyName } from "./components/content";
 export {
     DIALOG_CONTENT_PROPS,
-    closeTriggerProps,
     DIALOG_BEHAVIOR_PROPS,
     DIALOG_ROOT_PROPS,
-    dialogBackdropLayout,
-    dialogMachineProps,
-    dialogPositionerLayout,
     dialogSelection,
 } from "./components/dialog";
 export type {
@@ -134,7 +117,6 @@ export type {
 export {
     FULLSCREEN_DIALOG_CONTENT_PROPS,
     FULLSCREEN_DIALOG_ROOT_PROPS,
-    fullscreenDialogPositionerLayout,
     fullscreenDialogSelection,
 } from "./components/fullscreen-dialog";
 export type {
@@ -148,17 +130,11 @@ export {
     BOTTOM_SHEET_CONTENT_PROPS,
     BOTTOM_SHEET_REST_PROPS,
     BOTTOM_SHEET_ROOT_PROPS,
-    bottomSheetPositionerLayout,
     bottomSheetSelection,
     closeAsker,
     SIDE_SHEET_CONTENT_PROPS,
     SIDE_SHEET_ROOT_PROPS,
-    sheetContentLayout,
-    sideSheetBodyLayout,
-    sideSheetContentLayout,
     sheetDragHandleLabel,
-    sheetDragHandleLayout,
-    sheetMachineProps,
     sheetModal,
     sheetOpeningRest,
     sheetPartialOffset,
@@ -169,7 +145,6 @@ export {
     SHEET_POSITIONAL_THRESHOLD,
     SHEET_VELOCITY_THRESHOLD,
     SHEET_PARTIAL_SHARE,
-    sideSheetPositionerLayout,
     sideSheetSelection,
 } from "./components/sheet";
 export type {
@@ -190,10 +165,8 @@ export {
     CAROUSEL_CONTENT_PROPS,
     CAROUSEL_ROOT_PROPS,
     CAROUSEL_SIZES,
-    carouselInitialStyle,
     carouselItemSizes,
     carouselKeylines,
-    carouselMachineProps,
     carouselSelection,
 } from "./components/carousel";
 export type {
@@ -248,15 +221,12 @@ export {
     SPLITTER_ROOT_PROPS,
     splitterInitialSizes,
     splitterLimits,
-    splitterMachineProps,
     splitterMoveBy,
     splitterOrientation,
     splitterPercent,
     splitterSelection,
-    splitterSizeProps,
     splitterSnap,
     splitterTriggerId,
-    splitterTriggerProps,
 } from "./components/splitter";
 export type {
     SplitterAnchor,
@@ -272,7 +242,6 @@ export type {
 export {
     FAB_CONTENT_PROPS,
     FAB_ROOT_PROPS,
-    fabMachineProps,
     fabSelection,
 } from "./components/fab";
 export type {
@@ -285,9 +254,8 @@ export type {
 export {
     FAB_MENU_CONTENT_PROPS,
     FAB_MENU_ROOT_PROPS,
-    fabMenuItemFocusProps,
     fabMenuItemProps,
-    fabMenuMachineProps,
+    fabMenuPositioning,
     fabMenuSelection,
 } from "./components/fab-menu";
 export type {
@@ -299,13 +267,13 @@ export type {
 } from "./components/fab-menu";
 export {
     MENU_BUTTON_BEHAVIOR_PROPS,
-    menuButtonMachineProps,
+    menuButtonPositioning,
 } from "./components/menu-button";
 export {
     SPLIT_BUTTON_CONTENT_PROPS,
     SPLIT_BUTTON_MENU_LABEL,
     SPLIT_BUTTON_ROOT_PROPS,
-    splitButtonMachineProps,
+    splitButtonPositioning,
     splitButtonSelection,
 } from "./components/split-button";
 export type {
@@ -346,14 +314,10 @@ export type {
 export {
     LIST_ITEM_CONTENT_PROPS,
     LIST_ITEM_EXPAND_PROPS,
-    LIST_ITEM_EXPAND_VALUE,
     isInteractiveListItem,
     LIST_ITEM_FRAME_PROPS,
     LIST_ITEM_ROOT_PROPS,
-    listItemElement,
-    listItemExpandMachineProps,
     listItemLines,
-    listItemRootProps,
     listItemSelection,
 } from "./components/list-item";
 export {
@@ -384,9 +348,7 @@ export {
     hasSubmenu,
     menuDrillLevel,
     menuGrouped,
-    menuItemMachineProps,
     menuItemProps,
-    menuMachineProps,
     menuSelection,
     menuDrillPathTo,
     menuDrillPick,
@@ -413,13 +375,6 @@ export {
     NAVIGATION_CONTENT_PROPS,
     NAVIGATION_ITEM_PROPS,
     NAVIGATION_ROOT_PROPS,
-    navigationItemElement,
-    navigationItemElementProps,
-    navigationItemMachineProps,
-    navigationMachineProps,
-    navigationModalContentLayout,
-    navigationModalMachineProps,
-    navigationModalPositionerLayout,
     navigationSections,
     navigationSelection,
 } from "./components/navigation";
@@ -441,11 +396,7 @@ export type {
     InteractionSourceProps,
     InteractiveProps,
 } from "./components/indication";
-export {
-    overlayPositionerProps,
-    overlayPresent,
-    presentProps,
-} from "./components/overlay";
+export { overlayPresent } from "./components/overlay";
 export type {
     OverlayPlacement,
     OverlayPositioning,
@@ -455,12 +406,6 @@ export {
     RADIO_GROUP_ROOT_PROPS,
     RADIO_INPUT_LABEL_PROPS,
     RADIO_PROPS,
-    radioGroupMachineProps,
-    radioGroupResetValue,
-    radioGroupRootProps,
-    radioInputProps,
-    radioItemProps,
-    radioRingProps,
     radioSelection,
 } from "./components/radio-group";
 export type {
@@ -476,33 +421,24 @@ export type {
     RadioVariantProps,
 } from "./components/radio-group";
 export {
-    fromZagValue,
     SELECT_COLLECTION,
     SELECT_CONTENT_PROPS,
     SELECT_INPUT_LABEL_PROPS,
     SELECT_ROOT_PROPS,
     selectGroupedItems,
-    selectHiddenSelectProps,
-    selectInputProps,
     selectItemGroups,
-    selectMachineProps,
     selectMenuSelection,
-    selectPositionerProps,
     selectSelection,
     selectSupportingTextId,
-    selectValueProps,
-    toZagValue,
 } from "./components/select";
 export {
     AUTOCOMPLETE_ROOT_PROPS,
     autocompleteFilterText,
     autocompleteInitialText,
-    autocompleteMachineProps,
     autocompleteMatches,
     autocompleteMenuSelection,
     autocompleteSelection,
     autocompleteSupportingTextId,
-    autocompleteTriggerProps,
     containsFilter,
 } from "./components/autocomplete";
 export type {
@@ -532,7 +468,6 @@ export {
     dateSegmentStep,
     dateSegmentTexts,
     dateTextSegments,
-    dateMachineProps,
     localTimeZone,
     datePickerSelection,
     dayOfWeek,
@@ -599,7 +534,6 @@ export type {
 export {
     SNACKBAR_CONTENT_PROPS,
     SNACKBAR_ROOT_PROPS,
-    snackbarMachineProps,
     snackbarSelection,
 } from "./components/snackbar";
 export {
@@ -613,7 +547,6 @@ export {
     toolbarOverflowTestId,
     toolbarRootProps,
     toolbarSelection,
-    unstyledToolbarProvidedTokens,
 } from "./components/toolbar";
 export type {
     ToolbarContentProps,
@@ -626,7 +559,6 @@ export {
     TABLE_CONTENT_PROPS,
     TABLE_ROOT_PROPS,
     tableCellValue,
-    tableMachineProps,
     tableRowPart,
     tableRowValue,
     tableSelection,
@@ -653,7 +585,6 @@ export {
     TIME_PICKER_HEADLINE,
     TIME_PICKER_ROOT_PROPS,
     timeInputSelection,
-    timeMachineProps,
     timePickerSelection,
 } from "./components/time-picker";
 export type {
@@ -676,7 +607,6 @@ export {
     DEFAULT_PAGE_SIZE_OPTIONS,
     PAGINATOR_ROOT_PROPS,
     paginatorClampPage,
-    paginatorMachineProps,
     paginatorPageAfterSize,
     paginatorPageSizes,
     paginatorRange,
@@ -684,7 +614,6 @@ export {
     paginatorSelection,
     paginatorSizeItems,
     paginatorTotalPages,
-    paginatorTriggerProps,
 } from "./components/paginator";
 export type {
     PaginatorBehaviorProps,
@@ -701,11 +630,9 @@ export type { OverflowLayout } from "./overflow";
 export {
     isToastType,
     TOAST_GLYPHS,
-    TOAST_STACK_STYLE,
     TOASTER_DEFAULTS,
     TOASTER_PROPS,
     toasterOptions,
-    toastGroupStyle,
     toastSelection,
     TOAST_SWIPE_VELOCITY_THRESHOLD,
     toastSwipeRelease,
@@ -738,9 +665,6 @@ export {
     SWITCH_CONTENT_PROPS,
     SWITCH_INPUT_LABEL_PROPS,
     SWITCH_ROOT_PROPS,
-    switchInputProps,
-    switchMachineProps,
-    switchNativeDefault,
     switchSelection,
 } from "./components/switch";
 export type {
@@ -757,7 +681,6 @@ export {
     isTreeBranch,
     treeCollectionOptions,
     treeControlProps,
-    treeMachineProps,
     treeNaming,
     treeSelection,
 } from "./components/tree";
@@ -775,7 +698,6 @@ export {
     ACCORDION_CONTENT_PROPS,
     ACCORDION_ROOT_PROPS,
     accordionItemProps,
-    accordionMachineProps,
     accordionSelection,
 } from "./components/accordion";
 export type {
@@ -794,7 +716,6 @@ export {
     STEPPER_LIST_LABEL_PROPS,
     STEPPER_ROOT_PROPS,
     stepperIndicator,
-    stepperMachineProps,
     stepperSelection,
     stepperTriggerDisabled,
     stepperTriggerProps,
@@ -819,9 +740,7 @@ export {
     tabsHaveIcons,
     tabsHavePanels,
     tabsItemProps,
-    tabsMachineProps,
     tabsSelection,
-    tabsTriggerProps,
 } from "./components/tabs";
 export type {
     TabsBehaviorProps,
@@ -846,7 +765,6 @@ export {
     numberFieldClamp,
     numberFieldFormat,
     numberFieldLocale,
-    numberFieldMachineProps,
     numberFieldOutOfRange,
     numberFieldParse,
     numberFieldPlaceholder,
@@ -873,7 +791,6 @@ export {
     codeFieldCells,
     codeFieldComplete,
     codeFieldEnter,
-    codeFieldMachineProps,
     codeFieldSelection,
     codeFieldString,
 } from "./components/code-field";
@@ -892,10 +809,8 @@ export {
     fileUploadErrorText,
     formatFileSize,
     fileUploadItemTestId,
-    fileUploadMachineProps,
     fileUploadProgress,
     fileUploadSelection,
-    fileUploadValueProps,
     isPreviewable,
 } from "./components/file-upload";
 export type {
@@ -913,11 +828,9 @@ export type {
 } from "./components/file-upload";
 export {
     COPIED_LABEL,
-    COPY_ANNOUNCEMENT_STYLE,
     COPY_BUTTON_OWN_PROPS,
     COPY_LABEL,
     copyAnnouncement,
-    copyButtonMachineProps,
 } from "./components/copy-button";
 export type {
     CopyButtonBehaviorProps,
@@ -929,7 +842,6 @@ export {
     NATIVE_SELECT_CONTENT_PROPS,
     NATIVE_SELECT_ROOT_PROPS,
     nativeSelectGroups,
-    nativeSelectProps,
     nativeSelectSelection,
     nativeSelectValue,
     nativeSelectValues,
@@ -949,7 +861,6 @@ export type {
 export {
     RATING_CONTENT_PROPS,
     RATING_ROOT_PROPS,
-    ratingMachineProps,
     ratingSelection,
     starFill,
 } from "./components/rating";
@@ -967,7 +878,6 @@ export {
     TAGS_INPUT_ROOT_PROPS,
     tagsInputChipTestId,
     tagsInputFilled,
-    tagsInputMachineProps,
     tagsInputSelection,
 } from "./components/tags-input";
 export type {
@@ -985,8 +895,6 @@ export {
     TEXT_FIELD_INPUT_PROPS,
     TEXT_FIELD_ROOT_PROPS,
     textAreaSelection,
-    textFieldMachineProps,
-    textFieldNativeDefault,
     textFieldSelection,
 } from "./components/text-field";
 export type {
@@ -1003,16 +911,13 @@ export type {
 } from "./components/text-field";
 export {
     isInteractiveTooltip,
-    CARET_STYLE,
     TOOLTIP_CONTENT_PROPS,
     TOOLTIP_ROOT_PROPS,
-    tooltipMachineProps,
     tooltipSelection,
 } from "./components/tooltip";
 export {
     POPOVER_CONTENT_PROPS,
     POPOVER_ROOT_PROPS,
-    popoverMachineProps,
     popoverSelection,
 } from "./components/popover";
 export type {
@@ -1027,7 +932,6 @@ export {
     isInteractiveRichTooltip,
     RICH_TOOLTIP_CONTENT_PROPS,
     RICH_TOOLTIP_ROOT_PROPS,
-    richTooltipMachineProps,
     richTooltipSelection,
 } from "./components/rich-tooltip";
 export type {
@@ -1061,18 +965,9 @@ export type {
     ControllableNames,
     DefaultName,
 } from "./controllable";
-export {
-    classEntry,
-    lazyFactoryError,
-    serverLazyFactoryMessage,
-} from "./entries";
 export { DEFAULT_ICON_STYLE, sameIconStyle } from "./icon-style";
 export type { IconStyle } from "./icon-style";
-export {
-    MOTION_ATTRIBUTE,
-    REDUCED_MOTION_QUERY,
-    resolveReducedMotion,
-} from "./motion";
+export { resolveReducedMotion } from "./motion";
 export type { MotionSetting } from "./motion";
 export { GLYPH_PATHS, TOAST_GLYPH_PATHS } from "./glyphs";
 export {
@@ -1081,50 +976,32 @@ export {
     isIconPart,
     isPerInstance,
     isUnstyled,
-    outsideRootMessage,
+    mergeKeyedDefaults,
+    mergeShallowDefaults,
     overDefaults,
     partAsRoot,
-    partClasses,
-    partSources,
-    spreadableProps,
-    stateAttributes,
 } from "./parts";
 export type {
+    DefaultsMergePolicy,
     InnerProps,
     ItemInstance,
     PartInstances,
-    PartSourcesInput,
     PartStates,
     PerInstance,
     SlotKeyed,
     SlotKeyedEach,
-    StateAttributes,
     Unstyled,
 } from "./parts";
-export { combineProps, mergeStyleObjects } from "./props";
-export type { CombineRules } from "./props";
 export { createSlotReader } from "./slot-reader";
-export {
-    providerAttributes,
-    requireRegistry,
-    resolveProvider,
-    ROOT_PROVIDER,
-    themeAttributeOf,
-    themeAttributes,
-} from "./provider";
+export { requireRegistry, resolveProvider, ROOT_PROVIDER } from "./provider";
 export type {
     AnyRegistry,
     ComponentDefaults,
     Direction,
     MergePartProps,
-    ProviderAttributes,
     ProviderOptions,
     ProviderSlotProps,
     ProviderState,
-    ProviderTheme,
-    ThemeHydration,
-    ThemeName,
-    ThemeOverrides,
 } from "./provider";
 export {
     mergeProvidedTokens,
@@ -1149,7 +1026,6 @@ export type {
 } from "./components/badge";
 export {
     AVATAR_ROOT_PROPS,
-    avatarMachineProps,
     avatarRootProps,
     avatarSelection,
 } from "./components/avatar";
@@ -1163,10 +1039,8 @@ export type {
 export {
     CARD_CONTENT_PROPS,
     CARD_ROOT_PROPS,
-    cardElement,
     cardEntryActive,
     cardLayout,
-    cardRootProps,
     cardSelection,
     isInteractiveCard,
 } from "./components/card";
@@ -1230,11 +1104,7 @@ export type {
     ProgressValueProps,
     ProgressVariantProps,
 } from "./components/progress";
-export {
-    RIPPLE_ROOT_PROPS,
-    rippleMachineProps,
-    rippleSelection,
-} from "./components/ripple";
+export { RIPPLE_ROOT_PROPS, rippleSelection } from "./components/ripple";
 export type {
     RippleBehaviorProps,
     RipplePart,
@@ -1249,8 +1119,6 @@ export {
     SHARED_AXIS_SLIDE_FRACTION,
     sharedAxisChange,
     sharedAxisDirection,
-    sharedAxisPageProps,
-    sharedAxisScrimProps,
 } from "./components/horizontal-shared-axis";
 export type {
     HorizontalSharedAxisPart,
@@ -1261,9 +1129,7 @@ export type {
 export {
     changePages,
     keepContents,
-    LEAVING_PAGE_PROPS,
     PAGE_TRANSITION_PROPS,
-    pageRootProps,
     pagesLeaving,
     pagesMoving,
     settlePage,
@@ -1284,7 +1150,6 @@ export type {
 } from "./components/scrim";
 export {
     FADE_THROUGH_ROOT_PROPS,
-    fadeThroughPageProps,
     fadeThroughSelection,
 } from "./components/fade-through";
 export type {
@@ -1317,7 +1182,6 @@ export {
     SEARCH_BAR_CONTENT_PROPS,
     SEARCH_BAR_INPUT_PROPS,
     SEARCH_BAR_ROOT_PROPS,
-    searchBarMachineProps,
     searchBarSelection,
 } from "./components/search-bar";
 export type {
@@ -1333,15 +1197,10 @@ export {
     SEARCH_VIEW_COLLECTION,
     SEARCH_VIEW_CONTENT_PROPS,
     SEARCH_VIEW_ROOT_PROPS,
-    SEARCH_VIEW_ROOT_STYLE,
-    SEARCH_VIEW_TRIGGER_STYLE,
     searchViewCarriedKey,
-    searchViewComboboxProps,
-    searchViewDialogProps,
     searchViewLabel,
     searchViewMatches,
     searchViewMenuSelection,
-    searchViewPositionerLayout,
     searchViewSelection,
 } from "./components/search-view";
 export type {
@@ -1358,7 +1217,6 @@ export type {
 } from "./components/search-view";
 export {
     SEPARATOR_ROOT_PROPS,
-    separatorRootProps,
     separatorSelection,
 } from "./components/separator";
 export type {
@@ -1370,14 +1228,11 @@ export {
     SLIDER_INPUT_LABEL_PROPS,
     SLIDER_INSET_ICON,
     SLIDER_ROOT_PROPS,
-    sliderControllableProps,
     sliderInsetIconOverflows,
     sliderInsetIconMeasuresOfStyle,
     sliderClearanceOf,
     sameSliderInsetIcon,
-    sliderMachineProps,
     sliderMarkerTokens,
-    sliderNativeDefault,
     sliderSelection,
     sliderStopActive,
     sliderStops,
@@ -1402,10 +1257,9 @@ export {
     DESCRIPTION_ROOT_PROPS,
     ERROR_TEXT_ROOT_PROPS,
     FIELD_ROOT_PROPS,
-    fieldControlProps,
+    fieldControlState,
     joinIdRefs,
     fieldIds,
-    fieldLabelProps,
     fieldLabelState,
     fieldState,
     INPUT_ROOT_PROPS,

@@ -13,15 +13,10 @@ import {
     SELECT_INPUT_LABEL_PROPS,
     SELECT_ROOT_PROPS,
     selectGroupedItems,
-    selectHiddenSelectProps,
-    selectInputProps,
     selectItemGroups,
-    selectMachineProps,
     selectMenuSelection,
     selectSelection,
     selectSupportingTextId,
-    selectValueProps,
-    toZagValue,
 } from "@pureform/binding-core";
 import type {
     InnerProps,
@@ -31,6 +26,13 @@ import type {
     SelectRootOwnProps,
     Unstyled,
 } from "@pureform/binding-core";
+import {
+    selectHiddenSelectProps,
+    selectInputProps,
+    selectMachineProps,
+    selectValueProps,
+    toZagValue,
+} from "@pureform/binding-web";
 import * as select from "@pureform/machines/select";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {

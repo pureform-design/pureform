@@ -1,6 +1,25 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 
-import { rippleGeometry, ripplePress } from "./ripple-core";
+import {
+    DEFAULT_RIPPLE_CURVE,
+    DEFAULT_RIPPLE_TIMING,
+    rippleGeometry,
+    ripplePress,
+} from "./core";
+import type { RippleCurve, RippleTiming } from "./core";
+
+describe("the neutral ripple entry", () => {
+    it("defaults to semantic points and durations, never a CSS easing string", () => {
+        expect(DEFAULT_RIPPLE_TIMING).toEqual({
+            grow: 450,
+            fade: 375,
+            easing: [0.2, 0, 0, 1],
+        });
+        expect(DEFAULT_RIPPLE_TIMING.easing).toBe(DEFAULT_RIPPLE_CURVE);
+        expectTypeOf<RippleTiming["easing"]>().toEqualTypeOf<RippleCurve>();
+        expectTypeOf(DEFAULT_RIPPLE_TIMING.easing).toEqualTypeOf<RippleCurve>();
+    });
+});
 
 describe("rippleGeometry", () => {
     it("starts at a fifth of the larger side, centered on the press", () => {
@@ -33,7 +52,26 @@ describe("rippleGeometry", () => {
 });
 
 describe("ripplePress", () => {
-    const timing = { grow: 400, fade: 300, easing: "linear" };
+    it("shares press timing without depending on the drawing target's curve", () => {
+        const timing: RippleTiming<{ points: number[] }> = {
+            grow: 400,
+            fade: 300,
+            easing: { points: [0.2, 0, 0, 1] },
+        };
+        const released: number[] = [];
+        const press = ripplePress(() => 0);
+        press.begin({ release: (delay) => released.push(delay) }, timing);
+        press.end();
+        expect(released).toEqual([200]);
+        // A duration-only caller also satisfies the semantic press seam.
+        press.begin(
+            { release: (delay) => released.push(delay) },
+            { grow: 100 },
+        );
+        press.end();
+        expect(released).toEqual([200, 50]);
+    });
+    const timing = { grow: 400 };
     const clock = () => {
         let t = 0;
         return { now: () => t, wait: (ms: number) => void (t += ms) };

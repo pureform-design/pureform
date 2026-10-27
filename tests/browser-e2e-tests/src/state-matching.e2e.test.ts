@@ -5,7 +5,7 @@
 // not. The selectors come from the shared lowering, as the CSS and Tailwind adapters emit them;
 // the Panda adapter must lower each state to the same selector rather than to its own keys.
 
-import { STATE_ATTRIBUTES } from "@pureform/core";
+import { STATE_ATTRIBUTES } from "@pureform/web-contracts";
 import type { PortableCondition, SlotState } from "@pureform/core/ast";
 import type { CoreConfig } from "@pureform/core/types";
 import { conditionKey } from "@pureform/css-lowering";

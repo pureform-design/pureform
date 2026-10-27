@@ -5,7 +5,6 @@
 import { avatarAnatomy } from "@pureform/anatomy";
 import {
     AVATAR_ROOT_PROPS,
-    avatarMachineProps,
     avatarRootProps,
     avatarSelection,
 } from "@pureform/binding-core";
@@ -13,6 +12,7 @@ import type {
     AvatarContentProps,
     AvatarRootOwnProps,
 } from "@pureform/binding-core";
+import { avatarMachineProps } from "@pureform/binding-web";
 import * as avatar from "@pureform/machines/avatar";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";

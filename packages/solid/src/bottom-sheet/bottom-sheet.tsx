@@ -17,14 +17,9 @@ import type { TestIdOverride } from "@pureform/anatomy";
 import {
     BOTTOM_SHEET_CONTENT_PROPS,
     BOTTOM_SHEET_ROOT_PROPS,
-    bottomSheetPositionerLayout,
     bottomSheetSelection,
-    closeTriggerProps,
     isPresent,
-    sheetContentLayout,
     sheetDragHandleLabel,
-    sheetDragHandleLayout,
-    sheetMachineProps,
     sheetModal,
     sheetOpeningRest,
     sheetPartiallyExpandable,
@@ -36,6 +31,13 @@ import type {
     SheetRest,
     Unstyled,
 } from "@pureform/binding-core";
+import {
+    bottomSheetPositionerLayout,
+    closeTriggerProps,
+    sheetContentLayout,
+    sheetDragHandleLayout,
+    sheetMachineProps,
+} from "@pureform/binding-web";
 import type { DialogFocusProps } from "@pureform/binding-web";
 import {
     dragToDismiss,

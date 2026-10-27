@@ -18,15 +18,17 @@ import {
     FILE_UPLOAD_ROOT_PROPS,
     fileUploadErrorText,
     fileUploadItemTestId,
-    fileUploadMachineProps,
-    fileUploadValueProps,
     fileUploadProgress,
     fileUploadSelection,
     isPresent,
     isPreviewable,
-    overDefaults,
 } from "@pureform/binding-core";
 import type { FileUploadInstances } from "@pureform/binding-core";
+import {
+    fileUploadMachineProps,
+    fileUploadValueProps,
+    overDefaults,
+} from "@pureform/binding-web";
 import type {
     FileUploadDomContentProps,
     FileUploadDomRootOwnProps,

@@ -2,7 +2,7 @@
 // Renders a scene to HTML on the server, through React DOM's server build. Loaded in Node by the
 // `renderOnServer` command.
 
-import { isRuntimeTheme, preloadTheme } from "@pureform/styling";
+import { isRuntimeTheme, preloadTheme } from "@pureform/styling-web";
 import { renderToString } from "react-dom/server";
 
 import type { Scene } from "../../harness/scene";

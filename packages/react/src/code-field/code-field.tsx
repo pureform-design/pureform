@@ -7,7 +7,6 @@
 import { codeFieldAnatomy } from "@pureform/anatomy";
 import {
     CODE_FIELD_ROOT_PROPS,
-    codeFieldMachineProps,
     codeFieldSelection,
     isPresent,
 } from "@pureform/binding-core";
@@ -17,6 +16,7 @@ import type {
     CodeFieldRootOwnProps,
     CodeFieldValueDetails,
 } from "@pureform/binding-core";
+import { codeFieldMachineProps } from "@pureform/binding-web";
 import * as pinInput from "@pureform/machines/pin-input";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";

@@ -12,18 +12,14 @@ import {
     AUTOCOMPLETE_ROOT_PROPS,
     autocompleteFilterText,
     autocompleteInitialText,
-    autocompleteMachineProps,
     autocompleteMatches,
     autocompleteMenuSelection,
     autocompleteSelection,
     autocompleteSupportingTextId,
-    autocompleteTriggerProps,
     isPresent,
     SELECT_COLLECTION,
     selectGroupedItems,
     selectItemGroups,
-    selectValueProps,
-    toZagValue,
 } from "@pureform/binding-core";
 import type {
     AutocompleteItem,
@@ -33,6 +29,12 @@ import type {
     SelectContentProps,
     Unstyled,
 } from "@pureform/binding-core";
+import {
+    autocompleteMachineProps,
+    autocompleteTriggerProps,
+    selectValueProps,
+    toZagValue,
+} from "@pureform/binding-web";
 import * as combobox from "@pureform/machines/combobox";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";

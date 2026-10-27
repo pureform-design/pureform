@@ -4,11 +4,11 @@
 // at-rules and selectors from the styled element, as the color schemes' are, so an adapter
 // expands the condition into every path.
 
-import { MOTION_ATTRIBUTE } from "@pureform/core";
+import { MOTION_ATTRIBUTE, REDUCED_MOTION_QUERY } from "@pureform/web-contracts";
 
 const REDUCE = `[${MOTION_ATTRIBUTE}=reduce]`;
 const FULL = `[${MOTION_ATTRIBUTE}=full]`;
-const SYSTEM = "@media (prefers-reduced-motion: reduce)";
+const SYSTEM = `@media ${REDUCED_MOTION_QUERY}`;
 
 /** The paths under which an element's motion is reduced. The nearer of two nested providers
  *  wins: a `full` provider inside a `reduce` one turns motion back on. */

@@ -9,17 +9,19 @@ import { tooltipOverlayAnatomy } from "@pureform/anatomy";
 import {
     isInteractiveTooltip,
     isPresent,
-    overlayPositionerProps,
-    presentProps,
     TOOLTIP_ROOT_PROPS,
-    tooltipMachineProps,
     tooltipSelection,
-    CARET_STYLE,
 } from "@pureform/binding-core";
 import type {
     TooltipContentProps,
     TooltipRootOwnProps,
 } from "@pureform/binding-core";
+import {
+    overlayPositionerProps,
+    presentProps,
+    tooltipMachineProps,
+    CARET_STYLE,
+} from "@pureform/binding-web";
 import * as tooltip from "@pureform/machines/tooltip";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";

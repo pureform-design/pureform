@@ -13,6 +13,13 @@ export type Indication = CoreIndication<HTMLElement>;
 /** The elements a web indication draws on. */
 export type IndicationTarget = CoreIndicationTarget<HTMLElement>;
 
+export {
+    componentIndicationTokens,
+    indicationTokenValue,
+    indicationTokenValues,
+    providerIndicationOverrides,
+} from "./indication-tokens";
+
 /** An indication, checked against the interface with the web's elements: returns it
  *  unchanged. */
 export const defineIndication = (indication: Indication): Indication =>
@@ -21,8 +28,10 @@ export const defineIndication = (indication: Indication): Indication =>
 export {
     DEFAULT_INDICATION,
     materialIndication,
+    rippleClasses,
     webIndication,
 } from "./indication-material";
+export type { RippleClasses } from "./indication-material";
 export {
     holdsLayer,
     IndicationHost,

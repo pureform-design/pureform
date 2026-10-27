@@ -1,6 +1,20 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+    afterEach,
+    beforeEach,
+    describe,
+    expect,
+    expectTypeOf,
+    it,
+    vi,
+} from "vitest";
 
-import { createRipple, readRippleTiming, ripple } from "./ripple";
+import {
+    DEFAULT_RIPPLE_TIMING,
+    createRipple,
+    readRippleTiming,
+    ripple,
+} from "./index";
+import type { RippleTiming } from "./index";
 
 const transitionStyle = (
     transitionProperty: string,
@@ -9,6 +23,17 @@ const transitionStyle = (
 ) => ({ transitionProperty, transitionDuration, transitionTimingFunction });
 
 describe("readRippleTiming", () => {
+    it("keeps the browser entry's exact CSS defaults", () => {
+        expect(DEFAULT_RIPPLE_TIMING).toEqual({
+            grow: 450,
+            fade: 375,
+            easing: "cubic-bezier(0.2, 0, 0, 1)",
+        });
+        expectTypeOf<RippleTiming["easing"]>().toEqualTypeOf<string>();
+        expect(readRippleTiming(transitionStyle("all", "0s", "ease"))).toEqual(
+            DEFAULT_RIPPLE_TIMING,
+        );
+    });
     it("reads the grow from transform and the fade from opacity", () => {
         expect(
             readRippleTiming(
@@ -147,7 +172,10 @@ describe("ripple", () => {
         expect(animations[0]?.keyframes[0]?.transform).toBe(
             "translate(10px, -10px) scale(1)",
         );
-        expect(animations[0]?.options).toMatchObject({ duration: 450 });
+        expect(animations[0]?.options).toMatchObject({
+            duration: 450,
+            easing: "cubic-bezier(0.2, 0, 0, 1)",
+        });
     });
 
     it("fades on release after the rest of the minimum press", () => {

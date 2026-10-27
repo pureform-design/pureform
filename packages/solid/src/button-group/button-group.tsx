@@ -7,10 +7,7 @@ import type { buttonAnatomy, iconButtonAnatomy } from "@pureform/anatomy";
 import {
     BUTTON_GROUP_CONTENT_PROPS,
     BUTTON_GROUP_ROOT_PROPS,
-    buttonGroupMachineProps,
     buttonGroupPosition,
-    buttonGroupRootProps,
-    toggleGroupItemProps,
     buttonGroupSelection,
     groupedButtonVariants,
 } from "@pureform/binding-core";
@@ -20,6 +17,11 @@ import type {
     ButtonGroupPosition,
     ButtonGroupRootOwnProps,
 } from "@pureform/binding-core";
+import {
+    buttonGroupMachineProps,
+    buttonGroupRootProps,
+    toggleGroupItemProps,
+} from "@pureform/binding-web";
 import * as buttonGroup from "@pureform/machines/button-group";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {

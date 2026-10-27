@@ -2,13 +2,13 @@
 
 import { labelAnatomy } from "@pureform/anatomy";
 import {
-    fieldLabelProps,
     fieldLabelState,
     LABEL_ROOT_PROPS,
     labelSelection,
     REQUIRED_MARK,
 } from "@pureform/binding-core";
 import type { LabelRootOwnProps } from "@pureform/binding-core";
+import { fieldLabelProps } from "@pureform/binding-web";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import { merge, omit, Show } from "solid-js";
 

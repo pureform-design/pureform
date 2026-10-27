@@ -8,9 +8,7 @@ import { carouselAnatomy } from "@pureform/anatomy";
 import {
     CAROUSEL_CONTENT_PROPS,
     CAROUSEL_ROOT_PROPS,
-    carouselInitialStyle,
     carouselItemSizes,
-    carouselMachineProps,
     carouselSelection,
 } from "@pureform/binding-core";
 import type {
@@ -23,6 +21,8 @@ import type {
     CarouselRootOwnProps,
     InteractionSourceProps,
 } from "@pureform/binding-core";
+import { carouselInitialStyle } from "@pureform/binding-web";
+import { carouselMachineProps } from "@pureform/binding-web";
 import { carouselRowPadding, observeCarouselRow } from "@pureform/binding-web";
 import * as carousel from "@pureform/machines/carousel";
 import type { JSX, ValidComponent } from "@solidjs/web";

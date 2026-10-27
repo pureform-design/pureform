@@ -100,7 +100,7 @@ describe("tokenTransitions", () => {
     ): Transition => ({
         property,
         duration: 100,
-        easing: "linear",
+        easing: { type: "easing", kind: "keyword", name: "linear" },
         delay: 0,
         ...(valueType ? { valueType } : {}),
     });

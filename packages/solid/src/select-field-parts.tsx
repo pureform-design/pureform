@@ -4,8 +4,8 @@
 // contexts; their machines' APIs (Zag's select and combobox) name these parts' props alike.
 
 import type { ComponentAnatomy } from "@pureform/anatomy";
-import { presentProps } from "@pureform/binding-core";
 import type { MutableInteractionSource } from "@pureform/binding-core/interaction";
+import { presentProps } from "@pureform/binding-web";
 import type { JSX } from "@solidjs/web";
 import { type Accessor, merge, omit } from "solid-js";
 

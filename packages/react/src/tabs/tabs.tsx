@@ -13,9 +13,7 @@ import {
     tabsHaveIcons,
     tabsHavePanels,
     tabsItemProps,
-    tabsMachineProps,
     tabsSelection,
-    tabsTriggerProps,
 } from "@pureform/binding-core";
 import type {
     InteractionSourceProps,
@@ -25,6 +23,7 @@ import type {
     TabsRootOwnProps,
     TabsTabInstance,
 } from "@pureform/binding-core";
+import { tabsMachineProps, tabsTriggerProps } from "@pureform/binding-web";
 import { revealInRow, slideIndicator } from "@pureform/binding-web";
 import * as tabs from "@pureform/machines/tabs";
 import { normalizeProps } from "@zag-js/react";

@@ -1,5 +1,6 @@
 import { useAnimatedSlide } from "@pureform/rn-adapter/animated";
 import type { SlideMotion } from "@pureform/rn-adapter/animated";
+import { LINEAR } from "@pureform/rn-adapter/factory";
 import { Animated } from "react-native";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -23,7 +24,7 @@ describe("useAnimatedSlide", () => {
                     from: { translateX: 40, scaleX: 0.5 },
                     duration: 300,
                     delay: 120,
-                    easing: "linear",
+                    easing: LINEAR,
                     spring: {
                         type: "spring",
                         stiffness: 800,

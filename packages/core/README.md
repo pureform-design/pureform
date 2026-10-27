@@ -11,7 +11,8 @@ Tailwind, or React Native.
 @pureform/core  ◄── @pureform/theme, material, preset          (authoring)
                 ◄── @pureform/css-lowering ◄── panda-adapter, css-adapter, tailwind-adapter
                 ◄── @pureform/rn-adapter
-                ◄── binding-core, solid, react, react-native (state attribute names)
+                ◄── binding-core, solid, react, react-native (portable meaning)
+                ◄── web-contracts (semantic condition types only)
 ```
 
 It depends on nothing else in the workspace.
@@ -27,15 +28,14 @@ It depends on nothing else in the workspace.
 | `typed.ts`            | `typed()`: helpers typed from a registered config, so aliases and breakpoints autocomplete.                                                                                      |
 | `path.ts`             | Path resolution (`getByPath`, `tokenAt`, `resolveAlias`), `isSpringToken`, and `validateConfig`.                                                                                 |
 | `inline.ts`           | `inlineStyles` and `mergeStyles` for style maps.                                                                                                                                 |
-| `state-attributes.ts` | `STATE_ATTRIBUTES`: the `data-pf-*` names the web bindings set and the web adapters match.                                                                                       |
-| `motion.ts`           | `MOTION_ATTRIBUTE` and `MotionSetting` for the provider's motion setting, and `transitionMoves`/`valueTypeMoves`: what reduced motion stops.                                     |
+| `motion.ts`           | `MotionSetting` for the provider's motion setting, and `transitionMoves`/`valueTypeMoves`: what reduced motion stops. |
 | `spring.ts`           | Springs and `linear()` curves: `springAt`, `springState` (with a starting velocity), `settleTime`, `sampleSpring`, `sampleCubicPath`, and reading and writing `linear()` points. |
 
 ## Public API
 
 | Entry                          | Exports                                                                                                                         |
 | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
-| `@pureform/core`               | Builders, `typed`, path resolution, `STATE_ATTRIBUTES`, `MOTION_ATTRIBUTE`, `transitionMoves`, `sampleSpring`, the schema types |
+| `@pureform/core`               | Builders, `typed`, path resolution, `MotionSetting`, `transitionMoves`, `sampleSpring`, the schema types |
 | `@pureform/core/ast`           | Node types and every helper constructor                                                                                         |
 | `@pureform/core/ast/helpers/*` | One helper group per module (`keyword`, `color`, …)                                                                             |
 | `@pureform/core/types`         | The schema types alone                                                                                                          |
@@ -70,7 +70,7 @@ On the web a state is matched on the native pseudo-class first (`:hover`, `:chec
 `aria-disabled`, …), and only where neither covers it on one of pureform's own attributes:
 
 ```ts
-import { STATE_ATTRIBUTES } from "@pureform/core";
+import { STATE_ATTRIBUTES } from "@pureform/web-contracts";
 
 STATE_ATTRIBUTES.hover; //   "data-pf-hover"    hover driven by another element
 STATE_ATTRIBUTES.pressed; // "data-pf-active"   a press :active misses (keyboard)
@@ -98,7 +98,8 @@ else, `"all"` included, moves. A dynamic value goes by its `valueType`
 values don't.
 
 ```ts
-import { MOTION_ATTRIBUTE, transitionMoves } from "@pureform/core";
+import { transitionMoves } from "@pureform/core";
+import { MOTION_ATTRIBUTE } from "@pureform/web-contracts";
 
 transitionMoves("backgroundColor"); // false
 transitionMoves("insetInlineStart"); // true
@@ -156,6 +157,6 @@ Through the omni MCP (or `omni run`):
 ## Worth knowing
 
 - Core never encodes selectors: conditions are names (`"hover"`, `slot("root", "checked")`),
-  and each adapter owns the lowering. `STATE_ATTRIBUTES` is the one place a web name lives
-  here, because both the bindings and the CSS must agree on it.
+  and each adapter owns the lowering. Web wire names live in `@pureform/web-contracts`,
+  because both the bindings and the CSS must agree on them; core does not depend on it.
 - `rawCondition` is the escape hatch for a selector the portable set can't express.

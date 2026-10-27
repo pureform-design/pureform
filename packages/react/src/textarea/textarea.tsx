@@ -3,11 +3,11 @@
 
 import { plainTextareaAnatomy } from "@pureform/anatomy";
 import {
-    fieldControlProps,
     TEXTAREA_ROOT_PROPS,
     plainTextareaSelection,
 } from "@pureform/binding-core";
 import type { TextareaRootOwnProps } from "@pureform/binding-core";
+import { fieldControlProps } from "@pureform/binding-web";
 import type {
     ElementType,
     TextareaHTMLAttributes,

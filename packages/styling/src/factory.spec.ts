@@ -1,34 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { button as nativeButton } from "./__fixtures__/native-button";
-import { button as webButton } from "./__fixtures__/web-button";
 import { createRegistry } from "./registry";
-
-describe("a generated web factory", () => {
-    it("gives each slot's classes for a selection, defaults filled in", () => {
-        expect(webButton({ variant: "text", toggle: true })).toEqual({
-            root: {
-                class: "pf-button__root pf-button__root--variant_text pf-button__root--size_medium pf-button__root--toggle_true",
-            },
-            label: { class: "pf-button__label" },
-        });
-    });
-
-    it("returns the cached, frozen slots when the instance sets no tokens", () => {
-        const slots = webButton({ size: "small" });
-        expect(webButton({ size: "small", variant: "filled" })).toBe(slots);
-        expect(Object.isFrozen(slots.root)).toBe(true);
-    });
-
-    it("adds instance tokens as the root's CSS vars", () => {
-        const slots = webButton({ tokens: { accent: "red" } });
-        expect(slots.root.style).toEqual({
-            "--pf-components-button-accent": "red",
-        });
-        expect(slots.root.class).toBe(webButton({}).root.class);
-        expect(slots.label).toBe(webButton({}).label);
-    });
-});
 
 describe("a generated native factory", () => {
     it("resolves styles per selection, states included", () => {
@@ -51,18 +24,18 @@ describe("a generated native factory", () => {
 describe("a registry of generated factories", () => {
     it("serves a static and a lazy one", async () => {
         const registry = createRegistry({
-            button: webButton,
-            nativeButton: {
+            button: nativeButton,
+            lazyButton: {
                 lazy: () =>
                     import("./__fixtures__/native-button").then(
                         (m) => m.button,
                     ),
             },
         });
-        const web = registry.entry("button");
-        expect(web.factory({}).label.class).toBe("pf-button__label");
-        await registry.preload("nativeButton");
-        const native = await registry.entry("nativeButton").load();
-        expect(native).toBe(nativeButton);
+        const entry = registry.entry("button");
+        expect(entry.factory({}).label.style).toEqual({ fontWeight: "500" });
+        await registry.preload("lazyButton");
+        const loaded = await registry.entry("lazyButton").load();
+        expect(loaded).toBe(nativeButton);
     });
 });

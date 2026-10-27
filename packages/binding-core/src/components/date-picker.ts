@@ -366,33 +366,10 @@ export const pickerWeekStart = (props: {
     readonly firstDayOfWeek?: number | undefined;
 }) => props.firstDayOfWeek ?? weekStartOf(pickerLocale(props));
 
-/** Zag's date picker or date input props from a picker's, besides `id`, `dir` and the state:
- *  `parse` turns an ISO date into Zag's date value (the machines' `parse`). */
 /** The time zone the user is in. Zag's default is UTC, which makes "today" the wrong day for
  *  part of every day anywhere else. */
 export const localTimeZone = (): string =>
     new Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-export const dateMachineProps = <D>(
-    props: DatePickerBehaviorProps,
-    parse: (value: string) => D | undefined,
-) => ({
-    locale: pickerLocale(props),
-    timeZone: localTimeZone(),
-    startOfWeek: pickerWeekStart(props),
-    selectionMode: props.selectionMode,
-    min: props.min === undefined ? undefined : parse(props.min),
-    max: props.max === undefined ? undefined : parse(props.max),
-    isDateUnavailable: props.isDateUnavailable
-        ? (date: { toString(): string }) =>
-              props.isDateUnavailable!(date.toString().slice(0, 10))
-        : undefined,
-    disabled: props.disabled,
-    readOnly: props.readOnly,
-    required: props.required,
-    invalid: props.invalid,
-    name: props.name,
-});
 
 /** What the ready-made pickers render besides the calendar or field, in the framework's node
  *  type. The labels default to Material's English ones. */

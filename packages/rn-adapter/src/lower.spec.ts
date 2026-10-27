@@ -2,7 +2,6 @@ import {
     dampingCoefficient,
     defineComponent,
     defineSlotComponent,
-    formatLinearEasing,
     sampleSpring,
 } from "@pureform/core";
 import {
@@ -208,7 +207,7 @@ describe("lowerRn animations", () => {
             animation: {
                 name: "slide",
                 duration: 1000,
-                easing: "cubic-bezier(0.25, 0.1, 0.25, 1)",
+                easing: { type: "easing", kind: "keyword", name: "ease" },
                 delay: 0,
                 iterations: -1,
                 direction: "normal",
@@ -306,6 +305,23 @@ describe("lowerRn filters", () => {
 });
 
 describe("lowerRn transitions", () => {
+    it("keeps object-valued easing tokens in named themes", () => {
+        const base = linearEasing(0, [1.2, 50], [0.8, 50], 1);
+        const changed = linearEasing(0, [0.3, 75], 1);
+        const config = configWith(
+            {},
+            {
+                easings: { path: base },
+                themes: { brand: { easings: { path: changed } } },
+            },
+        );
+        const theme = resolveTheme(config, { scheme: "light" });
+        expect(theme["easings.path"]).toBe(base);
+        expect(evaluate({ $ref: "easings.path" }, theme)).toBe(base);
+        const named = resolveTheme(config, { scheme: "light", theme: "brand" });
+        expect(named["easings.path"]).toBe(changed);
+        expect(evaluate(base, theme)).toBe(base);
+    });
     it("lowers durations to milliseconds and easings to curves, with reduced motion a state", () => {
         const motion = {
             type: "transition",
@@ -350,20 +366,32 @@ describe("lowerRn transitions", () => {
                         {
                             property: "backgroundColor",
                             duration: 200,
-                            easing: "cubic-bezier(0, 0, 0.58, 1)",
+                            easing: {
+                                type: "easing",
+                                kind: "keyword",
+                                name: "easeOut",
+                            },
                             delay: 0,
                         },
                         {
                             property: "paddingStart",
                             duration: 90,
-                            easing: "linear",
+                            easing: {
+                                type: "easing",
+                                kind: "steps",
+                                steps: { count: 2 },
+                            },
                             delay: 0,
                         },
                         // A shape's transition, for SVG to morph.
                         {
                             property: "clipPath",
                             duration: 1,
-                            easing: "cubic-bezier(0.25, 0.1, 0.25, 1)",
+                            easing: {
+                                type: "easing",
+                                kind: "keyword",
+                                name: "ease",
+                            },
                             delay: 0,
                         },
                     ],
@@ -431,7 +459,11 @@ describe("lowerRn springs", () => {
             {
                 property: "transform",
                 duration: sampled.duration,
-                easing: formatLinearEasing(sampled.points),
+                easing: {
+                    type: "easing",
+                    kind: "linear",
+                    points: sampled.points,
+                },
                 delay: 20,
                 spring: {
                     type: "spring",
@@ -443,7 +475,7 @@ describe("lowerRn springs", () => {
             {
                 property: "opacity",
                 duration: 100,
-                easing: "linear(0, 1)",
+                easing: linearEasing(0, 1),
                 delay: 0,
             },
         ]);
@@ -457,7 +489,11 @@ describe("lowerRn springs", () => {
         const sampled = sampleSpring(fast);
         expect(theme).toMatchObject({
             "springs.spatialFast.duration": sampled.duration,
-            "springs.spatialFast.easing": formatLinearEasing(sampled.points),
+            "springs.spatialFast.easing": {
+                type: "easing",
+                kind: "linear",
+                points: sampled.points,
+            },
             "springs.spatialFast.stiffness": 800,
             "springs.spatialFast.damping": dampingCoefficient(fast),
             "springs.spatialFast.mass": 1,

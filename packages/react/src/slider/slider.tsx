@@ -9,12 +9,9 @@ import type { PartName } from "@pureform/anatomy";
 import {
     SLIDER_INPUT_LABEL_PROPS,
     SLIDER_ROOT_PROPS,
-    sliderControllableProps,
     sameSliderInsetIcon,
     sliderInsetIconOverflows,
-    sliderMachineProps,
     sliderMarkerTokens,
-    sliderNativeDefault,
     sliderSelection,
     sliderStopActive,
     sliderStops,
@@ -27,6 +24,11 @@ import type {
     SliderThumbInstance,
     SliderValue,
 } from "@pureform/binding-core";
+import { sliderNativeDefault } from "@pureform/binding-web";
+import {
+    sliderControllableProps,
+    sliderMachineProps,
+} from "@pureform/binding-web";
 import { readSliderInsetIcon } from "@pureform/binding-web";
 import { setNativeDefault } from "@pureform/machines/form";
 import * as slider from "@pureform/machines/slider";

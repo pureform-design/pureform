@@ -77,15 +77,6 @@ export interface OverlayCloseProps {
     readonly onClose?: CloseQuestion | undefined;
 }
 
-/** A close trigger's props: Zag's `close` props as they are, or, with an `onClose`, its click
- *  replaced by `requestClose`, which asks first (a dialog's close trigger, a bottom sheet's drag
- *  handle). */
-export const closeTriggerProps = <P extends object>(
-    close: P,
-    onClose: CloseQuestion | undefined,
-    requestClose: () => void,
-): P => (onClose ? { ...close, onClick: requestClose } : close);
-
 /** Everything Root takes for itself, besides the element's own props and `as`. */
 export interface DialogRootOwnProps
     extends DialogVariantProps, DialogBehaviorProps, OverlayCloseProps {
@@ -153,47 +144,4 @@ export const dialogSelection = (
 ): Selection<"dialog"> => ({
     icon: props.icon,
     tokens: props.tokens,
-});
-
-/** Zag's dialog props from Root's, besides `id`, `dir`, and the controllable `open`. */
-export const dialogMachineProps = (props: DialogBehaviorProps) => ({
-    modal: props.modal,
-    role: props.role,
-    closeOnInteractOutside: props.closeOnInteractOutside,
-    closeOnEscape: props.closeOnEscape,
-    restoreFocus: props.restoreFocus,
-    "aria-label": props["aria-label"],
-    ids: {
-        trigger: props.ids?.trigger,
-        backdrop: props.ids?.backdrop,
-        positioner: props.ids?.positioner,
-        content: props.ids?.content,
-        title: props.ids?.headline,
-        description: props.ids?.body,
-        closeTrigger: props.ids?.closeTrigger,
-    },
-});
-
-/** What the positioner adds to Zag's props: hidden once the dialog is gone (closed, and its exit
- *  animation over), and fixed over the viewport, centering the dialog. Normalize it with the
- *  framework's `normalizeProps` and merge it after Zag's. Once it shows, `stackPositioner` (from
- *  `/dom`) stacks it at the surface's layer, in the next frame. */
-export const dialogPositionerLayout = (present: boolean) => ({
-    hidden: !present,
-    style: {
-        position: "fixed",
-        inset: "0",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        boxSizing: "border-box",
-        padding: "24px",
-    } as const,
-});
-
-/** What the backdrop adds to Zag's props: hidden once the dialog is gone, and the scrim covering
- *  the viewport rather than its container. Normalize it and merge it after Zag's. */
-export const dialogBackdropLayout = (present: boolean) => ({
-    hidden: !present,
-    style: { position: "fixed" } as const,
 });

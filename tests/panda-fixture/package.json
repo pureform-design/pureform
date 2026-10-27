@@ -8,6 +8,7 @@
         "@pureform/js-effects": "workspace:^",
         "@pureform/preset": "workspace:^",
         "@pureform/styling": "workspace:^",
+        "@pureform/styling-web": "workspace:^",
         "@solidjs/web": "catalog:",
         "solid-js": "catalog:"
     },

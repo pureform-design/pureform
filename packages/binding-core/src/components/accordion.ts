@@ -114,21 +114,6 @@ export const accordionSelection = (
     tokens: props.tokens,
 });
 
-/** Zag's accordion props from Root's, besides `id`, `dir`, and the controllable `value`. Root's
- *  `id` becomes Zag's root id. An item collapses from its header by default, as Angular's
- *  expansion panels do. */
-export const accordionMachineProps = (props: AccordionBehaviorProps) => ({
-    multiple: props.multiple,
-    collapsible: props.collapsible ?? true,
-    disabled: props.disabled,
-    ids: {
-        root: props.id ?? props.ids?.root,
-        item: props.ids?.item,
-        itemContent: props.ids?.itemContent,
-        itemTrigger: props.ids?.itemTrigger,
-    },
-});
-
 /** Zag's item props for one item, from the item's props and the accordion's `disabled`. */
 export const accordionItemProps = (
     item: { readonly value: string; readonly disabled?: boolean | undefined },

@@ -18,7 +18,7 @@ import { nativeSelectAnatomy } from "@pureform/anatomy";
 import type { TestIdOverride } from "@pureform/anatomy";
 import {
     nativeSelectGroups,
-    nativeSelectProps,
+    fieldControlState,
     nativeSelectSelection,
     nativeSelectValue,
     nativeSelectValues,
@@ -225,9 +225,12 @@ function NativeSelectImpl(props: NativeSelectProps): ReactNode {
         setValue(nativeSelectValue(next, true));
     };
     const field = useField()?.state;
-    const control = nativeSelectProps(props, false, field);
+    const control = fieldControlState(field, {
+        ...props,
+        describedBy: props["aria-describedby"],
+    });
     const disabled = control.disabled ?? false;
-    const invalid = control["aria-invalid"] === "true";
+    const invalid = control.invalid;
     const web = Platform.OS === "web";
     const [focused, setFocused] = useState(false);
     const [hovered, setHovered] = useState(false);
@@ -320,7 +323,14 @@ function NativeSelectImpl(props: NativeSelectProps): ReactNode {
                     onBlur: () => setFocused(false),
                     onMouseEnter: () => setHovered(true),
                     onMouseLeave: () => setHovered(false),
-                    ...control,
+                    id: control.id,
+                    disabled: disabled || undefined,
+                    required: control.required || undefined,
+                    "aria-invalid": invalid ? "true" : undefined,
+                    "aria-describedby": control.describedBy,
+                    name: props.name,
+                    form: props.form,
+                    multiple: props.multiple || undefined,
                     "aria-label": label,
                     "aria-labelledby": labelledBy,
                     style: {
@@ -367,7 +377,7 @@ function NativeSelectImpl(props: NativeSelectProps): ReactNode {
             {...(control.id ? { nativeID: control.id } : {})}
             aria-expanded={expanded ?? false}
             aria-invalid={invalid}
-            aria-required={control.required}
+            aria-required={control.required || undefined}
             aria-disabled={disabled || undefined}
             disabled={disabled}
             onPress={slot.on("select", "onPress", onPress)}

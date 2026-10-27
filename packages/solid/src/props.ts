@@ -1,8 +1,8 @@
 // Solid's rules for merging a part's props: classes join into Solid 2's array form, styles merge
 // as objects (a string style is parsed), and handlers may be Solid's `[handler, data]` pairs.
 
-import { combineProps } from "@pureform/binding-core";
-import type { CombineRules } from "@pureform/binding-core";
+import { combineProps } from "@pureform/binding-web";
+import type { CombineRules } from "@pureform/binding-web";
 import type { JSX } from "@solidjs/web";
 
 /** The props a part takes, as one element's attributes. */

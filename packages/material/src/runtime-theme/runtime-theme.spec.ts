@@ -1,4 +1,4 @@
-import { isRuntimeTheme, themeScope } from "@pureform/styling";
+import { isRuntimeTheme, themeScope } from "@pureform/styling-web";
 import { describe, expect, it } from "vitest";
 
 import {

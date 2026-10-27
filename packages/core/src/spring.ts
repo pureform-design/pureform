@@ -377,35 +377,3 @@ export const linearEasingAt = (
     }
     return stops.at(-1)![0];
 };
-
-/** `linear()` points as CSS writes them: `linear(0, 0.5 20%, 1)`. */
-export const formatLinearEasing = (
-    points: readonly LinearEasingPoint[],
-): string =>
-    `linear(${points
-        .map(([output, input]) =>
-            input === undefined ? `${output}` : `${output} ${input}%`,
-        )
-        .join(", ")})`;
-
-/** The points of a CSS `linear(...)` string, or `undefined` if it isn't one. Each stop is an
- *  output with up to two inputs (CSS's shorthand for a flat run, read as two stops). */
-export const parseLinearEasing = (
-    text: string,
-): LinearEasingPoint[] | undefined => {
-    const inner = /^linear\((.*)\)$/s.exec(text.trim())?.[1];
-    if (inner === undefined) return undefined;
-    const points: LinearEasingPoint[] = [];
-    for (const stop of inner.split(",")) {
-        const [output, ...inputs] = stop.trim().split(/\s+/);
-        const value = Number(output);
-        if (!Number.isFinite(value)) return undefined;
-        if (inputs.length === 0) points.push([value]);
-        for (const input of inputs) {
-            const percent = /^(-?[\d.]+)%$/.exec(input)?.[1];
-            if (percent === undefined) return undefined;
-            points.push([value, Number(percent)]);
-        }
-    }
-    return linearPointsProblem(points) ? undefined : points;
-};

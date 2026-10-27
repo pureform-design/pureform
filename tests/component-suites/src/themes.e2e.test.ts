@@ -4,7 +4,7 @@
 // without a provider applies a theme. The teal theme recolors, so it must change what's drawn.
 // A runtime theme from teal's seed draws teal's colors, in both schemes.
 
-import { preloadTheme } from "@pureform/styling";
+import { preloadTheme } from "@pureform/styling-web";
 import { afterAll, describe, expect, it, vi } from "vitest";
 import { commands } from "vitest/browser";
 

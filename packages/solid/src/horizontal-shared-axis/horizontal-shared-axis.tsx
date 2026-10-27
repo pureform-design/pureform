@@ -7,16 +7,18 @@ import { horizontalSharedAxisAnatomy } from "@pureform/anatomy";
 import {
     HORIZONTAL_SHARED_AXIS_ROOT_PROPS,
     horizontalSharedAxisSelection,
-    pageRootProps,
     sharedAxisChange,
-    sharedAxisPageProps,
-    sharedAxisScrimProps,
 } from "@pureform/binding-core";
 import type {
     HorizontalSharedAxisRootOwnProps,
     PageKey,
     TransitionPage,
 } from "@pureform/binding-core";
+import {
+    pageRootProps,
+    sharedAxisPageProps,
+    sharedAxisScrimProps,
+} from "@pureform/binding-web";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import { createMemo, For, merge, omit, Show } from "solid-js";
 

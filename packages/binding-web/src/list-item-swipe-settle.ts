@@ -5,8 +5,8 @@
 
 import { createDragVelocity } from "@pureform/binding-core";
 import type { SpringNode } from "@pureform/core/ast";
-import type { Registry } from "@pureform/styling";
-import { tokenVar } from "@pureform/styling/theme-vars";
+import type { WebRegistry } from "@pureform/styling-web";
+import { tokenVar } from "@pureform/styling-web/theme-vars";
 
 import { settleOnSpring, springRoleVar, transitionSpring } from "./settle";
 
@@ -27,7 +27,7 @@ export interface SwipeSettle {
 
 /** A swipeable row's settle from its release speed, for the registry's var names. */
 export const createSwipeSettle = (
-    registry: () => Pick<Registry, "vars"> | undefined,
+    registry: () => Pick<WebRegistry, "vars"> | undefined,
 ): SwipeSettle => {
     const speed = createDragVelocity();
     let spring: SpringNode | undefined;

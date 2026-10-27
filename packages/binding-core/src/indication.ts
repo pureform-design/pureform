@@ -125,13 +125,9 @@ export function defineIndication<E = unknown>(
 }
 
 export {
-    componentIndicationTokens,
     droppedFocusIndicatorMessage,
     dropsFocusIndicator,
     INDICATION_TOKEN_NAMES,
-    indicationTokenValue,
-    indicationTokenValues,
-    providerIndicationOverrides,
     THEME_INDICATION_TOKENS,
 } from "./indication-tokens";
 export type { IndicationTokenName } from "./indication-tokens";
@@ -139,10 +135,8 @@ export {
     DEFAULT_INDICATION,
     materialIndication,
     noIndication,
-    rippleClasses,
 } from "./indication-material";
 export type {
     MaterialIndicationOptions,
     MaterialRipple,
-    RippleClasses,
 } from "./indication-material";

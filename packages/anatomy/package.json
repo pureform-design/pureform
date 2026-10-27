@@ -1,7 +1,7 @@
 {
     "name": "@pureform/anatomy",
     "version": "0.0.0-semantically-released",
-    "description": "Each component's parts, part attributes, and test ids, generated from the preset's AST",
+    "description": "Each component's portable part identities and test ids, generated from the preset's AST",
     "type": "module",
     "sideEffects": false,
     "exports": {

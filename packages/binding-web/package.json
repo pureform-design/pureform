@@ -32,8 +32,11 @@
         "@pureform/anatomy": "workspace:^",
         "@pureform/binding-core": "workspace:^",
         "@pureform/core": "workspace:^",
+        "@pureform/css-lowering": "workspace:^",
         "@pureform/js-effects": "workspace:^",
-        "@pureform/styling": "workspace:^"
+        "@pureform/styling": "workspace:^",
+        "@pureform/styling-web": "workspace:^",
+        "@pureform/web-contracts": "workspace:^"
     },
     "devDependencies": {
         "@pureform/tsconfig": "workspace:^",

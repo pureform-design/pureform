@@ -226,30 +226,28 @@ export const fieldState = (
 const isGiven = (node: unknown) =>
     node !== undefined && node !== null && node !== false && node !== "";
 
-/** The control's props: its id, the field's states (its own props win), and the
- *  description's and the error's ids in `aria-describedby` after any it was given. Outside a
- *  field, only its own states. */
-export const fieldControlProps = (
+/** Resolved control state and IDs. Own states win; descriptions join in reference order. */
+export const fieldControlState = (
     field: FieldState | undefined,
     own: FieldStateProps & {
         readonly id?: string | undefined;
-        readonly "aria-describedby"?: string | undefined;
+        readonly describedBy?: string | undefined;
     },
 ) => {
     const invalid = own.invalid ?? field?.invalid ?? false;
     const disabled = own.disabled ?? field?.disabled ?? false;
     const required = own.required ?? field?.required ?? false;
     const describedBy = joinIdRefs(
-        own["aria-describedby"],
+        own.describedBy,
         field?.described.description ? field.ids.description : undefined,
         field?.described.error ? field.ids.error : undefined,
     );
     return {
         id: own.id ?? field?.ids.control,
-        disabled: disabled || undefined,
-        required: required || undefined,
-        "aria-invalid": invalid ? ("true" as const) : undefined,
-        "aria-describedby": describedBy,
+        disabled,
+        required,
+        invalid,
+        describedBy,
     };
 };
 
@@ -260,17 +258,6 @@ export const fieldLabelState = (
 ) => ({
     required: own.required ?? field?.required ?? false,
     disabled: own.disabled ?? field?.disabled ?? false,
-});
-
-/** The label's element props: its id and the control it names (the binding spells `for` its
- *  own way), and `aria-disabled` while dimmed, which its style reads. */
-export const fieldLabelProps = (
-    field: FieldState | undefined,
-    state: { readonly disabled: boolean },
-) => ({
-    id: field?.ids.label,
-    for: field?.ids.control,
-    "aria-disabled": state.disabled ? ("true" as const) : undefined,
 });
 
 /** The required mark's text, hidden from assistive technology: the control's `required` says
