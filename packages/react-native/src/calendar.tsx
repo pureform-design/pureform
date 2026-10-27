@@ -279,7 +279,8 @@ export interface CellListProps<L extends ListSlot> {
     readonly onChoose: (key: number) => void;
 }
 
-/** A scrolling list of month or year cells. */
+/** A scrolling list of month or year cells. These do not overflow a day grid; disabled handles
+ *  unavailable choices, so outside remains false in all targets' month/year lists. */
 export function CellList<L extends ListSlot>(
     props: CellListProps<L>,
 ): ReactNode {

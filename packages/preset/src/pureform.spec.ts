@@ -202,6 +202,31 @@ describe("pureform", () => {
 });
 
 describe("pureform color options", () => {
+    it("keeps named opacity derivation when only the shared-axis recipe is customized", () => {
+        const config = pureform({
+            themes: {
+                inverted: {
+                    color: materialColor({
+                        overrides: {
+                            surface: { light: "#000000", dark: "#FFFFFF" },
+                        },
+                    }),
+                },
+            },
+            components: ({ defaults }) => ({
+                ...defaults,
+                horizontalSharedAxis: {
+                    ...defaults.horizontalSharedAxis,
+                    recipe: { ...defaults.horizontalSharedAxis.recipe },
+                },
+            }),
+        });
+        expect(
+            config.themes?.["inverted"]?.components?.["horizontalSharedAxis"]
+                ?.tokens?.["scrimOpacity"],
+        ).toEqual(when("dark", pct(20), pct(80)));
+    });
+
     it("does not impose derived opacity on a customized shared-axis component", () => {
         const config = pureform({
             themes: { custom: { color: materialColor() } },

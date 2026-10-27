@@ -257,18 +257,19 @@ export function calendarParts(use: (name: string) => CalendarContext) {
                 api.selectionMode === "range" ? "range" : "single",
             );
         };
+        const today = () =>
+            view() === "day"
+                ? (state() as datePicker.DayTableCellState).today
+                : isCurrentCalendarPeriod(
+                      view() as "month" | "year",
+                      state().value.year,
+                      state().value.month,
+                  );
         const instance = (): CalendarCellInstance => ({
             view: view(),
             value: props.value,
             selected: selection() !== "none",
-            today:
-                view() === "day"
-                    ? (state() as datePicker.DayTableCellState).today
-                    : isCurrentCalendarPeriod(
-                          view() as "month" | "year",
-                          state().value.year,
-                          state().value.month,
-                      ),
+            today: today(),
             // Month/year lists have no overflow-day cells; disabled reports availability.
             outside: view() === "day" && state().outsideRange,
             disabled: state().disabled,
@@ -288,7 +289,7 @@ export function calendarParts(use: (name: string) => CalendarContext) {
                 calendarCellSelectionOf({
                     view: view(),
                     selection: selection(),
-                    today: instance().today,
+                    today: today(),
                     outside: view() === "day" && state().outsideRange,
                 }),
             interactionSource: source,

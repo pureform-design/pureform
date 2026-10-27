@@ -67,7 +67,10 @@ describe("table", () => {
                 onSortChange={onSortChange}
             />,
         );
-        expect(computed("pf-data-table-sort-indicator").opacity).toBe("0");
+        // Reduced motion retains opacity transitions; wait for the initial fade as for sorting.
+        await until(() =>
+            expect(computed("pf-data-table-sort-indicator").opacity).toBe("0"),
+        );
         await userEvent.click(byTestId("pf-data-table-sort-header"));
         await settle();
         expect(names()).toEqual(["Helium", "Hydrogen", "Lithium"]);

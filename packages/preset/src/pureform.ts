@@ -473,6 +473,7 @@ export const pureform = <
         string,
         ReturnType<typeof sharedAxisScrimOpacityOf>
     > = {};
+    const baseScrimOpacity = sharedAxisScrimOpacityOf(theme.color);
     for (const [name, overrides] of Object.entries(options.themes ?? {})) {
         const variant = resolveTheme(
             { ...providers, ...overrides } as ThemeProviders<
@@ -522,9 +523,14 @@ export const pureform = <
 
     // This derived token belongs to each effective theme, not the base color contract. Keeping
     // it in theme overrides makes CSS/Panda/Tailwind and Native consume the same luminance rule.
-    // A replaced/customized component owns its tokens; do not overwrite its explicit defaults.
-    if (components["horizontalSharedAxis"] === defaults.horizontalSharedAxis) {
+    // Custom components retain explicit opacity defaults, but unrelated recipe changes must not
+    // disable theme derivation when the component still uses the preset's opacity token.
+    if (
+        components["horizontalSharedAxis"]?.tokens?.["scrimOpacity"] ===
+        defaults.horizontalSharedAxis.tokens?.["scrimOpacity"]
+    ) {
         for (const [name, scrimOpacity] of Object.entries(scrimOpacities)) {
+            if (same(scrimOpacity, baseScrimOpacity)) continue;
             themes[name] = {
                 ...themes[name],
                 components: {

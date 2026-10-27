@@ -25,12 +25,15 @@ describe("finite keyframe iterations", () => {
                 start(callback) {
                     complete = callback;
                     if (config.duration) legs.push(config.toValue as number);
-                    timer = setTimeout(() => {
-                        (value as Animated.Value).setValue(
-                            config.toValue as number,
-                        );
-                        callback?.({ finished: true });
-                    }, config.duration ?? 0);
+                    timer = setTimeout(
+                        () => {
+                            (value as Animated.Value).setValue(
+                                config.toValue as number,
+                            );
+                            callback?.({ finished: true });
+                        },
+                        (config.duration ?? 0) + (config.delay ?? 0),
+                    );
                 },
                 stop() {
                     clearTimeout(timer);
@@ -39,6 +42,14 @@ describe("finite keyframe iterations", () => {
                 reset() {},
             };
         });
+        vi.spyOn(Animated, "delay").mockImplementation((delay) =>
+            Animated.timing(new Animated.Value(0), {
+                toValue: 0,
+                duration: 0,
+                delay,
+                useNativeDriver: false,
+            }),
+        );
     });
     afterEach(() => {
         vi.restoreAllMocks();
@@ -46,6 +57,7 @@ describe("finite keyframe iterations", () => {
     });
 
     it.each([
+        ["alternate", 0, []],
         ["normal", 3, [1, 1, 1]],
         ["reverse", 3, [0, 0, 0]],
         ["alternate", 1, [1]],
@@ -85,5 +97,22 @@ describe("finite keyframe iterations", () => {
         vi.runAllTimers();
         expect(legs).toEqual([1]);
         expect(complete).toHaveBeenCalledExactlyOnceWith({ finished: false });
+    });
+
+    it("waits once before a reversed animation and initializes at its far endpoint", () => {
+        const progress = new Animated.Value(0);
+        const values: number[] = [];
+        progress.addListener(({ value }) => values.push(value));
+        runKeyframes(progress, {
+            direction: "alternateReverse",
+            iterations: 1,
+            duration: 100,
+            delay: 20,
+        }).start();
+        vi.advanceTimersByTime(19);
+        expect(legs).toEqual([]);
+        vi.runAllTimers();
+        expect(legs).toEqual([0]);
+        expect(values).toEqual([1, 0]);
     });
 });
