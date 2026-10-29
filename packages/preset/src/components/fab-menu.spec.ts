@@ -10,7 +10,7 @@ const list = () =>
 
 const OPEN = "&[data-state=open] > :nth-last-child";
 const CLOSED = "&[data-state=closed] > :nth-child";
-const WAIT = "calc(25ms * ";
+const WAIT = "calc(25ms * var(--components-fabMenu-staggering, 0) * ";
 
 describe("fab menu items", () => {
     it("staggers 25ms a step, Compose's spring-driven stagger evenly spaced", () => {
@@ -62,11 +62,19 @@ describe("fab menu items", () => {
         const rules = list();
         const closed = rules["&[data-state=closed]"]!.animation.base;
         expect(closed).toContain(
-            `${WAIT}calc(min(var(--components-fabMenu-itemCount, ${FAB_MENU_STAGGERED}), ${FAB_MENU_STAGGERED}) - 1))`,
+            `${WAIT}max(calc(min(var(--components-fabMenu-itemCount, ${FAB_MENU_STAGGERED}), ${FAB_MENU_STAGGERED}) - 1), 0))`,
         );
         expect(closed).toContain("overlayHold");
         // Presence waits for an exit that differs from the open state's animation.
         expect(rules["&[data-state=open]"]).toBeUndefined();
+    });
+
+    it("staggers nothing until the count is known, so a composed menu's first frame is still", () => {
+        const rules = list();
+        // The token's default is 0; the bindings set 1 once they know how many items there are.
+        expect(rules[`${OPEN}(2)`]!.animation.base).toContain(
+            "--components-fabMenu-staggering, 0)",
+        );
     });
 
     it("drops the stagger under reduced motion", () => {

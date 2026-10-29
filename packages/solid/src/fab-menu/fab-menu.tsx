@@ -118,7 +118,8 @@ function Root(props: FabMenuRootProps): JSX.Element {
     const [itemCount, setItemCount] = createSignal<number>();
     const given = useContext(ReadyMadeItemCount);
     const scope = useComponent(fabMenuAnatomy, {
-        selection: () => fabMenuSelection(props, itemCount() ?? given()),
+        selection: () =>
+            fabMenuSelection(props, props.itemCount ?? itemCount() ?? given()),
         testId: () => props.testId,
         unstyled: () => props.unstyled,
         indication: () => props.indication,
@@ -251,7 +252,10 @@ function CloseTrigger(props: FabMenuCloseTriggerProps): JSX.Element {
  *  items as data. */
 export interface FabMenuProps
     extends
-        Omit<FabMenuRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
+        Omit<
+            FabMenuRootProps,
+            keyof SlotKeyedProps<Anatomy> | "children" | "itemCount"
+        >,
         SlotKeyedProps<Anatomy, never, FabMenuInstances<JSX.Element>>,
         FabMenuContentProps<JSX.Element> {}
 

@@ -20,6 +20,30 @@ const all = (id: string) => [
     ...document.querySelectorAll<HTMLElement>(`[data-testid="${id}"]`),
 ];
 
+describe("FabMenu, composed", () => {
+    it("takes an explicit item count without passing it to the element", async () => {
+        withRegistry(
+            <FabMenu.Root itemCount={2} defaultOpen>
+                <FabMenu.CloseTrigger aria-label="Create">
+                    +
+                </FabMenu.CloseTrigger>
+                <FabMenu.List>
+                    <FabMenu.Item value="message">
+                        <FabMenu.ItemLabel>Message</FabMenu.ItemLabel>
+                    </FabMenu.Item>
+                    <FabMenu.Item value="call">
+                        <FabMenu.ItemLabel>Call</FabMenu.ItemLabel>
+                    </FabMenu.Item>
+                </FabMenu.List>
+            </FabMenu.Root>,
+        );
+        await settle();
+        const root = all(ids.root)[0]!;
+        expect(root.hasAttribute("itemcount")).toBe(false);
+        expect(all(ids.item)).toHaveLength(2);
+    });
+});
+
 describe("FabMenu, ready-made", () => {
     it("takes a function of each item in its parts' keys", async () => {
         withRegistry(

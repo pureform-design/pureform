@@ -110,7 +110,8 @@ function Root(props: FabMenuRootProps): ReactNode {
     });
     const api = menu.connect(service, normalizeProps);
     const presence = usePresence(api.open);
-    const [itemCount, setItemCount] = useState(useContext(ReadyMadeItemCount));
+    const [counted, setCounted] = useState(useContext(ReadyMadeItemCount));
+    const itemCount = props.itemCount ?? counted;
     const scope = useComponent(fabMenuAnatomy, {
         selection: fabMenuSelection(props, itemCount),
         testId: props.testId,
@@ -120,7 +121,7 @@ function Root(props: FabMenuRootProps): ReactNode {
     const { as, ...rest } = omitProps(props, FAB_MENU_ROOT_PROPS);
     return (
         <context.Provider
-            value={{ scope, api, sources, presence, setItemCount }}
+            value={{ scope, api, sources, presence, setItemCount: setCounted }}
         >
             {scope.render("root", { element: "div", as, props: rest })}
         </context.Provider>
@@ -219,7 +220,10 @@ function FabIcon(props: {
  *  keyed by part (an item's parts also by item, `FabMenuInstances`), the FAB's icons and name, and the items as data. */
 export interface FabMenuProps
     extends
-        Omit<FabMenuRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
+        Omit<
+            FabMenuRootProps,
+            keyof SlotKeyedProps<Anatomy> | "children" | "itemCount"
+        >,
         SlotKeyedProps<Anatomy, never, FabMenuInstances<ReactNode>>,
         FabMenuContentProps<ReactNode> {}
 

@@ -6,10 +6,6 @@ criteria. These are not all confirmed bugs: reproduction and external verificati
 
 ## B. Bounded component work — low to moderate complexity
 
-7. **FAB-menu SSR item count:** replace the guessed eight steps with data-derived ready-made counts,
-   optional explicit composed counts and stable non-staggered SSR/first-hydration fallback until
-   registration. Dynamic item changes must not restart the whole animation.
-
 ## C. Shared APIs and motion — moderate to high complexity
 
 8. **Per-item customization:** audit ButtonGroup/ChipSet/Toolbar/RadioGroup and SplitButton/Toolbar
@@ -65,6 +61,10 @@ criteria. These are not all confirmed bugs: reproduction and external verificati
   speculative fork of timing behavior.
 
 ## Retained decisions / separate work
+
+- **7 completed:** FAB-menu composed `itemCount` and a `staggering` token. Items stagger only once
+  their count is known, so composed SSR and first hydration are unstaggered, not guessed at eight.
+  Ready-mades still derive from items; Native's ready-made menu already did.
 
 - **6 completed:** shared filled SVG wave arc restores Native radial waviness on both SVG engines;
   non-SVG fallback retained. Actual rendered geometry, modes, RTL, theme dimensions, value updates

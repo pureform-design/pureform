@@ -24,6 +24,7 @@ import {
     end,
     flex,
     inlineFlex,
+    max,
     min,
     mul,
     numeric,
@@ -98,6 +99,9 @@ const { tokens, ref } = componentTokens("fabMenu", {
     // How many items the list holds, which the bindings set, so the list's exit holds exactly
     // until its last item has left.
     itemCount: unitless(8),
+    // Whether the items stagger: 1 once the count is known, 0 until then, so a composed menu
+    // renders unstaggered on the server and its first client frame.
+    staggering: unitless(0),
     ...groupTokens(DEFAULT_GROUP),
     ...INDICATION_TOKENS,
 });
@@ -117,7 +121,9 @@ export const FAB_MENU_STAGGER = numeric(25, "ms");
 export const FAB_MENU_STAGGERED = 8;
 
 const wait = (index: number) =>
-    index === 0 ? undefined : mul(FAB_MENU_STAGGER, unitless(index));
+    index === 0
+        ? undefined
+        : mul(FAB_MENU_STAGGER, ref("staggering"), unitless(index));
 
 const OPEN = "&[data-state=open]";
 const CLOSED = "&[data-state=closed]";
@@ -168,9 +174,13 @@ const LIST_EXIT = overlayMotion({
         ...FAB_MENU_LIST_MOTION.exit,
         wait: mul(
             FAB_MENU_STAGGER,
-            sub(
-                min(ref("itemCount"), unitless(FAB_MENU_STAGGERED)),
-                unitless(1),
+            ref("staggering"),
+            max(
+                sub(
+                    min(ref("itemCount"), unitless(FAB_MENU_STAGGERED)),
+                    unitless(1),
+                ),
+                unitless(0),
             ),
         ),
     },

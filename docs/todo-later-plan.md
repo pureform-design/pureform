@@ -19,15 +19,6 @@ old B/C/D/E identifiers. Complexity estimates are relative and may change after 
 
 ## B. Bounded component work — low to moderate complexity
 
-### 7. FAB-menu composed item count and SSR
-
-- Composed Root discovers items after mount; SSR currently guesses eight animation steps.
-- Ready-mades derive count from item data. Composed menus support an optional explicit count.
-- Without an explicit count, server output and the first hydration frame use a stable non-staggered
-  state; enable automatic staggering after registration instead of guessing eight items.
-- Do not inspect arbitrary children. Later additions/removals must not restart the whole animation.
-- Test initially open/closed menus, explicit/automatic counts, hydration and variable item counts.
-
 ## C. Shared APIs and motion — moderate to high complexity
 
 ### 8. Per-item customization consistency
@@ -172,6 +163,13 @@ and dynamic usage rather than extend static asset pruning speculatively.
 Record device/OS/engine/AT results and recordings; unavailable environments remain blocked.
 
 ## Retained decisions and out-of-scope tooling
+
+- **7 completed (2026-10-29): FAB-menu item count.** Composed `FabMenu.Root` takes an optional
+  `itemCount`; without it, the list's registered count applies after mount. The preset's `staggering`
+  token is 0 until a count is known, so composed SSR and first hydration render unstaggered rather
+  than guessing eight steps. Ready-mades derive count from items; Native's ready-made menu already
+  did. Later item additions update the count token without restarting the whole animation. Verified
+  in preset (1338), React (1099) and Solid (1184) unit suites; web SSR/device checks remain V3 items.
 
 - **6 completed (2026-10-29): Native wavy radial geometry.** User approved a shared SVG path
   approach, retaining the non-SVG border fallback rather than adding a native masking dependency.
