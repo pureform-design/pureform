@@ -66,6 +66,9 @@ include = [
     "packages/generate/**",
     "packages/bundler/**",
     "packages/cli/**",
+    "packages/animate-core/**",
+    "packages/animate-web/**",
+    "packages/animate-react-native/**",
     # @anchor:new-core-package
 ]
 

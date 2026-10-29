@@ -1,0 +1,31 @@
+{
+    "name": "@pureform/animate-react-native",
+    "version": "0.0.0-semantically-released",
+    "description": "React Native animation APIs and drivers for animate-core",
+    "type": "module",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": {
+                "development": "./src/index.ts",
+                "default": "./dist/index.mjs"
+            },
+            "require": {
+                "development": "./src/index.ts",
+                "default": "./dist/index.mjs"
+            }
+        }
+    },
+    "dependencies": {
+        "@pureform/animate-core": "workspace:^"
+    },
+    "devDependencies": {
+        "@types/node": "catalog:",
+        "@pureform/tsconfig": "workspace:^",
+        "@pureform/vite-config": "workspace:^",
+        "@pureform/vitest-config": "workspace:^",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:"
+    }
+}

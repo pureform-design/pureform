@@ -31,6 +31,13 @@ old B/C/D/E identifiers. Complexity estimates are relative and may change after 
   motion and reduced-motion support rather than hardcode an unrelated animation policy.
 - Reproduce current motion, test direction/alignment and rapid toggles, and integrate with count
   and hydration behavior from 7.
+- Agreed architecture: generic runtime animation coordination and driver contracts live in
+  `animate-core`, separate from the styling AST's `core`. `animate-web` and `animate-react-native`
+  depend on and wrap it with Motion-like public APIs; applications import adapters, not core.
+  Web drivers are shared by React/Solid, with lifecycle hooks in the existing bindings. Native
+  drivers must retain native/UI-thread execution where possible. Generic stagger coordinates
+  visibility; FAB-menu owns width measurement and item motion. Distinguish fixed-delay stagger
+  from spring-driven visibility progression. Scaffolded with Omni; runtime implementation pending.
 
 ### 11. Arbitrarily nested motion providers and provider-aware motion-safe
 

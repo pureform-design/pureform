@@ -264,6 +264,51 @@
         "vitest": "catalog:",
       },
     },
+    "packages/animate-core": {
+      "name": "@pureform/animate-core",
+      "version": "0.0.0-semantically-released",
+      "devDependencies": {
+        "@pureform/tsconfig": "workspace:^",
+        "@pureform/vite-config": "workspace:^",
+        "@pureform/vitest-config": "workspace:^",
+        "@types/node": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:",
+      },
+    },
+    "packages/animate-react-native": {
+      "name": "@pureform/animate-react-native",
+      "version": "0.0.0-semantically-released",
+      "dependencies": {
+        "@pureform/animate-core": "workspace:^",
+      },
+      "devDependencies": {
+        "@pureform/tsconfig": "workspace:^",
+        "@pureform/vite-config": "workspace:^",
+        "@pureform/vitest-config": "workspace:^",
+        "@types/node": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:",
+      },
+    },
+    "packages/animate-web": {
+      "name": "@pureform/animate-web",
+      "version": "0.0.0-semantically-released",
+      "dependencies": {
+        "@pureform/animate-core": "workspace:^",
+      },
+      "devDependencies": {
+        "@pureform/tsconfig": "workspace:^",
+        "@pureform/vite-config": "workspace:^",
+        "@pureform/vitest-config": "workspace:^",
+        "@types/node": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:",
+      },
+    },
     "packages/binding-core": {
       "name": "@pureform/binding-core",
       "version": "0.0.0-semantically-released",
@@ -1675,6 +1720,12 @@
     "@polka/url": ["@polka/url@1.0.0-next.29", "", {}, "sha512-wwQAWhWSuHaag8c4q/KN/vCoeOJYshAIvMQwD4GpSb3OiZklFfvAgmj0VCBBImRpuF/aFgIRzllXlVX93Jevww=="],
 
     "@pureform/anatomy": ["@pureform/anatomy@workspace:packages/anatomy"],
+
+    "@pureform/animate-core": ["@pureform/animate-core@workspace:packages/animate-core"],
+
+    "@pureform/animate-react-native": ["@pureform/animate-react-native@workspace:packages/animate-react-native"],
+
+    "@pureform/animate-web": ["@pureform/animate-web@workspace:packages/animate-web"],
 
     "@pureform/binding-core": ["@pureform/binding-core@workspace:packages/binding-core"],
 
