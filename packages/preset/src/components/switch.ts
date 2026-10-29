@@ -52,7 +52,7 @@ import {
     defaultGroups,
     disabledColor,
     focusRing,
-    INDICATION_ROOT,
+    indicationRoot,
     mergeSlots,
     stateTransition,
     sys,
@@ -200,7 +200,7 @@ export const createSwitch = <const G extends string = ColorGroup>(
                 base: mergeSlots(
                     {
                         root: {
-                            ...INDICATION_ROOT,
+                            ...indicationRoot(ref),
                             ...focusRing(ref, CONTROL_FOCUS),
                             borderRadius: radius("full"),
                             position: relative,

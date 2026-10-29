@@ -56,7 +56,7 @@ import { INDICATION_TOKENS } from "../state-layer";
 import { POPUP_MOTION, timedAnimation } from "./overlay";
 import {
     componentTokens,
-    INDICATION_ROOT,
+    indicationRoot,
     interactiveColors,
     motionTransition,
     notificationAction,
@@ -147,7 +147,7 @@ export const toast = pf.slotComponent({
         base: {
             // Zag positions the region and its toasts; this stacks it over the page.
             group: {
-                ...INDICATION_ROOT,
+                ...indicationRoot(ref),
                 zIndex: zIndex("snackbar"),
                 width: ref("width"),
             },

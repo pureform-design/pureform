@@ -40,7 +40,7 @@ import {
     groupTokens,
     iconBox,
     iconFill,
-    INDICATION_ROOT,
+    indicationRoot,
     keysOf,
     sizeTokenName,
     sizeTokens,
@@ -161,7 +161,7 @@ export const createFab = <const G extends string = ColorGroup>(
             recipe: () => ({
                 base: {
                     root: {
-                        ...INDICATION_ROOT,
+                        ...indicationRoot(ref),
                         ...pressableRoot(ref),
                         ...OWN_SIZE,
                         ...elevation.root,

@@ -28,7 +28,7 @@ import {
     componentTokens,
     focusRing,
     iconBox,
-    INDICATION_ROOT,
+    indicationRoot,
     iconFill,
     inputText,
     stateTransition,
@@ -70,7 +70,7 @@ export const searchBar = pf.slotComponent({
     recipe: () => ({
         base: {
             root: {
-                ...INDICATION_ROOT,
+                ...indicationRoot(ref),
                 ...surface(ref("container"), ref("inputColor"), "level0"),
                 ...focusRing(ref, slot("root", "focusVisibleWithin")),
                 transition: stateTransition,

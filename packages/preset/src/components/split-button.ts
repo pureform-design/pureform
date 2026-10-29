@@ -40,7 +40,7 @@ import {
     fillVariant,
     groupTokens,
     iconBox,
-    INDICATION_ROOT,
+    indicationRoot,
     OWN_SIZE,
     keysOf,
     pressableRoot,
@@ -192,7 +192,7 @@ export const createSplitButton = <
             recipe: () => ({
                 base: {
                     root: {
-                        ...INDICATION_ROOT,
+                        ...indicationRoot(ref),
                         ...OWN_SIZE,
                         display: inlineFlex,
                         flexDirection: row,

@@ -67,7 +67,7 @@ import {
     touchTarget,
     stateTransition,
     focusRing,
-    INDICATION_ROOT,
+    indicationRoot,
 } from "./shared";
 
 type CardFill = "elevated" | "filled" | "outlined";
@@ -266,7 +266,7 @@ export const card = pf.slotComponent({
     recipe: () => ({
         base: {
             root: {
-                ...INDICATION_ROOT,
+                ...indicationRoot(ref),
                 ...focusRing(ref),
                 transition: stateTransition,
                 position: relative,

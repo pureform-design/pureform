@@ -49,7 +49,7 @@ import {
     disabledColor,
     iconBox,
     iconFill,
-    INDICATION_ROOT,
+    indicationRoot,
     slotStateLayer,
     sys,
 } from "./shared";
@@ -96,7 +96,7 @@ export const createNativeSelect = () =>
         recipe: () => ({
             base: {
                 root: {
-                    ...INDICATION_ROOT,
+                    ...indicationRoot(ref),
                     position: relative,
                     display: inlineFlex,
                     alignItems: center,

@@ -1,9 +1,9 @@
 // Where each component shows indication, checked against its styles: every declared surface
 // draws a state layer from the component's own opacities, every declared focus part draws the
 // focus indicator from its own tokens, and every component that draws a state layer declares
-// where. Each such component sets its indication tokens back to the theme's on its root.
+// where. Each such component resets instance tokens on its root, below inherited theme overrides.
 
-import { px } from "@pureform/core/ast";
+import { dynamic, px } from "@pureform/core/ast";
 import type { SlottedComponentSpec } from "@pureform/core/types";
 import { materialState } from "@pureform/material";
 import { describe, expect, it } from "vitest";
@@ -94,7 +94,7 @@ describe("indication", () => {
             .filter(drawsStateLayer)
             .map((spec) => [spec.name, spec] as const),
     )(
-        "%s sets its indication tokens back to the theme's on its root",
+        "%s resets instance indication tokens without shadowing theme overrides",
         (_, spec) => {
             // The outermost slot: the root, or the toast's group.
             const root = spec.recipe.base[spec.slots[0]!] as {
@@ -103,17 +103,20 @@ describe("indication", () => {
             expect(root.tokens).toMatchObject(
                 Object.fromEntries(
                     Object.entries(INDICATION_TOKENS).map(([token, value]) => [
-                        `components.${spec.name}.${token}`,
-                        value,
+                        `components.${spec.name}.indication.${token}`,
+                        dynamic(["components", spec.name, token], value),
                     ]),
                 ),
             );
             for (const token of Object.keys(INDICATION_TOKENS)) {
                 expect(spec.tokens?.[token]).toMatchObject({
-                    default:
+                    path: ["components", spec.name, "indication", token],
+                    default: dynamic(
+                        ["components", spec.name, token],
                         INDICATION_TOKENS[
                             token as keyof typeof INDICATION_TOKENS
                         ],
+                    ),
                 });
             }
         },

@@ -55,7 +55,7 @@ import {
     defaultGroups,
     densitySteps,
     disabledColor,
-    INDICATION_ROOT,
+    indicationRoot,
     iconFill,
     variantsOf,
     roundIconButton,
@@ -191,7 +191,7 @@ export const createNumberField = <
             recipe: () => ({
                 base: {
                     ...withoutTrailingIcon(parts.base),
-                    root: { ...parts.base.root, ...INDICATION_ROOT },
+                    root: { ...parts.base.root, ...indicationRoot(ref) },
                     // The control takes the trailing icon's room, on the input or the suffix.
                     input: {
                         ...parts.base.input,

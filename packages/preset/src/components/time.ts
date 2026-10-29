@@ -25,7 +25,7 @@ import { INDICATION_TOKENS, stateLayer } from "../state-layer";
 import type { IndicationToken } from "../state-layer";
 import {
     focusRing,
-    INDICATION_ROOT,
+    indicationRoot,
     stateTransition,
     surface,
     sys,
@@ -71,7 +71,7 @@ export type TimeRef = (name: TimeToken | IndicationToken) => AliasNode;
 export const timeSlots = (ref: TimeRef, fieldHeight: AliasNode) =>
     ({
         root: {
-            ...INDICATION_ROOT,
+            ...indicationRoot(ref),
             ...surface(ref("container"), ref("fieldContent"), "level3"),
             transition: stateTransition,
             // Its own size, as Compose's `TimePicker` and `TimeInput` and MDC's time picker

@@ -19,7 +19,7 @@ describe("ripple", () => {
         });
         expect(recipe?.base?.ripple).toMatchObject({
             backgroundImage:
-                "radial-gradient(closest-side, color-mix(in srgb, transparent, var(--components-ripple-color, currentColor) var(--components-ripple-opacity, token(opacity.statePressed))) max(calc(100% - 70px), 65%), transparent 100%)",
+                "radial-gradient(closest-side, color-mix(in srgb, transparent, var(--components-ripple-color, currentColor) var(--components-ripple-opacity, var(--components-ripple-surfaceOpacity, token(opacity.statePressed)))) max(calc(100% - 70px), 65%), transparent 100%)",
         });
     });
 });

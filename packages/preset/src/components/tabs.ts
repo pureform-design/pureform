@@ -63,7 +63,7 @@ import {
     disabledColor,
     iconBox,
     iconFill,
-    INDICATION_ROOT,
+    indicationRoot,
     motionTransition,
     pressableRoot,
     sys,
@@ -166,7 +166,7 @@ export const createTabs = <const G extends string = ColorGroup>(
             recipe: () => ({
                 base: {
                     root: {
-                        ...INDICATION_ROOT,
+                        ...indicationRoot(ref),
                         // A stacking context of its own, so the indicator's layer stays in it.
                         position: relative,
                         ...isolated,

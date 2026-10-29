@@ -623,16 +623,20 @@ describe.each(INDICATED)("$component", (component) => {
     });
 });
 
-// Known gaps, kept as tests that are expected to fail, so fixing one shows here.
-describe("known gaps", () => {
+describe("indication token overrides", () => {
     const button = INDICATED.find((each) => each.component === "Button")!;
     const [, entry] = entriesOf(button)[0]!;
 
     /** The opacity of the ink a press draws on the button. */
-    const inkOpacity = async (indication?: SceneIndication) => {
+    const inkOpacity = async (
+        indication?: SceneIndication,
+        provider?: SceneProvider,
+        props?: SceneProps,
+    ) => {
         const { mounted, parts } = await mountIndicated(button, entry, {
-            provider: { motion: "full" },
+            provider: { motion: "full", ...provider },
             indication,
+            props,
         });
         await mouse("down", parts().surface);
         await harness.settle();
@@ -644,18 +648,67 @@ describe("known gaps", () => {
         return rgba(ink)[3]!;
     };
 
-    // The ripple's own `opacity` token defaults to the theme's pressed opacity; a component's
-    // `statePressedOpacity` (its `indication` prop) doesn't reach the ripple inside it.
-    it.fails("a component's indication sets its ripple's opacity", async () => {
+    it("a component's indication sets its ripple's opacity", async () => {
         const material = await inkOpacity();
         const custom = await inkOpacity("custom");
         expect(Math.abs(custom - material)).toBeGreaterThan(10);
     });
 
-    // Each interactive component's root sets its indication tokens back to the theme's, so an
-    // override of `components.<component>.<token>` above it doesn't reach it.
+    it("an explicit ripple opacity overrides the surface indication", async () => {
+        const provider = { overrides: { "components.ripple.opacity": "60%" } };
+        expect(await inkOpacity("custom", provider)).toBeCloseTo(153, 0);
+        expect(await inkOpacity(undefined, provider)).toBeCloseTo(153, 0);
+    });
+
+    it("keeps instance tokens above own indication tokens above provider component defaults", async () => {
+        const provider = {
+            overrides: { "components.button.statePressedOpacity": "60%" },
+        };
+        expect(await inkOpacity(undefined, provider)).toBeCloseTo(153, 0);
+        expect(await inkOpacity("custom", provider)).toBeCloseTo(102, 0);
+        expect(
+            await inkOpacity("custom", provider, {
+                tokens: { statePressedOpacity: "20%" },
+            }),
+        ).toBeCloseTo(51, 0);
+    });
+
+    // oxlint-disable-next-line vitest/expect-expect -- assertions are in expectSame
+    it("an instance indication does not leak into a nested component of the same kind", async () => {
+        const card = INDICATED.find((each) => each.component === "Card")!;
+        const [, cardEntry] = entriesOf(card)[0]!;
+        const plain = await mountIndicated(card, cardEntry, {
+            props: { interactive: true },
+        });
+        await mouse("move", plain.parts().surface);
+        await settled(plain.parts().surface);
+        const expected = background(plain.parts().surface);
+        plain.mounted.unmount();
+        const nested = await mountIndicated(card, cardEntry, {
+            props: { interactive: true },
+            wrapper: {
+                component: "Card",
+                props: { interactive: true, testId: "outer" },
+                indication: "custom",
+            },
+        });
+        await mouse("move", nested.parts().surface);
+        await settled(nested.parts().surface);
+        expectSame(background(nested.parts().surface), expected);
+    });
+
+    it("hydrates a named component indication override without changes", async () => {
+        const { logged, changes } = await hydrate({
+            component: "Button",
+            props: button.props,
+            provider: { theme: "indication" },
+        });
+        expect(logged).toEqual([]);
+        expectNoChanges(button, changes);
+    });
+
     // oxlint-disable-next-line vitest/expect-expect -- the assertions are in the expectDiffers helper
-    it.fails("a provider's override of a component's indication token reaches it", async () => {
+    it("a provider's override of a component's indication token reaches it", async () => {
         const hovered = async (provider?: SceneProvider) => {
             const { mounted, parts } = await mountIndicated(button, entry, {
                 provider,
@@ -672,5 +725,10 @@ describe("known gaps", () => {
             overrides: { "components.button.stateHoverOpacity": "40%" },
         });
         expectDiffers(overridden, theme, "hovered");
+        expectDiffers(
+            await hovered({ theme: "indication" }),
+            theme,
+            "named theme",
+        );
     });
 });

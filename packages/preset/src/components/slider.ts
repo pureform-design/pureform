@@ -67,7 +67,7 @@ import {
     iconBox,
     iconFill,
     keysOf,
-    INDICATION_ROOT,
+    indicationRoot,
     mergeSlots,
     on,
     slotStateLayer,
@@ -501,7 +501,7 @@ export const createSlider = <const G extends string = ColorGroup>(
                     base: mergeSlots(
                         {
                             root: {
-                                ...INDICATION_ROOT,
+                                ...indicationRoot(ref),
                                 position: relative,
                                 width: pct(100),
                                 height: ROOT_ACROSS,

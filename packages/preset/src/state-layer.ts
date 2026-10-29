@@ -36,8 +36,8 @@ export type IndicationToken =
     | "focusIndicatorColor";
 
 /** Each indication token's default: the theme's state opacities and focus indicator lengths,
- *  and the secondary color. A component's tokens default to these, and its root sets them back
- *  to these, so a nested component of the same kind doesn't inherit its parent's. */
+ *  and the secondary color. Roots reset their instance indication values, falling back to
+ *  inherited component overrides and then these defaults, without inheriting parent instances. */
 export const INDICATION_TOKENS = {
     stateHoverOpacity: opacity("stateHover"),
     stateFocusOpacity: opacity("stateFocus"),

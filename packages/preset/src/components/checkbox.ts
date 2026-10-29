@@ -62,7 +62,7 @@ import {
     densityVariant,
     disabledColor,
     focusRing,
-    INDICATION_ROOT,
+    indicationRoot,
     mergeSlots,
     stateTransition,
     sys,
@@ -178,7 +178,7 @@ export const createCheckbox = <
                 base: mergeSlots(
                     {
                         root: {
-                            ...INDICATION_ROOT,
+                            ...indicationRoot(ref),
                             ...focusRing(ref, CONTROL_FOCUS),
                             ...OWN_SIZE,
                             ...controlRoot(dense(ref("size"))),

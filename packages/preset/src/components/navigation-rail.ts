@@ -35,7 +35,7 @@ import {
     DEFAULT_GROUP,
     colorVariant,
     defaultGroups,
-    INDICATION_ROOT,
+    indicationRoot,
     surface,
     sys,
     variantsOf,
@@ -107,7 +107,7 @@ export const createNavigationRail = <const G extends string = ColorGroup>(
             recipe: () => ({
                 base: {
                     root: {
-                        ...INDICATION_ROOT,
+                        ...indicationRoot(ref),
                         display: flex,
                         flexDirection: column,
                         alignItems: center,

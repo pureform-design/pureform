@@ -39,7 +39,7 @@ import type { PlainBoxToken } from "./plain-box";
 import {
     componentTokens,
     disabledColor,
-    INDICATION_ROOT,
+    indicationRoot,
     sys,
     THEME_DENSITY,
 } from "./shared";
@@ -139,7 +139,7 @@ type BoxToken = PlainBoxToken | "paddingBlock";
 /** Input's and Textarea's box: the plain box, with the state layer of the text color on hover
  *  and press. */
 const boxStyle = (ref: (token: BoxToken) => AliasNode): StyleMap => ({
-    ...INDICATION_ROOT,
+    ...indicationRoot(ref),
     ...plainBoxStyle(ref, {
         hover: slot("root", "hover"),
         invalid: ROOT_INVALID,

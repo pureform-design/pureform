@@ -48,7 +48,7 @@ import {
     disabledColor,
     iconBox,
     iconFill,
-    INDICATION_ROOT,
+    indicationRoot,
     pressableRoot,
     sys,
     touchTarget,
@@ -169,7 +169,7 @@ export const chipShape = (
     name: "chip" | "inputChip",
     ref: IndicationRef & ((token: ChipShapeToken) => NumericValue),
 ): StyleMap => ({
-    ...INDICATION_ROOT,
+    ...indicationRoot(ref),
     ...pressableRoot(ref),
     ...OWN_SIZE,
     gap: ref("gap"),
@@ -179,7 +179,7 @@ export const chipShape = (
     transition: spatialCornerTransition,
     borderRadius: cornerRadius(ref),
     tokens: {
-        ...INDICATION_ROOT.tokens,
+        ...indicationRoot(ref).tokens,
         radius: pillRadius(name, dense(ref("height"))),
     },
 });

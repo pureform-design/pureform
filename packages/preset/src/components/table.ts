@@ -66,7 +66,7 @@ import {
     densityTokenVariant,
     focusRing,
     iconBox,
-    INDICATION_ROOT,
+    indicationRoot,
     slotStateLayer,
     springTweens,
     stateTransition,
@@ -218,7 +218,7 @@ export const createTable = <D extends string = MaterialDensity>(
             recipe: () => ({
                 base: {
                     root: {
-                        ...INDICATION_ROOT,
+                        ...indicationRoot(ref),
                         display: flex,
                         flexDirection: column,
                         backgroundColor: ref("container"),

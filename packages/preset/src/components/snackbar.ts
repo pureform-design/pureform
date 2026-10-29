@@ -40,7 +40,7 @@ import { INDICATION_TOKENS } from "../state-layer";
 import { overlayMotion, POPUP_MOTION } from "./overlay";
 import {
     componentTokens,
-    INDICATION_ROOT,
+    indicationRoot,
     interactiveColors,
     notificationAction,
     pressableRoot,
@@ -92,7 +92,7 @@ export const snackbar = pf.slotComponent({
     recipe: () => ({
         base: {
             root: {
-                ...INDICATION_ROOT,
+                ...indicationRoot(ref),
                 ...surface(ref("container"), ref("content"), "level3"),
                 ...overlayMotion(POPUP_MOTION),
                 zIndex: zIndex("snackbar"),

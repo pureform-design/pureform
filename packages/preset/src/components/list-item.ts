@@ -74,7 +74,7 @@ import {
     DENSITY_TOKEN,
     densityTokenVariant,
     densitySteps,
-    INDICATION_ROOT,
+    indicationRoot,
     motionTransition,
     STATE_TWEENS,
     stateTransition,
@@ -241,7 +241,7 @@ export const createListItem = <
             recipe: () => ({
                 base: {
                     root: {
-                        ...INDICATION_ROOT,
+                        ...indicationRoot(ref),
                         ...parts.row,
                         // The whole line, as Compose's `ListItem` (`fillMaxWidth`): a `<button>`
                         // would otherwise take only its content's width.

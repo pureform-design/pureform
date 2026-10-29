@@ -42,7 +42,7 @@ import {
     disabledColor,
     iconBox,
     iconFill,
-    INDICATION_ROOT,
+    indicationRoot,
     pressableRoot,
     sys,
 } from "./shared";
@@ -347,7 +347,7 @@ export const calendarCell = pf.slotComponent({
     recipe: () => ({
         base: {
             root: {
-                ...INDICATION_ROOT,
+                ...indicationRoot(ref),
                 display: flex,
                 alignItems: center,
                 justifyContent: center,

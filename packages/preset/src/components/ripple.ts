@@ -13,6 +13,7 @@
 import { typed } from "@pureform/core";
 import {
     absolute,
+    alias,
     colorMix,
     hidden,
     literal,
@@ -33,7 +34,9 @@ import { componentTokens } from "./shared";
 
 const { tokens, ref } = componentTokens("ripple", {
     color: literal("currentColor"),
-    opacity: opacity("statePressed"),
+    // A surface supplies its indication here; an explicit ripple opacity still wins.
+    surfaceOpacity: opacity("statePressed"),
+    opacity: alias("components", "ripple", "surfaceOpacity"),
     growDuration: duration("long1"),
     fadeDuration: duration("medium3"),
     easing: easing("standard"),

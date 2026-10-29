@@ -113,7 +113,11 @@ const showsFocusRing = (name: string, style: Record<string, unknown>) => {
         alias("components", name, "focusIndicatorThickness"),
     );
     expect(slotted(name).tokens?.focusIndicatorThickness).toMatchObject({
-        default: alias("tokens", "sizes", "focusIndicatorThickness"),
+        path: ["components", name, "indication", "focusIndicatorThickness"],
+        default: {
+            path: ["components", name, "focusIndicatorThickness"],
+            default: alias("tokens", "sizes", "focusIndicatorThickness"),
+        },
     });
 };
 

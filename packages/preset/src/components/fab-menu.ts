@@ -57,7 +57,7 @@ import {
     entriesOf,
     groupTokens,
     iconBox,
-    INDICATION_ROOT,
+    indicationRoot,
     OWN_SIZE,
     interactiveColors,
     keysOf,
@@ -225,7 +225,7 @@ export const createFabMenu = <const G extends string = ColorGroup>(
                 base: {
                     // Over the page, with the list it opens.
                     root: {
-                        ...INDICATION_ROOT,
+                        ...indicationRoot(ref),
                         ...OWN_SIZE,
                         zIndex: zIndex("menu"),
                         position: relative,

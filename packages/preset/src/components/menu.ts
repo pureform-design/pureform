@@ -51,7 +51,7 @@ import {
     dense,
     densitySteps,
     densityVariant,
-    INDICATION_ROOT,
+    indicationRoot,
     surface,
     sys,
     variantsOf,
@@ -143,7 +143,7 @@ export const createMenu = <
             recipe: () => ({
                 base: {
                     root: {
-                        ...INDICATION_ROOT,
+                        ...indicationRoot(ref),
                         ...surface(ref("container"), ref("content"), "level2"),
                         ...overlayMotion({ ...POPUP_MOTION, fromAnchor: true }),
                         zIndex: zIndex("menu"),

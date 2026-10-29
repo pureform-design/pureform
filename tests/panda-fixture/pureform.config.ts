@@ -3,7 +3,7 @@
 // it into the Panda preset, `pureform generate` writes `.pureform/` from it, and the suites
 // compile the CSS, Tailwind, and React Native targets from it too.
 
-import { morph } from "@pureform/core/ast";
+import { morph, pct } from "@pureform/core/ast";
 import {
     materialColor,
     materialLayout,
@@ -18,7 +18,7 @@ import { roundedShape } from "@pureform/theme";
 // Named density steps, in grid units: one roomier than Material's default, and two denser.
 const DENSITIES = { comfortable: 1, default: 0, compact: -1, dense: -3 };
 
-export default pureform({
+const config = pureform({
     // Material's shapes, and two that change shape while pressed.
     shapes: {
         ...MATERIAL_SHAPES,
@@ -57,3 +57,13 @@ export default pureform({
         },
     },
 });
+
+export default {
+    ...config,
+    themes: {
+        ...config.themes,
+        indication: {
+            components: { button: { tokens: { stateHoverOpacity: pct(40) } } },
+        },
+    },
+};

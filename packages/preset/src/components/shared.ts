@@ -109,7 +109,8 @@ export const sys = (name: string): AliasNode => colorRole(name);
 /** A component's token set. Each entry compiles to an overridable
  *  `--<prefix>-components-<name>-<token>` var that falls back to the given default, so an app
  *  can restyle a component at runtime by setting the var on it or any ancestor. `ref(token)`
- *  is the alias a recipe reads it through. */
+ *  is the alias a recipe reads it through. Indication values have a separate instance path,
+ *  reset by `indicationRoot`, so inherited overrides survive without leaking instance values. */
 export const componentTokens = <K extends string>(
     name: string,
     defaults: Record<K, ValueNode>,
@@ -120,7 +121,17 @@ export const componentTokens = <K extends string>(
     const tokens = Object.fromEntries(
         Object.entries<ValueNode>(defaults).map(([token, value]) => [
             token,
-            dynamic(["components", name, token], value, valueTypes[token as K]),
+            Object.hasOwn(INDICATION_TOKENS, token)
+                ? dynamic(
+                      ["components", name, "indication", token],
+                      dynamic(["components", name, token], value),
+                      valueTypes[token as K],
+                  )
+                : dynamic(
+                      ["components", name, token],
+                      value,
+                      valueTypes[token as K],
+                  ),
         ]),
     ) as Record<K, DynamicNode>;
     return {
@@ -142,10 +153,19 @@ export const disabledColor = (
     level: "disabledContainer" | "disabledContent",
 ): ColorValue => colorMix(transparent, sys("onSurface"), opacity(level));
 
-/** The indication tokens' root style: every interactive component's base sets them back to the
- *  theme's on its root, so a component's own tokens reach its slots but not a nested component
- *  of the same kind, which starts from the theme's again. */
-export const INDICATION_ROOT: StyleMap = { tokens: INDICATION_TOKENS };
+/** Reset instance indication values without shadowing inherited component/theme overrides.
+ *  The ripple reads the surface's pressed opacity, below its own explicit opacity override. */
+export const indicationRoot = (ref: IndicationRef): StyleMap => ({
+    tokens: Object.fromEntries(
+        Object.entries(INDICATION_TOKENS).map(([token, value]) => [
+            `indication.${token}`,
+            dynamic(ref(token as IndicationToken).path, value),
+        ]),
+    ),
+    providedTokens: {
+        "components.ripple.surfaceOpacity": ref("statePressedOpacity"),
+    },
+});
 
 /** Container and content colors for an interactive surface: the container takes a state layer
  *  of the content color, at the opacities `token` reads, and the content stays as given. */

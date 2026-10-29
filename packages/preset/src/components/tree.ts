@@ -62,7 +62,7 @@ import {
     densitySteps,
     disabledColor,
     densityTokenVariant,
-    INDICATION_ROOT,
+    indicationRoot,
     variantsOf,
 } from "./shared";
 import type { ColorGroup, ColorGroups, Densities } from "./shared";
@@ -176,7 +176,7 @@ export const createTree = <
             recipe: () => ({
                 base: {
                     root: {
-                        ...INDICATION_ROOT,
+                        ...indicationRoot(ref),
                         display: flex,
                         flexDirection: column,
                         gap: spacing("2"),

@@ -43,7 +43,7 @@ import {
     DENSITY_TOKEN,
     densitySteps,
     densityTokenVariant,
-    INDICATION_ROOT,
+    indicationRoot,
     sys,
     variantsOf,
 } from "./shared";
@@ -108,7 +108,7 @@ export const createAccordion = <D extends string = MaterialDensity>(
             recipe: () => ({
                 base: {
                     root: {
-                        ...INDICATION_ROOT,
+                        ...indicationRoot(ref),
                         display: flex,
                         flexDirection: column,
                         gap: ref("itemGap"),

@@ -72,7 +72,7 @@ import {
     groupTokens,
     iconBox,
     iconFill,
-    INDICATION_ROOT,
+    indicationRoot,
     keysOf,
     sizeTokenName,
     sizeTokens,
@@ -321,7 +321,7 @@ export const createIconButton = <
                     // The corners morph on the root (for the focus ring), the container, and the
                     // outline. A shape, as a variant, clips the container over them.
                     root: {
-                        ...INDICATION_ROOT,
+                        ...indicationRoot(ref),
                         ...pressableRoot(ref),
                         ...OWN_SIZE,
                         ...corners,

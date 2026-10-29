@@ -572,7 +572,8 @@ describe("generate with the CSS target", () => {
                         "navigationRail",
                         "nativeSelect",
                     ].map(
-                        (name) => `--pf-components-${name}-stateDraggedOpacity`,
+                        (name) =>
+                            `--pf-components-${name}-indication-stateDraggedOpacity`,
                     ),
                 );
                 for (const [name, spec] of Object.entries(preset.components)) {

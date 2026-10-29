@@ -37,7 +37,7 @@ import {
 import { radius } from "@pureform/theme";
 
 import { INDICATION_TOKENS, stateLayer } from "../state-layer";
-import { componentTokens, INDICATION_ROOT, pressableRoot, sys } from "./shared";
+import { componentTokens, indicationRoot, pressableRoot, sys } from "./shared";
 
 /** The carousel's `layout` values. */
 export const CAROUSEL_LAYOUTS = [
@@ -87,7 +87,7 @@ export const carousel = pf.slotComponent({
     recipe: () => ({
         base: {
             root: {
-                ...INDICATION_ROOT,
+                ...indicationRoot(ref),
                 position: relative,
                 display: flex,
                 width: pct(100),

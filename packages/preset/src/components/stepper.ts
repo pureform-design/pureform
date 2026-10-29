@@ -57,7 +57,7 @@ import {
     densitySteps,
     densityTokenVariant,
     disabledColor,
-    INDICATION_ROOT,
+    indicationRoot,
     pressableRoot,
     stateTransition,
     sys,
@@ -161,7 +161,7 @@ export const createStepper = <D extends string = MaterialDensity>(
             recipe: () => ({
                 base: {
                     root: {
-                        ...INDICATION_ROOT,
+                        ...indicationRoot(ref),
                         display: flex,
                         flexDirection: column,
                         backgroundColor: ref("container"),
