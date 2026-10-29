@@ -20,6 +20,7 @@ export * from "./components";
 export { overDefaults } from "./defaults";
 export { partAttributes } from "./anatomy";
 export { cx } from "./class-names";
+export { styleRippleElement } from "./ripple-element";
 export type { ClassDictionary, ClassValue } from "./class-names";
 export {
     classEntry,

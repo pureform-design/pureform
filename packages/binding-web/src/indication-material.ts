@@ -15,6 +15,7 @@ import type { RippleController } from "@pureform/js-effects";
 import type { SlotClasses } from "@pureform/styling-web";
 
 import type { Indication } from "./indication";
+import { styleRippleElement } from "./ripple-element";
 
 /** The ripple's slots, from the registry's `ripple` entry: the layer (`root`) and each ripple
  *  element (`ripple`). */
@@ -68,6 +69,12 @@ const drawRipple =
                                 rippleClasses(context.registry)?.ripple
                                     ?.class ?? ""
                             );
+                        },
+                        decorateElement: (element) => {
+                            const styles = rippleClasses(
+                                context.registry,
+                            )?.ripple;
+                            if (styles) styleRippleElement(element, styles);
                         },
                         // The context says whether motion is reduced.
                         respectReducedMotion: false,

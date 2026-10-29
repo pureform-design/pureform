@@ -8,6 +8,7 @@ export const props = createProps<RippleProps>()([
     "centered",
     "color",
     "disabled",
+    "decorateElement",
     "getRootNode",
     "getSurfaceEl",
     "id",

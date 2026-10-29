@@ -37,6 +37,7 @@ import {
     InteractionEmitter,
     pressableItemProps,
 } from "@pureform/machines/interaction";
+import type { SlotClasses } from "@pureform/styling-web";
 import { normalizeProps } from "@zag-js/react";
 import {
     type DOMAttributes,
@@ -109,6 +110,7 @@ export interface IndicationScope {
     readonly source: InteractionSource | undefined;
     /** The ripple's layer class, from the registry. */
     readonly layerClass: string | undefined;
+    readonly layerStyle: SlotClasses["style"] | undefined;
 }
 
 /** A component's indication scope; `indication` is its prop. */
@@ -155,6 +157,7 @@ export function useIndicationScope(
         },
         source: options.source,
         layerClass: rippleClasses(registry)?.root?.class,
+        layerStyle: rippleClasses(registry)?.root?.style,
     };
 }
 
@@ -237,6 +240,7 @@ export function usePartIndication(part: PartIndication | undefined): {
                     className={
                         part.unstyled ? undefined : part.scope.layerClass
                     }
+                    style={part.unstyled ? undefined : part.scope.layerStyle}
                     {...LAYER_ATTRIBUTES}
                 />
             ) : null,

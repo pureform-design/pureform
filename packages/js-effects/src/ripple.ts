@@ -107,6 +107,8 @@ export type RippleOptions = {
     color?: string;
     /** Element to use for each ink-well ripple. Default: a new `span`. */
     createElement?: () => HTMLElement;
+    /** Style each decorative ink element before the renderer applies its geometry. */
+    decorateElement?: (element: HTMLElement) => void;
     /** Find the layer the ripples are drawn in. Default: the `[data-ripple-layer]` child. */
     getRippleLayer?: (container: HTMLElement) => HTMLElement | null;
     /** Always grow from the center, as icon buttons do. */
@@ -167,6 +169,7 @@ const inkWell: Renderer = (
     options,
 ) => {
     const element = options.createElement?.() ?? document.createElement("span");
+    options.decorateElement?.(element);
     element.dataset.ripple = "";
     if (options.class) element.classList.add(...normalizeClass(options.class));
     if (options.color) element.style.backgroundColor = options.color;
@@ -225,6 +228,7 @@ const inkSparkle: Renderer = (
     const dpr = globalThis.devicePixelRatio || 1;
 
     const canvas = document.createElement("canvas");
+    options.decorateElement?.(canvas);
     canvas.dataset.ripple = "";
     if (options.class) canvas.classList.add(...normalizeClass(options.class));
     // The class may paint the ink-well gradient; the canvas draws its own.

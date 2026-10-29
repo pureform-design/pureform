@@ -52,8 +52,11 @@ const registry = () =>
                     VARS,
                 ),
             ripple: () => ({
-                root: { class: "ripple" },
-                ripple: { class: "ripple__ink" },
+                root: { class: "ripple", style: { "--layer": "registry" } },
+                ripple: {
+                    class: "ripple__ink",
+                    style: { "--ink": "registry" },
+                },
             }),
         },
         { vars: { prefix: "pf" } },
@@ -107,6 +110,9 @@ describe("indication", () => {
         const root = byTestId(ids.root);
         const layer = layerOf(root);
         expect(layer?.className).toBe("ripple");
+        expect((layer as HTMLElement).style.getPropertyValue("--layer")).toBe(
+            "registry",
+        );
         expect(layer?.getAttribute("aria-hidden")).toBe("true");
         expect(root.firstElementChild).toBe(layer);
         await dispatch(root, pointer("pointerdown"));
@@ -114,6 +120,11 @@ describe("indication", () => {
         expect(layer?.querySelector("[data-ripple]")?.className).toBe(
             "ripple__ink",
         );
+        expect(
+            layer
+                ?.querySelector<HTMLElement>("[data-ripple]")
+                ?.style.getPropertyValue("--ink"),
+        ).toBe("registry");
         await dispatch(window, pointer("pointerup"));
     });
 

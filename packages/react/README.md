@@ -702,6 +702,9 @@ import { RichTooltip } from "@pureform/react/rich-tooltip";
   surface. It runs pureform's ripple machine with `useReducedMotion()` (no ripples while motion is
   reduced) and the `ripple` slot's class for each ripple. Props: `disabled`, `effect`
   (`"ink-well"` or `"ink-sparkle"`), `centered`, `allowPropagation`, `getSurfaceEl`.
+  `slotProps.root` customizes the layer; `slotProps.ripple` customizes the decorative ink's
+  `className`, `style` and identifying attributes, merged after registry and provider styling.
+  The renderer retains ownership of the ink's dimensions and animation. `testId` names both parts.
 - **Single-part components** (`Avatar`, `Badge`, `Media`, `Separator`, `Scrim`, `SupportingText`, `Text`,
   `Icon`, `TouchTarget`) are Root alone (`Avatar.Root` is the same component): their variants,
   `tokens`, `testId`, `unstyled`, `as`, and the element's own props, `className` and `style` included.

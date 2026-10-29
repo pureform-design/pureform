@@ -239,6 +239,8 @@ export function usePartIndication(
     );
     const layerClass = () =>
         unstyled() ? undefined : rippleClasses(state().registry)?.root?.class;
+    const layerStyle = () =>
+        unstyled() ? undefined : rippleClasses(state().registry)?.root?.style;
     // A call in `when`, which the compiler doesn't wrap in a memo of its own.
     const layered = () =>
         scope.interactive() &&
@@ -249,7 +251,11 @@ export function usePartIndication(
         layer:
             holding.length > 0 ? (
                 <Show when={layered()}>
-                    <span class={layerClass()} {...LAYER_ATTRIBUTES} />
+                    <span
+                        class={layerClass()}
+                        style={layerStyle()}
+                        {...LAYER_ATTRIBUTES}
+                    />
                 </Show>
             ) : undefined,
     };

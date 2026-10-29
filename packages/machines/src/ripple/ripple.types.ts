@@ -26,6 +26,8 @@ export interface RippleProps extends CommonProperties {
     centered?: boolean | undefined;
     /** Classes for each ripple element, usually the preset's ripple slot class. */
     rippleClass?: string | undefined;
+    /** Binding-owned decoration of the imperative ink element. */
+    decorateElement?: ((element: HTMLElement) => void) | undefined;
     /** The ripple color. Default: the ink well takes it from its class, and the sparkle uses
      *  the layer's text color. */
     color?: string | undefined;

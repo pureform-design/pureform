@@ -1,4 +1,5 @@
 import { testIds } from "@pureform/anatomy";
+import { createWebRegistry } from "@pureform/styling-web";
 import { describe, expect, it } from "vitest";
 
 import { Ripple } from ".";
@@ -14,6 +15,66 @@ const byTestId = <E extends HTMLElement = HTMLElement>(id: string): E => {
 };
 
 describe("Ripple", () => {
+    it.each(["ink-well", "ink-sparkle"] as const)(
+        "merges registry, provider and instance styling on %s ink",
+        async (effect) => {
+            const registry = createWebRegistry({
+                ripple: () => ({
+                    root: { class: "layer" },
+                    ripple: {
+                        class: "ink",
+                        style: { color: "red", opacity: "0.1" },
+                    },
+                }),
+            });
+            mount(
+                <PureformProvider
+                    registry={registry}
+                    motion="full"
+                    slotProps={{
+                        ripple: {
+                            ripple: {
+                                className: "provided",
+                                style: { opacity: 0.3, marginLeft: 4 },
+                            },
+                        },
+                    }}
+                >
+                    <button type="button">
+                        <Ripple
+                            effect={effect}
+                            testId="styled"
+                            slotProps={{
+                                ripple: {
+                                    className: "instance",
+                                    style: { opacity: 0.6 },
+                                },
+                            }}
+                        />
+                    </button>
+                </PureformProvider>,
+            );
+            await settle();
+            const layer = byTestId("styled-root");
+            layer.parentElement!.dispatchEvent(
+                new PointerEvent("pointerdown", {
+                    bubbles: true,
+                    button: 0,
+                    isPrimary: true,
+                    pointerType: "mouse",
+                }),
+            );
+            await settle();
+            const ink = layer.querySelector<HTMLElement>("[data-ripple]")!;
+            expect(ink.className).toBe("ink provided instance");
+            expect(ink.style.color).toBe("red");
+            expect(ink.style.opacity).toBe("0.6");
+            expect(ink.style.marginLeft).toBe("4px");
+            expect(ink.dataset.testid).toBe("styled-ripple");
+            expect(layer.hasAttribute("slotProps")).toBe(false);
+        },
+    );
+
     it("is a hidden layer that ripples presses on its surface with the ripple slot's class", async () => {
         mount(
             <PureformProvider registry={displayRegistry()} motion="full">

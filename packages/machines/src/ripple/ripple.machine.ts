@@ -44,6 +44,9 @@ export const machine = createMachine<RippleSchema>({
                     get class() {
                         return prop("rippleClass") ?? "";
                     },
+                    get decorateElement() {
+                        return prop("decorateElement");
+                    },
                     get allowPropagation() {
                         return prop("allowPropagation") ?? false;
                     },

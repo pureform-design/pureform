@@ -3,19 +3,22 @@
 // `ripple` slot, and draws none while motion is reduced.
 
 import { rippleAnatomy } from "@pureform/anatomy";
-import { isUnstyled, rippleSelection } from "@pureform/binding-core";
+import { rippleSelection } from "@pureform/binding-core";
 import {
     RIPPLE_DOM_ROOT_PROPS,
     rippleDomMachineProps,
+    styleRippleElement,
 } from "@pureform/binding-web";
 import type { RippleDomRootOwnProps } from "@pureform/binding-web";
 import * as ripple from "@pureform/machines/ripple";
 import type { JSX, ValidComponent } from "@solidjs/web";
-import { createMemo, createUniqueId, omit } from "solid-js";
+import { createMemo, createUniqueId, merge, omit } from "solid-js";
 
 import { normalizeProps, useMachine } from "../internal/zag";
 import { useReducedMotion } from "../motion";
 import { useComponent } from "../parts";
+import type { SlotKeyedProps } from "../parts";
+import { combinePartProps } from "../props";
 import type { PartProps } from "../props";
 
 /** The ripple's props: the machine's (`disabled`, `centered`, `effect`, …), the tokens, `testId`
@@ -26,6 +29,8 @@ export interface RippleProps
         RippleDomRootOwnProps {
     /** Another element or component to render instead of `<span>`. */
     readonly as?: ValidComponent | undefined;
+    /** Layer props and decorative ink styling/identifying attributes; the renderer owns ink geometry. */
+    readonly slotProps?: SlotKeyedProps<typeof rippleAnatomy>["slotProps"];
 }
 
 /** The ripple's root: an empty layer over its surface, hidden from assistive technology. */
@@ -37,21 +42,24 @@ function Root(props: RippleProps): JSX.Element {
         testId: () => props.testId,
         unstyled: () => props.unstyled,
     });
+    const inkCustomization = merge(() => props.slotProps?.ripple ?? {});
+    const inkProps = scope.part("ripple", { props: inkCustomization });
     const service = useMachine(ripple.machine, () => ({
         id,
         reducedMotion: reducedMotion(),
-        rippleClass: isUnstyled(props.unstyled, "ripple")
-            ? undefined
-            : scope.classes().ripple?.class,
+        decorateElement: (element) => styleRippleElement(element, inkProps),
         ...rippleDomMachineProps(props),
     }));
     const api = createMemo(() => ripple.connect(service, normalizeProps));
-    const rest = omit(props, "as", ...RIPPLE_DOM_ROOT_PROPS);
+    const rest = omit(props, "as", "slotProps", ...RIPPLE_DOM_ROOT_PROPS);
+    const rootProps = merge(() =>
+        combinePartProps([props.slotProps?.root, rest]),
+    );
     return scope.render("root", {
         element: "span",
         as: () => props.as,
         machine: () => api().getLayerProps(),
-        props: rest,
+        props: rootProps,
     });
 }
 
