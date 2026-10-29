@@ -59,6 +59,72 @@ const day = (label: string) => {
 };
 
 describe("DatePicker", () => {
+    it.each([
+        {
+            value: ["2026-08-10", "2026-08-10"],
+            selected: ["Monday, August 10, 2026"],
+            next: [],
+            outside: "Tuesday, August 11, 2026",
+        },
+        {
+            value: ["2024-02-28", "2024-03-01"],
+            selected: [
+                "Wednesday, February 28, 2024",
+                "Thursday, February 29, 2024",
+            ],
+            next: ["Friday, March 1, 2024"],
+            outside: "Tuesday, February 27, 2024",
+        },
+        {
+            value: ["2026-12-31", "2027-01-02"],
+            selected: ["Thursday, December 31, 2026"],
+            next: ["Friday, January 1, 2027", "Saturday, January 2, 2027"],
+            outside: "Wednesday, December 30, 2026",
+        },
+    ])(
+        "includes the boundaries of range $value",
+        async ({ value, selected, next, outside }) => {
+            await render(
+                <DatePicker
+                    locale="en-US"
+                    selectionMode="range"
+                    defaultValue={value}
+                />,
+            );
+            for (const label of selected) {
+                expect(
+                    day(label)
+                        .closest('[role="gridcell"]')!
+                        .getAttribute("aria-selected"),
+                ).toBe("true");
+            }
+            expect(
+                day(outside)
+                    .closest('[role="gridcell"]')!
+                    .getAttribute("aria-selected"),
+            ).not.toBe("true");
+            if (next.length > 0) {
+                // Native intentionally leaves outside-month cells unselected. Verify the endpoint
+                // once its own month is shown rather than changing that display policy here.
+                await interact(() =>
+                    userEvent.click(
+                        byTestId("pf-date-picker-next").querySelector(
+                            "[role=button]",
+                        )!,
+                    ),
+                );
+                for (const label of next) {
+                    // oxlint-disable-next-line vitest/no-conditional-expect -- only cross-month cases navigate
+                    expect(
+                        day(label)
+                            .closest('[role="gridcell"]')!
+                            .getAttribute("aria-selected"),
+                    ).toBe("true");
+                }
+            }
+        },
+    );
+
     it("renders the surface with the chosen date and its month", async () => {
         await render(
             <DatePicker locale="en-US" defaultValue={["2026-08-17"]} />,

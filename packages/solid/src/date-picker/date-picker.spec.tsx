@@ -220,6 +220,56 @@ describe("DatePicker, ready-made", () => {
         expect(cellOf(iso).className).toContain("calendar-cell--today-true");
     });
 
+    it.each([
+        {
+            value: ["2026-08-10", "2026-08-10"],
+            days: [
+                ["2026-08-09", "none"],
+                ["2026-08-10", "selected"],
+                ["2026-08-11", "none"],
+            ],
+        },
+        {
+            value: ["2026-08-12", "2026-08-10"],
+            days: [
+                ["2026-08-10", "rangeStart"],
+                ["2026-08-11", "rangeMiddle"],
+                ["2026-08-12", "rangeEnd"],
+            ],
+        },
+        {
+            value: ["2024-02-28", "2024-03-01"],
+            days: [
+                ["2024-02-28", "rangeStart"],
+                ["2024-02-29", "rangeMiddle"],
+                ["2024-03-01", "rangeEnd"],
+            ],
+        },
+        {
+            value: ["2026-12-31", "2027-01-02"],
+            days: [
+                ["2026-12-31", "rangeStart"],
+                ["2027-01-01", "rangeMiddle"],
+                ["2027-01-02", "rangeEnd"],
+            ],
+        },
+    ])("marks range boundaries for $value", async ({ value, days }) => {
+        withRegistry(() => (
+            <DatePicker
+                locale="en-US"
+                selectionMode="range"
+                defaultValue={value}
+                defaultOpen
+            />
+        ));
+        await settle();
+        for (const [date, selection] of days) {
+            expect(cellOf(date!).className).toContain(
+                `calendar-cell--selection-${selection}`,
+            );
+        }
+    });
+
     it("marks a range's start, middle and end", async () => {
         withRegistry(() => (
             <DatePicker
