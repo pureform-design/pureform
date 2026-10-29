@@ -143,6 +143,30 @@ describe("Toolbar", () => {
         expect(clicked).toEqual(["g"]);
     });
 
+    it("takes a function of each overflow entry in menuProps", async () => {
+        await render(
+            <Toolbar
+                overflow
+                testId="edit"
+                items={ITEMS}
+                menuProps={{
+                    style: {
+                        item: ({ index }) => ({
+                            opacity: index === 0 ? 0.4 : 0.9,
+                        }),
+                    },
+                }}
+            />,
+        );
+        await until(() => expect(shown()).toEqual(["a", "b", "c", "d", "e"]));
+        await interact(() => userEvent.click(byTestId("edit-overflow-root")));
+        await settle(300);
+        const items = [...query("pf-menu-item")];
+        expect(items).toHaveLength(2);
+        expect(getComputedStyle(items[0]!).opacity).toBe("0.4");
+        expect(getComputedStyle(items[1]!).opacity).toBe("0.9");
+    });
+
     it("keeps every element and no overflow button when they fit", async () => {
         await render(<Toolbar overflow items={ITEMS.slice(0, 3)} testId="x" />);
         // Until the row is measured, every element shows with the overflow button, so the

@@ -336,6 +336,40 @@ describe("Toolbar, overflow", () => {
         expect(onClick).toHaveBeenCalledOnce();
     });
 
+    it("takes a function of each overflow entry in the menu's part keys", async () => {
+        withRegistry(
+            () => (
+                <Toolbar
+                    overflow
+                    testId="edit"
+                    items={ITEMS}
+                    menuProps={{
+                        class: {
+                            item: ({ item, index }) =>
+                                `entry-${index}-${String(item.value)}`,
+                        },
+                    }}
+                />
+            ),
+            130,
+        );
+        await frames();
+        await userEvent.click(
+            byTestId<HTMLButtonElement>("edit-overflow-root"),
+        );
+        await frames();
+        const items = [
+            ...document.querySelectorAll<HTMLElement>(
+                `[data-testid="${menuIds.item}"]`,
+            ),
+        ];
+        expect(items.map((item) => item.className)).toEqual([
+            expect.stringContaining("entry-0-underline"),
+            expect.stringContaining("entry-1-strike"),
+            expect.stringContaining("entry-2-link"),
+        ]);
+    });
+
     it("brings elements back as the room grows", async () => {
         const host = withRegistry(() => <Toolbar overflow items={ITEMS} />, 90);
         await frames();

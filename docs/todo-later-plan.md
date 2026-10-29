@@ -21,26 +21,6 @@ old B/C/D/E identifiers. Complexity estimates are relative and may change after 
 
 ## C. Shared APIs and motion — moderate to high complexity
 
-### 8. Per-item customization consistency
-
-- Audit found: ChipSet, ButtonGroup and RadioGroup items took only a `testId` before; they now take
-  their own `class`/`className`, `style`, `slotProps`, `unstyled` and `tokens` over `chipProps`,
-  `buttonProps`/`iconButtonProps` or `radioProps`, as List's `ListEntry` does, in React, Solid and
-  Native.
-- Pattern for items drawn with per-part hooks (a radio's parts read through `useSlotProps`): each
-  item renders its own child component, which merges its customization before reading its parts.
-  Other ready-mades that hit the same limitation may copy this shape.
-- Test ids: ChipSet and ButtonGroup items now take `TestIdOverride` (a prefix or ids by part), as
-  List and RadioGroup items do, so per-part customization is the same everywhere. Toolbar items still
-  take a string; that follows with Toolbar.
-- Still open: Toolbar items and its `buttonProps`/`menuProps` defaults, and SplitButton's `menuProps`,
-  need the same item typing plus per-item instance functions like `SelectMenuProps`
-  (`MenuScopeInstances`).
-- Reuse established APIs, not a new customization system; verify current gaps before expanding.
-- Compile usage tests first. Preserve provider/instance/slot precedence, internal handler merging
-  and equivalent cross-binding capabilities with host-specific props.
-- Test post-mount updates, especially Solid, and avoid SSR/hydration or reactive-node-budget regressions.
-
 ### 9. Provider-level Native slotProps
 
 - Follow established web provider APIs and merge behavior closely, adapting host typing to Native.
@@ -173,6 +153,19 @@ and dynamic usage rather than extend static asset pruning speculatively.
 Record device/OS/engine/AT results and recordings; unavailable environments remain blocked.
 
 ## Retained decisions and out-of-scope tooling
+
+- **8 completed (2026-10-29): per-item customization.** ChipSet, ButtonGroup, RadioGroup and Toolbar
+  items take their own `class`/`className`, `style`, `slotProps`, `unstyled` and `tokens` over
+  `chipProps`, `buttonProps`/`iconButtonProps` or `radioProps`, as List's `ListEntry` does, and test
+  ids by part (`TestIdOverride`), in React, Solid and Native. SplitButton's and Toolbar's overflow
+  `menuProps` take a function of each item (`MenuScopeInstances`). The React and Solid menu props
+  type, duplicated in Select, Autocomplete and SearchView, is now one shared `MenuScopeProps` in each
+  binding's `parts.tsx`; Native's menu already supported per-row functions, locked in with tests.
+  Reusable pattern: an item drawn with per-part hooks (a radio's parts read through `useSlotProps`)
+  renders its own child component, which merges its customization before reading its parts; other
+  ready-mades hitting the same limit may copy it. Known gap, kept on purpose: overflow-menu entries do
+  not take a per-item `testId` (the menu item type has none; group prefixing works through
+  `menuProps.testId`); adding it is a separate change to the shared menu item type.
 
 - **7 completed (2026-10-29): FAB-menu item count.** Composed `FabMenu.Root` takes an optional
   `itemCount`; without it, the list's registered count applies after mount. The preset's `staggering`

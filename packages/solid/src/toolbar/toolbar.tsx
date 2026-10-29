@@ -22,6 +22,8 @@ import {
     toolbarSelection,
 } from "@pureform/binding-core";
 import type {
+    MenuItem,
+    MenuScopeInstances,
     ToolbarContentProps,
     ToolbarItem,
     ToolbarPart,
@@ -43,7 +45,7 @@ import type { IconButtonProps } from "../icon-button";
 import { Menu } from "../menu";
 import { MENU_TRIGGER_ATTRIBUTES } from "../menu/menu";
 import { asRoot, createSlotProps, useComponent } from "../parts";
-import type { InnerPropsOf, SlotKeyedProps } from "../parts";
+import type { InnerPropsOf, MenuScopeProps, SlotKeyedProps } from "../parts";
 import { mergeStyles } from "../props";
 import type { PartProps } from "../props";
 import { ProvidedTokens } from "../provided-tokens";
@@ -137,7 +139,11 @@ export interface ToolbarProps
     readonly menuProps?: MenuInnerProps | undefined;
 }
 
-type MenuInnerProps = InnerPropsOf<typeof menuOverlayAnatomy>;
+/** The overflow menu's own props, keyed by the menu's parts (an entry's also by entry). */
+type MenuInnerProps = MenuScopeProps<
+    typeof menuOverlayAnatomy,
+    MenuItem<JSX.Element>
+>;
 
 const READY_MADE_PROPS = [
     "class",
@@ -224,7 +230,11 @@ function ReadyMade(props: ToolbarProps): JSX.Element {
     const rootSlot = createSlotProps(
         props as Keyed as SlotKeyedProps<typeof toolbarAnatomy>,
     )("root");
-    const menuSlots = createSlotProps({
+    const menuSlots = createSlotProps<
+        typeof menuOverlayAnatomy,
+        never,
+        MenuScopeInstances<MenuItem<JSX.Element>>
+    >({
         get class() {
             return props.menuProps?.class;
         },
@@ -234,7 +244,11 @@ function ReadyMade(props: ToolbarProps): JSX.Element {
         get slotProps() {
             return props.menuProps?.slotProps;
         },
-    } as SlotKeyedProps<typeof menuOverlayAnatomy>);
+    } as SlotKeyedProps<
+        typeof menuOverlayAnatomy,
+        never,
+        MenuScopeInstances<MenuItem<JSX.Element>>
+    >);
     const menuRoot = menuSlots("root");
     const items = () => props.items ?? [];
     const [root, setRoot] = createSignal<HTMLElement | undefined>(undefined, {

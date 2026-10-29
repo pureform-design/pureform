@@ -8,10 +8,6 @@ criteria. These are not all confirmed bugs: reproduction and external verificati
 
 ## C. Shared APIs and motion — moderate to high complexity
 
-8. **Per-item customization:** ChipSet, ButtonGroup and RadioGroup are done (items take their own
-   customizing props over the defaults, and test ids by part, in React, Solid and Native). Remaining:
-   Toolbar items and defaults (including test ids by part), and SplitButton/Toolbar `menuProps`
-   per-item functions via the `SelectMenuProps` pattern.
 9. **Native provider slotProps:** closely follow web provider APIs and merge behavior, with Native
    host typing and tests for provider/instance precedence, handlers, styles and accessibility.
 10. **FAB-menu motion:** Compose-style nearest-first stagger, aligned-edge width expansion at fixed
@@ -66,6 +62,11 @@ criteria. These are not all confirmed bugs: reproduction and external verificati
 - **7 completed:** FAB-menu composed `itemCount` and a `staggering` token. Items stagger only once
   their count is known, so composed SSR and first hydration are unstaggered, not guessed at eight.
   Ready-mades still derive from items; Native's ready-made menu already did.
+
+- **8 completed:** items of ChipSet, ButtonGroup, RadioGroup and Toolbar take their own customizing
+  props and test ids by part; SplitButton/Toolbar `menuProps` take a function of each item; one shared
+  `MenuScopeProps` replaces three copies. Per-radio child-component pattern may be reused elsewhere.
+  Kept gap: overflow-menu entries take no per-item `testId` (separate change to the menu item type).
 
 - **6 completed:** shared filled SVG wave arc restores Native radial waviness on both SVG engines;
   non-SVG fallback retained. Actual rendered geometry, modes, RTL, theme dimensions, value updates

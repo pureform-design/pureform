@@ -15,6 +15,8 @@ import {
 } from "@pureform/binding-core";
 import type {
     InteractionSourceProps,
+    MenuItem,
+    MenuScopeInstances,
     SplitButtonContentProps,
     SplitButtonRootOwnProps,
 } from "@pureform/binding-core";
@@ -32,7 +34,7 @@ import { Menu } from "../menu";
 import { MENU_TRIGGER_ATTRIBUTES } from "../menu/menu";
 import { createPartContext } from "../part-context";
 import { createSlotProps, useComponent } from "../parts";
-import type { ComponentScope, InnerPropsOf, SlotKeyedProps } from "../parts";
+import type { ComponentScope, MenuScopeProps, SlotKeyedProps } from "../parts";
 import { combinePartProps } from "../props";
 import type { PartProps } from "../props";
 
@@ -56,17 +58,28 @@ export interface SplitButtonRootProps
     /** Another element or component to render instead of `<div>`. */
     readonly as?: ValidComponent | undefined;
     /** The menu's own props: `testId`, `unstyled`, `tokens`, and its root's `class`, `style` and
-     *  `slotProps` (the ready-made also reaches the menu's other parts). */
-    readonly menuProps?: InnerPropsOf<MenuAnatomy> | undefined;
+     *  `slotProps` (the ready-made also reaches the menu's other parts, an item's also by item,
+     *  `MenuScopeInstances`). */
+    readonly menuProps?: SplitButtonMenuProps | undefined;
 }
 
 type MenuAnatomy = typeof menuOverlayAnatomy;
 
+/** The menu's own props, keyed by the menu's parts (an item's also by item). */
+export type SplitButtonMenuProps = MenuScopeProps<
+    MenuAnatomy,
+    MenuItem<JSX.Element>
+>;
+
 // The menu's parts' slot props from `menuProps`, followed as it changes.
 const createMenuSlotProps = (props: {
-    readonly menuProps?: InnerPropsOf<MenuAnatomy> | undefined;
+    readonly menuProps?: SplitButtonMenuProps | undefined;
 }) =>
-    createSlotProps({
+    createSlotProps<
+        MenuAnatomy,
+        never,
+        MenuScopeInstances<MenuItem<JSX.Element>>
+    >({
         get class() {
             return props.menuProps?.class;
         },
@@ -76,7 +89,11 @@ const createMenuSlotProps = (props: {
         get slotProps() {
             return props.menuProps?.slotProps;
         },
-    } as SlotKeyedProps<MenuAnatomy>);
+    } as SlotKeyedProps<
+        MenuAnatomy,
+        never,
+        MenuScopeInstances<MenuItem<JSX.Element>>
+    >);
 
 /** A part's props: the element's own, and the part's `unstyled`. */
 export interface SplitButtonPartProps extends PartProps {

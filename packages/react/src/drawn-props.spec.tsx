@@ -74,6 +74,29 @@ describe("props of drawn components", () => {
         for (const item of items) expect(item.className).toContain("row");
     });
 
+    it("SplitButton: menuProps take a function of each item", async () => {
+        mount(
+            <PureformProvider registry={overlaysRegistry()}>
+                <SplitButton
+                    label="Save"
+                    items={ITEMS}
+                    defaultOpen
+                    menuProps={{
+                        className: {
+                            item: ({ item, index }) =>
+                                `row-${index}-${item.value}`,
+                        },
+                    }}
+                />
+            </PureformProvider>,
+        );
+        await settle();
+        const items = all(`[data-testid="${compositeTestIds.menu.item}"]`);
+        expect(items).toHaveLength(2);
+        expect(items[0]!.className).toContain(`row-0-${ITEMS[0]!.value}`);
+        expect(items[1]!.className).toContain(`row-1-${ITEMS[1]!.value}`);
+    });
+
     it("DateInput: cancelButtonProps and confirmButtonProps reach each button", async () => {
         mount(
             <PureformProvider registry={datePickersRegistry()}>

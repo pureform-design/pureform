@@ -55,6 +55,35 @@ describe("SplitButton", () => {
         expect(box(byTestId(split.root)).width).toBeLessThan(280);
     });
 
+    it("takes a function of each item in menuProps", async () => {
+        await render(
+            <SplitButton
+                label="Save"
+                items={[
+                    { value: "draft", label: "Draft" },
+                    { value: "copy", label: "Copy" },
+                ]}
+                menuProps={{
+                    style: {
+                        item: ({ index }) => ({
+                            opacity: index === 0 ? 0.4 : 0.9,
+                        }),
+                    },
+                }}
+            />,
+        );
+        await interact(() => userEvent.click(byTestId(split.trailingButton)));
+        await settle(300);
+        const items = [
+            ...document.querySelectorAll<HTMLElement>(
+                '[data-testid="pf-menu-item"]',
+            ),
+        ];
+        expect(items).toHaveLength(2);
+        expect(getComputedStyle(items[0]!).opacity).toBe("0.4");
+        expect(getComputedStyle(items[1]!).opacity).toBe("0.9");
+    });
+
     it("still allows an explicit full-width root", async () => {
         await render(
             <SplitButton

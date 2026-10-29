@@ -21,6 +21,8 @@ import {
     toolbarSelection,
 } from "@pureform/binding-core";
 import type {
+    MenuItem,
+    MenuScopeInstances,
     ToolbarContentProps,
     ToolbarItem,
     ToolbarPart,
@@ -46,7 +48,7 @@ import { IconButton } from "../icon-button";
 import type { IconButtonProps } from "../icon-button";
 import { Menu } from "../menu";
 import { asRoot, useComponent, useSlotProps } from "../parts";
-import type { InnerPropsOf, SlotKeyedProps } from "../parts";
+import type { InnerPropsOf, MenuScopeProps, SlotKeyedProps } from "../parts";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
 import { ProvidedTokens } from "../provided-tokens";
@@ -114,7 +116,11 @@ function Root(props: ToolbarRootProps): ReactNode {
 type Keyed = SlotKeyedProps<typeof toolbarAnatomy>;
 type ButtonDefaults = InnerPropsOf<typeof buttonAnatomy>;
 type IconButtonDefaults = InnerPropsOf<typeof iconButtonAnatomy>;
-type MenuInnerProps = InnerPropsOf<typeof menuOverlayAnatomy>;
+/** The overflow menu's own props, keyed by the menu's parts (an entry's also by entry). */
+type MenuInnerProps = MenuScopeProps<
+    typeof menuOverlayAnatomy,
+    MenuItem<ReactNode>
+>;
 
 const NO_MENU_PROPS: MenuInnerProps = {};
 
@@ -222,7 +228,11 @@ function ReadyMade(props: ToolbarProps): ReactNode {
         ...rootProps
     } = props;
     const slot = useSlotProps(props);
-    const menuSlot = useSlotProps(menuProps);
+    const menuSlot = useSlotProps<
+        typeof menuOverlayAnatomy,
+        never,
+        MenuScopeInstances<MenuItem<ReactNode>>
+    >(menuProps);
     const menuRoot = menuSlot("root");
     const root = useRef<HTMLElement>(null);
     // How many elements stay in the row; all of them, with the overflow button, until measured.
@@ -290,13 +300,16 @@ function ReadyMade(props: ToolbarProps): ReactNode {
                     />
                     <Menu.Positioner {...menuSlot("positioner")}>
                         <Menu.Content {...menuSlot("content")}>
-                            {toolbarMenuItems(items, shown).map((item) => (
-                                <Menu.ItemEntry
-                                    key={item.value}
-                                    item={item}
-                                    slot={menuSlot}
-                                />
-                            ))}
+                            {toolbarMenuItems(items, shown).map(
+                                (item, index) => (
+                                    <Menu.ItemEntry
+                                        key={item.value}
+                                        item={item}
+                                        index={index}
+                                        slot={menuSlot}
+                                    />
+                                ),
+                            )}
                         </Menu.Content>
                     </Menu.Positioner>
                 </Menu.Root>
