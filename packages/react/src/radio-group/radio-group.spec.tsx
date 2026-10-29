@@ -125,6 +125,28 @@ describe("RadioGroup, ready-made", () => {
 });
 
 describe("RadioGroup, radioProps", () => {
+    it("gives an item its own parts' class over radioProps, and no other radio's", async () => {
+        withRegistry(
+            <RadioGroup
+                aria-label="Size"
+                name="size"
+                items={[
+                    { value: "s", label: "Small" },
+                    {
+                        value: "m",
+                        label: "Medium",
+                        testId: "own",
+                        className: { root: "mine" },
+                    },
+                ]}
+                radioProps={{ testId: "r" }}
+            />,
+        );
+        await settle();
+        expect(byTestId("own-root").classList.contains("mine")).toBe(true);
+        expect(byTestId("r-root").classList.contains("mine")).toBe(false);
+    });
+
     it("gives every radio radioProps, an item's own testId winning", async () => {
         withRegistry(
             <RadioGroup

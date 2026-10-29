@@ -11,12 +11,14 @@ import {
 } from "@pureform/binding-core";
 import type {
     RadioGroupContentProps,
+    RadioGroupItem,
     RadioGroupRootOwnProps,
     RadioGroupVariantProps,
     RadioOwnProps,
 } from "@pureform/binding-core";
 import { radioGroupResetValue } from "@pureform/binding-web";
 import {
+    overDefaults,
     radioGroupMachineProps,
     radioGroupRootProps,
     radioInputProps,
@@ -275,7 +277,10 @@ export interface RadioGroupProps
     extends
         Omit<RadioGroupRootProps, keyof GroupKeyed | "children">,
         GroupKeyed,
-        RadioGroupContentProps {
+        Omit<RadioGroupContentProps, "items"> {
+    /** The radios, in order: each its data and its own `className`, `style`, `slotProps`,
+     *  `unstyled` and `tokens`, over `radioProps`. */
+    readonly items?: readonly RadioGroupEntry[] | undefined;
     /** Every radio's `className`, `style`, `slotProps`, `unstyled`, `testId` and `tokens`, keyed
      *  by the radio's parts: `{ className: { input: "…" }, tokens: { … } }`. An item's own
      *  `testId` wins. */
@@ -284,8 +289,49 @@ export interface RadioGroupProps
 
 const NO_RADIO_PROPS: InnerPropsOf<typeof radioAnatomy> = {};
 
-/** The ready-made radio group: a radio per item, each with every part in the preset's
- *  structure, named by its item's `label`. */
+/** One radio of the ready-made group: its data, and its own customizing props, over `radioProps`. */
+export type RadioGroupEntry = RadioGroupItem &
+    Omit<InnerPropsOf<typeof radioAnatomy>, "testId">;
+
+/** One radio of the ready-made group, drawn with its defaults and its own customizing props. Each
+ *  radio is its own component so its props merge before its parts read them. */
+function RadioEntry({
+    item,
+    defaults,
+}: {
+    readonly item: RadioGroupEntry;
+    readonly defaults: InnerPropsOf<typeof radioAnatomy>;
+}): ReactNode {
+    const merged = overDefaults(defaults, {
+        className: item.className,
+        style: item.style,
+        slotProps: item.slotProps,
+        unstyled: item.unstyled,
+        tokens: item.tokens,
+    } as InnerPropsOf<typeof radioAnatomy>);
+    const slot = useSlotProps(merged);
+    return (
+        <Item
+            {...slot("root")}
+            value={item.value}
+            disabled={item.disabled}
+            invalid={item.invalid}
+            testId={item.testId ?? defaults.testId}
+            tokens={merged.tokens}
+            interactionSource={item.interactionSource}
+            unstyled={merged.unstyled}
+        >
+            <ItemTouchTarget {...slot("touchTarget")} />
+            <ItemInput aria-label={item.label} {...slot("input")} />
+            <ItemRing {...slot("ring")}>
+                <ItemDot {...slot("dot")} />
+            </ItemRing>
+        </Item>
+    );
+}
+
+/** The ready-made radio group: a radio per item, each with every part in the preset's structure,
+ *  named by its item's `label`. */
 function ReadyMade(props: RadioGroupProps): ReactNode {
     const {
         className: _className,
@@ -296,27 +342,14 @@ function ReadyMade(props: RadioGroupProps): ReactNode {
         ...rootProps
     } = props;
     const group = useSlotProps(props);
-    const slot = useSlotProps(radioProps);
     return (
         <Root {...rootProps} {...(group("root") as object)}>
             {(items ?? []).map((item) => (
-                <Item
+                <RadioEntry
                     key={item.value}
-                    {...slot("root")}
-                    value={item.value}
-                    disabled={item.disabled}
-                    invalid={item.invalid}
-                    testId={item.testId ?? radioProps.testId}
-                    tokens={radioProps.tokens}
-                    interactionSource={item.interactionSource}
-                    unstyled={radioProps.unstyled}
-                >
-                    <ItemTouchTarget {...slot("touchTarget")} />
-                    <ItemInput aria-label={item.label} {...slot("input")} />
-                    <ItemRing {...slot("ring")}>
-                        <ItemDot {...slot("dot")} />
-                    </ItemRing>
-                </Item>
+                    item={item}
+                    defaults={radioProps}
+                />
             ))}
         </Root>
     );

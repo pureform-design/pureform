@@ -19,6 +19,7 @@ import type { ReactNode } from "react";
 import { View } from "react-native";
 
 import { useCheckKeys } from "../check-keys";
+import { overDefaults } from "../defaults";
 import { useSurfaceIndication } from "../indication";
 import {
     testIdOf,
@@ -164,11 +165,16 @@ export interface RadioGroupProps
         | undefined;
     readonly disabled?: boolean | undefined;
     readonly invalid?: boolean | undefined;
-    /** Radios to render, each named by its label; or give `Radio`s as children. */
-    readonly items?: readonly RadioGroupItem[] | undefined;
+    /** Radios to render, each named by its label, with its own `style`, `slotProps` and `tokens`
+     *  over `radioProps`; or give `Radio`s as children. */
+    readonly items?: readonly RadioGroupEntry[] | undefined;
     readonly "aria-label"?: string | undefined;
     readonly children?: ReactNode;
 }
+
+/** One radio of the ready-made group: its data, and its own customizing props, over `radioProps`. */
+export type RadioGroupEntry = RadioGroupItem &
+    Omit<InnerPropsOf<RadioProps>, "testId">;
 
 /** A group of radios, one of which is checked: `<RadioGroup items={sizes} defaultValue="m" />`,
  *  or with `Radio` children. */
@@ -188,10 +194,13 @@ export function RadioGroup(props: RadioGroupProps): ReactNode {
         ...(props.color === undefined ? {} : { color: props.color }),
         ...(props.density === undefined ? {} : { density: props.density }),
     });
-    // Kept while the radios' tokens hold the same values, so a memoized radio skips the render.
-    const radioTokens = useStableSelection({
+    // Kept while the radios' defaults hold the same values, so a memoized radio skips the render.
+    const radioDefaults = useStableSelection({
+        style: props.radioProps?.style,
+        slotProps: props.radioProps?.slotProps,
         tokens: props.radioProps?.tokens,
-    }).tokens;
+        testId: props.radioProps?.testId,
+    }) as InnerPropsOf<RadioProps>;
     const disabled = props.disabled ?? false;
     const invalid = props.invalid ?? false;
     // The radios render again with the group only when what they read from it changes.
@@ -218,34 +227,43 @@ export function RadioGroup(props: RadioGroupProps): ReactNode {
             testID={compositeTestIds.radioGroup.root}
         >
             <RadioGroupContext value={context}>
-                {props.items?.map((item) => (
-                    <Radio
-                        key={item.value}
-                        value={item.value}
-                        aria-label={item.label}
-                        {...(item.disabled ? { disabled: true } : {})}
-                        {...(item.invalid ? { invalid: true } : {})}
-                        {...(item.interactionSource === undefined
-                            ? {}
-                            : { interactionSource: item.interactionSource })}
-                        {...(radioTokens === undefined
-                            ? {}
-                            : { tokens: radioTokens })}
-                        {...(props.radioProps?.style === undefined
-                            ? {}
-                            : { style: props.radioProps.style })}
-                        {...(props.radioProps?.slotProps === undefined
-                            ? {}
-                            : { slotProps: props.radioProps.slotProps })}
-                        {...((item.testId ?? props.radioProps?.testId) ===
-                        undefined
-                            ? {}
-                            : {
-                                  testId:
-                                      item.testId ?? props.radioProps?.testId,
-                              })}
-                    />
-                ))}
+                {props.items?.map((item) => {
+                    const own = overDefaults(radioDefaults, {
+                        style: item.style,
+                        slotProps: item.slotProps,
+                        tokens: item.tokens,
+                    } as InnerPropsOf<RadioProps>);
+                    return (
+                        <Radio
+                            key={item.value}
+                            value={item.value}
+                            aria-label={item.label}
+                            {...(item.disabled ? { disabled: true } : {})}
+                            {...(item.invalid ? { invalid: true } : {})}
+                            {...(item.interactionSource === undefined
+                                ? {}
+                                : {
+                                      interactionSource: item.interactionSource,
+                                  })}
+                            {...(own.tokens === undefined
+                                ? {}
+                                : { tokens: own.tokens })}
+                            {...(own.style === undefined
+                                ? {}
+                                : { style: own.style })}
+                            {...(own.slotProps === undefined
+                                ? {}
+                                : { slotProps: own.slotProps })}
+                            {...((item.testId ?? radioDefaults.testId) ===
+                            undefined
+                                ? {}
+                                : {
+                                      testId:
+                                          item.testId ?? radioDefaults.testId,
+                                  })}
+                        />
+                    );
+                })}
                 {props.children}
             </RadioGroupContext>
         </View>

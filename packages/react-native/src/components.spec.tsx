@@ -383,6 +383,25 @@ describe("controlled and uncontrolled state", () => {
         expect(chip).not.toHaveBeenCalled();
     });
 
+    it("gives an item its own style over radioProps, and no other radio's", async () => {
+        await render(
+            <RadioGroup
+                radioProps={{ style: { root: { opacity: 0.9 } } }}
+                items={[
+                    {
+                        value: "s",
+                        label: "Small",
+                        testId: "s",
+                        style: { root: { opacity: 0.4 } },
+                    },
+                    { value: "m", label: "Medium", testId: "m" },
+                ]}
+            />,
+        );
+        expect(computed("s-root").opacity).toBe("0.4");
+        expect(computed("m-root").opacity).toBe("0.9");
+    });
+
     it("checks a checkbox, a switch and a radio with Space on the web, and not with Enter", async () => {
         await render(
             <View>

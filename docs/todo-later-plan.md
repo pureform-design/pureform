@@ -23,13 +23,16 @@ old B/C/D/E identifiers. Complexity estimates are relative and may change after 
 
 ### 8. Per-item customization consistency
 
-- Audit found: ChipSet and ButtonGroup items took only a `testId` before; they now take their own
-  `class`/`className`, `style`, `slotProps`, `unstyled` and `tokens` over `chipProps` or
-  `buttonProps`/`iconButtonProps`, as List's `ListEntry` does, in React, Solid and Native.
-- Still open: RadioGroup items need the same, which means each radio becomes a child that merges
-  its own customization before reading its parts (`useSlotProps` can't run per item in a loop).
-  Toolbar items and its `buttonProps`/`menuProps`, and SplitButton's `menuProps`, need the same
-  item typing plus per-item instance functions like `SelectMenuProps` (`MenuScopeInstances`).
+- Audit found: ChipSet, ButtonGroup and RadioGroup items took only a `testId` before; they now take
+  their own `class`/`className`, `style`, `slotProps`, `unstyled` and `tokens` over `chipProps`,
+  `buttonProps`/`iconButtonProps` or `radioProps`, as List's `ListEntry` does, in React, Solid and
+  Native.
+- Pattern for items drawn with per-part hooks (a radio's parts read through `useSlotProps`): each
+  item renders its own child component, which merges its customization before reading its parts.
+  Other ready-mades that hit the same limitation may copy this shape.
+- Still open: Toolbar items and its `buttonProps`/`menuProps` defaults, and SplitButton's `menuProps`,
+  need the same item typing plus per-item instance functions like `SelectMenuProps`
+  (`MenuScopeInstances`).
 - Reuse established APIs, not a new customization system; verify current gaps before expanding.
 - Compile usage tests first. Preserve provider/instance/slot precedence, internal handler merging
   and equivalent cross-binding capabilities with host-specific props.
