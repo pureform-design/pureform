@@ -19,6 +19,23 @@ const buttons = () =>
     [...byTestId(testIds.buttonGroup.root).children] as HTMLElement[];
 
 describe("ButtonGroup, ready-made", () => {
+    it("gives an item its own parts' class over the group's buttonProps, and no other button's", async () => {
+        withRegistry(() => (
+            <ButtonGroup
+                buttonProps={{ class: { label: "every" } }}
+                items={[
+                    { label: "Day", class: { root: "own" } },
+                    { label: "Week" },
+                ]}
+            />
+        ));
+        await settle();
+        expect(buttons()[0]!.classList.contains("own")).toBe(true);
+        expect(buttons()[0]!.querySelector(".every")).not.toBeNull();
+        expect(buttons()[1]!.classList.contains("own")).toBe(false);
+        expect(buttons()[1]!.querySelector(".every")).not.toBeNull();
+    });
+
     it("renders a group of buttons in its size, each single in a standard group", async () => {
         withRegistry(() => (
             <ButtonGroup

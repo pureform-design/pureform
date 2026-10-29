@@ -12,6 +12,7 @@ import {
 } from "@pureform/binding-core";
 import type {
     ButtonGroupContentProps,
+    ButtonGroupItem,
     ButtonGroupPart,
     ButtonGroupRootOwnProps,
 } from "@pureform/binding-core";
@@ -19,6 +20,7 @@ import type { ReactNode } from "react";
 
 import { Button } from "../button/button";
 import type { ButtonProps } from "../button/button";
+import { overDefaults } from "../defaults";
 import { IconButton } from "../icon-button/icon-button";
 import type { IconButtonProps } from "../icon-button/icon-button";
 import { testIdOf, useControllable, withEngine } from "../parts";
@@ -34,14 +36,22 @@ export interface ButtonGroupHosts {
 export interface ButtonGroupProps
     extends
         Omit<ButtonGroupRootOwnProps, "unstyled">,
-        ButtonGroupContentProps<ReactNode>,
+        Omit<ButtonGroupContentProps<ReactNode>, "items">,
         NativeSlotProps<ButtonGroupHosts> {
     readonly "aria-label"?: string | undefined;
+    /** The buttons, in order: each its data and its own `style`, `slotProps` and `tokens`, over
+     *  the defaults for its kind. */
+    readonly items?: readonly ButtonGroupEntry[] | undefined;
     /** Every labelled button's `style`, `slotProps`, `tokens` and `testId`; an item's own `testId` wins. */
     readonly buttonProps?: InnerPropsOf<ButtonProps> | undefined;
     /** The same for every icon-only button. */
     readonly iconButtonProps?: InnerPropsOf<IconButtonProps> | undefined;
 }
+
+/** One button of the ready-made group: its data, and its own customizing props, over the defaults
+ *  for its kind (`buttonProps` with a label, `iconButtonProps` without one). */
+export type ButtonGroupEntry = ButtonGroupItem<ReactNode> &
+    Omit<InnerPropsOf<ButtonProps> & InnerPropsOf<IconButtonProps>, "testId">;
 
 function ButtonGroupImpl(props: ButtonGroupProps): ReactNode {
     const { styles: s, views: v } = useComponentSlots<ButtonGroupPart>(
@@ -95,7 +105,11 @@ function ButtonGroupImpl(props: ButtonGroupProps): ReactNode {
                 return item.label === undefined ? (
                     <IconButton
                         key={key}
-                        {...(props.iconButtonProps as object)}
+                        {...(overDefaults(props.iconButtonProps, {
+                            style: item.style,
+                            slotProps: item.slotProps,
+                            tokens: item.tokens,
+                        } as InnerPropsOf<IconButtonProps>) as object)}
                         {...(variants as Partial<IconButtonProps>)}
                         variant={
                             (variants.variant === "text"
@@ -115,7 +129,11 @@ function ButtonGroupImpl(props: ButtonGroupProps): ReactNode {
                 ) : (
                     <Button
                         key={key}
-                        {...(props.buttonProps as object)}
+                        {...(overDefaults(props.buttonProps, {
+                            style: item.style,
+                            slotProps: item.slotProps,
+                            tokens: item.tokens,
+                        } as InnerPropsOf<ButtonProps>) as object)}
                         {...(variants as Partial<ButtonProps>)}
                         label={item.label}
                         icon={item.icon}

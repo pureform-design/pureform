@@ -28,6 +28,24 @@ const render = (view: ReactNode) =>
     );
 
 describe("ButtonGroup", () => {
+    it("gives an item its own style over the group's buttonProps, and no other button's", async () => {
+        await render(
+            <ButtonGroup
+                buttonProps={{ style: { root: { opacity: 0.9 } } }}
+                items={[
+                    {
+                        label: "Day",
+                        testId: "day",
+                        style: { root: { opacity: 0.4 } },
+                    },
+                    { label: "Week", testId: "week" },
+                ]}
+            />,
+        );
+        expect(computed("day-root").opacity).toBe("0.4");
+        expect(computed("week-root").opacity).toBe("0.9");
+    });
+
     it("squares a connected group's inner corners, and keeps the outer ones round", async () => {
         await render(
             <ButtonGroup

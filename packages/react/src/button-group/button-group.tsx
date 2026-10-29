@@ -19,6 +19,7 @@ import type {
 import {
     buttonGroupMachineProps,
     buttonGroupRootProps,
+    overDefaults,
     toggleGroupItemProps,
 } from "@pureform/binding-web";
 import * as buttonGroup from "@pureform/machines/button-group";
@@ -162,7 +163,10 @@ export interface ButtonGroupProps
     extends
         Omit<ButtonGroupRootProps, keyof Keyed | "children">,
         Keyed,
-        ButtonGroupContentProps<ReactNode> {
+        Omit<ButtonGroupContentProps<ReactNode>, "items"> {
+    /** The buttons, in order: each its data and its own `className`, `style`, `slotProps`,
+     *  `unstyled` and `tokens`, over the defaults for its kind. */
+    readonly items?: readonly ButtonGroupEntry[] | undefined;
     /** Every labelled button's `className`, `style`, `slotProps`, `unstyled`, `testId` and
      *  `tokens`, keyed by the button's parts. An item's own `testId` wins. */
     readonly buttonProps?: InnerPropsOf<typeof buttonAnatomy> | undefined;
@@ -171,6 +175,15 @@ export interface ButtonGroupProps
         | InnerPropsOf<typeof iconButtonAnatomy>
         | undefined;
 }
+
+/** One button of the ready-made group: its data, and its own customizing props, over the defaults
+ *  for its kind (`buttonProps` with a label, `iconButtonProps` without one). */
+export type ButtonGroupEntry = ButtonGroupItem<ReactNode> &
+    Omit<
+        InnerPropsOf<typeof buttonAnatomy> &
+            InnerPropsOf<typeof iconButtonAnatomy>,
+        "testId"
+    >;
 
 /** The ready-made group: a button per item with a label, an icon button per icon-only item, each
  *  placed by its index. */
@@ -185,7 +198,7 @@ function ReadyMade(props: ButtonGroupProps): ReactNode {
         ...rootProps
     } = props;
     const slot = useSlotProps(props);
-    const one = (item: ButtonGroupItem<ReactNode>, index: number) => ({
+    const one = (item: ButtonGroupEntry, index: number) => ({
         value: item.value ?? (props.selectable ? String(index) : undefined),
         position: buttonGroupPosition(index, items.length, props.connected),
         disabled: item.disabled,
@@ -193,13 +206,23 @@ function ReadyMade(props: ButtonGroupProps): ReactNode {
         "aria-label": item["aria-label"],
         interactionSource: item.interactionSource,
     });
+    const own = (item: ButtonGroupEntry) => ({
+        className: item.className,
+        style: item.style,
+        slotProps: item.slotProps,
+        unstyled: item.unstyled,
+        tokens: item.tokens,
+    });
     return (
         <Root {...rootProps} {...(slot("root") as object)}>
             {items.map((item, index) =>
                 item.label === undefined ? (
                     <GroupIconButton
                         key={item.value ?? index}
-                        {...(iconButtonProps as object)}
+                        {...(overDefaults(
+                            iconButtonProps,
+                            own(item) as InnerPropsOf<typeof iconButtonAnatomy>,
+                        ) as object)}
                         {...(one(item, index) as object)}
                         testId={item.testId ?? iconButtonProps?.testId}
                         icon={item.icon}
@@ -208,7 +231,10 @@ function ReadyMade(props: ButtonGroupProps): ReactNode {
                 ) : (
                     <GroupButton
                         key={item.value ?? index}
-                        {...(buttonProps as object)}
+                        {...(overDefaults(
+                            buttonProps,
+                            own(item) as InnerPropsOf<typeof buttonAnatomy>,
+                        ) as object)}
                         {...(one(item, index) as object)}
                         testId={item.testId ?? buttonProps?.testId}
                         label={item.label}

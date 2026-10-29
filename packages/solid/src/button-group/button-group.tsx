@@ -20,6 +20,7 @@ import type {
 import {
     buttonGroupMachineProps,
     buttonGroupRootProps,
+    overDefaults,
     toggleGroupItemProps,
 } from "@pureform/binding-web";
 import * as buttonGroup from "@pureform/machines/button-group";
@@ -199,7 +200,10 @@ export interface ButtonGroupProps
     extends
         Omit<ButtonGroupRootProps, keyof Keyed | "children">,
         Keyed,
-        ButtonGroupContentProps<JSX.Element> {
+        Omit<ButtonGroupContentProps<JSX.Element>, "items"> {
+    /** The buttons, in order: each its data and its own `class`, `style`, `slotProps`,
+     *  `unstyled` and `tokens`, over the defaults for its kind. */
+    readonly items?: readonly ButtonGroupEntry[] | undefined;
     /** Every labelled button's `class`, `style`, `slotProps`, `unstyled`, `testId` and
      *  `tokens`, keyed by the button's parts. An item's own `testId` wins. */
     readonly buttonProps?: InnerPropsOf<typeof buttonAnatomy> | undefined;
@@ -208,6 +212,15 @@ export interface ButtonGroupProps
         | InnerPropsOf<typeof iconButtonAnatomy>
         | undefined;
 }
+
+/** One button of the ready-made group: its data, and its own customizing props, over the defaults
+ *  for its kind (`buttonProps` with a label, `iconButtonProps` without one). */
+export type ButtonGroupEntry = ButtonGroupItem<JSX.Element> &
+    Omit<
+        InnerPropsOf<typeof buttonAnatomy> &
+            InnerPropsOf<typeof iconButtonAnatomy>,
+        "testId"
+    >;
 
 const READY_MADE_PROPS = [
     "class",
@@ -232,7 +245,7 @@ function ReadyMade(props: ButtonGroupProps): JSX.Element {
     const position = (index: number) =>
         buttonGroupPosition(index, entries().length, props.connected);
     const one = (
-        item: ButtonGroupItem<JSX.Element>,
+        item: ButtonGroupEntry,
         index: number,
         defaults: { readonly testId?: unknown } | undefined,
     ) => ({
@@ -244,6 +257,13 @@ function ReadyMade(props: ButtonGroupProps): JSX.Element {
         "aria-label": item["aria-label"],
         interactionSource: item.interactionSource,
     });
+    const customOf = (item: ButtonGroupEntry) => ({
+        class: item.class,
+        style: item.style,
+        slotProps: item.slotProps,
+        unstyled: item.unstyled,
+        tokens: item.tokens,
+    });
     const root = createSlotProps(props)("root");
     const own = omit(props, ...READY_MADE_PROPS) as ButtonGroupRootProps;
     return (
@@ -254,7 +274,12 @@ function ReadyMade(props: ButtonGroupProps): JSX.Element {
                         when={entry().item.label !== undefined}
                         fallback={
                             <GroupIconButton
-                                {...(props.iconButtonProps as object)}
+                                {...(overDefaults(
+                                    props.iconButtonProps,
+                                    customOf(entry().item) as InnerPropsOf<
+                                        typeof iconButtonAnatomy
+                                    >,
+                                ) as object)}
                                 {...(one(
                                     entry().item,
                                     index(),
@@ -266,7 +291,12 @@ function ReadyMade(props: ButtonGroupProps): JSX.Element {
                         }
                     >
                         <GroupButton
-                            {...(props.buttonProps as object)}
+                            {...(overDefaults(
+                                props.buttonProps,
+                                customOf(entry().item) as InnerPropsOf<
+                                    typeof buttonAnatomy
+                                >,
+                            ) as object)}
                             {...(one(
                                 entry().item,
                                 index(),
