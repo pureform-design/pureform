@@ -19,16 +19,6 @@ old B/C/D/E identifiers. Complexity estimates are relative and may change after 
 
 ## A. Verification and documentation — easiest
 
-### 1. BottomSheet expansion callback verification
-
-- Historical report: reopening an uncontrolled sheet at another rest fires `onExpandedChange`.
-- Agreed contract: report user-driven expansion changes (drags/handle presses), not initialization,
-  reopening, controlled-prop synchronization or closing. Open and expanded are separate states.
-- Current React/Solid/Native source already suppresses non-user changes. Add an explicit reopen
-  regression before retiring the report; no speculative behavior change.
-- Guard user-driven reporting and controlled behavior. Native sheets already travel by measured
-  size and hold for async `onClose`; do not regress those behaviors.
-
 ### 2. NativeSelect typing verification and fallback ripple documentation
 
 - The historical cross-binding value-type discrepancy appears stale: all bindings use shared
@@ -231,6 +221,11 @@ Record device/OS/engine/AT results and recordings; unavailable environments rema
 
 ## Retained decisions and out-of-scope tooling
 
+- **1 completed (2026-10-29): BottomSheet callback verification.** Reopen regressions pass in
+  React, Solid and Native Web: expanding, closing and reopening at partial rest reports only the
+  user's expansion. Controlled-prop synchronization remains silent; existing drag and async-close
+  coverage passes. Historical report retired without implementation changes. This verifies callback
+  semantics in browser tests, not device motion. Remaining queue identifiers stay stable.
 - Keep swipeable-row focus attached to the moving row, with its intentional inset ring.
 - Keep FadeThrough timings theme-controlled (14).
 - Keep `build` separate from `check:types` and retain `tsconfig.project.json` naming. Build,

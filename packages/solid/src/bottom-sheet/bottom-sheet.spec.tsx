@@ -152,6 +152,42 @@ describe("BottomSheet, ready-made", () => {
         expect(onOpenChange).toHaveBeenLastCalledWith({ open: false });
     });
 
+    it("reopens partly open without reporting an expansion change", async () => {
+        const onExpandedChange =
+            vi.fn<(details: ChangeDetails<"expanded", boolean>) => void>();
+        withRegistry(() => (
+            <BottomSheet
+                trigger="Share"
+                aria-label="Share"
+                body={<div style={{ height: "200vh" }}>Options</div>}
+                onExpandedChange={onExpandedChange}
+            />
+        ));
+        await frames();
+        for (let opening = 0; opening < 2; opening++) {
+            await userEvent.click(byTestId(ids.trigger));
+            await frames();
+            const handle = byTestId(ids.dragHandle);
+            await until(() =>
+                expect(handle.getAttribute("aria-label")).toBe("Expand sheet"),
+            );
+            expect(byTestId(ids.content).style.translate).not.toBe("");
+            expect(onExpandedChange).toHaveBeenCalledTimes(opening);
+            await userEvent.click(handle);
+            await frames();
+            expect(byTestId(ids.content).style.translate).toBe("");
+            expect(onExpandedChange).toHaveBeenLastCalledWith({
+                expanded: true,
+            });
+            expect(onExpandedChange).toHaveBeenCalledTimes(opening + 1);
+            await userEvent.keyboard("{Escape}");
+            await until(() =>
+                expect(byTestId(ids.positioner).hidden).toBe(true),
+            );
+            expect(onExpandedChange).toHaveBeenCalledTimes(opening + 1);
+        }
+    });
+
     it("follows a controlled expanded, and scrolls its body by keyboard", async () => {
         const onExpandedChange =
             vi.fn<(details: ChangeDetails<"expanded", boolean>) => void>();
@@ -192,6 +228,7 @@ describe("BottomSheet, ready-made", () => {
         setExpanded(false);
         await frames();
         expect(content.style.translate).not.toBe("");
+        expect(onExpandedChange).toHaveBeenCalledTimes(1);
     });
 
     it("opens fully with partiallyExpandable off, and keeps a short body out of the tab order", async () => {

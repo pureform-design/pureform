@@ -1564,6 +1564,53 @@ describe("the sheets", () => {
         expect(expanded).toEqual([true, false, true]);
     });
 
+    it("reopens a bottom sheet partly open without reporting an expansion change", async () => {
+        const expanded: boolean[] = [];
+        const open = outside(true);
+        const tall = window.innerHeight;
+        await render(
+            <open.Holder>
+                {(shown) => (
+                    <View style={{ height: tall }}>
+                        <BottomSheet
+                            modal={false}
+                            open={shown}
+                            onExpandedChange={(details) =>
+                                expanded.push(details.expanded)
+                            }
+                        >
+                            <View style={{ height: tall }} />
+                        </BottomSheet>
+                    </View>
+                )}
+            </open.Holder>,
+        );
+        for (let opening = 0; opening < 2; opening++) {
+            if (opening > 0) await open.set(true);
+            await until(() => sheet("bottom-sheet") !== null);
+            const root = sheet("bottom-sheet")!;
+            const frame = root.parentElement!.parentElement!;
+            await laidOut(root);
+            const offset = () => box(root).top - box(frame).top;
+            const partial = box(root).height - tall / 2;
+            await until(() => Math.abs(offset() - partial) < 2);
+            expect(Math.abs(offset() - partial)).toBeLessThan(2);
+            expect(expanded).toEqual(
+                Array.from({ length: opening }, () => true),
+            );
+            await press("Expand sheet");
+            await until(() => Math.abs(offset()) < 1);
+            expect(Math.abs(offset())).toBeLessThan(1);
+            expect(expanded).toEqual(
+                Array.from({ length: opening + 1 }, () => true),
+            );
+            await open.set(false);
+            await until(() => sheet("bottom-sheet") === null);
+            expect(sheet("bottom-sheet")).toBeNull();
+            expect(expanded).toHaveLength(opening + 1);
+        }
+    });
+
     it("opens a tall bottom sheet fully given partiallyExpandable={false} or defaultExpanded", async () => {
         const tall = window.innerHeight;
         for (const props of [

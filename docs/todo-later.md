@@ -6,8 +6,6 @@ criteria. These are not all confirmed bugs: reproduction and external verificati
 
 ## A. Verification and documentation — easiest
 
-1. **BottomSheet callbacks:** verify reopening with a regression, then retire the historical report.
-   Current source already suppresses non-user changes; `onExpandedChange` is interaction-driven.
 2. **NativeSelect typing/ripple:** verify shared mode-discriminated typing across bindings and retire
    the stale discrepancy report. Retain fallback ripple customization with renderer-specific docs;
    OS-menu claims require device evidence.
@@ -83,6 +81,9 @@ criteria. These are not all confirmed bugs: reproduction and external verificati
 
 ## Retained decisions / separate work
 
+- **1 completed:** BottomSheet reopen regressions pass in React, Solid and Native Web; only user
+  expansion reports a change. Historical report retired without implementation changes. Queue IDs
+  stay stable; device motion is not claimed verified.
 - Swipeable-row inset focus attached to the moving row is intentional; report retired.
 - FadeThrough remains theme-controlled; exact Compose timings are not required.
 - Retain separate `build`/`check:types` and `tsconfig.project.json`. Build/type-check/CI work is
