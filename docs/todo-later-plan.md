@@ -17,17 +17,6 @@ old B/C/D/E identifiers. Complexity estimates are relative and may change after 
   must not block unrelated work. Reproduction-gated items can move later in the queue.
 - Commit related changes in batches and push after validation.
 
-## A. Verification and documentation — easiest
-
-### 2. NativeSelect typing verification and fallback ripple documentation
-
-- The historical cross-binding value-type discrepancy appears stale: all bindings use shared
-  `NativeSelectValueProps`, discriminated by `multiple`.
-- Verify single string/multiple readonly string-array values, defaults and matching callbacks with
-  cross-binding usage/type tests, including rejected mismatches, then retire the stale report.
-- Retain Material Menu fallback ripple customization; document its renderer-specific scope.
-  Do not imply it customizes OS-owned menus. Native-menu claims remain gated on V3 device tests.
-
 ## B. Bounded component work — low to moderate complexity
 
 ### 3. Chip/InputChip radius precedence
@@ -221,6 +210,11 @@ Record device/OS/engine/AT results and recordings; unavailable environments rema
 
 ## Retained decisions and out-of-scope tooling
 
+- **2 completed (2026-10-29): NativeSelect typing/ripple.** Cross-binding compile-time tests verify
+  mode-dependent values, defaults and inferred callbacks, including rejected mismatches and web
+  composed Root props. Shared discriminated typing was already correct; historical discrepancy
+  retired. NativeSelect API documentation scopes indication/ripple customization to the Material
+  fallback, not HTML/OS menus. Native-menu device verification remains V3.
 - **1 completed (2026-10-29): BottomSheet callback verification.** Reopen regressions pass in
   React, Solid and Native Web: expanding, closing and reopening at partial rest reports only the
   user's expansion. Controlled-prop synchronization remains silent; existing drag and async-close

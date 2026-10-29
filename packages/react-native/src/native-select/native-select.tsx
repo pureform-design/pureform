@@ -453,7 +453,12 @@ function NativeSelectImpl(props: NativeSelectProps): ReactNode {
     );
 }
 
-/** A styled native select: `<NativeSelect aria-label="Size" items={sizes} defaultValue="m" />`. */
+/** A styled native select: `<NativeSelect aria-label="Size" items={sizes} defaultValue="m" />`.
+ * On web this renders an HTML select; on devices it uses the optional native-menu renderer,
+ * falling back to the Material Menu when that renderer is unavailable. `indication` (including
+ * Material ripple customization) applies to the fallback trigger, not HTML or OS-owned menus.
+ * Customize fallback menu-item indications through the existing Menu defaults in the provider.
+ * Native-menu multiple-selection behavior still requires device verification. */
 export const NativeSelect: ComponentType<NativeSelectProps> = withEngine(
     NativeSelectImpl,
     "NativeSelect",

@@ -4,12 +4,6 @@ Reviewed and decisions agreed 2026-10-29. Ordered from easiest to hardest, with 
 as [the implementation plan](todo-later-plan.md), which contains the full contracts and acceptance
 criteria. These are not all confirmed bugs: reproduction and external verification remain explicit.
 
-## A. Verification and documentation — easiest
-
-2. **NativeSelect typing/ripple:** verify shared mode-discriminated typing across bindings and retire
-   the stale discrepancy report. Retain fallback ripple customization with renderer-specific docs;
-   OS-menu claims require device evidence.
-
 ## B. Bounded component work — low to moderate complexity
 
 3. **Chip/InputChip radius:** instance > explicit theme > derived pill radius. Density does not
@@ -81,6 +75,8 @@ criteria. These are not all confirmed bugs: reproduction and external verificati
 
 ## Retained decisions / separate work
 
+- **2 completed:** NativeSelect mode-dependent values/defaults/callbacks verified across bindings;
+  stale discrepancy retired. Fallback indication/ripple scope documented; device checks remain V3.
 - **1 completed:** BottomSheet reopen regressions pass in React, Solid and Native Web; only user
   expansion reports a change. Historical report retired without implementation changes. Queue IDs
   stay stable; device motion is not claimed verified.
