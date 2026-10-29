@@ -1,93 +1,89 @@
-# Parked for later
+# Follow-up backlog
 
-Relevance review: 2026-10-29, after the platform-boundary refactor and follow-up regressions. See
-[the follow-up plan](todo-later-plan.md) for priorities
-and verification gates. Items below are not all reproduced bugs: device checks, design
-questions, and older reports awaiting reproduction remain explicitly deferred.
+Reviewed and decisions agreed 2026-10-29. Ordered from easiest to hardest, with the same identifiers
+as [the implementation plan](todo-later-plan.md), which contains the full contracts and acceptance
+criteria. These are not all confirmed bugs: reproduction and external verification remain explicit.
 
-- **Hover flicker** (Solid, React): the highlight flickers when hovering items in the Menu Default
-  story (open with its button) and, intermittently, navigation bar items. Seen in a desktop
-  browser; not reproduced headless (fix-storybook-6a swept 1px at a time). Needs a screen
-  recording, the browser and the pointing device. Suspect: React's menu highlight trails the CSS
-  hover by ~50 ms; the first item counts as hovered for one frame on open.
-- **Device checks** (only tested on React Native Web so far):
-    - NativeSelect's iOS and Android menu;
-    - the SVG engine's device paths (native-driver ripples, morphs written to native paths);
-    - React Native toast swipe;
-    - container measuring for Menu `submenu="auto"` (`measureInWindow`);
-    - TouchTarget on Android (`useTouchTargetSlop`).
+## A. Verification and documentation — easiest
 
-## Follow-ups from the component roadmap's batch notes
+1. **BottomSheet callbacks:** verify reopening with a regression, then retire the historical report.
+   Current source already suppresses non-user changes; `onExpandedChange` is interaction-driven.
+2. **NativeSelect typing/ripple:** verify shared mode-discriminated typing across bindings and retire
+   the stale discrepancy report. Retain fallback ripple customization with renderer-specific docs;
+   OS-menu claims require device evidence.
 
-Still open when the batch notes (`docs/roadmap-components/context/` and the first roadmap's
-`docs/roadmap/context/`, now only in git history) were pruned. Open questions already listed in
-[next.md §3](roadmap-components/next.md#3-open-questions-from-the-contexts) aren't repeated.
+## B. Bounded component work — low to moderate complexity
 
-### Accessibility
+3. **Chip/InputChip radius:** instance > explicit theme > derived pill radius. Density does not
+   alter an explicit radius; uncustomized chips stay pill-shaped.
+4. **DockedDatePicker actions/trigger:** optional user-supplied actions, no empty wrapper/default
+   OK/Cancel or selection changes; reuse trigger slot conventions and preserve internal behavior.
+5. **Native cascading submenu exit:** outside-click dismissal reportedly waits for the parent exit,
+   then removes the submenu instantly. Reproduce and animate its exit; selection dismissal and
+   web targets already work. Separate from drill.
+6. **Native wavy radial progress:** user reports no waviness at all. Reproduce rendered geometry;
+   validate both engines, progress modes, reduced motion and actual device paths.
+7. **FAB-menu SSR item count:** replace the guessed eight steps with data-derived ready-made counts,
+   optional explicit composed counts and stable non-staggered SSR/first-hydration fallback until
+   registration. Dynamic item changes must not restart the whole animation.
 
-- Snackbar announcements and click-only ("virtual") activation are covered by DOM and API spies
-  only: the persistent live region, the single iOS `announceForAccessibility` call per message,
-  and one virtual press/release per click. Actual speech and assistive-technology click delivery
-  still need VoiceOver, TalkBack, NVDA or JAWS; DOM tests can't show them.
+## C. Shared APIs and motion — moderate to high complexity
 
-### Menus
+8. **Per-item customization:** audit ButtonGroup/ChipSet/Toolbar/RadioGroup and SplitButton/Toolbar
+   menu functions. Reuse established List/InnerPropsOf and instance-function conventions, including
+   merge precedence, internal handlers, host typing and Solid post-mount reactivity.
+9. **Native provider slotProps:** closely follow web provider APIs and merge behavior, with Native
+   host typing and tests for provider/instance precedence, handlers, styles and accessibility.
+10. **FAB-menu motion:** Compose-style nearest-first stagger, aligned-edge width expansion at fixed
+    height and opacity; reverse visibility sequence on close. Not center scaling or spatial travel
+    from the FAB. Retain theme roles, RTL and reduced motion.
+11. **Nested motion providers:** nearest provider wins at any depth; system follows OS, full
+    overrides OS reduction, reduce requests reduction. Motion-safe uses the same effective setting
+    across adapters, including SSR/hydration.
+12. **Linear wavy progress:** reproduce wave movement/gaps, then match Compose track-relative motion
+    at one wavelength per second by default and gaps around the active indicator. Preserve theme
+    overrides; test both modes, RTL, reduced motion and Native visible track segments.
+13. **Native drill animation:** reproduce on devices; animate measured width/height, translate
+    labels and fade nonparticipating rows. Reverse back navigation, mirror RTL and use theme
+    springs/reduced motion with both engines.
 
-- Menu `submenu="auto"`: recheck resizing, scrolling and changing content while open,
-  and separately verify Native measuring before adding live observers.
-- React Native drill: height animates but width jumps; the whole row moves rather than its
-  label; other rows don't fade.
-- Hover flicker (above): a suggested fix is drawing pointer hover only from `:hover` and the
-  keyboard highlight as focus; it changes menus on every web binding.
+## D. Lifecycle and architecture — hardest
 
-### Motion and progress
+14. **Interrupted page transitions:** reproduce and preserve in-flight visual progress/outgoing
+    identity. Reuse returning pages where practical; latest navigation wins without queuing.
+    Keep theme-controlled timing, not exact Compose constants.
+15. **Live auto-submenu adaptation:** adapt cascade/drill both ways on layout changes across all
+    platforms, preserving active submenu/focus with a small stability margin against oscillation.
+    Explicit modes remain explicit; verify Native measurement on devices.
+16. **Select multiple mode:** mode of Select with strict scalar/array values/defaults/callbacks
+    discriminated by `multiple`. Toggle without closing, selection checkmarks, keyboard toggling,
+    repeated form fields and customizable summary; design cross-binding accessibility together.
+17. **Asset pruning:** measure output, then conservatively prune unused keyframes/shape paths.
+    Keep runtime theme/variant and unknown references; test theme changes. Token/theme/@property
+    pruning is separate.
 
-- Page transitions: recheck visual continuity when an entering page becomes a leaving one.
-- Fade through uses theme roles (`short2`/`short4`, `spatialDefault`) rather than Compose's
-  90/210 ms and default spring.
-- FAB menu: items scale from their own centre, not from the FAB (no `transform-origin` in
-  preset `fab-menu.ts`); a composed `FabMenu.Root` counts items after mount, so server
-  rendering falls back to eight steps until hydration.
-- Linear wavy progress: the wave rides with the sliding bar; Compose moves it along the track
-  at one wavelength per second. Indeterminate wavy runs a flat track under the whole bar
-  without Compose's gaps; on React Native the linear indeterminate track has no gap window
-  (needs two views).
-- SVG device validation: verify actual path updates on devices.
-- Reduced motion nested three deep (`reduce` in `full` in `reduce`) doesn't resolve: the
-  innermost `reduce` loses (`css-lowering/src/motion.ts` selectors go two levels).
-- Panda's `_motionSafe` and Tailwind's `motion-safe` follow only the system setting, not the
-  provider's motion.
+## Deferred designs
 
-### Components
+- **F1. NativeSelect option customization:** API design deferred, not customization. The wrapper
+  must expose renderer-supported customization, with distinct web/fallback/OS-owned contracts.
+- **F2. Token/theme/@property pruning:** separate design after keyframe/shape output measurements.
 
-- Swipeable list row: its focus ring draws inside (the frame clips it).
-- Slider: the icon button's focus ring inside it was reported clipped to 1px; obtain the
-  nested-icon-button scene before changing clipping. Handle-clearance theming and the styled
-  inset-icon reader are already covered by `slider-inset-icon.e2e.test.ts`.
-- Bottom sheet: `onExpandedChange` also fires when an uncontrolled sheet reopens at another
-  rest; undecided whether only drags and presses should fire it.
-- Splitter: the machines wrapper patches Zag internals (`resizeObserver` measure): recheck on Zag
-  upgrades. Zag's long press is 700 ms; set 500 ms if Zag exposes it.
-- Chip: the pill radius is a root token now, so a theme's `components.chip.radius` no longer
-  reaches the round corner.
-- Docked date picker: the `actions` part is defined but never rendered by the React and Solid
-  ready-mades.
-- NativeSelect: value typing differs (React/React Native a union, Solid a discriminated type);
-  `@react-native-menu/menu` paths (`multiple`, `keepsMenuPresented`) need a device check before
-  the peer is advertised; `ripple` stays in its usage for the Material Menu fallback.
-- Select: no `multiple` (`Select<string[]>`) though component-architecture §9.4 describes it.
+## External verification and maintenance
 
-### Slot props
+- **V1. Slider clipping:** obtain the nested-icon-button reproduction; existing handle-clearance
+  and styled inset-icon tests pass.
+- **V2. Hover flicker:** needs recording, browser/OS and pointing-device details. Preserve keyboard
+  highlighting and first-frame behavior; not reproduced headless.
+- **V3. Native devices:** NativeSelect menus, SVG/ripple/morph/Reanimated paths, toast swipe,
+  submenu measurement and Android touch slop; test iOS/Android and both engines where relevant.
+- **V4. Screen readers:** verify Snackbar speech and virtual-click delivery on real AT, not DOM/API
+  spies alone.
+- **V5. Zag upgrades:** recheck Splitter internal patches and upstream long-press options; no
+  speculative fork of timing behavior.
 
-- Per-item keys: ButtonGroup, ChipSet, Toolbar and RadioGroup items take only `testId`;
-  per-item `className`/`tokens` need `InnerPropsOf` on their item types, as List has.
-- SplitButton/Toolbar `menuProps` have no per-item functions.
-- React Native: NativeSelect has no option parts (its web options and the OS-owned menus need
-  different contracts). No provider-level `slotProps` on React Native (undecided whether it
-  should have them).
+## Retained decisions / separate work
 
-### Tooling
-
-- Open choices: run the node type checks in `build` (now in `check:types`); rename
-  `tsconfig.project.json`.
-- Bundler pruning keeps every token, theme, `@property`, keyframes and shape, most of the CSS
-  left; dropping keyframes and shape paths no kept rule reads is the next step.
+- Swipeable-row inset focus attached to the moving row is intentional; report retired.
+- FadeThrough remains theme-controlled; exact Compose timings are not required.
+- Retain separate `build`/`check:types` and `tsconfig.project.json`. Build/type-check/CI work is
+  handled separately, with no CI/release gating changes authorized here.
