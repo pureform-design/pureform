@@ -11,7 +11,14 @@ import { IconButton } from "../icon-button";
 import { colorText } from "../styles";
 import { presetRegistry } from "../testing/registry";
 import type { TestRegistry } from "../testing/registry";
-import { byTestId, interact, mount, settle, until } from "../testing/render";
+import {
+    byTestId,
+    computed,
+    interact,
+    mount,
+    settle,
+    until,
+} from "../testing/render";
 
 let registry: TestRegistry;
 
@@ -51,6 +58,26 @@ const shown = () =>
     }).map((item) => item.value);
 
 describe("Toolbar", () => {
+    it("gives an element its own style over buttonProps, and no other element's", async () => {
+        await render(
+            <Toolbar
+                aria-label="Edit"
+                buttonProps={{ style: { root: { opacity: 0.9 } } }}
+                items={[
+                    {
+                        value: "bold",
+                        label: "Bold",
+                        testId: "bold",
+                        style: { root: { opacity: 0.4 } },
+                    },
+                    { value: "italic", label: "Italic", testId: "italic" },
+                ]}
+            />,
+        );
+        expect(computed("bold-root").opacity).toBe("0.4");
+        expect(computed("italic-root").opacity).toBe("0.9");
+    });
+
     it("hugs its elements when floating, as the web's inline-flex bar, and fills its edge when docked", async () => {
         await render(<Toolbar aria-label="Edit" items={ITEMS.slice(0, 3)} />);
         const floating = box(byTestId(testIds.toolbar.root)).width;

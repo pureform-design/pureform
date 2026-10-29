@@ -111,6 +111,11 @@ type Keyed = Pick<
 type ButtonDefaults = InnerPropsOf<typeof buttonAnatomy>;
 type IconButtonDefaults = InnerPropsOf<typeof iconButtonAnatomy>;
 
+/** One element of the ready-made toolbar, as data, with its own customizing props over the defaults
+ *  for its kind (`iconButtonProps` with an icon, `buttonProps` without). */
+export type ToolbarEntry = ToolbarItem<JSX.Element> &
+    Omit<ButtonDefaults & IconButtonDefaults, "testId">;
+
 /** The ready-made toolbar's props: Root's, with `class`, `style` and `slotProps` keyed by the
  *  toolbar's own part (`root`), the elements as data, and the defaults of the buttons it draws:
  *  `iconButtonProps` for elements with an icon, `buttonProps` for text ones. */
@@ -118,7 +123,10 @@ export interface ToolbarProps
     extends
         Omit<ToolbarRootProps, keyof Keyed | "children">,
         Keyed,
-        ToolbarContentProps<JSX.Element> {
+        Omit<ToolbarContentProps<JSX.Element>, "items"> {
+    /** The elements, in order: each its data and its own `class`, `style`, `slotProps`,
+     *  `unstyled` and `tokens`, over the defaults for its kind. */
+    readonly items?: readonly ToolbarEntry[] | undefined;
     /** Every text button's `class`, `style`, `slotProps`, `unstyled`, `testId` and `tokens`,
      *  keyed by the button's parts. An element's own `testId` wins. */
     readonly buttonProps?: ButtonDefaults | undefined;
@@ -146,7 +154,7 @@ const OVERFLOW = "data-pf-toolbar-overflow";
 
 // One element in the row: an icon button named by its label, or a text button.
 function Element(props: {
-    readonly item: ToolbarItem<JSX.Element>;
+    readonly item: ToolbarEntry;
     readonly hidden: boolean;
     readonly buttonProps: ButtonDefaults | undefined;
     readonly iconButtonProps: IconButtonDefaults | undefined;
@@ -157,8 +165,21 @@ function Element(props: {
         onClick: props.item.onClick,
         testId: props.item.testId,
         interactionSource: props.item.interactionSource,
-        // The ready-made buttons take their style by part.
-        style: props.hidden ? { root: HIDDEN } : undefined,
+        class: props.item.class,
+        slotProps: props.item.slotProps,
+        unstyled: props.item.unstyled,
+        tokens: props.item.tokens,
+        // The ready-made buttons take their style by part; the hidden overflow keeps the item's own.
+        style: props.hidden
+            ? {
+                  ...(props.item.style as object),
+                  root: mergeStyles([
+                      (props.item.style as { root?: unknown } | undefined)
+                          ?.root as never,
+                      HIDDEN,
+                  ]),
+              }
+            : props.item.style,
         ...(props.item.selected === undefined
             ? {}
             : {

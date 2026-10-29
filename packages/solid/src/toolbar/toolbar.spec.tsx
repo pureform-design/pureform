@@ -52,6 +52,31 @@ const elements = (root: string = testIds.toolbar.root) =>
     ].filter((element) => element.style.display !== "none");
 
 describe("Toolbar, ready-made", () => {
+    it("gives an element its own parts' class and test ids, and no other button's", async () => {
+        withRegistry(() => (
+            <Toolbar
+                aria-label="Edit"
+                items={[
+                    {
+                        value: "bold",
+                        label: "Bold",
+                        icon: "B",
+                        class: { root: "own" },
+                        testId: { root: "bold-btn" },
+                    },
+                    { value: "italic", label: "Italic", icon: "I" },
+                ]}
+            />
+        ));
+        await settle();
+        expect(
+            document
+                .querySelector('[data-testid="bold-btn"]')
+                ?.classList.contains("own"),
+        ).toBe(true);
+        expect(document.querySelectorAll(".own")).toHaveLength(1);
+    });
+
     // Solid accepts CSS strings; React and Native accept style objects, so this string-merge
     // regression belongs here. Exercise both hidden and visible overflow roots after updates.
     it("preserves reactive string menu root styles while hiding an unneeded overflow", async () => {

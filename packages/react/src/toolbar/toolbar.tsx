@@ -118,6 +118,11 @@ type MenuInnerProps = InnerPropsOf<typeof menuOverlayAnatomy>;
 
 const NO_MENU_PROPS: MenuInnerProps = {};
 
+/** One element of the ready-made toolbar, as data, with its own customizing props over the defaults
+ *  for its kind (`iconButtonProps` with an icon, `buttonProps` without). */
+export type ToolbarEntry = ToolbarItem<ReactNode> &
+    Omit<ButtonDefaults & IconButtonDefaults, "testId">;
+
 /** The ready-made toolbar's props: Root's, with `className`, `style` and `slotProps` keyed by the
  *  toolbar's own part (`root`), the elements as data, and the defaults of the buttons it draws:
  *  `iconButtonProps` for elements with an icon, `buttonProps` for text ones. */
@@ -125,7 +130,10 @@ export interface ToolbarProps
     extends
         Omit<ToolbarRootProps, keyof Keyed | "children">,
         Keyed,
-        ToolbarContentProps<ReactNode> {
+        Omit<ToolbarContentProps<ReactNode>, "items"> {
+    /** The elements, in order: each its data and its own `className`, `style`, `slotProps`,
+     *  `unstyled` and `tokens`, over the defaults for its kind. */
+    readonly items?: readonly ToolbarEntry[] | undefined;
     /** Every text button's `className`, `style`, `slotProps`, `unstyled`, `testId` and `tokens`,
      *  keyed by the button's parts. An element's own `testId` wins. */
     readonly buttonProps?: ButtonDefaults | undefined;
@@ -146,7 +154,7 @@ function Element({
     buttonProps,
     iconButtonProps,
 }: {
-    readonly item: ToolbarItem<ReactNode>;
+    readonly item: ToolbarEntry;
     readonly hidden: boolean;
     readonly buttonProps: ButtonDefaults | undefined;
     readonly iconButtonProps: IconButtonDefaults | undefined;
@@ -158,8 +166,14 @@ function Element({
         onClick: item.onClick,
         testId: item.testId,
         interactionSource: item.interactionSource,
-        // The ready-made buttons take their style by part.
-        style: hidden ? { root: HIDDEN } : undefined,
+        className: item.className,
+        slotProps: item.slotProps,
+        unstyled: item.unstyled,
+        tokens: item.tokens,
+        // The ready-made buttons take their style by part; the hidden overflow keeps the item's own.
+        style: hidden
+            ? { ...item.style, root: { ...item.style?.root, ...HIDDEN } }
+            : item.style,
         ...(item.selected === undefined
             ? {}
             : {

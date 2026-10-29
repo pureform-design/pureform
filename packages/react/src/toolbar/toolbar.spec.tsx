@@ -56,6 +56,27 @@ const elements = (root: string = testIds.toolbar.root) =>
     ].filter((element) => element.style.display !== "none");
 
 describe("Toolbar, ready-made", () => {
+    it("gives an element its own parts' class and test ids, and no other button's", async () => {
+        withRegistry(() => (
+            <Toolbar
+                aria-label="Edit"
+                items={[
+                    {
+                        value: "bold",
+                        label: "Bold",
+                        icon: "B",
+                        className: { root: "own" },
+                        testId: { root: "bold-btn" },
+                    },
+                    { value: "italic", label: "Italic", icon: "I" },
+                ]}
+            />
+        ));
+        await settle();
+        expect(byTestId("bold-btn").classList.contains("own")).toBe(true);
+        expect(document.querySelectorAll(".own")).toHaveLength(1);
+    });
+
     it("renders a toolbar of icon buttons and text buttons in its variants", async () => {
         withRegistry(() => (
             <Toolbar

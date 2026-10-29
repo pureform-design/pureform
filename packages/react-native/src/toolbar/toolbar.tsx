@@ -27,6 +27,7 @@ import { View } from "react-native";
 
 import { Button } from "../button/button";
 import type { ButtonProps } from "../button/button";
+import { overDefaults } from "../defaults";
 import { IconButton } from "../icon-button/icon-button";
 import type { IconButtonProps } from "../icon-button/icon-button";
 import { Menu } from "../menu";
@@ -42,13 +43,19 @@ export interface ToolbarHosts {
     readonly root: "View";
 }
 
+export type ToolbarEntry = ToolbarItem<ReactNode> &
+    Omit<InnerPropsOf<ButtonProps> & InnerPropsOf<IconButtonProps>, "testId">;
+
 export interface ToolbarProps
     extends
         ToolbarRootOwnProps,
-        ToolbarContentProps<ReactNode>,
+        Omit<ToolbarContentProps<ReactNode>, "items">,
         NativeSlotProps<ToolbarHosts> {
     /** The toolbar's name, for assistive technology. */
     readonly "aria-label"?: string | undefined;
+    /** The elements, in order: each its data and its own `style`, `slotProps` and `tokens`, over
+     *  the defaults for its kind. */
+    readonly items?: readonly ToolbarEntry[] | undefined;
     /** Every text button's `style`, `slotProps`, `tokens` and `testId`; an item's own `testId`
      *  wins. */
     readonly buttonProps?: InnerPropsOf<ButtonProps> | undefined;
@@ -100,7 +107,12 @@ const spacing = (
 };
 
 // One element: an icon button named by its label, or a text button.
-const element = (item: ToolbarItem<ReactNode>, props: ToolbarProps) => {
+const element = (item: ToolbarEntry, props: ToolbarProps) => {
+    const custom = {
+        style: item.style,
+        slotProps: item.slotProps,
+        tokens: item.tokens,
+    };
     const shared = {
         disabled: item.disabled,
         onPress: item.onClick,
@@ -114,7 +126,10 @@ const element = (item: ToolbarItem<ReactNode>, props: ToolbarProps) => {
     };
     return isPresent(item.icon) ? (
         <IconButton
-            {...props.iconButtonProps}
+            {...(overDefaults(
+                props.iconButtonProps,
+                custom as InnerPropsOf<IconButtonProps>,
+            ) as object)}
             {...shared}
             testId={item.testId ?? props.iconButtonProps?.testId}
             aria-label={item.label}
@@ -122,7 +137,10 @@ const element = (item: ToolbarItem<ReactNode>, props: ToolbarProps) => {
         />
     ) : (
         <Button
-            {...props.buttonProps}
+            {...(overDefaults(
+                props.buttonProps,
+                custom as InnerPropsOf<ButtonProps>,
+            ) as object)}
             {...shared}
             testId={item.testId ?? props.buttonProps?.testId}
             variant="text"

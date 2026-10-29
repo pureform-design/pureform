@@ -10,6 +10,8 @@ import type {
 } from "@pureform/anatomy";
 import type { InstanceTokens, Selection } from "@pureform/styling";
 
+import type { ButtonPart } from "./button";
+import type { IconButtonPart } from "./icon-button";
 import type { InteractionSourceProps } from "./indication";
 import type { MenuItem } from "./menu";
 import type { VariantProp } from "./variants";
@@ -64,7 +66,7 @@ export interface ToolbarItem<Node = unknown> extends InteractionSourceProps {
         | undefined;
     /** Called when it's pressed, in the row or in the menu. */
     readonly onClick?: (() => void) | undefined;
-    readonly testId?: string | undefined;
+    readonly testId?: TestIdOverride<ButtonPart | IconButtonPart> | undefined;
 }
 
 /** What the ready-made toolbar renders inside Root. */
