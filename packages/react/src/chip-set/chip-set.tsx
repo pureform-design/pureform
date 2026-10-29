@@ -16,6 +16,7 @@ import type {
 } from "@pureform/binding-core";
 import {
     buttonGroupRootProps,
+    overDefaults,
     toggleGroupItemProps,
     chipSetMachineProps,
 } from "@pureform/binding-web";
@@ -119,11 +120,18 @@ export interface ChipSetProps
     extends
         Omit<ChipSetRootProps, keyof Keyed | "children">,
         Keyed,
-        ChipSetContentProps<ReactNode> {
+        Omit<ChipSetContentProps<ReactNode>, "items"> {
+    /** The chips, in order: each its data and its own `className`, `style`, `slotProps`,
+     *  `unstyled` and `tokens`, over `chipProps`. */
+    readonly items?: readonly ChipSetEntry[] | undefined;
     /** Every chip's `className`, `style`, `slotProps`, `unstyled`, `testId` and `tokens`, keyed
      *  by the chip's parts. An item's own `testId` wins. */
     readonly chipProps?: InnerPropsOf<typeof chipAnatomy> | undefined;
 }
+
+/** One chip of the ready-made set: its data, and its own customizing props, over `chipProps`. */
+export type ChipSetEntry = ChipSetItem<ReactNode> &
+    Omit<InnerPropsOf<typeof chipAnatomy>, "testId">;
 
 /** The ready-made set: a chip per item, a filter chip in a selectable set. */
 function ReadyMade(props: ChipSetProps): ReactNode {
@@ -136,7 +144,14 @@ function ReadyMade(props: ChipSetProps): ReactNode {
         ...rootProps
     } = props;
     const slot = useSlotProps(props);
-    const one = (item: ChipSetItem<ReactNode>, index: number) => ({
+    const one = (item: ChipSetEntry, index: number) => ({
+        ...overDefaults(chipProps, {
+            className: item.className,
+            style: item.style,
+            slotProps: item.slotProps,
+            unstyled: item.unstyled,
+            tokens: item.tokens,
+        } as InnerPropsOf<typeof chipAnatomy>),
         value: item.value ?? (props.selectable ? String(index) : undefined),
         label: item.label,
         icon: item.icon,
@@ -151,7 +166,6 @@ function ReadyMade(props: ChipSetProps): ReactNode {
             {items.map((item, index) => (
                 <SetChip
                     key={item.value ?? index}
-                    {...(chipProps as object)}
                     {...(one(item, index) as object)}
                 />
             ))}

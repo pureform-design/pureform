@@ -19,6 +19,32 @@ const chips = () =>
     [...byTestId(testIds.chipSet.root).children] as HTMLButtonElement[];
 
 describe("ChipSet, ready-made", () => {
+    it("gives an item its own parts' class and style over the set's chipProps, and no other chip's", async () => {
+        withRegistry(() => (
+            <ChipSet
+                aria-label="Suggestions"
+                chipProps={{
+                    class: { label: "every" },
+                    style: { root: { opacity: 0.9 } },
+                }}
+                items={[
+                    {
+                        label: "Reply",
+                        class: { root: "own" },
+                        style: { root: { opacity: 0.4 } },
+                    },
+                    { label: "Forward" },
+                ]}
+            />
+        ));
+        await settle();
+        expect(chips()[0]!.classList.contains("own")).toBe(true);
+        expect(chips()[0]!.querySelector(".every")).not.toBeNull();
+        expect(chips()[0]!.style.opacity).toBe("0.4");
+        expect(chips()[1]!.classList.contains("own")).toBe(false);
+        expect(chips()[1]!.style.opacity).toBe("0.9");
+    });
+
     it("renders a wrapping group of chips in the set's variants", async () => {
         withRegistry(() => (
             <ChipSet

@@ -9,7 +9,7 @@ import { SelectionList } from "./selection-list";
 import { Tabs } from "./tabs";
 import { presetRegistry } from "./testing/registry";
 import type { TestRegistry } from "./testing/registry";
-import { byTestId, interact, mount } from "./testing/render";
+import { byTestId, computed, interact, mount } from "./testing/render";
 
 let registry: TestRegistry;
 
@@ -56,6 +56,25 @@ describe("ChipSet", () => {
         { value: "a", label: "A", testId: "a" },
         { value: "b", label: "B", testId: "b" },
     ];
+
+    it("gives an item its own style over the set's chipProps, and no other chip's", async () => {
+        await render(
+            <ChipSet
+                chipProps={{ style: { root: { opacity: 0.9 } } }}
+                items={[
+                    {
+                        value: "a",
+                        label: "A",
+                        testId: "a",
+                        style: { root: { opacity: 0.4 } },
+                    },
+                    { value: "b", label: "B", testId: "b" },
+                ]}
+            />,
+        );
+        expect(computed("a-root").opacity).toBe("0.4");
+        expect(computed("b-root").opacity).toBe("0.9");
+    });
 
     it("keeps one chip on in a single-select set", async () => {
         const change =

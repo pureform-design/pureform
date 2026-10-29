@@ -17,8 +17,9 @@ import type {
 } from "@pureform/binding-core";
 import {
     buttonGroupRootProps,
-    toggleGroupItemProps,
     chipSetMachineProps,
+    overDefaults,
+    toggleGroupItemProps,
 } from "@pureform/binding-web";
 import * as toggleGroup from "@pureform/machines/button-group";
 import type { JSX, ValidComponent } from "@solidjs/web";
@@ -146,11 +147,18 @@ export interface ChipSetProps
     extends
         Omit<ChipSetRootProps, keyof Keyed | "children">,
         Keyed,
-        ChipSetContentProps<JSX.Element> {
+        Omit<ChipSetContentProps<JSX.Element>, "items"> {
+    /** The chips, in order: each its data and its own `class`, `style`, `slotProps`, `unstyled`
+     *  and `tokens`, over `chipProps`. */
+    readonly items?: readonly ChipSetEntry[] | undefined;
     /** Every chip's `class`, `style`, `slotProps`, `unstyled`, `testId` and `tokens`, keyed by
      *  the chip's parts. An item's own `testId` wins. */
     readonly chipProps?: InnerPropsOf<typeof chipAnatomy> | undefined;
 }
+
+/** One chip of the ready-made set: its data, and its own customizing props, over `chipProps`. */
+export type ChipSetEntry = ChipSetItem<JSX.Element> &
+    Omit<InnerPropsOf<typeof chipAnatomy>, "testId">;
 
 const READY_MADE_PROPS = [
     "class",
@@ -170,7 +178,14 @@ function ReadyMade(props: ChipSetProps): JSX.Element {
             item,
         })),
     );
-    const one = (item: ChipSetItem<JSX.Element>, index: number) => ({
+    const one = (item: ChipSetEntry, index: number) => ({
+        ...overDefaults(props.chipProps, {
+            class: item.class,
+            style: item.style,
+            slotProps: item.slotProps,
+            unstyled: item.unstyled,
+            tokens: item.tokens,
+        } as InnerPropsOf<typeof chipAnatomy>),
         value: item.value ?? (props.selectable ? String(index) : undefined),
         label: item.label,
         icon: item.icon,
@@ -186,10 +201,7 @@ function ReadyMade(props: ChipSetProps): JSX.Element {
         <Root {...own} {...(root as object)}>
             <For each={entries()} keyed={(entry) => entry.key}>
                 {(entry, index) => (
-                    <SetChip
-                        {...(props.chipProps as object)}
-                        {...(one(entry().item, index()) as object)}
-                    />
+                    <SetChip {...(one(entry().item, index()) as object)} />
                 )}
             </For>
         </Root>

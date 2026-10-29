@@ -11,6 +11,7 @@ import {
 } from "@pureform/binding-core";
 import type {
     ChipSetContentProps,
+    ChipSetItem,
     ChipSetPart,
     ChipSetRootOwnProps,
 } from "@pureform/binding-core";
@@ -19,6 +20,7 @@ import { ScrollView } from "react-native";
 
 import { Chip } from "../chip/chip";
 import type { ChipProps } from "../chip/chip";
+import { overDefaults } from "../defaults";
 import { testIdOf, useControllable, withEngine } from "../parts";
 import { nativeSlots } from "../slot-props";
 import type { InnerPropsOf, NativeSlotProps } from "../slot-props";
@@ -32,12 +34,19 @@ export interface ChipSetHosts {
 export interface ChipSetProps
     extends
         Omit<ChipSetRootOwnProps, "unstyled">,
-        ChipSetContentProps<ReactNode>,
+        Omit<ChipSetContentProps<ReactNode>, "items">,
         NativeSlotProps<ChipSetHosts> {
     readonly "aria-label"?: string | undefined;
+    /** The chips, in order: each its data and its own `style`, `slotProps` and `tokens`, over
+     *  `chipProps`. */
+    readonly items?: readonly ChipSetEntry[] | undefined;
     /** Every chip's `style`, `slotProps`, `tokens` and `testId`; an item's own `testId` wins. */
     readonly chipProps?: InnerPropsOf<ChipProps> | undefined;
 }
+
+/** One chip of the ready-made set: its data, and its own customizing props, over `chipProps`. */
+export type ChipSetEntry = ChipSetItem<ReactNode> &
+    Omit<InnerPropsOf<ChipProps>, "testId">;
 
 function ChipSetImpl(props: ChipSetProps): ReactNode {
     const slot = nativeSlots(props);
@@ -71,7 +80,11 @@ function ChipSetImpl(props: ChipSetProps): ReactNode {
                 return (
                     <Chip
                         key={key}
-                        {...(props.chipProps as object)}
+                        {...overDefaults(props.chipProps, {
+                            style: item.style,
+                            slotProps: item.slotProps,
+                            tokens: item.tokens,
+                        } as InnerPropsOf<ChipProps>)}
                         {...variants}
                         label={item.label}
                         icon={item.icon}
