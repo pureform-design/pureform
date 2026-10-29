@@ -35,6 +35,7 @@ import { Anchored, useFieldPopup } from "../overlay";
 import { useControllable } from "../parts";
 import { Portal } from "../portal";
 import { useEngine } from "../provider";
+import { resolveText } from "../resolve-text";
 import { nativeSlots, withUnselectable } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
@@ -56,9 +57,11 @@ export interface DockedDatePickerHosts {
     readonly suffixText: "Text";
     readonly label: "Text";
     readonly trailingIcon: "View";
+    readonly trigger: "Pressable";
     readonly supportingText: "Text";
     readonly content: "View";
     readonly controls: "View";
+    readonly actions: "View";
     readonly prev: "Pressable";
     readonly monthButton: "Pressable";
     readonly next: "Pressable";
@@ -253,6 +256,15 @@ function Popup(
                     }}
                 />
             )}
+            {isPresent(props.actions) ? (
+                <v.actions.View
+                    {...slot.props("actions")}
+                    style={slot.style("actions", s.actions)}
+                    testID={id("actions")}
+                >
+                    {resolveText(props.actions, v.actions, s.actions)}
+                </v.actions.View>
+            ) : null}
         </v.content.View>
     );
 }
@@ -296,6 +308,7 @@ export function DockedDatePicker(props: DockedDatePickerProps): ReactNode {
         if (iso && iso !== value[0]) setValue([iso]);
     };
     const disabled = props.disabled || props.readOnly;
+    const slot = nativeSlots(props);
     return (
         <View>
             <Field
@@ -343,14 +356,17 @@ export function DockedDatePicker(props: DockedDatePickerProps): ReactNode {
             />
             {/* The calendar button, over the field's trailing icon (which takes no presses). */}
             <Pressable
+                {...slot.props("trigger")}
                 role="button"
                 aria-label={props.triggerLabel ?? "Open calendar"}
                 aria-expanded={open}
                 aria-haspopup="dialog"
                 disabled={disabled}
                 onLayout={trigger.onLayout}
-                onPress={() => (open ? close() : show())}
-                style={trigger.style}
+                onPress={slot.on("trigger", "onPress", () =>
+                    open ? close() : show(),
+                )}
+                style={slot.style("trigger", trigger.style)}
                 testID={
                     typeof props.testId === "string"
                         ? `${props.testId}-trigger`

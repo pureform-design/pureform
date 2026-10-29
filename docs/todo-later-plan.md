@@ -19,15 +19,6 @@ old B/C/D/E identifiers. Complexity estimates are relative and may change after 
 
 ## B. Bounded component work — low to moderate complexity
 
-### 4. DockedDatePicker ready-made actions and trigger customization
-
-- React/Solid define the Actions part but do not render it in ready-mades; composed Actions works.
-- Accept optional user-supplied action content and render Actions only when supplied.
-- Do not add default OK/Cancel buttons or change selection/close-on-select semantics.
-- Use existing `slotProps.trigger` conventions, preserving internal handlers and accessibility.
-- Test content, absent/empty actions, slot merges and unchanged selection behavior. Preserve the
-  Native trigger ID's existing `testId` behavior.
-
 ### 5. Native cascading submenu outside-click exit
 
 **User-reported; reproduction required.** Separate from drill motion (13).
@@ -202,6 +193,12 @@ Record device/OS/engine/AT results and recordings; unavailable environments rema
 
 ## Retained decisions and out-of-scope tooling
 
+- **4 completed (2026-10-29): DockedDatePicker actions/trigger.** Optional `actions` content renders
+  through the existing Actions part across React/Solid/Native; absent/null/false content adds no
+  wrapper, no default buttons or new confirmation semantics. Web keeps its `trailingIcon` trigger
+  slot; Native exposes its separate `trigger` Pressable through existing slot conventions, retaining
+  trigger test IDs, measurement and accessibility. Tests cover reactive content, part customization,
+  merged trigger handlers and both close-on-select settings. SSR/hydration passes on all web targets.
 - **3 completed (2026-10-29): shared radius precedence.** Scope expanded by agreement to Button,
   IconButton and SplitButton alongside Chip/InputChip. Recipes set `defaultRadius`, leaving
   `radius` as the explicit override input: instance > theme > derived pill. Existing `pillRadius`

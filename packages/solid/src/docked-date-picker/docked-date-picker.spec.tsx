@@ -1,4 +1,5 @@
 import { compositeTestIds } from "@pureform/anatomy";
+import { createSignal } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
@@ -28,6 +29,84 @@ const day = (iso: string) =>
     )!;
 
 describe("DockedDatePicker, ready-made", () => {
+    it("renders supplied actions reactively with their slot props, without an empty wrapper", async () => {
+        const [shown, setShown] = createSignal(false);
+        const action = vi.fn<() => void>();
+        withRegistry(() => (
+            <DockedDatePicker
+                label="Date"
+                defaultOpen
+                actions={
+                    shown() ? (
+                        <button type="button" onClick={action}>
+                            Custom action
+                        </button>
+                    ) : null
+                }
+                slotProps={{ actions: { class: "custom-actions" } }}
+            />
+        ));
+        await settle();
+        const actions = () =>
+            document.querySelector(`[data-testid="${ids.actions}"]`);
+        expect(actions()).toBeNull();
+        setShown(true);
+        await settle();
+        expect(byTestId(ids.actions).classList.contains("custom-actions")).toBe(
+            true,
+        );
+        (byTestId(ids.actions).firstElementChild as HTMLButtonElement).click();
+        await settle();
+        expect(action).toHaveBeenCalledTimes(1);
+        expect(byTestId(ids.positioner).hidden).toBe(false);
+        setShown(false);
+        await settle();
+        expect(actions()).toBeNull();
+        expect(byTestId(ids.root).hasAttribute("actions")).toBe(false);
+    });
+
+    it.each([true, false])(
+        "preserves closeOnSelect=%s with actions and a customized trigger",
+        async (closeOnSelect) => {
+            const onClick = vi.fn<() => void>();
+            const onValueChange =
+                vi.fn<
+                    (details: { readonly value: readonly string[] }) => void
+                >();
+            withRegistry(() => (
+                <DockedDatePicker
+                    label="Date"
+                    locale="en-US"
+                    defaultValue={["2026-08-17"]}
+                    closeOnSelect={closeOnSelect}
+                    actions={<button type="button">Custom action</button>}
+                    onValueChange={onValueChange}
+                    slotProps={{
+                        trailingIcon: { title: "Calendar trigger", onClick },
+                    }}
+                />
+            ));
+            await settle();
+            const button = byTestId(ids.trailingIcon);
+            expect(button.title).toBe("Calendar trigger");
+            expect(button.getAttribute("aria-haspopup")).toBe("grid");
+            button.click();
+            await until(() =>
+                expect(byTestId(ids.positioner).hidden).toBe(false),
+            );
+            expect(onClick).toHaveBeenCalledTimes(1);
+            day("2026-08-20").click();
+            await until(() =>
+                expect(onValueChange).toHaveBeenLastCalledWith({
+                    value: ["2026-08-20"],
+                }),
+            );
+            await until(() =>
+                expect(byTestId(ids.positioner).hidden).toBe(closeOnSelect),
+            );
+        },
+    );
+
     it("renders the field, the format as supporting text, and the closed popup", async () => {
         withRegistry(() => <DockedDatePicker label="Date" locale="en-GB" />);
         await settle();

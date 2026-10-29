@@ -152,6 +152,7 @@ export const dockedDatePicker: ComponentCase = {
     root: docked.root,
     examples: {
         empty: {},
+        "custom actions": { actions: "Choose a day to continue" },
         chosen: { defaultValue: DATE },
         filled: { variant: "filled", defaultValue: DATE },
         "secondary color": { color: "secondary", defaultValue: DATE },

@@ -474,6 +474,9 @@ function ReadyMadeContent(props: {
                             <calendar.DayCalendar slots={slots} />
                         </Match>
                     </Switch>
+                    <Show when={isPresent(own.actions)}>
+                        <Actions {...slots("actions")}>{own.actions}</Actions>
+                    </Show>
                 </Content>
             </Positioner>
         </>

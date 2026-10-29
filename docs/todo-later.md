@@ -6,8 +6,6 @@ criteria. These are not all confirmed bugs: reproduction and external verificati
 
 ## B. Bounded component work — low to moderate complexity
 
-4. **DockedDatePicker actions/trigger:** optional user-supplied actions, no empty wrapper/default
-   OK/Cancel or selection changes; reuse trigger slot conventions and preserve internal behavior.
 5. **Native cascading submenu exit:** outside-click dismissal reportedly waits for the parent exit,
    then removes the submenu instantly. Reproduce and animate its exit; selection dismissal and
    web targets already work. Separate from drill.
@@ -73,6 +71,9 @@ criteria. These are not all confirmed bugs: reproduction and external verificati
 
 ## Retained decisions / separate work
 
+- **4 completed:** optional DockedDatePicker actions across bindings, with reactive part props and
+  unchanged selection semantics. Native trigger forwards established slot props/styles and merges
+  handlers; existing IDs/accessibility preserved. Web SSR/hydration verified across adapters.
 - **3 completed:** shared radius fallback for Chip/InputChip, Button, IconButton and SplitButton.
   Explicit radius wins over derived size/density defaults; existing pillRadius customization stays.
   Native and all six web binding/adapter combinations verified.

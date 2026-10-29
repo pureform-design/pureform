@@ -443,6 +443,9 @@ function ReadyMadeContent({ own }: { readonly own: DockedDatePickerProps }) {
                     ) : (
                         <YearList {...slot("yearList")} slots={slots} />
                     )}
+                    {isPresent(own.actions) ? (
+                        <Actions {...slot("actions")}>{own.actions}</Actions>
+                    ) : null}
                 </Content>
             </Positioner>
         </>
@@ -465,6 +468,7 @@ function ReadyMade(props: DockedDatePickerProps): ReactNode {
         prefixText,
         suffixText,
         triggerLabel: _triggerLabel,
+        actions: _actions,
         ...rootProps
     } = props;
     const slot = useSlotProps(props as SlotKeyedProps<ComponentAnatomy>);

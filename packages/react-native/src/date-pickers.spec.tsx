@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { useState } from "react";
-import { View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
@@ -11,7 +11,14 @@ import { DockedDatePicker } from "./docked-date-picker";
 import { animated } from "./engine";
 import { presetRegistry } from "./testing/registry";
 import type { TestRegistry } from "./testing/registry";
-import { byTestId, computed, interact, mount, until } from "./testing/render";
+import {
+    byTestId,
+    computed,
+    interact,
+    mount,
+    outside,
+    until,
+} from "./testing/render";
 
 let registry: TestRegistry;
 
@@ -300,6 +307,103 @@ describe("DatePicker", () => {
 });
 
 describe("DockedDatePicker", () => {
+    it("renders optional actions reactively through their existing part", async () => {
+        const actions = outside<ReactNode>(null);
+        const onPress = vi.fn<() => void>();
+        await render(
+            <actions.Holder>
+                {(content) => (
+                    <DockedDatePicker
+                        defaultOpen
+                        actions={content}
+                        style={{ actions: { padding: 7 } }}
+                        slotProps={{
+                            actions: { accessibilityLabel: "Calendar actions" },
+                        }}
+                    />
+                )}
+            </actions.Holder>,
+        );
+        await until(() => byTestId("pf-docked-date-picker-content"));
+        expect(
+            document.querySelector(
+                '[data-testid="pf-docked-date-picker-actions"]',
+            ),
+        ).toBeNull();
+        await actions.set(
+            <Pressable role="button" onPress={onPress}>
+                <Text>Custom action</Text>
+            </Pressable>,
+        );
+        expect(
+            byTestId("pf-docked-date-picker-actions").getAttribute(
+                "aria-label",
+            ),
+        ).toBe("Calendar actions");
+        expect(computed("pf-docked-date-picker-actions").paddingTop).toBe(
+            "7px",
+        );
+        await interact(() => userEvent.click(button("Custom action")));
+        expect(onPress).toHaveBeenCalledTimes(1);
+        expect(byTestId("pf-docked-date-picker-content")).toBeTruthy();
+        await actions.set(false);
+        expect(
+            document.querySelector(
+                '[data-testid="pf-docked-date-picker-actions"]',
+            ),
+        ).toBeNull();
+    });
+
+    it.each([true, false])(
+        "keeps selection semantics and trigger wiring with closeOnSelect=%s",
+        async (closeOnSelect) => {
+            const onPress = vi.fn<() => void>();
+            const onValueChange =
+                vi.fn<
+                    (details: { readonly value: readonly string[] }) => void
+                >();
+            await render(
+                <DockedDatePicker
+                    testId="custom"
+                    label="Date"
+                    locale="en-US"
+                    defaultValue={["2026-08-17"]}
+                    closeOnSelect={closeOnSelect}
+                    actions={<Text>Calendar actions</Text>}
+                    onValueChange={onValueChange}
+                    style={{ trigger: { opacity: 0.8 } }}
+                    slotProps={{
+                        trigger: {
+                            accessibilityHint: "Choose a date",
+                            onPress,
+                        },
+                    }}
+                />,
+            );
+            const trigger = byTestId("custom-trigger");
+            expect(computed("custom-trigger").opacity).toBe("0.8");
+            expect(trigger.getAttribute("aria-haspopup")).toBe("dialog");
+            await interact(() => userEvent.click(trigger));
+            expect(onPress).toHaveBeenCalledTimes(1);
+            await until(() => byTestId("custom-content"));
+            expect(byTestId("custom-actions").textContent).toBe(
+                "Calendar actions",
+            );
+            await interact(() =>
+                userEvent.click(day("Friday, August 21, 2026")),
+            );
+            expect(onValueChange).toHaveBeenLastCalledWith({
+                value: ["2026-08-21"],
+            });
+            await until(() =>
+                expect(
+                    document.querySelector('[data-testid="custom-content"]') ===
+                        null,
+                ).toBe(closeOnSelect),
+            );
+        },
+    );
+
     it("exposes the current month to cell styling", async () => {
         const now = new Date();
         const seen = new Map<number | string, boolean>();

@@ -557,6 +557,8 @@ export const dockedDatePickerSelection = (
 
 /** What the ready-made docked date picker renders, in the framework's node type. */
 export interface DockedDatePickerContentProps<Node> {
+    /** Optional content below the calendar. Does not change selection or close-on-select behavior. */
+    readonly actions?: Node;
     /** The floating label. */
     readonly label?: Node;
     /** Helper text under the field; an `error` replaces it. @default the date's format */
@@ -570,6 +572,7 @@ export interface DockedDatePickerContentProps<Node> {
 
 /** The keys of `DockedDatePickerContentProps`. */
 export const DOCKED_DATE_PICKER_CONTENT_PROPS = [
+    "actions",
     "label",
     "supportingText",
     "leadingIcon",
