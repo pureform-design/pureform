@@ -19,7 +19,6 @@ import {
     selectSupportingTextId,
 } from "@pureform/binding-core";
 import type {
-    InnerProps,
     MenuScopeInstances,
     SelectContentProps,
     SelectItem,
@@ -57,7 +56,7 @@ import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
 import type { PartContext } from "../part-context";
 import { createSlotProps, useComponent } from "../parts";
-import type { ComponentScope, InnerPropsOf, SlotKeyedProps } from "../parts";
+import type { ComponentScope, MenuScopeProps, SlotKeyedProps } from "../parts";
 import { usePresence } from "../presence";
 import type { Presence } from "../presence";
 import type { PartProps } from "../props";
@@ -102,17 +101,11 @@ export interface SelectRootProps
     /** The list's own props, drawn as a menu: `testId`, `unstyled`, and `tokens` (the ready-made
      *  also takes `class`, `style`, and `slotProps` keyed by the menu's parts, an option's also by
      *  option, `MenuScopeInstances`). */
-    readonly menuProps?: MenuScopeProps | undefined;
+    readonly menuProps?: SelectMenuProps | undefined;
 }
 
 /** The list's own props, keyed by the menu's parts (an option's also by option). */
-type MenuScopeProps = Omit<
-    InnerPropsOf<MenuAnatomy>,
-    keyof SlotKeyedProps<MenuAnatomy>
-> &
-    InnerProps<
-        SlotKeyedProps<MenuAnatomy, never, MenuScopeInstances<SelectItem>>
-    >;
+type SelectMenuProps = MenuScopeProps<MenuAnatomy, SelectItem>;
 
 /** A part's props: the element's own, and the part's `unstyled`. */
 export interface SelectPartProps extends PartProps {

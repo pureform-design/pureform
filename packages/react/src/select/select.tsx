@@ -18,7 +18,6 @@ import {
 } from "@pureform/binding-core";
 import type {
     Direction,
-    InnerProps,
     MenuScopeInstances,
     SelectContentProps,
     SelectItem,
@@ -56,7 +55,7 @@ import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import type { PartContext } from "../part-context";
 import { useComponent, useSlotProps } from "../parts";
-import type { ComponentScope, InnerPropsOf, SlotKeyedProps } from "../parts";
+import type { ComponentScope, MenuScopeProps, SlotKeyedProps } from "../parts";
 import { usePresence } from "../presence";
 import type { Presence } from "../presence";
 import { omitProps } from "../props";
@@ -104,13 +103,7 @@ export interface SelectRootProps
 }
 
 /** The select's list's own props, keyed by the menu's parts (an option's also by option). */
-export type SelectMenuProps = Omit<
-    InnerPropsOf<MenuAnatomy>,
-    keyof SlotKeyedProps<MenuAnatomy>
-> &
-    InnerProps<
-        SlotKeyedProps<MenuAnatomy, never, MenuScopeInstances<SelectItem>>
-    >;
+export type SelectMenuProps = MenuScopeProps<MenuAnatomy, SelectItem>;
 
 const NO_MENU_PROPS: SelectMenuProps = {};
 

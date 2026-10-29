@@ -18,6 +18,7 @@ import {
 } from "@pureform/binding-core";
 import type {
     InnerProps,
+    MenuScopeInstances,
     PartInstances,
     PartStates,
     SlotKeyedEach,
@@ -408,6 +409,15 @@ export interface CustomizeProps<
 export type InnerPropsOf<A extends ComponentAnatomy> = InnerProps<
     CustomizeProps<A>
 >;
+
+/** What a ready-made takes to customize the menu it draws (`menuProps`): that menu's
+ *  `InnerPropsOf`, with its slot-keyed props also taking a function of each option
+ *  (`MenuScopeInstances`), so one option's parts can differ from the rest. */
+export type MenuScopeProps<A extends ComponentAnatomy, Item> = Omit<
+    InnerPropsOf<A>,
+    keyof SlotKeyedProps<A>
+> &
+    InnerProps<SlotKeyedProps<A, never, MenuScopeInstances<Item>>>;
 
 /** One part's props from a ready-made component's slot-keyed props: its `slotProps` entry with
  *  its `className` and `style` merged in. `testId` and `unstyled` go to Root whole. */

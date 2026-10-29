@@ -23,7 +23,6 @@ import {
     searchViewSelection,
 } from "@pureform/binding-core";
 import type {
-    InnerProps,
     MenuScopeInstances,
     SearchViewContentProps,
     SearchViewItem,
@@ -64,7 +63,12 @@ import type { ItemInteractionSources } from "../interaction";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import { useComponent, useSlotProps } from "../parts";
-import type { ComponentScope, InnerPropsOf, SlotKeyedProps } from "../parts";
+import type {
+    ComponentScope,
+    InnerPropsOf,
+    MenuScopeProps,
+    SlotKeyedProps,
+} from "../parts";
 import { usePresence } from "../presence";
 import type { Presence } from "../presence";
 import { omitProps } from "../props";
@@ -113,19 +117,13 @@ export interface SearchViewRootProps
     /** The suggestions' own props, drawn as menu items: `testId`, `unstyled`, and `tokens` (the
      *  ready-made also takes `className`, `style`, and `slotProps` keyed by the items' parts, also
      *  by suggestion, `MenuScopeInstances`). */
-    readonly menuProps?: MenuScopeProps | undefined;
+    readonly menuProps?: SearchViewMenuProps | undefined;
 }
 
 /** The list's own props, keyed by the menu's parts (an option's also by option). */
-type MenuScopeProps = Omit<
-    InnerPropsOf<MenuAnatomy>,
-    keyof SlotKeyedProps<MenuAnatomy>
-> &
-    InnerProps<
-        SlotKeyedProps<MenuAnatomy, never, MenuScopeInstances<SearchViewItem>>
-    >;
+type SearchViewMenuProps = MenuScopeProps<MenuAnatomy, SearchViewItem>;
 
-const NO_MENU_PROPS: MenuScopeProps = {};
+const NO_MENU_PROPS: SearchViewMenuProps = {};
 
 /** A part's props: the element's own, and the part's `unstyled`. */
 export interface SearchViewPartProps extends PartProps {
