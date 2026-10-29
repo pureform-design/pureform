@@ -147,13 +147,61 @@ function LinearProgressImpl(props: LinearProgressProps): ReactNode {
 export const LinearProgress = withEngine(LinearProgressImpl, "LinearProgress");
 
 function CircularProgressImpl(props: CircularProgressProps): ReactNode {
-    const { styles: s, views: v } = useComponentSlots<CircularProgressPart>(
+    const engine = useEngine();
+    const {
+        styles: s,
+        views: v,
+        selected,
+    } = useComponentSlots<CircularProgressPart>(
         "circularProgress",
         progressSelection(props) as Record<string, unknown>,
     );
     const id = (part: CircularProgressPart) =>
         testIdOf(circularProgressAnatomy, part, props.testId);
     const slot = nativeSlots(props);
+    // SVG draws the band itself, rather than trying to mask a rotating native border View.
+    // Keep the arc hosts (IDs/props) and their color customization in both rendering paths.
+    const half = (
+        part: "endHalf" | "startHalf",
+        arc: "endArc" | "startArc",
+    ) => {
+        const Half = v[part];
+        const Arc = v[arc];
+        const drawing = selected.drawings[part];
+        const svg = engine.Drawing && drawing;
+        const arcStyle = slot.style(
+            arc,
+            svg ? { ...s[arc], borderWidth: 0, transform: [] } : s[arc],
+        );
+        const color = slot.style(
+            arc,
+            selected.styles[arc] ?? {},
+        ).borderTopColor;
+        return (
+            <Half.View
+                {...slot.props(part)}
+                style={slot.style(part, s[part])}
+                testID={id(part)}
+            >
+                <Arc.View
+                    {...slot.props(arc)}
+                    style={arcStyle}
+                    testID={id(arc)}
+                >
+                    {svg && engine.Drawing ? (
+                        <engine.Drawing
+                            drawing={{
+                                ...drawing,
+                                ...(typeof color === "string"
+                                    ? { fill: color }
+                                    : {}),
+                            }}
+                        />
+                    ) : null}
+                </Arc.View>
+            </Half.View>
+        );
+    };
     return (
         <v.root.View
             {...slot.props("root")}
@@ -201,28 +249,8 @@ function CircularProgressImpl(props: CircularProgressProps): ReactNode {
                     />
                 </v.track.View>
             )}
-            <v.endHalf.View
-                {...slot.props("endHalf")}
-                style={slot.style("endHalf", s.endHalf)}
-                testID={id("endHalf")}
-            >
-                <v.endArc.View
-                    {...slot.props("endArc")}
-                    style={slot.style("endArc", s.endArc)}
-                    testID={id("endArc")}
-                />
-            </v.endHalf.View>
-            <v.startHalf.View
-                {...slot.props("startHalf")}
-                style={slot.style("startHalf", s.startHalf)}
-                testID={id("startHalf")}
-            >
-                <v.startArc.View
-                    {...slot.props("startArc")}
-                    style={slot.style("startArc", s.startArc)}
-                    testID={id("startArc")}
-                />
-            </v.startHalf.View>
+            {half("endHalf", "endArc")}
+            {half("startHalf", "startArc")}
             <v.tailCap.View
                 {...slot.props("tailCap")}
                 style={slot.style("tailCap", s.tailCap)}
@@ -238,7 +266,8 @@ function CircularProgressImpl(props: CircularProgressProps): ReactNode {
 }
 
 /** Material's circular progress indicator: `<CircularProgress value={40} />`, indeterminate
- *  without a value. */
+ *  without a value. `shape="wavy"` draws a wave band with either SVG engine; non-SVG engines
+ *  retain the border-arc fallback. Size, thickness, amplitude and colors follow the theme tokens. */
 export const CircularProgress = withEngine(
     CircularProgressImpl,
     "CircularProgress",

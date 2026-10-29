@@ -7,6 +7,7 @@ import {
     px,
     transparent,
 } from "@pureform/core/ast";
+import type { PlatformNode } from "@pureform/core/ast";
 import { compilePreset } from "@pureform/panda-adapter";
 import { radius } from "@pureform/theme";
 import { describe, expect, it } from "vitest";
@@ -326,17 +327,17 @@ describe("wavy progress", () => {
         const clip = (half: "endHalf" | "startHalf") =>
             wavy?.[half]?.clipPath as unknown as {
                 type: string;
-                base: { type: string; fillRule: string };
-                cases: { value: unknown }[];
+                base: PlatformNode;
+                cases: { value: PlatformNode }[];
             };
         expect(clip("endHalf").type).toBe("conditional");
-        expect(clip("endHalf").base).toMatchObject({
+        expect(clip("endHalf").base.values.css).toMatchObject({
             type: "shape",
             fillRule: "evenodd",
         });
         // The end half is the right one (left under right to left, where the ring is mirrored),
         // the start half the other.
-        expect(clip("endHalf").base).toEqual(
+        expect(clip("endHalf").base.values.css).toEqual(
             wavyRing({
                 waves: 9,
                 thickness: alias("components", "circularProgress", "thickness"),
@@ -344,7 +345,7 @@ describe("wavy progress", () => {
                 half: "right",
             }),
         );
-        expect(clip("endHalf").cases[0]!.value).toEqual(
+        expect(clip("endHalf").cases[0]!.value.values.css).toEqual(
             wavyRing({
                 waves: 9,
                 thickness: alias("components", "circularProgress", "thickness"),
@@ -357,6 +358,11 @@ describe("wavy progress", () => {
             clip("endHalf").base,
         );
         expect(clip("endHalf").base).not.toEqual(clip("startHalf").base);
+        // Native's SVG engines draw the filled partial band, not a mask over child Views.
+        expect(clip("endHalf").base.default).toMatchObject({ type: "shape" });
+        expect(clip("endHalf").base.default).not.toEqual(
+            clip("endHalf").base.values.css,
+        );
         // The ring reads the thickness, and the spinner draws with the same arcs.
         expect(circularProgress.recipe.compoundVariants ?? []).toHaveLength(0);
     });

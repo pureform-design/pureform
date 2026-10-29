@@ -11,7 +11,7 @@ import { animatedSvg } from "./engines/svg";
 import { LinearProgress } from "./linear-progress";
 import { presetRegistry } from "./testing/registry";
 import type { TestRegistry } from "./testing/registry";
-import { mount, settle } from "./testing/render";
+import { byTestId, mount, outside, settle } from "./testing/render";
 
 let registry: TestRegistry;
 
@@ -30,6 +30,191 @@ const render = async (node: ReactNode, engine: MotionEngine = animated) => {
 
 const has = (id: string) =>
     document.querySelector(`[data-testid="${id}"]`) !== null;
+
+const wavePoints = (id: string, part = "end-half") => {
+    const path = byTestId(`${id}-${part}`).querySelector<SVGPathElement>(
+        "path",
+    );
+    expect(path).not.toBeNull();
+    return path!
+        .getAttribute("d")!
+        .match(/-?\d+(?:\.\d+)?/g)!
+        .map(Number);
+};
+
+describe.each([animatedSvg, reanimatedSvg])(
+    "wavy circular geometry with $name",
+    (engine) => {
+        it.each(
+            [40, undefined].flatMap((value) =>
+                (["full", "reduce"] as const).map((motion) => ({
+                    value,
+                    motion,
+                })),
+            ),
+        )(
+            "draws a real wave band for value=$value, motion=$motion",
+            async ({ value, motion }) => {
+                await mount(
+                    <PureformProvider
+                        registry={registry}
+                        engine={engine}
+                        motion={motion}
+                    >
+                        <CircularProgress
+                            testId="wave"
+                            shape="wavy"
+                            value={value}
+                        />
+                    </PureformProvider>,
+                );
+                await settle(100);
+                const coordinates = wavePoints("wave");
+                const radius = (point: number) =>
+                    Math.hypot(
+                        coordinates[point * 2]! - 24,
+                        coordinates[point * 2 + 1]! - 24,
+                    );
+                // The outer edge crests at 10 degrees and dips at 30, not a smooth circular arc.
+                expect(radius(2)).toBeCloseTo(24, 1);
+                expect(radius(6)).toBeCloseTo(21, 1);
+                expect(radius(2) - radius(6)).toBeCloseTo(3, 1);
+            },
+        );
+
+        it("scales its actual band with size, thickness and amplitude, and mirrors it in RTL", async () => {
+            await mount(
+                <>
+                    <PureformProvider
+                        registry={registry}
+                        engine={engine}
+                        motion="reduce"
+                        dir="ltr"
+                    >
+                        <CircularProgress
+                            testId="ltr"
+                            value={75}
+                            shape="wavy"
+                            tokens={{ size: 64, thickness: 6, amplitude: 3 }}
+                        />
+                    </PureformProvider>
+                    <PureformProvider
+                        registry={registry}
+                        engine={engine}
+                        motion="reduce"
+                        dir="rtl"
+                    >
+                        <CircularProgress
+                            testId="rtl"
+                            value={75}
+                            shape="wavy"
+                            tokens={{ size: 64, thickness: 6, amplitude: 3 }}
+                        />
+                    </PureformProvider>
+                </>,
+            );
+            await settle(100);
+            const ltr = wavePoints("ltr");
+            const rtl = wavePoints("rtl");
+            const radius = (p: number[], i: number) =>
+                Math.hypot(p[i * 2]! - 32, p[i * 2 + 1]! - 32);
+            expect(radius(ltr, 2)).toBeCloseTo(32, 1);
+            expect(radius(ltr, 6)).toBeCloseTo(26, 1);
+            // 73 outer points, then 73 inner points in reverse: both edges are waves, 6px apart.
+            expect(radius(ltr, 2) - radius(ltr, 143)).toBeCloseTo(6, 1);
+            expect(radius(ltr, 6) - radius(ltr, 139)).toBeCloseTo(6, 1);
+            for (let i = 0; i < ltr.length; i += 2) {
+                expect(ltr[i]! + rtl[i]!).toBeCloseTo(64, 1);
+                expect(ltr[i + 1]).toBeCloseTo(rtl[i + 1]!, 1);
+            }
+            const start = wavePoints("ltr", "start-half");
+            for (let i = 0; i < ltr.length; i += 2) {
+                expect(start[i]).toBe(ltr[i]);
+                expect(start[i + 1]).toBe(ltr[i + 1]);
+            }
+            expect(getComputedStyle(byTestId("ltr-end-half")).overflow).toBe(
+                "hidden",
+            );
+            expect(getComputedStyle(byTestId("ltr-start-half")).overflow).toBe(
+                "hidden",
+            );
+        });
+
+        it("updates the drawn sweep, respects range bounds, and preserves arc hosts and customization", async () => {
+            const progress = outside(30);
+            await mount(
+                <PureformProvider
+                    registry={registry}
+                    engine={engine}
+                    motion="reduce"
+                >
+                    <progress.Holder>
+                        {(value) => (
+                            <CircularProgress
+                                testId="wave"
+                                shape="wavy"
+                                value={value}
+                                min={20}
+                                max={60}
+                                track={false}
+                                style={{
+                                    endArc: {
+                                        borderTopColor: "rgb(255, 0, 0)",
+                                        opacity: 0.6,
+                                    },
+                                }}
+                                slotProps={{
+                                    endArc: { accessibilityLabel: "Wave arc" },
+                                }}
+                            />
+                        )}
+                    </progress.Holder>
+                </PureformProvider>,
+            );
+            await settle(100);
+            const path = () => byTestId("wave-end-half").querySelector("path")!;
+            expect(path().getAttribute("fill")).toBe("rgb(255, 0, 0)");
+            expect(byTestId("wave-end-arc").getAttribute("aria-label")).toBe(
+                "Wave arc",
+            );
+            expect(getComputedStyle(byTestId("wave-end-arc")).opacity).toBe(
+                "0.6",
+            );
+            expect(
+                getComputedStyle(byTestId("wave-end-arc")).borderTopWidth,
+            ).toBe("0px");
+            expect(has("wave-track")).toBe(false);
+            const points = wavePoints("wave");
+            // 30 in [20, 60] is 25%, so the last outer point is at the quarter turn.
+            expect(points[144]).toBeCloseTo(48, 1);
+            expect(points[145]).toBeCloseTo(24, 1);
+            await progress.set(50);
+            await settle(100);
+            const updated = wavePoints("wave");
+            expect(updated[144]).toBeCloseTo(3, 1);
+            expect(updated[145]).toBeCloseTo(24, 1);
+            await progress.set(0);
+            await settle(100);
+            expect(wavePoints("wave")[144]).toBe(24);
+        });
+    },
+);
+
+it.each([animated, reanimated])(
+    "keeps the non-SVG fallback with $name",
+    async (engine) => {
+        await render(
+            <CircularProgress testId="fallback" value={40} shape="wavy" />,
+            engine,
+        );
+        expect(byTestId("fallback-root").querySelector("svg")).toBeNull();
+        expect(
+            parseFloat(
+                getComputedStyle(byTestId("fallback-end-arc")).borderTopWidth,
+            ),
+        ).toBeGreaterThan(0);
+    },
+);
 
 describe("the progress indicators' track", () => {
     it("draws the track by default, determinate and indeterminate, flat and wavy", async () => {

@@ -49,6 +49,7 @@ import {
     none,
     numeric,
     pct,
+    platform,
     px,
     ratio,
     relative,
@@ -66,7 +67,7 @@ import {
 import type { NumericValue, ShapeNode, StyleMap } from "@pureform/core/ast";
 import { easing, radius } from "@pureform/theme";
 
-import { waveBand, wavyRing } from "./shape-paths";
+import { waveBand, wavyArc as wavyArcPath, wavyRing } from "./shape-paths";
 import {
     DEFAULT_GROUP,
     circle,
@@ -581,10 +582,25 @@ export const createCircularProgress = <const G extends string = ColorGroup>(
     const wavyHalf = (side: "Start" | "End"): StyleMap => ({
         clipPath: when(
             "rtl",
-            circularWave(side === "End" ? "left" : "right", true),
-            circularWave(side === "End" ? "right" : "left"),
+            platform(
+                { css: circularWave(side === "End" ? "left" : "right", true) },
+                nativeWave(true),
+            ),
+            platform(
+                { css: circularWave(side === "End" ? "right" : "left") },
+                nativeWave(false),
+            ),
         ),
     });
+
+    const nativeWave = (rtl: boolean) =>
+        wavyArcPath({
+            waves: 9,
+            thickness: ref("thickness"),
+            amplitude: ref("amplitude"),
+            sweep: mul(ref("value"), DEG_PER_PERCENT),
+            mirrored: rtl,
+        });
 
     const valueTurn = mul(ref("value"), DEG_PER_PERCENT);
     const degrees = (n: number) => numeric(n, "deg");

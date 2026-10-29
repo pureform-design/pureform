@@ -2,7 +2,18 @@
 // can animate into the next (the loading indicator's morph, core's `morphSequence`), and wave
 // bands to clip a progress indicator to (the wavy linear and circular progress).
 
-import { add, min, mul, pct, px, unitless } from "@pureform/core/ast";
+import {
+    add,
+    clamp,
+    min,
+    mul,
+    numeric,
+    pct,
+    px,
+    sin,
+    sub,
+    unitless,
+} from "@pureform/core/ast";
 import type { NumericValue, ShapeNode, ShapePoint } from "@pureform/core/ast";
 
 export { morphSequence } from "@pureform/core/ast";
@@ -164,6 +175,59 @@ export const wavyRing = ({
         type: "shape",
         fillRule: "evenodd",
         contours: [ring(false), ring(true)],
+    };
+};
+
+/** A wave band from the top clockwise to `sweep` degrees. Unlike the full ring used as a CSS
+ * mask, this is the filled arc itself: SVG can draw it without masking native child Views.
+ * Both halves read the same angle and wave, so their seam stays joined. Fixed point topology
+ * lets the existing drawing engines update it as the value token moves. */
+export const wavyArc = ({
+    waves,
+    thickness,
+    amplitude,
+    sweep,
+    mirrored = false,
+}: {
+    waves: number;
+    thickness: NumericValue;
+    amplitude: NumericValue;
+    sweep: NumericValue;
+    mirrored?: boolean;
+}): ShapeNode => {
+    const samples = waves * 8;
+    const end = clamp(numeric(0, "deg"), sweep, numeric(360, "deg"));
+    const point = (i: number, inner: boolean): ShapePoint => {
+        const angle = min(numeric((i * 360) / samples, "deg"), end);
+        const wave = sin(mul(angle, unitless(waves)));
+        const inset = add(
+            mul(amplitude, sub(unitless(1), wave)),
+            inner ? thickness : px(0),
+        );
+        const x = mul(sin(angle), unitless(mirrored ? -1 : 1));
+        const y = sin(sub(angle, numeric(90, "deg")));
+        return [
+            add(pct(50), mul(x, sub(pct(50), inset))),
+            add(pct(50), mul(y, sub(pct(50), inset))),
+        ];
+    };
+    const outer = Array.from({ length: samples + 1 }, (_, i) =>
+        point(i, false),
+    );
+    const inner = Array.from({ length: samples + 1 }, (_, i) =>
+        point(samples - i, true),
+    );
+    return {
+        type: "shape",
+        contours: [
+            {
+                from: outer[0]!,
+                segments: [...outer.slice(1), ...inner].map((to) => ({
+                    op: "line" as const,
+                    to,
+                })),
+            },
+        ],
     };
 };
 

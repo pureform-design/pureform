@@ -19,15 +19,6 @@ old B/C/D/E identifiers. Complexity estimates are relative and may change after 
 
 ## B. Bounded component work — low to moderate complexity
 
-### 6. Native wavy radial progress shape
-
-**User-reported; reproduction required.** No visible waviness, not merely incorrect wave motion.
-
-- Inspect rendered path geometry and add a failing regression before restoring the wavy shape.
-- Cover determinate/indeterminate modes and reduced motion with both Native animation engines.
-- Validate actual device paths separately from Native Web; animation prop presence is insufficient.
-- Keep this distinct from linear track geometry and gaps (12).
-
 ### 7. FAB-menu composed item count and SSR
 
 - Composed Root discovers items after mount; SSR currently guesses eight animation steps.
@@ -182,6 +173,14 @@ Record device/OS/engine/AT results and recordings; unavailable environments rema
 
 ## Retained decisions and out-of-scope tooling
 
+- **6 completed (2026-10-29): Native wavy radial geometry.** User approved a shared SVG path
+  approach, retaining the non-SVG border fallback rather than adding a native masking dependency.
+  Failing rendered-path regressions reproduced the absence in both SVG engines. Native now draws
+  the filled partial wave through the existing shared Drawing machinery, with token-driven size,
+  amplitude, thickness and sweep; web keeps its existing mask geometry. Geometry tests verify
+  crests/troughs, both band edges, RTL, half alignment, range/value updates, part colors/IDs/props,
+  determinate/indeterminate and full/reduced motion, plus non-SVG fallback. Device path rendering
+  remains V3 and is not claimed verified; linear wave motion/gaps remain separate (12).
 - **5 completed (2026-10-29): Native cascading exit coordination.** Reproduced with real Animated
   and Reanimated presence drivers on Native Web: outside-click/Escape started only the parent exit,
   while selection started all levels. The overlay now passes logical visibility separately from

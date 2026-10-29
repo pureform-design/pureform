@@ -6,8 +6,6 @@ criteria. These are not all confirmed bugs: reproduction and external verificati
 
 ## B. Bounded component work — low to moderate complexity
 
-6. **Native wavy radial progress:** user reports no waviness at all. Reproduce rendered geometry;
-   validate both engines, progress modes, reduced motion and actual device paths.
 7. **FAB-menu SSR item count:** replace the guessed eight steps with data-derived ready-made counts,
    optional explicit composed counts and stable non-staggered SSR/first-hydration fallback until
    registration. Dynamic item changes must not restart the whole animation.
@@ -68,6 +66,9 @@ criteria. These are not all confirmed bugs: reproduction and external verificati
 
 ## Retained decisions / separate work
 
+- **6 completed:** shared filled SVG wave arc restores Native radial waviness on both SVG engines;
+  non-SVG fallback retained. Actual rendered geometry, modes, RTL, theme dimensions, value updates
+  and reduced motion tested. Device rendering remains V3; linear waves/gaps remain item 12.
 - **5 completed:** reproduced and fixed Native cascading dismissal coordination. Outside-click,
   Escape and selection now start every open level's exit together; three-level tests pass on both
   engines in Native Web. Device visuals remain V3; web bindings/drill motion unchanged.
