@@ -51,6 +51,37 @@ const scriptAdapter = () =>
     });
 
 describe("generateTargets", () => {
+    it("publishes a complete final plan when target sets overlap", async () => {
+        const root = tempRoot();
+        const first = fakeAdapter();
+        const other = defineCodegen({ ...fakeAdapter(), name: "other" });
+        await Promise.all([
+            generateTargets({
+                root,
+                config: fixtureConfig(),
+                targets: { first: { target: first }, other: { target: other } },
+            }),
+            generateTargets({
+                root,
+                config: fixtureConfig(),
+                targets: { other: { target: other, components: ["chip"] } },
+            }),
+        ]);
+        for (const file of tree(join(root, ".pureform")).filter((file) =>
+            file.endsWith(".ts"),
+        )) {
+            for (const match of read(root, file).matchAll(
+                /from "([.][/][^"]+)"/g,
+            )) {
+                expect(
+                    existsSync(
+                        join(root, ".pureform", file, "..", `${match[1]}.ts`),
+                    ),
+                ).toBe(true);
+            }
+        }
+    });
+
     it("writes a single target's full output under its name, with top-level entries and declarations", async () => {
         const root = tempRoot();
         const result = await generateTargets({

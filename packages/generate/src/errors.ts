@@ -22,7 +22,9 @@ export type GenerateErrorCode =
      *  the core. */
     | "version-mismatch"
     /** `.pureform/` hasn't been generated. */
-    | "missing-output";
+    | "missing-output"
+    /** Another process still owns the output, or left a lock after interruption. */
+    | "output-lock";
 
 export class GenerateError extends Error {
     readonly code: GenerateErrorCode;

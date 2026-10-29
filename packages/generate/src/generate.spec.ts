@@ -1,5 +1,6 @@
 import { existsSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { setImmediate } from "node:timers/promises";
 
 import { describe, expect, it } from "vitest";
 
@@ -36,6 +37,59 @@ const rejection = async (promise: Promise<unknown>) => {
 const body = (contents: string) => contents.split("\n").slice(3).join("\n");
 
 describe("generate", () => {
+    it("serializes different plans for one output through publication and pruning", async () => {
+        const root = tempRoot();
+        writeTree(root, { ".pureform/app.txt": "owned by the app" });
+        const entered = Promise.withResolvers<void>();
+        const release = Promise.withResolvers<void>();
+        const base = fakeAdapter();
+        let calls = 0;
+        const target = defineCodegen({
+            ...base,
+            codegen: async (context) => {
+                calls++;
+                if (calls === 1) {
+                    entered.resolve();
+                    await release.promise;
+                }
+                return base.codegen(context);
+            },
+        });
+        const first = generate({
+            root,
+            config: fixtureConfig(),
+            target,
+            components: ["button"],
+        });
+        await entered.promise;
+        const second = generate({
+            root,
+            config: fixtureConfig(),
+            target,
+            components: ["chip"],
+        });
+        try {
+            await setImmediate();
+            expect(calls).toBe(1);
+        } finally {
+            release.resolve();
+            await Promise.all([first, second]);
+        }
+        const final = await second;
+        expect(read(root, "index.ts")).toContain('from "./web/chip"');
+        expect(read(root, "index.ts")).not.toContain('from "./web/button"');
+        for (const path of read(root, "index.ts").matchAll(
+            /from "([.][/][^"]+)"/g,
+        )) {
+            expect(existsSync(join(root, ".pureform", `${path[1]}.ts`))).toBe(
+                true,
+            );
+        }
+        expect(headerHash(read(root, "web/chip.ts"))).toBe(final.hash);
+        expect(read(root, "app.txt")).toBe("owned by the app");
+        expect(existsSync(join(root, ".pureform.pureform-lock"))).toBe(false);
+    });
+
     it("writes each module, the adapter's files, the index, and the declarations, all headed by one hash", async () => {
         const root = tempRoot();
         const adapter = fakeAdapter();

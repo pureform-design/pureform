@@ -18,6 +18,7 @@ import { DEFAULT_OUT_DIR, generate, tsconfigHint } from "./generate";
 import type { GenerateOptions, GenerateResult } from "./generate";
 import { hashOf, withHeader } from "./hash";
 import type { ImportRuleOptions } from "./imports";
+import { withOutputLock } from "./output-lock";
 import { DECLARATIONS_FILE, INDEX_FILE } from "./registry-index";
 import type { Usage } from "./usage";
 import { checkVersions, findInstalled } from "./version-check";
@@ -223,6 +224,16 @@ const entryContents = (
 /** Generates every target's `full/` (and `pruned/` when asked), then the top-level entries and
  *  declarations, or checks them (`check: true`). */
 export const generateTargets = async <Options = Record<string, unknown>>(
+    options: GenerateTargetsOptions<Options>,
+): Promise<GenerateTargetsResult> => {
+    const root = resolve(options.root ?? process.cwd());
+    const outDir = resolve(root, options.outDir ?? DEFAULT_OUT_DIR);
+    return withOutputLock(outDir, () =>
+        generateTargetsUnlocked({ ...options, root, outDir }),
+    );
+};
+
+const generateTargetsUnlocked = async <Options = Record<string, unknown>>(
     options: GenerateTargetsOptions<Options>,
 ): Promise<GenerateTargetsResult> => {
     const root = resolve(options.root ?? process.cwd());

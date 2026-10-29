@@ -65,16 +65,30 @@ describe("createGenerateRunner", () => {
             "parts.ts": parts,
         });
         const adapter = fakeAdapter();
+        const entered = Promise.withResolvers<void>();
+        const release = Promise.withResolvers<void>();
         const runner = createGenerateRunner({
             root,
             config: "pureform.config.ts",
-            target: adapter,
+            target: {
+                ...adapter,
+                codegen: async (context) => {
+                    const output = adapter.codegen(context);
+                    if (adapter.calls.length === 1) {
+                        entered.resolve();
+                        await release.promise;
+                    }
+                    return output;
+                },
+            },
         });
         const first = runner.run();
+        await entered.promise;
         writeFileSync(join(root, "pureform.config.ts"), config("divider"));
         const second = runner.run();
         const third = runner.run();
         expect(second).toBe(third);
+        release.resolve();
         await Promise.all([first, second]);
         expect(adapter.calls.map((call) => call.components)).toEqual([
             ["chip"],

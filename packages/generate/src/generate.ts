@@ -20,6 +20,7 @@ import { GenerateError } from "./errors";
 import { hashOf, withHeader } from "./hash";
 import type { ImportRuleOptions } from "./imports";
 import { isAdapter, loadAdapter } from "./load-adapter";
+import { withOutputLock } from "./output-lock";
 import { VERSION } from "./package-version";
 import {
     DECLARATIONS_FILE,
@@ -268,6 +269,16 @@ const tsconfigMentions = (
 
 /** Generates `.pureform/` for a config and a target, or checks it (`check: true`). */
 export const generate = async <Options = Record<string, unknown>>(
+    options: GenerateOptions<Options>,
+): Promise<GenerateResult> => {
+    const root = resolve(options.root ?? process.cwd());
+    const outDir = resolve(root, options.outDir ?? DEFAULT_OUT_DIR);
+    return withOutputLock(outDir, () =>
+        generateUnlocked({ ...options, root, outDir }),
+    );
+};
+
+const generateUnlocked = async <Options = Record<string, unknown>>(
     options: GenerateOptions<Options>,
 ): Promise<GenerateResult> => {
     const root = resolve(options.root ?? process.cwd());

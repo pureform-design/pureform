@@ -115,6 +115,26 @@ The layout:
 - **Clean-up.** Generated files at the top that no entry wants, and folders of an older layout,
   are removed; `<target>/full/` and `<target>/pruned/` are left to their own runs.
 
+In a mixed web/Native project, use explicit imports when code needs Native factory types:
+
+```ts
+import { registry as webRegistry } from "./.pureform"; // first web target's types
+import { registry as nativeRegistry } from "./.pureform/native"; // target named "native"
+
+const nativeButton = nativeRegistry.entry("button").factory;
+const pressed = nativeButton.for({ scheme: "dark" })({ pressed: true });
+```
+
+Bundler routing changes which implementation runs; it does not change TypeScript's view of the
+plain entry. The explicit target entry keeps runtime routing and factory types aligned.
+
+Overlapping generators serialize per output directory, across processes, through writing and
+pruning. The last completed plan owns the final output; unrelated output directories can run in
+parallel. App-owned files without a generated header are preserved. A sibling directory such as
+`.pureform.pureform-lock` holds ownership and is removed on success or failure. If a process is
+killed, a later run times out after 30 seconds rather than removing a possibly live owner's
+lock; remove that empty lock directory only after confirming no generator is running.
+
 ### `generate`
 
 ```ts
@@ -149,7 +169,7 @@ with `declarations: false`, and writes the declarations once at the top.
 
 Errors are `GenerateError`s with a `code`: `config-not-found`, `config-load`,
 `config-export`, `config-imports`, `adapter-not-found`, `adapter-invalid`,
-`adapter-output`, `components`, `version-mismatch`, `missing-output`.
+`adapter-output`, `components`, `version-mismatch`, `missing-output`, `output-lock`.
 
 ### Pruning: `usage`
 

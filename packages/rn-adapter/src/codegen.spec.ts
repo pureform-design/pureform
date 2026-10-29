@@ -25,7 +25,9 @@ import {
 import type { CoreConfig } from "@pureform/core/types";
 import {
     componentShape,
+    defineCodegen,
     generate,
+    generateTargets,
     normalizeVariants,
 } from "@pureform/generate";
 import type { CodegenContext, ComponentShape } from "@pureform/generate";
@@ -308,6 +310,83 @@ describe("the native codegen", () => {
 });
 
 describe("generate with the native target", () => {
+    it(
+        "type-checks explicit native imports alongside a web-default entry",
+        { timeout: 120_000 },
+        async () => {
+            const root = appRoot();
+            symlinkSync(
+                fileURLToPath(new URL("../../styling-web", import.meta.url)),
+                join(root, "node_modules", "@pureform", "styling-web"),
+                "dir",
+            );
+            const web = defineCodegen({
+                name: "web",
+                platform: "web",
+                codegen: () => ({
+                    components: [
+                        {
+                            name: "button",
+                            path: "web/button.ts",
+                            contents:
+                                'export const button = (_selection: { size?: "small" | "large" } = {}) => ({ root: { class: "button" }, label: { class: "label" } });\n',
+                        },
+                    ],
+                }),
+            });
+            await generateTargets({
+                root,
+                config: config(),
+                targets: {
+                    web: { target: web, components: ["button"] },
+                    native: { target: codegen, components: ["button"] },
+                },
+                versionCheck: false,
+            });
+            writeFileSync(
+                join(root, "app.ts"),
+                [
+                    'import { registry as web } from "./.pureform";',
+                    'import { registry as native } from "./.pureform/native";',
+                    'const webButton = web.entry("button").factory;',
+                    'const nativeButton = native.entry("button").factory;',
+                    'export const webClass: string = webButton({ size: "small" }).root.class;',
+                    'export const nativeStyle: object = nativeButton.for({ scheme: "dark" })({ size: "small", hover: true }).root.style;',
+                    "// @ts-expect-error the plain entry has web factory types, even in a native importer",
+                    'webButton.for({ scheme: "dark" });',
+                    "// @ts-expect-error native-only state does not belong to the web factory",
+                    "webButton({ hover: true });",
+                    "// @ts-expect-error the native factory retains its state contract",
+                    "nativeButton({ nonexistentState: true });",
+                ].join("\n"),
+            );
+            writeFileSync(
+                join(root, "tsconfig.json"),
+                JSON.stringify({
+                    extends: TSCONFIG,
+                    compilerOptions: {
+                        noEmit: true,
+                        types: [],
+                        paths: {
+                            "@pureform/rn-adapter/factory": [
+                                join(PACKAGE, "src", "factory.ts"),
+                            ],
+                        },
+                    },
+                    include: ["app.ts", ".pureform/**/*.*"],
+                }),
+            );
+            const checked = spawnSync(
+                process.execPath,
+                [TSC, "-p", root, "--pretty", "false"],
+                { encoding: "utf8" },
+            );
+            expect(checked.stdout).toBe("");
+            expect(checked.stderr).toBe("");
+            expect(checked.status).toBe(0);
+        },
+    );
+
     it("writes the factories, the themes, the index, and the declarations", async () => {
         const root = appRoot();
         const result = await generateInto(
