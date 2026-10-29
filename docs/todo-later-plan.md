@@ -38,6 +38,13 @@ old B/C/D/E identifiers. Complexity estimates are relative and may change after 
   drivers must retain native/UI-thread execution where possible. Generic stagger coordinates
   visibility; FAB-menu owns width measurement and item motion. Distinguish fixed-delay stagger
   from spring-driven visibility progression. Scaffolded with Omni; runtime implementation pending.
+- Adapters choose the fastest compatible platform abstraction, not a lowest-common-denominator
+  JavaScript frame loop: browser-native animations/compositor paths on web, Animated's native
+  driver for supported properties and Reanimated UI-thread execution on Native. Layout properties
+  require capability-specific paths; do not promise compositor/native-driver width animation.
+  Keep stagger coordination driver-local where supported, with boundary/lifecycle notifications
+  instead of per-frame framework renders. Fallbacks preserve interruption, cleanup and reduced
+  motion. Verify driver selection and profile actual performance, including devices.
 
 ### 11. Arbitrarily nested motion providers and provider-aware motion-safe
 
