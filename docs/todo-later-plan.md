@@ -19,14 +19,6 @@ old B/C/D/E identifiers. Complexity estimates are relative and may change after 
 
 ## B. Bounded component work — low to moderate complexity
 
-### 3. Chip/InputChip radius precedence
-
-- Chip writes the derived pill radius at the root, blocking explicit theme radius overrides.
-- Agreed precedence: instance radius > explicit theme radius > size/density-derived pill default.
-- Density changes dimensions, not an explicit radius. Uncustomized chips remain pill-shaped as
-  height changes. Apply equally to Chip and InputChip.
-- Regress provider/named themes, instance overrides and density variants.
-
 ### 4. DockedDatePicker ready-made actions and trigger customization
 
 - React/Solid define the Actions part but do not render it in ready-mades; composed Actions works.
@@ -210,6 +202,12 @@ Record device/OS/engine/AT results and recordings; unavailable environments rema
 
 ## Retained decisions and out-of-scope tooling
 
+- **3 completed (2026-10-29): shared radius precedence.** Scope expanded by agreement to Button,
+  IconButton and SplitButton alongside Chip/InputChip. Recipes set `defaultRadius`, leaving
+  `radius` as the explicit override input: instance > theme > derived pill. Existing `pillRadius`
+  customization and size/density-derived defaults remain supported. Native tests cover every size
+  and density; styled React/Solid tests cover all web adapters, named/provider themes, instance
+  overrides, reactive removal and uncustomized pills. Only affected recipe snapshots updated.
 - **2 completed (2026-10-29): NativeSelect typing/ripple.** Cross-binding compile-time tests verify
   mode-dependent values, defaults and inferred callbacks, including rejected mismatches and web
   composed Root props. Shared discriminated typing was already correct; historical discrepancy

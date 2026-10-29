@@ -62,7 +62,7 @@ const { tokens, ref } = componentTokens("chip", {
     height: sizeToken("controlSmall"),
     // The round corner, and the square one the chip rests in, with the `corner` and `toggle`
     // variants' flags: only a toggle swaps when selected.
-    ...cornerMorphTokens("square", radius("medium"), radius("small")),
+    ...cornerMorphTokens("chip", "square", radius("medium"), radius("small")),
     gap: spacing("2"),
     padding: spacing("4"),
     iconSize: sizeToken("iconSmall"),
@@ -180,7 +180,7 @@ export const chipShape = (
     borderRadius: cornerRadius(ref),
     tokens: {
         ...indicationRoot(ref).tokens,
-        radius: pillRadius(name, dense(ref("height"))),
+        defaultRadius: pillRadius(name, dense(ref("height"))),
     },
 });
 
@@ -265,7 +265,7 @@ export const createChip = <
                         root: {
                             height: add(ref("height"), offset),
                             tokens: {
-                                radius: pillRadius(
+                                defaultRadius: pillRadius(
                                     "chip",
                                     add(ref("height"), offset),
                                 ),

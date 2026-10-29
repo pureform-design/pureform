@@ -66,7 +66,8 @@ describe("button corners", () => {
             string,
             unknown
         >;
-        const radius = String(small["--components-button-radius"]);
+        const radius = String(small["--components-button-defaultRadius"]);
+        expect(small).not.toHaveProperty("--components-button-radius");
         expect(radius).toMatch(/^min\(/);
         expect(radius).toContain("token(radii.full)");
         expect(radius).toContain("--components-button-heightSmall");

@@ -172,7 +172,7 @@ export const BUTTON_SIZES = {
 const { tokens, ref } = componentTokens("button", {
     // The size's square and pressed corners, and the `corner` and `toggle` variants' flags,
     // which `cornerRadius` reads.
-    ...cornerMorphTokens("round", radius("medium"), radius("small")),
+    ...cornerMorphTokens("button", "round", radius("medium"), radius("small")),
     gap: spacing("2"),
     iconSize: px(20),
     iconFill: unitless(0),
@@ -418,7 +418,7 @@ export const createButton = <
                                         iconSize: s.icon,
                                         secondaryIconSize: s.icon,
                                         outlineWidth: s.outline,
-                                        radius: pillRadius(
+                                        defaultRadius: pillRadius(
                                             "button",
                                             add(
                                                 ref(

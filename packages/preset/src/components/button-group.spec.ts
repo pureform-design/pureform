@@ -80,9 +80,9 @@ describe("buttonGroup", () => {
         // `connectedButtonCheckedShape` is `CornerFull` on every corner: the outside blends to
         // the round radius by the toggle flag, never to the square one.
         expect(selected).toContain("components-button-toggles");
-        expect(selected).toMatch(
-            /calc\(var\(--components-button-radius[^)]*\)\) - calc\(var\(--components-button-radius/,
-        );
+        const round =
+            "var(--components-button-radius, var(--components-button-defaultRadius, token(radii.full)))";
+        expect(selected).toContain(`calc(${round} - calc(${round}`);
         const inner = first.borderStartEndRadius as Record<string, string>;
         expect(
             Object.entries(inner).find(([key]) => key.includes(":active"))?.[1],

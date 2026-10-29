@@ -100,6 +100,7 @@ exports[`input chip > compiles to a stable Panda slot recipe 1`] = `
         "borderColor": "transparent",
         "color": "var(--components-inputChip-selectedContent, token(colors.onSecondaryContainer))",
       },
+      "--components-inputChip-defaultRadius": "min(token(radii.full), var(--components-inputChip-pillRadius, calc(calc(var(--components-inputChip-height, token(sizes.controlSmall)) + token(sizes.densityOffset)) * 0.5)))",
       "--components-inputChip-indication-focusIndicatorColor": "var(--components-inputChip-focusIndicatorColor, token(colors.secondary))",
       "--components-inputChip-indication-focusIndicatorOuterOffset": "var(--components-inputChip-focusIndicatorOuterOffset, token(sizes.focusIndicatorOuterOffset))",
       "--components-inputChip-indication-focusIndicatorThickness": "var(--components-inputChip-focusIndicatorThickness, token(sizes.focusIndicatorThickness))",
@@ -107,7 +108,6 @@ exports[`input chip > compiles to a stable Panda slot recipe 1`] = `
       "--components-inputChip-indication-stateFocusOpacity": "var(--components-inputChip-stateFocusOpacity, token(opacity.stateFocus))",
       "--components-inputChip-indication-stateHoverOpacity": "var(--components-inputChip-stateHoverOpacity, token(opacity.stateHover))",
       "--components-inputChip-indication-statePressedOpacity": "var(--components-inputChip-statePressedOpacity, token(opacity.statePressed))",
-      "--components-inputChip-radius": "min(token(radii.full), var(--components-inputChip-pillRadius, calc(calc(var(--components-inputChip-height, token(sizes.controlSmall)) + token(sizes.densityOffset)) * 0.5)))",
       "--components-ripple-surfaceOpacity": "var(--components-inputChip-indication-statePressedOpacity, var(--components-inputChip-statePressedOpacity, token(opacity.statePressed)))",
       "alignItems": "center",
       "backgroundColor": {
@@ -120,8 +120,8 @@ exports[`input chip > compiles to a stable Panda slot recipe 1`] = `
       "borderColor": "var(--components-inputChip-outlineColor, token(colors.outlineVariant))",
       "borderRadius": {
         "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "var(--components-inputChip-pressedRadius, token(radii.small))",
-        "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": "calc(calc(var(--components-inputChip-radius, token(radii.full)) + calc(calc(var(--components-inputChip-squareRadius, token(radii.medium)) - var(--components-inputChip-radius, token(radii.full))) * var(--components-inputChip-square, 1))) + calc(calc(calc(var(--components-inputChip-squareRadius, token(radii.medium)) + calc(calc(var(--components-inputChip-radius, token(radii.full)) - var(--components-inputChip-squareRadius, token(radii.medium))) * var(--components-inputChip-square, 1))) - calc(var(--components-inputChip-radius, token(radii.full)) + calc(calc(var(--components-inputChip-squareRadius, token(radii.medium)) - var(--components-inputChip-radius, token(radii.full))) * var(--components-inputChip-square, 1)))) * var(--components-inputChip-toggles, 0)))",
-        "base": "calc(var(--components-inputChip-radius, token(radii.full)) + calc(calc(var(--components-inputChip-squareRadius, token(radii.medium)) - var(--components-inputChip-radius, token(radii.full))) * var(--components-inputChip-square, 1)))",
+        "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": "calc(calc(var(--components-inputChip-radius, var(--components-inputChip-defaultRadius, token(radii.full))) + calc(calc(var(--components-inputChip-squareRadius, token(radii.medium)) - var(--components-inputChip-radius, var(--components-inputChip-defaultRadius, token(radii.full)))) * var(--components-inputChip-square, 1))) + calc(calc(calc(var(--components-inputChip-squareRadius, token(radii.medium)) + calc(calc(var(--components-inputChip-radius, var(--components-inputChip-defaultRadius, token(radii.full))) - var(--components-inputChip-squareRadius, token(radii.medium))) * var(--components-inputChip-square, 1))) - calc(var(--components-inputChip-radius, var(--components-inputChip-defaultRadius, token(radii.full))) + calc(calc(var(--components-inputChip-squareRadius, token(radii.medium)) - var(--components-inputChip-radius, var(--components-inputChip-defaultRadius, token(radii.full)))) * var(--components-inputChip-square, 1)))) * var(--components-inputChip-toggles, 0)))",
+        "base": "calc(var(--components-inputChip-radius, var(--components-inputChip-defaultRadius, token(radii.full))) + calc(calc(var(--components-inputChip-squareRadius, token(radii.medium)) - var(--components-inputChip-radius, var(--components-inputChip-defaultRadius, token(radii.full)))) * var(--components-inputChip-square, 1)))",
       },
       "borderStyle": "solid",
       "borderWidth": "var(--components-inputChip-outlineWidth, 1px)",
@@ -229,25 +229,25 @@ exports[`input chip > compiles to a stable Panda slot recipe 1`] = `
     "density": {
       "-1": {
         "root": {
-          "--components-inputChip-radius": "min(token(radii.full), var(--components-inputChip-pillRadius, calc(calc(var(--components-inputChip-height, token(sizes.controlSmall)) + calc(token(spacing.1) * -1)) * 0.5)))",
+          "--components-inputChip-defaultRadius": "min(token(radii.full), var(--components-inputChip-pillRadius, calc(calc(var(--components-inputChip-height, token(sizes.controlSmall)) + calc(token(spacing.1) * -1)) * 0.5)))",
           "height": "calc(var(--components-inputChip-height, token(sizes.controlSmall)) + calc(token(spacing.1) * -1))",
         },
       },
       "-2": {
         "root": {
-          "--components-inputChip-radius": "min(token(radii.full), var(--components-inputChip-pillRadius, calc(calc(var(--components-inputChip-height, token(sizes.controlSmall)) + calc(token(spacing.1) * -2)) * 0.5)))",
+          "--components-inputChip-defaultRadius": "min(token(radii.full), var(--components-inputChip-pillRadius, calc(calc(var(--components-inputChip-height, token(sizes.controlSmall)) + calc(token(spacing.1) * -2)) * 0.5)))",
           "height": "calc(var(--components-inputChip-height, token(sizes.controlSmall)) + calc(token(spacing.1) * -2))",
         },
       },
       "-3": {
         "root": {
-          "--components-inputChip-radius": "min(token(radii.full), var(--components-inputChip-pillRadius, calc(calc(var(--components-inputChip-height, token(sizes.controlSmall)) + calc(token(spacing.1) * -3)) * 0.5)))",
+          "--components-inputChip-defaultRadius": "min(token(radii.full), var(--components-inputChip-pillRadius, calc(calc(var(--components-inputChip-height, token(sizes.controlSmall)) + calc(token(spacing.1) * -3)) * 0.5)))",
           "height": "calc(var(--components-inputChip-height, token(sizes.controlSmall)) + calc(token(spacing.1) * -3))",
         },
       },
       "0": {
         "root": {
-          "--components-inputChip-radius": "min(token(radii.full), var(--components-inputChip-pillRadius, calc(calc(var(--components-inputChip-height, token(sizes.controlSmall)) + 0px) * 0.5)))",
+          "--components-inputChip-defaultRadius": "min(token(radii.full), var(--components-inputChip-pillRadius, calc(calc(var(--components-inputChip-height, token(sizes.controlSmall)) + 0px) * 0.5)))",
           "height": "calc(var(--components-inputChip-height, token(sizes.controlSmall)) + 0px)",
         },
       },

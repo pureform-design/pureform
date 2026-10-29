@@ -57,7 +57,12 @@ import type { ColorGroup, ColorGroups, Densities } from "./shared";
 
 const { tokens, ref } = componentTokens("inputChip", {
     height: sizeToken("controlSmall"),
-    ...cornerMorphTokens("square", radius("medium"), radius("small")),
+    ...cornerMorphTokens(
+        "inputChip",
+        "square",
+        radius("medium"),
+        radius("small"),
+    ),
     gap: spacing("2"),
     padding: spacing("3"),
     // Where the leading avatar, the leading icon and the remove button sit from the edge.
@@ -214,7 +219,7 @@ export const createInputChip = <
                         root: {
                             height: add(ref("height"), offset),
                             tokens: {
-                                radius: pillRadius(
+                                defaultRadius: pillRadius(
                                     "inputChip",
                                     add(ref("height"), offset),
                                 ),

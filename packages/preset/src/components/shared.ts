@@ -855,6 +855,15 @@ export const pillRadius = (
  *  alone, outside a size that knows the height, it is the theme's full radius. */
 export const PILL_RADIUS_TOKEN = { pillRadius: radius("full") };
 
+/** The round radius's overrideable input and its size-derived fallback. Recipes set only
+ * `defaultRadius`: writing `radius` on the root would mask a theme's inherited override.
+ * Keep `pillRadius` as the input to the derived fallback for existing customizations. */
+export const roundRadiusTokens = (component: string) => ({
+    radius: alias("components", component, "defaultRadius"),
+    defaultRadius: radius("full"),
+    ...PILL_RADIUS_TOKEN,
+});
+
 /** Which corners a corner-morphing component rests in by default. */
 export type RestingCorner = "round" | "square";
 
@@ -862,12 +871,12 @@ export type RestingCorner = "round" | "square";
  *  radii, the `corner` variant's `square` flag (1 when `rest` is square), and the `toggle`
  *  variant's `toggles` flag. A component spreads them first in its token set. */
 export const cornerMorphTokens = (
+    component: string,
     rest: RestingCorner,
     squareRadius: ValueNode,
     pressedRadius: ValueNode,
 ) => ({
-    radius: radius("full"),
-    ...PILL_RADIUS_TOKEN,
+    ...roundRadiusTokens(component),
     squareRadius,
     pressedRadius,
     square: unitless(rest === "square" ? 1 : 0),

@@ -9,7 +9,7 @@ import type { ThemeValues } from "./values";
 
 // The corner-morphing components' round corner, `min(radius("full"), pillRadius)`, as the
 // factory selects it: at every size and density it is half the root's height, as CSS computes
-// the same formula, and a theme or an instance retunes it through `pillRadius`.
+// the same formula. `pillRadius` retunes that fallback; explicit `radius` wins over it.
 const precomputed = precompute(pureform(), {
     components: [
         "button",
@@ -60,6 +60,11 @@ const cases = (name: string, extra: Record<string, string> = {}) => {
     );
 };
 
+const drawnRadius = (name: string, selected: ReturnType<typeof pick>) =>
+    name === "splitButton"
+        ? selected.styles.trailingButton!.borderTopEndRadius
+        : selected.styles.root!.borderRadius;
+
 describe("the pill radius", () => {
     for (const [name, extra] of [
         ["button", {}],
@@ -76,7 +81,7 @@ describe("the pill radius", () => {
                 const height = selected.styles.root!.height as number;
                 expect(typeof height, JSON.stringify(variants)).toBe("number");
                 expect(
-                    selected.tokens[`components.${name}.radius`],
+                    drawnRadius(name, selected),
                     JSON.stringify(variants),
                 ).toBe(height / 2);
             }
@@ -85,16 +90,36 @@ describe("the pill radius", () => {
         it(`lets a theme and an instance retune ${name}'s pill radius`, () => {
             const [variants] = cases(name, extra);
             const key = `components.${name}.pillRadius`;
+            expect(drawnRadius(name, pick(name, variants!, { [key]: 6 }))).toBe(
+                6,
+            );
             expect(
-                pick(name, variants!, { [key]: 6 }).tokens[
-                    `components.${name}.radius`
-                ],
-            ).toBe(6);
-            expect(
-                pick(name, variants!, { [key]: 6 }, { [key]: 3 }).tokens[
-                    `components.${name}.radius`
-                ],
+                drawnRadius(
+                    name,
+                    pick(name, variants!, { [key]: 6 }, { [key]: 3 }),
+                ),
             ).toBe(3);
+        });
+
+        it(`keeps explicit ${name} radii above derived size and density defaults`, () => {
+            const key = `components.${name}.radius`;
+            for (const variants of cases(name, extra)) {
+                expect(
+                    drawnRadius(name, pick(name, variants, { [key]: 6 })),
+                    JSON.stringify(variants),
+                ).toBe(6);
+                expect(
+                    drawnRadius(
+                        name,
+                        pick(name, variants, { [key]: 6 }, { [key]: 3 }),
+                    ),
+                    JSON.stringify(variants),
+                ).toBe(3);
+                expect(
+                    drawnRadius(name, pick(name, variants, { [key]: 0 })),
+                    JSON.stringify(variants),
+                ).toBe(0);
+            }
         });
     }
 
@@ -116,6 +141,6 @@ describe("the pill radius", () => {
 
     it("keeps the theme's full radius when it is smaller", () => {
         const selected = pick("button", { size: "small" }, { "radii.full": 0 });
-        expect(selected.tokens["components.button.radius"]).toBe(0);
+        expect(drawnRadius("button", selected)).toBe(0);
     });
 });

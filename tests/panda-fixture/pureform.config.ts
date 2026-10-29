@@ -3,7 +3,7 @@
 // it into the Panda preset, `pureform generate` writes `.pureform/` from it, and the suites
 // compile the CSS, Tailwind, and React Native targets from it too.
 
-import { morph, pct } from "@pureform/core/ast";
+import { morph, pct, px } from "@pureform/core/ast";
 import {
     materialColor,
     materialLayout,
@@ -64,6 +64,17 @@ export default {
         ...config.themes,
         indication: {
             components: { button: { tokens: { stateHoverOpacity: pct(40) } } },
+        },
+        radius: {
+            components: Object.fromEntries(
+                [
+                    "button",
+                    "iconButton",
+                    "chip",
+                    "inputChip",
+                    "splitButton",
+                ].map((name) => [name, { tokens: { radius: px(6) } }]),
+            ),
         },
     },
 };

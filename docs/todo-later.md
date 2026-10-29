@@ -6,8 +6,6 @@ criteria. These are not all confirmed bugs: reproduction and external verificati
 
 ## B. Bounded component work — low to moderate complexity
 
-3. **Chip/InputChip radius:** instance > explicit theme > derived pill radius. Density does not
-   alter an explicit radius; uncustomized chips stay pill-shaped.
 4. **DockedDatePicker actions/trigger:** optional user-supplied actions, no empty wrapper/default
    OK/Cancel or selection changes; reuse trigger slot conventions and preserve internal behavior.
 5. **Native cascading submenu exit:** outside-click dismissal reportedly waits for the parent exit,
@@ -75,6 +73,9 @@ criteria. These are not all confirmed bugs: reproduction and external verificati
 
 ## Retained decisions / separate work
 
+- **3 completed:** shared radius fallback for Chip/InputChip, Button, IconButton and SplitButton.
+  Explicit radius wins over derived size/density defaults; existing pillRadius customization stays.
+  Native and all six web binding/adapter combinations verified.
 - **2 completed:** NativeSelect mode-dependent values/defaults/callbacks verified across bindings;
   stale discrepancy retired. Fallback indication/ripple scope documented; device checks remain V3.
 - **1 completed:** BottomSheet reopen regressions pass in React, Solid and Native Web; only user

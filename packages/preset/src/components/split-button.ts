@@ -49,7 +49,7 @@ import {
     sys,
     variantsOf,
     pillRadius,
-    PILL_RADIUS_TOKEN,
+    roundRadiusTokens,
 } from "./shared";
 import type { ColorGroup, ColorGroups, Densities, Fill } from "./shared";
 import { runCorners } from "./tiles";
@@ -102,8 +102,7 @@ type Size = keyof typeof SPLIT_BUTTON_SIZES;
 const { tokens, ref } = componentTokens("splitButton", {
     // The outside corners, the inner ones at rest and pressed (each size sets them), and the
     // space between the buttons.
-    radius: radius("full"),
-    ...PILL_RADIUS_TOKEN,
+    ...roundRadiusTokens("splitButton"),
     innerRadius: radius("extraSmall"),
     pressedInnerRadius: radius("small"),
     gap: px(2),
@@ -276,7 +275,7 @@ export const createSplitButton = <
                                             iconSize: b.icon,
                                             leadingGap: b.gap,
                                             outlineWidth: b.outline,
-                                            radius: pillRadius(
+                                            defaultRadius: pillRadius(
                                                 "splitButton",
                                                 height,
                                             ),
