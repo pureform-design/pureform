@@ -15,8 +15,8 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Controllable } from "../controllable";
 import type { Unstyled } from "../parts";
-import type { ButtonVariantProps } from "./button";
-import type { IconButtonVariantProps } from "./icon-button";
+import type { ButtonPart, ButtonVariantProps } from "./button";
+import type { IconButtonPart, IconButtonVariantProps } from "./icon-button";
 import type { IndicationProps, InteractionSourceProps } from "./indication";
 import { tilePosition } from "./list";
 import type { TilePosition } from "./list";
@@ -116,7 +116,8 @@ export interface ButtonGroupItem<
     readonly width?: IconButtonVariantProps["width"];
     /** Called when it's pressed. */
     readonly onClick?: (() => void) | undefined;
-    readonly testId?: string | undefined;
+    /** The button's test ids: a prefix, or ids by part (a labelled button's or an icon button's). */
+    readonly testId?: TestIdOverride<ButtonPart | IconButtonPart> | undefined;
 }
 
 /** What the ready-made group renders inside Root. */

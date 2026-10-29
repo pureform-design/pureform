@@ -13,7 +13,7 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Controllable } from "../controllable";
 import type { Unstyled } from "../parts";
-import type { ChipVariantProps } from "./chip";
+import type { ChipPart, ChipVariantProps } from "./chip";
 import type { IndicationProps, InteractionSourceProps } from "./indication";
 
 /** The set's own parts: `"root"`. */
@@ -91,7 +91,7 @@ export interface ChipSetItem<Node = unknown> extends InteractionSourceProps {
     readonly disabled?: boolean | undefined;
     /** Called when it's pressed. */
     readonly onClick?: (() => void) | undefined;
-    readonly testId?: string | undefined;
+    readonly testId?: TestIdOverride<ChipPart> | undefined;
 }
 
 /** What the ready-made set renders inside Root. */

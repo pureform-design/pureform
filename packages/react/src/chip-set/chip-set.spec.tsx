@@ -24,6 +24,17 @@ const chips = () =>
     [...byTestId(testIds.chipSet.root).children] as HTMLButtonElement[];
 
 describe("ChipSet, ready-made", () => {
+    it("gives an item test ids by part, as List's items do", async () => {
+        withRegistry(
+            <ChipSet
+                aria-label="Suggestions"
+                items={[{ label: "Reply", testId: { label: "reply-label" } }]}
+            />,
+        );
+        await settle();
+        expect(byTestId("reply-label").textContent).toBe("Reply");
+    });
+
     it("gives an item its own parts' class and style over the set's chipProps, and no other chip's", async () => {
         withRegistry(
             <ChipSet

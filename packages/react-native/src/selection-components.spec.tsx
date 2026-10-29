@@ -57,6 +57,15 @@ describe("ChipSet", () => {
         { value: "b", label: "B", testId: "b" },
     ];
 
+    it("gives an item test ids by part, as List's items do", async () => {
+        await render(
+            <ChipSet
+                items={[{ label: "Reply", testId: { label: "reply-label" } }]}
+            />,
+        );
+        expect(byTestId("reply-label").textContent).toBe("Reply");
+    });
+
     it("gives an item its own style over the set's chipProps, and no other chip's", async () => {
         await render(
             <ChipSet

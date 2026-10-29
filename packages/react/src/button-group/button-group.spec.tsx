@@ -24,6 +24,16 @@ const buttons = () =>
     [...byTestId(testIds.buttonGroup.root).children] as HTMLElement[];
 
 describe("ButtonGroup, ready-made", () => {
+    it("gives an item test ids by part, as List's items do", async () => {
+        withRegistry(
+            <ButtonGroup
+                items={[{ label: "Day", testId: { label: "day-label" } }]}
+            />,
+        );
+        await settle();
+        expect(byTestId("day-label").textContent).toBe("Day");
+    });
+
     it("gives an item its own parts' class over the group's buttonProps, and no other button's", async () => {
         withRegistry(
             <ButtonGroup

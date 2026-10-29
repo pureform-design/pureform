@@ -30,6 +30,9 @@ old B/C/D/E identifiers. Complexity estimates are relative and may change after 
 - Pattern for items drawn with per-part hooks (a radio's parts read through `useSlotProps`): each
   item renders its own child component, which merges its customization before reading its parts.
   Other ready-mades that hit the same limitation may copy this shape.
+- Test ids: ChipSet and ButtonGroup items now take `TestIdOverride` (a prefix or ids by part), as
+  List and RadioGroup items do, so per-part customization is the same everywhere. Toolbar items still
+  take a string; that follows with Toolbar.
 - Still open: Toolbar items and its `buttonProps`/`menuProps` defaults, and SplitButton's `menuProps`,
   need the same item typing plus per-item instance functions like `SelectMenuProps`
   (`MenuScopeInstances`).

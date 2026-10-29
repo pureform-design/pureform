@@ -28,6 +28,21 @@ const render = (view: ReactNode) =>
     );
 
 describe("ButtonGroup", () => {
+    it("gives an item test ids by part, as List's items do", async () => {
+        await render(
+            <ButtonGroup
+                items={[
+                    {
+                        value: "day",
+                        label: "Day",
+                        testId: { label: "day-label" },
+                    },
+                ]}
+            />,
+        );
+        expect(byTestId("day-label").textContent).toBe("Day");
+    });
+
     it("gives an item its own style over the group's buttonProps, and no other button's", async () => {
         await render(
             <ButtonGroup
