@@ -1,6 +1,6 @@
 # Parked for later
 
-Relevance review: 2026-10-27, after the platform-boundary refactor. See
+Relevance review: 2026-10-29, after the platform-boundary refactor and follow-up regressions. See
 [the follow-up plan](todo-later-plan.md) for priorities
 and verification gates. Items below are not all reproduced bugs: device checks, design
 questions, and older reports awaiting reproduction remain explicitly deferred.
@@ -60,8 +60,9 @@ Still open when the batch notes (`docs/roadmap-components/context/` and the firs
 ### Components
 
 - Swipeable list row: its focus ring draws inside (the frame clips it).
-- Slider: the icon button's focus ring inside it is clipped to 1px; handle clearance isn't
-  themed; no styled web test for the slider reader.
+- Slider: the icon button's focus ring inside it was reported clipped to 1px; obtain the
+  nested-icon-button scene before changing clipping. Handle-clearance theming and the styled
+  inset-icon reader are already covered by `slider-inset-icon.e2e.test.ts`.
 - Bottom sheet: `onExpandedChange` also fires when an uncontrolled sheet reopens at another
   rest; undecided whether only drags and presses should fire it.
 - Splitter: the machines wrapper patches Zag internals (`resizeObserver` measure): recheck on Zag
@@ -74,9 +75,6 @@ Still open when the batch notes (`docs/roadmap-components/context/` and the firs
   `@react-native-menu/menu` paths (`multiple`, `keepsMenuPresented`) need a device check before
   the peer is advertised; `ripple` stays in its usage for the Material Menu fallback.
 - Select: no `multiple` (`Select<string[]>`) though component-architecture §9.4 describes it.
-- Direction: the web `rtl` condition matches an ancestor, so an `ltr` part inside an `rtl` page
-  matches both; `&:dir(rtl)` with Panda's condition overridden would fix it
-  (css-lowering `conditions.ts`, panda-adapter `_rtl`, Tailwind's `rtl:` variant, snapshots).
 
 ### Slot props
 
@@ -86,20 +84,10 @@ Still open when the batch notes (`docs/roadmap-components/context/` and the firs
 - React Native: NativeSelect has no option parts (its web options and the OS-owned menus need
   different contracts). No provider-level `slotProps` on React Native (undecided whether it
   should have them).
-- Ripple's `ripple` elements take only the registry class, no `className`/`style`/`slotProps`.
-- Indication: the ripple's opacity comes from the theme's pressed opacity, not the surface's
-  `statePressedOpacity`, so `indication` doesn't change it (`it.fails` in `indication.e2e.test.ts`).
-- Indication: a `components.<c>.<indication token>` override in a provider or named theme never
-  reaches the component; each root resets those tokens (`it.fails` in the same file).
 
 ### Tooling
 
-- tailwind-demo `generate`: reproduce overlapping runs with different plans: pruning may still
-  remove another run's files. Prefer per-output serialization or a transactional swap, not clearing
-  app-owned files.
 - Open choices: run the node type checks in `build` (now in `check:types`); rename
   `tsconfig.project.json`.
-- The plain `.pureform/` entry is typed from the first web target; multi-target code needing
-  native factory types imports `.pureform/native`. Revisit if it confuses users.
 - Bundler pruning keeps every token, theme, `@property`, keyframes and shape, most of the CSS
   left; dropping keyframes and shape paths no kept rule reads is the next step.

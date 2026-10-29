@@ -1,6 +1,6 @@
 # Parked work: relevance review and action plan
 
-Reviewed 2026-10-27 against `main` after the platform-boundary refactor. This is a source/test
+Reviewed 2026-10-29 after the platform-boundary refactor and follow-up regressions. This is a source/test
 audit, not a claim that every historical visual report has been reproduced. Keep device-only
 and subjective behavior out of speculative quick fixes.
 
@@ -23,11 +23,7 @@ verification is a separate lane and must not block unrelated fixes.
 
 | Order | Item                                                           | Recommended approach                                                                                                              |
 | ----- | -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| C1    | Nested RTL/LTR selectors                                       | Prefer effective element direction; update CSS/Panda/Tailwind together with nested-direction geometry tests.                      |
 | C2    | Arbitrarily nested reduced motion / provider-aware motion-safe | Establish nearest-provider semantics across all adapters; test system/full/reduce combinations and SSR before choosing selectors. |
-| C3    | Ripple opacity / provider indication-token overrides           | Fix the two existing expected-failure regressions at token resolution, without changing override precedence or caches.            |
-| C4    | Ripple class/style/slot forwarding                             | Audit ownership and use the existing part merge contract across web bindings.                                                     |
-| C5    | Concurrent generation with different plans                     | Reproduce missing exports after both runs complete; prefer per-output serialization over broad deletion.                          |
 | C6    | Interrupted page transitions                                   | Preserve in-flight visual progress and leaving-page identity; test rapid direction changes before altering the page lifecycle.    |
 | C7    | Native drill width / label translation / sibling fades         | Implement from measured geometry and existing springs after visual reproduction; validate both engines.                           |
 | C8    | Linear wavy progress motion and gaps                           | Specify track-relative geometry and gap windows, then implement consistent web/Native rendering.                                  |
@@ -37,7 +33,6 @@ verification is a separate lane and must not block unrelated fixes.
 | Order | Item                                                                            | Recommendation / decision needed                                                                                                                 |
 | ----- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
 | D1    | Chip/InputChip radius precedence                                                | Recommend explicit theme radius overrides win over derived defaults; confirm how density affects an explicit radius.                             |
-| D2    | Slider handle-clearance theming                                                 | Recommend a component token with the current clearance as default; confirm naming and scope.                                                     |
 | D3    | DockedDatePicker ready-made actions and trigger props                           | Decide whether action content belongs in the ready-made and how trigger customization is exposed; do not merely render an empty Actions wrapper. |
 | D4    | BottomSheet onExpandedChange on reopen                                          | Decide whether it reports every effective rest change or only user-driven changes.                                                               |
 | D5    | Live submenu adaptation                                                         | Decide whether an open menu changes cascade/drill mode on resize/scroll/content changes; add observers only for that contract.                   |
@@ -45,7 +40,6 @@ verification is a separate lane and must not block unrelated fixes.
 | D7    | Per-item styling on ButtonGroup/ChipSet/Toolbar/RadioGroup; menu prop functions | Recommend existing InnerPropsOf and instance-function conventions, with one consistent cross-binding type contract.                              |
 | D8    | NativeSelect value typing and fallback ripple API                               | Align with the chosen cross-binding discriminated/union convention; keep optional native-menu claims gated on device tests.                      |
 | D9    | Node checks in build / tsconfig naming                                          | Recommend retaining explicit check:types gating unless build guarantees require otherwise; avoid a naming-only migration without a benefit.      |
-| D10   | Default generated target imports                                                | Recommend documenting explicit native imports and adding a mixed-target fixture before redesigning entries.                                      |
 | D11   | Compose timing parity                                                           | Decide whether exact Compose timings or theme roles are the contract; recommend retaining theme roles by default.                                |
 
 ### E. Large API/architecture projects — separate designs and milestones
@@ -76,8 +70,7 @@ reproduces, retire it with the test/source evidence instead of changing behavior
 click-only activation and typed Snackbar button sources are now implemented and covered by DOM
 and API tests; actual screen-reader behavior is unverified (see the verification lane).
 
-1. Add calendar range-boundary coverage before changing range semantics.
-2. Treat Select multiple mode as an API project: define scalar/array discrimination, deselection,
+1. Treat Select multiple mode as an API project: define scalar/array discrimination, deselection,
    labels, form serialization and keyboard/AT behavior across all bindings before implementation.
 
 **Exit gate:** targeted interaction tests plus React/Solid/Native suites; a recorded AT matrix
@@ -86,28 +79,25 @@ for the Snackbar and click-only work already implemented.
 ### 2. Motion and layout regressions
 
 **Confirmed source limitations:** reduced-motion selectors in `css-lowering/src/motion.ts` only
-handle limited provider nesting; direction selectors in `conditions.ts` can match an RTL ancestor
-inside a nearer LTR subtree; Chip writes its radius as a root token; web docked pickers define
-Actions but do not render that part in ready-mades; Native docked picker trigger ID is hardcoded.
+handle limited provider nesting; Chip writes its radius as a root token; web docked pickers define
+Actions but do not render that part in ready-mades.
 
 1. Reproduce `reduce → full → reduce` and reverse/system combinations. Choose a nearest-provider
    strategy before editing selectors; test CSS, Panda, Tailwind, SSR and hydration together.
    Include provider-aware `_motionSafe` / `motion-safe`, not just reduce variants.
-2. Add nested RTL/LTR and element-local direction regressions; evaluate `:dir()` across the CSS,
-   Panda and Tailwind adapters, then update snapshots and mirrored keyboard/geometry tests.
-3. Check Chip round-radius overrides in provider/named themes and density variants. Define whether
+2. Check Chip round-radius overrides in provider/named themes and density variants. Define whether
    explicit radius or density-derived pill radius wins, then use the same policy for InputChip.
-4. Reproduce SwipeableListRow/Slider focus-ring clipping in a styled browser fixture. Resolve
-   themed handle clearance and add reader coverage.
-5. Recheck interrupted page transitions. Native FadeThrough now settles its page model without
+3. Reproduce SwipeableListRow/Slider focus-ring clipping in a styled browser fixture. Slider's
+   themed handle clearance and styled inset-icon reader already have passing regressions.
+4. Recheck interrupted page transitions. Native FadeThrough now settles its page model without
    restarting presence. Compare default and custom motion themes rather than hardcoding Compose timings.
-6. Check FAB-menu transform origin and composed SSR item count; choose an explicit count contract
+5. Check FAB-menu transform origin and composed SSR item count; choose an explicit count contract
    or server-safe composition strategy, with hydration and variable-item-count tests.
-7. Reproduce linear-wavy track motion/gaps across determinate and indeterminate modes. Implement
+6. Reproduce linear-wavy track motion/gaps across determinate and indeterminate modes. Implement
    Native gap windows only after geometry tests specify both visible track segments.
-8. Verify Reanimated path updates on devices, not merely prop presence on Native Web. Delayed
+7. Verify Reanimated path updates on devices, not merely prop presence on Native Web. Delayed
    spring cancellation and factory spring tokens were checked and need no change.
-9. For DockedDatePicker, decide whether the ready-made should expose action content at all
+8. For DockedDatePicker, decide whether the ready-made should expose action content at all
    (composed Actions already works). Its Native trigger ID now follows `testId`.
 
 **Exit gate:** styled geometry/motion regressions, reduced-motion checks, SSR/hydration checks,
@@ -144,26 +134,18 @@ above. No API expansion should be made solely because the old note requests it.
 3. Audit NativeSelect option parts (trigger part keys and FabMenu item IDs are done).
    Decide provider-level Native `slotProps` separately; test instance/provider merge precedence
    before adding any provider API.
-4. Audit Ripple's class/style/slot forwarding. Keep the two existing `it.fails` cases in
-   `tests/component-suites/src/indication.e2e.test.ts` as explicit known failures until component
-   indication opacity and provider/named-theme token resets are fixed and pass normally.
-5. Recheck NativeSelect value-type differences and fallback `ripple` usage against device findings.
-6. Review Splitter's Zag resizeObserver patches and long-press options on upgrades.
+4. Recheck NativeSelect value-type differences and fallback `ripple` usage against device findings.
+5. Review Splitter's Zag resizeObserver patches and long-press options on upgrades.
 
 **Exit gate:** cross-binding usage/type tests, reactive updates, merge precedence, stable IDs,
 and no new SSR/hydration or reactive-node-budget regressions.
 
 ### 5. Tooling and output-size work
 
-1. Reproduce two generators with different plans targeting one output directory. Assert every
-   exported path exists after both finish. Use serialization/transactional output if reproduced;
-   per-file atomic writes alone do not serialize pruning. Never clear unowned app files.
-2. Decide node-check-in-build and tsconfig naming policies as tooling changes, not bug fixes.
-3. Document default-target versus explicit `.pureform/native` imports with a mixed-target type
-   fixture; redesign the entry only if the current contract is confusing in real usage.
-4. Measure full/pruned CSS bytes and asset counts, then implement reachability for keyframes and
+1. Decide node-check-in-build and tsconfig naming policies as tooling changes, not bug fixes.
+2. Measure full/pruned CSS bytes and asset counts, then implement reachability for keyframes and
    shape paths (including runtime theme/variant references). Keep dynamic/unknown references
    conservatively. Token/theme/@property pruning is a later, separate pass.
 
-**Exit gate:** deterministic concurrent-generation tests, mixed-target typechecks, and before/after
-bundle measurements with dynamic-reference safety tests.
+**Exit gate:** explicit tooling policy decisions and before/after bundle measurements with
+dynamic-reference safety tests.
