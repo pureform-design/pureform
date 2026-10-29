@@ -16,12 +16,14 @@ exports[`compilePreset (canonical button) > produces a stable Panda preset shape
           ":root:not(.dark) &": "@slot",
         },
       },
+      "ltr": "&:where(:dir(ltr))",
       "motionReduce": {
         "@media (prefers-reduced-motion: reduce)": {
           "&:not([data-pf-motion=full] *)": "@slot",
         },
         "[data-pf-motion=reduce] &:not([data-pf-motion=reduce] [data-pf-motion=full] *)": "@slot",
       },
+      "rtl": "&:where(:dir(rtl))",
     },
   },
   "name": "pureform",

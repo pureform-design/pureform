@@ -53,6 +53,10 @@ const dataAttributes = (selector: string): string[] =>
     [...selector.matchAll(/\[(data-[\w-]+)/g)].map(([, name]) => name!);
 
 describe("state selectors", () => {
+    it("matches the element's effective direction rather than any ancestor", () => {
+        expect(conditionKey("ltr", ctx)).toBe("&:where(:dir(ltr))");
+        expect(conditionKey("rtl", ctx)).toBe("&:where(:dir(rtl))");
+    });
     it("match no data attribute but pureform's own", () => {
         const allowed: string[] = Object.values(STATE_ATTRIBUTES);
         for (const key of [

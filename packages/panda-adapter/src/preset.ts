@@ -167,7 +167,12 @@ export const compilePreset = (
             slotRecipes,
         }),
         conditions: {
-            extend: { ...COLOR_SCHEME_CONDITIONS, ...MOTION_CONDITIONS },
+            extend: {
+                ...COLOR_SCHEME_CONDITIONS,
+                ...MOTION_CONDITIONS,
+                ltr: "&:where(:dir(ltr))",
+                rtl: "&:where(:dir(rtl))",
+            },
         },
         globalCss: (() => {
             const css = {

@@ -6,7 +6,9 @@
 // suite.
 
 import { describe, expect, it } from "vitest";
-import { commands } from "vitest/browser";
+import { commands, userEvent } from "vitest/browser";
+
+import { harness } from "#binding";
 
 import {
     boxesWithin,
@@ -30,16 +32,68 @@ const DRAWN = [
     "transform",
 ] as const;
 
+describe("nested direction", () => {
+    it.each(["ltr", "rtl"] as const)(
+        "keeps %s Slider arrow keys aligned with the nearest provider",
+        async (dir) => {
+            const mounted = harness.mount({
+                component: "Slider",
+                props: { defaultValue: 50, "aria-label": "Volume" },
+                provider: { dir },
+            });
+            mounted.host.dir = dir === "ltr" ? "rtl" : "ltr";
+            await settlePlaced();
+            const handle =
+                mounted.host.querySelector<HTMLElement>('[role="slider"]')!;
+            handle.focus();
+            await userEvent.keyboard("{ArrowRight}");
+            await harness.settle();
+            expect(handle.getAttribute("aria-valuenow")).toBe(
+                dir === "ltr" ? "51" : "49",
+            );
+        },
+    );
+
+    it.each(["ltr", "rtl"] as const)(
+        "uses the nearest direction inside an opposite %s ancestor",
+        async (outer) => {
+            const inner = outer === "ltr" ? "rtl" : "ltr";
+            const mounted = harness.mount({
+                component: "Button",
+                props: { label: "Direction", icon: "→", mirrorIcon: true },
+                provider: { dir: inner },
+            });
+            mounted.host.dir = outer;
+            await settlePlaced();
+            const icon = mounted.host.querySelector<HTMLElement>(
+                '[data-pf-part="icon"]',
+            )!;
+            const scale = () =>
+                new DOMMatrix(getComputedStyle(icon).transform).a;
+            expect(scale()).toBe(inner === "rtl" ? -1 : 1);
+            // A third, element-local direction wins over both ancestors.
+            icon.dir = outer;
+            await settlePlaced();
+            expect(scale()).toBe(outer === "rtl" ? -1 : 1);
+            icon.removeAttribute("dir");
+            await settlePlaced();
+            expect(scale()).toBe(inner === "rtl" ? -1 : 1);
+        },
+    );
+});
+
 /** Every part's box against the root, by part name, rendered in `dir`. */
 const measure = async (
     component: ComponentCase,
     props: SceneProps,
     dir: "ltr" | "rtl",
+    outer?: "ltr" | "rtl",
 ) => {
     // The pointer stays wherever an earlier test left it. Resting on a tooltip's trigger in one
     // direction only, it would open the tooltip in that one, so it waits in the far corner.
     await commands.mouse("move", window.innerWidth - 1, window.innerHeight - 1);
     const scene = mountCase(component, props, { provider: { dir } });
+    scene.host.dir = outer ?? dir;
     await settlePlaced();
     const root = byTestId(scene.host, component.root);
     // An indeterminate progress indicator moves on its own, reduced motion or not: every animation
@@ -92,6 +146,27 @@ const measure = async (
     scene.host.remove();
     return measured;
 };
+
+describe("nested direction geometry", () => {
+    it.each(["ltr", "rtl"] as const)(
+        "keeps the %s Switch geometry inside an opposite ancestor",
+        async (dir) => {
+            const component = COMPONENTS.find(
+                (each) => each.component === "Switch",
+            )!;
+            const props = { ...component.props, defaultChecked: true };
+            const plain = await measure(component, props, dir);
+            const nested = await measure(
+                component,
+                props,
+                dir,
+                dir === "ltr" ? "rtl" : "ltr",
+            );
+            expect(nested.width).toBeCloseTo(plain.width, 1);
+            expect(nested.boxes).toEqual(plain.boxes);
+        },
+    );
+});
 
 describe.each(COMPONENTS)("$component", (component) => {
     it.each(renderings(component))(

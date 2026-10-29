@@ -73,6 +73,8 @@ describe("toTailwind", () => {
             "dark",
             "light",
             "motion-reduce",
+            "ltr",
+            "rtl",
             "theme-teal",
         ]);
         const named = toTailwind(config, {
@@ -100,6 +102,16 @@ describe("toTailwind", () => {
                 ],
             ],
         });
+    });
+
+    it("overrides Tailwind's direction variants with element-local direction", async () => {
+        const css = await build(compileTailwind(config), [
+            "rtl:ml-2",
+            "ltr:mr-2",
+        ]);
+        expect(css).toContain(".rtl\\:ml-2:where(:dir(rtl))");
+        expect(css).toContain(".ltr\\:mr-2:where(:dir(ltr))");
+        expect(css).not.toContain('[dir="rtl"] *');
     });
 });
 

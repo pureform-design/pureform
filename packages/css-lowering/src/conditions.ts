@@ -64,8 +64,8 @@ const CONDITION_SELECTOR: Record<string, string> = {
     mirrored: `&[${mirrored}]`,
     // A part that doesn't fit where it usually sits; only pureform marks it.
     overflowing: `&[${overflowing}]`,
-    ltr: ":where([dir=ltr], :dir(ltr)) &",
-    rtl: ":where([dir=rtl], :dir(rtl)) &",
+    ltr: "&:where(:dir(ltr))",
+    rtl: "&:where(:dir(rtl))",
 };
 
 // Media and feature conditions as at-rules.

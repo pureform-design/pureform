@@ -203,6 +203,10 @@ export const toTailwind = (
         variants: [
             ...schemeVariants(config),
             MOTION_VARIANT,
+            ...["ltr", "rtl"].map((name) => ({
+                name,
+                paths: [[`&:where(:dir(${name}))`]],
+            })),
             ...Object.keys(config.themes ?? {}).map((name) => ({
                 name: themeVariant(name),
                 paths: [[ELEMENT(`[${attribute}="${name}"]`)]],
