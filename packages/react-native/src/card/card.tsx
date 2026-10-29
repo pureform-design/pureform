@@ -20,7 +20,7 @@ import { useSurfaceIndication } from "../indication";
 import type { SurfaceIndicationScope } from "../indication";
 import { testIdOf, withEngine } from "../parts";
 import { resolveText } from "../resolve-text";
-import { nativeSlots, withUnselectable } from "../slot-props";
+import { useNativeSlotReader, withUnselectable } from "../slot-props";
 import type { PartSlots } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
@@ -80,6 +80,7 @@ export interface CardRootProps
 }
 
 function Root(props: CardRootProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("card");
     const acts = props.onPress !== undefined;
     const [hasArea, setHasArea] = useState(false);
     const indication = useSurfaceIndication(

@@ -16,7 +16,7 @@ import { IconSlot, iconSlot } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, withEngine } from "../parts";
 import { useEngine } from "../provider";
-import { nativeSlots, withUnselectable } from "../slot-props";
+import { useNativeSlotReader, withUnselectable } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
@@ -50,6 +50,7 @@ export interface FabProps
 const present = (node: ReactNode) => node != null && node !== false;
 
 function FabImpl(props: FabProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("fab");
     const engine = useEngine();
     const indication = useSurfaceIndication(INDICATION!, {
         indication: props.indication,

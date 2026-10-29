@@ -29,7 +29,12 @@ import type { MotionStyles } from "./engine";
 import { IconSlot, iconSlot } from "./icon-style";
 import { useSurfaceIndication } from "./indication";
 import { testIdOf, withEngine } from "./parts";
-import { nativeSlots, withUnselectable } from "./slot-props";
+import {
+    mergeNativePartProps,
+    nativeSlots,
+    useNativeSlotReader,
+    withUnselectable,
+} from "./slot-props";
 import type { PartSlots } from "./slot-props";
 import { useComponentSlots } from "./styles";
 import type { SlotViewsBySlot } from "./styles";
@@ -55,8 +60,9 @@ export interface CalendarCellProps {
 }
 
 function CalendarCellImpl(props: CalendarCellProps): ReactNode {
-    const slot = nativeSlots(undefined);
-    const owner = props.owner ?? slot;
+    const readSlots = useNativeSlotReader("calendarCell");
+    const slot = readSlots(undefined);
+    const owner = props.owner ?? nativeSlots(undefined);
     const indication = useSurfaceIndication(INDICATION, {
         disabled: props.disabled,
     });
@@ -84,11 +90,18 @@ function CalendarCellImpl(props: CalendarCellProps): ReactNode {
     const chosen = props.selection !== "none";
     return (
         <v.root.View
-            {...owner.props("cell", props.instance)}
+            {...mergeNativePartProps(
+                slot.props("root"),
+                owner.props("cell", props.instance),
+            )}
             {...(day
                 ? { role: "gridcell" as const, "aria-selected": chosen }
                 : {})}
-            style={owner.style("cell", s.root, props.instance)}
+            style={owner.style(
+                "cell",
+                slot.style("root", s.root),
+                props.instance,
+            )}
             testID={id("root")}
         >
             <v.trigger.Pressable

@@ -8,8 +8,6 @@ criteria. These are not all confirmed bugs: reproduction and external verificati
 
 ## C. Shared APIs and motion — moderate to high complexity
 
-9. **Native provider slotProps:** closely follow web provider APIs and merge behavior, with Native
-   host typing and tests for provider/instance precedence, handlers, styles and accessibility.
 10. **FAB-menu motion:** Compose-style nearest-first stagger, aligned-edge width expansion at fixed
     height and opacity; reverse visibility sequence on close. Not center scaling or spatial travel
     from the FAB. Retain theme roles, RTL and reduced motion.
@@ -43,6 +41,10 @@ criteria. These are not all confirmed bugs: reproduction and external verificati
 - **F1. NativeSelect option customization:** API design deferred, not customization. The wrapper
   must expose renderer-supported customization, with distinct web/fallback/OS-owned contracts.
 - **F2. Token/theme/@property pruning:** separate design after keyframe/shape output measurements.
+- **F3. Public customization naming:** use anatomy-part names for both provider and instance APIs
+  across React, Solid and Native in a future refactor. Keep style slots for preset/theme authoring;
+  audit migration and ambiguous overlay `root` names, rather than silently support both. Item 9
+  retains today's web provider style-slot convention.
 
 ## External verification and maintenance
 
@@ -58,6 +60,11 @@ criteria. These are not all confirmed bugs: reproduction and external verificati
   speculative fork of timing behavior.
 
 ## Retained decisions / separate work
+
+- **9 completed:** Native provider slot props now match the web style-slot convention, with Native
+  host typing, cached merges, instance precedence and protected internal wiring. Cross-binding
+  tests cover nested merges, live updates and overlay mappings; naming unification is deferred to
+  F3. Native's recurring animated linear-progress sampling failure remains with item 12.
 
 - **7 completed:** FAB-menu composed `itemCount` and a `staggering` token. Items stagger only once
   their count is known, so composed SSR and first hydration are unstaggered, not guessed at eight.

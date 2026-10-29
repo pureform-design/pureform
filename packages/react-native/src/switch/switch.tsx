@@ -15,7 +15,7 @@ import type { ReactNode } from "react";
 import { useCheckKeys } from "../check-keys";
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, useControllable, withEngine } from "../parts";
-import { nativeSlots, withUnselectable } from "../slot-props";
+import { useNativeSlotReader, withUnselectable } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 import { touchTargetSlopOf } from "../touch-slop";
@@ -51,6 +51,7 @@ export interface SwitchProps
 }
 
 function SwitchImpl(props: SwitchProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("switchControl");
     const [checked, setChecked] = useControllable(
         "Switch",
         "checked",

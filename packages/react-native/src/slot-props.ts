@@ -9,6 +9,8 @@
 import type { ComponentAnatomy } from "@pureform/anatomy";
 import { createSlotReader, isPerInstance } from "@pureform/binding-core";
 import type { InnerProps, PerInstance } from "@pureform/binding-core";
+import type { ComponentName } from "@pureform/styling";
+import { useMemo } from "react";
 import { StyleSheet } from "react-native";
 import type {
     ImageProps,
@@ -24,6 +26,7 @@ import type {
 } from "react-native";
 
 import { unselectable } from "./parts";
+import { usePureform } from "./provider";
 
 /** What a part renders as. */
 export type NativeHost =
@@ -120,12 +123,54 @@ const cached = <V>(
 const styles = pairCache<object>();
 const composed = pairCache<Handler>();
 const spreads = pairCache<object>();
+const partMerges = pairCache<Dict>();
+
+/** Provider defaults merge outer first, then inner, as on the web. Internal handlers still
+ *  run before these when the component consumes the resulting slot reader. */
+export const mergeNativePartProps = (outer: object, inner: object): Dict =>
+    cached(partMerges, outer, inner, () => {
+        const merged: Record<string, unknown> = { ...outer };
+        for (const [key, value] of Object.entries(inner)) {
+            if (value === undefined) continue;
+            const before = merged[key];
+            merged[key] =
+                key === "style" && before != null && value != null
+                    ? {
+                          ...StyleSheet.flatten(before as StyleProp<ViewStyle>),
+                          ...StyleSheet.flatten(value as StyleProp<ViewStyle>),
+                      }
+                    : key.startsWith("on") &&
+                        typeof before === "function" &&
+                        typeof value === "function"
+                      ? compose(before as Handler, value as Handler)
+                      : value;
+        }
+        return merged;
+    });
 
 const compose = (own: Handler, user: Handler): Handler =>
     cached(composed, own, user, () => (...args: never[]) => {
         own(...args);
         return user(...args);
     });
+
+const styleOver = <S>(base: S, extra: unknown): S => {
+    if (extra == null || extra === false) return base;
+    const extraKey =
+        typeof extra === "object"
+            ? extra
+            : StyleSheet.flatten(extra as StyleProp<ViewStyle>);
+    if (!extraKey) return base;
+    const before = base ?? EMPTY;
+    const key =
+        typeof before === "object"
+            ? before
+            : (StyleSheet.flatten(before as StyleProp<ViewStyle>) ?? EMPTY);
+    return cached(styles, key, extraKey, () => ({
+        ...StyleSheet.flatten(base as StyleProp<ViewStyle>),
+        ...StyleSheet.flatten(extra as StyleProp<ViewStyle>),
+    })) as S;
+};
 
 /** A component's parts, customized by the user's keyed `style` and `slotProps`. A repeated part's
  *  copy passes what it is (`instance`), which a function of the copy is called with; build it only
@@ -168,25 +213,28 @@ const build = (
     style: Dict,
     slotProps: Dict,
     keyOf: (part: string) => string,
+    provided: Dict,
 ): PartSlots => {
-    const userProps = (part: string, instance?: unknown) =>
-        (createSlotReader(keyOf(part), () => instance)(slotProps) as
-            | Dict
-            | undefined) ?? EMPTY;
+    const userProps = (part: string, instance?: unknown) => {
+        const own =
+            (createSlotReader(keyOf(part), () => instance)(slotProps) as
+                | Dict
+                | undefined) ?? EMPTY;
+        const defaults = provided[part] as Dict | undefined;
+        return defaults
+            ? own === EMPTY
+                ? defaults
+                : mergeNativePartProps(defaults, own)
+            : own;
+    };
     const keyed = [style, slotProps];
     return {
         props: userProps,
         each: (part) => isPerInstance(keyed, keyOf(part)),
         style: (part, own, instance) => {
             const user = createSlotReader(keyOf(part), () => instance)(style);
-            if (user == null) return own;
-            const base = (own ?? EMPTY) as object;
-            return cached(styles, base, user as object, () => ({
-                ...(Array.isArray(base)
-                    ? StyleSheet.flatten(base as StyleProp<ViewStyle>)
-                    : base),
-                ...StyleSheet.flatten(user as StyleProp<ViewStyle>),
-            })) as typeof own;
+            const defaults = (provided[part] as Dict | undefined)?.["style"];
+            return styleOver(styleOver(own, defaults), user);
         },
         on: (part, name, own, instance) => {
             const user = userProps(part, instance)[name];
@@ -223,8 +271,11 @@ const build = (
 };
 
 const built = new WeakMap<
-    (part: string) => string,
-    WeakMap<object, WeakMap<object, PartSlots>>
+    object,
+    WeakMap<
+        (part: string) => string,
+        WeakMap<object, WeakMap<object, PartSlots>>
+    >
 >();
 
 /** A ready-made's parts customized by its `style` and `slotProps`: the same object while they
@@ -238,14 +289,35 @@ export const nativeSlots = (
           }
         | undefined,
     keyOf: (part: string) => string = same,
+    provided: object = EMPTY,
 ): PartSlots => {
     const style = props?.style as Dict | undefined;
     const slotProps = props?.slotProps as Dict | undefined;
-    if (!style && !slotProps) return plain;
-    let cache = built.get(keyOf);
-    if (!cache) built.set(keyOf, (cache = pairCache<PartSlots>()));
+    if (
+        !style &&
+        !slotProps &&
+        (provided === EMPTY || Object.keys(provided).length === 0)
+    )
+        return plain;
+    let byKey = built.get(provided);
+    if (!byKey) built.set(provided, (byKey = new WeakMap()));
+    let cache = byKey.get(keyOf);
+    if (!cache) byKey.set(keyOf, (cache = pairCache<PartSlots>()));
     return cached(cache, style ?? EMPTY, slotProps ?? EMPTY, () =>
-        build(style ?? EMPTY, slotProps ?? EMPTY, keyOf),
+        build(style ?? EMPTY, slotProps ?? EMPTY, keyOf, provided as Dict),
+    );
+};
+
+/** Read provider defaults once, unconditionally in the component owner. The returned pure
+ *  reader may also be used in callbacks and for composed children. Provider keys are style
+ *  slots; `keyOf` only translates the instance's anatomy-part keys. */
+export const useNativeSlotReader = (
+    name: ComponentName,
+): typeof nativeSlots => {
+    const provided = usePureform().slotProps[name] ?? EMPTY;
+    return useMemo(
+        () => (props, keyOf) => nativeSlots(props, keyOf, provided),
+        [provided],
     );
 };
 

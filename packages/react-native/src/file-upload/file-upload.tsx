@@ -35,7 +35,7 @@ import { ListItem } from "../list-item";
 import type { ListItemProps } from "../list-item/list-item";
 import { testIdOf, withEngine } from "../parts";
 import type { LinearProgressProps } from "../progress";
-import { nativeSlots } from "../slot-props";
+import { useNativeSlotReader } from "../slot-props";
 import type { InnerPropsOf, NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
@@ -97,6 +97,7 @@ export interface FileUploadProps
 }
 
 function FileUploadImpl(props: FileUploadProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("fileUpload");
     const {
         styles: s,
         selected,

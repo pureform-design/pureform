@@ -23,7 +23,7 @@ import { ListDefaults, ListItem } from "../list-item/list-item";
 import type { ListItemProps } from "../list-item/list-item";
 import type { ListItemDefaults } from "../list/list";
 import { testIdOf, useControllable, withEngine } from "../parts";
-import { nativeSlots } from "../slot-props";
+import { useNativeSlotReader } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
@@ -47,6 +47,7 @@ export interface SelectionListProps
 }
 
 function SelectionListImpl(props: SelectionListProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("list");
     const { styles: s, views: v } = useComponentSlots<ListPart>(
         "list",
         listSelection(props),

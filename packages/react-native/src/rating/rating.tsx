@@ -21,7 +21,7 @@ import type { GestureResponderEvent, LayoutChangeEvent } from "react-native";
 import { Glyph, IconSlot, iconSlot } from "../icon-style";
 import { testIdOf, useControllable, withEngine } from "../parts";
 import { useDirection } from "../provider";
-import { nativeSlots, withUnselectable } from "../slot-props";
+import { useNativeSlotReader, withUnselectable } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
@@ -59,6 +59,7 @@ export interface RatingProps
 const defaultText = (index: number) => `${index} stars`;
 
 function RatingImpl(props: RatingProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("rating");
     const count = props.count ?? 5;
     const rtl = useDirection() === "rtl";
     const interactive = !props.readOnly && !props.disabled;

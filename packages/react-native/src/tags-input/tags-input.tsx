@@ -30,7 +30,7 @@ import { ownText } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, useControllable, withEngine } from "../parts";
 import { resolveText } from "../resolve-text";
-import { nativeSlots, withUnselectable } from "../slot-props";
+import { useNativeSlotReader, withUnselectable } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
@@ -112,6 +112,7 @@ const chipId = (part: InputChipPart, props: TagsInputProps) =>
     );
 
 function RemoveImpl(options: ChipOptions): ReactNode {
+    const nativeSlots = useNativeSlotReader("inputChip");
     const { props, value } = options;
     const slot = nativeSlots(props.chipProps);
     const indication = useSurfaceIndication(INDICATIONS["remove"]!, {
@@ -152,6 +153,7 @@ function RemoveImpl(options: ChipOptions): ReactNode {
 const Remove = withEngine(RemoveImpl, "TagsInputChipRemove");
 
 function ChipImpl(options: ChipOptions): ReactNode {
+    const nativeSlots = useNativeSlotReader("inputChip");
     const { props, value } = options;
     const slot = nativeSlots(props.chipProps);
     const indication = useSurfaceIndication(INDICATIONS["root"]!, {
@@ -222,6 +224,7 @@ function ChipImpl(options: ChipOptions): ReactNode {
 const Chip = withEngine(ChipImpl, "TagsInputChip");
 
 function TagsInputImpl(props: TagsInputProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("tagsInput");
     const [values, setValues] = useControllable<"value", string[]>(
         "TagsInput",
         "value",

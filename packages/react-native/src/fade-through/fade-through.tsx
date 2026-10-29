@@ -27,7 +27,7 @@ import { useTransitionPages } from "../page-transition";
 import { testIdOf } from "../parts";
 import { useOverlayPresence } from "../presence";
 import { useEngine } from "../provider";
-import { nativeSlots } from "../slot-props";
+import { useNativeSlotReader } from "../slot-props";
 import type { NativeSlotProps, PartSlots } from "../slot-props";
 import { useSelectedStyles } from "../styles";
 
@@ -110,6 +110,7 @@ const change = (pages: readonly TransitionPage[], key: PageKey) =>
 /** Material's fade through: `<FadeThrough value={destination}>{page}</FadeThrough>`, with the
  *  navigation bar's or rail's `value`. */
 export function FadeThrough(props: FadeThroughProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("fadeThrough");
     const slot = nativeSlots(props);
     const selected = useSelectedStyles("fadeThrough", fadeThroughSelection());
     const given = props.children;

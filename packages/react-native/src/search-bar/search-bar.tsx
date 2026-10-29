@@ -17,7 +17,7 @@ import type { ReactNode } from "react";
 import { iconParts } from "../icon-style";
 import { interactionStates, useInteraction } from "../interaction";
 import { testIdOf, useControllable, withEngine } from "../parts";
-import { nativeSlots, withUnselectable } from "../slot-props";
+import { useNativeSlotReader, withUnselectable } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { colorText, useComponentSlots } from "../styles";
 
@@ -47,6 +47,7 @@ export interface SearchBarProps
 }
 
 function SearchBarImpl(props: SearchBarProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("searchBar");
     const [value, setValue] = useControllable(
         "SearchBar",
         "value",

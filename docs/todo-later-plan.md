@@ -21,13 +21,6 @@ old B/C/D/E identifiers. Complexity estimates are relative and may change after 
 
 ## C. Shared APIs and motion — moderate to high complexity
 
-### 9. Provider-level Native slotProps
-
-- Follow established web provider APIs and merge behavior closely, adapting host typing to Native.
-- Audit web conventions first; do not invent a separate Native API.
-- Test provider/instance/slot precedence, style and handler merging, and preservation of internal
-  behavior/accessibility wiring. Instance customization must retain its established precedence.
-
 ### 10. FAB-menu Compose-style motion
 
 - Current source report: items scale from their centers. The agreed reference is current Compose
@@ -130,6 +123,17 @@ features. Trigger part keys and FabMenu item IDs are already done.
 Separate design after asset-pruning measurements (17). Account for runtime token/theme references
 and dynamic usage rather than extend static asset pruning speculatively.
 
+### F3. Anatomy-part names for public customization across bindings
+
+Standardize provider and instance customization on anatomy-part names in React, Solid and Native.
+Today providers use preset style slots (`dialog.root` styles the surface), while instances use
+anatomy parts (`dialog.content` is that surface; anatomy `root` is its structural wrapper).
+Keep style-slot names for preset/theme authoring, not public element-prop customization.
+Audit mappings, types and existing usages, with migration guidance and cross-binding regressions.
+Do not silently accept both conventions: overlay `root` is ambiguous. Include structural parts
+without style slots, handler/style precedence, accessibility and reactive/SSR behavior. This is a
+future API refactor, not part of 9; Native provider support follows the existing web convention now.
+
 ## External verification and maintenance — independent of complexity order
 
 - **V1. Slider focus-ring clipping:** obtain the nested-icon-button scene before changing clipping.
@@ -153,6 +157,22 @@ and dynamic usage rather than extend static asset pruning speculatively.
 Record device/OS/engine/AT results and recordings; unavailable environments remain blocked.
 
 ## Retained decisions and out-of-scope tooling
+
+- **9 completed (2026-10-30): Native provider slot props.** Provider `slotProps` use existing web
+  component/style-slot keys and Native host props, reusing component host declarations and anatomy
+  aliases for typing. Nested defaults merge styles and compose handlers outer first, then inner;
+  instance customization retains precedence and Native internal handlers/state/accessibility/
+  measurement wiring remain protected. The shared `useNativeSlotReader(name)` hook runs
+  unconditionally in component owners and returns a cached pure reader usable inside callbacks;
+  standalone `nativeSlots` remains context-free. Backdrops read `scrim.root`, not the owner's
+  surface defaults. Calendar-cell defaults combine under picker cell customization. This pattern
+  is documented in the Native README for new components. React/Solid contract regressions lock
+  in nested merges, live replacement/removal without remounting, surface/scrim mapping and
+  accessibility. Native additionally covers host typing, lazy per-copy functions, caching and
+  TextInput handlers. Full React (1119) and Solid (1204) suites pass; Native passed 1034 tests with
+  the recurring animated linear-progress sampling assertion failing (still deferred to 12).
+  Native targeted provider/customization/date-picker tests and all three source type checks pass.
+  Unifying provider/instance names is separate future work (F3), not a silent API change here.
 
 - **8 completed (2026-10-29): per-item customization.** ChipSet, ButtonGroup, RadioGroup and Toolbar
   items take their own `class`/`className`, `style`, `slotProps`, `unstyled` and `tokens` over

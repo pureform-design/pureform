@@ -29,7 +29,7 @@ import { Fragment, type ReactNode, useState } from "react";
 import type { TextInputKeyPressEvent } from "react-native";
 
 import { testIdOf, withEngine } from "../parts";
-import { nativeSlots } from "../slot-props";
+import { useNativeSlotReader } from "../slot-props";
 import type { PartSlots } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { inFlowInline, useComponentSlots } from "../styles";
@@ -60,6 +60,7 @@ export interface TimeInputProps
 }
 
 function TimeInputImpl(props: TimeInputProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("timeInput");
     const [time, setTime] = useTime(props);
     const { cycle, periods } = timeLocale(props);
     const selection = timeInputSelection(props);

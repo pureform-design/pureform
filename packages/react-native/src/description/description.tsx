@@ -8,7 +8,7 @@ import type { ReactNode } from "react";
 
 import { useField, useFieldPiece } from "../field/context";
 import { testIdOf, withEngine } from "../parts";
-import { nativeSlots } from "../slot-props";
+import { useNativeSlotReader } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
@@ -24,6 +24,7 @@ export interface DescriptionProps extends NativeSlotProps<DescriptionHosts> {
 }
 
 function DescriptionImpl(props: DescriptionProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("description");
     const slot = nativeSlots(props);
     const field = useField();
     useFieldPiece(field, "description");

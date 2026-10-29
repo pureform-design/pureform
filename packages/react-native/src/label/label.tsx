@@ -13,7 +13,7 @@ import type { ReactNode } from "react";
 
 import { useField } from "../field/context";
 import { testIdOf, withEngine } from "../parts";
-import { nativeSlots } from "../slot-props";
+import { useNativeSlotReader } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
@@ -32,6 +32,7 @@ export interface LabelProps
 }
 
 function LabelImpl(props: LabelProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("label");
     const slot = nativeSlots(props);
     const field = useField()?.state;
     const state = fieldLabelState(field, props);

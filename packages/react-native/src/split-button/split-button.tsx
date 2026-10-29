@@ -30,7 +30,7 @@ import { useSurfaceIndication } from "../indication";
 import { Menu } from "../menu";
 import type { MenuProps, MenuTriggerProps } from "../menu";
 import { testIdOf, withEngine } from "../parts";
-import { nativeSlots, withUnselectable } from "../slot-props";
+import { useNativeSlotReader, withUnselectable } from "../slot-props";
 import type { InnerPropsOf, NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
@@ -85,6 +85,7 @@ function SplitButtonButtonImpl(props: {
     readonly icon?: ReactNode;
     readonly children: ReactNode;
 }): ReactNode {
+    const nativeSlots = useNativeSlotReader("splitButton");
     const slot = nativeSlots(props.split);
     const disabled = props.split.disabled ?? false;
     const indication = useSurfaceIndication(INDICATIONS[props.part]!, {
@@ -158,6 +159,7 @@ const SplitButtonButton = withEngine(
 );
 
 function SplitButtonImpl(props: SplitButtonProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("splitButton");
     const slot = nativeSlots(props);
     const { styles: s, views: v } = useComponentSlots<SplitButtonPart>(
         "splitButton",

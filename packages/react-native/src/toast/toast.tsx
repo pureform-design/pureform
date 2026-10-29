@@ -39,7 +39,7 @@ import { usePortalHost } from "../portal-host";
 import { usePresence } from "../presence";
 import { useEngine } from "../provider";
 import { useSidewaysPan } from "../sideways-pan";
-import { nativeSlots } from "../slot-props";
+import { useNativeSlotReader } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 import { SurfaceButton } from "../surface-button";
@@ -117,6 +117,7 @@ function ToastButtonImpl(props: {
     readonly onPress: () => void;
     readonly children: ReactNode;
 }): ReactNode {
+    const nativeSlots = useNativeSlotReader("toast");
     return (
         <SurfaceButton
             anatomy={toastAnatomy}
@@ -224,6 +225,7 @@ function ToastItem(props: {
     readonly index: number;
     readonly zIndex: number;
 }): ReactNode {
+    const nativeSlots = useNativeSlotReader("toast");
     const slot = nativeSlots(props.toaster);
     const { item, toaster } = props;
     const store = toaster.toaster;
@@ -342,6 +344,7 @@ function ToastItem(props: {
 }
 
 function ToasterImpl(props: ToasterProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("toast");
     const slot = nativeSlots(props);
     const toasts = useToasts(props.toaster);
     const host = usePortalHost();

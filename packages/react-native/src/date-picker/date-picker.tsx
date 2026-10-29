@@ -40,7 +40,7 @@ import { ModalScrimLayer, ModalWindow, useModalOverlay } from "../modal";
 import { useControllable, withEngine } from "../parts";
 import {
     backdropKeys,
-    nativeSlots,
+    useNativeSlotReader,
     overlayKeys,
     withUnselectable,
 } from "../slot-props";
@@ -98,6 +98,7 @@ interface SurfaceProps extends DatePickerProps {
 }
 
 function SurfaceImpl(props: SurfaceProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("datePicker");
     const locale = pickerLocale(props);
     const mode = props.selectionMode ?? "single";
     const [draft, setDraft] = useState(props.committed);
@@ -313,6 +314,8 @@ function StandaloneDatePicker(props: DatePickerProps): ReactNode {
 }
 
 function ModalDatePicker(props: DatePickerProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("datePicker");
+    const scrimSlots = useNativeSlotReader("scrim");
     const [value, setValue] = useValue(props);
     const { open, presence, close, show } = useModalOverlay(
         "DatePicker",
@@ -347,7 +350,7 @@ function ModalDatePicker(props: DatePickerProps): ReactNode {
             >
                 <ModalScrimLayer
                     scrimTestId={partAsRoot<string>(props.testId, "backdrop")}
-                    scrimSlot={nativeSlots(props, backdropKeys)}
+                    scrimSlot={scrimSlots(props, backdropKeys)}
                     open={open}
                     presence={presence}
                     onPressOutside={

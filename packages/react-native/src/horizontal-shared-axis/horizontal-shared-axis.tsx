@@ -39,7 +39,7 @@ import { useTransitionPages } from "../page-transition";
 import { testIdOf } from "../parts";
 import { themeSpring } from "../presence";
 import { useDirection, usePureform } from "../provider";
-import { nativeSlots } from "../slot-props";
+import { useNativeSlotReader } from "../slot-props";
 import type { NativeSlotProps, PartSlots } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
@@ -258,6 +258,7 @@ const springOf = (
 export function HorizontalSharedAxis(
     props: HorizontalSharedAxisProps,
 ): ReactNode {
+    const nativeSlots = useNativeSlotReader("horizontalSharedAxis");
     const { styles: s, views: v } = useComponentSlots<HorizontalSharedAxisPart>(
         "horizontalSharedAxis",
         horizontalSharedAxisSelection(props),

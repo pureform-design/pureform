@@ -60,7 +60,7 @@ import { PortalHost } from "./portal-host";
 import { useDirection, useEngine } from "./provider";
 import { resolveText } from "./resolve-text";
 import { Scrim } from "./single-part";
-import { nativeSlots, withUnselectable } from "./slot-props";
+import { useNativeSlotReader, withUnselectable } from "./slot-props";
 import type { PartSlots } from "./slot-props";
 import type { NativeSlotProps } from "./slot-props";
 import { useComponentSlots } from "./styles";
@@ -221,6 +221,7 @@ function TabImpl(props: TabProps): ReactNode {
 const Tab = memo(withEngine(TabImpl, "Tab"));
 
 function TabsImpl(props: TabsProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("tabs");
     const slot = nativeSlots(props);
     const icon = tabsHaveIcons(props.items);
     const [value, setValue] = useControllable(
@@ -510,6 +511,7 @@ const Destination = memo(withEngine(DestinationImpl, "NavigationDestination"));
 function NavigationImpl<C extends NavigationComponent>(
     props: NavigationProps<C> & { readonly name: C },
 ): ReactNode {
+    const nativeSlots = useNativeSlotReader(props.name);
     const slot = nativeSlots(props);
     const [value, setValue] = useControllable(
         props.name,
@@ -635,6 +637,8 @@ export function NavigationBar(props: NavigationBarProps): ReactNode {
 /** A modal rail: the scrim, and the rail over it along the start edge, while `open`. A press on
  *  the scrim, Escape, or the back button closes it. */
 function ModalRail(props: NavigationRailProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("navigationRail");
+    const scrimSlots = useNativeSlotReader("scrim");
     const {
         open: _open,
         defaultOpen,
@@ -653,7 +657,7 @@ function ModalRail(props: NavigationRailProps): ReactNode {
     );
     const layer = useLayer("dialog");
     const slot = nativeSlots(props);
-    const scrimSlot = nativeSlots(props, scrimKeys);
+    const scrimSlot = scrimSlots(props, scrimKeys);
     const testId = props.testId;
     const modalId = (part: "scrim" | "dialog") =>
         typeof testId === "string" ? `${testId}-${part}` : testId?.[part];

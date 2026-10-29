@@ -28,7 +28,7 @@ import {
     useStableSelection,
     withEngine,
 } from "../parts";
-import { nativeSlots, withUnselectable } from "../slot-props";
+import { useNativeSlotReader, withUnselectable } from "../slot-props";
 import type { InnerPropsOf, NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 import { touchTargetSlopOf } from "../touch-slop";
@@ -68,6 +68,7 @@ export interface RadioProps
 }
 
 function RadioImpl(props: RadioProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("radio");
     const group = useContext(RadioGroupContext);
     const checked =
         group && props.value !== undefined
@@ -179,6 +180,7 @@ export type RadioGroupEntry = RadioGroupItem &
 /** A group of radios, one of which is checked: `<RadioGroup items={sizes} defaultValue="m" />`,
  *  or with `Radio` children. */
 export function RadioGroup(props: RadioGroupProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("radioGroup");
     const [value, setValue] = useControllable<"value", string | null>(
         "RadioGroup",
         "value",

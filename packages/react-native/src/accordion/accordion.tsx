@@ -22,7 +22,7 @@ import { iconParts, ownText } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, useControllable, withEngine } from "../parts";
 import { resolveText } from "../resolve-text";
-import { nativeSlots, withUnselectable } from "../slot-props";
+import { useNativeSlotReader, withUnselectable } from "../slot-props";
 import type { NativeSlotProps, PartSlots } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
@@ -176,6 +176,7 @@ function Item(props: ItemProps): ReactNode {
 }
 
 function AccordionImpl(props: AccordionProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("accordion");
     const slot = nativeSlots(props);
     const [value, setValue] = useControllable<"value", string[]>(
         "Accordion",

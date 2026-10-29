@@ -14,7 +14,7 @@ import type { ReactNode } from "react";
 
 import { testIdOf, withEngine } from "../parts";
 import { useEngine } from "../provider";
-import { nativeSlots } from "../slot-props";
+import { useNativeSlotReader } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
@@ -34,6 +34,7 @@ export interface LoadingIndicatorProps
 }
 
 function LoadingIndicatorImpl(props: LoadingIndicatorProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("loadingIndicator");
     const engine = useEngine();
     const {
         styles: s,

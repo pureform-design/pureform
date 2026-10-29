@@ -22,7 +22,7 @@ import { type ReactNode, useState } from "react";
 
 import { useSurfaceIndication } from "./indication";
 import { testIdOf, withEngine } from "./parts";
-import { nativeSlots, withUnselectable } from "./slot-props";
+import { useNativeSlotReader, withUnselectable } from "./slot-props";
 import type { PartSlots } from "./slot-props";
 import { useComponentSlots } from "./styles";
 
@@ -79,6 +79,7 @@ export interface TimeButtonProps<A extends ComponentAnatomy> {
 function TimeButtonImpl<A extends ComponentAnatomy>(
     props: TimeButtonProps<A>,
 ): ReactNode {
+    const nativeSlots = useNativeSlotReader(props.component);
     const slot = props.slot ?? nativeSlots(undefined);
     const indication = useSurfaceIndication(
         props.anatomy.indication!.find(

@@ -75,7 +75,11 @@ import { Portal } from "../portal";
 import type { WindowRect } from "../portal-host";
 import { themeSpring, useOverlayPresence } from "../presence";
 import { useDirection, useEngine, usePureform } from "../provider";
-import { nativeSlots, withUnselectable, overlayKeys } from "../slot-props";
+import {
+    useNativeSlotReader,
+    withUnselectable,
+    overlayKeys,
+} from "../slot-props";
 import type { NativeSlotProps, PartSlots } from "../slot-props";
 import { useComponentSlots } from "../styles";
 import { triggerButtonProps } from "../trigger-button";
@@ -602,6 +606,7 @@ function MenuImpl(
         readonly shown?: boolean;
     },
 ): ReactNode {
+    const nativeSlots = useNativeSlotReader("menu");
     const engine = useEngine();
     const visible = props.shown ?? props.open ?? true;
     const rtl = useDirection() === "rtl";
@@ -1327,6 +1332,7 @@ function ContextTrigger(props: {
 }
 
 function MenuOverlay(props: MenuProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("menu");
     const {
         trigger,
         contextTrigger,

@@ -66,6 +66,36 @@ const day = (label: string) => {
 };
 
 describe("DatePicker", () => {
+    it("combines calendar-cell provider slots with the picker's per-cell customization", async () => {
+        const pressed = vi.fn<() => void>();
+        await render(
+            <PureformProvider
+                slotProps={{
+                    datePicker: { root: { style: { marginLeft: 7 } } },
+                    calendarCell: {
+                        root: { style: { marginTop: 3 } },
+                        trigger: { style: { opacity: 0.9 }, onPress: pressed },
+                    },
+                }}
+            >
+                <DatePicker
+                    locale="en-US"
+                    defaultValue={["2026-08-10"]}
+                    style={{ cell: { marginTop: 6 } }}
+                />
+            </PureformProvider>,
+        );
+        expect(computed("pf-date-picker-content").marginLeft).toBe("7px");
+        expect(computed("pf-calendar-cell-root").marginTop).toBe("6px");
+        const next = day("Tuesday, August 11, 2026");
+        expect(getComputedStyle(next).opacity).toBe("0.9");
+        await interact(() => userEvent.click(next));
+        expect(pressed).toHaveBeenCalledTimes(1);
+        expect(
+            next.closest('[role="gridcell"]')?.getAttribute("aria-selected"),
+        ).toBe("true");
+    });
+
     it.each([
         {
             value: ["2026-08-10", "2026-08-10"],

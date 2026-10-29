@@ -45,7 +45,7 @@ import { IconSlot, iconSlot } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { Menu } from "../menu/menu";
 import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
-import { nativeSlots, withUnselectable } from "../slot-props";
+import { useNativeSlotReader, withUnselectable } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots, useSelectedStyles } from "../styles";
 
@@ -194,6 +194,7 @@ const menuActions = (
 };
 
 function NativeSelectImpl(props: NativeSelectProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("nativeSelect");
     const items = props.items ?? [];
     const first =
         props.placeholder !== undefined ? "" : (items[0]?.value ?? "");

@@ -12,7 +12,7 @@ import { StyleSheet, View } from "react-native";
 import type { Insets, ViewStyle } from "react-native";
 
 import { testIdOf } from "../parts";
-import { nativeSlots } from "../slot-props";
+import { useNativeSlotReader } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useSelectedStyles } from "../styles";
 
@@ -38,6 +38,7 @@ const useOwnStyle = (name: string, selection: Record<string, unknown>) => {
 /** Grows a small pressable's hit area to the theme's minimum: `<Pressable style={{ width: 24,
  *  height: 24 }}><TouchTarget />…</Pressable>`. */
 export function TouchTarget(props: TouchTargetProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("touchTarget");
     const slot = nativeSlots(props);
     const minimum = minimumOf(useOwnStyle("touchTarget", {}));
     // Centred by a layer over the parent rather than the web's percentage translate, which

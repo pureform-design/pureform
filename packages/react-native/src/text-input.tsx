@@ -34,7 +34,7 @@ import type { TextInputProps } from "react-native";
 
 import { IconSlot, iconSlot } from "./icon-style";
 import { useControllable, withEngine } from "./parts";
-import { nativeSlots } from "./slot-props";
+import { useNativeSlotReader } from "./slot-props";
 import type { NativeSlotProps } from "./slot-props";
 import { useComponentSlots } from "./styles";
 
@@ -102,6 +102,7 @@ export interface FieldOptions
 }
 
 function FieldImpl({ container, ...props }: FieldOptions): ReactNode {
+    const nativeSlots = useNativeSlotReader(props.name);
     const [ownFocus, setFocused] = useState(false);
     const [value, setValue] = useControllable(
         props.name,

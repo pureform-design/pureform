@@ -37,7 +37,7 @@ import { ownText } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
 import { resolveText } from "../resolve-text";
-import { nativeSlots } from "../slot-props";
+import { useNativeSlotReader } from "../slot-props";
 import type { NativeSlotProps, PartSlots } from "../slot-props";
 import { useComponentSlots } from "../styles";
 import type { ComponentSlots } from "../styles";
@@ -179,6 +179,7 @@ function ItemImpl({
 const Item = withEngine(ItemImpl, "CarouselItem");
 
 function CarouselImpl(props: CarouselProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("carousel");
     const selection = carouselSelection(props);
     const { styles: s, views: v } = useComponentSlots<CarouselPart>(
         "carousel",

@@ -35,7 +35,7 @@ import { ownText } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, useControllable, withEngine } from "../parts";
 import { resolveText } from "../resolve-text";
-import { nativeSlots, withUnselectable } from "../slot-props";
+import { useNativeSlotReader, withUnselectable } from "../slot-props";
 import type { PartSlots } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
@@ -273,6 +273,7 @@ const stepOf = (
         : undefined;
 
 function StepperImpl(props: StepperProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("stepper");
     const selection = stepperSelection(props);
     const { styles: s, views: v } = useComponentSlots<StepperPart>(
         "stepper",

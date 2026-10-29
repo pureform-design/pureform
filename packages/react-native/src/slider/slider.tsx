@@ -40,7 +40,7 @@ import { IconSlot, iconSlot } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, useControllable, withEngine } from "../parts";
 import { useDirection } from "../provider";
-import { nativeSlots, withUnselectable } from "../slot-props";
+import { useNativeSlotReader, withUnselectable } from "../slot-props";
 import type { PartSlots } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
@@ -247,6 +247,7 @@ function Marker(props: {
 }
 
 function SliderImpl(props: SliderProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("slider");
     const min = props.min ?? 0;
     const max = props.max ?? 100;
     const step = props.step ?? 1;

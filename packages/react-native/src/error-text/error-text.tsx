@@ -9,7 +9,7 @@ import type { ReactNode } from "react";
 
 import { useField, useFieldPiece } from "../field/context";
 import { testIdOf, withEngine } from "../parts";
-import { nativeSlots } from "../slot-props";
+import { useNativeSlotReader } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
@@ -25,6 +25,7 @@ export interface ErrorTextProps extends NativeSlotProps<ErrorTextHosts> {
 }
 
 function ErrorTextImpl(props: ErrorTextProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("errorText");
     const slot = nativeSlots(props);
     const field = useField();
     useFieldPiece(field, "error");

@@ -35,7 +35,7 @@ import { Platform } from "react-native";
 import { IconSlot, iconSlot } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, useStableCallback, withEngine } from "../parts";
-import { nativeSlots, withUnselectable } from "../slot-props";
+import { useNativeSlotReader, withUnselectable } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
@@ -109,6 +109,7 @@ const id = (part: NumberFieldPart, props: NumberFieldProps) =>
 
 // One button: a press steps once, and holding it keeps stepping until it's let go or disabled.
 function TriggerImpl(options: TriggerOptions): ReactNode {
+    const nativeSlots = useNativeSlotReader("numberField");
     const { props, part, disabled } = options;
     const slot = nativeSlots(props);
     const indication = useSurfaceIndication(INDICATIONS[part]!, {
@@ -186,6 +187,7 @@ function TriggerImpl(options: TriggerOptions): ReactNode {
 const Trigger = withEngine(TriggerImpl, "NumberFieldTrigger");
 
 function NumberFieldImpl(props: NumberFieldProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("numberField");
     const locale = props.locale;
     const options = props.formatOptions;
     const range: NumberFieldRange = numberFieldRange(props);

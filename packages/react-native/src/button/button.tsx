@@ -17,7 +17,7 @@ import type { GestureResponderEvent } from "react-native";
 import { IconSlot, iconSlot } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, useControllable, withEngine } from "../parts";
-import { nativeSlots, withUnselectable } from "../slot-props";
+import { useNativeSlotReader, withUnselectable } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
@@ -78,6 +78,7 @@ const pick = <P extends object, K extends keyof P>(
     ) as Partial<Pick<P, K>>;
 
 function ButtonImpl(props: ButtonProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("button");
     const disabled = props.disabled ?? false;
     const toggle = isToggle(props);
     const [on, setOn] = useControllable(

@@ -36,7 +36,7 @@ import type { LayoutChangeEvent } from "react-native";
 import { ownText } from "../icon-style";
 import { testIdOf, withEngine } from "../parts";
 import { useDirection, usePureform } from "../provider";
-import { nativeSlots, withUnselectable } from "../slot-props";
+import { useNativeSlotReader, withUnselectable } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { colorText, useComponentSlots } from "../styles";
 
@@ -105,6 +105,7 @@ interface Settling {
 
 /** The divider after pane `index`: it takes the drag, the adjustments and the keys. */
 function ResizeTrigger(props: TriggerProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("splitter");
     const slot = nativeSlots(props.splitter);
     const { splitter, index } = props;
     const [dragging, setDragging] = useState(false);
@@ -247,6 +248,7 @@ function ResizeTrigger(props: TriggerProps): ReactNode {
 }
 
 function SplitterImpl(props: SplitterProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("splitter");
     const { styles: s, views: v } = useComponentSlots<Part>(
         "splitter",
         splitterSelection(props),

@@ -28,7 +28,7 @@ import { testIdOf, useControllable, withEngine } from "../parts";
 import { ProvidedTokens } from "../provided-tokens";
 import { Select } from "../select/select";
 import type { SelectProps } from "../select/select";
-import { nativeSlots } from "../slot-props";
+import { useNativeSlotReader } from "../slot-props";
 import type { InnerPropsOf, NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
@@ -62,6 +62,7 @@ export interface PaginatorProps
 type Trigger = "firstTrigger" | "prevTrigger" | "nextTrigger" | "lastTrigger";
 
 function PaginatorImpl(props: PaginatorProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("paginator");
     const {
         styles: s,
         views: v,

@@ -52,7 +52,7 @@ import { IconSlot, ownText } from "./icon-style";
 import { testIdOf, withEngine } from "./parts";
 import { useOverlayPresence } from "./presence";
 import { useEngine } from "./provider";
-import { nativeSlots } from "./slot-props";
+import { useNativeSlotReader } from "./slot-props";
 import type { NativeSlotProps, PartSlots } from "./slot-props";
 import { colorText, useSelectedStyles } from "./styles";
 
@@ -78,6 +78,7 @@ export interface TextProps
 /** Text in a type style: `<Text textStyle="titleLarge">Inbox</Text>`. Nothing inherits on React
  *  Native, so it takes the surface's text color unless its style says otherwise. */
 export function Text(props: TextProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("text");
     const slot = nativeSlots(props);
     const selected = useSelectedStyles("text", textSelection(props));
     const tokens = useTokens();
@@ -126,6 +127,7 @@ const HIDDEN = {
 } as const;
 
 function AvatarImpl(props: AvatarProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("avatar");
     const slot = nativeSlots(props);
     const engine = useEngine();
     const selected = useSelectedStyles("avatar", avatarSelection(props));
@@ -198,6 +200,7 @@ export interface BadgeProps
 }
 
 function BadgeImpl(props: BadgeProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("badge");
     const slot = nativeSlots(props);
     const engine = useEngine();
     const selected = useSelectedStyles("badge", badgeSelection(props));
@@ -246,6 +249,7 @@ export interface IconProps
 /** A standalone icon in Material's sizes and colors: `<Icon label="Star"><Glyph glyph="★" />
  *  </Icon>`. Without a color, it takes the surface's text color. */
 export function Icon(props: IconProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("icon");
     const slot = nativeSlots(props);
     const selected = useSelectedStyles(
         "icon",
@@ -288,6 +292,7 @@ export interface SeparatorProps
 
 /** Material's divider: `<Separator inset="start" />`. */
 export function Separator(props: SeparatorProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("separator");
     const slot = nativeSlots(props);
     const selected = useSelectedStyles("separator", separatorSelection(props));
     return (
@@ -313,6 +318,7 @@ export interface SupportingTextProps
 
 /** Text under a control, in a tone: `<SupportingText tone="error">…</SupportingText>`. */
 export function SupportingText(props: SupportingTextProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("supportingText");
     const slot = nativeSlots(props);
     const selected = useSelectedStyles(
         "supportingText",
@@ -346,6 +352,7 @@ export interface ScrimProps
 
 /** A layer dimming what sits behind it, over the whole of its parent. */
 export function Scrim(props: ScrimProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("scrim");
     const engine = useEngine();
     const selected = useSelectedStyles("scrim", scrimSelection(props));
     const presence = useOverlayPresence(props.open, "scrim");
@@ -430,6 +437,7 @@ const remoteOf = (
 let warnedBoth = false;
 
 function MediaImpl(props: MediaProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("media");
     const engine = useEngine();
     const selected = useSelectedStyles("media", mediaSelection(props));
     const { objectFit, ...style } = rootOf(selected);

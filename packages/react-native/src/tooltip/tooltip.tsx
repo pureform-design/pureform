@@ -13,7 +13,7 @@ import type { ReactNode } from "react";
 import { testIdOf, withEngine } from "../parts";
 import { useOverlayPresence } from "../presence";
 import { useEngine } from "../provider";
-import { nativeSlots, overlayKeys } from "../slot-props";
+import { useNativeSlotReader, overlayKeys } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 import { TooltipHost } from "../tooltip-overlay";
@@ -42,6 +42,7 @@ export interface TooltipProps
 }
 
 function TooltipSurface(props: TooltipProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("tooltip");
     const engine = useEngine();
     const { styles: s, views: v } = useComponentSlots<Part>(
         "tooltip",

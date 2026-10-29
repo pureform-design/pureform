@@ -40,6 +40,7 @@ export {
     backdropKeys,
     nativeSlots,
     overlayKeys,
+    useNativeSlotReader,
     withUnselectable,
 } from "./slot-props";
 export type {
@@ -81,6 +82,7 @@ export type {
     PureformState,
     SchemeOverrides,
 } from "./provider";
+export type { NativeProviderSlotProps } from "./provider-slots";
 export {
     useComponentSlots,
     useSelectedStyles,

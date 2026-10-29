@@ -34,7 +34,7 @@ import { testIdOf, withEngine } from "../parts";
 import { ProvidedTokens } from "../provided-tokens";
 import { SearchBar } from "../search-bar";
 import type { SearchBarProps } from "../search-bar";
-import { nativeSlots } from "../slot-props";
+import { useNativeSlotReader } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
@@ -74,6 +74,7 @@ function useScrollState(props: AppBarProps): AppBarScrollState {
 }
 
 function AppBarImpl(props: AppBarProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("appBar");
     const search = props.searchBarProps !== undefined;
     const state = useScrollState(props);
     const {

@@ -234,6 +234,19 @@ import { registry } from "./.pureform";
   only when `slot.each(part)` says one was passed. An overlay's `Button` trigger (dialog, sheets,
   popover, menu, date picker) takes the `trigger` key on its root, and a string `testId` gives it
   `<prefix>-trigger`; the menu's `contextTrigger` takes its own key.
+- **Provider slot defaults:** `PureformProvider` takes `slotProps` keyed by component and preset
+  style slot, matching React and Solid today. For example,
+  `slotProps={{ button: { label: { style: { fontWeight: "600" } } } }}` sets every button label.
+  Values take the slot's Native host props, including `style`; nested providers merge styles and
+  compose handlers outer first, then inner. Instance customization wins over provider defaults;
+  the component's internal handlers still run first and its state/accessibility/measurement wiring
+  remains protected. Keep provider objects stable for cached lookups. Overlay names differ from
+  instance part names: provider `dialog.root` reaches instance `content`, while backdrops read
+  `scrim.root`. Unifying these public names on anatomy parts is deferred (F3 in the follow-up plan).
+  Custom components can call `useNativeSlotReader(name)` unconditionally, then use its returned
+  pure `nativeSlots(props, keyOf)` reader in callbacks or for children, just as built-in components
+  do. Keep standalone `nativeSlots` for context-free merging; never add hooks inside item loops or
+  conditional rendering paths.
 
 ### Plain form primitives
 

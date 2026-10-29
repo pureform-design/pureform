@@ -8,7 +8,7 @@ import type { DragHandleVariantProps } from "@pureform/binding-core";
 import type { ReactNode } from "react";
 
 import { testIdOf, withEngine } from "../parts";
-import { nativeSlots, withUnselectable } from "../slot-props";
+import { useNativeSlotReader, withUnselectable } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
@@ -30,6 +30,7 @@ export interface DragHandleProps
 }
 
 function DragHandleImpl(props: DragHandleProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("dragHandle");
     const { styles: s, views: v } = useComponentSlots<Part>(
         "dragHandle",
         dragHandleSelection(props),

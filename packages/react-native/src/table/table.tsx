@@ -41,7 +41,7 @@ import type { CheckboxProps } from "../checkbox";
 import { Glyph, IconSlot, iconSlot } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, useControllable, withEngine } from "../parts";
-import { nativeSlots, withUnselectable } from "../slot-props";
+import { useNativeSlotReader, withUnselectable } from "../slot-props";
 import type { PartSlots } from "../slot-props";
 import type { InnerPropsOf, NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
@@ -285,6 +285,7 @@ function BodyRow<Row>(props: {
 }
 
 function TableImpl<Row>(props: TableProps<Row>): ReactNode {
+    const nativeSlots = useNativeSlotReader("dataTable");
     const [sort, setSort] = useControllable<"sort", TableSort | null>(
         "Table",
         "sort",

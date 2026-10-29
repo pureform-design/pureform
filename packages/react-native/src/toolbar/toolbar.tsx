@@ -34,7 +34,7 @@ import { Menu } from "../menu";
 import type { MenuProps, MenuTriggerProps } from "../menu";
 import { testIdOf, withEngine } from "../parts";
 import { ProvidedTokens } from "../provided-tokens";
-import { nativeSlots } from "../slot-props";
+import { useNativeSlotReader } from "../slot-props";
 import type { InnerPropsOf, NativeSlotProps } from "../slot-props";
 import { inFlowInline, useComponentSlots } from "../styles";
 
@@ -150,6 +150,7 @@ const element = (item: ToolbarEntry, props: ToolbarProps) => {
 };
 
 function ToolbarImpl(props: ToolbarProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("toolbar");
     const {
         styles: s,
         views: v,

@@ -23,7 +23,7 @@ import { ModalScrimLayer, ModalWindow, useModalOverlay } from "../modal";
 import { testIdOf, withEngine } from "../parts";
 import { useOverlayPresence } from "../presence";
 import { useEngine } from "../provider";
-import { backdropKeys, nativeSlots, overlayKeys } from "../slot-props";
+import { backdropKeys, useNativeSlotReader, overlayKeys } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 import { triggerButtonProps } from "../trigger-button";
@@ -104,6 +104,7 @@ export interface DialogProps
 }
 
 function DialogImpl(props: DialogProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("dialog");
     const engine = useEngine();
     const {
         styles: s,
@@ -180,6 +181,8 @@ function DialogImpl(props: DialogProps): ReactNode {
 const Surface = withEngine(DialogImpl, "Dialog");
 
 function ModalDialog(props: DialogProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("dialog");
+    const scrimSlots = useNativeSlotReader("scrim");
     const {
         trigger,
         open: _open,
@@ -223,7 +226,7 @@ function ModalDialog(props: DialogProps): ReactNode {
             >
                 <ModalScrimLayer
                     scrimTestId={partAsRoot<string>(props.testId, "backdrop")}
-                    scrimSlot={nativeSlots(props, backdropKeys)}
+                    scrimSlot={scrimSlots(props, backdropKeys)}
                     open={open}
                     presence={presence}
                     onPressOutside={outside ? close : undefined}

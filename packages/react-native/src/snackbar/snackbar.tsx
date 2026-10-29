@@ -18,7 +18,7 @@ import { AccessibilityInfo, Platform, Text } from "react-native";
 import { testIdOf, useControllable, withEngine } from "../parts";
 import { useOverlayPresence } from "../presence";
 import { useEngine } from "../provider";
-import { nativeSlots } from "../slot-props";
+import { useNativeSlotReader } from "../slot-props";
 import type { NativeSlotProps, NativePartProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 import { SurfaceButton } from "../surface-button";
@@ -74,6 +74,7 @@ function SnackbarButtonImpl(props: {
     readonly onPress: (() => void) | undefined;
     readonly children: ReactNode;
 }): ReactNode {
+    const nativeSlots = useNativeSlotReader("snackbar");
     return (
         <SurfaceButton
             anatomy={snackbarAnatomy}
@@ -94,6 +95,7 @@ function SnackbarButtonImpl(props: {
 const SnackbarButton = withEngine(SnackbarButtonImpl, "SnackbarButton");
 
 function SnackbarImpl(props: SnackbarProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("snackbar");
     const engine = useEngine();
     const { styles: s, views: v } = useComponentSlots<SnackbarPart>(
         "snackbar",

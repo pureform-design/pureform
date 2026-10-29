@@ -16,7 +16,7 @@ import type { GestureResponderEvent } from "react-native";
 import { IconSlot, iconSlot } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, useControllable, withEngine } from "../parts";
-import { nativeSlots, withUnselectable } from "../slot-props";
+import { useNativeSlotReader, withUnselectable } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 import { touchTargetSlopOf } from "../touch-slop";
@@ -57,6 +57,7 @@ export interface ChipProps
 }
 
 function ChipImpl(props: ChipProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("chip");
     const toggle = isToggle(props);
     const [on, setOn] = useControllable(
         "Chip",

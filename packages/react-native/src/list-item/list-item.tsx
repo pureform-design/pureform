@@ -40,7 +40,7 @@ import { testIdOf, useControllable, withEngine } from "../parts";
 import { useDirection } from "../provider";
 import { resolveText } from "../resolve-text";
 import { useSidewaysPan } from "../sideways-pan";
-import { nativeSlots, withUnselectable } from "../slot-props";
+import { useNativeSlotReader, withUnselectable } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
@@ -88,6 +88,7 @@ export interface ListItemProps
 export const ListDefaults = createContext<ListVariantProps | null>(null);
 
 function ListItemImpl(props: ListItemProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("listItem");
     const list = use(ListDefaults);
     const expandable = isPresent(props.region);
     const [expanded, setExpanded] = useControllable<"expanded", boolean>(

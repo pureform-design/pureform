@@ -22,7 +22,7 @@ import { Chip } from "../chip/chip";
 import type { ChipProps } from "../chip/chip";
 import { overDefaults } from "../defaults";
 import { testIdOf, useControllable, withEngine } from "../parts";
-import { nativeSlots } from "../slot-props";
+import { useNativeSlotReader } from "../slot-props";
 import type { InnerPropsOf, NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
@@ -49,6 +49,7 @@ export type ChipSetEntry = ChipSetItem<ReactNode> &
     Omit<InnerPropsOf<ChipProps>, "testId">;
 
 function ChipSetImpl(props: ChipSetProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("chipSet");
     const slot = nativeSlots(props);
     const { styles: s, views: v } = useComponentSlots<ChipSetPart>(
         "chipSet",

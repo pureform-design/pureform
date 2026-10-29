@@ -41,7 +41,7 @@ import type { IconButtonProps } from "../icon-button/icon-button";
 import { Glyph } from "../icon-style";
 import { testIdOf, useControllable, withEngine } from "../parts";
 import { useDirection } from "../provider";
-import { nativeSlots, withUnselectable } from "../slot-props";
+import { useNativeSlotReader, withUnselectable } from "../slot-props";
 import type { InnerPropsOf, NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 import { TextField } from "../text-field";
@@ -176,6 +176,7 @@ interface PartsProps {
 }
 
 function Area(props: PartsProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("colorPicker");
     const slot = nativeSlots(props.picker);
     const { picker, color, rtl } = props;
     const { styles: s, views: v } = useComponentSlots<Part>(
@@ -299,6 +300,7 @@ function Grid(props: { readonly width: number; readonly height: number }) {
 }
 
 function ChannelSlider(props: PartsProps & { readonly channel: Channel }) {
+    const nativeSlots = useNativeSlotReader("colorPicker");
     const slot = nativeSlots(props.picker);
     const { picker, color, rtl, channel } = props;
     const each: ColorPickerChannelInstance | undefined =
@@ -447,6 +449,7 @@ function SwatchTrigger(props: {
     readonly checked: boolean;
     readonly pick: (value: string) => void;
 }): ReactNode {
+    const nativeSlots = useNativeSlotReader("colorPicker");
     const slot = nativeSlots(props.picker);
     const { picker, value, checked } = props;
     const each: ColorPickerSwatchInstance | undefined =
@@ -501,6 +504,7 @@ const after =
     };
 
 function ColorPickerImpl(props: ColorPickerProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("colorPicker");
     const userInput = props.textFieldProps?.slotProps?.input as
         | TextInputProps
         | undefined;

@@ -1,4 +1,4 @@
-// `PureformProvider`: the registry, scheme, theme, overrides, direction, motion, defaults, and motion
+// `PureformProvider`: the registry, scheme, theme, overrides, direction, motion, defaults, slot props, and motion
 // engine for everything under it, over the nearest provider's. It renders no view of its own: it
 // gives `@pureform/rn-adapter`'s hooks their factories (the registry's entries) and environment, so
 // every component selects through the generated `StyleFactory`s.
@@ -51,6 +51,8 @@ import type { MotionEngine } from "./engine";
 import { isDev } from "./env";
 import { providerIndicationValues } from "./indication-tokens";
 import { PortalHost, useHasPortalHost } from "./portal-host";
+import type { NativeProviderSlotProps } from "./provider-slots";
+import { mergeNativePartProps } from "./slot-props";
 
 /** Overrides resolved for each scheme. */
 export interface SchemeOverrides {
@@ -67,6 +69,7 @@ export interface PureformState {
     readonly dir: Direction;
     readonly motion: MotionSetting;
     readonly defaults: ComponentDefaults;
+    readonly slotProps: NativeProviderSlotProps;
     readonly engine: MotionEngine;
     readonly width: number | undefined;
     readonly timeScale: number;
@@ -109,6 +112,9 @@ export interface PureformProviderProps {
     readonly motion?: MotionSetting | undefined;
     /** Default variants and tokens per component, over the outer provider's. */
     readonly defaults?: ComponentDefaults | undefined;
+    /** Host props per component and preset style slot, merged over outer providers and under
+     *  instance customization. Keep the object stable, as with `defaults`. */
+    readonly slotProps?: NativeProviderSlotProps | undefined;
     /** What runs transitions and ripples and draws shapes: `animated` (React Native's Animated,
      *  the default), or `animatedSvg`, `reanimated`, or `reanimatedSvg` from this package's
      *  subpaths. Inherited. */
@@ -284,7 +290,7 @@ const mergeOverrides = (
         : outer;
 
 /** Provides the registry and the settings components read, over the nearest provider's.
- *  `registry`, `defaults`, and `engine` are compared by identity (keep them stable), `overrides`
+ *  `registry`, `defaults`, `slotProps`, and `engine` are compared by identity (keep them stable), `overrides`
  *  by value. */
 export function PureformProvider(props: PureformProviderProps): ReactNode {
     const parent = useContext(PureformContext);
@@ -320,13 +326,14 @@ export function PureformProvider(props: PureformProviderProps): ReactNode {
             width: rootWidth ?? undefined,
             timeScale: 1,
         };
-        const resolved = resolveProvider(
+        const resolved = resolveProvider<object>(
             {
                 ...ROOT_PROVIDER,
                 registry: base.registry,
                 dir: base.dir,
                 motion: base.motion,
                 defaults: base.defaults,
+                slotProps: base.slotProps,
                 indication: base.indication,
                 focusIndicatorColor: base.focusIndicatorColor,
             },
@@ -335,14 +342,17 @@ export function PureformProvider(props: PureformProviderProps): ReactNode {
                 dir: props.dir,
                 motion: props.motion,
                 defaults: props.defaults,
+                slotProps: props.slotProps,
                 indication: props.indication,
             },
+            mergeNativePartProps,
         );
         return {
             registry: resolved.registry,
             dir: resolved.dir,
             motion: resolved.motion,
             defaults: resolved.defaults,
+            slotProps: resolved.slotProps as NativeProviderSlotProps,
             indication: resolved.indication,
             focusIndicatorColor: resolved.focusIndicatorColor,
             scheme: props.scheme ?? base.scheme,
@@ -370,6 +380,7 @@ export function PureformProvider(props: PureformProviderProps): ReactNode {
         props.dir,
         props.motion,
         props.defaults,
+        props.slotProps,
         props.scheme,
         props.theme,
         overrideKey,

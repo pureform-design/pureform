@@ -65,7 +65,7 @@ import {
 import { themeSpring, useOverlayPresence } from "../presence";
 import { useEngine, usePureform } from "../provider";
 import { resolveText } from "../resolve-text";
-import { backdropKeys, nativeSlots, overlayKeys } from "../slot-props";
+import { backdropKeys, useNativeSlotReader, overlayKeys } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 import { triggerButtonProps } from "../trigger-button";
@@ -147,6 +147,7 @@ function BottomSheetImpl(
         readonly shown?: boolean | undefined;
     },
 ): ReactNode {
+    const nativeSlots = useNativeSlotReader("bottomSheet");
     const engine = useEngine();
     const { styles: s, views: v } = useComponentSlots<Part>(
         "bottomSheet",
@@ -432,6 +433,8 @@ function BottomSheetImpl(
 const Surface = withEngine(BottomSheetImpl, "BottomSheet");
 
 function ModalBottomSheet(props: BottomSheetProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("bottomSheet");
+    const scrimSlots = useNativeSlotReader("scrim");
     const {
         trigger,
         open: _open,
@@ -467,7 +470,7 @@ function ModalBottomSheet(props: BottomSheetProps): ReactNode {
             <ModalWindow visible={presence.present} label={props["aria-label"]}>
                 <ModalScrimLayer
                     scrimTestId={partAsRoot<string>(props.testId, "backdrop")}
-                    scrimSlot={nativeSlots(props, backdropKeys)}
+                    scrimSlot={scrimSlots(props, backdropKeys)}
                     open={open}
                     presence={presence}
                     onPressOutside={close}
@@ -490,6 +493,7 @@ function ModalBottomSheet(props: BottomSheetProps): ReactNode {
 // it (Material's standard bottom sheet; Compose's `BottomSheetScaffold`), so where it sits is the
 // app's layout.
 function StandardBottomSheet(props: BottomSheetProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("bottomSheet");
     const {
         trigger,
         open: _open,

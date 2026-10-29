@@ -34,7 +34,7 @@ import { testIdOf, useStableCallback, withEngine } from "../parts";
 import { Portal } from "../portal";
 import { useOverlayPresence } from "../presence";
 import { useEngine } from "../provider";
-import { nativeSlots, withUnselectable } from "../slot-props";
+import { useNativeSlotReader, withUnselectable } from "../slot-props";
 import type { PartSlots } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
@@ -180,6 +180,7 @@ function CloseTriggerImpl(props: {
     readonly source: ReturnType<typeof useInteractionSource>;
     readonly onPress: () => void;
 }): ReactNode {
+    const nativeSlots = useNativeSlotReader("fabMenu");
     const slot = nativeSlots(props.menu);
     const indication = useSurfaceIndication(INDICATIONS.closeTrigger!, {
         indication: props.menu.indication,
@@ -236,6 +237,7 @@ const inFlow = (style: Readonly<Record<string, unknown>> | undefined) =>
     );
 
 function FabMenuImpl(props: FabMenuProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("fabMenu");
     const engine = useEngine();
     const selection = fabMenuSelection(props);
     const { styles: s, views: v } = useComponentSlots<FabMenuPart>(

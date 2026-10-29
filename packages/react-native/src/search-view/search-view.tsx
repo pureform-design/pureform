@@ -46,7 +46,7 @@ import { testIdOf, useControllable, useStableCallback } from "../parts";
 import { useEngine } from "../provider";
 import { SearchBar } from "../search-bar/search-bar";
 import type { SearchBarProps } from "../search-bar/search-bar";
-import { nativeSlots, overlayKeys } from "../slot-props";
+import { useNativeSlotReader, overlayKeys } from "../slot-props";
 import type { InnerPropsOf, NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
@@ -149,6 +149,7 @@ const COVERED_INPUT = {
 } as const;
 
 export function SearchView(props: SearchViewProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("searchView");
     const engine = useEngine();
     const { open, setOpen, presence, close } = useModalOverlay(
         "SearchView",

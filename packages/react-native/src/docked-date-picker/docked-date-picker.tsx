@@ -36,7 +36,7 @@ import { useControllable } from "../parts";
 import { Portal } from "../portal";
 import { useEngine } from "../provider";
 import { resolveText } from "../resolve-text";
-import { nativeSlots, withUnselectable } from "../slot-props";
+import { useNativeSlotReader, withUnselectable } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 import { Field, partId } from "../text-input";
@@ -100,6 +100,7 @@ function Popup(
         readonly onChoose: (day: string) => void;
     },
 ): ReactNode {
+    const nativeSlots = useNativeSlotReader("dockedDatePicker");
     const locale = pickerLocale(props);
     const [month, setMonth] = useState(() => startMonth(props.value));
     const [view, setView] = useState<CalendarView>("day");
@@ -272,6 +273,7 @@ function Popup(
 /** Material's docked date picker:
  *  `<DockedDatePicker label="Date" locale="en-US" onValueChange={({ value }) => …} />`. */
 export function DockedDatePicker(props: DockedDatePickerProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("dockedDatePicker");
     const locale = pickerLocale(props);
     const mode = props.selectionMode ?? "single";
     const [value, setValue] = useControllable<"value", readonly string[]>(

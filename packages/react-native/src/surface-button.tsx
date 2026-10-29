@@ -16,7 +16,7 @@ import type { ReactNode } from "react";
 import { IconSlot, iconSlot } from "./icon-style";
 import { useSurfaceIndication } from "./indication";
 import { testIdOf } from "./parts";
-import { nativeSlots, withUnselectable } from "./slot-props";
+import { useNativeSlotReader, withUnselectable } from "./slot-props";
 import type { PartSlots } from "./slot-props";
 import { useComponentSlots } from "./styles";
 
@@ -44,6 +44,7 @@ export interface SurfaceButtonProps<A extends ComponentAnatomy> {
 export function SurfaceButton<A extends ComponentAnatomy>(
     props: SurfaceButtonProps<A>,
 ): ReactNode {
+    const nativeSlots = useNativeSlotReader(props.component);
     const slot = props.slot ?? nativeSlots(undefined);
     const user = slot.props(
         props.part,

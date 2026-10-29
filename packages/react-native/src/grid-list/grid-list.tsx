@@ -17,7 +17,7 @@ import type { ImageStyle } from "react-native";
 import { ownText } from "../icon-style";
 import { testIdOf, withEngine } from "../parts";
 import { resolveText } from "../resolve-text";
-import { nativeSlots } from "../slot-props";
+import { useNativeSlotReader } from "../slot-props";
 import type { PartSlots } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
@@ -62,6 +62,7 @@ export interface GridListRootProps
 
 /** The grid list's root: a wrapping row of tiles, a list for assistive technology. */
 function Root(props: GridListRootProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("gridList");
     const slot = nativeSlots(props);
     const slots = useComponentSlots<GridListPart>(
         "gridList",

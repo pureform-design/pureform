@@ -19,7 +19,7 @@ import { IconSlot, iconSlot } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, useControllable, withEngine } from "../parts";
 import { useEngine } from "../provider";
-import { nativeSlots, withUnselectable } from "../slot-props";
+import { useNativeSlotReader, withUnselectable } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 import { touchTargetSlopOf } from "../touch-slop";
@@ -58,6 +58,7 @@ export interface IconButtonProps
 }
 
 function IconButtonImpl(props: IconButtonProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("iconButton");
     const engine = useEngine();
     const disabled = props.disabled ?? false;
     const toggle = isToggle(props);

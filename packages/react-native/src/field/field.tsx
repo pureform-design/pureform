@@ -26,7 +26,7 @@ import { ErrorText } from "../error-text/error-text";
 import { Input } from "../input/input";
 import { Label } from "../label/label";
 import { testIdOf, withEngine } from "../parts";
-import { nativeSlots } from "../slot-props";
+import { useNativeSlotReader } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 import { FieldContext } from "./context";
@@ -51,6 +51,7 @@ export interface FieldProps
 }
 
 function FieldImpl(props: FieldProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("field");
     const slot = nativeSlots(props);
     const generated = useId();
     const ids = useMemo(

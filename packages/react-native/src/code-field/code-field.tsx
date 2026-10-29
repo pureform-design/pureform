@@ -31,7 +31,7 @@ import { Platform } from "react-native";
 import type { TextInputKeyPressEvent } from "react-native";
 
 import { testIdOf, withEngine } from "../parts";
-import { nativeSlots } from "../slot-props";
+import { useNativeSlotReader } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
@@ -102,6 +102,7 @@ const WEB = Platform.OS === "web";
 
 // One cell, with its own states: the filled indicator and stroke follow its focus.
 function CellImpl({ inputRef, ...options }: CellOptions): ReactNode {
+    const nativeSlots = useNativeSlotReader("codeField");
     const { props, index } = options;
     const slot = nativeSlots(props);
     const cell: CodeFieldCellInstance | undefined = slot.each("input")
@@ -203,6 +204,7 @@ function CellImpl({ inputRef, ...options }: CellOptions): ReactNode {
 const Cell = withEngine(CellImpl, "CodeFieldCell");
 
 function CodeFieldImpl(props: CodeFieldProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("codeField");
     const length = props.length ?? CODE_FIELD_LENGTH;
     const type = props.type ?? "numeric";
     const controlled = props.value !== undefined;

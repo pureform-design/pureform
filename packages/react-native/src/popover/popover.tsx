@@ -25,7 +25,7 @@ import { Portal } from "../portal";
 import { useOverlayPresence } from "../presence";
 import { useEngine } from "../provider";
 import { resolveText } from "../resolve-text";
-import { nativeSlots, overlayKeys } from "../slot-props";
+import { useNativeSlotReader, overlayKeys } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 import { triggerButtonProps } from "../trigger-button";
@@ -106,6 +106,7 @@ function PopoverSurface(
         readonly actions?: ReactNode;
     },
 ): ReactNode {
+    const nativeSlots = useNativeSlotReader("popover");
     const engine = useEngine();
     const { styles: s, views: v } = useComponentSlots<Part>(
         "popover",
@@ -167,6 +168,7 @@ function PopoverSurface(
 const Surface = withEngine(PopoverSurface, "Popover");
 
 function PopoverOverlay(props: PopoverProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("popover");
     const {
         trigger,
         open: _open,

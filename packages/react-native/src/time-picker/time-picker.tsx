@@ -51,7 +51,7 @@ import type { GestureResponderEvent, LayoutChangeEvent } from "react-native";
 import { testIdOf, withEngine } from "../parts";
 import { themeSpring } from "../presence";
 import { useDirection, usePureform } from "../provider";
-import { nativeSlots } from "../slot-props";
+import { useNativeSlotReader } from "../slot-props";
 import type { PartSlots } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { inFlowInline, useComponentSlots } from "../styles";
@@ -103,6 +103,7 @@ type AccessibilityAction = {
 const ADJUST = [{ name: "increment" }, { name: "decrement" }] as const;
 
 function TimePickerImpl(props: TimePickerProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("timePicker");
     const [time, setTime] = useTime(props);
     const rtl = useDirection() === "rtl";
     const { cycle, periods } = timeLocale(props);

@@ -29,7 +29,7 @@ import { testIdOf, withEngine } from "../parts";
 import { useOverlayPresence } from "../presence";
 import { useEngine } from "../provider";
 import { resolveText } from "../resolve-text";
-import { nativeSlots, overlayKeys } from "../slot-props";
+import { useNativeSlotReader, overlayKeys } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 import { triggerButtonProps } from "../trigger-button";
@@ -115,6 +115,7 @@ function FullscreenDialogImpl(
         readonly close?: (() => void) | undefined;
     },
 ): ReactNode {
+    const nativeSlots = useNativeSlotReader("fullscreenDialog");
     const engine = useEngine();
     const { styles: s, views: v } = useComponentSlots<Part>(
         "fullscreenDialog",
@@ -219,6 +220,7 @@ function FullscreenDialogImpl(
 const Surface = withEngine(FullscreenDialogImpl, "FullscreenDialog");
 
 function ModalFullscreenDialog(props: FullscreenDialogProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("fullscreenDialog");
     const {
         trigger,
         open: _open,

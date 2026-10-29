@@ -35,7 +35,7 @@ import { iconParts } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, useControllable, withEngine } from "../parts";
 import { useDirection } from "../provider";
-import { nativeSlots, withUnselectable } from "../slot-props";
+import { useNativeSlotReader, withUnselectable } from "../slot-props";
 import type { NativeSlotProps, PartSlots } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
@@ -148,6 +148,7 @@ function Row(props: {
     readonly count: number;
     readonly tree: TreeState;
 }): ReactNode {
+    const nativeSlots = useNativeSlotReader("tree");
     const { node, tree } = props;
     const branch = isTreeBranch(node);
     const expanded = branch && tree.expanded.includes(node.value);
@@ -338,6 +339,7 @@ const shownRows = (
     ]);
 
 function TreeImpl(props: TreeProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("tree");
     const [expanded, setExpanded] = useControllable<"expandedValue", string[]>(
         "Tree",
         "expandedValue",

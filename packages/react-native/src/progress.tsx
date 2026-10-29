@@ -19,7 +19,7 @@ import type { ReactNode } from "react";
 
 import { testIdOf, withEngine } from "./parts";
 import { useEngine } from "./provider";
-import { nativeSlots } from "./slot-props";
+import { useNativeSlotReader } from "./slot-props";
 import type { NativeSlotProps } from "./slot-props";
 import { useComponentSlots } from "./styles";
 
@@ -84,6 +84,7 @@ const valueProps = (
 });
 
 function LinearProgressImpl(props: LinearProgressProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("linearProgress");
     const engine = useEngine();
     const {
         styles: s,
@@ -147,6 +148,7 @@ function LinearProgressImpl(props: LinearProgressProps): ReactNode {
 export const LinearProgress = withEngine(LinearProgressImpl, "LinearProgress");
 
 function CircularProgressImpl(props: CircularProgressProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("circularProgress");
     const engine = useEngine();
     const {
         styles: s,

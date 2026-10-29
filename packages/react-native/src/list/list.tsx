@@ -18,7 +18,7 @@ import { overDefaults } from "../defaults";
 import { ListDefaults, ListItem } from "../list-item/list-item";
 import type { ListItemProps } from "../list-item/list-item";
 import { testIdOf, withEngine } from "../parts";
-import { nativeSlots } from "../slot-props";
+import { useNativeSlotReader } from "../slot-props";
 import type { InnerPropsOf, NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
@@ -43,6 +43,7 @@ export interface ListProps
 }
 
 function ListImpl(props: ListProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("list");
     const { styles: s, views: v } = useComponentSlots<ListPart>(
         "list",
         listSelection(props),

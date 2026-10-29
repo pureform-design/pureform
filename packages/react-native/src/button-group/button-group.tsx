@@ -24,7 +24,7 @@ import { overDefaults } from "../defaults";
 import { IconButton } from "../icon-button/icon-button";
 import type { IconButtonProps } from "../icon-button/icon-button";
 import { testIdOf, useControllable, withEngine } from "../parts";
-import { nativeSlots } from "../slot-props";
+import { useNativeSlotReader } from "../slot-props";
 import type { InnerPropsOf, NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 
@@ -54,6 +54,7 @@ export type ButtonGroupEntry = ButtonGroupItem<ReactNode> &
     Omit<InnerPropsOf<ButtonProps> & InnerPropsOf<IconButtonProps>, "testId">;
 
 function ButtonGroupImpl(props: ButtonGroupProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("buttonGroup");
     const { styles: s, views: v } = useComponentSlots<ButtonGroupPart>(
         "buttonGroup",
         buttonGroupSelection(props),

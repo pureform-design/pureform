@@ -39,7 +39,7 @@ import { IconButton } from "../icon-button/icon-button";
 import { IconSlot, iconSlot, ownText } from "../icon-style";
 import { useControllable, withEngine } from "../parts";
 import { useDirection } from "../provider";
-import { nativeSlots } from "../slot-props";
+import { useNativeSlotReader } from "../slot-props";
 import type { InnerPropsOf, NativeSlotProps, PartSlots } from "../slot-props";
 import { colorText, useComponentSlots } from "../styles";
 import { partId } from "../text-input";
@@ -213,6 +213,7 @@ export interface DateInputProps
 }
 
 function DateInputImpl(props: DateInputProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("dateInput");
     const locale = pickerLocale(props);
     const [value, setValue] = useControllable<"value", readonly string[]>(
         "DateInput",
