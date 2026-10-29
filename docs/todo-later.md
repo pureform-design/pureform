@@ -6,9 +6,6 @@ criteria. These are not all confirmed bugs: reproduction and external verificati
 
 ## B. Bounded component work — low to moderate complexity
 
-5. **Native cascading submenu exit:** outside-click dismissal reportedly waits for the parent exit,
-   then removes the submenu instantly. Reproduce and animate its exit; selection dismissal and
-   web targets already work. Separate from drill.
 6. **Native wavy radial progress:** user reports no waviness at all. Reproduce rendered geometry;
    validate both engines, progress modes, reduced motion and actual device paths.
 7. **FAB-menu SSR item count:** replace the guessed eight steps with data-derived ready-made counts,
@@ -71,6 +68,9 @@ criteria. These are not all confirmed bugs: reproduction and external verificati
 
 ## Retained decisions / separate work
 
+- **5 completed:** reproduced and fixed Native cascading dismissal coordination. Outside-click,
+  Escape and selection now start every open level's exit together; three-level tests pass on both
+  engines in Native Web. Device visuals remain V3; web bindings/drill motion unchanged.
 - **4 completed:** optional DockedDatePicker actions across bindings, with reactive part props and
   unchanged selection semantics. Native trigger forwards established slot props/styles and merges
   handlers; existing IDs/accessibility preserved. Web SSR/hydration verified across adapters.

@@ -138,6 +138,82 @@ describe("placeOverlay", () => {
 });
 
 describe.each([animated, reanimated])("the menu with $name", (engine) => {
+    it.each(["outside", "selection", "escape"] as const)(
+        "starts every cascading level's exit on %s dismissal",
+        async (dismissal) => {
+            const exits = new Set<number>();
+            let next = 0;
+            // Observe the real driver's exit steps, including portals outside the parent view.
+            const observed: MotionEngine = {
+                ...engine,
+                presence: () => {
+                    const driver = engine.presence!();
+                    const id = next++;
+                    return {
+                        ...driver,
+                        run: (phase, motion, done) => {
+                            if (phase === "exit") exits.add(id);
+                            return driver.run(phase, motion, done);
+                        },
+                    };
+                },
+            };
+            await mount(
+                <PureformProvider
+                    registry={registry}
+                    engine={observed}
+                    motion="full"
+                >
+                    <Menu
+                        trigger="Edit"
+                        submenu="cascade"
+                        items={[
+                            {
+                                value: "share",
+                                label: "Share",
+                                items: [
+                                    {
+                                        value: "mail",
+                                        label: "Mail",
+                                        items: [
+                                            { value: "work", label: "Work" },
+                                        ],
+                                    },
+                                ],
+                            },
+                        ]}
+                    />
+                </PureformProvider>,
+            );
+            await interact(() => userEvent.click(byTestId("pf-button-root")));
+            await until(() => items().length === 1);
+            await settle(600);
+            await interact(() => userEvent.click(items()[0]!));
+            await until(() => items().length === 2);
+            await settle(600);
+            await interact(() => userEvent.click(items()[1]!));
+            await until(() => items().length === 3);
+            await settle(600);
+            expect(document.querySelectorAll('[role="menu"]')).toHaveLength(3);
+            exits.clear();
+            const outside = document.elementFromPoint(
+                window.innerWidth - 4,
+                window.innerHeight - 4,
+            ) as HTMLElement;
+            expect(outside.closest('[role="menu"]')).toBeNull();
+            if (dismissal === "outside") {
+                await interact(() => userEvent.click(outside));
+            } else if (dismissal === "selection") {
+                await interact(() => userEvent.click(items()[2]!));
+            } else {
+                await interact(() => userEvent.keyboard("{Escape}"));
+            }
+            expect(exits.size).toBe(3);
+            await until(() => menu() === null, 3000);
+            expect(document.querySelectorAll('[role="menu"]')).toHaveLength(0);
+        },
+    );
+
     it("opens under its trigger over the page, and picking an item closes it", async () => {
         const picked: string[] = [];
         await render(

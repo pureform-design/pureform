@@ -598,9 +598,12 @@ function MenuImpl(
         readonly listbox?: MenuListboxOptions;
         /** How deep a cascaded submenu is: `1` for the menu's own submenus. */
         readonly depth?: number;
+        /** The owning overlay's logical visibility, without animating the surface a second time. */
+        readonly shown?: boolean;
     },
 ): ReactNode {
     const engine = useEngine();
+    const visible = props.shown ?? props.open ?? true;
     const rtl = useDirection() === "rtl";
     const window_ = useWindowDimensions();
     const auto = props.submenu === undefined || props.submenu === "auto";
@@ -788,14 +791,14 @@ function MenuImpl(
     };
     // Out of any submenu once it closes.
     useEffect(() => {
-        if (props.open === false) {
+        if (!visible) {
             // oxlint-disable-next-line react/set-state-in-effect -- a closed menu forgets its drill path and measures once the app closes it
             setMeasuring(undefined);
             setPath([]);
             setFlip(undefined);
             setBeside(undefined);
         }
-    }, [props.open]);
+    }, [visible]);
     const { styles: s, views: v } = useComponentSlots<Part>("menu", selection);
     const presence = useOverlayPresence(props.open, "popup");
     // The cascaded submenu grows in and fades out as the menu does: the last one shown stays
@@ -803,7 +806,10 @@ function MenuImpl(
     const lastBeside = useRef(beside);
     // oxlint-disable-next-line react/refs -- the last side the submenu showed beside, kept while it leaves
     if (beside) lastBeside.current = beside;
-    const cascade = useOverlayPresence(beside !== undefined, "popup");
+    const cascade = useOverlayPresence(
+        visible && beside !== undefined,
+        "popup",
+    );
     if (!presence.present) return null;
     const id = (part: Part) =>
         testIdOf(menuOverlayAnatomy, KEYS(part) as Key, props.testId);
@@ -987,7 +993,8 @@ function MenuImpl(
                                 {...cascade.props}
                                 style={{
                                     // A closing submenu takes no more presses.
-                                    pointerEvents: beside ? "auto" : "none",
+                                    pointerEvents:
+                                        visible && beside ? "auto" : "none",
                                     ...(placed
                                         ? {
                                               transformOrigin:
@@ -1023,6 +1030,7 @@ function MenuImpl(
                                         groups={undefined}
                                         grouped={false}
                                         open={undefined}
+                                        shown={visible && beside !== undefined}
                                         depth={depth + 1}
                                         onSelect={(details) => {
                                             setBeside(undefined);
@@ -1418,6 +1426,7 @@ function MenuOverlay(props: MenuProps): ReactNode {
                                 <Popup onClose={close}>
                                     <Surface
                                         {...surface}
+                                        shown={open}
                                         {...(container
                                             ? { containerFrame: container }
                                             : {})}

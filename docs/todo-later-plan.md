@@ -19,17 +19,6 @@ old B/C/D/E identifiers. Complexity estimates are relative and may change after 
 
 ## B. Bounded component work — low to moderate complexity
 
-### 5. Native cascading submenu outside-click exit
-
-**User-reported; reproduction required.** Separate from drill motion (13).
-
-- Open a cascading submenu, then click elsewhere without selecting an item: the submenu reportedly
-  waits for the parent to animate away, then disappears instantly without its own exit animation.
-- Submenu-item selection animates correctly; web targets work correctly.
-- Regress the outside-click path before fixing exit/presence coordination. Animate submenu exit
-  during dismissal, preserving the working selection path and web behavior.
-- Validate both supported Native animation engines; record device evidence where needed.
-
 ### 6. Native wavy radial progress shape
 
 **User-reported; reproduction required.** No visible waviness, not merely incorrect wave motion.
@@ -193,6 +182,13 @@ Record device/OS/engine/AT results and recordings; unavailable environments rema
 
 ## Retained decisions and out-of-scope tooling
 
+- **5 completed (2026-10-29): Native cascading exit coordination.** Reproduced with real Animated
+  and Reanimated presence drivers on Native Web: outside-click/Escape started only the parent exit,
+  while selection started all levels. The overlay now passes logical visibility separately from
+  the surface's own animation; each cascading portal starts its exit with the parent, recursively,
+  without duplicating the parent's animation. Three-level regressions cover outside-click, Escape
+  and selection on both engines; the full Native overlay suite passes. Actual device visuals remain
+  in V3, not claimed verified. Web bindings and drill motion were not changed.
 - **4 completed (2026-10-29): DockedDatePicker actions/trigger.** Optional `actions` content renders
   through the existing Actions part across React/Solid/Native; absent/null/false content adds no
   wrapper, no default buttons or new confirmation semantics. Web keeps its `trailingIcon` trigger
