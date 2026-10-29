@@ -23,9 +23,13 @@ old B/C/D/E identifiers. Complexity estimates are relative and may change after 
 
 ### 8. Per-item customization consistency
 
-- Audit ButtonGroup, ChipSet, Toolbar and RadioGroup item classes, tokens, style functions and
-  test IDs against List's established `InnerPropsOf` and instance-function conventions.
-- Audit SplitButton/Toolbar per-item `menuProps` functions under those same conventions.
+- Audit found: ChipSet and ButtonGroup items took only a `testId` before; they now take their own
+  `class`/`className`, `style`, `slotProps`, `unstyled` and `tokens` over `chipProps` or
+  `buttonProps`/`iconButtonProps`, as List's `ListEntry` does, in React, Solid and Native.
+- Still open: RadioGroup items need the same, which means each radio becomes a child that merges
+  its own customization before reading its parts (`useSlotProps` can't run per item in a loop).
+  Toolbar items and its `buttonProps`/`menuProps`, and SplitButton's `menuProps`, need the same
+  item typing plus per-item instance functions like `SelectMenuProps` (`MenuScopeInstances`).
 - Reuse established APIs, not a new customization system; verify current gaps before expanding.
 - Compile usage tests first. Preserve provider/instance/slot precedence, internal handler merging
   and equivalent cross-binding capabilities with host-specific props.

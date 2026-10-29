@@ -8,9 +8,10 @@ criteria. These are not all confirmed bugs: reproduction and external verificati
 
 ## C. Shared APIs and motion — moderate to high complexity
 
-8. **Per-item customization:** audit ButtonGroup/ChipSet/Toolbar/RadioGroup and SplitButton/Toolbar
-   menu functions. Reuse established List/InnerPropsOf and instance-function conventions, including
-   merge precedence, internal handlers, host typing and Solid post-mount reactivity.
+8. **Per-item customization:** ChipSet and ButtonGroup are done (items take their own customizing
+   props over the defaults in React, Solid and Native). Remaining: RadioGroup items (per-radio
+   child merge), Toolbar items/defaults, and SplitButton/Toolbar `menuProps` per-item functions
+   via the `SelectMenuProps` pattern.
 9. **Native provider slotProps:** closely follow web provider APIs and merge behavior, with Native
    host typing and tests for provider/instance precedence, handlers, styles and accessibility.
 10. **FAB-menu motion:** Compose-style nearest-first stagger, aligned-edge width expansion at fixed
