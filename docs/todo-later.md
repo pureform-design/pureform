@@ -77,10 +77,11 @@ Ordered from easy to complex. "Real" is a component or preset bug; "scene" is th
 ## External verification and maintenance
 
 - **Full-gate timing failures:** RN `presence.spec.tsx`'s Reanimated FAB-menu stagger test
-  failed waiting for the menu to disappear, and browser-e2e `rn-motion.e2e.test.ts` exceeded
-  its 30s setup-hook limit during a full workspace run. Both passed isolated reruns; neither
-  is declared fixed. Investigate load sensitivity and animation cleanup before increasing
-  timeouts. The earlier component-suite `overlayShrinkOut` failure did not recur in that run.
+  failed waiting for the menu to disappear in two full workspace runs, but passed isolated.
+  Browser-e2e `rn-motion.e2e.test.ts` exceeded its 30s setup-hook limit in the first full run;
+  both its isolated rerun and the next full browser suite passed. Neither is declared fixed.
+  Investigate load sensitivity and animation cleanup before increasing timeouts. The earlier
+  component-suite `overlayShrinkOut` failure did not recur in these full runs.
 
 - **V1. Slider focus-ring clipping:** obtain the nested-icon-button scene before changing clipping.
   Handle clearance and styled inset-icon reading pass (`slider-inset-icon.e2e.test.ts`); swipeable-row
