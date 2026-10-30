@@ -19,6 +19,7 @@ dependencies:
     - "@pureform/styling"
     - "@pureform/styling-web"
     - "@pureform/anatomy"
+    - "@pureform/binding-web"
     - "@pureform/react-native"
     - "@pureform/panda-fixture"
 

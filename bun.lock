@@ -1016,6 +1016,7 @@
         "@fontsource/roboto": "catalog:",
         "@pandacss/vite": "catalog:",
         "@pureform/anatomy": "workspace:^",
+        "@pureform/binding-web": "workspace:^",
         "@pureform/core": "workspace:^",
         "@pureform/css-adapter": "workspace:^",
         "@pureform/css-lowering": "workspace:^",
