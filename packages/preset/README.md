@@ -1377,7 +1377,8 @@ the progress still shows, but the track and the round ends aren't turned into pl
   card is clickable, and render its touch target slot. For Material's anatomy, set `padded`
   to `false` and lay it out with `media` (full bleed), `header` (`avatar`, `headerText` holding
   `headline` and `subhead`, `headerAction`), `content` (`supportingText`), `actions`
-  (`actionsAlign`: `end` or `start`), and `footer`; the sections pad themselves. A card that acts
+  (`actionsAlign`: `end` or `start`), and `footer`; the sections pad themselves. `width` is `fill`
+  (the default: the width the parent offers, whatever element the card is) or `fit` (its content's). A card that acts
   and has other controls wraps the part that acts in `actionArea` (a link or a button) and keeps
   the controls outside it: the container then tints, lifts, draws the focus indicator, and dims
   from the action area (`:has()` over its states), and the ripple's layer sits in the action

@@ -3669,12 +3669,18 @@ export function Page() {
             <section data-section="cards" style={row}>
                 <For each={CARD_FILLS}>
                     {(variant) => (
-                        <div class={card({ variant }).root}>{variant} card</div>
+                        <div class={card({ variant, width: "fit" }).root}>
+                            {variant} card
+                        </div>
                     )}
                 </For>
                 <div
                     class={
-                        card({ variant: "elevated", interactive: true }).root
+                        card({
+                            variant: "elevated",
+                            interactive: true,
+                            width: "fit",
+                        }).root
                     }
                     role="button"
                     tabindex={0}
@@ -4580,6 +4586,7 @@ export function Page() {
                     style={{
                         width: "320px",
                         display: "flex",
+                        "flex-direction": "row",
                         gap: "16px",
                         "align-items": "center",
                     }}

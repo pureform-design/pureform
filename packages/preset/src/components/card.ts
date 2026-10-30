@@ -39,6 +39,7 @@ import {
     end,
     flex,
     hidden,
+    inlineFlex,
     none,
     pct,
     pointer,
@@ -390,6 +391,25 @@ export const card = pf.slotComponent({
                     },
                 },
             },
+            // Fill takes the width its parent offers, as a View does in a column and a block does,
+            // whatever element the card is (a link is inline); fit hugs its content, as a Compose
+            // card does.
+            width: {
+                fill: {
+                    root: {
+                        display: flex,
+                        flexDirection: column,
+                        width: pct(100),
+                    },
+                },
+                fit: {
+                    root: {
+                        display: inlineFlex,
+                        flexDirection: column,
+                        alignSelf: start,
+                    },
+                },
+            },
             actionsAlign: {
                 end: { actions: { justifyContent: end } },
                 start: { actions: { justifyContent: start } },
@@ -404,6 +424,7 @@ export const card = pf.slotComponent({
             variant: "elevated",
             interactive: "false",
             padded: "true",
+            width: "fill",
             actionsAlign: "end",
         },
     }),

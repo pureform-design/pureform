@@ -32,8 +32,6 @@ Confirm in the storybook before changing.
 
 ### 3. Small decisions, then a small fix
 
-- **Card width:** the web card is a shrink-wrapping `<button>` and RN stretches; choose the intended
-  width, then set it in the preset card root or RN's root.
 - **SearchView trigger width (React, Solid, probably RN):** the trigger is `width: 100%` while the
   `SearchBar` is capped at 720px; make the trigger shrink-wrap (`width: fit-content; max-width:
   100%`) or carry the same cap.

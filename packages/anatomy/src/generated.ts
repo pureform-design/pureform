@@ -5715,6 +5715,7 @@ export const cardAnatomy = {
         interactive: ["true", "false"],
         padded: ["true", "false"],
         actionsAlign: ["end", "start"],
+        width: ["fill", "fit"],
     },
 } as const satisfies ComponentAnatomy;
 

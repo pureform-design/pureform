@@ -23,12 +23,15 @@ export type CardPart = PartName<typeof cardAnatomy>;
 
 /** The card's variant groups and instance tokens. `interactive` follows Root's element unless
  *  given. `padded` is whether Root pads its content: turn it off when the sections lay the card
- *  out (they pad themselves, and the media bleeds to the edges). `actionsAlign` places the
+ *  out (they pad themselves, and the media bleeds to the edges). `width` is `"fill"` (the width
+ *  the parent offers, as a React Native view or a web block takes) or `"fit"` (the content's,
+ *  as Compose's card does). `actionsAlign` places the
  *  actions at the row's end (Material's) or start. */
 export interface CardVariantProps {
     readonly variant?: VariantProp<"card", "variant">;
     readonly interactive?: boolean | undefined;
     readonly padded?: boolean | undefined;
+    readonly width?: VariantProp<"card", "width">;
     readonly actionsAlign?: VariantProp<"card", "actionsAlign">;
     readonly tokens?: InstanceTokens<"card"> | undefined;
 }
@@ -49,6 +52,7 @@ export const CARD_ROOT_PROPS = [
     "variant",
     "interactive",
     "padded",
+    "width",
     "actionsAlign",
     "tokens",
     "disabled",
@@ -102,6 +106,7 @@ export const cardSelection = (
     variant: props.variant,
     interactive: isInteractiveCard(props, interactive),
     padded: props.padded,
+    width: props.width,
     actionsAlign: props.actionsAlign,
     tokens: props.tokens,
 });

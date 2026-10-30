@@ -206,6 +206,7 @@ exports[`card > compiles to a stable Panda slot recipe 1`] = `
       "interactive": false,
       "padded": true,
       "variant": "elevated",
+      "width": "fill",
     },
     "jsx": [
       "Card",
@@ -316,6 +317,22 @@ exports[`card > compiles to a stable Panda slot recipe 1`] = `
             },
             "borderStyle": "solid",
             "borderWidth": "var(--components-card-outlineWidth, 1px)",
+          },
+        },
+      },
+      "width": {
+        "fill": {
+          "root": {
+            "display": "flex",
+            "flexDirection": "column",
+            "width": "100%",
+          },
+        },
+        "fit": {
+          "root": {
+            "alignSelf": "start",
+            "display": "inline-flex",
+            "flexDirection": "column",
           },
         },
       },

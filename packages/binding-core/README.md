@@ -569,7 +569,7 @@ sliderValues(value); sliderValueShape(values, given);
 sliderNativeDefault(resetsTo, min);      // "20,60": a reset shows the default, else min
 
 // Card (no machine)
-type CardPart; interface CardRootOwnProps // variant, interactive, padded, actionsAlign, tokens,
+type CardPart; interface CardRootOwnProps // variant, interactive, padded, width, actionsAlign, tokens,
                                          // disabled, testId, unstyled
 CARD_ROOT_PROPS; cardElement({ href, as }); // "a" with an href, else as, else "div"
 isInteractiveCard(props, element);       // interactive, else a link or a button

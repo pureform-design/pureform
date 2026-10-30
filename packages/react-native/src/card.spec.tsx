@@ -1,6 +1,7 @@
 import { testIds } from "@pureform/anatomy";
 import { createInteractionSource } from "@pureform/binding-core/interaction";
 import type { ComponentProps } from "react";
+import { View } from "react-native";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
@@ -32,6 +33,23 @@ const background = (id: string) =>
     getComputedStyle(byTestId(id)).backgroundColor;
 
 describe("Card on React Native", () => {
+    const widthOf = async (props: ComponentProps<typeof Card>) => {
+        await withRegistry(
+            <View style={{ width: 400 }}>
+                <Card headline="Basic plan" {...props} />
+            </View>,
+        );
+        return byTestId(ids.root).getBoundingClientRect().width;
+    };
+
+    it("fills its parent's width", async () => {
+        expect(await widthOf({})).toBeCloseTo(400, 0);
+    });
+
+    it("hugs its content with width fit", async () => {
+        expect(await widthOf({ width: "fit" })).toBeLessThan(200);
+    });
+
     it("is one button around its children with onPress, as before", async () => {
         const press = vi.fn<() => void>();
         await withRegistry(

@@ -313,6 +313,7 @@ function CardImpl(props: CardProps): ReactNode {
     const root = {
         variant: props.variant,
         padded,
+        width: props.width,
         actionsAlign: props.actionsAlign,
         tokens: props.tokens,
         indication: props.indication,
