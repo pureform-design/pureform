@@ -115,10 +115,11 @@ app's own `_hover` in its own styles keeps Panda's meaning.
 
 Panda keys are still used where they mean the same thing on every target: `_dark`, `_light`,
 and `_motionReduce` (conditions the preset declares), `_ltr`, and `_rtl`, plus breakpoints by
-name. The preset's `motionReduce` replaces Panda's: it follows the system's
-`prefers-reduced-motion` unless a `data-pf-motion` attribute on an ancestor overrides it
-([the rules](../css-lowering/README.md#reduced-motion)), so an app's own `_motionReduce`
-follows the provider too. Panda's `_motionSafe` still reads only the system.
+name. The preset replaces both `motionReduce` and `motionSafe`: the nearest provider's
+explicit setting wins at any depth, and `system` resets an outer override to the OS preference.
+An app's `_motionReduce` and `_motionSafe` use the same setting as components
+([the rules and browser floor](../css-lowering/README.md#reduced-motion): Chrome 111+,
+Safari 18+, Firefox 151+).
 
 ## Build and test
 

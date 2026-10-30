@@ -59,6 +59,62 @@ describe.each(["light", "dark"] as const)("%s color scheme", (scheme) => {
 
 const stateful = COMPONENTS.filter((component) => component.state);
 
+describe("nested motion providers", () => {
+    it.each([
+        {
+            motionParents: ["reduce", "full"] as const,
+            motion: "reduce" as const,
+            reduced: true,
+        },
+        {
+            motionParents: ["full", "reduce"] as const,
+            motion: "full" as const,
+            reduced: false,
+        },
+        {
+            motionParents: ["reduce", "full"] as const,
+            motion: "system" as const,
+            reduced: true,
+        },
+        {
+            motionParents: ["full", "reduce"] as const,
+            motion: "system" as const,
+            reduced: true,
+        },
+    ])(
+        "$motionParents → $motion is effective before and after hydration",
+        async ({ motionParents, motion, reduced }) => {
+            // This suite's browser context requests reduced motion. Full must override it, while
+            // system resets either explicit ancestor. Read rendered CSS, not just serialized props.
+            const scene: Scene = {
+                component: "Button",
+                props: { children: "Motion" },
+                motionParents,
+                provider: { motion },
+            };
+            const check = (host: HTMLElement) => {
+                expect(
+                    [...host.querySelectorAll("[data-pf-motion]")].map(
+                        (element) => element.getAttribute("data-pf-motion"),
+                    ),
+                ).toEqual([...motionParents, motion]);
+                expect(
+                    getComputedStyle(
+                        host.querySelector("button")!,
+                    ).transitionProperty.includes("border-radius"),
+                ).toBe(!reduced);
+            };
+            const server = await serverRendered(scene);
+            check(server);
+            server.remove();
+            const { host, logged, changes } = await hydrate(scene);
+            expect(logged).toEqual([]);
+            expect(changes).toEqual([]);
+            check(host);
+        },
+    );
+});
+
 // Both web bindings serialize textarea values as content, not value attributes. Native has no
 // HTML textarea/hydration boundary; its controlled TextInput behavior is covered in Native tests.
 describe.each(["Textarea", "TextArea"] as const)(

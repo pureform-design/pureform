@@ -18,7 +18,10 @@ export type AdapterOptions = Pick<CssOptions, "prefix" | "themeAttribute">;
 
 // Tailwind's own preflight is left out, so only its theme and the adapter's components apply
 // over the page's reset.
-const tailwind = async (options: AdapterOptions): Promise<string> => {
+const tailwind = async (
+    options: AdapterOptions,
+    candidates: string[] = [],
+): Promise<string> => {
     const compiler = await compile(
         `@layer theme, base, components, utilities;
 @import "tailwindcss/theme.css" layer(theme);
@@ -26,7 +29,7 @@ const tailwind = async (options: AdapterOptions): Promise<string> => {
 ${compileTailwind(pureformConfig, options)}`,
         { base: import.meta.dirname, onDependency: () => {} },
     );
-    return compiler.build([]);
+    return compiler.build(candidates);
 };
 
 const ADAPTERS = {
@@ -37,8 +40,9 @@ const ADAPTERS = {
 export type Adapter = keyof typeof ADAPTERS;
 
 const adapterCss: BrowserCommand<
-    [adapter: Adapter, options: AdapterOptions]
-> = (_context, adapter, options) => ADAPTERS[adapter](options);
+    [adapter: Adapter, options: AdapterOptions, candidates?: string[]]
+> = (_context, adapter, options, candidates) =>
+    ADAPTERS[adapter](options, candidates);
 
 const rnStyles: BrowserCommand<[components?: string[]]> = (
     _context,
@@ -99,6 +103,7 @@ declare module "vitest/browser" {
         adapterCss: (
             adapter: Adapter,
             options: AdapterOptions,
+            candidates?: string[],
         ) => Promise<string>;
         /** The React Native adapter's precomputed styles for the Panda fixture's config: the
          *  components the adapter covers, or these. */

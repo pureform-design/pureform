@@ -138,7 +138,8 @@ import { registry } from "./.pureform";
   `{ light, dark }`, merged over the outer provider's), `dir` (`I18nManager.isRTL` at the root;
   `"rtl"` puts `rtl` in every selection), `motion` (`"system"` follows `AccessibilityInfo`'s
   reduce motion setting and its `reduceMotionChanged` event), `defaults`, `engine`, `width` (the
-  window's at the root), and `timeScale`. Everything is inherited.
+  window's at the root), and `timeScale`. Omitted options inherit. Explicit `motion="system"`
+  resets outer `reduce`/`full` overrides to the OS, matching the web at any provider depth.
 - **Engines and drawn shapes:** `animatedSvg` grows ripples on the native driver, so on a device
   they clip to the surface's rounded corners, not to a drawn shape (a native-driven view can't sit
   inside an SVG clip path, and masking a view needs a mask view, which React Native doesn't ship).

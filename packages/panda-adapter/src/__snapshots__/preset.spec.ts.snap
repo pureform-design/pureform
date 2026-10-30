@@ -18,12 +18,43 @@ exports[`compilePreset (canonical button) > produces a stable Panda preset shape
       },
       "ltr": "&:where(:dir(ltr))",
       "motionReduce": {
-        "@media (prefers-reduced-motion: reduce)": {
-          "&:not([data-pf-motion=full] *)": "@slot",
+        "&[data-pf-motion=reduce], :root[data-pf-motion=reduce] > &:not([data-pf-motion])": "@slot",
+        "@container style(--pf-motion: reduce)": {
+          "&:not([data-pf-motion])": "@slot",
         },
-        "[data-pf-motion=reduce] &:not([data-pf-motion=reduce] [data-pf-motion=full] *)": "@slot",
+        "@media (prefers-reduced-motion: reduce)": {
+          "&:not([data-pf-motion], [data-pf-motion] *)": "@slot",
+          "&[data-pf-motion=system], :root[data-pf-motion=system] > &:not([data-pf-motion])": "@slot",
+          "@container style(--pf-motion: system)": {
+            "&:not([data-pf-motion])": "@slot",
+          },
+        },
+      },
+      "motionSafe": {
+        "&[data-pf-motion=full], :root[data-pf-motion=full] > &:not([data-pf-motion])": "@slot",
+        "@container style(--pf-motion: full)": {
+          "&:not([data-pf-motion])": "@slot",
+        },
+        "@media (prefers-reduced-motion: no-preference)": {
+          "&:not([data-pf-motion], [data-pf-motion] *)": "@slot",
+          "&[data-pf-motion=system], :root[data-pf-motion=system] > &:not([data-pf-motion])": "@slot",
+          "@container style(--pf-motion: system)": {
+            "&:not([data-pf-motion])": "@slot",
+          },
+        },
       },
       "rtl": "&:where(:dir(rtl))",
+    },
+  },
+  "globalCss": {
+    "[data-pf-motion=full]": {
+      "--pf-motion": "full",
+    },
+    "[data-pf-motion=reduce]": {
+      "--pf-motion": "reduce",
+    },
+    "[data-pf-motion=system]": {
+      "--pf-motion": "system",
     },
   },
   "name": "pureform",

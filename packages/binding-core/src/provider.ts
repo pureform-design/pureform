@@ -41,8 +41,8 @@ export interface ProviderOptions<
     readonly registry?: R | undefined;
     /** Text direction. `"ltr"` at the root. */
     readonly dir?: Direction | undefined;
-    /** How much motion to allow. `"system"` follows the platform's setting, or the nearest
-     *  provider that says `"reduce"` or `"full"`. */
+    /** How much motion to allow. Omitted inherits; explicit `"system"` follows the platform's
+     *  setting even inside a `"reduce"` or `"full"` provider. */
     readonly motion?: MotionSetting | undefined;
     /** Default variants and tokens per component. */
     readonly defaults?: ComponentDefaults | undefined;
@@ -61,7 +61,7 @@ export interface ProviderState<
 > {
     readonly registry: R | undefined;
     readonly dir: Direction;
-    /** The setting in effect: the nearest `"reduce"` or `"full"`, else `"system"`. */
+    /** The nearest supplied setting; `"system"` at the root. */
     readonly motion: MotionSetting;
     readonly defaults: ComponentDefaults;
     readonly slotProps: ProviderSlotProps<P>;
@@ -151,10 +151,7 @@ export const resolveProvider = <P, R extends AnyRegistry = AnyRegistry>(
     return {
         registry: own.registry ?? base.registry,
         dir: own.dir ?? base.dir,
-        motion:
-            own.motion !== undefined && own.motion !== "system"
-                ? own.motion
-                : base.motion,
+        motion: own.motion ?? base.motion,
         defaults: mergeDefaults(base.defaults, own.defaults),
         slotProps: mergeSlotProps(base.slotProps, own.slotProps, merge),
         indication: own.indication ?? base.indication,

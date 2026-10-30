@@ -24,7 +24,12 @@ export {
     varTokenRef,
 } from "./css";
 export type { AliasTarget } from "./css";
-export { REDUCED_MOTION_RULES, ROOT_REDUCED_MOTION_RULES } from "./motion";
+export {
+    REDUCED_MOTION_RULES,
+    ROOT_REDUCED_MOTION_RULES,
+    MOTION_SAFE_RULES,
+    MOTION_STYLES,
+} from "./motion";
 export { themeVars } from "./runtime";
 export {
     compileSpring,

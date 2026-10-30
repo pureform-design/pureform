@@ -220,10 +220,11 @@ The class name runtime, `componentClasses`, lives in [`@pureform/styling-web`](.
 - **Tokens** are CSS vars on `:root`. Dark values apply under a `.dark` class on the root, or
   with the system's dark scheme unless the root has `.light`. Named themes apply under their
   attribute: `<div data-theme="teal">`.
-- **Reduced motion** follows the system's `prefers-reduced-motion`, unless a provider's
-  `data-pf-motion="full"` sits on an ancestor; `data-pf-motion="reduce"` reduces it whatever
-  the system says ([the rules](../css-lowering/README.md#reduced-motion)). Only movement
-  stops; color, opacity, and elevation fades keep running.
+- **Reduced motion** follows the nearest provider at any depth: `full` and `reduce` override
+  the OS, while explicit `system` resets to the OS preference; omission inherits. Only movement
+  stops; color, opacity, and elevation fades keep running. The shared CSS uses container style
+  queries: Chrome 111+, Safari 18+, Firefox 151+
+  ([the rules](../css-lowering/README.md#reduced-motion)).
 - **Component tokens** are vars too, such as `--components-button-radius`: set one on a
   component or any ancestor to restyle it.
 

@@ -120,7 +120,8 @@ does not change the separate prop/handler merge precedence of `combineProps`.
 `hydrate`, and narrows `registry` to `@pureform/styling-web`'s `AnyWebRegistry` (its theme
 attribute and var prefixes). `resolveWebProvider` inherits those over the neutral registry/direction/motion/defaults/
 slots/indication state. `providerAttributes` projects only **own** theme and explicit motion,
-but resolved direction; `system` continues to inherit the nearest explicit motion setting.
+but resolved direction. Explicit `system` writes a reset attribute and follows the OS even
+inside an override; only omitted motion inherits.
 React and Solid retain their theme-independent component contexts and reactive budgets.
 
 `ProviderTheme`, `ThemeName`, `ThemeOverrides` and `ThemeHydration` are exported here, not by

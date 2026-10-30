@@ -73,6 +73,7 @@ describe("toTailwind", () => {
             "dark",
             "light",
             "motion-reduce",
+            "motion-safe",
             "ltr",
             "rtl",
             "theme-teal",
@@ -95,10 +96,23 @@ describe("toTailwind", () => {
             paths: [
                 [
                     "@media (prefers-reduced-motion: reduce)",
-                    "&:not([data-pf-motion=full] *)",
+                    "&:not([data-pf-motion], [data-pf-motion] *)",
                 ],
                 [
-                    "[data-pf-motion=reduce] &:not([data-pf-motion=reduce] [data-pf-motion=full] *)",
+                    "@container style(--pf-motion: reduce)",
+                    "&:not([data-pf-motion])",
+                ],
+                [
+                    "@media (prefers-reduced-motion: reduce)",
+                    "@container style(--pf-motion: system)",
+                    "&:not([data-pf-motion])",
+                ],
+                [
+                    "&[data-pf-motion=reduce], :root[data-pf-motion=reduce] > &:not([data-pf-motion])",
+                ],
+                [
+                    "@media (prefers-reduced-motion: reduce)",
+                    "&[data-pf-motion=system], :root[data-pf-motion=system] > &:not([data-pf-motion])",
                 ],
             ],
         });
@@ -184,14 +198,16 @@ describe("compileTailwind", () => {
         );
     });
 
-    it("replaces Tailwind's motion-reduce variant with the provider-aware one", async () => {
-        const out = await build(css, ["motion-reduce:transition-none"]);
-        expect(out).toMatch(
-            /@media \(prefers-reduced-motion: reduce\) \{\s*\.motion-reduce\\:transition-none:not\(\[data-pf-motion=full\] \*\)/,
-        );
-        expect(out).toContain(
-            "[data-pf-motion=reduce] .motion-reduce\\:transition-none:not([data-pf-motion=reduce] [data-pf-motion=full] *)",
-        );
+    it("replaces both Tailwind motion variants with provider-aware conditions", async () => {
+        const out = await build(css, [
+            "motion-reduce:transition-none",
+            "motion-safe:opacity-100",
+        ]);
+        expect(out).toContain("@container style(--pf-motion: reduce)");
+        expect(out).toContain("@container style(--pf-motion: full)");
+        expect(out).toContain("@container style(--pf-motion: system)");
+        expect(out).toContain(".motion-reduce\\:transition-none");
+        expect(out).toContain(".motion-safe\\:opacity-100");
     });
 
     it("keeps the components below utilities, and their own layers in order", async () => {

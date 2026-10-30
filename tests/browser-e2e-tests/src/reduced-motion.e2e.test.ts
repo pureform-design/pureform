@@ -12,6 +12,7 @@ import { afterAll, describe, expect, it } from "vitest";
 import { commands } from "vitest/browser";
 
 import { pureformConfig } from "../../panda-fixture/panda.pureform";
+import { motionSafe, motionReduce } from "../../panda-fixture/src/motion";
 import type { Adapter } from "./commands";
 
 import pandaCss from "#/styles.css?inline";
@@ -130,11 +131,21 @@ const STYLINGS: Record<
     },
 };
 
+const sheets = new Map<object, Promise<string[]>>();
+const sheetsFor = (styling: (typeof STYLINGS)[keyof typeof STYLINGS]) => {
+    let value = sheets.get(styling);
+    if (!value) {
+        value = styling.css();
+        sheets.set(styling, value);
+    }
+    return value;
+};
+
 interface Scenario {
     name: string;
     system: "reduce" | "no-preference";
     /** The motion attribute on each ancestor provider, outermost first. */
-    providers: ("reduce" | "full")[];
+    providers: ("reduce" | "full" | "system")[];
     reduced: boolean;
 }
 
@@ -177,6 +188,32 @@ const SCENARIOS: Scenario[] = [
     },
 ];
 
+// Every three-level combination, then a much deeper alternating tree: no fixed selector depth.
+for (const system of ["reduce", "no-preference"] as const) {
+    for (const outer of ["reduce", "full", "system"] as const) {
+        for (const middle of ["reduce", "full", "system"] as const) {
+            for (const inner of ["reduce", "full", "system"] as const) {
+                SCENARIOS.push({
+                    name: `${outer} → ${middle} → ${inner}, system ${system}`,
+                    system,
+                    providers: [outer, middle, inner],
+                    reduced:
+                        inner === "reduce" ||
+                        (inner === "system" && system === "reduce"),
+                });
+            }
+        }
+    }
+    SCENARIOS.push({
+        name: `31 alternating providers, system ${system}`,
+        system,
+        providers: Array.from({ length: 31 }, (_, index) =>
+            index % 2 ? "full" : "reduce",
+        ),
+        reduced: true,
+    });
+}
+
 /** Render each fixture in a frame and read its computed transition. */
 const transitions = async (
     styling: (typeof STYLINGS)[keyof typeof STYLINGS],
@@ -199,13 +236,13 @@ const transitions = async (
             .join("");
         const markup = scenario.providers.reduceRight(
             (inner, motion) =>
-                `<div ${MOTION_ATTRIBUTE}="${motion}">${inner}</div>`,
+                `<div ${MOTION_ATTRIBUTE}="${motion}" style="display:contents">${inner}</div>`,
             elements,
         );
         const doc = frame.contentDocument!;
         doc.open();
         doc.write(
-            `<!doctype html><html><head>${(await styling.css())
+            `<!doctype html><html><head>${(await sheetsFor(styling))
                 .map((sheet) => `<style>${sheet}</style>`)
                 .join("")}</head><body>${markup}</body></html>`,
         );
@@ -270,6 +307,143 @@ describe.each(Object.keys(STYLINGS) as (keyof typeof STYLINGS)[])(
     },
 );
 
+describe.each(["Panda", "Tailwind"] as const)(
+    "%s: application motion utilities",
+    (name) => {
+        let sheet: string | undefined;
+        const utilitySheet = async () =>
+            (sheet ??=
+                name === "Panda"
+                    ? pandaCss
+                    : await commands.adapterCss("Tailwind", OPTIONS, [
+                          "opacity-0",
+                          "motion-safe:opacity-100",
+                          "motion-reduce:opacity-100",
+                      ]));
+        const safe =
+            name === "Panda" ? motionSafe : "opacity-0 motion-safe:opacity-100";
+        const reduce =
+            name === "Panda"
+                ? motionReduce
+                : "opacity-0 motion-reduce:opacity-100";
+        it.each(SCENARIOS)("$name", async (scenario) => {
+            await commands.emulateReducedMotion(scenario.system);
+            const css = await utilitySheet();
+            const frame = document.createElement("iframe");
+            document.body.append(frame);
+            try {
+                const wrap = (
+                    providers: Scenario["providers"],
+                    inner: string,
+                ) =>
+                    providers.reduceRight(
+                        (child, motion) =>
+                            `<div ${MOTION_ATTRIBUTE}="${motion}" style="display:contents">${child}</div>`,
+                        inner,
+                    );
+                const own = scenario.providers.at(-1);
+                const attribute = own ? `${MOTION_ATTRIBUTE}="${own}"` : "";
+                const markup =
+                    wrap(
+                        scenario.providers,
+                        `<div id="safe" class="${safe}"></div><div id="reduce" class="${reduce}"></div>`,
+                    ) +
+                    wrap(
+                        scenario.providers.slice(0, -1),
+                        `<div id="ownSafe" ${attribute} class="${safe}"></div><div id="ownReduce" ${attribute} class="${reduce}"></div>`,
+                    );
+                const doc = frame.contentDocument!;
+                doc.open();
+                doc.write(`<!doctype html><style>${css}</style>${markup}`);
+                doc.close();
+                const opacity = (id: string) =>
+                    frame.contentWindow!.getComputedStyle(
+                        doc.getElementById(id)!,
+                    ).opacity;
+                expect(opacity("safe")).toBe(scenario.reduced ? "0" : "1");
+                expect(opacity("reduce")).toBe(scenario.reduced ? "1" : "0");
+                expect(opacity("ownSafe")).toBe(scenario.reduced ? "0" : "1");
+                expect(opacity("ownReduce")).toBe(scenario.reduced ? "1" : "0");
+
+                const provider = doc.getElementById("safe")!.parentElement!;
+                for (const setting of ["full", "reduce", "system"] as const) {
+                    provider.setAttribute(MOTION_ATTRIBUTE, setting);
+                    const reduced =
+                        setting === "reduce" ||
+                        (setting === "system" && scenario.system === "reduce");
+                    expect(opacity("safe")).toBe(reduced ? "0" : "1");
+                    expect(opacity("reduce")).toBe(reduced ? "1" : "0");
+                }
+
+                // An attribute change must switch existing utilities without replacing their nodes.
+                doc.getElementById("ownSafe")!.setAttribute(
+                    MOTION_ATTRIBUTE,
+                    "full",
+                );
+                doc.getElementById("ownReduce")!.setAttribute(
+                    MOTION_ATTRIBUTE,
+                    "reduce",
+                );
+                expect(opacity("ownSafe")).toBe("1");
+                expect(opacity("ownReduce")).toBe("1");
+                // The document root has no ancestor container, so utilities need own/root paths too.
+                doc.body.removeAttribute(MOTION_ATTRIBUTE);
+                doc.body.className = safe;
+                doc.documentElement.className = safe;
+                if (own)
+                    doc.documentElement.setAttribute(MOTION_ATTRIBUTE, own);
+                expect(
+                    frame.contentWindow!.getComputedStyle(doc.documentElement)
+                        .opacity,
+                ).toBe(scenario.reduced ? "0" : "1");
+                expect(
+                    frame.contentWindow!.getComputedStyle(doc.body).opacity,
+                ).toBe(scenario.reduced ? "0" : "1");
+                doc.documentElement.className = reduce;
+                expect(
+                    frame.contentWindow!.getComputedStyle(doc.documentElement)
+                        .opacity,
+                ).toBe(scenario.reduced ? "1" : "0");
+            } finally {
+                frame.remove();
+            }
+        });
+        it("follows live OS changes through an explicit system reset", async () => {
+            const frame = document.createElement("iframe");
+            document.body.append(frame);
+            try {
+                const doc = frame.contentDocument!;
+                doc.open();
+                doc.write(`<!doctype html><style>${await utilitySheet()}</style>
+                    <div ${MOTION_ATTRIBUTE}="reduce"><div ${MOTION_ATTRIBUTE}="full">
+                    <div ${MOTION_ATTRIBUTE}="system" style="display:contents">
+                    <div id="safe" class="${safe}"></div><div id="reduce" class="${reduce}"></div>
+                    </div></div></div>`);
+                doc.close();
+                for (const system of [
+                    "no-preference",
+                    "reduce",
+                    "no-preference",
+                ] as const) {
+                    await commands.emulateReducedMotion(system);
+                    const opacity = (id: string) =>
+                        frame.contentWindow!.getComputedStyle(
+                            doc.getElementById(id)!,
+                        ).opacity;
+                    expect(opacity("safe")).toBe(
+                        system === "reduce" ? "0" : "1",
+                    );
+                    expect(opacity("reduce")).toBe(
+                        system === "reduce" ? "1" : "0",
+                    );
+                }
+            } finally {
+                frame.remove();
+            }
+        });
+    },
+);
+
 // The loading indicator's animation is its only sign of a wait, so reduced motion keeps it
 // turning and stops the shape from changing: its morph gives way to a plain spin.
 const animationName = async (
@@ -294,7 +468,7 @@ const animationName = async (
         const doc = frame.contentDocument!;
         doc.open();
         doc.write(
-            `<!doctype html><html><head>${(await STYLINGS[name].css())
+            `<!doctype html><html><head>${(await sheetsFor(STYLINGS[name]))
                 .map((sheet) => `<style>${sheet}</style>`)
                 .join("")}</head><body>${markup}</body></html>`,
         );
@@ -362,7 +536,7 @@ const itemAnimationName = async (
         doc.open();
         doc.write(
             `<!doctype html><html dir="${dir}"><head>${(
-                await STYLINGS[name].css()
+                await sheetsFor(STYLINGS[name])
             )
                 .map((sheet) => `<style>${sheet}</style>`)
                 .join("")}</head><body>${markup}</body></html>`,

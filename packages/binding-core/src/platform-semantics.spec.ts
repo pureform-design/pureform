@@ -39,7 +39,7 @@ describe("portable provider", () => {
         expect(() => requireRegistry(ROOT_PROVIDER)).toThrow("no registry");
     });
 
-    it("inherits nearest explicit motion and focus color across system and tokenless indications", () => {
+    it("resets explicit system motion, but inherits omitted motion and tokenless focus color", () => {
         const parent = resolveProvider(undefined, {
             motion: "reduce",
             dir: "rtl",
@@ -52,7 +52,8 @@ describe("portable provider", () => {
             motion: "system",
             indication: noIndication,
         });
-        expect(child.motion).toBe("reduce");
+        expect(child.motion).toBe("system");
+        expect(resolveProvider(parent, {}).motion).toBe("reduce");
         expect(child.dir).toBe("rtl");
         expect(child.indication).toBe(noIndication);
         expect(child.focusIndicatorColor).toBe("red");

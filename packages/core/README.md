@@ -103,7 +103,7 @@ import { MOTION_ATTRIBUTE } from "@pureform/web-contracts";
 
 transitionMoves("backgroundColor"); // false
 transitionMoves("insetInlineStart"); // true
-MOTION_ATTRIBUTE; // "data-pf-motion", set to "reduce" or "full" by a provider
+MOTION_ATTRIBUTE; // "data-pf-motion", set to "reduce", "full", or explicit "system" by a provider
 ```
 
 Springs follow the same rule: a spring on a moving property is instant under reduced motion

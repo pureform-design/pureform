@@ -6,6 +6,8 @@ import type { ValueNode } from "@pureform/core/ast";
 import type { CoreConfig, ThemeOverride, Token } from "@pureform/core/types";
 import {
     REDUCED_MOTION_RULES,
+    MOTION_SAFE_RULES,
+    MOTION_STYLES,
     componentTokenVars,
     registeredProperties,
     usesColorScheme,
@@ -68,8 +70,8 @@ type ConditionRules = { [key: string]: "@slot" | ConditionRules };
 
 // Panda's `motionReduce` reads only the system preference, so the preset replaces it with
 // pureform's, which a provider's `data-pf-motion` overrides either way.
-const MOTION_CONDITIONS = {
-    motionReduce: REDUCED_MOTION_RULES.reduce<ConditionRules>((rules, path) => {
+const motionCondition = (paths: readonly (readonly string[])[]) =>
+    paths.reduce<ConditionRules>((rules, path) => {
         let at = rules;
         path.forEach((key, index) => {
             if (index === path.length - 1) {
@@ -79,7 +81,11 @@ const MOTION_CONDITIONS = {
             }
         });
         return rules;
-    }, {}),
+    }, {});
+
+const MOTION_CONDITIONS = {
+    motionReduce: motionCondition(REDUCED_MOTION_RULES),
+    motionSafe: motionCondition(MOTION_SAFE_RULES),
 };
 
 // Tell the browser which schemes the page supports, so its own controls and scrollbars match.
@@ -176,6 +182,7 @@ export const compilePreset = (
         },
         globalCss: (() => {
             const css = {
+                ...MOTION_STYLES,
                 ...colorSchemeCss(config),
                 ...themeComponentVars(config, ctx),
             };

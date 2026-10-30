@@ -52,6 +52,10 @@ export interface Scene {
      *  browser alone). */
     readonly indication?: SceneIndication | undefined;
     readonly provider?: SceneProvider | undefined;
+    /** Extra outer motion providers, outermost first, for shared SSR/hydration regressions. */
+    readonly motionParents?:
+        | readonly ("system" | "reduce" | "full")[]
+        | undefined;
     /** A component the scene's renders inside, as its children. */
     readonly wrapper?: SceneWrapper | undefined;
 }

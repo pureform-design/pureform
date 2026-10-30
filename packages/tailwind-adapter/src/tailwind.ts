@@ -13,6 +13,7 @@ import { compileCss, themeAttributeOf } from "@pureform/css-adapter";
 import type { CssOptions } from "@pureform/css-adapter";
 import {
     REDUCED_MOTION_RULES,
+    MOTION_SAFE_RULES,
     compileNodeToCSS,
     hyphenate,
     usesColorScheme,
@@ -148,10 +149,13 @@ const schemeVariants = (config: CoreConfig): TailwindVariant[] =>
 
 // Tailwind's own `motion-reduce` reads only the system preference; pureform's follows a
 // provider's `data-pf-motion` too, as the components do.
-const MOTION_VARIANT: TailwindVariant = {
-    name: "motion-reduce",
-    paths: REDUCED_MOTION_RULES.map((path) => [...path]),
-};
+const MOTION_VARIANTS: TailwindVariant[] = [
+    {
+        name: "motion-reduce",
+        paths: REDUCED_MOTION_RULES.map((path) => [...path]),
+    },
+    { name: "motion-safe", paths: MOTION_SAFE_RULES.map((path) => [...path]) },
+];
 
 /** Turn a config into Tailwind's pieces. */
 export const toTailwind = (
@@ -202,7 +206,7 @@ export const toTailwind = (
         clear: options.replace ? [...clear] : [],
         variants: [
             ...schemeVariants(config),
-            MOTION_VARIANT,
+            ...MOTION_VARIANTS,
             ...["ltr", "rtl"].map((name) => ({
                 name,
                 paths: [[`&:where(:dir(${name}))`]],

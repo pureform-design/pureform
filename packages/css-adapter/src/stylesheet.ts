@@ -11,6 +11,7 @@ import type {
     Token,
 } from "@pureform/core/types";
 import {
+    MOTION_STYLES,
     aliasTarget,
     compileConditional,
     compileNodeToCSS,
@@ -120,6 +121,9 @@ const properties = (config: CoreConfig, ctx: LowerCtx): string[] =>
     );
 
 const tokenRules = (config: CoreConfig, ctx: LowerCtx, options: CssOptions) => [
+    ...Object.entries(MOTION_STYLES).flatMap(([selector, style]) =>
+        rule(selector, style),
+    ),
     ...rule(
         ":root",
         {

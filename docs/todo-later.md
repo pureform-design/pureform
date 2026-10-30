@@ -8,12 +8,6 @@ criteria. These are not all confirmed bugs: reproduction and external verificati
 
 ## C. Shared APIs and motion — moderate to high complexity
 
-10. **FAB-menu motion:** Compose-style nearest-first stagger, aligned-edge width expansion at fixed
-    height and opacity; reverse visibility sequence on close. Not center scaling or spatial travel
-    from the FAB. Retain theme roles, RTL and reduced motion.
-11. **Nested motion providers:** nearest provider wins at any depth; system follows OS, full
-    overrides OS reduction, reduce requests reduction. Motion-safe uses the same effective setting
-    across adapters, including SSR/hydration.
 12. **Linear wavy progress:** reproduce wave movement/gaps, then match Compose track-relative motion
     at one wavelength per second by default and gaps around the active indicator. Preserve theme
     overrides; test both modes, RTL, reduced motion and Native visible track segments.
@@ -60,6 +54,14 @@ criteria. These are not all confirmed bugs: reproduction and external verificati
   speculative fork of timing behavior.
 
 ## Retained decisions / separate work
+
+- **11 completed:** nearest supplied motion setting wins at any depth on React, Solid and Native;
+  omission inherits and explicit `system` resets to the OS. Shared CSS style queries drive both
+  motion-reduce and motion-safe across adapters, including SSR/hydration and live updates. User
+  accepted Chrome 111+, Safari 18+, Firefox 151+ as the browser floor. See the implementation plan
+  and `packages/css-lowering/README.md#reduced-motion` for evidence and reusable rules.
+- **10 completed:** Compose-style reveal and spring-sampled stagger on web/Native, with CSS-only
+  web rapid-toggle continuity. Actual Native RTL/frame-rate checks remain V3.
 
 - **9 completed:** Native provider slot props now match the web style-slot convention, with Native
   host typing, cached merges, instance precedence and protected internal wiring. Cross-binding

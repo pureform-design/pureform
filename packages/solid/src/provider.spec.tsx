@@ -27,7 +27,7 @@ import { byTestId, mount, settle } from "./testing/mount";
 const neverLoads = () => new Promise<never>(() => {});
 
 describe("PureformProvider", () => {
-    it("writes dir, and data-pf-motion only when it isn't system, on a display: contents element", () => {
+    it("writes dir and an explicit system reset on a display: contents element", () => {
         const host = mount(() => (
             <PureformProvider data-testid="outer" dir="rtl" motion="reduce">
                 <PureformProvider data-testid="inner" motion="system">
@@ -41,7 +41,7 @@ describe("PureformProvider", () => {
         expect(getComputedStyle(outer).display).toBe("contents");
         const inner = byTestId("inner");
         expect(inner.getAttribute("dir")).toBe("rtl");
-        expect(inner.hasAttribute("data-pf-motion")).toBe(false);
+        expect(inner.getAttribute("data-pf-motion")).toBe("system");
         expect(host.querySelector("span")!.matches(":dir(rtl)")).toBe(true);
     });
 
@@ -113,7 +113,7 @@ describe("PureformProvider", () => {
         ));
         expect(seen).toEqual([
             ["ltr", "system", undefined],
-            ["rtl", "reduce", "teal"],
+            ["rtl", "system", "teal"],
             ["ltr", "full", "teal"],
         ]);
     });

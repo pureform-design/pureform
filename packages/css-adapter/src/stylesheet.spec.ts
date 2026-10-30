@@ -70,11 +70,14 @@ describe("compileCss (full pureform config)", () => {
     it("reduces motion as the system asks unless a provider's attribute overrides it", () => {
         const handle = ruleOf(css, ".switchControl__handle");
         expect(handle).toMatch(
-            /@media \(prefers-reduced-motion: reduce\) \{\n\s+&:not\(\[data-pf-motion=full\] \*\) \{\n\s+transition: background-color [^;]*;/,
+            /@media \(prefers-reduced-motion: reduce\) \{\n\s+&:not\(\[data-pf-motion\], \[data-pf-motion\] \*\) \{\n\s+transition: background-color [^;]*;/,
         );
         expect(handle).toMatch(
-            /\[data-pf-motion=reduce\] &:not\(\[data-pf-motion=reduce\] \[data-pf-motion=full\] \*\) \{\n\s+transition: background-color [^;]*;/,
+            /@container style\(--pf-motion: reduce\) \{\n\s+&:not\(\[data-pf-motion\]\) \{\n\s+transition: background-color [^;]*;/,
         );
+        expect(handle).toContain("@container style(--pf-motion: system)");
+        expect(handle).toContain("&[data-pf-motion=system]");
+        expect(css).toContain("--pf-motion: system;");
         expect(css).not.toContain("@motion");
     });
 

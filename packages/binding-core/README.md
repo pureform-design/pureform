@@ -100,7 +100,8 @@ DEFAULT_ICON_STYLE; // { size: undefined, color: undefined, filled: false }
 ```
 
 How a provider resolves: registry, `dir`, and indication are inherited unless set;
-`motion` is the nearest `"reduce"` or `"full"`, else `"system"`; `defaults` merge per component, the inner provider's
+`motion` is the nearest explicitly supplied setting; omission inherits, while `"system"` resets
+an outer override to the platform preference. `defaults` merge per component, the inner provider's
 defined values winning, tokens too; `slotProps` merge per component and slot through the
 binding's `merge`. Focus color inherits independently from the nearest indication setting it.
 Theme/scheme/override inheritance belongs to each platform, not this state.

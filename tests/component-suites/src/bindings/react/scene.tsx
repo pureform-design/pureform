@@ -284,7 +284,7 @@ export function SceneView(props: {
         components[scene.component] as ComponentType<object>,
         { ...indicationOf(scene.indication), ...props.props },
     );
-    return (
+    const content = (
         <PureformProvider
             registry={registry}
             indication={
@@ -310,5 +310,11 @@ export function SceneView(props: {
                   )
                 : view}
         </PureformProvider>
+    );
+    return (scene.motionParents ?? []).reduceRight<ReactNode>(
+        (children, motion) => (
+            <PureformProvider motion={motion}>{children}</PureformProvider>
+        ),
+        content,
     );
 }

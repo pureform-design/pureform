@@ -83,9 +83,11 @@ Under reduced motion, components stop moving but keep fading: a switch handle, a
 floating label, a navigation indicator, a shape morph, and a progress value change at once,
 while their colors, opacity, and elevation (`box-shadow`) still ease over the motion tokens.
 Indeterminate progress keeps spinning, since that motion is the only sign of work going on.
-The web follows the system's `prefers-reduced-motion`, which a `data-pf-motion="reduce"` or
-`"full"` attribute on an ancestor overrides (the bindings' provider writes it); React Native
-follows its provider's `reducedMotion`.
+The nearest provider wins at any depth: `reduce`/`full` override the OS, while explicit `system`
+resets to it and omission inherits. Web uses the provider's `data-pf-motion` and shared container
+style queries (Chrome 111+, Safari 18+, Firefox 151+;
+[details](../css-lowering/README.md#reduced-motion)); React Native follows the same contract
+through its provider's `reducedMotion`.
 
 Specs build their transitions with the helpers in `components/shared.ts`:
 

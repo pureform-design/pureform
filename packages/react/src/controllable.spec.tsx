@@ -13,7 +13,7 @@ import {
     useReducedMotion,
 } from ".";
 import type { ChangeDetails, Controllable } from ".";
-import { interact, mount, settle } from "./testing/render";
+import { interact, mount, settle, outside } from "./testing/render";
 
 // The preset's `input` slot: a native input stretched invisibly over the control.
 const OVERLAY = {
@@ -320,6 +320,38 @@ describe("useReducedMotion", () => {
         return <span data-testid={props.id}>{String(reduce)}</span>;
     }
 
+    it("reacts to a deep provider switching between reset, override and inheritance", async () => {
+        const motion = outside<"system" | "reduce" | "full" | undefined>(
+            "reduce",
+        );
+        mount(
+            <PureformProvider motion="reduce">
+                <PureformProvider motion="full">
+                    <motion.Holder>
+                        {(value) => (
+                            <PureformProvider motion={value}>
+                                <Probe id="deep" />
+                            </PureformProvider>
+                        )}
+                    </motion.Holder>
+                </PureformProvider>
+            </PureformProvider>,
+        );
+        const read = () => screen.getByTestId("deep").textContent;
+        expect(read()).toBe("true");
+        await motion.set("system");
+        await settle();
+        expect(read()).toBe("false");
+        await act(() => commands.emulateReducedMotion("reduce"));
+        await act(
+            () => new Promise((resolve) => requestAnimationFrame(resolve)),
+        );
+        await settle();
+        expect(read()).toBe("true");
+        await motion.set(undefined);
+        expect(read()).toBe("false");
+    });
+
     it("follows the system under system, and the provider's reduce or full over it", async () => {
         mount(
             <>
@@ -340,7 +372,7 @@ describe("useReducedMotion", () => {
             ["root", "reduce", "nested-system", "full"].map(
                 (id) => screen.getByTestId(id).textContent,
             );
-        expect(read()).toEqual(["false", "true", "true", "false"]);
+        expect(read()).toEqual(["false", "true", "false", "false"]);
 
         await act(() => commands.emulateReducedMotion("reduce"));
         await act(

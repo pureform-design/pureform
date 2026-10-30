@@ -305,6 +305,34 @@ describe("useReducedMotion", () => {
         return <span data-testid={props.id}>{String(reduce())}</span>;
     }
 
+    it("reacts to a deep provider switching between reset, override and inheritance", async () => {
+        const [motion, setMotion] = createSignal<
+            "system" | "reduce" | "full" | undefined
+        >("reduce");
+        mount(() => (
+            <PureformProvider motion="reduce">
+                <PureformProvider motion="full">
+                    <PureformProvider motion={motion()}>
+                        <Probe id="deep" />
+                    </PureformProvider>
+                </PureformProvider>
+            </PureformProvider>
+        ));
+        const read = () => byTestId("deep").textContent;
+        expect(read()).toBe("true");
+        setMotion("system");
+        flush();
+        await settle();
+        expect(read()).toBe("false");
+        await commands.emulateReducedMotion("reduce");
+        await new Promise((resolve) => requestAnimationFrame(resolve));
+        await settle();
+        expect(read()).toBe("true");
+        setMotion(undefined);
+        flush();
+        expect(read()).toBe("false");
+    });
+
     it("follows the system under system, and the provider's reduce or full over it", async () => {
         mount(() => (
             <>
@@ -325,7 +353,7 @@ describe("useReducedMotion", () => {
             ["root", "reduce", "nested-system", "full"].map(
                 (id) => byTestId(id).textContent,
             );
-        expect(read()).toEqual(["false", "true", "true", "false"]);
+        expect(read()).toEqual(["false", "true", "false", "false"]);
 
         await commands.emulateReducedMotion("reduce");
         await new Promise((resolve) => requestAnimationFrame(resolve));

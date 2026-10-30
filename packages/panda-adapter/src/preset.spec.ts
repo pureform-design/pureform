@@ -180,15 +180,40 @@ describe("compilePreset (color schemes)", () => {
         expect(obj(preset.globalCss)[":root"]).toEqual({
             colorScheme: "light dark",
         });
-        expect(compilePreset(buttonConfig).globalCss).toBeUndefined();
+        expect(
+            obj(compilePreset(buttonConfig).globalCss)[":root"],
+        ).toBeUndefined();
     });
 
     it("reduces motion as the system asks unless a provider's attribute overrides it", () => {
         expect(obj(obj(preset.conditions).extend).motionReduce).toEqual({
             "@media (prefers-reduced-motion: reduce)": {
-                "&:not([data-pf-motion=full] *)": "@slot",
+                "&:not([data-pf-motion], [data-pf-motion] *)": "@slot",
+                "@container style(--pf-motion: system)": {
+                    "&:not([data-pf-motion])": "@slot",
+                },
+                "&[data-pf-motion=system], :root[data-pf-motion=system] > &:not([data-pf-motion])":
+                    "@slot",
             },
-            "[data-pf-motion=reduce] &:not([data-pf-motion=reduce] [data-pf-motion=full] *)":
+            "@container style(--pf-motion: reduce)": {
+                "&:not([data-pf-motion])": "@slot",
+            },
+            "&[data-pf-motion=reduce], :root[data-pf-motion=reduce] > &:not([data-pf-motion])":
+                "@slot",
+        });
+        expect(obj(obj(preset.conditions).extend).motionSafe).toEqual({
+            "@media (prefers-reduced-motion: no-preference)": {
+                "&:not([data-pf-motion], [data-pf-motion] *)": "@slot",
+                "@container style(--pf-motion: system)": {
+                    "&:not([data-pf-motion])": "@slot",
+                },
+                "&[data-pf-motion=system], :root[data-pf-motion=system] > &:not([data-pf-motion])":
+                    "@slot",
+            },
+            "@container style(--pf-motion: full)": {
+                "&:not([data-pf-motion])": "@slot",
+            },
+            "&[data-pf-motion=full], :root[data-pf-motion=full] > &:not([data-pf-motion])":
                 "@slot",
         });
     });

@@ -93,17 +93,6 @@ old B/C/D/E identifiers. Complexity estimates are relative and may change after 
   instead of per-frame framework renders. Fallbacks preserve interruption, cleanup and reduced
   motion. Verify driver selection and profile actual performance, including devices.
 
-### 11. Arbitrarily nested motion providers and provider-aware motion-safe
-
-- Source-supported limitation: CSS reduced-motion selectors handle limited provider nesting;
-  Panda `_motionSafe` and Tailwind `motion-safe` currently follow only the system setting.
-- Agreed contract: nearest provider wins at any depth. `system` follows the OS even inside an
-  explicit override; `full` enables normal motion even when the OS requests reduction; `reduce`
-  requests reduced motion. Motion-safe uses the same effective setting.
-- Regress `reduce → full → reduce`, reverse and system combinations before selecting an approach.
-- Validate CSS, Panda, Tailwind, SSR and hydration together; preserve consistent provider behavior
-  across platforms and avoid selectors that only handle another fixed nesting depth.
-
 ### 12. Linear wavy progress motion and gaps
 
 **Historical report; reproduce before implementation.**
@@ -114,6 +103,10 @@ old B/C/D/E identifiers. Complexity estimates are relative and may change after 
   per second independently of indicator movement, with gaps around the active indicator.
 - Specify geometry and both visible track segments in tests before implementing Native gap windows.
 - Preserve theme overrides; cover determinate/indeterminate modes, RTL, reduced motion and web/Native parity.
+- Native's existing indeterminate linear-track sampling flake recurred during item 11 validation
+  (animated, instance 60px width; sampled gap differed by 2.87px). Targeted progress/provider rerun
+  passed 71 tests and the subsequent full Native suite passed 1051. Investigate with this item;
+  do not relax its geometry assertions as part of provider work.
 
 ### 13. Native submenu drill geometry and motion
 
@@ -218,6 +211,22 @@ future API refactor, not part of 9; Native provider support follows the existing
 Record device/OS/engine/AT results and recordings; unavailable environments remain blocked.
 
 ## Retained decisions and out-of-scope tooling
+
+- **11 completed (2026-10-30): nested motion and motion-safe.** Failing regressions first recorded
+  36 rendered-style failures across CSS/Panda/Tailwind, plus shared provider resolution treating
+  explicit `system` as inheritance. The nearest supplied setting now wins on React, Solid and
+  Native; omission inherits and `system` resets to the OS. Web shares an inherited `--pf-motion`
+  setting and container style queries; both Panda motion conditions and Tailwind motion variants
+  use it, with own-element/document-root paths and no fixed nesting limit or JS animation driver.
+  User explicitly accepted Chrome 111+, Safari 18+, Firefox 151+ as the browser floor. Nested
+  `@scope` was rejected because Tailwind keeps variants inside utility rules, changing their roots.
+  Rendered Chromium regressions cover all three-level combinations under both OS preferences,
+  31 alternating providers, display-contents wrappers, own/root utilities and live provider/OS
+  changes; React/Solid hydration passes on all three adapters (24 cases, no warnings or changes).
+  Full React (1131), Solid (1216), Native (1051), binding-core/web, CSS-lowering and adapter suites
+  pass. Enabled affected type checks pass; component-suite/fixture type tasks remain disabled
+  (unchanged). Reusable contract, browser floor and compiler caveat are in
+  `packages/css-lowering/README.md#reduced-motion`. Device/other-browser verification is not claimed.
 
 - **9 completed (2026-10-30): Native provider slot props.** Provider `slotProps` use existing web
   component/style-slot keys and Native host props, reusing component host declarations and anatomy

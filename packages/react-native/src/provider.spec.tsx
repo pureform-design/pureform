@@ -16,7 +16,7 @@ import {
 import { reanimated } from "./engines/reanimated";
 import { presetRegistry } from "./testing/registry";
 import type { TestRegistry } from "./testing/registry";
-import { mount, settle } from "./testing/render";
+import { mount, settle, outside } from "./testing/render";
 
 let registry: TestRegistry;
 
@@ -98,7 +98,7 @@ describe("PureformProvider", () => {
                         </PureformProvider>
                     </PureformProvider>
                 )),
-            ).toBe("reduce");
+            ).toBe("system");
         } finally {
             await commands.emulateReducedMotion("no-preference");
         }
@@ -107,6 +107,50 @@ describe("PureformProvider", () => {
                 <PureformProvider registry={registry}>{node}</PureformProvider>
             )),
         ).toBe(false);
+    });
+
+    it("retargets deep motion providers and lets system reset an override", async () => {
+        const motion = outside<"system" | "reduce" | "full" | undefined>(
+            "reduce",
+        );
+        function Probe() {
+            return (
+                <pre data-testid="motion">
+                    {JSON.stringify([useMotion(), useReducedMotion()])}
+                </pre>
+            );
+        }
+        await commands.emulateReducedMotion("no-preference");
+        try {
+            const host = await mount(
+                <PureformProvider registry={registry} motion="reduce">
+                    <PureformProvider motion="full">
+                        <motion.Holder>
+                            {(value) => (
+                                <PureformProvider motion={value}>
+                                    <Probe />
+                                </PureformProvider>
+                            )}
+                        </motion.Holder>
+                    </PureformProvider>
+                </PureformProvider>,
+            );
+            const current = () =>
+                JSON.parse(
+                    host.querySelector('[data-testid="motion"]')!.textContent!,
+                );
+            expect(current()).toEqual(["reduce", true]);
+            await motion.set("system");
+            await settle(20);
+            expect(current()).toEqual(["system", false]);
+            await commands.emulateReducedMotion("reduce");
+            await settle(20);
+            expect(current()).toEqual(["system", true]);
+            await motion.set(undefined);
+            expect(current()).toEqual(["full", false]);
+        } finally {
+            await commands.emulateReducedMotion("no-preference");
+        }
     });
 
     it("merges overrides over the outer provider's, per scheme", async () => {

@@ -781,7 +781,7 @@ names it), states and descriptions, its own props winning.
 <PureformProvider
     registry={registry} // from .pureform, or a fake one in tests
     dir="rtl" // written on its element, passed to machines; "ltr" at the root
-    motion="reduce" // "system" | "reduce" | "full"; writes data-pf-motion unless "system"
+    motion="reduce" // "system" | "reduce" | "full"; writes data-pf-motion when supplied
     defaults={{ button: { variant: "tonal" } }}
     slotProps={{ button: { label: { class: "caps" } } }}
     theme="teal" // a named theme, or a runtime one: seedTheme({ seed: "#006A60" })
@@ -815,7 +815,7 @@ and no `</head>` hands the head tags to its `onHead` option.
 | `useRegistry()`  | `Accessor<AnyRegistry>`; reading it throws when no provider has a registry         |
 | `useDirection()` | `Accessor<"ltr" \| "rtl">`: pass it to every machine as `dir`                      |
 | `useThemeVars()` | the nearest runtime theme's generated vars, `undefined` while reusing the server's |
-| `useMotion()`    | `Accessor<MotionSetting>`: the nearest `"reduce"` or `"full"`, else `"system"`     |
+| `useMotion()`    | `Accessor<MotionSetting>`: the nearest supplied setting, `"system"` with none      |
 
 The state `usePureform()` gives is one object for the provider's life, with a memo behind each
 field: a component depends on the fields it reads (`state().dir`), and only a field whose value
@@ -1033,8 +1033,11 @@ const fieldsetDisabled = useFieldsetDisabled(inputElement); // OR it into the ma
 
 ### Motion and icons
 
-- `useReducedMotion(): Accessor<boolean>`: the nearest `"reduce"` (true) or `"full"` (false),
-  else the system's `prefers-reduced-motion`, `false` until mounted.
+- `useReducedMotion(): Accessor<boolean>`: the nearest supplied `"reduce"` (true), `"full"` (false),
+  or `"system"` (the OS preference), `false` for system until mounted. Omission inherits; explicit
+  `system` resets outer overrides. Provider-aware CSS and `_motionSafe` work before hydration
+  and require Chrome 111+, Safari 18+, Firefox 151+
+  ([implementation](../css-lowering/README.md#reduced-motion)).
 - `usePresence(open, onShow?): { present: Accessor<boolean>; ref }`: an overlay's presence on
   Zag's presence machine: `present` while open and while the surface given to `ref` runs its exit
   animation, `false` once it ends (at once when none runs). `onShow` gets the surface each time it

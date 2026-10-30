@@ -1,25 +1,56 @@
-// Where the `reducedMotion` condition holds on the web: under the system's
-// `prefers-reduced-motion` unless a provider around the element asks for full motion, or under
-// a provider asking for reduced motion whatever the system says. Each rule is a path of
-// at-rules and selectors from the styled element, as the color schemes' are, so an adapter
-// expands the condition into every path.
+// Motion is inherited as a setting, not as the OS-resolved boolean: an explicit `system`
+// provider resets an outer override without client JS, on the server too.
+import {
+    MOTION_ATTRIBUTE,
+    MOTION_PROPERTY,
+    REDUCED_MOTION_QUERY,
+} from "@pureform/web-contracts";
 
-import { MOTION_ATTRIBUTE, REDUCED_MOTION_QUERY } from "@pureform/web-contracts";
-
-const REDUCE = `[${MOTION_ATTRIBUTE}=reduce]`;
-const FULL = `[${MOTION_ATTRIBUTE}=full]`;
+const PROVIDER = `[${MOTION_ATTRIBUTE}]`;
 const SYSTEM = `@media ${REDUCED_MOTION_QUERY}`;
+const SAFE = "@media (prefers-reduced-motion: no-preference)";
 
-/** The paths under which an element's motion is reduced. The nearer of two nested providers
- *  wins: a `full` provider inside a `reduce` one turns motion back on. */
-export const REDUCED_MOTION_RULES: readonly (readonly string[])[] = [
-    [SYSTEM, `&:not(${FULL} *)`],
-    [`${REDUCE} &:not(${REDUCE} ${FULL} *)`],
+/** Global CSS shared by the adapters. Reserved contract var, independent of token prefixes. */
+export const MOTION_STYLES = Object.fromEntries(
+    ["reduce", "full", "system"].map((setting) => [
+        `[${MOTION_ATTRIBUTE}=${setting}]`,
+        { [MOTION_PROPERTY]: setting },
+    ]),
+);
+
+// Every ancestor is a style container by default, including display:contents providers.
+// Its inherited setting is the nearest provider's, through arbitrary intervening elements.
+// An element cannot query itself, so own-attribute paths take precedence over ancestor queries.
+const motionRules = (
+    setting: "reduce" | "full",
+    media: string,
+): readonly (readonly string[])[] => [
+    [media, `&:not(${PROVIDER}, ${PROVIDER} *)`],
+    [`@container style(${MOTION_PROPERTY}: ${setting})`, `&:not(${PROVIDER})`],
+    [
+        media,
+        `@container style(${MOTION_PROPERTY}: system)`,
+        `&:not(${PROVIDER})`,
+    ],
+    // Safari 18 cannot use the document element as a style container. Its direct children
+    // need the same explicit-setting paths as providers themselves; deeper nodes inherit normally.
+    [
+        `&[${MOTION_ATTRIBUTE}=${setting}], :root[${MOTION_ATTRIBUTE}=${setting}] > &:not(${PROVIDER})`,
+    ],
+    [
+        media,
+        `&[${MOTION_ATTRIBUTE}=system], :root[${MOTION_ATTRIBUTE}=system] > &:not(${PROVIDER})`,
+    ],
 ];
 
-/** The same paths for the root element's own rule, where the attribute sits on the root
- *  itself. */
+/** Where the nearest provider/OS requests reduced motion, at any nesting depth. */
+export const REDUCED_MOTION_RULES = motionRules("reduce", SYSTEM);
+
+/** The complementary effective setting for application motion-safe utilities. */
+export const MOTION_SAFE_RULES = motionRules("full", SAFE);
+
+/** The document root has no ancestor container: its own setting or the OS decides. */
 export const ROOT_REDUCED_MOTION_RULES: readonly (readonly string[])[] = [
-    [SYSTEM, `&:not(${FULL})`],
-    [`&${REDUCE}`],
+    [SYSTEM, `&:not([${MOTION_ATTRIBUTE}=full])`],
+    [`&[${MOTION_ATTRIBUTE}=reduce]`],
 ];

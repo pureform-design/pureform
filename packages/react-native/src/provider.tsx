@@ -108,7 +108,7 @@ export interface PureformProviderProps {
      *  a nested provider changes what the styles read, not the layout. */
     readonly dir?: Direction | undefined;
     /** How much motion to allow. `"system"` follows the system's reduce motion setting
-     *  (`AccessibilityInfo`), or the nearest provider that says `"reduce"` or `"full"`. */
+     *  (`AccessibilityInfo`), even inside an override. Omission inherits. */
     readonly motion?: MotionSetting | undefined;
     /** Default variants and tokens per component, over the outer provider's. */
     readonly defaults?: ComponentDefaults | undefined;
@@ -499,7 +499,7 @@ export function useDirection(): Direction {
     return usePureform().dir;
 }
 
-/** The motion setting in effect: the nearest `"reduce"` or `"full"`, else `"system"`. */
+/** The motion setting in effect: the nearest supplied setting, or `"system"`. */
 export function useMotion(): MotionSetting {
     return usePureform().motion;
 }

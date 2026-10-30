@@ -88,7 +88,7 @@ export const resolveWebProvider = <P>(
  *  theme's attributes, which depend on the target. */
 export interface ProviderAttributes {
     readonly dir: Direction;
-    readonly [MOTION_ATTRIBUTE]: "reduce" | "full" | undefined;
+    readonly [MOTION_ATTRIBUTE]: "system" | "reduce" | "full" | undefined;
     readonly [themeAttribute: string]: string | undefined;
 }
 
@@ -118,8 +118,5 @@ export const providerAttributes = (
 ): ProviderAttributes => ({
     ...themeAttributes(own.theme, state.registry),
     dir: state.dir,
-    [MOTION_ATTRIBUTE]:
-        own.motion === "reduce" || own.motion === "full"
-            ? own.motion
-            : undefined,
+    [MOTION_ATTRIBUTE]: own.motion,
 });

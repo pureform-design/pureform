@@ -119,16 +119,34 @@ row: each allowed marking matches, and Zag's attributes alone don't.
 
 `reducedMotion` lowers to `@media (prefers-reduced-motion: reduce)` by default. An adapter
 that follows a provider's setting expands it into `REDUCED_MOTION_RULES` instead, as all three
-web adapters do. Each rule is a path from the styled element:
+web adapters do. `MOTION_SAFE_RULES` is its complement, used by Panda's `_motionSafe` and
+Tailwind's `motion-safe` utilities.
 
-| Path                                                                             | When                                      |
-| -------------------------------------------------------------------------------- | ----------------------------------------- |
-| `@media (prefers-reduced-motion: reduce)` then `&:not([data-pf-motion=full] *)`  | the system asks, and no `full` provider   |
-| `[data-pf-motion=reduce] &:not([data-pf-motion=reduce] [data-pf-motion=full] *)` | a `reduce` provider, with no `full` in it |
+`MOTION_STYLES` maps each explicit `data-pf-motion` setting (`reduce`, `full`, `system`) to
+the inherited `--pf-motion` custom property. Container style queries read the nearest
+ancestor's inherited setting, so arbitrary provider depth and intervening elements work
+without JS or enumerating nesting depths. `system` resets an outer override and combines
+with the OS media query; omitted motion inherits. The variable is a reserved wire contract
+(`MOTION_PROPERTY`), not a prefixed theme token. Do not register it as non-inheriting.
 
-`ROOT_REDUCED_MOTION_RULES` are the same for the root's own rule. The attribute's name is
-`MOTION_ATTRIBUTE` from `@pureform/web-contracts`. Nested providers resolve to the nearer one for two
-levels; a third level (`reduce` in `full` in `reduce`) isn't told apart.
+An element cannot query itself, so own-attribute selectors handle styled providers, and
+`ROOT_REDUCED_MOTION_RULES` handles the document root without an ancestor container. Direct
+children of a root with a motion attribute share the explicit-setting selectors, because
+Safari 18 cannot use the document element as a style container. The unprovided media-query
+path also works without a container. Providers keep `display: contents`; no size containment
+or layout wrapper is needed.
+
+**Browser floor:** provider-aware conditions require container style queries for custom
+properties: Chrome 111+, Safari 18+, Firefox 151+. This floor was explicitly accepted for
+item 11. There is no older-browser nesting polyfill. `@scope` was rejected here: Tailwind
+leaves custom variants nested in utility rules, making their scope roots relative to the
+utility rather than its ancestor providers. Do not substitute nested `@scope` without testing
+the actual compiled browser styles.
+
+Chromium regressions cover all three-level setting combinations under both OS preferences,
+31 alternating providers, `display: contents`, own-provider/root utilities, and updates.
+Shared component suites verify rendered CSS before and after React/Solid hydration on every
+web adapter. CSS is effective on the server-rendered markup before any client hook runs.
 
 ## Build and test
 

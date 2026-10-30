@@ -50,10 +50,10 @@ describe("resolveProvider", () => {
         expect(inner.motion).toBe("full");
     });
 
-    it("keeps the nearest reduce or full when a nested provider says system, as the CSS does", () => {
+    it("resets an override when a nested provider explicitly says system", () => {
         const outer = resolveProvider(undefined, { motion: "reduce" });
         expect(resolveProvider(outer, { motion: "system" }).motion).toBe(
-            "reduce",
+            "system",
         );
     });
 
@@ -131,14 +131,14 @@ describe("resolveProvider", () => {
 });
 
 describe("providerAttributes", () => {
-    it("writes the direction in effect and only a reduce or full setting", () => {
+    it("writes the direction in effect and any explicit motion setting", () => {
         expect(providerAttributes({}, { dir: "ltr" })).toEqual({
             dir: "ltr",
             "data-pf-motion": undefined,
         });
         expect(
             providerAttributes({ motion: "system" }, { dir: "rtl" }),
-        ).toEqual({ dir: "rtl", "data-pf-motion": undefined });
+        ).toEqual({ dir: "rtl", "data-pf-motion": "system" });
         expect(
             providerAttributes({ motion: "reduce" }, { dir: "ltr" }),
         ).toEqual({ dir: "ltr", "data-pf-motion": "reduce" });

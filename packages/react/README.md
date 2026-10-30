@@ -761,7 +761,7 @@ value an array; a form submits every chosen value).
 <PureformProvider
     registry={registry} // from .pureform, or a fake one in tests
     dir="rtl" // written on its element, passed to machines; "ltr" at the root
-    motion="reduce" // "system" | "reduce" | "full"; writes data-pf-motion unless "system"
+    motion="reduce" // "system" | "reduce" | "full"; writes data-pf-motion when supplied
     defaults={{ button: { variant: "tonal" } }}
     slotProps={{ button: { label: { className: "caps" } } }}
     theme="teal" // a named theme, or a runtime one: seedTheme({ seed: "#006A60" })
@@ -776,6 +776,11 @@ It renders a `div` with `display: contents` holding `dir`, `data-pf-motion`, and
 attributes. Other props (`className`, `style`, `data-*`, `ref`) go on that element. Nested
 providers inherit what they leave out. Its state is memoized on the options' identity, so keep `defaults`, `slotProps`,
 `overrides`, and a runtime `theme` stable (module constants or `useMemo`).
+
+Motion resolves at any depth: `full` overrides OS reduction, `reduce` requests reduction, and
+explicit `system` resets an outer override to the OS. CSS and motion-safe utilities use the
+same setting before hydration too. Provider-aware CSS requires Chrome 111+, Safari 18+,
+Firefox 151+ ([implementation](../css-lowering/README.md#reduced-motion)).
 
 It provides two contexts: the whole state, which `usePureform()` reads, and the part components
 read (the registry, `dir`, `motion`, `defaults`, `slotProps`, and the indication), which
@@ -801,7 +806,7 @@ in the head (unused).
 | `useRegistry()`  | `AnyRegistry`; throws when no provider has a registry                              |
 | `useDirection()` | `"ltr" \| "rtl"`: pass it to every machine as `dir`                                |
 | `useThemeVars()` | the nearest runtime theme's generated vars, `undefined` while reusing the server's |
-| `useMotion()`    | `MotionSetting`: the nearest `"reduce"` or `"full"`, else `"system"`               |
+| `useMotion()`    | `MotionSetting`: the nearest supplied setting, `"system"` with none                |
 
 ### Indication
 
@@ -1004,8 +1009,8 @@ const fieldsetDisabled = useFieldsetDisabled(input); // OR it into the machine's
 
 ### Motion and icons
 
-- `useReducedMotion(): boolean`: the nearest `"reduce"` (true) or `"full"` (false), else the
-  system's `prefers-reduced-motion` (`useSyncExternalStore`; `false` on the server and while
+- `useReducedMotion(): boolean`: the nearest supplied `"reduce"` (true), `"full"` (false), or `"system"` (the
+  system's `prefers-reduced-motion`) (`useSyncExternalStore`; `false` on the server and while
   hydrating).
 - `usePresence(open, onShow?): { present: boolean; ref }`: an overlay's presence on Zag's
   presence machine: `present` while open and while the surface given to `ref` runs its exit

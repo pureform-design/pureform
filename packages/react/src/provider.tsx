@@ -247,6 +247,6 @@ export const useRegistry = (): AnyWebRegistry =>
 /** The direction in effect: pass it to every machine as `dir`. */
 export const useDirection = (): Direction => useComponentState().dir;
 
-/** The motion setting in effect: the nearest `"reduce"` or `"full"`, else `"system"`. Most
+/** The motion setting in effect: the nearest supplied setting, or `"system"`. Most
  *  components want `useReducedMotion()` instead. */
 export const useMotion = (): MotionSetting => useComponentState().motion;

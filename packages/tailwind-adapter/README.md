@@ -122,13 +122,17 @@ with no candidates, and the generated modules give the scanner nothing to make u
 
 ## Variants
 
-| Variant         | Applies                                                                                                                                                                                                    |
-| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `dark`, `light` | under the scheme's class, or the system's scheme when the root doesn't set the other                                                                                                                       |
-| `motion-reduce` | replaces Tailwind's: the system's reduced motion unless a provider's `data-pf-motion="full"` is on an ancestor, or under `data-pf-motion="reduce"` ([the rules](../css-lowering/README.md#reduced-motion)) |
-| `theme-<name>`  | inside a named theme's attribute                                                                                                                                                                           |
+| Variant         | Applies                                                                                                         |
+| --------------- | --------------------------------------------------------------------------------------------------------------- |
+| `dark`, `light` | under the scheme's class, or the system's scheme when the root doesn't set the other                            |
+| `motion-reduce` | nearest provider requests reduction, or the OS requests it under `system`/no provider                           |
+| `motion-safe`   | complementary effective setting: nearest provider is `full`, or the OS allows motion under `system`/no provider |
+| `theme-<name>`  | inside a named theme's attribute                                                                                |
 
-Tailwind's own `motion-safe` still reads only the system.
+Both motion variants replace Tailwind's system-only defaults and support arbitrary provider
+nesting. Explicit `system` resets an outer override; omitted motion inherits.
+[Rules and browser floor](../css-lowering/README.md#reduced-motion): Chrome 111+, Safari 18+,
+Firefox 151+.
 
 ## Build and test
 

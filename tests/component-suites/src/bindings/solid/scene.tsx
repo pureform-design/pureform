@@ -264,6 +264,21 @@ const indications: Record<SceneIndication, Indication> = {
 const indicationOf = (name: SceneIndication | undefined) =>
     name === undefined ? {} : { indication: indications[name] };
 
+function MotionParents(props: {
+    settings: NonNullable<Scene["motionParents"]>;
+    children: JSX.Element;
+}): JSX.Element {
+    return props.settings.length > 0 ? (
+        <PureformProvider motion={props.settings[0]}>
+            <MotionParents settings={props.settings.slice(1)}>
+                {props.children}
+            </MotionParents>
+        </PureformProvider>
+    ) : (
+        props.children
+    );
+}
+
 export function SceneView(props: {
     scene: Scene;
     props: Accessor<SceneProps>;
@@ -277,29 +292,31 @@ export function SceneView(props: {
     );
     const wrapper = props.scene.wrapper;
     return (
-        <PureformProvider
-            registry={registry}
-            indication={
-                props.scene.provider?.indication &&
-                indications[props.scene.provider.indication]
-            }
-            dir={props.scene.provider?.dir}
-            motion={props.scene.provider?.motion}
-            theme={sceneTheme(props.scene.provider)}
-            hydrate={props.scene.provider?.hydrate}
-            overrides={props.scene.provider?.overrides}
-        >
-            {wrapper ? (
-                <Dynamic
-                    component={components[wrapper.component]}
-                    {...indicationOf(wrapper.indication)}
-                    {...(wrapper.props as object)}
-                >
-                    {view()}
-                </Dynamic>
-            ) : (
-                view()
-            )}
-        </PureformProvider>
+        <MotionParents settings={props.scene.motionParents ?? []}>
+            <PureformProvider
+                registry={registry}
+                indication={
+                    props.scene.provider?.indication &&
+                    indications[props.scene.provider.indication]
+                }
+                dir={props.scene.provider?.dir}
+                motion={props.scene.provider?.motion}
+                theme={sceneTheme(props.scene.provider)}
+                hydrate={props.scene.provider?.hydrate}
+                overrides={props.scene.provider?.overrides}
+            >
+                {wrapper ? (
+                    <Dynamic
+                        component={components[wrapper.component]}
+                        {...indicationOf(wrapper.indication)}
+                        {...(wrapper.props as object)}
+                    >
+                        {view()}
+                    </Dynamic>
+                ) : (
+                    view()
+                )}
+            </PureformProvider>
+        </MotionParents>
     );
 }

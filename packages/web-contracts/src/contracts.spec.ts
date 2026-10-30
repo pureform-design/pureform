@@ -4,6 +4,7 @@ import { describe, expect, expectTypeOf, it } from "vitest";
 import {
     STATE_ATTRIBUTES,
     MOTION_ATTRIBUTE,
+    MOTION_PROPERTY,
     REDUCED_MOTION_QUERY,
     PART_ATTRIBUTE,
     SCOPE_ATTRIBUTE,
@@ -33,6 +34,7 @@ describe("web wire contracts", () => {
             "data-testid",
         ]);
         expect(MOTION_ATTRIBUTE).toBe("data-pf-motion");
+        expect(MOTION_PROPERTY).toBe("--pf-motion");
         expect(REDUCED_MOTION_QUERY).toBe("(prefers-reduced-motion: reduce)");
         expectTypeOf<keyof PartAttributes>().toEqualTypeOf<
             "data-pf-part" | "data-scope" | "data-testid"
