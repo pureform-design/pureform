@@ -14,12 +14,15 @@ import {
     selectItemGroups,
     selectMenuSelection,
     selectSelection,
+    selectSummary,
 } from "@pureform/binding-core";
 import type {
     ChangeDetails,
     IndicationProps,
     SelectItem,
     SelectPart,
+    SelectValue,
+    SelectValueProps,
     SelectVariantProps,
     TextFieldAffixProps,
 } from "@pureform/binding-core";
@@ -64,7 +67,7 @@ const useShownLabel = (
     return kept.current?.label ?? "";
 };
 
-export interface SelectProps
+interface SelectBaseProps
     extends
         Omit<SelectVariantProps, "leadingIcon" | "prefixText" | "suffixText">,
         TextFieldAffixProps<ReactNode>,
@@ -76,14 +79,14 @@ export interface SelectProps
     /** The menu's `style`, `slotProps`, `tokens` and `testId`. */
     readonly menuProps?: InnerPropsOf<MenuProps> | undefined;
     readonly items: readonly SelectItem[];
-    /** The picked item's value, `null` for none. Controlled when defined. */
-    readonly value?: string | null | undefined;
-    readonly defaultValue?: string | null | undefined;
-    readonly onValueChange?:
-        | ((details: ChangeDetails<"value", string | null>) => void)
-        | undefined;
+    /** What the field shows for the chosen options. @default the labels, joined by ", " */
+    readonly summary?: ((chosen: readonly SelectItem[]) => string) | undefined;
     readonly testId?: TestIdOverride<SelectPart> | undefined;
 }
+
+/** The select's props. The value is the picked item's, `null` for none, controlled when defined;
+ *  with `multiple`, an array of the picked items' values, and picking toggles without closing. */
+export type SelectProps = SelectBaseProps & SelectValueProps;
 
 // The menu grows from the field's side, as the web's grows from its positioner's origin.
 const MENU_ORIGIN = { transformOrigin: "top left" } as const;
@@ -95,19 +98,37 @@ export function Select(props: SelectProps): ReactNode {
         value: _value,
         defaultValue: _defaultValue,
         onValueChange,
+        multiple,
+        summary,
         testId,
         indication,
         menuProps,
         ...field
     } = props;
-    const [value, setValue] = useControllable<"value", string | null>(
+    const [chosen, setChosen] = useControllable<"value", SelectValue>(
         "Select",
         "value",
         props.value,
         props.defaultValue,
-        onValueChange,
-        null,
+        onValueChange as
+            | ((details: ChangeDetails<"value", SelectValue>) => void)
+            | undefined,
+        multiple ? [] : null,
     );
+    const many =
+        chosen !== null && typeof chosen !== "string" ? chosen : undefined;
+    // The one value, where one is picked; none (`null`) with `multiple`.
+    const value = many ? null : (chosen as string | null);
+    const setValue = (next: string | null) => setChosen(next);
+    // Picking adds to the end, as the web's does.
+    const toggle = (picked: string) => {
+        const now = many ?? [];
+        setChosen(
+            now.includes(picked)
+                ? now.filter((entry) => entry !== picked)
+                : [...now, picked],
+        );
+    };
     const engine = useEngine();
     const [menu, setMenu] = useState<{
         left: number;
@@ -186,7 +207,15 @@ export function Select(props: SelectProps): ReactNode {
         });
         return () => cancelAnimationFrame(frame);
     }, [presence.present]);
-    const shown = useShownLabel(items, value);
+    const single = useShownLabel(items, value);
+    const shown = many
+        ? selectSummary(
+              many.flatMap((entry) =>
+                  items.filter((item) => item.value === entry),
+              ),
+              summary,
+          )
+        : single;
     // The options by group: a run outside any group goes unlabelled.
     const groups = useMemo(
         () =>
@@ -279,7 +308,7 @@ export function Select(props: SelectProps): ReactNode {
                         >
                             <MenuListbox
                                 {...menuProps}
-                                listbox={{ id: listId }}
+                                listbox={{ id: listId, multiple: !!multiple }}
                                 {...(typeof props.label === "string"
                                     ? { "aria-label": props.label }
                                     : {})}
@@ -293,8 +322,11 @@ export function Select(props: SelectProps): ReactNode {
                                 {...(indication === undefined
                                     ? {}
                                     : { indication })}
-                                value={value}
+                                {...(multiple
+                                    ? { values: many ?? [] }
+                                    : { value })}
                                 onSelect={(details) => {
+                                    if (multiple) return toggle(details.value);
                                     if (details.value !== value)
                                         setValue(details.value);
                                     close();

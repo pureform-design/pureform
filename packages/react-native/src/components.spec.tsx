@@ -482,6 +482,52 @@ describe("controlled and uncontrolled state", () => {
         );
     });
 
+    it("toggles a multiple select's options without closing, showing them selected and summarised", async () => {
+        const change =
+            vi.fn<
+                (details: ChangeDetails<"value", readonly string[]>) => void
+            >();
+        await render(
+            <Select
+                label="Size"
+                multiple
+                items={[
+                    { value: "s", label: "Small" },
+                    { value: "m", label: "Medium" },
+                    { value: "l", label: "Large" },
+                ]}
+                defaultValue={["m"]}
+                onValueChange={change}
+            />,
+        );
+        const field = () =>
+            (byTestId("pf-select-input") as HTMLInputElement).value;
+        expect(field()).toBe("Medium");
+        await interact(() =>
+            userEvent.click(document.querySelector('[role="combobox"]')!),
+        );
+        await settle(50);
+        const option = (label: string) =>
+            [...document.querySelectorAll('[role="option"]')].find(
+                (item) => item.textContent === label,
+            ) as HTMLElement;
+        expect(
+            document
+                .querySelector('[role="listbox"]')!
+                .getAttribute("aria-multiselectable"),
+        ).toBe("true");
+        expect(option("Medium").getAttribute("aria-selected")).toBe("true");
+        await interact(() => userEvent.click(option("Large")));
+        await interact(() => userEvent.click(option("Small")));
+        expect(change).toHaveBeenNthCalledWith(1, { value: ["m", "l"] });
+        expect(change).toHaveBeenNthCalledWith(2, { value: ["m", "l", "s"] });
+        expect(document.querySelector('[role="listbox"]')).not.toBeNull();
+        expect(field()).toBe("Medium, Large, Small");
+        await interact(() => userEvent.click(option("Medium")));
+        expect(change).toHaveBeenLastCalledWith({ value: ["l", "s"] });
+        expect(field()).toBe("Large, Small");
+    });
+
     it("keeps a select's label for its value after the item leaves, until the value changes", async () => {
         const SMALL = { value: "s", label: "Small" };
         const MEDIUM = { value: "m", label: "Medium" };

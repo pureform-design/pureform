@@ -39,14 +39,18 @@ const shown = () =>
 // Slowed, so a change is still running when the test reads it.
 const render = (
     node: ReactNode,
-    options: { dir?: "ltr" | "rtl"; motion?: "full" | "reduce" } = {},
+    options: {
+        dir?: "ltr" | "rtl";
+        motion?: "full" | "reduce";
+        timeScale?: number;
+    } = {},
 ) =>
     mount(
         <PureformProvider
             registry={registry}
             dir={options.dir ?? "ltr"}
             motion={options.motion ?? "full"}
-            timeScale={20}
+            timeScale={options.timeScale ?? 20}
         >
             <View style={{ width: 400 }}>{node}</View>
         </PureformProvider>,
@@ -113,6 +117,7 @@ describe("HorizontalSharedAxis on React Native", () => {
                     </HorizontalSharedAxis>
                 )}
             </index.Holder>,
+            { timeScale: 100 },
         );
         await settle();
         await index.set(1);

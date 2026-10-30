@@ -148,6 +148,8 @@ export interface MenuProps
     readonly positioning?: OverlayPositioning | undefined;
     /** The item shown selected, such as a select's value. */
     readonly value?: string | null | undefined;
+    /** The items shown selected, for a multiple select's list (over `value`). */
+    readonly values?: readonly string[] | undefined;
     /** An item was picked. */
     readonly onSelect?: ((details: MenuSelectDetails) => void) | undefined;
     /** How an item with `items` opens its submenu: `cascade` beside it, `drill` in the menu's
@@ -935,7 +937,11 @@ function MenuImpl(
             selection={selection}
             indication={props.indication}
             testId={props.testId}
-            selected={props.value === entry.value}
+            selected={
+                props.values
+                    ? props.values.includes(entry.value)
+                    : props.value === entry.value
+            }
             onSelect={select}
             openKey={rtl ? "ArrowLeft" : "ArrowRight"}
             option={props.listbox !== undefined}
@@ -981,6 +987,9 @@ function MenuImpl(
                 ? {}
                 : { role: props.listbox ? "listbox" : "menu" })}
             {...(props.listbox ? { nativeID: props.listbox.id } : {})}
+            {...(props.listbox?.multiple
+                ? { "aria-multiselectable": true }
+                : {})}
             {...(props["aria-label"] === undefined
                 ? {}
                 : { "aria-label": props["aria-label"] })}
@@ -1159,6 +1168,8 @@ export function MenuItems(
  *  option highlighted there (`aria-activedescendant`) and each option's id. */
 export interface MenuListboxOptions {
     readonly id: string;
+    /** Several options can be chosen (`aria-multiselectable`). */
+    readonly multiple?: boolean | undefined;
     readonly active?: {
         readonly value: string | undefined;
         readonly idOf: (value: string) => string;
