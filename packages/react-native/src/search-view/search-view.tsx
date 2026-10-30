@@ -22,6 +22,7 @@ import {
     searchViewMatches,
     searchViewMenuSelection,
     searchViewSelection,
+    searchBarSelection,
 } from "@pureform/binding-core";
 import type {
     ChangeDetails,
@@ -150,6 +151,15 @@ const COVERED_INPUT = {
 
 export function SearchView(props: SearchViewProps): ReactNode {
     const nativeSlots = useNativeSlotReader("searchView");
+    const readBarSlots = useNativeSlotReader("searchBar");
+    const bar = useComponentSlots<"root">(
+        "searchBar",
+        searchBarSelection(props.searchBarProps ?? {}),
+    );
+    const barStyle = readBarSlots(props.searchBarProps ?? {}).style(
+        "root",
+        bar.styles.root,
+    ) as import("react-native").ViewStyle;
     const engine = useEngine();
     const { open, setOpen, presence, close } = useModalOverlay(
         "SearchView",
@@ -225,6 +235,15 @@ export function SearchView(props: SearchViewProps): ReactNode {
         <>
             <View
                 ref={trigger as never}
+                style={
+                    props.trigger === undefined
+                        ? {
+                              width: barStyle?.width ?? "100%",
+                              maxWidth: barStyle?.maxWidth,
+                              minWidth: barStyle?.minWidth,
+                          }
+                        : undefined
+                }
                 collapsable={false}
                 testID={compositeTestIds.searchView.trigger}
             >

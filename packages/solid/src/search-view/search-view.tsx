@@ -8,11 +8,11 @@
 import {
     searchViewMenuAnatomy,
     searchViewOverlayAnatomy,
+    searchBarAnatomy,
 } from "@pureform/anatomy";
 import type {
     iconButtonAnatomy,
     PartName,
-    searchBarAnatomy,
     TestIdOverride,
 } from "@pureform/anatomy";
 import {
@@ -39,6 +39,7 @@ import {
     presentProps,
     SEARCH_VIEW_ROOT_STYLE,
     SEARCH_VIEW_TRIGGER_STYLE,
+    searchViewBarSizing,
     searchViewComboboxProps,
     searchViewPositionerLayout,
 } from "@pureform/binding-web";
@@ -271,22 +272,25 @@ function Trigger(props: SearchViewPartProps): JSX.Element {
     return scope.render("trigger", {
         element: "button",
         machine: () =>
-            mergeProps(view().getTriggerProps(), {
-                "aria-label": label(),
-                disabled: disabled(),
-                style: SEARCH_VIEW_TRIGGER_STYLE,
-                onKeyDown: (event: KeyboardEvent) => {
-                    if (view().open || !opensSearchView(event)) return;
-                    event.preventDefault();
-                    const carried = searchViewCarriedKey(event.key);
-                    if (carried !== undefined)
-                        query().setInputValue(
-                            query().inputValue + carried,
-                            "input-change",
-                        );
-                    view().setOpen(true);
-                },
-            }),
+            mergeProps(
+                view().getTriggerProps(),
+                normalizeProps.button({
+                    "aria-label": label(),
+                    disabled: disabled(),
+                    style: SEARCH_VIEW_TRIGGER_STYLE,
+                    onKeyDown: (event) => {
+                        if (view().open || !opensSearchView(event)) return;
+                        event.preventDefault();
+                        const carried = searchViewCarriedKey(event.key);
+                        if (carried !== undefined)
+                            query().setInputValue(
+                                query().inputValue + carried,
+                                "input-change",
+                            );
+                        view().setOpen(true);
+                    },
+                }),
+            ),
         unstyled: () => props.unstyled,
         props: rest,
     });
@@ -515,6 +519,18 @@ function ReadyMadeContent(props: {
     const { view, query, matches } = context.use("Root");
     // oxlint-disable-next-line solid/reactivity -- the parent's own props, passed once and never replaced
     const own = props.own;
+    const barScope = useComponent(searchBarAnatomy, {
+        selection: () => ({ tokens: own.searchBarProps?.tokens }),
+    });
+    const barSlots = createSlotProps<SearchBarAnatomy>({
+        get style() {
+            return own.searchBarProps?.style;
+        },
+        get slotProps() {
+            return own.searchBarProps?.slotProps;
+        },
+    });
+    const barRoot = barScope.part("root", { props: barSlots("root") });
     // oxlint-disable-next-line solid/reactivity -- the parent's slot props function, passed once and never replaced
     const slots = props.slots;
     const menuSlots = createSlotProps<
@@ -541,7 +557,14 @@ function ReadyMadeContent(props: {
     >);
     return (
         <>
-            <Trigger {...slots("trigger")}>
+            <Trigger
+                style={
+                    isPresent(own.trigger)
+                        ? { "max-width": "none" }
+                        : searchViewBarSizing(barRoot.style)
+                }
+                {...slots("trigger")}
+            >
                 {isPresent(own.trigger) ? (
                     own.trigger
                 ) : (

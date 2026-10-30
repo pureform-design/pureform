@@ -36,7 +36,7 @@ import {
     sys,
 } from "./shared";
 
-const { tokens, ref } = componentTokens("searchBar", {
+const { tokens, ref, own } = componentTokens("searchBar", {
     container: sys("surfaceContainerHigh"),
     // The container once the app bar it sits in is scrolled under.
     scrolledContainer: sys("surfaceContainerHighest"),
@@ -56,6 +56,9 @@ const { tokens, ref } = componentTokens("searchBar", {
 });
 
 const pf = typed();
+
+/** Shared by the bar and SearchView's trigger so theme overrides and defaults cannot diverge. */
+export const SEARCH_BAR_MAX_WIDTH = own("maxWidth");
 
 export const searchBar = pf.slotComponent({
     name: "searchBar",

@@ -8,8 +8,9 @@
 import {
     searchViewMenuAnatomy,
     searchViewOverlayAnatomy,
+    searchBarAnatomy,
 } from "@pureform/anatomy";
-import type { iconButtonAnatomy, searchBarAnatomy } from "@pureform/anatomy";
+import type { iconButtonAnatomy } from "@pureform/anatomy";
 import type { PartName, TestIdOverride } from "@pureform/anatomy";
 import {
     isPresent,
@@ -34,6 +35,7 @@ import {
     presentProps,
     SEARCH_VIEW_ROOT_STYLE,
     SEARCH_VIEW_TRIGGER_STYLE,
+    searchViewBarSizing,
     searchViewComboboxProps,
     searchViewPositionerLayout,
 } from "@pureform/binding-web";
@@ -498,6 +500,11 @@ function ReadyMadeContent({
     readonly own: SearchViewProps;
 }): ReactNode {
     const { view, query, matches } = context.use("Root");
+    const barScope = useComponent(searchBarAnatomy, {
+        selection: { tokens: own.searchBarProps?.tokens },
+    });
+    const barSlots = useSlotProps(own.searchBarProps ?? {});
+    const barRoot = barScope.part("root", { props: barSlots("root") });
     const slot = useSlotProps(own);
     const menuSlot = useSlotProps<
         MenuAnatomy,
@@ -511,7 +518,14 @@ function ReadyMadeContent({
         menuSlot.each("itemSupportingText");
     return (
         <>
-            <Trigger {...slot("trigger")}>
+            <Trigger
+                style={
+                    isPresent(own.trigger)
+                        ? { maxWidth: "none" }
+                        : searchViewBarSizing(barRoot.style)
+                }
+                {...slot("trigger")}
+            >
                 {isPresent(own.trigger) ? (
                     own.trigger
                 ) : (

@@ -41,3 +41,24 @@ export const SEARCH_VIEW_TRIGGER_STYLE = {
     textAlign: "inherit",
     cursor: "pointer",
 } as const;
+
+/** Only the bar's sizing and token vars belong on its hit target, not its padding or paint. */
+export const searchViewBarSizing = (
+    style: unknown,
+): Record<string, string | number> =>
+    style && typeof style === "object"
+        ? Object.fromEntries(
+              Object.entries(style).filter(
+                  ([key, value]) =>
+                      (key.startsWith("--") ||
+                          [
+                              "width",
+                              "minWidth",
+                              "maxWidth",
+                              "min-width",
+                              "max-width",
+                          ].includes(key)) &&
+                      (typeof value === "string" || typeof value === "number"),
+              ),
+          )
+        : {};

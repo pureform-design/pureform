@@ -106,6 +106,9 @@ exports[`searchView > compiles to a stable Panda slot recipe 1`] = `
       "minHeight": "var(--components-searchView-iconSize, token(sizes.iconMedium))",
       "minWidth": "var(--components-searchView-iconSize, token(sizes.iconMedium))",
     },
+    "trigger": {
+      "maxWidth": "var(--components-searchBar-maxWidth, 720px)",
+    },
   },
   "className": "searchView",
   "compoundVariants": [],
@@ -117,6 +120,7 @@ exports[`searchView > compiles to a stable Panda slot recipe 1`] = `
   ],
   "slots": [
     "root",
+    "trigger",
     "header",
     "leading",
     "input",

@@ -29,9 +29,6 @@ Confirm in the storybook before changing.
 
 ### 3. Small decisions, then a small fix
 
-- **SearchView trigger width (React, Solid, probably RN), needs a decision:** the trigger is `width: 100%` while the
-  `SearchBar` is capped at 720px; make the trigger shrink-wrap (`width: fit-content; max-width:
-  100%`) or carry the same cap.
 - **Table row hover parity:** the preset specifies a hover tint (not from Material), absent on RN;
   keep it (add pointer enter/leave to RN rows) or drop it from the preset.
 - **Draggable list item ripple (React, Solid):** a swipe only sets the pressed layer, and M3 shows

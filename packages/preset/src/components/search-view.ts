@@ -48,6 +48,7 @@ import {
 } from "@pureform/theme";
 
 import { DIALOG_MOTION, motionAnimation, overlayMotion } from "./overlay";
+import { SEARCH_BAR_MAX_WIDTH } from "./search-bar";
 import {
     componentTokens,
     iconBox,
@@ -156,6 +157,7 @@ export const searchView = pf.slotComponent({
     tokens,
     slots: [
         "root",
+        "trigger",
         "header",
         "leading",
         "input",
@@ -170,6 +172,9 @@ export const searchView = pf.slotComponent({
     variants: { variant: ["fullScreen", "docked", "contained"] },
     recipe: () => ({
         base: {
+            // Reuse the bar's dynamic token, including its default and theme overrides; there
+            // is deliberately no independent SearchView trigger-width token.
+            trigger: { maxWidth: SEARCH_BAR_MAX_WIDTH },
             root: {
                 ...surface(ref("container"), ref("contentColor"), "level0"),
                 ...overlayMotion(DIALOG_MOTION),

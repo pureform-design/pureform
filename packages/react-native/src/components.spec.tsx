@@ -1246,6 +1246,17 @@ describe("lists, menus, and selects", () => {
         );
     });
 
+    it("caps a search view's hit target at its search bar's instance width", async () => {
+        await render(
+            <SearchView searchBarProps={{ tokens: { maxWidth: 400 } }} />,
+        );
+        const trigger = byTestId("pf-search-view-trigger");
+        expect(trigger.getBoundingClientRect().width).toBeCloseTo(400, 0);
+        expect(
+            byTestId("pf-search-bar-root").getBoundingClientRect().width,
+        ).toBeCloseTo(400, 0);
+    });
+
     it("closes a search view from its back button", async () => {
         await render(<SearchView defaultOpen variant="docked" />);
         const view = () => document.querySelector('[role="dialog"]');

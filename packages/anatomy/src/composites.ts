@@ -1680,7 +1680,8 @@ export const searchViewOverlayAnatomy = {
             testId: "pf-search-view-trigger",
             parent: "root",
             children: [],
-            styled: false,
+            styled: true,
+            slot: "trigger",
             mirror: false,
         },
         positioner: {

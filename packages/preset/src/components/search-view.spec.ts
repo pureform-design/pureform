@@ -17,6 +17,7 @@ describe("searchView", () => {
     it("has M3's parts: a header over a divider and the content", () => {
         expect(searchView.slots).toEqual([
             "root",
+            "trigger",
             "header",
             "leading",
             "input",

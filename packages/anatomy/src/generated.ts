@@ -1645,6 +1645,7 @@ export const searchViewAnatomy = {
     root: "root",
     partNames: [
         "root",
+        "trigger",
         "header",
         "leading",
         "input",
@@ -1659,6 +1660,15 @@ export const searchViewAnatomy = {
             testId: "pf-search-view-root",
             parent: null,
             children: ["header", "divider", "content"],
+            styled: true,
+            mirror: false,
+        },
+        trigger: {
+            name: "trigger",
+            attribute: "trigger",
+            testId: "pf-search-view-trigger",
+            parent: null,
+            children: [],
             styled: true,
             mirror: false,
         },
@@ -6832,6 +6842,7 @@ export const testIds = {
     },
     searchView: {
         root: "pf-search-view-root",
+        trigger: "pf-search-view-trigger",
         header: "pf-search-view-header",
         leading: "pf-search-view-leading",
         input: "pf-search-view-input",
