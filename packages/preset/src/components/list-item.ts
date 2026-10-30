@@ -42,6 +42,7 @@ import { typed } from "@pureform/core";
 import {
     absolute,
     add,
+    auto,
     center,
     column,
     flex,
@@ -266,7 +267,14 @@ export const createListItem = <
                     },
                     headline: { textStyle: textStyle("bodyLarge") },
                     supportingText: parts.supportingText,
-                    trailing: parts.trailing,
+                    // At least an icon's box, and as large as the control it holds (a remove
+                    // button), which a fixed box would squeeze.
+                    trailing: {
+                        ...parts.trailing,
+                        width: auto,
+                        height: auto,
+                        minHeight: ref("iconSize"),
+                    },
                     trailingText: parts.trailingText("labelSmall"),
                     indicator: expandIndicator(
                         parts.trailing,
