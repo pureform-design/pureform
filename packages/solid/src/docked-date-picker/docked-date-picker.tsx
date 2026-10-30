@@ -44,7 +44,12 @@ import type {
     CalendarTableProps,
 } from "../calendar-parts";
 import { useControllable } from "../controllable";
-import { CalendarIcon, DropDownArrow } from "../glyphs";
+import {
+    CalendarIcon,
+    ChevronEndIcon,
+    ChevronStartIcon,
+    DropDownArrow,
+} from "../glyphs";
 import { IconButton } from "../icon-button";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
@@ -439,13 +444,22 @@ function ReadyMadeContent(props: {
                 <Content {...slots("content")}>
                     <Controls {...slots("controls")}>
                         <Show when={view() === "day"}>
-                            <Prev as={IconButton} {...asRoot(slots("prev"))} />
+                            <Prev
+                                as={IconButton}
+                                icon={<ChevronStartIcon />}
+                                {...asRoot(slots("prev"))}
+                            />
                         </Show>
                         <MonthButton {...slots("monthButton")} />
                         <Show when={view() === "day"}>
-                            <Next as={IconButton} {...asRoot(slots("next"))} />
+                            <Next
+                                as={IconButton}
+                                icon={<ChevronEndIcon />}
+                                {...asRoot(slots("next"))}
+                            />
                             <Prev
                                 as={IconButton}
+                                icon={<ChevronStartIcon />}
                                 unit="year"
                                 {...asRoot(slots("prev"))}
                             />
@@ -454,6 +468,7 @@ function ReadyMadeContent(props: {
                         <Show when={view() === "day"}>
                             <Next
                                 as={IconButton}
+                                icon={<ChevronEndIcon />}
                                 unit="year"
                                 {...asRoot(slots("next"))}
                             />

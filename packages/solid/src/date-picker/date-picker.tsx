@@ -57,7 +57,12 @@ import type {
 } from "../calendar-parts";
 import { useControllable } from "../controllable";
 import { dialogParts } from "../dialog-parts";
-import { DropDownArrow, EditIcon } from "../glyphs";
+import {
+    ChevronEndIcon,
+    ChevronStartIcon,
+    DropDownArrow,
+    EditIcon,
+} from "../glyphs";
 import { IconButton } from "../icon-button";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
@@ -442,8 +447,16 @@ function ReadyMadeContent(props: {
             <Controls {...slots("controls")}>
                 <ViewTrigger {...slots("viewTrigger")} />
                 <Show when={picker().view === "day"}>
-                    <Prev as={IconButton} {...asRoot(slots("prev"))} />
-                    <Next as={IconButton} {...asRoot(slots("next"))} />
+                    <Prev
+                        as={IconButton}
+                        icon={<ChevronStartIcon />}
+                        {...asRoot(slots("prev"))}
+                    />
+                    <Next
+                        as={IconButton}
+                        icon={<ChevronEndIcon />}
+                        {...asRoot(slots("next"))}
+                    />
                 </Show>
             </Controls>
             <Show
