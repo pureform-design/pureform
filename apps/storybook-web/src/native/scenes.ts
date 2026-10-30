@@ -12,12 +12,21 @@ import { View } from "react-native";
 import { gridListScene, toastScene } from "../react/scene-builders";
 import { OVERLAY_HEIGHT, pickedFile } from "../renderers/scenes";
 
-export const Toast = toastScene({
+const ToastScene = toastScene({
     createToaster,
     Toaster,
     Button,
     press: "onPress",
 });
+/** The toaster draws against the bottom of its nearest view, as against an app's screen: in the
+ *  screen's height, not the button's row. */
+export function Toast(props: Record<string, unknown>): ReactNode {
+    return createElement(
+        View,
+        { style: { minHeight: OVERLAY_HEIGHT } },
+        createElement(ToastScene, props),
+    );
+}
 export const GridList = gridListScene(NativeGridList as never);
 
 /** React Native's file upload leaves the picking to the app (its trigger calls `onPick`, and the
