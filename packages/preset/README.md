@@ -505,7 +505,10 @@ menu's item parts). `variant`: `fullScreen` (default) fills its positioner over 
 is docked with the header kept as a pill, no divider, and its icons travel outward as it opens
 (keyframes `searchViewFromEnd`/`searchViewFromStart`, web only; still under reduced motion).
 The search bar's `scrolled` variant takes the app bar's scrolled container colour (its lift on
-scroll). It grows with its container up to its `maxWidth` token (720px, M3 Expressive's).
+scroll). It grows with its container up to its `maxWidth` token (720px, M3 Expressive's). The
+search view's `trigger` (the button around the bar) reuses that same token as its own `maxWidth`,
+so the hit target is as wide as the bar under any theme or instance override, with no token of
+its own.
 
 `autocomplete` is the select's field (affixes, icons, colour, density) over an editable
 combobox input: no pointer cursor, the arrow turns while the suggestions are open. The
@@ -1214,7 +1217,8 @@ transition on its `handSpring` token (the `spatialDefault` spring) that reduced 
 since Tailwind's scanner makes a `display: table` utility of a bare `table` in the generated
 modules; the bindings' component is `Table`. Parts: the `root` (a `<table>`), the `header`, `body`
 and `footer` row groups, the `headerRow`, `row`, `alternateRow` (every other body row of a striped
-table) and `footerRow`, the `headerCell`, `cell` and `footerCell`, the `selectionCell` (the
+table) and `footerRow`, (a body row tints on hover only with `rowHover`, which the bindings turn on
+when the table has a `selectionMode`; passive rows have no hover), the `headerCell`, `cell` and `footerCell`, the `selectionCell` (the
 checkbox column, one width in every row), and in a sortable column's header the `sortHeader`
 button with its `sortLabel` and `sortIndicator` (the arrow). Rows and cells are flex boxes, each
 cell an equal share of its row, so every target lays it out alike; the bindings write the table
@@ -1468,6 +1472,7 @@ each setting one token on the root (0 compounds): `columns` 1 to 6, `gutter` non
 large, `aspect` square, landscape, portrait, wide. Tokens `columns`, `gutter`, `aspect`, `radius`,
 `container` and the caption's (`captionContainer`, `captionContent`, `captionOpacity`,
 `captionSize`, `captionPadding`) take any value. Spanning a tile over several columns is not built.
+
 ## RadioGroup layout
 
 `radioGroup` now has a styled `root` with an `orientation` variant: `vertical` (default) or a

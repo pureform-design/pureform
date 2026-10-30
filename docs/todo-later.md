@@ -22,8 +22,6 @@ results and recordings.
 Traced through story scenes and component code, grouped from immediately fixable to most complex.
 Confirm in the storybook before changing.
 
-### 2. Remaining scene work
-
 ### 4. Not reproduced
 
 - **TimeInput border radius:** the input, period selector and root radii are identical on Solid,
@@ -47,26 +45,62 @@ Confirm in the storybook before changing.
        props on the UI thread; elsewhere keep the spinning half-circle wave.
     3. Reduced motion keeps the static half circle; test the rendered rotations over time.
 
-## Storybook observations, second set (reported, not yet checked)
+## Storybook observations, second set (triaged by reading the code; none reproduced yet)
 
-Verify in the storybook and the code before changing; fix scenes separately from components.
+Ordered from easy to complex. "Real" is a component or preset bug; "scene" is the story host.
 
-- **React DatePicker year list (all scenarios):** only a few years render, unlike Solid and React
-  Native, and picking one doesn't update the list shown.
-- **React, Solid FileUpload (all scenarios):** the delete icon is too narrow once a file is
-  uploaded (visible in the focus/click highlight).
-- **RN Card > Not interactive:** a press draws a ripple.
-- **RN Card (Elevated 2 and others), dark mode:** the "Plan details" text is black.
-- **RN Autocomplete > Opened grouped suggestions:** the group headers aren't rendered.
-- **RN "Two lines expanded" (list item):** pressing the item doesn't expand or collapse it.
-- **Solid Paginator > Key Space, then click the left arrow:** `[EFFECT_RELAY_TEAR]` for
-  `createBindable.value` (an effect writes the value it reads, and runs twice; seen three times),
-  from `packages/solid/src/parts.tsx:240` under `PrevTrigger`.
-- **RN Scrim > Dark:** the play fails (`expected 0 to be 178`, `scrim.ts:51`): the scrim has no
-  height in dark, though light passes. Content behind it looks normal.
-- **SideSheet > Opened standard > `coplanar: true` (all three):** what `coplanar` should do isn't
-  documented where seen; React and Solid look broken with it on, React Native looks different.
-  Define it first (the RN doc says a coplanar sheet is the surface in the app's layout), then align.
+### Easy
+
+- **React, Solid FileUpload, the remove button is too narrow (real):** the remove `IconButton`
+  sits in the list item's `trailing` slot, which `iconBox` sizes to the icon (about 24px), so the
+  40px button's highlight is clipped (`preset/src/components/list.ts:153`, `file-upload` bindings
+  pass `control`). Fix: when the trailing part holds a `control`, let it size to its content
+  (`width: auto; minWidth: 0; height: auto`), with a state or variant in the list item preset.
+- **RN Card, "Plan details" is black in dark mode (real):** `actions` given as a string is wrapped
+  in a `Text` with no style (`react-native/src/card/card.tsx`, `Actions = viewPart("actions", …)`
+  has no text part), while `Content` and `Footer` pass `supportingText`. Fix: give the actions a
+  text style (`viewPart("actions", "Actions", …)`), ideally a preset text token for the row.
+- **RN Card > Not interactive ripples (scene):** the storybook adds an `onClick` spy to every Card
+  story and the native hook turns it into `onPress` (`apps/storybook-web/src/renderers/compose.ts`,
+  `react-native/src/storybook/index.ts:80`), so the card acts. The component is right: no
+  `onPress` means no ripple. Fix: only add the spy when `as` or `href` is set, or drop it for the
+  non-interactive examples.
+- **RN Scrim > Dark play fails (scene):** the story element is 178px (the stage's `fill`), but RN's
+  root `View` only has `flexGrow: 1` inside a block `div`, so it has no height. Fix: in
+  `stages/stage.ts`'s `fill`, also make the element `display: flex; flex-direction: column`, and
+  wait for layout in `stages/scrim.ts`. Light passed only because it measured later.
+
+### Medium
+
+- **RN Autocomplete > Opened grouped suggestions, no group headers (real):** `autocomplete.tsx`
+  renders the flat `matches` and ignores `item.group`, where `select.tsx` builds `selectItemGroups`
+  and passes `groups`. Fix: do the same over the filtered matches, keeping the flat order for
+  the arrow keys and option ids.
+- **SideSheet > Opened standard > `coplanar` (scene, plus a missing case):** the story never sets
+  `coplanar`; it appears only through the control. `coplanar` is for a standard sheet that shares
+  the page's layout (the content beside it resizes; web positioner is in-flow `display: flex`,
+  RN is the surface in the app's layout), so it needs a page row to sit in. Fix: add a web scene
+  that mirrors RN's `screen("row", …)` for `modal: false`, and a dedicated "Opened: coplanar" case
+  in `component-cases`; then compare the three renderers.
+- **Solid Paginator > Key Space, then click the left arrow, `[EFFECT_RELAY_TEAR]` (cause unknown):**
+  the effect is the part's render effect (`solid/src/parts.tsx:240`) under `PrevTrigger`; the
+  written signal is the machine's `page` bindable (`solid/src/internal/zag/bindable.ts`). Two
+  suspects: a double `set` of `page` (the controlled round trip in `paginator.tsx`, or Zag's
+  `pageSize` watch re-setting it), or the trigger's `machine()` accessor not being a memo. Next:
+  log the bindable's writes per click; if two, skip the write when the value is equal, else memoize
+  the trigger's machine props.
+
+### Needs a reproduction first
+
+- **React DatePicker year list (unconfirmed):** React and Solid both render Zag's `getYearsGrid`
+  (12 years, a decade). Only React's `Cell` sets the day view on a year click
+  (`react/src/calendar-parts.tsx:440`). The report ("few years", the list not reflecting the pick)
+  may be that view switch, or the 288px scrolling `yearList`. Compare React, Solid and RN in the
+  storybook, then decide whether the year view should be a longer scrollable range everywhere.
+- **RN "Two lines, expanded" doesn't toggle (unconfirmed):** the press handler toggles correctly
+  (`react-native/src/list-item/list-item.tsx:290`), so check whether the story's args make it
+  controlled (`expanded`), and the `Expanding` phase on RN-web (`expand.tsx`, `onLayout`, reduced
+  motion).
 
 ## Deferred designs
 
