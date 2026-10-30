@@ -16,6 +16,7 @@ import {
     autocompleteMenuSelection,
     autocompleteSelection,
     isPresent,
+    selectItemGroups,
 } from "@pureform/binding-core";
 import type {
     AutocompleteFilter,
@@ -144,6 +145,16 @@ export function Autocomplete(props: AutocompleteProps): ReactNode {
     // chosen suggestion's label, or set to one, shows every suggestion.
     const [typed, setTyped] = useState("");
     const matches = autocompleteMatches(items, typed, filter);
+    // The matches by group, as the select's options are: a run outside any group is unlabelled.
+    // The arrow keys and option ids keep walking `matches`, which holds the same order.
+    const groups = selectItemGroups(matches).map((run, index) => ({
+        id: run.group ?? `ungrouped-${index}`,
+        label: run.group,
+        items: run.items,
+    }));
+    const grouped = groups.some((run) => run.label !== undefined);
+    // The suggestions as drawn, which the arrow keys walk: grouped ones sit together.
+    const drawn = grouped ? groups.flatMap((run) => run.items) : matches;
     const disabled = props.disabled || props.readOnly;
     // The list the combobox controls, while it shows.
     const listId = useId();
@@ -164,15 +175,15 @@ export function Autocomplete(props: AutocompleteProps): ReactNode {
         close();
     };
     const step = (by: 1 | -1) => {
-        if (matches.length === 0) return;
-        const at = matches.findIndex((item) => item.value === active);
+        if (drawn.length === 0) return;
+        const at = drawn.findIndex((item) => item.value === active);
         const next =
             at < 0
                 ? by === 1
                     ? 0
-                    : matches.length - 1
-                : (at + by + matches.length) % matches.length;
-        setHighlighted(matches[next]!.value);
+                    : drawn.length - 1
+                : (at + by + drawn.length) % drawn.length;
+        setHighlighted(drawn[next]!.value);
     };
     const onKeyPress = (event: {
         nativeEvent: { key: string; altKey?: boolean };
@@ -278,7 +289,9 @@ export function Autocomplete(props: AutocompleteProps): ReactNode {
                                         {...(typeof props.label === "string"
                                             ? { "aria-label": props.label }
                                             : {})}
-                                        items={matches}
+                                        {...(grouped
+                                            ? { groups, grouped: false }
+                                            : { items: matches })}
                                         {...(indication === undefined
                                             ? {}
                                             : { indication })}

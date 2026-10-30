@@ -51,10 +51,6 @@ Ordered from easy to complex. "Real" is a component or preset bug; "scene" is th
 
 ### Medium
 
-- **RN Autocomplete > Opened grouped suggestions, no group headers (real):** `autocomplete.tsx`
-  renders the flat `matches` and ignores `item.group`, where `select.tsx` builds `selectItemGroups`
-  and passes `groups`. Fix: do the same over the filtered matches, keeping the flat order for
-  the arrow keys and option ids.
 - **SideSheet > Opened standard > `coplanar` (scene, plus a missing case):** the story never sets
   `coplanar`; it appears only through the control. `coplanar` is for a standard sheet that shares
   the page's layout (the content beside it resizes; web positioner is in-flow `display: flex`,

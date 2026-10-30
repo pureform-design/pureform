@@ -1128,6 +1128,61 @@ describe("lists, menus, and selects", () => {
         ]);
     });
 
+    it("groups an autocomplete's suggestions under their labels, keeping the filter", async () => {
+        await render(
+            <Autocomplete
+                label="Fruit"
+                items={[
+                    { value: "a", label: "Apple", group: "Pome" },
+                    { value: "c", label: "Cherry", group: "Drupe" },
+                    { value: "p", label: "Pear", group: "Pome" },
+                ]}
+            />,
+        );
+        const input = byTestId("pf-autocomplete-input") as HTMLInputElement;
+        await interact(() =>
+            userEvent.click(
+                document.querySelector('[aria-label="Show suggestions"]')!,
+            ),
+        );
+        await settle(50);
+        const groups = () =>
+            [
+                ...document.querySelectorAll(
+                    '[data-testid="pf-menu-item-group"]',
+                ),
+            ].map((group) => group.textContent);
+        expect(groups()).toEqual(["PomeApplePear", "DrupeCherry"]);
+        await interact(() => userEvent.type(input, "ch"));
+        await settle(50);
+        expect(groups()).toEqual(["DrupeCherry"]);
+    });
+
+    it("walks a grouped autocomplete's suggestions in the order they're drawn", async () => {
+        await render(
+            <Autocomplete
+                label="Fruit"
+                items={[
+                    { value: "a", label: "Apple", group: "Pome" },
+                    { value: "c", label: "Cherry", group: "Drupe" },
+                    { value: "p", label: "Pear", group: "Pome" },
+                ]}
+            />,
+        );
+        const input = byTestId("pf-autocomplete-input") as HTMLInputElement;
+        await interact(() => userEvent.click(input));
+        const walked: (string | null | undefined)[] = [];
+        for (let key = 0; key < 3; key++) {
+            await interact(() => userEvent.keyboard("{ArrowDown}"));
+            await settle(30);
+            const active = input.getAttribute("aria-activedescendant");
+            walked.push(
+                document.getElementById(active ?? "")?.textContent ?? active,
+            );
+        }
+        expect(walked).toEqual(["Apple", "Pear", "Cherry"]);
+    });
+
     it("filters an autocomplete's suggestions as it's typed in, and picks one", async () => {
         const change =
             vi.fn<(details: ChangeDetails<"value", string | null>) => void>();
