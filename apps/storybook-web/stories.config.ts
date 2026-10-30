@@ -97,13 +97,6 @@ export default defineStories({
         },
         Scrim: {
             hooks: ["./src/stages/scrim.ts"],
-            // Every React Native Web view is a positioned container, so its scrim fills the
-            // story's root view inside the stage's padding, not the stage the play measures.
-            parameters: native({
-                "*": {
-                    play: "React Native's scrim fills its nearest view (every view is positioned), inside the stage's padding.",
-                },
-            }),
         },
         // Invisible on its own: drawn in a small element, its area outlined.
         TouchTarget: { hooks: ["./src/stages/touch-target.ts"] },

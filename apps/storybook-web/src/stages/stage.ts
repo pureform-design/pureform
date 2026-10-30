@@ -17,9 +17,15 @@ export const STAGE_ATTRIBUTE = "data-pf-stage";
 export const stage = (
     style: StyleProps,
     content: () => HTMLElement,
+    options: { readonly fill?: boolean } = {},
 ): Decorator => {
     return (story) => {
         const el = story() as HTMLElement;
+        // A layer that fills its container (a scrim) fills the story's element, which sits in the
+        // frame after the content: it has to be the frame's size, or a view with no content has
+        // none (React Native's root view).
+        if (options.fill)
+            Object.assign(el.style, { position: "absolute", inset: "0" });
         const frame = document.createElement("div");
         frame.setAttribute(STAGE_ATTRIBUTE, "");
         Object.assign(frame.style, {

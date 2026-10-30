@@ -8,18 +8,22 @@ import { isBaseStory, type StoryHooks } from "../renderers/hooks";
 import { STAGE_ATTRIBUTE, stage, text } from "./stage";
 
 export const decorators = [
-    stage({ padding: "16px" }, () => {
-        const page = document.createElement("div");
-        page.append(
-            text("h3", "Page content", { fontSize: "20px" }),
-            text(
-                "p",
-                "The scrim dims this text, and whatever else sits behind a modal surface.",
-                { marginTop: "8px" },
-            ),
-        );
-        return page;
-    }),
+    stage(
+        { padding: "16px" },
+        () => {
+            const page = document.createElement("div");
+            page.append(
+                text("h3", "Page content", { fontSize: "20px" }),
+                text(
+                    "p",
+                    "The scrim dims this text, and whatever else sits behind a modal surface.",
+                    { marginTop: "8px" },
+                ),
+            );
+            return page;
+        },
+        { fill: true },
+    ),
 ];
 
 export const extendStory: NonNullable<StoryHooks["extendStory"]> = (
