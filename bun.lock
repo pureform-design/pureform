@@ -298,6 +298,7 @@
       "version": "0.0.0-semantically-released",
       "dependencies": {
         "@pureform/animate-core": "workspace:^",
+        "@pureform/core": "workspace:^",
       },
       "devDependencies": {
         "@pureform/tsconfig": "workspace:^",

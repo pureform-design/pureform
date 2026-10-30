@@ -16,5 +16,9 @@ reads/writes; do not require framework renders or computed-style reads on every 
 height still involve layout even when browser-native animation executes them. Choose fast paths
 by capability and validate performance rather than assume every browser-native path is faster.
 
-This scaffold has no runtime API or behavior tests yet. Browser targets, animation values and
-playback controls will be introduced with tested implementations, not placeholder exports.
+This package has one capability so far: `stagger`, which samples a theme spring into one wait per
+item (via `@pureform/animate-core`) and hands each item its wait as the `--pf-stagger-delay`
+custom property. The item's own CSS animation reads it (`animation-delay: var(--pf-stagger-delay)`),
+so the browser runs every frame and JavaScript only works out the timing. Reduced motion yields
+zero waits. The Web Animations and JavaScript fallbacks, animation values and playback controls
+will be added when something needs them, not as placeholder exports.
