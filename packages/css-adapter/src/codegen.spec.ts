@@ -564,7 +564,11 @@ describe("generate with the CSS target", () => {
                         .map(keyframes)
                         .filter(Boolean),
                 );
-                expect([...goneFrames].sort()).toEqual([
+                expect(
+                    [...goneFrames].sort((a, b) =>
+                        String(a).localeCompare(String(b)),
+                    ),
+                ).toEqual([
                     "appBarCollapseIn",
                     "linearProgressWave",
                     "linearProgressWaveRtl",

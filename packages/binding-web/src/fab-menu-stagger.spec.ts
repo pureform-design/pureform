@@ -328,6 +328,40 @@ describe("fabMenuStagger, toggled mid-motion", () => {
         expect(fade(element)).toEqual(first);
     });
 
+    it("opens a menu first drawn closed as a first toggle, not as one hiding part way", () => {
+        writeSprings();
+        const element = list(4);
+        const time = clock();
+        const reference = list(4);
+        run(reference, clock(), true);
+        // Drawn closed at the clock's start, then opened a moment later (before any spring could
+        // have run its course): its items were away, not mid-exit.
+        time.at(0);
+        run(element, time, false);
+        time.at(30);
+        run(element, time, true);
+        expect(clip(element)).toEqual(clip(reference));
+        expect(fade(element)).toEqual(fade(reference));
+        expect(Math.min(...clip(element))).toBeGreaterThanOrEqual(0);
+    });
+
+    it("writes no style attribute on a list or items it has nothing to write to", () => {
+        writeSprings();
+        const element = list(3);
+        run(element, clock(), false);
+        run(element, clock(), true);
+        run(element, clock(), false);
+        fabMenuStagger(element, {
+            registry,
+            open: false,
+            reducedMotion: true,
+            now: () => 0,
+        });
+        expect(element.hasAttribute("style")).toBe(false);
+        for (const item of element.children)
+            expect(item.hasAttribute("style")).toBe(false);
+    });
+
     it("holds the list for the longest wait still ahead of its items", () => {
         writeSprings();
         const element = list(4);

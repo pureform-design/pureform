@@ -95,12 +95,12 @@ describe.each(overlays)("$component", (component) => {
         expect(shows(scene.host)).toBe(true);
         // The movement (on a spring) and the fade (on its tween) are two animations. A popup
         // grows on the `scale` property (composing with its own transform), a sheet or dialog
-        // moves on `transform`.
+        // moves on `transform`, and a FAB menu's item is revealed by a `clip-path`.
         const entering = animated(entered);
         expect(entering).toHaveLength(2);
         expect(entering).toEqual(
             expect.arrayContaining([
-                [expect.stringMatching(/^(transform|scale)$/)],
+                [expect.stringMatching(/^(transform|scale|clipPath)$/)],
                 ["opacity"],
             ]),
         );

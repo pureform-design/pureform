@@ -41,6 +41,14 @@ const DRAWN = [
  *  each alike. */
 const drawn = async (component: ComponentCase, scene: Mounted) => {
     await harness.settle();
+    // A theme arriving after the first frame restyles through the components' transitions: wait
+    // for those to land, so the colors are the theme's and not part way.
+    await Promise.allSettled(
+        document
+            .getAnimations()
+            .filter((animation) => animation instanceof CSSTransition)
+            .map((animation) => animation.finished),
+    );
     const root = byTestId(scene.host, component.root);
     const styles = Object.fromEntries(
         [root, ...root.querySelectorAll<HTMLElement>("[data-pf-part]")].map(

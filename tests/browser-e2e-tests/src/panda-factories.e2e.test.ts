@@ -303,7 +303,7 @@ const UNREAD = [
     "navigationBar",
     "navigationRail",
     "nativeSelect",
-].map((name) => `--pf-components-${name}-stateDraggedOpacity`);
+].map((name) => `--pf-components-${name}-indication-stateDraggedOpacity`);
 
 describe("instance tokens", () => {
     it("are vars Panda's stylesheet reads", () => {

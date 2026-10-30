@@ -11,6 +11,9 @@ import { compareVersions, isVersion, satisfies } from "./semver";
  *  `cog.toml`'s `core` by a test. */
 export const CORE_PACKAGES = [
     "@pureform/anatomy",
+    "@pureform/animate-core",
+    "@pureform/animate-react-native",
+    "@pureform/animate-web",
     "@pureform/binding-core",
     "@pureform/binding-web",
     "@pureform/bundler",

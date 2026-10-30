@@ -58,10 +58,6 @@ criteria. These are not all confirmed bugs: reproduction and external verificati
 - **V5. Zag upgrades:** recheck Splitter internal patches and upstream long-press options; no
   speculative fork of timing behavior.
 
-- **M1. Release train test:** `packages/generate`'s "lists the packages in cog.toml's core train"
-  fails since the three `animate-*` packages were scaffolded; add them to `cog.toml` (release
-  config, left out of this work's scope).
-
 ## Retained decisions / separate work
 
 - **11 completed:** nearest supplied motion setting wins at any depth on React, Solid and Native;

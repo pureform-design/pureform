@@ -45,6 +45,9 @@ interface Run {
 
 const runs = new WeakMap<HTMLElement, Run>();
 
+// A run that began so long ago that every spring of it is over.
+const SETTLED = 1e7;
+
 const ms = (value: number) => `${Math.round(value * 100) / 100}ms`;
 
 // A share of an item's distance this close to 0 or 1 counts as there.
@@ -109,13 +112,21 @@ export const fabMenuStagger = (
     const total = tokenVar("components.fabMenu.staggerTotal", vars);
     if (!delay || !fadeDelay || !total) return;
     const items = [...list.children] as HTMLElement[];
+    // Only what's set is removed, and an emptied `style` attribute goes: writing one where the
+    // server rendered none would be a change at hydration.
+    const unset = (element: HTMLElement, ...names: string[]) => {
+        for (const name of names)
+            if (element.style.getPropertyValue(name) !== "")
+                element.style.removeProperty(name);
+        if (element.getAttribute("style") === "")
+            element.removeAttribute("style");
+    };
     const clear = () => {
         for (const item of items) {
-            item.style.removeProperty(delay);
-            item.style.removeProperty(fadeDelay);
+            unset(item, delay, fadeDelay);
             runs.delete(item);
         }
-        list.style.removeProperty(total);
+        unset(list, total);
     };
     const named = (role: string): SpringNode | undefined => {
         const name = springRoleVar(registry, role);
@@ -151,8 +162,15 @@ export const fabMenuStagger = (
             : planned;
         item.style.setProperty(delay, ms(reveal));
         item.style.setProperty(fadeDelay, ms(fade));
-        runs.set(item, { open: options.open, startedAt: now, reveal, fade });
-        started.push(item);
+        // A menu first drawn closed isn't hiding: its items are already away, not part way.
+        const away = !was && !options.open;
+        runs.set(item, {
+            open: options.open,
+            startedAt: away ? -SETTLED : now,
+            reveal,
+            fade,
+        });
+        if (!away) started.push(item);
     });
     // The list holds for the longest wait any item still has ahead of it.
     const longest = Math.max(

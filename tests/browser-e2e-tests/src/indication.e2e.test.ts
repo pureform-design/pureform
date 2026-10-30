@@ -403,9 +403,9 @@ const NESTED: [name: string, surface: string][] = [
 ];
 
 const OWN_TOKENS = {
-    stateHoverOpacity: "50%",
-    focusIndicatorThickness: "7px",
-    focusIndicatorColor: "rgb(255, 0, 0)",
+    "indication.stateHoverOpacity": "50%",
+    "indication.focusIndicatorThickness": "7px",
+    "indication.focusIndicatorColor": "rgb(255, 0, 0)",
 };
 
 // The same in React Native's values: lengths in points.
