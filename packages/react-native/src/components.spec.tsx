@@ -922,6 +922,46 @@ describe("tags input", () => {
 });
 
 describe("lists, menus, and selects", () => {
+    it.each([false, true])(
+        "names a select's display input without a visible label (disabled: %s)",
+        async (disabled) => {
+            await render(
+                <Select
+                    aria-label="Items per page"
+                    disabled={disabled}
+                    items={[{ value: "10", label: "10" }]}
+                />,
+            );
+            expect(byTestId("pf-select-input").getAttribute("aria-label")).toBe(
+                "Items per page",
+            );
+            expect(
+                document
+                    .querySelector('[role="combobox"]')!
+                    .getAttribute("aria-label"),
+            ).toBe("Items per page");
+        },
+    );
+
+    it("uses a select's explicit accessible name ahead of its visible label", async () => {
+        await render(
+            <Select
+                label="Size"
+                aria-label="Page size"
+                items={[{ value: "10", label: "10" }]}
+            />,
+        );
+        expect(byTestId("pf-select-input").getAttribute("aria-label")).toBe(
+            "Page size",
+        );
+        expect(byTestId("pf-select-label").textContent).toBe("Size");
+        expect(
+            document
+                .querySelector('[role="combobox"]')!
+                .getAttribute("aria-label"),
+        ).toBe("Page size");
+    });
+
     const corners = (element: Element) => {
         const style = getComputedStyle(element);
         return [style.borderTopLeftRadius, style.borderBottomLeftRadius];

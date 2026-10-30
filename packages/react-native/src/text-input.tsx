@@ -101,6 +101,8 @@ export interface FieldOptions
     readonly revealLabel?: string | undefined;
     /** The component's own `TextInput` props, which win over the user's `slotProps.input`. */
     readonly inputProps?: TextInputProps | undefined;
+    /** Names the input when a composite has no visible label (for example a paginator's select). */
+    readonly "aria-label"?: string | undefined;
 }
 
 function FieldImpl({ container, ...props }: FieldOptions): ReactNode {
@@ -237,8 +239,13 @@ function FieldImpl({ container, ...props }: FieldOptions): ReactNode {
                     {...(WEB_DISABLED && props.disabled
                         ? ({ disabled: true } as object)
                         : {})}
-                    {...(typeof props.label === "string"
-                        ? { "aria-label": props.label }
+                    {...(props["aria-label"] !== undefined ||
+                    typeof props.label === "string"
+                        ? {
+                              "aria-label":
+                                  props["aria-label"] ??
+                                  (props.label as string),
+                          }
                         : {})}
                     {...(labelled ? { "aria-labelledby": labelId } : {})}
                     aria-invalid={invalid}

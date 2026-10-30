@@ -270,6 +270,7 @@ export function Select(props: SelectProps): ReactNode {
             <Field
                 {...field}
                 name="select"
+                aria-label={name}
                 selection={selectSelection({
                     ...props,
                     leadingIcon: isPresent(props.leadingIcon),
