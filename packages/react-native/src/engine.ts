@@ -4,18 +4,21 @@
 // `/reanimated`, and `/reanimated-svg` add the others, so an app only imports
 // react-native-svg and Reanimated when it picks an engine that needs them.
 
+import type { MotionTimeline } from "@pureform/animate-react-native";
 import { claimEvent } from "@pureform/machines/interaction";
 import {
     animatedPresence,
     useAnimatedComponentStyles,
     useAnimatedSlide,
     useRipple,
+    useMotionTimeline,
 } from "@pureform/rn-adapter/animated";
 import type {
     PresenceDriver,
     RippleOptions,
     Ripples,
     SlideMotion,
+    TimelineClock,
 } from "@pureform/rn-adapter/animated";
 import type { Drawing, State, ThemeValues } from "@pureform/rn-adapter/factory";
 import type { TokenVelocities } from "@pureform/rn-adapter/react";
@@ -53,7 +56,14 @@ export interface MotionEngine {
         state: State,
         tokens: ThemeValues | undefined,
         velocities?: TokenVelocities,
+        options?: { readonly keyframes?: boolean },
     ): MotionStyles;
+    /** Shared normalized clocks and derived numeric transform/opacity channels. Built-in engines
+     *  use Animated's native driver on devices (also under Reanimated); no JS frames there. */
+    useTimeline?(
+        this: void,
+        clocks: Readonly<Record<string, TimelineClock>>,
+    ): MotionTimeline<any, ComponentType<any>>;
     /** Press ripples for a surface. */
     useRipple(this: void, options: InkOptions): Ripples;
     /** What runs one overlay's enter and exit, telling when each step ends. Without it,
@@ -142,6 +152,7 @@ export const animated: MotionEngine = {
     name: "animated",
     svg: false,
     useStyles: useAnimatedComponentStyles,
+    useTimeline: useMotionTimeline,
     useRipple,
     presence: animatedPresence,
     useSlide: useAnimatedSlide,

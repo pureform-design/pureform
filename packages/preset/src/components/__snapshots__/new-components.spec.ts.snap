@@ -845,6 +845,7 @@ exports[`linearProgress > compiles to a stable Panda slot recipe 1`] = `
               },
             },
           },
+          "animation": "none",
           "height": "calc(var(--components-linearProgress-height, 4px) + calc(var(--components-linearProgress-amplitude, 3px) * 2))",
         },
         "stopIndicator": {

@@ -2,7 +2,7 @@
 // overlays' enter and exit, and the tabs' indicator slide on the UI thread, as CSS's animation
 // properties.
 
-import { useRipple } from "@pureform/rn-adapter/animated";
+import { useRipple, useMotionTimeline } from "@pureform/rn-adapter/animated";
 import {
     reanimatedPresence,
     useReanimatedComponentStyles,
@@ -19,6 +19,7 @@ export const reanimated: MotionEngine = {
     name: "reanimated",
     svg: false,
     useStyles: useReanimatedComponentStyles,
+    useTimeline: useMotionTimeline,
     useRipple,
     presence: reanimatedPresence,
     useSlide: useReanimatedSlide,

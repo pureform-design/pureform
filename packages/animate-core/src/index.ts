@@ -4,3 +4,5 @@ export { staggerDelays } from "./stagger";
 export type { StaggerCurve, StaggerOptions } from "./stagger";
 export { staggerOnSpring } from "./spring-stagger";
 export type { SpringStagger, SpringStaggerOptions } from "./spring-stagger";
+export { channelAt } from "./channel";
+export type { MotionChannel, MotionClock, MotionTimeline } from "./channel";

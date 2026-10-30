@@ -32,3 +32,5 @@ export type {
     PresenceView,
 } from "./motion";
 export type { State, Style } from "./select";
+export { useMotionTimeline } from "./animate/timeline";
+export type { MotionTimeline, TimelineClock } from "./animate/timeline";

@@ -1,5 +1,24 @@
 # @pureform/rn-adapter
 
+## Shared motion channels
+
+The `animated` entry exports `useMotionTimeline`, `TimelineClock` and `MotionTimeline`. Named
+clocks share normalized Animated values; `value({ offset, terms })` derives a scalar from one or
+more clocks using native interpolation/addition nodes. Use the returned `View` for transforms
+and opacity only. Devices use Animated's native driver; Native Web uses its JS fallback.
+Reanimated engines reuse this faster compatible path rather than route it through JS or require
+new worklets. Driver selection is unit-tested; actual device frame rates still require profiling.
+
+`useAnimatedComponentStyles` and `useReanimatedComponentStyles` accept a final
+`{ keyframes: false }` option when a binding coordinates the selected animations externally.
+Transitions still run, and the plain selection retains its animation timings for the shared
+timeline. Do not run both a slot clock and an external clock for the same motion.
+
+Clock timing changes restart only that clock; geometry changes do not restart it. Disable a
+clock to reset it to its first frame, and unmount/removal stops it. Memoize derived graph nodes
+by their geometry rather than subscribe to values in React state. The engine contract and scalar
+channel model are exposed through `animate-react-native`; `animate-core` stays platform-free.
+
 Compiles a pureform config to React Native styles, and the React bindings that pick a
 component's styles for its variants and state and animate between them. The web adapters
 lower to CSS; this one lowers the same AST to style templates that React Native can take.

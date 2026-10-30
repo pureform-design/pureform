@@ -23,3 +23,15 @@ to its fastest path. The FAB menu uses it with an Animated width spring for each
 does not replace the existing engines in `@pureform/rn-adapter` or the React Native binding. Animated
 and Reanimated entry points, and other drivers, will be added when something needs them, not as
 placeholder exports.
+
+The adapter also exposes `MotionClock`, `MotionChannel`, `MotionTimeline` and `channelAt` for
+coordinated scalar motion. The existing Native engine layer implements the clock contract through
+`@pureform/rn-adapter/animated`'s `useMotionTimeline`: one Animated value per named clock, with
+derived native arithmetic/interpolation nodes, not per-frame React updates. Transform and opacity
+channels use Animated's native driver on devices, even under the Reanimated engine; Native Web
+uses its JS fallback. These channels are not a native-driver layout/width API.
+
+Geometry changes replace derived nodes but keep a clock's phase. Changing a clock's timing
+restarts that clock only; disabling it resets it to the first frame, and removal/unmount stops it.
+Bindings own measurement and reduced-motion policy. A custom engine can implement the same
+generic timeline contract with its own host/value types and report a UI-thread driver instead.

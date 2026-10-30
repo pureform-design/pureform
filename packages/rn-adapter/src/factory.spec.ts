@@ -273,7 +273,13 @@ describe("movingSlots", () => {
         );
         expect(nativeFactory("dialog", styles).moving).toEqual(new Set());
         expect(nativeFactory("linearProgress", styles).moving).toEqual(
-            new Set(["track", "trackBefore", "trackAfter", "indicator"]),
+            new Set([
+                "root",
+                "track",
+                "trackBefore",
+                "trackAfter",
+                "indicator",
+            ]),
         );
     });
 });

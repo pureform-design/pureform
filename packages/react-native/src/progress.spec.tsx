@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { beforeAll, describe, expect, it } from "vitest";
+import { Animated } from "react-native";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 
 import { PureformProvider } from ".";
 import { CircularProgress } from "./circular-progress";
@@ -11,7 +12,7 @@ import { animatedSvg } from "./engines/svg";
 import { LinearProgress } from "./linear-progress";
 import { presetRegistry } from "./testing/registry";
 import type { TestRegistry } from "./testing/registry";
-import { byTestId, mount, outside, settle } from "./testing/render";
+import { byTestId, mount, outside, settle, until } from "./testing/render";
 
 let registry: TestRegistry;
 
@@ -41,6 +42,201 @@ const wavePoints = (id: string, part = "end-half") => {
         .match(/-?\d+(?:\.\d+)?/g)!
         .map(Number);
 };
+
+describe.each([animatedSvg, reanimatedSvg])(
+    "linear wave channels with $name",
+    (engine) => {
+        it("uses provider and instance timings, freezing only the wave under reduced motion", async () => {
+            const calls: { duration: number; value: Animated.Value }[] = [];
+            const timing = Animated.timing;
+            const spy = vi
+                .spyOn(Animated, "timing")
+                .mockImplementation((progress, config) => {
+                    if (![1700, 2000, 3500].includes(config.duration!))
+                        return timing(progress, config);
+                    calls.push({
+                        duration: config.duration!,
+                        value: progress as Animated.Value,
+                    });
+                    return {
+                        start() {},
+                        stop() {},
+                        reset() {},
+                        _isUsingNativeDriver: () => false,
+                    } as Animated.CompositeAnimation;
+                });
+            const options = outside<{
+                motion: "full" | "reduce";
+                duration?: number;
+            }>({ motion: "full", duration: 2000 });
+            try {
+                await mount(
+                    <options.Holder>
+                        {(value) => (
+                            <PureformProvider
+                                registry={registry}
+                                engine={engine}
+                                motion={value.motion}
+                                defaults={{
+                                    linearProgress: {
+                                        tokens: {
+                                            waveDuration: 850,
+                                            indeterminateDuration: 1750,
+                                        },
+                                    },
+                                }}
+                                timeScale={2}
+                            >
+                                <div style={{ width: 200 }}>
+                                    <LinearProgress
+                                        testId="policy"
+                                        shape="wavy"
+                                        tokens={
+                                            value.duration === undefined
+                                                ? {}
+                                                : {
+                                                      waveDuration:
+                                                          value.duration / 2,
+                                                  }
+                                        }
+                                    />
+                                </div>
+                            </PureformProvider>
+                        )}
+                    </options.Holder>,
+                );
+                await settle(100);
+                expect(calls.map((c) => c.duration)).toEqual([3500, 2000]);
+                calls[1]!.value.setValue(0.25);
+                await settle();
+                await options.set({ motion: "reduce", duration: 2000 });
+                expect(calls).toHaveLength(2);
+                // Disabling the wave resets its native value, leaving the same slide clock alive.
+                const indicator = byTestId("policy-indicator");
+                const canvas = indicator.firstElementChild!;
+                calls[0]!.value.setValue(0.5);
+                await settle();
+                expect(
+                    new DOMMatrix(getComputedStyle(indicator).transform).m41,
+                ).toBeCloseTo(60, 0);
+                expect(
+                    new DOMMatrix(getComputedStyle(canvas).transform).m41,
+                ).toBeCloseTo(-60, 0);
+                await options.set({ motion: "full" });
+                expect(calls.map((c) => c.duration)).toEqual([
+                    3500, 2000, 1700,
+                ]);
+            } finally {
+                spy.mockRestore();
+            }
+        });
+        it.each(
+            [40, undefined].flatMap((value) =>
+                (["ltr", "rtl"] as const).flatMap((dir) => [
+                    { value, dir, duration: 1000, amplitude: 3, height: 4 },
+                    { value, dir, duration: 2000, amplitude: 5, height: 8 },
+                ]),
+            ),
+        )(
+            "moves the rendered wave independently (value $value, $dir, $duration ms, amplitude $amplitude)",
+            async ({ value, dir, duration, amplitude, height }) => {
+                const clocks = new Map<number, Animated.Value>();
+                const timing = Animated.timing;
+                const spy = vi
+                    .spyOn(Animated, "timing")
+                    .mockImplementation((progress, config) => {
+                        if (
+                            config.duration !== duration &&
+                            config.duration !== 1750
+                        )
+                            return timing(progress, config);
+                        clocks.set(config.duration, progress as Animated.Value);
+                        return {
+                            start() {},
+                            stop() {},
+                            reset() {},
+                            _isUsingNativeDriver: () => false,
+                        } as Animated.CompositeAnimation;
+                    });
+                try {
+                    await mount(
+                        <PureformProvider
+                            registry={registry}
+                            engine={engine}
+                            motion="full"
+                            dir={dir}
+                        >
+                            <div style={{ width: 220 }}>
+                                <LinearProgress
+                                    testId="linear-wave"
+                                    shape="wavy"
+                                    value={value}
+                                    tokens={{
+                                        waveDuration: duration,
+                                        amplitude,
+                                        height,
+                                    }}
+                                />
+                            </div>
+                        </PureformProvider>,
+                    );
+                    await settle(100);
+                    const slide = clocks.get(1750);
+                    slide?.setValue(0.4);
+                    clocks.get(duration)!.setValue(0);
+                    await settle();
+                    const root =
+                        byTestId("linear-wave-root").getBoundingClientRect();
+                    const path = byTestId(
+                        "linear-wave-indicator",
+                    ).querySelector("path")!;
+                    await until(() => expect(path.getBBox().width).toBeCloseTo(root.width + 40, 0));
+                    expect(root.height).toBe(height + 2 * amplitude);
+                    expect(path.getBBox().height).toBeCloseTo(
+                        height + 2 * amplitude,
+                        0,
+                    );
+                    const upper = (x: number) => {
+                        const matrix = path.getScreenCTM()!;
+                        const local = new DOMPoint(
+                            root.left + (dir === "rtl" ? root.width - x : x),
+                            root.top,
+                        ).matrixTransform(matrix.inverse());
+                        let from = 0;
+                        let to = path.getTotalLength() / 2;
+                        for (let i = 0; i < 24; i++) {
+                            const mid = (from + to) / 2;
+                            if (path.getPointAtLength(mid).x < local.x)
+                                from = mid;
+                            else to = mid;
+                        }
+                        const point = path.getPointAtLength((from + to) / 2);
+                        return (
+                            new DOMPoint(point.x, point.y).matrixTransform(
+                                matrix,
+                            ).y - root.top
+                        );
+                    };
+                    const start = upper(50);
+                    expect(start).toBeCloseTo(0, 0);
+                    clocks.get(duration)!.setValue(0.25);
+                    await settle();
+                    expect(upper(60)).toBeCloseTo(start, 1);
+                    expect(upper(50)).toBeCloseTo(amplitude, 0);
+                    // Changing only the sliding clock leaves the track-relative wave where it was.
+                    slide?.setValue(0.45);
+                    await settle();
+                    expect(upper(60)).toBeCloseTo(start, 1);
+                    clocks.get(duration)!.setValue(1);
+                    await settle();
+                    expect(upper(50)).toBeCloseTo(start, 1);
+                } finally {
+                    spy.mockRestore();
+                }
+            },
+        );
+    },
+);
 
 describe.each([animatedSvg, reanimatedSvg])(
     "wavy circular geometry with $name",
@@ -350,6 +546,43 @@ describe.each([animated, reanimated, animatedSvg, reanimatedSvg])(
 );
 
 describe("the indeterminate linear track", () => {
+    it("derives the indicator and both track segments from one clock", async () => {
+        const values: Animated.Value[] = [];
+        const timing = Animated.timing;
+        const spy = vi
+            .spyOn(Animated, "timing")
+            .mockImplementation((value, config) => {
+                if (config.duration !== 1750) return timing(value, config);
+                values.push(value as Animated.Value);
+                return {
+                    start() {},
+                    stop() {},
+                    reset() {},
+                    _isUsingNativeDriver: () => false,
+                } as Animated.CompositeAnimation;
+            });
+        try {
+            await render(
+                <div style={{ width: 200 }}>
+                    <LinearProgress testId="shared" />
+                </div>,
+            );
+            expect(values).toHaveLength(1);
+            values[0]!.setValue(0.5);
+            await settle();
+            const box = (part: string) =>
+                byTestId(`shared-${part}`).getBoundingClientRect();
+            const indicator = box("indicator");
+            expect(indicator.left).toBeGreaterThan(0);
+            expect(box("track-before").right).toBeCloseTo(
+                indicator.left - 4,
+                0,
+            );
+            expect(box("track-after").left).toBeCloseTo(indicator.right + 4, 0);
+        } finally {
+            spy.mockRestore();
+        }
+    });
     it("leaves a gap either side of the sliding indicator, drawn in two rounded parts moving with it", async () => {
         await render(
             <div style={{ width: 200 }}>

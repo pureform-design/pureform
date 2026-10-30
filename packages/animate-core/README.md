@@ -28,3 +28,10 @@ and spring-driven visibility progression are distinct capabilities; this is the 
 plain numbers a driver can hand to its fastest path (a CSS `animation-delay`, a native delay). It
 depends only on `@pureform/core` for the spring math, and has no host, timer or framework
 dependency. Existing animation code is not migrated here.
+
+`MotionClock<Curve>`, `MotionChannel` and `MotionTimeline<Value, Host>` describe shared repeating
+clocks and derived scalar channels without owning a timer, framework or platform value. A channel
+is an offset plus affine terms from named clocks; a driver lowers those terms to its own arithmetic
+nodes. `channelAt` samples the same contract for parity tests. A slide, its inverse, and several
+edges can therefore share one value, while a wave or fade has an independent phase. Applications
+consume these through their platform adapter, not this package.

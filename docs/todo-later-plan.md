@@ -123,6 +123,21 @@ old B/C/D/E identifiers. Complexity estimates are relative and may change after 
   missing-gap report is stale. Its existing rendered tests still intermittently fail synchronization
   (latest default-width case: 0.81px gap error); no tolerance was relaxed. Native wave travel is
   not implemented by this web-only unit: the drawing currently remains the bar-local static wave.
+- Native unit completed (2026-10-30): the recurring sampling failure was real. Indicator and the
+  two track segments ran three separate Animated loops, so a snapshot could catch them at
+  different phases. A deterministic regression (capturing the clock and setting it) reproduced it.
+  They now derive from one shared `slide` clock, and the wavy drawing rides a separate `wave`
+  clock on a track-anchored layer, cancelling the slide so the wave stays on the track. This is
+  built on a generic clock/channel contract (`animate-core` `MotionClock`/`MotionChannel`/
+  `MotionTimeline`, `channelAt`; `animate-react-native` re-exports; `rn-adapter`
+  `useMotionTimeline`, engine `useTimeline`), not a component-local loop. Transform channels use
+  Animated's native driver on devices (also under Reanimated); Native Web uses the JS fallback.
+  Verified: shared-clock regression, rendered wave sampled in track coordinates on both SVG
+  engines (LTR/RTL, determinate/indeterminate, custom duration/amplitude/height), independence
+  from slide, reduced motion freezing only the wave, provider/instance timing and timeScale,
+  clock lifecycle (restart, reset, cleanup, no React renders per frame), device-driver selection.
+  Mutation check: zeroing the wave term fails the wave tests. Native 1076, rn-adapter 500, preset
+  1344, animate-core 26 pass. Device frame rates and RTL mirroring remain V3.
 - Reference checked: current Compose `WavyProgressIndicator.kt` documents wave speed as one
   wavelength per second in both determinate and indeterminate linear indicators. Native work
   must coordinate the independent wave phase and slide clock through shared engine facilities,

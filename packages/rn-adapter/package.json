@@ -116,6 +116,7 @@
         }
     },
     "dependencies": {
+        "@pureform/animate-react-native": "workspace:^",
         "@pureform/core": "workspace:^",
         "@pureform/generate": "workspace:^",
         "@pureform/js-effects": "workspace:^",

@@ -765,6 +765,7 @@
       "name": "@pureform/rn-adapter",
       "version": "0.0.0-semantically-released",
       "dependencies": {
+        "@pureform/animate-react-native": "workspace:^",
         "@pureform/core": "workspace:^",
         "@pureform/generate": "workspace:^",
         "@pureform/js-effects": "workspace:^",

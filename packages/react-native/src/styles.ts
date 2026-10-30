@@ -163,6 +163,7 @@ export function useComponentSlots<P extends string = string>(
     selection: Record<string, unknown>,
     state: State = {},
     velocities?: Readonly<Record<string, number>>,
+    motion?: { readonly keyframes?: boolean },
 ): ComponentSlots<P> {
     const provider = usePureform();
     const factory = useEntryFactory(name);
@@ -189,6 +190,7 @@ export function useComponentSlots<P extends string = string>(
         state,
         tokens,
         keyed,
+        motion,
     );
     const selected = useComponentState(name, variants, state, tokens, keyed);
     return { styles, selected, views: viewsOf(provider.engine, factory) };

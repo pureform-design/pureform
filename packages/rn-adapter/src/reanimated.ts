@@ -86,6 +86,7 @@ export const useReanimatedComponentStyles = (
     state: State = {},
     tokens?: ThemeValues,
     velocities?: TokenVelocities,
+    options?: { readonly keyframes?: boolean },
 ): Record<string, Record<string, unknown>> => {
     const { styles, transitions, animations } = useComponentState(
         name,
@@ -100,7 +101,9 @@ export const useReanimatedComponentStyles = (
                 Object.entries(styles).map(([slot, style]) => {
                     const motion = cssMotion(
                         transitions[slot] ?? [],
-                        animations[slot],
+                        options?.keyframes === false
+                            ? undefined
+                            : animations[slot],
                     );
                     return [
                         slot,
@@ -132,7 +135,7 @@ export const useReanimatedComponentStyles = (
                     ];
                 }),
             ),
-        [styles, transitions, animations],
+        [styles, transitions, animations, options?.keyframes],
     );
 };
 

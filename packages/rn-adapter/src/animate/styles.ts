@@ -17,6 +17,7 @@ export const useAnimatedComponentStyles = (
     state: State = {},
     tokens?: ThemeValues,
     velocities?: TokenVelocities,
+    options?: { readonly keyframes?: boolean },
 ): Record<string, Record<string, unknown>> => {
     const { styles, transitions, animations, parents } = useComponentState(
         name,
@@ -38,7 +39,12 @@ export const useAnimatedComponentStyles = (
             animated,
             parent === undefined ? undefined : styles[parent],
         );
-        keyframes(slot, style, animations[slot], animated);
+        keyframes(
+            slot,
+            style,
+            options?.keyframes === false ? undefined : animations[slot],
+            animated,
+        );
         out[slot] = animated;
     }
     return out;

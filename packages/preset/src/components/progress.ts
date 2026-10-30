@@ -391,6 +391,12 @@ export const createLinearProgress = <const G extends string = ColorGroup>(
                         flat: {},
                         wavy: {
                             root: {
+                                // Native's shared timeline consumes this timing without running
+                                // a separate slot animation. Web uses its CSS drift rule below.
+                                animation: platform(
+                                    { rn: travel("linearProgressWave") },
+                                    none,
+                                ),
                                 height: add(
                                     ref("height"),
                                     mul(ref("amplitude"), unitless(2)),
