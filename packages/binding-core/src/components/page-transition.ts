@@ -3,6 +3,11 @@
 // the key changes, the page shown before leaves and the new one enters. The binding keeps a
 // leaving page, inert and hidden from assistive technology, until its motion ends
 // (`settlePage`), and each page's content as it last was (`keepContents`).
+//
+// A change mid-motion wins at once and queues nothing: pages still leaving stay until their own
+// exit ends (`keepLeaving`), and one called back while leaving is reused, not duplicated. A
+// binding carries it on from the frame it had reached (web: `carryOn` in binding-web; Native: the
+// page's own fade and slide values) rather than restarting its entrance from the first frame.
 
 /** What names a page: a navigation destination's value, a tab's or step's index. */
 export type PageKey = string | number;
