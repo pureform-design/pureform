@@ -30,7 +30,11 @@ describe.each([animated, reanimated])(
                     return { start() {}, stop() {}, reset() {} };
                 });
             const loop = vi.spyOn(Animated, "loop").mockImplementation(() => {
-                    const run = { start: vi.fn<() => void>(), stop: vi.fn<() => void>(), reset() {} };
+                const run = {
+                    start: vi.fn<() => void>(),
+                    stop: vi.fn<() => void>(),
+                    reset() {},
+                };
                 runs.push(run);
                 return run;
             });

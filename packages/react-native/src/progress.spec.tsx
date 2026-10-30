@@ -190,7 +190,12 @@ describe.each([animatedSvg, reanimatedSvg])(
                     const path = byTestId(
                         "linear-wave-indicator",
                     ).querySelector("path")!;
-                    await until(() => expect(path.getBBox().width).toBeCloseTo(root.width + 40, 0));
+                    await until(() =>
+                        expect(path.getBBox().width).toBeCloseTo(
+                            root.width + 40,
+                            0,
+                        ),
+                    );
                     expect(root.height).toBe(height + 2 * amplitude);
                     expect(path.getBBox().height).toBeCloseTo(
                         height + 2 * amplitude,

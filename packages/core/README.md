@@ -19,27 +19,27 @@ It depends on nothing else in the workspace.
 
 ## Architecture
 
-| Module                | What it holds                                                                                                                                                                    |
-| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ast/nodes.ts`        | The node types: values (`literal`, `alias`, `dynamic`, `conditional`, `platform`, …) and conditions (portable states, slot states, sizes).                                       |
-| `ast/helpers/`        | Constructors for every node (`px`, `hex`, `alias`, `when`, `slot`, …), one module per group.                                                                                     |
-| `types.ts`            | The config schema: `CoreConfig`, component specs, utilities, themes.                                                                                                             |
-| `define.ts`           | Builders: `defineConfig`, `defineComponent`, `defineSlotComponent`, the utility builders, `mergeConfigs`, `meta`.                                                                |
-| `typed.ts`            | `typed()`: helpers typed from a registered config, so aliases and breakpoints autocomplete.                                                                                      |
-| `path.ts`             | Path resolution (`getByPath`, `tokenAt`, `resolveAlias`), `isSpringToken`, and `validateConfig`.                                                                                 |
-| `inline.ts`           | `inlineStyles` and `mergeStyles` for style maps.                                                                                                                                 |
-| `motion.ts`           | `MotionSetting` for the provider's motion setting, and `transitionMoves`/`valueTypeMoves`: what reduced motion stops. |
-| `spring.ts`           | Springs and `linear()` curves: `springAt`, `springState` (with a starting velocity), `settleTime`, `sampleSpring`, `sampleCubicPath`, and reading and writing `linear()` points. |
+| Module         | What it holds                                                                                                                                                                    |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ast/nodes.ts` | The node types: values (`literal`, `alias`, `dynamic`, `conditional`, `platform`, …) and conditions (portable states, slot states, sizes).                                       |
+| `ast/helpers/` | Constructors for every node (`px`, `hex`, `alias`, `when`, `slot`, …), one module per group.                                                                                     |
+| `types.ts`     | The config schema: `CoreConfig`, component specs, utilities, themes.                                                                                                             |
+| `define.ts`    | Builders: `defineConfig`, `defineComponent`, `defineSlotComponent`, the utility builders, `mergeConfigs`, `meta`.                                                                |
+| `typed.ts`     | `typed()`: helpers typed from a registered config, so aliases and breakpoints autocomplete.                                                                                      |
+| `path.ts`      | Path resolution (`getByPath`, `tokenAt`, `resolveAlias`), `isSpringToken`, and `validateConfig`.                                                                                 |
+| `inline.ts`    | `inlineStyles` and `mergeStyles` for style maps.                                                                                                                                 |
+| `motion.ts`    | `MotionSetting` for the provider's motion setting, and `transitionMoves`/`valueTypeMoves`: what reduced motion stops.                                                            |
+| `spring.ts`    | Springs and `linear()` curves: `springAt`, `springState` (with a starting velocity), `settleTime`, `sampleSpring`, `sampleCubicPath`, and reading and writing `linear()` points. |
 
 ## Public API
 
-| Entry                          | Exports                                                                                                                         |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| Entry                          | Exports                                                                                                  |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------- |
 | `@pureform/core`               | Builders, `typed`, path resolution, `MotionSetting`, `transitionMoves`, `sampleSpring`, the schema types |
-| `@pureform/core/ast`           | Node types and every helper constructor                                                                                         |
-| `@pureform/core/ast/helpers/*` | One helper group per module (`keyword`, `color`, …)                                                                             |
-| `@pureform/core/types`         | The schema types alone                                                                                                          |
-| `@pureform/core/raw`           | The untyped builders, to opt out of `typed()` explicitly                                                                        |
+| `@pureform/core/ast`           | Node types and every helper constructor                                                                  |
+| `@pureform/core/ast/helpers/*` | One helper group per module (`keyword`, `color`, …)                                                      |
+| `@pureform/core/types`         | The schema types alone                                                                                   |
+| `@pureform/core/raw`           | The untyped builders, to opt out of `typed()` explicitly                                                 |
 
 ```ts
 import { defineComponent } from "@pureform/core";
