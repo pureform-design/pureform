@@ -137,7 +137,14 @@ export const FAB_MENU_LIST_MOTION = {
 // again each frame: each item is its own row, so no neighbor depends on its width. The rounded
 // clip keeps the pill's end round as it grows. The aligned edge is the end one (the left under
 // right to left, hence the `Rtl` frames).
-const ROUND = "round var(--components-fabMenu-itemRadius)";
+//
+// The clip's rounding is the pill's own radius written out (`radii.full` is 9999px), not a
+// variable: a keyframe is raw CSS, which the target's var prefix (`--pf-components-…`) isn't applied
+// to, and a component token's default is only ever a fallback inside the rules that read it, never
+// a defined var, so a `var()` here has no value and invalidates the whole clip. It matches the
+// default pill; an instance that sets a smaller `itemRadius` has its corners cut by the pill-round
+// clip only while the item is revealed.
+const ROUND = "round 9999px";
 const SHOWN = literal(`inset(0 0 0 0 ${ROUND})`);
 const HIDDEN = literal(`inset(0 0 0 100% ${ROUND})`);
 const HIDDEN_RTL = literal(`inset(0 100% 0 0 ${ROUND})`);

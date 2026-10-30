@@ -6,9 +6,7 @@
 // drops position, size, and shape, or is `none` when nothing else is left.
 
 import * as pandaRecipes from "$recipes";
-import { fabMenuStagger } from "@pureform/binding-web";
 import { classesFor } from "@pureform/css-adapter";
-import { tokenVar } from "@pureform/styling-web/theme-vars";
 import { MOTION_ATTRIBUTE } from "@pureform/web-contracts";
 import { afterAll, describe, expect, it } from "vitest";
 import { commands } from "vitest/browser";
@@ -396,83 +394,6 @@ describe.each(Object.keys(STYLINGS) as (keyof typeof STYLINGS)[])(
                 );
                 expect(animation).toMatch(/overlayFadeIn/);
             });
-        });
-    },
-);
-
-// The web FAB menu staggers on the theme's slow effects spring, which it reads from the vars the
-// stylesheet writes for a spring token's parameters. This runs the real binding code against each
-// styling's real output, since a theme that didn't write those vars would leave the items
-// unstaggered without any test of the binding itself noticing.
-const REGISTRIES = {
-    Panda: { vars: {} },
-    CSS: { vars: { prefix: OPTIONS.prefix } },
-    Tailwind: { vars: { prefix: OPTIONS.prefix } },
-} as const;
-
-const staggerWaits = async (
-    name: keyof typeof STYLINGS,
-    open: boolean,
-): Promise<{ waits: number[]; total: string }> => {
-    await commands.emulateReducedMotion("no-preference");
-    const frame = document.createElement("iframe");
-    document.body.append(frame);
-    try {
-        const doc = frame.contentDocument!;
-        doc.open();
-        doc.write(
-            `<!doctype html><html><head>${(await STYLINGS[name].css())
-                .map((sheet) => `<style>${sheet}</style>`)
-                .join(
-                    "",
-                )}</head><body><div data-id><div></div><div></div><div></div><div></div></div></body></html>`,
-        );
-        doc.close();
-        const list = doc.querySelector<HTMLElement>("[data-id]")!;
-        fabMenuStagger(list, {
-            registry: REGISTRIES[name],
-            open,
-            reducedMotion: false,
-        });
-        const delay = tokenVar(
-            "components.fabMenu.staggerDelay",
-            REGISTRIES[name].vars,
-        )!;
-        const total = tokenVar(
-            "components.fabMenu.staggerTotal",
-            REGISTRIES[name].vars,
-        )!;
-        return {
-            waits: [...list.children].map((item) =>
-                Number.parseFloat(
-                    (item as HTMLElement).style.getPropertyValue(delay),
-                ),
-            ),
-            total: list.style.getPropertyValue(total),
-        };
-    } finally {
-        frame.remove();
-    }
-};
-
-describe.each(Object.keys(STYLINGS) as (keyof typeof STYLINGS)[])(
-    "%s: a FAB menu's stagger reads the theme's slow effects spring",
-    (name) => {
-        it("staggers the items, the one nearest the FAB first, when it opens", async () => {
-            const { waits } = await staggerWaits(name, true);
-            expect(waits).toHaveLength(4);
-            expect(waits.every(Number.isFinite)).toBe(true);
-            expect(waits[3]).toBe(0);
-            expect(waits[0]!).toBeGreaterThan(waits[1]!);
-            expect(waits[1]!).toBeGreaterThan(waits[2]!);
-            expect(waits[2]!).toBeGreaterThan(waits[3]!);
-        });
-
-        it("leaves in reverse, and holds the list for the last item", async () => {
-            const { waits, total } = await staggerWaits(name, false);
-            expect(waits[0]).toBe(0);
-            expect(waits[3]!).toBeGreaterThan(waits[0]!);
-            expect(Number.parseFloat(total)).toBe(Math.max(...waits));
         });
     },
 );

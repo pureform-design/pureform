@@ -38,7 +38,17 @@ old B/C/D/E identifiers. Complexity estimates are relative and may change after 
   needs no layout per frame, so it looks the same and runs on the CSS fast path. No new anatomy part
   was needed (the grid `0fr → 1fr` width trick would have needed one, and a style AST addition).
   Mirrored under right to left; reduced motion keeps only the fade in both directions, verified in
-  Chromium against the Panda, CSS and Tailwind outputs. Web now staggers on
+  Chromium against the Panda, CSS and Tailwind outputs. Correction (2026-10-30): the first web
+  reveal did not render at all. Its keyframes' `var(--components-fabMenu-itemRadius)` has no value
+  (a component token's default is only a fallback inside the rules that read it, and a raw keyframe
+  isn't given the target's `--pf-` prefix), so the clip was invalid and the items only faded. The
+  unit and e2e checks then in place compared keyframe text and animation names, which were all
+  right. The clip's rounding is now the pill radius written out (`9999px`), and
+  `fab-menu-motion.e2e.test.ts` scrubs the running animation in Chromium for the Panda, CSS and
+  Tailwind outputs and reads the rendered clip; it fails nine ways with the bug restored. The same
+  file reads the delay the browser makes each animation wait and checks it is what the binding
+  wrote, under the real `--pf-components-…` names (the earlier stagger e2e only checked the binding
+  against itself). Web now staggers on
   the sampled theme `effectsSlow` spring (`animate-web`'s `stagger`, written per item by
   `binding-web`'s `fabMenuStagger` as `staggerDelay`, with `staggerTotal` for the list's hold):
   no 25ms step, no eight-item cap, and no item count handed to composed menus. The spring is read

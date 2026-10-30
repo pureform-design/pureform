@@ -105,14 +105,14 @@ describe("fab menu item reveal", () => {
             JSON.stringify(frames[name]![step]);
         // Hidden: all of the width clipped from the start side, the end edge fixed.
         expect(text("fabMenuItemRevealIn", "from")).toContain(
-            "inset(0 0 0 100% round var(--components-fabMenu-itemRadius))",
+            "inset(0 0 0 100% round 9999px)",
         );
         expect(text("fabMenuItemRevealIn", "to")).toContain(
-            "inset(0 0 0 0 round var(--components-fabMenu-itemRadius))",
+            "inset(0 0 0 0 round 9999px)",
         );
         // Right to left: the aligned edge is the left one.
         expect(text("fabMenuItemRevealInRtl", "from")).toContain(
-            "inset(0 100% 0 0 round var(--components-fabMenu-itemRadius))",
+            "inset(0 100% 0 0 round 9999px)",
         );
         // Leaving runs the same frames back.
         expect(text("fabMenuItemRevealOut", "to")).toBe(
