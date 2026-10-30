@@ -108,97 +108,113 @@ exports[`FAB menu > compiles to a stable Panda slot recipe 1`] = `
       "&[data-state=closed] > :nth-child(1)": {
         "animation": {
           "_motionReduce": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) forwards overlayFadeOut",
-          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) forwards overlayShrinkOut, token(springs.effectsFast.duration) token(springs.effectsFast.easing) forwards overlayFadeOut",
+          "_rtl": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) forwards fabMenuItemRevealOutRtl, token(springs.effectsFast.duration) token(springs.effectsFast.easing) forwards overlayFadeOut",
+          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) forwards fabMenuItemRevealOut, token(springs.effectsFast.duration) token(springs.effectsFast.easing) forwards overlayFadeOut",
         },
       },
       "&[data-state=closed] > :nth-child(2)": {
         "animation": {
           "_motionReduce": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) forwards overlayFadeOut",
-          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 1) both overlayShrinkOut, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 1) both overlayFadeOut",
+          "_rtl": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 1) both fabMenuItemRevealOutRtl, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 1) both overlayFadeOut",
+          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 1) both fabMenuItemRevealOut, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 1) both overlayFadeOut",
         },
       },
       "&[data-state=closed] > :nth-child(3)": {
         "animation": {
           "_motionReduce": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) forwards overlayFadeOut",
-          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 2) both overlayShrinkOut, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 2) both overlayFadeOut",
+          "_rtl": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 2) both fabMenuItemRevealOutRtl, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 2) both overlayFadeOut",
+          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 2) both fabMenuItemRevealOut, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 2) both overlayFadeOut",
         },
       },
       "&[data-state=closed] > :nth-child(4)": {
         "animation": {
           "_motionReduce": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) forwards overlayFadeOut",
-          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 3) both overlayShrinkOut, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 3) both overlayFadeOut",
+          "_rtl": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 3) both fabMenuItemRevealOutRtl, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 3) both overlayFadeOut",
+          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 3) both fabMenuItemRevealOut, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 3) both overlayFadeOut",
         },
       },
       "&[data-state=closed] > :nth-child(5)": {
         "animation": {
           "_motionReduce": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) forwards overlayFadeOut",
-          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 4) both overlayShrinkOut, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 4) both overlayFadeOut",
+          "_rtl": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 4) both fabMenuItemRevealOutRtl, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 4) both overlayFadeOut",
+          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 4) both fabMenuItemRevealOut, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 4) both overlayFadeOut",
         },
       },
       "&[data-state=closed] > :nth-child(6)": {
         "animation": {
           "_motionReduce": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) forwards overlayFadeOut",
-          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 5) both overlayShrinkOut, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 5) both overlayFadeOut",
+          "_rtl": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 5) both fabMenuItemRevealOutRtl, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 5) both overlayFadeOut",
+          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 5) both fabMenuItemRevealOut, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 5) both overlayFadeOut",
         },
       },
       "&[data-state=closed] > :nth-child(7)": {
         "animation": {
           "_motionReduce": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) forwards overlayFadeOut",
-          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 6) both overlayShrinkOut, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 6) both overlayFadeOut",
+          "_rtl": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 6) both fabMenuItemRevealOutRtl, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 6) both overlayFadeOut",
+          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 6) both fabMenuItemRevealOut, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 6) both overlayFadeOut",
         },
       },
       "&[data-state=closed] > :nth-child(n+8)": {
         "animation": {
           "_motionReduce": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) forwards overlayFadeOut",
-          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 7) both overlayShrinkOut, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 7) both overlayFadeOut",
+          "_rtl": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 7) both fabMenuItemRevealOutRtl, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 7) both overlayFadeOut",
+          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 7) both fabMenuItemRevealOut, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 7) both overlayFadeOut",
         },
       },
       "&[data-state=open] > :nth-last-child(1)": {
         "animation": {
           "_motionReduce": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) overlayFadeIn",
-          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) overlayGrowIn, token(springs.effectsFast.duration) token(springs.effectsFast.easing) overlayFadeIn",
+          "_rtl": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) fabMenuItemRevealInRtl, token(springs.effectsFast.duration) token(springs.effectsFast.easing) overlayFadeIn",
+          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) fabMenuItemRevealIn, token(springs.effectsFast.duration) token(springs.effectsFast.easing) overlayFadeIn",
         },
       },
       "&[data-state=open] > :nth-last-child(2)": {
         "animation": {
           "_motionReduce": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) overlayFadeIn",
-          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 1) backwards overlayGrowIn, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 1) backwards overlayFadeIn",
+          "_rtl": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 1) backwards fabMenuItemRevealInRtl, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 1) backwards overlayFadeIn",
+          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 1) backwards fabMenuItemRevealIn, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 1) backwards overlayFadeIn",
         },
       },
       "&[data-state=open] > :nth-last-child(3)": {
         "animation": {
           "_motionReduce": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) overlayFadeIn",
-          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 2) backwards overlayGrowIn, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 2) backwards overlayFadeIn",
+          "_rtl": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 2) backwards fabMenuItemRevealInRtl, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 2) backwards overlayFadeIn",
+          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 2) backwards fabMenuItemRevealIn, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 2) backwards overlayFadeIn",
         },
       },
       "&[data-state=open] > :nth-last-child(4)": {
         "animation": {
           "_motionReduce": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) overlayFadeIn",
-          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 3) backwards overlayGrowIn, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 3) backwards overlayFadeIn",
+          "_rtl": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 3) backwards fabMenuItemRevealInRtl, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 3) backwards overlayFadeIn",
+          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 3) backwards fabMenuItemRevealIn, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 3) backwards overlayFadeIn",
         },
       },
       "&[data-state=open] > :nth-last-child(5)": {
         "animation": {
           "_motionReduce": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) overlayFadeIn",
-          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 4) backwards overlayGrowIn, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 4) backwards overlayFadeIn",
+          "_rtl": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 4) backwards fabMenuItemRevealInRtl, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 4) backwards overlayFadeIn",
+          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 4) backwards fabMenuItemRevealIn, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 4) backwards overlayFadeIn",
         },
       },
       "&[data-state=open] > :nth-last-child(6)": {
         "animation": {
           "_motionReduce": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) overlayFadeIn",
-          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 5) backwards overlayGrowIn, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 5) backwards overlayFadeIn",
+          "_rtl": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 5) backwards fabMenuItemRevealInRtl, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 5) backwards overlayFadeIn",
+          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 5) backwards fabMenuItemRevealIn, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 5) backwards overlayFadeIn",
         },
       },
       "&[data-state=open] > :nth-last-child(7)": {
         "animation": {
           "_motionReduce": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) overlayFadeIn",
-          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 6) backwards overlayGrowIn, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 6) backwards overlayFadeIn",
+          "_rtl": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 6) backwards fabMenuItemRevealInRtl, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 6) backwards overlayFadeIn",
+          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 6) backwards fabMenuItemRevealIn, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 6) backwards overlayFadeIn",
         },
       },
       "&[data-state=open] > :nth-last-child(n+8)": {
         "animation": {
           "_motionReduce": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) overlayFadeIn",
-          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 7) backwards overlayGrowIn, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 7) backwards overlayFadeIn",
+          "_rtl": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 7) backwards fabMenuItemRevealInRtl, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 7) backwards overlayFadeIn",
+          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 7) backwards fabMenuItemRevealIn, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(25ms * var(--components-fabMenu-staggering, 0) * 7) backwards overlayFadeIn",
         },
       },
       "alignItems": "end",

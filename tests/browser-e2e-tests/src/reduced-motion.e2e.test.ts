@@ -335,3 +335,65 @@ describe.each(Object.keys(STYLINGS) as (keyof typeof STYLINGS)[])(
         });
     },
 );
+
+// A FAB menu's items are revealed from the menu's aligned edge, which is the end one: the left
+// under right to left. Reduced motion drops that movement and keeps the fade, whichever way the
+// page reads, so a right-to-left page can't bring the reveal back.
+const itemAnimationName = async (
+    name: keyof typeof STYLINGS,
+    scenario: Scenario,
+    dir: "ltr" | "rtl",
+): Promise<string> => {
+    await commands.emulateReducedMotion(scenario.system);
+    const fns =
+        name === "Panda"
+            ? (pandaRecipes as unknown as Record<string, ClassFn>)
+            : (classesFor(pureformConfig) as Record<string, ClassFn>);
+    const list = (fns.fabMenu!({}) as Record<string, string>).list!;
+    const frame = document.createElement("iframe");
+    document.body.append(frame);
+    try {
+        const markup = scenario.providers.reduceRight(
+            (inner, motion) =>
+                `<div ${MOTION_ATTRIBUTE}="${motion}">${inner}</div>`,
+            `<div class="${list}" data-state="open"><div data-id></div></div>`,
+        );
+        const doc = frame.contentDocument!;
+        doc.open();
+        doc.write(
+            `<!doctype html><html dir="${dir}"><head>${(
+                await STYLINGS[name].css()
+            )
+                .map((sheet) => `<style>${sheet}</style>`)
+                .join("")}</head><body>${markup}</body></html>`,
+        );
+        doc.close();
+        return frame.contentWindow!.getComputedStyle(
+            doc.querySelector("[data-id]")!,
+        ).animationName;
+    } finally {
+        frame.remove();
+    }
+};
+
+describe.each(Object.keys(STYLINGS) as (keyof typeof STYLINGS)[])(
+    "%s: a FAB menu's item reveal under reduced motion",
+    (name) => {
+        describe.each(["ltr", "rtl"] as const)("%s", (dir) => {
+            it.each(SCENARIOS)("$name", async (scenario) => {
+                const animation = await itemAnimationName(name, scenario, dir);
+                // The reveal (mirrored under right to left) only with full motion; the fade
+                // always.
+                const reveal =
+                    dir === "rtl"
+                        ? /fabMenuItemRevealInRtl/
+                        : /fabMenuItemRevealIn(?!Rtl)/;
+                expect(reveal.test(animation)).toBe(!scenario.reduced);
+                expect(/fabMenuItemReveal/.test(animation)).toBe(
+                    !scenario.reduced,
+                );
+                expect(animation).toMatch(/overlayFadeIn/);
+            });
+        });
+    },
+);

@@ -24,6 +24,7 @@ import {
     end,
     flex,
     inlineFlex,
+    literal,
     max,
     min,
     mul,
@@ -47,7 +48,7 @@ import {
 
 import { INDICATION_TOKENS } from "../state-layer";
 import { FAB_SIZES } from "./fab";
-import { overlayMotion, POPUP_MOTION } from "./overlay";
+import { overlayMotion } from "./overlay";
 import type { OverlayMotion } from "./overlay";
 import { spatialCornerTransition } from "./shared";
 import {
@@ -161,8 +162,54 @@ export const FAB_MENU_LIST_MOTION = {
     exit: { keyframes: "overlayHold", spring: "spatialFast" },
 } as const satisfies OverlayMotion;
 
-/** Each item grows and fades in as a popup does (and shrinks as it leaves), after its wait. */
-export const FAB_MENU_ITEM_MOTION = POPUP_MOTION;
+// An item is revealed from the menu's aligned edge, as Compose's `FloatingActionButtonMenuItem`
+// is: it is laid out at its full width and a width animation clips it, so its content is never
+// squeezed, only uncovered. A clip shows the same thing as the width without laying the page out
+// again each frame: each item is its own row, so no neighbor depends on its width. The rounded
+// clip keeps the pill's end round as it grows. The aligned edge is the end one (the left under
+// right to left, hence the `Rtl` frames).
+const ROUND = "round var(--components-fabMenu-itemRadius)";
+const SHOWN = literal(`inset(0 0 0 0 ${ROUND})`);
+const HIDDEN = literal(`inset(0 0 0 100% ${ROUND})`);
+const HIDDEN_RTL = literal(`inset(0 100% 0 0 ${ROUND})`);
+
+/** The item reveal's keyframes; `pureform()` adds them to the config. */
+export const FAB_MENU_KEYFRAMES: Record<string, Record<string, StyleMap>> = {
+    fabMenuItemRevealIn: {
+        from: { clipPath: HIDDEN },
+        to: { clipPath: SHOWN },
+    },
+    fabMenuItemRevealOut: {
+        from: { clipPath: SHOWN },
+        to: { clipPath: HIDDEN },
+    },
+    fabMenuItemRevealInRtl: {
+        from: { clipPath: HIDDEN_RTL },
+        to: { clipPath: SHOWN },
+    },
+    fabMenuItemRevealOutRtl: {
+        from: { clipPath: SHOWN },
+        to: { clipPath: HIDDEN_RTL },
+    },
+};
+
+/** Each item is revealed from the aligned edge on the fast spatial spring as it fades in on the
+ *  fast effects spring (Compose's `FastSpatial` width and `FastEffects` alpha), after its wait,
+ *  and leaves the same way back. */
+export const FAB_MENU_ITEM_MOTION = {
+    enter: {
+        keyframes: "fabMenuItemRevealIn",
+        rtl: "fabMenuItemRevealInRtl",
+        spring: "spatialFast",
+        fade: { spring: "effectsFast" },
+    },
+    exit: {
+        keyframes: "fabMenuItemRevealOut",
+        rtl: "fabMenuItemRevealOutRtl",
+        spring: "spatialFast",
+        fade: { spring: "effectsFast" },
+    },
+} as const satisfies OverlayMotion;
 
 // The list leaves once the last staggered item has: `itemCount` (the bindings set it) less one
 // steps, at most the staggered ones. It has no enter animation: Zag's presence waits for an exit

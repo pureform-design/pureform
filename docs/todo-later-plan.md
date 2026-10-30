@@ -31,6 +31,17 @@ old B/C/D/E identifiers. Complexity estimates are relative and may change after 
   motion and reduced-motion support rather than hardcode an unrelated animation policy.
 - Reproduce current motion, test direction/alignment and rapid toggles, and integrate with count
   and hydration behavior from 7.
+- Web progress (2026-10-30): items are now revealed from the aligned edge instead of scaled from
+  their centers, and fade alongside on `FastSpatial`/`FastEffects`. It is a rounded
+  `clip-path: inset(... round var(--components-fabMenu-itemRadius))` animation, not a width one:
+  Compose lays each item out at full width and clips it, siblings are separate rows, and a clip
+  needs no layout per frame, so it looks the same and runs on the CSS fast path. No new anatomy part
+  was needed (the grid `0fr → 1fr` width trick would have needed one, and a style AST addition).
+  Mirrored under right to left; reduced motion keeps only the fade in both directions, verified in
+  Chromium against the Panda, CSS and Tailwind outputs. Still open: Native (its presence engine has
+  no clip, so it needs its own layout-capable path), the sampled `SlowEffects` stagger
+  (`--pf-stagger-delay` from `animate-web`) in place of the fixed 25ms step and eight-item cap, and
+  rapid-toggle behavior.
 - Agreed architecture: generic runtime animation coordination and driver contracts live in
   `animate-core`, separate from the styling AST's `core`. `animate-web` and `animate-react-native`
   depend on and wrap it with Motion-like public APIs; applications import adapters, not core.

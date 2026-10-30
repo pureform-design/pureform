@@ -2,7 +2,12 @@ import { compilePreset } from "@pureform/panda-adapter";
 import { describe, expect, it } from "vitest";
 
 import { configWith } from "../__fixtures__/config";
-import { FAB_MENU_STAGGER, FAB_MENU_STAGGERED, fabMenu } from "./fab-menu";
+import {
+    FAB_MENU_KEYFRAMES,
+    FAB_MENU_STAGGER,
+    FAB_MENU_STAGGERED,
+    fabMenu,
+} from "./fab-menu";
 
 const list = () =>
     compilePreset(configWith(fabMenu)).theme?.slotRecipes?.fabMenu?.base
@@ -89,5 +94,69 @@ describe("fab menu items", () => {
         expect(
             reduced.filter((animation) => animation.includes("calc(")),
         ).toEqual([]);
+    });
+});
+
+describe("fab menu item reveal", () => {
+    const rules = () =>
+        list() as Record<string, { animation: Record<string, string> }>;
+
+    it("reveals each item from the menu's aligned edge instead of scaling it from its center", () => {
+        const rule = rules()[`${OPEN}(1)`]!.animation.base!;
+        expect(rule).toContain("fabMenuItemRevealIn");
+        expect(rule).not.toContain("overlayGrowIn");
+        const closed = rules()[`${CLOSED}(1)`]!.animation.base!;
+        expect(closed).toContain("fabMenuItemRevealOut");
+        expect(closed).not.toContain("overlayShrinkOut");
+    });
+
+    it("fades the item alongside the reveal, on its own spring", () => {
+        const rule = rules()[`${OPEN}(1)`]!.animation.base!;
+        expect(rule).toContain("overlayFadeIn");
+        expect(rules()[`${CLOSED}(1)`]!.animation.base).toContain(
+            "overlayFadeOut",
+        );
+    });
+
+    it("mirrors the reveal under right to left", () => {
+        const rtl = rules()[`${OPEN}(1)`]!.animation as Record<string, unknown>;
+        expect(JSON.stringify(rtl)).toContain("fabMenuItemRevealInRtl");
+        expect(JSON.stringify(rules()[`${CLOSED}(1)`]!.animation)).toContain(
+            "fabMenuItemRevealOutRtl",
+        );
+    });
+
+    it("clips to the item's own rounded shape, from the end edge, at full height", () => {
+        const frames = FAB_MENU_KEYFRAMES;
+        const text = (name: string, step: "from" | "to") =>
+            JSON.stringify(frames[name]![step]);
+        // Hidden: all of the width clipped from the start side, the end edge fixed.
+        expect(text("fabMenuItemRevealIn", "from")).toContain(
+            "inset(0 0 0 100% round var(--components-fabMenu-itemRadius))",
+        );
+        expect(text("fabMenuItemRevealIn", "to")).toContain(
+            "inset(0 0 0 0 round var(--components-fabMenu-itemRadius))",
+        );
+        // Right to left: the aligned edge is the left one.
+        expect(text("fabMenuItemRevealInRtl", "from")).toContain(
+            "inset(0 100% 0 0 round var(--components-fabMenu-itemRadius))",
+        );
+        // Leaving runs the same frames back.
+        expect(text("fabMenuItemRevealOut", "to")).toBe(
+            text("fabMenuItemRevealIn", "from"),
+        );
+        expect(text("fabMenuItemRevealOut", "from")).toBe(
+            text("fabMenuItemRevealIn", "to"),
+        );
+    });
+
+    it("keeps the reveal off the item's height: only the clip changes", () => {
+        for (const name of Object.keys(FAB_MENU_KEYFRAMES)) {
+            for (const step of ["from", "to"] as const) {
+                expect(Object.keys(FAB_MENU_KEYFRAMES[name]![step]!)).toEqual([
+                    "clipPath",
+                ]);
+            }
+        }
     });
 });

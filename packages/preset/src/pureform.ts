@@ -65,7 +65,7 @@ import { dialog } from "./components/dialog";
 import { createDockedDatePicker } from "./components/docked-date-picker";
 import { dragHandle } from "./components/drag-handle";
 import { createFab } from "./components/fab";
-import { createFabMenu } from "./components/fab-menu";
+import { createFabMenu, FAB_MENU_KEYFRAMES } from "./components/fab-menu";
 import { FADE_THROUGH_KEYFRAMES, fadeThrough } from "./components/fade-through";
 import {
     description,
@@ -583,6 +583,7 @@ export const pureform = <
                     ...PROGRESS_KEYFRAMES,
                     ...LOADING_INDICATOR_KEYFRAMES,
                     ...OVERLAY_KEYFRAMES,
+                    ...FAB_MENU_KEYFRAMES,
                     ...SHEET_KEYFRAMES,
                     ...SEARCH_VIEW_KEYFRAMES,
                     ...APP_BAR_KEYFRAMES,
