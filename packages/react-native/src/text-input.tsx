@@ -88,6 +88,8 @@ export interface FieldOptions
     readonly selection: Record<string, unknown>;
     readonly testId: (part: FieldPart) => string;
     readonly lines?: number | undefined;
+    /** A text area's height follows its text, from its lines' height up. */
+    readonly autoGrow?: boolean | undefined;
     /** A select's menu is open: the field shows focus and turns its arrow. */
     readonly expanded?: boolean | undefined;
     /** The input takes no typing (a select). */
@@ -248,7 +250,15 @@ function FieldImpl({ container, ...props }: FieldOptions): ReactNode {
                         : {})}
                     multiline={props.name === "textArea"}
                     numberOfLines={props.lines}
-                    style={slot.style("input", s.input)}
+                    // A multiline input grows with its text on iOS and Android by itself (the
+                    // lines are its least there); the web's takes `field-sizing`, as the web
+                    // binding's does.
+                    style={slot.style("input", {
+                        ...s.input,
+                        ...(props.autoGrow && Platform.OS === "web"
+                            ? ({ fieldSizing: "content" } as object)
+                            : {}),
+                    })}
                     testID={id("input")}
                 />
                 {affix("suffixText", props.suffixText)}

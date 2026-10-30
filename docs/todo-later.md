@@ -32,7 +32,7 @@ Confirm in the storybook before changing.
 
 ### 3. Small decisions, then a small fix
 
-- **SearchView trigger width (React, Solid, probably RN):** the trigger is `width: 100%` while the
+- **SearchView trigger width (React, Solid, probably RN), needs a decision:** the trigger is `width: 100%` while the
   `SearchBar` is capped at 720px; make the trigger shrink-wrap (`width: fit-content; max-width:
   100%`) or carry the same cap.
 - **RN RadioGroup `orientation`:** vertical is the RN/Material default, but `orientation` is
@@ -42,16 +42,14 @@ Confirm in the storybook before changing.
 - **Draggable list item ripple (React, Solid):** a swipe only sets the pressed layer, and M3 shows
   the dragged state, so probably by design; confirm the spec.
 
-### 4. Measure first
+### 4. Not reproduced
 
-- **TimeInput border radius (RN, Solid vs React):** same `fieldRadius` token everywhere; compare
-  each renderer's computed `border-radius` (suspect Panda's `radii.small` fallback in React).
+- **TimeInput border radius:** the input, period selector and root radii are identical on Solid,
+  React and React Native in the storybook and the suites (28px root, 8px fields). Reopen with a
+  screenshot of the scene that differs.
 
 ### 5. New behavior
 
-- **RN TextArea `autoGrow`:** a no-op on RN (`fieldSizing` is dropped, `autoGrow` is never read).
-  Track `onContentSizeChange` and set the height, clamped to the minimum rows. (Web is CSS
-  `field-sizing`; check the browser before calling a web report a bug.)
 - **Carousel arrow-key parity on react-native-web (optional):** add `onKeyDown` focus-and-scroll on
   the masks.
 
