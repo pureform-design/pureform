@@ -207,6 +207,27 @@ export const menuSubmenuMode = (
           ? "drill"
           : "cascade";
 
+/** Extra room, in px, a submenu must have beside its menu before a drilled `auto` menu cascades
+ *  again, so a menu at the edge of fitting doesn't flip back and forth as the layout settles. */
+export const MENU_SUBMENU_MARGIN = 16;
+
+/** What an `auto` menu's submenu comes to as the layout changes under it: a cascading one
+ *  drills as soon as it doesn't fit, and a drilled one cascades again only once it fits with
+ *  `margin` to spare. Without a measure (`undefined`) the mode is kept. */
+export const menuSubmenuAdapt = (
+    current: "cascade" | "drill",
+    room: MenuSubmenuRoom | undefined,
+    margin: number = MENU_SUBMENU_MARGIN,
+): "cascade" | "drill" => {
+    if (room === undefined) return current;
+    const spare = current === "drill" ? margin : 0;
+    const fits =
+        room.beside >= room.needed + spare &&
+        (room.neededHeight === undefined ||
+            (room.upright ?? 0) >= room.neededHeight + spare);
+    return fits ? "cascade" : "drill";
+};
+
 /** The value of a drilled-in submenu's row that goes back out. */
 export const MENU_BACK_VALUE = "pf-menu-back";
 

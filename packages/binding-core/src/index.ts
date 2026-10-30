@@ -353,6 +353,8 @@ export {
     menuSelection,
     menuDrillPathTo,
     menuDrillPick,
+    MENU_SUBMENU_MARGIN,
+    menuSubmenuAdapt,
     menuSubmenuMode,
     menuSubmenuRoomOf,
     submenuPositioning,

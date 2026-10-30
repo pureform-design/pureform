@@ -20,6 +20,8 @@ import {
     menuGrouped,
     menuItemProps,
     menuSelection,
+    menuSubmenuAdapt,
+    menuSubmenuRoomOf,
     menuSubmenuMode,
     submenuPositioning,
 } from "@pureform/binding-core";
@@ -47,6 +49,7 @@ import {
     menuDrillTiming,
     menuDrillTo,
     menuSubmenuPressed,
+    menuSubmenuBoundary,
     menuSubmenuRoom,
     noteMenuSubmenuPresses,
     springRoleVar,
@@ -558,6 +561,20 @@ interface AutoSubmenuValue {
     readonly drills: () => ReadonlySet<string>;
     /** Notes `value` doesn't fit, and drills into it when `now`. */
     readonly drill: (value: string, now: boolean) => void;
+    /** What was measured as `value` stopped fitting, to tell when it would again. */
+    readonly remember: (value: string, fit: SubmenuFit) => void;
+    /** The submenu item that opens as a cascade again once its room returns. */
+    readonly reopen: () => string | undefined;
+}
+
+/** A submenu's measure as it stopped fitting: what to compare the room against once the menu
+ *  has drilled and the cascade isn't there to measure. */
+interface SubmenuFit {
+    readonly anchor: Element | null;
+    readonly menuWidth: number;
+    readonly rowTop: number;
+    readonly rowBottom: number;
+    readonly size: { readonly width: number; readonly height: number };
 }
 
 const AutoSubmenuContext = createContext<AutoSubmenuValue | null>(null);
@@ -657,7 +674,11 @@ function Items(props: MenuItemsProps): JSX.Element {
                             </Show>
                         }
                     >
-                        <Submenu>
+                        <Submenu
+                            defaultOpen={
+                                auto?.reopen() === item().value || undefined
+                            }
+                        >
                             <AutoSubmenu value={item().value} />
                             <TriggerItem {...itemSlot}>
                                 {parts(
@@ -725,20 +746,64 @@ function AutoSubmenu(props: { readonly value: string }): JSX.Element {
             submenu.style.visibility = "";
             let top: MenuContextValue = parent;
             while (top.parent) top = top.parent;
-            const room = menuSubmenuRoom(
-                menu,
-                row,
-                submenu,
-                byId(untrack(top.api).getTriggerProps().id),
-                untrack(auto.container),
-            );
-            if (menuSubmenuMode("auto", room) === "cascade") return;
+            const anchor = byId(untrack(top.api).getTriggerProps().id);
+            const room = () =>
+                menuSubmenuRoom(
+                    menu,
+                    row,
+                    submenu,
+                    anchor,
+                    untrack(auto.container),
+                );
+            const remember = () => {
+                const box = menu.getBoundingClientRect();
+                const at = row.getBoundingClientRect();
+                auto.remember(props.value, {
+                    anchor,
+                    menuWidth: box.width,
+                    rowTop: at.top - box.top,
+                    rowBottom: at.bottom - box.top,
+                    size: submenu.getBoundingClientRect(),
+                });
+            };
+            if (menuSubmenuMode("auto", room()) === "cascade") {
+                // Cascading: watched while it's open, so it drills if the room goes (a
+                // narrowing window, a growing submenu or menu, a moving panel), keeping the
+                // submenu and the keys.
+                const watch = () => {
+                    if (!submenu.isConnected || !menu.isConnected) return;
+                    if (menuSubmenuAdapt("cascade", room()) === "cascade")
+                        return;
+                    stop();
+                    remember();
+                    submenu.style.visibility = "hidden";
+                    auto.drill(props.value, true);
+                    menu.focus();
+                };
+                const observer = new ResizeObserver(watch);
+                for (
+                    let element: Element | null = anchor;
+                    element;
+                    element = element.parentElement
+                )
+                    observer.observe(element);
+                observer.observe(menu);
+                observer.observe(submenu);
+                window.addEventListener("resize", watch);
+                const stop = () => {
+                    observer.disconnect();
+                    window.removeEventListener("resize", watch);
+                };
+                return stop;
+            }
+            remember();
             // Hidden from now, so its way out isn't seen.
             submenu.style.visibility = "hidden";
             // Its item drills from now on (so the submenu goes), at once when it was pressed.
             const pressed = menuSubmenuPressed(row, menu);
             auto.drill(props.value, pressed);
             if (pressed) menu.focus();
+            return undefined;
         },
     );
     return null;
@@ -801,6 +866,9 @@ function ReadyMade(props: MenuProps): JSX.Element {
         props.submenu === "drill" || (auto() && path().length > 0);
     // Under `auto`, the submenu items found not to fit as they opened.
     const [drills, setDrills] = createSignal<ReadonlySet<string>>(new Set());
+    const fits = new Map<string, SubmenuFit>();
+    // The submenu item to open as a cascade once, when room returns to a drilled one.
+    const [reopen, setReopen] = createSignal<string>();
     const level = createMemo(() =>
         menuDrillLevel(
             props.items ?? [],
@@ -859,6 +927,8 @@ function ReadyMade(props: MenuProps): JSX.Element {
         active: () => auto() && !drill(),
         container: () => props.container,
         drills,
+        reopen,
+        remember: (value, fit) => fits.set(value, fit),
         drill: (value, now) => {
             setDrills((before) => new Set(before).add(value));
             const next = now
@@ -867,6 +937,70 @@ function ReadyMade(props: MenuProps): JSX.Element {
             if (next) drillTo(next, value);
         },
     };
+    // Drilled for want of room: watched, so the item cascades again once the room is back with
+    // some to spare (a drill into it opens it beside the menu once more).
+    createEffect(
+        () => [auto(), drills(), path()] as const,
+        ([isAuto, drilled, at]) => {
+            if (!isAuto || drilled.size === 0) return undefined;
+            const content = () =>
+                drillState.contentId
+                    ? document.getElementById(drillState.contentId)
+                    : null;
+            const check = () => {
+                const shown = content();
+                if (!shown) return;
+                const box = shown.getBoundingClientRect();
+                for (const value of drilled) {
+                    const fit = fits.get(value);
+                    if (!fit) continue;
+                    const room = menuSubmenuRoomOf(
+                        { left: box.left, right: box.left + fit.menuWidth },
+                        menuSubmenuBoundary(fit.anchor, props.container),
+                        {
+                            row: {
+                                top: box.top + fit.rowTop,
+                                bottom: box.top + fit.rowBottom,
+                            },
+                            size: fit.size,
+                        },
+                    );
+                    if (menuSubmenuAdapt("drill", room) === "drill") continue;
+                    // A drill into a deeper level stays until it's back out.
+                    if (at.length > 1 || (at.length === 1 && at[0] !== value))
+                        continue;
+                    setDrills((before) => {
+                        const next = new Set(before);
+                        next.delete(value);
+                        return next;
+                    });
+                    if (at.length === 1) {
+                        setReopen(value);
+                        setPath([]);
+                    }
+                    return;
+                }
+            };
+            const observer = new ResizeObserver(check);
+            const shown = content();
+            if (shown) observer.observe(shown);
+            for (const fit of fits.values())
+                for (
+                    let element = fit.anchor;
+                    element;
+                    element = element.parentElement
+                )
+                    observer.observe(element);
+            window.addEventListener("resize", check);
+            return () => {
+                observer.disconnect();
+                window.removeEventListener("resize", check);
+            };
+        },
+    );
+    createEffect(reopen, (value) => {
+        if (value !== undefined) setReopen(undefined);
+    });
     const onOpenChange: MenuRootProps["onOpenChange"] = (details) => {
         if (!details.open) {
             setPath([]);

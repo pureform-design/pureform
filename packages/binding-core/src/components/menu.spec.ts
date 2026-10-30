@@ -5,6 +5,8 @@ import {
     menuDrillLevel,
     menuDrillPathTo,
     menuDrillPick,
+    MENU_SUBMENU_MARGIN,
+    menuSubmenuAdapt,
     menuSubmenuMode,
     menuSubmenuRoomOf,
 } from "./menu";
@@ -188,5 +190,38 @@ describe("menuDrillPathTo", () => {
         expect(menuDrillPathTo(items, groups, "tools")).toEqual(["tools"]);
         expect(menuDrillPathTo(items, groups, "cut")).toBeUndefined();
         expect(menuDrillPathTo(items, groups, "post")).toBeUndefined();
+    });
+});
+
+describe("menuSubmenuAdapt", () => {
+    const room = (beside: number, needed = 100) => ({ beside, needed });
+
+    it("drills a cascade as soon as it doesn't fit, and keeps it when it does", () => {
+        expect(menuSubmenuAdapt("cascade", room(100))).toBe("cascade");
+        expect(menuSubmenuAdapt("cascade", room(99))).toBe("drill");
+    });
+
+    it("cascades a drill again only with the margin to spare, so the boundary doesn't flicker", () => {
+        expect(menuSubmenuAdapt("drill", room(100))).toBe("drill");
+        expect(
+            menuSubmenuAdapt("drill", room(100 + MENU_SUBMENU_MARGIN - 1)),
+        ).toBe("drill");
+        expect(
+            menuSubmenuAdapt("drill", room(100 + MENU_SUBMENU_MARGIN)),
+        ).toBe("cascade");
+    });
+
+    it("applies the margin to height, and keeps the mode when unmeasured", () => {
+        const tall = (upright: number) => ({
+            beside: 500,
+            needed: 100,
+            upright,
+            neededHeight: 200,
+        });
+        expect(menuSubmenuAdapt("cascade", tall(200))).toBe("cascade");
+        expect(menuSubmenuAdapt("drill", tall(200))).toBe("drill");
+        expect(menuSubmenuAdapt("drill", tall(216))).toBe("cascade");
+        expect(menuSubmenuAdapt("drill", undefined)).toBe("drill");
+        expect(menuSubmenuAdapt("cascade", undefined)).toBe("cascade");
     });
 });

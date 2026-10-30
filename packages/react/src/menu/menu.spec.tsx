@@ -10,7 +10,14 @@ import type { ChangeDetails } from "..";
 import { PureformProvider } from "..";
 import { overlaysRegistry } from "../__fixtures__/registry";
 import { Button } from "../button";
-import { Errored, interact, mount, quietly, settle } from "../testing/render";
+import {
+    Errored,
+    interact,
+    mount,
+    quietly,
+    settle,
+    until,
+} from "../testing/render";
 
 const byTestId = <E extends HTMLElement = HTMLElement>(id: string): E =>
     screen.getByTestId(id) as E;
@@ -662,6 +669,29 @@ describe("Menu, submenus", () => {
         } finally {
             await page.viewport(414, 896);
         }
+    });
+
+    it("drills the open submenu when the room goes, keeping it and the keys, and cascades back with room to spare", async () => {
+        await openShare(
+            <div
+                id="panel"
+                style={{ width: "600px", height: "300px", overflow: "hidden" }}
+            >
+                <Menu trigger="Edit" items={NESTED} />
+            </div>,
+        );
+        const panel = document.getElementById("panel")!;
+        expect(cascaded()).toBe(true);
+        // The panel narrows under the open submenu.
+        panel.style.width = "70px";
+        await until(() => expect(contents()).toHaveLength(1));
+        expect(labels()).toEqual(["Share", "Mail", "Copy link"]);
+        expect(document.activeElement).toBe(contents()[0]);
+        // Room returns: back beside the menu, with the submenu still open.
+        panel.style.width = "600px";
+        await until(() => expect(contents()).toHaveLength(2));
+        expect(cascaded()).toBe(true);
+        expect(contents()[1]!.textContent).toContain("Mail");
     });
 
     it("measures the submenu's own width and height as it opens", async () => {
