@@ -53,7 +53,7 @@ import {
 
 import { useControllable } from "../controllable";
 import { useFieldsetDisabled, useFormReset } from "../form";
-import { DropDownArrow } from "../glyphs";
+import { CheckIcon, DropDownArrow } from "../glyphs";
 import { itemInteractionSources } from "../interaction";
 import type { ItemInteractionSources } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
@@ -372,6 +372,35 @@ const ItemGroupLabel: (props: SelectItemGroupLabelProps) => JSX.Element =
 /** An option, drawn as a menu item; the highlighted one shows the hover state. */
 const Item: (props: SelectItemProps) => JSX.Element = field.Item;
 
+/** A chosen option's check, in the option's leading place: unseen while the option isn't chosen,
+ *  so the labels line up. Hidden from assistive technology (the option says `aria-selected`). */
+function ItemLeading(props: SelectPartProps): JSX.Element {
+    const { menu, api } = context.use("ItemLeading");
+    const { item } = itemContext.use("ItemLeading");
+    const rest = omit(props, "unstyled");
+    // Always drawn, so the labels line up; unseen until the option is chosen.
+    const merged = merge(rest, {
+        get children() {
+            return <CheckIcon />;
+        },
+        get style() {
+            return {
+                visibility: api().getItemState({ item: item() as never })
+                    .selected
+                    ? undefined
+                    : "hidden",
+                ...(typeof props.style === "object" ? props.style : {}),
+            };
+        },
+    });
+    return menu.render("itemLeading", {
+        element: "span",
+        machine: () => ({ "aria-hidden": "true" }),
+        unstyled: () => props.unstyled,
+        props: merged,
+    });
+}
+
 /** An option's label. */
 const ItemLabel: (props: SelectPartProps) => JSX.Element = field.ItemLabel;
 
@@ -461,6 +490,9 @@ function ReadyMadeContent(props: {
                 });
                 return (
                     <Item item={item()} {...menuSlots("item", copy)}>
+                        <Show when={own.multiple === true}>
+                            <ItemLeading {...menuSlots("itemLeading", copy)} />
+                        </Show>
                         <ItemLabel {...menuSlots("itemLabel", copy)}>
                             {item().label}
                         </ItemLabel>
@@ -584,5 +616,6 @@ export const Select = Object.assign(ReadyMade, {
     ItemGroup,
     ItemGroupLabel,
     Item,
+    ItemLeading,
     ItemLabel,
 });

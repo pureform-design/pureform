@@ -105,7 +105,9 @@ function Page(props: {
     const [fade] = useState(() => new Animated.Value(1));
     const moving = page.state !== "current";
     // Where a leaving page had got when it stopped, to carry on from if it is called back.
-    const left = useRef<{ slide: number; fade: number; x: number }>(undefined);
+    const left = useRef<{ slide: number; fade: number; side: number }>(
+        undefined,
+    );
     useLayoutEffect(() => {
         if (!moving) {
             left.current = undefined;
@@ -114,13 +116,25 @@ function Page(props: {
             return;
         }
         const from = left.current;
-        left.current = undefined;
-        const offset = offsetOf(page, motion.rtl) * motion.width;
+        // Kept while it leaves again (a re-run of the same page), spent once it enters.
+        if (page.state === "entering") left.current = undefined;
         // Entering again from partway out: the same place and opacity, then the rest of the way.
+        // The place is a share of the slide on its side, so it doesn't wait for a measured width.
         const carried =
-            page.state === "entering" && from && offset !== 0
+            page.state === "entering" && from
                 ? {
-                      slide: Math.min(1, Math.max(0, 1 - from.x / offset)),
+                      slide: Math.min(
+                          1,
+                          Math.max(
+                              0,
+                              1 -
+                                  from.slide *
+                                      (from.side /
+                                          Math.sign(
+                                              offsetOf(page, motion.rtl),
+                                          )),
+                          ),
+                      ),
                       fade: 1 - from.fade,
                   }
                 : undefined;
@@ -150,7 +164,7 @@ function Page(props: {
                 here.fade = value;
                 left.current = {
                     ...here,
-                    x: here.slide * offsetOf(page, motion.rtl) * motion.width,
+                    side: Math.sign(offsetOf(page, motion.rtl)),
                 };
             });
         };

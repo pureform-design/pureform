@@ -227,6 +227,21 @@ old B/C/D/E identifiers. Complexity estimates are relative and may change after 
 - Design accessibility and React/Solid/Native parity together. Searchable options and removable
   chip-input experiences are not implied by this scope. Test form serialization and keyboard/AT semantics.
 
+- Implemented (2026-10-30) in React, Solid and Native: `multiple` on Select (not a new component).
+  `SelectValueProps` in binding-core is a discriminated union (scalar or `null` without `multiple`;
+  `readonly string[]` with it, for `value`, `defaultValue` and `onValueChange`), applied to Root and
+  the ready-made component; compile-time tests reject mismatches in each binding. Choosing toggles
+  without closing (Zag's `multiple`, `closeOnSelect: false`), Enter/Space toggle with the arrows
+  going on, the hidden `<select multiple>` submits each value under `name` and resets to the default,
+  the list is `aria-multiselectable` and options `aria-selected`. The field shows the labels joined
+  by ", " in pick order, or `summary(chosen)`. A new `itemLeading` part on the select's and
+  autocomplete's menu anatomies (the menu's own slot) holds a check, drawn but unseen until chosen so
+  labels line up; the ready-made draws it only in multiple mode (compose `Select.ItemLeading`).
+  Native is by pick order too, with a ✓ leading each option. Not done: searchable options and chips
+  (out of scope); screen-reader and device checks (V1-V5); Native keyboard on devices.
+- Also fixed (found while verifying): the Native shared-axis carry (item 14) depended on a measured
+  width, so it intermittently didn't carry; it now uses a share of the slide on its side.
+
 ### 17. Conservative keyframe and shape pruning
 
 - Measure full/pruned CSS bytes and asset counts first, then track references from kept output.

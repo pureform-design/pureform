@@ -52,7 +52,7 @@ import {
 
 import { useControllable } from "../controllable";
 import { useFieldsetDisabled, useFormReset } from "../form";
-import { DropDownArrow } from "../glyphs";
+import { CheckIcon, DropDownArrow } from "../glyphs";
 import { useItemInteractionSources } from "../interaction";
 import type { ItemInteractionSources } from "../interaction";
 import { useMachine } from "../machine";
@@ -365,6 +365,28 @@ const ItemGroupLabel: (props: SelectItemGroupLabelProps) => ReactNode =
 /** An option, drawn as a menu item; the highlighted one shows the hover state. */
 const Item: (props: SelectItemProps) => ReactNode = field.Item;
 
+/** A chosen option's check, in the option's leading place: unseen while the option isn't chosen,
+ *  so the labels line up. Hidden from assistive technology (the option says `aria-selected`). */
+function ItemLeading({ unstyled, ...props }: SelectPartProps): ReactNode {
+    const { menu, api } = context.use("ItemLeading");
+    const { item } = itemContext.use("ItemLeading");
+    const chosen = api.getItemState({ item: item as never }).selected;
+    return menu.render("itemLeading", {
+        element: "span",
+        machine: { "aria-hidden": "true" },
+        unstyled,
+        props: {
+            ...props,
+            // Always drawn, so the labels line up; unseen until the option is chosen.
+            style: {
+                visibility: chosen ? undefined : "hidden",
+                ...props.style,
+            },
+            children: <CheckIcon />,
+        },
+    });
+}
+
 /** An option's label. */
 const ItemLabel: (props: SelectPartProps) => ReactNode = field.ItemLabel;
 
@@ -385,6 +407,7 @@ export type SelectProps = Omit<
 
 // Inside Root, so it can read whether an error shows and the options.
 function ReadyMadeContent({ own }: { readonly own: SelectProps }): ReactNode {
+    const multiple = own.multiple === true;
     const { items, supportingTextId, errorText } = context.use("Root");
     const slot = useSlotProps(own);
     const menuSlot = useSlotProps<
@@ -450,6 +473,11 @@ function ReadyMadeContent({ own }: { readonly own: SelectProps }): ReactNode {
                                     item={item}
                                     {...menuSlot("item", copy)}
                                 >
+                                    {multiple ? (
+                                        <ItemLeading
+                                            {...menuSlot("itemLeading", copy)}
+                                        />
+                                    ) : null}
                                     <ItemLabel {...menuSlot("itemLabel", copy)}>
                                         {item.label}
                                     </ItemLabel>
@@ -537,5 +565,6 @@ export const Select = Object.assign(ReadyMade, {
     ItemGroup,
     ItemGroupLabel,
     Item,
+    ItemLeading,
     ItemLabel,
 });

@@ -28,7 +28,14 @@ import type {
 } from "@pureform/binding-core";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { Modal, Platform, Pressable, StyleSheet, View } from "react-native";
+import {
+    Modal,
+    Platform,
+    Pressable,
+    StyleSheet,
+    Text,
+    View,
+} from "react-native";
 
 import { isTypedKey, MenuKeys, MenuListbox, typeahead } from "../menu/menu";
 import type { MenuProps } from "../menu/menu";
@@ -227,6 +234,24 @@ export function Select(props: SelectProps): ReactNode {
         [items],
     );
     const grouped = groups.some((run) => run.label !== undefined);
+    // A multiple select's options carry a check in their leading place, unseen until chosen, so
+    // the labels line up.
+    const checked = (entry: SelectItem) => ({
+        ...entry,
+        leadingIcon: (
+            <Text
+                style={{
+                    opacity: many?.includes(entry.value) ? 1 : 0,
+                }}
+            >
+                ✓
+            </Text>
+        ),
+    });
+    const options = multiple ? items.map(checked) : items;
+    const optionGroups = multiple
+        ? groups.map((run) => ({ ...run, items: run.items.map(checked) }))
+        : groups;
     // The list the combobox controls, while it shows.
     const listId = useId();
     // React Native Web draws the `Modal` as a `role="dialog"`, which needs a name.
@@ -317,8 +342,8 @@ export function Select(props: SelectProps): ReactNode {
                                     density: props.density,
                                 })}
                                 {...(grouped
-                                    ? { groups, grouped: false }
-                                    : { items })}
+                                    ? { groups: optionGroups, grouped: false }
+                                    : { items: options })}
                                 {...(indication === undefined
                                     ? {}
                                     : { indication })}

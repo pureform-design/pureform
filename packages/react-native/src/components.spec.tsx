@@ -508,8 +508,8 @@ describe("controlled and uncontrolled state", () => {
         );
         await settle(50);
         const option = (label: string) =>
-            [...document.querySelectorAll('[role="option"]')].find(
-                (item) => item.textContent === label,
+            [...document.querySelectorAll('[role="option"]')].find((item) =>
+                item.textContent?.endsWith(label),
             ) as HTMLElement;
         expect(
             document
@@ -517,6 +517,25 @@ describe("controlled and uncontrolled state", () => {
                 .getAttribute("aria-multiselectable"),
         ).toBe("true");
         expect(option("Medium").getAttribute("aria-selected")).toBe("true");
+        // A check leads each option, unseen until it's chosen, so the labels line up.
+        const check = (label: string) =>
+            Number(
+                getComputedStyle(
+                    option(label).querySelector(
+                        "[data-testid$='item-leading']",
+                    )!.firstElementChild ??
+                        option(label).querySelector(
+                            "[data-testid$='item-leading']",
+                        )!,
+                ).opacity,
+            );
+        expect(check("Medium")).toBe(1);
+        expect(check("Small")).toBe(0);
+        const labelLeft = (label: string) =>
+            option(label)
+                .querySelector("[data-testid$='item-label']")!
+                .getBoundingClientRect().left;
+        expect(labelLeft("Small")).toBe(labelLeft("Medium"));
         await interact(() => userEvent.click(option("Large")));
         await interact(() => userEvent.click(option("Small")));
         expect(change).toHaveBeenNthCalledWith(1, { value: ["m", "l"] });

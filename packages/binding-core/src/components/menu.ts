@@ -426,6 +426,7 @@ export interface MenuInstances<Node = unknown> {
  *  together, and the option's data), for a function of the copy in its `menuProps`. */
 export interface MenuScopeInstances<Item> {
     readonly item: ItemInstance<Item>;
+    readonly itemLeading: ItemInstance<Item>;
     readonly itemContent: ItemInstance<Item>;
     readonly itemLabel: ItemInstance<Item>;
     readonly itemSupportingText: ItemInstance<Item>;

@@ -110,6 +110,48 @@ describe("Select, multiple", () => {
         expect(input.value).toBe("Large");
     });
 
+    it("marks each chosen option with a check in its leading place, and leaves a single select's without", async () => {
+        withRegistry(
+            <Select label="Size" multiple items={MANY} defaultValue={["m"]} />,
+        );
+        await settle();
+        const leading = (value: string) =>
+            item(value).querySelector<HTMLElement>(
+                `[data-testid="${menu.itemLeading}"]`,
+            );
+        const seen = (value: string) =>
+            getComputedStyle(leading(value)!.querySelector("svg")!)
+                .visibility === "visible";
+        expect(seen("m")).toBe(true);
+        expect(seen("s")).toBe(false);
+        expect(leading("m")!.getAttribute("aria-hidden")).toBe("true");
+        const input = byTestId<HTMLInputElement>(ids.input);
+        await interact(() => userEvent.click(input));
+        await frames();
+        await interact(() => userEvent.click(item("s")));
+        expect(seen("s")).toBe(true);
+        // Chosen or not, the labels line up, and the check is drawn in the leading place.
+        const labelLeft = (value: string) =>
+            item(value)
+                .querySelector(`[data-testid="${menu.itemLabel}"]`)!
+                .getBoundingClientRect().left;
+        expect(labelLeft("s")).toBe(labelLeft("l"));
+        expect(leading("s")!.getBoundingClientRect().width).toBeGreaterThan(8);
+        expect(
+            leading("s")!.querySelector("svg")!.getBoundingClientRect().width,
+        ).toBeGreaterThan(8);
+        await interact(() => userEvent.click(item("m")));
+        expect(seen("m")).toBe(false);
+    });
+
+    it("draws no leading place in a single select", async () => {
+        withRegistry(<Select label="Size" items={MANY} defaultValue="m" />);
+        await settle();
+        expect(
+            item("m").querySelector(`[data-testid="${menu.itemLeading}"]`),
+        ).toBeNull();
+    });
+
     it("toggles the highlighted option with Enter and Space, keeping the keys going", async () => {
         withRegistry(<Select label="Size" multiple items={MANY} />);
         await settle();

@@ -23,7 +23,7 @@ generator and the drift test read it, and nothing at runtime does.
 | `types.ts`      | `ComponentAnatomy`, `PartAnatomy`, `ExtraPart`, `PartName`.                                                     |
 | `generated.ts`  | Generated. One constant per component (`buttonAnatomy`), `anatomy` by name, and `testIds`.                      |
 | `components.ts` | Types over the generated anatomy: `Anatomies`, `AnatomyName`, `PartOf`.                                         |
-| `attributes.ts` | Portable `kebabCase`, `partTestId`, `TestIdOverride`, `TEST_ID_PREFIX`, and `partSlot`. |
+| `attributes.ts` | Portable `kebabCase`, `partTestId`, `TestIdOverride`, `TEST_ID_PREFIX`, and `partSlot`.                         |
 | `derive.ts`     | The `/derive` subpath: `deriveAnatomy`, `deriveAnatomies`, `renderAnatomyModule`.                               |
 | `extras.ts`     | `EXTRA_PARTS`: parts that aren't AST slots (the select's `hiddenSelect`).                                       |
 | `composites.ts` | Written by hand: anatomies outside the preset's slots (`radioGroupAnatomy`, `selectMenuAnatomy`, the overlays). |
@@ -118,11 +118,7 @@ interface PartAnatomy<P extends string = string> {
 ### `@pureform/anatomy`
 
 ```ts
-import {
-    buttonAnatomy,
-    partTestId,
-    testIds,
-} from "@pureform/anatomy";
+import { buttonAnatomy, partTestId, testIds } from "@pureform/anatomy";
 import { partAttributes } from "@pureform/binding-web";
 
 buttonAnatomy.parts.icon.mirror; // true
@@ -143,7 +139,7 @@ partTestId(buttonAnatomy, "label", { root: "save" }); // "pf-button-label"
 | `anatomy`                                                                          | Every preset component's anatomy, by name.                       |
 | `testIds`                                                                          | Default test ids by component and part.                          |
 | `partTestId(component, part, testId?)`                                             | A part's test id under Root's `testId` (a `TestIdOverride`).     |
-| `TEST_ID_PREFIX` | `"pf"`, the portable default test-id prefix. |
+| `TEST_ID_PREFIX`                                                                   | `"pf"`, the portable default test-id prefix.                     |
 | `kebabCase(name)`                                                                  | `touchTarget` → `touch-target`.                                  |
 | `partSlot(part)`                                                                   | The registry slot a part is drawn by: its `slot`, else its name. |
 | `ComponentAnatomy`, `PartAnatomy`, `IndicationAnatomy`, `PartName<A>`, `ExtraPart` | The shape.                                                       |
@@ -186,9 +182,9 @@ rules as any part (`useUnstyledComponent`), and they stay out of `anatomy` and `
 `selectMenuAnatomy` is the select's list of options, drawn by another component's slots: its
 `name` is `"menu"`, so a binding's `useComponent` styles its parts with the menu's registry entry,
 and its part names are the menu's slots (`root`, `itemGroup`, `itemGroupLabel`, `item`,
-`itemLabel`) plus an unstyled `positioner`. Its `scope` and test ids are the select's: `data-scope="select"`, the list's
+`itemLeading`, `itemLabel`) plus an unstyled `positioner`. Its `scope` and test ids are the select's: `data-scope="select"`, the list's
 `data-pf-part="content"` and `pf-select-content`, then `pf-select-item-group`,
-`pf-select-item-group-label`, `pf-select-item`, `pf-select-item-label`,
+`pf-select-item-group-label`, `pf-select-item`, `pf-select-item-leading`, `pf-select-item-label`,
 `pf-select-positioner` (`compositeTestIds.selectMenu`).
 
 **The overlays** (`menuOverlayAnatomy`, `tooltipOverlayAnatomy`, `richTooltipOverlayAnatomy`,
