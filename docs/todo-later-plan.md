@@ -178,6 +178,13 @@ old B/C/D/E identifiers. Complexity estimates are relative and may change after 
 - Agreed timing policy: retain theme roles (`short2`/`short4`, `spatialDefault`), not exact Compose
   90/210 ms timings or its default spring. Numerical timing parity is not a separate backlog task.
 
+- Native FadeThrough fixed (2026-10-30): reproduced A → B → A, where the initial page, having
+  never moved, had no presence driver on its return, so it settled to current at once and popped
+  in. A page now keeps its motion once it has left. Added tests for A → B → C (latest wins, one
+  page per key, no queue), A → B → A (returning page enters, no duplicate), and reduced motion on
+  Animated and Reanimated. Native 1088 pass. Web page transitions and shared axis not yet
+  reproduced; still to check before closing this item.
+
 ### 15. Live auto-submenu adaptation across platforms
 
 - `submenu="auto"` already exists and is the default; currently its choice is made on opening.

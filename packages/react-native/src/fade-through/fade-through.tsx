@@ -68,7 +68,10 @@ function Page({
     // Keep the driver's presence open after settling the page model. Switching to undefined
     // would replace the driver and can restart or discard in-flight motion. The initial page
     // alone starts still. Both Native engines use their own completion signal.
-    const [moves] = useState(page.state !== "current");
+    // A page that left and returns keeps its motion; a settled current page only ever stays still
+    // until its first change.
+    const [moves, setMoves] = useState(page.state !== "current");
+    if (!moves && page.state !== "current") setMoves(true);
     const presence = useOverlayPresence(
         page.state === "leaving" ? false : moves ? true : undefined,
         "fadeThrough",

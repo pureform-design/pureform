@@ -140,6 +140,74 @@ describe("FadeThrough", () => {
         });
     }
 
+    for (const [name, engine] of [
+        ["Animated", animated],
+        ["Reanimated", reanimated],
+    ] as const) {
+        it(`lets the latest change win at once, with no duplicates or queue, on ${name}`, async () => {
+            const value = await render(engine);
+            await settle(50);
+            await value.set("mail");
+            await settle(60);
+            // A -> B -> C: B leaves where it is; C enters; A is still leaving.
+            await value.set("chat");
+            const texts = () => pages().map((p) => p.textContent);
+            expect(texts().filter((t) => t === "mail")).toHaveLength(1);
+            expect(texts().filter((t) => t === "chat")).toHaveLength(1);
+            expect(texts().at(-1)).toBe("chat");
+            expect(model.states.at(-1)).toBe("entering");
+            await until(() => expect(texts()).toEqual(["chat"]), 5000);
+            await until(
+                () =>
+                    expect(frame(pages()[0]!)).toEqual({
+                        opacity: 1,
+                        scale: 1,
+                    }),
+                5000,
+            );
+            await until(() => expect(model.states).toEqual(["current"]));
+        });
+
+        it(`returns to a page left mid-way without duplicating it, on ${name}`, async () => {
+            const value = await render(engine);
+            await settle(50);
+            await value.set("mail");
+            await settle(60);
+            await value.set("home");
+            expect(
+                pages().filter((p) => p.textContent === "home"),
+            ).toHaveLength(1);
+            expect(pages().at(-1)!.textContent).toBe("home");
+            expect(model.states).toEqual(["leaving", "entering"]);
+            await until(
+                () =>
+                    expect(pages().map((p) => p.textContent)).toEqual(["home"]),
+                5000,
+            );
+            await until(
+                () =>
+                    expect(frame(pages()[0]!)).toEqual({
+                        opacity: 1,
+                        scale: 1,
+                    }),
+                5000,
+            );
+            await until(() => expect(model.states).toEqual(["current"]));
+        });
+    }
+
+    it("settles rapid changes under reduced motion", async () => {
+        const value = await render(animated, "reduce");
+        await value.set("mail");
+        await value.set("home");
+        await value.set("chat");
+        await until(
+            () => expect(pages().map((p) => p.textContent)).toEqual(["chat"]),
+            5000,
+        );
+        await until(() => expect(frame(pages()[0]!).opacity).toBe(1));
+    });
+
     it("only fades under reduced motion", async () => {
         const value = await render(animated, "reduce");
         await value.set("mail");
