@@ -152,6 +152,17 @@ old B/C/D/E identifiers. Complexity estimates are relative and may change after 
   and fade nonparticipating rows. Reverse for back navigation and mirror for RTL.
 - Use existing theme springs and respect reduced motion. Validate iOS/Android with both engines.
 - Cascade arrow navigation passes on Native Web in LTR/RTL, not yet verified on devices.
+- Verified on Native Web (2026-10-30), no motion change needed: the reported behavior is already
+  implemented in `menu.tsx`. A drilled level springs the measured panel width and height (clipped,
+  `DrillSize`), the pressed label alone moves into the header's place (`Flip`), and the other rows
+  fade in (`FadeIn`), all on the theme's `spatialDefault` spring. The existing forward test covers
+  size, label and fade; added tests cover the reverse step (size springs back down, the header's
+  label moves into the row it came from, rows fade in, and everything returns to the top level's
+  exact size) and reduced motion (the first frame is the final one: no size, label or fade
+  motion). Mutating the label flip fails the reverse test. These run on `Animated` directly, so
+  both engines share them. Full Native suite passes (1080). Not verified: iOS/Android rendering,
+  `measureInWindow` accuracy and frame rate (V3), and right-to-left mirroring, which React Native
+  Web can't emulate per subtree. The historical report stays device-gated until V3 confirms it.
 
 ## D. Lifecycle and architecture — hardest
 

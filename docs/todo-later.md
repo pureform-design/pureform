@@ -17,6 +17,8 @@ criteria. These are not all confirmed bugs: reproduction and external verificati
 13. **Native drill animation:** reproduce on devices; animate measured width/height, translate
     labels and fade nonparticipating rows. Reverse back navigation, mirror RTL and use theme
     springs/reduced motion with both engines.
+    Native Web verification added: the behavior already exists (size, label, fade; forward and
+    back; reduced motion). Awaiting device confirmation (V3); no motion change made.
 
 ## D. Lifecycle and architecture — hardest
 

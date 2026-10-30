@@ -1456,6 +1456,109 @@ describe("nested rows", () => {
         expect(midWidth).toBeLessThan(box().width);
     });
 
+    it("runs the drill in reverse on the way back: the size springs down, the header's label moves into the row it came from, and the rows fade in", async () => {
+        const deep = [
+            ...SHARE.slice(0, 1),
+            {
+                value: "share",
+                label: "Share",
+                items: ["mail", "link", "print a copy of this page"].map(
+                    (value) => ({ value, label: value }),
+                ),
+            },
+        ];
+        await moving(
+            <View style={{ alignItems: "flex-start" }}>
+                <Menu submenu="drill" items={deep} />
+            </View>,
+        );
+        const menu = document.querySelector<HTMLElement>('[role="menu"]')!;
+        const box = () => menu.getBoundingClientRect();
+        const labelOf = (row: HTMLElement) =>
+            row.querySelector<HTMLElement>(
+                '[data-testid="pf-menu-item-label"]',
+            )!;
+        const opacity = (row: HTMLElement) =>
+            Number(getComputedStyle(row.parentElement!).opacity);
+        const rest = async (what: () => void) => until(what, 5000);
+        const [topHeight, topWidth] = [box().height, box().width];
+        await interact(() => userEvent.click(rows()[1]!));
+        await rest(() => {
+            expect(rows()[0]!.textContent).toBe("‹Share");
+            expect(opacity(rows()[1]!)).toBe(1);
+            expect(box().height).toBeGreaterThan(topHeight * 1.5);
+        });
+        const [deepHeight, deepWidth] = [box().height, box().width];
+        const back = labelOf(rows()[0]!).getBoundingClientRect().top;
+        await interact(() => userEvent.click(rows()[0]!));
+        await until(() => expect(rows()[1]!.textContent).toBe("Share›"));
+        // The row it returns to is in its place; only its label starts where the header's was.
+        const share = rows()[1]!;
+        const label = labelOf(share).getBoundingClientRect().top;
+        expect(Math.abs(label - back)).toBeLessThan(
+            Math.abs(share.getBoundingClientRect().top - back),
+        );
+        // Size springs part way between the levels, and the rows fade in.
+        await until(() => {
+            expect(box().height).toBeLessThan(deepHeight - 1);
+            expect(box().height).toBeGreaterThan(topHeight + 1);
+        }, 5000);
+        expect(box().width).toBeLessThanOrEqual(deepWidth);
+        await rest(() => {
+            expect(opacity(rows()[0]!)).toBe(1);
+            expect(box().height).toBeCloseTo(topHeight, 0);
+            expect(box().width).toBeCloseTo(topWidth, 0);
+            expect(
+                labelOf(rows()[1]!).getBoundingClientRect().top -
+                    rows()[1]!.getBoundingClientRect().top,
+            ).toBeLessThan(20);
+        });
+    });
+
+    it("drills at once, with no size, label or fade motion, under reduced motion", async () => {
+        const deep = [
+            ...SHARE.slice(0, 1),
+            {
+                value: "share",
+                label: "Share",
+                items: ["mail", "link", "print a copy of this page"].map(
+                    (value) => ({ value, label: value }),
+                ),
+            },
+        ];
+        await mount(
+            <PureformProvider
+                registry={registry}
+                engine={animated}
+                motion="reduce"
+                timeScale={10}
+            >
+                <View style={{ width: 400, alignItems: "flex-start" }}>
+                    <Menu submenu="drill" items={deep} />
+                </View>
+            </PureformProvider>,
+        );
+        const menu = document.querySelector<HTMLElement>('[role="menu"]')!;
+        const labelOf = (row: HTMLElement) =>
+            row.querySelector<HTMLElement>(
+                '[data-testid="pf-menu-item-label"]',
+            )!;
+        const top = menu.getBoundingClientRect().height;
+        await interact(() => userEvent.click(rows()[1]!));
+        // The first frame at the new level is already the final one.
+        expect(rows()[0]!.textContent).toBe("‹Share");
+        expect(menu.getBoundingClientRect().height).toBeGreaterThan(top * 1.5);
+        for (const row of rows()) {
+            expect(Number(getComputedStyle(row.parentElement!).opacity)).toBe(
+                1,
+            );
+        }
+        expect(
+            labelOf(rows()[0]!).getBoundingClientRect().top -
+                rows()[0]!.getBoundingClientRect().top,
+        ).toBeLessThan(20);
+    });
+
     it("cascades by default when a submenu fits beside the menu, and drills when it doesn't", async () => {
         const centered = (
             <View style={{ alignItems: "center" }}>
