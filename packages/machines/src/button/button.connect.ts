@@ -1,3 +1,4 @@
+import { IDLE_INTERACTION_STATE } from "@pureform/binding-core/interaction";
 import type { Service } from "@zag-js/core";
 import { dataAttr } from "@zag-js/dom-query";
 import type { NormalizeProps, PropTypes } from "@zag-js/types";
@@ -17,7 +18,11 @@ export function connect<T extends PropTypes>(
 
     const disabled = computed("disabled");
     const toggle = prop("toggle");
-    const interaction = context.get("interaction");
+    // Disabling clears the source in a watch. Its state cannot be displayed while disabled,
+    // so don't subscribe to that later cleanup and render a second time for the same change.
+    const interaction = disabled
+        ? IDLE_INTERACTION_STATE
+        : context.get("interaction");
     const emitter = refs.get("interaction");
     const pressed = !disabled && interaction.pressed;
     const focused = !disabled && context.get("focused");

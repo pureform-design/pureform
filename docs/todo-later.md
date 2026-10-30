@@ -45,19 +45,14 @@ Confirm in the storybook before changing.
        props on the UI thread; elsewhere keep the spinning half-circle wave.
     3. Reduced motion keeps the static half circle; test the rendered rotations over time.
 
-## Storybook observations, second set (triaged by reading the code; none reproduced yet)
+## Pending Storybook observations
 
 Ordered from easy to complex. "Real" is a component or preset bug; "scene" is the story host.
 
-### Medium
-
-- **Solid Paginator > Key Space, then click the left arrow, `[EFFECT_RELAY_TEAR]` (cause unknown):**
-  the effect is the part's render effect (`solid/src/parts.tsx:240`) under `PrevTrigger`; the
-  written signal is the machine's `page` bindable (`solid/src/internal/zag/bindable.ts`). Two
-  suspects: a double `set` of `page` (the controlled round trip in `paginator.tsx`, or Zag's
-  `pageSize` watch re-setting it), or the trigger's `machine()` accessor not being a memo. Next:
-  log the bindable's writes per click; if two, skip the write when the value is equal, else memoize
-  the trigger's machine props.
+- **RN Paginator page-size input lacks an accessible label:** reproduced by the Storybook
+  accessibility checks in five stories (with page size, first/last, size options, no items,
+  disabled), before the Solid relay fix. The nested `pf-select-input` has no accessible name.
+  Investigate the RN Select input's label forwarding separately.
 
 ### Needs a reproduction first
 

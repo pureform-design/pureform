@@ -28,6 +28,27 @@ const frames = async (count = 3) => {
 const range = () => byTestId(ids.rangeLabel).textContent;
 
 describe("Paginator, ready-made", () => {
+    it("returns to the first page after Space without a reactive relay warning", async () => {
+        const warn = vi.spyOn(console, "warn");
+        try {
+            withRegistry(() => <Paginator count={95} hidePageSize />);
+            await settle();
+            // Solid reports recurring relays after three occurrences.
+            for (let step = 0; step < 3; step++) {
+                byTestId<HTMLElement>(ids.nextTrigger).focus();
+                await userEvent.keyboard(" ");
+                await settle();
+                expect(range()).toBe("11 – 20 of 95");
+                await userEvent.click(byTestId(ids.prevTrigger));
+                await settle();
+                expect(range()).toBe("1 – 10 of 95");
+            }
+            expect(warn).not.toHaveBeenCalled();
+        } finally {
+            warn.mockRestore();
+        }
+    });
+
     it("renders the group, the page-size select, the range and the previous and next buttons", async () => {
         withRegistry(() => <Paginator count={95} />);
         await settle();

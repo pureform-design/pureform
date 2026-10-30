@@ -1,9 +1,10 @@
+import * as button from "@pureform/machines/button";
 import { render } from "@solidjs/web";
 import { createMachine } from "@zag-js/core";
 import { createEffect, createMemo, createSignal, flush } from "solid-js";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { useMachine } from ".";
+import { normalizeProps, useMachine } from ".";
 
 // A machine with a count, its double kept by a watch (as Zag's select keeps its highlighted
 // item from its highlighted value), and a watch on a prop.
@@ -94,6 +95,44 @@ const run = (props: () => CounterSchema["props"] = () => ({})) => {
 };
 
 describe("a machine's watches", () => {
+    it("does not render a disabled button again when its watch clears interaction", async () => {
+        const [disabled, setDisabled] = createSignal(false);
+        const seen: boolean[] = [];
+        let service!: button.Service;
+        const host = document.body.appendChild(document.createElement("div"));
+        dispose = render(() => {
+            service = useMachine(button.machine, () => ({
+                id: "relay-button",
+                disabled: disabled(),
+            }));
+            const api = createMemo(() =>
+                button.connect(service, normalizeProps),
+            );
+            createEffect(api, (value) => {
+                seen.push(value.disabled);
+            });
+            return <button {...api().getRootProps()}>Previous page</button>;
+        }, host);
+        await settle();
+        service.send({ type: "CONTEXT.SET", context: { focused: true } });
+        host.querySelector("button")!.dispatchEvent(
+            new PointerEvent("pointermove", {
+                bubbles: true,
+                pointerType: "mouse",
+            }),
+        );
+        await settle();
+        seen.length = 0;
+        setDisabled(true);
+        await settle();
+        expect(host.querySelector("button")!.disabled).toBe(true);
+        expect(seen).toEqual([true]);
+        setDisabled(false);
+        await settle();
+        expect(host.querySelector("button")!.disabled).toBe(false);
+        expect(seen).toEqual([true, false]);
+    });
+
     it("write in the same flush as the write they follow, so no reader sees one without the other", async () => {
         const { seen, host, send } = run();
         await settle();
