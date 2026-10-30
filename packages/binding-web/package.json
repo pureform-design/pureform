@@ -30,6 +30,7 @@
     },
     "dependencies": {
         "@pureform/anatomy": "workspace:^",
+        "@pureform/animate-web": "workspace:^",
         "@pureform/binding-core": "workspace:^",
         "@pureform/core": "workspace:^",
         "@pureform/css-lowering": "workspace:^",

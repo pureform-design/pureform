@@ -37,10 +37,6 @@ export interface FabMenuRootOwnProps
     readonly testId?: TestIdOverride<FabMenuPart> | undefined;
     /** Every part, or some, without the registry's styles. */
     readonly unstyled?: Unstyled<FabMenuPart> | undefined;
-    /** How many items a composed menu holds, when known before its items render: its items then
-     *  stagger from the first frame, server-rendered too. Without it, they stagger once the list
-     *  has counted them, and until then don't stagger. */
-    readonly itemCount?: number | undefined;
 }
 
 /** The keys of `FabMenuRootOwnProps`, which Root keeps off its element. */
@@ -52,22 +48,15 @@ export const FAB_MENU_ROOT_PROPS = [
     "testId",
     "unstyled",
     "indication",
-    "itemCount",
 ] as const satisfies readonly (keyof FabMenuRootOwnProps)[];
 
-/** The FAB menu's registry selection from Root's props, with the number of items its list
- *  holds (the `itemCount` token, which times the list's exit to its last item's, and whether
- *  they stagger), under the app's own tokens. */
+/** The FAB menu's registry selection from Root's props: its variants, under the app's own tokens. */
 export const fabMenuSelection = (
     props: FabMenuVariantProps,
-    itemCount?: number,
 ): Selection<"fabMenu"> => ({
     color: props.color,
     size: props.size,
-    tokens:
-        itemCount === undefined
-            ? props.tokens
-            : { itemCount, staggering: 1, ...props.tokens },
+    tokens: props.tokens,
 });
 
 /** The FAB menu's items open above the FAB, at its end. */

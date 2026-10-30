@@ -20,12 +20,12 @@ import type {
 } from "@pureform/binding-core";
 import { fabMenuItemFocusProps } from "@pureform/binding-web";
 import { fabMenuMachineProps, presentProps } from "@pureform/binding-web";
-import { fabMenuListProps } from "@pureform/binding-web";
+import { fabMenuListProps, fabMenuStagger } from "@pureform/binding-web";
 import * as menu from "@pureform/machines/menu";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {
     type Accessor,
-    createContext,
+    createEffect,
     createMemo,
     createSignal,
     createUniqueId,
@@ -33,7 +33,7 @@ import {
     omit,
     onSettled,
     Show,
-    useContext,
+    untrack,
 } from "solid-js";
 
 import { useControllable } from "../controllable";
@@ -42,13 +42,14 @@ import { itemInteractionSources, useMachineButton } from "../interaction";
 import type { ItemInteractionSources } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
+import { useReducedMotion } from "../motion";
 import { createPartContext } from "../part-context";
 import { createSlotProps, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { usePresence } from "../presence";
 import type { Presence } from "../presence";
 import type { PartProps } from "../props";
-import { useDirection } from "../provider";
+import { useDirection, usePureform } from "../provider";
 
 type Anatomy = typeof fabMenuAnatomy;
 
@@ -58,17 +59,9 @@ interface FabMenuContextValue {
     readonly api: Accessor<menu.Api<PropTypes>>;
     readonly sources: ItemInteractionSources;
     readonly presence: Presence;
-    /** The list tells Root how many items it holds. */
-    readonly setItemCount: (count: number) => void;
 }
 
 const context = createPartContext<FabMenuContextValue>("FabMenu");
-
-// The ready-made's item count, which Root reads until the list has counted its own, so the
-// server renders the list's `itemCount` and hydration changes nothing.
-const ReadyMadeItemCount = createContext<Accessor<number | undefined>>(
-    () => undefined,
-);
 
 /** Root's props: the variants and tokens, the menu machine's props (`open`, `onSelect`,
  *  `positioning`, …), `testId` and `unstyled` for every part, `as`, and the element's own props. */
@@ -115,20 +108,15 @@ function Root(props: FabMenuRootProps): JSX.Element {
     }));
     const api = createMemo(() => menu.connect(service, normalizeProps));
     const presence = usePresence(() => api().open);
-    const [itemCount, setItemCount] = createSignal<number>();
-    const given = useContext(ReadyMadeItemCount);
     const scope = useComponent(fabMenuAnatomy, {
-        selection: () =>
-            fabMenuSelection(props, props.itemCount ?? itemCount() ?? given()),
+        selection: () => fabMenuSelection(props),
         testId: () => props.testId,
         unstyled: () => props.unstyled,
         indication: () => props.indication,
     });
     const rest = omit(props, "as", ...FAB_MENU_ROOT_PROPS);
     return (
-        <context.Provider
-            value={{ scope, api, sources, presence, setItemCount }}
-        >
+        <context.Provider value={{ scope, api, sources, presence }}>
             {scope.render("root", {
                 element: "div",
                 as: () => props.as,
@@ -140,20 +128,38 @@ function Root(props: FabMenuRootProps): JSX.Element {
 
 /** The list of items, the menu's content, which holds focus while it's open and moves through
  *  the items with the arrow keys. It stays while its exit animation runs, which ends with its
- *  last item's: it tells Root how many it holds, counting its elements as they change. */
+ *  last item's. It works out each item's wait on the theme's slow effects spring as the menu
+ *  opens, closes, or gains items (counted from its elements as they change), for the CSS
+ *  animations to run (`fabMenuStagger`). */
 function List(props: FabMenuPartProps): JSX.Element {
-    const { scope, api, presence, setItemCount } = context.use("List");
+    const { scope, api, presence } = context.use("List");
+    const state = usePureform();
+    const reducedMotion = useReducedMotion();
+    const [count, setCount] = createSignal(0);
     let list: HTMLElement | undefined;
     onSettled(() => {
         const element = list;
         if (!element) return;
-        const count = () => setItemCount(element.childElementCount);
-        count();
+        const update = () => setCount(element.childElementCount);
+        update();
         if (typeof MutationObserver === "undefined") return;
-        const observer = new MutationObserver(count);
+        const observer = new MutationObserver(update);
         observer.observe(element, { childList: true });
         return () => observer.disconnect();
     });
+    createEffect(
+        () => [api().open, count(), state().registry, reducedMotion()] as const,
+        ([open, , registry, reduced]) => {
+            if (list)
+                untrack(() =>
+                    fabMenuStagger(list!, {
+                        registry,
+                        open,
+                        reducedMotion: reduced,
+                    }),
+                );
+        },
+    );
     const rest = omit(props, "unstyled");
     return scope.render("list", {
         element: "div",
@@ -252,10 +258,7 @@ function CloseTrigger(props: FabMenuCloseTriggerProps): JSX.Element {
  *  items as data. */
 export interface FabMenuProps
     extends
-        Omit<
-            FabMenuRootProps,
-            keyof SlotKeyedProps<Anatomy> | "children" | "itemCount"
-        >,
+        Omit<FabMenuRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
         SlotKeyedProps<Anatomy, never, FabMenuInstances<JSX.Element>>,
         FabMenuContentProps<JSX.Element> {}
 
@@ -279,76 +282,72 @@ function ReadyMade(props: FabMenuProps): JSX.Element {
     const list = slots("list");
     const closeTrigger = slots("closeTrigger");
     return (
-        // oxlint-disable-next-line solid/reactivity -- the context's accessor, which the items read where tracked
-        <ReadyMadeItemCount value={() => (props.items ?? []).length}>
-            <Root {...own} {...root}>
-                <List {...list}>
-                    <For
-                        each={props.items ?? []}
-                        keyed={(item: FabMenuItem<JSX.Element>) => item.value}
-                    >
-                        {(item, index) => {
-                            const copy = () => ({
-                                index: index(),
-                                item: item(),
-                            });
-                            return (
-                                <Item
-                                    {...fabMenuItemProps(item())}
-                                    {...slots("item", copy)}
-                                    {...(item().testId === undefined
-                                        ? {}
-                                        : {
-                                              "data-testid": fabMenuItemTestId(
-                                                  item(),
-                                                  "item",
-                                                  props.testId,
-                                              ),
-                                          })}
-                                >
-                                    <Show when={isPresent(item().icon)}>
-                                        <ItemIcon
-                                            mirror={item().mirrorIcon}
-                                            {...slots("itemIcon", copy)}
-                                            {...(item().testId === undefined
-                                                ? {}
-                                                : {
-                                                      "data-testid":
-                                                          fabMenuItemTestId(
-                                                              item(),
-                                                              "itemIcon",
-                                                              props.testId,
-                                                          ),
-                                                  })}
-                                        >
-                                            {item().icon}
-                                        </ItemIcon>
-                                    </Show>
-                                    <ItemLabel
-                                        {...slots("itemLabel", copy)}
+        <Root {...own} {...root}>
+            <List {...list}>
+                <For
+                    each={props.items ?? []}
+                    keyed={(item: FabMenuItem<JSX.Element>) => item.value}
+                >
+                    {(item, index) => {
+                        const copy = () => ({
+                            index: index(),
+                            item: item(),
+                        });
+                        return (
+                            <Item
+                                {...fabMenuItemProps(item())}
+                                {...slots("item", copy)}
+                                {...(item().testId === undefined
+                                    ? {}
+                                    : {
+                                          "data-testid": fabMenuItemTestId(
+                                              item(),
+                                              "item",
+                                              props.testId,
+                                          ),
+                                      })}
+                            >
+                                <Show when={isPresent(item().icon)}>
+                                    <ItemIcon
+                                        mirror={item().mirrorIcon}
+                                        {...slots("itemIcon", copy)}
                                         {...(item().testId === undefined
                                             ? {}
                                             : {
                                                   "data-testid":
                                                       fabMenuItemTestId(
                                                           item(),
-                                                          "itemLabel",
+                                                          "itemIcon",
                                                           props.testId,
                                                       ),
                                               })}
                                     >
-                                        {item().label}
-                                    </ItemLabel>
-                                </Item>
-                            );
-                        }}
-                    </For>
-                </List>
-                <CloseTrigger aria-label={props.fabLabel} {...closeTrigger}>
-                    <FabIcon icon={props.icon} closeIcon={props.closeIcon} />
-                </CloseTrigger>
-            </Root>
-        </ReadyMadeItemCount>
+                                        {item().icon}
+                                    </ItemIcon>
+                                </Show>
+                                <ItemLabel
+                                    {...slots("itemLabel", copy)}
+                                    {...(item().testId === undefined
+                                        ? {}
+                                        : {
+                                              "data-testid": fabMenuItemTestId(
+                                                  item(),
+                                                  "itemLabel",
+                                                  props.testId,
+                                              ),
+                                          })}
+                                >
+                                    {item().label}
+                                </ItemLabel>
+                            </Item>
+                        );
+                    }}
+                </For>
+            </List>
+            <CloseTrigger aria-label={props.fabLabel} {...closeTrigger}>
+                <FabIcon icon={props.icon} closeIcon={props.closeIcon} />
+            </CloseTrigger>
+        </Root>
     );
 }
 

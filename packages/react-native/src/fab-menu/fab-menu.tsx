@@ -77,9 +77,10 @@ export interface FabMenuProps
     readonly testId?: TestIdOverride<FabMenuPart> | undefined;
 }
 
-// The items that stagger, as the preset's `FAB_MENU_STAGGERED`: the rest share the last one's
-// wait. Each waits the preset's `FAB_MENU_STAGGER` (25ms) more than the one before it: Compose's
-// spring-driven stagger, evenly spaced.
+// The items that stagger: the rest share the last one's wait. Each waits 25ms more than the one
+// before it: Compose's spring-driven stagger, evenly spaced. The web samples the theme's slow effects
+// spring instead (`animate-web`'s `stagger`); this stays a fixed step until Native takes the same
+// sampled delays.
 const STAGGERED = 8;
 
 /** How long each item waits after the one before it, in ms. */

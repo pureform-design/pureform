@@ -66,9 +66,8 @@ criteria. These are not all confirmed bugs: reproduction and external verificati
   tests cover nested merges, live updates and overlay mappings; naming unification is deferred to
   F3. Native's recurring animated linear-progress sampling failure remains with item 12.
 
-- **7 completed:** FAB-menu composed `itemCount` and a `staggering` token. Items stagger only once
-  their count is known, so composed SSR and first hydration are unstaggered, not guessed at eight.
-  Ready-mades still derive from items; Native's ready-made menu already did.
+- **7 completed, superseded on web by 10:** the composed `itemCount` prop and its tokens are gone;
+  web bindings count the list's children and write each item's sampled stagger wait.
 
 - **8 completed:** items of ChipSet, ButtonGroup, RadioGroup and Toolbar take their own customizing
   props and test ids by part; SplitButton/Toolbar `menuProps` take a function of each item; one shared

@@ -18,16 +18,15 @@ import type {
 } from "@pureform/binding-core";
 import { fabMenuItemFocusProps } from "@pureform/binding-web";
 import { fabMenuMachineProps, presentProps } from "@pureform/binding-web";
-import { fabMenuListProps } from "@pureform/binding-web";
+import { fabMenuListProps, fabMenuStagger } from "@pureform/binding-web";
 import * as menu from "@pureform/machines/menu";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";
 import {
     Children,
-    createContext,
     type ElementType,
     type ReactNode,
-    useContext,
+    useCallback,
     useId,
     useLayoutEffect,
     useState,
@@ -38,6 +37,7 @@ import { CloseIcon } from "../glyphs";
 import { useItemInteractionSources, useMachineButton } from "../interaction";
 import type { ItemInteractionSources } from "../interaction";
 import { useMachine } from "../machine";
+import { useReducedMotion } from "../motion";
 import { createPartContext } from "../part-context";
 import { useComponent, useSlotProps } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
@@ -45,7 +45,7 @@ import { usePresence } from "../presence";
 import type { Presence } from "../presence";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
-import { useDirection } from "../provider";
+import { useComponentState, useDirection } from "../provider";
 
 type Anatomy = typeof fabMenuAnatomy;
 
@@ -55,15 +55,9 @@ interface FabMenuContextValue {
     readonly api: menu.Api<PropTypes>;
     readonly sources: ItemInteractionSources;
     readonly presence: Presence;
-    /** The list tells Root how many items it holds. */
-    readonly setItemCount: (count: number) => void;
 }
 
 const context = createPartContext<FabMenuContextValue>("FabMenu");
-
-// The ready-made's item count, which Root starts from, so the server renders the list's
-// `itemCount` and hydration changes nothing; composed parts count once the list renders.
-const ReadyMadeItemCount = createContext<number | undefined>(undefined);
 
 /** Root's props: the variants and tokens, the menu machine's props (`open`, `onSelect`,
  *  `positioning`, …), `testId` and `unstyled` for every part, `as`, and the element's own props. */
@@ -110,19 +104,15 @@ function Root(props: FabMenuRootProps): ReactNode {
     });
     const api = menu.connect(service, normalizeProps);
     const presence = usePresence(api.open);
-    const [counted, setCounted] = useState(useContext(ReadyMadeItemCount));
-    const itemCount = props.itemCount ?? counted;
     const scope = useComponent(fabMenuAnatomy, {
-        selection: fabMenuSelection(props, itemCount),
+        selection: fabMenuSelection(props),
         testId: props.testId,
         unstyled: props.unstyled,
         indication: props.indication,
     });
     const { as, ...rest } = omitProps(props, FAB_MENU_ROOT_PROPS);
     return (
-        <context.Provider
-            value={{ scope, api, sources, presence, setItemCount: setCounted }}
-        >
+        <context.Provider value={{ scope, api, sources, presence }}>
             {scope.render("root", { element: "div", as, props: rest })}
         </context.Provider>
     );
@@ -130,14 +120,34 @@ function Root(props: FabMenuRootProps): ReactNode {
 
 /** The list of items, the menu's content, which holds focus while it's open and moves through
  *  the items with the arrow keys. It stays while its exit animation runs, which ends with its
- *  last item's: it tells Root how many it holds. */
+ *  last item's. It works out each item's wait on the theme's slow effects spring as the menu
+ *  opens, closes, or gains items, for the CSS animations to run (`fabMenuStagger`). */
 function List({ unstyled, ...props }: FabMenuPartProps): ReactNode {
-    const { scope, api, presence, setItemCount } = context.use("List");
+    const { scope, api, presence } = context.use("List");
+    const { registry } = useComponentState();
+    const reducedMotion = useReducedMotion();
+    // The list element, which the stagger writes the items' waits to once it's there.
+    const [list, setList] = useState<HTMLElement | null>(null);
+    // One stable callback, so presence's ref isn't detached and attached again each render.
+    const { ref: presenceRef } = presence;
+    // oxlint-disable-next-line react/preserve-manual-memoization -- the package isn't built with React Compiler; this callback ref is memoized by hand
+    const ref = useCallback(
+        (element: HTMLElement | null) => {
+            setList(element);
+            presenceRef(element);
+        },
+        // oxlint-disable-next-line react/preserve-manual-memoization -- the package isn't built with React Compiler; this callback ref is memoized by hand
+        [presenceRef],
+    );
     const count = Children.toArray(props.children).length;
-    useLayoutEffect(() => setItemCount(count), [count, setItemCount]);
+    // Before the browser paints, so the animations the new state starts read this render's waits.
+    useLayoutEffect(() => {
+        if (list)
+            fabMenuStagger(list, { registry, open: api.open, reducedMotion });
+    }, [list, api.open, count, registry, reducedMotion]);
     return scope.render("list", {
         element: "div",
-        ref: presence.ref,
+        ref,
         machine: presentProps(
             fabMenuListProps(api.getContentProps(), () => {
                 const { id } = api.getTriggerProps();
@@ -220,10 +230,7 @@ function FabIcon(props: {
  *  keyed by part (an item's parts also by item, `FabMenuInstances`), the FAB's icons and name, and the items as data. */
 export interface FabMenuProps
     extends
-        Omit<
-            FabMenuRootProps,
-            keyof SlotKeyedProps<Anatomy> | "children" | "itemCount"
-        >,
+        Omit<FabMenuRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
         SlotKeyedProps<Anatomy, never, FabMenuInstances<ReactNode>>,
         FabMenuContentProps<ReactNode> {}
 
@@ -246,67 +253,64 @@ function ReadyMade(props: FabMenuProps): ReactNode {
     const each =
         slot.each("item") || slot.each("itemIcon") || slot.each("itemLabel");
     return (
-        <ReadyMadeItemCount.Provider value={items.length}>
-            <Root {...rootProps} {...(slot("root") as object)}>
-                <List {...slot("list")}>
-                    {items.map((item, index) => {
-                        const copy = each ? { index, item } : undefined;
-                        return (
-                            <Item
-                                key={item.value}
-                                {...fabMenuItemProps(item)}
-                                {...slot("item", copy)}
-                                {...(item.testId === undefined
-                                    ? {}
-                                    : {
-                                          "data-testid": fabMenuItemTestId(
-                                              item,
-                                              "item",
-                                              props.testId,
-                                          ),
-                                      })}
-                            >
-                                {isPresent(item.icon) ? (
-                                    <ItemIcon
-                                        mirror={item.mirrorIcon}
-                                        {...slot("itemIcon", copy)}
-                                        {...(item.testId === undefined
-                                            ? {}
-                                            : {
-                                                  "data-testid":
-                                                      fabMenuItemTestId(
-                                                          item,
-                                                          "itemIcon",
-                                                          props.testId,
-                                                      ),
-                                              })}
-                                    >
-                                        {item.icon}
-                                    </ItemIcon>
-                                ) : null}
-                                <ItemLabel
-                                    {...slot("itemLabel", copy)}
+        <Root {...rootProps} {...(slot("root") as object)}>
+            <List {...slot("list")}>
+                {items.map((item, index) => {
+                    const copy = each ? { index, item } : undefined;
+                    return (
+                        <Item
+                            key={item.value}
+                            {...fabMenuItemProps(item)}
+                            {...slot("item", copy)}
+                            {...(item.testId === undefined
+                                ? {}
+                                : {
+                                      "data-testid": fabMenuItemTestId(
+                                          item,
+                                          "item",
+                                          props.testId,
+                                      ),
+                                  })}
+                        >
+                            {isPresent(item.icon) ? (
+                                <ItemIcon
+                                    mirror={item.mirrorIcon}
+                                    {...slot("itemIcon", copy)}
                                     {...(item.testId === undefined
                                         ? {}
                                         : {
                                               "data-testid": fabMenuItemTestId(
                                                   item,
-                                                  "itemLabel",
+                                                  "itemIcon",
                                                   props.testId,
                                               ),
                                           })}
                                 >
-                                    {item.label}
-                                </ItemLabel>
-                            </Item>
-                        );
-                    })}
-                </List>
-                <CloseTrigger aria-label={fabLabel} {...slot("closeTrigger")}>
-                    <FabIcon icon={icon} closeIcon={closeIcon} />
-                </CloseTrigger>
-            </Root>
-        </ReadyMadeItemCount.Provider>
+                                    {item.icon}
+                                </ItemIcon>
+                            ) : null}
+                            <ItemLabel
+                                {...slot("itemLabel", copy)}
+                                {...(item.testId === undefined
+                                    ? {}
+                                    : {
+                                          "data-testid": fabMenuItemTestId(
+                                              item,
+                                              "itemLabel",
+                                              props.testId,
+                                          ),
+                                      })}
+                            >
+                                {item.label}
+                            </ItemLabel>
+                        </Item>
+                    );
+                })}
+            </List>
+            <CloseTrigger aria-label={fabLabel} {...slot("closeTrigger")}>
+                <FabIcon icon={icon} closeIcon={closeIcon} />
+            </CloseTrigger>
+        </Root>
     );
 }
 

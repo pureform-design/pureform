@@ -39,9 +39,10 @@ old B/C/D/E identifiers. Complexity estimates are relative and may change after 
   was needed (the grid `0fr → 1fr` width trick would have needed one, and a style AST addition).
   Mirrored under right to left; reduced motion keeps only the fade in both directions, verified in
   Chromium against the Panda, CSS and Tailwind outputs. Still open: Native (its presence engine has
-  no clip, so it needs its own layout-capable path), the sampled `SlowEffects` stagger
-  (`--pf-stagger-delay` from `animate-web`) in place of the fixed 25ms step and eight-item cap, and
-  rapid-toggle behavior.
+  no clip, so it needs its own layout-capable path) and rapid-toggle behavior. Web now staggers on
+  the sampled theme `effectsSlow` spring (`animate-web`'s `stagger`, written per item by
+  `binding-web`'s `fabMenuStagger` as `staggerDelay`, with `staggerTotal` for the list's hold):
+  no 25ms step, no eight-item cap, and no item count handed to composed menus.
 - Agreed architecture: generic runtime animation coordination and driver contracts live in
   `animate-core`, separate from the styling AST's `core`. `animate-web` and `animate-react-native`
   depend on and wrap it with Motion-like public APIs; applications import adapters, not core.
@@ -215,12 +216,14 @@ Record device/OS/engine/AT results and recordings; unavailable environments rema
   not take a per-item `testId` (the menu item type has none; group prefixing works through
   `menuProps.testId`); adding it is a separate change to the shared menu item type.
 
-- **7 completed (2026-10-29): FAB-menu item count.** Composed `FabMenu.Root` takes an optional
+- **7 completed (2026-10-29): FAB-menu item count (superseded on web by 10).** Composed `FabMenu.Root` takes an optional
   `itemCount`; without it, the list's registered count applies after mount. The preset's `staggering`
   token is 0 until a count is known, so composed SSR and first hydration render unstaggered rather
   than guessing eight steps. Ready-mades derive count from items; Native's ready-made menu already
   did. Later item additions update the count token without restarting the whole animation. Verified
   in preset (1338), React (1099) and Solid (1184) unit suites; web SSR/device checks remain V3 items.
+  Superseded on 2026-10-30: the web bindings now count the list's own children and write each
+  item's sampled wait, so the `itemCount` prop and the `itemCount`/`staggering` tokens were removed.
 
 - **6 completed (2026-10-29): Native wavy radial geometry.** User approved a shared SVG path
   approach, retaining the non-SVG border fallback rather than adding a native masking dependency.

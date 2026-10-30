@@ -300,6 +300,8 @@ export {
     menuDrillTo,
 } from "./menu-drill-motion";
 export type { MenuDrillSnapshot, MenuDrillTiming } from "./menu-drill-motion";
+export { fabMenuStagger } from "./fab-menu-stagger";
+export type { FabMenuStaggerOptions } from "./fab-menu-stagger";
 export { markMenuGroupEdges } from "./menu-groups";
 export {
     menuSubmenuBoundary,

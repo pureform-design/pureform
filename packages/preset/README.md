@@ -306,14 +306,15 @@ target first, and render the icon slot only when there is an icon.
 - `fabMenu` (M3 Expressive): `closeTrigger` is the FAB (`size` `default`, `medium`, `large`),
   which turns into a round close button in the group's main color while `aria-expanded`;
   `list` (the menu's content) sits above it at its end through logical insets, holding `item`
-  pills (`itemIcon`, `itemLabel`) in the group's container color. `color` takes any group. The
-  items stagger as Compose's do: each grows and fades in (the popup's motion) 25ms after the one
-  nearer the FAB (`FAB_MENU_STAGGER`: Compose's `FloatingActionButtonMenu` runs its stagger on the
-  `SlowEffects` spring, about 90ms to 150ms in all, which 25ms a step spaces evenly), showing
-  its first frame while it waits, and they leave in reverse (the first item goes first); the
-  `list` itself only holds until the last has left, for the `itemCount` token the bindings set
-  (`FAB_MENU_STAGGERED`: up to eight steps, the rest share the last wait). Under reduced motion
-  they fade together.
+  pills (`itemIcon`, `itemLabel`) in the group's container color. `color` takes any group. Each
+  item is revealed from the menu's aligned edge as Compose's are (a rounded `clip-path` reveal on
+  the fast spatial spring, mirrored under right to left, fading in on the fast effects spring), not
+  scaled from its center. The items stagger on the theme's slow effects spring: each waits its own
+  `staggerDelay`, which the bindings sample from that spring (`animate-web`'s `stagger`) and write
+  on the item, so the one nearest the FAB enters first and the farthest leaves first, with no cap
+  on how many; the `list` itself only holds until the last has left, for the `staggerTotal` the
+  bindings write. Until the bindings know the spring (a server render, a first frame), both are 0
+  and the items move together. Under reduced motion they fade together.
 
 ## Shapes
 

@@ -773,7 +773,7 @@ replaces nothing, so nothing deprecated is removed.
 The m3 merge put both transitions on one page model (binding-core `page-transition.ts`):
 `transition: "fadeThrough" | "sharedAxis"` on the ready-made tabs and a row stepper, the fade
 through's root clipping while a page leaves, the shared axis's scrim opt-in (Compose draws it only
-behind predictive back). The FAB menu's items stagger 25ms a step (Compose's
-`FloatingActionButtonMenu` runs its stagger on the `SlowEffects` spring) and the list holds for
-the `itemCount` the bindings set. The dialog, full-screen dialog, side sheet and bottom sheet share
+behind predictive back). The FAB menu's items stagger on the theme's slow effects spring
+(Compose's `FloatingActionButtonMenu` runs its stagger on `SlowEffects`): the bindings sample each
+item's wait and the list holds for the longest. The dialog, full-screen dialog, side sheet and bottom sheet share
 one `OverlayCloseProps`. Nothing deprecated was removed.
