@@ -176,7 +176,7 @@ function PaginatorImpl(props: PaginatorProps): ReactNode {
                                 {...props.selectProps}
                                 variant="outlined"
                                 density={props.density}
-                                label={label}
+                                aria-label={label}
                                 items={paginatorSizeItems(
                                     paginatorPageSizes(
                                         props.pageSizeOptions,

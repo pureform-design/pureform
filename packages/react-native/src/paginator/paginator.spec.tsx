@@ -35,6 +35,16 @@ const press = (part: string) =>
     );
 
 describe("Paginator", () => {
+    it("draws the page size's name once and names the select by it", async () => {
+        await render(<Paginator count={95} />);
+        const root = byTestId("pf-paginator-root");
+        const drawn = root.textContent!.split("Items per page:").length - 1;
+        expect(drawn).toBe(1);
+        expect(
+            root.querySelector('[role="combobox"]')?.getAttribute("aria-label"),
+        ).toBe("Items per page:");
+    });
+
     it("shows the range and steps with the buttons", async () => {
         const onPageChange =
             vi.fn<

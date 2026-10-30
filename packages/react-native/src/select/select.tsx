@@ -89,6 +89,8 @@ interface SelectBaseProps
     /** What the field shows for the chosen options. @default the labels, joined by ", " */
     readonly summary?: ((chosen: readonly SelectItem[]) => string) | undefined;
     readonly testId?: TestIdOverride<SelectPart> | undefined;
+    /** The select's name when it draws no `label`, as the web's `aria-label`. */
+    readonly "aria-label"?: string | undefined;
 }
 
 /** The select's props. The value is the picked item's, `null` for none, controlled when defined;
@@ -110,8 +112,12 @@ export function Select(props: SelectProps): ReactNode {
         testId,
         indication,
         menuProps,
+        "aria-label": ariaLabel,
         ...field
     } = props;
+    const name =
+        ariaLabel ??
+        (typeof props.label === "string" ? props.label : undefined);
     const [chosen, setChosen] = useControllable<"value", SelectValue>(
         "Select",
         "value",
@@ -256,8 +262,8 @@ export function Select(props: SelectProps): ReactNode {
     const listId = useId();
     // React Native Web draws the `Modal` as a `role="dialog"`, which needs a name.
     const windowName =
-        Platform.OS === "web" && typeof props.label === "string"
-            ? ({ "aria-label": props.label } as object)
+        Platform.OS === "web" && name !== undefined
+            ? ({ "aria-label": name } as object)
             : {};
     return (
         <View>
@@ -281,9 +287,7 @@ export function Select(props: SelectProps): ReactNode {
                 ref={combobox as never}
                 // oxlint-disable-next-line jsx-a11y/role-has-required-aria-props -- aria-controls is spread in below while the menu is shown
                 role="combobox"
-                {...(typeof props.label === "string"
-                    ? { "aria-label": props.label }
-                    : {})}
+                {...(name !== undefined ? { "aria-label": name } : {})}
                 aria-expanded={expanded}
                 {...(expanded && presence.present && menu
                     ? { "aria-controls": listId }
@@ -334,8 +338,8 @@ export function Select(props: SelectProps): ReactNode {
                             <MenuListbox
                                 {...menuProps}
                                 listbox={{ id: listId, multiple: !!multiple }}
-                                {...(typeof props.label === "string"
-                                    ? { "aria-label": props.label }
+                                {...(name !== undefined
+                                    ? { "aria-label": name }
                                     : {})}
                                 {...selectMenuSelection({
                                     color: props.color,
