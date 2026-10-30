@@ -102,6 +102,8 @@ export default defineStories({
         Scrim: {
             hooks: ["./src/stages/scrim.ts"],
         },
+        // A coplanar sheet sits in a row beside the page's content.
+        SideSheet: { hooks: ["./src/stages/side-sheet.ts"] },
         // Invisible on its own: drawn in a small element, its area outlined.
         TouchTarget: { hooks: ["./src/stages/touch-target.ts"] },
         FabMenu: {

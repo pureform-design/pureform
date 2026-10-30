@@ -35,6 +35,8 @@ export const sideSheet: ComponentCase = {
             actions: "Save",
         },
         standard: { defaultOpen: true, modal: false },
+        // In the page's layout, beside its content and as tall as the row: the story puts it in one.
+        coplanar: { defaultOpen: true, modal: false, coplanar: true },
     },
     state: { prop: "open", from: false, to: true, act: click, read },
     overlay: overlay({

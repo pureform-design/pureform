@@ -51,12 +51,6 @@ Ordered from easy to complex. "Real" is a component or preset bug; "scene" is th
 
 ### Medium
 
-- **SideSheet > Opened standard > `coplanar` (scene, plus a missing case):** the story never sets
-  `coplanar`; it appears only through the control. `coplanar` is for a standard sheet that shares
-  the page's layout (the content beside it resizes; web positioner is in-flow `display: flex`,
-  RN is the surface in the app's layout), so it needs a page row to sit in. Fix: add a web scene
-  that mirrors RN's `screen("row", …)` for `modal: false`, and a dedicated "Opened: coplanar" case
-  in `component-cases`; then compare the three renderers.
 - **Solid Paginator > Key Space, then click the left arrow, `[EFFECT_RELAY_TEAR]` (cause unknown):**
   the effect is the part's render effect (`solid/src/parts.tsx:240`) under `PrevTrigger`; the
   written signal is the machine's `page` bindable (`solid/src/internal/zag/bindable.ts`). Two
