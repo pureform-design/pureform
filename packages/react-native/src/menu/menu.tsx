@@ -21,6 +21,8 @@ import {
     menuDrillPick,
     menuGrouped,
     menuSelection,
+    menuDrillPathTo,
+    menuSubmenuAdapt,
     menuSubmenuMode,
     menuSubmenuRoomOf,
     submenuPositioning,
@@ -620,7 +622,6 @@ function MenuImpl(
     // fails; they're kept in refs, so caching them renders nothing.
     const box = useRef<{ left: number; right: number } | undefined>(undefined);
     const cachedFrame = useRef(props.containerFrame ?? inherited);
-    // oxlint-disable-next-line react/refs -- the latest value for callbacks and gestures that run after render
     cachedFrame.current = props.containerFrame ?? inherited;
     const cacheBox = () =>
         surface.current?.measureInWindow((x, _y, width) => {
@@ -779,6 +780,13 @@ function MenuImpl(
                 row: { top: row.y, bottom: row.y + row.height },
                 size: { width, height },
             });
+        if (auto && room && bounds)
+            fit.current = {
+                value: chosen.value,
+                row,
+                size: { width, height },
+                menuWidth: bounds.menu.right - bounds.menu.left,
+            };
         if (menuSubmenuMode(props.submenu, room || undefined) === "drill") {
             const next = menuDrillPick(
                 props.items ?? [],
@@ -794,10 +802,92 @@ function MenuImpl(
             ...(how === "key" ? { from: element } : {}),
         });
     };
+    // What a submenu measured as it opened, to tell later whether it still fits (cascading) or
+    // would fit again (drilled into for want of room).
+    const fit = useRef<
+        | {
+              readonly value: string;
+              readonly row: WindowRect;
+              readonly size: {
+                  readonly width: number;
+                  readonly height: number;
+              };
+              readonly menuWidth: number;
+          }
+        | undefined
+    >(undefined);
+    const cascading = beside?.item.value;
+    const drilled = path.length === 1 ? path[0] : undefined;
+    const frame = props.containerFrame ?? inherited;
+    // The window or container changes under an open submenu: a cascade that no longer fits
+    // drills (keeping the submenu), and a drill cascades again with room to spare.
+    useEffect(() => {
+        const measured = fit.current;
+        if (!auto || !visible || !measured) return;
+        const mode =
+            cascading === measured.value
+                ? "cascade"
+                : drilled === measured.value
+                  ? "drill"
+                  : undefined;
+        if (!mode) return;
+        let live = true;
+        void (async () => {
+            const bounds = await boundsNow();
+            if (!live || !bounds) return;
+            const menu =
+                mode === "drill"
+                    ? {
+                          left: bounds.menu.left,
+                          right: bounds.menu.left + measured.menuWidth,
+                      }
+                    : bounds.menu;
+            const room = menuSubmenuRoomOf(menu, bounds.boundary, {
+                row: {
+                    top: measured.row.y,
+                    bottom: measured.row.y + measured.row.height,
+                },
+                size: measured.size,
+            });
+            const now = menuSubmenuAdapt(mode, room);
+            if (now === mode) return;
+            if (mode === "cascade") {
+                const next = menuDrillPathTo(
+                    props.items ?? [],
+                    props.groups ?? [],
+                    measured.value,
+                );
+                setBeside(undefined);
+                if (next) drillTo(next, measured.value, null);
+                return;
+            }
+            const chosen = [
+                ...(props.items ?? []),
+                ...(props.groups ?? []).flatMap((group) => group.items),
+            ].find((entry) => entry.value === measured.value);
+            if (!chosen) return;
+            setPath([]);
+            setBeside({ item: chosen, row: measured.row });
+        })();
+        return () => {
+            live = false;
+        };
+        // oxlint-disable-next-line react-hooks/exhaustive-deps -- measured when the window, the container or the submenu's place changes
+    }, [
+        window_.width,
+        window_.height,
+        frame?.x,
+        frame?.y,
+        frame?.width,
+        frame?.height,
+        cascading,
+        drilled,
+        auto,
+        visible,
+    ]);
     // Out of any submenu once it closes.
     useEffect(() => {
         if (!visible) {
-            // oxlint-disable-next-line react/set-state-in-effect -- a closed menu forgets its drill path and measures once the app closes it
             setMeasuring(undefined);
             setPath([]);
             setFlip(undefined);
@@ -809,7 +899,6 @@ function MenuImpl(
     // The cascaded submenu grows in and fades out as the menu does: the last one shown stays
     // while it goes.
     const lastBeside = useRef(beside);
-    // oxlint-disable-next-line react/refs -- the last side the submenu showed beside, kept while it leaves
     if (beside) lastBeside.current = beside;
     const cascade = useOverlayPresence(
         visible && beside !== undefined,
@@ -819,7 +908,6 @@ function MenuImpl(
     const id = (part: Part) =>
         testIdOf(menuOverlayAnatomy, KEYS(part) as Key, props.testId);
     const slot = nativeSlots(props, KEYS);
-    // oxlint-disable-next-line react/refs -- the last side the submenu showed beside, kept while it leaves
     const shownBeside = lastBeside.current;
     // During a drill step, the row its label moves into takes it (`flip`), and the others fade
     // in (`FadeIn`, remounted for each step's level).
@@ -987,7 +1075,6 @@ function MenuImpl(
                 // outside both.
                 <Portal layer="menu">
                     <Anchored
-                        // oxlint-disable-next-line react/refs -- the last side the submenu showed beside, kept while it leaves
                         anchor={shownBeside.row}
                         positioning={submenuPositioning(rtl ? "rtl" : "ltr")}
                         placement="right-start"

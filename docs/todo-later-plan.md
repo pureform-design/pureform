@@ -205,6 +205,16 @@ old B/C/D/E identifiers. Complexity estimates are relative and may change after 
 - Explicit cascade/drill modes remain explicit. Test lifecycle/observer cleanup and integrate with
   Native exit/drill work (5, 13); verify Native measurement on devices, not just Native Web.
 
+- Implemented (2026-10-30) in React, Solid and Native: an open `auto` cascade that stops fitting
+  drills (keeping the submenu and moving the keys into the menu), and a drilled one cascades again
+  once it fits with `MENU_SUBMENU_MARGIN` (16px) to spare (`menuSubmenuAdapt` in binding-core, so the
+  boundary doesn't flicker). Web observes the anchor's ancestors, menu and submenu (ResizeObserver)
+  plus window resize, cleaned up on close; Native re-measures on window and container-frame change.
+  Re-opening uses what was measured as it stopped fitting. Rendered tests (panel narrowing and
+  widening; Native viewport) fail without it. Limits: a drill deeper than one level stays until
+  backed out; a keyboard user's focus returning into the re-opened cascade, scroll-driven changes,
+  and Native device measurement are not verified (V3). The 16px value is a first choice, not tuned.
+
 ### 16. Select multiple-value mode
 
 - Add a mode of Select, not a separate MultiSelect component. NativeSelect already has multiple mode.

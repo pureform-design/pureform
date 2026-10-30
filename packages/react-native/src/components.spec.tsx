@@ -1595,6 +1595,43 @@ describe("nested rows", () => {
         }
     });
 
+    it("drills the open submenu when the window narrows, and cascades back when room returns", async () => {
+        const centered = (
+            <View style={{ alignItems: "center" }}>
+                <Menu items={SHARE} />
+            </View>
+        );
+        const widthIs = (width: number) =>
+            until(() => expect(Dimensions.get("window").width).toBe(width));
+        try {
+            await page.viewport(1000, 800);
+            await widthIs(1000);
+            await render(centered);
+            await settle(100);
+            await interact(() =>
+                userEvent.click(
+                    document.querySelectorAll<HTMLElement>(
+                        '[role="menuitem"]',
+                    )[1]!,
+                ),
+            );
+            await until(() =>
+                expect(menuLabels()).toEqual(["Cut", "Share›", "Mail"]),
+            );
+            await page.viewport(320, 800);
+            await widthIs(320);
+            await until(() => expect(menuLabels()).toEqual(["‹Share", "Mail"]));
+            expect(document.querySelectorAll('[role="menu"]')).toHaveLength(1);
+            await page.viewport(1000, 800);
+            await widthIs(1000);
+            await until(() =>
+                expect(menuLabels()).toEqual(["Cut", "Share›", "Mail"]),
+            );
+        } finally {
+            await page.viewport(414, 896);
+        }
+    });
+
     it("shows an expanded rail's section headings", async () => {
         await render(
             <NavigationRail
