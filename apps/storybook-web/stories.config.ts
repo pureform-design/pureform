@@ -33,8 +33,6 @@ const TREE_NAME = {
 };
 const NO_FILE_INPUT =
     "React Native has no file input to give files to: its trigger calls the app's onPick.";
-const NO_CAROUSEL_KEYS =
-    "React Native's carousel pages follow its native scroll; arrow keys between items would have to drive it.";
 const keyClicks = (...stories: readonly string[]) =>
     native(
         Object.fromEntries(
@@ -200,14 +198,6 @@ export default defineStories({
                 layout: "fullscreen",
                 pureform: {
                     width: 1280,
-                    // React Native's pages follow its native scroll, and it has no arrow keys
-                    // between its items: they would have to drive that scroll.
-                    skip: {
-                        native: {
-                            Light: { play: NO_CAROUSEL_KEYS },
-                            Dark: { play: NO_CAROUSEL_KEYS },
-                        },
-                    },
                 },
                 viewport: {
                     options: {

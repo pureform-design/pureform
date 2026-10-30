@@ -24,22 +24,11 @@ Confirm in the storybook before changing.
 
 ### 2. Remaining scene work
 
-- **Carousel arrow keys:** expected on touch-first RN (already recorded in the stories' skips); no
-  change planned.
-
-### 3. Small decisions, then a small fix
-
-
 ### 4. Not reproduced
 
 - **TimeInput border radius:** the input, period selector and root radii are identical on Solid,
   React and React Native in the storybook and the suites (28px root, 8px fields). Reopen with a
   screenshot of the scene that differs.
-
-### 5. New behavior
-
-- **Carousel arrow-key parity on react-native-web (optional):** add `onKeyDown` focus-and-scroll on
-  the masks.
 
 ### 6. Complex
 

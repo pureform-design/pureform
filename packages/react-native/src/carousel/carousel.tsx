@@ -22,10 +22,11 @@ import type {
     ChangeDetails,
 } from "@pureform/binding-core";
 import type { Indication } from "@pureform/binding-core/indication";
+import { rovingIndex } from "@pureform/machines/interaction";
 import { useReducedMotion } from "@pureform/rn-adapter/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { ScrollView } from "react-native";
+import { Platform, ScrollView } from "react-native";
 import type {
     ScrollViewInstance,
     LayoutChangeEvent,
@@ -36,6 +37,7 @@ import type {
 import { ownText } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
+import { useDirection } from "../provider";
 import { resolveText } from "../resolve-text";
 import { useNativeSlotReader } from "../slot-props";
 import type { NativeSlotProps, PartSlots } from "../slot-props";
@@ -91,6 +93,9 @@ interface ItemProps {
     readonly onPress: ((index: number) => void) | undefined;
     readonly testId: TestIdOverride<CarouselPart> | undefined;
     readonly slot: PartSlots;
+    /** Web only: the mask's ref, and the arrow keys moving focus between masks. */
+    readonly maskRef: ((mask: unknown) => void) | undefined;
+    readonly onKey: ((index: number, key: string) => boolean) | undefined;
 }
 
 function ItemImpl({
@@ -103,6 +108,8 @@ function ItemImpl({
     onPress,
     testId,
     slot,
+    maskRef,
+    onKey,
 }: ItemProps): ReactNode {
     const indication = useSurfaceIndication(MASK_INDICATION, {
         indication: given,
@@ -131,6 +138,18 @@ function ItemImpl({
         >
             <v.mask.Pressable
                 {...slot.props("mask", each)}
+                ref={maskRef as never}
+                {...(onKey
+                    ? ({
+                          onKeyDown: (event: {
+                              nativeEvent: { key: string };
+                              preventDefault?: () => void;
+                          }) => {
+                              if (onKey(index, event.nativeEvent.key))
+                                  event.preventDefault?.();
+                          },
+                      } as object)
+                    : {})}
                 {...slot.with("mask", indication.handlers, each)}
                 role="button"
                 {...(item["aria-label"] === undefined
@@ -276,6 +295,22 @@ function CarouselImpl(props: CarouselProps): ReactNode {
             animated: !reducedMotion,
         });
     }, [page, offsets, reducedMotion]);
+    // On the web (react-native-web), as the web carousel's: the arrow keys, Home and End move
+    // focus between the items and bring the focused one into view. Touch scrolling is untouched.
+    const masks = useRef(new Map<number, { focus?: () => void }>());
+    const rtl = useDirection() === "rtl";
+    const onKey = (index: number, key: string) => {
+        const next = rovingIndex(key, index, props.items.length, { rtl });
+        if (next === undefined) return false;
+        masks.current.get(next)?.focus?.();
+        shown.current = next;
+        if (next !== page) setPage(next);
+        row.current?.scrollTo({
+            x: offsets[next] ?? 0,
+            animated: !reducedMotion,
+        });
+        return true;
+    };
     const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) =>
         setScroll(Math.abs(event.nativeEvent.contentOffset.x));
     const onSettle = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -343,6 +378,15 @@ function CarouselImpl(props: CarouselProps): ReactNode {
                         onPress={props.onItemPress}
                         testId={props.testId}
                         slot={slot}
+                        maskRef={
+                            Platform.OS === "web"
+                                ? (mask) => {
+                                      if (mask) masks.current.set(index, mask);
+                                      else masks.current.delete(index);
+                                  }
+                                : undefined
+                        }
+                        onKey={Platform.OS === "web" ? onKey : undefined}
                     />
                 ))}
             </ScrollView>
