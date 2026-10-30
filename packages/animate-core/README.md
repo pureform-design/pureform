@@ -8,7 +8,10 @@ updates and animation execution; the contract must permit native/UI-thread execu
 requiring a JavaScript callback on every frame.
 
 The shared contract describes animation intent, not a mandatory frame loop. Adapters select the
-fastest compatible platform abstraction by capability, target and animated property; core must
+fastest compatible platform abstraction by capability, target and animated property (CSS first on
+the web, the fastest native path first on React Native, JavaScript only as a fallback). Core
+prefers precomputed timing, such as stagger delays, that any driver can hand to its fastest path;
+core must
 not force accelerated work through JavaScript or framework renders. Keep values and coordinated
 stagger execution on the driver's execution thread where supported, notifying bindings of
 visibility boundaries or lifecycle events rather than every frame. Fall back only for unsupported
@@ -18,5 +21,8 @@ Applications import `@pureform/animate-web` or `@pureform/animate-react-native`,
 Adapters wrap core with their own Motion-like public APIs rather than expose core directly.
 Component measurement, layout and accessibility remain in the bindings.
 
-This scaffold has no runtime API or behavior tests yet. Fixed-delay stagger and spring-driven
-visibility progression are distinct capabilities. Existing animation code is not migrated here.
+This package has one capability so far: `staggerDelays`, which turns a progression curve into one
+wait per item, relative to the first item to move. Fixed-delay stagger and spring-driven
+visibility progression are distinct capabilities; this is the second, sampled into plain numbers
+a driver can hand to its fastest path (a CSS `animation-delay`, a native delay). It has no host,
+timer or framework dependency. Existing animation code is not migrated here.

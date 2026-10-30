@@ -1,2 +1,4 @@
-// Platform-neutral coordination and driver contracts will live here. Consumers use adapters.
-export {};
+// Platform-neutral animation coordination. Consumers import `@pureform/animate-web` or
+// `@pureform/animate-react-native`, not this package.
+export { staggerDelays } from "./stagger";
+export type { StaggerCurve, StaggerOptions } from "./stagger";
