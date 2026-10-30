@@ -21,8 +21,10 @@ Applications import `@pureform/animate-web` or `@pureform/animate-react-native`,
 Adapters wrap core with their own Motion-like public APIs rather than expose core directly.
 Component measurement, layout and accessibility remain in the bindings.
 
-This package has one capability so far: `staggerDelays`, which turns a progression curve into one
-wait per item, relative to the first item to move. Fixed-delay stagger and spring-driven
-visibility progression are distinct capabilities; this is the second, sampled into plain numbers
-a driver can hand to its fastest path (a CSS `animation-delay`, a native delay). It has no host,
-timer or framework dependency. Existing animation code is not migrated here.
+Two capabilities so far. `staggerDelays` turns a progression curve into one wait per item, relative
+to the first item to move. `staggerOnSpring` samples a spring into that curve (and reports its settle
+time), so the web and React Native run the same sequence from the same spring. Fixed-delay stagger
+and spring-driven visibility progression are distinct capabilities; this is the second, sampled into
+plain numbers a driver can hand to its fastest path (a CSS `animation-delay`, a native delay). It
+depends only on `@pureform/core` for the spring math, and has no host, timer or framework
+dependency. Existing animation code is not migrated here.

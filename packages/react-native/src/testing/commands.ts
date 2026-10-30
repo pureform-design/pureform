@@ -9,6 +9,7 @@ import {
     DIALOG_MOTION,
     FADE_THROUGH_KEYFRAMES,
     FADE_THROUGH_MOTION,
+    FAB_MENU_ITEM_MOTION,
     FAB_MENU_LIST_MOTION,
     OVERLAY_KEYFRAMES,
     POPUP_MOTION,
@@ -102,7 +103,18 @@ const overlayMotions: BrowserCommand<[]> = () => ({
     motions: {
         popup: POPUP_MOTION,
         fabMenuList: FAB_MENU_LIST_MOTION,
-        fabMenuItem: POPUP_MOTION,
+        // The item's fade alone: the preset's reveal is a clip, which Native runs as a width
+        // spring of its own, so what the two share is the fade's spring.
+        fabMenuItem: {
+            enter: {
+                keyframes: "overlayFadeIn",
+                ...FAB_MENU_ITEM_MOTION.enter.fade,
+            },
+            exit: {
+                keyframes: "overlayFadeOut",
+                ...FAB_MENU_ITEM_MOTION.exit.fade,
+            },
+        },
         dialog: DIALOG_MOTION,
         bottomSheet: BOTTOM_SHEET_MOTION,
         sideSheet: SIDE_SHEET_MOTION,

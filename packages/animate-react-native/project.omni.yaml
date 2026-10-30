@@ -7,6 +7,8 @@ extends:
 dependencies:
   append:
     - "@pureform/animate-core"
+    - "@pureform/core"
+    - "@pureform/animate-web"
     - "@pureform/tsconfig"
     - "@pureform/vite-config"
     - "@pureform/vitest-config"

@@ -17,5 +17,9 @@ stagger coordination off the JavaScript thread where supported, and cross thread
 required events rather than per-frame React updates. Preserve the same lifecycle semantics on
 accelerated and fallback paths, with driver-selection and interruption tests plus device profiling.
 
-This scaffold has no runtime API or behavior tests yet. It does not replace the existing engines
-in `@pureform/rn-adapter` or the React Native binding.
+It has one capability so far: `stagger`, the same sampled waits as `@pureform/animate-web`'s, from the
+same spring (`animate-core`'s `staggerOnSpring`; a test checks the two agree), for the engine to hand
+to its fastest path. The FAB menu uses it with an Animated width spring for each item's reveal. It
+does not replace the existing engines in `@pureform/rn-adapter` or the React Native binding. Animated
+and Reanimated entry points, and other drivers, will be added when something needs them, not as
+placeholder exports.

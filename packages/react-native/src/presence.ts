@@ -153,19 +153,13 @@ export const OVERLAY_MOTIONS = {
         enter: { keyframes: "overlayHold", spring: "spatialFast" },
         exit: { keyframes: "overlayHold", spring: "spatialFast" },
     },
-    /** One of the FAB menu's items: grows and fades in as a popup does, each after the one nearer
-     *  the FAB, and leaves in reverse. */
+    /** One of the FAB menu's items: fades in and out on its own (each after the one nearer the
+     *  FAB, which its owner times). It is revealed from the menu's aligned edge by the item's
+     *  own width spring, which clips rather than scales it (the preset's reveal), so this is its
+     *  fade alone. */
     fabMenuItem: {
-        enter: {
-            keyframes: "overlayGrowIn",
-            spring: "spatialFast",
-            fade: { spring: "effectsFast" },
-        },
-        exit: {
-            keyframes: "overlayShrinkOut",
-            spring: "spatialFast",
-            fade: { spring: "effectsFast" },
-        },
+        enter: { keyframes: "overlayFadeIn", spring: "effectsFast" },
+        exit: { keyframes: "overlayFadeOut", spring: "effectsFast" },
     },
     dialog: {
         enter: {
@@ -314,6 +308,31 @@ export const themeSpring = (
     );
 };
 
+/** A spring role in a theme as a spring to sample (`animate-react-native`'s `stagger`): its
+ *  stiffness and mass, and its damping as the ratio the web and the sampler take. A theme's
+ *  values hold the coefficient `2ζ√(k·m)` that React Native's engines run, so this turns it back
+ *  into the ratio ζ. `undefined` when the theme doesn't define the role. */
+export const themeSpringRatio = (
+    role: string,
+    tokens: ThemeValues,
+):
+    | { type: "spring"; stiffness: number; damping: number; mass: number }
+    | undefined => {
+    const read = (field: string) => Number(tokens[`springs.${role}.${field}`]);
+    const [stiffness, coefficient, mass] = [
+        read("stiffness"),
+        read("damping"),
+        read("mass"),
+    ];
+    if (!(stiffness > 0 && coefficient >= 0 && mass > 0)) return undefined;
+    return {
+        type: "spring",
+        stiffness,
+        damping: coefficient / (2 * Math.sqrt(stiffness * mass)),
+        mass,
+    };
+};
+
 // A timing in a theme: its duration (`timeScale` times as long) and curve, and for a spring,
 // its physics, slowed `timeScale` times (`slowSpring`).
 const timingOf = (
@@ -390,7 +409,9 @@ export const overlayMotion = (
         if (reducedMotion && moving) {
             return { ...ends, ...timingOf(fade ?? timing, tokens, timeScale) };
         }
-        const wait = (delay[phase] ?? 0) * timeScale;
+        // Reduced motion drops the stagger too, as the preset's reduced rule does: the items
+        // fade together.
+        const wait = reducedMotion ? 0 : (delay[phase] ?? 0) * timeScale;
         const waiting = wait > 0 ? { delay: wait } : {};
         return {
             ...ends,

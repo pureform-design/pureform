@@ -11,6 +11,7 @@ dependencies:
     - "@pureform/vitest-config"
     - "@pureform/styling"
     - "@pureform/anatomy"
+    - "@pureform/animate-react-native"
     - "@pureform/binding-core"
     - "@pureform/machines"
     - "@pureform/rn-adapter"

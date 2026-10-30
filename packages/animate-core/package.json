@@ -16,7 +16,9 @@
             }
         }
     },
-    "dependencies": {},
+    "dependencies": {
+        "@pureform/core": "workspace:^"
+    },
     "devDependencies": {
         "@pureform/tsconfig": "workspace:^",
         "@pureform/vite-config": "workspace:^",

@@ -681,10 +681,16 @@ trigger shows their labels joined by ", " (the placeholder when none):
 - **Split button and FAB menu:** `SplitButton` renders its two buttons as the `Menu`'s trigger
   (`trigger` as a function), so the menu opens over the page under the trailing button, at its
   end. `FabMenu` opens its items in the portal above the FAB, at its end; the `list` slot's
-  logical insets, which place it on the web, are dropped there, since the portal places it. Each item runs its own presence (`fabMenuItem`, the popup's motion
-  with a `delay`), so they enter from the one nearest the FAB and leave in reverse; the list
-  (`fabMenuList`) holds until the last has left. `usePresence` takes an optional per-phase
-  `delay` in ms.
+  logical insets, which place it on the web, are dropped there, since the portal places it. Each item is revealed from the menu's aligned edge as Compose's is, not scaled from its
+  center: its content keeps the width it measured, anchored to the logical end edge, while a
+  clipping wrapper's width springs from nothing on the spatial spring (a layout property, so it runs
+  on JavaScript rather than the native driver) as the item fades in on its own presence
+  (`fabMenuItem`, a fade with a `delay`). A toggle mid-reveal carries on from the width it's at.
+  The items stagger on the theme's slow effects spring, sampled by `animate-react-native`'s
+  `stagger` (the same waits as the web's), so they enter from the one nearest the FAB and leave
+  in reverse; the list (`fabMenuList`) holds until the last has left. Under reduced motion they
+  fade together, fully shown, with no stagger. `usePresence` takes an optional per-phase `delay`
+  in ms.
 - **Long lists:** each interactive `ListItem` takes about 0.4 to 0.5 ms to mount in development
   (its source, indication, and selection), so render long lists with `FlatList`, which mounts only
   the rows near the screen. Key rows by their value, not their index, memoize the row, and keep

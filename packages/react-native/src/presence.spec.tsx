@@ -1,4 +1,5 @@
 import { testIds } from "@pureform/anatomy";
+import { stagger } from "@pureform/animate-react-native";
 import type { ReactNode } from "react";
 import { afterEach, beforeAll, describe, expect, it } from "vitest";
 import { commands, userEvent } from "vitest/browser";
@@ -18,6 +19,7 @@ import type { MotionEngine } from "./engine";
 import { reanimated } from "./engines/reanimated";
 import { FabMenu } from "./fab-menu";
 import { Menu } from "./menu";
+import { themeSpringRatio } from "./presence";
 import { Scrim } from "./scrim";
 import { Select } from "./select";
 import { Snackbar } from "./snackbar";
@@ -154,18 +156,10 @@ describe("the overlay motions", () => {
             </PureformProvider>,
         );
         const size = { width: 0, height: 0 };
-        const waiting = overlayMotion(
-            "fabMenuItem",
-            tokens,
-            false,
-            2,
-            size,
-            false,
-            {
-                enter: 50,
-                exit: 100,
-            },
-        );
+        const waiting = overlayMotion("popup", tokens, false, 2, size, false, {
+            enter: 50,
+            exit: 100,
+        });
         expect(waiting.enter).toMatchObject({
             delay: 100,
             fade: { delay: 100 },
@@ -174,10 +168,20 @@ describe("the overlay motions", () => {
             delay: 200,
             fade: { delay: 200 },
         });
-        const reduced = overlayMotion(
+        const reduced = overlayMotion("popup", tokens, true, 2, size, false, {
+            enter: 50,
+            exit: 100,
+        });
+        expect(reduced.enter).not.toHaveProperty("delay");
+        expect(overlayMotion("popup", tokens, false).enter).not.toHaveProperty(
+            "delay",
+        );
+        // The FAB menu's item is only a fade here (its reveal is its own width spring), which
+        // waits its delay the same way.
+        const item = overlayMotion(
             "fabMenuItem",
             tokens,
-            true,
+            false,
             2,
             size,
             false,
@@ -186,10 +190,43 @@ describe("the overlay motions", () => {
                 exit: 100,
             },
         );
-        expect(reduced.enter).not.toHaveProperty("delay");
+        expect(item.enter).toMatchObject({ delay: 100 });
+        expect(item.exit).toMatchObject({ delay: 200 });
+        expect(item.enter).not.toHaveProperty("fade");
+        expect(item.enter.from.scale).toBeUndefined();
         expect(
-            overlayMotion("fabMenuItem", tokens, false).enter,
+            overlayMotion("fabMenuItem", tokens, true, 2, size, false, {
+                enter: 50,
+            }).enter,
         ).not.toHaveProperty("delay");
+    });
+
+    it("reads a spring role as the damping ratio the sampler takes, not the coefficient the engines run", async () => {
+        let tokens!: import("@pureform/rn-adapter/factory").ThemeValues;
+        function Read(): ReactNode {
+            // oxlint-disable-next-line react/globals -- the test harness captures what it drives from outside the component
+            tokens = useTokens();
+            return null;
+        }
+        await mount(
+            <PureformProvider registry={registry}>
+                <Read />
+            </PureformProvider>,
+        );
+        // The theme's slow effects spring: stiffness 800, critically damped.
+        const spring = themeSpringRatio("effectsSlow", tokens)!;
+        expect(spring.stiffness).toBe(800);
+        expect(spring.mass).toBe(1);
+        expect(spring.damping).toBeCloseTo(1, 3);
+        // The engines run the coefficient: 2ζ√(k·m).
+        expect(tokens["springs.effectsSlow.damping"]).toBeCloseTo(
+            2 * Math.sqrt(800),
+            3,
+        );
+        // The waits are the web's for the same spring: nearest the FAB first, in tens of ms.
+        const { delays } = stagger({ count: 3, spring, phase: "enter" });
+        expect(delays).toEqual([89, 34, 0]);
+        expect(themeSpringRatio("noSuchSpring", tokens)).toBeUndefined();
     });
 
     it("take the theme's durations and curves, the time scale, and fades under reduced motion", async () => {
@@ -381,7 +418,10 @@ describe.each(ENGINES)("with $name", (engine) => {
         { timeout: 60_000 },
         async () => {
             const fab = testIds.fabMenu;
-            const wrapper = (item: Element) => item.parentElement!;
+            // The engine's view that fades: the item's pressable, its measuring view, and the width wrapper
+            // sit inside it.
+            const wrapper = (item: Element) =>
+                item.parentElement!.parentElement!.parentElement!;
             await render(
                 <FabMenu
                     icon="+"

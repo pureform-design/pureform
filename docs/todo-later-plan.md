@@ -38,11 +38,31 @@ old B/C/D/E identifiers. Complexity estimates are relative and may change after 
   needs no layout per frame, so it looks the same and runs on the CSS fast path. No new anatomy part
   was needed (the grid `0fr → 1fr` width trick would have needed one, and a style AST addition).
   Mirrored under right to left; reduced motion keeps only the fade in both directions, verified in
-  Chromium against the Panda, CSS and Tailwind outputs. Still open: Native (its presence engine has
-  no clip, so it needs its own layout-capable path) and rapid-toggle behavior. Web now staggers on
+  Chromium against the Panda, CSS and Tailwind outputs. Web now staggers on
   the sampled theme `effectsSlow` spring (`animate-web`'s `stagger`, written per item by
   `binding-web`'s `fabMenuStagger` as `staggerDelay`, with `staggerTotal` for the list's hold):
-  no 25ms step, no eight-item cap, and no item count handed to composed menus.
+  no 25ms step, no eight-item cap, and no item count handed to composed menus. The spring is read
+  from the real generated CSS in every styling (e2e), not only fake registries.
+- Native progress (2026-10-30): the same motion on React Native, from the same sampled waits
+  (`animate-react-native`'s `stagger`, with `animate-core`'s `staggerOnSpring` shared with the web,
+  and a parity test that the two give identical waits). Each item's content keeps its measured
+  width, anchored to the logical end edge, under a clipping wrapper whose width springs on the
+  spatial spring; the fade stays on the presence engine, so the item's presence (`fabMenuItem`) is
+  now fade-only. Width is a layout property, so that spring runs on JavaScript, not the native
+  driver or the UI thread, which is the capability-specific path the policy allows. A toggle
+  mid-reveal continues from the current width (Animated springs retarget). Reduced motion drops the
+  stagger (`overlayMotion` now drops delays for fade-only steps too, as the preset's reduced rule
+  does) and leaves the item fully shown for its fade. A theme's damping is a coefficient
+  (`2ζ√(k·m)`), so `themeSpringRatio` converts it back to the ratio the sampler takes; reading it as
+  a ratio gave multi-second waits, now covered by a regression test. Verified on React Native Web
+  with the animated and reanimated engines (full Native suite, 1049 tests); the mirrored edge under a
+  right-to-left layout, device frame rates and the JavaScript-driven width on low-end devices are V3
+  device checks (React Native Web resolves the logical edge from the global direction, not per
+  subtree).
+- Known limitation, web: toggling the menu rapidly mid-animation restarts each item's CSS animation
+  from its first frame, so an item can visibly jump. Native carries on smoothly. A fix needs a Web
+  Animations path that reverses from the current time (the tier-two driver `animate-web` is meant to
+  grow); not started, and not yet measured in a real browser.
 - Agreed architecture: generic runtime animation coordination and driver contracts live in
   `animate-core`, separate from the styling AST's `core`. `animate-web` and `animate-react-native`
   depend on and wrap it with Motion-like public APIs; applications import adapters, not core.

@@ -267,6 +267,9 @@
     "packages/animate-core": {
       "name": "@pureform/animate-core",
       "version": "0.0.0-semantically-released",
+      "dependencies": {
+        "@pureform/core": "workspace:^",
+      },
       "devDependencies": {
         "@pureform/tsconfig": "workspace:^",
         "@pureform/vite-config": "workspace:^",
@@ -282,8 +285,10 @@
       "version": "0.0.0-semantically-released",
       "dependencies": {
         "@pureform/animate-core": "workspace:^",
+        "@pureform/core": "workspace:^",
       },
       "devDependencies": {
+        "@pureform/animate-web": "workspace:^",
         "@pureform/tsconfig": "workspace:^",
         "@pureform/vite-config": "workspace:^",
         "@pureform/vitest-config": "workspace:^",
@@ -694,6 +699,7 @@
       "version": "0.0.0-semantically-released",
       "dependencies": {
         "@pureform/anatomy": "workspace:^",
+        "@pureform/animate-react-native": "workspace:^",
         "@pureform/binding-core": "workspace:^",
         "@pureform/machines": "workspace:^",
       },

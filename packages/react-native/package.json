@@ -599,6 +599,7 @@
     },
     "dependencies": {
         "@pureform/anatomy": "workspace:^",
+        "@pureform/animate-react-native": "workspace:^",
         "@pureform/binding-core": "workspace:^",
         "@pureform/machines": "workspace:^"
     },

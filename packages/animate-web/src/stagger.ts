@@ -3,8 +3,7 @@
 // its wait as the `--pf-stagger-delay` custom property, which the item's own CSS animation reads
 // (`animation-delay: var(--pf-stagger-delay)`). No frame of the sequence runs JavaScript.
 
-import { staggerDelays } from "@pureform/animate-core";
-import { settleTime, springAt, springProblem } from "@pureform/core";
+import { staggerOnSpring } from "@pureform/animate-core";
 import type { SpringNode } from "@pureform/core/ast";
 
 /** The custom property an item's CSS animation reads its wait from. */
@@ -38,21 +37,17 @@ const ms = (value: number): string => `${Math.round(value * 100) / 100}ms`;
 
 /** A stagger on a theme spring, as CSS custom properties per item. */
 export const stagger = (options: StaggerOptions): Stagger => {
-    const { count, spring, phase, from, reducedMotion } = options;
-    const problem = springProblem(spring);
-    if (problem) throw new Error(`stagger: ${problem}`);
-    // The spring's settle time, in ms, bounds the sequence.
-    const duration = Math.ceil(settleTime(spring) * 1000);
-    const delays = staggerDelays({
-        count,
-        curve: (time) => springAt(spring, time / 1000),
-        duration,
-        phase,
-        ...(from === undefined ? {} : { from }),
+    const { delays, duration } = staggerOnSpring({
+        count: options.count,
+        spring: options.spring,
+        phase: options.phase,
+        ...(options.from === undefined ? {} : { from: options.from }),
         ...(options.timeScale === undefined
             ? {}
             : { timeScale: options.timeScale }),
-        ...(reducedMotion === undefined ? {} : { reducedMotion }),
+        ...(options.reducedMotion === undefined
+            ? {}
+            : { reducedMotion: options.reducedMotion }),
     });
     return {
         delays,

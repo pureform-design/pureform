@@ -17,13 +17,15 @@
         }
     },
     "dependencies": {
-        "@pureform/animate-core": "workspace:^"
+        "@pureform/animate-core": "workspace:^",
+        "@pureform/core": "workspace:^"
     },
     "devDependencies": {
-        "@types/node": "catalog:",
+        "@pureform/animate-web": "workspace:^",
         "@pureform/tsconfig": "workspace:^",
         "@pureform/vite-config": "workspace:^",
         "@pureform/vitest-config": "workspace:^",
+        "@types/node": "catalog:",
         "typescript": "catalog:",
         "vite": "catalog:",
         "vitest": "catalog:"

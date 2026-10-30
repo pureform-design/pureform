@@ -4,6 +4,7 @@
 
 import { fabMenuAnatomy } from "@pureform/anatomy";
 import type { TestIdOverride } from "@pureform/anatomy";
+import { stagger } from "@pureform/animate-react-native";
 import {
     fabMenuItemTestId,
     fabMenuPositioning,
@@ -22,9 +23,12 @@ import type {
     OverlayPositioning,
 } from "@pureform/binding-core";
 import type { Indication } from "@pureform/binding-core/indication";
-import { useReducedMotion } from "@pureform/rn-adapter/react";
+import { useReducedMotion, useTokens } from "@pureform/rn-adapter/react";
 import type { Selection } from "@pureform/styling";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
+import { Animated, View } from "react-native";
+import type { LayoutChangeEvent } from "react-native";
 
 import { IconSlot, iconSlot } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
@@ -32,8 +36,8 @@ import { useInteractionSource } from "../interaction";
 import { Anchored, useAnchoredOverlay } from "../overlay";
 import { testIdOf, useStableCallback, withEngine } from "../parts";
 import { Portal } from "../portal";
-import { useOverlayPresence } from "../presence";
-import { useEngine } from "../provider";
+import { themeSpring, themeSpringRatio, useOverlayPresence } from "../presence";
+import { useEngine, usePureform } from "../provider";
 import { useNativeSlotReader, withUnselectable } from "../slot-props";
 import type { PartSlots } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
@@ -77,19 +81,68 @@ export interface FabMenuProps
     readonly testId?: TestIdOverride<FabMenuPart> | undefined;
 }
 
-// The items that stagger: the rest share the last one's wait. Each waits 25ms more than the one
-// before it: Compose's spring-driven stagger, evenly spaced. The web samples the theme's slow effects
-// spring instead (`animate-web`'s `stagger`); this stays a fixed step until Native takes the same
-// sampled delays.
-const STAGGERED = 8;
+interface Size {
+    readonly width: number;
+    readonly height: number;
+}
 
-/** How long each item waits after the one before it, in ms. */
-const STAGGER = 25;
+// An item is revealed from the menu's aligned edge, as Compose's is: its content is laid out at
+// the width it measured, anchored to the end edge, and a wrapper clips it while its width springs
+// from nothing to that width (and back). Width is a layout property, so unlike the fade it can't
+// run on the native driver. A new target carries on from the width it's at, so toggling mid-reveal
+// doesn't jump. Reduced motion, or no spring in the theme, leaves it fully shown for the fade.
+function useReveal(
+    open: boolean,
+    delay: number,
+    size: Size | undefined,
+): Animated.Value {
+    const tokens = useTokens();
+    const reducedMotion = useReducedMotion();
+    const { timeScale } = usePureform();
+    const spring = reducedMotion
+        ? undefined
+        : themeSpring("spatialFast", tokens, timeScale);
+    const progress = useRef(new Animated.Value(spring ? 0 : 1)).current;
+    useEffect(() => {
+        if (!size) return undefined;
+        if (!spring) {
+            progress.setValue(1);
+            return undefined;
+        }
+        const run = Animated.sequence([
+            Animated.delay(delay * timeScale),
+            Animated.spring(progress, {
+                toValue: open ? 1 : 0,
+                stiffness: spring.stiffness,
+                damping: spring.damping,
+                mass: spring.mass,
+                overshootClamping: true,
+                useNativeDriver: false,
+            }),
+        ]);
+        run.start();
+        return () => run.stop();
+        // The spring's numbers, not the object, which is new each render and would restart it.
+        // oxlint-disable-next-line react-hooks/exhaustive-deps -- keyed by the spring's values
+    }, [
+        open,
+        delay,
+        size,
+        spring?.stiffness,
+        spring?.damping,
+        spring?.mass,
+        timeScale,
+        progress,
+    ]);
+    return progress;
+}
 
 function FabMenuItemImpl(props: {
     readonly item: FabMenuItem<ReactNode>;
     readonly index: number;
-    readonly count: number;
+    /** How long it waits to enter and to leave, in ms: its place in the menu's stagger. */
+    readonly enterDelay: number;
+    readonly exitDelay: number;
     readonly open: boolean;
     readonly selection: Selection<"fabMenu">;
     readonly indication: Indication | undefined;
@@ -123,52 +176,98 @@ function FabMenuItemImpl(props: {
             ? { index: props.index, item }
             : undefined;
     const engine = useEngine();
-    const wait = (steps: number) => Math.min(steps, STAGGERED - 1) * STAGGER;
-    // The item nearest the FAB (the last) enters first, the farthest leaves first.
+    // The fade; the reveal is the wrapper's width.
     const presence = useOverlayPresence(props.open, "fabMenuItem", {
-        enter: wait(props.count - 1 - props.index),
-        exit: wait(props.index),
+        enter: props.enterDelay,
+        exit: props.exitDelay,
     });
+    const [size, setSize] = useState<Size>();
+    const measure = (event: LayoutChangeEvent) => {
+        const { width, height } = event.nativeEvent.layout;
+        setSize((last) =>
+            last?.width === width && last.height === height
+                ? last
+                : { width, height },
+        );
+    };
+    const reveal = useReveal(
+        props.open,
+        props.open ? props.enterDelay : props.exitDelay,
+        size,
+    );
     return (
         <engine.View {...presence.props} style={presence.style}>
-            <v.item.Pressable
-                {...slot.props("item", copy)}
-                {...slot.with("item", indication.handlers, copy)}
-                role="menuitem"
-                disabled={item.disabled}
-                onPress={slot.on(
-                    "item",
-                    "onPress",
-                    () => props.onSelect(item.value),
-                    copy,
-                )}
-                style={slot.style("item", withUnselectable(s.item), copy)}
-                testID={id("item")}
+            <Animated.View
+                style={
+                    size
+                        ? {
+                              width: reveal.interpolate({
+                                  inputRange: [0, 1],
+                                  outputRange: [0, size.width],
+                              }),
+                              height: size.height,
+                              overflow: "hidden",
+                          }
+                        : undefined
+                }
             >
-                {isPresent(item.icon) ? (
-                    <v.itemIcon.View
-                        {...slot.props("itemIcon", copy)}
-                        style={slot.style("itemIcon", s.itemIcon, copy)}
-                        testID={id("itemIcon")}
-                    >
-                        <IconSlot
-                            {...iconSlot(selected, "itemIcon")}
-                            motion={s.itemIcon}
-                        >
-                            {item.icon}
-                        </IconSlot>
-                    </v.itemIcon.View>
-                ) : null}
-                <v.itemLabel.Text
-                    {...slot.props("itemLabel", copy)}
-                    selectable={false}
-                    style={slot.style("itemLabel", s.itemLabel, copy)}
-                    testID={id("itemLabel")}
+                <View
+                    onLayout={measure}
+                    style={
+                        size
+                            ? {
+                                  position: "absolute",
+                                  top: 0,
+                                  end: 0,
+                                  width: size.width,
+                              }
+                            : undefined
+                    }
                 >
-                    {item.label}
-                </v.itemLabel.Text>
-                {indication.layer(selected)}
-            </v.item.Pressable>
+                    <v.item.Pressable
+                        {...slot.props("item", copy)}
+                        {...slot.with("item", indication.handlers, copy)}
+                        role="menuitem"
+                        disabled={item.disabled}
+                        onPress={slot.on(
+                            "item",
+                            "onPress",
+                            () => props.onSelect(item.value),
+                            copy,
+                        )}
+                        style={slot.style(
+                            "item",
+                            withUnselectable(s.item),
+                            copy,
+                        )}
+                        testID={id("item")}
+                    >
+                        {isPresent(item.icon) ? (
+                            <v.itemIcon.View
+                                {...slot.props("itemIcon", copy)}
+                                style={slot.style("itemIcon", s.itemIcon, copy)}
+                                testID={id("itemIcon")}
+                            >
+                                <IconSlot
+                                    {...iconSlot(selected, "itemIcon")}
+                                    motion={s.itemIcon}
+                                >
+                                    {item.icon}
+                                </IconSlot>
+                            </v.itemIcon.View>
+                        ) : null}
+                        <v.itemLabel.Text
+                            {...slot.props("itemLabel", copy)}
+                            selectable={false}
+                            style={slot.style("itemLabel", s.itemLabel, copy)}
+                            testID={id("itemLabel")}
+                        >
+                            {item.label}
+                        </v.itemLabel.Text>
+                        {indication.layer(selected)}
+                    </v.item.Pressable>
+                </View>
+            </Animated.View>
         </engine.View>
     );
 }
@@ -246,13 +345,35 @@ function FabMenuImpl(props: FabMenuProps): ReactNode {
         selection,
     );
     const reducedMotion = useReducedMotion();
+    const tokens = useTokens();
     const items = props.items ?? [];
-    // The list holds until the last staggered item has left.
+    // Each item's wait on the theme's slow effects spring (Compose's menu staggers on it), the
+    // one nearest the FAB first when the menu opens and last when it closes. Unscaled: presence
+    // and the reveal apply the time scale. The theme without the spring staggers nothing.
+    const spring = useMemo(
+        () => themeSpringRatio("effectsSlow", tokens),
+        [tokens],
+    );
+    const waits = useMemo(() => {
+        const options = {
+            count: items.length,
+            reducedMotion: reducedMotion || spring === undefined,
+            spring: spring ?? {
+                type: "spring",
+                stiffness: 1,
+                damping: 1,
+                mass: 1,
+            },
+        } as const;
+        return {
+            enter: stagger({ ...options, phase: "enter" }).delays,
+            exit: stagger({ ...options, phase: "exit" }).delays,
+        };
+    }, [items.length, reducedMotion, spring]);
+    // The list holds until the last item has left.
     const { open, source, measured, presence, close, toggle } =
         useAnchoredOverlay("FabMenu", props, "fabMenuList", {
-            exit: reducedMotion
-                ? 0
-                : Math.min(items.length - 1, STAGGERED - 1) * STAGGER,
+            exit: Math.max(0, ...waits.exit),
         });
     const select = useStableCallback((value: string) => {
         props.onSelect?.({ value });
@@ -302,7 +423,8 @@ function FabMenuImpl(props: FabMenuProps): ReactNode {
                                         key={item.value}
                                         item={item}
                                         index={index}
-                                        count={items.length}
+                                        enterDelay={waits.enter[index] ?? 0}
+                                        exitDelay={waits.exit[index] ?? 0}
                                         open={open}
                                         selection={selection}
                                         indication={props.indication}
