@@ -543,12 +543,34 @@ describe("generate with the CSS target", () => {
                 const extra = pruned.filter((rule) => !fullSet.has(rule));
                 expect(extra).toEqual([]);
                 const prunedSet = new Set(pruned);
+                // A keyframes rule goes once nothing left asks for it: only the variant values
+                // left out used it.
+                const asked = (name: string) =>
+                    pruned.some((rule) =>
+                        new RegExp(`animation[^;]*\\b${name}\\b`).test(rule),
+                    );
+                const keyframes = (rule: string) =>
+                    /@keyframes (\w+)/.exec(rule)?.[1];
                 const lost = full.filter(
                     (rule) =>
                         !prunedSet.has(rule) &&
-                        !removed.some((pattern) => pattern.test(rule)),
+                        !removed.some((pattern) => pattern.test(rule)) &&
+                        !(keyframes(rule) && !asked(keyframes(rule)!)),
                 );
                 expect(lost).toEqual([]);
+                const goneFrames = new Set(
+                    full
+                        .filter((rule) => !prunedSet.has(rule))
+                        .map(keyframes)
+                        .filter(Boolean),
+                );
+                expect([...goneFrames].sort()).toEqual([
+                    "appBarCollapseIn",
+                    "linearProgressWave",
+                    "linearProgressWaveRtl",
+                    "searchViewFromEnd",
+                    "searchViewFromStart",
+                ]);
                 expect(pruned.length).toBeLessThan(full.length);
             },
         );

@@ -127,27 +127,65 @@ const namesOtherComponent = (
     });
 };
 
+// The names among `names` that `value` mentions anywhere, as text: in an animation node, a raw
+// rule, or a token. A substring match, so it errs toward keeping.
+const mentioned = (value: unknown, names: readonly string[]): Set<string> => {
+    const text = JSON.stringify(value) ?? "";
+    return new Set(names.filter((name) => text.includes(name)));
+};
+
+// The keyframes to keep: those the left-out components or unselected variant values were the only
+// users of go, as the components' own text names them. A keyframe nothing in the config mentions
+// (an app's own, or one named by building a string) stays, and so does one the kept components
+// still mention, or any other part of the config does.
+const keptKeyframes = (
+    config: CoreConfig,
+    narrowed: CoreConfig,
+): CoreConfig["keyframes"] => {
+    const all = Object.keys(config.keyframes ?? {});
+    if (all.length === 0) return config.keyframes;
+    const owned = mentioned(config.components, all);
+    const { keyframes: _own, components: _kept, ...rest } = narrowed;
+    const used = new Set([
+        ...mentioned(narrowed.components, all),
+        ...mentioned(rest, all),
+    ]);
+    return Object.fromEntries(
+        Object.entries(config.keyframes!).filter(
+            ([name]) => !owned.has(name) || used.has(name),
+        ),
+    );
+};
+
 /** The config with only these components, each narrowed to the variant values in use: the values
  *  left out lose their styles, and so do the compound variants that match them. Tokens, themes,
  *  and everything else stay. For adapters that compile styles from the config (stylesheets,
- *  precomputed tables); keyframes that name a left-out component's tokens go too. The factory modules keep reading the whole config. */
+ *  precomputed tables). Keyframes go that name a left-out component's tokens, or that only left-out
+ *  components or unselected variant values used; one nothing in the config names stays. The factory modules keep reading the whole config. */
 export const narrowConfig = (
     config: CoreConfig,
     components: readonly string[],
     variants: VariantUsage = {},
-): CoreConfig => ({
-    ...config,
-    ...(config.keyframes && {
-        keyframes: Object.fromEntries(
-            Object.entries(config.keyframes).filter(
-                ([, stops]) => !namesOtherComponent(stops, components),
-            ),
+): CoreConfig => {
+    const narrowed: CoreConfig = {
+        ...config,
+        components: Object.fromEntries(
+            components.map((name) => [
+                name,
+                narrowSpec(name, config.components[name]!, variants),
+            ]),
         ),
-    }),
-    components: Object.fromEntries(
-        components.map((name) => [
-            name,
-            narrowSpec(name, config.components[name]!, variants),
-        ]),
-    ),
-});
+    };
+    if (!config.keyframes) return narrowed;
+    // Keyframes that name a left-out component's tokens go too.
+    const named = Object.fromEntries(
+        Object.entries(config.keyframes).filter(
+            ([, stops]) => !namesOtherComponent(stops, components),
+        ),
+    );
+    const pruned = keptKeyframes(
+        { ...config, keyframes: named },
+        { ...narrowed, keyframes: named },
+    );
+    return { ...narrowed, keyframes: pruned! };
+};

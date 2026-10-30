@@ -300,3 +300,64 @@ describe("compileCss (pruned full config)", () => {
         expect(() => compileCss(kept)).not.toThrow();
     });
 });
+
+describe("compileCss (pruned keyframes)", () => {
+    const names = (css: string) =>
+        new Set([...css.matchAll(/@keyframes (\w+)/g)].map((m) => m[1]!));
+    // Every keyframes name an animation in the stylesheet asks for.
+    const asked = (css: string, known: readonly string[]) =>
+        known.filter((name) =>
+            new RegExp(`animation[^;{}]*\\b${name}\\b`).test(css),
+        );
+
+    const config = pureform();
+    const all = Object.keys(config.keyframes ?? {});
+    const SUBSETS = [
+        ["button"],
+        ["button", "linearProgress"],
+        ["menu", "button"],
+        ["fadeThrough"],
+        ["loadingIndicator", "circularProgress"],
+        ["bottomSheet", "sideSheet", "toast", "fabMenu"],
+        ["horizontalSharedAxis", "tabs"],
+        Object.keys(config.components),
+    ];
+
+    it.each(SUBSETS)(
+        "leaves no animation without its keyframes (%s)",
+        (...keep) => {
+            const css = compileCss(narrowConfig(config, keep));
+            const defined = names(css);
+            for (const name of asked(css, all))
+                expect(defined.has(name)).toBe(true);
+        },
+    );
+
+    it("leaves a button-only build none of the keyframes, and every component's the full build's", () => {
+        const full = compileCss(config);
+        const pruned = compileCss(narrowConfig(config, ["button"]));
+        expect(names(full).size).toBe(all.length);
+        expect(names(pruned).size).toBe(0);
+        expect(pruned).not.toContain("@keyframes");
+        expect(
+            compileCss(narrowConfig(config, Object.keys(config.components))),
+        ).toBe(full);
+    });
+
+    it("keeps a named theme's own animation references", () => {
+        const withTheme = {
+            ...config,
+            themes: {
+                ...config.themes,
+                lively: {
+                    components: {
+                        button: { transition: "overlayFadeIn 1s" },
+                    },
+                },
+            },
+        } as unknown as CoreConfig;
+        expect(
+            Object.keys(narrowConfig(withTheme, ["button"]).keyframes!),
+        ).toContain("overlayFadeIn");
+    });
+});

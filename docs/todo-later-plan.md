@@ -250,6 +250,20 @@ old B/C/D/E identifiers. Complexity estimates are relative and may change after 
 - Test runtime theme switches and dynamic-reference safety alongside output measurements.
 - Token/theme/`@property` pruning is deferred to F2, not part of this implementation.
 
+- Implemented (2026-10-30): `narrowConfig` in `generate` drops keyframes only the left-out
+  components or unselected variant values used (named in their spec text, including raw rules);
+  keyframes nothing in the config mentions (an app's own), and any the kept components, tokens or
+  themes still mention, stay. Measured on the preset (full CSS 2,635,326 bytes, 36 keyframes):
+  button only 165,275 → 139,548 (-15.6%, 28 → 0 keyframes); button + linear progress 6 kept;
+  fade through 4; loading indicator 2; menu + button 4. Tests: no stylesheet animation lacks its
+  keyframes across eight component subsets (including the whole preset, byte-identical to the
+  full build); a theme's reference keeps a keyframe; the existing variant-pruning test now also
+  asserts which five keyframes go (`appBarCollapseIn`, `linearProgressWave(Rtl)`,
+  `searchViewFrom(End|Start)`). Native keyframes are lowered per reference so they follow suit.
+  Shape paths need no separate pass: they're variant values, already pruned with their variants.
+  Substring matching errs toward keeping; building names dynamically from strings would be kept
+  only if the full name appears somewhere in the config.
+
 ## Deferred designs — not in the execution queue
 
 ### F1. NativeSelect option customization

@@ -132,3 +132,71 @@ describe("narrowConfig", () => {
         expect(narrowed.components.chip).toBe(config.components.chip);
     });
 });
+
+describe("narrowConfig keyframes", () => {
+    const frames = { from: {}, to: {} };
+    const animated = {
+        ...config,
+        keyframes: {
+            chipSpin: frames,
+            chipFade: frames,
+            buttonPulse: frames,
+            buttonPulseRtl: frames,
+            appOwned: frames,
+        },
+        components: {
+            button: {
+                ...config.components.button!,
+                recipe: {
+                    ...(config.components.button!.recipe as object),
+                    variants: {
+                        variant: {
+                            filled: { root: {} },
+                            text: { root: { animation: "buttonPulse 1s" } },
+                        },
+                    },
+                    compoundVariants: [],
+                    defaultVariants: { variant: "filled" },
+                },
+            },
+            chip: {
+                kind: "component",
+                name: "chip",
+                recipe: {
+                    base: {
+                        animation: { type: "animation", name: "chipSpin" },
+                        rawRules: {
+                            css: { "&:hover": { animationName: "chipFade" } },
+                        },
+                    },
+                },
+            },
+        },
+    } as unknown as CoreConfig;
+
+    it("drops keyframes only a left-out component used, keeping the kept components' and those nothing in the config uses", () => {
+        const narrowed = narrowConfig(animated, ["button"]);
+        // The chip left, so do its two; the app's own keyframes, which nothing here names, stay.
+        expect(Object.keys(narrowed.keyframes!).sort()).toEqual([
+            "appOwned",
+            "buttonPulse",
+            "buttonPulseRtl",
+        ]);
+        // Nothing is left out: nothing goes.
+        expect(
+            Object.keys(narrowConfig(animated, ["button", "chip"]).keyframes!),
+        ).toHaveLength(5);
+    });
+
+    it("drops keyframes a kept component only used through a variant value the app doesn't select", () => {
+        const narrowed = narrowConfig(animated, ["button", "chip"], {
+            button: { variant: ["filled"] },
+        });
+        expect(Object.keys(narrowed.keyframes!).sort()).toEqual([
+            "appOwned",
+            "buttonPulseRtl",
+            "chipFade",
+            "chipSpin",
+        ]);
+    });
+});

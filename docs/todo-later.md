@@ -32,9 +32,8 @@ criteria. These are not all confirmed bugs: reproduction and external verificati
 16. **Select multiple mode:** done in React, Solid and Native (typed values, toggling, keys, form
     fields, summary, check in the new `itemLeading` part). Still open: screen-reader/AT verification
     (V4), Native device keyboard/touch (V3). Searchable options and chips remain out of scope.
-17. **Asset pruning:** measure output, then conservatively prune unused keyframes/shape paths.
-    Keep runtime theme/variant and unknown references; test theme changes. Token/theme/@property
-    pruning is separate.
+17. **Asset pruning:** done for keyframes (button-only CSS -15.6%); shape paths are variant values
+    and already pruned with them. Token/theme/@property pruning remains F2.
 
 ## Deferred designs
 
@@ -58,6 +57,10 @@ criteria. These are not all confirmed bugs: reproduction and external verificati
   spies alone.
 - **V5. Zag upgrades:** recheck Splitter internal patches and upstream long-press options; no
   speculative fork of timing behavior.
+
+- **M1. Release train test:** `packages/generate`'s "lists the packages in cog.toml's core train"
+  fails since the three `animate-*` packages were scaffolded; add them to `cog.toml` (release
+  config, left out of this work's scope).
 
 ## Retained decisions / separate work
 
