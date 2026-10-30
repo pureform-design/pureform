@@ -42,7 +42,6 @@ import { typed } from "@pureform/core";
 import {
     absolute,
     add,
-    auto,
     center,
     column,
     flex,
@@ -122,6 +121,13 @@ const { tokens, ref, own } = rowTokens(
 );
 
 const parts = rowParts(ref, "root");
+// The trailing part without the icon box's fixed width and height: it is at least an icon's box
+// (its `minWidth`, `minHeight`) and as large as the control it holds (a remove button).
+const {
+    width: _fixedWidth,
+    height: _fixedHeight,
+    ...trailing
+} = parts.trailing;
 
 type LineHeight = "heightOne" | "heightTwo" | "heightThree";
 
@@ -267,12 +273,8 @@ export const createListItem = <
                     },
                     headline: { textStyle: textStyle("bodyLarge") },
                     supportingText: parts.supportingText,
-                    // At least an icon's box, and as large as the control it holds (a remove
-                    // button), which a fixed box would squeeze.
                     trailing: {
-                        ...parts.trailing,
-                        width: auto,
-                        height: auto,
+                        ...trailing,
                         minHeight: ref("iconSize"),
                     },
                     trailingText: parts.trailingText("labelSmall"),

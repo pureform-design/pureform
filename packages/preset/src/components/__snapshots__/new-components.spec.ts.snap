@@ -1065,12 +1065,10 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
       "display": "inline-flex",
       "fontSize": "var(--components-listItem-iconSize, token(sizes.iconMedium))",
       "fontVariationSettings": ""FILL" var(--components-listItem-iconFill, 0)",
-      "height": "auto",
       "justifyContent": "center",
       "lineHeight": "1",
       "minHeight": "var(--components-listItem-iconSize, token(sizes.iconMedium))",
       "minWidth": "var(--components-listItem-iconSize, token(sizes.iconMedium))",
-      "width": "auto",
     },
     "trailingText": {
       "color": {

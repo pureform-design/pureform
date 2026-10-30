@@ -29,6 +29,7 @@ export const RN_COMPONENTS = [
     "circularProgress",
     "loadingIndicator",
     "radio",
+    "radioGroup",
     "scrim",
     "supportingText",
     "field",
