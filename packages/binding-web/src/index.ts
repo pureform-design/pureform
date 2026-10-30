@@ -263,10 +263,11 @@ export const whenAnimationsEnd = (
     };
 };
 
-/** How far a page's fade and growth had got: its opacity and `scale`. */
+/** How far a page's fade, growth and slide had got: its opacity, `scale` and sideways offset. */
 export interface PageFrame {
     readonly opacity: number;
     readonly scale: number;
+    readonly x: number;
 }
 
 /** Reads `element`'s current opacity and scale, to carry on from if it changes course. */
@@ -276,6 +277,7 @@ export const readPageFrame = (element: Element): PageFrame => {
     return {
         opacity: Number(style.opacity),
         scale: Number.isFinite(scale) ? scale : 1,
+        x: new DOMMatrix(style.transform === "none" ? "" : style.transform).m41,
     };
 };
 
@@ -292,11 +294,26 @@ export const carryOn = (element: Element, from: PageFrame): void => {
         for (const [property, value, easing] of [
             ["opacity", from.opacity, "linear"],
             ["scale", from.scale, "ease-out"],
+            ["transform", from.x, "ease-out"],
         ] as const) {
             if (!keyframes.some((frame) => property in frame)) continue;
-            const first = Number.parseFloat(String(keyframes[0]?.[property]));
-            if (Math.abs(first - value) < 0.01) continue;
-            element.animate({ [property]: [value, 1] }, { duration, easing });
+            if (property === "transform") {
+                if (Math.abs(value) < 0.5) continue;
+            } else {
+                const first = Number.parseFloat(
+                    String(keyframes[0]?.[property]),
+                );
+                if (Math.abs(first - value) < 0.01) continue;
+            }
+            element.animate(
+                {
+                    [property]:
+                        property === "transform"
+                            ? [`translateX(${value}px)`, "translateX(0px)"]
+                            : [value, 1],
+                },
+                { duration, easing },
+            );
         }
     }
 };

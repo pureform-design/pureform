@@ -187,7 +187,10 @@ old B/C/D/E identifiers. Complexity estimates are relative and may change after 
   animation restarts from the first frame). React and Solid now read its frame before the restyle
   and `binding-web`'s `carryOn` runs a same-duration animation from there to rest above the CSS
   one. Rendered A → B → C and A → B → A tests pass on react and solid across Panda, CSS and
-  Tailwind. Horizontal shared axis (translate) is not yet carried on; check before closing.
+  Tailwind. Horizontal shared axis reproduced the same
+  jump in its slide; `carryOn` now carries the sideways offset too (tests freeze the leaving panel,
+  and read the carry animation's start; they fail without the fix). Native shared axis, and
+  device checks, remain V3. Item 14 is complete on web and Native Web.
 
 ### 15. Live auto-submenu adaptation across platforms
 

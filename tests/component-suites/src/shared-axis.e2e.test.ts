@@ -126,6 +126,52 @@ describe("tabs with transition=sharedAxis", () => {
         );
     });
 
+    it("lets the latest change win and carries a called-back panel on from where it was", async () => {
+        const host = await mount({});
+        await go(host, "cars");
+        await new Promise((resolve) => setTimeout(resolve, 60));
+        const text = () => pages(host).map((page) => page.textContent);
+        const flights = pages(host)[0]!;
+        const x = (page: HTMLElement) =>
+            new DOMMatrix(getComputedStyle(page).transform).m41;
+        // Frozen part way, so what it carries on from can be read exactly.
+        for (const animation of flights.getAnimations()) animation.pause();
+        await Promise.all(
+            flights.getAnimations().map((animation) => animation.ready),
+        );
+        const away = x(flights);
+        expect(away).toBeLessThan(-1);
+        await go(host, "flights");
+        const back = pages(host).find(
+            (page) => page.textContent === "Flights panel",
+        )!;
+        expect(text().filter((t) => t === "Flights panel")).toHaveLength(1);
+        // Called back, it carries on from where it had got: an animation from there above its
+        // entrance. Rewound to its start, the panel is where it was.
+        const carry = back
+            .getAnimations()
+            .filter((animation) => !(animation instanceof CSSAnimation));
+        expect(carry.length).toBeGreaterThan(0);
+        for (const animation of carry) {
+            animation.pause();
+            animation.currentTime = 0;
+        }
+        expect(Math.abs(x(back) - away)).toBeLessThan(10);
+        for (const animation of carry) animation.play();
+        await go(host, "hotels");
+        expect(text().filter((t) => t === "Hotels panel")).toHaveLength(1);
+        for (let i = 0; i < 40 && pages(host).length > 1; i++) {
+            await Promise.allSettled(
+                pages(host).flatMap((page) =>
+                    page.getAnimations().map((a) => a.finished),
+                ),
+            );
+            await harness.settle();
+        }
+        expect(text()).toEqual(["Hotels panel"]);
+        expect(x(pages(host)[0]!)).toBe(0);
+    });
+
     it("only fade under reduced motion", async () => {
         const host = await mount({}, { motion: "reduce" });
         await go(host, "hotels");
