@@ -22,15 +22,16 @@ criteria. These are not all confirmed bugs: reproduction and external verificati
 
 ## D. Lifecycle and architecture — hardest
 
-14. **Interrupted page transitions:** reproduce and preserve in-flight visual progress/outgoing
-    identity. Reuse returning pages where practical; latest navigation wins without queuing.
-    Keep theme-controlled timing, not exact Compose constants.
-15. **Live auto-submenu adaptation:** adapt cascade/drill both ways on layout changes across all
-    platforms, preserving active submenu/focus with a small stability margin against oscillation.
-    Explicit modes remain explicit; verify Native measurement on devices.
-16. **Select multiple mode:** mode of Select with strict scalar/array values/defaults/callbacks
-    discriminated by `multiple`. Toggle without closing, selection checkmarks, keyboard toggling,
-    repeated form fields and customizable summary; design cross-binding accessibility together.
+14. **Interrupted page transitions:** done on web (fade through, shared axis) and Native: a page
+    called back mid-exit carries on from its frame; latest change wins, no duplicates. Still open:
+    web reduced-motion tests for the returning case; Native device carry (native driver reports
+    values asynchronously, V3).
+15. **Live auto-submenu adaptation:** done in React, Solid and Native with a 16px margin. Still open:
+    drills deeper than one level stay until backed out; scroll-driven changes; focus returning into
+    a re-opened cascade for keyboard users; tuning the 16px value; Native device measurement (V3).
+16. **Select multiple mode:** done in React, Solid and Native (typed values, toggling, keys, form
+    fields, summary, check in the new `itemLeading` part). Still open: screen-reader/AT verification
+    (V4), Native device keyboard/touch (V3). Searchable options and chips remain out of scope.
 17. **Asset pruning:** measure output, then conservatively prune unused keyframes/shape paths.
     Keep runtime theme/variant and unknown references; test theme changes. Token/theme/@property
     pruning is separate.
