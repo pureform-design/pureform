@@ -42,6 +42,27 @@ Confirm in the storybook before changing.
        props (UI thread) where present, and fall back to the flat arc's spin elsewhere.
     3. Reduced motion keeps the static half circle; test the rendered transforms over time.
 
+## Storybook observations, second set (reported, not yet checked)
+
+Verify in the storybook and the code before changing; fix scenes separately from components.
+
+- **React DatePicker year list (all scenarios):** only a few years render, unlike Solid and React
+  Native, and picking one doesn't update the list shown.
+- **React, Solid FileUpload (all scenarios):** the delete icon is too narrow once a file is
+  uploaded (visible in the focus/click highlight).
+- **RN Card > Not interactive:** a press draws a ripple.
+- **RN Card (Elevated 2 and others), dark mode:** the "Plan details" text is black.
+- **RN Autocomplete > Opened grouped suggestions:** the group headers aren't rendered.
+- **RN "Two lines expanded" (list item):** pressing the item doesn't expand or collapse it.
+- **Solid Paginator > Key Space, then click the left arrow:** `[EFFECT_RELAY_TEAR]` for
+  `createBindable.value` (an effect writes the value it reads, and runs twice; seen three times),
+  from `packages/solid/src/parts.tsx:240` under `PrevTrigger`.
+- **RN Scrim > Dark:** the play fails (`expected 0 to be 178`, `scrim.ts:51`): the scrim has no
+  height in dark, though light passes. Content behind it looks normal.
+- **SideSheet > Opened standard > `coplanar: true` (all three):** what `coplanar` should do isn't
+  documented where seen; React and Solid look broken with it on, React Native looks different.
+  Define it first (the RN doc says a coplanar sheet is the surface in the app's layout), then align.
+
 ## Deferred designs
 
 - **F1. NativeSelect option customization:** defer API design, not customization. The wrapper must
