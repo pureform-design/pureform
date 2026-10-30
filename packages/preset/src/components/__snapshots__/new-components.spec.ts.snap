@@ -3155,6 +3155,7 @@ exports[`select > compiles to a stable Panda slot recipe 1`] = `
       "justifyContent": "center",
       "lineHeight": "1",
       "minWidth": "var(--components-select-iconSize, token(sizes.iconMedium))",
+      "pointerEvents": "none",
       "position": "absolute",
       "top": "50%",
       "transform": {

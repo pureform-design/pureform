@@ -21,6 +21,7 @@ import { typed } from "@pureform/core";
 import {
     numeric,
     pct,
+    none,
     pointer,
     rotate,
     slot,
@@ -99,6 +100,9 @@ export const selectField = <
                     // The arrow turns over while the menu is open.
                     trailingIcon: {
                         ...field.icons.base.trailingIcon,
+                        // A read-only select's arrow lets a click through to the input, which
+                        // opens the list; an editable one's arrow is a button of its own.
+                        ...(editable ? {} : { pointerEvents: none }),
                         transform: when()
                             .on(
                                 EXPANDED,
