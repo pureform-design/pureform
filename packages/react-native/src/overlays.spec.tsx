@@ -1839,6 +1839,25 @@ describe("the sheets", () => {
         expect(box(root).top).toBe(start);
     });
 
+    it("closes and reopens an uncontrolled standard side sheet", async () => {
+        await render(
+            <SideSheet
+                modal={false}
+                defaultOpen
+                trigger="Filters"
+                headline="Filters"
+            >
+                Narrow it down.
+            </SideSheet>,
+        );
+        expect(sheet("side-sheet")).not.toBeNull();
+        await press("Close");
+        await until(() => sheet("side-sheet") === null);
+        await press("Filters");
+        await until(() => sheet("side-sheet") !== null);
+        expect(sheet("side-sheet")).not.toBeNull();
+    });
+
     it("closes a modal side sheet from its close button, and its back button calls onBack", async () => {
         const backs: number[] = [];
         await render(

@@ -1,7 +1,8 @@
 // The side sheet: its surface (a header with an optional back button, the headline, and a close
 // button, over the scrolling content and an optional row of actions), and, given a trigger,
 // `onOpenChange`, or `defaultOpen`, the whole modal sheet. Without them, or with `modal={false}`,
-// showing it is the app's, and given `open`, it enters and leaves in place; a coplanar sheet is
+// its position is the app's; given a trigger or state props it opens and closes in place. Without
+// them it is a surface alone. A coplanar sheet is
 // the surface in the app's own layout. A modal sheet opens in a `Modal` over a scrim, against the
 // end edge: a press on the scrim, its close button, Escape, or the back button closes it. Its
 // `Modal` holds a portal host of its own, so menus, tooltips, and selects opened inside draw
@@ -37,7 +38,12 @@ import { Button } from "../button/button";
 import { IconButton } from "../icon-button/icon-button";
 import { ownText } from "../icon-style";
 import { ModalScrimLayer, ModalWindow, useModalOverlay } from "../modal";
-import { testIdOf, useStableCallback, withEngine } from "../parts";
+import {
+    testIdOf,
+    useControllable,
+    useStableCallback,
+    withEngine,
+} from "../parts";
 import { themeSpring, useOverlayPresence } from "../presence";
 import { useDirection, useEngine, usePureform } from "../provider";
 import { resolveText } from "../resolve-text";
@@ -420,24 +426,58 @@ const styles = StyleSheet.create({
     drag: { flexShrink: 1, maxWidth: "100%" },
 });
 
-/** A standard sheet (`modal={false}`, coplanar or not): it drags too once the app can hide it
- *  (`onOpenChange`), asking `onClose` first; the app's `open` keeps showing it. */
+/** A standard sheet owns its open state when given a trigger or defaultOpen, as BottomSheet
+ *  does. With no state props it remains a surface in the app's layout. */
 function StandardSideSheet(props: SideSheetProps): ReactNode {
+    const nativeSlots = useNativeSlotReader("sideSheet");
     const [asker] = useState(closeAsker);
     useEffect(() => () => asker.cancel(), [asker]);
-    const closeNow = useStableCallback(() =>
-        props.onOpenChange?.({ open: false }),
+    const [open, setOpen] = useControllable(
+        "SideSheet",
+        "open",
+        props.open,
+        props.defaultOpen,
+        props.onOpenChange,
+        false,
     );
-    if (props.onOpenChange === undefined) return <Surface {...props} />;
+    const closeNow = useStableCallback(() => setOpen(false));
+    const close = () => asker.ask(props.onClose, closeNow, () => {});
+    if (
+        props.trigger === undefined &&
+        props.defaultOpen === undefined &&
+        props.open === undefined &&
+        props.onOpenChange === undefined
+    )
+        return <Surface {...props} />;
+    const given: SideSheetTriggerProps = {
+        onPress: () => setOpen(true),
+        "aria-haspopup": "dialog",
+        "aria-expanded": open,
+    };
     return (
-        <SideSheetDrag
-            open={props.open ?? true}
-            asker={asker}
-            onClose={props.onClose}
-            closeNow={closeNow}
-        >
-            <Surface {...props} />
-        </SideSheetDrag>
+        <>
+            {props.trigger === undefined ? null : typeof props.trigger ===
+              "function" ? (
+                props.trigger(given)
+            ) : (
+                <Button
+                    {...triggerButtonProps(
+                        nativeSlots(props, KEYS),
+                        props.testId,
+                    )}
+                    label={props.trigger}
+                    {...given}
+                />
+            )}
+            <SideSheetDrag
+                open={open}
+                asker={asker}
+                onClose={props.onClose}
+                closeNow={closeNow}
+            >
+                <Surface {...props} open={open} close={close} />
+            </SideSheetDrag>
+        </>
     );
 }
 

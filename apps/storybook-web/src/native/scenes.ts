@@ -70,33 +70,8 @@ export function BottomSheet(props: Record<string, unknown>): ReactNode {
     return props["modal"] === false ? screen("column", sheet) : sheet;
 }
 
-/** The side sheet's standard sheet is shown by the app, which also closes it from its close
- *  button: the scene is that app, with a button that opens it. */
+/** The standard sheet owns its open state; the app only places its trigger and surface. */
 export function SideSheet(props: Record<string, unknown>): ReactNode {
-    const { defaultOpen, open, onOpenChange, trigger, ...rest } = props as {
-        defaultOpen?: boolean;
-        open?: boolean;
-        onOpenChange?: (details: { open: boolean }) => void;
-        trigger?: string;
-    } & Record<string, unknown>;
-    const [shown, setShown] = useState(defaultOpen ?? false);
-    if (props["modal"] !== false)
-        return createElement(NativeSideSheet as never, props);
-    return screen(
-        "row",
-        trigger === undefined
-            ? null
-            : createElement(Button, {
-                  label: trigger,
-                  onPress: () => setShown(true),
-              }),
-        createElement(NativeSideSheet as never, {
-            ...rest,
-            open: open ?? shown,
-            onOpenChange: (details: { open: boolean }) => {
-                setShown(details.open);
-                onOpenChange?.(details);
-            },
-        }),
-    );
+    const sheet = createElement(NativeSideSheet as never, props);
+    return props["modal"] === false ? screen("row", sheet) : sheet;
 }
