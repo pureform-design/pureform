@@ -32,10 +32,15 @@ Confirm in the storybook before changing.
 
 ### 6. Complex
 
-- **RN wavy indeterminate, circular:** linear already animates (slide plus wave clocks, SVG engine
-  only). On web the circular arc grows and shrinks by animating `value`; on RN that needs the SVG
-  path redrawn per frame (Reanimated or JS-driven), while the rotation alone is cheap on the native
-  driver. Decide whether to add a circular timeline.
+- **RN circular indeterminate (flat and wavy), needs a design:** a mounted indeterminate
+  `CircularProgress` on the animated-SVG engine rendered the same markup 500ms apart (rotations
+  frozen, motion `full`), so it doesn't spin or grow at all on RN today, not only the wavy one.
+  Linear already animates (slide plus wave clocks, SVG engine only). Plan, engine-aware:
+    1. Flat: the two halves' rotations are linear in `value`, so drive them from a shared timeline
+       clock through Animated interpolation on the native driver (no per-frame React renders).
+    2. Wavy: the arc's path changes per frame; draw it with the Reanimated SVG engine's animated
+       props (UI thread) where present, and fall back to the flat arc's spin elsewhere.
+    3. Reduced motion keeps the static half circle; test the rendered transforms over time.
 
 ## Deferred designs
 
