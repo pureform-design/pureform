@@ -582,6 +582,22 @@ describe("DateInput", () => {
         expect(parseFloat(look.paddingLeft)).toBeGreaterThan(0);
     });
 
+    it("leaves its separators as they were while a segment has focus", async () => {
+        await render(<DateInput locale="en-US" />);
+        const separator = () =>
+            [
+                ...byTestId(
+                    "pf-date-input-input",
+                ).querySelectorAll<HTMLElement>('[aria-hidden="true"]'),
+            ].find((element) => element.textContent === "/")!;
+        const resting = getComputedStyle(separator()).backgroundColor;
+        await interact(() => userEvent.click(segments()[0]!));
+        expect(getComputedStyle(segments()[0]!).backgroundColor).not.toBe(
+            resting,
+        );
+        expect(getComputedStyle(separator()).backgroundColor).toBe(resting);
+    });
+
     it("moves on from a full segment, back from an empty one, and along the row and up and down with the arrow keys", async () => {
         const onValueChange =
             vi.fn<(details: { readonly value: readonly string[] }) => void>();

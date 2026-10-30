@@ -173,6 +173,37 @@ function Segment({ inputRef, ...options }: SegmentOptions): ReactNode {
     );
 }
 
+// A separator between the segments. It takes a segment's look (its padding included) but not the
+// focus a segment in the row has, which the root's styles carry: a web separator isn't a focus
+// target either.
+function Separator(options: {
+    readonly selection: Selection<"dateInput">;
+    readonly invalid: boolean;
+    readonly disabled: boolean;
+    readonly readOnly: boolean;
+    readonly text: string;
+}): ReactNode {
+    const { styles: s, views: v } = useComponentSlots<DateInputPart>(
+        "dateInput",
+        options.selection,
+        {
+            filled: true,
+            invalid: options.invalid,
+            disabled: options.disabled,
+            ...(options.readOnly ? { readOnly: true } : {}),
+        },
+    );
+    return (
+        <v.input.Text
+            selectable={false}
+            aria-hidden
+            style={{ ...ownText(s.input), ...s.segment }}
+        >
+            {options.text}
+        </v.input.Text>
+    );
+}
+
 /** What each part renders as, for its keyed `style` and `slotProps`. */
 export interface DateInputHosts {
     readonly root: "View";
@@ -430,20 +461,14 @@ function DateInputImpl(props: DateInputProps): ReactNode {
                     >
                         {segments.map((segment, index) =>
                             segment.kind === "literal" ? (
-                                // A separator is a segment on the web (Zag's literal), so it takes the
-                                // segment's look, its padding included, and sits as far from the
-                                // digits as the web's.
-                                <v.input.Text
+                                <Separator
                                     key={index}
-                                    selectable={false}
-                                    aria-hidden
-                                    style={{
-                                        ...ownText(s.input),
-                                        ...s.segment,
-                                    }}
-                                >
-                                    {segment.text}
-                                </v.input.Text>
+                                    selection={selection}
+                                    invalid={invalid}
+                                    disabled={props.disabled ?? false}
+                                    readOnly={props.readOnly ?? false}
+                                    text={segment.text}
+                                />
                             ) : (
                                 <Segment
                                     key={segment.kind}
