@@ -168,20 +168,22 @@ function Root(props: ListItemRootProps): JSX.Element {
         isInteractiveListItem(listItemVariants(list?.(), props), element()),
     );
     const source = useOwnInteractionSource(() => props.interactionSource);
+    const swipe = frame?.swipe;
     if (expand) expand.root.source = source;
     const handlers = expand
         ? undefined
         : useInteractionHandlers(
               source,
-              () => !interactive() || !!props.disabled,
+              () => !(interactive() || swipe) || !!props.disabled,
+              swipe ? () => swipe.dragging() : undefined,
           );
     // In a frame, the row swipes.
-    const swipe = frame?.swipe;
     const scope = useComponent(listItemAnatomy, {
         selection: () => {
             const variants = {
                 ...listItemVariants(list?.(), props),
                 swipeable: swipe ? true : undefined,
+                interactive: interactive() || !!swipe,
             };
             return listItemSelection(
                 swipe
@@ -197,7 +199,7 @@ function Root(props: ListItemRootProps): JSX.Element {
         unstyled: () => props.unstyled,
         indication: () => props.indication,
         interactionSource: source,
-        interactive,
+        interactive: () => interactive() || !!swipe,
     });
     const rest = omit(props, "as", ...LIST_ITEM_ROOT_PROPS);
     return (
@@ -209,16 +211,14 @@ function Root(props: ListItemRootProps): JSX.Element {
                     swipe
                         ? combinePartProps([
                               own(),
-                              interactive() && handlers
-                                  ? handlers()
-                                  : undefined,
+                              handlers?.(),
                               swipe.rootProps(interactive()),
                           ])
                         : interactive() && handlers
                           ? combinePartProps([own(), handlers()])
                           : own(),
                 ...(swipe
-                    ? { states: () => ({ pressed: swipe.dragging() }) }
+                    ? { states: () => ({ dragged: swipe.dragging() }) }
                     : {}),
                 props: rest,
             })}

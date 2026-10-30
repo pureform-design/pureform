@@ -75,6 +75,7 @@ export function useItemInteractionSources(): ItemInteractionSources {
 export function useInteractionHandlers(
     source: MutableInteractionSource | undefined,
     disabled: boolean,
+    dragging = false,
 ): Readonly<Record<string, unknown>> {
     // The emitter reads the latest source at each emit.
     const latest = useRef(source);
@@ -88,6 +89,12 @@ export function useInteractionHandlers(
     useEffect(() => {
         if (disabled) emitter.end();
     }, [emitter, disabled]);
+    useEffect(() => {
+        if (dragging) {
+            emitter.cancel();
+            emitter.dragStart();
+        } else emitter.dragStop();
+    }, [emitter, dragging]);
     return pressableItemProps(
         {},
         emitter,

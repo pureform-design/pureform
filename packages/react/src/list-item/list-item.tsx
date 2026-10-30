@@ -153,16 +153,18 @@ function Root(props: ListItemRootProps): ReactNode {
     const source = useOwnInteractionSource(props.interactionSource);
     // oxlint-disable-next-line react/immutability -- hands Root's source to Expandable's ref, which the machine reads when it emits, after render
     if (expand) expand.root.current = source;
+    const swipe = frame?.swipe;
     const handlers = useInteractionHandlers(
         source,
-        !!expand || !interactive || !!props.disabled,
+        !!expand || !(interactive || swipe) || !!props.disabled,
+        swipe?.dragging,
     );
     // In a frame, the row swipes.
     const variants = {
         ...listItemVariants(list, props),
         swipeable: frame ? true : undefined,
+        interactive: interactive || !!swipe,
     };
-    const swipe = frame?.swipe;
     const scope = useComponent(listItemAnatomy, {
         selection: listItemSelection(
             swipe
@@ -177,7 +179,7 @@ function Root(props: ListItemRootProps): ReactNode {
         unstyled: props.unstyled,
         indication: props.indication,
         interactionSource: source,
-        interactive,
+        interactive: interactive || !!swipe,
     });
     const { as: _as, ...rest } = omitProps(props, LIST_ITEM_ROOT_PROPS);
     return (
@@ -188,11 +190,11 @@ function Root(props: ListItemRootProps): ReactNode {
                     interactive || swipe
                         ? combinePartProps([
                               own,
-                              interactive && !expand ? handlers : undefined,
+                              !expand ? handlers : undefined,
                               swipe?.rootProps(interactive),
                           ])
                         : own,
-                ...(swipe ? { states: { pressed: swipe.dragging } } : {}),
+                ...(swipe ? { states: { dragged: swipe.dragging } } : {}),
                 props: rest,
             })}
         </context.Provider>

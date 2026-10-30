@@ -77,6 +77,7 @@ export const itemInteractionSources = (): ItemInteractionSources => {
 export const useInteractionHandlers = (
     source: Accessor<MutableInteractionSource | undefined>,
     disabled: Accessor<boolean>,
+    dragging?: Accessor<boolean>,
 ): Accessor<Readonly<Record<string, unknown>>> => {
     // The source when it emits, which may be in the effect below: a read, not a dependency.
     const emitter = new InteractionEmitter(() => untrack(source));
@@ -84,6 +85,13 @@ export const useInteractionHandlers = (
     createEffect(disabled, (now) => {
         if (now) emitter.end();
     });
+    if (dragging)
+        createEffect(dragging, (now) => {
+            if (now) {
+                emitter.cancel();
+                emitter.dragStart();
+            } else emitter.dragStop();
+        });
     return () =>
         pressableItemProps({}, emitter, disabled(), normalizeProps) as Readonly<
             Record<string, unknown>

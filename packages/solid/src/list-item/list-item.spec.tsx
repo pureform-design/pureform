@@ -466,6 +466,31 @@ describe("a swipeable ListItem", () => {
             }),
         );
 
+    it("starts press feedback and cancels it when the swipe becomes a drag", async () => {
+        const source = createInteractionSource();
+        const events: string[] = [];
+        source.subscribe((event) => events.push(event.type));
+        withRegistry(() => (
+            <ListItem
+                headline="Message"
+                swipeAction="Delete"
+                interactionSource={source}
+            />
+        ));
+        await settle();
+        const root = byTestId(ids.root);
+        pointer(root, "pointerdown", 200);
+        expect(source.state.pressed).toBe(true);
+        pointer(root, "pointermove", 140);
+        await settle();
+        expect(source.state.pressed).toBe(false);
+        expect(source.state.dragged).toBe(true);
+        expect(events).toContain("cancel");
+        pointer(root, "pointerup", 140);
+        await settle();
+        expect(source.state.dragged).toBe(false);
+    });
+
     it("gives its frame, action and region their keyed props and unstyled", async () => {
         withRegistry(() => (
             <ListItem
@@ -652,3 +677,4 @@ describe("a swipeable ListItem", () => {
         expect(byTestId(ids.region).hidden).toBe(false);
     });
 });
+import { createInteractionSource } from "@pureform/binding-core/interaction";

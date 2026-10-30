@@ -29,8 +29,6 @@ Confirm in the storybook before changing.
 
 ### 3. Small decisions, then a small fix
 
-- **Draggable list item ripple (React, Solid):** a swipe only sets the pressed layer, and M3 shows
-  the dragged state, so probably by design; confirm the spec.
 
 ### 4. Not reproduced
 
