@@ -25,3 +25,6 @@ export const pickedFile = (count: number) => ({
     size: 1024 * (40 + count),
     type: "application/pdf",
 });
+
+/** The height of the canvas an overlay's story opens in, `overlayHeight` in `stories.config.ts`. */
+export const OVERLAY_HEIGHT = 480;

@@ -74,13 +74,19 @@ export default defineStories({
             scenes: {
                 module: "./src/native/scenes.ts",
                 // React Native's FileUpload leaves the picking to the app: its scene is one.
-                components: ["Toast", "GridList", "FileUpload"],
+                components: [
+                    "Toast",
+                    "GridList",
+                    "FileUpload",
+                    "BottomSheet",
+                    "SideSheet",
+                ],
             },
         },
     },
     schemes: ["light", "dark"],
     // Floating and modal overlays open into the canvas; this keeps room for them.
-    overlayHeight: 480,
+    overlayHeight: 480, // `OVERLAY_HEIGHT` in `src/renderers/scenes.ts`
     components: {
         // Both act on what's around them: a surface to press, and content to dim.
         Ripple: {
