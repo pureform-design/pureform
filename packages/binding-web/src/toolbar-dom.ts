@@ -18,6 +18,15 @@ export interface OverflowWatch {
 
 const px = (value: string) => Number.parseFloat(value) || 0;
 
+/** The nearest ancestor that draws a box: a wrapper with `display: contents` (a provider's) has
+ *  no size of its own, so the room is its parent's. */
+const boxParent = (element: HTMLElement): HTMLElement | null => {
+    let parent = element.parentElement;
+    while (parent && getComputedStyle(parent).display === "contents")
+        parent = parent.parentElement;
+    return parent;
+};
+
 const shown = (element: HTMLElement) => element.getClientRects().length > 0;
 
 /** Watches the row, calling `onCount` with how many elements fit. The row may grow up to its
@@ -36,7 +45,7 @@ export const watchOverflow = (watch: OverflowWatch) => {
         const { root } = watch;
         const vertical = watch.vertical();
         const style = getComputedStyle(root);
-        const parent = root.parentElement;
+        const parent = boxParent(root);
         const own = vertical
             ? px(style.paddingTop) +
               px(style.paddingBottom) +
@@ -73,7 +82,8 @@ export const watchOverflow = (watch: OverflowWatch) => {
     };
     const observer = new ResizeObserver(() => update());
     observer.observe(watch.root);
-    if (watch.root.parentElement) observer.observe(watch.root.parentElement);
+    const parent = boxParent(watch.root);
+    if (parent) observer.observe(parent);
     update();
     return { update, stop: () => observer.disconnect() };
 };

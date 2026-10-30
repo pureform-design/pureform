@@ -157,7 +157,10 @@ export default defineStories({
         Stepper: { parameters: keyClicks("KeyEnter", "KeySpace") },
         Table: { parameters: keyClicks("KeyEnter", "KeySpace") },
         Tabs: { parameters: keyClicks("KeyEnter", "KeySpace") },
-        Toolbar: { parameters: keyClicks("KeyEnter", "KeySpace") },
+        Toolbar: {
+            hooks: ["./src/stages/toolbar.ts"],
+            parameters: keyClicks("KeyEnter", "KeySpace"),
+        },
         TimePicker: { parameters: native({ KeyEnter: { play: NO_BUBBLING } }) },
         CodeField: { parameters: native({ Disabled: DISABLED_TEXT }) },
         NumberField: { parameters: native({ Disabled: DISABLED_TEXT }) },
