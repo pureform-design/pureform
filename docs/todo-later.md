@@ -17,18 +17,7 @@ results and recordings.
   options and chips are out of scope.
 - **Native wave, drill and FAB menu:** frame rates and RTL mirroring on devices (V3).
 
-## Storybook observations (code-checked, not yet reproduced in a browser)
-
-Traced through story scenes and component code, grouped from immediately fixable to most complex.
-Confirm in the storybook before changing.
-
-### 4. Not reproduced
-
-- **TimeInput border radius:** the input, period selector and root radii are identical on Solid,
-  React and React Native in the storybook and the suites (28px root, 8px fields). Reopen with a
-  screenshot of the scene that differs.
-
-### 6. Complex
+## Native circular progress
 
 - **RN circular indeterminate, the arc doesn't grow and shrink, needs a design:** measured on the
   animated, animated-SVG and Reanimated-SVG engines (motion `full`): the root's spin runs, but the
