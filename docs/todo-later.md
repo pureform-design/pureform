@@ -22,32 +22,13 @@ results and recordings.
 Traced through story scenes and component code, grouped from immediately fixable to most complex.
 Confirm in the storybook before changing.
 
-### 1. Immediate: one-line or one-file fixes
+### 2. Remaining scene work
 
-- **Solid date picker icons:** `packages/solid/src/date-picker/date-picker.tsx` (~445) renders the
-  prev/next `IconButton`s with no `icon`; pass `ChevronStartIcon`/`ChevronEndIcon` and `mirror` as
-  React does (glyphs exist). Also check Solid's docked picker and date input.
-- **Select arrow doesn't open (Paginator, every React/Solid Select):** add `pointerEvents: none` to
-  the trailing icon from `icon()` in `packages/preset/src/components/field.ts` (as `native-select.ts`
-  does).
-- **Rating small star on hover (React, Solid):** add `flexShrink: 0` to the glyph in the
-  `filled(0.5)` box in `preset/.../rating.ts` so `overflow: hidden` clips it instead of it scaling.
-- **RN Paginator label twice:** `react-native/src/paginator/paginator.tsx` passes `label` to `Select`
-  as well as drawing it; use an accessibility label (React uses `aria-label`).
-- **RN DateInput separators highlighted:** style the `/` literals from a focus-free selection, not
-  the root `segment` style that carries focus.
-
-### 2. Scene fixes: story or host, not the component
-
-- **RN Scrim:** add a native scene with page content inside a sized, positioned frame.
-- **SideSheet > Open standard:** no scrim on web is correct (non-modal). For RN, give the scene a row
-  container aligned to the end, and controlled `open`/`onOpenChange` so the X closes it.
-- **BottomSheet > Opened standard (RN):** give the scene a bottom-aligned column frame.
-- **Toast on RN:** give the scene a tall positioned frame (the `Toaster` positions against the story
-  root, not the viewport).
-- **Toolbar > Opened overflow:** web (menu) is correct; give the case a fixed narrow width on every
-  renderer. If RN still doesn't overflow in a fixed-width parent, it is an RN measuring bug.
-- **Carousel arrow keys:** expected on touch-first RN; mark it a known difference in the stories.
+- **Carousel arrow keys:** expected on touch-first RN (already recorded in the stories' skips); no
+  change planned.
+- **SideSheet standard on RN:** the component keeps no state for `defaultOpen` on a standard sheet,
+  where the BottomSheet does. The scene now supplies it; decide whether the component should match
+  the BottomSheet.
 
 ### 3. Small decisions, then a small fix
 
