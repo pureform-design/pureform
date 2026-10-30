@@ -25,7 +25,13 @@ export const stage = (
         // frame after the content: it has to be the frame's size, or a view with no content has
         // none (React Native's root view).
         if (options.fill)
-            Object.assign(el.style, { position: "absolute", inset: "0" });
+            Object.assign(el.style, {
+                position: "absolute",
+                inset: "0",
+                // A React Native root view's `flexGrow` needs a flex parent to take the height.
+                display: "flex",
+                flexDirection: "column",
+            });
         const frame = document.createElement("div");
         frame.setAttribute(STAGE_ATTRIBUTE, "");
         Object.assign(frame.style, {

@@ -69,6 +69,10 @@ export const withoutUnset = (
     for (const key of unset) {
         if (out[key] === component[key]) delete out[key];
     }
+    // Without its element or a link, nothing in the example acts, so the case's click spy has no
+    // press to answer: where React Native takes it as `onPress`, it would ripple.
+    if (unset.includes("as") && !("as" in out) && out["href"] === undefined)
+        delete out["onClick"];
     return out;
 };
 

@@ -49,27 +49,6 @@ Confirm in the storybook before changing.
 
 Ordered from easy to complex. "Real" is a component or preset bug; "scene" is the story host.
 
-### Easy
-
-- **React, Solid FileUpload, the remove button is too narrow (real):** the remove `IconButton`
-  sits in the list item's `trailing` slot, which `iconBox` sizes to the icon (about 24px), so the
-  40px button's highlight is clipped (`preset/src/components/list.ts:153`, `file-upload` bindings
-  pass `control`). Fix: when the trailing part holds a `control`, let it size to its content
-  (`width: auto; minWidth: 0; height: auto`), with a state or variant in the list item preset.
-- **RN Card, "Plan details" is black in dark mode (real):** `actions` given as a string is wrapped
-  in a `Text` with no style (`react-native/src/card/card.tsx`, `Actions = viewPart("actions", …)`
-  has no text part), while `Content` and `Footer` pass `supportingText`. Fix: give the actions a
-  text style (`viewPart("actions", "Actions", …)`), ideally a preset text token for the row.
-- **RN Card > Not interactive ripples (scene):** the storybook adds an `onClick` spy to every Card
-  story and the native hook turns it into `onPress` (`apps/storybook-web/src/renderers/compose.ts`,
-  `react-native/src/storybook/index.ts:80`), so the card acts. The component is right: no
-  `onPress` means no ripple. Fix: only add the spy when `as` or `href` is set, or drop it for the
-  non-interactive examples.
-- **RN Scrim > Dark play fails (scene):** the story element is 178px (the stage's `fill`), but RN's
-  root `View` only has `flexGrow: 1` inside a block `div`, so it has no height. Fix: in
-  `stages/stage.ts`'s `fill`, also make the element `display: flex; flex-direction: column`, and
-  wait for layout in `stages/scrim.ts`. Light passed only because it measured later.
-
 ### Medium
 
 - **RN Autocomplete > Opened grouped suggestions, no group headers (real):** `autocomplete.tsx`
