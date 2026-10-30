@@ -16,9 +16,11 @@ export const parts = anatomy.build();
 
 // The search view: Zag's dialog around Zag's combobox. The dialog's content is the view's
 // `root`, and the combobox's input its `input` and its list its `content`; the header, the
-// leading and trailing icons, and the divider are drawn only.
+// leading and trailing icons, and the divider are drawn only. The external trigger has its own
+// sizing slot, even though the dialog machine handles its behavior.
 export const searchViewAnatomy = createAnatomy("searchView").parts(
     "root",
+    "trigger",
     "header",
     "leading",
     "input",

@@ -46,6 +46,9 @@ const select = (
             return core.navigationSelection(p);
         case "radio-group:radio":
             return core.radioSelection(p, {});
+        case "radio-group:radioGroup":
+            // The bindings select the group's preset orientation inline.
+            return { orientation: props.orientation };
         case "select:menu":
             return core.selectMenuSelection(p);
         case "slider:slider":

@@ -60,9 +60,10 @@ describe("composites", () => {
         },
     );
 
-    it("aren't preset components, and the registry doesn't style them", () => {
-        expect(Object.keys(anatomy)).not.toContain(radioGroupAnatomy.name);
-        expect(radioGroupAnatomy.parts.root.styled).toBe(false);
+    it("styles the radio group through its own preset component", () => {
+        expect(anatomy.radioGroup).toBe(radioGroupAnatomy);
+        expect(radioGroupAnatomy.parts.root.styled).toBe(true);
+        expect(partSlot(radioGroupAnatomy.parts.root)).toBe("root");
     });
 
     it("carry the attributes and test ids of any part", () => {
@@ -200,7 +201,9 @@ describe("composites", () => {
         );
         expect(partSlot(parts.surface!)).toBe("root");
         expect(partSlot(parts.root!)).toBeNull();
-        for (const name of ["root", "trigger", "positioner"])
+        expect(partSlot(parts.trigger!)).toBe("trigger");
+        expect(parts.trigger!.parent).toBe("root");
+        for (const name of ["root", "positioner"])
             expect(parts[name]!.styled).toBe(false);
         for (const name of searchViewOverlayAnatomy.partNames) {
             expect(parts[name]!.testId).toBe(compositeTestIds.searchView[name]);
