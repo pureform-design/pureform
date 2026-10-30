@@ -6,9 +6,12 @@ Scaffold for browser animation drivers and Motion-like public APIs wrapping
 React and Solid share the browser implementation. Framework lifecycle hooks belong in their
 existing binding packages; separate animation engines per framework are not needed.
 
-Prefer browser-native execution (Web Animations API and compositor-eligible properties where
-supported), with CSS/native timelines where they satisfy the contract. Use a JavaScript driver
-only when the target, property or coordination cannot run correctly on that path. Batch layout
+CSS first, by default: express animations as CSS (transitions, keyframes, `animation-delay`,
+custom properties) and let the browser run them. Try hard to fit a motion into CSS before
+leaving it, including by precomputing timing (a stagger's per-item delays, a spring's sampled
+`linear()` curve) so the browser needs no per-frame JavaScript. Use the Web Animations API, then
+a JavaScript driver, only as fallbacks when CSS cannot express the motion correctly (for example
+interruption that must carry velocity, or values only known at runtime). Batch layout
 reads/writes; do not require framework renders or computed-style reads on every frame. Width and
 height still involve layout even when browser-native animation executes them. Choose fast paths
 by capability and validate performance rather than assume every browser-native path is faster.

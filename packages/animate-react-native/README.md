@@ -7,9 +7,10 @@ Animated and Reanimated drivers should have separate entry points so consumers d
 both engines. Those exports and optional peer dependencies will be added with their implementations.
 Native/UI-thread execution must remain possible without routing every frame through JavaScript.
 
-Use each engine's fastest compatible abstraction: Animated's native driver for supported
-properties, and Reanimated UI-thread worklets/shared values or native animation facilities where
-appropriate. Layout properties such as width cannot use Animated's native driver; use the
+Choose the fastest available path first, per property and engine: Animated's native driver for
+supported properties, then Reanimated's UI-thread CSS-style animations, worklets and shared
+values, and only then JavaScript-driven values as a fallback. Precompute timing (such as a
+stagger's per-item delays) so the fast path needs no per-frame JavaScript. Layout properties such as width cannot use Animated's native driver; use the
 engine's supported layout/UI-thread path, or a JavaScript fallback where necessary. Do not
 silently pull in Reanimated to accelerate the Animated entry point. Keep interpolation and
 stagger coordination off the JavaScript thread where supported, and cross threads only for

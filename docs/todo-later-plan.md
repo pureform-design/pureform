@@ -39,8 +39,11 @@ old B/C/D/E identifiers. Complexity estimates are relative and may change after 
   visibility; FAB-menu owns width measurement and item motion. Distinguish fixed-delay stagger
   from spring-driven visibility progression. Scaffolded with Omni; runtime implementation pending.
 - Adapters choose the fastest compatible platform abstraction, not a lowest-common-denominator
-  JavaScript frame loop: browser-native animations/compositor paths on web, Animated's native
-  driver for supported properties and Reanimated UI-thread execution on Native. Layout properties
+  JavaScript frame loop: CSS first on web (then Web Animations, then JavaScript as fallbacks, after
+  trying hard to fit the motion into CSS), and the fastest native path first on React Native
+  (Animated's native driver, then Reanimated UI-thread execution, then JavaScript values). Core
+  prefers precomputed timing (a stagger's per-item delays, a spring's sampled curve) that any
+  driver can hand to its fastest path with no per-frame JavaScript. Layout properties
   require capability-specific paths; do not promise compositor/native-driver width animation.
   Keep stagger coordination driver-local where supported, with boundary/lifecycle notifications
   instead of per-frame framework renders. Fallbacks preserve interruption, cleanup and reduced
