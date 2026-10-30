@@ -189,8 +189,10 @@ old B/C/D/E identifiers. Complexity estimates are relative and may change after 
   one. Rendered A → B → C and A → B → A tests pass on react and solid across Panda, CSS and
   Tailwind. Horizontal shared axis reproduced the same
   jump in its slide; `carryOn` now carries the sideways offset too (tests freeze the leaving panel,
-  and read the carry animation's start; they fail without the fix). Native shared axis, and
-  device checks, remain V3. Item 14 is complete on web and Native Web.
+  and read the carry animation's start; they fail without the fix). Native shared axis reproduced the same
+  jump (its fade and slide reset to the start); a leaving page now records where it stopped and a
+  page called back enters from there (Native Web test fails without it; Native 1090 pass). On
+  devices the native driver reports values asynchronously, so the carry there is V3. Item 14 is complete on web and Native Web.
 
 ### 15. Live auto-submenu adaptation across platforms
 

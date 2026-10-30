@@ -103,6 +103,42 @@ describe("HorizontalSharedAxis on React Native", () => {
         );
     });
 
+    it("carries a page called back mid-exit on from where it was, without duplicating it", async () => {
+        const index = outside(0);
+        await render(
+            <index.Holder>
+                {(at) => (
+                    <HorizontalSharedAxis index={at}>
+                        <Text>{`Page ${at}`}</Text>
+                    </HorizontalSharedAxis>
+                )}
+            </index.Holder>,
+        );
+        await settle();
+        await index.set(1);
+        const opacity = (page: HTMLElement) =>
+            Number(getComputedStyle(page).opacity);
+        const first = pages().find((page) => page.textContent === "Page 0")!;
+        await until(() => {
+            expect(opacity(first)).toBeLessThan(0.9);
+            expect(opacity(first)).toBeGreaterThan(0.2);
+        }, 30_000);
+        const away = translateOf(first);
+        const faded = opacity(first);
+        expect(away).toBeLessThan(0);
+        expect(faded).toBeLessThan(1);
+        await index.set(0);
+        const texts = () => pages().map((page) => page.textContent);
+        expect(texts().filter((text) => text === "Page 0")).toHaveLength(1);
+        const back = pages().find((page) => page.textContent === "Page 0")!;
+        // Where it was, within what a few frames move, not snapped to the entrance's start.
+        expect(Math.abs(translateOf(back) - away)).toBeLessThan(20);
+        expect(Math.abs(opacity(back) - faded)).toBeLessThan(0.2);
+        await index.set(2);
+        expect(texts().filter((text) => text === "Page 2")).toHaveLength(1);
+        await until(() => expect(texts()).toEqual(["Page 2"]), 30_000);
+    });
+
     it("mirrors the slide under right to left", async () => {
         const index = outside(0);
         await render(

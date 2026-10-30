@@ -30,7 +30,7 @@ import {
 import type { AnimatedTiming, Spring } from "@pureform/rn-adapter/animated";
 import { LINEAR } from "@pureform/rn-adapter/factory";
 import { useReducedMotion, useTokens } from "@pureform/rn-adapter/react";
-import { useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Animated } from "react-native";
 import type { LayoutChangeEvent, StyleProp, ViewStyle } from "react-native";
@@ -104,14 +104,28 @@ function Page(props: {
     const [slide] = useState(() => new Animated.Value(1));
     const [fade] = useState(() => new Animated.Value(1));
     const moving = page.state !== "current";
+    // Where a leaving page had got when it stopped, to carry on from if it is called back.
+    const left = useRef<{ slide: number; fade: number; x: number }>(undefined);
     useLayoutEffect(() => {
         if (!moving) {
+            left.current = undefined;
             slide.setValue(1);
             fade.setValue(1);
             return;
         }
-        slide.setValue(0);
-        fade.setValue(0);
+        const from = left.current;
+        left.current = undefined;
+        const offset = offsetOf(page, motion.rtl) * motion.width;
+        // Entering again from partway out: the same place and opacity, then the rest of the way.
+        const carried =
+            page.state === "entering" && from && offset !== 0
+                ? {
+                      slide: Math.min(1, Math.max(0, 1 - from.x / offset)),
+                      fade: 1 - from.fade,
+                  }
+                : undefined;
+        slide.setValue(carried?.slide ?? 0);
+        fade.setValue(carried?.fade ?? 0);
         const run = Animated.parallel([
             ...(motion.slide
                 ? [animate(slide, motion.slide, NATIVE_DRIVER)]
@@ -127,7 +141,19 @@ function Page(props: {
         run.start(({ finished }) => {
             if (finished) onSettle(page);
         });
-        return () => run.stop();
+        return () => {
+            run.stop();
+            if (page.state !== "leaving") return;
+            const here = { slide: 0, fade: 0 };
+            slide.stopAnimation((value) => (here.slide = value));
+            fade.stopAnimation((value) => {
+                here.fade = value;
+                left.current = {
+                    ...here,
+                    x: here.slide * offsetOf(page, motion.rtl) * motion.width,
+                };
+            });
+        };
         // oxlint-disable-next-line react-hooks/exhaustive-deps -- runs as the page (or direction) changes; the motion is read as it runs
     }, [page]);
     const offset = moving ? offsetOf(page, motion.rtl) * motion.width : 0;
