@@ -32,15 +32,20 @@ Confirm in the storybook before changing.
 
 ### 6. Complex
 
-- **RN circular indeterminate (flat and wavy), needs a design:** a mounted indeterminate
-  `CircularProgress` on the animated-SVG engine rendered the same markup 500ms apart (rotations
-  frozen, motion `full`), so it doesn't spin or grow at all on RN today, not only the wavy one.
-  Linear already animates (slide plus wave clocks, SVG engine only). Plan, engine-aware:
-    1. Flat: the two halves' rotations are linear in `value`, so drive them from a shared timeline
-       clock through Animated interpolation on the native driver (no per-frame React renders).
-    2. Wavy: the arc's path changes per frame; draw it with the Reanimated SVG engine's animated
-       props (UI thread) where present, and fall back to the flat arc's spin elsewhere.
-    3. Reduced motion keeps the static half circle; test the rendered transforms over time.
+- **RN circular indeterminate, the arc doesn't grow and shrink, needs a design:** measured on the
+  animated, animated-SVG and Reanimated-SVG engines (motion `full`): the root's spin runs, but the
+  arc stays a half circle, because the keyframes also animate the `value` token (10 to 87 and
+  back) and RN can't animate a token. Parts that depend on `value` (halves' and track's rotations,
+  caps, the wavy path) are resolved once at rest. Plan, engine-aware:
+    1. Flat: sample the styles at a few `value`s (`useSelectedStyles`, a fixed number of calls),
+       then interpolate each part's rotation and opacity from one shared timeline clock on the
+       native driver, so there are no per-frame React renders. Open point: the cycle's easing is per
+       step between frames (10, 87, 10); the timeline's clocks ease a whole cycle, so keep the spin
+       and the arc on the same clock or add a stepped clock, or they drift apart.
+    2. Wavy: the arc's SVG path changes with `value`; interpolate sampled paths with an animated
+       `d` (needs an animated path in the rn-adapter SVG drawing) or, on Reanimated SVG, animated
+       props on the UI thread; elsewhere keep the spinning half-circle wave.
+    3. Reduced motion keeps the static half circle; test the rendered rotations over time.
 
 ## Storybook observations, second set (reported, not yet checked)
 
