@@ -6318,6 +6318,7 @@ export const dataTableAnatomy = {
     ],
     variants: {
         stickyHeader: ["true", "false"],
+        rowHover: ["true", "false"],
         density: ["0", "inherit", "-1", "-2", "-3"],
     },
 } as const satisfies ComponentAnatomy;

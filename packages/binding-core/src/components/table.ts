@@ -34,6 +34,9 @@ export interface TableVariantProps {
     /** Keeps the header at the top of the scrolling container (not on React Native). */
     readonly stickyHeader?: boolean | undefined;
     readonly density?: VariantProp<"dataTable", "density">;
+    /** Hover feedback for actionable rows. Defaults to whether selectionMode is supplied;
+     *  set it explicitly when composing custom row actions. It adds no click behavior. */
+    readonly rowHover?: boolean | undefined;
     readonly tokens?: InstanceTokens<"dataTable"> | undefined;
 }
 
@@ -89,6 +92,7 @@ export interface TableRootOwnProps
 export const TABLE_ROOT_PROPS = [
     "stickyHeader",
     "density",
+    "rowHover",
     "tokens",
     "sort",
     "defaultSort",
@@ -179,10 +183,13 @@ export const tableRowValue = <Row>(
 
 /** The table's registry selection. */
 export const tableSelection = (
-    props: TableVariantProps,
+    props: TableVariantProps & Pick<TableBehaviorProps, "selectionMode">,
 ): Selection<"dataTable"> => ({
     stickyHeader: props.stickyHeader,
     density: props.density,
+    rowHover:
+        props.rowHover ??
+        (props.selectionMode !== undefined ? true : undefined),
     tokens: props.tokens,
 });
 

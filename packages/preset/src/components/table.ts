@@ -117,11 +117,19 @@ const rowStyle = (height: AliasNode, color: AliasNode): StyleMap => ({
     color,
 });
 
-// A body row: tinted while hovered or while something inside it has keyboard focus, and filled
-// with the selected colors once selected.
+// A passive body row has no hover affordance. Actionable rows opt into the state layer below.
 const bodyRow = (part: string, container: AliasNode): StyleMap => ({
     ...rowStyle(ref("rowHeight"), ref("content")),
     transition: stateTransition,
+    backgroundColor: when(
+        slot(part, "selected"),
+        ref("selectedContainer"),
+        container,
+    ),
+    states: { selected: { color: ref("selectedContent") } },
+});
+
+const rowLayer = (part: string, container: AliasNode): StyleMap => ({
     backgroundColor: slotStateLayer(
         ref,
         part,
@@ -132,7 +140,6 @@ const bodyRow = (part: string, container: AliasNode): StyleMap => ({
             content: ref("selectedContent"),
         },
     ),
-    states: { selected: { color: ref("selectedContent") } },
 });
 
 // A cell takes an equal share of the row, and its content starts at its inline start.
@@ -213,6 +220,7 @@ export const createTable = <D extends string = MaterialDensity>(
             ],
             variants: {
                 stickyHeader: ["true", "false"],
+                rowHover: ["true", "false"],
                 density: densitySteps<string>(densities),
             },
             recipe: () => ({
@@ -297,6 +305,16 @@ export const createTable = <D extends string = MaterialDensity>(
                     },
                 },
                 variants: {
+                    rowHover: {
+                        true: {
+                            row: rowLayer("row", ref("container")),
+                            alternateRow: rowLayer(
+                                "alternateRow",
+                                ref("alternateContainer"),
+                            ),
+                        },
+                        false: {},
+                    },
                     // The header stays at the top of the scrolling container. React Native has
                     // no sticky position, so there the header stays where it is.
                     stickyHeader: {

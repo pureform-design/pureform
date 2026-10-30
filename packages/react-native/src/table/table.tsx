@@ -35,6 +35,7 @@ import {
     toggleRow,
 } from "@pureform/machines/table";
 import type { ReactNode } from "react";
+import { useState } from "react";
 
 import { Checkbox } from "../checkbox";
 import type { CheckboxProps } from "../checkbox";
@@ -216,10 +217,11 @@ function BodyRow<Row>(props: {
     readonly checkboxProps: InnerPropsOf<CheckboxProps> | undefined;
 }): ReactNode {
     const slot = props.slot;
+    const [hover, setHover] = useState(false);
     const { styles: s, views: v } = useComponentSlots<TablePart>(
         "dataTable",
         props.selection,
-        props.selectable ? { selected: props.selected } : {},
+        { hover, ...(props.selectable ? { selected: props.selected } : {}) },
     );
     const part = tableRowPart(props.index, props.striped);
     const RowView = v[part].View;
@@ -236,6 +238,18 @@ function BodyRow<Row>(props: {
         <RowView
             {...slot.props(part, row)}
             role="row"
+            onPointerEnter={slot.on(
+                part,
+                "onPointerEnter",
+                () => setHover(true),
+                row,
+            )}
+            onPointerLeave={slot.on(
+                part,
+                "onPointerLeave",
+                () => setHover(false),
+                row,
+            )}
             {...(props.selectable ? { "aria-selected": props.selected } : {})}
             style={slot.style(part, s[part], row)}
             testID={props.id(part)}

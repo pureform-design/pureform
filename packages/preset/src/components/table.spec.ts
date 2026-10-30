@@ -33,9 +33,10 @@ describe("table", () => {
         ]);
     });
 
-    it("has a sticky header and density, and no compounds", () => {
+    it("has sticky header, actionable row hover and density variants, and no compounds", () => {
         expect(Object.keys(table.recipe.variants ?? {})).toEqual([
             "stickyHeader",
+            "rowHover",
             "density",
         ]);
         expect(table.recipe.compoundVariants ?? []).toEqual([]);

@@ -51,6 +51,21 @@ const names = () =>
         .map((cell) => cell.textContent);
 
 describe("table", () => {
+    it.each([false, true])(
+        "only hovers actionable rows (rowHover %s)",
+        async (rowHover) => {
+            await render(
+                <Table columns={COLUMNS} rows={ELEMENTS} rowHover={rowHover} />,
+            );
+            await pointerAway();
+            const resting = computed("pf-data-table-row").backgroundColor;
+            await userEvent.hover(byTestId("pf-data-table-row"));
+            await settle(100);
+            expect(
+                computed("pf-data-table-row").backgroundColor === resting,
+            ).toBe(!rowHover);
+        },
+    );
     it("lays out its rows with their roles, a rule under each", async () => {
         await render(<Table columns={COLUMNS} rows={ELEMENTS} />);
         expect(byTestId("pf-data-table-root").getAttribute("role")).toBe(

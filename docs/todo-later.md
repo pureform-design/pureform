@@ -29,8 +29,6 @@ Confirm in the storybook before changing.
 
 ### 3. Small decisions, then a small fix
 
-- **Table row hover parity:** the preset specifies a hover tint (not from Material), absent on RN;
-  keep it (add pointer enter/leave to RN rows) or drop it from the preset.
 - **Draggable list item ripple (React, Solid):** a swipe only sets the pressed layer, and M3 shows
   the dragged state, so probably by design; confirm the spec.
 
