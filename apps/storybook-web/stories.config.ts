@@ -75,6 +75,7 @@ export default defineStories({
                 components: [
                     "Toast",
                     "GridList",
+                    "ListItem",
                     "FileUpload",
                     "BottomSheet",
                     "SideSheet",
@@ -116,6 +117,7 @@ export default defineStories({
         Splitter: { hooks: ["./src/stages/splitter.ts"] },
         Media: { hooks: ["./src/stages/media.ts"] },
         Switch: { hooks: ["./src/checks/switch.ts"] },
+        ListItem: { hooks: ["./src/checks/list-item.ts"] },
         Badge: { hooks: ["./src/checks/badge.ts"] },
         Slider: { hooks: ["./src/checks/slider.ts"] },
         CopyButton: { hooks: ["./src/checks/copy-button.ts"] },

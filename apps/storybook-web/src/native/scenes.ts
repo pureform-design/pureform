@@ -3,6 +3,7 @@ import { Button } from "@pureform/react-native/button";
 import { FileUpload as NativeFileUpload } from "@pureform/react-native/file-upload";
 import type { FileUploadEntry } from "@pureform/react-native/file-upload";
 import { GridList as NativeGridList } from "@pureform/react-native/grid-list";
+import { List as NativeList } from "@pureform/react-native/list";
 import { SideSheet as NativeSideSheet } from "@pureform/react-native/side-sheet";
 import { createToaster, Toaster } from "@pureform/react-native/toast";
 import { createElement, useRef, useState } from "react";
@@ -28,6 +29,12 @@ export function Toast(props: Record<string, unknown>): ReactNode {
     );
 }
 export const GridList = gridListScene(NativeGridList as never);
+
+/** Non-interactive and swipeable rows expose listitem semantics on RN-web. Give the standalone
+ *  example its app's list parent rather than removing the row's useful role. */
+export function ListItem(props: Record<string, unknown>): ReactNode {
+    return createElement(NativeList, { items: [props] });
+}
 
 /** React Native's file upload leaves the picking to the app (its trigger calls `onPick`, and the
  *  app keeps `files`): the story is that app, whose picker adds a sample file each press, and
