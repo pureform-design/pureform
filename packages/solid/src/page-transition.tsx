@@ -10,7 +10,12 @@ import type {
     PageState,
     TransitionPage,
 } from "@pureform/binding-core";
-import { whenAnimationsEnd } from "@pureform/binding-web";
+import {
+    carryOn,
+    readPageFrame,
+    whenAnimationsEnd,
+} from "@pureform/binding-web";
+import type { PageFrame } from "@pureform/binding-web";
 import type { JSX } from "@solidjs/web";
 import {
     type Accessor,
@@ -68,11 +73,23 @@ export function TransitionPageView(props: {
     ) => JSX.Element;
 }): JSX.Element {
     let element: HTMLElement | undefined;
+    let was: PageState = untrack(() => props.page().state);
     createEffect(
-        () => props.page(),
-        (page) => {
+        () => {
+            const page = props.page();
+            // Read before this change restyles the page: one called back mid-exit carries on
+            // from the frame it had reached.
+            const from: PageFrame | undefined =
+                was === "leaving" && page.state === "entering" && element
+                    ? readPageFrame(element)
+                    : undefined;
+            was = page.state;
+            return { page, from };
+        },
+        ({ page, from }) => {
             if (page.state === "current") return;
             let cancel: (() => void) | undefined;
+            if (element && from) carryOn(element, from);
             const frame = requestAnimationFrame(() => {
                 if (element)
                     cancel = whenAnimationsEnd(element, () =>

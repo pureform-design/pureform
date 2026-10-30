@@ -10,7 +10,12 @@ import type {
     PageState,
     TransitionPage,
 } from "@pureform/binding-core";
-import { whenAnimationsEnd } from "@pureform/binding-web";
+import {
+    carryOn,
+    readPageFrame,
+    whenAnimationsEnd,
+} from "@pureform/binding-web";
+import type { PageFrame } from "@pureform/binding-web";
 import {
     createContext,
     useContext,
@@ -65,8 +70,23 @@ export function TransitionPageView(props: {
 }): ReactNode {
     const { page, settle } = props;
     const element = useRef<HTMLElement>(null);
+    // Read while rendering, before the commit restyles it: a page called back mid-exit carries
+    // on from the frame it had reached.
+    const was = useRef<PageState>(page.state);
+    const frame = useRef<PageFrame>(undefined);
+    /* oxlint-disable react/refs -- the DOM as it is before this render's commit */
+    if (
+        was.current === "leaving" &&
+        page.state === "entering" &&
+        element.current
+    )
+        frame.current = readPageFrame(element.current);
+    /* oxlint-enable react/refs */
     useLayoutEffect(() => {
+        const returned = was.current === "leaving" && page.state === "entering";
+        was.current = page.state;
         if (page.state === "current" || !element.current) return;
+        if (returned && frame.current) carryOn(element.current, frame.current);
         return whenAnimationsEnd(element.current, () => settle(page));
     }, [page, settle]);
     return (

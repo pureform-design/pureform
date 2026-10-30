@@ -263,6 +263,44 @@ export const whenAnimationsEnd = (
     };
 };
 
+/** How far a page's fade and growth had got: its opacity and `scale`. */
+export interface PageFrame {
+    readonly opacity: number;
+    readonly scale: number;
+}
+
+/** Reads `element`'s current opacity and scale, to carry on from if it changes course. */
+export const readPageFrame = (element: Element): PageFrame => {
+    const style = getComputedStyle(element);
+    const scale = Number.parseFloat(style.scale);
+    return {
+        opacity: Number(style.opacity),
+        scale: Number.isFinite(scale) ? scale : 1,
+    };
+};
+
+/** After `element`'s styles have changed course (a page leaving is called back), starts from
+ *  `from` rather than from the new animations' first frames: for each fade or growth they run,
+ *  an animation of the same property and duration from `from` to rest, above them. CSS still
+ *  drives the rest, and when `from` is already their start nothing is added. */
+export const carryOn = (element: Element, from: PageFrame): void => {
+    for (const motion of element.getAnimations?.() ?? []) {
+        const effect = motion.effect as KeyframeEffect | null;
+        const keyframes = effect?.getKeyframes?.() ?? [];
+        const duration = Number(effect?.getComputedTiming().duration);
+        if (!duration) continue;
+        for (const [property, value, easing] of [
+            ["opacity", from.opacity, "linear"],
+            ["scale", from.scale, "ease-out"],
+        ] as const) {
+            if (!keyframes.some((frame) => property in frame)) continue;
+            const first = Number.parseFloat(String(keyframes[0]?.[property]));
+            if (Math.abs(first - value) < 0.01) continue;
+            element.animate({ [property]: [value, 1] }, { duration, easing });
+        }
+    }
+};
+
 export {
     carouselRowPadding,
     measureCarouselRow,

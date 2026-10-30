@@ -182,8 +182,12 @@ old B/C/D/E identifiers. Complexity estimates are relative and may change after 
   never moved, had no presence driver on its return, so it settled to current at once and popped
   in. A page now keeps its motion once it has left. Added tests for A → B → C (latest wins, one
   page per key, no queue), A → B → A (returning page enters, no duplicate), and reduced motion on
-  Animated and Reanimated. Native 1088 pass. Web page transitions and shared axis not yet
-  reproduced; still to check before closing this item.
+  Animated and Reanimated. Native 1088 pass.
+- Web fade through fixed (2026-10-30): a page called back mid-exit jumped to opacity 0 (its enter
+  animation restarts from the first frame). React and Solid now read its frame before the restyle
+  and `binding-web`'s `carryOn` runs a same-duration animation from there to rest above the CSS
+  one. Rendered A → B → C and A → B → A tests pass on react and solid across Panda, CSS and
+  Tailwind. Horizontal shared axis (translate) is not yet carried on; check before closing.
 
 ### 15. Live auto-submenu adaptation across platforms
 

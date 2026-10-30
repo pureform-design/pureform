@@ -100,6 +100,53 @@ describe("FadeThrough", () => {
         expect(getComputedStyle(into!).opacity).toBe("1");
     });
 
+    const settled = async (host: HTMLElement) => {
+        for (let i = 0; i < 40 && pages(host).length > 1; i++) {
+            await Promise.allSettled(
+                pages(host).flatMap((page) =>
+                    page.getAnimations().map((a) => a.finished),
+                ),
+            );
+            await harness.settle();
+        }
+    };
+
+    it("lets the latest change win when switched again mid-motion: one page per value, no queue", async () => {
+        const { host, update } = await mount();
+        await update({ value: "mail", children: "Mail" });
+        await update({ value: "chat", children: "Chat" });
+        const shown = pages(host).map((page) => page.textContent);
+        expect(shown.filter((t) => t === "Mail")).toHaveLength(1);
+        expect(shown.filter((t) => t === "Chat")).toHaveLength(1);
+        expect(shown.at(-1)).toBe("Chat");
+        await settled(host);
+        expect(pages(host).map((page) => page.textContent)).toEqual(["Chat"]);
+        expect(getComputedStyle(pages(host)[0]!).opacity).toBe("1");
+    });
+
+    it("returns to the page it was leaving without duplicating it or jumping to transparent", async () => {
+        const { host, update } = await mount();
+        await update({ value: "mail", children: "Mail" });
+        const home = pages(host)[0]!;
+        // Part way through its fade out.
+        await new Promise((resolve) => setTimeout(resolve, 40));
+        const before = Number(getComputedStyle(home).opacity);
+        expect(before).toBeLessThan(1);
+        expect(before).toBeGreaterThan(0);
+        await update({ value: "home", children: "Home" });
+        expect(
+            pages(host).filter((page) => page.textContent === "Home"),
+        ).toHaveLength(1);
+        expect(pages(host).at(-1)!.textContent).toBe("Home");
+        // It carries on from where it was, not from nothing.
+        expect(
+            Number(getComputedStyle(pages(host).at(-1)!).opacity),
+        ).toBeGreaterThan(0.01);
+        await settled(host);
+        expect(pages(host).map((page) => page.textContent)).toEqual(["Home"]);
+        expect(getComputedStyle(pages(host)[0]!).opacity).toBe("1");
+    });
+
     it("only fades under reduced motion", async () => {
         const { host, update } = await mount({ motion: "reduce" });
         await update({ value: "mail", children: "Mail" });
