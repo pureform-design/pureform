@@ -49,11 +49,6 @@ Confirm in the storybook before changing.
 
 Ordered from easy to complex. "Real" is a component or preset bug; "scene" is the story host.
 
-- **RN Paginator page-size input lacks an accessible label:** reproduced by the Storybook
-  accessibility checks in five stories (with page size, first/last, size options, no items,
-  disabled), before the Solid relay fix. The nested `pf-select-input` has no accessible name.
-  Investigate the RN Select input's label forwarding separately.
-
 ### Needs a reproduction first
 
 - **React DatePicker year list (unconfirmed):** React and Solid both render Zag's `getYearsGrid`
@@ -80,6 +75,12 @@ Ordered from easy to complex. "Real" is a component or preset bug; "scene" is th
   ambiguous); cover structural parts, handler/style precedence, accessibility and reactivity/SSR.
 
 ## External verification and maintenance
+
+- **Full-gate timing failures:** RN `presence.spec.tsx`'s Reanimated FAB-menu stagger test
+  failed waiting for the menu to disappear, and browser-e2e `rn-motion.e2e.test.ts` exceeded
+  its 30s setup-hook limit during a full workspace run. Both passed isolated reruns; neither
+  is declared fixed. Investigate load sensitivity and animation cleanup before increasing
+  timeouts. The earlier component-suite `overlayShrinkOut` failure did not recur in that run.
 
 - **V1. Slider focus-ring clipping:** obtain the nested-icon-button scene before changing clipping.
   Handle clearance and styled inset-icon reading pass (`slider-inset-icon.e2e.test.ts`); swipeable-row
