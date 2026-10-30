@@ -579,11 +579,11 @@ variant: { filled: { root: { backgroundColor: token("accent"), color: token("onA
 - **What stays compound:** cases that need both conditions at once: the FAB's size with
   its shape (4), the anchored badge's offset per size (2), each text input's fill with a leading icon, primary tabs with an icon,
   interactive cards per fill (3), and each fill's toggle colors on the button and icon button
-  (5 each), whose selected colors read the `color` group's tokens. The wavy progress adds 1: the
-  circular spinner's wave while indeterminate (one group's clip, another's condition). c4a added
-  4; r4-findings drew the wave clips from the `height`/`thickness` and `amplitude` tokens, which
-  dropped the three per thickness. c5a's docked date picker and date input each add the
-  text field's one (fill with a leading icon), and c9a's number field too. 29 across the preset, counting every
+  (5 each), whose selected colors read the `color` group's tokens. Wavy progress needs no compound:
+  wave travel belongs to the wavy variant for both determinate and indeterminate modes. c4a added
+  4; r4-findings drew the wave clips from the `height`/`thickness` and `amplitude` tokens, and
+  item 12 removed the indeterminate-only linear wave compound. c5a's docked date picker and date input each add the
+  text field's one (fill with a leading icon), and c9a's number field too. 28 across the preset, counting every
   `compoundVariants` entry of every component in `pureform()` (`packages/preset/src/doc-counts.spec.ts`
   checks this number against the code).
 - **Flags for two groups (M3 Expressive):** when a value depends on two groups, one sets a

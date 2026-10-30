@@ -166,10 +166,8 @@ describe("wave paths", () => {
         for (const compound of circularProgress.recipe.compoundVariants ?? []) {
             expect(compound.match).not.toHaveProperty("thickness");
         }
-        // Only the indeterminate line's travelling wave, which no thickness changes.
-        expect(
-            linearProgress.recipe.compoundVariants?.map((c) => c.match),
-        ).toEqual([{ shape: "wavy", indeterminate: "true" }]);
+        // Wave travel belongs to the wavy variant in either progress mode.
+        expect(linearProgress.recipe.compoundVariants ?? []).toHaveLength(0);
         expect(circularProgress.recipe.compoundVariants ?? []).toHaveLength(0);
     });
 });
@@ -309,13 +307,14 @@ describe("wavy progress", () => {
         const wavy = linearProgress.recipe.variants?.shape?.wavy;
         expect(wavy?.indicator?.clipPath).toMatchObject({ type: "shape" });
         expect(JSON.stringify(wavy?.indicator?.top)).toContain("clipShape");
-        // The wave reads the height, so a thick bar needs no compound; the indeterminate
-        // line's wave travels along the track, clipping the root rather than the bar.
-        expect(linearProgress.recipe.compoundVariants).toEqual([
-            expect.objectContaining({
-                match: { shape: "wavy", indeterminate: "true" },
-            }),
-        ]);
+        // Both modes travel; the indicator clips to the track-relative wave, not the root.
+        expect(linearProgress.recipe.compoundVariants ?? []).toHaveLength(0);
+        expect(JSON.stringify(wavy?.root?.rawRules)).toContain(
+            "linearProgressWave",
+        );
+        expect(JSON.stringify(wavy?.indicator?.rawRules)).toContain(
+            "waveDrift",
+        );
     });
 
     it("clips the circular halves to one wavy ring, the spinner too while indeterminate", () => {

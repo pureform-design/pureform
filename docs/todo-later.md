@@ -11,6 +11,9 @@ criteria. These are not all confirmed bugs: reproduction and external verificati
 12. **Linear wavy progress:** reproduce wave movement/gaps, then match Compose track-relative motion
     at one wavelength per second by default and gaps around the active indicator. Preserve theme
     overrides; test both modes, RTL, reduced motion and Native visible track segments.
+    Web wave unit is done: determinate travel and RTL empty-clip regressions fixed, rendered wave
+    and custom track gaps verified across adapters. Native wave motion and the recurring
+    track/indicator synchronization failure remain active; Native already has two track segments.
 13. **Native drill animation:** reproduce on devices; animate measured width/height, translate
     labels and fade nonparticipating rows. Reverse back navigation, mirror RTL and use theme
     springs/reduced motion with both engines.

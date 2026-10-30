@@ -79,6 +79,16 @@ FAB, navigation) has no drag state, so their `stateDraggedOpacity` is declared b
 
 ## Reduced motion
 
+Linear wavy progress on web travels one 40px wavelength per second in both progress modes.
+`waveDuration` customizes its cycle independently of `indeterminateDuration`; reduced motion
+freezes the wave but retains the indeterminate slide. The band is anchored to the track, not
+the sliding indicator, and both its geometry and compensation mirror in RTL. Native currently
+keeps the static bar-local wave; Native motion parity remains item 12 in `docs/todo-later-plan.md`.
+
+When testing animated clips, scrub the independent clocks and hit-test the rendered band at fixed
+track coordinates. Comparing a keyframe name or changing `clip-path` text does not establish that
+the shape is visible, travels at the right speed, or remains anchored while the bar moves.
+
 Under reduced motion, components stop moving but keep fading: a switch handle, a radio dot, a
 floating label, a navigation indicator, a shape morph, and a progress value change at once,
 while their colors, opacity, and elevation (`box-shadow`) still ease over the motion tokens.

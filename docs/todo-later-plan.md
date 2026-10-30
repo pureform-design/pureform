@@ -107,6 +107,26 @@ old B/C/D/E identifiers. Complexity estimates are relative and may change after 
   (animated, instance 60px width; sampled gap differed by 2.87px). Targeted progress/provider rerun
   passed 71 tests and the subsequent full Native suite passed 1051. Investigate with this item;
   do not relax its geometry assertions as part of provider work.
+- Web unit completed (2026-10-30): original browser progress suite passed 39 tests; existing web
+  indeterminate wave travel and two-part track gaps were not reproduced as broken. Stronger
+  rendered-clip hit tests did reproduce three missing determinate wave clocks, and six RTL
+  indeterminate cases whose clip collapsed to the far edge. Wave travel now belongs to the wavy
+  variant for both modes; its 40px band and slide compensation mirror together in RTL. This
+  remains CSS-only, controlled by `waveDuration` (1000ms default), with reduced motion freezing
+  wave drift while preserving the indeterminate slide as the sign of work. Verified with 93
+  Chromium progress cases across Panda/CSS/Tailwind (actual hit-tested band, quarter-wave speed,
+  full-cycle return, independent bar movement, RTL, custom durations, reduced motion, both rounded
+  track segments with custom percentage/pixel indicator widths and gaps). Combined progress and
+  reduced-motion suites pass 1149; LinearProgress SSR/hydration passes 156 across React/Solid and
+  all web adapters; preset passes 1344; affected types/lint pass.
+- Native remains active: source already renders `trackBefore`/`trackAfter`, so the historical
+  missing-gap report is stale. Its existing rendered tests still intermittently fail synchronization
+  (latest default-width case: 0.81px gap error); no tolerance was relaxed. Native wave travel is
+  not implemented by this web-only unit: the drawing currently remains the bar-local static wave.
+- Reference checked: current Compose `WavyProgressIndicator.kt` documents wave speed as one
+  wavelength per second in both determinate and indeterminate linear indicators. Native work
+  must coordinate the independent wave phase and slide clock through shared engine facilities,
+  not duplicate per-frame animation loops in the component.
 
 ### 13. Native submenu drill geometry and motion
 

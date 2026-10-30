@@ -245,14 +245,25 @@ describe.each(Object.keys(STYLINGS) as (keyof typeof STYLINGS)[])(
             expect(box(end!).left).toBeCloseTo(box(start!).right, 0);
         });
 
-        it.each(["ltr", "rtl"])(
-            "leaves a gap on each side of the sliding linear indicator, the track in two rounded parts (%s)",
-            (dir) => {
+        it.each(
+            (["ltr", "rtl"] as const).flatMap((dir) =>
+                (["flat", "wavy"] as const).flatMap((shape) =>
+                    [
+                        { width: "40%", gap: 4 },
+                        { width: "20%", gap: 8 },
+                        { width: "60px", gap: 6 },
+                    ].map((tokens) => ({ dir, shape, ...tokens })),
+                ),
+            ),
+        )(
+            "keeps both rounded track segments clear ($dir, $shape, $width, gap $gap)",
+            ({ dir, shape, width, gap }) => {
                 const c = STYLINGS[styling].classes("linearProgress", {
                     indeterminate: true,
+                    shape,
                 });
                 const root =
-                    show(`<div dir="${dir}"><div data-root class="${c.root}" role="progressbar" style="width: 400px">
+                    show(`<div dir="${dir}"><div data-root class="${c.root}" role="progressbar" style="width: 400px; --pf-components-linearProgress-indeterminateWidth:${width}; --pf-components-linearProgress-gap:${gap}px">
                 <div class="${c.track}"><div class="${c.trackBefore}"></div><div class="${c.trackAfter}"></div></div>
                 <div class="${c.indicator}"></div>
             </div></div>`);
@@ -264,11 +275,11 @@ describe.each(Object.keys(STYLINGS) as (keyof typeof STYLINGS)[])(
                     dir === "rtl" ? [after!, before!] : [before!, after!];
                 // Mid-slide, the parts stop a gap short of the indicator on each side.
                 expect(lead.getBoundingClientRect().right).toBeCloseTo(
-                    bar.left - 4,
+                    bar.left - gap,
                     0,
                 );
                 expect(trail.getBoundingClientRect().left).toBeCloseTo(
-                    bar.right + 4,
+                    bar.right + gap,
                     0,
                 );
                 // Each part's ends are rounded; the track only clips them to its own.
@@ -292,7 +303,7 @@ describe.each(Object.keys(STYLINGS) as (keyof typeof STYLINGS)[])(
                 shape: "wavy",
             });
             const root =
-                show(`<div data-root class="${c.root}" role="progressbar" style="width: 320px">
+                show(`<div data-root data-pf-motion="full" class="${c.root}" role="progressbar" style="width: 320px">
                 <div class="${c.track}"></div>
                 <div class="${c.indicator}"></div>
             </div>`);
@@ -321,5 +332,92 @@ describe.each(Object.keys(STYLINGS) as (keyof typeof STYLINGS)[])(
             pauseAt(root, 750);
             expect(getComputedStyle(indicator).clipPath).not.toBe(clip);
         });
+
+        it.each(
+            [false, true].flatMap((indeterminate) =>
+                (["ltr", "rtl"] as const).flatMap((dir) =>
+                    [1000, 2000].map((duration) => ({
+                        indeterminate,
+                        dir,
+                        duration,
+                    })),
+                ),
+            ),
+        )(
+            "renders an independent wave (indeterminate $indeterminate, $dir, $duration ms)",
+            ({ indeterminate, dir, duration }) => {
+                const c = STYLINGS[styling].classes("linearProgress", {
+                    shape: "wavy",
+                    indeterminate,
+                });
+                const root =
+                    show(`<div dir="${dir}"><div data-root data-pf-motion="full" class="${c.root}" style="width:320px; --pf-components-linearProgress-value:80; --pf-components-linearProgress-waveDuration:${duration}ms; transition:none">
+                    <div class="${c.indicator}" style="transition:none"></div></div></div>`);
+                const indicator = root.firstElementChild as HTMLElement;
+                const animations = root.getAnimations({ subtree: true });
+                for (const animation of animations) {
+                    animation.pause();
+                    animation.currentTime = 700;
+                }
+                const wave = animations.find(
+                    (animation) =>
+                        "animationName" in animation &&
+                        String(animation.animationName).includes(
+                            "linearProgressWave",
+                        ),
+                );
+                expect(
+                    wave,
+                    "a wave clock for both determinate and indeterminate progress",
+                ).toBeDefined();
+                const box = root.getBoundingClientRect();
+                const x =
+                    Math.max(box.left, indicator.getBoundingClientRect().left) +
+                    17;
+                // Hit-testing uses the rendered clip, not a token or the shape's serialized text.
+                const band = (at = x) =>
+                    Array.from(
+                        { length: 40 },
+                        (_, index) =>
+                            doc().elementFromPoint(at, box.top + index / 4) ===
+                            indicator,
+                    );
+                wave!.currentTime = 0;
+                const start = band();
+                expect(start.some(Boolean)).toBe(true);
+                const quarter = band(x + (dir === "rtl" ? 10 : -10));
+                const slides = animations.filter(
+                    (animation) =>
+                        "animationName" in animation &&
+                        String(animation.animationName).includes(
+                            "linearProgressSlide",
+                        ),
+                );
+                expect(slides).toHaveLength(indeterminate ? 1 : 0);
+                for (const slide of slides) {
+                    slide.currentTime = 650;
+                    expect(band()).toEqual(start);
+                    slide.currentTime = 700;
+                }
+                wave!.currentTime = duration / 4;
+                expect(band()).toEqual(quarter);
+                wave!.currentTime = duration / 2;
+                expect(band()).not.toEqual(start);
+                wave!.currentTime = duration;
+                expect(band()).toEqual(start);
+                root.setAttribute("data-pf-motion", "reduce");
+                const remaining = root.getAnimations({ subtree: true });
+                expect(
+                    remaining.some(
+                        (animation) =>
+                            "animationName" in animation &&
+                            String(animation.animationName).includes(
+                                "linearProgressWave",
+                            ),
+                    ),
+                ).toBe(false);
+                expect(remaining.length > 0).toBe(indeterminate);
+            },
+        );
     },
 );

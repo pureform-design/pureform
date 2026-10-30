@@ -166,8 +166,9 @@ export const PROGRESS_KEYFRAMES: Record<string, Record<string, StyleMap>> = {
         to: { tokens: { [WAVE_DRIFT]: px(WAVELENGTH) } },
     },
     linearProgressWaveRtl: {
-        from: { tokens: { [WAVE_DRIFT]: px(WAVELENGTH) } },
-        to: { tokens: { [WAVE_DRIFT]: px(0) } },
+        // The band itself is mirrored, so increasing logical drift moves physically left.
+        from: { tokens: { [WAVE_DRIFT]: px(0) } },
+        to: { tokens: { [WAVE_DRIFT]: px(WAVELENGTH) } },
     },
     ...circularArcKeyframes(),
     // The indeterminate track's two parts move with the indicator: as far, in the root's widths
@@ -213,20 +214,21 @@ const linearWave = waveBand({
     amplitude: linear.ref("amplitude"),
 });
 
-// The indeterminate wave: the same band, anchored to the track rather than the sliding bar, a
+// The travelling wave: the same band, anchored to the track rather than the sliding bar, a
 // wave longer so it can travel a wavelength. The indicator clips to it, shifted back by however
 // far it has slid (`slide` of its own widths), so the wave stays where it is on the track while
 // the bar moves under it, and the flat track isn't clipped.
-const travellingWave = (): ShapeNode =>
+const travellingWave = (mirrored = false): ShapeNode =>
     waveBand({
         waves: 25,
         wavelength: WAVELENGTH,
         top: linear.ref("amplitude"),
         bottom: add(linear.ref("amplitude"), linear.ref("height")),
         amplitude: linear.ref("amplitude"),
+        mirrored,
         shift: sub(
             sub(linear.ref("waveDrift"), px(WAVELENGTH)),
-            mul(linear.ref("slide"), pct(100)),
+            mul(linear.ref("slide"), pct(mirrored ? -100 : 100)),
         ),
     });
 
@@ -393,6 +395,25 @@ export const createLinearProgress = <const G extends string = ColorGroup>(
                                     ref("height"),
                                     mul(ref("amplitude"), unitless(2)),
                                 ),
+                                rawRules: {
+                                    css: {
+                                        "&": {
+                                            animation: when(
+                                                "reducedMotion",
+                                                none,
+                                                when(
+                                                    "rtl",
+                                                    travel(
+                                                        "linearProgressWaveRtl",
+                                                    ),
+                                                    travel(
+                                                        "linearProgressWave",
+                                                    ),
+                                                ),
+                                            ),
+                                        },
+                                    },
+                                },
                             },
                             track: {
                                 top: ref("amplitude"),
@@ -420,6 +441,19 @@ export const createLinearProgress = <const G extends string = ColorGroup>(
                                     radius("full"),
                                 ),
                                 clipPath: linearWave,
+                                rawRules: {
+                                    css: {
+                                        "&": {
+                                            clipPath: when(
+                                                "rtl",
+                                                travellingWave(true),
+                                                travellingWave(),
+                                            ),
+                                            top: px(0),
+                                            height: pct(100),
+                                        },
+                                    },
+                                },
                             },
                         },
                     },
@@ -431,40 +465,6 @@ export const createLinearProgress = <const G extends string = ColorGroup>(
                         stopIndicator: { backgroundColor: g.main },
                     })),
                 },
-                // The indeterminate wave travels along the track, not with the bar (Compose's
-                // `LinearWavyProgressIndicator`): on the web the root animates the wave's drift
-                // and the bar, filling its height, clips to the wave where it is on the track. React Native keeps the bar's own wave.
-                compoundVariants: [
-                    {
-                        match: { shape: "wavy", indeterminate: "true" },
-                        style: {
-                            root: {
-                                rawRules: {
-                                    css: {
-                                        "&": {
-                                            animation: when(
-                                                "rtl",
-                                                travel("linearProgressWaveRtl"),
-                                                travel("linearProgressWave"),
-                                            ),
-                                        },
-                                    },
-                                },
-                            },
-                            indicator: {
-                                rawRules: {
-                                    css: {
-                                        "&": {
-                                            clipPath: travellingWave(),
-                                            top: px(0),
-                                            height: pct(100),
-                                        },
-                                    },
-                                },
-                            },
-                        },
-                    },
-                ],
                 defaultVariants: {
                     indeterminate: "false",
                     thickness: "default",

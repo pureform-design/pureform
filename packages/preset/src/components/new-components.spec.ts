@@ -199,14 +199,14 @@ describe("progress", () => {
         expect(JSON.stringify(frames?.["100%"]?.transform)).toContain("720");
     });
 
-    it("moves the indeterminate linear wave along the track, not with the bar", () => {
+    it("moves every wavy linear indicator's wave along the track, not with the bar", () => {
         const css = compilePreset(configWith(linearProgress)).theme?.slotRecipes
             ?.linearProgress;
-        const compound = JSON.stringify(css?.compoundVariants);
-        expect(compound).toContain('"shape":"wavy"');
-        expect(compound).toContain("linearProgressWave");
-        // The root clips to the travelling wave, which reads how far it has travelled.
-        expect(compound).toContain("--components-linearProgress-waveDrift");
+        const wavy = JSON.stringify(css?.variants?.shape?.wavy);
+        expect(wavy).toContain("linearProgressWave");
+        expect(wavy).toContain('"_motionReduce":"none"');
+        // The indicator clips to the travelling wave; the root only supplies its drift clock.
+        expect(wavy).toContain("--components-linearProgress-waveDrift");
         const frames = pureform().keyframes?.["linearProgressWave"];
         expect(JSON.stringify(frames?.["to"]?.tokens)).toContain("40");
     });

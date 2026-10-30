@@ -60,6 +60,7 @@ export const waveBand = ({
     bottom,
     amplitude,
     shift,
+    mirrored = false,
 }: {
     waves: number;
     wavelength: number;
@@ -67,13 +68,17 @@ export const waveBand = ({
     bottom: NumericValue;
     amplitude: NumericValue;
     shift?: NumericValue | undefined;
+    /** Mirror the whole band around the box's inline end, including its travel offset. */
+    mirrored?: boolean | undefined;
 }): ShapeNode => {
     const end = waves * wavelength;
-    const x = (length: number) =>
-        min(
+    const x = (length: number) => {
+        const at = min(
             shift ? add(px(round(length)), shift) : px(round(length)),
             pct(100),
         );
+        return mirrored ? sub(pct(100), at) : at;
+    };
     const point =
         (middle: NumericValue) =>
         (t: number, s: number): ShapePoint => [
@@ -98,8 +103,8 @@ export const waveBand = ({
                 from: point(top)(0, 0),
                 segments: [
                     ...upper.map(curve),
-                    { op: "line", to: [pct(100), top] },
-                    { op: "line", to: [pct(100), bottom] },
+                    { op: "line", to: [pct(mirrored ? 0 : 100), top] },
+                    { op: "line", to: [pct(mirrored ? 0 : 100), bottom] },
                     { op: "line", to: [x(end), bottom] },
                     ...lower.map(curve),
                 ],
