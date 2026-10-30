@@ -51,11 +51,11 @@ import type { ItemInteractionSources } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
-import { createSlotProps, useComponent, useUnstyledComponent } from "../parts";
+import { createSlotProps, useComponent } from "../parts";
 import type { ComponentScope, InnerPropsOf, SlotKeyedProps } from "../parts";
 import { combinePartProps } from "../props";
 import type { PartProps } from "../props";
-import { useDirection } from "../provider";
+import { useDirection, usePureform } from "../provider";
 
 /** What Root shares with its radios. */
 interface RadioGroupContextValue {
@@ -107,6 +107,12 @@ export interface RadioGroupPartProps extends PartProps {
 function Root(props: RadioGroupRootProps): JSX.Element {
     const id = createUniqueId();
     const dir = useDirection();
+    const provider = usePureform();
+    const orientation = (): "horizontal" | "vertical" =>
+        (props.orientation ?? provider().defaults.radioGroup?.orientation) ===
+        "horizontal"
+            ? "horizontal"
+            : "vertical";
     const value = useControllable("RadioGroup", "value", props);
     const [root, setRoot] = createSignal<HTMLElement | undefined>(undefined, {
         ownedWrite: true,
@@ -118,6 +124,7 @@ function Root(props: RadioGroupRootProps): JSX.Element {
         ...sources.machineProps,
         dir: dir(),
         ...radioGroupMachineProps(props, fieldsetDisabled()),
+        orientation: orientation(),
         ...value.machineProps(),
     }));
     const api = createMemo(() => radioGroup.connect(service, normalizeProps));
@@ -137,8 +144,10 @@ function Root(props: RadioGroupRootProps): JSX.Element {
                 }),
             ),
     });
-    const scope = useUnstyledComponent(radioGroupAnatomy, {
+    const scope = useComponent(radioGroupAnatomy, {
+        selection: () => ({ orientation: props.orientation }),
         testId: () => props.testId,
+        unstyled: () => props.unstyled,
     });
     const rest = omit(props, "as", ...RADIO_GROUP_ROOT_PROPS);
     return (

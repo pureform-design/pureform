@@ -21,6 +21,7 @@ let registry: TestRegistry;
 beforeAll(async () => {
     registry = await presetRegistry([
         "radio",
+        "radioGroup",
         "tabs",
         "menu",
         "navigationBar",
@@ -95,6 +96,56 @@ const count = (ids: readonly string[], testId: string) =>
     new Set(ids.filter((id) => id.startsWith(`${testId}#`))).size;
 
 describe("a composite's rows", () => {
+    it("uses the preset's provider orientation for layout and semantics", async () => {
+        await mount(
+            <PureformProvider
+                registry={registry}
+                motion="reduce"
+                defaults={{ radioGroup: { orientation: "horizontal" } }}
+            >
+                <RadioGroup
+                    items={[
+                        { value: "a", label: "A" },
+                        { value: "b", label: "B" },
+                    ]}
+                />
+            </PureformProvider>,
+        );
+        const root = document.querySelector<HTMLElement>(
+            '[role="radiogroup"]',
+        )!;
+        expect(root.getAttribute("aria-orientation")).toBe("horizontal");
+        expect(getComputedStyle(root).flexDirection).toBe("row");
+    });
+    it.each(["horizontal", "vertical"] as const)(
+        "lays out %s radio groups",
+        async (orientation) => {
+            await mountUnder("a", (value) => (
+                <RadioGroup
+                    value={value}
+                    orientation={orientation}
+                    items={[
+                        { value: "a", label: "A" },
+                        { value: "b", label: "B" },
+                    ]}
+                />
+            ));
+            const radios = [
+                ...document.querySelectorAll<HTMLElement>(
+                    '[data-testid="pf-radio-root"]',
+                ),
+            ];
+            const a = radios[0]!.getBoundingClientRect();
+            const b = radios[1]!.getBoundingClientRect();
+            // Both branches assert the geometry of this parameterized layout.
+            /* oxlint-disable vitest/no-conditional-expect */
+            if (orientation === "horizontal") {
+                expect(b.top).toBeCloseTo(a.top, 0);
+                expect(b.left).toBeGreaterThan(a.left);
+            } else expect(b.top).toBeGreaterThan(a.top);
+            /* oxlint-enable vitest/no-conditional-expect */
+        },
+    );
     it("a radio group's radios don't render again with the group's parent", async () => {
         const items = await mountUnder("a", (value) => (
             <RadioGroup

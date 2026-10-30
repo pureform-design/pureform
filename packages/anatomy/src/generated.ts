@@ -2916,6 +2916,25 @@ export const radioAnatomy = {
     },
 } as const satisfies ComponentAnatomy;
 
+export const radioGroupAnatomy = {
+    name: "radioGroup",
+    scope: "radio-group",
+    root: "root",
+    partNames: ["root"],
+    parts: {
+        root: {
+            name: "root",
+            attribute: "root",
+            testId: "pf-radio-group-root",
+            parent: null,
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+    },
+    variants: { orientation: ["vertical", "horizontal"] },
+} as const satisfies ComponentAnatomy;
+
 export const switchControlAnatomy = {
     name: "switchControl",
     scope: "switch-control",
@@ -6621,6 +6640,7 @@ export const anatomy = {
     supportingText: supportingTextAnatomy,
     checkbox: checkboxAnatomy,
     radio: radioAnatomy,
+    radioGroup: radioGroupAnatomy,
     switchControl: switchControlAnatomy,
     slider: sliderAnatomy,
     linearProgress: linearProgressAnatomy,
@@ -6930,6 +6950,7 @@ export const testIds = {
         ring: "pf-radio-ring",
         dot: "pf-radio-dot",
     },
+    radioGroup: { root: "pf-radio-group-root" },
     switchControl: {
         root: "pf-switch-control-root",
         touchTarget: "pf-switch-control-touch-target",

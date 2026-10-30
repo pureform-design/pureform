@@ -16,7 +16,6 @@ import type {
 import type { Indication } from "@pureform/binding-core/indication";
 import { createContext, memo, useContext, useMemo } from "react";
 import type { ReactNode } from "react";
-import { View } from "react-native";
 
 import { useCheckKeys } from "../check-keys";
 import { overDefaults } from "../defaults";
@@ -28,6 +27,7 @@ import {
     useStableSelection,
     withEngine,
 } from "../parts";
+import { usePureform } from "../provider";
 import { useNativeSlotReader, withUnselectable } from "../slot-props";
 import type { InnerPropsOf, NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
@@ -169,6 +169,8 @@ export interface RadioGroupProps
     /** Radios to render, each named by its label, with its own `style`, `slotProps` and `tokens`
      *  over `radioProps`; or give `Radio`s as children. */
     readonly items?: readonly RadioGroupEntry[] | undefined;
+    /** Visual and semantic orientation; vertical by default, as on web. */
+    readonly orientation?: "horizontal" | "vertical" | undefined;
     readonly "aria-label"?: string | undefined;
     readonly children?: ReactNode;
 }
@@ -181,6 +183,14 @@ export type RadioGroupEntry = RadioGroupItem &
  *  or with `Radio` children. */
 export function RadioGroup(props: RadioGroupProps): ReactNode {
     const nativeSlots = useNativeSlotReader("radioGroup");
+    const { defaults } = usePureform();
+    const orientation =
+        (props.orientation ?? defaults.radioGroup?.orientation) === "horizontal"
+            ? "horizontal"
+            : "vertical";
+    const { styles: s, views: v } = useComponentSlots<"root">("radioGroup", {
+        orientation: props.orientation,
+    });
     const [value, setValue] = useControllable<"value", string | null>(
         "RadioGroup",
         "value",
@@ -219,13 +229,14 @@ export function RadioGroup(props: RadioGroupProps): ReactNode {
     );
     const slot = nativeSlots(props);
     return (
-        <View
+        <v.root.View
             {...slot.props("root")}
             role="radiogroup"
+            aria-orientation={orientation}
             {...(props["aria-label"] === undefined
                 ? {}
                 : { "aria-label": props["aria-label"] })}
-            style={slot.style("root", undefined)}
+            style={slot.style("root", s.root)}
             testID={compositeTestIds.radioGroup.root}
         >
             <RadioGroupContext value={context}>
@@ -268,6 +279,6 @@ export function RadioGroup(props: RadioGroupProps): ReactNode {
                 })}
                 {props.children}
             </RadioGroupContext>
-        </View>
+        </v.root.View>
     );
 }

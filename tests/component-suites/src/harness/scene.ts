@@ -4,6 +4,7 @@
 // on the server.
 
 import type { ComponentName, SceneProps } from "@pureform/component-cases";
+import type { PureformProviderProps } from "@pureform/react";
 
 // The component names and props live with the cases.
 export { COMPONENT_NAMES } from "@pureform/component-cases";
@@ -23,6 +24,7 @@ export type SceneIndication =
 
 /** The provider's options a scene sets. */
 export interface SceneProvider {
+    readonly defaults?: PureformProviderProps["defaults"];
     /** The provider's indication, which every component under it takes. */
     readonly indication?: SceneIndication | undefined;
     readonly dir?: "ltr" | "rtl" | undefined;

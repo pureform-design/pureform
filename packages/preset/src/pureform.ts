@@ -107,6 +107,7 @@ import {
     createLinearProgress,
 } from "./components/progress";
 import { createRadio } from "./components/radio";
+import { radioGroup } from "./components/radio-group";
 import { createRating } from "./components/rating";
 import { richTooltip } from "./components/rich-tooltip";
 import { ripple } from "./components/ripple";
@@ -359,6 +360,7 @@ const defaultComponents = <G extends string>(
         supportingText: createSupportingText(theme.color.groups),
         checkbox: createCheckbox<G, Step>(theme.color.groups, densities),
         radio: createRadio<G, Step>(theme.color.groups, densities),
+        radioGroup,
         switchControl: createSwitch(theme.color.groups),
         slider: createSlider(theme.color.groups),
         linearProgress: createLinearProgress(theme.color.groups),

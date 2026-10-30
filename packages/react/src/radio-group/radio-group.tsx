@@ -50,11 +50,11 @@ import { useItemInteractionSources } from "../interaction";
 import type { ItemInteractionSources } from "../interaction";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
-import { useComponent, useSlotProps, useUnstyledComponent } from "../parts";
+import { useComponent, useSlotProps } from "../parts";
 import type { ComponentScope, InnerPropsOf, SlotKeyedProps } from "../parts";
 import { combinePartProps, omitProps } from "../props";
 import type { PartProps } from "../props";
-import { useDirection } from "../provider";
+import { useDirection, useComponentState } from "../provider";
 
 /** What Root shares with its radios. */
 interface RadioGroupContextValue {
@@ -102,10 +102,15 @@ export interface RadioGroupPartProps extends PartProps {
 }
 
 /** The group's root: an element with `role="radiogroup"` that runs the machine and shares it with
- *  its radios. The registry doesn't style it. */
+ *  its radios. The preset styles its orientation independently of the radios. */
 function Root(props: RadioGroupRootProps): ReactNode {
     const id = useId();
     const dir = useDirection();
+    const { defaults } = useComponentState();
+    const orientation =
+        (props.orientation ?? defaults.radioGroup?.orientation) === "horizontal"
+            ? "horizontal"
+            : "vertical";
     const value = useControllable<"value", string | null>(
         "RadioGroup",
         "value",
@@ -119,6 +124,7 @@ function Root(props: RadioGroupRootProps): ReactNode {
         ...sources.machineProps,
         dir,
         ...radioGroupMachineProps(props, fieldsetDisabled),
+        orientation,
         ...value.machineProps,
     });
     const api = radioGroup.connect(service, normalizeProps);
@@ -161,8 +167,10 @@ function Root(props: RadioGroupRootProps): ReactNode {
             syncRadioInputs(element, current);
         }
     }, []);
-    const scope = useUnstyledComponent(radioGroupAnatomy, {
+    const scope = useComponent(radioGroupAnatomy, {
+        selection: { orientation: props.orientation },
         testId: props.testId,
+        unstyled: props.unstyled,
     });
     const { as, ...rest } = omitProps(props, RADIO_GROUP_ROOT_PROPS);
     return (

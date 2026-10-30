@@ -22,6 +22,7 @@ beforeAll(async () => {
         "touchTarget",
         "checkbox",
         "radio",
+        "radioGroup",
         "switchControl",
         "iconButton",
         "chip",

@@ -39,7 +39,7 @@ const inputs = () => [
 ];
 
 describe("RadioGroup, ready-made", () => {
-    it("renders an unstyled radiogroup holding a radio per item", async () => {
+    it("renders a preset-styled radiogroup holding a radio per item", async () => {
         withRegistry(
             <RadioGroup
                 aria-label="Size"
@@ -57,7 +57,7 @@ describe("RadioGroup, ready-made", () => {
         expect(group.getAttribute("aria-label")).toBe("Size");
         expect(group.hasAttribute("aria-labelledby")).toBe(false);
         expect(group.getAttribute("style")).toBeNull();
-        expect(group.className).toBe("sizes");
+        expect(group.className).toBe("radioGroup sizes");
         const roots = group.querySelectorAll(`[data-pf-part="root"]`);
         expect(roots).toHaveLength(2);
         expect(roots[0]!.tagName).toBe("LABEL");

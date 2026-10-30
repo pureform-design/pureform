@@ -1,8 +1,8 @@
 // The radio group's contract, shared by every binding: the props the group's Root and each radio
 // take for themselves, how they map onto the selection and Zag's radio group machine, and how the
 // machine's part props are adjusted for the preset's markup (each radio a native input laid over
-// its ring). The group itself is an unstyled element (`radioGroupAnatomy`); each radio is the
-// preset's `radio`, with its own parts.
+// its ring). The group's preset controls layout; each radio is the preset's `radio`, with its
+// own parts.
 
 import type {
     PartName,
@@ -30,12 +30,12 @@ export interface RadioVariantProps {
     readonly tokens?: InstanceTokens<"radio"> | undefined;
 }
 
-/** The group's variants: every radio's defaults. The group has no recipe, so no tokens of its
- *  own; the ready-made group gives its radios' tokens in `radioProps`. */
+/** Color and density default the radios, whose instance tokens belong in `radioProps`.
+ *  Orientation styles the group itself and controls its semantic orientation. */
 export type RadioGroupVariantProps = Pick<
     RadioVariantProps,
     "color" | "density"
->;
+> & { readonly orientation?: "horizontal" | "vertical" | undefined };
 
 /** The ids of the group's elements, for composition. Zag builds each radio's ids from its value:
  *  `itemHiddenInput("small")` is the input of the radio whose value is `small`, for a
@@ -66,7 +66,7 @@ export interface RadioGroupBehaviorProps extends Controllable<
     /** The id of the form the radios belong to, for a group outside it.
      *  @control none */
     readonly form?: string | undefined;
-    /** How the radios are laid out, for `aria-orientation`. @default "vertical" */
+    /** The radios' layout and `aria-orientation`. @default "vertical" */
     readonly orientation?: "horizontal" | "vertical" | undefined;
     /** The group element's id; the machine finds the element by it.
      *  @control none */
@@ -79,6 +79,7 @@ export interface RadioGroupRootOwnProps
     extends RadioGroupVariantProps, RadioGroupBehaviorProps, IndicationProps {
     /** The group element's test id: a prefix (`size` → `size-root`), or by part. */
     readonly testId?: TestIdOverride<RadioGroupPart> | undefined;
+    readonly unstyled?: Unstyled<RadioGroupPart> | undefined;
 }
 
 /** The keys of `RadioGroupRootOwnProps`, which Root keeps off its element. */
@@ -98,6 +99,7 @@ export const RADIO_GROUP_ROOT_PROPS = [
     "defaultValue",
     "onValueChange",
     "testId",
+    "unstyled",
     "indication",
 ] as const satisfies readonly (keyof RadioGroupRootOwnProps)[];
 

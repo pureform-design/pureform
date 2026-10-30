@@ -6,26 +6,6 @@
 
 import type { ComponentAnatomy } from "./types";
 
-/** The radio group: one element around its radios, which carries Zag's `role="radiogroup"`.
- *  Each radio inside it is a `radio` with its own parts. */
-export const radioGroupAnatomy = {
-    name: "radioGroup",
-    scope: "radio-group",
-    root: "root",
-    partNames: ["root"],
-    parts: {
-        root: {
-            name: "root",
-            attribute: "root",
-            testId: "pf-radio-group-root",
-            parent: null,
-            children: [],
-            styled: false,
-            mirror: false,
-        },
-    },
-} as const satisfies ComponentAnatomy;
-
 /** The select's list of options, drawn as a menu: its parts are the menu's slots (so the menu's
  *  registry entry styles them), named and test-identified as the select's. Zag's positioner
  *  around it places it under the field and isn't styled. */

@@ -296,6 +296,7 @@ export function SceneView(props: {
             theme={sceneTheme(props.scene.provider)}
             hydrate={props.scene.provider?.hydrate}
             overrides={props.scene.provider?.overrides}
+            defaults={props.scene.provider?.defaults}
         >
             {scene.wrapper
                 ? createElement(

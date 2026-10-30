@@ -1468,3 +1468,9 @@ each setting one token on the root (0 compounds): `columns` 1 to 6, `gutter` non
 large, `aspect` square, landscape, portrait, wide. Tokens `columns`, `gutter`, `aspect`, `radius`,
 `container` and the caption's (`captionContainer`, `captionContent`, `captionOpacity`,
 `captionSize`, `captionPadding`) take any value. Spanning a tile over several columns is not built.
+## RadioGroup layout
+
+`radioGroup` now has a styled `root` with an `orientation` variant: `vertical` (default) or a
+wrapping `horizontal` row. React, Solid and React Native use the same preset, provider defaults and
+instance style overrides. Groups generated before this addition need their registry regenerated;
+the `radio-group` usage entry includes both the group and its `radio` children.

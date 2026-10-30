@@ -26,17 +26,12 @@ Confirm in the storybook before changing.
 
 - **Carousel arrow keys:** expected on touch-first RN (already recorded in the stories' skips); no
   change planned.
-- **SideSheet standard on RN:** the component keeps no state for `defaultOpen` on a standard sheet,
-  where the BottomSheet does. The scene now supplies it; decide whether the component should match
-  the BottomSheet.
 
 ### 3. Small decisions, then a small fix
 
 - **SearchView trigger width (React, Solid, probably RN), needs a decision:** the trigger is `width: 100%` while the
   `SearchBar` is capped at 720px; make the trigger shrink-wrap (`width: fit-content; max-width:
   100%`) or carry the same cap.
-- **RN RadioGroup `orientation`:** vertical is the RN/Material default, but `orientation` is
-  ARIA-only on RN; map `horizontal` to a wrapping row or document it.
 - **Table row hover parity:** the preset specifies a hover tint (not from Material), absent on RN;
   keep it (add pointer enter/leave to RN rows) or drop it from the preset.
 - **Draggable list item ripple (React, Solid):** a swipe only sets the pressed layer, and M3 shows

@@ -97,7 +97,9 @@ export const COMPONENT_USAGE = {
         },
     },
     // `interactive` follows the element, and `padded` the sections the ready-made shows.
-    card: { entries: { card: same("variant", "width", "actionsAlign"), ripple: {} } },
+    card: {
+        entries: { card: same("variant", "width", "actionsAlign"), ripple: {} },
+    },
     carousel: { entries: { carousel: same("layout"), ripple: {} } },
     accordion: { entries: { accordion: same("density"), ripple: {} } },
     tree: { entries: { tree: same("density", "color"), ripple: {} } },
@@ -223,7 +225,13 @@ export const COMPONENT_USAGE = {
         },
     },
     // The group's color and density reach each radio.
-    "radio-group": { entries: { radio: same("color", "density"), ripple: {} } },
+    "radio-group": {
+        entries: {
+            radioGroup: same("orientation"),
+            radio: same("color", "density"),
+            ripple: {},
+        },
+    },
     // The trigger is a button.
     popover: {
         entries: { popover: {}, button: {}, ripple: {} },

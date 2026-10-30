@@ -130,6 +130,7 @@ export const togglesRegistry = () =>
             "icon",
         ]),
         radio: named("radio", ["root", "touchTarget", "input", "ring", "dot"]),
+        radioGroup: named("radioGroup", ["root"]),
         chip: named("chip", ["root", "icon", "label", "touchTarget"]),
         iconButton: named("icon-button", [
             "root",

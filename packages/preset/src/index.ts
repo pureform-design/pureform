@@ -14,6 +14,7 @@ export * from "./components/scrim";
 export * from "./components/fade-through";
 export * from "./components/horizontal-shared-axis";
 export * from "./components/radio";
+export * from "./components/radio-group";
 export * from "./components/ripple";
 export * from "./components/checkbox";
 export * from "./components/chip";

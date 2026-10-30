@@ -74,6 +74,7 @@ const COMPONENTS = [
     "checkbox",
     "switchControl",
     "radio",
+    "radioGroup",
     "card",
     "text",
     "avatar",
