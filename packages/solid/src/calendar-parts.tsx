@@ -55,6 +55,8 @@ export interface CalendarStepProps extends CalendarPartProps {
     readonly unit?: "page" | "year" | undefined;
     /** Another element or component to render instead of `<button>`: `IconButton`. */
     readonly as?: ValidComponent | undefined;
+    /** The icon an `as` component such as `IconButton` draws, as it takes its icon by prop. */
+    readonly icon?: JSX.Element | undefined;
 }
 
 /** A table's props: a part's, and the view it lays out and how many cells a row holds, for the
