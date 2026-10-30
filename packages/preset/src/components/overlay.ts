@@ -102,6 +102,10 @@ export type OverlayMotionStep = {
     /** How long the step waits before it starts, which its fade waits too. Under reduced motion
      *  the fade runs at once. */
     readonly wait?: NumericValue;
+    /** How long the fade waits, when it isn't the step's `wait`: a step interrupted partway skips
+     *  ahead on each of its springs by its own amount (a negative wait), and the movement and
+     *  the fade run on different springs. */
+    readonly fadeWait?: NumericValue;
 } & MotionTiming;
 
 /** How an overlay enters and leaves. */
@@ -156,7 +160,14 @@ export const motionAnimation = (
 ) => timedAnimation(name, { duration: time, easing: curve }, fillMode);
 
 const step = (
-    { keyframes, rtl, fade: fadeTiming, wait, ...timing }: OverlayMotionStep,
+    {
+        keyframes,
+        rtl,
+        fade: fadeTiming,
+        wait,
+        fadeWait,
+        ...timing
+    }: OverlayMotionStep,
     fade: string,
     fillMode: "none" | "forwards",
 ) => {
@@ -166,7 +177,7 @@ const step = (
         return fadeTiming
             ? animations(
                   moving,
-                  timedAnimation(fade, fadeTiming, fillMode, wait),
+                  timedAnimation(fade, fadeTiming, fillMode, fadeWait ?? wait),
               )
             : moving;
     };

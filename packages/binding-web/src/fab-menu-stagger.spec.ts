@@ -1,3 +1,4 @@
+import { springAt } from "@pureform/core";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { fabMenuStagger } from "./fab-menu-stagger";
@@ -166,5 +167,223 @@ describe("fabMenuStagger", () => {
                 "--pf-components-fabMenu-staggerDelay",
             ),
         ).not.toBe("");
+    });
+});
+
+// Toggling while the items are moving: each carries on from where it is.
+describe("fabMenuStagger, toggled mid-motion", () => {
+    // The theme's springs as the FAB menu runs them: its stagger on the slow effects spring, each
+    // item's reveal on the fast spatial one, and its fade on the fast effects one.
+    const SPRINGS = {
+        effectsSlow: { stiffness: 800, damping: 1 },
+        spatialFast: { stiffness: 1400, damping: 0.9 },
+        effectsFast: { stiffness: 3800, damping: 1 },
+    } as const;
+
+    const writeSprings = (omit: readonly string[] = []) => {
+        const root = document.documentElement.style;
+        for (const [role, { stiffness, damping }] of Object.entries(SPRINGS)) {
+            if (omit.includes(role)) continue;
+            const name = springRoleVar(registry, role)!;
+            root.setProperty(`${name}-stiffness`, String(stiffness));
+            root.setProperty(`${name}-damping`, String(damping));
+            root.setProperty(`${name}-mass`, "1");
+        }
+    };
+
+    const FADE = "--components-fabMenu-fadeDelay";
+
+    const spring = (role: keyof typeof SPRINGS) => ({
+        type: "spring" as const,
+        ...SPRINGS[role],
+        mass: 1,
+    });
+
+    // How far a spring has run `ms` after it began, 0 to 1.
+    const ran = (role: keyof typeof SPRINGS, ms: number) =>
+        Math.min(1, Math.max(0, springAt(spring(role), ms / 1000)));
+
+    const clip = (element: HTMLElement) => delays(element);
+    const fade = (element: HTMLElement) =>
+        [...element.children].map((item) =>
+            Number.parseFloat(
+                (item as HTMLElement).style.getPropertyValue(FADE),
+            ),
+        );
+
+    // A clock the test sets, in ms.
+    const clock = () => {
+        const state = { now: 0 };
+        return {
+            at: (ms: number) => {
+                state.now = ms;
+            },
+            now: () => state.now,
+        };
+    };
+
+    const run = (
+        element: HTMLElement,
+        time: ReturnType<typeof clock>,
+        open: boolean,
+    ) =>
+        fabMenuStagger(element, {
+            registry,
+            open,
+            reducedMotion: false,
+            now: time.now,
+        });
+
+    afterEach(() => {
+        document.body.replaceChildren();
+        document.documentElement.removeAttribute("style");
+    });
+
+    it("gives the item's fade its own wait, equal to the reveal's when nothing is moving", () => {
+        writeSprings();
+        const element = list(3);
+        const time = clock();
+        run(element, time, true);
+        expect(fade(element)).toEqual(clip(element));
+    });
+
+    it("skips an item closed partway through opening ahead on each of its springs, to where it is", () => {
+        writeSprings();
+        const element = list(3);
+        const time = clock();
+        run(element, time, true);
+        // 40ms in, the nearest item (the last, which waited nothing) is part open.
+        time.at(40);
+        run(element, time, false);
+        const revealed = ran("spatialFast", 40);
+        const faded = ran("effectsFast", 40);
+        expect(revealed).toBeGreaterThan(0.1);
+        expect(revealed).toBeLessThan(0.95);
+        // Closing from here takes up the exit where the item is: skipped ahead (a negative wait)
+        // to the point on the way out that has as much shown as it has now.
+        expect(clip(element)[2]!).toBeLessThan(0);
+        expect(1 - ran("spatialFast", -clip(element)[2]!)).toBeCloseTo(
+            revealed,
+            1,
+        );
+        expect(1 - ran("effectsFast", -fade(element)[2]!)).toBeCloseTo(
+            faded,
+            1,
+        );
+        // The two springs differ, so the skips do.
+        expect(fade(element)[2]!).not.toBeCloseTo(clip(element)[2]!, 0);
+    });
+
+    it("leaves an item that hadn't started opening hidden, rather than showing it to close it", () => {
+        writeSprings();
+        const element = list(3);
+        const time = clock();
+        run(element, time, true);
+        // The farthest item (the first) waits the longest to open, so 40ms in it hasn't begun.
+        const waited = clip(element)[0]!;
+        expect(waited).toBeGreaterThan(40);
+        time.at(40);
+        run(element, time, false);
+        // Its exit is already over before it starts: skipped past the end.
+        expect(clip(element)[0]!).toBeLessThan(-200);
+        expect(fade(element)[0]!).toBeLessThan(-100);
+    });
+
+    it("reopens an item part closed from where it is, and leaves one still shown as it is", () => {
+        writeSprings();
+        const element = list(3);
+        const time = clock();
+        run(element, time, true);
+        time.at(1000);
+        run(element, time, false);
+        // The farthest item leaves first (no wait), the nearest last: 40ms into closing, the
+        // first is part closed and the last hasn't begun.
+        const lastWait = clip(element)[2]!;
+        expect(clip(element)[0]).toBe(0);
+        expect(lastWait).toBeGreaterThan(40);
+        time.at(1040);
+        run(element, time, true);
+        const shown = 1 - ran("spatialFast", 40);
+        expect(shown).toBeGreaterThan(0.05);
+        expect(shown).toBeLessThan(0.95);
+        // Opening again from here: the enter taken up where it has as much shown.
+        expect(clip(element)[0]!).toBeLessThan(0);
+        expect(ran("spatialFast", -clip(element)[0]!)).toBeCloseTo(shown, 1);
+        // The item that never began closing is still shown, so its opening is over already.
+        expect(clip(element)[2]!).toBeLessThan(-200);
+    });
+
+    it("staggers a toggle that interrupts nothing exactly as a first one", () => {
+        writeSprings();
+        const element = list(4);
+        const time = clock();
+        run(element, time, true);
+        const first = clip(element);
+        time.at(2000);
+        run(element, time, false);
+        time.at(4000);
+        run(element, time, true);
+        // Everything had settled: opening again waits what it did the first time.
+        expect(clip(element)).toEqual(first);
+        expect(fade(element)).toEqual(first);
+    });
+
+    it("holds the list for the longest wait still ahead of its items", () => {
+        writeSprings();
+        const element = list(4);
+        const time = clock();
+        run(element, time, true);
+        time.at(2000);
+        run(element, time, false);
+        const total = Number.parseFloat(element.style.getPropertyValue(TOTAL));
+        expect(total).toBe(Math.max(0, ...clip(element)));
+        expect(total).toBeGreaterThan(0);
+    });
+
+    it("leaves the items already moving alone when only their number changes", () => {
+        writeSprings();
+        const element = list(3);
+        const time = clock();
+        run(element, time, true);
+        const before = clip(element);
+        time.at(30);
+        element.append(document.createElement("div"));
+        run(element, time, true);
+        // The running items keep the waits their animations are on; only the new one is given one.
+        expect(clip(element).slice(0, 3)).toEqual(before);
+        expect(Number.isFinite(clip(element)[3]!)).toBe(true);
+    });
+
+    it("forgets what was moving under reduced motion", () => {
+        writeSprings();
+        const element = list(3);
+        const time = clock();
+        run(element, time, true);
+        time.at(40);
+        fabMenuStagger(element, {
+            registry,
+            open: false,
+            reducedMotion: true,
+            now: time.now,
+        });
+        for (const item of element.children) {
+            expect((item as HTMLElement).style.getPropertyValue(FADE)).toBe("");
+        }
+        // Back to full motion later, the next toggle starts every item as a first one does.
+        time.at(60);
+        run(element, time, true);
+        expect(clip(element)[2]).toBe(0);
+        expect(clip(element).every((wait) => wait >= 0)).toBe(true);
+    });
+
+    it("carries on without the two item springs, staggering as it did", () => {
+        writeSprings(["spatialFast", "effectsFast"]);
+        const element = list(3);
+        const time = clock();
+        run(element, time, true);
+        time.at(40);
+        run(element, time, false);
+        expect(clip(element).every((wait) => wait >= 0)).toBe(true);
+        expect(fade(element)).toEqual(clip(element));
     });
 });

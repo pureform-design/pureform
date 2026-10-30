@@ -69,10 +69,12 @@ old B/C/D/E identifiers. Complexity estimates are relative and may change after 
   right-to-left layout, device frame rates and the JavaScript-driven width on low-end devices are V3
   device checks (React Native Web resolves the logical edge from the global direction, not per
   subtree).
-- Known limitation, web: toggling the menu rapidly mid-animation restarts each item's CSS animation
-  from its first frame, so an item can visibly jump. Native carries on smoothly. A fix needs a Web
-  Animations path that reverses from the current time (the tier-two driver `animate-web` is meant to
-  grow); not started, and not yet measured in a real browser.
+- Resolved, web (2026-10-30): toggling mid-motion used to restart each item's CSS animation from its
+  first frame. Still CSS: `fabMenuStagger` gives each new animation a negative wait (separate
+  `fadeDelay` for the fade, which runs on its own spring) that skips it to where the item is; items
+  not yet started are skipped past their end. Verified in Chromium for Panda, CSS and Tailwind
+  (`fab-menu-motion.e2e.test.ts`, fails nine ways with carry-on disabled). Residual error is about a
+  frame of clock offset.
 - Agreed architecture: generic runtime animation coordination and driver contracts live in
   `animate-core`, separate from the styling AST's `core`. `animate-web` and `animate-react-native`
   depend on and wrap it with Motion-like public APIs; applications import adapters, not core.

@@ -108,15 +108,15 @@ exports[`FAB menu > compiles to a stable Panda slot recipe 1`] = `
       "&[data-state=closed] > *": {
         "animation": {
           "_motionReduce": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) forwards overlayFadeOut",
-          "_rtl": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) var(--components-fabMenu-staggerDelay, 0ms) both fabMenuItemRevealOutRtl, token(springs.effectsFast.duration) token(springs.effectsFast.easing) var(--components-fabMenu-staggerDelay, 0ms) both overlayFadeOut",
-          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) var(--components-fabMenu-staggerDelay, 0ms) both fabMenuItemRevealOut, token(springs.effectsFast.duration) token(springs.effectsFast.easing) var(--components-fabMenu-staggerDelay, 0ms) both overlayFadeOut",
+          "_rtl": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) var(--components-fabMenu-staggerDelay, 0ms) both fabMenuItemRevealOutRtl, token(springs.effectsFast.duration) token(springs.effectsFast.easing) var(--components-fabMenu-fadeDelay, 0ms) both overlayFadeOut",
+          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) var(--components-fabMenu-staggerDelay, 0ms) both fabMenuItemRevealOut, token(springs.effectsFast.duration) token(springs.effectsFast.easing) var(--components-fabMenu-fadeDelay, 0ms) both overlayFadeOut",
         },
       },
       "&[data-state=open] > *": {
         "animation": {
           "_motionReduce": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) overlayFadeIn",
-          "_rtl": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) var(--components-fabMenu-staggerDelay, 0ms) backwards fabMenuItemRevealInRtl, token(springs.effectsFast.duration) token(springs.effectsFast.easing) var(--components-fabMenu-staggerDelay, 0ms) backwards overlayFadeIn",
-          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) var(--components-fabMenu-staggerDelay, 0ms) backwards fabMenuItemRevealIn, token(springs.effectsFast.duration) token(springs.effectsFast.easing) var(--components-fabMenu-staggerDelay, 0ms) backwards overlayFadeIn",
+          "_rtl": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) var(--components-fabMenu-staggerDelay, 0ms) backwards fabMenuItemRevealInRtl, token(springs.effectsFast.duration) token(springs.effectsFast.easing) var(--components-fabMenu-fadeDelay, 0ms) backwards overlayFadeIn",
+          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) var(--components-fabMenu-staggerDelay, 0ms) backwards fabMenuItemRevealIn, token(springs.effectsFast.duration) token(springs.effectsFast.easing) var(--components-fabMenu-fadeDelay, 0ms) backwards overlayFadeIn",
         },
       },
       "alignItems": "end",

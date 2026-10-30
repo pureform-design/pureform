@@ -13,12 +13,21 @@ const CLOSED = "&[data-state=closed] > *";
 const DELAY = "var(--components-fabMenu-staggerDelay, 0ms)";
 
 describe("fab menu items", () => {
-    it("waits each item's own delay, which the bindings sample from the theme's spring", () => {
+    it("waits each item's own delay, the reveal and the fade each their own", () => {
         const rules = list();
+        const FADE_DELAY = "var(--components-fabMenu-fadeDelay, 0ms)";
         for (const key of [OPEN, CLOSED]) {
             const base = rules[key]!.animation.base;
-            // Both the reveal and its fade wait it, so they stay together.
-            expect(base.split(DELAY)).toHaveLength(3);
+            // The reveal waits the item's delay and the fade its own, so an item toggled partway
+            // through moving can skip ahead on each spring by its own amount.
+            expect(base.split(DELAY)).toHaveLength(2);
+            expect(base.split(FADE_DELAY)).toHaveLength(2);
+            // The two animations, split where the second begins (a var's fallback has a comma too).
+            const [reveal, fade] = base.split(", token(");
+            expect(reveal).toContain(DELAY);
+            expect(reveal).not.toContain("fadeDelay");
+            expect(fade).toContain(FADE_DELAY.slice(0, -1));
+            expect(fade).not.toContain("staggerDelay");
         }
     });
 

@@ -301,3 +301,185 @@ describe.each(Object.keys(STYLINGS) as (keyof typeof STYLINGS)[])(
         });
     },
 );
+
+// Toggling the menu while its items are moving. A CSS animation that's replaced starts again from
+// its first frame, so an item closed partway through opening would snap back to fully shown and
+// then close, and one reopened partway through closing would snap to hidden. The binding gives each
+// item's new animation a negative wait that skips it ahead to where the item is, so it carries on.
+//
+// Real timers can't pin "35ms in" (a loaded page runs them late), so these hold every item's
+// running animations still at an exact time and give the binding the same time as its clock.
+describe.each(Object.keys(STYLINGS) as (keyof typeof STYLINGS)[])(
+    "%s: a FAB menu toggled mid-motion carries on from where its items are",
+    (name) => {
+        // What each item shows right now: how much of it is clipped away (0 shown, 100 gone), and
+        // how opaque it is.
+        const shown = (win: Window, items: HTMLElement[]) =>
+            items.map((item) => {
+                const style = win.getComputedStyle(item);
+                return {
+                    clipped: covered(style.clipPath) ?? 0,
+                    opacity: Number(style.opacity),
+                };
+            });
+
+        // The binding's clock, which a test sets.
+        const clock = { now: 0 };
+        const stagger = (list: HTMLElement, open: boolean) =>
+            fabMenuStagger(list, {
+                registry: REGISTRY,
+                open,
+                reducedMotion: false,
+                now: () => clock.now,
+            });
+
+        // Holds every running animation of the items at `ms` after the phase began.
+        const holdAt = (items: HTMLElement[], ms: number) => {
+            for (const item of items) {
+                for (const animation of item.getAnimations()) {
+                    animation.pause();
+                    animation.currentTime = ms;
+                }
+            }
+        };
+
+        // How far an item's look may differ across the flip: the model works the springs out from
+        // their curves, and the browser runs a sampled `linear()` of each, so they agree to a few
+        // points, nothing like the snap from partway to fully shown or hidden.
+        const CLIP = 8;
+        const OPACITY = 0.1;
+
+        it("closes from the width and opacity it had opened to, not from fully shown", async () => {
+            const { win, list, items, dispose } = await menu(name, 3);
+            try {
+                clock.now = 0;
+                list.dataset.state = "open";
+                stagger(list, true);
+                holdAt(items, 40);
+                const before = shown(win, items);
+                // The nearest item (the last, which waited nothing) is part open.
+                expect(
+                    before[2]!.clipped,
+                    "the nearest item is part open",
+                ).toBeGreaterThan(5);
+                expect(before[2]!.clipped).toBeLessThan(95);
+                // The farthest (the first) is still waiting, hidden.
+                expect(before[0]!.clipped).toBeGreaterThan(99);
+                clock.now = 40;
+                list.dataset.state = "closed";
+                stagger(list, false);
+                const after = shown(win, items);
+                items.forEach((_, i) => {
+                    expect(
+                        Math.abs(after[i]!.clipped - before[i]!.clipped),
+                        `item ${i} clip`,
+                    ).toBeLessThan(CLIP);
+                    expect(
+                        Math.abs(after[i]!.opacity - before[i]!.opacity),
+                        `item ${i} opacity`,
+                    ).toBeLessThan(OPACITY);
+                });
+            } finally {
+                dispose();
+            }
+        });
+
+        it("reopens from the width and opacity it had closed to, not from hidden", async () => {
+            const { win, list, items, dispose } = await menu(name, 3);
+            try {
+                clock.now = 0;
+                list.dataset.state = "open";
+                stagger(list, true);
+                holdAt(items, 1000);
+                clock.now = 1000;
+                list.dataset.state = "closed";
+                stagger(list, false);
+                // The farthest item (the first) leaves first, so it's the one part closed.
+                holdAt(items, 40);
+                const before = shown(win, items);
+                expect(
+                    before[0]!.clipped,
+                    "the farthest item is part closed",
+                ).toBeGreaterThan(5);
+                expect(before[0]!.clipped).toBeLessThan(95);
+                // The nearest (the last) hasn't begun to leave: still shown.
+                expect(before[2]!.clipped).toBeLessThan(1);
+                clock.now = 1040;
+                list.dataset.state = "open";
+                stagger(list, true);
+                const after = shown(win, items);
+                items.forEach((_, i) => {
+                    expect(
+                        Math.abs(after[i]!.clipped - before[i]!.clipped),
+                        `item ${i} clip`,
+                    ).toBeLessThan(CLIP);
+                    expect(
+                        Math.abs(after[i]!.opacity - before[i]!.opacity),
+                        `item ${i} opacity`,
+                    ).toBeLessThan(OPACITY);
+                });
+            } finally {
+                dispose();
+            }
+        });
+
+        it("carries on again when toggled twice in a row", async () => {
+            const { win, list, items, dispose } = await menu(name, 3);
+            try {
+                clock.now = 0;
+                list.dataset.state = "open";
+                stagger(list, true);
+                holdAt(items, 40);
+                clock.now = 40;
+                list.dataset.state = "closed";
+                stagger(list, false);
+                holdAt(items, 25);
+                const middle = shown(win, items);
+                clock.now = 65;
+                list.dataset.state = "open";
+                stagger(list, true);
+                const after = shown(win, items);
+                items.forEach((_, i) => {
+                    expect(
+                        Math.abs(after[i]!.clipped - middle[i]!.clipped),
+                        `item ${i} clip`,
+                    ).toBeLessThan(CLIP);
+                });
+            } finally {
+                dispose();
+            }
+        });
+
+        it("still staggers a toggle that interrupts nothing, from the first frame", async () => {
+            const { win, list, items, dispose } = await menu(name, 3);
+            try {
+                clock.now = 0;
+                list.dataset.state = "open";
+                stagger(list, true);
+                const first = items.map(
+                    (item) => win.getComputedStyle(item).animationDelay,
+                );
+                holdAt(items, 2000);
+                clock.now = 2000;
+                list.dataset.state = "closed";
+                stagger(list, false);
+                holdAt(items, 2000);
+                clock.now = 4000;
+                list.dataset.state = "open";
+                stagger(list, true);
+                // Everything had settled: opening again waits what it did the first time, and
+                // starts every item hidden.
+                expect(
+                    items.map(
+                        (item) => win.getComputedStyle(item).animationDelay,
+                    ),
+                ).toEqual(first);
+                for (const { clipped } of shown(win, items)) {
+                    expect(clipped).toBeGreaterThan(95);
+                }
+            } finally {
+                dispose();
+            }
+        });
+    },
+);

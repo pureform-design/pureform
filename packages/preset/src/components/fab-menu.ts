@@ -97,6 +97,9 @@ const { tokens, ref } = componentTokens("fabMenu", {
     // `stagger`) once they know the spring, and write each item its own. Until then they are 0, so
     // a menu renders unstaggered on the server and its first client frame.
     staggerDelay: numeric(0, "ms"),
+    // The item's fade waits its own, since an item toggled partway through moving carries on from
+    // where it is on each of its two springs (the reveal's and the fade's), which differ.
+    fadeDelay: numeric(0, "ms"),
     staggerTotal: numeric(0, "ms"),
     ...groupTokens(DEFAULT_GROUP),
     ...INDICATION_TOKENS,
@@ -115,9 +118,10 @@ const CLOSED = "&[data-state=closed]";
 // means no cap on how many items stagger, and the theme's spring sets the spacing.
 const staggered = (): Record<string, StyleMap> => {
     const wait = ref("staggerDelay");
+    const fadeWait = ref("fadeDelay");
     const motion = overlayMotion({
-        enter: { ...FAB_MENU_ITEM_MOTION.enter, wait },
-        exit: { ...FAB_MENU_ITEM_MOTION.exit, wait },
+        enter: { ...FAB_MENU_ITEM_MOTION.enter, wait, fadeWait },
+        exit: { ...FAB_MENU_ITEM_MOTION.exit, wait, fadeWait },
     }).rawRules!.css as Record<string, StyleMap>;
     return {
         [`${OPEN} > *`]: motion[OPEN]!,

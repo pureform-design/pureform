@@ -116,7 +116,9 @@ describe("FabMenu, composed", () => {
         await count.set(5);
         await settle();
         expect(waits()).toHaveLength(5);
-        expect(new Set(waits()).size).toBe(5);
+        // The two already moving keep the waits their animations run on; each new one is given its own.
+        expect(waits().every((wait) => wait !== undefined)).toBe(true);
+        expect(new Set(waits().slice(2)).size).toBe(3);
     });
 
     it("doesn't stagger until the theme has the spring, so a first render is still", async () => {
