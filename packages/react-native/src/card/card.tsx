@@ -16,6 +16,7 @@ import type {
 import { createContext, useContext, useLayoutEffect, useState } from "react";
 import type { ReactNode } from "react";
 
+import { ownText } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import type { SurfaceIndicationScope } from "../indication";
 import { testIdOf, withEngine } from "../parts";
@@ -196,7 +197,8 @@ export interface CardPartProps {
     readonly children?: ReactNode;
 }
 
-// A view part; a string inside is drawn as text in `text`'s style, as a View can't hold one.
+// A view part; a string inside is drawn as text in `text`'s style, as a View can't hold one. The
+// actions take the card's own (`root`): its content color, which the web's text inherits.
 const viewPart = (name: CardPart, label: string, text?: CardPart) =>
     function CardViewPart(props: CardPartProps): ReactNode {
         const card = useCard(label);
@@ -206,7 +208,7 @@ const viewPart = (name: CardPart, label: string, text?: CardPart) =>
         const children = resolveText(
             props.children,
             Slot,
-            text ? s[text] : undefined,
+            text ? ownText(s[text]) : undefined,
         );
         return (
             <Slot.View
@@ -256,7 +258,7 @@ const Content = viewPart("content", "Content", "supportingText");
 /** Material's supporting text. */
 const SupportingText = textPart("supportingText", "SupportingText");
 /** A row of buttons. */
-const Actions = viewPart("actions", "Actions");
+const Actions = viewPart("actions", "Actions", "root");
 /** A last section, under the actions. */
 const Footer = viewPart("footer", "Footer", "supportingText");
 

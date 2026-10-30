@@ -149,3 +149,14 @@ describe("Card on React Native", () => {
         expect(byTestId(ids.root).lastElementChild).toBe(byTestId(ids.header));
     });
 });
+
+describe("Card actions as text on React Native", () => {
+    it("draw a string in the card's content color, as the web's inherit it", async () => {
+        await withRegistry(<Card headline="Plan" actions="Plan details" />);
+        const text = byTestId(ids.actions).querySelector("div, span")!;
+        expect(getComputedStyle(text).color).toBe(
+            getComputedStyle(byTestId(ids.root)).color,
+        );
+        expect(getComputedStyle(text).color).not.toBe("rgb(0, 0, 0)");
+    });
+});
