@@ -97,8 +97,10 @@ const itemSide = add(
 /** A filled star laid over the empty one, as wide as `share` of the item's icon. */
 const filled = (share: number): StyleMap => ({
     ...iconBox(ref("iconSize"), { fill: iconFill(unitless(1)) }),
+    // A column, so the glyph keeps its own width and the box clips it instead of squeezing it.
     display: flex,
-    justifyContent: start,
+    flexDirection: column,
+    alignItems: start,
     position: absolute,
     insetBlockStart: ref("itemPadding"),
     insetInlineStart: ref("itemPadding"),

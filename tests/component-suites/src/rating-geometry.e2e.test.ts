@@ -30,11 +30,14 @@ describe.each(["ltr", "rtl"] as const)(
                     `[data-testid="${testIds.rating.icon}"]`,
                 )!
                 .getBoundingClientRect();
-            const half = star
-                .querySelector<HTMLElement>(
-                    `[data-testid="${testIds.rating.halfFill}"]`,
-                )!
-                .getBoundingClientRect();
+            const halfPart = star.querySelector<HTMLElement>(
+                `[data-testid="${testIds.rating.halfFill}"]`,
+            )!;
+            const half = halfPart.getBoundingClientRect();
+            // The star is clipped to its half, not shrunk to fit it.
+            const glyph = halfPart.firstElementChild!.getBoundingClientRect();
+            expect(glyph.width).toBeCloseTo(icon.width, 0);
+            expect(glyph.height).toBeCloseTo(icon.height, 0);
             expect(box.width).toBeGreaterThan(0);
             // The item includes touch padding; only the glyph, not the touch target, is half-filled.
             expect(half.width).toBeCloseTo(icon.width / 2, 0);
