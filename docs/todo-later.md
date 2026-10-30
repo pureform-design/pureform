@@ -19,69 +19,69 @@ results and recordings.
 
 ## Storybook observations (code-checked, not yet reproduced in a browser)
 
-Each was traced through the story scene and component code. "Real" means the component or preset is
-at fault; "scene" means the story host or scene differs from the others. Confirm in the storybook
-before changing, then fix the scene or component as marked.
+Traced through story scenes and component code, grouped from immediately fixable to most complex.
+Confirm in the storybook before changing.
 
-Real bugs:
+### 1. Immediate: one-line or one-file fixes
 
 - **Solid date picker icons:** `packages/solid/src/date-picker/date-picker.tsx` (~445) renders the
-  prev/next `IconButton`s with no `icon`; React passes `ChevronStartIcon`/`ChevronEndIcon` and
-  `mirror`. Glyphs already exist in Solid. Also check Solid's docked picker and date input.
-- **Select arrow doesn't open (Paginator, any React/Solid Select):** the trailing icon from `icon()`
-  in `packages/preset/src/components/field.ts` is absolutely positioned over the input with no
-  `pointerEvents: none`, so clicks miss the input that opens the list (`native-select.ts` already
-  sets it). Fix in the preset; this is not Paginator-specific.
-- **Rating small star on hover (React, Solid):** `filled(0.5)` in `preset/.../rating.ts` is a
-  clipped box, but its `svg` is a flex item that shrinks to half width and scales down. Add
-  `flexShrink: 0` to the glyph so `overflow: hidden` clips it.
-- **RN Paginator label twice:** `react-native/src/paginator/paginator.tsx` draws a `pageSizeLabel`
-  and passes `label` to `Select`, which floats it. Use an accessibility label instead (React uses
-  `aria-label`).
-- **RN DateInput separators highlighted:** the `/` literals use the root's `segment` style, which
-  carries the focus state whenever any segment is focused. Style them from a focus-free selection.
-- **RN TextArea `autoGrow` is a no-op:** `fieldSizing` is dropped by the adapter and `autoGrow` is
-  never read. Track `onContentSizeChange` and set the height, clamped to the minimum rows. (On web it
-  is CSS `field-sizing`; check the browser before calling a web report a bug.)
-- **RN RadioGroup `orientation`:** vertical is the RN/Material default, but `orientation` is
-  ARIA-only on RN and never changes the layout. Map `horizontal` to a wrapping row, or document it.
-- **Table row hover parity:** the preset specifies a hover tint on body rows (not from Material), so
-  React/Solid have it and RN has no hover state. Decide to keep it (add pointer enter/leave to RN
-  rows) or drop it from the preset.
+  prev/next `IconButton`s with no `icon`; pass `ChevronStartIcon`/`ChevronEndIcon` and `mirror` as
+  React does (glyphs exist). Also check Solid's docked picker and date input.
+- **Select arrow doesn't open (Paginator, every React/Solid Select):** add `pointerEvents: none` to
+  the trailing icon from `icon()` in `packages/preset/src/components/field.ts` (as `native-select.ts`
+  does).
+- **Rating small star on hover (React, Solid):** add `flexShrink: 0` to the glyph in the
+  `filled(0.5)` box in `preset/.../rating.ts` so `overflow: hidden` clips it instead of it scaling.
+- **RN Paginator label twice:** `react-native/src/paginator/paginator.tsx` passes `label` to `Select`
+  as well as drawing it; use an accessibility label (React uses `aria-label`).
+- **RN DateInput separators highlighted:** style the `/` literals from a focus-free selection, not
+  the root `segment` style that carries focus.
+
+### 2. Scene fixes: story or host, not the component
+
+- **RN Scrim:** add a native scene with page content inside a sized, positioned frame.
+- **SideSheet > Open standard:** no scrim on web is correct (non-modal). For RN, give the scene a row
+  container aligned to the end, and controlled `open`/`onOpenChange` so the X closes it.
+- **BottomSheet > Opened standard (RN):** give the scene a bottom-aligned column frame.
+- **Toast on RN:** give the scene a tall positioned frame (the `Toaster` positions against the story
+  root, not the viewport).
+- **Toolbar > Opened overflow:** web (menu) is correct; give the case a fixed narrow width on every
+  renderer. If RN still doesn't overflow in a fixed-width parent, it is an RN measuring bug.
+- **Carousel arrow keys:** expected on touch-first RN; mark it a known difference in the stories.
+
+### 3. Small decisions, then a small fix
+
+- **Card width:** the web card is a shrink-wrapping `<button>` and RN stretches; choose the intended
+  width, then set it in the preset card root or RN's root.
 - **SearchView trigger width (React, Solid, probably RN):** the trigger is `width: 100%` while the
-  `SearchBar` is capped at `maxWidth: 720px`, so the button outspans the pill. Make the trigger
-  shrink-wrap the bar (`width: fit-content; max-width: 100%`) or carry the same cap.
-- **Card width:** the preset's card root sets no width, so web (`<button>` in the case) shrinks to
-  content while RN stretches. Decide the intended width, then set it in the preset or RN's root.
+  `SearchBar` is capped at 720px; make the trigger shrink-wrap (`width: fit-content; max-width:
+  100%`) or carry the same cap.
+- **RN RadioGroup `orientation`:** vertical is the RN/Material default, but `orientation` is
+  ARIA-only on RN; map `horizontal` to a wrapping row or document it.
+- **Table row hover parity:** the preset specifies a hover tint (not from Material), absent on RN;
+  keep it (add pointer enter/leave to RN rows) or drop it from the preset.
+- **Draggable list item ripple (React, Solid):** a swipe only sets the pressed layer, and M3 shows
+  the dragged state, so probably by design; confirm the spec.
 
-Scene or host issues (fix the story or scene, not the component):
+### 4. Measure first
 
-- **RN Scrim:** the story uses the DOM stage with a sibling page; the native root has no sized,
-  positioned frame. Add a native scene with page content inside a sized frame.
-- **SideSheet > Open standard:** no scrim on web is correct (non-modal). On RN a standard sheet
-  renders in the app's layout (start edge) and its X is a no-op without `onOpenChange`; give the RN
-  scene a row container aligned to the end and controlled state.
-- **BottomSheet > Opened standard (RN):** the standard sheet renders in flow, so it sits at the top
-  of the 480px frame. Give the scene a bottom-aligned column frame.
-- **Toast on RN:** the `Toaster` is inline and positions against the story root, not the viewport,
-  so it lands near the button and is clipped. Give the scene a tall positioned frame (or portal).
-- **Toolbar > Opened overflow:** web (menu) is correct. RN has the overflow logic, but a
-  shrink-wrapped host measures as wide as all items. Give the case a fixed narrow width on every
-  renderer; if RN still doesn't overflow in a fixed-width parent, it is an RN measuring bug.
-- **Carousel arrow keys:** web's machine moves focus between item masks; RN is a `ScrollView`
-  and scrolls. Expected on touch-first RN; add `onKeyDown` focus-and-scroll on react-native-web if
-  parity is wanted, otherwise mark it as a known difference in the stories.
+- **TimeInput border radius (RN, Solid vs React):** same `fieldRadius` token everywhere; compare
+  each renderer's computed `border-radius` (suspect Panda's `radii.small` fallback in React).
 
-Unclear, need a measurement first:
+### 5. New behavior
 
-- **Draggable list item ripple (React, Solid):** a swipe only sets the pressed state layer; M3
-  shows the dragged state, not a ripple. Probably by design; confirm the intended spec.
-- **TimeInput border radius (RN, Solid vs React):** same `fieldRadius` token on every binding, so
-  compare each renderer's computed `border-radius` (suspect Panda's `radii.small` fallback in React).
-- **RN wavy indeterminate:** linear already animates (slide plus wave clocks, SVG engine only).
-  Circular does not: its arc grows and shrinks on web by animating `value`, which on RN needs the
-  SVG path redrawn per frame (Reanimated or JS-driven) while the rotation alone is cheap on the
-  native driver. Decide whether to add a circular timeline.
+- **RN TextArea `autoGrow`:** a no-op on RN (`fieldSizing` is dropped, `autoGrow` is never read).
+  Track `onContentSizeChange` and set the height, clamped to the minimum rows. (Web is CSS
+  `field-sizing`; check the browser before calling a web report a bug.)
+- **Carousel arrow-key parity on react-native-web (optional):** add `onKeyDown` focus-and-scroll on
+  the masks.
+
+### 6. Complex
+
+- **RN wavy indeterminate, circular:** linear already animates (slide plus wave clocks, SVG engine
+  only). On web the circular arc grows and shrinks by animating `value`; on RN that needs the SVG
+  path redrawn per frame (Reanimated or JS-driven), while the rotation alone is cheap on the native
+  driver. Decide whether to add a circular timeline.
 
 ## Deferred designs
 
