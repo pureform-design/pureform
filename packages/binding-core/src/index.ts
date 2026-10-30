@@ -428,6 +428,9 @@ export {
     SELECT_CONTENT_PROPS,
     SELECT_INPUT_LABEL_PROPS,
     SELECT_ROOT_PROPS,
+    fromSelectList,
+    selectSummary,
+    toSelectList,
     selectGroupedItems,
     selectItemGroups,
     selectMenuSelection,
@@ -533,6 +536,9 @@ export type {
     SelectPart,
     SelectPositioning,
     SelectRootOwnProps,
+    SelectValue,
+    SelectValueKeys,
+    SelectValueProps,
     SelectVariantProps,
 } from "./components/select";
 export {

@@ -13,6 +13,7 @@ import {
     selectGroupedItems,
     selectItemGroups,
     selectMenuSelection,
+    selectSummary,
     selectSelection,
     selectSupportingTextId,
 } from "@pureform/binding-core";
@@ -22,6 +23,9 @@ import type {
     SelectContentProps,
     SelectItem,
     SelectRootOwnProps,
+    SelectValue,
+    SelectValueKeys,
+    SelectValueProps,
     Unstyled,
 } from "@pureform/binding-core";
 import {
@@ -77,6 +81,8 @@ interface SelectContextValue {
     /** The supporting text's id, and the message it shows instead of its own. */
     readonly supportingTextId: string;
     readonly errorText: string | undefined;
+    /** The field's text for the chosen options. */
+    readonly valueText: string;
     readonly setHiddenSelect: (element: HTMLSelectElement | null) => void;
     readonly sources: ItemInteractionSources;
     readonly presence: Presence;
@@ -92,8 +98,12 @@ const itemContext = createPartContext<ItemContextValue>("Select", "Item");
 
 /** Root's props: the variants and tokens, the machine's props (`items`, `value`, `open`, `name`,
  *  …), `testId` and `unstyled` for the field's parts, `as`, and the element's own props. */
-export interface SelectRootProps
-    extends Omit<PartProps, keyof SelectRootOwnProps>, SelectRootOwnProps {
+export type SelectRootProps = RootBaseProps & SelectValueProps;
+
+interface RootBaseProps
+    extends
+        Omit<PartProps, keyof SelectRootOwnProps>,
+        Omit<SelectRootOwnProps, SelectValueKeys> {
     /** Another element or component to render instead of `<div>`. */
     readonly as?: ElementType | undefined;
     /** The list's own props, drawn as a menu: `testId`, `unstyled`, and `tokens` (the ready-made
@@ -101,6 +111,8 @@ export interface SelectRootProps
      *  also by option, `MenuScopeInstances`). */
     readonly menuProps?: SelectMenuProps | undefined;
 }
+
+export type { SelectValueProps };
 
 /** The select's list's own props, keyed by the menu's parts (an option's also by option). */
 export type SelectMenuProps = MenuScopeProps<MenuAnatomy, SelectItem>;
@@ -129,10 +141,10 @@ const NO_ITEMS: readonly SelectItem[] = [];
 function Root(props: SelectRootProps): ReactNode {
     const id = useId();
     const dir = useDirection();
-    const value = useControllable<"value", string | null>(
+    const value = useControllable<"value", SelectValue>(
         "Select",
         "value",
-        props,
+        props as SelectRootOwnProps,
     );
     const open = useControllable<"open", boolean>("Select", "open", props);
     const [hidden, setHidden] = useState<HTMLSelectElement | null>(null);
@@ -153,19 +165,21 @@ function Root(props: SelectRootProps): ReactNode {
         dir,
         collection,
         ...selectMachineProps(props, fieldsetDisabled),
-        ...selectValueProps(value.machineProps),
+        ...selectValueProps(value.machineProps, props.multiple),
         ...open.machineProps,
     });
     const api = select.connect(service, normalizeProps);
     const presence = usePresence(api.open);
     useFormReset(hidden, {
-        resetsTo: value.resetsTo ?? null,
+        resetsTo: value.resetsTo ?? (props.multiple ? [] : null),
         onBeforeReset: value.beforeReset,
         onReset: () =>
             value.reset(() =>
                 service.send({
                     type: "VALUE.SET",
-                    value: toZagValue(value.defaultValue ?? null),
+                    value: toZagValue(
+                        value.defaultValue ?? (props.multiple ? [] : null),
+                    ),
                 }),
             ),
     });
@@ -205,6 +219,9 @@ function Root(props: SelectRootProps): ReactNode {
                 items,
                 supportingTextId: selectSupportingTextId(props, id),
                 errorText: props.error || undefined,
+                valueText: props.summary
+                    ? selectSummary(api.selectedItems, props.summary)
+                    : api.valueAsString,
                 setHiddenSelect: setHidden,
                 sources,
                 presence,
@@ -234,14 +251,10 @@ function Container({ unstyled, ...props }: SelectPartProps): ReactNode {
 /** The combobox: a read-only `<input>` showing the chosen option, which opens the list on a
  *  click, Enter, Space, or an arrow key, and changes the value with the arrow keys sideways. */
 function Input({ unstyled, ...props }: SelectPartProps): ReactNode {
-    const { scope, api, dir } = context.use("Input");
+    const { scope, api, dir, valueText } = context.use("Input");
     return scope.render("input", {
         element: "input",
-        machine: selectInputProps(
-            api.getTriggerProps(),
-            api.valueAsString,
-            dir,
-        ),
+        machine: selectInputProps(api.getTriggerProps(), valueText, dir),
         unstyled,
         props,
     });
@@ -358,18 +371,17 @@ const ItemLabel: (props: SelectPartProps) => ReactNode = field.ItemLabel;
 /** The ready-made select's props: Root's, with `className`, `style`, and `slotProps` keyed by the
  *  field's parts, and the label, supporting text, and icons as content. `aria-label`,
  *  `aria-labelledby`, and `aria-describedby` go on the combobox. */
-export interface SelectProps
-    extends
-        Omit<
-            SelectRootProps,
-            | keyof SlotKeyedProps<Anatomy>
-            | "children"
-            | "leadingIcon"
-            | "prefixText"
-            | "suffixText"
-        >,
-        SlotKeyedProps<Anatomy>,
-        SelectContentProps<ReactNode> {}
+export type SelectProps = Omit<
+    RootBaseProps,
+    | keyof SlotKeyedProps<Anatomy>
+    | "children"
+    | "leadingIcon"
+    | "prefixText"
+    | "suffixText"
+> &
+    SlotKeyedProps<Anatomy> &
+    SelectContentProps<ReactNode> &
+    SelectValueProps;
 
 // Inside Root, so it can read whether an error shows and the options.
 function ReadyMadeContent({ own }: { readonly own: SelectProps }): ReactNode {

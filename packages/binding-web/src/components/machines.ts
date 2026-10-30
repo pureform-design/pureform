@@ -75,13 +75,19 @@ const itemId = (
 /** Zag's select props from Root's, besides `id`, `dir`, the collection, and the controllable
  *  `value` and `open`. `fieldsetDisabled` is the binding's `useFieldsetDisabled`. */
 export const selectMachineProps = (
-    props: SelectBehaviorProps,
+    props: Omit<
+        SelectBehaviorProps,
+        "value" | "defaultValue" | "onValueChange"
+    >,
     fieldsetDisabled: boolean,
 ) => ({
     disabled: props.disabled || fieldsetDisabled,
     invalid: props.invalid || !!props.error,
     required: props.required,
     readOnly: props.readOnly,
+    multiple: props.multiple,
+    // Choosing in a multiple select toggles, and the list stays for the next.
+    closeOnSelect: !props.multiple,
     name: props.name,
     form: props.form,
     autoComplete: props.autoComplete,

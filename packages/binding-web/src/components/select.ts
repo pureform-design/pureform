@@ -1,28 +1,33 @@
-import type { ChangeDetails } from "@pureform/binding-core";
+import { fromSelectList, toSelectList } from "@pureform/binding-core";
+import type { ChangeDetails, SelectValue } from "@pureform/binding-core";
 
 import { presentProps } from "./layout";
 
-/** Zag's value (a list) from the select's (one value or `null`). */
+/** Zag's value (a list) from the select's (one value, `null`, or an array). */
 export const toZagValue = (
-    value: string | null | undefined,
-): string[] | undefined =>
-    value === undefined ? undefined : value === null ? [] : [value];
-/** The select's value from Zag's. */
-export const fromZagValue = (value: readonly string[]): string | null =>
-    value[0] ?? null;
+    value: SelectValue | undefined,
+): string[] | undefined => toSelectList(value);
+/** The select's value from Zag's: the first or `null`, or with `multiple` the array. */
+export const fromZagValue = (
+    value: readonly string[],
+    multiple?: boolean,
+): SelectValue => fromSelectList(value, multiple);
 /** The controllable `value`'s machine props in Zag's shape: lists for the value and default, and
  *  the callback given the select's value. `controllable` is `useControllable`'s machine props. */
-export const selectValueProps = (controllable: {
-    readonly value: string | null | undefined;
-    readonly defaultValue: string | null | undefined;
-    readonly onValueChange: (
-        details: ChangeDetails<"value", string | null>,
-    ) => void;
-}) => ({
+export const selectValueProps = <V extends SelectValue>(
+    controllable: {
+        readonly value: V | undefined;
+        readonly defaultValue: V | undefined;
+        readonly onValueChange: (details: ChangeDetails<"value", V>) => void;
+    },
+    multiple?: boolean,
+) => ({
     value: toZagValue(controllable.value),
     defaultValue: toZagValue(controllable.defaultValue),
     onValueChange: (details: { value: string[] }) =>
-        controllable.onValueChange({ value: fromZagValue(details.value) }),
+        controllable.onValueChange({
+            value: fromZagValue(details.value, multiple) as V,
+        }),
 });
 const SIDEWAYS: Readonly<Record<string, string>> = {
     ArrowLeft: "ArrowRight",

@@ -12,7 +12,7 @@ import type {
 } from "@pureform/anatomy";
 import type { InstanceTokens, Selection } from "@pureform/styling";
 
-import type { Controllable } from "../controllable";
+import type { ChangeDetails, Controllable } from "../controllable";
 import type { Unstyled } from "../parts";
 import type { IndicationProps, InteractionSourceProps } from "./indication";
 import type { VariantProp } from "./variants";
@@ -125,12 +125,17 @@ export interface SelectPositioning {
     readonly flip?: boolean | undefined;
 }
 
-/** What the select machine takes from Root's props. The value is the chosen option's, or `null`.
- *  `open` is the list's. */
+/** What the select machine takes from Root's props. `open` is the list's. The value is the chosen
+ *  option's, or `null`, or with `multiple` an array; each binding's props type it by `multiple`
+ *  (`SelectValueProps`). */
 export interface SelectBehaviorProps
-    extends
-        Controllable<"value", string | null>,
-        Controllable<"open", boolean> {
+    extends Controllable<"value", SelectValue>, Controllable<"open", boolean> {
+    /** Lets several options be chosen: choosing one toggles it without closing the list, and a
+     *  form submits each chosen value under `name`. The value is then an array. */
+    readonly multiple?: boolean | undefined;
+    /** What the field shows for the chosen options, as text. @default the labels, joined by
+     *  ", " */
+    readonly summary?: ((chosen: readonly SelectItem[]) => string) | undefined;
     /** The options, in order. */
     readonly items?: readonly SelectItem[] | undefined;
     /** A disabled fieldset around the select disables it too. */
@@ -158,6 +163,64 @@ export interface SelectBehaviorProps
     readonly id?: string | undefined;
     readonly ids?: SelectElementIds | undefined;
 }
+
+/** The value props, typed by `multiple`: the chosen option's value, or `null`, for one option, and
+ *  an array of the chosen options' values for several. Each binding's Root and ready-made
+ *  component take these with `SelectRootOwnProps` (less `SelectValueKeys`), so a scalar value
+ *  with `multiple`, or an array without it, is a type error. */
+export type SelectValueProps =
+    | {
+          readonly multiple?: false | undefined;
+          readonly value?: string | null | undefined;
+          readonly defaultValue?: string | null | undefined;
+          readonly onValueChange?:
+              | ((details: ChangeDetails<"value", string | null>) => void)
+              | undefined;
+      }
+    | {
+          readonly multiple: true;
+          readonly value?: readonly string[] | undefined;
+          readonly defaultValue?: readonly string[] | undefined;
+          readonly onValueChange?:
+              | ((details: ChangeDetails<"value", readonly string[]>) => void)
+              | undefined;
+      };
+
+/** The keys `SelectValueProps` types. */
+export type SelectValueKeys =
+    | "multiple"
+    | "value"
+    | "defaultValue"
+    | "onValueChange";
+
+/** The chosen options' labels as the field's text: joined by ", ", or `summary`'s. */
+export const selectSummary = (
+    chosen: readonly SelectItem[],
+    summary?: SelectBehaviorProps["summary"],
+): string =>
+    summary ? summary(chosen) : chosen.map((item) => item.label).join(", ");
+
+/** The select's value in the shape a controllable gives: one value or `null`, or an array. */
+export type SelectValue = string | null | readonly string[];
+
+/** The value as the machine's list of values. */
+export const toSelectList = (
+    value: SelectValue | undefined,
+): string[] | undefined =>
+    value === undefined
+        ? undefined
+        : value === null
+          ? []
+          : typeof value === "string"
+            ? [value]
+            : [...value];
+
+/** The machine's list of values as the select's value: the array with `multiple`, else the first
+ *  or `null`. */
+export const fromSelectList = (
+    list: readonly string[],
+    multiple: boolean | undefined,
+): SelectValue => (multiple ? [...list] : (list[0] ?? null));
 
 /** Everything Root takes for itself, besides the element's own props and `as`. */
 export interface SelectRootOwnProps
@@ -190,6 +253,8 @@ export const SELECT_ROOT_PROPS = [
     "positioning",
     "id",
     "ids",
+    "multiple",
+    "summary",
     "value",
     "defaultValue",
     "onValueChange",

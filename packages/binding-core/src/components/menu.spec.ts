@@ -206,9 +206,9 @@ describe("menuSubmenuAdapt", () => {
         expect(
             menuSubmenuAdapt("drill", room(100 + MENU_SUBMENU_MARGIN - 1)),
         ).toBe("drill");
-        expect(
-            menuSubmenuAdapt("drill", room(100 + MENU_SUBMENU_MARGIN)),
-        ).toBe("cascade");
+        expect(menuSubmenuAdapt("drill", room(100 + MENU_SUBMENU_MARGIN))).toBe(
+            "cascade",
+        );
     });
 
     it("applies the margin to height, and keeps the mode when unmeasured", () => {

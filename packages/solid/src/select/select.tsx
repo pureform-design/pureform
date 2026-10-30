@@ -15,6 +15,7 @@ import {
     selectGroupedItems,
     selectItemGroups,
     selectMenuSelection,
+    selectSummary,
     selectSelection,
     selectSupportingTextId,
 } from "@pureform/binding-core";
@@ -23,6 +24,9 @@ import type {
     SelectContentProps,
     SelectItem,
     SelectRootOwnProps,
+    SelectValue,
+    SelectValueKeys,
+    SelectValueProps,
     Unstyled,
 } from "@pureform/binding-core";
 import {
@@ -32,6 +36,7 @@ import {
     selectValueProps,
     toZagValue,
 } from "@pureform/binding-web";
+import type { NativeDefault } from "@pureform/machines/form";
 import * as select from "@pureform/machines/select";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {
@@ -78,7 +83,9 @@ interface SelectContextValue {
     readonly supportingTextId: Accessor<string>;
     readonly errorText: Accessor<string | undefined>;
     /** What a form reset shows, for the hidden select's options. */
-    readonly resetsTo: Accessor<string | null>;
+    readonly resetsTo: Accessor<NativeDefault>;
+    /** The field's text for the chosen options. */
+    readonly valueText: Accessor<string>;
     readonly setHiddenSelect: (element: HTMLSelectElement) => void;
     readonly sources: ItemInteractionSources;
     readonly presence: Presence;
@@ -94,8 +101,12 @@ const itemContext = createPartContext<ItemContextValue>("Select", "Item");
 
 /** Root's props: the variants and tokens, the machine's props (`items`, `value`, `open`, `name`,
  *  …), `testId` and `unstyled` for the field's parts, `as`, and the element's own props. */
-export interface SelectRootProps
-    extends Omit<PartProps, keyof SelectRootOwnProps>, SelectRootOwnProps {
+export type SelectRootProps = RootBaseProps & SelectValueProps;
+
+interface RootBaseProps
+    extends
+        Omit<PartProps, keyof SelectRootOwnProps>,
+        Omit<SelectRootOwnProps, SelectValueKeys> {
     /** Another element or component to render instead of `<div>`. */
     readonly as?: ValidComponent | undefined;
     /** The list's own props, drawn as a menu: `testId`, `unstyled`, and `tokens` (the ready-made
@@ -103,6 +114,8 @@ export interface SelectRootProps
      *  option, `MenuScopeInstances`). */
     readonly menuProps?: SelectMenuProps | undefined;
 }
+
+export type { SelectValueProps };
 
 /** The list's own props, keyed by the menu's parts (an option's also by option). */
 type SelectMenuProps = MenuScopeProps<MenuAnatomy, SelectItem>;
@@ -127,10 +140,10 @@ export interface SelectItemProps extends SelectPartProps {
 function Root(props: SelectRootProps): JSX.Element {
     const id = createUniqueId();
     const dir = useDirection();
-    const value = useControllable<"value", string | null>(
+    const value = useControllable<"value", SelectValue>(
         "Select",
         "value",
-        props,
+        props as SelectRootOwnProps,
     );
     const open = useControllable<"open", boolean>("Select", "open", props);
     const [hidden, setHidden] = createSignal<HTMLSelectElement | undefined>(
@@ -153,12 +166,13 @@ function Root(props: SelectRootProps): JSX.Element {
         dir: dir(),
         collection: collection(),
         ...selectMachineProps(props, fieldsetDisabled()),
-        ...selectValueProps(value.machineProps()),
+        ...selectValueProps(value.machineProps(), props.multiple),
         ...open.machineProps(),
     }));
     const api = createMemo(() => select.connect(service, normalizeProps));
     const presence = usePresence(() => api().open);
-    const resetsTo = () => value.resetsTo() ?? null;
+    const resetsTo = () =>
+        value.resetsTo() ?? (props.multiple ? ([] as string[]) : null);
     useFormReset(hidden, {
         resetsTo,
         onBeforeReset: value.beforeReset,
@@ -166,7 +180,9 @@ function Root(props: SelectRootProps): JSX.Element {
             value.reset(() =>
                 service.send({
                     type: "VALUE.SET",
-                    value: toZagValue(value.defaultValue ?? null),
+                    value: toZagValue(
+                        value.defaultValue ?? (props.multiple ? [] : null),
+                    ),
                 }),
             ),
     });
@@ -204,6 +220,10 @@ function Root(props: SelectRootProps): JSX.Element {
                 supportingTextId: () => selectSupportingTextId(props, id),
                 errorText: () => props.error || undefined,
                 resetsTo,
+                valueText: () =>
+                    props.summary
+                        ? selectSummary(api().selectedItems, props.summary)
+                        : api().valueAsString,
                 setHiddenSelect: setHidden,
                 sources,
                 presence,
@@ -234,7 +254,7 @@ function Container(props: SelectPartProps): JSX.Element {
 /** The combobox: a read-only `<input>` showing the chosen option, which opens the list on a
  *  click, Enter, Space, or an arrow key, and changes the value with the arrow keys sideways. */
 function Input(props: SelectPartProps): JSX.Element {
-    const { scope, api, dir } = context.use("Input");
+    const { scope, api, dir, valueText } = context.use("Input");
     // The field's own default is the text it shows, so a form reset doesn't clear it; the select's
     // value, reset or not, decides what it shows.
     const [element, setElement] = createSignal<HTMLInputElement | undefined>(
@@ -242,7 +262,7 @@ function Input(props: SelectPartProps): JSX.Element {
         { ownedWrite: true },
     );
     createEffect(
-        () => [element(), api().valueAsString] as const,
+        () => [element(), valueText()] as const,
         ([input, text]) => {
             if (input && input.defaultValue !== text) input.defaultValue = text;
         },
@@ -251,11 +271,7 @@ function Input(props: SelectPartProps): JSX.Element {
     return scope.render("input", {
         element: "input",
         machine: () =>
-            selectInputProps(
-                api().getTriggerProps(),
-                api().valueAsString,
-                dir(),
-            ),
+            selectInputProps(api().getTriggerProps(), valueText(), dir()),
         ref: (input) => setElement(input as HTMLInputElement),
         unstyled: () => props.unstyled,
         props: rest,
@@ -315,7 +331,10 @@ function HiddenSelect(props: SelectPartProps): JSX.Element {
                         <option
                             value={item().value}
                             disabled={item().disabled}
-                            defaultSelected={item().value === resetsTo()}
+                            defaultSelected={defaultChosen(
+                                resetsTo(),
+                                item().value,
+                            )}
                         >
                             {item().label}
                         </option>
@@ -359,18 +378,21 @@ const ItemLabel: (props: SelectPartProps) => JSX.Element = field.ItemLabel;
 /** The ready-made select's props: Root's, with `class`, `style`, and `slotProps` keyed by the
  *  field's parts, and the label, supporting text, and icons as content. `aria-label`,
  *  `aria-labelledby`, and `aria-describedby` go on the combobox. */
-export interface SelectProps
-    extends
-        Omit<
-            SelectRootProps,
-            | keyof SlotKeyedProps<Anatomy>
-            | "children"
-            | "leadingIcon"
-            | "prefixText"
-            | "suffixText"
-        >,
-        SlotKeyedProps<Anatomy>,
-        SelectContentProps<JSX.Element> {}
+export type SelectProps = Omit<
+    RootBaseProps,
+    | keyof SlotKeyedProps<Anatomy>
+    | "children"
+    | "leadingIcon"
+    | "prefixText"
+    | "suffixText"
+> &
+    SlotKeyedProps<Anatomy> &
+    SelectContentProps<JSX.Element> &
+    SelectValueProps;
+
+/** Whether an option is among what a reset shows. */
+const defaultChosen = (resetsTo: NativeDefault, value: string): boolean =>
+    Array.isArray(resetsTo) ? resetsTo.includes(value) : resetsTo === value;
 
 const READY_MADE_PROPS = [
     "class",

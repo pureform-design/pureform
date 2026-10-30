@@ -11,4 +11,5 @@ export type {
     SelectPartProps,
     SelectProps,
     SelectRootProps,
+    SelectValueProps,
 } from "./select";

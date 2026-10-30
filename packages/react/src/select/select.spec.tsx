@@ -69,6 +69,129 @@ const controlled = (initial: string | null) => {
     };
 };
 
+describe("Select, multiple", () => {
+    const MANY = [
+        { value: "s", label: "Small" },
+        { value: "m", label: "Medium" },
+        { value: "l", label: "Large" },
+    ];
+
+    it("toggles options without closing the list, reporting an array each time", async () => {
+        const onValueChange =
+            vi.fn<
+                (details: ChangeDetails<"value", readonly string[]>) => void
+            >();
+        withRegistry(
+            <Select
+                label="Size"
+                multiple
+                items={MANY}
+                onValueChange={onValueChange}
+            />,
+        );
+        await settle();
+        const input = byTestId<HTMLInputElement>(ids.input);
+        await interact(() => userEvent.click(input));
+        await frames();
+        await interact(() => userEvent.click(item("s")));
+        await interact(() => userEvent.click(item("l")));
+        expect(onValueChange).toHaveBeenNthCalledWith(1, { value: ["s"] });
+        expect(onValueChange).toHaveBeenNthCalledWith(2, { value: ["s", "l"] });
+        expect(input.getAttribute("aria-expanded")).toBe("true");
+        expect(byTestId(menu.root).hidden).toBe(false);
+        expect(input.value).toBe("Small, Large");
+        expect(item("s").getAttribute("aria-selected")).toBe("true");
+        expect(item("m").getAttribute("aria-selected")).toBe("false");
+        expect(byTestId(menu.root).getAttribute("aria-multiselectable")).toBe(
+            "true",
+        );
+        await interact(() => userEvent.click(item("s")));
+        expect(onValueChange).toHaveBeenLastCalledWith({ value: ["l"] });
+        expect(input.value).toBe("Large");
+    });
+
+    it("toggles the highlighted option with Enter and Space, keeping the keys going", async () => {
+        withRegistry(<Select label="Size" multiple items={MANY} />);
+        await settle();
+        const input = byTestId<HTMLInputElement>(ids.input);
+        input.focus();
+        await interact(() => userEvent.keyboard("{ArrowDown}"));
+        await frames();
+        await interact(() => userEvent.keyboard("{ArrowDown}{Enter}"));
+        await interact(() => userEvent.keyboard("{ArrowDown} "));
+        // The list opens on the first option, so these two are the second and third.
+        expect(input.value).toBe("Medium, Large");
+        expect(input.getAttribute("aria-expanded")).toBe("true");
+        await interact(() => userEvent.keyboard("{ArrowUp}{Enter}"));
+        expect(input.value).toBe("Large");
+    });
+
+    it("submits each chosen value under the same name, and resets to its default", async () => {
+        const onValueChange =
+            vi.fn<
+                (details: ChangeDetails<"value", readonly string[]>) => void
+            >();
+        withRegistry(
+            <form>
+                <Select
+                    label="Size"
+                    name="size"
+                    multiple
+                    items={MANY}
+                    defaultValue={["s", "m"]}
+                    onValueChange={onValueChange}
+                />
+            </form>,
+        );
+        await settle();
+        const input = byTestId<HTMLInputElement>(ids.input);
+        const form = input.closest("form")!;
+        expect(new FormData(form).getAll("size")).toEqual(["s", "m"]);
+        await interact(() => userEvent.click(input));
+        await frames();
+        await interact(() => userEvent.click(item("l")));
+        await interact(() => userEvent.click(item("s")));
+        expect(new FormData(form).getAll("size")).toEqual(["m", "l"]);
+        form.reset();
+        await settle();
+        await settle();
+        expect(input.value).toBe("Small, Medium");
+        expect(new FormData(form).getAll("size")).toEqual(["s", "m"]);
+        expect(onValueChange).toHaveBeenLastCalledWith({
+            value: ["s", "m"],
+            reason: "reset",
+        });
+    });
+
+    it("follows a controlled array, and takes a summary of the chosen options", async () => {
+        const view = outside<readonly string[]>(["s"]);
+        withRegistry(
+            <view.Holder>
+                {(value) => (
+                    <Select
+                        label="Size"
+                        multiple
+                        items={MANY}
+                        value={value}
+                        summary={(chosen) =>
+                            chosen.length > 1
+                                ? `${chosen.length} sizes`
+                                : (chosen[0]?.label ?? "")
+                        }
+                    />
+                )}
+            </view.Holder>,
+        );
+        await settle();
+        const input = byTestId<HTMLInputElement>(ids.input);
+        expect(input.value).toBe("Small");
+        await view.set(["s", "m", "l"]);
+        expect(input.value).toBe("3 sizes");
+        await view.set([]);
+        expect(input.value).toBe("");
+    });
+});
+
 describe("Select, option groups", () => {
     it("renders grouped options under their labels, in the order the groups first appear", async () => {
         withRegistry(
