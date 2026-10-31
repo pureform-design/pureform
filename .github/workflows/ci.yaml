@@ -30,7 +30,7 @@ jobs:
       - name: Conventional Commits Check
         uses: cocogitto/cocogitto-action@v4.2.0
         with:
-          command: check
+          check-latest-tag-only: true
 
   check:
     name: Check
