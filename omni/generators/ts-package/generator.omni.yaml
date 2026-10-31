@@ -28,6 +28,8 @@ inputs:
     allowed:
       - name: Library
         value: lib
+      - name: UI Library (components, with component tests)
+        value: ui-lib
       - name: Application
         value: app
       - name: Script
@@ -74,7 +76,13 @@ inputs:
     message: Do you want to add integration tests?
     default: true
 
-  - if: "{{ inputs.package_type == 'lib' or inputs.package_type == 'script' }}"
+  - if: "{{ inputs.package_type == 'ui-lib' }}"
+    name: component_test
+    type: boolean
+    message: Do you want to add component tests (real components in a browser)?
+    default: true
+
+  - if: "{{ inputs.package_type == 'lib' or inputs.package_type == 'ui-lib' or inputs.package_type == 'script' }}"
     name: release_group
     type: string
     message: How is this package versioned?
@@ -135,8 +143,9 @@ actions:
         - "templates/vitest.config.*.ts.tpl"
         - "templates/src/__tests__/integration.spec.ts.tpl"
         - "templates/src/add.spec.ts.tpl"
+        - "templates/src/add.component.spec.ts.tpl"
 
-  - if: "{{ inputs.package_type == 'lib' or inputs.package_type == 'script' }}"
+  - if: "{{ inputs.package_type == 'lib' or inputs.package_type == 'ui-lib' or inputs.package_type == 'script' }}"
     type: add-many
     base_path: templates
     files:
@@ -159,6 +168,13 @@ actions:
     base_path: templates
     files:
       - "templates/vitest.config.service.ts.tpl"
+
+  - if: "{{ inputs.component_test | default(value=false) }}"
+    type: add-many
+    base_path: templates
+    files:
+      - templates/vitest.config.component.ts.tpl
+      - templates/src/add.component.spec.ts.tpl
 
   - if: "{{ inputs.integration_test | default(value=false) }}"
     type: add-many

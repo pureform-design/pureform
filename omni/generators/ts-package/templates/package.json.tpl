@@ -6,7 +6,7 @@
     {% if inputs.package_type == 'script' %}
     "bin": "./dist/{{ inputs.package_name }}-cli.mjs",
     {% endif %}
-    {% if inputs.package_type == 'lib' or (inputs.package_type == 'script' and inputs.script_can_be_used_as_lib) %}
+    {% if inputs.package_type == 'lib' or inputs.package_type == 'ui-lib' or (inputs.package_type == 'script' and inputs.script_can_be_used_as_lib) %}
     "exports": {
         ".": {
             "types": "./dist/index.d.ts",
@@ -47,6 +47,10 @@
             {% elif inputs.shebang_executor == 'deno' %}
         "@types/deno": "catalog:",
             {% endif %}
+        {% endif %}
+        {% if inputs.package_type == 'ui-lib' and inputs.component_test %}
+        "@vitest/browser-playwright": "catalog:",
+        "playwright": "catalog:",
         {% endif %}
         "typescript": "catalog:"
     }

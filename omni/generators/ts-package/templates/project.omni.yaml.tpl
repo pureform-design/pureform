@@ -4,6 +4,8 @@ name: "@{{ vars.scope_name }}/{{ inputs.package_name }}"
 extends:
 {% if inputs.package_type == 'lib' %}
   - "@workspace/omni/presets/ts-vite-lib.omni.yaml"
+{% elif inputs.package_type == 'ui-lib' %}
+  - "@workspace/omni/presets/ts-vite-ui-lib.omni.yaml"
 {% elif inputs.package_type == 'app' %}
   - "@workspace/omni/presets/ts-vite-app.omni.yaml"
 {% elif inputs.package_type == 'script' %}
@@ -19,12 +21,17 @@ dependencies:
     - "@{{ vars.scope_name }}/vitest-config"
 
 tasks:
-{% if inputs.package_type == 'lib' or inputs.package_type == 'script' or inputs.package_type == 'app' %}
+{% if inputs.package_type == 'lib' or inputs.package_type == 'ui-lib' or inputs.package_type == 'script' or inputs.package_type == 'app' %}
   test:unit:
     enabled: {{ inputs.unit_test | default(value=false) }}
 
   test:integration:
     enabled: {{ inputs.integration_test | default(value=false) }}
+{% if inputs.package_type == 'ui-lib' %}
+
+  test:component:
+    enabled: {{ inputs.component_test | default(value=false) }}
+{% endif %}
 
   test:
     enabled: true
@@ -43,7 +50,7 @@ tasks:
   test:service:
     enabled: {{ inputs.package_type == 'service-tests' }}
 {% endif %}
-{% if inputs.package_type == 'lib' or inputs.package_type == 'script' or inputs.package_type == 'app' %}
+{% if inputs.package_type == 'lib' or inputs.package_type == 'ui-lib' or inputs.package_type == 'script' or inputs.package_type == 'app' %}
 meta:
   publish: {{ inputs.published }}
 {% endif %}
