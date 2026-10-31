@@ -1,0 +1,126 @@
+name: "Package Jobs Artifacts"
+description: "Package Jobs Artifacts, archives task outputs one by one and collects into a single folder"
+
+inputs:
+  jobs:
+    description: "Jobs to package"
+    required: true
+  target:
+    description: "Target platform if applicable"
+    required: false
+  outdir:
+    description: "Output directory"
+    required: false
+    default: "artifacts"
+  name:
+    description: "Name of the artifacts"
+    required: false
+    default: "artifacts"
+
+outputs:
+  artifacts_list:
+    description: "List of artifacts"
+    value: ${{ steps.collect.outputs.artifacts_list }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Collect Artifacts
+      id: collect
+      uses: actions/github-script@v8
+      env:
+        JOBS_JSON: ${{ inputs.jobs }}
+        TARGET: ${{ inputs.target }}
+        OUTDIR: ${{ inputs.outdir }}
+      with:
+        script: |
+          const fs = require('node:fs');
+          const path = require('node:path');
+
+          const jobs = JSON.parse(process.env.JOBS_JSON);
+          const target = process.env.TARGET;
+          const repoRoot = process.env.GITHUB_WORKSPACE;
+          const isWindows = process.platform === 'win32';
+
+          const outdir = path.isAbsolute(process.env.OUTDIR)
+              ? process.env.OUTDIR
+              : path.join(repoRoot, process.env.OUTDIR);
+
+          let createdZips = [];
+          await fs.promises.mkdir(outdir, { recursive: true });
+
+          const getZipName = (artifact) => target
+              ? `${artifact.name}_${target}.zip`
+              : `${artifact.name}.zip`;
+
+          for (const job of jobs) {
+              const { project_dir, artifacts } = job;
+              const categories = [
+                  { data: artifacts.workspace, base: repoRoot },
+                  { data: artifacts.project, base: path.join(repoRoot, project_dir) },
+              ];
+
+              const fullTaskName = `${job.task_name}#${job.project_name}`;
+              core.info(`Collecting artifacts for ${fullTaskName}`);
+
+              for (const cat of categories) {
+                  console.log(`Base dir: ${cat.base}`);
+                  if (cat.data && cat.data.files_count > 0) {
+                      const zipName = getZipName(cat.data);
+                      const zipPath = path.join(outdir, zipName);
+
+                      const patterns = cat.data.files.map((f) => path.join(cat.base, f)).join('\n');
+
+                      core.info(`Discovering files for ${cat.data.name} from job ${fullTaskName} using:\n${patterns}`);
+
+                      const globber = await glob.create(patterns, { matchDirectories: false });
+                      const files = await globber.glob();
+
+                      if (files.length > 0) {
+                          // ensure unique
+                          const relativeFiles = [...new Set(files.map((f) => {
+                              if (path.isAbsolute(f)) {
+                                  return path.relative(cat.base, f);
+                              } else {
+                                  return f;
+                              }
+                          }))];
+                          core.info(`Creating ${zipName} from files: \n${relativeFiles.join('\n')}`);
+
+                          if (isWindows) {
+                              // Windows: Use pre-installed 7-Zip to create the zip file.
+                              // '7z' is globally available on the PATH in GitHub Actions Windows runners.
+                              // 'a' adds files to an archive, '-aoa' overwrites existing files without asking.
+                              await exec.exec('7z', ['a', zipPath, ...relativeFiles, '-aoa'], { cwd: cat.base });
+                          } else {
+                              // Unix: Use standard zip utility
+                              await exec.exec('zip', ['-r9', zipPath, ...relativeFiles], { cwd: cat.base });
+                          }
+
+                          createdZips.push(zipPath);
+                      } else {
+                          core.info(`No files discovered for ${cat.data.name} from job ${fullTaskName}`);
+                      }
+                  } else {
+                      core.info(`No files found for ${cat.data.name} from job ${fullTaskName}`);
+                  }
+              }
+          }
+
+          // ensure no duplicate file names
+          createdZips = [...new Set(createdZips)];
+
+          core.setOutput('artifacts', createdZips.join('\n'));
+          core.setOutput('artifacts_count', createdZips.length.toString());
+          if (createdZips.length > 0) {
+              core.info(`Created ${createdZips.length} artifacts`);
+          } else {
+              core.info('No artifacts created');
+          }
+
+    - if: ${{ steps.collect.outputs.artifacts_count > 0 }}
+      name: Upload Artifacts
+      uses: actions/upload-artifact@v6
+      with:
+        name: ${{ inputs.name }}
+        path: ${{ steps.collect.outputs.artifacts }}

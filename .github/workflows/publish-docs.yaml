@@ -1,0 +1,49 @@
+name: Publish Docs
+
+# Disabled for now: the job is gated by the DOCS_DEPLOY_ENABLED repo variable and the trigger is
+# manual only. Enable by setting the repo variable to "true" and adding push/tag triggers.
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Vercel environment"
+        type: choice
+        options: [preview, production]
+        default: preview
+
+permissions:
+  contents: read
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+jobs:
+  publish-docs:
+    if: ${{ vars.DOCS_DEPLOY_ENABLED == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Workspace
+        uses: ./.github/actions/setup-workspace
+        with:
+          cache-key-prefix: docs
+          cache-restore-key-prefixes: build
+          install-playwright: "false"
+
+      - name: Install Vercel CLI
+        run: bun add -g vercel
+
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=${{ inputs.environment }} --token="$VERCEL_TOKEN"
+
+      - name: Build docs (Storybook)
+        run: omni -i run -p '@pureform/storybook-web' build
+
+      - name: Deploy
+        run: |
+          flags=""
+          if [ "${{ inputs.environment }}" = "production" ]; then flags="--prod"; fi
+          vercel deploy --prebuilt $flags --token="$VERCEL_TOKEN" --cwd ./apps/storybook-web

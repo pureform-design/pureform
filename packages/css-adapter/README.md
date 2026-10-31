@@ -100,7 +100,7 @@ config, theme providers, and color generation stay out of the bundle.
 
 Named themes are scoped by `themeAttribute` (default `data-theme`): the provider's `theme` writes
 `registry.themeAttributes(theme)`, `{ "data-theme": "teal" }`, on its element, and an app without a
-provider can set the attribute on any element. `apps/css-demo` is a working example.
+provider can set the attribute on any element.
 
 ## Generated registry (codegen)
 

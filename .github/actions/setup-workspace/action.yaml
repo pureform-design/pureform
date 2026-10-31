@@ -1,0 +1,83 @@
+name: "Setup Workspace"
+description: "Install Omni, Bun and dependencies, and restore the Omni cache"
+inputs:
+  cache-key-prefix:
+    description: "Prefix for the Omni cache key"
+    required: false
+    default: "global"
+  cache-restore-key-prefixes:
+    description: "Extra whitespace-separated prefixes to restore from"
+    required: false
+  omni-version:
+    description: "Version of Omni to install"
+    required: false
+    default: "latest"
+  install-playwright:
+    description: "Install Playwright Chromium (needed by browser tests)"
+    required: false
+    default: "false"
+  github-token:
+    description: "GitHub token for higher rate limit"
+    required: false
+    default: ${{ github.token }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install Omni
+      uses: omni-oss/setup-omni@v2
+      with:
+        github-token: ${{ inputs.github-token }}
+        version: ${{ inputs.omni-version }}
+
+    - name: Install Bun
+      uses: oven-sh/setup-bun@v2
+
+    - name: Install Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: lts/*
+
+    - name: Cache Bun install
+      uses: actions/cache@v5
+      with:
+        path: ~/.bun/install/cache
+        key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-bun-
+
+    - name: Install dependencies
+      shell: bash
+      run: bun install --frozen-lockfile
+
+    - name: Get workspace hash
+      id: workspace_hash
+      shell: bash
+      run: echo "hash=$(omni hash -r workspace)" >> "$GITHUB_OUTPUT"
+
+    - name: Create restore key list
+      id: restore_keys
+      shell: bash
+      env:
+        PREFIXES: ${{ inputs.cache-restore-key-prefixes }}
+        PREFIX: ${{ inputs.cache-key-prefix }}
+      run: |
+        {
+          echo "list<<EOF"
+          echo "${RUNNER_OS}-omni-${PREFIX}-"
+          for p in $PREFIXES; do echo "${RUNNER_OS}-omni-${p}-"; done
+          echo "${RUNNER_OS}-omni-"
+          echo "EOF"
+        } >> "$GITHUB_OUTPUT"
+
+    - name: Cache Omni directory
+      uses: actions/cache@v5
+      with:
+        path: .omni
+        key: ${{ runner.os }}-omni-${{ inputs.cache-key-prefix }}-${{ steps.workspace_hash.outputs.hash }}
+        restore-keys: ${{ steps.restore_keys.outputs.list }}
+
+    - name: Install Playwright Chromium
+      if: ${{ inputs.install-playwright == 'true' }}
+      shell: bash
+      run: bun x playwright install --with-deps chromium

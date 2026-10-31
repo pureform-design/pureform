@@ -305,30 +305,35 @@ describe.each(ADAPTERS)(
     (adapter) => {
         let adapterCss: Promise<string> | undefined;
 
-        it.each(SCENARIOS)("$name", async (scenario) => {
-            adapterCss ??= commands.adapterCss(adapter, OPTIONS);
-            const panda = await computed(pandaClasses, scenario, []);
-            const plain = await computed(
-                plainClasses,
-                scenario,
-                [await adapterCss],
-                ["reset", "base"],
-            );
+        it.each(SCENARIOS)(
+            "$name",
+            // The `every` scenarios render every variant value, which takes a minute on a CI runner.
+            { timeout: 180_000 },
+            async (scenario) => {
+                adapterCss ??= commands.adapterCss(adapter, OPTIONS);
+                const panda = await computed(pandaClasses, scenario, []);
+                const plain = await computed(
+                    plainClasses,
+                    scenario,
+                    [await adapterCss],
+                    ["reset", "base"],
+                );
 
-            const differences: string[] = [];
-            for (const [id, values] of Object.entries(panda)) {
-                for (const [property, value] of Object.entries(values)) {
-                    const other = plain[id]?.[property];
-                    if (!same(value, other)) {
-                        differences.push(
-                            `${id} ${property}: panda "${value}", ${adapter} "${other}"`,
-                        );
+                const differences: string[] = [];
+                for (const [id, values] of Object.entries(panda)) {
+                    for (const [property, value] of Object.entries(values)) {
+                        const other = plain[id]?.[property];
+                        if (!same(value, other)) {
+                            differences.push(
+                                `${id} ${property}: panda "${value}", ${adapter} "${other}"`,
+                            );
+                        }
                     }
                 }
-            }
-            expect(Object.keys(panda).length).toBeGreaterThan(30);
-            expect(Object.keys(plain)).toEqual(Object.keys(panda));
-            expect(differences, differences.join("\n")).toEqual([]);
-        });
+                expect(Object.keys(panda).length).toBeGreaterThan(30);
+                expect(Object.keys(plain)).toEqual(Object.keys(panda));
+                expect(differences, differences.join("\n")).toEqual([]);
+            },
+        );
     },
 );

@@ -20,6 +20,9 @@ tasks:
           append:
             - "./vite.config.ts"
             - "./vitest.config.e2e.ts"
+      output:
+        files:
+          - ".vitest/**/*"
     dependencies:
       append:
         - ^test:e2e
