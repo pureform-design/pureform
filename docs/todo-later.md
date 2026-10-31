@@ -19,13 +19,18 @@ results and recordings.
 
 ## Native circular progress
 
-- **RN wavy circular indeterminate still spins a fixed half circle:** the flat indicator now
-  grows and shrinks (`react-native/src/circular-progress-motion.ts`: the preset's token keyframes
-  are baked into one linear shared clock's piecewise channels, so spin, arcs, caps and track gaps
-  stay in step on the native driver, with each keyframe's own easing). The wavy arc is an SVG
-  path that depends on `value`; it needs an animated path in the rn-adapter SVG drawing (or
-  Reanimated animated props on the UI thread) driven by the same clock. Until then it keeps the
-  spinning half-circle wave. Device frame rates are V3.
+- **RN wavy circular indeterminate still spins a fixed half circle (decided: leave until V3):** the
+  flat indicator grows and shrinks (`react-native/src/circular-progress-motion.ts`: the preset's
+  token keyframes are baked into one linear shared clock's piecewise channels, so spin, arcs, caps
+  and track gaps stay in step on the native driver, each keyframe keeping its own easing). The wavy
+  arc is an SVG path of fixed point topology, so sampled shapes interpolate. Plan: bake the whole
+  wavy indeterminate indicator (arc growth, spin, track gaps and caps) into one self-contained
+  keyframed drawing, which both SVG engines already animate (`drawing.keyframes`: Animated on its
+  JS loop, Reanimated as a CSS `d` animation on the UI thread, CSS/SMIL on the web). One clock per
+  drawing means nothing to drift, and no new API. About 60 frames a cycle, with the easing baked
+  into the offsets and played linearly (eased steps on sparse frames cut chords across the circle).
+  Don't add an external shared clock to the SVG API: Reanimated can't read an Animated value, so two
+  clocks would remain. Verify per-frame cost and timing on devices (V3) before building it.
 
 ## Deferred designs
 
