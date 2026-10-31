@@ -557,6 +557,7 @@ function ReadyMadeContent({
                         as="span"
                         inert
                         placeholder={own.placeholder}
+                        disabled={own.disabled}
                         value={query.inputValue}
                         readOnly
                     />

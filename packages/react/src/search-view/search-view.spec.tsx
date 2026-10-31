@@ -125,6 +125,16 @@ describe("SearchView, ready-made", () => {
         },
     );
 
+    it("draws its search bar disabled when the view is", async () => {
+        withRegistry(<SearchView disabled placeholder="Search" />);
+        await settle();
+        expect(byTestId(ids.trigger).hasAttribute("disabled")).toBe(true);
+        const input = document.querySelector<HTMLInputElement>(
+            `[data-testid="${bar.input}"]`,
+        )!;
+        expect(input.disabled).toBe(true);
+    });
+
     it("opens from the bar, takes focus, traps it, and gives it back on Escape", async () => {
         const onOpenChange =
             vi.fn<(details: ChangeDetails<"open", boolean>) => void>();
