@@ -17,7 +17,6 @@ export default mergeConfig(mergeConfig(baseConfig, unitTestConfig), {
             ...shared.test.browser,
             enabled: true,
             headless: true,
-            instances: [{ browser: "chromium" }],
         },
     },
 });

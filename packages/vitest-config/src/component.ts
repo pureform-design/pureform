@@ -23,10 +23,10 @@ export default mergeConfig(
                 enabled: true,
                 include: ["./src/**/*.component.{test,spec}.{ts,mts,cts,tsx}"],
             },
+            // The package adds its `provider` and `instances` (a viewport, a timezone, a locale).
             browser: {
                 enabled: true,
                 headless: true,
-                instances: [{ browser: "chromium" }],
             },
         },
     }),

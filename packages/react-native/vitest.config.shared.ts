@@ -76,6 +76,7 @@ export default {
             provider: playwright({
                 launchOptions: executablePath ? { executablePath } : {},
             }),
+            instances: [{ browser: "chromium" }],
             commands,
         },
     },

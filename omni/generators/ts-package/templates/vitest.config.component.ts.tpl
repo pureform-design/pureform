@@ -13,6 +13,7 @@ export default mergeConfig(mergeConfig(baseConfig, componentTestConfig), {
             provider: playwright({
                 launchOptions: executablePath ? { executablePath } : {},
             }),
+            instances: [{ browser: "chromium" }],
         },
     },
 } satisfies UserWorkspaceConfig);

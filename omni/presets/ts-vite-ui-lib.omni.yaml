@@ -5,28 +5,10 @@ extends:
   - "./ts-vite-lib.omni.yaml"
 
 tasks:
-  # Real components rendered in Chromium: `src/**/*.component.spec.*`, next to the component.
-  # A package enables it and keeps its `vitest.config.component.ts` beside `vite.config.ts`.
+  # A UI library's components are tested by rendering them (`src/**/*.component.spec.*`, next to
+  # the component, with a `vitest.config.component.ts` beside `vite.config.ts`).
   test:component:
-    enabled: false
-    exec: bun x vitest --config ./vitest.config.component.ts run
-    # The components import the packages' built output.
-    dependencies:
-      - ^build
-    cache:
-      key:
-        files:
-          append:
-            - "./vite.config.ts"
-            - "./vitest.config.component.ts"
-      output:
-        files:
-          - ".vitest/**/*"
-
-  test:
-    dependencies:
-      append:
-        - test:component
+    enabled: true
 
 meta:
   ui: true

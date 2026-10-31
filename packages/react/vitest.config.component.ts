@@ -62,6 +62,7 @@ export default mergeConfig(mergeConfig(baseConfig, componentTestConfig), {
                 // Not UTC, so a date computed in UTC instead of locally shows up (the date pickers' "today").
                 contextOptions: { timezoneId: "Asia/Manila" },
             }),
+            instances: [{ browser: "chromium" }],
             commands,
         },
     },
