@@ -49,7 +49,7 @@ results and recordings.
 - **Full-gate timing failures (load, not reproduced alone):** under the parallel full workspace
   gate a few specs fail once and pass alone: browser-e2e `rn-motion.e2e.test.ts` (30s setup
   hook), RN `table.spec` ("only hovers actionable rows") and `fullscreen-dialog.spec` ("draws a
-  label (Save)"), browser-e2e `parity.e2e.test.ts` ("every variant value at rest", 60s test limit; the file takes ~150s alone), and the earlier component-suite `overlayShrinkOut`. The Reanimated FAB-menu
+  label (Save)"), RN `rows.spec.tsx` ("a menu's items render again only those whose selection changed"), browser-e2e `parity.e2e.test.ts` ("every variant value at rest", 60s test limit; the file takes ~150s alone), and the earlier component-suite `overlayShrinkOut`. The Reanimated FAB-menu
   stagger test (`presence.spec.tsx`) now waits on its own 6× slowed motion's budget (30s) rather
   than `until`'s 10s, and passed two full RN runs; rerun the whole workspace gate to confirm.
   Look for what starves the browsers (workers per core) before widening any other timeout.
