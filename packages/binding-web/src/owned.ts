@@ -1,0 +1,121 @@
+// Which keys of a part's props the component owns. A provider's `slotProps` can't set them: one
+// entry reaches every instance, and the machine finds its elements by `id`, reads its state back
+// from `aria-*` and `data-state`, while the anatomy's attributes are the contract tests and
+// styles select on. An instance's own props are not held back: a part drawn `as` another
+// component receives the outer part's merged props (its `id`, `data-testid`), which must win.
+// Handlers, classes and styles still combine, and the keys in `OVERRIDABLE_KEYS` stay settable.
+
+import {
+    PART_ATTRIBUTE,
+    SCOPE_ATTRIBUTE,
+    TEST_ID_ATTRIBUTE,
+} from "@pureform/web-contracts";
+
+type Dict = Readonly<Record<string, unknown>>;
+
+/** What a user may set even when the machine sets it too: a label or role for their own use, a
+ *  tooltip, a custom tab order. */
+export const OVERRIDABLE_KEYS: ReadonlySet<string> = new Set([
+    "tabIndex",
+    "role",
+    "aria-label",
+    "aria-description",
+    "aria-describedby",
+    "title",
+]);
+
+/** The style properties that place a floating part: a machine's values for them hold, the rest of
+ *  its `style` joins like any other. Custom properties (`--x`, `--transform-origin`) hold too. */
+const POSITIONING_STYLE = new Set([
+    "position",
+    "top",
+    "left",
+    "right",
+    "bottom",
+    "inset",
+    "transform",
+    "translate",
+    "transformOrigin",
+    "willChange",
+    "zIndex",
+    "offsetPath",
+    "offsetDistance",
+    "offsetRotate",
+    "offsetAnchor",
+]);
+
+const isPositioningStyle = (property: string): boolean =>
+    property.startsWith("--") || POSITIONING_STYLE.has(property);
+
+const HANDLER_KEY = /^on[A-Z]/;
+const CLASS_KEYS = new Set(["class", "className"]);
+
+/** The anatomy's own attributes, and every `data-pf-*` state attribute. */
+export const isReservedAttribute = (key: string): boolean =>
+    key === SCOPE_ATTRIBUTE ||
+    key === PART_ATTRIBUTE ||
+    key === TEST_ID_ATTRIBUTE ||
+    key.startsWith("data-pf-");
+
+/** The machine's props for a part: all but the style that places it (`rest`), the keys it owns
+ *  (`owned`: what a provider can't set), and its positioning `style`, which wins where it conflicts
+ *  so a floating part's placement holds. The escape hatch is to style a wrapper, or the part's
+ *  `positioning` options, not the placement properties. */
+export interface MachineSplit {
+    readonly rest: Dict | undefined;
+    readonly owned: Dict | undefined;
+    readonly style: Dict | undefined;
+}
+
+export const splitMachine = (machine: Dict | undefined): MachineSplit => {
+    if (!machine) return { rest: undefined, owned: undefined, style: undefined };
+    const rest: Record<string, unknown> = {};
+    const owned: Record<string, unknown> = {};
+    let style: Dict | undefined;
+    for (const key of Object.keys(machine)) {
+        const value = machine[key];
+        if (key === "style" && value && typeof value === "object") {
+            const placed: Record<string, unknown> = {};
+            const others: Record<string, unknown> = {};
+            for (const [property, v] of Object.entries(value)) {
+                (isPositioningStyle(property) ? placed : others)[property] = v;
+            }
+            if (Object.keys(placed).length > 0) style = { style: placed };
+            if (Object.keys(others).length > 0) rest["style"] = others;
+            continue;
+        }
+        rest[key] = value;
+        if (
+            value !== undefined &&
+            !HANDLER_KEY.test(key) &&
+            !CLASS_KEYS.has(key) &&
+            !OVERRIDABLE_KEYS.has(key)
+        )
+            owned[key] = value;
+    }
+    return { rest, owned, style };
+};
+
+/** `source` without the keys the component owns, and the keys that were dropped. `source` itself
+ *  when nothing is. Only a defined value counts as setting a key. */
+export const withoutOwned = (
+    source: Dict | undefined,
+    owned: Dict | undefined,
+): {
+    readonly source: Dict | undefined;
+    readonly dropped: readonly string[];
+} => {
+    if (!source) return { source, dropped: [] };
+    const dropped: string[] = [];
+    for (const key of Object.keys(source)) {
+        if (source[key] === undefined) continue;
+        if (isReservedAttribute(key) || (owned && key in owned))
+            dropped.push(key);
+    }
+    if (dropped.length === 0) return { source, dropped };
+    const clean: Record<string, unknown> = {};
+    for (const key of Object.keys(source)) {
+        if (!dropped.includes(key)) clean[key] = source[key];
+    }
+    return { source: clean, dropped };
+};

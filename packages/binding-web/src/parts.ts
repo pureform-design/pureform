@@ -12,6 +12,7 @@ import type { AttributeState, StateAttribute } from "@pureform/web-contracts";
 import { STATE_ATTRIBUTES } from "@pureform/web-contracts";
 
 import { partAttributes } from "./anatomy";
+import { splitMachine, withoutOwned } from "./owned";
 
 type Dict = Readonly<Record<string, unknown>>;
 
@@ -102,15 +103,22 @@ export interface PartSourcesInput<A extends ComponentAnatomy> {
     readonly slotProps?: object | undefined;
     /** The user's props for the part; `children` and `ref` are left out. */
     readonly props?: object | undefined;
+    /** Called, in development, with a message when the provider's `slotProps` set a key the
+     *  component owns. The binding passes `warnOnce` there. */
+    readonly warn?: ((message: string) => void) | undefined;
 }
 
-/** A part's props sources, in the order they merge: the machine's part props, the anatomy's
- *  `data-scope`/`data-pf-part`/`data-testid`, the `data-pf-*` state attributes, the registry's
- *  class and token style (unless unstyled), the provider's `slotProps` for the part, then for a
- *  backdrop the provider's props for its owner's `backdrop` (the scrim's own come first), and the
- *  user's props. A provider addresses a part by its name, as an instance's keyed props do (the
- *  surface of an overlay is `content`, though the preset draws it with its `root` slot). Pass them
- *  to `combineProps` with the binding's rules. */
+/** A part's props sources, in the order they merge: the machine's part props (but its `style`),
+ *  the anatomy's `data-scope`/`data-pf-part`/`data-testid`, the `data-pf-*` state attributes, the
+ *  registry's class and token style (unless unstyled), the provider's `slotProps` for the part,
+ *  then for a backdrop or a cell the provider's props for its owner (the scrim's own come first),
+ *  the user's props, and last the machine's `style`, so a positioner's placement holds. The
+ *  provider can't set what the component owns (the machine's props other than handlers, classes
+ *  and `OVERRIDABLE_KEYS`, and the attributes above); a dropped key is reported through `warn`.
+ *  The user's props are not held back, since a part drawn `as` another component arrives as the
+ *  outer part's merged props. A provider addresses a part by its name, as an instance's keyed
+ *  props do (the surface of an overlay is `content`, though the preset draws it with its `root`
+ *  slot). Pass them to `combineProps` with the binding's rules. */
 export const partSources = <A extends ComponentAnatomy>(
     input: PartSourcesInput<A>,
 ): readonly (Dict | undefined)[] => {
@@ -127,13 +135,23 @@ export const partSources = <A extends ComponentAnatomy>(
         | undefined;
     const owner =
         input.owner ?? (part === anatomy.root ? anatomy.owner : undefined);
+    const machine = splitMachine(input.machine as Dict | undefined);
+    const clean = (source: Dict | undefined) => {
+        const { source: kept, dropped } = withoutOwned(source, machine.owned);
+        if (dropped.length > 0)
+            input.warn?.(
+                `pureform: <${anatomy.name}> ${part} ignored ${dropped.map((key) => `"${key}"`).join(", ")} from the provider's slotProps: the component sets ${dropped.length === 1 ? "it" : "them"}.`,
+            );
+        return kept;
+    };
     return [
-        input.machine as Dict | undefined,
+        machine.rest,
         partAttributes(anatomy, part, input.testId) as unknown as Dict,
         stateAttributes(input.states) as Dict,
         partClasses(anatomy, part, input.classes, unstyled) as Dict | undefined,
-        provider?.[anatomy.name]?.[part],
-        owner ? provider?.[owner.component]?.[owner.part] : undefined,
+        clean(provider?.[anatomy.name]?.[part]),
+        clean(owner ? provider?.[owner.component]?.[owner.part] : undefined),
         spreadableProps(input.props),
+        machine.style,
     ];
 };

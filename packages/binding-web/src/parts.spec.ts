@@ -168,6 +168,7 @@ describe("partSources", () => {
             { title: "provided" },
             undefined,
             { title: "user" },
+            undefined,
         ]);
     });
 
@@ -204,7 +205,7 @@ describe("partSources", () => {
             slotProps,
             props: { title: "user" },
         });
-        expect(sources.slice(4)).toEqual([
+        expect(sources.slice(4, 7)).toEqual([
             { title: "every scrim" },
             { title: "this dialog's" },
             { title: "user" },
@@ -234,7 +235,7 @@ describe("partSources", () => {
             slotProps,
             props: { title: "user" },
         });
-        expect(sources.slice(4)).toEqual([
+        expect(sources.slice(4, 7)).toEqual([
             { title: "every cell" },
             { title: "this picker's" },
             { title: "user" },
@@ -272,6 +273,44 @@ describe("partSources", () => {
             partSources({ ...base, part: "label", partUnstyled: true })[3],
         ).toBeUndefined();
         expect(partSources({ ...base, part: "label" })[4]).toBeUndefined();
+    });
+
+    it("keeps the component's own keys from the provider, says which were dropped, and leaves the user's props alone", () => {
+        const warn: string[] = [];
+        const sources = partSources({
+            anatomy: buttonAnatomy,
+            part: "root",
+            machine: { id: "zag", "aria-pressed": true, role: "button" },
+            testId: "mine",
+            slotProps: {
+                button: {
+                    root: {
+                        "data-testid": "prov",
+                        "aria-pressed": false,
+                        id: "prov",
+                        role: "link",
+                        title: "hi",
+                    },
+                },
+            },
+            props: { id: "forwarded", tabIndex: -1 },
+            warn: (message) => warn.push(message),
+        });
+        expect(sources[4]).toEqual({ role: "link", title: "hi" });
+        expect(sources[6]).toEqual({ id: "forwarded", tabIndex: -1 });
+        expect(warn).toHaveLength(1);
+        expect(warn[0]).toContain('"data-testid", "aria-pressed", "id"');
+    });
+
+    it("puts the machine's positioning style last, so a positioner's placement holds", () => {
+        const sources = partSources({
+            anatomy: buttonAnatomy,
+            part: "root",
+            machine: { style: { top: "1px", paddingTop: "2px" }, title: "m" },
+            props: { style: { top: "9px" } },
+        });
+        expect(sources[0]).toEqual({ title: "m", style: { paddingTop: "2px" } });
+        expect(sources[7]).toEqual({ style: { top: "1px" } });
     });
 });
 
