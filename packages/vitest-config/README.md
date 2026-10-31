@@ -8,14 +8,15 @@ depends on nothing but Vite and Vitest (peers); every package with tests depends
 
 The package ships its TypeScript sources (`./*` maps to `src/*.ts`); there is no build.
 
-| Subpath                                  | What it is                                                                                                                  |
-| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `@pureform/vitest-config/unit`           | Unit tests: `src/**/*.test.*` outside `__tests__/`, a 1 s limit per test, and the type assertions in the same specs checked |
-| `@pureform/vitest-config/integration`    | Integration tests: `src/**/__tests__/**/*.test.*`                                                                           |
-| `@pureform/vitest-config/service`        | Service tests: `src/**/*.service.test.*`                                                                                    |
-| `@pureform/vitest-config/e2e`            | End-to-end and smoke tests: `src/**/*.e2e.test.*`                                                                           |
-| `@pureform/vitest-config/coverage`       | The V8 coverage defaults every config above carries, inert unless a run passes `--coverage`                                 |
-| `@pureform/vitest-config/browser-warmup` | A global setup for a browser-mode project: compiles the test files' modules before any test runs (below)                    |
+| Subpath                                  | What it is                                                                                                                                                |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@pureform/vitest-config/unit`           | Unit tests: `src/**/*.test.*` outside `__tests__/` and the component tests, a 1 s limit per test, and the type assertions in the same specs checked       |
+| `@pureform/vitest-config/component`      | Component tests: `src/**/*.component.spec.*`, real components rendered in Chromium (browser mode), a 30 s limit per test, and the type assertions checked |
+| `@pureform/vitest-config/integration`    | Integration tests: `src/**/__tests__/**/*.test.*`                                                                                                         |
+| `@pureform/vitest-config/service`        | Service tests: `src/**/*.service.test.*`                                                                                                                  |
+| `@pureform/vitest-config/e2e`            | End-to-end and smoke tests: `src/**/*.e2e.test.*`                                                                                                         |
+| `@pureform/vitest-config/coverage`       | The V8 coverage defaults every config above carries, inert unless a run passes `--coverage`                                                               |
+| `@pureform/vitest-config/browser-warmup` | A global setup for a browser-mode project: compiles the test files' modules before any test runs (below)                                                  |
 
 ```ts
 import e2eTestConfig from "@pureform/vitest-config/e2e";
