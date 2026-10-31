@@ -34,29 +34,8 @@ jobs:
           # only this PR's commits; the repo has no SemVer tag for --from-latest-tag
           args: ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}
 
-  check:
-    name: Check
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-
-      - name: Setup Workspace
-        uses: ./.github/actions/setup-workspace
-        with:
-          cache-key-prefix: check
-          cache-restore-key-prefixes: |
-            build
-            test
-
-      - name: Check (format, lint, types)
-        run: omni -i run -f=failed check
-
-      - name: Prune stale caches
-        run: omni -i cache prune -sy -o="7d"
-
   build:
     name: Build
-    needs: [check]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -86,9 +65,31 @@ jobs:
       - name: Prune stale caches
         run: omni -i cache prune -sy -o="7d"
 
+  check:
+    name: Check
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Workspace
+        uses: ./.github/actions/setup-workspace
+        with:
+          cache-key-prefix: check
+          cache-restore-key-prefixes: |
+            build
+            test
+
+      # After build: type-aware lint and tsc need built declarations and generated output (`.pureform/`)
+      - name: Check (format, lint, types)
+        run: omni -i run -f=failed check
+
+      - name: Prune stale caches
+        run: omni -i cache prune -sy -o="7d"
+
   test:
     name: Test
-    needs: [build]
+    needs: [check]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
