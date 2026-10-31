@@ -74,19 +74,21 @@ jobs:
             check
             test
 
+      - name: Plan build outputs
+        id: plan
+        run: |
+          omni -i run -f=failed -d --result=result.json build
+          bun --bun x @omni-oss/create-jobs result.json --output=jobs.json
+          echo "jobs=$(jq -c '.build.typescript' jobs.json)" >> "$GITHUB_OUTPUT"
+
       - name: Build
         run: omni -i run -f=failed build
 
-      - name: Upload build outputs
-        uses: actions/upload-artifact@v4
+      - name: Package build outputs
+        uses: ./.github/actions/package-jobs-artifacts
         with:
+          jobs: ${{ steps.plan.outputs.jobs }}
           name: build
-          retention-days: 7
-          if-no-files-found: ignore
-          path: |
-            packages/*/dist
-            apps/*/dist
-            apps/storybook-web/storybook-static
 
       - name: Prune stale caches
         run: omni -i cache prune -sy -o="7d"
