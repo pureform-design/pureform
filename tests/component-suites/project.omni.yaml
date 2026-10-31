@@ -25,6 +25,7 @@ cache:
   key:
     files:
       append:
+        - "./vitest.config.shared.ts"
         - "../panda-fixture/.pureform/**/*"
         - "../panda-fixture/panda.config.ts"
         - "../panda-fixture/panda.pureform.ts"
@@ -44,7 +45,7 @@ tasks:
     enabled: false
 
   # Writes the CSS and Tailwind targets' registries (`.pureform/`, ignored by git), which
-  # `vitest.config.e2e.ts` also writes on every run, for the type-aware lint without a test run.
+  # `vitest.config.shared.ts` also writes on every run, for the type-aware lint without a test run.
   generate:
     exec: node scripts/generate-registries.ts
     dependencies:
@@ -54,9 +55,16 @@ tasks:
         files:
           - ".pureform/**/*"
 
-  test:e2e:
+  test:component:
     enabled: true
     # The Panda fixture's codegen writes the styled-system the registry and stylesheet import.
+    dependencies:
+      append:
+        - ^prepare
+
+  # The server rendering suite and the indication benchmark.
+  test:e2e:
+    enabled: true
     dependencies:
       append:
         - ^prepare
