@@ -39,11 +39,12 @@ results and recordings.
   menu actions separately and don't promise unsupported OS-menu features.
 - **F2. Token, theme and @property pruning:** separate design; account for runtime token/theme
   references and dynamic usage (keyframe pruning is done in `narrowConfig`).
-- **F3. Anatomy-part names for public customization:** providers use preset style slots
-  (`dialog.root` styles the surface), instances use anatomy parts (`dialog.content`). Standardize both
-  on anatomy-part names across React, Solid and Native; keep style slots for preset/theme authoring.
-  Audit mappings, types, usages and migration; don't silently accept both (overlay `root` is
-  ambiguous); cover structural parts, handler/style precedence, accessibility and reactivity/SSR.
+- **F3. Anatomy-part names for public customization:** audited, see
+  `docs/design/provider-part-names.md` (24 of 646 parts differ, 13 real renames, two collisions;
+  it reverses a recorded decision in `component-architecture.md`). Recommended: provider
+  `slotProps` keyed by anatomy part, a hard switch with a dev-only warning for old keys, never
+  accepting both. Waiting on three decisions listed in the doc (hard switch or window, per-owner
+  `backdrop`/`cell` keys, unstyled parts on web).
 
 ## External verification and maintenance
 
