@@ -213,6 +213,23 @@ describe("DockedDatePicker, ready-made", () => {
         expect(byTestId(ids.grid)).toBeTruthy();
     });
 
+    it("goes from the years back to the days when a year is chosen with the keys", async () => {
+        withRegistry(
+            <DockedDatePicker
+                label="Date"
+                locale="en-US"
+                defaultValue={["2026-08-17"]}
+                defaultOpen
+            />,
+        );
+        await settle();
+        await interact(() => press(byTestId(ids.yearButton)));
+        trigger("2026").focus();
+        await interact(() => userEvent.keyboard("{ArrowRight}{Enter}"));
+        expect(byTestId(ids.yearButton).textContent).toBe("2027");
+        expect(byTestId(ids.grid)).toBeTruthy();
+    });
+
     it("takes a function of each cell in its keys, in every view", async () => {
         withRegistry(
             <DockedDatePicker

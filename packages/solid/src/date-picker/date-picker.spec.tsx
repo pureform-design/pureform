@@ -12,7 +12,7 @@ const ids = compositeTestIds.datePicker;
 // The fake registry draws nothing: lay the weeks out in rows, so the dialog fits the page.
 const style = document.createElement("style");
 style.textContent =
-    "[data-pf-part=week], [data-pf-part=weekdays], [data-pf-part=year-list] { display: flex }";
+    "[data-pf-part=week], [data-pf-part=weekdays], [data-pf-part=year-list] { display: flex; flex-wrap: wrap; width: 300px }";
 document.head.append(style);
 
 const withRegistry = (view: () => unknown, dir?: "ltr" | "rtl") =>
@@ -361,6 +361,53 @@ describe("DatePicker, ready-made", () => {
         await until(() =>
             expect(byTestId(ids.viewTrigger).textContent).toContain("2028"),
         );
+    });
+
+    it("lists the years as one scrollable range around the chosen year, as Material's", async () => {
+        withRegistry(() => (
+            <DatePicker
+                locale="en-US"
+                defaultOpen
+                defaultValue={["2026-08-17"]}
+            />
+        ));
+        await settle();
+        await userEvent.click(byTestId(ids.viewTrigger));
+        await settle();
+        const years = () =>
+            all(
+                `[data-testid="${ids.yearList}"] [data-view="year"][role="button"]`,
+            ).map((year) => Number(year.dataset["value"]));
+        expect(years()[0]).toBe(1926);
+        expect(years().at(-1)).toBe(2126);
+        expect(years()).toHaveLength(201);
+        const far = document.querySelector<HTMLElement>(
+            `[data-testid="${ids.yearList}"] [data-value="1931"][role="button"]`,
+        )!;
+        await userEvent.click(far);
+        await until(() =>
+            expect(byTestId(ids.viewTrigger).textContent).toContain("1931"),
+        );
+    });
+
+    it("keeps the years inside min and max", async () => {
+        withRegistry(() => (
+            <DatePicker
+                locale="en-US"
+                defaultOpen
+                defaultValue={["2026-08-17"]}
+                min="2024-01-01"
+                max="2029-12-31"
+            />
+        ));
+        await settle();
+        await userEvent.click(byTestId(ids.viewTrigger));
+        await settle();
+        expect(
+            all(
+                `[data-testid="${ids.yearList}"] [data-view="year"][role="button"]`,
+            ).map((year) => Number(year.dataset["value"])),
+        ).toEqual([2024, 2025, 2026, 2027, 2028, 2029]);
     });
 
     it("mirrors the chevrons under rtl, and shows the mode toggle only when given", async () => {

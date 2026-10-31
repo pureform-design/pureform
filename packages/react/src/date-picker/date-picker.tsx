@@ -181,6 +181,11 @@ function Calendar({
         value: zagValue,
         onValueChange: (details) =>
             setDraft(details.value.map(datePicker.toISO)),
+        // Material's picker goes from the years straight back to the days, with the keys as
+        // with a click.
+        onViewChange: (details) => {
+            if (details.view === "month") picker.setView("day");
+        },
     });
     const picker = datePicker.connect(service, normalizeProps);
     useEffect(() => {
@@ -199,6 +204,7 @@ function Calendar({
                 selectionMode: own.selectionMode ?? "single",
                 locale: pickerLocale(own),
                 weekStart: pickerWeekStart(own),
+                yearBounds: { min: own.min, max: own.max },
                 dialog: dialogApi,
                 confirm: () => {
                     if (!value.controlled) setOwn(draft);
@@ -414,7 +420,15 @@ function ReadyMadeContent({ own }: { readonly own: DatePickerProps }) {
                     <Divider {...slot("divider")} />
                     <Controls {...slot("controls")}>
                         <ViewTrigger {...slot("viewTrigger")}>
-                            {picker.visibleRangeText.start}
+                            {new Intl.DateTimeFormat(locale, {
+                                month: "long",
+                                year: "numeric",
+                                timeZone: "UTC",
+                            }).format(
+                                new Date(
+                                    `${datePicker.toISO(picker.focusedValue)}T00:00:00Z`,
+                                ),
+                            )}
                             <DropDownArrow />
                         </ViewTrigger>
                         {days ? (

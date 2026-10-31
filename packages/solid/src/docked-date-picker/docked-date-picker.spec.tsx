@@ -13,7 +13,7 @@ const ids = compositeTestIds.dockedDatePicker;
 // The fake registry draws nothing: lay the weeks out in rows, so the calendar fits the page.
 const style = document.createElement("style");
 style.textContent =
-    "[data-pf-part=week], [data-pf-part=weekdays], [data-pf-part=year-list] { display: flex }";
+    "[data-pf-part=week], [data-pf-part=weekdays], [data-pf-part=year-list] { display: flex; flex-wrap: wrap; width: 300px }";
 document.head.append(style);
 
 const withRegistry = (view: () => unknown, dir?: "ltr" | "rtl") =>

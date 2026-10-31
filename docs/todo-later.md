@@ -27,22 +27,6 @@ results and recordings.
   Reanimated animated props on the UI thread) driven by the same clock. Until then it keeps the
   spinning half-circle wave. Device frame rates are V3.
 
-## Pending Storybook observations
-
-Ordered from easy to complex. "Real" is a component or preset bug; "scene" is the story host.
-
-### Needs a decision
-
-- **DatePicker year view shows a different range on web and Native:** reproduced in the storybook
-  ("Opened: plain"). Solid and React list one decade of Zag's `getYearsGrid` (2020 to 2029,
-  stepped by the prev/next triggers); React Native lists 201 years (1926 to 2126) in one
-  scrollable list, as Material's does. Picking a year returns to the day view on all three.
-  Decide whether the web year view should be the long scrollable range (an own year list over
-  Zag's focused year and min/max, not `getYearsGrid`'s decade) or whether Native should page by
-  decade. Also, in the year view React's view toggle reads the decade ("2020") where Solid's keeps
-  "February 2026" and Native's keeps the month with a turned arrow; align the three once the
-  range is decided.
-
 ## Deferred designs
 
 - **F1. NativeSelect option customization:** defer API design, not customization. The wrapper must
@@ -62,7 +46,7 @@ Ordered from easy to complex. "Real" is a component or preset bug; "scene" is th
   failed waiting for the menu to disappear in two full workspace runs, but passed isolated.
   Browser-e2e `rn-motion.e2e.test.ts` exceeded its 30s setup-hook limit in the first full run;
   both its isolated rerun and the next full browser suite passed. Neither is declared fixed.
-  Investigate load sensitivity and animation cleanup before increasing timeouts. The earlier
+  RN `table.spec` ("only hovers actionable rows") and `fullscreen-dialog.spec` ("draws a label (Save)") failed once each in a full run and passed alone. Investigate load sensitivity and animation cleanup before increasing timeouts. The earlier
   component-suite `overlayShrinkOut` failure did not recur in these full runs.
 
 - **V1. Slider focus-ring clipping:** obtain the nested-icon-button scene before changing clipping.

@@ -339,7 +339,7 @@ export {
     LIST_ITEM_SWIPE_SPRING,
 } from "./list-item-swipe-settle";
 export type { SwipeSettle } from "./list-item-swipe-settle";
-export { focusableWhileOverflowing } from "./scroll-focus";
+export { focusableWhileOverflowing, scrollCellIntoList } from "./scroll-focus";
 export { transitionTiming, watchCollapse } from "./collapse";
 export {
     settleOnSpring,

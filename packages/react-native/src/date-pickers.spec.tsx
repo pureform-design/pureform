@@ -258,6 +258,26 @@ describe("DatePicker", () => {
         );
     });
 
+    it("opens its year list on the chosen year, centred, as Material's does", async () => {
+        await render(
+            <DatePicker locale="en-US" defaultValue={["2026-08-17"]} />,
+        );
+        await interact(() =>
+            userEvent.click(byTestId("pf-date-picker-view-trigger")),
+        );
+        const list = byTestId("pf-date-picker-year-list");
+        const cell = day("2026");
+        await until(() => expect(list.scrollTop).toBeGreaterThan(0));
+        await until(() => {
+            const area = list.getBoundingClientRect();
+            const box = cell.getBoundingClientRect();
+            expect(box.top + box.height / 2 - area.top).toBeCloseTo(
+                area.height / 2,
+                -1,
+            );
+        });
+    });
+
     it("takes a function of each cell, week and weekday in its style and slotProps", async () => {
         const views = new Set<string>();
         await render(

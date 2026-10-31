@@ -22,8 +22,10 @@ import type {
     DatePickerBehaviorProps,
     DateSelectionMode,
 } from "@pureform/binding-core";
+import { useRef } from "react";
 import type { ReactNode } from "react";
 import { ScrollView } from "react-native";
+import type { LayoutChangeEvent, ScrollViewInstance } from "react-native";
 
 import type { MotionStyles } from "./engine";
 import { IconSlot, iconSlot } from "./icon-style";
@@ -57,6 +59,8 @@ export interface CalendarCellProps {
     readonly owner?: PartSlots | undefined;
     /** What the cell is, for a function of the copy in the picker's `cell` key. */
     readonly instance?: CalendarCellInstance | undefined;
+    /** Where the cell's root lays out, which a list reads to scroll to it. */
+    readonly onLayout?: ((event: LayoutChangeEvent) => void) | undefined;
 }
 
 function CalendarCellImpl(props: CalendarCellProps): ReactNode {
@@ -102,6 +106,7 @@ function CalendarCellImpl(props: CalendarCellProps): ReactNode {
                 slot.style("root", s.root),
                 props.instance,
             )}
+            {...(props.onLayout ? { onLayout: props.onLayout } : {})}
             testID={id("root")}
         >
             <v.trigger.Pressable
@@ -305,8 +310,25 @@ export function CellList<L extends ListSlot>(
         overflow: _overflow,
         ...content
     } = (s[props.part] ?? {}) as Record<string, unknown>;
+    // Opens on the chosen cell (else the current one), centred, as Material's lists do.
+    const scroller = useRef<ScrollViewInstance>(null);
+    const placed = useRef(false);
+    const target = (
+        props.cells.find((cell) => cell.selected) ??
+        props.cells.find((cell) => cell.current)
+    )?.key;
+    const center = (event: LayoutChangeEvent) => {
+        if (placed.current) return;
+        placed.current = true;
+        const { y, height: cell } = event.nativeEvent.layout;
+        scroller.current?.scrollTo({
+            y: Math.max(0, y - (Number(height) - cell) / 2),
+            animated: false,
+        });
+    };
     return (
         <ScrollView
+            ref={scroller}
             {...slot.props(props.part)}
             style={slot.style(props.part, { height: height as number })}
             contentContainerStyle={content as never}
@@ -334,6 +356,7 @@ export function CellList<L extends ListSlot>(
                             : undefined
                     }
                     label={cell.text}
+                    {...(cell.key === target ? { onLayout: center } : {})}
                     onPress={() => props.onChoose(cell.key)}
                 >
                     {cell.text}
@@ -342,20 +365,6 @@ export function CellList<L extends ListSlot>(
         </ScrollView>
     );
 }
-
-/** The years a calendar lists: between `min` and `max`, else a century either side of the
- *  shown one. */
-export const yearsOf = (
-    shown: number,
-    props: Pick<DatePickerBehaviorProps, "min" | "max">,
-): number[] => {
-    const first = props.min ? parseIsoDate(props.min)!.year : shown - 100;
-    const last = props.max ? parseIsoDate(props.max)!.year : shown + 100;
-    return Array.from(
-        { length: last - first + 1 },
-        (_, index) => first + index,
-    );
-};
 
 /** A month's name and year: "August 2026". */
 export const monthTitle = (month: string, locale: string): string =>

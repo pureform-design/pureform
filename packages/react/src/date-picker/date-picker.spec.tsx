@@ -318,6 +318,74 @@ describe("DatePicker, ready-made", () => {
         expect(onModeToggle).toHaveBeenCalled();
     });
 
+    it("lists the years as one scrollable range around the chosen year, as Material's", async () => {
+        withRegistry(
+            <DatePicker
+                locale="en-US"
+                defaultValue={["2026-08-17"]}
+                defaultOpen
+            />,
+        );
+        await settle();
+        await interact(() => press(byTestId(ids.viewTrigger)));
+        const years = () =>
+            [
+                ...document.querySelectorAll<HTMLElement>(
+                    `[data-testid="${cell.trigger}"][data-view="year"]`,
+                ),
+            ].map((year) => Number(year.dataset["value"]));
+        expect(years()[0]).toBe(1926);
+        expect(years().at(-1)).toBe(2126);
+        expect(years()).toHaveLength(201);
+        // The header keeps naming the month, as in the days, not a decade.
+        expect(byTestId(ids.viewTrigger).textContent).toContain("August 2026");
+        const year = document.querySelector<HTMLElement>(
+            `[data-testid="${cell.trigger}"][data-value="1931"]`,
+        )!;
+        await interact(() => press(year));
+        expect(byTestId(ids.viewTrigger).textContent).toContain("August 1931");
+    });
+
+    it("goes from the years back to the days when a year is chosen with the keys", async () => {
+        withRegistry(
+            <DatePicker
+                locale="en-US"
+                defaultValue={["2026-08-17"]}
+                defaultOpen
+            />,
+        );
+        await settle();
+        await interact(() => press(byTestId(ids.viewTrigger)));
+        document
+            .querySelector<HTMLElement>(
+                `[data-testid="${cell.trigger}"][data-value="2026"]`,
+            )!
+            .focus();
+        await interact(() => userEvent.keyboard("{ArrowRight}{Enter}"));
+        expect(byTestId(ids.viewTrigger).textContent).toContain("August 2027");
+        expect(byTestId(ids.grid)).toBeTruthy();
+    });
+
+    it("keeps the years inside min and max", async () => {
+        withRegistry(
+            <DatePicker
+                locale="en-US"
+                defaultValue={["2026-08-17"]}
+                min="2024-01-01"
+                max="2029-12-31"
+                defaultOpen
+            />,
+        );
+        await settle();
+        await interact(() => press(byTestId(ids.viewTrigger)));
+        const years = [
+            ...document.querySelectorAll<HTMLElement>(
+                `[data-testid="${cell.trigger}"][data-view="year"]`,
+            ),
+        ].map((year) => Number(year.dataset["value"]));
+        expect(years).toEqual([2024, 2025, 2026, 2027, 2028, 2029]);
+    });
+
     it("passes the previous and next parts' className and style to their IconButtons, and the backdrop's", async () => {
         withRegistry(
             <DatePicker

@@ -15,6 +15,7 @@ import {
     pickerLocale,
     pickerWeekStart,
     selectedDateText,
+    calendarYears,
 } from "@pureform/binding-core";
 import type {
     CalendarInstances,
@@ -27,13 +28,7 @@ import { StyleSheet } from "react-native";
 
 import { Button } from "../button/button";
 import type { ButtonProps } from "../button/button";
-import {
-    CellList,
-    DayGrid,
-    monthTitle,
-    startMonth,
-    yearsOf,
-} from "../calendar";
+import { CellList, DayGrid, monthTitle, startMonth } from "../calendar";
 import { IconButton } from "../icon-button/icon-button";
 import { IconSlot, iconSlot } from "../icon-style";
 import { ModalScrimLayer, ModalWindow, useModalOverlay } from "../modal";
@@ -247,7 +242,7 @@ function SurfaceImpl(props: SurfaceProps): ReactNode {
                     slots={{ styles: s, views: v, id, slot }}
                     part="yearList"
                     view="year"
-                    cells={yearsOf(year, props).map((each) => ({
+                    cells={calendarYears(year, props).map((each) => ({
                         key: each,
                         text: String(each),
                         selected: each === year,

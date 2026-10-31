@@ -117,6 +117,7 @@ function Root(props: DockedDatePickerRootProps): ReactNode {
         "open",
         props,
     );
+    const lastView = useRef<datePicker.DateView>("day");
     const service = useMachine(datePicker.machine, {
         id,
         dir,
@@ -127,6 +128,14 @@ function Root(props: DockedDatePickerRootProps): ReactNode {
         placeholder: dateFormatHint(pickerLocale(props)),
         closeOnSelect: props.closeOnSelect ?? true,
         ...value,
+        // Material's docked picker goes from the years straight back to the days, with the
+        // keys as with a click.
+        onViewChange: (details) => {
+            const from = lastView.current;
+            lastView.current = details.view;
+            if (from === "year" && details.view === "month")
+                picker.setView("day");
+        },
         ...open.machineProps,
     });
     const picker = datePicker.connect(service, normalizeProps);
@@ -148,6 +157,7 @@ function Root(props: DockedDatePickerRootProps): ReactNode {
                 selectionMode: props.selectionMode ?? "single",
                 locale: pickerLocale(props),
                 weekStart: pickerWeekStart(props),
+                yearBounds: { min: props.min, max: props.max },
                 supportingTextId: `${id}-supporting-text`,
                 errorText: props.error || undefined,
                 filled: typed || selected.length > 0,

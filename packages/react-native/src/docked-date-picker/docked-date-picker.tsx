@@ -18,6 +18,7 @@ import {
     parseDateText,
     pickerLocale,
     pickerWeekStart,
+    calendarYears,
 } from "@pureform/binding-core";
 import type {
     CalendarInstances,
@@ -28,7 +29,7 @@ import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { Pressable, View } from "react-native";
 
-import { CellList, DayGrid, startMonth, yearsOf } from "../calendar";
+import { CellList, DayGrid, startMonth } from "../calendar";
 import { IconButton } from "../icon-button/icon-button";
 import { IconSlot, iconSlot } from "../icon-style";
 import { Anchored, useFieldPopup } from "../overlay";
@@ -242,7 +243,7 @@ function Popup(
                     slots={slots}
                     part="yearList"
                     view="year"
-                    cells={yearsOf(year, props).map((each) => ({
+                    cells={calendarYears(year, props).map((each) => ({
                         key: each,
                         text: String(each),
                         selected: each === year,

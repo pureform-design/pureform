@@ -118,6 +118,28 @@ export const isCurrentCalendarPeriod = (
     year === now.getFullYear() &&
     (view === "year" || month === now.getMonth() + 1);
 
+/** The years a calendar's year list holds, one scrollable list as Material's: between `min` and
+ *  `max`, else a century either side of `shown` (a stable anchor, such as the chosen date's year,
+ *  so the list doesn't move while it is used). A `focused` year past the century is held too,
+ *  where `min` or `max` doesn't bound that side, so a key or step that reaches it has a cell. */
+export const calendarYears = (
+    shown: number,
+    bounds: {
+        readonly min?: string | undefined;
+        readonly max?: string | undefined;
+    },
+    focused: number = shown,
+): number[] => {
+    const min = bounds.min ? parseIsoDate(bounds.min)?.year : undefined;
+    const max = bounds.max ? parseIsoDate(bounds.max)?.year : undefined;
+    const first = min ?? Math.min(shown - 100, focused);
+    const last = max ?? Math.max(shown + 100, focused);
+    return Array.from(
+        { length: Math.max(0, last - first + 1) },
+        (_, index) => first + index,
+    );
+};
+
 // Regions whose week starts on Sunday, Saturday or Friday when the platform can't say (CLDR's
 // `firstDay`); the rest start on Monday.
 const SUNDAY_FIRST = new Set(

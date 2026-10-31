@@ -7,6 +7,7 @@ import { calendarCellAnatomy } from "@pureform/anatomy";
 import type { ComponentAnatomy, TestIdOverride } from "@pureform/anatomy";
 import {
     calendarCellSelection,
+    calendarYears,
     calendarCellSelectionOf,
     isCurrentCalendarPeriod,
     weekdayLabels,
@@ -22,10 +23,18 @@ import type {
     Unstyled,
 } from "@pureform/binding-core";
 import type { MutableInteractionSource } from "@pureform/binding-core/interaction";
+import { scrollCellIntoList } from "@pureform/binding-web";
 import * as datePicker from "@pureform/machines/date-picker";
 import type { InstanceTokens } from "@pureform/styling";
 import type { PropTypes } from "@zag-js/react";
-import { type ElementType, type ReactNode, useMemo, useState } from "react";
+import {
+    type ElementType,
+    type ReactNode,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from "react";
 
 import { useControllable } from "./controllable";
 import { useInteractionHandlers, useOwnInteractionSource } from "./interaction";
@@ -44,6 +53,13 @@ export interface CalendarContext {
     readonly selectionMode: DateSelectionMode;
     readonly locale: string;
     readonly weekStart: number;
+    /** The picker's `min` and `max` (ISO dates), which bound the year list. */
+    readonly yearBounds?:
+        | {
+              readonly min?: string | undefined;
+              readonly max?: string | undefined;
+          }
+        | undefined;
 }
 
 /** A calendar part's props: the element's own, and the part's `unstyled`. */
@@ -308,12 +324,38 @@ export function calendarParts(context: PartContext<CalendarContext>) {
             slots,
             ...props
         }: CalendarTableProps): ReactNode {
-            const { scope, picker } = context.use(name);
+            const { scope, picker, yearBounds } = context.use(name);
             const each = slots?.each("cell") ?? false;
+            // The years are one scrollable list, as Material's, anchored on the chosen date's
+            // year (or this one) so it stays put as it is used.
+            const focusedYear = picker.focusedValue.year;
             const rows =
                 view === "year"
-                    ? picker.getYearsGrid({ columns })
+                    ? [
+                          calendarYears(
+                              picker.value[0]?.year ?? new Date().getFullYear(),
+                              yearBounds ?? {},
+                              focusedYear,
+                          ).map((year) => ({
+                              value: year,
+                              label: String(year),
+                          })),
+                      ]
                     : picker.getMonthsGrid({ columns, format: "short" });
+            const opened = useRef(true);
+            useEffect(() => {
+                if (view !== "year") return;
+                const id = picker.getYearTableCellTriggerProps({
+                    value: focusedYear,
+                    columns,
+                }).id as string;
+                const cell = document.getElementById(id);
+                const list = cell?.closest<HTMLElement>('[role="grid"]');
+                if (cell && list)
+                    scrollCellIntoList(list, cell, opened.current);
+                opened.current = false;
+                // oxlint-disable-next-line react-hooks/exhaustive-deps -- follows the focused year; the picker object is new each render
+            }, [focusedYear]);
             return scope.render(part(slot), {
                 element: "div",
                 machine: picker.getTableProps({ view, columns }),

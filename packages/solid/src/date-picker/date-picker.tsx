@@ -138,6 +138,7 @@ interface PickerContextValue {
     /** The dates chosen in the calendar, not yet confirmed. */
     readonly draft: Accessor<readonly string[]>;
     readonly locale: Accessor<string>;
+    readonly yearBounds: CalendarContext["yearBounds"];
     readonly confirm: () => void;
     readonly cancel: () => void;
 }
@@ -215,6 +216,7 @@ function Picker(props: {
                 picker,
                 draft,
                 locale: () => pickerLocale(root),
+                yearBounds: () => ({ min: root.min, max: root.max }),
                 confirm,
                 cancel: () => dialog().setOpen(false),
             }}
@@ -337,10 +339,11 @@ function ViewTrigger(props: DatePickerPartProps): JSX.Element {
 }
 
 const calendar = calendarParts((name) => {
-    const { scope, picker } = pickerContext.use(name);
+    const { scope, picker, yearBounds } = pickerContext.use(name);
     return {
         scope: scope as unknown as CalendarContext["scope"],
         picker,
+        yearBounds,
     };
 });
 

@@ -75,6 +75,7 @@ interface DockedContextValue {
     readonly filled: Accessor<boolean>;
     readonly setText: (text: string) => void;
     readonly locale: Accessor<string>;
+    readonly yearBounds: CalendarContext["yearBounds"];
 }
 
 const context = createPartContext<DockedContextValue>("DockedDatePicker");
@@ -157,6 +158,7 @@ function Root(props: DockedDatePickerRootProps): JSX.Element {
                 filled: () => text() !== "" || api().value.length > 0,
                 setText,
                 locale: () => pickerLocale(props),
+                yearBounds: () => ({ min: props.min, max: props.max }),
             }}
         >
             {scope.render("root", {
@@ -333,10 +335,11 @@ const MonthButton = viewButton("monthButton", "MonthButton", "month");
 const YearButton = viewButton("yearButton", "YearButton", "year");
 
 const calendar = calendarParts((name) => {
-    const { scope, api } = context.use(name);
+    const { scope, api, yearBounds } = context.use(name);
     return {
         scope: scope as unknown as CalendarContext["scope"],
         picker: api,
+        yearBounds,
     };
 });
 

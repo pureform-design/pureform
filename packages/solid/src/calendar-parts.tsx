@@ -9,6 +9,7 @@ import type { ComponentAnatomy, PartName } from "@pureform/anatomy";
 import {
     calendarCellSelection,
     calendarCellSelectionOf,
+    calendarYears,
     isCurrentCalendarPeriod,
 } from "@pureform/binding-core";
 import type {
@@ -18,9 +19,17 @@ import type {
     Controllable,
 } from "@pureform/binding-core";
 import type { MutableInteractionSource } from "@pureform/binding-core/interaction";
+import { scrollCellIntoList } from "@pureform/binding-web";
 import * as datePicker from "@pureform/machines/date-picker";
 import type { JSX, ValidComponent } from "@solidjs/web";
-import { type Accessor, createMemo, For, merge, omit } from "solid-js";
+import {
+    type Accessor,
+    createEffect,
+    createMemo,
+    For,
+    merge,
+    omit,
+} from "solid-js";
 
 import { useControllable } from "./controllable";
 import { ChevronEndIcon, ChevronStartIcon } from "./glyphs";
@@ -35,6 +44,13 @@ import type { PartProps } from "./props";
 export interface CalendarContext {
     readonly scope: PartScope<ComponentAnatomy>;
     readonly picker: Accessor<datePicker.Api<PropTypes>>;
+    /** The picker's `min` and `max` (ISO dates), which bound the year list. */
+    readonly yearBounds?:
+        | Accessor<{
+              readonly min?: string | undefined;
+              readonly max?: string | undefined;
+          }>
+        | undefined;
 }
 
 /** A calendar part's props: the element's own, and the part's `unstyled`. */
@@ -408,32 +424,63 @@ export function calendarParts(use: (name: string) => CalendarContext) {
         );
     }
 
-    const listCells =
-        (view: "month" | "year") =>
-        (props: { readonly slots?: CalendarSlots | undefined }) => {
-            const { picker } = use("ListCells");
-            const cells = () =>
-                (view === "month"
-                    ? picker().getMonthsGrid({
-                          columns: MONTH_COLUMNS,
-                          format: "long",
-                      })
-                    : picker().getYearsGrid({ columns: YEAR_COLUMNS })
-                ).flat();
-            return (
-                <For each={cells()} keyed={false}>
-                    {(cell) => (
-                        <Cell
-                            view={view}
-                            value={cell().value}
-                            slots={props.slots}
-                        >
-                            {cell().label}
-                        </Cell>
-                    )}
-                </For>
-            );
-        };
+    // One scrollable list of years, as Material's, anchored on the chosen date's year (or this
+    // one) so it stays put as it is used. Plain numbers, so a focus move that leaves the range as
+    // it was updates no cell.
+    function YearCells(props: {
+        readonly slots?: CalendarSlots | undefined;
+    }): JSX.Element {
+        const { picker, yearBounds } = use("ListCells");
+        const years = createMemo(() =>
+            calendarYears(
+                picker().value[0]?.year ?? new Date().getFullYear(),
+                yearBounds?.() ?? {},
+                picker().focusedValue.year,
+            ),
+        );
+        let opened = true;
+        createEffect(
+            () => picker().focusedValue.year,
+            (focused) => {
+                const id = picker().getYearTableCellTriggerProps({
+                    value: focused,
+                    columns: YEAR_COLUMNS,
+                }).id as string;
+                const cell = document.getElementById(id);
+                const list = cell?.closest<HTMLElement>('[role="grid"]');
+                if (cell && list) scrollCellIntoList(list, cell, opened);
+                opened = false;
+            },
+        );
+        return (
+            <For each={years()} keyed={false}>
+                {(year) => (
+                    <Cell view="year" value={year()} slots={props.slots}>
+                        {String(year())}
+                    </Cell>
+                )}
+            </For>
+        );
+    }
+
+    function MonthCells(props: {
+        readonly slots?: CalendarSlots | undefined;
+    }): JSX.Element {
+        const { picker } = use("ListCells");
+        const cells = () =>
+            picker()
+                .getMonthsGrid({ columns: MONTH_COLUMNS, format: "long" })
+                .flat();
+        return (
+            <For each={cells()} keyed={false}>
+                {(cell) => (
+                    <Cell view="month" value={cell().value} slots={props.slots}>
+                        {cell().label}
+                    </Cell>
+                )}
+            </For>
+        );
+    }
 
     const Grid = table("grid", "Grid", { view: "day", columns: 7 });
 
@@ -454,7 +501,7 @@ export function calendarParts(use: (name: string) => CalendarContext) {
             columns: YEAR_COLUMNS,
         }),
         DayCalendar,
-        MonthCells: listCells("month"),
-        YearCells: listCells("year"),
+        MonthCells,
+        YearCells,
     };
 }

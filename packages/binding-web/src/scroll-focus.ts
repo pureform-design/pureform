@@ -36,3 +36,23 @@ export const focusableWhileOverflowing = (
         if (set) element.removeAttribute("tabindex");
     };
 };
+
+/** Scrolls `list` so `cell` shows: centred when `center` (a list just opened on it), else only as
+ *  far as it takes to show it (a key or step that moved to it). Moves `list` alone, never the
+ *  page around it, as `scrollIntoView` would. */
+export const scrollCellIntoList = (
+    list: HTMLElement,
+    cell: HTMLElement,
+    center: boolean,
+): void => {
+    const area = list.getBoundingClientRect();
+    const box = cell.getBoundingClientRect();
+    if (center) {
+        list.scrollTop +=
+            box.top - area.top - (list.clientHeight - box.height) / 2;
+    } else if (box.top < area.top) {
+        list.scrollTop -= area.top - box.top;
+    } else if (box.bottom > area.bottom) {
+        list.scrollTop += box.bottom - area.bottom;
+    }
+};
