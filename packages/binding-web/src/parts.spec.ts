@@ -309,7 +309,10 @@ describe("partSources", () => {
             machine: { style: { top: "1px", paddingTop: "2px" }, title: "m" },
             props: { style: { top: "9px" } },
         });
-        expect(sources[0]).toEqual({ title: "m", style: { paddingTop: "2px" } });
+        expect(sources[0]).toEqual({
+            title: "m",
+            style: { paddingTop: "2px" },
+        });
         expect(sources[7]).toEqual({ style: { top: "1px" } });
     });
 });

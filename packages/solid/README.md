@@ -65,7 +65,8 @@ Root ── useComponent(anatomy, { selection, testId, unstyled }) ──► use
   │          │
   │          └─ scope.render(part, { element, as, machine, states, props })
   │                 merges: machine props → data-scope/data-pf-part/data-testid → data-pf-* states
-  │                         → registry class + token style → provider slotProps → user props
+  │                         → registry class + token style → provider slotProps (owned keys
+  │                         dropped) → user props → the machine's positioning style
   └─ context { scope, api } ──► Label, Icon, … call scope.render with their part
 ```
 
