@@ -24,9 +24,9 @@ import type {
     Unstyled,
 } from "@pureform/binding-core";
 import type { InteractionSource } from "@pureform/binding-core/interaction";
-import { partSources } from "@pureform/binding-web";
+import { cx, partSources } from "@pureform/binding-web";
 import { resolveWebSlotCustomization } from "@pureform/binding-web";
-import type { WebSlotCustomization } from "@pureform/binding-web";
+import type { ClassValue, WebSlotCustomization } from "@pureform/binding-web";
 import { componentIndicationTokens } from "@pureform/binding-web/indication";
 import type { Indication } from "@pureform/binding-web/indication";
 import { indicationRoles } from "@pureform/binding-web/indication";
@@ -393,7 +393,9 @@ const onePart = (
     return combinePartProps([
         resolved.props,
         {
-            class: resolved.class,
+            // Joined here, where the merge tracks it: a class dictionary's values (`{ busy:
+            // saving() }`) would otherwise be read by the DOM's own effect, outside tracking.
+            class: cx(resolved.class as ClassValue) || undefined,
             style: resolved.style,
             // Only a copy's own `unstyled` (Root reads the rest).
             unstyled: resolved.unstyled,
