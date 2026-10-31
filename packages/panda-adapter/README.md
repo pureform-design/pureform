@@ -129,7 +129,7 @@ Through the omni MCP (or `omni run`):
 - `test:unit`: Vitest, with snapshot tests of the compiled preset and of the generated
   modules (`src/codegen.spec.ts`, which also runs `generate` with the adapter end to end).
 
-The demos (`apps/solid-demo`, `apps/react-demo`) and the browser suites' Panda fixture
+The demo (`apps/solid-demo`) and the browser suites' Panda fixture
 (`tests/panda-fixture`) regenerate their `.pureform/` with the codegen (their `generate` tasks)
 and then their `styled-system/` from this preset (their `prepare` tasks). The browser suites in
 `tests/browser-e2e-tests` compare the fixture's styles with the other adapters, and

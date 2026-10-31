@@ -13,8 +13,7 @@ components the app draws and the variant values it selects.
   `@pureform/anatomy` (anatomy names), `oxc-parser` (the scan), `@pureform/styling` and
   `@pureform/core` (types). `@pureform/styling-web` is an optional peer, for the
   `/client-web` types' `WebRegistry`; a React Native app never needs it.
-- **Depended on by:** apps' bundler configs (every app under `apps/`; `rn-web-demo` uses the Vite
-  plugin with the `native` target).
+- **Depended on by:** apps' bundler configs (every app under `apps/`).
 - Part of the core: released at the same version as `core`, `styling`, and the adapters.
 
 Design: [§6 the generated registry](../../docs/design/component-architecture.md#6-the-generated-registry),

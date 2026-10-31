@@ -61,6 +61,9 @@ tasks:
             - "./vitest.config.storybook.ts"
             - stories.config.ts
             - ".storybook/**/*"
+      output:
+        files:
+          - ".vitest/**/*"
 
   dev:
     exec: bun x storybook dev -p 6006 --no-open
@@ -74,6 +77,10 @@ tasks:
     exec: node node_modules/@pureform/cli/dist/pureform.mjs generate
     dependencies:
       - ^build
+    cache:
+      output:
+        files:
+          - ".pureform/**/*"
 
   # Writes `src/stories/generated/` (ignored) from `stories.config.ts`. Node runs the script.
   generate:stories:
@@ -94,6 +101,10 @@ tasks:
     exec: bun x panda codegen
     dependencies:
       - generate
+    cache:
+      output:
+        files:
+          - "styled-system/**/*"
 
   build:
     enabled: true

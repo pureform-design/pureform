@@ -81,6 +81,10 @@ tasks:
     exec: bun x panda codegen
     dependencies:
       - generate
+    cache:
+      output:
+        files:
+          - "styled-system/**/*"
 
   build:
     enabled: true

@@ -1,4 +1,0 @@
-{
-    "extends": ["@pureform/tsconfig/types.json", "./tsconfig.project.json"],
-    "compilerOptions": {}
-}

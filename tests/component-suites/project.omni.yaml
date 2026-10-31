@@ -43,6 +43,17 @@ tasks:
   check:types:
     enabled: false
 
+  # Writes the CSS and Tailwind targets' registries (`.pureform/`, ignored by git), which
+  # `vitest.config.e2e.ts` also writes on every run, for the type-aware lint without a test run.
+  generate:
+    exec: node scripts/generate-registries.ts
+    dependencies:
+      - ^build
+    cache:
+      output:
+        files:
+          - ".pureform/**/*"
+
   test:e2e:
     enabled: true
     # The Panda fixture's codegen writes the styled-system the registry and stylesheet import.

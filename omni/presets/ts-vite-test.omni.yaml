@@ -18,6 +18,9 @@ tasks:
           append:
             - "./vite.config.ts"
             - "./vitest.config.e2e.ts"
+      output:
+        files:
+          - ".vitest/**/*"
 
   test:service:
     enabled: false
@@ -28,6 +31,9 @@ tasks:
           append:
             - "./vite.config.ts"
             - "./vitest.config.service.ts"
+      output:
+        files:
+          - ".vitest/**/*"
 
   test:unit:
     enabled: false
