@@ -9,7 +9,7 @@ doesn't pull in the plugin.
 
 - **Depends on:** `@pureform/generate` (generation, config discovery, the watcher), `jiti`
   (loading the codegen file), `@pureform/bundler` (the usage scan behind `--prune`).
-- **Depended on by:** apps' and fixtures' scripts (`apps/solid-demo`, `apps/react-demo`,
+- **Depended on by:** apps' and fixtures' scripts (`apps/solid-demo`,
   `tests/panda-fixture`: their omni `generate` tasks).
 - Part of the core: released at the same version as `core`, `styling`, and the adapters.
 

@@ -26,7 +26,7 @@ lower to CSS; this one lowers the same AST to style templates that React Native 
 ## Where it sits
 
 ```
-@pureform/core ──► @pureform/rn-adapter ──► @pureform/react-native ──► apps/rn-web-demo
+@pureform/core ──► @pureform/rn-adapter ──► @pureform/react-native ──► apps/storybook-web
 @pureform/preset (tests and demos)
 ```
 

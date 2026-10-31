@@ -16,8 +16,7 @@ A bun + omni monorepo. Each package's README says what it is, what it depends on
 | Bindings  | [`styling`](packages/styling/README.md), [`anatomy`](packages/anatomy/README.md), [`machines`](packages/machines/README.md), [`js-effects`](packages/js-effects/README.md), [`binding-core`](packages/binding-core/README.md), [`binding-web`](packages/binding-web/README.md), [`solid`](packages/solid/README.md), [`react`](packages/react/README.md), [`react-native`](packages/react-native/README.md) |
 | Tooling   | [`component-cases`](packages/component-cases/README.md), [`vitest-config`](packages/vitest-config/README.md), [`release`](packages/release/README.md)                                                                                                                                                                                                                                                       |
 
-Demos live in `apps/` ([`css-demo`](apps/css-demo/README.md), [`react-demo`](apps/react-demo/README.md),
-[`rn-web-demo`](apps/rn-web-demo/README.md), [`solid-demo`](apps/solid-demo/README.md),
+Demos live in `apps/` ([`solid-demo`](apps/solid-demo/README.md),
 [`tailwind-demo`](apps/tailwind-demo/README.md), [`storybook-web`](apps/storybook-web/README.md)).
 
 ## Getting started

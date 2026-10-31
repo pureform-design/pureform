@@ -29,7 +29,7 @@ where React Native allows.
   peers, `@pureform/styling` (the registry) and `@pureform/rn-adapter` (the factories' runtime,
   the hooks that select and animate, and the engines' drawing). Both peers are core
   packages the app's generated registry imports too, so the app and the binding share one copy.
-- **Depended on by:** `apps/rn-web-demo`.
+- **Depended on by:** `apps/storybook-web`.
 - No Zag: React Native has no DOM for its machines. `Pressable`'s callbacks emit each
   component's press, hover, and focus to its interaction source, as a machine does on the web,
   and controlled state goes through `useControllable`.
@@ -315,8 +315,6 @@ trigger shows their labels joined by ", " (the placeholder when none):
   controlled value; a change mid-slide starts from where it had got to; reduced motion changes at
   once; a resize keeps it aligned). Node-side commands (`src/testing/commands.ts`) precompute the
   preset's styles for a test registry.
-- `apps/rn-web-demo`'s `test:e2e` renders the whole demo page from this package, and opens and
-  dismisses each overlay.
 
 ## Worth knowing
 
