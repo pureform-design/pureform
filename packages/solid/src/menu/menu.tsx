@@ -51,6 +51,7 @@ import {
     menuSubmenuPressed,
     menuSubmenuBoundary,
     menuSubmenuRoom,
+    watchScroll,
     noteMenuSubmenuPresses,
     springRoleVar,
 } from "@pureform/binding-web";
@@ -790,9 +791,11 @@ function AutoSubmenu(props: { readonly value: string }): JSX.Element {
                 observer.observe(menu);
                 observer.observe(submenu);
                 window.addEventListener("resize", watch);
+                const unscroll = watchScroll(watch);
                 const stop = () => {
                     observer.disconnect();
                     window.removeEventListener("resize", watch);
+                    unscroll();
                 };
                 return stop;
             }
@@ -992,9 +995,11 @@ function ReadyMade(props: MenuProps): JSX.Element {
                 )
                     observer.observe(element);
             window.addEventListener("resize", check);
+            const unscroll = watchScroll(check);
             return () => {
                 observer.disconnect();
                 window.removeEventListener("resize", check);
+                unscroll();
             };
         },
     );

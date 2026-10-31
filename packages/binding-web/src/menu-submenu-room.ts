@@ -96,3 +96,28 @@ export const noteMenuSubmenuPresses = (): void => {
     doc.addEventListener("pointerdown", notePress, true);
     doc.addEventListener("keydown", notePress, true);
 };
+
+/** Calls `watch` after anything on the page scrolls (a panel that carries the menu with it),
+ *  once the menu's position has followed: two frames on, and no more often than that. Returns
+ *  what stops it. The scroll of any element is heard, as scrolling doesn't bubble. */
+export const watchScroll = (watch: () => void): (() => void) => {
+    let frame = 0;
+    const listener = () => {
+        if (frame) return;
+        frame = requestAnimationFrame(() => {
+            frame = requestAnimationFrame(() => {
+                frame = 0;
+                watch();
+            });
+        });
+    };
+    window.addEventListener("scroll", listener, {
+        capture: true,
+        passive: true,
+    });
+    return () => {
+        window.removeEventListener("scroll", listener, { capture: true });
+        if (frame) cancelAnimationFrame(frame);
+        frame = 0;
+    };
+};

@@ -718,6 +718,44 @@ describe("Menu, submenus", () => {
         expect(contents()[1]!.textContent).toContain("Mail");
     });
 
+    it("drills the open submenu when a scrolling panel carries the menu away from the edges", async () => {
+        await userEvent.keyboard("{Escape}{Escape}");
+        document.body.innerHTML = "";
+        // Only 190px wide: a 60px menu leaves room for the 69px submenu beside it only while it
+        // sits near an edge, and not once it is in the middle.
+        withRegistry(() => (
+            <div
+                id="panel"
+                style={{ width: "190px", height: "300px", overflow: "auto" }}
+            >
+                <div style={{ width: "1000px", "padding-left": "400px" }}>
+                    <Menu trigger="Edit" items={NESTED} />
+                </div>
+            </div>
+        ));
+        const panel = document.getElementById("panel")!;
+        panel.scrollLeft = 400;
+        await frames(4);
+        await userEvent.click(byTestId(ids.trigger));
+        await frames(4);
+        await userEvent.keyboard("{ArrowDown}{ArrowDown}");
+        await settle();
+        await userEvent.keyboard("{ArrowRight}");
+        await frames(4);
+        expect(cascaded()).toBe(true);
+        panel.scrollLeft = 335;
+        await until(() => expect(contents()).toHaveLength(1));
+        expect(labels()).toEqual(["Share", "Mail", "Copy link"]);
+        expect(document.activeElement).toBe(contents()[0]);
+        // Scrolled back to an edge, the room returns: beside the menu again, still open.
+        panel.scrollLeft = 400;
+        await until(() => expect(contents()).toHaveLength(2));
+        expect(cascaded()).toBe(true);
+        // The keys go on in the submenu that opened beside the menu.
+        await frames(4);
+        expect(document.activeElement).toBe(contents()[1]);
+    });
+
     it("measures the submenu's own width and height as it opens", async () => {
         const wide = [
             NESTED[0]!,

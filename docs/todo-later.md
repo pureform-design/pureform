@@ -10,9 +10,9 @@ results and recordings.
 
 - **Page transitions:** Native device carry (the native driver reports values asynchronously, so
   verify on devices, V3).
-- **Live auto-submenu:** drills deeper than one level stay until backed out; scroll-driven changes;
-  keyboard focus returning into a re-opened cascade; tune the 16px stability margin
-  (`MENU_SUBMENU_MARGIN`); Native device measurement (V3).
+- **Live auto-submenu:** drills deeper than one level stay until backed out, by design (a drill into
+  a deeper level isn't re-cascaded while it's open); tune the 16px stability margin
+  (`MENU_SUBMENU_MARGIN`) against real layouts; Native device measurement (V3).
 - **Select multiple:** screen-reader verification (V4); Native device keyboard/touch (V3). Searchable
   options and chips are out of scope.
 - **Native wave, drill and FAB menu:** frame rates and RTL mirroring on devices (V3).

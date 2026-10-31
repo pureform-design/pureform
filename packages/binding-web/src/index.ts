@@ -362,6 +362,7 @@ export {
     menuSubmenuBoundary,
     menuSubmenuPressed,
     menuSubmenuRoom,
+    watchScroll,
     noteMenuSubmenuPresses,
 } from "./menu-submenu-room";
 export { revealInRow } from "./reveal";
