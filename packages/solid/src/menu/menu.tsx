@@ -789,7 +789,13 @@ function AutoSubmenu(props: { readonly value: string }): JSX.Element {
                         element;
                         element = element.parentElement
                     )
-                        observer.observe(element);
+                        // The page itself changes size with the window, which `resize` hears; observing it too
+                        // makes the browser report a ResizeObserver loop.
+                        if (
+                            element !== document.documentElement &&
+                            element !== document.body
+                        )
+                            observer.observe(element);
                     observer.observe(menu);
                     observer.observe(submenu);
                     window.addEventListener("resize", watch);
@@ -995,7 +1001,13 @@ function ReadyMade(props: MenuProps): JSX.Element {
                     element;
                     element = element.parentElement
                 )
-                    observer.observe(element);
+                    // The page itself changes size with the window, which `resize` hears; observing it too
+                    // makes the browser report a ResizeObserver loop.
+                    if (
+                        element !== document.documentElement &&
+                        element !== document.body
+                    )
+                        observer.observe(element);
             window.addEventListener("resize", check);
             const unscroll = watchScroll(check);
             return () => {
