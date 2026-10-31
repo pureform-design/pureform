@@ -121,65 +121,15 @@ different elements in each vocabulary, so any union is ambiguous.
 - **Native:** `NativeProviderSlotProps` drops the `RemappedHosts` slot remap. Components read
   `provided` through the same part key as the instance, so `overlayKeys` also serves the provider.
   Parts Native lacks stay absent from its type.
-- **Old keys:** no silent acceptance. A development-only warning names the new key when a
-  provider uses a slot name that was renamed (`dialog.root` to `dialog.content`). It does not
-  apply the style.
-- **Order of merge:** unchanged (machine, anatomy attributes, state attributes, registry classes,
-  provider, instance). Handler and style precedence therefore don't move.
-
-### Risks checked
-
-- **Accessibility:** a provider can now set props on the unstyled wrapper, trigger or positioner.
-  It already could on instances, and it merges before the instance, so ARIA from the machine
-  can be overridden the same way. No new capability beyond the instance's.
-- **Reactivity and SSR/hydration:** keys resolve at render from the provider's object (compared by
-  identity); nothing is stored or measured, so server and client render the same.
-- **Structural parts:** unaffected; `parent` and `children` still come from the AST.
-- **Registry and theme authoring:** unchanged, still slot-keyed (`components.dialog.root`).
-
-### Specs and prose to update
-
-The four specs in 3.5 change their keys (`dialog.root` to `dialog.content`, `scrim.root` to
-`dialog.backdrop` once decision 2 is made, and so on), and the two docs in 3.5 are rewritten.
-
-### Tests the change needs
-
-1. Anatomy: for every part, the provider key resolves to the same element the instance key does.
-2. Web and Native: a provider prop on `content`, on `body` (sheets), and on an unstyled
-   `positioner` reaches the right element; the old `root` key warns and styles nothing.
-3. Type tests: old slot keys are rejected, composites' unstyled parts are accepted on web only.
-4. Existing provider specs pass unchanged for non-composite components.
-
-## 6. Decisions needed
-
-1. **Hard switch or a deprecation window?** Recommended: hard switch, given the pre-release
-   versions and no in-repo users. A window would need the ambiguous-key rule in 3.2 resolved first.
-2. **Per-owner `backdrop` and `cell` provider keys.** Today they are only reachable as `scrim` and
-   `calendarCell`, shared. Recommended: add `dialog.backdrop`, `datePicker.cell`, and so on, merged
-   after the shared key and before the instance's. Without this, F3 leaves them asymmetrical.
-3. **Expose unstyled parts to the provider on web?** Recommended yes, for parity with the
-   instance; Native keeps only its own hosts.
-
-## 7. What shipped
-
-- **Contract:** `ProviderPartOf<N>` in `@pureform/anatomy` (the parts as the bindings render
-  them, plus the owned `backdrop` and `cell`), `owner` on the four backdrop anatomies, and
-  `ProviderSlotProps` keyed by it. `partSources` reads `slotProps[component][part]`, then the
-  owner's key, ahead of the user's props. A render can name an `owner` (a picker's cells).
-- **Native:** `provided[keyOf(part)]`, so overlays' `content`/`body` and the rest read as the
-  instance does; `useNativeScrimSlots(owner)` merges `scrim.root` then the owner's `backdrop` (or
-  `scrim` for the rail). `NativeProviderSlotProps` is the hosts' own keys, so `dialog.root` is a
-  compile error there.
-- **Old keys:** no dual acceptance. In development `legacyProviderKeyMessages` names the new key
-  once per stale key; `root` (and a sheet's `content`) are still parts, so it is a message and not
-  an error. It can be removed when no consumer predates the switch.
+- **Old keys:** no dual acceptance and no warning; the dev-only message that named stale keys
+  was removed once nothing predated the switch. `root` and a sheet's `content` are still parts,
+  so a stale key now styles the part of that name.
 - **Specs:** the four that encoded the old contract now state the new one, with new cases for the
-  wrapper, the positioner, per-owner backdrop and cell, precedence, and the warning.
+  wrapper, the positioner, per-owner backdrop and cell, and precedence.
 
 ### Left open
 
 - **Native tabs:** the web's tab list is `list` and its wrapper `root`; Native's Tabs has no
   wrapper, so its list is `root` and its test id `pf-tabs-root`. The shared tabs case finds
   `pf-tabs-root` on both platforms, so renaming Native's is a parity decision of its own (give it a
-  wrapper, or rename the web's), not part of the provider switch. The dev message skips Native's
-  tabs for this reason.
+  wrapper, or rename the web's), not part of the provider switch.

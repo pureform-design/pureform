@@ -9,7 +9,6 @@ import {
     resolveReducedMotion,
     ROOT_PROVIDER,
     trainVersionMismatch,
-    legacyProviderKeyMessages,
     warnOnce,
 } from "@pureform/binding-core";
 import type {
@@ -398,15 +397,6 @@ export function PureformProvider(props: PureformProviderProps): ReactNode {
         const message = trainVersionMismatch(state.registry);
         if (message) warnOnce(message);
     }, [state.registry]);
-    useEffect(() => {
-        if (!isDev) return;
-        // Native has no wrapper `root` around an overlay, and its tabs' `root` is their list.
-        for (const message of legacyProviderKeyMessages(props.slotProps, {
-            wrapper: false,
-            keeps: (component) => component === "tabs",
-        }))
-            warnOnce(message);
-    }, [props.slotProps]);
     const reducedMotion = resolveReducedMotion(
         state.motion,
         useSystemReducedMotion(state.motion === "system"),

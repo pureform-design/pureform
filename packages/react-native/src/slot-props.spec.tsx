@@ -284,32 +284,6 @@ describe("keyed style and slotProps", () => {
         expect(computed("dim").opacity).toBe("0.8");
     });
 
-    it("says in development when a provider still keys an overlay by its preset slot, not for Native's own tabs", async () => {
-        const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-        try {
-            await render(
-                <PureformProvider
-                    slotProps={
-                        {
-                            popover: { root: { style: { margin: 1 } } },
-                            tabs: { root: { style: { margin: 1 } } },
-                            dialog: { content: { style: { margin: 1 } } },
-                        } as never
-                    }
-                >
-                    <View />
-                </PureformProvider>,
-            );
-            const said = warn.mock.calls.map((call) => String(call[0]));
-            expect(said).toHaveLength(1);
-            expect(said[0]).toContain("slotProps.popover.root");
-            expect(said[0]).toContain("slotProps.popover.content");
-            expect(said[0]).toContain("isn't a part on this platform");
-        } finally {
-            warn.mockRestore();
-        }
-    });
-
     it("reacts to provider replacement and removal without resetting instance state", async () => {
         const value = outside(3);
         const calls: string[] = [];

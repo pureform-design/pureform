@@ -142,7 +142,6 @@ partTestId(buttonAnatomy, "label", { root: "save" }); // "pf-button-label"
 | `TEST_ID_PREFIX`                                                                   | `"pf"`, the portable default test-id prefix.                     |
 | `kebabCase(name)`                                                                  | `touchTarget` → `touch-target`.                                  |
 | `partSlot(part)`                                                                   | The registry slot a part is drawn by: its `slot`, else its name. |
-| `renamedSlotPart(component, key)`                                                  | The part that took over a preset slot's name as a provider key.  |
 | `ComponentAnatomy`, `PartAnatomy`, `IndicationAnatomy`, `PartName<A>`, `ExtraPart` | The shape.                                                       |
 | `Anatomies`, `AnatomyName`, `PartOf<N>`                                            | Types over the preset's components: `PartOf<"button">`.          |
 | `ProviderPartOf<N>`                                                                | The part names a provider and an instance address `N` by.        |

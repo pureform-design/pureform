@@ -10,7 +10,6 @@ import {
     resolveProvider,
     ROOT_PROVIDER,
     trainVersionMismatch,
-    legacyProviderKeyMessages,
     warnOnce,
 } from "@pureform/binding-core";
 import type { Direction, MotionSetting } from "@pureform/binding-core";
@@ -144,11 +143,6 @@ export function PureformProvider({
         const message = trainVersionMismatch(registry);
         if (message) warnOnce(message);
     }, [registry]);
-    useEffect(() => {
-        if (!isDev) return;
-        for (const message of legacyProviderKeyMessages(slotProps))
-            warnOnce(message);
-    }, [slotProps]);
     const block = useThemeBlock(theme, state.registry, state.hydrate);
     const vars = useMemo(() => {
         // The indication's theme-level tokens, under the provider's own overrides.

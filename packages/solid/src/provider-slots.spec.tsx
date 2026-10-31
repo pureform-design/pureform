@@ -1,5 +1,5 @@
 import { createSignal, flush } from "solid-js";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { PureformProvider } from ".";
@@ -142,30 +142,5 @@ describe("provider slot customization contract", () => {
         ));
         await settle();
         expect(byTestId("pf-dialog-backdrop").style.opacity).toBe("0.8");
-    });
-
-    it("says in development when a provider still keys a component by its preset slot", async () => {
-        const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-        try {
-            mount(() => (
-                <PureformProvider
-                    registry={overlaysRegistry()}
-                    slotProps={{
-                        sideSheet: { content: { style: { margin: "1px" } } },
-                        // Parts, not slots: nothing to say about these.
-                        dialog: { content: { style: { margin: "1px" } } },
-                    }}
-                >
-                    <div />
-                </PureformProvider>
-            ));
-            await settle();
-            const said = warn.mock.calls.map((call) => String(call[0]));
-            expect(said).toHaveLength(1);
-            expect(said[0]).toContain("slotProps.sideSheet.content");
-            expect(said[0]).toContain("slotProps.sideSheet.body");
-        } finally {
-            warn.mockRestore();
-        }
     });
 });
