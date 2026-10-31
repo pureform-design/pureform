@@ -1,0 +1,163 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    # workspace tags only (v1.2.3), not per-package tags (package-v1.2.3)
+    tags:
+      - "v*.*.*"
+      - "!*-v*.*.*"
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+
+jobs:
+  commits:
+    name: Check Commits
+    if: ${{ github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Conventional Commits Check
+        uses: cocogitto/cocogitto-action@v4.2.0
+        with:
+          command: check
+
+  check:
+    name: Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Workspace
+        uses: ./.github/actions/setup-workspace
+        with:
+          cache-key-prefix: check
+          cache-restore-key-prefixes: |
+            build
+            test
+
+      - name: Check (format, lint, types)
+        run: omni -i run -f=failed check
+
+      - name: Prune stale caches
+        run: omni -i cache prune -sy -o="7d"
+
+  build:
+    name: Build
+    needs: [check]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Workspace
+        uses: ./.github/actions/setup-workspace
+        with:
+          cache-key-prefix: build
+          cache-restore-key-prefixes: |
+            check
+            test
+
+      - name: Build
+        run: omni -i run -f=failed build
+
+      - name: Upload build outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          retention-days: 7
+          if-no-files-found: ignore
+          path: |
+            packages/*/dist
+            apps/*/dist
+            apps/storybook-web/storybook-static
+
+      - name: Prune stale caches
+        run: omni -i cache prune -sy -o="7d"
+
+  test:
+    name: Test
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Workspace
+        uses: ./.github/actions/setup-workspace
+        with:
+          cache-key-prefix: test
+          cache-restore-key-prefixes: |
+            build
+            check
+          install-playwright: "true"
+
+      - name: Test
+        run: omni -i run -f=failed test
+
+      - name: Prune stale caches
+        run: omni -i cache prune -sy -o="7d"
+
+  # Disabled until the PUBLISH_ENABLED repo variable is set to "true" (and a version tag is pushed).
+  publish:
+    name: Publish
+    needs: [test]
+    if: ${{ vars.PUBLISH_ENABLED == 'true' && startsWith(github.ref, 'refs/tags/') }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Workspace
+        uses: ./.github/actions/setup-workspace
+        with:
+          cache-key-prefix: publish
+          cache-restore-key-prefixes: |
+            build
+            test
+
+      - name: Publish
+        run: omni -i run -f=failed publish
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  # The ONLY status check to require in the `main` branch protection / ruleset.
+  # Skipped jobs (publish on PRs, commits on pushes) must not fail the gate.
+  ci-gatekeeper:
+    name: CI Passed
+    needs: [commits, check, build, test, publish]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Evaluate upstream job results
+        uses: actions/github-script@v8
+        env:
+          RESULTS_JSON: |
+            {
+              "commits": "${{ needs.commits.result }}",
+              "check": "${{ needs.check.result }}",
+              "build": "${{ needs.build.result }}",
+              "test": "${{ needs.test.result }}",
+              "publish": "${{ needs.publish.result }}"
+            }
+        with:
+          script: |
+            const results = JSON.parse(process.env.RESULTS_JSON);
+            const failed = Object.entries(results)
+              .filter(([, r]) => r === 'failure' || r === 'cancelled')
+              .map(([name, r]) => `${name}: ${r}`);
+            for (const [name, r] of Object.entries(results)) core.info(`${name}: ${r}`);
+            if (failed.length) core.setFailed(`Upstream jobs did not pass:\n${failed.join('\n')}`);
