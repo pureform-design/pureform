@@ -150,16 +150,20 @@ describe("provider slot customization contract", () => {
     });
 
     it("keeps the keys a component owns from a provider, and leaves the ones a user may set", async () => {
+        // Keys the types leave out, passed through to reach the runtime check.
+        const untyped1: object = { "aria-pressed": false };
+        // Keys the types leave out, passed through to reach the runtime check.
+        const untyped2: object = { "data-testid": "provided" };
         mount(
             <PureformProvider
                 registry={overlaysRegistry()}
                 slotProps={{
                     button: {
                         root: {
-                            ...{ "aria-pressed": false },
+                            ...untyped1,
                             role: "link",
                             title: "from the provider",
-                            ...{ "data-testid": "provided" },
+                            ...untyped2,
                         },
                     },
                 }}

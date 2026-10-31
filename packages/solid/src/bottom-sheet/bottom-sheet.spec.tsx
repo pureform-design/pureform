@@ -205,8 +205,8 @@ describe("BottomSheet, ready-made", () => {
                     expanded={expanded()}
                     onExpandedChange={onExpandedChange}
                     // This registry doesn't bound the body; the preset does.
-                    // oxlint-disable-next-line solid/style-prop -- a part-keyed style record, not CSS properties
                     style={{
+                        // oxlint-disable-next-line solid/style-prop -- a part-keyed style record, not CSS properties
                         body: { "max-height": "70vh", overflow: "auto" },
                     }}
                 />

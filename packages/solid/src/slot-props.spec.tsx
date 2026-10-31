@@ -66,10 +66,15 @@ describe("createSlotProps", () => {
         ));
         const label = byTestId("label");
         const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+        // Keys the types leave out, passed through to reach the runtime check.
+        const untyped1: object = {
+            class: "slot",
+            style: { "margin-top": "4px" },
+        };
         setOverrides({
             label: {
                 title: "added",
-                ...{ class: "slot", style: { "margin-top": "4px" } },
+                ...untyped1,
             },
         });
         flush();

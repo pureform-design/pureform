@@ -28,6 +28,7 @@ const render = (
             <Carousel
                 aria-label="Trips"
                 items={ITEMS}
+                // oxlint-disable-next-line solid/style-prop -- a part-keyed style record, not CSS properties
                 style={{ itemGroup: ROW }}
                 {...props}
             />
@@ -156,6 +157,7 @@ describe("Carousel", () => {
                         itemGroup: "row",
                     }}
                     style={{
+                        // oxlint-disable-next-line solid/style-prop -- a part-keyed style record, not CSS properties
                         itemGroup: ROW,
                         content: (item) => ({
                             opacity: item.index === 1 ? 0.5 : 1,
