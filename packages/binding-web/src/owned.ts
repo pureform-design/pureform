@@ -68,7 +68,8 @@ export interface MachineSplit {
 }
 
 export const splitMachine = (machine: Dict | undefined): MachineSplit => {
-    if (!machine) return { rest: undefined, owned: undefined, style: undefined };
+    if (!machine)
+        return { rest: undefined, owned: undefined, style: undefined };
     const rest: Record<string, unknown> = {};
     const owned: Record<string, unknown> = {};
     let style: Dict | undefined;
