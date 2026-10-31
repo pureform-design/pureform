@@ -35,9 +35,9 @@
         "zod": "catalog:"
     },
     "devDependencies": {
-        "@{{ vars.scope_name }}/tsconfig": "catalog:",
-        "@{{ vars.scope_name }}/vite-config": "catalog:",
-        "@{{ vars.scope_name }}/vitest-config": "catalog:",
+        "@{{ vars.scope_name }}/tsconfig": "workspace:^",
+        "@{{ vars.scope_name }}/vite-config": "workspace:^",
+        "@{{ vars.scope_name }}/vitest-config": "workspace:^",
         "vite": "catalog:",
         "vitest": "catalog:",
         {% if inputs.package_type == 'script' %}
