@@ -11,7 +11,7 @@ import type {
 } from "@pureform/binding-core";
 import * as snackbar from "@pureform/machines/snackbar";
 import type { JSX } from "@solidjs/web";
-import { createEffect, createSignal, For } from "solid-js";
+import { createEffect, createSignal, For, untrack } from "solid-js";
 
 import { Snackbar } from "./snackbar";
 
@@ -43,14 +43,16 @@ export interface SnackbarHostProps extends SnackbarHostPlacementProps<string> {
  *  `offset`. */
 export function SnackbarHost(props: SnackbarHostProps): JSX.Element {
     const queue = () => props.queue.queue;
-    const [items, setItems] = createSignal(queue().items(), {
+    const [items, setItems] = createSignal(untrack(queue).items(), {
         equals: false,
     });
     // A new queue is followed, as React's `useSyncExternalStore` does: its items, then its changes.
-    createEffect(queue, (current) => {
-        setItems(current.items());
-        return current.subscribe(() => setItems(current.items()));
-    });
+    createEffect(queue, (current) =>
+        untrack(() => {
+            setItems(current.items());
+            return current.subscribe(() => setItems(current.items()));
+        }),
+    );
     const shown = () => items().slice(0, 1);
     return (
         <div
@@ -65,8 +67,8 @@ export function SnackbarHost(props: SnackbarHostProps): JSX.Element {
         >
             <For each={shown()} keyed={(item) => item.id}>
                 {(item) => {
-                    // oxlint-disable-next-line solid/reactivity -- For is keyed by id, so a row's id never changes
-                    const { id } = item();
+                    // For is keyed by id, so a row's id never changes.
+                    const { id } = untrack(item);
                     return (
                         <Snackbar
                             {...item().options}

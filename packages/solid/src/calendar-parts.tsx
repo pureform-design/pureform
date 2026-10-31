@@ -31,6 +31,7 @@ import {
     For,
     merge,
     omit,
+    untrack,
 } from "solid-js";
 
 import { useControllable } from "./controllable";
@@ -453,16 +454,18 @@ export function calendarParts(use: (name: string) => CalendarContext) {
         let opened = true;
         createEffect(
             () => picker().focusedValue.year,
-            (focused) => {
-                const id = picker().getYearTableCellTriggerProps({
-                    value: focused,
-                    columns: YEAR_COLUMNS,
-                }).id as string;
-                const cell = document.getElementById(id);
-                const list = cell?.closest<HTMLElement>('[role="grid"]');
-                if (cell && list) scrollCellIntoList(list, cell, opened);
-                opened = false;
-            },
+            (focused) =>
+                // The api's methods read the machine's props for their current values.
+                untrack(() => {
+                    const id = picker().getYearTableCellTriggerProps({
+                        value: focused,
+                        columns: YEAR_COLUMNS,
+                    }).id as string;
+                    const cell = document.getElementById(id);
+                    const list = cell?.closest<HTMLElement>('[role="grid"]');
+                    if (cell && list) scrollCellIntoList(list, cell, opened);
+                    opened = false;
+                }),
         );
         return (
             <For each={years()} keyed={false}>

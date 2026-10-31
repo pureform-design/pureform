@@ -6,10 +6,18 @@ import { isFunction } from "@zag-js/utils";
 import {
     type Accessor,
     createMemo,
+    getObserver,
     createSignal,
     onCleanup,
     untrack,
 } from "solid-js";
+
+/** Reads `read` where something tracks it, and untracked where nothing does (an effect's callback
+ *  or a handler running a machine's action), which wants the current value and no dependency. The
+ *  machine's own reads go through this, so Solid's strict-read check still speaks for the reads
+ *  components make. */
+export const readNow = <T>(read: () => T): T =>
+    getObserver() ? read() : untrack(read);
 
 let latestReads = 0;
 
@@ -43,11 +51,11 @@ export function createBindable<T>(
     const controlled = createMemo(() => props().value !== undefined);
 
     const read = (): T =>
-        controlled()
-            ? (props().value as T)
+        readNow(controlled)
+            ? (readNow(props).value as T)
             : latestReads > 0
               ? latest
-              : value().v;
+              : readNow(value).v;
 
     const set = (v: T | ((prev: T) => T)) => {
         // An update reads the last write, not the value Solid shows until the next flush, so

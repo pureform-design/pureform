@@ -42,7 +42,7 @@ import {
     untrack,
 } from "solid-js";
 
-import { createBindable, readingLatest } from "./bindable";
+import { createBindable, readingLatest, readNow } from "./bindable";
 import { createRefs } from "./refs";
 import { createTracker } from "./track";
 
@@ -69,7 +69,7 @@ export function useMachine<T extends MachineSchema>(
         () =>
             machine.props?.({
                 props: compact(access(userProps)),
-                scope: scope(),
+                scope: readNow(scope),
             }) ?? access(userProps),
     );
     const prop: any = createProp(props);
@@ -84,7 +84,7 @@ export function useMachine<T extends MachineSchema>(
             prop,
             bindable: createBindable as any,
             get scope() {
-                return scope();
+                return readNow(scope);
             },
             flush,
             getContext() {
@@ -168,7 +168,7 @@ export function useMachine<T extends MachineSchema>(
         computed,
         flush,
         get scope() {
-            return scope();
+            return readNow(scope);
         },
         choose,
     });
@@ -232,7 +232,7 @@ export function useMachine<T extends MachineSchema>(
             event,
             prop,
             refs,
-            scope: scope(),
+            scope: readNow(scope),
             computed,
         });
     };
@@ -276,7 +276,11 @@ export function useMachine<T extends MachineSchema>(
         const started = status === MachineStatus.Started;
         status = MachineStatus.Started;
         debug(started ? "rehydrating..." : "initializing...");
-        tracker.run(() => state.invoke(state.initial!, INIT_STATE as any));
+        // The machine's entry actions and effects read its props and context for their current
+        // values, which isn't a dependency of this callback.
+        untrack(() =>
+            tracker.run(() => state.invoke(state.initial!, INIT_STATE as any)),
+        );
     });
 
     onCleanup(() => {
@@ -344,7 +348,7 @@ export function useMachine<T extends MachineSchema>(
         context: ctx,
         prop,
         get scope() {
-            return scope();
+            return readNow(scope);
         },
         refs,
         computed,
@@ -363,6 +367,6 @@ function access<T>(value: T | Accessor<T>): T {
 
 function createProp<T>(value: Accessor<T>) {
     return function get<K extends keyof T>(key: K): T[K] {
-        return value()[key];
+        return readNow(value)[key];
     };
 }

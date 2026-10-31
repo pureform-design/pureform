@@ -735,79 +735,81 @@ function AutoSubmenu(props: { readonly value: string }): JSX.Element {
     noteMenuSubmenuPresses();
     createEffect(
         () => child.api().open,
-        (open) => {
-            if (!open || !untrack(auto.active)) return;
-            const api = untrack(child.api);
-            const byId = (id: unknown) =>
-                typeof id === "string" ? document.getElementById(id) : null;
-            const submenu = byId(api.getContentProps().id);
-            const menu = byId(untrack(parent.api).getContentProps().id);
-            const row = byId(api.getTriggerProps().id);
-            if (!submenu || !menu || !row) return;
-            submenu.style.visibility = "";
-            let top: MenuContextValue = parent;
-            while (top.parent) top = top.parent;
-            const anchor = byId(untrack(top.api).getTriggerProps().id);
-            const room = () =>
-                menuSubmenuRoom(
-                    menu,
-                    row,
-                    submenu,
-                    anchor,
-                    untrack(auto.container),
-                );
-            const remember = () => {
-                const box = menu.getBoundingClientRect();
-                const at = row.getBoundingClientRect();
-                auto.remember(props.value, {
-                    anchor,
-                    menuWidth: box.width,
-                    rowTop: at.top - box.top,
-                    rowBottom: at.bottom - box.top,
-                    size: submenu.getBoundingClientRect(),
-                });
-            };
-            if (menuSubmenuMode("auto", room()) === "cascade") {
-                // Cascading: watched while it's open, so it drills if the room goes (a
-                // narrowing window, a growing submenu or menu, a moving panel), keeping the
-                // submenu and the keys.
-                const watch = () => {
-                    if (!submenu.isConnected || !menu.isConnected) return;
-                    if (menuSubmenuAdapt("cascade", room()) === "cascade")
-                        return;
-                    stop();
-                    remember();
-                    submenu.style.visibility = "hidden";
-                    auto.drill(props.value, true);
-                    menu.focus();
+        // The measuring reads what it needs now (props, the api's ids), none of it a dependency.
+        (open) =>
+            untrack(() => {
+                if (!open || !untrack(auto.active)) return;
+                const api = untrack(child.api);
+                const byId = (id: unknown) =>
+                    typeof id === "string" ? document.getElementById(id) : null;
+                const submenu = byId(api.getContentProps().id);
+                const menu = byId(untrack(parent.api).getContentProps().id);
+                const row = byId(api.getTriggerProps().id);
+                if (!submenu || !menu || !row) return;
+                submenu.style.visibility = "";
+                let top: MenuContextValue = parent;
+                while (top.parent) top = top.parent;
+                const anchor = byId(untrack(top.api).getTriggerProps().id);
+                const room = () =>
+                    menuSubmenuRoom(
+                        menu,
+                        row,
+                        submenu,
+                        anchor,
+                        untrack(auto.container),
+                    );
+                const remember = () => {
+                    const box = menu.getBoundingClientRect();
+                    const at = row.getBoundingClientRect();
+                    auto.remember(props.value, {
+                        anchor,
+                        menuWidth: box.width,
+                        rowTop: at.top - box.top,
+                        rowBottom: at.bottom - box.top,
+                        size: submenu.getBoundingClientRect(),
+                    });
                 };
-                const observer = new ResizeObserver(watch);
-                for (
-                    let element: Element | null = anchor;
-                    element;
-                    element = element.parentElement
-                )
-                    observer.observe(element);
-                observer.observe(menu);
-                observer.observe(submenu);
-                window.addEventListener("resize", watch);
-                const unscroll = watchScroll(watch);
-                const stop = () => {
-                    observer.disconnect();
-                    window.removeEventListener("resize", watch);
-                    unscroll();
-                };
-                return stop;
-            }
-            remember();
-            // Hidden from now, so its way out isn't seen.
-            submenu.style.visibility = "hidden";
-            // Its item drills from now on (so the submenu goes), at once when it was pressed.
-            const pressed = menuSubmenuPressed(row, menu);
-            auto.drill(props.value, pressed);
-            if (pressed) menu.focus();
-            return undefined;
-        },
+                if (menuSubmenuMode("auto", room()) === "cascade") {
+                    // Cascading: watched while it's open, so it drills if the room goes (a
+                    // narrowing window, a growing submenu or menu, a moving panel), keeping the
+                    // submenu and the keys.
+                    const watch = () => {
+                        if (!submenu.isConnected || !menu.isConnected) return;
+                        if (menuSubmenuAdapt("cascade", room()) === "cascade")
+                            return;
+                        stop();
+                        remember();
+                        submenu.style.visibility = "hidden";
+                        auto.drill(props.value, true);
+                        menu.focus();
+                    };
+                    const observer = new ResizeObserver(watch);
+                    for (
+                        let element: Element | null = anchor;
+                        element;
+                        element = element.parentElement
+                    )
+                        observer.observe(element);
+                    observer.observe(menu);
+                    observer.observe(submenu);
+                    window.addEventListener("resize", watch);
+                    const unscroll = watchScroll(watch);
+                    const stop = () => {
+                        observer.disconnect();
+                        window.removeEventListener("resize", watch);
+                        unscroll();
+                    };
+                    return stop;
+                }
+                remember();
+                // Hidden from now, so its way out isn't seen.
+                submenu.style.visibility = "hidden";
+                // Its item drills from now on (so the submenu goes), at once when it was pressed.
+                const pressed = menuSubmenuPressed(row, menu);
+                auto.drill(props.value, pressed);
+                if (pressed) menu.focus();
+                return undefined;
+            }),
     );
     return null;
 }

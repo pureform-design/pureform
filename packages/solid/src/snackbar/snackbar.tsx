@@ -31,6 +31,7 @@ import {
     createSignal,
     omit,
     Show,
+    untrack,
 } from "solid-js";
 
 import { useControllable } from "../controllable";
@@ -101,7 +102,8 @@ function Root(props: SnackbarRootProps): JSX.Element {
             if (present) shown = true;
             else if (shown) {
                 shown = false;
-                props.onExitComplete?.();
+                // The app's callback reads what it likes; none of it is this effect's.
+                untrack(() => props.onExitComplete?.());
             }
         },
     );

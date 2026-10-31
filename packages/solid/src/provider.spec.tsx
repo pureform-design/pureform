@@ -6,7 +6,14 @@ import {
 } from "@pureform/styling-web";
 import type { ThemeGenerator } from "@pureform/styling-web";
 import type { JSX } from "@solidjs/web";
-import { createMemo, createSignal, Errored, flush, Loading } from "solid-js";
+import {
+    createMemo,
+    createSignal,
+    Errored,
+    flush,
+    Loading,
+    untrack,
+} from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 
 import {
@@ -95,7 +102,8 @@ describe("PureformProvider", () => {
             const state = usePureform();
             const dir = useDirection();
             const motion = useMotion();
-            seen.push([dir(), motion(), state().theme]);
+            // A one-time snapshot of what's in effect, taken at setup.
+            seen.push(untrack(() => [dir(), motion(), state().theme]));
             return null;
         }
         mount(() => (
