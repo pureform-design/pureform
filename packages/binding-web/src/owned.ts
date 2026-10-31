@@ -119,3 +119,20 @@ export const withoutOwned = (
     }
     return { source: clean, dropped };
 };
+
+/** The props a provider's `slotProps` can't set, as the types know them: what the machine sets for
+ *  an element's identity and state. The rest of the owned keys (`data-*`, a component's other
+ *  `aria-*`) aren't typed props, and a provider that sets one is warned in development. */
+export type OwnedPartKeys =
+    | "id"
+    | "disabled"
+    | "hidden"
+    | "aria-expanded"
+    | "aria-pressed"
+    | "aria-selected"
+    | "aria-checked"
+    | "aria-disabled"
+    | "aria-hidden"
+    | "aria-controls"
+    | "aria-activedescendant"
+    | "aria-labelledby";
