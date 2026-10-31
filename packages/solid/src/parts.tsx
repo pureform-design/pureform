@@ -14,6 +14,7 @@ import {
     isIconPart,
     isPresent,
     isUnstyled,
+    warnOnce,
     withProvidedTokens,
 } from "@pureform/binding-core";
 import type {
@@ -36,7 +37,7 @@ import type {
     Selection,
 } from "@pureform/styling";
 import type { ClassSlots, SlotClasses } from "@pureform/styling-web";
-import { dynamic } from "@solidjs/web";
+import { dynamic, isDev } from "@solidjs/web";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {
     $PROXY,
@@ -183,6 +184,7 @@ const createPartScope = <A extends ComponentAnatomy>(
                         classes: classes(),
                         slotProps: state().slotProps,
                         props: partOptions.props,
+                        warn: isDev ? warnOnce : undefined,
                     }),
                 ),
             ) as PartProps;

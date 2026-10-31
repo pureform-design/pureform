@@ -14,6 +14,7 @@ import {
     isIconPart,
     isPerInstance,
     isUnstyled,
+    warnOnce,
     withProvidedTokens,
 } from "@pureform/binding-core";
 import type {
@@ -50,6 +51,7 @@ import {
 } from "react";
 
 import { useClasses } from "./classes";
+import { isDev } from "./env";
 import { IconPartContext } from "./icon-style";
 import {
     usePartIndication,
@@ -271,6 +273,7 @@ const createPartScope = <A extends ComponentAnatomy>(
                     classes,
                     slotProps,
                     props: partOptions.props,
+                    warn: isDev ? warnOnce : undefined,
                 }),
             ) as PartProps;
         },
