@@ -38,6 +38,7 @@ export {
 } from "./parts";
 export type { PartSourcesInput, StateAttributes } from "./parts";
 export { OVERRIDABLE_KEYS, isReservedAttribute } from "./owned";
+export type { OwnedPartKeys } from "./owned";
 export {
     providerAttributes,
     resolveWebProvider,
