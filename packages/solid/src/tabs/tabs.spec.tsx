@@ -379,7 +379,9 @@ describe("Tabs, scrollable", () => {
                 onValueChange={(details) => setValue(details.value)}
                 items={many}
                 style={{
+                    // oxlint-disable-next-line solid/style-prop -- a part-keyed style record, not CSS properties
                     list: "display: flex; width: 200px; overflow: auto",
+                    // oxlint-disable-next-line solid/style-prop -- a part-keyed style record, not CSS properties
                     tab: "flex: 0 0 120px",
                 }}
             />

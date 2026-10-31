@@ -244,6 +244,8 @@ describe("ready-made components", () => {
 describe("an instance's slotProps", () => {
     it("don't take appearance: a className or style there is dropped, and reported once", () => {
         const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+        // Keys the types leave out, passed through to reach the runtime check.
+        const untyped1: object = { className: "slot", style: { color: "red" } };
         withRegistry(
             <Button
                 label="Save"
@@ -252,7 +254,7 @@ describe("an instance's slotProps", () => {
                 slotProps={{
                     label: {
                         "aria-live": "polite",
-                        ...{ className: "slot", style: { color: "red" } },
+                        ...untyped1,
                     },
                 }}
             />,
