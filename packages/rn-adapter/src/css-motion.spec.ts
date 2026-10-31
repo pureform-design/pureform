@@ -70,4 +70,29 @@ describe("cssMotion", () => {
             animationDirection: "alternate-reverse",
         });
     });
+
+    it("leaves token frames out of the view's keyframes, which only components read", () => {
+        const { animationName } = cssMotion([], {
+            name: "arc",
+            duration: 1000,
+            easing: LINEAR,
+            delay: 0,
+            iterations: -1,
+            direction: "normal",
+            frames: [
+                {
+                    offset: 0,
+                    style: { "--components.x.value": 10, opacity: 0 },
+                },
+                {
+                    offset: 1,
+                    style: { "--components.x.value": 87, opacity: 1 },
+                },
+            ],
+        });
+        expect(animationName).toEqual({
+            "0%": { opacity: 0 },
+            "100%": { opacity: 1 },
+        });
+    });
 });

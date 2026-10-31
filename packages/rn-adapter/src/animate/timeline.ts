@@ -15,7 +15,10 @@ import { curve, NATIVE_DRIVER } from "./curve";
 export type TimelineClock = MotionClock<Easing>;
 
 export type MotionTimeline = Timeline<
-    number | Animated.AnimatedInterpolation<number> | Animated.AnimatedAddition,
+    | number
+    | string
+    | Animated.AnimatedInterpolation<number | string>
+    | Animated.AnimatedAddition,
     typeof Animated.View
 >;
 
@@ -89,15 +92,35 @@ export const useMotionTimeline = (
                             `pureform: unknown timeline clock "${term.clock}"`,
                         );
                     return clock.value.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: [term.from, term.to],
+                        inputRange:
+                            "stops" in term
+                                ? term.stops.map((stop) => stop.offset)
+                                : [0, 1],
+                        outputRange:
+                            "stops" in term
+                                ? term.stops.map((stop) => stop.value)
+                                : [term.from, term.to],
+                        ...("stops" in term
+                            ? { extrapolate: "clamp" as const }
+                            : {}),
                     });
                 });
-                return terms.reduce<
+                const value = terms.reduce<
                     | number
                     | Animated.AnimatedInterpolation<number>
                     | Animated.AnimatedAddition
                 >((sum, term) => Animated.add(sum, term), channel.offset ?? 0);
+                return !channel.unit
+                    ? value
+                    : typeof value === "number"
+                      ? `${value}${channel.unit}`
+                      : value.interpolate({
+                            inputRange: [0, 1],
+                            outputRange: [
+                                `0${channel.unit}`,
+                                `1${channel.unit}`,
+                            ],
+                        });
             },
         }),
         [clocks],

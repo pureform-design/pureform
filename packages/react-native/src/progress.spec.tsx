@@ -1,3 +1,4 @@
+import { curve } from "@pureform/rn-adapter/animated";
 import type { ReactNode } from "react";
 import { Animated } from "react-native";
 import { beforeAll, describe, expect, it, vi } from "vitest";
@@ -42,6 +43,189 @@ const wavePoints = (id: string, part = "end-half") => {
         .match(/-?\d+(?:\.\d+)?/g)!
         .map(Number);
 };
+
+describe.each([animated, reanimated, animatedSvg, reanimatedSvg])(
+    "indeterminate circular sweep with $name",
+    (engine) => {
+        it.each(["ltr", "rtl"] as const)(
+            "shares one clock with preset geometry and per-step easing (%s)",
+            async (dir) => {
+                const clocks: Animated.Value[] = [];
+                const timing = Animated.timing;
+                const spy = vi
+                    .spyOn(Animated, "timing")
+                    .mockImplementation((value, config) => {
+                        if (config.duration !== 6000)
+                            return timing(value, config);
+                        clocks.push(value as Animated.Value);
+                        return {
+                            start() {},
+                            stop() {},
+                            reset() {},
+                            _isUsingNativeDriver: () => false,
+                        } as Animated.CompositeAnimation;
+                    });
+                const options = outside({
+                    value: 10,
+                    motion: "full" as "full" | "reduce",
+                    size: 64,
+                });
+                const useStyles = vi.fn<typeof engine.useStyles>(
+                    engine.useStyles,
+                );
+                const observed = { ...engine, useStyles };
+                try {
+                    await mount(
+                        <options.Holder>
+                            {(state) => (
+                                <PureformProvider
+                                    registry={registry}
+                                    engine={observed}
+                                    dir={dir}
+                                    motion={state.motion}
+                                    timeScale={2}
+                                    defaults={{
+                                        circularProgress: {
+                                            tokens: {
+                                                rotationDuration: 1500,
+                                                size: state.size,
+                                                thickness: 6,
+                                                gap: 3,
+                                            },
+                                        },
+                                    }}
+                                >
+                                    <CircularProgress
+                                        testId="live"
+                                        tokens={{ gap: 5 }}
+                                    />
+                                    <PureformProvider motion="reduce">
+                                        <CircularProgress
+                                            testId="reference"
+                                            value={state.value}
+                                            tokens={{ gap: 5 }}
+                                        />
+                                    </PureformProvider>
+                                </PureformProvider>
+                            )}
+                        </options.Holder>,
+                    );
+                    expect(clocks).toHaveLength(1);
+                    const read = (id: string) => {
+                        const style = getComputedStyle(byTestId(id));
+                        const m = new DOMMatrix(style.transform);
+                        return [
+                            m.a,
+                            m.b,
+                            m.c,
+                            m.d,
+                            m.e,
+                            m.f,
+                            Number(style.opacity),
+                        ];
+                    };
+                    const ease = curve({
+                        type: "easing",
+                        kind: "cubicBezier",
+                        points: [0.2, 0, 0, 1],
+                    });
+                    const frames = [0, 0.25, 0.5, 0.75, 1];
+                    const parts = [
+                        "end-arc",
+                        "start-arc",
+                        "track",
+                        "track-end-arc",
+                        "track-start-arc",
+                        "head-cap",
+                        "tail-cap",
+                        "track-head-cap",
+                        "track-tail-cap",
+                    ];
+                    for (const phase of frames) {
+                        const local =
+                            phase <= 0.5 ? phase * 2 : (phase - 0.5) * 2;
+                        const amount =
+                            phase <= 0.5
+                                ? 10 + 77 * ease(local)
+                                : 87 - 77 * ease(local);
+                        await options.set({
+                            value: amount,
+                            motion: "full",
+                            size: 64,
+                        });
+                        const before = useStyles.mock.calls.length;
+                        clocks[0]!.setValue(phase);
+                        await settle();
+                        expect(useStyles).toHaveBeenCalledTimes(before);
+                        for (const part of parts) {
+                            const actual = read(`live-${part}`);
+                            const expected = read(`reference-${part}`);
+                            actual.forEach((value, i) =>
+                                expect(
+                                    value,
+                                    `${part} at ${phase}`,
+                                ).toBeCloseTo(expected[i]!, 2),
+                            );
+                        }
+                        const degrees =
+                            (phase <= 0.5
+                                ? 221.4 * ease(local)
+                                : 221.4 + 498.6 * ease(local)) *
+                            (dir === "rtl" ? -1 : 1);
+                        const root = read("live-root");
+                        expect(root[0]).toBeCloseTo(
+                            Math.cos((degrees * Math.PI) / 180),
+                            3,
+                        );
+                        expect(root[1]).toBeCloseTo(
+                            Math.sin((degrees * Math.PI) / 180),
+                            3,
+                        );
+                        expect(clocks).toHaveLength(1);
+                    }
+                    const host = byTestId("live-root");
+                    await options.set({
+                        value: 50,
+                        motion: "reduce",
+                        size: 72,
+                    });
+                    expect(byTestId("live-root")).toBe(host);
+                    for (const part of parts)
+                        read(`live-${part}`).forEach((value, i) =>
+                            expect(value).toBeCloseTo(
+                                read(`reference-${part}`)[i]!,
+                                2,
+                            ),
+                        );
+                    expect(read("live-root")[0]).toBeCloseTo(1);
+                    await options.set({ value: 50, motion: "full", size: 72 });
+                    expect(clocks).toHaveLength(2);
+                    expect(byTestId("live-root")).toBe(host);
+                } finally {
+                    spy.mockRestore();
+                }
+            },
+        );
+
+        it("grows and shrinks the rendered arc rather than only spinning a half circle", async () => {
+            await render(
+                <CircularProgress
+                    testId="sweep"
+                    tokens={{ rotationDuration: 250 }}
+                />,
+                engine,
+            );
+            const arc = byTestId("sweep-end-arc");
+            const before = getComputedStyle(arc).transform;
+            await until(() =>
+                expect(getComputedStyle(arc).transform).not.toBe(before),
+            );
+            expect(byTestId("sweep-root").hasAttribute("aria-valuenow")).toBe(
+                false,
+            );
+        });
+    },
+);
 
 describe.each([animatedSvg, reanimatedSvg])(
     "linear wave channels with $name",

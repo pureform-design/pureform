@@ -433,6 +433,11 @@ const keyframes = (name: string, ctx: Ctx): Value => {
                       ? 1
                       : Number.parseFloat(stop) / 100;
             const style: Record<string, Value> = {};
+            // Keep token keyframes as metadata for components that lower their dependent
+            // geometry to shared native channels. They are not native View properties.
+            for (const [path, node] of Object.entries(map.tokens ?? {})) {
+                style[`${TOKEN}${path}`] = lowerNode(node, ctx)[0]!.value;
+            }
             for (const [property, node] of Object.entries(map)) {
                 // A frame's clip shape is what an SVG engine morphs the slot's drawing through.
                 const rn =

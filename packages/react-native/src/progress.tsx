@@ -21,6 +21,7 @@ import { useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import type { LayoutChangeEvent, ViewProps } from "react-native";
 
+import { useCircularProgressMotion } from "./circular-progress-motion";
 import type { MotionEngine } from "./engine";
 import { testIdOf, withEngine } from "./parts";
 import { useEngine, useDirection } from "./provider";
@@ -275,14 +276,30 @@ export const LinearProgress = withEngine(LinearProgressImpl, "LinearProgress");
 function CircularProgressImpl(props: CircularProgressProps): ReactNode {
     const nativeSlots = useNativeSlotReader("circularProgress");
     const engine = useEngine();
-    const {
-        styles: s,
-        views: v,
-        selected,
-    } = useComponentSlots<CircularProgressPart>(
-        "circularProgress",
-        progressSelection(props) as Record<string, unknown>,
+    const selection = useMemo(
+        () => progressSelection(props) as Record<string, unknown>,
+        [props],
     );
+    const { styles, selected } = useComponentSlots<CircularProgressPart>(
+        "circularProgress",
+        selection,
+        {},
+        undefined,
+        { keyframes: false },
+    );
+    const motion = useCircularProgressMotion(engine, selection, selected);
+    const s = Object.fromEntries(
+        Object.entries(styles).map(([part, style]) => [
+            part,
+            { ...style, ...motion.styles[part] },
+        ]),
+    );
+    const v = Object.fromEntries(
+        circularProgressAnatomy.partNames.map((part) => [
+            part,
+            { View: motion.View },
+        ]),
+    ) as Record<CircularProgressPart, { View: MotionEngine["View"] }>;
     const id = (part: CircularProgressPart) =>
         testIdOf(circularProgressAnatomy, part, props.testId);
     const slot = nativeSlots(props);

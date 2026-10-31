@@ -138,7 +138,7 @@ export const channels = (
     const out: Channel[] = [];
     for (const property of properties) {
         // A frame's shape is the drawing's to morph, not a style's.
-        if (property === SHAPE) continue;
+        if (property === SHAPE || property.startsWith(TOKEN)) continue;
         const at = (f: Frame) => f.style[property] ?? base[property];
         if (property === "transform") {
             const lists = all.map(

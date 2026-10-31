@@ -54,7 +54,11 @@ export const cssMotion = (
                   animationName: Object.fromEntries(
                       animation.frames.map((frame) => [
                           `${Math.round(frame.offset * 10000) / 100}%`,
-                          frame.style,
+                          Object.fromEntries(
+                              Object.entries(frame.style).filter(
+                                  ([property]) => !property.startsWith(TOKEN),
+                              ),
+                          ),
                       ]),
                   ),
                   animationDuration: animation.duration,
