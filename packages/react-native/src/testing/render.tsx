@@ -98,10 +98,16 @@ export const drag = async (
     await interact(() => {
         element.dispatchEvent(new MouseEvent("mousedown", at([0, 0])));
     });
+    // A pan responder counts only the moves stamped after the last it accounted for, so each
+    // move waits until the clock has moved on from the one before it.
+    let stamped = performance.now();
     for (const move of moves) {
+        while (performance.now() - stamped < 2)
+            await new Promise((resolve) => setTimeout(resolve, 2));
         await interact(() => {
             element.dispatchEvent(new MouseEvent("mousemove", at(move)));
         });
+        stamped = performance.now();
     }
     return () =>
         interact(() => {

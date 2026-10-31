@@ -1842,10 +1842,22 @@ describe("the sheets", () => {
         const drag = async () =>
             (await dragDown(handle, [20, 100, 200, 300]))();
 
+        // The sheet follows the pointer as the frames come, so wait for it to rest past where the
+        // drag began, and to stop, before taking where it is.
+        const rested = async () => {
+            let last = NaN;
+            let still = 0;
+            await until(() => {
+                const top = box(root).top;
+                still = top === last ? still + 1 : 0;
+                last = top;
+                return top > start + 100 && still >= 5;
+            });
+            return last;
+        };
         // It holds where it was let go while the app thinks, then springs back on false.
         await drag();
-        const held = box(root).top;
-        expect(held).toBeGreaterThan(start + 100);
+        const held = await rested();
         await settle(100);
         expect(box(root).top).toBe(held);
         expect(asked).toEqual([]);
@@ -1856,7 +1868,7 @@ describe("the sheets", () => {
 
         // On true, it asks to close (and, kept open here, settles back).
         await drag();
-        expect(box(root).top).toBeGreaterThan(start + 100);
+        await rested();
         await interact(async () => answer(true));
         expect(asked).toEqual([false]);
         await until(() => box(root).top === start);
