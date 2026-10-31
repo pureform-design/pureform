@@ -61,6 +61,9 @@ tasks:
             - "./vitest.config.storybook.ts"
             - stories.config.ts
             - ".storybook/**/*"
+      output:
+        files:
+          - ".vitest/**/*"
 
   dev:
     exec: bun x storybook dev -p 6006 --no-open
