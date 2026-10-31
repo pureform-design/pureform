@@ -34,7 +34,7 @@ import type {
     SearchViewVariantProps,
     AutocompleteFilter,
 } from "@pureform/binding-core";
-import { useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 
@@ -190,6 +190,13 @@ export function SearchView(props: SearchViewProps): ReactNode {
             });
         else setOpen(true);
     });
+    // A view that starts open, or is opened by `open`, wasn't pressed open, so it measures here.
+    useEffect(() => {
+        if (!anchored || !open || place || !trigger.current) return;
+        trigger.current.measureInWindow((left, top, width) =>
+            setPlace({ left, top, width }),
+        );
+    }, [anchored, open, place]);
     const { styles: s, views: v } = useComponentSlots<Part>(
         "searchView",
         searchViewSelection(props),

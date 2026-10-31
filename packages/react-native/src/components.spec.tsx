@@ -1352,6 +1352,38 @@ describe("lists, menus, and selects", () => {
         ).toBeCloseTo(400, 0);
     });
 
+    it.each(["docked", "contained"] as const)(
+        "anchors a %s view that starts open to its search bar, as one opened by a press",
+        async (variant) => {
+            await render(
+                <View style={{ paddingLeft: 40, paddingTop: 30, width: 600 }}>
+                    <SearchView
+                        defaultOpen
+                        variant={variant}
+                        searchBarProps={{ tokens: { maxWidth: 400 } }}
+                    />
+                </View>,
+            );
+            await until(() => byTestId("pf-search-view-surface"));
+            const root = byTestId("pf-search-view-surface");
+            const trigger = byTestId("pf-search-view-trigger");
+            await until(() =>
+                expect(root.getBoundingClientRect().left).toBeCloseTo(
+                    trigger.getBoundingClientRect().left,
+                    0,
+                ),
+            );
+            expect(root.getBoundingClientRect().top).toBeCloseTo(
+                trigger.getBoundingClientRect().top,
+                0,
+            );
+            expect(root.getBoundingClientRect().width).toBeCloseTo(
+                trigger.getBoundingClientRect().width,
+                0,
+            );
+        },
+    );
+
     it("closes a search view from its back button", async () => {
         await render(<SearchView defaultOpen variant="docked" />);
         const view = () => document.querySelector('[role="dialog"]');
