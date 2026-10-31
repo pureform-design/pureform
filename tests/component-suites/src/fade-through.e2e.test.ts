@@ -147,6 +147,57 @@ describe("FadeThrough", () => {
         expect(getComputedStyle(pages(host)[0]!).opacity).toBe("1");
     });
 
+    it("returns to the page it was leaving under reduced motion with the fade alone", async () => {
+        const { host, update } = await mount({ motion: "reduce" });
+        await update({ value: "mail", children: "Mail" });
+        const home = pages(host)[0]!;
+        const leaving = home.getAnimations()[0]!;
+        leaving.pause();
+        // Inside its fade out, so what it carries on from can be read.
+        leaving.currentTime =
+            Number(leaving.effect!.getComputedTiming().duration) / 2;
+        const before = Number(getComputedStyle(home).opacity);
+        expect(before).toBeGreaterThan(0);
+        expect(before).toBeLessThan(1);
+        await update({ value: "home", children: "Home" });
+        const back = pages(host).filter((page) => page.textContent === "Home");
+        expect(back).toHaveLength(1);
+        const animated = back[0]!
+            .getAnimations()
+            .flatMap((animation) =>
+                (animation.effect as KeyframeEffect)
+                    .getKeyframes()
+                    .flatMap((frame) => Object.keys(frame)),
+            );
+        // The carrying on is an animation of its own, of the fade alone.
+        const carry = back[0]!
+            .getAnimations()
+            .filter((animation) => !(animation instanceof CSSAnimation));
+        expect(carry.length).toBeGreaterThan(0);
+        for (const animation of carry) {
+            const properties = (animation.effect as KeyframeEffect)
+                .getKeyframes()
+                .flatMap((frame) => Object.keys(frame))
+                .filter(
+                    (key) =>
+                        ![
+                            "offset",
+                            "easing",
+                            "composite",
+                            "computedOffset",
+                        ].includes(key),
+                );
+            expect([...new Set(properties)]).toEqual(["opacity"]);
+        }
+        expect(animated).toContain("opacity");
+        expect(animated).not.toContain("scale");
+        expect(animated).not.toContain("transform");
+        expect(getComputedStyle(back[0]!).scale).toMatch(/^(none|1)$/);
+        await settled(host);
+        expect(pages(host).map((page) => page.textContent)).toEqual(["Home"]);
+        expect(getComputedStyle(pages(host)[0]!).opacity).toBe("1");
+    });
+
     it("only fades under reduced motion", async () => {
         const { host, update } = await mount({ motion: "reduce" });
         await update({ value: "mail", children: "Mail" });

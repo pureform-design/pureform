@@ -180,6 +180,71 @@ describe("tabs with transition=sharedAxis", () => {
         expect(Object.keys(held(entering!))).toEqual(["overlayFadeIn"]);
     });
 
+    it("carries a called-back panel on with the fade alone under reduced motion", async () => {
+        const host = await mount({}, { motion: "reduce" });
+        await go(host, "cars");
+        const flights = pages(host)[0]!;
+        const leaving = Object.values(held(flights))[0]!;
+        // Inside the fade (its 50ms wait, then 90ms), so what it carries on from can be read.
+        leaving.currentTime = 100;
+        const away = Number(getComputedStyle(flights).opacity);
+        expect(away).toBeGreaterThan(0);
+        expect(away).toBeLessThan(1);
+        await go(host, "flights");
+        const back = pages(host).find(
+            (page) => page.textContent === "Flights panel",
+        )!;
+        expect(
+            pages(host).filter((page) => page.textContent === "Flights panel"),
+        ).toHaveLength(1);
+        const animated = back
+            .getAnimations()
+            .flatMap((animation) =>
+                (animation.effect as KeyframeEffect)
+                    .getKeyframes()
+                    .flatMap((frame) => Object.keys(frame)),
+            );
+        // The carrying on is an animation of its own, of the fade alone.
+        const carry = back
+            .getAnimations()
+            .filter((animation) => !(animation instanceof CSSAnimation));
+        expect(carry.length).toBeGreaterThan(0);
+        for (const animation of carry) {
+            const properties = (animation.effect as KeyframeEffect)
+                .getKeyframes()
+                .flatMap((frame) => Object.keys(frame))
+                .filter(
+                    (key) =>
+                        ![
+                            "offset",
+                            "easing",
+                            "composite",
+                            "computedOffset",
+                        ].includes(key),
+                );
+            expect([...new Set(properties)]).toEqual(["opacity"]);
+        }
+        // Only the fade moves: no slide and no growth, from the entrance or the carrying on.
+        expect(animated).toContain("opacity");
+        expect(animated).not.toContain("transform");
+        expect(animated).not.toContain("scale");
+        for (const animation of back.getAnimations()) animation.pause();
+        expect(new DOMMatrix(getComputedStyle(back).transform).m41).toBe(0);
+        for (const animation of back.getAnimations()) animation.play();
+        for (let i = 0; i < 40 && pages(host).length > 1; i++) {
+            await Promise.allSettled(
+                pages(host).flatMap((page) =>
+                    page.getAnimations().map((a) => a.finished),
+                ),
+            );
+            await harness.settle();
+        }
+        expect(pages(host).map((page) => page.textContent)).toEqual([
+            "Flights panel",
+        ]);
+        expect(getComputedStyle(pages(host)[0]!).opacity).toBe("1");
+    });
+
     it("veil the old panel with the theme's scrim, at the light surface's 20%", async () => {
         const host = await mount({ transitionScrim: true });
         expect(host.querySelector('[data-pf-part="scrim"]')).toBeNull();

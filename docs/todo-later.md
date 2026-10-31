@@ -8,8 +8,8 @@ results and recordings.
 
 ## Open follow-ups from finished work
 
-- **Page transitions:** web reduced-motion tests for the returning-page case; Native device carry
-  (the native driver reports values asynchronously, so verify on devices, V3).
+- **Page transitions:** Native device carry (the native driver reports values asynchronously, so
+  verify on devices, V3).
 - **Live auto-submenu:** drills deeper than one level stay until backed out; scroll-driven changes;
   keyboard focus returning into a re-opened cascade; tune the 16px stability margin
   (`MENU_SUBMENU_MARGIN`); Native device measurement (V3).
