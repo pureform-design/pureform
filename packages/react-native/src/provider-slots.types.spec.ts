@@ -25,6 +25,11 @@ it("types provider style slots by their Native host", () => {
         },
         bottomSheet: { body: { style: { padding: 4 } } },
         datePicker: { cell: { style: { margin: 2 } } },
+        // The tabs have the web's parts: `root` around the `list`.
+        tabs: {
+            root: { style: { margin: 1 } },
+            list: { style: { margin: 2 } },
+        },
         media: { root: { resizeMode: "contain" } },
     } satisfies NativeProviderSlotProps;
     expectTypeOf({ slotProps: slots }).toExtend<PureformProviderProps>();

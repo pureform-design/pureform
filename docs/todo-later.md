@@ -39,10 +39,6 @@ results and recordings.
   menu actions separately and don't promise unsupported OS-menu features.
 - **F2. Token, theme and @property pruning:** separate design; account for runtime token/theme
   references and dynamic usage (keyframe pruning is done in `narrowConfig`).
-- **F3 follow-up, Native tabs naming:** the web's tab list is `list` (wrapper `root`); Native's Tabs
-  has no wrapper, so its list is `root` (`pf-tabs-root`) and the shared tabs case finds that id on
-  both platforms. Decide whether Native gets a wrapper or the web's names change. See
-  `docs/design/provider-part-names.md` §7.
 
 ## External verification and maintenance
 

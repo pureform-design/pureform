@@ -7,6 +7,7 @@ import {
     navigationBarAnatomy,
     navigationRailAnatomy,
     tabsAnatomy,
+    tabsCompositeAnatomy,
 } from "@pureform/anatomy";
 import type { PartName, TestIdOverride } from "@pureform/anatomy";
 import {
@@ -72,6 +73,16 @@ import { omitSpring, useIndicatorSlides } from "./tab-indicator";
 import type { IndicatorSlides } from "./tab-indicator";
 
 type TabsPart = PartName<typeof tabsAnatomy>;
+// The parts an instance addresses, as the web's: `root` around the list, then the `list` (the
+// preset's `root` slot) and its tabs. A tab's panels are the app's, so there is no `content`.
+type TabsInstancePart = Exclude<
+    PartName<typeof tabsCompositeAnatomy>,
+    "content"
+>;
+// The tabs read the preset's slot `root` for the list, which the instance calls `list`, and the
+// instance's `root` is the wrapper around it, with no slot.
+const TABS_KEYS = (part: string): string =>
+    part === "root" ? "list" : part === "wrapper" ? "root" : part;
 type NavigationPart =
     | PartName<typeof navigationBarAnatomy>
     | "header"
@@ -83,6 +94,7 @@ const [TAB_INDICATION] = tabsAnatomy.indication!;
 /** What each part renders as, for its keyed `style` and `slotProps`. */
 export interface TabsHosts {
     readonly root: "View";
+    readonly list: "View";
     readonly tab: "Pressable";
     readonly tabContent: "View";
     readonly icon: "View";
@@ -103,7 +115,7 @@ export interface TabsProps
         | ((details: ChangeDetails<"value", string>) => void)
         | undefined;
     readonly "aria-label"?: string | undefined;
-    readonly testId?: TestIdOverride<TabsPart> | undefined;
+    readonly testId?: TestIdOverride<TabsInstancePart> | undefined;
 }
 
 // A row gets only what it reads, each stable while the tabs render with the same props, so a row
@@ -114,7 +126,7 @@ interface TabProps {
     readonly item: TabsItem<ReactNode>;
     readonly selection: Selection<"tabs">;
     readonly indication: Indication | undefined;
-    readonly testId: TestIdOverride<TabsPart> | undefined;
+    readonly testId: TestIdOverride<TabsInstancePart> | undefined;
     readonly selected: boolean;
     readonly onPick: (value: string) => void;
     /** The slide its indicator is drawn with, while it's the latest. */
@@ -148,7 +160,8 @@ function TabImpl(props: TabProps): ReactNode {
             ...(item.mirrorIcon ? { mirrored: true } : {}),
         }),
     );
-    const id = (part: TabsPart) => testIdOf(tabsAnatomy, part, props.testId);
+    const id = (part: TabsPart) =>
+        testIdOf(tabsCompositeAnatomy, part, props.testId);
     const slot = props.slot;
     return (
         <v.tab.Pressable
@@ -226,7 +239,7 @@ const Tab = memo(withEngine(TabImpl, "Tab"));
 
 function TabsImpl(props: TabsProps): ReactNode {
     const nativeSlots = useNativeSlotReader("tabs");
-    const slot = nativeSlots(props);
+    const slot = nativeSlots(props, TABS_KEYS);
     const icon = tabsHaveIcons(props.items);
     const [value, setValue] = useControllable(
         "Tabs",
@@ -317,7 +330,7 @@ function TabsImpl(props: TabsProps): ReactNode {
                 ? {}
                 : { "aria-label": props["aria-label"] })}
             style={slot.style("root", s.root)}
-            testID={testIdOf(tabsAnatomy, "root", props.testId)}
+            testID={testIdOf(tabsCompositeAnatomy, "list", props.testId)}
         >
             {props.items.map((item) => (
                 <Tab
@@ -335,7 +348,7 @@ function TabsImpl(props: TabsProps): ReactNode {
             ))}
         </v.root.View>
     );
-    return scrollable ? (
+    const body = scrollable ? (
         <ScrollView
             {...slot.props("root")}
             ref={scroller}
@@ -346,12 +359,23 @@ function TabsImpl(props: TabsProps): ReactNode {
                 viewport.current = event.nativeEvent.layout.width;
                 reveal(false);
             }}
-            testID={testIdOf(tabsAnatomy, "root", props.testId) + "-scroll"}
+            testID={
+                testIdOf(tabsCompositeAnatomy, "list", props.testId) + "-scroll"
+            }
         >
             {list}
         </ScrollView>
     ) : (
         list
+    );
+    return (
+        <View
+            {...slot.props("wrapper")}
+            style={slot.style("wrapper", undefined)}
+            testID={testIdOf(tabsCompositeAnatomy, "root", props.testId)}
+        >
+            {body}
+        </View>
     );
 }
 

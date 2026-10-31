@@ -127,9 +127,12 @@ different elements in each vocabulary, so any union is ambiguous.
 - **Specs:** the four that encoded the old contract now state the new one, with new cases for the
   wrapper, the positioner, per-owner backdrop and cell, and precedence.
 
-### Left open
+### Native tabs
 
-- **Native tabs:** the web's tab list is `list` and its wrapper `root`; Native's Tabs has no
-  wrapper, so its list is `root` and its test id `pf-tabs-root`. The shared tabs case finds
-  `pf-tabs-root` on both platforms, so renaming Native's is a parity decision of its own (give it a
-  wrapper, or rename the web's), not part of the provider switch.
+Native's Tabs now have the web's parts: an unstyled `root` wrapper (`pf-tabs-root`) around the
+`list` (`pf-tabs-list`, the tablist, drawn by the preset's `root` slot), so a provider's
+`slotProps.tabs.list` means the same on both platforms. The wrapper adds no layout of its own:
+the list keeps its position and size in a column, a row, centered, and scrolling. A row stretches
+the wrapper to its height, as it does the web's, while the list keeps its own. Native has no
+`content` part, since a tab's panels are the app's. A Native `style.root` or `tabs.root` that
+styled the list now styles the wrapper: move it to `list`.
