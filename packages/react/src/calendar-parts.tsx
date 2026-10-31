@@ -10,6 +10,7 @@ import {
     calendarYears,
     calendarCellSelectionOf,
     isCurrentCalendarPeriod,
+    monthName,
     weekdayLabels,
 } from "@pureform/binding-core";
 import type {
@@ -20,6 +21,7 @@ import type {
     CalendarView,
     Controllable,
     DateSelectionMode,
+    MonthFormat,
     Unstyled,
 } from "@pureform/binding-core";
 import type { MutableInteractionSource } from "@pureform/binding-core/interaction";
@@ -53,6 +55,8 @@ export interface CalendarContext {
     readonly selectionMode: DateSelectionMode;
     readonly locale: string;
     readonly weekStart: number;
+    /** How the month list writes a month's name; Zag's own when not given. */
+    readonly monthFormat?: MonthFormat | undefined;
     /** The picker's `min` and `max` (ISO dates), which bound the year list. */
     readonly yearBounds?:
         | {
@@ -327,7 +331,8 @@ export function calendarParts(context: PartContext<CalendarContext>) {
             slots,
             ...props
         }: CalendarTableProps): ReactNode {
-            const { scope, picker, yearBounds } = context.use(name);
+            const { scope, picker, yearBounds, locale, monthFormat } =
+                context.use(name);
             const each = slots?.each("cell") ?? false;
             // The years are one scrollable list, as Material's, anchored on the chosen date's
             // year (or this one) so it stays put as it is used.
@@ -344,7 +349,20 @@ export function calendarParts(context: PartContext<CalendarContext>) {
                               label: String(year),
                           })),
                       ]
-                    : picker.getMonthsGrid({ columns, format: "short" });
+                    : picker
+                          .getMonthsGrid({ columns, format: "short" })
+                          .map((row) =>
+                              row.map((month) => ({
+                                  ...month,
+                                  label: monthFormat
+                                      ? monthName(
+                                            locale,
+                                            month.value,
+                                            monthFormat,
+                                        )
+                                      : month.label,
+                              })),
+                          );
             const opened = useRef(true);
             useEffect(() => {
                 if (view !== "year") return;

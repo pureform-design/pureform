@@ -184,6 +184,34 @@ describe("DockedDatePicker, ready-made", () => {
         expect(byTestId<HTMLInputElement>(ids.input).value).toBe("08/20/2026");
     });
 
+    it.each([
+        [undefined, "Aug", "Sep"],
+        ["long", "August", "September"],
+        ["narrow", "A", "S"],
+    ] as const)(
+        "writes month names as monthFormat %s says, in the button and the list",
+        async (monthFormat, button, september) => {
+            withRegistry(
+                <DockedDatePicker
+                    label="Date"
+                    locale="en-US"
+                    monthFormat={monthFormat}
+                    defaultValue={["2026-08-17"]}
+                    defaultOpen
+                />,
+            );
+            await settle();
+            expect(byTestId(ids.monthButton).textContent).toBe(button);
+            await interact(() => press(byTestId(ids.monthButton)));
+            const months = [
+                ...byTestId(ids.monthList).querySelectorAll(
+                    "[data-view=month][role=button]",
+                ),
+            ].map((cell) => cell.textContent);
+            expect(months[8]).toBe(september);
+        },
+    );
+
     it("steps by month and year, and picks from the month and year lists", async () => {
         withRegistry(
             <DockedDatePicker

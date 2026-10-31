@@ -132,17 +132,29 @@ exports[`calendarCell > compiles to a stable Panda slot recipe 1`] = `
       "month": {
         "root": {
           "--components-calendarCell-cellHeight": "52px",
-          "--components-calendarCell-cellWidth": "88px",
           "--components-calendarCell-triggerHeight": "36px",
-          "--components-calendarCell-triggerWidth": "72px",
+          "minWidth": "88px",
+          "width": "auto",
+        },
+        "trigger": {
+          "minWidth": "72px",
+          "paddingInlineEnd": "token(spacing.3)",
+          "paddingInlineStart": "token(spacing.3)",
+          "width": "auto",
         },
       },
       "year": {
         "root": {
           "--components-calendarCell-cellHeight": "52px",
-          "--components-calendarCell-cellWidth": "88px",
           "--components-calendarCell-triggerHeight": "36px",
-          "--components-calendarCell-triggerWidth": "72px",
+          "minWidth": "88px",
+          "width": "auto",
+        },
+        "trigger": {
+          "minWidth": "72px",
+          "paddingInlineEnd": "token(spacing.3)",
+          "paddingInlineStart": "token(spacing.3)",
+          "width": "auto",
         },
       },
     },

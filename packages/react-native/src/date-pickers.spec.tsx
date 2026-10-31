@@ -487,6 +487,39 @@ describe("DockedDatePicker", () => {
         expect([...seen.values()].filter(Boolean)).toHaveLength(1);
     });
 
+    it.each([
+        [undefined, "Aug", "Sep"],
+        ["long", "August", "September"],
+        ["narrow", "A", "S"],
+    ] as const)(
+        "writes month names as monthFormat %s says, in the button and the list",
+        async (monthFormat, button, september) => {
+            await render(
+                <DockedDatePicker
+                    locale="en-US"
+                    monthFormat={monthFormat}
+                    defaultValue={["2026-08-17"]}
+                />,
+            );
+            await interact(() =>
+                userEvent.click(byTestId("pf-docked-date-picker-trigger")),
+            );
+            await until(() => byTestId("pf-docked-date-picker-month-button"));
+            expect(
+                byTestId("pf-docked-date-picker-month-button").textContent,
+            ).toContain(`${button} `);
+            await interact(() =>
+                userEvent.click(byTestId("pf-docked-date-picker-month-button")),
+            );
+            const months = [
+                ...document.querySelectorAll(
+                    "[data-testid='pf-calendar-cell-trigger']",
+                ),
+            ].map((cell) => cell.textContent);
+            expect(months[8]).toBe(september);
+        },
+    );
+
     it("shows the format hint in the input only once focused, not under its resting label", async () => {
         await render(<DockedDatePicker label="Date" locale="en-US" />);
         const input = byTestId(

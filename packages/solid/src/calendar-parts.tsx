@@ -11,12 +11,14 @@ import {
     calendarCellSelectionOf,
     calendarYears,
     isCurrentCalendarPeriod,
+    monthName,
 } from "@pureform/binding-core";
 import type {
     CalendarCellInstance,
     CalendarInstances,
     CalendarView,
     Controllable,
+    MonthFormat,
 } from "@pureform/binding-core";
 import type { MutableInteractionSource } from "@pureform/binding-core/interaction";
 import { scrollCellIntoList } from "@pureform/binding-web";
@@ -44,6 +46,9 @@ import type { PartProps } from "./props";
 export interface CalendarContext {
     readonly scope: PartScope<ComponentAnatomy>;
     readonly picker: Accessor<datePicker.Api<PropTypes>>;
+    /** The locale and month format the month list writes its names in. */
+    readonly locale?: Accessor<string> | undefined;
+    readonly monthFormat?: Accessor<MonthFormat> | undefined;
     /** The picker's `min` and `max` (ISO dates), which bound the year list. */
     readonly yearBounds?:
         | Accessor<{
@@ -473,11 +478,19 @@ export function calendarParts(use: (name: string) => CalendarContext) {
     function MonthCells(props: {
         readonly slots?: CalendarSlots | undefined;
     }): JSX.Element {
-        const { picker } = use("ListCells");
+        const { picker, locale, monthFormat } = use("ListCells");
         const cells = () =>
             picker()
-                .getMonthsGrid({ columns: MONTH_COLUMNS, format: "long" })
-                .flat();
+                .getMonthsGrid({ columns: MONTH_COLUMNS, format: "short" })
+                .flat()
+                .map((cell) => ({
+                    ...cell,
+                    label: monthName(
+                        locale?.() ?? "en-US",
+                        cell.value,
+                        monthFormat?.() ?? "short",
+                    ),
+                }));
         return (
             <For each={cells()} keyed={false}>
                 {(cell) => (

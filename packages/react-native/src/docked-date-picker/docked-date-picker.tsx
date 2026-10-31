@@ -12,7 +12,7 @@ import {
     dateFormatHint,
     dockedDatePickerSelection,
     formatDateText,
-    formatIsoDate,
+    monthName,
     isPresent,
     isCurrentCalendarPeriod,
     parseDateText,
@@ -187,7 +187,7 @@ function Popup(
                     {toggle(
                         "monthButton",
                         "month",
-                        formatIsoDate(month, locale, { month: "short" }),
+                        monthName(locale, monthNumber, props.monthFormat),
                     )}
                     {arrow("next", "Next month", 1, true)}
                 </View>
@@ -218,11 +218,7 @@ function Popup(
                     view="month"
                     cells={Array.from({ length: 12 }, (_, index) => ({
                         key: index + 1,
-                        text: formatIsoDate(
-                            `2026-${String(index + 1).padStart(2, "0")}-01`,
-                            locale,
-                            { month: "long" },
-                        ),
+                        text: monthName(locale, index + 1, props.monthFormat),
                         selected: index + 1 === monthNumber,
                         current: isCurrentCalendarPeriod(
                             "month",

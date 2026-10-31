@@ -157,6 +157,7 @@ function Root(props: DockedDatePickerRootProps): ReactNode {
                 selectionMode: props.selectionMode ?? "single",
                 locale: pickerLocale(props),
                 weekStart: pickerWeekStart(props),
+                monthFormat: props.monthFormat ?? "short",
                 yearBounds: { min: props.min, max: props.max },
                 supportingTextId: `${id}-supporting-text`,
                 errorText: props.error || undefined,
@@ -287,7 +288,7 @@ const viewButton = (
     view: "month" | "year",
 ) =>
     function ViewButton({ unstyled, ...props }: CalendarPartProps): ReactNode {
-        const { scope, picker } = context.use(name);
+        const { scope, picker, monthFormat } = context.use(name);
         const shown = picker.view === view;
         return scope.render(part, {
             element: "button",
@@ -304,7 +305,7 @@ const viewButton = (
                     picker.format(
                         picker.focusedValue,
                         view === "month"
-                            ? { month: "short" }
+                            ? { month: monthFormat }
                             : { year: "numeric" },
                     ),
             },
@@ -364,7 +365,8 @@ export interface DockedDatePickerProps
 
 // Inside Root, so it can read the view and the locale.
 function ReadyMadeContent({ own }: { readonly own: DockedDatePickerProps }) {
-    const { picker, locale, supportingTextId } = context.use("Root");
+    const { picker, locale, monthFormat, supportingTextId } =
+        context.use("Root");
     const slot = useSlotProps<Anatomy, "cell", CalendarInstances>(own);
     const slots: CalendarSlots = slot;
     const step = (unit: "month" | "year") => (
@@ -378,7 +380,7 @@ function ReadyMadeContent({ own }: { readonly own: DockedDatePickerProps }) {
             />
             {unit === "month" ? (
                 <MonthButton {...slot("monthButton")}>
-                    {picker.format(picker.focusedValue, { month: "short" })}
+                    {picker.format(picker.focusedValue, { month: monthFormat })}
                     <DropDownArrow />
                 </MonthButton>
             ) : (

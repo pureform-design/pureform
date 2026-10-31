@@ -515,6 +515,21 @@ export type DockedDatePickerPart = PartName<
     typeof dockedDatePickerOverlayAnatomy
 >;
 
+/** How a month's name is written: "September", "Sep", or "S". */
+export type MonthFormat = "long" | "short" | "narrow";
+
+/** A month (1 to 12) written in `locale`, with no year, in the time zone-free way a month name
+ *  needs. */
+export const monthName = (
+    locale: string,
+    month: number,
+    format: MonthFormat = "short",
+): string =>
+    new Intl.DateTimeFormat(locale, {
+        month: format,
+        timeZone: "UTC",
+    }).format(new Date(Date.UTC(2026, month - 1, 1)));
+
 /** The docked date picker's variant groups (its field's) and instance tokens. The trailing icon,
  *  the button that opens the calendar, is always there. */
 export interface DockedDatePickerVariantProps {
@@ -536,6 +551,9 @@ export interface DockedDatePickerRootOwnProps
         Controllable<"open", boolean> {
     /** Whether choosing a date closes the calendar. @default true */
     readonly closeOnSelect?: boolean | undefined;
+    /** How the month button and the month list write a month's name: in full, as three letters
+     *  or so ("Sep"), or as one. @default "short" */
+    readonly monthFormat?: MonthFormat | undefined;
     /** An error message: marks the field invalid and replaces the supporting text. */
     readonly error?: string | undefined;
     readonly testId?: TestIdOverride<DockedDatePickerPart> | undefined;
@@ -556,6 +574,7 @@ export const DOCKED_DATE_PICKER_ROOT_PROPS = [
     "defaultOpen",
     "onOpenChange",
     "closeOnSelect",
+    "monthFormat",
     "error",
     "testId",
     "unstyled",

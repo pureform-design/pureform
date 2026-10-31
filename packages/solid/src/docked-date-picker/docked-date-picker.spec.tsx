@@ -259,6 +259,39 @@ describe("DockedDatePicker, ready-made", () => {
         expect(byTestId(ids.grid)).toBeTruthy();
     });
 
+    it.each([
+        [undefined, "Aug", "Sep"],
+        ["long", "August", "September"],
+        ["narrow", "A", "S"],
+    ] as const)(
+        "writes month names as monthFormat %s says, in the button and the list",
+        async (monthFormat, button, september) => {
+            withRegistry(() => (
+                <DockedDatePicker
+                    label="Date"
+                    locale="en-US"
+                    monthFormat={monthFormat}
+                    defaultValue={["2026-08-17"]}
+                    defaultOpen
+                />
+            ));
+            await settle();
+            expect(byTestId(ids.monthButton).textContent).toBe(button);
+            await userEvent.click(byTestId(ids.monthButton));
+            await until(() =>
+                expect(byTestId(ids.monthList).getAttribute("role")).toBe(
+                    "grid",
+                ),
+            );
+            const months = [
+                ...byTestId(ids.monthList).querySelectorAll(
+                    "[data-view=month][role=button]",
+                ),
+            ].map((cell) => cell.textContent);
+            expect(months[8]).toBe(september);
+        },
+    );
+
     it("shows an error in place of the format, and marks the input invalid", async () => {
         withRegistry(() => (
             <DockedDatePicker label="Date" locale="en-US" error="Too late" />

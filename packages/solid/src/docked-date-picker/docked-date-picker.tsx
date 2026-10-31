@@ -12,6 +12,7 @@ import {
     DOCKED_DATE_PICKER_ROOT_PROPS,
     dockedDatePickerSelection,
     isPresent,
+    monthName,
     pickerLocale,
 } from "@pureform/binding-core";
 import type {
@@ -19,6 +20,7 @@ import type {
     Unstyled,
     DockedDatePickerContentProps,
     DockedDatePickerRootOwnProps,
+    MonthFormat,
 } from "@pureform/binding-core";
 import { dateMachineProps, presentProps } from "@pureform/binding-web";
 import * as datePicker from "@pureform/machines/date-picker";
@@ -75,6 +77,7 @@ interface DockedContextValue {
     readonly filled: Accessor<boolean>;
     readonly setText: (text: string) => void;
     readonly locale: Accessor<string>;
+    readonly monthFormat: Accessor<MonthFormat>;
     readonly yearBounds: CalendarContext["yearBounds"];
 }
 
@@ -158,6 +161,7 @@ function Root(props: DockedDatePickerRootProps): JSX.Element {
                 filled: () => text() !== "" || api().value.length > 0,
                 setText,
                 locale: () => pickerLocale(props),
+                monthFormat: () => props.monthFormat ?? "short",
                 yearBounds: () => ({ min: props.min, max: props.max }),
             }}
         >
@@ -287,7 +291,7 @@ const viewButton = (
     view: "month" | "year",
 ) =>
     function ViewButton(props: DockedDatePickerPartProps): JSX.Element {
-        const { scope, api, locale } = context.use(display);
+        const { scope, api, locale, monthFormat } = context.use(display);
         const children = {
             get children() {
                 return (
@@ -295,17 +299,10 @@ const viewButton = (
                     props.children ?? (
                         <>
                             {view === "month"
-                                ? new Intl.DateTimeFormat(locale(), {
-                                      month: "short",
-                                      timeZone: "UTC",
-                                  }).format(
-                                      new Date(
-                                          Date.UTC(
-                                              2026,
-                                              api().focusedValue.month - 1,
-                                              1,
-                                          ),
-                                      ),
+                                ? monthName(
+                                      locale(),
+                                      api().focusedValue.month,
+                                      monthFormat(),
                                   )
                                 : String(api().focusedValue.year)}
                             <DropDownArrow />
@@ -335,10 +332,12 @@ const MonthButton = viewButton("monthButton", "MonthButton", "month");
 const YearButton = viewButton("yearButton", "YearButton", "year");
 
 const calendar = calendarParts((name) => {
-    const { scope, api, yearBounds } = context.use(name);
+    const { scope, api, yearBounds, locale, monthFormat } = context.use(name);
     return {
         scope: scope as unknown as CalendarContext["scope"],
         picker: api,
+        locale,
+        monthFormat,
         yearBounds,
     };
 });

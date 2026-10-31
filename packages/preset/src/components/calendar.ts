@@ -43,6 +43,7 @@ import {
     iconBox,
     iconFill,
     indicationRoot,
+    OWN_SIZE,
     pressableRoot,
     sys,
 } from "./shared";
@@ -319,6 +320,22 @@ const band = (side: "start" | "end" | "both" | "none"): StyleMap => {
     };
 };
 
+// A month's or year's cell and pill. The pill hugs its text with Material's 72dp and 36dp as the
+// least, so a long month name ("September", or any locale's) still fits and the cell grows with it.
+const LIST_VIEW = {
+    root: {
+        tokens: { cellHeight: px(52), triggerHeight: px(36) },
+        ...OWN_SIZE,
+        minWidth: px(88),
+    },
+    trigger: {
+        ...OWN_SIZE,
+        minWidth: px(72),
+        paddingInlineStart: spacing("3"),
+        paddingInlineEnd: spacing("3"),
+    },
+} satisfies Record<string, StyleMap>;
+
 const pf = typed();
 
 export const calendarCell = pf.slotComponent({
@@ -390,26 +407,8 @@ export const calendarCell = pf.slotComponent({
         variants: {
             view: {
                 day: {},
-                month: {
-                    root: {
-                        tokens: {
-                            cellWidth: px(88),
-                            cellHeight: px(52),
-                            triggerWidth: px(72),
-                            triggerHeight: px(36),
-                        },
-                    },
-                },
-                year: {
-                    root: {
-                        tokens: {
-                            cellWidth: px(88),
-                            cellHeight: px(52),
-                            triggerWidth: px(72),
-                            triggerHeight: px(36),
-                        },
-                    },
-                },
+                month: LIST_VIEW,
+                year: LIST_VIEW,
             },
             selection: {
                 none: {},
