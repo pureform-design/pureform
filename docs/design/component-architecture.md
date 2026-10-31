@@ -1697,7 +1697,11 @@ Agreed in [slot-props-sketch.md](slot-props-sketch.md); batches in the
   slotProps: the component sets it.`); the types leave the common ones out (`ProviderPartProps`).
   Settable from a provider: `tabIndex`, `role`, `aria-label`, `aria-description`,
   `aria-describedby`, `title`, handlers, classes, and style outside the positioning set. React
-  Native is stricter: its component wins `role` as well.
+  Native is stricter: its component wins `role` and the other accessibility props as well, and
+  always sets its own `testID`, `children` and `ref`; a `slotProps` entry (a provider's or an
+  instance's) that sets one of those three is dropped and reported in development, the same
+  message as on web. `binding-core`'s `ownedKeysIn` and `ownedKeysMessage` are the shared part;
+  each target says what it owns.
 
   **An instance's own props are not held back.** A part drawn `as` another component (a menu's
   trigger as a `Button`) arrives as the outer part's merged props (its `id`, `data-testid`,
