@@ -38,6 +38,15 @@ export {
 } from "./parts";
 export type { PartSourcesInput, StateAttributes } from "./parts";
 export {
+    FORWARDED_SLOT_PROPS,
+    OVERRIDABLE_KEYS,
+    appearanceMessage,
+    isForwardedSlotProps,
+    isReservedAttribute,
+    withoutAppearance,
+} from "./owned";
+export type { OwnedPartKeys } from "./owned";
+export {
     providerAttributes,
     resolveWebProvider,
     ROOT_WEB_PROVIDER,

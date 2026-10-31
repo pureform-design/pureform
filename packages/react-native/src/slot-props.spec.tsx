@@ -105,6 +105,26 @@ describe("nativeSlots", () => {
         );
     });
 
+    it("drops a test id, children and ref from slotProps, and says so once, by component and part", () => {
+        const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+        const slots = nativeSlots(
+            { slotProps: { root: { testID: "x", accessibilityLabel: "ok" } } },
+            undefined,
+            { root: { children: "c", ref: 1 } },
+            "button",
+        );
+        slots.props("root");
+        slots.props("root");
+        expect(warn).toHaveBeenCalledTimes(2);
+        expect(warn.mock.calls[0]![0]).toBe(
+            `pureform: <button> root ignored "children", "ref" from the provider's slotProps: the component sets them.`,
+        );
+        expect(warn.mock.calls[1]![0]).toBe(
+            `pureform: <button> root ignored "testID" from slotProps: the component sets it.`,
+        );
+        warn.mockRestore();
+    });
+
     it("composes handlers, the component's first, and keeps its measuring onLayout", () => {
         const calls: string[] = [];
         const user = () => calls.push("user");
