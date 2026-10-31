@@ -49,7 +49,7 @@ import {
     menuSubmenuPressed,
     menuSubmenuBoundary,
     menuSubmenuRoom,
-    watchScroll,
+    watchMenuLayout,
     noteMenuSubmenuPresses,
     springRoleVar,
 } from "@pureform/binding-web";
@@ -721,30 +721,13 @@ function AutoSubmenu(props: { readonly value: string }): null {
                 auto.drill(props.value, true);
                 menu.focus();
             };
-            const observer = new ResizeObserver(watch);
-            for (
-                let element: Element | null = byId(
-                    top.api.getTriggerProps().id,
-                );
-                element;
-                element = element.parentElement
-            )
-                // The page itself changes size with the window, which `resize` hears; observing it too
-                // makes the browser report a ResizeObserver loop.
-                if (
-                    element !== document.documentElement &&
-                    element !== document.body
-                )
-                    observer.observe(element);
-            observer.observe(menu);
-            observer.observe(submenu);
-            window.addEventListener("resize", watch);
-            const unscroll = watchScroll(watch);
-            const stop = () => {
-                observer.disconnect();
-                window.removeEventListener("resize", watch);
-                unscroll();
-            };
+            const stop = watchMenuLayout(
+                {
+                    anchors: [byId(top.api.getTriggerProps().id)],
+                    content: [menu, submenu],
+                },
+                watch,
+            );
             return stop;
         };
         const room = menuSubmenuRoom(
@@ -939,29 +922,14 @@ function ReadyMade(props: MenuProps): ReactNode {
                 return;
             }
         };
-        const observer = new ResizeObserver(check);
         const shown = content();
-        if (shown) observer.observe(shown);
-        for (const fit of fits.current.values())
-            for (
-                let element = fit.anchor;
-                element;
-                element = element.parentElement
-            )
-                // The page itself changes size with the window, which `resize` hears; observing it too
-                // makes the browser report a ResizeObserver loop.
-                if (
-                    element !== document.documentElement &&
-                    element !== document.body
-                )
-                    observer.observe(element);
-        window.addEventListener("resize", check);
-        const unscroll = watchScroll(check);
-        return () => {
-            observer.disconnect();
-            window.removeEventListener("resize", check);
-            unscroll();
-        };
+        return watchMenuLayout(
+            {
+                anchors: [...fits.current.values()].map((fit) => fit.anchor),
+                content: shown ? [shown] : [],
+            },
+            check,
+        );
     }, [auto, drills, path, container]);
     useEffect(() => {
         // oxlint-disable-next-line react/set-state-in-effect -- clears the one-shot reopen once the submenu has mounted open

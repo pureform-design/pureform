@@ -97,6 +97,52 @@ export const noteMenuSubmenuPresses = (): void => {
     doc.addEventListener("keydown", notePress, true);
 };
 
+/** Calls `onChange` when the room a submenu has might have changed: the window or any scroller
+ *  moved or resized, or the open menus (`content`) or the anchors (`anchors`, and each up its
+ *  ancestors) resized. The page itself (`html`, `body`) is left to `resize`: observing it too
+ *  makes the browser report a "ResizeObserver loop".
+ *
+ *  Observing starts once the menus' first positioning has settled, two frames on: Zag's
+ *  positioning resizes the elements around them as it places them, which an observer started
+ *  before it would report as a loop. What changed meanwhile is checked once, as it starts.
+ *  Returns what stops it all. */
+export const watchMenuLayout = (
+    {
+        anchors,
+        content,
+    }: {
+        anchors: Iterable<Element | null>;
+        content: Iterable<Element>;
+    },
+    onChange: () => void,
+): (() => void) => {
+    const watched = new Set<Element>(content);
+    for (const anchor of anchors)
+        for (let element = anchor; element; element = element.parentElement)
+            if (
+                element !== document.documentElement &&
+                element !== document.body
+            )
+                watched.add(element);
+    let observer: ResizeObserver | undefined;
+    let frame = requestAnimationFrame(() => {
+        frame = requestAnimationFrame(() => {
+            frame = 0;
+            observer = new ResizeObserver(onChange);
+            for (const element of watched) observer.observe(element);
+            onChange();
+        });
+    });
+    window.addEventListener("resize", onChange);
+    const unscroll = watchScroll(onChange);
+    return () => {
+        if (frame) cancelAnimationFrame(frame);
+        observer?.disconnect();
+        window.removeEventListener("resize", onChange);
+        unscroll();
+    };
+};
+
 /** Calls `watch` after anything on the page scrolls (a panel that carries the menu with it),
  *  once the menu's position has followed: two frames on, and no more often than that. Returns
  *  what stops it. The scroll of any element is heard, as scrolling doesn't bubble. */

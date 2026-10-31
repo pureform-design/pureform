@@ -362,6 +362,7 @@ export {
     menuSubmenuBoundary,
     menuSubmenuPressed,
     menuSubmenuRoom,
+    watchMenuLayout,
     watchScroll,
     noteMenuSubmenuPresses,
 } from "./menu-submenu-room";
