@@ -136,3 +136,45 @@ export type OwnedPartKeys =
     | "aria-controls"
     | "aria-activedescendant"
     | "aria-labelledby";
+
+const APPEARANCE_KEYS = new Set(["className", "class", "style"]);
+
+/** Marks an instance's `slotProps` that a part drawn `as` a button forwards to it (`asRoot`): its
+ *  `root` carries the part's own `className` and `style`, which no keyed prop can, since the part's
+ *  merge joins them as plain values. It's a symbol, so spreading keeps it and `Object.keys` doesn't
+ *  see it. */
+export const FORWARDED_SLOT_PROPS: unique symbol = Symbol.for(
+    "pureform.forwardedSlotProps",
+);
+
+/** Whether `slotProps` were forwarded by `asRoot`, not written by the user. */
+export const isForwardedSlotProps = (slotProps: unknown): boolean =>
+    typeof slotProps === "object" &&
+    slotProps !== null &&
+    (slotProps as Record<symbol, unknown>)[FORWARDED_SLOT_PROPS] === true;
+
+/** An instance's `slotProps` entry without `className`, `class` and `style`, which the keyed props
+ *  set (`className={{ label: "caps" }}`): an instance has one channel for appearance, and
+ *  `slotProps` carries a part's attributes and handlers. The keys that were dropped come with it.
+ *  `source` itself when it has none. A provider has no keyed props, so its `slotProps` keep them. */
+export const withoutAppearance = (
+    source: Dict | undefined,
+): {
+    readonly source: Dict | undefined;
+    readonly dropped: readonly string[];
+} => {
+    const dropped = ownedKeysIn(source, (key) => APPEARANCE_KEYS.has(key));
+    if (!source || dropped.length === 0) return { source, dropped };
+    const clean: Record<string, unknown> = {};
+    for (const key of Object.keys(source)) {
+        if (!APPEARANCE_KEYS.has(key)) clean[key] = source[key];
+    }
+    return { source: clean, dropped };
+};
+
+/** The development warning for appearance set in an instance's `slotProps`. */
+export const appearanceMessage = (
+    part: string,
+    dropped: readonly string[],
+): string =>
+    `pureform: slotProps.${part} ignored ${dropped.map((key) => `"${key}"`).join(", ")}: style a part with the keyed props (\`className={{ ${part}: … }}\`, \`style={{ ${part}: … }}\`); \`slotProps\` is for its attributes and handlers.`;

@@ -54,7 +54,7 @@ describe("createSlotProps", () => {
         }
     });
 
-    it("adds and removes spread keys, and merges slot props before keyed classes and styles", () => {
+    it("adds and removes slotProps keys, and a class or style set there gives way to the keyed ones", () => {
         const [overrides, setOverrides] = createSignal<Props["slotProps"]>();
         const style: Props["style"] = { label: { color: "red" } };
         mount(() => (
@@ -65,23 +65,26 @@ describe("createSlotProps", () => {
             />
         ));
         const label = byTestId("label");
+        const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
         setOverrides({
             label: {
                 title: "added",
-                class: "slot",
-                style: { color: "blue", "margin-top": "4px" },
+                ...{ class: "slot", style: { "margin-top": "4px" } },
             },
         });
         flush();
         expect(label.title).toBe("added");
-        expect(label.className).toBe("slot keyed");
+        expect(label.className).toBe("keyed");
         expect(label.style.color).toBe("red");
-        expect(label.style.marginTop).toBe("4px");
+        expect(label.style.marginTop).toBe("");
+        expect(warn).toHaveBeenCalledWith(
+            expect.stringContaining('slotProps.label ignored "class", "style"'),
+        );
+        warn.mockRestore();
         setOverrides(undefined);
         flush();
         expect(label.hasAttribute("title")).toBe(false);
         expect(label.className).toBe("keyed");
-        expect(label.style.marginTop).toBe("");
     });
 
     it("does not evaluate instance data or customizations of an unconsumed part", () => {

@@ -1681,7 +1681,7 @@ Agreed in [slot-props-sketch.md](slot-props-sketch.md); batches in the
     | 1 | The component's own | machine props, `data-*` attributes, registry class and token style | its own props and style |
     | 2 | Provider `slotProps` | for the part | for the part |
     | 3 | The owner's provider key | `datePicker.cell`, `dialog.backdrop` | same |
-    | 4 | Instance | `slotProps`, then `className`, then `style` (and direct element props) | `slotProps`, then `style` |
+    | 4 | Instance | `slotProps` (attributes, handlers), then keyed `className`, then keyed `style` (and direct element props) | `slotProps`, then keyed `style` |
     | 5 | Positioning style | the machine's placement (`position`, `inset`, `transform*`, `zIndex`, `--*`) | none |
 
   Handlers all run, the component's first, then the provider's, then the instance's. Classes join
@@ -1702,6 +1702,13 @@ Agreed in [slot-props-sketch.md](slot-props-sketch.md); batches in the
   instance's) that sets one of those three is dropped and reported in development, the same
   message as on web. `binding-core`'s `ownedKeysIn` and `ownedKeysMessage` are the shared part;
   each target says what it owns.
+
+  **An instance has one channel for appearance.** Keyed `className` (`class` on Solid) and `style`
+  say how a part looks; `slotProps` carries its attributes and handlers, and doesn't take
+  `className`, `class` or `style` (`SlotPartProps`). One set there anyway is dropped and reported
+  in development. A provider has no keyed props, so its `slotProps` keep them. Two exceptions:
+  `Ripple`'s ink, which has no keyed prop, and a part drawn `as={Button}`, whose `className` and
+  `style` `asRoot` forwards to the button's root through a marked `slotProps`.
 
   **An instance's own props are not held back.** A part drawn `as` another component (a menu's
   trigger as a `Button`) arrives as the outer part's merged props (its `id`, `data-testid`,
