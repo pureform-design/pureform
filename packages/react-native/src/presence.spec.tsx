@@ -448,7 +448,9 @@ describe.each(ENGINES)("with $name", (engine) => {
             tick();
             const trigger = byTestId(fab.closeTrigger);
             await interact(() => userEvent.click(trigger));
-            await until(() => expect(opacities()).toEqual([1, 1, 1]));
+            // Motion runs 6 times slower here, and a loaded machine slows it further: the waits
+            // follow the test's own budget, not `until`'s default.
+            await until(() => expect(opacities()).toEqual([1, 1, 1]), 30_000);
             // Never the farther item ahead of the nearer one, and a moment with the nearest in
             // while the farthest hasn't begun.
             const entered = samples.filter((o) =>
@@ -469,10 +471,12 @@ describe.each(ENGINES)("with $name", (engine) => {
                     )[2]!,
                 ),
             );
-            await until(() =>
-                expect(
-                    document.querySelector(`[data-testid="${fab.list}"]`),
-                ).toBeNull(),
+            await until(
+                () =>
+                    expect(
+                        document.querySelector(`[data-testid="${fab.list}"]`),
+                    ).toBeNull(),
+                30_000,
             );
             cancelAnimationFrame(id);
             const left = samples.filter((o) => o.some((x) => x > 0 && x < 1));

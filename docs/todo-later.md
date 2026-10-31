@@ -42,12 +42,13 @@ results and recordings.
 
 ## External verification and maintenance
 
-- **Full-gate timing failures:** RN `presence.spec.tsx`'s Reanimated FAB-menu stagger test
-  failed waiting for the menu to disappear in two full workspace runs, but passed isolated.
-  Browser-e2e `rn-motion.e2e.test.ts` exceeded its 30s setup-hook limit in the first full run;
-  both its isolated rerun and the next full browser suite passed. Neither is declared fixed.
-  RN `table.spec` ("only hovers actionable rows") and `fullscreen-dialog.spec` ("draws a label (Save)") failed once each in a full run and passed alone. Investigate load sensitivity and animation cleanup before increasing timeouts. The earlier
-  component-suite `overlayShrinkOut` failure did not recur in these full runs.
+- **Full-gate timing failures (load, not reproduced alone):** under the parallel full workspace
+  gate a few specs fail once and pass alone: browser-e2e `rn-motion.e2e.test.ts` (30s setup
+  hook), RN `table.spec` ("only hovers actionable rows") and `fullscreen-dialog.spec` ("draws a
+  label (Save)"), and the earlier component-suite `overlayShrinkOut`. The Reanimated FAB-menu
+  stagger test (`presence.spec.tsx`) now waits on its own 6× slowed motion's budget (30s) rather
+  than `until`'s 10s, and passed two full RN runs; rerun the whole workspace gate to confirm.
+  Look for what starves the browsers (workers per core) before widening any other timeout.
 
 - **V1. Slider focus-ring clipping:** obtain the nested-icon-button scene before changing clipping.
   Handle clearance and styled inset-icon reading pass (`slider-inset-icon.e2e.test.ts`); swipeable-row
