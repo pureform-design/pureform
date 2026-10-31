@@ -53,9 +53,19 @@ results and recordings.
 - **V1. Slider focus-ring clipping:** obtain the nested-icon-button scene before changing clipping.
   Handle clearance and styled inset-icon reading pass (`slider-inset-icon.e2e.test.ts`); swipeable-row
   inset focus is intentional.
-- **V2. Hover flicker:** capture browser/version, OS, pointing device and a recording of Menu Default
-  and navigation items. Not reproduced headless, including a 1px sweep. Guard first-frame opening and
-  keyboard highlighting; don't switch highlight ownership on speculation.
+- **V2. Hover flicker (Chromium at 100 Hz; not a pureform bug):** the DockedDatePicker month list
+  (and other state layers) drops its hover highlight for one frame, about 150 ms after the pointer
+  enters, when the `background-color` transition ends, while the pointer is still. Seen in Brave 1.98
+  (Chromium 156.0.8078.74) and stock Chromium on a 100 Hz monitor under Fedora KDE; hardly visible on
+  the same machine's 75 Hz monitor, and hardware acceleration made no difference. Not seen in
+  Firefox or headless Chromium 156. A standalone page with plain `background-color` transitions
+  (bare, mixed with `var()`, same-shape `0%` mix) flickered the same way, while an opacity-only
+  overlay didn't, so it isn't pureform's markup or highlight ownership. Computed style never dips,
+  so it's frame scheduling in Chromium, not the CSS. Decided to leave it: don't switch highlight
+  ownership or restructure state layers for it. If it shows up in other browsers or on common
+  refresh rates, the fix is to draw each state layer as an overlay animating only opacity (about 25
+  `stateLayer()` call sites, none in React Native, and the web needs `::before` rules through
+  `rawRules`).
 - **V3. Native devices:** NativeSelect `multiple`/`keepsMenuPresented`, SVG/native-driver ripple and
   morph paths, Reanimated path updates, toast swipe, `measureInWindow` submenu bounds, Android
   TouchTarget slop, both engines where applicable. Keep the optional native-menu peer unadvertised
