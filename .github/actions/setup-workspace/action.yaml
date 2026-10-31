@@ -36,7 +36,7 @@ runs:
     - name: Install Node
       uses: actions/setup-node@v4
       with:
-        node-version: latest
+        node-version: lts/*
 
     - name: Cache Bun install
       uses: actions/cache@v5
