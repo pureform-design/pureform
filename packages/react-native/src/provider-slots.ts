@@ -1,5 +1,6 @@
-// Provider keys follow the preset's style slots, not the instance's anatomy parts. Reuse the
-// component's host declarations; this file has no runtime imports of components.
+// Provider keys follow the instance's anatomy parts, so one vocabulary reaches a part from a
+// provider and from an instance. Reuse the component's host declarations; this file has no
+// runtime imports of components.
 import type { ComponentName, SlotOf } from "@pureform/styling";
 
 import type {
@@ -88,46 +89,17 @@ interface ComponentHosts {
     rating: import("./rating/rating").RatingHosts;
 }
 
-// Derive aliases from the same anatomies as overlayKeys, rather than repeat their mappings.
-interface OverlayAnatomies {
-    menu: typeof import("@pureform/anatomy").menuOverlayAnatomy;
-    dialog: typeof import("@pureform/anatomy").dialogOverlayAnatomy;
-    fullscreenDialog: typeof import("@pureform/anatomy").fullscreenDialogOverlayAnatomy;
-    popover: typeof import("@pureform/anatomy").popoverOverlayAnatomy;
-    tooltip: typeof import("@pureform/anatomy").tooltipOverlayAnatomy;
-    richTooltip: typeof import("@pureform/anatomy").richTooltipOverlayAnatomy;
-    bottomSheet: typeof import("@pureform/anatomy").bottomSheetOverlayAnatomy;
-    sideSheet: typeof import("@pureform/anatomy").sideSheetOverlayAnatomy;
-    searchView: typeof import("@pureform/anatomy").searchViewOverlayAnatomy;
-    datePicker: typeof import("@pureform/anatomy").datePickerOverlayAnatomy;
-}
-type SlotKey<Spec, P> = Spec extends { readonly slot: infer S }
-    ? Extract<S, string>
-    : P;
-type RemappedHosts<H, A extends { readonly parts: object }> = {
-    readonly [
-        P in keyof H as P extends keyof A["parts"]
-            ? Extract<SlotKey<A["parts"][P], P>, PropertyKey>
-            : never
-    ]: H[P];
-};
-type HostsFor<N extends keyof ComponentHosts> = N extends keyof OverlayAnatomies
-    ? RemappedHosts<ComponentHosts[N], OverlayAnatomies[N]>
-    : ComponentHosts[N];
-
-type SlotNames<N extends keyof ComponentHosts> = N extends ComponentName
-    ? Extract<keyof HostsFor<N>, SlotOf<N>>
-    : keyof HostsFor<N>;
-
-/** Native host props (including style), keyed by component and preset style slot, as on web
- *  providers. Instance customization remains keyed by anatomy part. */
+/** Native host props (including style), keyed by component and anatomy part, as an instance's
+ *  `style` and `slotProps` are and as the web providers' are: the surface of an overlay is
+ *  `content`, its backdrop `backdrop`, a date picker's cells `cell`. Native has no wrapper `root`
+ *  or `positioner` around an overlay, so those keys aren't offered. */
 export type NativeProviderSlotProps = {
     readonly [N in Extract<keyof ComponentHosts, ComponentName>]?: {
-        readonly [S in SlotNames<N>]?: NativePartProps<
-            Extract<HostsFor<N>[S], NativeHost>
+        readonly [S in keyof ComponentHosts[N]]?: NativePartProps<
+            Extract<ComponentHosts[N][S], NativeHost>
         > & {
             readonly style?: NativePartStyle<
-                Extract<HostsFor<N>[S], NativeHost>
+                Extract<ComponentHosts[N][S], NativeHost>
             >;
         };
     };

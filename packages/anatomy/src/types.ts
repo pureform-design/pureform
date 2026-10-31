@@ -17,9 +17,10 @@ export interface PartAnatomy<P extends string = string> {
     readonly styled: boolean;
     /** Whether it's an icon that flips under `rtl` when marked with the `mirrored` state. */
     readonly mirror: boolean;
-    /** The registry slot that styles it and takes the provider's `slotProps`, when that isn't
-     *  its name, or `null` for none: a menu's surface is its `content` part, drawn by the menu's
-     *  `root` slot, while its unstyled `root` wraps the trigger and the surface. */
+    /** The registry slot that draws it (its classes and tokens), when that isn't its name, or
+     *  `null` for none: a menu's surface is its `content` part, drawn by the menu's `root` slot,
+     *  while its unstyled `root` wraps the trigger and the surface. Every part, with or without a
+     *  slot, is addressed by its name: in a provider's `slotProps` as in an instance's props. */
     readonly slot?: string | null;
 }
 
@@ -52,6 +53,13 @@ export interface ComponentAnatomy<
     readonly scope: string;
     /** The outermost part. */
     readonly root: P;
+    /** For an anatomy another component's entry draws (an overlay's backdrop is the scrim's): the
+     *  component whose provider and instance props reach it, by the part named here, so a provider
+     *  writes `dialog.backdrop` as an instance writes `backdrop`. */
+    readonly owner?: {
+        readonly component: string;
+        readonly part: string;
+    };
     /** Every part's name: the AST's slots in order, then the extra parts. */
     readonly partNames: readonly P[];
     /** Every part, by name. */

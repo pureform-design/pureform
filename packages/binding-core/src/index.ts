@@ -1006,12 +1006,15 @@ export type {
 } from "./parts";
 export { createSlotReader } from "./slot-reader";
 export { requireRegistry, resolveProvider, ROOT_PROVIDER } from "./provider";
+export { legacyProviderKeyMessages } from "./legacy-provider-keys";
+export type { LegacyProviderKeyOptions } from "./legacy-provider-keys";
 export type {
     AnyRegistry,
     ComponentDefaults,
     Direction,
     MergePartProps,
     ProviderOptions,
+    ProviderPartKey,
     ProviderSlotProps,
     ProviderState,
 } from "./provider";

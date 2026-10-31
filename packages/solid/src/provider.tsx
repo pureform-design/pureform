@@ -10,6 +10,7 @@ import {
     resolveProvider,
     ROOT_PROVIDER,
     trainVersionMismatch,
+    legacyProviderKeyMessages,
     warnOnce,
 } from "@pureform/binding-core";
 import type { Direction, MotionSetting } from "@pureform/binding-core";
@@ -148,6 +149,13 @@ export function PureformProvider(props: PureformProviderProps): JSX.Element {
             (registry) => {
                 const message = registry && trainVersionMismatch(registry);
                 if (message) warnOnce(message);
+            },
+        );
+        createEffect(
+            () => props.slotProps,
+            (slotProps) => {
+                for (const message of legacyProviderKeyMessages(slotProps))
+                    warnOnce(message);
             },
         );
     }

@@ -60,7 +60,11 @@ import { PortalHost } from "./portal-host";
 import { useDirection, useEngine } from "./provider";
 import { resolveText } from "./resolve-text";
 import { Scrim } from "./single-part";
-import { useNativeSlotReader, withUnselectable } from "./slot-props";
+import {
+    useNativeScrimSlots,
+    useNativeSlotReader,
+    withUnselectable,
+} from "./slot-props";
 import type { PartSlots } from "./slot-props";
 import type { NativeSlotProps } from "./slot-props";
 import { useComponentSlots } from "./styles";
@@ -627,8 +631,6 @@ export type NavigationRailProps = Omit<
             | undefined;
     };
 
-const scrimKeys = (part: string): string => (part === "root" ? "scrim" : part);
-
 /** Material's navigation bar: `<NavigationBar items={destinations} defaultValue="mail" />`. */
 export function NavigationBar(props: NavigationBarProps): ReactNode {
     return <Navigation {...props} name="navigationBar" />;
@@ -638,7 +640,7 @@ export function NavigationBar(props: NavigationBarProps): ReactNode {
  *  the scrim, Escape, or the back button closes it. */
 function ModalRail(props: NavigationRailProps): ReactNode {
     const nativeSlots = useNativeSlotReader("navigationRail");
-    const scrimSlots = useNativeSlotReader("scrim");
+    const scrimSlots = useNativeScrimSlots("navigationRail", "scrim");
     const {
         open: _open,
         defaultOpen,
@@ -657,7 +659,7 @@ function ModalRail(props: NavigationRailProps): ReactNode {
     );
     const layer = useLayer("dialog");
     const slot = nativeSlots(props);
-    const scrimSlot = scrimSlots(props, scrimKeys);
+    const scrimSlot = scrimSlots(props);
     const testId = props.testId;
     const modalId = (part: "scrim" | "dialog") =>
         typeof testId === "string" ? `${testId}-${part}` : testId?.[part];

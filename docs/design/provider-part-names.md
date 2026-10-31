@@ -1,6 +1,7 @@
 # Part names for public customization (F3 audit)
 
-Status: audit and proposal. No code has changed. Decisions are listed at the end.
+Status: implemented (hard switch, per-owner `backdrop` and `cell`, unstyled parts on web). The audit
+below is what it was built from; section 7 records what shipped and what it left.
 
 ## 1. The two vocabularies
 
@@ -158,3 +159,27 @@ The four specs in 3.5 change their keys (`dialog.root` to `dialog.content`, `scr
    after the shared key and before the instance's. Without this, F3 leaves them asymmetrical.
 3. **Expose unstyled parts to the provider on web?** Recommended yes, for parity with the
    instance; Native keeps only its own hosts.
+
+## 7. What shipped
+
+- **Contract:** `ProviderPartOf<N>` in `@pureform/anatomy` (the parts as the bindings render
+  them, plus the owned `backdrop` and `cell`), `owner` on the four backdrop anatomies, and
+  `ProviderSlotProps` keyed by it. `partSources` reads `slotProps[component][part]`, then the
+  owner's key, ahead of the user's props. A render can name an `owner` (a picker's cells).
+- **Native:** `provided[keyOf(part)]`, so overlays' `content`/`body` and the rest read as the
+  instance does; `useNativeScrimSlots(owner)` merges `scrim.root` then the owner's `backdrop` (or
+  `scrim` for the rail). `NativeProviderSlotProps` is the hosts' own keys, so `dialog.root` is a
+  compile error there.
+- **Old keys:** no dual acceptance. In development `legacyProviderKeyMessages` names the new key
+  once per stale key; `root` (and a sheet's `content`) are still parts, so it is a message and not
+  an error. It can be removed when no consumer predates the switch.
+- **Specs:** the four that encoded the old contract now state the new one, with new cases for the
+  wrapper, the positioner, per-owner backdrop and cell, precedence, and the warning.
+
+### Left open
+
+- **Native tabs:** the web's tab list is `list` and its wrapper `root`; Native's Tabs has no
+  wrapper, so its list is `root` and its test id `pf-tabs-root`. The shared tabs case finds
+  `pf-tabs-root` on both platforms, so renaming Native's is a parity decision of its own (give it a
+  wrapper, or rename the web's), not part of the provider switch. The dev message skips Native's
+  tabs for this reason.

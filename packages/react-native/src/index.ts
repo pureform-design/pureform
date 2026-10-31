@@ -39,6 +39,7 @@ export { testIdOf, unselectable, useControllable, withEngine } from "./parts";
 export {
     backdropKeys,
     nativeSlots,
+    useNativeScrimSlots,
     overlayKeys,
     useNativeSlotReader,
     withUnselectable,

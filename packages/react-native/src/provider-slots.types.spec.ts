@@ -18,9 +18,13 @@ it("types provider style slots by their Native host", () => {
                 style: { fontSize: 16 },
             },
         },
+        // An overlay's surface is `content`, as an instance's key is; the backdrop is its own.
         dialog: {
-            root: { accessibilityLabel: "Dialog", style: { padding: 8 } },
+            content: { accessibilityLabel: "Dialog", style: { padding: 8 } },
+            backdrop: { style: { opacity: 0.5 } },
         },
+        bottomSheet: { body: { style: { padding: 4 } } },
+        datePicker: { cell: { style: { margin: 2 } } },
         media: { root: { resizeMode: "contain" } },
     } satisfies NativeProviderSlotProps;
     expectTypeOf({ slotProps: slots }).toExtend<PureformProviderProps>();
@@ -36,9 +40,10 @@ it("types provider style slots by their Native host", () => {
         // @ts-expect-error Native style values retain their host's types
         button: { root: { style: { position: "floating" } } },
     };
-    const anatomyKey: NativeProviderSlotProps = {
-        // @ts-expect-error dialog's surface is the root style slot, not the content anatomy part
-        dialog: { content: { style: { padding: 4 } } },
+    const slotKey: NativeProviderSlotProps = {
+        // @ts-expect-error `root` was the preset's slot for the surface; the part is `content`, and
+        // Native has no wrapper to address as `root`
+        dialog: { root: { style: { padding: 4 } } },
     };
-    void [inputOnLabel, imageOnInput, cssStyle, anatomyKey];
+    void [inputOnLabel, imageOnInput, cssStyle, slotKey];
 });

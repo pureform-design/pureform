@@ -1,5 +1,7 @@
 import {
     buttonAnatomy,
+    calendarCellAnatomy,
+    dialogBackdropAnatomy,
     menuOverlayAnatomy,
     selectAnatomy,
 } from "@pureform/anatomy";
@@ -164,20 +166,87 @@ describe("partSources", () => {
             { "data-pf-active": "" },
             classes.root,
             { title: "provided" },
+            undefined,
             { title: "user" },
         ]);
     });
 
-    it("gives the provider's slot props by the slot that draws the part", () => {
-        const provided = { menu: { root: { title: "surface" } } };
-        const source = (part: "root" | "content") =>
+    it("gives the provider's props by the part's name, as an instance's keyed props are", () => {
+        const provided = {
+            menu: {
+                root: { title: "wrapper" },
+                content: { title: "surface" },
+                positioner: { title: "positioner" },
+            },
+        };
+        const source = (part: "root" | "content" | "positioner" | "trigger") =>
             partSources({
                 anatomy: menuOverlayAnatomy,
                 part,
                 slotProps: provided,
             })[4];
+        // The surface is `content`, though the preset draws it with its `root` slot, and the
+        // unstyled wrapper and positioner (no slot) are addressed too.
         expect(source("content")).toEqual({ title: "surface" });
-        expect(source("root")).toBeUndefined();
+        expect(source("root")).toEqual({ title: "wrapper" });
+        expect(source("positioner")).toEqual({ title: "positioner" });
+        expect(source("trigger")).toBeUndefined();
+    });
+
+    it("gives a backdrop the scrim's props, then its owner's `backdrop` props, ahead of the user's", () => {
+        const slotProps = {
+            scrim: { root: { title: "every scrim" } },
+            dialog: { backdrop: { title: "this dialog's" } },
+        };
+        const sources = partSources({
+            anatomy: dialogBackdropAnatomy,
+            part: "root",
+            slotProps,
+            props: { title: "user" },
+        });
+        expect(sources.slice(4)).toEqual([
+            { title: "every scrim" },
+            { title: "this dialog's" },
+            { title: "user" },
+        ]);
+        // Another owner's key doesn't reach it, and a part with no owner has no such source.
+        expect(
+            partSources({
+                anatomy: dialogBackdropAnatomy,
+                part: "root",
+                slotProps: { bottomSheet: { backdrop: { title: "sheet" } } },
+            })[5],
+        ).toBeUndefined();
+        expect(
+            partSources({ anatomy: buttonAnatomy, part: "root", slotProps })[5],
+        ).toBeUndefined();
+    });
+
+    it("gives a part its owner's props when its render names one, as a picker's cell does", () => {
+        const slotProps = {
+            calendarCell: { root: { title: "every cell" } },
+            datePicker: { cell: { title: "this picker's" } },
+        };
+        const sources = partSources({
+            anatomy: calendarCellAnatomy,
+            part: "root",
+            owner: { component: "datePicker", part: "cell" },
+            slotProps,
+            props: { title: "user" },
+        });
+        expect(sources.slice(4)).toEqual([
+            { title: "every cell" },
+            { title: "this picker's" },
+            { title: "user" },
+        ]);
+        // Without an owner, the cell has only the calendar cell's own.
+        expect(
+            partSources({
+                anatomy: calendarCellAnatomy,
+                part: "root",
+                slotProps,
+            })[5],
+        ).toBeUndefined();
     });
 
     it("drops the registry's classes for an unstyled part, from Root or its own", () => {

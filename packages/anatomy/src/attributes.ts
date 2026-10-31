@@ -35,7 +35,7 @@ export const partTestId = <A extends ComponentAnatomy>(
     );
 };
 
-/** The registry slot a part reads its classes and the provider's `slotProps` from: its `slot`, else
- *  its name. `null` when it has none. */
+/** The registry slot a part reads its classes from: its `slot`, else its name. `null` when it has
+ *  none. Not the key a provider's `slotProps` or an instance's props use: those are the part's name. */
 export const partSlot = (part: PartAnatomy): string | null =>
     part.slot === undefined ? part.name : part.slot;

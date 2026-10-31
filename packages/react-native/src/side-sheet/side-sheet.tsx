@@ -48,7 +48,11 @@ import { themeSpring, useOverlayPresence } from "../presence";
 import { useDirection, useEngine, usePureform } from "../provider";
 import { resolveText } from "../resolve-text";
 import { useSidewaysPan } from "../sideways-pan";
-import { backdropKeys, useNativeSlotReader, overlayKeys } from "../slot-props";
+import {
+    useNativeScrimSlots,
+    useNativeSlotReader,
+    overlayKeys,
+} from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 import { triggerButtonProps } from "../trigger-button";
@@ -344,7 +348,7 @@ function SideSheetDrag(props: {
 
 function ModalSideSheet(props: SideSheetProps): ReactNode {
     const nativeSlots = useNativeSlotReader("sideSheet");
-    const scrimSlots = useNativeSlotReader("scrim");
+    const scrimSlots = useNativeScrimSlots("sideSheet");
     const {
         trigger,
         open: _open,
@@ -389,7 +393,7 @@ function ModalSideSheet(props: SideSheetProps): ReactNode {
             >
                 <ModalScrimLayer
                     scrimTestId={partAsRoot<string>(props.testId, "backdrop")}
-                    scrimSlot={scrimSlots(props, backdropKeys)}
+                    scrimSlot={scrimSlots(props)}
                     open={open}
                     presence={presence}
                     onPressOutside={close}

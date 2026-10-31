@@ -248,7 +248,7 @@ export function calendarParts(use: (name: string) => CalendarContext) {
     }
 
     function Cell(props: CalendarCellProps): JSX.Element {
-        const { picker } = use("Cell");
+        const { scope: owner, picker } = use("Cell");
         const view = (): CalendarView => props.view ?? "day";
         const day = createMemo(() =>
             view() === "day"
@@ -366,6 +366,9 @@ export function calendarParts(use: (name: string) => CalendarContext) {
             element: "div",
             machine: () => cellProps()[0],
             unstyled: () => rootSlot?.unstyled,
+            // The picker's own `cell` props from the provider come with the calendar cell's, and
+            // an instance's `cell` key, which is `rootSlot`, wins over both.
+            owner: { component: owner.anatomy.name, part: "cell" },
             props: rootSlot
                 ? // oxlint-disable-next-line solid/reactivity -- an optional slot's props, passed straight to render
                   merge(omit(rootSlot, "unstyled"), { children: trigger })

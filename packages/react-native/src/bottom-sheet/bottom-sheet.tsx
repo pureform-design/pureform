@@ -65,7 +65,11 @@ import {
 import { themeSpring, useOverlayPresence } from "../presence";
 import { useEngine, usePureform } from "../provider";
 import { resolveText } from "../resolve-text";
-import { backdropKeys, useNativeSlotReader, overlayKeys } from "../slot-props";
+import {
+    useNativeScrimSlots,
+    useNativeSlotReader,
+    overlayKeys,
+} from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 import { triggerButtonProps } from "../trigger-button";
@@ -434,7 +438,7 @@ const Surface = withEngine(BottomSheetImpl, "BottomSheet");
 
 function ModalBottomSheet(props: BottomSheetProps): ReactNode {
     const nativeSlots = useNativeSlotReader("bottomSheet");
-    const scrimSlots = useNativeSlotReader("scrim");
+    const scrimSlots = useNativeScrimSlots("bottomSheet");
     const {
         trigger,
         open: _open,
@@ -470,7 +474,7 @@ function ModalBottomSheet(props: BottomSheetProps): ReactNode {
             <ModalWindow visible={presence.present} label={props["aria-label"]}>
                 <ModalScrimLayer
                     scrimTestId={partAsRoot<string>(props.testId, "backdrop")}
-                    scrimSlot={scrimSlots(props, backdropKeys)}
+                    scrimSlot={scrimSlots(props)}
                     open={open}
                     presence={presence}
                     onPressOutside={close}

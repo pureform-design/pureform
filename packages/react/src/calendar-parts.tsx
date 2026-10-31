@@ -445,7 +445,12 @@ export function calendarParts(context: PartContext<CalendarContext>) {
         children,
         ...props
     }: CalendarCellProps): ReactNode {
-        const { picker, selected, selectionMode } = context.use("Cell");
+        const {
+            scope: owner,
+            picker,
+            selected,
+            selectionMode,
+        } = context.use("Cell");
         let root: Dict;
         let trigger: Dict;
         let label: ReactNode;
@@ -509,6 +514,9 @@ export function calendarParts(context: PartContext<CalendarContext>) {
         return scope.render("root", {
             element: "div",
             machine: root,
+            // The picker's own `cell` props from the provider come with the calendar cell's, and
+            // an instance's `cell` key, which is `props`, wins over both.
+            owner: { component: owner.anatomy.name, part: "cell" },
             props: {
                 ...props,
                 children: scope.render("trigger", {

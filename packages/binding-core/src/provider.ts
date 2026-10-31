@@ -2,6 +2,7 @@
 // provider's own options resolve over its parent's: the registry, direction, and motion are
 // inherited unless set, and defaults and slot props merge per component.
 
+import type { AnatomyName, ProviderPartOf } from "@pureform/anatomy";
 import type { MotionSetting } from "@pureform/core";
 import type {
     ComponentName,
@@ -25,10 +26,17 @@ export type ComponentDefaults = {
     readonly [N in ComponentName]?: Selection<N>;
 };
 
-/** Props per component and slot, applied to every part under the provider:
+/** The keys a provider addresses component `N` by: its anatomy's part names, the same as an
+ *  instance's keyed props (the surface of a dialog is `content`, its backdrop `backdrop`). A
+ *  component outside the preset (a custom registry's) is addressed by its registry slots. */
+export type ProviderPartKey<N extends ComponentName> = N extends AnatomyName
+    ? ProviderPartOf<N>
+    : SlotOf<N>;
+
+/** Props per component and part, applied to every part under the provider:
  *  `{ button: { label: { class: "caps" } } }`. `P` is the binding's props for one part. */
 export type ProviderSlotProps<P> = {
-    readonly [N in ComponentName]?: { readonly [S in SlotOf<N>]?: P };
+    readonly [N in ComponentName]?: { readonly [S in ProviderPartKey<N>]?: P };
 };
 
 /** A provider's own options. Every one is optional; left out, it's inherited. `R` is the

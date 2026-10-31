@@ -318,6 +318,36 @@ describe("DatePicker, ready-made", () => {
         expect(onModeToggle).toHaveBeenCalled();
     });
 
+    it("takes the provider's `cell` props for its own cells, over the calendar cell's and under the instance's", async () => {
+        mount(
+            <PureformProvider
+                registry={datePickersRegistry()}
+                slotProps={{
+                    calendarCell: {
+                        root: { style: { marginLeft: 1, marginTop: 1 } },
+                    },
+                    datePicker: {
+                        cell: { style: { marginTop: 2, marginBottom: 2 } },
+                    },
+                    dockedDatePicker: { cell: { style: { marginTop: 99 } } },
+                }}
+            >
+                <DatePicker
+                    locale="en-US"
+                    defaultValue={["2026-08-17"]}
+                    defaultOpen
+                    style={{ cell: { marginBottom: 3 } }}
+                />
+            </PureformProvider>,
+        );
+        await settle();
+        const root = cellRoot("2026-08-17");
+        // Every cell's, then this picker's, then the instance's, each over the one before.
+        expect(root.style.marginLeft).toBe("1px");
+        expect(root.style.marginTop).toBe("2px");
+        expect(root.style.marginBottom).toBe("3px");
+    });
+
     it("lists the years as one scrollable range around the chosen year, as Material's", async () => {
         withRegistry(
             <DatePicker

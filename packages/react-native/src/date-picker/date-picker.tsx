@@ -34,7 +34,7 @@ import { IconSlot, iconSlot } from "../icon-style";
 import { ModalScrimLayer, ModalWindow, useModalOverlay } from "../modal";
 import { useControllable, withEngine } from "../parts";
 import {
-    backdropKeys,
+    useNativeScrimSlots,
     useNativeSlotReader,
     overlayKeys,
     withUnselectable,
@@ -310,7 +310,7 @@ function StandaloneDatePicker(props: DatePickerProps): ReactNode {
 
 function ModalDatePicker(props: DatePickerProps): ReactNode {
     const nativeSlots = useNativeSlotReader("datePicker");
-    const scrimSlots = useNativeSlotReader("scrim");
+    const scrimSlots = useNativeScrimSlots("datePicker");
     const [value, setValue] = useValue(props);
     const { open, presence, close, show } = useModalOverlay(
         "DatePicker",
@@ -345,7 +345,7 @@ function ModalDatePicker(props: DatePickerProps): ReactNode {
             >
                 <ModalScrimLayer
                     scrimTestId={partAsRoot<string>(props.testId, "backdrop")}
-                    scrimSlot={scrimSlots(props, backdropKeys)}
+                    scrimSlot={scrimSlots(props)}
                     open={open}
                     presence={presence}
                     onPressOutside={

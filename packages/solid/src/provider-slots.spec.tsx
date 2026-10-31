@@ -1,5 +1,5 @@
 import { createSignal, flush } from "solid-js";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { PureformProvider } from ".";
@@ -79,14 +79,19 @@ describe("provider slot customization contract", () => {
         expect(calls).toEqual(["outer", "instance"]);
     });
 
-    it("uses style-slot root for the dialog surface, not its structural root or scrim", async () => {
+    it("addresses a dialog's parts by name, as an instance does: the surface is `content`", async () => {
         mount(() => (
             <PureformProvider
                 registry={overlaysRegistry()}
                 motion="reduce"
                 slotProps={{
-                    dialog: { root: { style: { "margin-top": "7px" } } },
-                    scrim: { root: { style: { opacity: 0.25 } } },
+                    dialog: {
+                        content: { style: { "margin-top": "7px" } },
+                        root: { style: { "margin-bottom": "5px" } },
+                        positioner: { style: { "padding-top": "3px" } },
+                        backdrop: { style: { opacity: 0.5 } },
+                    },
+                    scrim: { root: { style: { "margin-left": "2px" } } },
                 }}
             >
                 <Dialog
@@ -101,12 +106,66 @@ describe("provider slot customization contract", () => {
         const content = byTestId("pf-dialog-content");
         expect(content.style.marginTop).toBe("7px");
         expect(content.style.marginLeft).toBe("9px");
+        expect(content.style.marginBottom).toBe("");
         expect(content.getAttribute("role")).toBe("dialog");
         expect(content.getAttribute("aria-labelledby")).toBe(
             byTestId("pf-dialog-headline").id,
         );
+        // The unstyled wrapper and the positioner take their own keys now.
+        expect(byTestId("pf-dialog-root").style.marginBottom).toBe("5px");
         expect(byTestId("pf-dialog-root").style.marginTop).toBe("");
-        expect(byTestId("pf-dialog-backdrop").style.marginTop).toBe("");
-        expect(byTestId("pf-dialog-backdrop").style.opacity).toBe("0.25");
+        expect(byTestId("pf-dialog-positioner").style.paddingTop).toBe("3px");
+        // The backdrop takes every scrim's props, then this dialog's own `backdrop`.
+        const backdrop = byTestId("pf-dialog-backdrop");
+        expect(backdrop.style.marginLeft).toBe("2px");
+        expect(backdrop.style.opacity).toBe("0.5");
+    });
+
+    it("lets an instance's backdrop win over the provider's, and one dialog's key not reach another's", async () => {
+        mount(() => (
+            <PureformProvider
+                registry={overlaysRegistry()}
+                motion="reduce"
+                slotProps={{
+                    dialog: { backdrop: { style: { opacity: 0.5 } } },
+                    bottomSheet: { backdrop: { style: { opacity: 0.1 } } },
+                }}
+            >
+                <Dialog
+                    defaultOpen
+                    headline="Discard draft?"
+                    body="Gone."
+                    // oxlint-disable-next-line solid/style-prop -- a part-keyed style record, not CSS properties
+                    style={{ backdrop: { opacity: 0.8 } }}
+                />
+            </PureformProvider>
+        ));
+        await settle();
+        expect(byTestId("pf-dialog-backdrop").style.opacity).toBe("0.8");
+    });
+
+    it("says in development when a provider still keys a component by its preset slot", async () => {
+        const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+        try {
+            mount(() => (
+                <PureformProvider
+                    registry={overlaysRegistry()}
+                    slotProps={{
+                        sideSheet: { content: { style: { margin: "1px" } } },
+                        // Parts, not slots: nothing to say about these.
+                        dialog: { content: { style: { margin: "1px" } } },
+                    }}
+                >
+                    <div />
+                </PureformProvider>
+            ));
+            await settle();
+            const said = warn.mock.calls.map((call) => String(call[0]));
+            expect(said).toHaveLength(1);
+            expect(said[0]).toContain("slotProps.sideSheet.content");
+            expect(said[0]).toContain("slotProps.sideSheet.body");
+        } finally {
+            warn.mockRestore();
+        }
     });
 });

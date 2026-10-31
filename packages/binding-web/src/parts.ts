@@ -90,6 +90,12 @@ export interface PartSourcesInput<A extends ComponentAnatomy> {
     readonly unstyled?: Unstyled<PartName<A>> | undefined;
     /** The part's own `unstyled`. */
     readonly partUnstyled?: boolean | undefined;
+    /** The component whose provider key (`datePicker.cell`) also reaches this part, ahead of the
+     *  user's props, when the part is another component's: a picker's calendar cells. Over the
+     *  anatomy's own `owner`. */
+    readonly owner?:
+        | { readonly component: string; readonly part: string }
+        | undefined;
     /** Every slot's classes, from the registry. */
     readonly classes?: Readonly<Record<string, SlotClasses>> | undefined;
     /** The provider's `slotProps`, by component and slot. */
@@ -100,36 +106,34 @@ export interface PartSourcesInput<A extends ComponentAnatomy> {
 
 /** A part's props sources, in the order they merge: the machine's part props, the anatomy's
  *  `data-scope`/`data-pf-part`/`data-testid`, the `data-pf-*` state attributes, the registry's
- *  class and token style (unless unstyled), the provider's `slotProps` for the part's slot, and the
- *  user's props. Pass them to `combineProps` with the binding's rules. */
+ *  class and token style (unless unstyled), the provider's `slotProps` for the part, then for a
+ *  backdrop the provider's props for its owner's `backdrop` (the scrim's own come first), and the
+ *  user's props. A provider addresses a part by its name, as an instance's keyed props do (the
+ *  surface of an overlay is `content`, though the preset draws it with its `root` slot). Pass them
+ *  to `combineProps` with the binding's rules. */
 export const partSources = <A extends ComponentAnatomy>(
     input: PartSourcesInput<A>,
 ): readonly (Dict | undefined)[] => {
     const { anatomy, part } = input;
     const unstyled =
         isUnstyled(input.unstyled, part) || input.partUnstyled === true;
-    const spec = (anatomy.parts as ComponentAnatomy["parts"])[part];
-    const slot = spec ? partSlot(spec) : part;
-    const provided =
-        slot === null
-            ? undefined
-            : (
-                  input.slotProps as
-                      | Readonly<
-                            Record<
-                                string,
-                                | Readonly<Record<string, Dict | undefined>>
-                                | undefined
-                            >
-                        >
-                      | undefined
-              )?.[anatomy.name]?.[slot];
+    const provider = input.slotProps as
+        | Readonly<
+              Record<
+                  string,
+                  Readonly<Record<string, Dict | undefined>> | undefined
+              >
+          >
+        | undefined;
+    const owner =
+        input.owner ?? (part === anatomy.root ? anatomy.owner : undefined);
     return [
         input.machine as Dict | undefined,
         partAttributes(anatomy, part, input.testId) as unknown as Dict,
         stateAttributes(input.states) as Dict,
         partClasses(anatomy, part, input.classes, unstyled) as Dict | undefined,
-        provided,
+        provider?.[anatomy.name]?.[part],
+        owner ? provider?.[owner.component]?.[owner.part] : undefined,
         spreadableProps(input.props),
     ];
 };

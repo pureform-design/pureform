@@ -220,7 +220,7 @@ const build = (
             (createSlotReader(keyOf(part), () => instance)(slotProps) as
                 | Dict
                 | undefined) ?? EMPTY;
-        const defaults = provided[part] as Dict | undefined;
+        const defaults = provided[keyOf(part)] as Dict | undefined;
         return defaults
             ? own === EMPTY
                 ? defaults
@@ -233,7 +233,9 @@ const build = (
         each: (part) => isPerInstance(keyed, keyOf(part)),
         style: (part, own, instance) => {
             const user = createSlotReader(keyOf(part), () => instance)(style);
-            const defaults = (provided[part] as Dict | undefined)?.["style"];
+            const defaults = (provided[keyOf(part)] as Dict | undefined)?.[
+                "style"
+            ];
             return styleOver(styleOver(own, defaults), user);
         },
         on: (part, name, own, instance) => {
@@ -309,8 +311,9 @@ export const nativeSlots = (
 };
 
 /** Read provider defaults once, unconditionally in the component owner. The returned pure
- *  reader may also be used in callbacks and for composed children. Provider keys are style
- *  slots; `keyOf` only translates the instance's anatomy-part keys. */
+ *  reader may also be used in callbacks and for composed children. Provider keys are anatomy part
+ *  names, as an instance's keyed props are; a component addresses its parts by preset slot, and
+ *  `keyOf` translates a slot to the part both read. */
 export const useNativeSlotReader = (
     name: ComponentName,
 ): typeof nativeSlots => {
@@ -372,3 +375,34 @@ export const withUnselectable = <S>(own: S): S => {
  *  `nativeSlots` with the owner's props for the scrim's `slot`. */
 export const backdropKeys = (part: string): string =>
     part === "root" ? "backdrop" : part;
+
+const scrimKeys = (part: string): string => (part === "root" ? "scrim" : part);
+
+/** The reader for a scrim an `owner` draws (a dialog's or a sheet's backdrop, the rail's scrim):
+ *  the provider's props for every scrim (`scrim.root`), then the owner's own, under the part name
+ *  the owner's instance props use (`backdrop`, or `scrim`). Unlike `useNativeSlotReader`, which
+ *  reads one component's key. */
+export const useNativeScrimSlots = (
+    owner: ComponentName,
+    part: "backdrop" | "scrim" = "backdrop",
+): ((
+    props:
+        | {
+              readonly style?: object | undefined;
+              readonly slotProps?: object | undefined;
+          }
+        | undefined,
+) => PartSlots) => {
+    const provided = usePureform().slotProps as Readonly<
+        Record<string, Readonly<Record<string, Dict | undefined>> | undefined>
+    >;
+    const shared = provided["scrim"]?.["root"];
+    const own = provided[owner]?.[part];
+    return useMemo(() => {
+        const merged =
+            shared && own ? mergeNativePartProps(shared, own) : (own ?? shared);
+        const keyed = merged ? { [part]: merged } : EMPTY;
+        const keyOf = part === "backdrop" ? backdropKeys : scrimKeys;
+        return (props) => nativeSlots(props, keyOf, keyed);
+    }, [shared, own, part]);
+};

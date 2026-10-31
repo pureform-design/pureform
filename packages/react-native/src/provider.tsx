@@ -9,6 +9,7 @@ import {
     resolveReducedMotion,
     ROOT_PROVIDER,
     trainVersionMismatch,
+    legacyProviderKeyMessages,
     warnOnce,
 } from "@pureform/binding-core";
 import type {
@@ -112,8 +113,10 @@ export interface PureformProviderProps {
     readonly motion?: MotionSetting | undefined;
     /** Default variants and tokens per component, over the outer provider's. */
     readonly defaults?: ComponentDefaults | undefined;
-    /** Host props per component and preset style slot, merged over outer providers and under
-     *  instance customization. Keep the object stable, as with `defaults`. */
+    /** Host props per component and anatomy part (the same keys an instance's `style` and
+     *  `slotProps` use: an overlay's surface is `content`, its backdrop `backdrop`), merged over
+     *  outer providers and under instance customization. Keep the object stable, as with
+     *  `defaults`. */
     readonly slotProps?: NativeProviderSlotProps | undefined;
     /** What runs transitions and ripples and draws shapes: `animated` (React Native's Animated,
      *  the default), or `animatedSvg`, `reanimated`, or `reanimatedSvg` from this package's
@@ -395,6 +398,15 @@ export function PureformProvider(props: PureformProviderProps): ReactNode {
         const message = trainVersionMismatch(state.registry);
         if (message) warnOnce(message);
     }, [state.registry]);
+    useEffect(() => {
+        if (!isDev) return;
+        // Native has no wrapper `root` around an overlay, and its tabs' `root` is their list.
+        for (const message of legacyProviderKeyMessages(props.slotProps, {
+            wrapper: false,
+            keeps: (component) => component === "tabs",
+        }))
+            warnOnce(message);
+    }, [props.slotProps]);
     const reducedMotion = resolveReducedMotion(
         state.motion,
         useSystemReducedMotion(state.motion === "system"),

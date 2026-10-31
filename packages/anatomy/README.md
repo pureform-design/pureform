@@ -142,8 +142,10 @@ partTestId(buttonAnatomy, "label", { root: "save" }); // "pf-button-label"
 | `TEST_ID_PREFIX`                                                                   | `"pf"`, the portable default test-id prefix.                     |
 | `kebabCase(name)`                                                                  | `touchTarget` → `touch-target`.                                  |
 | `partSlot(part)`                                                                   | The registry slot a part is drawn by: its `slot`, else its name. |
+| `renamedSlotPart(component, key)`                                                  | The part that took over a preset slot's name as a provider key.  |
 | `ComponentAnatomy`, `PartAnatomy`, `IndicationAnatomy`, `PartName<A>`, `ExtraPart` | The shape.                                                       |
 | `Anatomies`, `AnatomyName`, `PartOf<N>`                                            | Types over the preset's components: `PartOf<"button">`.          |
+| `ProviderPartOf<N>`                                                                | The part names a provider and an instance address `N` by.        |
 
 HTML construction (`partAttributes`) is exported by `@pureform/binding-web`; the attribute
 constants and `PartAttributes` type are exported by `@pureform/web-contracts`.
@@ -192,8 +194,11 @@ and its part names are the menu's slots (`root`, `itemGroup`, `itemGroupLabel`, 
 menu, tooltips, and dialog as the bindings render them: an unstyled `root` (the element around
 everything, `pf-<scope>-root`), `trigger`, and `positioner`, then the preset's slots. The preset's
 `root` slot is the surface, so its part is `content` (`data-pf-part="content"`,
-`pf-menu-content`) with `slot: "root"`: a part's `slot` names the registry slot that draws it and
-takes the provider's `slotProps` (`partSlot(part)` reads it; `null` for none, as on the wrapper).
+`pf-menu-content`) with `slot: "root"`: a part's `slot` names the registry slot that draws it, for
+its classes and tokens (`partSlot(part)` reads it; `null` for none, as on the wrapper). Provider
+`slotProps` and an instance's keyed props address every part by its name, the wrapper `root` and
+`positioner` included, so `slotProps.menu.content` styles the surface; `ProviderPartOf<N>` is
+those names, with the parts a component owns (`dialog.backdrop`, `datePicker.cell`).
 The dialog also has an unstyled `closeTrigger`, and its backdrop is `dialogBackdropAnatomy`, drawn
 by the scrim's entry (`name: "scrim"`) under the dialog's scope (`pf-dialog-backdrop`). Their test
 ids are in `compositeTestIds.menu`, `.tooltip`, `.richTooltip`, `.popover`, `.dialog`, `.dialogBackdrop`; the snackbar uses

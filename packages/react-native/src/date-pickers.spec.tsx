@@ -71,9 +71,12 @@ describe("DatePicker", () => {
         await render(
             <PureformProvider
                 slotProps={{
-                    datePicker: { root: { style: { marginLeft: 7 } } },
+                    datePicker: {
+                        content: { style: { marginLeft: 7 } },
+                        cell: { style: { marginTop: 4, marginBottom: 4 } },
+                    },
                     calendarCell: {
-                        root: { style: { marginTop: 3 } },
+                        root: { style: { marginTop: 3, marginRight: 3 } },
                         trigger: { style: { opacity: 0.9 }, onPress: pressed },
                     },
                 }}
@@ -86,6 +89,9 @@ describe("DatePicker", () => {
             </PureformProvider>,
         );
         expect(computed("pf-date-picker-content").marginLeft).toBe("7px");
+        // Every cell's, then this picker's `cell`, then the instance's, each over the one before.
+        expect(computed("pf-calendar-cell-root").marginRight).toBe("3px");
+        expect(computed("pf-calendar-cell-root").marginBottom).toBe("4px");
         expect(computed("pf-calendar-cell-root").marginTop).toBe("6px");
         const next = day("Tuesday, August 11, 2026");
         expect(getComputedStyle(next).opacity).toBe("0.9");

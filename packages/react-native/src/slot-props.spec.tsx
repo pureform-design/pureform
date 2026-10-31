@@ -229,12 +229,15 @@ describe("keyed style and slotProps", () => {
         expect(calls).toEqual(["own", "outer", "inner", "instance"]);
     });
 
-    it("addresses an overlay surface by the provider's style-slot root", async () => {
+    it("addresses an overlay's parts by name as an instance does: the surface is `content`", async () => {
         await render(
             <PureformProvider
                 slotProps={{
-                    dialog: { root: { style: { marginTop: 7 } } },
-                    scrim: { root: { style: { opacity: 0.25 } } },
+                    dialog: {
+                        content: { style: { marginTop: 7 } },
+                        backdrop: { style: { opacity: 0.5 } },
+                    },
+                    scrim: { root: { style: { marginLeft: 2 } } },
                 }}
             >
                 <Dialog
@@ -254,7 +257,57 @@ describe("keyed style and slotProps", () => {
             "Discard draft?",
         );
         expect(computed("dim").marginTop).toBe("0px");
-        expect(computed("dim").opacity).toBe("0.25");
+        // Every scrim's props, then this dialog's own `backdrop`.
+        expect(computed("dim").marginLeft).toBe("2px");
+        expect(computed("dim").opacity).toBe("0.5");
+    });
+
+    it("lets an instance's backdrop win over the provider's, and another owner's key not reach it", async () => {
+        await render(
+            <PureformProvider
+                slotProps={{
+                    dialog: { backdrop: { style: { opacity: 0.5 } } },
+                    bottomSheet: { backdrop: { style: { opacity: 0.1 } } },
+                }}
+            >
+                <Dialog
+                    defaultOpen
+                    headline="Discard draft?"
+                    style={{ backdrop: { opacity: 0.8 } }}
+                    testId={{ backdrop: "dim" }}
+                >
+                    Gone.
+                </Dialog>
+            </PureformProvider>,
+        );
+        await settle(600);
+        expect(computed("dim").opacity).toBe("0.8");
+    });
+
+    it("says in development when a provider still keys an overlay by its preset slot, not for Native's own tabs", async () => {
+        const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+        try {
+            await render(
+                <PureformProvider
+                    slotProps={
+                        {
+                            popover: { root: { style: { margin: 1 } } },
+                            tabs: { root: { style: { margin: 1 } } },
+                            dialog: { content: { style: { margin: 1 } } },
+                        } as never
+                    }
+                >
+                    <View />
+                </PureformProvider>,
+            );
+            const said = warn.mock.calls.map((call) => String(call[0]));
+            expect(said).toHaveLength(1);
+            expect(said[0]).toContain("slotProps.popover.root");
+            expect(said[0]).toContain("slotProps.popover.content");
+            expect(said[0]).toContain("isn't a part on this platform");
+        } finally {
+            warn.mockRestore();
+        }
     });
 
     it("reacts to provider replacement and removal without resetting instance state", async () => {

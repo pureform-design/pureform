@@ -1538,6 +1538,30 @@ describe("the sheets", () => {
         ).toBeNull();
     });
 
+    it("takes a provider's `content` for a sheet's surface and `body` for its body, as an instance's keys do", async () => {
+        await render(
+            <PureformProvider
+                slotProps={{
+                    bottomSheet: {
+                        content: { style: { marginLeft: 5 } },
+                        body: { style: { marginTop: 6 } },
+                    },
+                }}
+            >
+                <BottomSheet modal={false}>Share to</BottomSheet>
+            </PureformProvider>,
+        );
+        expect(
+            getComputedStyle(byTestId("pf-bottom-sheet-content")).marginLeft,
+        ).toBe("5px");
+        expect(
+            getComputedStyle(byTestId("pf-bottom-sheet-content")).marginTop,
+        ).not.toBe("6px");
+        expect(
+            getComputedStyle(byTestId("pf-bottom-sheet-body")).marginTop,
+        ).toBe("6px");
+    });
+
     it("lays a standalone bottom sheet out as its surface would be, whatever its parent's layout", async () => {
         for (const layout of [
             { alignItems: "center" },

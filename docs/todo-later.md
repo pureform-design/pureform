@@ -39,19 +39,17 @@ results and recordings.
   menu actions separately and don't promise unsupported OS-menu features.
 - **F2. Token, theme and @property pruning:** separate design; account for runtime token/theme
   references and dynamic usage (keyframe pruning is done in `narrowConfig`).
-- **F3. Anatomy-part names for public customization:** audited, see
-  `docs/design/provider-part-names.md` (24 of 646 parts differ, 13 real renames, two collisions;
-  it reverses a recorded decision in `component-architecture.md`). Recommended: provider
-  `slotProps` keyed by anatomy part, a hard switch with a dev-only warning for old keys, never
-  accepting both. Waiting on three decisions listed in the doc (hard switch or window, per-owner
-  `backdrop`/`cell` keys, unstyled parts on web).
+- **F3 follow-up, Native tabs naming:** the web's tab list is `list` (wrapper `root`); Native's Tabs
+  has no wrapper, so its list is `root` (`pf-tabs-root`) and the shared tabs case finds that id on
+  both platforms. Decide whether Native gets a wrapper or the web's names change. See
+  `docs/design/provider-part-names.md` §7.
 
 ## External verification and maintenance
 
 - **Full-gate timing failures (load, not reproduced alone):** under the parallel full workspace
   gate a few specs fail once and pass alone: browser-e2e `rn-motion.e2e.test.ts` (30s setup
   hook), RN `table.spec` ("only hovers actionable rows") and `fullscreen-dialog.spec` ("draws a
-  label (Save)"), and the earlier component-suite `overlayShrinkOut`. The Reanimated FAB-menu
+  label (Save)"), browser-e2e `parity.e2e.test.ts` ("every variant value at rest", 60s test limit; the file takes ~150s alone), and the earlier component-suite `overlayShrinkOut`. The Reanimated FAB-menu
   stagger test (`presence.spec.tsx`) now waits on its own 6× slowed motion's budget (30s) rather
   than `until`'s 10s, and passed two full RN runs; rerun the whole workspace gate to confirm.
   Look for what starves the browsers (workers per core) before widening any other timeout.

@@ -715,6 +715,7 @@ export const dialogOverlayAnatomy = {
 export const dialogBackdropAnatomy = {
     name: "scrim",
     scope: "dialog",
+    owner: { component: "dialog", part: "backdrop" },
     root: "root",
     partNames: ["root"],
     parts: {
@@ -945,6 +946,7 @@ export const datePickerOverlayAnatomy = {
 export const datePickerBackdropAnatomy = {
     name: "scrim",
     scope: "date-picker",
+    owner: { component: "datePicker", part: "backdrop" },
     root: "root",
     partNames: ["root"],
     parts: {
@@ -1396,6 +1398,7 @@ export const bottomSheetOverlayAnatomy = {
 export const bottomSheetBackdropAnatomy = {
     name: "scrim",
     scope: "bottom-sheet",
+    owner: { component: "bottomSheet", part: "backdrop" },
     root: "root",
     partNames: ["root"],
     parts: {
@@ -1529,6 +1532,7 @@ export const sideSheetOverlayAnatomy = {
 export const sideSheetBackdropAnatomy = {
     name: "scrim",
     scope: "side-sheet",
+    owner: { component: "sideSheet", part: "backdrop" },
     root: "root",
     partNames: ["root"],
     parts: {

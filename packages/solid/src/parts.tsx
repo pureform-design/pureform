@@ -108,6 +108,11 @@ export interface PartOptions {
     readonly props?: object;
     /** The part's own `unstyled`. */
     readonly unstyled?: Accessor<boolean | undefined>;
+    /** The component whose provider key (`datePicker.cell`) also reaches the part: a picker's
+     *  calendar cells, which are another component's. */
+    readonly owner?:
+        | { readonly component: string; readonly part: string }
+        | undefined;
 }
 
 /** What `render` takes on top of `PartOptions`. */
@@ -174,6 +179,7 @@ const createPartScope = <A extends ComponentAnatomy>(
                         testId: options.testId?.(),
                         unstyled: options.unstyled?.(),
                         partUnstyled: partOptions.unstyled?.(),
+                        owner: partOptions.owner,
                         classes: classes(),
                         slotProps: state().slotProps,
                         props: partOptions.props,
