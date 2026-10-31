@@ -24,6 +24,30 @@ export const searchViewPositionerLayout = (
               } as const),
 });
 
+/** Makes the dropped view (`docked` or `contained`) as wide as the search bar's trigger, and
+ *  keeps it there while the trigger resizes: the positioner spans Root, but the bar may stop
+ *  short of it (its `maxWidth`). Placed by the trigger's own offset, so it holds under `rtl`.
+ *  Returns what stops following and restores the positioner's span. */
+export const followTriggerWidth = (
+    trigger: HTMLElement,
+    positioner: HTMLElement,
+): (() => void) => {
+    const place = () => {
+        positioner.style.left = `${trigger.offsetLeft}px`;
+        positioner.style.right = "auto";
+        positioner.style.width = `${trigger.offsetWidth}px`;
+    };
+    place();
+    const observer = new ResizeObserver(place);
+    observer.observe(trigger);
+    return () => {
+        observer.disconnect();
+        positioner.style.left = "0";
+        positioner.style.right = "0";
+        positioner.style.width = "";
+    };
+};
+
 /** Root's own layout: positioned, so a docked view drops over the search bar inside it. */
 export const SEARCH_VIEW_ROOT_STYLE = { position: "relative" } as const;
 /** The web's trigger, a native `<button>` around the search bar: none of the button's own look,

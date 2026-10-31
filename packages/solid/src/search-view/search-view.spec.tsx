@@ -102,6 +102,32 @@ describe("SearchView, ready-made", () => {
         );
     });
 
+    it.each(["docked", "contained"] as const)(
+        "drops a %s view at the bar's width, not its container's, and follows it",
+        async (variant) => {
+            withRegistry(() => (
+                <SearchView
+                    variant={variant}
+                    placeholder="Search"
+                    searchBarProps={{
+                        style: { root: { "max-width": "400px" } },
+                    }}
+                />
+            ));
+            byTestId(ids.root).parentElement!.style.width = "900px";
+            await settle();
+            const trigger = byTestId(ids.trigger);
+            await userEvent.click(trigger);
+            await settle();
+            const positioner = byTestId(ids.positioner);
+            expect(trigger.getBoundingClientRect().width).toBe(400);
+            expect(positioner.getBoundingClientRect().width).toBe(400);
+            expect(positioner.getBoundingClientRect().left).toBe(
+                trigger.getBoundingClientRect().left,
+            );
+        },
+    );
+
     it("opens from the bar, takes focus, traps it, and gives it back on Escape", async () => {
         const onOpenChange =
             vi.fn<(details: ChangeDetails<"open", boolean>) => void>();

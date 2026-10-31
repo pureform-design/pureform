@@ -38,6 +38,7 @@ import type {
 import {
     presentProps,
     SEARCH_VIEW_ROOT_STYLE,
+    followTriggerWidth,
     SEARCH_VIEW_TRIGGER_STYLE,
     searchViewBarSizing,
     searchViewComboboxProps,
@@ -50,6 +51,7 @@ import * as dialog from "@pureform/machines/dialog";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {
     type Accessor,
+    createEffect,
     createMemo,
     createSignal,
     createUniqueId,
@@ -93,6 +95,7 @@ interface SearchViewContextValue {
     readonly query: Accessor<combobox.Api<PropTypes>>;
     readonly matches: Accessor<readonly SearchViewItem[]>;
     readonly variant: Accessor<string | undefined>;
+    readonly setTrigger: (element: HTMLElement) => void;
     readonly presence: Presence;
     readonly sources: ItemInteractionSources;
     readonly setPositioner: (element: HTMLElement) => void;
@@ -206,10 +209,21 @@ function Root(props: SearchViewRootProps): JSX.Element {
         close();
     };
     let positioner: HTMLElement | undefined;
+    let trigger: HTMLElement | undefined;
     const presence = usePresence(
         () => viewApi().open,
         (surface) =>
             positioner ? stackPositioner(positioner, surface) : undefined,
+    );
+    // A dropped view is as wide as the bar, which may stop short of Root.
+    createEffect(
+        () =>
+            (props.variant === "docked" || props.variant === "contained") &&
+            presence.present(),
+        (follow) => {
+            if (!follow || !trigger || !positioner) return;
+            return followTriggerWidth(trigger, positioner);
+        },
     );
     const scope = useComponent(searchViewOverlayAnatomy, {
         selection: () => searchViewSelection(props),
@@ -243,6 +257,9 @@ function Root(props: SearchViewRootProps): JSX.Element {
                 setPositioner: (element) => {
                     positioner = element;
                 },
+                setTrigger: (element) => {
+                    trigger = element;
+                },
                 label: () => searchViewLabel(props),
                 disabled: () => props.disabled,
                 setInput: (element) => {
@@ -267,10 +284,12 @@ function Root(props: SearchViewRootProps): JSX.Element {
  *  typed character carries over to the view's query. Put no interactive element in it: the
  *  ready-made's search bar is inert. The registry doesn't style it. */
 function Trigger(props: SearchViewPartProps): JSX.Element {
-    const { scope, view, query, label, disabled } = context.use("Trigger");
+    const { scope, view, query, label, disabled, setTrigger } =
+        context.use("Trigger");
     const rest = omit(props, "unstyled");
     return scope.render("trigger", {
         element: "button",
+        ref: setTrigger,
         machine: () =>
             mergeProps(
                 view().getTriggerProps(),

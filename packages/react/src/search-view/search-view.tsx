@@ -34,6 +34,7 @@ import type {
 import {
     presentProps,
     SEARCH_VIEW_ROOT_STYLE,
+    followTriggerWidth,
     SEARCH_VIEW_TRIGGER_STYLE,
     searchViewBarSizing,
     searchViewComboboxProps,
@@ -52,6 +53,7 @@ import {
     type RefObject,
     useCallback,
     useId,
+    useLayoutEffect,
     useMemo,
     useRef,
     useState,
@@ -94,6 +96,7 @@ interface SearchViewContextValue {
     readonly presence: Presence;
     readonly sources: ItemInteractionSources;
     readonly positioner: RefObject<HTMLElement | null>;
+    readonly trigger: RefObject<HTMLElement | null>;
     readonly label: string;
     readonly disabled: boolean | undefined;
     readonly setInput: (element: HTMLElement | null) => void;
@@ -216,11 +219,22 @@ function Root(props: SearchViewRootProps): ReactNode {
         close();
     };
     const positioner = useRef<HTMLElement | null>(null);
+    const triggerRef = useRef<HTMLElement | null>(null);
     const presence = usePresence(viewApi.open, (surface) =>
         positioner.current
             ? stackPositioner(positioner.current, surface)
             : undefined,
     );
+    // A dropped view is as wide as the bar, which may stop short of Root.
+    const dropped = props.variant === "docked" || props.variant === "contained";
+    useLayoutEffect(() => {
+        if (!dropped || !presence.present) return;
+        const trigger = triggerRef.current;
+        const placed = positioner.current;
+        return trigger && placed
+            ? followTriggerWidth(trigger, placed)
+            : undefined;
+    }, [dropped, presence.present]);
     const scope = useComponent(searchViewOverlayAnatomy, {
         selection: searchViewSelection(props),
         testId: props.testId as TestIdOverride<PartName<Anatomy>> | undefined,
@@ -252,6 +266,7 @@ function Root(props: SearchViewRootProps): ReactNode {
                 presence,
                 sources,
                 positioner,
+                trigger: triggerRef,
                 label: searchViewLabel(props),
                 disabled: props.disabled,
                 setInput,
@@ -274,9 +289,17 @@ function Root(props: SearchViewRootProps): ReactNode {
  *  typed character carries over to the view's query. Put no interactive element in it: the
  *  ready-made's search bar is inert. The registry doesn't style it. */
 function Trigger({ unstyled, ...props }: SearchViewPartProps): ReactNode {
-    const { scope, view, query, label, disabled } = context.use("Trigger");
+    const {
+        scope,
+        view,
+        query,
+        label,
+        disabled,
+        trigger: ref,
+    } = context.use("Trigger");
     return scope.render("trigger", {
         element: "button",
+        ref,
         machine: mergeProps(
             view.getTriggerProps(),
             normalizeProps.button({
