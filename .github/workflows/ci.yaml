@@ -48,6 +48,11 @@ jobs:
             build
             test
 
+      # Type-aware lint and tsc import the apps' and tests' generated output (`.pureform/`,
+      # `styled-system/`), which no check task writes
+      - name: Generate
+        run: omni -i run -f=failed generate prepare
+
       - name: Check (format, lint, types)
         run: omni -i run -f=failed check
 
