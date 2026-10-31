@@ -388,6 +388,13 @@ describe("Menu, compound", () => {
     });
 });
 
+// The room depends on the menus' widths, so they're set here and not left to the machine's font:
+// a 60px menu and a 69px submenu, in a 190px panel.
+const FIXED_WIDTHS = `
+    #panel [data-testid="pf-menu-content"][data-has-nested] { box-sizing: border-box; width: 60px; }
+    #panel [data-testid="pf-menu-content"][data-nested] { box-sizing: border-box; width: 69px; }
+`;
+
 describe("Menu, submenus", () => {
     const NESTED = [
         { value: "cut", label: "Cut" },
@@ -705,6 +712,7 @@ describe("Menu, submenus", () => {
                 style={{ width: "190px", height: "300px", overflow: "auto" }}
             >
                 <div style={{ width: "1000px", paddingLeft: "400px" }}>
+                    <style>{FIXED_WIDTHS}</style>
                     <Menu trigger="Edit" items={NESTED} />
                 </div>
             </div>,
@@ -719,6 +727,9 @@ describe("Menu, submenus", () => {
         await interact(() => userEvent.keyboard("{ArrowRight}"));
         await frames(4);
         expect(cascaded()).toBe(true);
+        // The room below depends on these sizes, not on the font.
+        expect(contents()[0]!.getBoundingClientRect().width).toBe(60);
+        expect(contents()[1]!.getBoundingClientRect().width).toBe(69);
         panel.scrollLeft = 335;
         await until(() => expect(contents()).toHaveLength(1));
         expect(labels()).toEqual(["Share", "Mail", "Copy link"]);
