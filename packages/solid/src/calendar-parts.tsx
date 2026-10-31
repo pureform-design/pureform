@@ -267,6 +267,10 @@ export function calendarParts(use: (name: string) => CalendarContext) {
                 : api.getYearTableCellState(cell);
         });
         const selection = () => {
+            if (view() === "year")
+                return state().value.year === picker().focusedValue.year
+                    ? "selected"
+                    : "none";
             if (view() !== "day") return state().selected ? "selected" : "none";
             const api = picker();
             return calendarCellSelection(

@@ -318,6 +318,31 @@ describe("DatePicker, ready-made", () => {
         expect(onModeToggle).toHaveBeenCalled();
     });
 
+    it("highlights the year being shown in the years list, and moves it when another is chosen", async () => {
+        withRegistry(
+            <DatePicker
+                locale="en-US"
+                defaultValue={["2026-08-17"]}
+                defaultOpen
+            />,
+        );
+        await settle();
+        await interact(() => press(byTestId(ids.viewTrigger)));
+        const year = (value: string) =>
+            document.querySelector<HTMLElement>(
+                `[data-testid="${cell.trigger}"][data-value="${value}"]`,
+            )!;
+        const isSelected = (value: string) =>
+            year(value)
+                .closest(`[data-testid="${cell.root}"]`)!
+                .className.includes("calendar-cell--selection-selected");
+        expect(isSelected("2026")).toBe(true);
+        await interact(() => press(year("2027")));
+        await interact(() => press(byTestId(ids.viewTrigger)));
+        expect(isSelected("2027")).toBe(true);
+        expect(isSelected("2026")).toBe(false);
+    });
+
     it("takes the provider's `cell` props for its own cells, over the calendar cell's and under the instance's", async () => {
         mount(
             <PureformProvider
