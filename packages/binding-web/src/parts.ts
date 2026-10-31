@@ -6,7 +6,7 @@ import type {
 } from "@pureform/anatomy";
 import { partSlot } from "@pureform/anatomy";
 import type { PartStates, Unstyled } from "@pureform/binding-core";
-import { isUnstyled } from "@pureform/binding-core";
+import { isUnstyled, ownedKeysMessage } from "@pureform/binding-core";
 import type { SlotClasses } from "@pureform/styling-web";
 import type { AttributeState, StateAttribute } from "@pureform/web-contracts";
 import { STATE_ATTRIBUTES } from "@pureform/web-contracts";
@@ -140,7 +140,12 @@ export const partSources = <A extends ComponentAnatomy>(
         const { source: kept, dropped } = withoutOwned(source, machine.owned);
         if (dropped.length > 0)
             input.warn?.(
-                `pureform: <${anatomy.name}> ${part} ignored ${dropped.map((key) => `"${key}"`).join(", ")} from the provider's slotProps: the component sets ${dropped.length === 1 ? "it" : "them"}.`,
+                ownedKeysMessage(
+                    anatomy.name,
+                    part,
+                    dropped,
+                    "the provider's slotProps",
+                ),
             );
         return kept;
     };

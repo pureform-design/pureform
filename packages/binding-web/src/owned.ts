@@ -5,6 +5,7 @@
 // component receives the outer part's merged props (its `id`, `data-testid`), which must win.
 // Handlers, classes and styles still combine, and the keys in `OVERRIDABLE_KEYS` stay settable.
 
+import { ownedKeysIn } from "@pureform/binding-core";
 import {
     PART_ATTRIBUTE,
     SCOPE_ATTRIBUTE,
@@ -98,7 +99,7 @@ export const splitMachine = (machine: Dict | undefined): MachineSplit => {
 };
 
 /** `source` without the keys the component owns, and the keys that were dropped. `source` itself
- *  when nothing is. Only a defined value counts as setting a key. */
+ *  when nothing is. */
 export const withoutOwned = (
     source: Dict | undefined,
     owned: Dict | undefined,
@@ -106,14 +107,12 @@ export const withoutOwned = (
     readonly source: Dict | undefined;
     readonly dropped: readonly string[];
 } => {
-    if (!source) return { source, dropped: [] };
-    const dropped: string[] = [];
-    for (const key of Object.keys(source)) {
-        if (source[key] === undefined) continue;
-        if (isReservedAttribute(key) || (owned && key in owned))
-            dropped.push(key);
-    }
-    if (dropped.length === 0) return { source, dropped };
+    const dropped = ownedKeysIn(
+        source,
+        (key) =>
+            isReservedAttribute(key) || (owned !== undefined && key in owned),
+    );
+    if (!source || dropped.length === 0) return { source, dropped };
     const clean: Record<string, unknown> = {};
     for (const key of Object.keys(source)) {
         if (!dropped.includes(key)) clean[key] = source[key];
