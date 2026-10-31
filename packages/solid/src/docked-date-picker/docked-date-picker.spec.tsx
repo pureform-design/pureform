@@ -43,7 +43,7 @@ describe("DockedDatePicker, ready-made", () => {
                         </button>
                     ) : null
                 }
-                slotProps={{ actions: { class: "custom-actions" } }}
+                class={{ actions: "custom-actions" }}
             />
         ));
         await settle();

@@ -17,7 +17,7 @@ const ITEMS = Array.from({ length: 8 }, (_, index) => ({
 }));
 
 // The fake registry draws nothing: the row is 360 wide, with no gap or padding.
-const ROW = { style: { width: "360px", height: "120px" } };
+const ROW = { width: "360px", height: "120px" };
 
 const render = (
     props: Record<string, unknown> = {},
@@ -28,7 +28,7 @@ const render = (
             <Carousel
                 aria-label="Trips"
                 items={ITEMS}
-                slotProps={{ itemGroup: ROW }}
+                style={{ itemGroup: ROW }}
                 {...props}
             />
         </PureformProvider>
@@ -156,12 +156,12 @@ describe("Carousel", () => {
                         itemGroup: "row",
                     }}
                     style={{
+                        itemGroup: ROW,
                         content: (item) => ({
                             opacity: item.index === 1 ? 0.5 : 1,
                         }),
                     }}
                     slotProps={{
-                        itemGroup: ROW,
                         mask: (item) => ({ title: item.item["aria-label"] }),
                     }}
                     unstyled={{ item: (item) => item.index === 0 }}

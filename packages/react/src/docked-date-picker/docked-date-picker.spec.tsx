@@ -41,7 +41,7 @@ describe("DockedDatePicker, ready-made", () => {
                         label="Date"
                         defaultOpen
                         actions={actions}
-                        slotProps={{ actions: { className: "custom-actions" } }}
+                        className={{ actions: "custom-actions" }}
                     />
                 )}
             </content.Holder>,

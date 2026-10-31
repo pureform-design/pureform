@@ -208,7 +208,7 @@ describe("ready-made components", () => {
                 // oxlint-disable-next-line solid/style-prop -- a part-keyed style record, not CSS properties
                 style={{ root: { "margin-top": "8px" } }}
                 testId={{ root: "save", label: "save-label" }}
-                slotProps={{ label: { "aria-live": "polite", class: "slot" } }}
+                slotProps={{ label: { "aria-live": "polite" } }}
             />
         ));
         const root = byTestId("save");
@@ -222,8 +222,35 @@ describe("ready-made components", () => {
         expect(root.style.marginTop).toBe("8px");
         const label = byTestId("save-label");
         expect(label.textContent).toBe("Save");
-        expect([...label.classList]).toEqual(["button__label", "slot", "caps"]);
+        expect([...label.classList]).toEqual(["button__label", "caps"]);
         expect(label.getAttribute("aria-live")).toBe("polite");
+    });
+});
+
+describe("an instance's slotProps", () => {
+    it("don't take appearance: a class or style there is dropped, and reported once", () => {
+        const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+        withRegistry(() => (
+            <Button
+                label="Save"
+                testId="save"
+                class={{ label: "caps" }}
+                slotProps={{
+                    label: {
+                        "aria-live": "polite",
+                        ...{ class: "slot", style: { color: "red" } },
+                    },
+                }}
+            />
+        ));
+        const label = byTestId("save-label");
+        expect([...label.classList]).toEqual(["button__label", "caps"]);
+        expect(label.style.color).toBe("");
+        expect(label.getAttribute("aria-live")).toBe("polite");
+        expect(warn).toHaveBeenCalledWith(
+            expect.stringContaining('slotProps.label ignored "class", "style"'),
+        );
+        warn.mockRestore();
     });
 });
 
