@@ -31,17 +31,17 @@ results and recordings.
 
 Ordered from easy to complex. "Real" is a component or preset bug; "scene" is the story host.
 
-### Needs a reproduction first
+### Needs a decision
 
-- **React DatePicker year list (unconfirmed):** React and Solid both render Zag's `getYearsGrid`
-  (12 years, a decade). Only React's `Cell` sets the day view on a year click
-  (`react/src/calendar-parts.tsx:440`). The report ("few years", the list not reflecting the pick)
-  may be that view switch, or the 288px scrolling `yearList`. Compare React, Solid and RN in the
-  storybook, then decide whether the year view should be a longer scrollable range everywhere.
-- **RN "Two lines, expanded" doesn't toggle (unconfirmed):** the press handler toggles correctly
-  (`react-native/src/list-item/list-item.tsx:290`), so check whether the story's args make it
-  controlled (`expanded`), and the `Expanding` phase on RN-web (`expand.tsx`, `onLayout`, reduced
-  motion).
+- **DatePicker year view shows a different range on web and Native:** reproduced in the storybook
+  ("Opened: plain"). Solid and React list one decade of Zag's `getYearsGrid` (2020 to 2029,
+  stepped by the prev/next triggers); React Native lists 201 years (1926 to 2126) in one
+  scrollable list, as Material's does. Picking a year returns to the day view on all three.
+  Decide whether the web year view should be the long scrollable range (an own year list over
+  Zag's focused year and min/max, not `getYearsGrid`'s decade) or whether Native should page by
+  decade. Also, in the year view React's view toggle reads the decade ("2020") where Solid's keeps
+  "February 2026" and Native's keeps the month with a turned arrow; align the three once the
+  range is decided.
 
 ## Deferred designs
 

@@ -1456,6 +1456,29 @@ describe("nested rows", () => {
         expect(seen).toEqual([true]);
     });
 
+    it("collapses and re-expands a list item that starts expanded, with a text region", async () => {
+        await render(
+            <ListItem
+                headline="Folders"
+                supportingText="2 folders"
+                region="Work, Personal"
+                defaultExpanded
+                testId="open"
+            />,
+        );
+        const root = byTestId("open-root");
+        const region = () =>
+            document.querySelector('[data-testid="open-region"]');
+        expect(root.getAttribute("aria-expanded")).toBe("true");
+        expect(region()?.textContent).toBe("Work, Personal");
+        await interact(() => userEvent.click(root));
+        expect(root.getAttribute("aria-expanded")).toBe("false");
+        await until(() => expect(region()).toBeNull());
+        await interact(() => userEvent.click(root));
+        expect(root.getAttribute("aria-expanded")).toBe("true");
+        await until(() => expect(region()?.textContent).toBe("Work, Personal"));
+    });
+
     it("drills into a menu item's submenu, and back out", async () => {
         const onSelect =
             vi.fn<NonNullable<ComponentProps<typeof Menu>["onSelect"]>>();
