@@ -2,7 +2,7 @@
 name: "@pureform/react-native"
 
 extends:
-  - "@workspace/omni/presets/ts-vite-lib.omni.yaml"
+  - "@workspace/omni/presets/ts-vite-ui-lib.omni.yaml"
 
 dependencies:
   append:
@@ -22,9 +22,22 @@ dependencies:
 tasks:
   test:unit:
     enabled: true
+    cache:
+      key:
+        files:
+          append:
+            - "./vitest.config.shared.ts"
 
   test:integration:
     enabled: false
+
+  test:component:
+    enabled: true
+    cache:
+      key:
+        files:
+          append:
+            - "./vitest.config.shared.ts"
 
   test:
     enabled: true

@@ -1,0 +1,82 @@
+// The test environment the component and unit configs share: Chromium through Vitest's browser mode,
+// rendering through React Native Web, with React Testing Library. Set CHROMIUM_PATH to use a system Chromium instead of Playwright's
+// download.
+
+import { createRequire } from "node:module";
+import { dirname } from "node:path";
+
+import react from "@vitejs/plugin-react";
+import { playwright } from "@vitest/browser-playwright";
+import type { UserWorkspaceConfig } from "vitest/config";
+
+import { commands } from "./src/testing/commands.ts";
+
+const executablePath = process.env.CHROMIUM_PATH;
+
+const RN_WEB = dirname(
+    createRequire(import.meta.url).resolve("react-native-web/package.json"),
+);
+
+// React Native libraries such as react-native-svg pick their web build by these.
+const WEB_EXTENSIONS = [
+    ...[".mjs", ".js", ".mts", ".ts", ".jsx", ".tsx"].map(
+        (ext) => `.web${ext}`,
+    ),
+    ".mjs",
+    ".js",
+    ".mts",
+    ".ts",
+    ".jsx",
+    ".tsx",
+    ".json",
+];
+
+export default {
+    plugins: [react()],
+    resolve: {
+        extensions: WEB_EXTENSIONS,
+        alias: [
+            { find: /^react-native$/, replacement: RN_WEB },
+            // React Native's asset registry, which react-native-svg reads for images.
+            {
+                find: "@react-native/assets-registry/registry",
+                replacement: `${RN_WEB}/dist/modules/AssetRegistry/index.js`,
+            },
+        ],
+    },
+    define: {
+        // Parts of React Native Web's Animated refer to Node's `global`, and Reanimated to
+        // React Native's `__DEV__`.
+        global: "globalThis",
+        __DEV__: "true",
+        // React Native Web swaps Animated for a mock that ends every animation at once under
+        // test; the real one runs here.
+        "process.env.NODE_ENV": JSON.stringify("development"),
+    },
+    optimizeDeps: {
+        include: [
+            "react",
+            "react-dom",
+            "react-dom/client",
+            "react/jsx-dev-runtime",
+            "@testing-library/react",
+            "react-native-web",
+            "react-native-reanimated",
+            "react-native-svg",
+        ],
+        rolldownOptions: {
+            resolve: { extensions: WEB_EXTENSIONS },
+            shimMissingExports: true,
+        },
+    },
+    test: {
+        testTimeout: 30_000,
+        setupFiles: ["./src/testing/setup.ts"],
+        browser: {
+            provider: playwright({
+                launchOptions: executablePath ? { executablePath } : {},
+            }),
+            commands,
+        },
+    },
+} satisfies UserWorkspaceConfig;
