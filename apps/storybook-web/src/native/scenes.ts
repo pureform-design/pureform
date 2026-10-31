@@ -64,7 +64,9 @@ const screen = (direction: "row" | "column", ...children: ReactNode[]) =>
                 flexDirection: direction,
                 justifyContent: "space-between",
                 alignItems: direction === "row" ? "flex-start" : "stretch",
-                minHeight: OVERLAY_HEIGHT,
+                // The canvas's height, less its padding: the sheet then sits at the canvas's
+                // bottom edge, where the web's positioner draws it, however tall the canvas is.
+                minHeight: `max(${OVERLAY_HEIGHT}px, calc(100vh - 2rem))`,
             },
         },
         ...children,
