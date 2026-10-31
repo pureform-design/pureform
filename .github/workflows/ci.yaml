@@ -112,6 +112,20 @@ jobs:
       - name: Test
         run: omni -i run -f=failed test
 
+      - name: Upload Vitest failure artifacts
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: vitest-failures
+          retention-days: 7
+          if-no-files-found: ignore
+          # `.vitest/` is a hidden directory, skipped unless asked for
+          include-hidden-files: true
+          path: |
+            packages/*/.vitest/attachments
+            apps/*/.vitest/attachments
+            tests/*/.vitest/attachments
+
       - name: Prune stale caches
         run: omni -i cache prune -sy -o="7d"
 
