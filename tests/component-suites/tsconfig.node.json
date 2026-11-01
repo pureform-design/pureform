@@ -4,7 +4,7 @@
         "vite.config.ts",
         "vitest.config.component.ts",
         "vitest.config.e2e.ts",
-        "vitest.config.shared.ts"
+        "vitest.config.browser.ts"
     ],
     "compilerOptions": {
         "lib": ["ESNext", "DOM"]

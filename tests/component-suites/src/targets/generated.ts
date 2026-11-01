@@ -1,5 +1,5 @@
 // Writes the CSS and Tailwind targets' registries from the Panda fixture's config, once per run,
-// before the projects start (`vitest.config.shared.ts` awaits it): `.pureform/css` and
+// before the projects start (`vitest.config.browser.ts` awaits it): `.pureform/css` and
 // `.pureform/tailwind`, with every component, so a component the config has is in every registry.
 // The Panda target's registry is the fixture's own (`tests/panda-fixture/.pureform`, its omni
 // `generate` task).

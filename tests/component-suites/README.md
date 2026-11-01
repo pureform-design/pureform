@@ -15,7 +15,7 @@ component renders with its real classes and layout:
   (`tests/panda-fixture/.pureform`, `tests/panda-fixture/src/styles.css`), written by the
   fixture's omni `generate` and `prepare` tasks.
 - **CSS and Tailwind:** `.pureform/css` and `.pureform/tailwind` in this folder (ignored by git),
-  which `vitest.config.shared.ts` writes with `@pureform/generate` before the projects start
+  which `vitest.config.browser.ts` writes with `@pureform/generate` before the projects start
   (`src/targets/generated.ts`), with every component of the config.
 
 Each binding's own specs (`packages/<binding>/src`) test the binding's details; these suites test
@@ -38,7 +38,7 @@ src/*.e2e.test.ts                  the server rendering suite and the benchmark 
                              setup     ──► src/targets/<target>/setup.ts (the stylesheet)
 ```
 
-- **Six Vitest projects, one set of files.** `vitest.config.shared.ts` defines a project per binding
+- **Six Vitest projects, one set of files.** `vitest.config.browser.ts` defines a project per binding
   and target (`vitest.config.component.ts` and `vitest.config.e2e.ts` each add their files to them), named `<binding>/<target>`: `solid/panda`, `solid/css`, `solid/tailwind`,
   `react/panda`, `react/css`, `react/tailwind`. Solid's projects compile with Solid's plugin
   (hydratable output), React's with React's. Each aliases `#binding` to its binding's harness and
@@ -202,7 +202,7 @@ Type-check with `bun x tsc --noEmit -p tsconfig.json` (the React files carry a
   (`settlePlaced`); the keyboard suite waits out an overlay's exit before checking where focus is,
   and the indication suite mounts its other button at the top of the page, clear of an open
   overlay, which draws over what follows it.
-- **The test browser emulates `prefers-reduced-motion: reduce`** (`vitest.config.shared.ts`), so
+- **The test browser emulates `prefers-reduced-motion: reduce`** (`vitest.config.browser.ts`), so
   boxes are measured at rest; overlays still fade under it. A suite that checks full motion sets
   the provider's `motion: "full"`.
 - **The pointer rests where the last test left it.** A snackbar under it is held open, and a

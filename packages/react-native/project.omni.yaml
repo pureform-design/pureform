@@ -26,7 +26,7 @@ tasks:
       key:
         files:
           append:
-            - "./vitest.config.shared.ts"
+            - "./vitest.config.browser.ts"
 
   test:integration:
     enabled: false
@@ -37,7 +37,7 @@ tasks:
       key:
         files:
           append:
-            - "./vitest.config.shared.ts"
+            - "./vitest.config.browser.ts"
 
   test:
     enabled: true

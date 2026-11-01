@@ -25,7 +25,7 @@ cache:
   key:
     files:
       append:
-        - "./vitest.config.shared.ts"
+        - "./vitest.config.browser.ts"
         - "../panda-fixture/.pureform/**/*"
         - "../panda-fixture/panda.config.ts"
         - "../panda-fixture/panda.pureform.ts"
@@ -45,7 +45,7 @@ tasks:
     enabled: false
 
   # Writes the CSS and Tailwind targets' registries (`.pureform/`, ignored by git), which
-  # `vitest.config.shared.ts` also writes on every run, for the type-aware lint without a test run.
+  # `vitest.config.browser.ts` also writes on every run, for the type-aware lint without a test run.
   generate:
     exec: node scripts/generate-registries.ts
     dependencies:

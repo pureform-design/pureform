@@ -4,6 +4,6 @@
         "vite.config.ts",
         "vitest.config.unit.ts",
         "vitest.config.component.ts",
-        "vitest.config.shared.ts"
+        "vitest.config.browser.ts"
     ]
 }

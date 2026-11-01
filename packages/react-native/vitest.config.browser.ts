@@ -73,6 +73,8 @@ export default {
         testTimeout: 30_000,
         setupFiles: ["./src/testing/setup.ts"],
         browser: {
+            enabled: true,
+            headless: true,
             provider: playwright({
                 launchOptions: executablePath ? { executablePath } : {},
             }),
