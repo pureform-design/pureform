@@ -1,7 +1,7 @@
 import { testIds } from "@pureform/anatomy";
 import type { ReactNode } from "react";
 import { View } from "react-native";
-import { beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { FabMenu } from ".";
@@ -21,6 +21,8 @@ import {
 } from "../testing/render";
 
 const ids = testIds.fabMenu;
+
+const REAL_LIMIT_MS = 15_000;
 
 let registry: TestRegistry;
 
@@ -113,11 +115,18 @@ describe("FabMenu's item reveal on React Native", () => {
     const record = async (
         done: (frame: { w: number[]; n: number[] }) => boolean = (frame) =>
             frame.w.every((width, i) => width >= frame.n[i]! - 0.5),
-        max = 2000,
+        max = Number.POSITIVE_INFINITY,
     ) => {
         const frames: { w: number[]; n: number[]; edges: number[] }[] = [];
         let begun = false;
-        for (let i = 0; i < max; i++) {
+        // The layout the animation waits for is a real event, which a page in the background of
+        // many (a full run's parallel frames) is slow to deliver: so the limit is real time.
+        const started = vi.getRealSystemTime();
+        for (
+            let i = 0;
+            i < max && vi.getRealSystemTime() - started < REAL_LIMIT_MS;
+            i++
+        ) {
             await stepClock();
             const items = rows();
             if (items.length !== 3) continue;
@@ -242,7 +251,8 @@ describe("FabMenu's item reveal on React Native", () => {
         );
         startClock();
         // Close once the nearest item is part of the way open.
-        for (let i = 0; i < 2000; i++) {
+        const started = vi.getRealSystemTime();
+        while (vi.getRealSystemTime() - started < REAL_LIMIT_MS) {
             await stepClock();
             const w = rows().length === 3 ? widths()[2]! : 0;
             if (w > 8 && w < natural()[2]! - 8) break;
