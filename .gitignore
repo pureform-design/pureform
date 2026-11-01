@@ -34,3 +34,5 @@ dist
 /.agents/skills/why
 /.agents/skills/writing-for-agents
 # @@omni-managed:end 6faad3bd
+
+.pureform
