@@ -222,12 +222,7 @@ describe("ready-made components", () => {
                 className={{ root: ["wide", { busy: true }], label: "caps" }}
                 style={{ root: { marginTop: "8px" } }}
                 testId={{ root: "save", label: "save-label" }}
-                slotProps={{
-                    label: {
-                        "aria-live": "polite",
-                        className: "slot",
-                    },
-                }}
+                slotProps={{ label: { "aria-live": "polite" } }}
             />,
         );
         const root = screen.getByTestId("save");
@@ -241,8 +236,39 @@ describe("ready-made components", () => {
         expect(root.style.marginTop).toBe("8px");
         const label = screen.getByTestId("save-label");
         expect(label.textContent).toBe("Save");
-        expect([...label.classList]).toEqual(["button__label", "slot", "caps"]);
+        expect([...label.classList]).toEqual(["button__label", "caps"]);
         expect(label.getAttribute("aria-live")).toBe("polite");
+    });
+});
+
+describe("an instance's slotProps", () => {
+    it("don't take appearance: a className or style there is dropped, and reported once", () => {
+        const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+        // Keys the types leave out, passed through to reach the runtime check.
+        const untyped1: object = { className: "slot", style: { color: "red" } };
+        withRegistry(
+            <Button
+                label="Save"
+                testId="save"
+                className={{ label: "caps" }}
+                slotProps={{
+                    label: {
+                        "aria-live": "polite",
+                        ...untyped1,
+                    },
+                }}
+            />,
+        );
+        const label = screen.getByTestId("save-label");
+        expect([...label.classList]).toEqual(["button__label", "caps"]);
+        expect(label.style.color).toBe("");
+        expect(label.getAttribute("aria-live")).toBe("polite");
+        expect(warn).toHaveBeenCalledWith(
+            expect.stringContaining(
+                'slotProps.label ignored "className", "style"',
+            ),
+        );
+        warn.mockRestore();
     });
 });
 

@@ -12,10 +12,15 @@ import {
     trainVersionMismatch,
     warnOnce,
 } from "@pureform/binding-core";
-import type { Direction, MotionSetting } from "@pureform/binding-core";
+import type {
+    Direction,
+    MotionSetting,
+    ProviderSlotProps,
+} from "@pureform/binding-core";
 import type {
     WebProviderOptions as ProviderOptions,
     WebProviderState as ProviderState,
+    OwnedPartKeys,
     ProviderTheme,
     ThemeHydration,
 } from "@pureform/binding-web";
@@ -67,10 +72,16 @@ const ComponentContext = createContext<ComponentState>(ROOT_PROVIDER);
 
 const ThemeVarsContext = createContext<ThemeSchemeVars | undefined>(undefined);
 
+/** What a provider's `slotProps` set for one part: the element's props, but not those the
+ *  component owns (`id`, `aria-expanded`, `disabled`, …). */
+export type ProviderPartProps = Omit<PartProps, OwnedPartKeys>;
+
 export interface PureformProviderProps
     extends
-        ProviderOptions<PartProps>,
+        Omit<ProviderOptions<PartProps>, "slotProps">,
         Omit<HTMLAttributes<HTMLDivElement>, "dir"> {
+    /** Props per component and part, applied to every part under the provider. */
+    readonly slotProps?: ProviderSlotProps<ProviderPartProps> | undefined;
     children?: ReactNode;
     ref?: Ref<HTMLDivElement> | undefined;
 }

@@ -7,7 +7,13 @@
 // props stay the same, and nothing at all for a part the user doesn't customize.
 
 import type { ComponentAnatomy } from "@pureform/anatomy";
-import { createSlotReader, isPerInstance } from "@pureform/binding-core";
+import {
+    createSlotReader,
+    isPerInstance,
+    ownedKeysIn,
+    ownedKeysMessage,
+    warnOnce,
+} from "@pureform/binding-core";
 import type { InnerProps, PerInstance } from "@pureform/binding-core";
 import type { ComponentName } from "@pureform/styling";
 import { useMemo } from "react";
@@ -25,6 +31,7 @@ import type {
     ViewStyle,
 } from "react-native";
 
+import { isDev } from "./env";
 import { unselectable } from "./parts";
 import { usePureform } from "./provider";
 
@@ -99,6 +106,31 @@ const EMPTY: Dict = Object.freeze({});
 
 /** Handlers a component depends on itself: its measuring `onLayout` isn't composed. */
 const OWN_HANDLERS = new Set(["onLayout"]);
+
+/** What a component always sets on a part itself, after the user's props: its test id, the
+ *  children it places, and its ref. The types leave `testID` and `children` out of `slotProps`;
+ *  a key set anyway is dropped, and reported in development. */
+const OWNED_KEYS: ReadonlySet<string> = new Set(["testID", "children", "ref"]);
+
+const isOwnedKey = (key: string): boolean => OWNED_KEYS.has(key);
+
+const withoutOwnedCache = new WeakMap<object, Dict>();
+
+/** `source` without the keys the component owns: itself when it sets none, otherwise a copy kept
+ *  for as long as `source` is, so props that stay the same give the same object. */
+const withoutOwned = (source: Dict): Dict => {
+    if (source === EMPTY) return source;
+    let clean = withoutOwnedCache.get(source);
+    if (clean) return clean;
+    clean =
+        ownedKeysIn(source, isOwnedKey).length === 0
+            ? source
+            : Object.fromEntries(
+                  Object.entries(source).filter(([key]) => !isOwnedKey(key)),
+              );
+    withoutOwnedCache.set(source, clean);
+    return clean;
+};
 
 const isHandler = (key: string, value: unknown): value is Handler =>
     key.startsWith("on") &&
@@ -214,18 +246,40 @@ const build = (
     slotProps: Dict,
     keyOf: (part: string) => string,
     provided: Dict,
+    component: string | undefined,
 ): PartSlots => {
+    const warnOwned = (
+        part: string,
+        source: Dict | undefined,
+        from: string,
+    ) => {
+        if (!isDev) return;
+        const dropped = ownedKeysIn(source, isOwnedKey);
+        if (dropped.length > 0)
+            warnOnce(
+                ownedKeysMessage(
+                    component ?? "component",
+                    keyOf(part),
+                    dropped,
+                    from,
+                ),
+            );
+    };
     const userProps = (part: string, instance?: unknown) => {
         const own =
             (createSlotReader(keyOf(part), () => instance)(slotProps) as
                 | Dict
                 | undefined) ?? EMPTY;
         const defaults = provided[keyOf(part)] as Dict | undefined;
-        return defaults
-            ? own === EMPTY
-                ? defaults
-                : mergeNativePartProps(defaults, own)
-            : own;
+        warnOwned(part, defaults, "the provider's slotProps");
+        warnOwned(part, own, "slotProps");
+        const keptOwn = withoutOwned(own);
+        const keptDefaults = defaults ? withoutOwned(defaults) : undefined;
+        return keptDefaults
+            ? keptOwn === EMPTY
+                ? keptDefaults
+                : mergeNativePartProps(keptDefaults, keptOwn)
+            : keptOwn;
     };
     const keyed = [style, slotProps];
     return {
@@ -276,7 +330,7 @@ const built = new WeakMap<
     object,
     WeakMap<
         (part: string) => string,
-        WeakMap<object, WeakMap<object, PartSlots>>
+        Map<string | undefined, WeakMap<object, WeakMap<object, PartSlots>>>
     >
 >();
 
@@ -292,6 +346,7 @@ export const nativeSlots = (
         | undefined,
     keyOf: (part: string) => string = same,
     provided: object = EMPTY,
+    component?: string,
 ): PartSlots => {
     const style = props?.style as Dict | undefined;
     const slotProps = props?.slotProps as Dict | undefined;
@@ -303,10 +358,18 @@ export const nativeSlots = (
         return plain;
     let byKey = built.get(provided);
     if (!byKey) built.set(provided, (byKey = new WeakMap()));
-    let cache = byKey.get(keyOf);
-    if (!cache) byKey.set(keyOf, (cache = pairCache<PartSlots>()));
+    let byComponent = byKey.get(keyOf);
+    if (!byComponent) byKey.set(keyOf, (byComponent = new Map()));
+    let cache = byComponent.get(component);
+    if (!cache) byComponent.set(component, (cache = pairCache<PartSlots>()));
     return cached(cache, style ?? EMPTY, slotProps ?? EMPTY, () =>
-        build(style ?? EMPTY, slotProps ?? EMPTY, keyOf, provided as Dict),
+        build(
+            style ?? EMPTY,
+            slotProps ?? EMPTY,
+            keyOf,
+            provided as Dict,
+            component,
+        ),
     );
 };
 
@@ -319,8 +382,8 @@ export const useNativeSlotReader = (
 ): typeof nativeSlots => {
     const provided = usePureform().slotProps[name] ?? EMPTY;
     return useMemo(
-        () => (props, keyOf) => nativeSlots(props, keyOf, provided),
-        [provided],
+        () => (props, keyOf) => nativeSlots(props, keyOf, provided, name),
+        [provided, name],
     );
 };
 
@@ -403,6 +466,6 @@ export const useNativeScrimSlots = (
             shared && own ? mergeNativePartProps(shared, own) : (own ?? shared);
         const keyed = merged ? { [part]: merged } : EMPTY;
         const keyOf = part === "backdrop" ? backdropKeys : scrimKeys;
-        return (props) => nativeSlots(props, keyOf, keyed);
-    }, [shared, own, part]);
+        return (props) => nativeSlots(props, keyOf, keyed, owner);
+    }, [shared, own, part, owner]);
 };

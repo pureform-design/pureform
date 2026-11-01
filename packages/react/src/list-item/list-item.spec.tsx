@@ -142,9 +142,7 @@ describe("List", () => {
                     { headline: "Sent", density: undefined, testId: "sent" },
                 ]}
                 className={{ item: "row" }}
-                listItemProps={{
-                    slotProps: { headline: { className: "bold" } },
-                }}
+                listItemProps={{ className: { headline: "bold" } }}
             />,
         );
         await settle();

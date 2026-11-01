@@ -3,6 +3,7 @@
 // `ripple` slot, and draws none while motion is reduced.
 
 import { rippleAnatomy } from "@pureform/anatomy";
+import type { PartName } from "@pureform/anatomy";
 import { rippleSelection } from "@pureform/binding-core";
 import {
     RIPPLE_DOM_ROOT_PROPS,
@@ -17,7 +18,6 @@ import { type ElementType, type ReactNode, useId } from "react";
 import { useMachine } from "../machine";
 import { useReducedMotion } from "../motion";
 import { useComponent } from "../parts";
-import type { SlotKeyedProps } from "../parts";
 import { combinePartProps, omitProps } from "../props";
 import type { PartProps } from "../props";
 
@@ -29,8 +29,12 @@ export interface RippleProps
         RippleDomRootOwnProps {
     /** Another element or component to render instead of `<span>`. */
     readonly as?: ElementType | undefined;
-    /** Layer props and decorative ink styling/identifying attributes; the renderer owns ink geometry. */
-    readonly slotProps?: SlotKeyedProps<typeof rippleAnatomy>["slotProps"];
+    /** Layer props and decorative ink styling/identifying attributes; the renderer owns ink geometry.
+     *  The ink has no keyed `className` or `style` (those are the layer element's own), so its
+     *  `slotProps` take them. */
+    readonly slotProps?: {
+        readonly [P in PartName<typeof rippleAnatomy>]?: PartProps;
+    };
 }
 
 /** The ripple's root: an empty layer over its surface, hidden from assistive technology. */

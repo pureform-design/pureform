@@ -14,6 +14,7 @@ import {
     isIconPart,
     isPerInstance,
     isUnstyled,
+    warnOnce,
     withProvidedTokens,
 } from "@pureform/binding-core";
 import type {
@@ -25,7 +26,13 @@ import type {
     Unstyled,
 } from "@pureform/binding-core";
 import type { InteractionSource } from "@pureform/binding-core/interaction";
-import { partSources } from "@pureform/binding-web";
+import {
+    appearanceMessage,
+    FORWARDED_SLOT_PROPS,
+    isForwardedSlotProps,
+    partSources,
+    withoutAppearance,
+} from "@pureform/binding-web";
 import type { ClassValue } from "@pureform/binding-web";
 import { resolveWebSlotCustomization } from "@pureform/binding-web";
 import { componentIndicationTokens } from "@pureform/binding-web/indication";
@@ -50,6 +57,7 @@ import {
 } from "react";
 
 import { useClasses } from "./classes";
+import { isDev } from "./env";
 import { IconPartContext } from "./icon-style";
 import {
     usePartIndication,
@@ -271,6 +279,7 @@ const createPartScope = <A extends ComponentAnatomy>(
                     classes,
                     slotProps,
                     props: partOptions.props,
+                    warn: isDev ? warnOnce : undefined,
                 }),
             ) as PartProps;
         },
@@ -382,6 +391,10 @@ export function useUnstyledComponent<A extends ComponentAnatomy>(
     return createPartScope(anatomy, options, undefined, state.slotProps);
 }
 
+/** What an instance's `slotProps` set for one part: its element's props and handlers. Its classes
+ *  and style are the keyed `className` and `style`, so they aren't taken here. */
+export type SlotPartProps = Omit<PartProps, "className" | "style">;
+
 /** The props of a ready-made component that address each part by name:
  *  `className={{ root: "wide", label: "caps" }}`, `testId="save"`. */
 export interface SlotKeyedProps<
@@ -397,7 +410,7 @@ export interface SlotKeyedProps<
         | undefined;
     readonly testId?: TestIdOverride<PartName<A>> | undefined;
     readonly slotProps?:
-        | SlotKeyedEach<PartName<A> | Extra, PartProps, I>
+        | SlotKeyedEach<PartName<A> | Extra, SlotPartProps, I>
         | undefined;
     readonly unstyled?: Unstyled<PartName<A>, I> | undefined;
 }
@@ -442,8 +455,14 @@ export const slotPartProps = <A extends ComponentAnatomy>(
         part,
         () => instance,
     );
+    const { source: attributes, dropped } = isForwardedSlotProps(
+        props.slotProps,
+    )
+        ? { source: resolved.props, dropped: [] }
+        : withoutAppearance(resolved.props);
+    if (isDev && dropped.length > 0) warnOnce(appearanceMessage(part, dropped));
     return combinePartProps([
-        resolved.props,
+        attributes,
         {
             className: resolved.class,
             style: resolved.style,
@@ -455,7 +474,8 @@ export const slotPartProps = <A extends ComponentAnatomy>(
 
 /** A part drawn as a `Button` or `IconButton` (`as={Button}`): its `className` and `style` are
  *  plain values for the part, but the button keys them by its own parts, so they go to its root
- *  (`slotProps.root`), which the button's own `className` and `style` keys then join. */
+ *  (`slotProps.root`, marked as forwarded), which the button's own `className` and `style` keys
+ *  then join. */
 export const asRoot = (props: PartProps): PartProps => {
     const { className, style, slotProps, ...rest } = props as {
         className?: unknown;
@@ -468,6 +488,7 @@ export const asRoot = (props: PartProps): PartProps => {
         slotProps: {
             ...slotProps,
             root: combinePartProps([slotProps?.root, { className, style }]),
+            [FORWARDED_SLOT_PROPS]: true,
         },
     } as PartProps;
 };

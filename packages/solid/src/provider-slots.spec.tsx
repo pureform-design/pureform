@@ -143,4 +143,35 @@ describe("provider slot customization contract", () => {
         await settle();
         expect(byTestId("pf-dialog-backdrop").style.opacity).toBe("0.8");
     });
+
+    it("keeps the keys a component owns from a provider, and leaves the ones a user may set", async () => {
+        // Keys the types leave out, passed through to reach the runtime check.
+        const untyped1: object = { "aria-pressed": false };
+        // Keys the types leave out, passed through to reach the runtime check.
+        const untyped2: object = { "data-testid": "provided" };
+        mount(() => (
+            <PureformProvider
+                registry={overlaysRegistry()}
+                slotProps={{
+                    button: {
+                        root: {
+                            ...untyped1,
+                            role: "link",
+                            title: "from the provider",
+                            ...untyped2,
+                        },
+                    },
+                }}
+            >
+                <Button label="Toggle" defaultSelected testId="toggle" />
+            </PureformProvider>
+        ));
+        await settle();
+        // Owned: the component's test id and the machine's state hold.
+        const root = byTestId("toggle-root");
+        expect(root.getAttribute("aria-pressed")).toBe("true");
+        // Settable: a provider may set a role and a title.
+        expect(root.getAttribute("role")).toBe("link");
+        expect(root.getAttribute("title")).toBe("from the provider");
+    });
 });

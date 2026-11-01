@@ -1007,6 +1007,7 @@ export type {
     Unstyled,
 } from "./parts";
 export { createSlotReader } from "./slot-reader";
+export { ownedKeysIn, ownedKeysMessage } from "./owned";
 export { requireRegistry, resolveProvider, ROOT_PROVIDER } from "./provider";
 export type {
     AnyRegistry,

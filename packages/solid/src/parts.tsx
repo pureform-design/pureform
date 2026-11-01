@@ -14,6 +14,7 @@ import {
     isIconPart,
     isPresent,
     isUnstyled,
+    warnOnce,
     withProvidedTokens,
 } from "@pureform/binding-core";
 import type {
@@ -24,7 +25,14 @@ import type {
     Unstyled,
 } from "@pureform/binding-core";
 import type { InteractionSource } from "@pureform/binding-core/interaction";
-import { cx, partSources } from "@pureform/binding-web";
+import {
+    appearanceMessage,
+    cx,
+    FORWARDED_SLOT_PROPS,
+    isForwardedSlotProps,
+    partSources,
+    withoutAppearance,
+} from "@pureform/binding-web";
 import { resolveWebSlotCustomization } from "@pureform/binding-web";
 import type { ClassValue, WebSlotCustomization } from "@pureform/binding-web";
 import { componentIndicationTokens } from "@pureform/binding-web/indication";
@@ -36,7 +44,7 @@ import type {
     Selection,
 } from "@pureform/styling";
 import type { ClassSlots, SlotClasses } from "@pureform/styling-web";
-import { dynamic } from "@solidjs/web";
+import { dynamic, isDev } from "@solidjs/web";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {
     $PROXY,
@@ -183,6 +191,7 @@ const createPartScope = <A extends ComponentAnatomy>(
                         classes: classes(),
                         slotProps: state().slotProps,
                         props: partOptions.props,
+                        warn: isDev ? warnOnce : undefined,
                     }),
                 ),
             ) as PartProps;
@@ -330,6 +339,10 @@ export function useUnstyledComponent<A extends ComponentAnatomy>(
     return createPartScope(anatomy, options, () => undefined);
 }
 
+/** What an instance's `slotProps` set for one part: its element's props and handlers. Its classes
+ *  and style are the keyed `class` and `style`, so they aren't taken here. */
+export type SlotPartProps = Omit<PartProps, "class" | "style">;
+
 /** The props of a ready-made component that address each part by name:
  *  `class={{ root: "wide", label: "caps" }}`, `testId="save"`. */
 export interface SlotKeyedProps<
@@ -345,7 +358,7 @@ export interface SlotKeyedProps<
         | undefined;
     readonly testId?: TestIdOverride<PartName<A>> | undefined;
     readonly slotProps?:
-        | SlotKeyedEach<PartName<A> | Extra, PartProps, I>
+        | SlotKeyedEach<PartName<A> | Extra, SlotPartProps, I>
         | undefined;
     readonly unstyled?: Unstyled<PartName<A>, I> | undefined;
 }
@@ -390,8 +403,14 @@ const onePart = (
     instance?: Accessor<unknown>,
 ): Dict => {
     const resolved = resolveWebSlotCustomization(props, part, instance);
+    const { source: attributes, dropped } = isForwardedSlotProps(
+        props.slotProps,
+    )
+        ? { source: resolved.props, dropped: [] }
+        : withoutAppearance(resolved.props);
+    if (isDev && dropped.length > 0) warnOnce(appearanceMessage(part, dropped));
     return combinePartProps([
-        resolved.props,
+        attributes,
         {
             // Joined here, where the merge tracks it: a class dictionary's values (`{ busy:
             // saving() }`) would otherwise be read by the DOM's own effect, outside tracking.
@@ -405,7 +424,8 @@ const onePart = (
 
 /** A part drawn as a `Button` or `IconButton` (`as={Button}`): its `class` and `style` are plain
  *  values for the part, but the button keys them by its own parts, so they go to its root
- *  (`slotProps.root`), which the button's own `class` and `style` keys then join. */
+ *  (`slotProps.root`, marked as forwarded), which the button's own `class` and `style` keys then
+ *  join. */
 export const asRoot = (props: PartProps): PartProps => {
     const rest = omit(props as Dict, "class", "style");
     const resolved = merge(rest, {
@@ -416,6 +436,7 @@ export const asRoot = (props: PartProps): PartProps => {
             return {
                 ...keyed,
                 root: combinePartProps([keyed.root, { class: value, style }]),
+                [FORWARDED_SLOT_PROPS]: true,
             };
         },
     });

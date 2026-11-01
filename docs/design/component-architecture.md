@@ -1672,6 +1672,54 @@ Agreed in [slot-props-sketch.md](slot-props-sketch.md); batches in the
   `${prefix}-${part.attribute}` (the attribute, not the part name). Under a nested `as={Button}` one
   key can mix two recipes' parts, and `touchTarget`, `media` and `avatar` are both parts and
   standalone components. `positioning` and `indication` look like slot props but aren't.
+- **Precedence and owned keys** (`partSources`, `packages/binding-web/src/owned.ts`). One order on
+  every target, lowest to highest; a layer a target doesn't have (React Native has no registry
+  classes or `data-*`) is skipped, and the rest keep their order:
+
+    | # | Layer | Web (React, Solid) | React Native |
+    | - | ----- | ------------------ | ------------ |
+    | 1 | The component's own | machine props, `data-*` attributes, registry class and token style | its own props and style |
+    | 2 | Provider `slotProps` | for the part | for the part |
+    | 3 | The owner's provider key | `datePicker.cell`, `dialog.backdrop` | same |
+    | 4 | Instance | `slotProps` (attributes, handlers), then keyed `className`, then keyed `style` (and direct element props) | `slotProps`, then keyed `style` |
+    | 5 | Positioning style | the machine's placement (`position`, `inset`, `transform*`, `zIndex`, `--*`) | none |
+
+  Handlers all run, the component's first, then the provider's, then the instance's. Classes join
+  (no `tailwind-merge`: with Tailwind, CSS order decides conflicts, not the order in the
+  attribute); styles merge key by key, later winning; any other key takes the last defined value,
+  and `null` clears one (`undefined` does not).
+
+  **A provider can't set what the component owns.** One provider entry reaches every instance,
+  and the machine finds its elements by `id` and reads its state back from `aria-*`, `disabled`
+  and `data-state`, so those keys, `data-scope`, `data-pf-part`, `data-testid` and every
+  `data-pf-*` come from the component. A provider's value for one is dropped and, in
+  development, reported once (`pureform: <button> root ignored "id" from the provider's
+  slotProps: the component sets it.`); the types leave the common ones out (`ProviderPartProps`).
+  Settable from a provider: `tabIndex`, `role`, `aria-label`, `aria-description`,
+  `aria-describedby`, `title`, handlers, classes, and style outside the positioning set. React
+  Native is stricter: its component wins `role` and the other accessibility props as well, and
+  always sets its own `testID`, `children` and `ref`; a `slotProps` entry (a provider's or an
+  instance's) that sets one of those three is dropped and reported in development, the same
+  message as on web. `binding-core`'s `ownedKeysIn` and `ownedKeysMessage` are the shared part;
+  each target says what it owns.
+
+  **An instance has one channel for appearance.** Keyed `className` (`class` on Solid) and `style`
+  say how a part looks; `slotProps` carries its attributes and handlers, and doesn't take
+  `className`, `class` or `style` (`SlotPartProps`). One set there anyway is dropped and reported
+  in development. A provider has no keyed props, so its `slotProps` keep them. Two exceptions:
+  `Ripple`'s ink, which has no keyed prop, and a part drawn `as={Button}`, whose `className` and
+  `style` `asRoot` forwards to the button's root through a marked `slotProps`.
+
+  **An instance's own props are not held back.** A part drawn `as` another component (a menu's
+  trigger as a `Button`) arrives as the outer part's merged props (its `id`, `data-testid`,
+  `aria-expanded`), and those must win over the inner component's. An instance that sets `id` or
+  `aria-expanded` on a part is setting it on purpose, and owns the result.
+
+  **Escape hatches for positioning.** A floating part's placement holds, so a `transform` or
+  `transformOrigin` in `style` or a provider's `slotProps` has no effect on it. To change where it
+  sits use its `positioning` options (placement, offset, gutter); to animate it or change its
+  origin, style a wrapper or the surface inside it (`content`) instead of the positioner. A
+  React Native `style` spread over an animated engine style replaces it; style a wrapper.
 - **React Native cost:** keyed props add no per-render allocations (memoized on identity, as
   `useSlotProps`); a user key spread over an animated engine style replaces it.
 
