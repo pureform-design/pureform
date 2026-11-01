@@ -26,6 +26,7 @@ cache:
     files:
       append:
         - "./vitest.config.browser.ts"
+        - "./.pureform/**/*"
         - "../panda-fixture/.pureform/**/*"
         - "../panda-fixture/panda.config.ts"
         - "../panda-fixture/panda.pureform.ts"
@@ -44,8 +45,9 @@ tasks:
   check:types:
     enabled: false
 
-  # Writes the CSS and Tailwind targets' registries (`.pureform/`, ignored by git), which
-  # `vitest.config.browser.ts` also writes on every run, for the type-aware lint without a test run.
+  # Writes the CSS and Tailwind targets' registries (`.pureform/`, ignored by git), which the
+  # component and e2e tasks import, and the type-aware lint reads. A task of its own, so the two test
+  # tasks, which run at the same time, don't write the same files (and wait on each other's lock).
   generate:
     exec: node scripts/generate-registries.ts
     dependencies:
@@ -61,6 +63,7 @@ tasks:
     dependencies:
       append:
         - ^prepare
+        - generate
 
   # The server rendering suite and the indication benchmark.
   test:e2e:
@@ -68,3 +71,4 @@ tasks:
     dependencies:
       append:
         - ^prepare
+        - generate

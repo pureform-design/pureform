@@ -15,8 +15,9 @@ component renders with its real classes and layout:
   (`tests/panda-fixture/.pureform`, `tests/panda-fixture/src/styles.css`), written by the
   fixture's omni `generate` and `prepare` tasks.
 - **CSS and Tailwind:** `.pureform/css` and `.pureform/tailwind` in this folder (ignored by git),
-  which `vitest.config.browser.ts` writes with `@pureform/generate` before the projects start
-  (`src/targets/generated.ts`), with every component of the config.
+  which the `generate` task writes with `@pureform/generate` (`src/targets/generated.ts`, run by
+  `scripts/generate-registries.ts`), with every component of the config. Both test tasks depend on
+  it; to run Vitest by hand, run `omni run generate -p @pureform/component-suites` first.
 
 Each binding's own specs (`packages/<binding>/src`) test the binding's details; these suites test
 what both must agree on, on every target.

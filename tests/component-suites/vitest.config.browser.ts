@@ -20,7 +20,6 @@ import type {
 
 import machinesPackage from "../../packages/machines/package.json" with { type: "json" };
 import { closeServers, commands } from "./src/commands.ts";
-import { generateRegistries } from "./src/targets/generated.ts";
 import { TARGETS } from "./src/targets/targets.ts";
 import type { TargetName } from "./src/targets/targets.ts";
 
@@ -29,9 +28,6 @@ const executablePath = process.env.CHROMIUM_PATH;
 const bindings = fileURLToPath(new URL("./src/bindings/", import.meta.url));
 const targets = fileURLToPath(new URL("./src/targets/", import.meta.url));
 const fixture = fileURLToPath(new URL("../panda-fixture/", import.meta.url));
-
-// The CSS and Tailwind targets' registries and stylesheets, before any project imports them.
-await generateRegistries();
 
 // Every project's Vite server, and each one's server-rendering server, listens for SIGTERM.
 process.setMaxListeners(32);
