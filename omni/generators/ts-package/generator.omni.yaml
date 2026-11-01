@@ -173,6 +173,7 @@ actions:
     type: add-many
     base_path: templates
     files:
+      - templates/vitest.config.browser.ts.tpl
       - templates/vitest.config.component.ts.tpl
       - templates/src/add.component.spec.ts.tpl
 

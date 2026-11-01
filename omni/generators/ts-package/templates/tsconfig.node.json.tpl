@@ -7,6 +7,7 @@
         {% endif %}
         {% if inputs.component_test %}
         , "vitest.config.component.ts"
+        , "vitest.config.browser.ts"
         {% endif %}
     ]
 }
