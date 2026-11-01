@@ -8,4 +8,7 @@ import { mergeConfig } from "vitest/config";
 import baseConfig from "./vite.config.ts";
 import shared from "./vitest.config.shared.ts";
 
-export default mergeConfig(mergeConfig(baseConfig, e2eTestConfig), shared);
+export default mergeConfig(
+    mergeConfig(mergeConfig(baseConfig, e2eTestConfig), shared),
+    { test: { testTimeout: 20_000 } },
+);

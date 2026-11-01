@@ -202,7 +202,7 @@ Type-check with `bun x tsc --noEmit -p tsconfig.json` (the React files carry a
   (`settlePlaced`); the keyboard suite waits out an overlay's exit before checking where focus is,
   and the indication suite mounts its other button at the top of the page, clear of an open
   overlay, which draws over what follows it.
-- **The test browser emulates `prefers-reduced-motion: reduce`** (`vitest.config.component.ts`), so
+- **The test browser emulates `prefers-reduced-motion: reduce`** (`vitest.config.shared.ts`), so
   boxes are measured at rest; overlays still fade under it. A suite that checks full motion sets
   the provider's `motion: "full"`.
 - **The pointer rests where the last test left it.** A snackbar under it is held open, and a

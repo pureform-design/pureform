@@ -86,8 +86,9 @@ const binding = (
 export default {
     plugins: [closeServers],
     test: {
-        testTimeout: 20_000,
         browser: {
+            enabled: true,
+            headless: true,
             provider: playwright({
                 launchOptions: executablePath ? { executablePath } : {},
                 // Nothing moves, so boxes are measured at rest.
