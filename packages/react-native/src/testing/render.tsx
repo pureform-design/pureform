@@ -9,6 +9,7 @@ import { afterEach, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 afterEach(() => {
+    vi.useRealTimers();
     cleanup();
     document.body.innerHTML = "";
 });
@@ -21,6 +22,29 @@ export const mount = async (view: ReactNode): Promise<HTMLElement> => {
     });
     return container;
 };
+
+/** Takes over the clock an animation reads (`requestAnimationFrame` and the time), so motion
+ *  moves only as `stepClock` advances it, and a loaded machine can't stretch or skip a moment of
+ *  it. Timers stay real, so `act`, `until` and the real mouse still work. Call it once the view is
+ *  mounted, before the interaction that starts the motion; it is undone after each test. */
+export const startClock = (): void => {
+    vi.useFakeTimers({
+        toFake: [
+            "requestAnimationFrame",
+            "cancelAnimationFrame",
+            "Date",
+            "performance",
+        ],
+    });
+};
+
+/** Advances the animation clock one frame, then lets React and the page's real events (a
+ *  measured layout) catch up. */
+export const stepClock = (ms = 16): Promise<void> =>
+    act(async () => {
+        vi.advanceTimersByTime(ms);
+        await new Promise((resolve) => setTimeout(resolve, 0));
+    });
 
 /** Waits a task inside `act`. */
 export const settle = (ms = 0): Promise<void> =>
