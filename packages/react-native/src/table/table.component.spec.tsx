@@ -60,10 +60,20 @@ describe("table", () => {
             await pointerAway();
             const resting = computed("pf-data-table-row").backgroundColor;
             await userEvent.hover(byTestId("pf-data-table-row"));
-            await settle(100);
-            expect(
-                computed("pf-data-table-row").backgroundColor === resting,
-            ).toBe(!rowHover);
+            // The tint fades in on a tween, which a loaded machine stretches: wait for it when
+            // the row hovers, and give the absence a moment to show when it doesn't.
+            if (rowHover) {
+                await until(() =>
+                    expect(
+                        computed("pf-data-table-row").backgroundColor,
+                    ).not.toBe(resting),
+                );
+            } else {
+                await settle(100);
+                expect(computed("pf-data-table-row").backgroundColor).toBe(
+                    resting,
+                );
+            }
         },
     );
     it("lays out its rows with their roles, a rule under each", async () => {
