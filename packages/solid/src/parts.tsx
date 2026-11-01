@@ -341,7 +341,7 @@ export function useUnstyledComponent<A extends ComponentAnatomy>(
 
 /** What an instance's `slotProps` set for one part: its element's props and handlers. Its classes
  *  and style are the keyed `class` and `style`, so they aren't taken here. */
-export type SlotPartProps = Omit<PartProps, "class" | "classList" | "style">;
+export type SlotPartProps = Omit<PartProps, "class" | "style">;
 
 /** The props of a ready-made component that address each part by name:
  *  `class={{ root: "wide", label: "caps" }}`, `testId="save"`. */

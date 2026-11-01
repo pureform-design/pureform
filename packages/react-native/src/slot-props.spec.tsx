@@ -113,8 +113,11 @@ describe("nativeSlots", () => {
             { root: { children: "c", ref: 1 } },
             "button",
         );
+        const props = slots.props("root") as Record<string, unknown>;
         slots.props("root");
-        slots.props("root");
+        // Dropped from what the component spreads, not only reported.
+        expect(props).toEqual({ accessibilityLabel: "ok" });
+        expect(slots.props("root")).toBe(props);
         expect(warn).toHaveBeenCalledTimes(2);
         expect(warn.mock.calls[0]![0]).toBe(
             `pureform: <button> root ignored "children", "ref" from the provider's slotProps: the component sets them.`,
@@ -122,6 +125,22 @@ describe("nativeSlots", () => {
         expect(warn.mock.calls[1]![0]).toBe(
             `pureform: <button> root ignored "testID" from slotProps: the component sets it.`,
         );
+        warn.mockRestore();
+    });
+
+    it("names the part the key reaches in the warning, and keeps each component's reader apart", () => {
+        const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+        const slotProps = { content: { testID: "mapped" } };
+        const keyOf = overlayKeys(dialogOverlayAnatomy);
+        const dialog = nativeSlots({ slotProps }, keyOf, undefined, "dialog");
+        const other = nativeSlots({ slotProps }, keyOf, undefined, "popover");
+        expect(dialog).not.toBe(other);
+        dialog.props("root");
+        other.props("root");
+        expect(warn.mock.calls.map(([message]) => message)).toEqual([
+            `pureform: <dialog> content ignored "testID" from slotProps: the component sets it.`,
+            `pureform: <popover> content ignored "testID" from slotProps: the component sets it.`,
+        ]);
         warn.mockRestore();
     });
 

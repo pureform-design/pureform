@@ -26,7 +26,9 @@ export const OVERRIDABLE_KEYS: ReadonlySet<string> = new Set([
 ]);
 
 /** The style properties that place a floating part: a machine's values for them hold, the rest of
- *  its `style` joins like any other. Custom properties (`--x`, `--transform-origin`) hold too. */
+ *  its `style` joins like any other. Custom properties (`--x`, `--transform-origin`) hold too. Kept
+ *  hyphenated; a name in either form (`zIndex`, `z-index`) is checked as hyphenated, since Solid's
+ *  machine props arrive hyphenated and React's camel-cased. */
 const POSITIONING_STYLE = new Set([
     "position",
     "top",
@@ -36,17 +38,20 @@ const POSITIONING_STYLE = new Set([
     "inset",
     "transform",
     "translate",
-    "transformOrigin",
-    "willChange",
-    "zIndex",
-    "offsetPath",
-    "offsetDistance",
-    "offsetRotate",
-    "offsetAnchor",
+    "transform-origin",
+    "will-change",
+    "z-index",
+    "offset-path",
+    "offset-distance",
+    "offset-rotate",
+    "offset-anchor",
 ]);
 
+const hyphenated = (property: string): string =>
+    property.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
+
 const isPositioningStyle = (property: string): boolean =>
-    property.startsWith("--") || POSITIONING_STYLE.has(property);
+    property.startsWith("--") || POSITIONING_STYLE.has(hyphenated(property));
 
 const HANDLER_KEY = /^on[A-Z]/;
 const CLASS_KEYS = new Set(["class", "className"]);

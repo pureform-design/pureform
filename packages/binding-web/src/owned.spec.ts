@@ -4,6 +4,7 @@ import {
     appearanceMessage,
     FORWARDED_SLOT_PROPS,
     isForwardedSlotProps,
+    splitMachine,
     withoutAppearance,
 } from "./owned";
 
@@ -48,5 +49,28 @@ describe("appearanceMessage", () => {
         expect(appearanceMessage("label", ["className"])).toContain(
             'slotProps.label ignored "className": style a part with the keyed props',
         );
+    });
+});
+
+describe("splitMachine", () => {
+    it("holds a machine's positioning style in either casing, and leaves its other style joining", () => {
+        const { rest, style } = splitMachine({
+            style: {
+                zIndex: 5,
+                "transform-origin": "top",
+                "will-change": "transform",
+                "--x": "1px",
+                paddingTop: "24px",
+            },
+        });
+        expect(style).toEqual({
+            style: {
+                zIndex: 5,
+                "transform-origin": "top",
+                "will-change": "transform",
+                "--x": "1px",
+            },
+        });
+        expect(rest).toEqual({ style: { paddingTop: "24px" } });
     });
 });
