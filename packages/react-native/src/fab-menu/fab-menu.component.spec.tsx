@@ -1,7 +1,8 @@
 import { testIds } from "@pureform/anatomy";
+import { act } from "react";
 import type { ReactNode } from "react";
 import { View } from "react-native";
-import { beforeAll, describe, expect, it } from "vitest";
+import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { FabMenu } from ".";
@@ -201,24 +202,42 @@ describe("FabMenu's item reveal on React Native", () => {
         expect(Math.max(...edges)).toBeLessThan(1.5);
     });
 
+    // The animation's clock (`requestAnimationFrame` and the time it reads) is the test's own, so
+    // a loaded machine can't stretch or skip a moment of the motion: it advances one frame a step.
+    afterEach(() => {
+        vi.useRealTimers();
+    });
+    const stepFrames = async (count: number) => {
+        const frames: number[][] = [];
+        for (let i = 0; i < count; i++) {
+            await act(async () => {
+                vi.advanceTimersByTime(16);
+            });
+            if (rows().length) frames.push(widths());
+        }
+        return frames;
+    };
+
     it("reveals the item nearest the FAB first and the farthest last", async () => {
         await renderFull(<FabMenu icon="+" fabLabel="Create" items={ITEMS} />);
-        const recording = sample();
-        await open();
-        // A moment with the nearest item (the last) well open while the farthest hasn't begun.
-        await until(() => {
-            const [first, , last] = widths();
-            expect(last!).toBeGreaterThan(10);
-            expect(first!).toBeLessThan(2);
+        vi.useFakeTimers({
+            toFake: [
+                "requestAnimationFrame",
+                "cancelAnimationFrame",
+                "Date",
+                "performance",
+            ],
         });
-        await revealed();
-        recording.stop();
+        await open();
+        const frames = (await stepFrames(400)).filter((f) => f.length === 3);
+        // A moment with the nearest item (the last) well open while the farthest hasn't begun.
+        expect(frames.some((f) => f[2]! > 10 && f[0]! < 2)).toBe(true);
         // While it grows, the nearest is never behind the farthest.
-        const growing = recording.frames.filter(
-            (f) => f.length === 3 && f.some((w) => w > 2 && w < 40),
-        );
+        const growing = frames.filter((f) => f.some((w) => w > 2 && w < 40));
         expect(growing.length).toBeGreaterThan(0);
         expect(growing.every((f) => f[2]! >= f[0]! - 1)).toBe(true);
+        // And it ends with every item open.
+        expect(Math.min(...frames.at(-1)!)).toBeGreaterThan(40);
     });
 
     it("leaves its items fully shown for the fade under reduced motion", async () => {
