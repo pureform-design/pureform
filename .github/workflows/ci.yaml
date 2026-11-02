@@ -117,7 +117,7 @@ jobs:
         id: plan
         run: |
           omni -i run -f=failed -d --result=shards.json -m 'ci.shard == true' 'test:*'
-          echo "shards=$(jq -c '[.[] | select(.details.meta.ci.shard == true and .status != "skipped") | {project: .task.project_name, task: .task.task_name}]' shards.json)" >> "$GITHUB_OUTPUT"
+          echo "shards=$(jq -c '[.[] | select(.details.meta.ci.shard == true and .status != "skipped") | {project: .task.project_name, task: .task.task_name, slug: (((.task.project_name | ltrimstr("@")) + "-" + .task.task_name) | gsub("[^A-Za-z0-9._-]"; "-"))}]' shards.json)" >> "$GITHUB_OUTPUT"
 
       # A filter selects tasks but still runs their dependencies, so the aggregate of a project with
       # shards is marked `ci.shard: parent` and left out here.
@@ -156,7 +156,7 @@ jobs:
       - name: Setup Workspace
         uses: ./.github/actions/setup-workspace
         with:
-          cache-key-prefix: test-shard-${{ matrix.task }}
+          cache-key-prefix: test-shard-${{ matrix.slug }}
           cache-restore-key-prefixes: |
             test
             build
@@ -170,7 +170,7 @@ jobs:
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:
-          name: vitest-failures-${{ matrix.task }}
+          name: vitest-failures-${{ matrix.slug }}
           retention-days: 7
           if-no-files-found: ignore
           include-hidden-files: true
