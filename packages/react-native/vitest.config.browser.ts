@@ -5,6 +5,7 @@
 import { createRequire } from "node:module";
 import { dirname } from "node:path";
 
+import { zagOptimizeDeps } from "@pureform/vitest-config/zag";
 import react from "@vitejs/plugin-react";
 import { playwright } from "@vitest/browser-playwright";
 import type { UserWorkspaceConfig } from "vitest/config";
@@ -30,16 +31,6 @@ const WEB_EXTENSIONS = [
     ".tsx",
     ".json",
 ];
-
-// Zag's packages under the machines, which the components import, read from the machines' own
-// dependencies so a new machine is pre-bundled too (Vite would otherwise find it mid-run, reload
-// the page, and leave two copies of React: "Invalid hook call").
-const machinesPackage = createRequire(import.meta.url)(
-    "../machines/package.json",
-) as { dependencies: Record<string, string> };
-const ZAG = Object.keys(machinesPackage.dependencies)
-    .filter((name) => name.startsWith("@zag-js/"))
-    .map((name) => `@pureform/machines > ${name}`);
 
 export default {
     plugins: [react()],
@@ -73,7 +64,7 @@ export default {
             "react-native-web",
             "react-native-reanimated",
             "react-native-svg",
-            ...ZAG,
+            ...zagOptimizeDeps({ via: ["@pureform/machines"] }),
         ],
         rolldownOptions: {
             resolve: { extensions: WEB_EXTENSIONS },

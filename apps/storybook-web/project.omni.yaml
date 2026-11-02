@@ -7,6 +7,7 @@ extends:
 dependencies:
   append:
     - "@pureform/tsconfig"
+    - "@pureform/vitest-config"
     - "@pureform/solid"
     - "@pureform/react"
     - "@pureform/react-native"

@@ -2,6 +2,7 @@
 // Set CHROMIUM_PATH to use a system Chromium instead of Playwright's download.
 
 import componentTestConfig from "@pureform/vitest-config/component";
+import { zagOptimizeDeps } from "@pureform/vitest-config/zag";
 import solid from "@solidjs/vite-plugin";
 import { playwright } from "@vitest/browser-playwright";
 import { mergeConfig, type UserWorkspaceConfig } from "vitest/config";
@@ -20,36 +21,11 @@ export default mergeConfig(mergeConfig(baseConfig, componentTestConfig), {
         include: [
             "@zag-js/checkbox",
             "@zag-js/radio-group",
-            "@pureform/machines > @zag-js/select",
-            "@pureform/machines > @zag-js/menu",
-            "@pureform/machines > @zag-js/pagination",
-            "@pureform/machines > @zag-js/presence",
-            "@pureform/machines > @zag-js/dialog",
-            "@pureform/machines > @zag-js/toast",
-            "@pureform/machines > @zag-js/tooltip",
             "@zag-js/switch",
-            "@pureform/machines > @zag-js/tabs",
-            "@pureform/machines > @zag-js/carousel",
-            "@pureform/machines > @zag-js/accordion",
-            "@pureform/machines > @zag-js/tree-view",
-            "@pureform/machines > @zag-js/steps",
-            "@pureform/machines > @zag-js/date-picker",
-            "@pureform/machines > @zag-js/date-input",
-            "@pureform/machines > @zag-js/combobox",
-            "@pureform/machines > @zag-js/file-upload",
-            "@pureform/machines > @zag-js/tags-input",
-            "@pureform/machines > @zag-js/number-input",
-            "@pureform/machines > @zag-js/pin-input",
-            "@pureform/machines > @zag-js/clipboard",
-            "@pureform/machines > @zag-js/rating-group",
-            "@pureform/machines > @zag-js/toggle-group",
-            "@pureform/machines > @zag-js/slider",
-            "@pureform/machines > @zag-js/avatar",
-            "@pureform/machines > @zag-js/listbox",
-            "@pureform/machines > @zag-js/splitter",
-            "@pureform/machines > @zag-js/color-picker",
-            "@pureform/machines > @zag-js/anatomy",
-            "@pureform/machines > @zag-js/collection",
+            ...zagOptimizeDeps({
+                via: ["@pureform/machines"],
+                except: ["checkbox", "radio-group", "switch"],
+            }),
         ],
     },
     resolve: { dedupe: ["solid-js", "@solidjs/web"] },

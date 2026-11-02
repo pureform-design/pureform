@@ -5,6 +5,7 @@
 // --project storybook/native -t Button`.
 
 import { storybookTest } from "@storybook/addon-vitest/vitest-plugin";
+import { zagOptimizeDeps } from "@pureform/vitest-config/zag";
 import { playwright } from "@vitest/browser-playwright";
 import { defineConfig } from "vitest/config";
 
@@ -26,13 +27,9 @@ export default defineConfig({
             optimizeDeps: {
                 include: [
                     "storybook/theming",
-                    "@pureform/react > @pureform/machines > @zag-js/anatomy",
-                    "@pureform/react > @pureform/machines > @zag-js/core",
-                    "@pureform/react > @pureform/machines > @zag-js/dom-query",
-                    "@pureform/react > @pureform/machines > @zag-js/pin-input",
-                    "@pureform/react > @pureform/machines > @zag-js/toast",
-                    "@pureform/react > @pureform/machines > @zag-js/types",
-                    "@pureform/react > @pureform/machines > @zag-js/utils",
+                    ...zagOptimizeDeps({
+                        via: ["@pureform/react", "@pureform/machines"],
+                    }),
                 ],
             },
             plugins: [
