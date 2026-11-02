@@ -45,7 +45,16 @@ tasks:
       append:
         - ^prepare
 
+  # Run in CI as a shard, so the aggregate leaves it out (a filter still runs what its tasks depend on).
+  test:
+    meta:
+      ci:
+        shard: parent
+
   test:e2e:
+    meta:
+      ci:
+        shard: true
     enabled: true
     # The Panda fixture's codegen writes the styled-system the tests import.
     dependencies:

@@ -80,6 +80,9 @@ tasks:
   # The server rendering suite and the indication benchmark.
   test:e2e:
     enabled: true
+    meta:
+      ci:
+        shard: true
     dependencies:
       append:
         - ^prepare
