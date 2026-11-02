@@ -5,6 +5,7 @@
 import { createRequire } from "node:module";
 import { dirname } from "node:path";
 
+import { zagOptimizeDeps } from "@pureform/vitest-config/zag";
 import react from "@vitejs/plugin-react";
 import { playwright } from "@vitest/browser-playwright";
 import type { UserWorkspaceConfig } from "vitest/config";
@@ -63,6 +64,7 @@ export default {
             "react-native-web",
             "react-native-reanimated",
             "react-native-svg",
+            ...zagOptimizeDeps({ via: ["@pureform/machines"] }),
         ],
         rolldownOptions: {
             resolve: { extensions: WEB_EXTENSIONS },

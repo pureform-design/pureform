@@ -34,6 +34,9 @@ cache:
 
 tasks:
   test:
+    meta:
+      ci:
+        shard: parent
     enabled: true
 
   test:unit:
@@ -44,6 +47,9 @@ tasks:
 
   # A smoke test: the dev server renders the home page, and it hydrates in Chromium.
   test:e2e:
+    meta:
+      ci:
+        shard: true
     enabled: true
     cache:
       key:

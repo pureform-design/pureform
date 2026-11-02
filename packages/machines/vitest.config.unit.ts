@@ -3,6 +3,7 @@
 // instead of Playwright's download.
 
 import unitTestConfig from "@pureform/vitest-config/unit";
+import { zagOptimizeDeps } from "@pureform/vitest-config/zag";
 import { playwright } from "@vitest/browser-playwright";
 import { mergeConfig, type UserWorkspaceConfig } from "vitest/config";
 
@@ -13,23 +14,8 @@ const executablePath = process.env.CHROMIUM_PATH;
 export default mergeConfig(mergeConfig(baseConfig, unitTestConfig), {
     // Optimized up front, so Vite doesn't reload a test when it finds them.
     optimizeDeps: {
-        include: [
-            "@zag-js/checkbox",
-            "@zag-js/collection",
-            "@zag-js/combobox",
-            "@zag-js/dialog",
-            "@zag-js/file-upload",
-            "@zag-js/menu",
-            "@zag-js/pagination",
-            "@zag-js/presence",
-            "@zag-js/radio-group",
-            "@zag-js/select",
-            "@zag-js/switch",
-            "@zag-js/tags-input",
-            "@zag-js/toast",
-            "@zag-js/tooltip",
-            "@zag-js/vanilla",
-        ],
+        // The specs also drive the machines through Zag's vanilla runtime, a dev dependency.
+        include: [...zagOptimizeDeps(), "@zag-js/vanilla"],
     },
     test: {
         testTimeout: 5000,

@@ -5,6 +5,7 @@
 // --project storybook/native -t Button`.
 
 import { storybookTest } from "@storybook/addon-vitest/vitest-plugin";
+import { zagOptimizeDeps } from "@pureform/vitest-config/zag";
 import { playwright } from "@vitest/browser-playwright";
 import { defineConfig } from "vitest/config";
 
@@ -26,13 +27,9 @@ export default defineConfig({
             optimizeDeps: {
                 include: [
                     "storybook/theming",
-                    "@pureform/react > @pureform/machines > @zag-js/anatomy",
-                    "@pureform/react > @pureform/machines > @zag-js/core",
-                    "@pureform/react > @pureform/machines > @zag-js/dom-query",
-                    "@pureform/react > @pureform/machines > @zag-js/pin-input",
-                    "@pureform/react > @pureform/machines > @zag-js/toast",
-                    "@pureform/react > @pureform/machines > @zag-js/types",
-                    "@pureform/react > @pureform/machines > @zag-js/utils",
+                    ...zagOptimizeDeps({
+                        via: ["@pureform/react", "@pureform/machines"],
+                    }),
                 ],
             },
             plugins: [
@@ -48,7 +45,11 @@ export default defineConfig({
                     enabled: true,
                     headless: true,
                     provider: playwright({
-                        launchOptions: executablePath ? { executablePath } : {},
+                        launchOptions: {
+                            // CI's small /dev/shm crashes Chromium's pages mid-run.
+                            args: ["--disable-dev-shm-usage"],
+                            ...(executablePath ? { executablePath } : {}),
+                        },
                     }),
                     // The component suites' viewport, so components that measure the page (the
                     // carousel) lay out as they do there.

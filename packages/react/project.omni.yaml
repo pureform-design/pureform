@@ -24,9 +24,15 @@ tasks:
     enabled: false
 
   test:component:
+    meta:
+      ci:
+        shard: true
     enabled: true
 
   test:
+    meta:
+      ci:
+        shard: parent
     enabled: true
 
   build:

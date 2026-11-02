@@ -32,6 +32,9 @@ tasks:
     enabled: false
 
   test:component:
+    meta:
+      ci:
+        shard: true
     enabled: true
     cache:
       key:
@@ -40,6 +43,9 @@ tasks:
             - "./vitest.config.browser.ts"
 
   test:
+    meta:
+      ci:
+        shard: parent
     enabled: true
 
   build:

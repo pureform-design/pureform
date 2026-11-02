@@ -8,6 +8,7 @@
 import { fileURLToPath } from "node:url";
 
 import { pandacss } from "@pandacss/vite";
+import { zagOptimizeDeps } from "@pureform/vitest-config/zag";
 import solid from "@solidjs/vite-plugin";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
@@ -18,7 +19,6 @@ import type {
     UserWorkspaceConfig,
 } from "vitest/config";
 
-import machinesPackage from "../../packages/machines/package.json" with { type: "json" };
 import { closeServers, commands } from "./src/commands.ts";
 import { TARGETS } from "./src/targets/targets.ts";
 import type { TargetName } from "./src/targets/targets.ts";
@@ -41,14 +41,6 @@ const styling: Record<TargetName, () => PluginOption[]> = {
     css: () => [],
     tailwind: () => [tailwindcss()],
 };
-
-// Zag's packages under a binding, which the machines import, read from the machines' own
-// dependencies so a new machine is pre-bundled too (Vite would otherwise find it mid-run and
-// reload the page).
-const machines = (from: string): string[] =>
-    Object.keys(machinesPackage.dependencies)
-        .filter((name) => name.startsWith("@zag-js/"))
-        .map((name) => `${from} > @pureform/machines > ${name}`);
 
 // One project per target for a binding, named `<binding>/<target>` ("solid/css").
 const binding = (
@@ -86,7 +78,11 @@ export default {
             enabled: true,
             headless: true,
             provider: playwright({
-                launchOptions: executablePath ? { executablePath } : {},
+                launchOptions: {
+                    // CI's small /dev/shm crashes Chromium's pages mid-run.
+                    args: ["--disable-dev-shm-usage"],
+                    ...(executablePath ? { executablePath } : {}),
+                },
                 // Nothing moves, so boxes are measured at rest.
                 contextOptions: { reducedMotion: "reduce" },
             }),
@@ -101,7 +97,12 @@ export default {
             ...binding(
                 "solid",
                 () => solid({ ssr: true, solid: { hydratable: true } }),
-                [...machines("@pureform/solid"), "axe-core"],
+                [
+                    ...zagOptimizeDeps({
+                        via: ["@pureform/solid", "@pureform/machines"],
+                    }),
+                    "axe-core",
+                ],
             ),
             ...binding("react", () => react(), [
                 "react",
@@ -109,7 +110,9 @@ export default {
                 "react-dom/client",
                 "react/jsx-dev-runtime",
                 "@pureform/react > @zag-js/react",
-                ...machines("@pureform/react"),
+                ...zagOptimizeDeps({
+                    via: ["@pureform/react", "@pureform/machines"],
+                }),
                 "axe-core",
             ]),
         ],

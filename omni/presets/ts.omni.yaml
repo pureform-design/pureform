@@ -75,3 +75,6 @@ tasks:
 
 meta:
   language: typescript
+  # CI runs the tasks marked `ci.shard: true` as a matrix of their own, apart from the rest.
+  ci:
+    shard: false
