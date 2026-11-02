@@ -93,10 +93,14 @@ jobs:
       - name: Prune stale caches
         run: omni -i cache prune -sy -o="7d"
 
+  # Everything but the shards, in topological order. Also plans the shard matrix from the tasks'
+  # `meta.ci.shard`.
   test:
     name: Test
     needs: [build]
     runs-on: ubuntu-latest
+    outputs:
+      shards: ${{ steps.plan.outputs.shards }}
     steps:
       - uses: actions/checkout@v6
 
@@ -109,8 +113,16 @@ jobs:
             check
           install-playwright: "true"
 
+      - name: Plan shards
+        id: plan
+        run: |
+          omni -i run -f=failed -d --result=shards.json -m 'ci.shard == true' 'test:*'
+          echo "shards=$(jq -c '[.[] | select(.details.meta.ci.shard == true and .status != "skipped") | {project: .task.project_name, task: .task.task_name}]' shards.json)" >> "$GITHUB_OUTPUT"
+
+      # A filter selects tasks but still runs their dependencies, so the aggregate of a project with
+      # shards is marked `ci.shard: parent` and left out here.
       - name: Test
-        run: omni -i run -f=failed test
+        run: omni -i run -f=failed -m 'ci.shard == false' test test:e2e
 
       - name: Upload Vitest failure artifacts
         if: ${{ failure() }}
@@ -129,10 +141,51 @@ jobs:
       - name: Prune stale caches
         run: omni -i cache prune -sy -o="7d"
 
+  test-shard:
+    name: Test (${{ matrix.task }})
+    needs: [test]
+    if: ${{ needs.test.outputs.shards != '[]' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.test.outputs.shards) }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Workspace
+        uses: ./.github/actions/setup-workspace
+        with:
+          cache-key-prefix: test-shard-${{ matrix.task }}
+          cache-restore-key-prefixes: |
+            test
+            build
+            check
+          install-playwright: "true"
+
+      - name: Test
+        run: omni -i run -f=failed -p '${{ matrix.project }}' '${{ matrix.task }}'
+
+      - name: Upload Vitest failure artifacts
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: vitest-failures-${{ matrix.task }}
+          retention-days: 7
+          if-no-files-found: ignore
+          include-hidden-files: true
+          path: |
+            packages/*/.vitest/attachments
+            apps/*/.vitest/attachments
+            tests/*/.vitest/attachments
+
+      - name: Prune stale caches
+        run: omni -i cache prune -sy -o="7d"
+
   # Disabled until the PUBLISH_ENABLED repo variable is set to "true" (and a version tag is pushed).
   publish:
     name: Publish
-    needs: [test]
+    needs: [test, test-shard]
     if: ${{ vars.PUBLISH_ENABLED == 'true' && startsWith(github.ref, 'refs/tags/') }}
     runs-on: ubuntu-latest
     permissions:
@@ -159,7 +212,7 @@ jobs:
   # Skipped jobs (publish on PRs, commits on pushes) must not fail the gate.
   ci-gatekeeper:
     name: CI Passed
-    needs: [commits, check, build, test, publish]
+    needs: [commits, check, build, test, test-shard, publish]
     if: ${{ always() }}
     runs-on: ubuntu-latest
     steps:
@@ -172,6 +225,7 @@ jobs:
               "check": "${{ needs.check.result }}",
               "build": "${{ needs.build.result }}",
               "test": "${{ needs.test.result }}",
+              "test-shard": "${{ needs.test-shard.result }}",
               "publish": "${{ needs.publish.result }}"
             }
         with:

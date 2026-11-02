@@ -57,8 +57,20 @@ tasks:
         files:
           - ".pureform/**/*"
 
+  # CI runs the shard tasks below instead of this aggregate, so its filter leaves the aggregate out:
+  # a filter selects tasks, but still runs what they depend on.
+  test:
+    meta:
+      ci:
+        shard: parent
+
+  # One Vitest project per binding and target. CI runs the `meta.ci.shard` tasks as a matrix, and the
+  # parent task, with no project, runs them all.
   test:component:
     enabled: true
+    exec: bun x vitest --config ./vitest.config.component.ts run{% if args.project %} --project {{ args.project }}{% endif %}
+    args:
+      project: ""
     # The Panda fixture's codegen writes the styled-system the registry and stylesheet import.
     dependencies:
       append:
@@ -72,3 +84,51 @@ tasks:
       append:
         - ^prepare
         - generate
+
+  test:component:solid-panda:
+    extends: test:component
+    args:
+      project: "solid/panda"
+    meta:
+      ci:
+        shard: true
+
+  test:component:solid-css:
+    extends: test:component
+    args:
+      project: "solid/css"
+    meta:
+      ci:
+        shard: true
+
+  test:component:solid-tailwind:
+    extends: test:component
+    args:
+      project: "solid/tailwind"
+    meta:
+      ci:
+        shard: true
+
+  test:component:react-panda:
+    extends: test:component
+    args:
+      project: "react/panda"
+    meta:
+      ci:
+        shard: true
+
+  test:component:react-css:
+    extends: test:component
+    args:
+      project: "react/css"
+    meta:
+      ci:
+        shard: true
+
+  test:component:react-tailwind:
+    extends: test:component
+    args:
+      project: "react/tailwind"
+    meta:
+      ci:
+        shard: true
