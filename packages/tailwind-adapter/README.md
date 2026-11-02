@@ -12,7 +12,7 @@ CSS inside Tailwind's components layer, so utilities override components.
 ```
 
 The components' CSS is the CSS adapter's, so components look the same as with plain CSS and
-the Panda preset. `apps/tailwind-demo` uses it. The `/codegen` subpath is what
+the Panda preset. The `/codegen` subpath is what
 `@pureform/generate` loads for the `tailwind` target; it also depends on `@pureform/generate`
 and reuses the CSS adapter's codegen.
 
@@ -86,7 +86,6 @@ Named themes are scoped by `themeAttribute` (default `data-theme`), the attribut
 `theme-<name>` variants match: the provider's `theme` writes `registry.themeAttributes(theme)` on
 its element, so components and utilities switch together. Utilities override a component
 through its slot classes (`class={{ root: "rounded-none" }}`), since they sit in a later layer.
-`apps/tailwind-demo` is a working example.
 
 Options are the CSS adapter's, plus `palette` (map the raw palette too), `replace` (clear
 Tailwind's defaults in the namespaces pureform fills), and `themeVariant` (a named theme's

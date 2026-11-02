@@ -1,3 +1,0 @@
-@import "tailwindcss";
-/* pureform's stylesheet for Tailwind, which the bundler plugin writes into `.pureform/`. */
-@import "../.pureform/styles.css";
