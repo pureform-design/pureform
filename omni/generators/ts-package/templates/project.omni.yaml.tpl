@@ -31,6 +31,12 @@ tasks:
 
   test:component:
     enabled: {{ inputs.component_test | default(value=false) }}
+    # The component config imports the browser environment, which the preset's key doesn't list.
+    cache:
+      key:
+        files:
+          append:
+            - "./vitest.config.browser.ts"
 {% endif %}
 
   test:
