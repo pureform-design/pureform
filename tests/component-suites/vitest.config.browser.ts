@@ -86,7 +86,11 @@ export default {
             enabled: true,
             headless: true,
             provider: playwright({
-                launchOptions: executablePath ? { executablePath } : {},
+                launchOptions: {
+                    // CI's small /dev/shm crashes Chromium's pages mid-run.
+                    args: ["--disable-dev-shm-usage"],
+                    ...(executablePath ? { executablePath } : {}),
+                },
                 // Nothing moves, so boxes are measured at rest.
                 contextOptions: { reducedMotion: "reduce" },
             }),

@@ -48,7 +48,11 @@ export default defineConfig({
                     enabled: true,
                     headless: true,
                     provider: playwright({
-                        launchOptions: executablePath ? { executablePath } : {},
+                        launchOptions: {
+                            // CI's small /dev/shm crashes Chromium's pages mid-run.
+                            args: ["--disable-dev-shm-usage"],
+                            ...(executablePath ? { executablePath } : {}),
+                        },
                     }),
                     // The component suites' viewport, so components that measure the page (the
                     // carousel) lay out as they do there.
