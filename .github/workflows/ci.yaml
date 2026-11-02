@@ -142,7 +142,7 @@ jobs:
         run: omni -i cache prune -sy -o="7d"
 
   test-shard:
-    name: Test (${{ matrix.task }})
+    name: Test (${{ matrix.project }}#${{ matrix.task }})
     needs: [test]
     if: ${{ needs.test.outputs.shards != '[]' }}
     runs-on: ubuntu-latest
