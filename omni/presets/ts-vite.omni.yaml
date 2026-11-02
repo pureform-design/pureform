@@ -29,6 +29,29 @@ tasks:
         files:
           - ".vitest/**/*"
 
+  # Real components rendered in a browser: `src/**/*.component.{test,spec}.*`. Disabled until a
+  # package has a `vitest.config.component.ts` and enables it.
+  test:component:
+    enabled: false
+    exec: bun x vitest --config ./vitest.config.component.ts run
+    # The components import the packages' built output.
+    dependencies:
+      - ^build
+    cache:
+      key:
+        files:
+          append:
+            - "./vite.config.ts"
+            - "./vitest.config.component.ts"
+      output:
+        files:
+          - ".vitest/**/*"
+
+  test:
+    dependencies:
+      append:
+        - test:component
+
   build:
     exec: bun x vite build
     cache:

@@ -1,5 +1,5 @@
 // The suites' shared Vite config. Each Vitest project adds its binding's framework plugin and its
-// target's styling (`vitest.config.e2e.ts`).
+// target's styling (`vitest.config.browser.ts`).
 
 import { createConfig } from "@pureform/vite-config/test";
 

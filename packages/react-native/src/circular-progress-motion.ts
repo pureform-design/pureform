@@ -9,12 +9,14 @@ import { useReducedMotion } from "@pureform/rn-adapter/react";
 import { useMemo } from "react";
 
 import type { MotionEngine, MotionStyles } from "./engine";
+import { useStableSelection } from "./parts";
 import { useDirection, usePureform } from "./provider";
 import { useStyleFactory } from "./styles";
 
 const VALUE = "--components.circularProgress.value";
 const LINEAR = { type: "easing", kind: "keyword", name: "linear" } as const;
 const STEPS = 120;
+const NO_DEFAULTS = {};
 
 const number = (value: unknown): number =>
     typeof value === "number" ? value : Number.parseFloat(String(value));
@@ -49,10 +51,26 @@ export function useCircularProgressMotion(
     selected: Selected,
 ): { View: MotionEngine["View"]; styles: MotionStyles } {
     const provider = usePureform();
+    // An app's `defaults` is often a new object each render, with the same content.
+    const providerDefaults = useStableSelection(
+        provider.defaults.circularProgress ?? NO_DEFAULTS,
+    );
+    const defaults = provider.defaults.circularProgress
+        ? providerDefaults
+        : undefined;
     const factory = useStyleFactory("circularProgress");
+    // The sampling below fills the factory's cache of selections with instance tokens past its
+    // limit, which starts it again and hands back a new `selected` for the same selection. The
+    // styles are kept while they're the same by value, so that doesn't build the samples again.
+    const restStyles = useStableSelection(selected.styles);
     const reduced = useReducedMotion();
     const rtl = useDirection() === "rtl";
-    const animation = selected.animations.root;
+    // Kept while it's the same by value: a slowed copy (`timeScale`) is a new object each time.
+    const rootAnimation = selected.animations.root;
+    const stableAnimation = useStableSelection(rootAnimation ?? NO_DEFAULTS);
+    const animation = rootAnimation
+        ? (stableAnimation as typeof rootAnimation)
+        : undefined;
     const enabled = !!animation && !reduced;
     // A wavy drawing is a path, not a border arc. Until a drawing can consume the shared
     // clock, keep its documented spinning half-circle fallback rather than letting gaps drift.
@@ -64,10 +82,10 @@ export function useCircularProgressMotion(
     // Native graph nodes are kept until geometry or preset timing changes.
     const styles = useMemo(() => {
         if (!enabled || !animation) return {};
-        const base = withDefaults(
-            provider.defaults.circularProgress,
-            selection as never,
-        ) as Record<string, unknown>;
+        const base = withDefaults(defaults, selection as never) as Record<
+            string,
+            unknown
+        >;
         const tokens = base.tokens as Record<string, unknown> | undefined;
         const samples: { offset: number; styles: Record<string, Style> }[] =
             Array.from({ length: STEPS + 1 }, (_, i) => {
@@ -89,7 +107,7 @@ export function useCircularProgressMotion(
                               slot.style,
                           ]),
                       )
-                    : selected.styles;
+                    : restStyles;
                 return {
                     offset,
                     styles: {
@@ -151,10 +169,10 @@ export function useCircularProgressMotion(
         animation,
         enabled,
         factory,
-        provider.defaults.circularProgress,
+        defaults,
         selection,
         rtl,
-        selected.styles,
+        restStyles,
         timeline,
         wavy,
     ]);

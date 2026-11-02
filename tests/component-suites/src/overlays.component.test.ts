@@ -23,6 +23,23 @@ const frames = async (count: number) => {
     for (let i = 0; i < count; i++) await frame();
 };
 
+// Every animation `read` finds over the next `count` frames, each once, by what it animates. A
+// short fade can finish before a loaded machine renders a second frame, so a single look at a
+// fixed moment can miss it.
+const observe = async (
+    read: () => string[][],
+    count = 3,
+): Promise<string[][]> => {
+    const seen = new Map<string, string[]>();
+    for (let i = 0; i <= count; i++) {
+        for (const properties of read()) {
+            seen.set(properties.join(), properties);
+        }
+        if (i < count) await frame();
+    }
+    return [...seen.values()];
+};
+
 // The properties each running animation's keyframes set.
 const animated = (element: HTMLElement): string[][] =>
     element
@@ -89,14 +106,14 @@ describe.each(overlays)("$component", (component) => {
         await settlePlaced();
         expect(shows(scene.host)).toBe(false);
         await scene.update({ open: true });
-        await frames(2);
         const surface = overlay.surface(scene.host);
-        const entered = overlay.moving?.enter(scene.host) ?? surface;
+        const entering = await observe(() =>
+            animated(overlay.moving?.enter(scene.host) ?? surface),
+        );
         expect(shows(scene.host)).toBe(true);
         // The movement (on a spring) and the fade (on its tween) are two animations. A popup
         // grows on the `scale` property (composing with its own transform), a sheet or dialog
         // moves on `transform`, and a FAB menu's item is revealed by a `clip-path`.
-        const entering = animated(entered);
         expect(entering).toHaveLength(2);
         expect(entering).toEqual(
             expect.arrayContaining([
@@ -106,12 +123,13 @@ describe.each(overlays)("$component", (component) => {
         );
         await animationsDone();
         await scene.update({ open: false });
-        await frames(2);
+        const exiting = await observe(
+            () => animated(overlay.moving?.exit(scene.host) ?? surface),
+            1,
+        );
         expect(surface.dataset.state).toBe("closed");
         expect(shows(scene.host)).toBe(true);
-        expect(
-            animated(overlay.moving?.exit(scene.host) ?? surface).flat(),
-        ).toContain("opacity");
+        expect(exiting.flat()).toContain("opacity");
         await animationsDone();
         await frames(3);
         expect(shows(scene.host)).toBe(false);
@@ -121,18 +139,20 @@ describe.each(overlays)("$component", (component) => {
         const scene = mount({ open: false }, { motion: "reduce" });
         await settlePlaced();
         await scene.update({ open: true });
-        await frames(2);
         const surface = overlay.surface(scene.host);
-        expect(animated(overlay.moving?.enter(scene.host) ?? surface)).toEqual([
-            ["opacity"],
-        ]);
+        expect(
+            await observe(() =>
+                animated(overlay.moving?.enter(scene.host) ?? surface),
+            ),
+        ).toEqual([["opacity"]]);
         await animationsDone();
         await scene.update({ open: false });
-        await frames(2);
+        const exiting = await observe(
+            () => animated(overlay.moving?.exit(scene.host) ?? surface),
+            1,
+        );
         expect(shows(scene.host)).toBe(true);
-        expect(animated(overlay.moving?.exit(scene.host) ?? surface)).toEqual([
-            ["opacity"],
-        ]);
+        expect(exiting).toEqual([["opacity"]]);
         await animationsDone();
         await frames(3);
         expect(shows(scene.host)).toBe(false);

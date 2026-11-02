@@ -2491,7 +2491,7 @@ React Native runs the same rules through the selection, and RN-web in
 `tests/browser-e2e-tests`. A benchmark mounts 1,000 list items, with and without the layer
 element, and records mount time and style recalculation, for the layer decision above.
 
-**Built (p9e):** `tests/component-suites/src/indication.e2e.test.ts` runs the rules above for every
+**Built (p9e):** `tests/component-suites/src/indication.component.test.ts` runs the rules above for every
 component whose case has an `indication` (its anatomy, how a source and disabling reach it), on all
 six projects, with the real mouse; `tests/browser-e2e-tests/src/rn-indication.e2e.test.ts` runs them
 on React Native Web. What they found, now fixed: an opacity given as a number (`noIndication`'s 0)

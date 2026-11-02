@@ -42,7 +42,7 @@ registry and the binding share one copy. The provider takes a web registry
 | `icon-style.ts`                                                                                                                              | `useIconStyle`, and the context icon parts provide                                                                                                                                                                             |
 | `provided-tokens.tsx`                                                                                                                        | `ProvidedTokens` and `useProvidedTokens`: token values handed to nested components (component-architecture.md §5.5); `useComponent` merges a component's share under its own tokens                                            |
 | `part-context.ts`                                                                                                                            | `createPartContext`: the context Root shares with its parts, and the error outside Root                                                                                                                                        |
-| `button/`                                                                                                                                    | `@pureform/solid/button`: `button.tsx` (the component), `index.ts`, `button.spec.tsx`                                                                                                                                          |
+| `button/`                                                                                                                                    | `@pureform/solid/button`: `button.tsx` (the component), `index.ts`, `button.component.spec.tsx`                                                                                                                                |
 | `checkbox/`                                                                                                                                  | `@pureform/solid/checkbox`: the same layout                                                                                                                                                                                    |
 | `switch/`, `radio-group/`, `chip/`, `icon-button/`, `fab/`                                                                                   | The other components, in the same layout                                                                                                                                                                                       |
 | `text-field/`, `text-area/`, `select/`, `tags-input/`, `autocomplete/`, `search-view/`, `date-picker/`, `docked-date-picker/`, `date-input/` | The text inputs, in the same layout                                                                                                                                                                                            |
@@ -1003,7 +1003,7 @@ its element's spread and children effects, and, for a part with `as`, `dynamic`'
 without `as` renders its element through `dynamic(…, { static: true })`, which makes no
 computation, on the server as on the client. Its children are read where the element inserts them,
 with no memo of their own. One ready-made interactive list item row (a button with an avatar,
-supporting and trailing text) creates 68 reactive nodes, down from 144; `list-item/row-cost.spec.tsx`
+supporting and trailing text) creates 68 reactive nodes, down from 144; `list-item/row-cost.component.spec.tsx`
 holds that budget.
 
 ### Controllable state and forms
@@ -1090,8 +1090,9 @@ Through the omni MCP (or `omni run`):
   chunks are `.jsx` too, since an app's Solid plugin reads JSX only in files named so), so the
   app's Solid plugin compiles it for the DOM or the server; the `solid` export condition points
   there, as does `import`. Identifiers aren't minified, so components stay capitalized.
-- `test:unit`: Vitest in browser mode (Chromium; `CHROMIUM_PATH` from `.env.local`), with type
-  checks. The specs use a fake registry (`src/__fixtures__/registry.ts`, button and checkbox
+- `test:unit`: the type-level specs (`*.types.spec.ts`), in Node. `test:component`: Vitest in
+  browser mode (Chromium; `CHROMIUM_PATH` from `.env.local`), with type checks; the specs are
+  `*.component.spec.tsx`, beside each component. The specs use a fake registry (`src/__fixtures__/registry.ts`, button and checkbox
   classes that name the selection, `togglesRegistry()` for the toggles, and `textInputsRegistry()` for the text field, text area, select, and the menu the select draws its list with). Each component's spec covers rendering, keyboard, controlled
   and uncontrolled state, test ids, `unstyled`, slot overrides, and forms; the core helpers'
   specs use a smaller example button (`src/__fixtures__/button.tsx`).

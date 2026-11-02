@@ -190,12 +190,39 @@ const markup = (classes: Classes, scenario: Scenario): string => {
 const PAUSED =
     "*, ::before, ::after { animation-play-state: paused !important; }";
 
+/** Every longhand property the stylesheets declare, in any rule at any depth (layers, media,
+ *  supports). The browser's own CSS parser expands each shorthand to its longhands when a rule's
+ *  style is enumerated, so nothing is listed by hand. A property no rule declares computes the
+ *  same on both sides, inherited ones included, because each inherits from a declaration. */
+const declaredProperties = (sheets: string[]): Set<string> => {
+    const found = new Set<string>();
+    const walk = (rules: CSSRuleList) => {
+        for (const rule of rules) {
+            const style = (rule as Partial<CSSStyleRule>).style;
+            if (style) {
+                for (const property of style) {
+                    if (!property.startsWith("--")) found.add(property);
+                }
+            }
+            const nested = (rule as Partial<CSSGroupingRule>).cssRules;
+            if (nested) walk(nested);
+        }
+    };
+    for (const text of sheets) {
+        const sheet = new CSSStyleSheet();
+        sheet.replaceSync(text);
+        walk(sheet.cssRules);
+    }
+    return found;
+};
+
 /** Render the markup in a frame of the page's size, and return its computed styles. */
 const computed = async (
     classes: Classes,
     scenario: Scenario,
     css: string[],
     keepOnly?: string[],
+    only?: Set<string>,
 ): Promise<Record<string, Record<string, string>>> => {
     const frame = document.createElement("iframe");
     frame.id = "parity-frame";
@@ -243,10 +270,13 @@ const computed = async (
         for (const element of doc.querySelectorAll<HTMLElement>("[data-id]")) {
             const style = frame.contentWindow!.getComputedStyle(element);
             const values: Record<string, string> = {};
-            for (const property of style) {
+            for (const property of only ?? style) {
                 if (property.startsWith("--")) continue;
                 values[property] = style.getPropertyValue(property);
             }
+            // Used sizes and positions follow from the declarations, but a box is cheap to check.
+            const box = element.getBoundingClientRect();
+            values["@box"] = `${box.x} ${box.y} ${box.width} ${box.height}`;
             out[element.dataset.id ?? ""] = values;
         }
         return out;
@@ -304,6 +334,7 @@ describe.each(ADAPTERS)(
     "the %s adapter matches the Panda preset",
     (adapter) => {
         let adapterCss: Promise<string> | undefined;
+        let declared: Set<string> | undefined;
 
         it.each(SCENARIOS)(
             "$name",
@@ -311,12 +342,21 @@ describe.each(ADAPTERS)(
             { timeout: 180_000 },
             async (scenario) => {
                 adapterCss ??= commands.adapterCss(adapter, OPTIONS);
-                const panda = await computed(pandaClasses, scenario, []);
+                const sheet = await adapterCss;
+                declared ??= declaredProperties([pandaCss, sheet]);
+                const panda = await computed(
+                    pandaClasses,
+                    scenario,
+                    [],
+                    undefined,
+                    declared,
+                );
                 const plain = await computed(
                     plainClasses,
                     scenario,
-                    [await adapterCss],
+                    [sheet],
                     ["reset", "base"],
+                    declared,
                 );
 
                 const differences: string[] = [];

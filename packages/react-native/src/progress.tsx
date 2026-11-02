@@ -23,7 +23,7 @@ import type { LayoutChangeEvent, ViewProps } from "react-native";
 
 import { useCircularProgressMotion } from "./circular-progress-motion";
 import type { MotionEngine } from "./engine";
-import { testIdOf, withEngine } from "./parts";
+import { testIdOf, useStableSelection, withEngine } from "./parts";
 import { useEngine, useDirection } from "./provider";
 import { useNativeSlotReader } from "./slot-props";
 import type { NativeSlotProps } from "./slot-props";
@@ -276,9 +276,10 @@ export const LinearProgress = withEngine(LinearProgressImpl, "LinearProgress");
 function CircularProgressImpl(props: CircularProgressProps): ReactNode {
     const nativeSlots = useNativeSlotReader("circularProgress");
     const engine = useEngine();
-    const selection = useMemo(
-        () => progressSelection(props) as Record<string, unknown>,
-        [props],
+    // The same selection while it selects the same, so the sampled motion isn't built again each
+    // time the parent renders (`props` is a new object then).
+    const selection = useStableSelection(
+        progressSelection(props) as Record<string, unknown>,
     );
     const { styles, selected } = useComponentSlots<CircularProgressPart>(
         "circularProgress",

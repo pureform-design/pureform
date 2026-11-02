@@ -2,7 +2,7 @@
 name: "@pureform/solid"
 
 extends:
-  - "@workspace/omni/presets/ts-vite-lib.omni.yaml"
+  - "@workspace/omni/presets/ts-vite-ui-lib.omni.yaml"
 
 dependencies:
   append:
@@ -22,6 +22,9 @@ tasks:
 
   test:integration:
     enabled: false
+
+  test:component:
+    enabled: true
 
   test:
     enabled: true

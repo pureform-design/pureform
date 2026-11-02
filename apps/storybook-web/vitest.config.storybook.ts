@@ -21,8 +21,20 @@ export default defineConfig({
     test: {
         projects: RENDERERS.map((renderer) => ({
             extends: true,
-            // Found late (the preview's docs theme), it would reload the page mid-run.
-            optimizeDeps: { include: ["storybook/theming"] },
+            // Found late (the preview's docs theme, the Zag machines a story first opens), they
+            // would reload the page mid-run.
+            optimizeDeps: {
+                include: [
+                    "storybook/theming",
+                    "@pureform/react > @pureform/machines > @zag-js/anatomy",
+                    "@pureform/react > @pureform/machines > @zag-js/core",
+                    "@pureform/react > @pureform/machines > @zag-js/dom-query",
+                    "@pureform/react > @pureform/machines > @zag-js/pin-input",
+                    "@pureform/react > @pureform/machines > @zag-js/toast",
+                    "@pureform/react > @pureform/machines > @zag-js/types",
+                    "@pureform/react > @pureform/machines > @zag-js/utils",
+                ],
+            },
             plugins: [
                 storybookTest({
                     configDir: ".storybook",

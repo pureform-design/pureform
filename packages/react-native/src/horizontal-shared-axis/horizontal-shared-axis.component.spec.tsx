@@ -117,7 +117,6 @@ describe("HorizontalSharedAxis on React Native", () => {
                     </HorizontalSharedAxis>
                 )}
             </index.Holder>,
-            { timeScale: 100 },
         );
         await settle();
         await index.set(1);
