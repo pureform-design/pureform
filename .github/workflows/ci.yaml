@@ -122,7 +122,7 @@ jobs:
       # A filter selects tasks but still runs their dependencies, so the aggregate of a project with
       # shards is marked `ci.shard: parent` and left out here.
       - name: Test
-        run: omni -i run -f=failed -m 'ci.shard == false' test test:e2e
+        run: omni -i run -f=failed -m 'ci.shard == false' test test:unit test:e2e
 
       - name: Upload Vitest failure artifacts
         if: ${{ failure() }}

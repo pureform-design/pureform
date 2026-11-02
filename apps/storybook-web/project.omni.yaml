@@ -49,7 +49,12 @@ tasks:
   # vitest.config.storybook.ts).
   test:e2e:
     enabled: true
-    exec: bun run vitest --config ./vitest.config.storybook.ts run
+    exec: bun run vitest --config ./vitest.config.storybook.ts run{% if args.project %} --project storybook/{{ args.project }}{% endif %}
+    args:
+      project: ""
+    meta:
+      ci:
+        shard: parent
     dependencies:
       append:
         - generate:stories
@@ -64,6 +69,37 @@ tasks:
       output:
         files:
           - ".vitest/**/*"
+
+  # One task per renderer for CI to run as a matrix (`meta.ci.shard`). The aggregate is marked
+  # `ci.shard: parent`, as the component suites' is, so the light job leaves it out.
+  test:
+    meta:
+      ci:
+        shard: parent
+
+  test:e2e:solid:
+    extends: test:e2e
+    args:
+      project: "solid"
+    meta:
+      ci:
+        shard: true
+
+  test:e2e:react:
+    extends: test:e2e
+    args:
+      project: "react"
+    meta:
+      ci:
+        shard: true
+
+  test:e2e:native:
+    extends: test:e2e
+    args:
+      project: "native"
+    meta:
+      ci:
+        shard: true
 
   dev:
     exec: bun x storybook dev -p 6006 --no-open
