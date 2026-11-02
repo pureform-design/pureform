@@ -14,7 +14,8 @@ const executablePath = process.env.CHROMIUM_PATH;
 export default mergeConfig(mergeConfig(baseConfig, unitTestConfig), {
     // Optimized up front, so Vite doesn't reload a test when it finds them.
     optimizeDeps: {
-        include: zagOptimizeDeps(),
+        // The specs also drive the machines through Zag's vanilla runtime, a dev dependency.
+        include: [...zagOptimizeDeps(), "@zag-js/vanilla"],
     },
     test: {
         testTimeout: 5000,
