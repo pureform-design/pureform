@@ -292,25 +292,27 @@ trigger shows their labels joined by ", " (the placeholder when none):
 
 - `build`: Vite library build into `dist/`, one bundle per entry (the root and the components
   never import react-native-svg or Reanimated; their engines' subpaths do).
-- `test:unit`: Vitest in Chromium through React Native Web (`vitest.config.unit.ts`), with React
+- `test:unit`: the native defaults, the stories' args, the source's imports, and type-level specs
+  (`vitest.config.unit.ts`). `test:component`: Vitest in Chromium through React Native Web
+  (`vitest.config.component.ts`, `*.component.spec.tsx` beside each component), with React
   Testing Library and type checks: the provider (direction, reduced motion from the system,
-  overrides per scheme, inheritance; `nested-themes.spec.tsx`: themes for shape, density, and
+  overrides per scheme, inheritance; `nested-themes.component.spec.tsx`: themes for shape, density, and
   color combining, from a config with named themes), the hooks (the factory's result, one frozen
   object, suspending on a lazy entry, instance tokens by name), the components (test ids,
   controlled and uncontrolled state, the select's menu, icon fills, engines), and indication
-  (`indication.spec.tsx`: the source from `Pressable`, the provider's default and tokens, the
+  (`indication.component.spec.tsx`: the source from `Pressable`, the provider's default and tokens, the
   prop, a shared source, keyboard-only `focusVisible`, the ripple on every surface), rows
-  (`rows.spec.tsx`: a `Profiler` on each row's surface shows which render again), and layers
-  (`layer.spec.tsx`: the theme's z-index, and a wrapper lifting a menu over a later sibling where
-  the menu's own z-index can't), portals (`portal.spec.tsx`: at the host, sorted by layer and order, the declaring
-  provider carried through, an app's own host), overlays (`overlays.spec.tsx`, with both engines:
+  (`rows.component.spec.tsx`: a `Profiler` on each row's surface shows which render again), and layers
+  (`layer.component.spec.tsx`: the theme's z-index, and a wrapper lifting a menu over a later sibling where
+  the menu's own z-index can't), portals (`portal.component.spec.tsx`: at the host, sorted by layer and order, the declaring
+  provider carried through, an app's own host), overlays (`overlays.component.spec.tsx`, with both engines:
   placement, the menu, the snackbar queue, the tooltip, the modal dialog, and their stacking),
-  views (`views.spec.tsx`: a list item's still slots are plain and
+  views (`views.component.spec.tsx`: a list item's still slots are plain and
   its surface the engine's, with both engines, through a change of state; a moving slot still
-  tweens; a factory without `moving` keeps every slot on the engine), and presence (`presence.spec.tsx`: the motions are the preset's;
+  tweens; a factory without `moving` keeps every slot on the engine), and presence (`presence.component.spec.tsx`: the motions are the preset's;
   with each engine, the select's menu grows in and stays until it has faded out, reduced motion
   only fades, a reopened overlay enters again, the dialog and scrim, snackbar, and tooltip
-  `open`), and the tabs' indicator (`tab-indicator.spec.tsx`, with both engines: it slides from
+  `open`), and the tabs' indicator (`tab-indicator.component.spec.tsx`, with both engines: it slides from
   the old tab partway and rests in place, primary and secondary, for a press, a key, and a
   controlled value; a change mid-slide starts from where it had got to; reduced motion changes at
   once; a resize keeps it aligned). Node-side commands (`src/testing/commands.ts`) precompute the
@@ -538,7 +540,7 @@ trigger shows their labels joined by ", " (the placeholder when none):
   shows under the dialog's `Modal` on a device.
 - **Overlays move as on the web:** the preset's enter and exit keyframes are raw CSS on Zag's
   `data-state`, which React Native drops, so `presence.ts` holds the same motions (checked against
-  the preset's in `presence.spec.tsx`) and runs them through the engine: a menu, select list,
+  the preset's in `presence.component.spec.tsx`) and runs them through the engine: a menu, select list,
   tooltip, or snackbar grows from 80% as it fades in and shrinks back to 80% as it fades out
   (`spatialFast`, fading on `effectsFast`); a dialog comes down 48px as it fades in
   (`spatialDefault`) and goes back up as it fades out (`effectsFast`, fading on `effectsFast`); a

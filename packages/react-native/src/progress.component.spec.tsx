@@ -1,4 +1,5 @@
 import { curve } from "@pureform/rn-adapter/animated";
+import { useMemo } from "react";
 import type { ReactNode } from "react";
 import { Animated } from "react-native";
 import { beforeAll, describe, expect, it, vi } from "vitest";
@@ -13,7 +14,15 @@ import { animatedSvg } from "./engines/svg";
 import { LinearProgress } from "./linear-progress";
 import { presetRegistry } from "./testing/registry";
 import type { TestRegistry } from "./testing/registry";
-import { byTestId, mount, outside, settle, until } from "./testing/render";
+import {
+    byTestId,
+    mount,
+    outside,
+    settle,
+    startClock,
+    stepClock,
+    until,
+} from "./testing/render";
 
 let registry: TestRegistry;
 
@@ -28,6 +37,11 @@ const render = async (node: ReactNode, engine: MotionEngine = animated) => {
         </PureformProvider>,
     );
     await settle(50);
+};
+
+// Moves the animation clock `ms` on, a frame at a time (`startClock` first, before the render).
+const advance = async (ms: number) => {
+    for (let elapsed = 0; elapsed < ms; elapsed += 16) await stepClock();
 };
 
 const has = (id: string) =>
@@ -663,6 +677,7 @@ describe.each([animated, reanimated, animatedSvg, reanimatedSvg])(
         ])(
             "are rounded and keep the gap at %ipx, %ipx thick, with no other token set",
             async (size, thickness) => {
+                startClock();
                 await render(
                     <CircularProgress
                         testId="c"
@@ -671,7 +686,7 @@ describe.each([animated, reanimated, animatedSvg, reanimatedSvg])(
                     />,
                     engine,
                 );
-                await settle(600);
+                await advance(600);
                 const radius = (size - thickness) / 2;
                 const at = (percent: number) => {
                     const a = (percent * 3.6 * Math.PI) / 180;
@@ -706,11 +721,12 @@ describe.each([animated, reanimated, animatedSvg, reanimatedSvg])(
         );
 
         it("rides the wavy indicator's ends on its wave, the track keeping the gap", async () => {
+            startClock();
             await render(
                 <CircularProgress testId="w" value={40} shape="wavy" />,
                 engine,
             );
-            await settle(600);
+            await advance(600);
             // Nine waves around, 1.5px each way: at 40% the wave is sin(9 × 144°) out.
             const wave = 1.5 * Math.sin((9 * 144 * Math.PI) / 180);
             const head = centre("w", "head-cap");
@@ -773,12 +789,13 @@ describe("the indeterminate linear track", () => {
         }
     });
     it("leaves a gap either side of the sliding indicator, drawn in two rounded parts moving with it", async () => {
+        startClock();
         await render(
             <div style={{ width: 200 }}>
                 <LinearProgress testId="p" />
             </div>,
         );
-        await settle(300);
+        await advance(300);
         const box = (part: string) =>
             document
                 .querySelector(`[data-testid="p-${part}"]`)!
@@ -816,6 +833,7 @@ describe("the indeterminate linear track", () => {
     )(
         "moves the parts with an instance's own indicator width ($width), with $name",
         async ({ engine, width, px }) => {
+            startClock();
             await render(
                 <div style={{ width: 200 }}>
                     <LinearProgress
@@ -830,9 +848,9 @@ describe("the indeterminate linear track", () => {
                     .querySelector(`[data-testid="p-${part}"]`)!
                     .getBoundingClientRect();
             // Mid-slide, once the indicator has come into the track (later on a loaded machine).
-            await settle(300);
+            await advance(300);
             for (let i = 0; i < 40 && box("indicator").left <= 0; i++)
-                await settle(50);
+                await advance(50);
             const indicator = box("indicator");
             // The instance's width, and the parts still a gap from it.
             expect(indicator.width).toBeCloseTo(px as number, 0);
@@ -853,5 +871,60 @@ describe("the indeterminate linear track", () => {
                     document.querySelector(`[data-testid="p-${part}"]`)!,
                 ).display,
             ).toBe("none");
+    });
+});
+
+describe("the indeterminate circular progress's sampled motion", () => {
+    // What a rebuild costs (one style resolution per sample, over a hundred of them) is counted at
+    // the timeline, which each animated property reads once per rebuild.
+    const counting = (builds: { count: number }): MotionEngine => ({
+        ...animated,
+        useTimeline(options) {
+            const timeline = animated.useTimeline!(options);
+            return useMemo(
+                () => ({
+                    ...timeline,
+                    value: (...args: Parameters<typeof timeline.value>) => {
+                        builds.count++;
+                        return timeline.value(...args);
+                    },
+                }),
+                [timeline],
+            );
+        },
+    });
+
+    it("is built again only when what it draws changes, not when its parent renders", async () => {
+        const builds = { count: 0 };
+        const engine = counting(builds);
+        const parent = outside({ renders: 0, gap: 5 });
+        await render(
+            <parent.Holder>
+                {(state) => (
+                    <PureformProvider
+                        registry={registry}
+                        engine={engine}
+                        timeScale={2}
+                        defaults={{
+                            circularProgress: { tokens: { size: 64 } },
+                        }}
+                    >
+                        <CircularProgress
+                            testId="spinner"
+                            tokens={{ gap: state.gap }}
+                        />
+                    </PureformProvider>
+                )}
+            </parent.Holder>,
+            engine,
+        );
+        const built = builds.count;
+        expect(built).toBeGreaterThan(0);
+        // New props and a new `defaults` object each time, with the same content (and `timeScale`, which
+        // makes the selection's animations a new object each time).
+        for (const renders of [1, 2, 3]) await parent.set({ renders, gap: 5 });
+        expect(builds.count).toBe(built);
+        await parent.set({ renders: 3, gap: 9 });
+        expect(builds.count).toBeGreaterThan(built);
     });
 });

@@ -47,7 +47,7 @@ The table below records what was found _before_ fixing. Afterwards, on this bran
 
 ## Reproduction sources
 
-- `tests/component-suites/src/backlog-b-investigation.e2e.test.ts`: B1 outline/ancestor geometry,
+- `tests/component-suites/src/backlog-b-investigation.component.test.ts`: B1 outline/ancestor geometry,
   B2 runtime source isolation, B8 identical-message mutations, B9 click-only activation.
 - `packages/react/src/snackbar/backlog-b2.spec.tsx` and
   `packages/solid/src/snackbar/backlog-b2.spec.tsx`: compile-time ready-made/composed API comparison.

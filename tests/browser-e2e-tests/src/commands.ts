@@ -44,10 +44,24 @@ const adapterCss: BrowserCommand<
 > = (_context, adapter, options, candidates) =>
     ADAPTERS[adapter](options, candidates);
 
+// Computed once per component set: four files ask for it, each in a hook, and the work is
+// synchronous, so the repeats queue up behind one another and a loaded runner outlasts the hook's
+// timeout.
+const rnStylesBySet = new Map<string, Promise<PrecomputedStyles>>();
 const rnStyles: BrowserCommand<[components?: string[]]> = (
     _context,
     components = RN_COMPONENTS,
-) => precompute(pureformConfig, { components, fontStack: "all" });
+) => {
+    const key = JSON.stringify(components);
+    let styles = rnStylesBySet.get(key);
+    if (!styles) {
+        styles = Promise.resolve(
+            precompute(pureformConfig, { components, fontStack: "all" }),
+        );
+        rnStylesBySet.set(key, styles);
+    }
+    return styles;
+};
 
 // Each component's instance tokens by theme key, as the generated registry holds them.
 const rnTokenKeys: BrowserCommand<[components: string[]]> = (

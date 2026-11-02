@@ -45,7 +45,7 @@ registry and the binding share one copy. The provider takes a web registry
 | `provided-tokens.tsx`                                                                                                    | `ProvidedTokens` and `useProvidedTokens`: token values handed to nested components (component-architecture.md §5.5); `useComponent` merges a component's share under its own tokens            |
 | `part-context.ts`                                                                                                        | `createPartContext`: the context Root shares with its parts, and the error outside Root                                                                                                        |
 | `machine.ts`                                                                                                             | `useMachine`: Zag's, typed so a component can pass its optional props through                                                                                                                  |
-| `button/`                                                                                                                | `@pureform/react/button`: `button.tsx` (the component), `index.ts`, `button.spec.tsx`                                                                                                          |
+| `button/`                                                                                                                | `@pureform/react/button`: `button.tsx` (the component), `index.ts`, `button.component.spec.tsx`                                                                                                |
 | `checkbox/`                                                                                                              | `@pureform/react/checkbox`: the same layout                                                                                                                                                    |
 | `switch/`, `radio-group/`, `chip/`, `icon-button/`, `fab/`                                                               | The other components, in the same layout                                                                                                                                                       |
 | `text-field/`, `text-area/`, `select/`, `autocomplete/`, `date-picker/`, `docked-date-picker/`, `date-input/`            | The text inputs and date pickers, in the same layout                                                                                                                                           |
@@ -1030,8 +1030,9 @@ Through the omni MCP (or `omni run`):
 - `build`: Vite library build into `dist/index.mjs` and one `dist/<component>.mjs` per subpath
   (shared chunks beside them) with declarations; React, Zag, and the
   pureform packages stay external, and `process.env.NODE_ENV` is left for the app's bundler.
-- `test:unit`: Vitest in browser mode (Chromium; `CHROMIUM_PATH` from `.env.local`) with React
-  Testing Library, and type checks. The specs use a fake registry
+- `test:unit`: the type-level specs (`*.types.spec.ts`), in Node. `test:component`: Vitest in
+  browser mode (Chromium; `CHROMIUM_PATH` from `.env.local`) with React Testing Library, and type
+  checks; the specs are `*.component.spec.tsx`, beside each component. The specs use a fake registry
   (`src/__fixtures__/registry.ts`, with button and checkbox factories that name the selection,
   `togglesRegistry()` for the toggles, and `textInputsRegistry()` for the text field, text area, select, and the menu the select draws its list with)
   and the example button. The component specs mirror `@pureform/solid`'s case by case;
