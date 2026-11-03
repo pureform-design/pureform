@@ -114,6 +114,24 @@ describe("TagsInput, ready-made", () => {
         error.mockRestore();
     });
 
+    it("keeps the caret where an edit in the middle of the text puts it", async () => {
+        withRegistry(() => <TagsInput label="Tags" />);
+        await settle();
+        const input = byTestId<HTMLInputElement>(ids.input);
+        await userEvent.click(input);
+        await userEvent.type(input, "ac");
+        await settle();
+        input.setSelectionRange(1, 1);
+        await userEvent.keyboard("b");
+        await settle();
+        expect(input.value).toBe("abc");
+        expect(input.selectionStart).toBe(2);
+        await userEvent.keyboard("d");
+        await settle();
+        expect(input.value).toBe("abdc");
+        expect(input.selectionStart).toBe(3);
+    });
+
     it("follows a controlled value", async () => {
         const [value, setValue] = createSignal(["a"]);
         withRegistry(() => <TagsInput label="Tags" value={value()} />);
