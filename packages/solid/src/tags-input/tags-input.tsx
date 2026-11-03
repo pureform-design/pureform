@@ -30,6 +30,7 @@ import {
     For,
     merge,
     omit,
+    onSettled,
     Show,
     untrack,
 } from "solid-js";
@@ -218,7 +219,7 @@ function Input(props: TagsInputPartProps): JSX.Element {
         event: InputEvent & { currentTarget: HTMLInputElement },
     ) => {
         const input = event.currentTarget;
-        queueMicrotask(() => {
+        onSettled(() => {
             const next = inputValue();
             if (input.value !== next) input.value = next;
         });
