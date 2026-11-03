@@ -5,6 +5,7 @@
 
 import { calendarCellAnatomy } from "@pureform/anatomy";
 import {
+    CALENDAR_SLIDE_DISTANCE,
     calendarCellSelection,
     calendarCellSelectionOf,
     formatIsoDate,
@@ -23,7 +24,7 @@ import type {
     DateSelectionMode,
 } from "@pureform/binding-core";
 import type { SlideMotion } from "@pureform/rn-adapter/animated";
-import { useReducedMotion, useTokens } from "@pureform/rn-adapter/react";
+import type { Transition } from "@pureform/rn-adapter/factory";
 import { useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { ScrollView } from "react-native";
@@ -33,8 +34,7 @@ import type { MotionStyles } from "./engine";
 import { IconSlot, iconSlot } from "./icon-style";
 import { useSurfaceIndication } from "./indication";
 import { testIdOf, withEngine } from "./parts";
-import { themeSpring } from "./presence";
-import { useDirection, useEngine, usePureform } from "./provider";
+import { useDirection, useEngine } from "./provider";
 import {
     mergeNativePartProps,
     nativeSlots,
@@ -151,7 +151,17 @@ export interface CalendarSlots<S extends string> {
     readonly id: (part: S) => string;
     /** The picker's per-part props. */
     readonly slot?: PartSlots | undefined;
+    /** How a new month's days slide in: the grid's `transform` transition in the preset. None
+     *  under reduced motion, so the month changes at once. */
+    readonly slide?: Transition | undefined;
 }
+
+/** The grid's `transform` transition, which times the month slide, out of a picker's selected
+ *  transitions by part. */
+export const gridSlide = (
+    transitions: Readonly<Record<string, readonly Transition[]>>,
+): Transition | undefined =>
+    transitions.grid?.find((transition) => transition.property === "transform");
 
 /** What the day grid takes. */
 export interface DayGridProps extends Pick<
@@ -175,54 +185,48 @@ const LONG_DATE = {
     day: "numeric",
 } as const;
 
-/** The weekday row and the month's weeks of day cells. */
 // The days of a month, sliding in from the side the month lies on when it changes, through the
-// engine's slide (on the theme's spatial spring), or at once under reduced motion. The first month
-// shown doesn't slide.
+// engine's slide, timed by the grid's `transform` transition in the preset (a spring where the
+// engine runs one, else its duration and curve). Without one, as under reduced motion, the month
+// changes at once. The first month shown doesn't slide.
 function MonthSlide(props: {
     readonly month: string;
+    readonly timing: Transition | undefined;
     readonly children: ReactNode;
 }): ReactNode {
     const engine = useEngine();
-    const tokens = useTokens();
-    const reducedMotion = useReducedMotion();
-    const { timeScale } = usePureform();
     const flip = useDirection() === "rtl" ? -1 : 1;
     const [shown, setShown] = useState(props.month);
     const [motion, setMotion] = useState<SlideMotion | undefined>(undefined);
     // The slide starts from the render that shows the new month, so it never draws in place first.
     if (shown !== props.month) {
-        const spring = themeSpring("spatialDefault", tokens, timeScale);
+        const timing = props.timing;
         setShown(props.month);
         setMotion(
-            reducedMotion || !spring
-                ? undefined
-                : {
+            timing
+                ? {
                       from: {
                           translateX:
-                              (props.month > shown
-                                  ? SLIDE_DISTANCE
-                                  : -SLIDE_DISTANCE) * flip,
+                              (props.month > shown ? 1 : -1) *
+                              flip *
+                              CALENDAR_SLIDE_DISTANCE,
                           scaleX: 1,
                       },
-                      duration: SLIDE_DURATION,
-                      delay: 0,
-                      easing: {
-                          type: "easing",
-                          kind: "keyword",
-                          name: "easeOut",
-                      },
-                      ...(engine.slideSpring ? { spring } : {}),
-                  },
+                      duration: timing.duration,
+                      delay: timing.delay,
+                      easing: timing.easing,
+                      ...(engine.slideSpring && timing.spring
+                          ? { spring: timing.spring }
+                          : {}),
+                  }
+                : undefined,
         );
     }
     const slid = engine.useSlide?.(motion);
     return <engine.View style={slid}>{props.children}</engine.View>;
 }
 
-const SLIDE_DISTANCE = 32;
-const SLIDE_DURATION = 300;
-
+/** The weekday row and the month's weeks of day cells. */
 export function DayGrid(props: DayGridProps): ReactNode {
     const slot = props.slots.slot ?? nativeSlots(undefined);
     const { styles: s, views: v, id } = props.slots;
@@ -258,7 +262,7 @@ export function DayGrid(props: DayGridProps): ReactNode {
                     },
                 )}
             </v.weekdays.View>
-            <MonthSlide month={props.month}>
+            <MonthSlide month={props.month} timing={props.slots.slide}>
                 <v.grid.View
                     {...slot.props("grid")}
                     role="grid"

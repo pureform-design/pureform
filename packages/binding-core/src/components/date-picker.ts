@@ -118,6 +118,11 @@ export const isCurrentCalendarPeriod = (
     year === now.getFullYear() &&
     (view === "year" || month === now.getMonth() + 1);
 
+/** How far, in pixels, a new month's days start from their place when they slide in. Every
+ *  binding takes it from here, so the slide is the same everywhere; its timing is the grid's
+ *  `transform` transition in the preset. */
+export const CALENDAR_SLIDE_DISTANCE = 32;
+
 /** The years a calendar's year list holds, one scrollable list as Material's: between `min` and
  *  `max`, else a century either side of `shown` (a stable anchor, such as the chosen date's year,
  *  so the list doesn't move while it is used). A `focused` year past the century is held too,

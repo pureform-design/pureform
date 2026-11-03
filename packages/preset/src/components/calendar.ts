@@ -45,6 +45,7 @@ import {
     indicationRoot,
     OWN_SIZE,
     pressableRoot,
+    springTweens,
     sys,
 } from "./shared";
 
@@ -146,6 +147,9 @@ export const calendarParts = (ref: (token: CalendarToken) => AliasNode) =>
             alignItems: center,
             paddingInlineStart: ref("calendarPadding"),
             paddingInlineEnd: ref("calendarPadding"),
+            // A new month slides in over this, which bindings read (`slidePage`, the engine's
+            // slide); under reduced motion there is none, so the month changes at once.
+            transition: springTweens("spatialDefault", ["transform"]),
         },
         week: { display: flex, flexDirection: row },
         yearList: {

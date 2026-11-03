@@ -495,6 +495,7 @@ export {
     selectedDateText,
     todayIso,
     isCurrentCalendarPeriod,
+    CALENDAR_SLIDE_DISTANCE,
     calendarYears,
     weekdayLabels,
     weekStartOf,

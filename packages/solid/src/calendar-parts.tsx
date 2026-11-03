@@ -7,6 +7,7 @@
 import { calendarCellAnatomy } from "@pureform/anatomy";
 import type { ComponentAnatomy, PartName } from "@pureform/anatomy";
 import {
+    CALENDAR_SLIDE_DISTANCE,
     calendarCellSelection,
     calendarCellSelectionOf,
     calendarYears,
@@ -42,7 +43,6 @@ import { useControllable } from "./controllable";
 import { ChevronEndIcon, ChevronStartIcon } from "./glyphs";
 import { useInteractionHandlers, useOwnInteractionSource } from "./interaction";
 import type { PropTypes } from "./internal/zag";
-import { useReducedMotion } from "./motion";
 import { useComponent } from "./parts";
 import type { PartScope, SlotPropsOf } from "./parts";
 import { combinePartProps } from "./props";
@@ -144,11 +144,10 @@ const MONTH_COLUMNS = 1;
 const YEAR_COLUMNS = 3;
 
 // The ref of the page that slides in when the shown month changes, from the side the month lies
-// on, unless motion is reduced. The first month shown doesn't slide.
+// on, over the grid's `transform` transition. The first month shown doesn't slide.
 function useMonthSlide(
     picker: Accessor<datePicker.Api<PropTypes>>,
 ): (element: HTMLElement) => void {
-    const reduced = useReducedMotion();
     let page: HTMLElement | undefined;
     let shown: number | undefined;
     createEffect(
@@ -158,7 +157,7 @@ function useMonthSlide(
             const before = shown;
             shown = month;
             if (before === undefined || before === month || !page) return;
-            if (!untrack(reduced)) slidePage(page, month > before ? 1 : -1);
+            slidePage(page, month > before ? 1 : -1, CALENDAR_SLIDE_DISTANCE);
         },
     );
     return (element) => {

@@ -30,7 +30,7 @@ import type { ReactNode } from "react";
 import { Pressable, View } from "react-native";
 
 import { Button } from "../button/button";
-import { CellList, DayGrid, startMonth } from "../calendar";
+import { CellList, DayGrid, gridSlide, startMonth } from "../calendar";
 import { IconButton } from "../icon-button/icon-button";
 import { Anchored, useFieldPopup } from "../overlay";
 import { useControllable } from "../parts";
@@ -105,7 +105,11 @@ function Popup(
     const locale = pickerLocale(props);
     const [month, setMonth] = useState(() => startMonth(props.value));
     const [view, setView] = useState<CalendarView>("day");
-    const { styles: s, views: v } = useComponentSlots<Part>(
+    const {
+        styles: s,
+        views: v,
+        selected,
+    } = useComponentSlots<Part>(
         "dockedDatePicker",
         dockedDatePickerSelection({
             ...props,
@@ -119,7 +123,13 @@ function Popup(
     const slot = nativeSlots(props);
     const year = Number(month.slice(0, 4));
     const monthNumber = Number(month.slice(5, 7));
-    const slots = { styles: s, views: v, id, slot };
+    const slots = {
+        styles: s,
+        views: v,
+        id,
+        slot,
+        slide: gridSlide(selected.transitions),
+    };
     const toggle = (
         part: "monthButton" | "yearButton",
         target: CalendarView,

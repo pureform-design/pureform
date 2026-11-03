@@ -28,7 +28,13 @@ import { StyleSheet } from "react-native";
 
 import { Button } from "../button/button";
 import type { ButtonProps } from "../button/button";
-import { CellList, DayGrid, monthTitle, startMonth } from "../calendar";
+import {
+    CellList,
+    DayGrid,
+    gridSlide,
+    monthTitle,
+    startMonth,
+} from "../calendar";
 import { IconButton } from "../icon-button/icon-button";
 import { ModalScrimLayer, ModalWindow, useModalOverlay } from "../modal";
 import { useControllable, withEngine } from "../parts";
@@ -97,10 +103,11 @@ function SurfaceImpl(props: SurfaceProps): ReactNode {
     const [draft, setDraft] = useState(props.committed);
     const [month, setMonth] = useState(() => startMonth(props.committed));
     const [view, setView] = useState<"day" | "year">("day");
-    const { styles: s, views: v } = useComponentSlots<Part>(
-        "datePicker",
-        datePickerSelection(props),
-    );
+    const {
+        styles: s,
+        views: v,
+        selected,
+    } = useComponentSlots<Part>("datePicker", datePickerSelection(props));
     const id = (part: Part) =>
         partId(datePickerOverlayAnatomy, KEYS(part), props.testId);
     const slot = nativeSlots(props, KEYS);
@@ -215,7 +222,13 @@ function SurfaceImpl(props: SurfaceProps): ReactNode {
             </v.controls.View>
             {view === "day" ? (
                 <DayGrid
-                    slots={{ styles: s, views: v, id, slot }}
+                    slots={{
+                        styles: s,
+                        views: v,
+                        id,
+                        slot,
+                        slide: gridSlide(selected.transitions),
+                    }}
                     month={month}
                     selected={draft}
                     mode={mode}

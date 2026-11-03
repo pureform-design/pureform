@@ -6,6 +6,7 @@
 import { calendarCellAnatomy } from "@pureform/anatomy";
 import type { ComponentAnatomy, TestIdOverride } from "@pureform/anatomy";
 import {
+    CALENDAR_SLIDE_DISTANCE,
     calendarCellSelection,
     calendarYears,
     calendarCellSelectionOf,
@@ -44,7 +45,6 @@ import {
 
 import { useControllable } from "./controllable";
 import { useInteractionHandlers, useOwnInteractionSource } from "./interaction";
-import { useReducedMotion } from "./motion";
 import type { PartContext } from "./part-context";
 import { useComponent } from "./parts";
 import type { ComponentScope, SlotPropsOf } from "./parts";
@@ -212,9 +212,8 @@ const listInstance = (
 };
 
 // The ref of the page that slides in when the shown month changes, from the side the month lies
-// on, unless motion is reduced. The first month shown doesn't slide.
+// on, over the grid's `transform` transition. The first month shown doesn't slide.
 function useMonthSlide(picker: datePicker.Api<PropTypes>) {
-    const reduced = useReducedMotion();
     const element = useRef<HTMLElement | null>(null);
     const shown = useRef<number | undefined>(undefined);
     const month = monthIndex(
@@ -224,10 +223,14 @@ function useMonthSlide(picker: datePicker.Api<PropTypes>) {
     useEffect(() => {
         const before = shown.current;
         shown.current = month;
-        if (before === undefined || before === month || reduced) return;
+        if (before === undefined || before === month) return;
         if (element.current)
-            slidePage(element.current, month > before ? 1 : -1);
-    }, [month, reduced]);
+            slidePage(
+                element.current,
+                month > before ? 1 : -1,
+                CALENDAR_SLIDE_DISTANCE,
+            );
+    }, [month]);
     return element;
 }
 

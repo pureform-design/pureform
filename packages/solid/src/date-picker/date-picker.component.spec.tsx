@@ -14,6 +14,10 @@ const style = document.createElement("style");
 style.textContent =
     "[data-pf-part=week], [data-pf-part=weekdays], [data-pf-part=year-list] { display: flex; flex-wrap: wrap; width: 300px }";
 document.head.append(style);
+const slideStyle = document.createElement("style");
+slideStyle.textContent =
+    "body[data-slide] [data-pf-part=grid] { transition: transform 200ms linear }";
+document.head.append(slideStyle);
 
 const withRegistry = (view: () => unknown, dir?: "ltr" | "rtl") =>
     mount(() => (
@@ -509,9 +513,12 @@ describe("DatePicker, ready-made", () => {
 });
 
 describe("DatePicker, month slide", () => {
-    const open = (motion: "full" | "reduce") =>
+    // The fake registry draws nothing: the preset's grid transition, which times the slide and
+    // which reduced motion drops, is a rule a test turns on.
+    const open = (transition: "on" | "off") => {
+        document.body.toggleAttribute("data-slide", transition === "on");
         mount(() => (
-            <PureformProvider registry={datePickersRegistry()} motion={motion}>
+            <PureformProvider registry={datePickersRegistry()}>
                 <DatePicker
                     trigger="Pick"
                     locale="en-US"
@@ -520,10 +527,11 @@ describe("DatePicker, month slide", () => {
                 />
             </PureformProvider>
         ));
+    };
     const sliding = () => byTestId(ids.grid).getAnimations().length > 0;
 
     it("slides the days in when the next or previous month is shown", async () => {
-        open("full");
+        open("on");
         await settle();
         expect(sliding()).toBe(false);
         await userEvent.click(byTestId(ids.next));
@@ -541,8 +549,8 @@ describe("DatePicker, month slide", () => {
         ).toBe("translateX(-32px)");
     });
 
-    it("doesn't slide when motion is reduced", async () => {
-        open("reduce");
+    it("doesn't slide without a transition, as under reduced motion", async () => {
+        open("off");
         await settle();
         await userEvent.click(byTestId(ids.next));
         await settle();
