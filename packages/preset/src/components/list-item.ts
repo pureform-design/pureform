@@ -286,6 +286,8 @@ export const createListItem = <
                     // open and shrinks shut as that changes.
                     region: {
                         paddingInlineStart: ref("regionIndent"),
+                        // A sibling of the row, so text there doesn't inherit its color.
+                        color: ref("content"),
                         transition: collapseTransition,
                     },
                     // A swipeable item's frame: the action and the row, clipped to it. It

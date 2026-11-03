@@ -1006,6 +1006,7 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
       "textStyle": "labelSmall",
     },
     "region": {
+      "color": "var(--components-listItem-content, token(colors.onSurface))",
       "paddingInlineStart": "var(--components-listItem-regionIndent, token(spacing.4))",
       "transition": {
         "_motionReduce": "none",
