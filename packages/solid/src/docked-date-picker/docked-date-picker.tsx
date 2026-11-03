@@ -328,7 +328,7 @@ const viewButton = (
             },
             get secondaryIcon() {
                 if (!props.as) return props["secondaryIcon"];
-                return props.children === undefined
+                return props.children == null
                     ? (props["secondaryIcon"] ?? <DropDownArrow />)
                     : undefined;
             },

@@ -321,7 +321,7 @@ function ViewTrigger({
             ...props,
             // A component such as `Button` draws its label and arrow from props, so slot
             // children replace them: the label, without the arrow.
-            ...(as && props.children !== undefined
+            ...(as && props.children != null
                 ? { label: props.children, secondaryIcon: undefined }
                 : {}),
         },

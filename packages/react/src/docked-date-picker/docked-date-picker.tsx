@@ -321,7 +321,7 @@ const viewButton = (
                 // replace them (the label, without the arrow), else the shown month or year and
                 // the arrow stand in for any the caller doesn't give.
                 ...(as
-                    ? props.children !== undefined
+                    ? props.children != null
                         ? { label: props.children, secondaryIcon: undefined }
                         : {
                               label: props["label"] ?? text,
