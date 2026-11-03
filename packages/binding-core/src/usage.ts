@@ -44,8 +44,8 @@ export const COMPONENT_USAGE = {
         },
     },
     avatar: { entries: { avatar: same("size", "color", "shape") } },
-    // The calendar's cells take their variants from the dates; the actions are buttons, the
-    // controls icon buttons, and the modal picker's backdrop a scrim.
+    // The calendar's cells take their variants from the dates; the actions and the view
+    // trigger are buttons, the controls icon buttons, and the modal picker's backdrop a scrim.
     "date-picker": {
         entries: {
             datePicker: {},
@@ -60,6 +60,7 @@ export const COMPONENT_USAGE = {
         entries: {
             dockedDatePicker: same("variant", "color", "density"),
             calendarCell: {},
+            button: {},
             iconButton: {},
             ripple: {},
         },

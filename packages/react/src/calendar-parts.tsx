@@ -6,6 +6,7 @@
 import { calendarCellAnatomy } from "@pureform/anatomy";
 import type { ComponentAnatomy, TestIdOverride } from "@pureform/anatomy";
 import {
+    CALENDAR_SLIDE_DISTANCE,
     calendarCellSelection,
     calendarYears,
     calendarCellSelectionOf,
@@ -25,7 +26,11 @@ import type {
     Unstyled,
 } from "@pureform/binding-core";
 import type { MutableInteractionSource } from "@pureform/binding-core/interaction";
-import { scrollCellIntoList } from "@pureform/binding-web";
+import {
+    monthIndex,
+    scrollCellIntoList,
+    slidePage,
+} from "@pureform/binding-web";
 import * as datePicker from "@pureform/machines/date-picker";
 import type { InstanceTokens } from "@pureform/styling";
 import type { PropTypes } from "@zag-js/react";
@@ -33,6 +38,7 @@ import {
     type ElementType,
     type ReactNode,
     useEffect,
+    useLayoutEffect,
     useMemo,
     useRef,
     useState,
@@ -206,6 +212,29 @@ const listInstance = (
     };
 };
 
+// The ref of the page that slides in when the shown month changes, from the side the month lies
+// on, over the grid's `transform` transition. The first month shown doesn't slide.
+function useMonthSlide(picker: datePicker.Api<PropTypes>) {
+    const element = useRef<HTMLElement | null>(null);
+    const shown = useRef<number | undefined>(undefined);
+    const month = monthIndex(
+        picker.focusedValue.year,
+        picker.focusedValue.month,
+    );
+    useLayoutEffect(() => {
+        const before = shown.current;
+        shown.current = month;
+        if (before === undefined || before === month) return;
+        if (element.current)
+            slidePage(
+                element.current,
+                month > before ? 1 : -1,
+                CALENDAR_SLIDE_DISTANCE,
+            );
+    }, [month]);
+    return element;
+}
+
 /** Builds the calendar's parts over a picker's context. */
 export function calendarParts(context: PartContext<CalendarContext>) {
     const part = (name: string) => name as never;
@@ -262,10 +291,12 @@ export function calendarParts(context: PartContext<CalendarContext>) {
 
     function Grid({ unstyled, columns, slots, ...props }: CalendarTableProps) {
         const { scope, picker, selected, selectionMode } = context.use("Grid");
+        const slide = useMonthSlide(picker);
         const eachWeek = slots?.each("week") ?? false;
         const eachCell = slots?.each("cell") ?? false;
         return scope.render(part("grid"), {
             element: "div",
+            ref: slide,
             machine: picker.getTableProps({ view: "day", columns }),
             unstyled,
             props: {

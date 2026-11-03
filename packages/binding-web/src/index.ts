@@ -377,6 +377,7 @@ export {
 } from "./menu-submenu-room";
 export { revealInRow } from "./reveal";
 export { slideIndicator, slideTransform, transformTiming } from "./slide";
+export { monthIndex, slidePage } from "./page-slide";
 export { moveToolbarFocus, watchOverflow } from "./toolbar-dom";
 export type { OverflowWatch } from "./toolbar-dom";
 export type { SlideTiming } from "./slide";

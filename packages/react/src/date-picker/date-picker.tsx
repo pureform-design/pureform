@@ -301,18 +301,30 @@ const Actions: (props: DatePickerPartProps) => ReactNode = chrome.part(
 
 /** The month and year shown ("August 2026"), a button that switches between the days and the
  *  years. */
-function ViewTrigger({ unstyled, ...props }: DatePickerPartProps): ReactNode {
+function ViewTrigger({
+    unstyled,
+    as,
+    ...props
+}: DatePickerTriggerProps): ReactNode {
     const { scope, picker } = context.use("ViewTrigger");
     const view = picker.view === "day" ? "year" : "day";
     return scope.render("viewTrigger" as never, {
         element: "button",
+        as: as as ElementType | undefined,
         machine: {
             ...picker.getViewTriggerProps({ view: picker.view }),
             "aria-label": undefined,
             onClick: () => picker.setView(view),
         },
         unstyled,
-        props,
+        props: {
+            ...props,
+            // A component such as `Button` draws its label and arrow from props, so slot
+            // children replace them: the label, without the arrow.
+            ...(as && props.children != null
+                ? { label: props.children, secondaryIcon: undefined }
+                : {}),
+        },
     });
 }
 
@@ -419,8 +431,10 @@ function ReadyMadeContent({ own }: { readonly own: DatePickerProps }) {
                     </Header>
                     <Divider {...slot("divider")} />
                     <Controls {...slot("controls")}>
-                        <ViewTrigger {...slot("viewTrigger")}>
-                            {new Intl.DateTimeFormat(locale, {
+                        <ViewTrigger
+                            as={Button}
+                            variant="text"
+                            label={new Intl.DateTimeFormat(locale, {
                                 month: "long",
                                 year: "numeric",
                                 timeZone: "UTC",
@@ -429,8 +443,9 @@ function ReadyMadeContent({ own }: { readonly own: DatePickerProps }) {
                                     `${datePicker.toISO(picker.focusedValue)}T00:00:00Z`,
                                 ),
                             )}
-                            <DropDownArrow />
-                        </ViewTrigger>
+                            secondaryIcon={<DropDownArrow />}
+                            {...asRoot(slot("viewTrigger"))}
+                        />
                         {days ? (
                             <>
                                 <Prev

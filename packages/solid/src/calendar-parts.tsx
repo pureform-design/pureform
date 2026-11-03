@@ -7,6 +7,7 @@
 import { calendarCellAnatomy } from "@pureform/anatomy";
 import type { ComponentAnatomy, PartName } from "@pureform/anatomy";
 import {
+    CALENDAR_SLIDE_DISTANCE,
     calendarCellSelection,
     calendarCellSelectionOf,
     calendarYears,
@@ -21,7 +22,11 @@ import type {
     MonthFormat,
 } from "@pureform/binding-core";
 import type { MutableInteractionSource } from "@pureform/binding-core/interaction";
-import { scrollCellIntoList } from "@pureform/binding-web";
+import {
+    monthIndex,
+    scrollCellIntoList,
+    slidePage,
+} from "@pureform/binding-web";
 import * as datePicker from "@pureform/machines/date-picker";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {
@@ -138,6 +143,28 @@ export function useDateValue(
 const MONTH_COLUMNS = 1;
 const YEAR_COLUMNS = 3;
 
+// The ref of the page that slides in when the shown month changes, from the side the month lies
+// on, over the grid's `transform` transition. The first month shown doesn't slide.
+function useMonthSlide(
+    picker: Accessor<datePicker.Api<PropTypes>>,
+): (element: HTMLElement) => void {
+    let page: HTMLElement | undefined;
+    let shown: number | undefined;
+    createEffect(
+        () =>
+            monthIndex(picker().focusedValue.year, picker().focusedValue.month),
+        (month) => {
+            const before = shown;
+            shown = month;
+            if (before === undefined || before === month || !page) return;
+            slidePage(page, month > before ? 1 : -1, CALENDAR_SLIDE_DISTANCE);
+        },
+    );
+    return (element) => {
+        page = element;
+    };
+}
+
 /** Builds the calendar parts over a picker's context. */
 export function calendarParts(use: (name: string) => CalendarContext) {
     const name = (part: string) => part as PartName<ComponentAnatomy>;
@@ -227,8 +254,11 @@ export function calendarParts(use: (name: string) => CalendarContext) {
         function Table(props: CalendarTableProps): JSX.Element {
             const { scope, picker } = use(display);
             const rest = omit(props, "unstyled", "view", "columns");
+            const slide =
+                defaults.view === "day" ? useMonthSlide(picker) : undefined;
             return scope.render(name(part), {
                 element: "div",
+                ...(slide ? { ref: slide } : {}),
                 machine: () =>
                     picker().getTableProps({
                         view: props.view ?? defaults.view,

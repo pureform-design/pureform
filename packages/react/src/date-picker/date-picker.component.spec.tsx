@@ -16,6 +16,11 @@ const byTestId = <E extends HTMLElement = HTMLElement>(id: string): E =>
 const ids = compositeTestIds.datePicker;
 const cell = testIds.calendarCell;
 
+const slideStyle = document.createElement("style");
+slideStyle.textContent =
+    "body[data-slide] [data-pf-part=grid] { transition: transform 200ms linear }";
+document.head.append(slideStyle);
+
 const withRegistry = (view: ReactNode, dir: "ltr" | "rtl" = "ltr") =>
     mount(
         <PureformProvider registry={datePickersRegistry()} dir={dir}>
@@ -515,5 +520,48 @@ describe("DatePicker, ready-made", () => {
         await settle();
         expect(byTestId(ids.prev).hasAttribute("data-pf-mirror")).toBe(true);
         expect(byTestId(ids.next).hasAttribute("data-pf-mirror")).toBe(true);
+    });
+});
+
+describe("DatePicker, month slide", () => {
+    // The fake registry draws nothing: the preset's grid transition, which times the slide and
+    // which reduced motion drops, is a rule a test turns on.
+    const open = (transition: "on" | "off") => {
+        document.body.toggleAttribute("data-slide", transition === "on");
+        mount(
+            <PureformProvider registry={datePickersRegistry()}>
+                <DatePicker
+                    trigger="Pick"
+                    locale="en-US"
+                    defaultOpen
+                    defaultValue={["2026-08-17"]}
+                />
+            </PureformProvider>,
+        );
+    };
+    const sliding = () => byTestId(ids.grid).getAnimations().length > 0;
+
+    it("slides the days in when the next or previous month is shown", async () => {
+        open("on");
+        await settle();
+        expect(sliding()).toBe(false);
+        await interact(() => press(byTestId(ids.next)));
+        expect(sliding()).toBe(true);
+        const [slide] = byTestId(ids.grid).getAnimations();
+        const frames = (slide!.effect as KeyframeEffect).getKeyframes();
+        expect(frames[0]!.transform).toBe("translateX(32px)");
+        slide!.finish();
+        await interact(() => press(byTestId(ids.prev)));
+        const [back] = byTestId(ids.grid).getAnimations();
+        expect(
+            (back!.effect as KeyframeEffect).getKeyframes()[0]!.transform,
+        ).toBe("translateX(-32px)");
+    });
+
+    it("doesn't slide without a transition, as under reduced motion", async () => {
+        open("off");
+        await settle();
+        await interact(() => press(byTestId(ids.next)));
+        expect(sliding()).toBe(false);
     });
 });

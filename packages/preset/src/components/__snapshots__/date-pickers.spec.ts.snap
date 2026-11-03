@@ -719,6 +719,10 @@ exports[`datePicker > compiles to a stable Panda slot recipe 1`] = `
       "flexDirection": "column",
       "paddingInlineEnd": "var(--components-datePicker-calendarPadding, token(spacing.3))",
       "paddingInlineStart": "var(--components-datePicker-calendarPadding, token(spacing.3))",
+      "transition": {
+        "_motionReduce": "none",
+        "base": "transform token(springs.spatialDefault.duration) token(springs.spatialDefault.easing)",
+      },
     },
     "header": {
       "alignItems": "end",
@@ -948,6 +952,10 @@ exports[`dockedDatePicker > compiles to a stable Panda slot recipe 1`] = `
       "flexDirection": "column",
       "paddingInlineEnd": "var(--components-dockedDatePicker-calendarPadding, token(spacing.3))",
       "paddingInlineStart": "var(--components-dockedDatePicker-calendarPadding, token(spacing.3))",
+      "transition": {
+        "_motionReduce": "none",
+        "base": "transform token(springs.spatialDefault.duration) token(springs.spatialDefault.easing)",
+      },
     },
     "input": {
       "&::placeholder": {

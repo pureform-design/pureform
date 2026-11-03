@@ -37,6 +37,7 @@ import {
     Switch,
 } from "solid-js";
 
+import { Button } from "../button";
 import { calendarParts, parseDate, useDateValue } from "../calendar-parts";
 import type {
     CalendarCellProps,
@@ -100,6 +101,13 @@ export type DockedDatePickerPartProps = CalendarPartProps;
 /** An icon part's props: a part's, and `mirror` to flip it under `rtl`. */
 export interface DockedDatePickerIconProps extends DockedDatePickerPartProps {
     readonly mirror?: boolean | undefined;
+}
+
+/** The month or year button's props: a part's, and `as` to render a component instead of
+ *  `<button>` (`as={Button}`), which takes the rest of the props. */
+export interface DockedDatePickerViewButtonProps extends DockedDatePickerPartProps {
+    readonly as?: ValidComponent | undefined;
+    readonly [prop: string]: unknown;
 }
 
 export type {
@@ -290,30 +298,49 @@ const viewButton = (
     display: string,
     view: "month" | "year",
 ) =>
-    function ViewButton(props: DockedDatePickerPartProps): JSX.Element {
+    function ViewButton(props: DockedDatePickerViewButtonProps): JSX.Element {
         const { scope, api, locale, monthFormat } = context.use(display);
+        const text = () =>
+            view === "month"
+                ? monthName(locale(), api().focusedValue.month, monthFormat())
+                : String(api().focusedValue.year);
         const children = {
             get children() {
                 return (
                     // oxlint-disable-next-line solid/components-return-once -- a live props getter the part reads, not a component body
                     props.children ?? (
                         <>
-                            {view === "month"
-                                ? monthName(
-                                      locale(),
-                                      api().focusedValue.month,
-                                      monthFormat(),
-                                  )
-                                : String(api().focusedValue.year)}
+                            {text()}
                             <DropDownArrow />
                         </>
                     )
                 );
             },
         };
-        const merged = merge(omit(props, "unstyled", "children"), children);
+        // A component such as `Button` draws its own label and arrow from props, so slot
+        // children replace them: the label, without the arrow, as they replaced the whole
+        // content before.
+        const content = {
+            get label() {
+                return props.as
+                    ? (props.children ?? props["label"] ?? text())
+                    : props["label"];
+            },
+            get secondaryIcon() {
+                if (!props.as) return props["secondaryIcon"];
+                return props.children == null
+                    ? (props["secondaryIcon"] ?? <DropDownArrow />)
+                    : undefined;
+            },
+        };
+        const merged = merge(
+            omit(props, "unstyled", "children", "as"),
+            children,
+            content,
+        );
         return scope.render(part, {
             element: "button",
+            as: () => props.as,
             machine: () => ({
                 type: "button",
                 disabled: api().disabled,
@@ -452,7 +479,17 @@ function ReadyMadeContent(props: {
                                 {...asRoot(slots("prev"))}
                             />
                         </Show>
-                        <MonthButton {...slots("monthButton")} />
+                        <MonthButton
+                            as={Button}
+                            variant="text"
+                            label={monthName(
+                                locale(),
+                                api().focusedValue.month,
+                                own.monthFormat ?? "short",
+                            )}
+                            secondaryIcon={<DropDownArrow />}
+                            {...asRoot(slots("monthButton"))}
+                        />
                         <Show when={view() === "day"}>
                             <Next
                                 as={IconButton}
@@ -466,7 +503,13 @@ function ReadyMadeContent(props: {
                                 {...asRoot(slots("prev"))}
                             />
                         </Show>
-                        <YearButton {...slots("yearButton")} />
+                        <YearButton
+                            as={Button}
+                            variant="text"
+                            label={String(api().focusedValue.year)}
+                            secondaryIcon={<DropDownArrow />}
+                            {...asRoot(slots("yearButton"))}
+                        />
                         <Show when={view() === "day"}>
                             <Next
                                 as={IconButton}

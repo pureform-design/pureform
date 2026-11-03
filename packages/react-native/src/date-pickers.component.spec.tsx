@@ -9,6 +9,7 @@ import { DateInput } from "./date-input";
 import { DatePicker } from "./date-picker";
 import { DockedDatePicker } from "./docked-date-picker";
 import { animated } from "./engine";
+import { reanimated } from "./engines/reanimated";
 import { presetRegistry } from "./testing/registry";
 import type { TestRegistry } from "./testing/registry";
 import {
@@ -17,6 +18,7 @@ import {
     interact,
     mount,
     outside,
+    startClock,
     until,
 } from "./testing/render";
 
@@ -507,7 +509,7 @@ describe("DockedDatePicker", () => {
             await until(() => byTestId("pf-docked-date-picker-month-button"));
             expect(
                 byTestId("pf-docked-date-picker-month-button").textContent,
-            ).toContain(`${button} `);
+            ).toContain(button);
             await interact(() =>
                 userEvent.click(byTestId("pf-docked-date-picker-month-button")),
             );
@@ -807,5 +809,108 @@ describe("DateInput", () => {
         expect(document.activeElement).toBe(segments()[1]);
         await interact(() => setOutside([]));
         expect(digits()).toEqual(["", "", ""]);
+    });
+});
+
+describe.each([animated, reanimated])(
+    "DatePicker, month slide with $name",
+    (engine) => {
+        const open = (motion: "full" | "reduce", dir: "ltr" | "rtl" = "ltr") =>
+            mount(
+                <PureformProvider
+                    registry={registry}
+                    engine={engine}
+                    motion={motion}
+                    dir={dir}
+                >
+                    <View style={{ width: 600, height: 700 }}>
+                        <DatePicker
+                            locale="en-US"
+                            defaultValue={["2026-08-17"]}
+                        />
+                    </View>
+                </PureformProvider>,
+            );
+        const page = () => byTestId("pf-date-picker-grid").parentElement!;
+        const next = () =>
+            byTestId("pf-date-picker-next").querySelector<HTMLElement>(
+                "[role=button]",
+            )!;
+
+        const prev = () =>
+            byTestId("pf-date-picker-prev").querySelector<HTMLElement>(
+                "[role=button]",
+            )!;
+        // Animated moves the view by its transform, which says which way it starts; Reanimated
+        // runs a CSS animation, whose keyframes aren't on the element.
+        const offset = () =>
+            Number(
+                /translateX\((-?[\d.]+)px\)/.exec(page().style.transform)?.[1],
+            );
+
+        it.runIf(engine.name === "animated")(
+            "starts the days toward the month's side, flipped under rtl",
+            async () => {
+                await open("full");
+                await until(() => byTestId("pf-date-picker-grid"));
+                startClock();
+                await interact(() => userEvent.click(next()));
+                expect(offset()).toBeGreaterThan(0);
+                await interact(() => userEvent.click(prev()));
+                expect(offset()).toBeLessThan(0);
+            },
+        );
+
+        it.runIf(engine.name === "animated")(
+            "flips the side under rtl",
+            async () => {
+                await open("full", "rtl");
+                await until(() => byTestId("pf-date-picker-grid"));
+                startClock();
+                await interact(() => userEvent.click(next()));
+                expect(offset()).toBeLessThan(0);
+            },
+        );
+
+        it("slides the days in from the side the next month lies on", async () => {
+            await open("full");
+            await until(() => byTestId("pf-date-picker-grid"));
+            expect(page().style.transform).not.toContain("32");
+            await interact(() => userEvent.click(next()));
+            // Animated moves the view by its transform; Reanimated runs a CSS animation on it.
+            const { transform, animationDuration } = page().style;
+            expect(
+                transform.includes("translateX") ||
+                    (animationDuration !== "" && animationDuration !== "0ms"),
+            ).toBe(true);
+        });
+
+        it("doesn't slide when motion is reduced", async () => {
+            await open("reduce");
+            await until(() => byTestId("pf-date-picker-grid"));
+            await interact(() => userEvent.click(next()));
+            expect(["", "translateX(0px)"]).toContain(page().style.transform);
+        });
+    },
+);
+
+describe("DatePicker, view trigger", () => {
+    it("names the trigger by what a press does, and calls the slot's onPress", async () => {
+        const onPress = vi.fn<() => void>();
+        await render(
+            <DatePicker
+                locale="en-US"
+                defaultValue={["2026-08-17"]}
+                slotProps={{ viewTrigger: { onPress } }}
+            />,
+        );
+        const trigger = byTestId("pf-date-picker-view-trigger").querySelector(
+            "[role=button]",
+        )!;
+        expect(trigger.getAttribute("aria-label")).toBe(
+            "August 2026, choose year",
+        );
+        await interact(() => userEvent.click(trigger));
+        expect(onPress).toHaveBeenCalled();
     });
 });

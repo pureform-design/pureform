@@ -28,16 +28,20 @@ import { StyleSheet } from "react-native";
 
 import { Button } from "../button/button";
 import type { ButtonProps } from "../button/button";
-import { CellList, DayGrid, monthTitle, startMonth } from "../calendar";
+import {
+    CellList,
+    DayGrid,
+    gridSlide,
+    monthTitle,
+    startMonth,
+} from "../calendar";
 import { IconButton } from "../icon-button/icon-button";
-import { IconSlot, iconSlot } from "../icon-style";
 import { ModalScrimLayer, ModalWindow, useModalOverlay } from "../modal";
 import { useControllable, withEngine } from "../parts";
 import {
     useNativeScrimSlots,
     useNativeSlotReader,
     overlayKeys,
-    withUnselectable,
 } from "../slot-props";
 import type { InnerPropsOf, NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
@@ -101,8 +105,8 @@ function SurfaceImpl(props: SurfaceProps): ReactNode {
     const [view, setView] = useState<"day" | "year">("day");
     const {
         styles: s,
-        selected,
         views: v,
+        selected,
     } = useComponentSlots<Part>("datePicker", datePickerSelection(props));
     const id = (part: Part) =>
         partId(datePickerOverlayAnatomy, KEYS(part), props.testId);
@@ -167,31 +171,31 @@ function SurfaceImpl(props: SurfaceProps): ReactNode {
                 style={slot.style("controls", s.controls)}
                 testID={id("controls")}
             >
-                <v.viewTrigger.Pressable
+                <v.viewTrigger.View
                     {...slot.props("viewTrigger")}
-                    role="button"
-                    aria-label={
-                        view === "day"
-                            ? `${title}, choose year`
-                            : `${title}, choose day`
-                    }
-                    disabled={props.disabled}
-                    onPress={slot.on("viewTrigger", "onPress", () =>
-                        setView(view === "day" ? "year" : "day"),
-                    )}
-                    style={slot.style(
-                        "viewTrigger",
-                        withUnselectable(s.viewTrigger),
-                    )}
+                    style={slot.style("viewTrigger", s.viewTrigger)}
                     testID={id("viewTrigger")}
                 >
-                    <IconSlot
-                        {...iconSlot(selected, "viewTrigger")}
-                        motion={s.viewTrigger}
-                    >
-                        {`${title} ${view === "day" ? "▾" : "▴"}`}
-                    </IconSlot>
-                </v.viewTrigger.Pressable>
+                    <Button
+                        variant="text"
+                        label={title}
+                        secondaryIcon={view === "day" ? "▾" : "▴"}
+                        aria-label={
+                            view === "day"
+                                ? `${title}, choose year`
+                                : `${title}, choose day`
+                        }
+                        disabled={props.disabled}
+                        onLongPress={slot.on(
+                            "viewTrigger",
+                            "onLongPress",
+                            undefined,
+                        )}
+                        onPress={slot.on("viewTrigger", "onPress", () =>
+                            setView(view === "day" ? "year" : "day"),
+                        )}
+                    />
+                </v.viewTrigger.View>
                 {view === "day" ? (
                     <>
                         <v.prev.View
@@ -225,7 +229,13 @@ function SurfaceImpl(props: SurfaceProps): ReactNode {
             </v.controls.View>
             {view === "day" ? (
                 <DayGrid
-                    slots={{ styles: s, views: v, id, slot }}
+                    slots={{
+                        styles: s,
+                        views: v,
+                        id,
+                        slot,
+                        slide: gridSlide(selected.transitions),
+                    }}
                     month={month}
                     selected={draft}
                     mode={mode}

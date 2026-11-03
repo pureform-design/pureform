@@ -29,15 +29,15 @@ import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { Pressable, View } from "react-native";
 
-import { CellList, DayGrid, startMonth } from "../calendar";
+import { Button } from "../button/button";
+import { CellList, DayGrid, gridSlide, startMonth } from "../calendar";
 import { IconButton } from "../icon-button/icon-button";
-import { IconSlot, iconSlot } from "../icon-style";
 import { Anchored, useFieldPopup } from "../overlay";
 import { useControllable } from "../parts";
 import { Portal } from "../portal";
 import { useEngine } from "../provider";
 import { resolveText } from "../resolve-text";
-import { useNativeSlotReader, withUnselectable } from "../slot-props";
+import { useNativeSlotReader } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 import { Field, partId } from "../text-input";
@@ -107,8 +107,8 @@ function Popup(
     const [view, setView] = useState<CalendarView>("day");
     const {
         styles: s,
-        selected,
         views: v,
+        selected,
     } = useComponentSlots<Part>(
         "dockedDatePicker",
         dockedDatePickerSelection({
@@ -123,7 +123,13 @@ function Popup(
     const slot = nativeSlots(props);
     const year = Number(month.slice(0, 4));
     const monthNumber = Number(month.slice(5, 7));
-    const slots = { styles: s, views: v, id, slot };
+    const slots = {
+        styles: s,
+        views: v,
+        id,
+        slot,
+        slide: gridSlide(selected.transitions),
+    };
     const toggle = (
         part: "monthButton" | "yearButton",
         target: CalendarView,
@@ -131,21 +137,23 @@ function Popup(
     ) => {
         const Slot = v[part];
         return (
-            <Slot.Pressable
+            <Slot.View
                 {...slot.props(part)}
-                role="button"
-                aria-expanded={view === target}
-                disabled={props.disabled}
-                onPress={slot.on(part, "onPress", () =>
-                    setView(view === target ? "day" : target),
-                )}
-                style={slot.style(part, withUnselectable(s[part]))}
+                style={slot.style(part, s[part])}
                 testID={id(part)}
             >
-                <IconSlot {...iconSlot(selected, part)} motion={s[part]}>
-                    {`${text} ${view === target ? "▴" : "▾"}`}
-                </IconSlot>
-            </Slot.Pressable>
+                <Button
+                    variant="text"
+                    label={text}
+                    secondaryIcon={view === target ? "▴" : "▾"}
+                    aria-expanded={view === target}
+                    disabled={props.disabled}
+                    onLongPress={slot.on(part, "onLongPress", undefined)}
+                    onPress={slot.on(part, "onPress", () =>
+                        setView(view === target ? "day" : target),
+                    )}
+                />
+            </Slot.View>
         );
     };
     const arrow = (
