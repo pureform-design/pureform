@@ -300,19 +300,17 @@ const viewButton = (
 ) =>
     function ViewButton(props: DockedDatePickerViewButtonProps): JSX.Element {
         const { scope, api, locale, monthFormat } = context.use(display);
+        const text = () =>
+            view === "month"
+                ? monthName(locale(), api().focusedValue.month, monthFormat())
+                : String(api().focusedValue.year);
         const children = {
             get children() {
                 return (
                     // oxlint-disable-next-line solid/components-return-once -- a live props getter the part reads, not a component body
                     props.children ?? (
                         <>
-                            {view === "month"
-                                ? monthName(
-                                      locale(),
-                                      api().focusedValue.month,
-                                      monthFormat(),
-                                  )
-                                : String(api().focusedValue.year)}
+                            {text()}
                             <DropDownArrow />
                         </>
                     )
@@ -325,13 +323,14 @@ const viewButton = (
         const content = {
             get label() {
                 return props.as
-                    ? (props.children ?? props["label"])
+                    ? (props.children ?? props["label"] ?? text())
                     : props["label"];
             },
             get secondaryIcon() {
-                return props.as && props.children !== undefined
-                    ? undefined
-                    : props["secondaryIcon"];
+                if (!props.as) return props["secondaryIcon"];
+                return props.children === undefined
+                    ? (props["secondaryIcon"] ?? <DropDownArrow />)
+                    : undefined;
             },
         };
         const merged = merge(

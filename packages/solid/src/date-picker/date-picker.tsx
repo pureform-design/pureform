@@ -325,13 +325,16 @@ function ViewTrigger(props: DatePickerTriggerProps): JSX.Element {
     const content = {
         get label() {
             return props.as
-                ? (props.children ?? props["label"])
+                ? (props.children ??
+                      props["label"] ??
+                      monthAndYear(locale(), picker().focusedValue))
                 : props["label"];
         },
         get secondaryIcon() {
-            return props.as && props.children !== undefined
-                ? undefined
-                : props["secondaryIcon"];
+            if (!props.as) return props["secondaryIcon"];
+            return props.children === undefined
+                ? (props["secondaryIcon"] ?? <DropDownArrow />)
+                : undefined;
         },
     };
     const merged = merge(

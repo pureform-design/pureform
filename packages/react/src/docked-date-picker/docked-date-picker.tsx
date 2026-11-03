@@ -302,6 +302,10 @@ const viewButton = (
     }: DockedDatePickerViewButtonProps): ReactNode {
         const { scope, picker, monthFormat } = context.use(name);
         const shown = picker.view === view;
+        const text = picker.format(
+            picker.focusedValue,
+            view === "month" ? { month: monthFormat } : { year: "numeric" },
+        );
         return scope.render(part, {
             element: "button",
             as: as as ElementType | undefined,
@@ -313,19 +317,20 @@ const viewButton = (
             unstyled,
             props: {
                 ...props,
-                // A component such as `Button` draws its label and arrow from props, so slot
-                // children replace them: the label, without the arrow.
-                ...(as && props.children !== undefined
-                    ? { label: props.children, secondaryIcon: undefined }
+                // A component such as `Button` draws its label and arrow from props: slot children
+                // replace them (the label, without the arrow), else the shown month or year and
+                // the arrow stand in for any the caller doesn't give.
+                ...(as
+                    ? props.children !== undefined
+                        ? { label: props.children, secondaryIcon: undefined }
+                        : {
+                              label: props["label"] ?? text,
+                              secondaryIcon: props["secondaryIcon"] ?? (
+                                  <DropDownArrow />
+                              ),
+                          }
                     : {}),
-                children:
-                    props.children ??
-                    picker.format(
-                        picker.focusedValue,
-                        view === "month"
-                            ? { month: monthFormat }
-                            : { year: "numeric" },
-                    ),
+                children: props.children ?? text,
             },
         });
     };
