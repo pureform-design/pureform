@@ -18,6 +18,7 @@ import {
     interact,
     mount,
     outside,
+    startClock,
     until,
 } from "./testing/render";
 
@@ -852,6 +853,7 @@ describe.each([animated, reanimated])(
             async () => {
                 await open("full");
                 await until(() => byTestId("pf-date-picker-grid"));
+                startClock();
                 await interact(() => userEvent.click(next()));
                 expect(offset()).toBeGreaterThan(0);
                 await interact(() => userEvent.click(prev()));
@@ -864,6 +866,7 @@ describe.each([animated, reanimated])(
             async () => {
                 await open("full", "rtl");
                 await until(() => byTestId("pf-date-picker-grid"));
+                startClock();
                 await interact(() => userEvent.click(next()));
                 expect(offset()).toBeLessThan(0);
             },
