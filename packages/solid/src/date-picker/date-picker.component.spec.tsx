@@ -507,3 +507,45 @@ describe("DatePicker, ready-made", () => {
         expect(onModeToggle).toHaveBeenCalled();
     });
 });
+
+describe("DatePicker, month slide", () => {
+    const open = (motion: "full" | "reduce") =>
+        mount(() => (
+            <PureformProvider registry={datePickersRegistry()} motion={motion}>
+                <DatePicker
+                    trigger="Pick"
+                    locale="en-US"
+                    defaultOpen
+                    defaultValue={["2026-08-17"]}
+                />
+            </PureformProvider>
+        ));
+    const sliding = () => byTestId(ids.grid).getAnimations().length > 0;
+
+    it("slides the days in when the next or previous month is shown", async () => {
+        open("full");
+        await settle();
+        expect(sliding()).toBe(false);
+        await userEvent.click(byTestId(ids.next));
+        await settle();
+        expect(sliding()).toBe(true);
+        const [slide] = byTestId(ids.grid).getAnimations();
+        const frames = (slide!.effect as KeyframeEffect).getKeyframes();
+        expect(frames[0]!.transform).toBe("translateX(32px)");
+        slide!.finish();
+        await userEvent.click(byTestId(ids.prev));
+        await settle();
+        const [back] = byTestId(ids.grid).getAnimations();
+        expect(
+            (back!.effect as KeyframeEffect).getKeyframes()[0]!.transform,
+        ).toBe("translateX(-32px)");
+    });
+
+    it("doesn't slide when motion is reduced", async () => {
+        open("reduce");
+        await settle();
+        await userEvent.click(byTestId(ids.next));
+        await settle();
+        expect(sliding()).toBe(false);
+    });
+});

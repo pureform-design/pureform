@@ -25,7 +25,11 @@ import type {
     Unstyled,
 } from "@pureform/binding-core";
 import type { MutableInteractionSource } from "@pureform/binding-core/interaction";
-import { scrollCellIntoList } from "@pureform/binding-web";
+import {
+    monthIndex,
+    scrollCellIntoList,
+    slidePage,
+} from "@pureform/binding-web";
 import * as datePicker from "@pureform/machines/date-picker";
 import type { InstanceTokens } from "@pureform/styling";
 import type { PropTypes } from "@zag-js/react";
@@ -40,6 +44,7 @@ import {
 
 import { useControllable } from "./controllable";
 import { useInteractionHandlers, useOwnInteractionSource } from "./interaction";
+import { useReducedMotion } from "./motion";
 import type { PartContext } from "./part-context";
 import { useComponent } from "./parts";
 import type { ComponentScope, SlotPropsOf } from "./parts";
@@ -206,6 +211,26 @@ const listInstance = (
     };
 };
 
+// The ref of the page that slides in when the shown month changes, from the side the month lies
+// on, unless motion is reduced. The first month shown doesn't slide.
+function useMonthSlide(picker: datePicker.Api<PropTypes>) {
+    const reduced = useReducedMotion();
+    const element = useRef<HTMLElement | null>(null);
+    const shown = useRef<number | undefined>(undefined);
+    const month = monthIndex(
+        picker.focusedValue.year,
+        picker.focusedValue.month,
+    );
+    useEffect(() => {
+        const before = shown.current;
+        shown.current = month;
+        if (before === undefined || before === month || reduced) return;
+        if (element.current)
+            slidePage(element.current, month > before ? 1 : -1);
+    }, [month, reduced]);
+    return element;
+}
+
 /** Builds the calendar's parts over a picker's context. */
 export function calendarParts(context: PartContext<CalendarContext>) {
     const part = (name: string) => name as never;
@@ -262,10 +287,12 @@ export function calendarParts(context: PartContext<CalendarContext>) {
 
     function Grid({ unstyled, columns, slots, ...props }: CalendarTableProps) {
         const { scope, picker, selected, selectionMode } = context.use("Grid");
+        const slide = useMonthSlide(picker);
         const eachWeek = slots?.each("week") ?? false;
         const eachCell = slots?.each("cell") ?? false;
         return scope.render(part("grid"), {
             element: "div",
+            ref: slide,
             machine: picker.getTableProps({ view: "day", columns }),
             unstyled,
             props: {

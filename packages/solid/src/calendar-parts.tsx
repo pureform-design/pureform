@@ -21,7 +21,11 @@ import type {
     MonthFormat,
 } from "@pureform/binding-core";
 import type { MutableInteractionSource } from "@pureform/binding-core/interaction";
-import { scrollCellIntoList } from "@pureform/binding-web";
+import {
+    monthIndex,
+    scrollCellIntoList,
+    slidePage,
+} from "@pureform/binding-web";
 import * as datePicker from "@pureform/machines/date-picker";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {
@@ -38,6 +42,7 @@ import { useControllable } from "./controllable";
 import { ChevronEndIcon, ChevronStartIcon } from "./glyphs";
 import { useInteractionHandlers, useOwnInteractionSource } from "./interaction";
 import type { PropTypes } from "./internal/zag";
+import { useReducedMotion } from "./motion";
 import { useComponent } from "./parts";
 import type { PartScope, SlotPropsOf } from "./parts";
 import { combinePartProps } from "./props";
@@ -138,6 +143,29 @@ export function useDateValue(
 const MONTH_COLUMNS = 1;
 const YEAR_COLUMNS = 3;
 
+// The ref of the page that slides in when the shown month changes, from the side the month lies
+// on, unless motion is reduced. The first month shown doesn't slide.
+function useMonthSlide(
+    picker: Accessor<datePicker.Api<PropTypes>>,
+): (element: HTMLElement) => void {
+    const reduced = useReducedMotion();
+    let page: HTMLElement | undefined;
+    let shown: number | undefined;
+    createEffect(
+        () =>
+            monthIndex(picker().focusedValue.year, picker().focusedValue.month),
+        (month) => {
+            const before = shown;
+            shown = month;
+            if (before === undefined || before === month || !page) return;
+            if (!untrack(reduced)) slidePage(page, month > before ? 1 : -1);
+        },
+    );
+    return (element) => {
+        page = element;
+    };
+}
+
 /** Builds the calendar parts over a picker's context. */
 export function calendarParts(use: (name: string) => CalendarContext) {
     const name = (part: string) => part as PartName<ComponentAnatomy>;
@@ -227,8 +255,11 @@ export function calendarParts(use: (name: string) => CalendarContext) {
         function Table(props: CalendarTableProps): JSX.Element {
             const { scope, picker } = use(display);
             const rest = omit(props, "unstyled", "view", "columns");
+            const slide =
+                defaults.view === "day" ? useMonthSlide(picker) : undefined;
             return scope.render(name(part), {
                 element: "div",
+                ...(slide ? { ref: slide } : {}),
                 machine: () =>
                     picker().getTableProps({
                         view: props.view ?? defaults.view,
