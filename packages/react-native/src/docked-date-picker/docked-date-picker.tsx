@@ -64,9 +64,9 @@ export interface DockedDatePickerHosts {
     readonly controls: "View";
     readonly actions: "View";
     readonly prev: "Pressable";
-    readonly monthButton: "View";
+    readonly monthButton: "Pressable";
     readonly next: "Pressable";
-    readonly yearButton: "View";
+    readonly yearButton: "Pressable";
     readonly weekdays: "View";
     readonly weekday: "Text";
     readonly grid: "View";
@@ -148,7 +148,9 @@ function Popup(
                     secondaryIcon={view === target ? "▴" : "▾"}
                     aria-expanded={view === target}
                     disabled={props.disabled}
-                    onPress={() => setView(view === target ? "day" : target)}
+                    onPress={slot.on(part, "onPress", () =>
+                        setView(view === target ? "day" : target),
+                    )}
                 />
             </Slot.View>
         );

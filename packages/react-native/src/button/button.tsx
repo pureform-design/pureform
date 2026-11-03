@@ -57,6 +57,8 @@ export interface ButtonProps
     readonly "aria-expanded"?: boolean | undefined;
     /** The element that describes it, by `nativeID`: a tooltip showing for it. */
     readonly "aria-describedby"?: string | undefined;
+    /** The accessible name, when the label alone doesn't say what a press does. */
+    readonly "aria-label"?: string | undefined;
     /** A prefix for every part's test id (`save` → `save-root`), or ids by part. */
     readonly testId?: TestIdOverride<ButtonPart> | undefined;
 }
@@ -65,6 +67,7 @@ const TRIGGER_ARIA = [
     "aria-haspopup",
     "aria-expanded",
     "aria-describedby",
+    "aria-label",
 ] as const;
 
 const pick = <P extends object, K extends keyof P>(

@@ -319,9 +319,23 @@ const viewButton = (
                 );
             },
         };
+        // A component such as `Button` draws its own label and arrow from props, so slot
+        // children replace them: the label, without the arrow, as they replaced the whole
+        // content before.
+        const content = {
+            get label() {
+                return props.children ?? props["label"];
+            },
+            get secondaryIcon() {
+                return props.children === undefined
+                    ? props["secondaryIcon"]
+                    : undefined;
+            },
+        };
         const merged = merge(
             omit(props, "unstyled", "children", "as"),
             children,
+            props.as ? content : {},
         );
         return scope.render(part, {
             element: "button",

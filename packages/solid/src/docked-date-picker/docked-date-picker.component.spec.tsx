@@ -310,4 +310,18 @@ describe("DockedDatePicker, ready-made", () => {
         expect(byTestId(ids.prev).hasAttribute("data-pf-mirror")).toBe(true);
         expect(byTestId(ids.next).hasAttribute("data-pf-mirror")).toBe(true);
     });
+
+    it("shows the month button's slot children in place of its label", async () => {
+        withRegistry(() => (
+            <DockedDatePicker
+                locale="en-US"
+                defaultOpen
+                defaultValue={["2026-08-17"]}
+                slotProps={{ monthButton: { children: "Month" } }}
+            />
+        ));
+        await settle();
+        expect(byTestId(ids.monthButton).textContent).toBe("Month");
+        expect(byTestId(ids.yearButton).textContent).toBe("2026");
+    });
 });

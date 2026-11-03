@@ -63,7 +63,7 @@ export interface DatePickerHosts {
     readonly modeToggle: "View";
     readonly divider: "View";
     readonly controls: "View";
-    readonly viewTrigger: "View";
+    readonly viewTrigger: "Pressable";
     readonly prev: "View";
     readonly next: "View";
     readonly actions: "View";
@@ -186,7 +186,9 @@ function SurfaceImpl(props: SurfaceProps): ReactNode {
                                 : `${title}, choose day`
                         }
                         disabled={props.disabled}
-                        onPress={() => setView(view === "day" ? "year" : "day")}
+                        onPress={slot.on("viewTrigger", "onPress", () =>
+                            setView(view === "day" ? "year" : "day"),
+                        )}
                     />
                 </v.viewTrigger.View>
                 {view === "day" ? (

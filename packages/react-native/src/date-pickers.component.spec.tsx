@@ -856,3 +856,24 @@ describe.each([animated, reanimated])(
         });
     },
 );
+
+describe("DatePicker, view trigger", () => {
+    it("names the trigger by what a press does, and calls the slot's onPress", async () => {
+        const onPress = vi.fn<() => void>();
+        await render(
+            <DatePicker
+                locale="en-US"
+                defaultValue={["2026-08-17"]}
+                slotProps={{ viewTrigger: { onPress } }}
+            />,
+        );
+        const trigger = byTestId("pf-date-picker-view-trigger").querySelector(
+            "[role=button]",
+        )!;
+        expect(trigger.getAttribute("aria-label")).toBe(
+            "August 2026, choose year",
+        );
+        await interact(() => userEvent.click(trigger));
+        expect(onPress).toHaveBeenCalled();
+    });
+});

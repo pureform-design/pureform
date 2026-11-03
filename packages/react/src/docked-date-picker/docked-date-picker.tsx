@@ -313,6 +313,11 @@ const viewButton = (
             unstyled,
             props: {
                 ...props,
+                // A component such as `Button` draws its label and arrow from props, so slot
+                // children replace them: the label, without the arrow.
+                ...(as && props.children !== undefined
+                    ? { label: props.children, secondaryIcon: undefined }
+                    : {}),
                 children:
                     props.children ??
                     picker.format(

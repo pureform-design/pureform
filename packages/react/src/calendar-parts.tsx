@@ -38,6 +38,7 @@ import {
     type ElementType,
     type ReactNode,
     useEffect,
+    useLayoutEffect,
     useMemo,
     useRef,
     useState,
@@ -220,7 +221,7 @@ function useMonthSlide(picker: datePicker.Api<PropTypes>) {
         picker.focusedValue.year,
         picker.focusedValue.month,
     );
-    useEffect(() => {
+    useLayoutEffect(() => {
         const before = shown.current;
         shown.current = month;
         if (before === undefined || before === month) return;

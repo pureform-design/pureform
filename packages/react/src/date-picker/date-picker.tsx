@@ -317,7 +317,14 @@ function ViewTrigger({
             onClick: () => picker.setView(view),
         },
         unstyled,
-        props,
+        props: {
+            ...props,
+            // A component such as `Button` draws its label and arrow from props, so slot
+            // children replace them: the label, without the arrow.
+            ...(as && props.children !== undefined
+                ? { label: props.children, secondaryIcon: undefined }
+                : {}),
+        },
     });
 }
 
