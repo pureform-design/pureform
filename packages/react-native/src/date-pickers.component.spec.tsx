@@ -9,6 +9,7 @@ import { DateInput } from "./date-input";
 import { DatePicker } from "./date-picker";
 import { DockedDatePicker } from "./docked-date-picker";
 import { animated } from "./engine";
+import { reanimated } from "./engines/reanimated";
 import { presetRegistry } from "./testing/registry";
 import type { TestRegistry } from "./testing/registry";
 import {
@@ -810,38 +811,48 @@ describe("DateInput", () => {
     });
 });
 
-describe("DatePicker, month slide", () => {
-    const open = (motion: "full" | "reduce") =>
-        mount(
-            <PureformProvider
-                registry={registry}
-                engine={animated}
-                motion={motion}
-            >
-                <View style={{ width: 600, height: 700 }}>
-                    <DatePicker locale="en-US" defaultValue={["2026-08-17"]} />
-                </View>
-            </PureformProvider>,
-        );
-    const page = () => byTestId("pf-date-picker-grid").parentElement!;
-    const next = () =>
-        byTestId("pf-date-picker-next").querySelector<HTMLElement>(
-            "[role=button]",
-        )!;
+describe.each([animated, reanimated])(
+    "DatePicker, month slide with $name",
+    (engine) => {
+        const open = (motion: "full" | "reduce") =>
+            mount(
+                <PureformProvider
+                    registry={registry}
+                    engine={engine}
+                    motion={motion}
+                >
+                    <View style={{ width: 600, height: 700 }}>
+                        <DatePicker
+                            locale="en-US"
+                            defaultValue={["2026-08-17"]}
+                        />
+                    </View>
+                </PureformProvider>,
+            );
+        const page = () => byTestId("pf-date-picker-grid").parentElement!;
+        const next = () =>
+            byTestId("pf-date-picker-next").querySelector<HTMLElement>(
+                "[role=button]",
+            )!;
 
-    it("slides the days in from the side the next month lies on", async () => {
-        await open("full");
-        await until(() => byTestId("pf-date-picker-grid"));
-        expect(page().style.transform).not.toContain("32");
-        await interact(() => userEvent.click(next()));
-        expect(page().style.transform).toContain("translateX");
-        expect(page().style.transform).not.toBe("translateX(0px)");
-    });
+        it("slides the days in from the side the next month lies on", async () => {
+            await open("full");
+            await until(() => byTestId("pf-date-picker-grid"));
+            expect(page().style.transform).not.toContain("32");
+            await interact(() => userEvent.click(next()));
+            // Animated moves the view by its transform; Reanimated runs a CSS animation on it.
+            const { transform, animationDuration } = page().style;
+            expect(
+                transform.includes("translateX") ||
+                    (animationDuration !== "" && animationDuration !== "0ms"),
+            ).toBe(true);
+        });
 
-    it("doesn't slide when motion is reduced", async () => {
-        await open("reduce");
-        await until(() => byTestId("pf-date-picker-grid"));
-        await interact(() => userEvent.click(next()));
-        expect(["", "translateX(0px)"]).toContain(page().style.transform);
-    });
-});
+        it("doesn't slide when motion is reduced", async () => {
+            await open("reduce");
+            await until(() => byTestId("pf-date-picker-grid"));
+            await interact(() => userEvent.click(next()));
+            expect(["", "translateX(0px)"]).toContain(page().style.transform);
+        });
+    },
+);

@@ -22,10 +22,11 @@ import type {
     DatePickerBehaviorProps,
     DateSelectionMode,
 } from "@pureform/binding-core";
+import type { SlideMotion } from "@pureform/rn-adapter/animated";
 import { useReducedMotion, useTokens } from "@pureform/rn-adapter/react";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { Animated, ScrollView } from "react-native";
+import { ScrollView } from "react-native";
 import type { LayoutChangeEvent, ScrollViewInstance } from "react-native";
 
 import type { MotionStyles } from "./engine";
@@ -33,7 +34,7 @@ import { IconSlot, iconSlot } from "./icon-style";
 import { useSurfaceIndication } from "./indication";
 import { testIdOf, withEngine } from "./parts";
 import { themeSpring } from "./presence";
-import { useDirection, usePureform } from "./provider";
+import { useDirection, useEngine, usePureform } from "./provider";
 import {
     mergeNativePartProps,
     nativeSlots,
@@ -175,53 +176,52 @@ const LONG_DATE = {
 } as const;
 
 /** The weekday row and the month's weeks of day cells. */
-// The days of a month, sliding in from the side the month lies on when it changes, on the theme's
-// spatial spring, or at once under reduced motion. The first month shown doesn't slide.
+// The days of a month, sliding in from the side the month lies on when it changes, through the
+// engine's slide (on the theme's spatial spring), or at once under reduced motion. The first month
+// shown doesn't slide.
 function MonthSlide(props: {
     readonly month: string;
     readonly children: ReactNode;
 }): ReactNode {
+    const engine = useEngine();
     const tokens = useTokens();
     const reducedMotion = useReducedMotion();
     const { timeScale } = usePureform();
     const flip = useDirection() === "rtl" ? -1 : 1;
-    const [offset] = useState(() => new Animated.Value(0));
-    const shown = useRef(props.month);
-    useEffect(() => {
-        const before = shown.current;
-        shown.current = props.month;
-        if (before === props.month || reducedMotion) return;
+    const [shown, setShown] = useState(props.month);
+    const [motion, setMotion] = useState<SlideMotion | undefined>(undefined);
+    // The slide starts from the render that shows the new month, so it never draws in place first.
+    if (shown !== props.month) {
         const spring = themeSpring("spatialDefault", tokens, timeScale);
-        if (!spring) return;
-        offset.setValue(
-            (props.month > before ? SLIDE_DISTANCE : -SLIDE_DISTANCE) * flip,
+        setShown(props.month);
+        setMotion(
+            reducedMotion || !spring
+                ? undefined
+                : {
+                      from: {
+                          translateX:
+                              (props.month > shown
+                                  ? SLIDE_DISTANCE
+                                  : -SLIDE_DISTANCE) * flip,
+                          scaleX: 1,
+                      },
+                      duration: SLIDE_DURATION,
+                      delay: 0,
+                      easing: {
+                          type: "easing",
+                          kind: "keyword",
+                          name: "easeOut",
+                      },
+                      ...(engine.slideSpring ? { spring } : {}),
+                  },
         );
-        Animated.spring(offset, {
-            toValue: 0,
-            stiffness: spring.stiffness,
-            damping: spring.damping,
-            mass: spring.mass,
-            overshootClamping: true,
-            useNativeDriver: false,
-        }).start();
-    }, [props.month, reducedMotion, tokens, timeScale, flip, offset]);
-    return (
-        <Animated.View
-            style={{
-                transform: [{ translateX: offset }],
-                opacity: offset.interpolate({
-                    inputRange: [-SLIDE_DISTANCE, 0, SLIDE_DISTANCE],
-                    outputRange: [0, 1, 0],
-                    extrapolate: "clamp",
-                }),
-            }}
-        >
-            {props.children}
-        </Animated.View>
-    );
+    }
+    const slid = engine.useSlide?.(motion);
+    return <engine.View style={slid}>{props.children}</engine.View>;
 }
 
 const SLIDE_DISTANCE = 32;
+const SLIDE_DURATION = 300;
 
 export function DayGrid(props: DayGridProps): ReactNode {
     const slot = props.slots.slot ?? nativeSlots(undefined);
