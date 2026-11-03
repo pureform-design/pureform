@@ -296,8 +296,16 @@ function Divider(props: DatePickerPartProps): JSX.Element {
 /** The row of the view trigger and the previous and next buttons. */
 const Controls = block<DatePickerPartProps>("controls", "Controls");
 
+/** The month and year shown, "August 2026". */
+const monthAndYear = (locale: string, focused: datePicker.DateValue): string =>
+    new Intl.DateTimeFormat(locale, {
+        month: "long",
+        year: "numeric",
+        timeZone: "UTC",
+    }).format(new Date(`${datePicker.toISO(focused)}T00:00:00Z`));
+
 /** Switches between the days and the years; shows the month and year shown, and an arrow. */
-function ViewTrigger(props: DatePickerPartProps): JSX.Element {
+function ViewTrigger(props: DatePickerTriggerProps): JSX.Element {
     const { scope, picker, locale } = pickerContext.use("ViewTrigger");
     const children = {
         get children() {
@@ -305,24 +313,17 @@ function ViewTrigger(props: DatePickerPartProps): JSX.Element {
                 // oxlint-disable-next-line solid/components-return-once -- a live props getter the part reads, not a component body
                 props.children ?? (
                     <>
-                        {new Intl.DateTimeFormat(locale(), {
-                            month: "long",
-                            year: "numeric",
-                            timeZone: "UTC",
-                        }).format(
-                            new Date(
-                                `${datePicker.toISO(picker().focusedValue)}T00:00:00Z`,
-                            ),
-                        )}
+                        {monthAndYear(locale(), picker().focusedValue)}
                         <DropDownArrow />
                     </>
                 )
             );
         },
     };
-    const merged = merge(omit(props, "unstyled", "children"), children);
+    const merged = merge(omit(props, "unstyled", "children", "as"), children);
     return scope.render("viewTrigger", {
         element: "button",
+        as: () => props.as,
         machine: () => {
             const api = picker();
             return {
@@ -448,7 +449,13 @@ function ReadyMadeContent(props: {
             </Header>
             <Divider {...slots("divider")} />
             <Controls {...slots("controls")}>
-                <ViewTrigger {...slots("viewTrigger")} />
+                <ViewTrigger
+                    as={Button}
+                    variant="text"
+                    label={monthAndYear(locale(), picker().focusedValue)}
+                    secondaryIcon={<DropDownArrow />}
+                    {...asRoot(slots("viewTrigger"))}
+                />
                 <Show when={picker().view === "day"}>
                     <Prev
                         as={IconButton}

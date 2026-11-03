@@ -507,7 +507,7 @@ describe("DockedDatePicker", () => {
             await until(() => byTestId("pf-docked-date-picker-month-button"));
             expect(
                 byTestId("pf-docked-date-picker-month-button").textContent,
-            ).toContain(`${button} `);
+            ).toContain(button);
             await interact(() =>
                 userEvent.click(byTestId("pf-docked-date-picker-month-button")),
             );

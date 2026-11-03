@@ -29,6 +29,7 @@ import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { Pressable, View } from "react-native";
 
+import { Button } from "../button/button";
 import { CellList, DayGrid, startMonth } from "../calendar";
 import { IconButton } from "../icon-button/icon-button";
 import { IconSlot, iconSlot } from "../icon-style";
@@ -64,9 +65,9 @@ export interface DockedDatePickerHosts {
     readonly controls: "View";
     readonly actions: "View";
     readonly prev: "Pressable";
-    readonly monthButton: "Pressable";
+    readonly monthButton: "View";
     readonly next: "Pressable";
-    readonly yearButton: "Pressable";
+    readonly yearButton: "View";
     readonly weekdays: "View";
     readonly weekday: "Text";
     readonly grid: "View";
@@ -131,21 +132,20 @@ function Popup(
     ) => {
         const Slot = v[part];
         return (
-            <Slot.Pressable
+            <Slot.View
                 {...slot.props(part)}
-                role="button"
-                aria-expanded={view === target}
-                disabled={props.disabled}
-                onPress={slot.on(part, "onPress", () =>
-                    setView(view === target ? "day" : target),
-                )}
-                style={slot.style(part, withUnselectable(s[part]))}
+                style={slot.style(part, s[part])}
                 testID={id(part)}
             >
-                <IconSlot {...iconSlot(selected, part)} motion={s[part]}>
-                    {`${text} ${view === target ? "▴" : "▾"}`}
-                </IconSlot>
-            </Slot.Pressable>
+                <Button
+                    variant="text"
+                    label={text}
+                    secondaryIcon={view === target ? "▴" : "▾"}
+                    aria-expanded={view === target}
+                    disabled={props.disabled}
+                    onPress={() => setView(view === target ? "day" : target)}
+                />
+            </Slot.View>
         );
     };
     const arrow = (

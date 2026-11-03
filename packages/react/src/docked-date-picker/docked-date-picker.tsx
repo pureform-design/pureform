@@ -34,6 +34,7 @@ import {
     useState,
 } from "react";
 
+import { Button } from "../button";
 import { calendarParts, parseIso, useDateValue } from "../calendar-parts";
 import type {
     CalendarCellProps,
@@ -79,6 +80,13 @@ export interface DockedDatePickerRootProps
 
 /** A part's props: the element's own, and the part's `unstyled`. */
 export type DockedDatePickerPartProps = CalendarPartProps;
+
+/** The month or year button's props: a part's, and `as` to render a component instead of
+ *  `<button>` (`as={Button}`), which takes the rest of the props. */
+export interface DockedDatePickerViewButtonProps extends CalendarPartProps {
+    readonly as?: ElementType | undefined;
+    readonly [prop: string]: unknown;
+}
 
 /** An icon part's props: a part's, and `mirror` to flip it under `rtl`. */
 export interface DockedDatePickerIconProps extends CalendarPartProps {
@@ -287,11 +295,16 @@ const viewButton = (
     name: string,
     view: "month" | "year",
 ) =>
-    function ViewButton({ unstyled, ...props }: CalendarPartProps): ReactNode {
+    function ViewButton({
+        unstyled,
+        as,
+        ...props
+    }: DockedDatePickerViewButtonProps): ReactNode {
         const { scope, picker, monthFormat } = context.use(name);
         const shown = picker.view === view;
         return scope.render(part, {
             element: "button",
+            as: as as ElementType | undefined,
             machine: {
                 type: "button",
                 "aria-expanded": shown,
@@ -379,15 +392,25 @@ function ReadyMadeContent({ own }: { readonly own: DockedDatePickerProps }) {
                 {...asRoot(slot("prev"))}
             />
             {unit === "month" ? (
-                <MonthButton {...slot("monthButton")}>
-                    {picker.format(picker.focusedValue, { month: monthFormat })}
-                    <DropDownArrow />
-                </MonthButton>
+                <MonthButton
+                    as={Button}
+                    variant="text"
+                    label={picker.format(picker.focusedValue, {
+                        month: monthFormat,
+                    })}
+                    secondaryIcon={<DropDownArrow />}
+                    {...asRoot(slot("monthButton"))}
+                />
             ) : (
-                <YearButton {...slot("yearButton")}>
-                    {picker.format(picker.focusedValue, { year: "numeric" })}
-                    <DropDownArrow />
-                </YearButton>
+                <YearButton
+                    as={Button}
+                    variant="text"
+                    label={picker.format(picker.focusedValue, {
+                        year: "numeric",
+                    })}
+                    secondaryIcon={<DropDownArrow />}
+                    {...asRoot(slot("yearButton"))}
+                />
             )}
             <Next
                 as={IconButton}

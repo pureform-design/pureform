@@ -59,7 +59,7 @@ export interface DatePickerHosts {
     readonly modeToggle: "View";
     readonly divider: "View";
     readonly controls: "View";
-    readonly viewTrigger: "Pressable";
+    readonly viewTrigger: "View";
     readonly prev: "View";
     readonly next: "View";
     readonly actions: "View";
@@ -167,31 +167,24 @@ function SurfaceImpl(props: SurfaceProps): ReactNode {
                 style={slot.style("controls", s.controls)}
                 testID={id("controls")}
             >
-                <v.viewTrigger.Pressable
+                <v.viewTrigger.View
                     {...slot.props("viewTrigger")}
-                    role="button"
-                    aria-label={
-                        view === "day"
-                            ? `${title}, choose year`
-                            : `${title}, choose day`
-                    }
-                    disabled={props.disabled}
-                    onPress={slot.on("viewTrigger", "onPress", () =>
-                        setView(view === "day" ? "year" : "day"),
-                    )}
-                    style={slot.style(
-                        "viewTrigger",
-                        withUnselectable(s.viewTrigger),
-                    )}
+                    style={slot.style("viewTrigger", s.viewTrigger)}
                     testID={id("viewTrigger")}
                 >
-                    <IconSlot
-                        {...iconSlot(selected, "viewTrigger")}
-                        motion={s.viewTrigger}
-                    >
-                        {`${title} ${view === "day" ? "▾" : "▴"}`}
-                    </IconSlot>
-                </v.viewTrigger.Pressable>
+                    <Button
+                        variant="text"
+                        label={title}
+                        secondaryIcon={view === "day" ? "▾" : "▴"}
+                        aria-label={
+                            view === "day"
+                                ? `${title}, choose year`
+                                : `${title}, choose day`
+                        }
+                        disabled={props.disabled}
+                        onPress={() => setView(view === "day" ? "year" : "day")}
+                    />
+                </v.viewTrigger.View>
                 {view === "day" ? (
                     <>
                         <v.prev.View
