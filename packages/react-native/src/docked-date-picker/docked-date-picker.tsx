@@ -148,6 +148,7 @@ function Popup(
                     secondaryIcon={view === target ? "▴" : "▾"}
                     aria-expanded={view === target}
                     disabled={props.disabled}
+                    onLongPress={slot.on(part, "onLongPress", undefined)}
                     onPress={slot.on(part, "onPress", () =>
                         setView(view === target ? "day" : target),
                     )}

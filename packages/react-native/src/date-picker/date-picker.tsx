@@ -186,6 +186,11 @@ function SurfaceImpl(props: SurfaceProps): ReactNode {
                                 : `${title}, choose day`
                         }
                         disabled={props.disabled}
+                        onLongPress={slot.on(
+                            "viewTrigger",
+                            "onLongPress",
+                            undefined,
+                        )}
                         onPress={slot.on("viewTrigger", "onPress", () =>
                             setView(view === "day" ? "year" : "day"),
                         )}

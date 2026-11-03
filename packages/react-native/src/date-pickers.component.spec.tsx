@@ -814,12 +814,13 @@ describe("DateInput", () => {
 describe.each([animated, reanimated])(
     "DatePicker, month slide with $name",
     (engine) => {
-        const open = (motion: "full" | "reduce") =>
+        const open = (motion: "full" | "reduce", dir: "ltr" | "rtl" = "ltr") =>
             mount(
                 <PureformProvider
                     registry={registry}
                     engine={engine}
                     motion={motion}
+                    dir={dir}
                 >
                     <View style={{ width: 600, height: 700 }}>
                         <DatePicker
@@ -834,6 +835,39 @@ describe.each([animated, reanimated])(
             byTestId("pf-date-picker-next").querySelector<HTMLElement>(
                 "[role=button]",
             )!;
+
+        const prev = () =>
+            byTestId("pf-date-picker-prev").querySelector<HTMLElement>(
+                "[role=button]",
+            )!;
+        // Animated moves the view by its transform, which says which way it starts; Reanimated
+        // runs a CSS animation, whose keyframes aren't on the element.
+        const offset = () =>
+            Number(
+                /translateX\((-?[\d.]+)px\)/.exec(page().style.transform)?.[1],
+            );
+
+        it.runIf(engine.name === "animated")(
+            "starts the days toward the month's side, flipped under rtl",
+            async () => {
+                await open("full");
+                await until(() => byTestId("pf-date-picker-grid"));
+                await interact(() => userEvent.click(next()));
+                expect(offset()).toBeGreaterThan(0);
+                await interact(() => userEvent.click(prev()));
+                expect(offset()).toBeLessThan(0);
+            },
+        );
+
+        it.runIf(engine.name === "animated")(
+            "flips the side under rtl",
+            async () => {
+                await open("full", "rtl");
+                await until(() => byTestId("pf-date-picker-grid"));
+                await interact(() => userEvent.click(next()));
+                expect(offset()).toBeLessThan(0);
+            },
+        );
 
         it("slides the days in from the side the next month lies on", async () => {
             await open("full");

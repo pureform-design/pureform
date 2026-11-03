@@ -324,18 +324,20 @@ const viewButton = (
         // content before.
         const content = {
             get label() {
-                return props.children ?? props["label"];
+                return props.as
+                    ? (props.children ?? props["label"])
+                    : props["label"];
             },
             get secondaryIcon() {
-                return props.children === undefined
-                    ? props["secondaryIcon"]
-                    : undefined;
+                return props.as && props.children !== undefined
+                    ? undefined
+                    : props["secondaryIcon"];
             },
         };
         const merged = merge(
             omit(props, "unstyled", "children", "as"),
             children,
-            props.as ? content : {},
+            content,
         );
         return scope.render(part, {
             element: "button",
