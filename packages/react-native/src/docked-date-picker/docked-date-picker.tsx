@@ -32,13 +32,12 @@ import { Pressable, View } from "react-native";
 import { Button } from "../button/button";
 import { CellList, DayGrid, startMonth } from "../calendar";
 import { IconButton } from "../icon-button/icon-button";
-import { IconSlot, iconSlot } from "../icon-style";
 import { Anchored, useFieldPopup } from "../overlay";
 import { useControllable } from "../parts";
 import { Portal } from "../portal";
 import { useEngine } from "../provider";
 import { resolveText } from "../resolve-text";
-import { useNativeSlotReader, withUnselectable } from "../slot-props";
+import { useNativeSlotReader } from "../slot-props";
 import type { NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
 import { Field, partId } from "../text-input";
@@ -106,11 +105,7 @@ function Popup(
     const locale = pickerLocale(props);
     const [month, setMonth] = useState(() => startMonth(props.value));
     const [view, setView] = useState<CalendarView>("day");
-    const {
-        styles: s,
-        selected,
-        views: v,
-    } = useComponentSlots<Part>(
+    const { styles: s, views: v } = useComponentSlots<Part>(
         "dockedDatePicker",
         dockedDatePickerSelection({
             ...props,

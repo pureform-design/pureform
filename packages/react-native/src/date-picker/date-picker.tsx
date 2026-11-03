@@ -30,14 +30,12 @@ import { Button } from "../button/button";
 import type { ButtonProps } from "../button/button";
 import { CellList, DayGrid, monthTitle, startMonth } from "../calendar";
 import { IconButton } from "../icon-button/icon-button";
-import { IconSlot, iconSlot } from "../icon-style";
 import { ModalScrimLayer, ModalWindow, useModalOverlay } from "../modal";
 import { useControllable, withEngine } from "../parts";
 import {
     useNativeScrimSlots,
     useNativeSlotReader,
     overlayKeys,
-    withUnselectable,
 } from "../slot-props";
 import type { InnerPropsOf, NativeSlotProps } from "../slot-props";
 import { useComponentSlots } from "../styles";
@@ -99,11 +97,10 @@ function SurfaceImpl(props: SurfaceProps): ReactNode {
     const [draft, setDraft] = useState(props.committed);
     const [month, setMonth] = useState(() => startMonth(props.committed));
     const [view, setView] = useState<"day" | "year">("day");
-    const {
-        styles: s,
-        selected,
-        views: v,
-    } = useComponentSlots<Part>("datePicker", datePickerSelection(props));
+    const { styles: s, views: v } = useComponentSlots<Part>(
+        "datePicker",
+        datePickerSelection(props),
+    );
     const id = (part: Part) =>
         partId(datePickerOverlayAnatomy, KEYS(part), props.testId);
     const slot = nativeSlots(props, KEYS);

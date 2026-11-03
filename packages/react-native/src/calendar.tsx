@@ -22,15 +22,18 @@ import type {
     DatePickerBehaviorProps,
     DateSelectionMode,
 } from "@pureform/binding-core";
-import { useRef } from "react";
+import { useReducedMotion, useTokens } from "@pureform/rn-adapter/react";
+import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { ScrollView } from "react-native";
+import { Animated, ScrollView } from "react-native";
 import type { LayoutChangeEvent, ScrollViewInstance } from "react-native";
 
 import type { MotionStyles } from "./engine";
 import { IconSlot, iconSlot } from "./icon-style";
 import { useSurfaceIndication } from "./indication";
 import { testIdOf, withEngine } from "./parts";
+import { themeSpring } from "./presence";
+import { useDirection, usePureform } from "./provider";
 import {
     mergeNativePartProps,
     nativeSlots,
@@ -172,6 +175,54 @@ const LONG_DATE = {
 } as const;
 
 /** The weekday row and the month's weeks of day cells. */
+// The days of a month, sliding in from the side the month lies on when it changes, on the theme's
+// spatial spring, or at once under reduced motion. The first month shown doesn't slide.
+function MonthSlide(props: {
+    readonly month: string;
+    readonly children: ReactNode;
+}): ReactNode {
+    const tokens = useTokens();
+    const reducedMotion = useReducedMotion();
+    const { timeScale } = usePureform();
+    const flip = useDirection() === "rtl" ? -1 : 1;
+    const [offset] = useState(() => new Animated.Value(0));
+    const shown = useRef(props.month);
+    useEffect(() => {
+        const before = shown.current;
+        shown.current = props.month;
+        if (before === props.month || reducedMotion) return;
+        const spring = themeSpring("spatialDefault", tokens, timeScale);
+        if (!spring) return;
+        offset.setValue(
+            (props.month > before ? SLIDE_DISTANCE : -SLIDE_DISTANCE) * flip,
+        );
+        Animated.spring(offset, {
+            toValue: 0,
+            stiffness: spring.stiffness,
+            damping: spring.damping,
+            mass: spring.mass,
+            overshootClamping: true,
+            useNativeDriver: false,
+        }).start();
+    }, [props.month, reducedMotion, tokens, timeScale, flip, offset]);
+    return (
+        <Animated.View
+            style={{
+                transform: [{ translateX: offset }],
+                opacity: offset.interpolate({
+                    inputRange: [-SLIDE_DISTANCE, 0, SLIDE_DISTANCE],
+                    outputRange: [0, 1, 0],
+                    extrapolate: "clamp",
+                }),
+            }}
+        >
+            {props.children}
+        </Animated.View>
+    );
+}
+
+const SLIDE_DISTANCE = 32;
+
 export function DayGrid(props: DayGridProps): ReactNode {
     const slot = props.slots.slot ?? nativeSlots(undefined);
     const { styles: s, views: v, id } = props.slots;
@@ -207,76 +258,78 @@ export function DayGrid(props: DayGridProps): ReactNode {
                     },
                 )}
             </v.weekdays.View>
-            <v.grid.View
-                {...slot.props("grid")}
-                role="grid"
-                style={slot.style("grid", s.grid)}
-                testID={id("grid")}
-            >
-                {monthWeeks(shown, props.firstDay).map((week, index) => (
-                    <v.week.View
-                        {...slot.props(
-                            "week",
-                            eachWeek ? { index } : undefined,
-                        )}
-                        key={week[0]}
-                        role="row"
-                        style={slot.style(
-                            "week",
-                            s.week,
-                            eachWeek ? { index } : undefined,
-                        )}
-                        testID={id("week")}
-                    >
-                        {week.map((day) => {
-                            const outside =
-                                parseIsoDate(day)!.month !== shown.month;
-                            const selection = outside
-                                ? "none"
-                                : calendarCellSelection(
-                                      day,
-                                      props.selected,
-                                      props.mode,
-                                  );
-                            const disabled =
-                                !!props.disabled ||
-                                !isSelectableDate(day, props);
-                            return (
-                                <CalendarCell
-                                    key={day}
-                                    view="day"
-                                    selection={selection}
-                                    today={day === today}
-                                    outside={outside}
-                                    disabled={disabled}
-                                    owner={slot}
-                                    instance={
-                                        eachCell
-                                            ? {
-                                                  view: "day",
-                                                  value: day,
-                                                  selected:
-                                                      selection !== "none",
-                                                  today: day === today,
-                                                  outside,
-                                                  disabled,
-                                              }
-                                            : undefined
-                                    }
-                                    label={formatIsoDate(
-                                        day,
-                                        props.locale,
-                                        LONG_DATE,
-                                    )}
-                                    onPress={() => props.onChoose(day)}
-                                >
-                                    {String(parseIsoDate(day)!.day)}
-                                </CalendarCell>
-                            );
-                        })}
-                    </v.week.View>
-                ))}
-            </v.grid.View>
+            <MonthSlide month={props.month}>
+                <v.grid.View
+                    {...slot.props("grid")}
+                    role="grid"
+                    style={slot.style("grid", s.grid)}
+                    testID={id("grid")}
+                >
+                    {monthWeeks(shown, props.firstDay).map((week, index) => (
+                        <v.week.View
+                            {...slot.props(
+                                "week",
+                                eachWeek ? { index } : undefined,
+                            )}
+                            key={week[0]}
+                            role="row"
+                            style={slot.style(
+                                "week",
+                                s.week,
+                                eachWeek ? { index } : undefined,
+                            )}
+                            testID={id("week")}
+                        >
+                            {week.map((day) => {
+                                const outside =
+                                    parseIsoDate(day)!.month !== shown.month;
+                                const selection = outside
+                                    ? "none"
+                                    : calendarCellSelection(
+                                          day,
+                                          props.selected,
+                                          props.mode,
+                                      );
+                                const disabled =
+                                    !!props.disabled ||
+                                    !isSelectableDate(day, props);
+                                return (
+                                    <CalendarCell
+                                        key={day}
+                                        view="day"
+                                        selection={selection}
+                                        today={day === today}
+                                        outside={outside}
+                                        disabled={disabled}
+                                        owner={slot}
+                                        instance={
+                                            eachCell
+                                                ? {
+                                                      view: "day",
+                                                      value: day,
+                                                      selected:
+                                                          selection !== "none",
+                                                      today: day === today,
+                                                      outside,
+                                                      disabled,
+                                                  }
+                                                : undefined
+                                        }
+                                        label={formatIsoDate(
+                                            day,
+                                            props.locale,
+                                            LONG_DATE,
+                                        )}
+                                        onPress={() => props.onChoose(day)}
+                                    >
+                                        {String(parseIsoDate(day)!.day)}
+                                    </CalendarCell>
+                                );
+                            })}
+                        </v.week.View>
+                    ))}
+                </v.grid.View>
+            </MonthSlide>
         </>
     );
 }

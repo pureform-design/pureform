@@ -809,3 +809,39 @@ describe("DateInput", () => {
         expect(digits()).toEqual(["", "", ""]);
     });
 });
+
+describe("DatePicker, month slide", () => {
+    const open = (motion: "full" | "reduce") =>
+        mount(
+            <PureformProvider
+                registry={registry}
+                engine={animated}
+                motion={motion}
+            >
+                <View style={{ width: 600, height: 700 }}>
+                    <DatePicker locale="en-US" defaultValue={["2026-08-17"]} />
+                </View>
+            </PureformProvider>,
+        );
+    const page = () => byTestId("pf-date-picker-grid").parentElement!;
+    const next = () =>
+        byTestId("pf-date-picker-next").querySelector<HTMLElement>(
+            "[role=button]",
+        )!;
+
+    it("slides the days in from the side the next month lies on", async () => {
+        await open("full");
+        await until(() => byTestId("pf-date-picker-grid"));
+        expect(page().style.transform).not.toContain("32");
+        await interact(() => userEvent.click(next()));
+        expect(page().style.transform).toContain("translateX");
+        expect(page().style.transform).not.toBe("translateX(0px)");
+    });
+
+    it("doesn't slide when motion is reduced", async () => {
+        await open("reduce");
+        await until(() => byTestId("pf-date-picker-grid"));
+        await interact(() => userEvent.click(next()));
+        expect(["", "translateX(0px)"]).toContain(page().style.transform);
+    });
+});
