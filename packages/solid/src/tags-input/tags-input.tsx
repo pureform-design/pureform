@@ -212,7 +212,9 @@ function Input(props: TagsInputPartProps): JSX.Element {
     const rest = omit(props, "unstyled");
     // Zag adds the tag on the delimiter without taking it into its input value, which Solid
     // binds, so the input is given that value back rather than keep the delimiter.
-    const commit = (event: InputEvent & { currentTarget: HTMLInputElement }) => {
+    const commit = (
+        event: InputEvent & { currentTarget: HTMLInputElement },
+    ) => {
         const next = inputValue();
         if (event.currentTarget.value !== next)
             event.currentTarget.value = next;
