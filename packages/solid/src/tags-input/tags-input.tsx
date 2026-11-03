@@ -31,6 +31,7 @@ import {
     merge,
     omit,
     Show,
+    untrack,
 } from "solid-js";
 
 import { useControllable } from "../controllable";
@@ -47,6 +48,7 @@ import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
 import { createSlotProps, useComponent } from "../parts";
 import type { ComponentScope, InnerPropsOf, SlotKeyedProps } from "../parts";
+import { combinePartProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 
@@ -60,6 +62,8 @@ interface TagsInputContextValue {
     readonly api: Accessor<tagsInput.Api<PropTypes>>;
     readonly sources: ItemInteractionSources;
     readonly error: Accessor<string | undefined>;
+    /** The machine's input value as it is now, not as the last render saw it. */
+    readonly inputValue: () => string;
 }
 
 const context = createPartContext<TagsInputContextValue>("TagsInput");
@@ -166,7 +170,15 @@ function Root(props: TagsInputRootProps): JSX.Element {
     );
     return (
         <context.Provider
-            value={{ scope, chips, api, sources, error: () => props.error }}
+            value={{
+                scope,
+                chips,
+                api,
+                sources,
+                error: () => props.error,
+                inputValue: () =>
+                    untrack(() => service.context.get("inputValue")),
+            }}
         >
             {scope.render("root", {
                 element: "div",
@@ -196,11 +208,22 @@ function Container(props: TagsInputPartProps): JSX.Element {
 
 /** The native input the values are typed into. The label names it. */
 function Input(props: TagsInputPartProps): JSX.Element {
-    const { scope, api } = context.use("Input");
+    const { scope, api, inputValue } = context.use("Input");
     const rest = omit(props, "unstyled");
+    // Zag adds the tag on the delimiter without taking it into its input value, which Solid
+    // binds, so the input is given that value back rather than keep the delimiter.
+    const commit = (event: InputEvent & { currentTarget: HTMLInputElement }) => {
+        const next = inputValue();
+        if (event.currentTarget.value !== next)
+            event.currentTarget.value = next;
+    };
     return scope.render("input", {
         element: "input",
-        machine: () => api().getInputProps(),
+        machine: () =>
+            combinePartProps([
+                api().getInputProps() as Record<string, unknown>,
+                { onInput: commit },
+            ]),
         unstyled: () => props.unstyled,
         props: rest,
     });

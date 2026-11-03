@@ -94,6 +94,26 @@ describe("TagsInput, ready-made", () => {
         expect(chips()).toEqual(["blue"]);
     });
 
+    it("adds typed text on the delimiter without Solid overwriting the input", async () => {
+        const warn = vi.spyOn(console, "warn");
+        const error = vi.spyOn(console, "error");
+        withRegistry(() => <TagsInput label="Tags" />);
+        await settle();
+        const input = byTestId<HTMLInputElement>(ids.input);
+        await userEvent.click(input);
+        await userEvent.type(input, "blue,");
+        await settle();
+        expect(chips()).toEqual(["blue"]);
+        expect(input.value).toBe("");
+        const overwritten = (spy: typeof warn) =>
+            spy.mock.calls.some((args) =>
+                String(args[0]).includes("UNCOMMITTED_INPUT_OVERWRITTEN"),
+            );
+        expect(overwritten(warn) || overwritten(error)).toBe(false);
+        warn.mockRestore();
+        error.mockRestore();
+    });
+
     it("follows a controlled value", async () => {
         const [value, setValue] = createSignal(["a"]);
         withRegistry(() => <TagsInput label="Tags" value={value()} />);
