@@ -194,7 +194,7 @@ const listInstance = (
         selected:
             view === "year"
                 ? state.value.year === picker.focusedValue.year
-                : state.selected,
+                : state.value.month === picker.focusedValue.month,
         today: isCurrentCalendarPeriod(
             view,
             state.value.year,
@@ -510,16 +510,15 @@ export function calendarParts(context: PartContext<CalendarContext>) {
                     : undefined,
             ]);
             label = state.valueText;
-            // The years list marks the year being shown (the focused one), as Material's does,
-            // not only a year holding a chosen date.
-            selection =
+            // The lists mark the year and month being shown (the focused ones), as Material's
+            // do, not only those holding a chosen date.
+            selection = (
                 view === "year"
                     ? state.value.year === picker.focusedValue.year
-                        ? "selected"
-                        : "none"
-                    : state.selected
-                      ? "selected"
-                      : "none";
+                    : state.value.month === picker.focusedValue.month
+            )
+                ? "selected"
+                : "none";
             today = isCurrentCalendarPeriod(
                 view,
                 state.value.year,
