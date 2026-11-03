@@ -273,11 +273,15 @@ export function calendarParts(use: (name: string) => CalendarContext) {
                 : api.getYearTableCellState(cell);
         });
         const selection = () => {
+            // The lists mark the year and month being shown, as Material's do.
             if (view() === "year")
                 return state().value.year === picker().focusedValue.year
                     ? "selected"
                     : "none";
-            if (view() !== "day") return state().selected ? "selected" : "none";
+            if (view() === "month")
+                return state().value.month === picker().focusedValue.month
+                    ? "selected"
+                    : "none";
             const api = picker();
             return calendarCellSelection(
                 props.value as string,
