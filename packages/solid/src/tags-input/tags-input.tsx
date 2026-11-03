@@ -211,13 +211,17 @@ function Input(props: TagsInputPartProps): JSX.Element {
     const { scope, api, inputValue } = context.use("Input");
     const rest = omit(props, "unstyled");
     // Zag adds the tag on the delimiter without taking it into its input value, which Solid
-    // binds, so the input is given that value back rather than keep the delimiter.
+    // binds, so the input is given that value back rather than keep the delimiter. The machine
+    // applies an edit in a microtask, so this waits for it: an ordinary edit already matches and
+    // is left alone, which keeps the caret in place.
     const commit = (
         event: InputEvent & { currentTarget: HTMLInputElement },
     ) => {
-        const next = inputValue();
-        if (event.currentTarget.value !== next)
-            event.currentTarget.value = next;
+        const input = event.currentTarget;
+        queueMicrotask(() => {
+            const next = inputValue();
+            if (input.value !== next) input.value = next;
+        });
     };
     return scope.render("input", {
         element: "input",
