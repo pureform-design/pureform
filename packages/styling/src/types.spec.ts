@@ -16,6 +16,7 @@ import type {
     StyleFactory,
     InstanceSpringValue,
     SpringRole,
+    TokenPath,
     TokenValue,
     Variants,
 } from "./types";
@@ -41,7 +42,19 @@ declare module "./types" {
         spatialFast: true;
         spatialSlow: true;
     }
+    interface TokenRegistry {
+        "colors.primary": "colors";
+        "components.button.container": "components";
+    }
 }
+
+describe("registered tokens", () => {
+    it("names them", () => {
+        expectTypeOf<TokenPath>().toEqualTypeOf<
+            "colors.primary" | "components.button.container"
+        >();
+    });
+});
 
 describe("registered components", () => {
     it("names them", () => {

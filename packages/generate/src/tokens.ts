@@ -102,6 +102,28 @@ const entriesOf = (parts: object): Entry[] => {
     return out;
 };
 
+/** The var refs of a config's tokens (base and themes), each with whether it is a semantic token. */
+export const tokenRefs = (
+    config: CoreConfig,
+): { ref: string; semantic: boolean }[] => {
+    const seen = new Map<string, boolean>();
+    for (const entry of [
+        ...entriesOf(config),
+        ...Object.values(config.themes ?? {}).flatMap(entriesOf),
+    ]) {
+        seen.set(
+            entry.ref,
+            (seen.get(entry.ref) ?? false) ||
+                entry.path[0] === "semanticTokens",
+        );
+    }
+    return [...seen].map(([ref, semantic]) => ({ ref, semantic }));
+};
+
+/** Whether a var ref matches a glob over var refs, as `keepTokens` writes them. */
+export const matchesRef = (glob: string, ref: string): boolean =>
+    globToRegExp(glob).test(ref);
+
 interface Found {
     paths: string[][];
     vars: string[];

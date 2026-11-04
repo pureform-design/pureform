@@ -109,10 +109,12 @@ const union = (values: readonly string[]): string =>
         : "never";
 
 /** The declarations augmenting `@pureform/styling`'s `ComponentRegistry` with each entry's
- *  shape. */
+ *  shape, its `SpringRoleRegistry` with the spring roles, and its `TokenRegistry` with the
+ *  overridable tokens. */
 export const registryDeclarations = (
     entries: readonly GeneratedEntry[],
     springRoles: readonly string[] = [],
+    tokens: readonly { ref: string; category: string }[] = [],
 ): string => {
     const components = entries.flatMap((entry) => {
         const { shape } = entry;
@@ -152,6 +154,16 @@ export const registryDeclarations = (
             ? [
                   "    interface SpringRoleRegistry {",
                   ...springRoles.map((role) => `        ${key(role)}: true;`),
+                  "    }",
+              ]
+            : []),
+        ...(tokens.length > 0
+            ? [
+                  "    interface TokenRegistry {",
+                  ...tokens.map(
+                      ({ ref, category }) =>
+                          `        ${key(ref)}: ${JSON.stringify(category)};`,
+                  ),
                   "    }",
               ]
             : []),

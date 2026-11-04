@@ -19,6 +19,7 @@ import type { GenerateOptions, GenerateResult } from "./generate";
 import { hashOf, withHeader } from "./hash";
 import type { ImportRuleOptions } from "./imports";
 import { withOutputLock } from "./output-lock";
+import type { OverridableTokens } from "./overridable";
 import { DECLARATIONS_FILE, INDEX_FILE } from "./registry-index";
 import type { Usage } from "./usage";
 import { checkVersions, findInstalled } from "./version-check";
@@ -70,6 +71,8 @@ export interface GenerateTargetsOptions<
     readonly pruned?: boolean;
     /** What the app uses, for `pruned/`. One scan serves every target. */
     readonly usage?: Usage;
+    /** See `GenerateOptions.overridableTokens`. */
+    readonly overridableTokens?: OverridableTokens;
     /** Compare instead of writing. */
     readonly check?: boolean;
     /** See `GenerateOptions.versionCheck`. Default `true`. */
@@ -277,6 +280,9 @@ const generateTargetsUnlocked = async <Options = Record<string, unknown>>(
             outDir: join(outDir, name, kind),
             versionCheck: false,
             declarations: false,
+            ...(options.overridableTokens && {
+                overridableTokens: options.overridableTokens,
+            }),
             ...(kind === "pruned" &&
                 options.usage !== undefined && { usage: options.usage }),
             ...(options.check && { check: true }),

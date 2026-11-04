@@ -21,6 +21,8 @@ import { hashOf, withHeader } from "./hash";
 import type { ImportRuleOptions } from "./imports";
 import { isAdapter, loadAdapter } from "./load-adapter";
 import { withOutputLock } from "./output-lock";
+import { overridableTokens } from "./overridable";
+import type { OverridableTokens } from "./overridable";
 import { VERSION } from "./package-version";
 import {
     DECLARATIONS_FILE,
@@ -63,6 +65,9 @@ export interface GenerateOptions<Options = Record<string, unknown>> {
     /** What the app uses (the bundler plugin's pruning): the generated registry keeps only the
      *  components it names, within the allow-list, and adapters narrow styles to its variants. */
     readonly usage?: Usage;
+    /** Which tokens a provider's `overrides` completes, as globs over var refs. Default the
+     *  semantic tokens and the components' (`components.*`). Part of the hash. */
+    readonly overridableTokens?: OverridableTokens;
     /** The app's root. Default: the working directory. */
     readonly root?: string;
     /** The folder to write, relative to `root`. Default `.pureform`. */
@@ -386,6 +391,9 @@ const generateUnlocked = async <Options = Record<string, unknown>>(
         // Only when it narrows anything, so an unpruned registry keeps its hash.
         ...(Object.keys(variants).length > 0 && { variants }),
         ...(pruning && { pruning }),
+        ...(options.overridableTokens && {
+            overridableTokens: options.overridableTokens,
+        }),
         versions: Object.fromEntries(
             installed.map((entry) => [entry.name, entry.version]),
         ),
@@ -481,15 +489,31 @@ const generateUnlocked = async <Options = Record<string, unknown>>(
             output.vars,
         ),
     );
+    // The tokens the stylesheet keeps, so the types never name one it dropped.
+    const overridable = overridableTokens(
+        pruning && adapter.name === "css"
+            ? narrowConfig(config, components, variants, pruning)
+            : config,
+        Object.fromEntries(entries.map((e) => [e.name, e.shape.tokens])),
+        options.overridableTokens,
+    );
+    const hints: string[] = [];
+    if (overridable.length === 0 && options.overridableTokens) {
+        hints.push(
+            "pureform: overridableTokens selects no token, so provider overrides don't complete.",
+        );
+    }
     declarations = registryDeclarations(
         entries,
         Object.keys(config.springs ?? {}),
+        overridable,
     );
     if (writeDeclarations) add(DECLARATIONS_FILE, declarations);
 
     const hint = writeDeclarations ? tsconfigHint(root, outDir) : undefined;
+    if (hint) hints.push(hint);
     const files = options.check
         ? await compareFiles(outDir, planned, hash)
         : await writeFiles(outDir, planned);
-    return result(files, hint ? [hint] : []);
+    return result(files, hints);
 };

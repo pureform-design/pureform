@@ -6,7 +6,7 @@ import type {
     MergePartProps,
 } from "@pureform/binding-core";
 import { resolveProvider, ROOT_PROVIDER } from "@pureform/binding-core";
-import type { TokenValue } from "@pureform/styling";
+import type { TokenPath, TokenValue } from "@pureform/styling";
 import type { AnyRuntimeTheme, AnyWebRegistry } from "@pureform/styling-web";
 import { isRuntimeTheme, themeScope } from "@pureform/styling-web";
 import { MOTION_ATTRIBUTE } from "@pureform/web-contracts";
@@ -19,9 +19,13 @@ export type ThemeName = string;
 export type ProviderTheme = ThemeName | AnyRuntimeTheme;
 
 /** Token values set for everything under the provider, by token path:
- *  `{ "colors.primary": "#006a60", "components.button.container": "…" }`. A key that's already a
- *  CSS var (`--brand`) is written as is. */
-export type ThemeOverrides = Readonly<Record<string, TokenValue | undefined>>;
+ *  `{ "colors.primary": "#006a60", "components.button.container": "…" }`. The generated
+ *  `TokenRegistry` makes the config's overridable tokens complete and checks their values. Any
+ *  other key is accepted but doesn't complete: a key that's already a CSS var (`--brand`) is
+ *  written as is. */
+export type ThemeOverrides = {
+    readonly [P in TokenPath]?: TokenValue | undefined;
+} & Readonly<Record<string, TokenValue | undefined>>;
 
 /** How the client gets a server-rendered runtime theme: keep the server's block, or generate it
  *  again while hydrating. */
