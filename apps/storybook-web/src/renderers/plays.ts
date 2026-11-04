@@ -59,10 +59,17 @@ export const keyPlay =
     ): Play =>
     async ({ args, canvasElement, globals }) => {
         const host = await mounted(c, canvasElement);
-        c.keyboard!.focusable(host).focus();
+        const { focusable, focused } = c.keyboard!;
+        const element = focusable(host);
+        // A component that opens on focus does so for the keyboard only: a key press first, as
+        // the case's own focus does, so a pointer from an earlier story doesn't leave it closed.
+        if (focused !== undefined) {
+            element.blur();
+            await userEvent.keyboard("a");
+        }
+        element.focus();
         // Focus can open it a moment later (a tooltip), and a key pressed first would find it
         // closed. React Native doesn't open on a programmatic focus, so it gets only a short wait.
-        const { focused } = c.keyboard!;
         if (focused !== undefined) {
             const native = globals["renderer"] === "native";
             const opened = waitFor(
