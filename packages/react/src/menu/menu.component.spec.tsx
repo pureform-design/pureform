@@ -577,6 +577,16 @@ describe("Menu, submenus", () => {
         await interact(() => userEvent.click(byTestId(ids.trigger)));
         await frames();
         const content = () => contents()[0]!;
+        // A user event can take seconds on a loaded machine, longer than a drill step's motion, so
+        // each animation holds where it starts until the test is done looking.
+        const animate = Element.prototype.animate;
+        const holding = vi
+            .spyOn(Element.prototype, "animate")
+            .mockImplementation(function (this: Element, ...args) {
+                const animation = animate.apply(this, args);
+                animation.pause();
+                return animation;
+            });
         const moving = () =>
             content()
                 .getAnimations({ subtree: true })
@@ -600,6 +610,7 @@ describe("Menu, submenus", () => {
             `[data-testid="${ids.itemLabel}"]`,
         )!;
         expect(share.getAnimations()).toHaveLength(1);
+        holding.mockRestore();
     });
 
     // The submenu as it opens: its content shown, or drilled into (the rows read the submenu's).
