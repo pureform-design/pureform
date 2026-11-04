@@ -60,6 +60,13 @@ export const keyPlay =
     async ({ args, canvasElement }) => {
         const host = await mounted(c, canvasElement);
         c.keyboard!.focusable(host).focus();
+        // Focus can open it a moment later (a tooltip), and a key pressed first would find it
+        // closed. A renderer that doesn't open on focus gets only this short wait.
+        const { focused } = c.keyboard!;
+        if (focused !== undefined)
+            await waitFor(() => expect(c.state!.read(host)).toEqual(focused), {
+                timeout: 500,
+            }).catch(() => undefined);
         await userEvent.keyboard(key.key);
         const clicks = args["onClick"] === undefined ? undefined : onClick;
         if (key.does === "click") {
