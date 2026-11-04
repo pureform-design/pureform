@@ -55,6 +55,17 @@ export interface ComponentRegistry {}
  *  `springs`. */
 export interface SpringRoleRegistry {}
 
+/** The tokens a provider may override, by var ref (`"colors.primary"`,
+ *  `"components.button.container"`), each valued by its category. Generated declarations augment
+ *  it from the config and its `overridableTokens`. */
+export interface TokenRegistry {}
+
+/** An overridable token's path, or any string while none is registered. */
+export type TokenPath = [keyof TokenRegistry] extends [never]
+    ? string
+    : // oxlint-disable-next-line typescript/no-redundant-type-constituents -- `& string` drops the number and symbol keys `keyof` may add; redundant only while a registry is augmented
+      keyof TokenRegistry & string;
+
 /** A spring role's name, such as `"spatialSlow"`, or any string while none is registered. */
 export type SpringRole = [keyof SpringRoleRegistry] extends [never]
     ? string

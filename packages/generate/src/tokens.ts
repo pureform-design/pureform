@@ -1,6 +1,7 @@
 // Token and theme pruning for `narrowConfig`: drops the named themes an app doesn't select, and
 // the tokens nothing a build keeps can reach. It errs toward keeping, as keyframe pruning does.
 
+import { isSpringToken, tokenValue } from "@pureform/core";
 import type { CoreConfig, ThemeOverride } from "@pureform/core/types";
 
 /** What a pruned build may drop besides components and variant values. */
@@ -101,6 +102,41 @@ const entriesOf = (parts: object): Entry[] => {
     }
     return out;
 };
+
+/** The var refs of a config's tokens (base and themes), each with whether it is a semantic token.
+ *  Springs, and tokens holding one, are left out: they lower to suffixed vars
+ *  (`--springs-fast-duration`). */
+export const tokenRefs = (
+    config: CoreConfig,
+): { ref: string; semantic: boolean }[] => {
+    const seen = new Map<string, boolean>();
+    for (const entry of [
+        ...entriesOf(config),
+        ...Object.values(config.themes ?? {}).flatMap(entriesOf),
+    ]) {
+        if (
+            entry.path[0] === "springs" ||
+            isSpringToken(
+                tokenValue(entry.value as never) as Parameters<
+                    typeof isSpringToken
+                >[0],
+                { config },
+            )
+        ) {
+            continue;
+        }
+        seen.set(
+            entry.ref,
+            (seen.get(entry.ref) ?? false) ||
+                entry.path[0] === "semanticTokens",
+        );
+    }
+    return [...seen].map(([ref, semantic]) => ({ ref, semantic }));
+};
+
+/** Whether a var ref matches a glob over var refs, as `keepTokens` writes them. */
+export const matchesRef = (glob: string, ref: string): boolean =>
+    globToRegExp(glob).test(ref);
 
 interface Found {
     paths: string[][];

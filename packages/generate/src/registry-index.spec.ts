@@ -29,4 +29,19 @@ describe("registryDeclarations", () => {
             "    interface SpringRoleRegistry {\n        spatialFast: true;\n        spatialSlow: true;\n    }\n",
         );
     });
+
+    it("declares the overridable tokens, and nothing without any", () => {
+        const text = registryDeclarations(
+            [],
+            [],
+            [
+                { ref: "colors.primary", category: "colors" },
+                { ref: "components.button.container", category: "components" },
+            ],
+        );
+        expect(text).toContain(
+            '    interface TokenRegistry {\n        "colors.primary": "colors";\n        "components.button.container": "components";\n    }\n',
+        );
+        expect(registryDeclarations([], [])).not.toContain("TokenRegistry");
+    });
 });

@@ -281,12 +281,42 @@ describe("generate", () => {
                 '            slots: "root";',
                 "        };",
                 "    }",
+                "    interface TokenRegistry {",
+                '        "components.button.gap": "components";',
+                '        "components.button.radius": "components";',
+                "    }",
                 "}",
                 "",
                 "export {};",
                 "",
             ].join("\n"),
         );
+    });
+
+    it("narrows the declared tokens by overridableTokens", async () => {
+        const root = tempRoot();
+        const result = await generate({
+            root,
+            config: fixtureConfig(),
+            target: fakeAdapter(),
+            overridableTokens: {
+                include: ["components.*"],
+                exclude: ["*.gap"],
+            },
+        });
+        expect(result.declarations).toContain('"components.button.radius"');
+        expect(result.declarations).not.toContain("components.button.gap");
+    });
+
+    it("hints when overridableTokens selects nothing", async () => {
+        const result = await generate({
+            root: tempRoot(),
+            config: fixtureConfig(),
+            target: fakeAdapter(),
+            overridableTokens: { include: ["nothing.*"] },
+        });
+        expect(result.declarations).not.toContain("TokenRegistry");
+        expect(result.hints.join("\n")).toContain("overridableTokens");
     });
 
     it("writes lazy entries, states, and other export names as asked", async () => {

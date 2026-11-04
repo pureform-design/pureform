@@ -30,6 +30,7 @@ export type {
     TargetResult,
 } from "./targets";
 export type { GenerateOptions, GenerateResult } from "./generate";
+export type { OverridableTokens } from "./overridable";
 export {
     DECLARATIONS_FILE,
     INDEX_FILE,
