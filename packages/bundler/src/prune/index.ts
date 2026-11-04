@@ -93,6 +93,21 @@ export const findUsage = (
     };
 };
 
+// What token pruning dropped, as a clause to append, or nothing when it dropped none.
+const dropped = ({ tokenPruning }: GenerateResult): string => {
+    if (!tokenPruning) return "";
+    const { tokens, themes } = tokenPruning;
+    const parts = [
+        ...(tokens.kept < tokens.total
+            ? [`${tokens.kept} of ${tokens.total} tokens`]
+            : []),
+        ...(themes.kept < themes.total
+            ? [`${themes.kept} of ${themes.total} themes`]
+            : []),
+    ];
+    return parts.length > 0 ? `; kept ${parts.join(", ")}` : "";
+};
+
 /** One line saying what a pruned build kept. */
 export const describePruning = (result: GenerateResult): string => {
     const names = result.components;
@@ -100,5 +115,5 @@ export const describePruning = (result: GenerateResult): string => {
         names.length <= 8
             ? names.join(", ")
             : `${names.slice(0, 8).join(", ")}, …`;
-    return `pureform: pruned the generated registry to the ${names.length} component${names.length === 1 ? "" : "s"} the app uses${names.length > 0 ? ` (${shown})` : ""}, and the variant values it selects`;
+    return `pureform: pruned the generated registry to the ${names.length} component${names.length === 1 ? "" : "s"} the app uses${names.length > 0 ? ` (${shown})` : ""}, and the variant values it selects${dropped(result)}`;
 };

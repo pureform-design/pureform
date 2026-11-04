@@ -151,4 +151,7 @@ button-only stylesheet is 8.1 KB gzipped (-39%); button + menu + textField 17.7 
 - Known limit: `usesColorScheme` reads the semantic tokens, so a build that prunes every
   scheme-conditional semantic token also drops the root `color-scheme`. A kept component that
   uses a conditional color keeps it.
-- Not done: the "pruned N tokens (X KB)" log line.
+- Report: `GenerateResult.tokenPruning` has token entries and named themes, kept of total, for
+  the CSS adapter only (it computes them by running `narrowConfig` again, which is cheap). The
+  plugin's pruning line appends it: `; kept 312 of 843 tokens, 2 of 4 themes`, naming only what
+  was dropped. Counts only, not bytes: the stylesheet is built inside the adapter.

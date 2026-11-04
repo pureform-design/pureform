@@ -75,6 +75,7 @@ export type {
     VersionProblem,
 } from "./version-check";
 export {
+    countTokens,
     keepsValue,
     narrowConfig,
     normalizeVariants,

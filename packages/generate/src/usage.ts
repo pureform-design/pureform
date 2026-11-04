@@ -5,10 +5,11 @@
 import type { AnyComponentSpec, CoreConfig } from "@pureform/core/types";
 
 import type { ComponentShape } from "./adapter";
-import { pruneConfigTokens } from "./tokens";
+import { countTokens, pruneConfigTokens } from "./tokens";
 import type { TokenPruning } from "./tokens";
 
 export type { TokenPruning } from "./tokens";
+export { countTokens } from "./tokens";
 
 /** Variant values in use, by component and group: `{ button: { variant: ["filled"] } }`. A
  *  component or a group left out keeps every value, and so does a group listed as `["*"]`. A
