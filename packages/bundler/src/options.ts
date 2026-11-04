@@ -81,7 +81,7 @@ export interface PruneOptions {
      *  the others are left out of the stylesheet. Default: every theme. */
     readonly themes?: readonly string[];
     /** Drop the tokens nothing the kept components reach: `"safe"`, or `"off"` (default). Custom
-     *  properties the app's own scripts, styles, and markup read are kept, and runtime themes
+     *  properties the app's own scripts, styles, and markup read (styles and markup anywhere under the root) are kept, and runtime themes
      *  (`runtime-theme`) turn it off, since their tokens can't be seen at build time. */
     readonly tokens?: "off" | "safe";
     /** Tokens to keep with `tokens: "safe"`: globs such as `colors.*` or

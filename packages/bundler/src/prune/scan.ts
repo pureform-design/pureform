@@ -934,9 +934,8 @@ export const scanTokenUse = (
         );
     const files = new Set(scripts);
     const others: string[] = [];
-    for (const start of options.include ?? ["."]) {
-        listScripts(resolve(root, start), skip, others, STYLE_OR_MARKUP);
-    }
+    // Styles and markup can sit outside the script `include`, such as a root `index.html`.
+    listScripts(root, skip, others, STYLE_OR_MARKUP);
     for (const file of others) files.add(file);
     const vars = new Set<string>();
     let runtimeTheme = false;

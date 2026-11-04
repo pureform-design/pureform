@@ -378,6 +378,16 @@ describe("scanTokenUse", () => {
         expect(found.runtimeTheme).toBe(false);
     });
 
+    it("reads styles and markup outside the script include", () => {
+        const root = app({
+            "src/app.ts": `export {};`,
+            "index.html": `<div style="color: var(--colors-brand)"></div>`,
+        });
+        const outDir = join(root, ".pureform");
+        const found = scanTokenUse({ root, outDir, include: ["src"] }, []);
+        expect(found.vars).toContain("colors-brand");
+    });
+
     it("sees an app that uses runtime themes", () => {
         expect(
             use({
