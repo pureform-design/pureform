@@ -74,8 +74,13 @@ export type {
     VersionCheck,
     VersionProblem,
 } from "./version-check";
-export { keepsValue, narrowConfig, normalizeVariants } from "./usage";
-export type { Usage, VariantUsage } from "./usage";
+export {
+    keepsValue,
+    narrowConfig,
+    normalizeVariants,
+    tokenPruning,
+} from "./usage";
+export type { TokenPruning, Usage, VariantUsage } from "./usage";
 export { watchGenerate } from "./watch";
 export type { GenerateWatcher, WatchGenerateOptions } from "./watch";
 export type { FileResult, FileStatus } from "./write";

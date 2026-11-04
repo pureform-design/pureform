@@ -1,6 +1,6 @@
 # Design: token, theme and @property pruning (F2)
 
-Status: proposal, no code yet. From `docs/todo-later.md` (Deferred designs). Facts about the current
+Status: implemented (see "As built"). From `docs/todo-later.md` (Deferred designs). Facts about the current
 code are cited by file.
 
 ## Where it stands
@@ -43,18 +43,18 @@ toward keeping").
 
 1. **Roots** (always kept): every token referenced by a kept component's styles/tokens
    (alias walk, through `conditional`, `dynamic.default`, arrays and `inlineStyles`), every token a
-   kept theme override *sets*, all `fonts`/`durations`/`easings`/`springs` roles reachable from
+   kept theme override _sets_, all `fonts`/`durations`/`easings`/`springs` roles reachable from
    kept components, plus anything on a user `keep` list.
 2. **Closure:** follow token-to-token aliases until a fixed point.
 3. **Prune** unreachable tokens in `tokens`, `semanticTokens`, `fonts`, `durations`, `easings`,
    `zIndices`, `springs`. Springs prune as a role (all of its vars together).
 4. **Themes:** keep a named theme if the app might select it. A theme is selected by an attribute
    value, so it can't be known statically. Default keep; prune a theme only when a `themes: [...]`
-   list (usage input) says which are used, and always drop the *tokens inside* a kept theme that
+   list (usage input) says which are used, and always drop the _tokens inside_ a kept theme that
    nothing reaches.
 5. **@property:** emit a registration only for a token whose var is reachable (it already follows
    kept components; add the same reachability filter for tokens kept only by a `keep` list).
-6. **Runtime themes** (`themeScope`) are generated at runtime from the *source config*, not the
+6. **Runtime themes** (`themeScope`) are generated at runtime from the _source config_, not the
    pruned stylesheet, so they can reference a pruned token. This is the main risk: either
    runtime-theme sources register the tokens they set as roots, or any app using
    `runtime-theme` turns token pruning off. Proposal: the latter first (safe, and explicit
@@ -120,3 +120,35 @@ toward keeping").
 1. Measure token/theme/`@property` bytes on a fixture; build the "no dangling var" test first.
 2. Tier A.
 3. Tier B, if the measurement passes the gate.
+
+## Measurement
+
+`compileCss(narrowConfig(pureform(), ["button"]))`: 13.2 KB gzipped, of which the `:root` token vars
+are 9.0 KB (843 vars). The default preset has no named themes and 4 `@property` registrations, so
+Tier A saves little here; Tier B is where the bytes are. The gate passed. With `pruneTokens`, the
+button-only stylesheet is 8.1 KB gzipped (-39%); button + menu + textField 17.7 KB to 12.8 KB.
+
+## As built
+
+- `generate/src/tokens.ts`: `pruneConfigTokens`, called last by `narrowConfig(config, components,
+  variants, pruning)`. `Usage` gains `themes`, `pruneTokens`, `keepTokens`, `appVars`; the codegen
+  context carries them as `pruning`, and they're part of the output hash.
+- Roots are the narrowed config outside the token tiers (components, keyframes, utilities,
+  `componentBaseStyles`, theme component overrides). The closure follows aliases through tokens
+  and text styles, and any `var(--name)` in the config or in `appVars` (matched as text, so it errs
+  toward keeping).
+- Unreached **text styles are pruned too**: `validateConfig` walks them, and a text style
+  aliasing a pruned token would fail the build. A style is kept when a reached node aliases it.
+- **Springs always stay** (an instance names a spring role at runtime), as does any scale of a
+  scale-bound utility.
+- **The `@property` filter is a no-op**: registrations are component tokens, not tier tokens, and
+  left-out components' are already gone. Nothing to add.
+- Only the CSS adapter applies it. Tailwind (class names in markup reach tokens) and native (theme
+  values are read at runtime) don't.
+- Plugin: `prune.tokens: "safe" | "off"` (default `"off"`), `prune.themes`, `prune.keepTokens`.
+  `"safe"` also scans the app's scripts, styles and markup for `--name` references (`appVars`), and
+  turns itself off, with a warning, when a file uses `runtime-theme` or can't be read.
+- Known limit: `usesColorScheme` reads the semantic tokens, so a build that prunes every
+  scheme-conditional semantic token also drops the root `color-scheme`. A kept component that
+  uses a conditional color keeps it.
+- Not done: the "pruned N tokens (X KB)" log line.

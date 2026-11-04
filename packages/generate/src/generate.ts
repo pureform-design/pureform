@@ -31,7 +31,7 @@ import {
 } from "./registry-index";
 import type { GeneratedEntry } from "./registry-index";
 import { componentShape } from "./shape";
-import { normalizeVariants } from "./usage";
+import { normalizeVariants, tokenPruning } from "./usage";
 import type { Usage } from "./usage";
 import { checkVersions, findInstalled } from "./version-check";
 import { compareFiles, readGenerated, writeFiles } from "./write";
@@ -349,6 +349,7 @@ const generateUnlocked = async <Options = Record<string, unknown>>(
         return found;
     };
     const variants = normalizeVariants(usage?.variants, components, shape);
+    const pruning = tokenPruning(usage);
 
     const hash = hashOf({
         format: OUTPUT_FORMAT,
@@ -359,6 +360,7 @@ const generateUnlocked = async <Options = Record<string, unknown>>(
         lazy: [...lazy],
         // Only when it narrows anything, so an unpruned registry keeps its hash.
         ...(Object.keys(variants).length > 0 && { variants }),
+        ...(pruning && { pruning }),
         versions: Object.fromEntries(
             installed.map((entry) => [entry.name, entry.version]),
         ),
@@ -413,6 +415,7 @@ const generateUnlocked = async <Options = Record<string, unknown>>(
         config,
         components,
         variants,
+        ...(pruning && { pruning }),
         options: adapterOptions,
         root,
         outDir,

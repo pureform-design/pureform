@@ -5,6 +5,10 @@
 import type { AnyComponentSpec, CoreConfig } from "@pureform/core/types";
 
 import type { ComponentShape } from "./adapter";
+import { pruneConfigTokens } from "./tokens";
+import type { TokenPruning } from "./tokens";
+
+export type { TokenPruning } from "./tokens";
 
 /** Variant values in use, by component and group: `{ button: { variant: ["filled"] } }`. A
  *  component or a group left out keeps every value, and so does a group listed as `["*"]`. A
@@ -21,7 +25,33 @@ export interface Usage {
     readonly components: readonly string[];
     /** The variant values it selects. A component or group left out keeps every value. */
     readonly variants?: VariantUsage;
+    /** The named themes the app selects. The others are left out of the stylesheet. Absent keeps
+     *  every theme. */
+    readonly themes?: TokenPruning["themes"];
+    /** Drop the tokens nothing the kept components reach. Off by default. */
+    readonly pruneTokens?: TokenPruning["pruneTokens"];
+    /** Tokens to keep whatever is reached: globs such as `colors.*`. */
+    readonly keepTokens?: TokenPruning["keepTokens"];
+    /** Custom properties the app's own code reads, which keep their tokens. */
+    readonly appVars?: TokenPruning["appVars"];
 }
+
+/** What a usage asks adapters to prune besides components and variants, or `undefined` when it
+ *  asks for nothing. */
+export const tokenPruning = (
+    usage: Usage | undefined,
+): TokenPruning | undefined => {
+    if (!usage) return undefined;
+    const { themes, pruneTokens, keepTokens, appVars } = usage;
+    if (!themes && !pruneTokens) return undefined;
+    return {
+        ...(themes && { themes: [...themes].sort() }),
+        ...(pruneTokens && { pruneTokens }),
+        ...(pruneTokens &&
+            keepTokens && { keepTokens: [...keepTokens].sort() }),
+        ...(pruneTokens && appVars && { appVars: [...appVars].sort() }),
+    };
+};
 
 /** The variant usage `generate` hands adapters: only the given components, only groups and values
  *  the shapes have, each group with its default and in the config's order, and no group that
@@ -161,11 +191,14 @@ const keptKeyframes = (
  *  left out lose their styles, and so do the compound variants that match them. Tokens, themes,
  *  and everything else stay. For adapters that compile styles from the config (stylesheets,
  *  precomputed tables). Keyframes go that name a left-out component's tokens, or that only left-out
- *  components or unselected variant values used; one nothing in the config names stays. The factory modules keep reading the whole config. */
+ *  components or unselected variant values used; one nothing in the config names stays. Given
+ *  `pruning`, named themes the app doesn't select and tokens nothing reaches go too (see
+ *  `TokenPruning`). The factory modules keep reading the whole config. */
 export const narrowConfig = (
     config: CoreConfig,
     components: readonly string[],
     variants: VariantUsage = {},
+    pruning: TokenPruning = {},
 ): CoreConfig => {
     const narrowed: CoreConfig = {
         ...config,
@@ -176,7 +209,7 @@ export const narrowConfig = (
             ]),
         ),
     };
-    if (!config.keyframes) return narrowed;
+    if (!config.keyframes) return pruneConfigTokens(narrowed, pruning);
     // Keyframes that name a left-out component's tokens go too.
     const named = Object.fromEntries(
         Object.entries(config.keyframes).filter(
@@ -187,5 +220,5 @@ export const narrowConfig = (
         { ...config, keyframes: named },
         { ...narrowed, keyframes: named },
     );
-    return { ...narrowed, keyframes: pruned! };
+    return pruneConfigTokens({ ...narrowed, keyframes: pruned! }, pruning);
 };

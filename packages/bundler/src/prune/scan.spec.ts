@@ -4,7 +4,7 @@ import { dirname, join } from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-import { scanUsage } from "./scan";
+import { scanTokenUse, scanUsage } from "./scan";
 
 const app = (files: Record<string, string>): string => {
     const root = mkdtempSync(join(tmpdir(), "pureform-scan-"));
@@ -350,5 +350,39 @@ describe("scanUsage", () => {
         const result = scan({ "src/app.tsx": source });
         expect(result.usage).toBeUndefined();
         expect(result.warnings.join("\n")).toContain(warning);
+    });
+});
+
+describe("scanTokenUse", () => {
+    const use = (files: Record<string, string>) => {
+        const root = app(files);
+        const outDir = join(root, ".pureform");
+        return scanTokenUse({ root, outDir }, [
+            ...scanUsage({ root, outDir }).files,
+        ]);
+    };
+
+    it("reads the custom properties scripts, styles, and markup use", () => {
+        const found = use({
+            "src/app.tsx": `export const a = { color: "var(--colors-brand)" };`,
+            "src/app.css": `.x { margin: var(--spacing-4); --local: 1; }`,
+            "index.html": `<div class="bg-[--colors-surface]"></div>`,
+        });
+        expect(found.vars).toEqual(
+            expect.arrayContaining([
+                "colors-brand",
+                "spacing-4",
+                "colors-surface",
+            ]),
+        );
+        expect(found.runtimeTheme).toBe(false);
+    });
+
+    it("sees an app that uses runtime themes", () => {
+        expect(
+            use({
+                "src/app.ts": `import { themeScope } from "@pureform/styling-web";`,
+            }).runtimeTheme,
+        ).toBe(true);
     });
 });

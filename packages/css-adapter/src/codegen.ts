@@ -8,6 +8,7 @@ import { defineCodegen, narrowConfig } from "@pureform/generate";
 import type {
     CodegenContext,
     ComponentModule,
+    TokenPruning,
     VariantUsage,
 } from "@pureform/generate";
 
@@ -28,12 +29,14 @@ export type CssCodegenOptions = CssOptions;
 export const STYLESHEET_FILE = "styles.css";
 
 /** The config with only the given components, in that order, each narrowed to the variant
- *  values a pruned build uses (`narrowConfig` from `@pureform/generate`). */
+ *  values a pruned build uses, and the themes and tokens it leaves out (`narrowConfig` from
+ *  `@pureform/generate`). */
 export const subsetConfig = (
     config: CoreConfig,
     components: readonly string[],
     variants?: VariantUsage,
-): CoreConfig => narrowConfig(config, components, variants);
+    pruning?: TokenPruning,
+): CoreConfig => narrowConfig(config, components, variants, pruning);
 
 /** `web/<name>.ts` for each of the context's components: its `ClassFactory`, classed as the
  *  stylesheet names them. Other web adapters over this stylesheet reuse it. */
@@ -74,6 +77,7 @@ export const codegen = defineCodegen<CssCodegenOptions>({
                         context.config,
                         context.components,
                         context.variants,
+                        context.pruning,
                     ),
                     context.options,
                 ),

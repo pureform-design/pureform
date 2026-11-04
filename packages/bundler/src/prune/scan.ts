@@ -833,6 +833,7 @@ const listScripts = (
     path: string,
     skip: (path: string) => boolean,
     out: string[],
+    pattern: RegExp = SCRIPT,
 ): void => {
     let stats;
     try {
@@ -841,7 +842,7 @@ const listScripts = (
         return;
     }
     if (stats.isFile()) {
-        if (SCRIPT.test(path) && !TEST.test(path) && !path.endsWith(".d.ts")) {
+        if (pattern.test(path) && !TEST.test(path) && !path.endsWith(".d.ts")) {
             out.push(path);
         }
         return;
@@ -850,7 +851,7 @@ const listScripts = (
     for (const name of readdirSync(path).sort()) {
         const child = join(path, name);
         if (name.startsWith(".") || SKIPPED.has(name) || skip(child)) continue;
-        listScripts(child, skip, out);
+        listScripts(child, skip, out, pattern);
     }
 };
 
@@ -900,4 +901,58 @@ export const scanUsage = (options: ScanOptions): ScanResult => {
         };
     }
     return { usage: collector.usage(), warnings: [], files };
+};
+
+const STYLE_OR_MARKUP = /\.(?:css|scss|sass|less|html|vue|svelte|astro|mdx?)$/;
+const RUNTIME_THEME = /runtime-theme|themeScope\b|defineRuntimeTheme\b/;
+
+/** What the app's own files say about tokens, for pruning them: the custom properties they
+ *  read (`var(--colors-brand)`, or `--colors-brand` in a Tailwind arbitrary value), and whether
+ *  they use runtime themes, whose tokens a build can't see. */
+export interface TokenUse {
+    /** Custom property names without the `--`. */
+    readonly vars: readonly string[];
+    /** Whether a file uses runtime themes. */
+    readonly runtimeTheme: boolean;
+    /** A file the scan couldn't read, which keeps every token. */
+    readonly unreadable: string | undefined;
+}
+
+/** Reads the app's scripts, styles, and markup for the custom properties they use. */
+export const scanTokenUse = (
+    options: Pick<ScanOptions, "root" | "include" | "exclude" | "outDir">,
+    scripts: readonly string[],
+): TokenUse => {
+    const root = resolve(options.root);
+    const excluded = [
+        resolve(options.outDir),
+        ...(options.exclude ?? []).map((path) => resolve(root, path)),
+    ];
+    const skip = (path: string) =>
+        excluded.some(
+            (folder) => path === folder || path.startsWith(folder + sep),
+        );
+    const files = new Set(scripts);
+    const others: string[] = [];
+    for (const start of options.include ?? ["."]) {
+        listScripts(resolve(root, start), skip, others, STYLE_OR_MARKUP);
+    }
+    for (const file of others) files.add(file);
+    const vars = new Set<string>();
+    let runtimeTheme = false;
+    let unreadable: string | undefined;
+    for (const file of files) {
+        let source: string;
+        try {
+            source = readFileSync(file, "utf8");
+        } catch {
+            unreadable ??= file;
+            continue;
+        }
+        if (RUNTIME_THEME.test(source)) runtimeTheme = true;
+        for (const match of source.matchAll(/--([A-Za-z][\w-]*)/g)) {
+            vars.add(match[1]!);
+        }
+    }
+    return { vars: [...vars].sort(), runtimeTheme, unreadable };
 };
