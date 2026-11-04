@@ -57,16 +57,21 @@ export const keyPlay =
         key: KeyCase,
         onClick: Parameters<typeof expect>[0],
     ): Play =>
-    async ({ args, canvasElement }) => {
+    async ({ args, canvasElement, globals }) => {
         const host = await mounted(c, canvasElement);
         c.keyboard!.focusable(host).focus();
         // Focus can open it a moment later (a tooltip), and a key pressed first would find it
-        // closed. A renderer that doesn't open on focus gets only this short wait.
+        // closed. React Native doesn't open on a programmatic focus, so it gets only a short wait.
         const { focused } = c.keyboard!;
-        if (focused !== undefined)
-            await waitFor(() => expect(c.state!.read(host)).toEqual(focused), {
-                timeout: 500,
-            }).catch(() => undefined);
+        if (focused !== undefined) {
+            const native = globals["renderer"] === "native";
+            const opened = waitFor(
+                () => expect(c.state!.read(host)).toEqual(focused),
+                { timeout: native ? 500 : 3000 },
+            );
+            if (native) await opened.catch(() => undefined);
+            else await opened;
+        }
         await userEvent.keyboard(key.key);
         const clicks = args["onClick"] === undefined ? undefined : onClick;
         if (key.does === "click") {
