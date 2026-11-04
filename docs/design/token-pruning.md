@@ -147,7 +147,7 @@ button-only stylesheet is 8.1 KB gzipped (-39%); button + menu + textField 17.7 
   values are read at runtime) don't.
 - Plugin: `prune.tokens: "safe" | "off"` (default `"off"`), `prune.themes`, `prune.keepTokens`.
   `"safe"` also scans the app's scripts, styles and markup for `--name` references (`appVars`), and
-  turns itself off, with a warning, when a file uses `runtime-theme` or can't be read.
+  turns itself off, with a warning, when a file uses `runtime-theme`, builds custom property names at runtime (`` `--${name}` ``), or can't be read.
 - Known limit: `usesColorScheme` reads the semantic tokens, so a build that prunes every
   scheme-conditional semantic token also drops the root `color-scheme`. A kept component that
   uses a conditional color keeps it.

@@ -72,6 +72,10 @@ export const findUsage = (
             warnings.push(
                 `pureform: token pruning is off, since ${use.unreadable} couldn't be read.`,
             );
+        } else if (use.dynamic) {
+            warnings.push(
+                "pureform: token pruning is off, since the app reads custom properties by names it builds at runtime, which the scan can't identify.",
+            );
         } else {
             tokens = {
                 pruneTokens: true,

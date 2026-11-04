@@ -303,10 +303,15 @@ export const pruneConfigTokens = (
     } as CoreConfig;
 };
 
-/** How many token entries and named themes a config has, to report what pruning dropped. */
+/** How many token entries (base and in themes) and named themes a config has, to report what pruning dropped. */
 export const countTokens = (
     config: CoreConfig,
 ): { tokens: number; themes: number } => ({
-    tokens: entriesOf(config).length,
+    tokens:
+        entriesOf(config).length +
+        Object.values(config.themes ?? {}).reduce(
+            (sum, theme) => sum + entriesOf(theme).length,
+            0,
+        ),
     themes: Object.keys(config.themes ?? {}).length,
 });

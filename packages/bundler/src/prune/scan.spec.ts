@@ -435,6 +435,19 @@ describe("scanTokenUse", () => {
         }
     });
 
+    it("flags custom properties built at runtime", () => {
+        for (const source of [
+            "el.style.getPropertyValue(`--${name}`)",
+            "el.style.getPropertyValue(`--spacing-${name}`)",
+            `getComputedStyle(el).getPropertyValue("--" + name)`,
+        ]) {
+            expect(use({ "src/a.ts": source }).dynamic, source).toBe(true);
+        }
+        expect(
+            use({ "src/a.ts": `const x = "var(--colors-a)";` }).dynamic,
+        ).toBe(false);
+    });
+
     it("sees an app that uses runtime themes", () => {
         expect(
             use({

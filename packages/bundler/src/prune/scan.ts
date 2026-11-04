@@ -915,6 +915,8 @@ export const scanUsage = (options: ScanOptions): ScanResult => {
 
 const STYLE_OR_MARKUP = /\.(?:css|scss|sass|less|html|vue|svelte|astro|mdx?)$/;
 const RUNTIME_THEME = /runtime-theme|themeScope\b|defineRuntimeTheme\b/;
+// A custom property name built at runtime: `--${name}`, `--spacing-${name}`, or `"--" + name`.
+const DYNAMIC_CUSTOM_PROPERTY = /--(?:[A-Za-z][\w-]*)?\$\{|["'`]--["'`]\s*\+/;
 
 /** What the app's own files say about tokens, for pruning them: the custom properties they
  *  read (`var(--colors-brand)`, or `--colors-brand` in a Tailwind arbitrary value), and whether
@@ -924,6 +926,8 @@ export interface TokenUse {
     readonly vars: readonly string[];
     /** Whether a file uses runtime themes. */
     readonly runtimeTheme: boolean;
+    /** Whether a file reads a custom property whose name it builds at runtime. */
+    readonly dynamic: boolean;
     /** A file the scan couldn't read, which keeps every token. */
     readonly unreadable: string | undefined;
 }
@@ -954,6 +958,7 @@ export const scanTokenUse = (
     for (const file of others) files.add(file);
     const vars = new Set<string>();
     let runtimeTheme = false;
+    let dynamic = false;
     for (const file of files) {
         let source: string;
         try {
@@ -963,9 +968,10 @@ export const scanTokenUse = (
             continue;
         }
         if (RUNTIME_THEME.test(source)) runtimeTheme = true;
+        if (DYNAMIC_CUSTOM_PROPERTY.test(source)) dynamic = true;
         for (const match of source.matchAll(/--([A-Za-z][\w-]*)/g)) {
             vars.add(match[1]!);
         }
     }
-    return { vars: [...vars].sort(), runtimeTheme, unreadable };
+    return { vars: [...vars].sort(), runtimeTheme, dynamic, unreadable };
 };
