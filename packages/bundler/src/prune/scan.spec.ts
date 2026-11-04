@@ -405,6 +405,19 @@ describe("scanTokenUse", () => {
         expect(found.unreadable).toBeUndefined();
     });
 
+    it("still reads a folder a skipped path linked to first", () => {
+        const root = app({
+            "src/app.css": `a { color: var(--colors-brand); }`,
+        });
+        mkdirSync(join(root, "__tests__"));
+        symlinkSync(join(root, "src"), join(root, "__tests__/alias"));
+        const found = scanTokenUse(
+            { root, outDir: join(root, ".pureform") },
+            [],
+        );
+        expect(found.vars).toContain("colors-brand");
+    });
+
     it("reports an unreadable folder instead of throwing", () => {
         const root = app({ "src/app.ts": `export {};`, "locked/a.css": `a{}` });
         chmodSync(join(root, "locked"), 0o000);

@@ -839,8 +839,11 @@ const listScripts = (
     let stats;
     try {
         stats = statSync(path);
-    } catch {
-        return;
+    } catch (error) {
+        // A dangling or removed entry is nothing to read; anything else is a scan that
+        // can't be trusted to be complete.
+        if ((error as { code?: string }).code === "ENOENT") return;
+        throw error;
     }
     if (stats.isFile()) {
         if (pattern.test(path) && !TEST.test(path) && !path.endsWith(".d.ts")) {
@@ -849,7 +852,8 @@ const listScripts = (
         return;
     }
     if (!stats.isDirectory()) return;
-    // A symlink back up the tree would otherwise be walked again and again.
+    // A symlink back up the tree would otherwise be walked again and again: guard the
+    // ancestor chain only, so a folder reached by a second path is still read.
     const real = realpathSync(path);
     if (visited.has(real)) return;
     visited.add(real);
@@ -858,6 +862,7 @@ const listScripts = (
         if (name.startsWith(".") || SKIPPED.has(name) || skip(child)) continue;
         listScripts(child, skip, out, pattern, visited);
     }
+    visited.delete(real);
 };
 
 /** Scans an app for the components and variant values it uses. */
