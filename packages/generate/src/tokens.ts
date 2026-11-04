@@ -102,7 +102,8 @@ const entriesOf = (parts: object): Entry[] => {
     return out;
 };
 
-/** The var refs of a config's tokens (base and themes), each with whether it is a semantic token. */
+/** The var refs of a config's tokens (base and themes), each with whether it is a semantic token.
+ *  Springs are left out: they lower to suffixed vars (`--springs-fast-duration`). */
 export const tokenRefs = (
     config: CoreConfig,
 ): { ref: string; semantic: boolean }[] => {
@@ -111,6 +112,7 @@ export const tokenRefs = (
         ...entriesOf(config),
         ...Object.values(config.themes ?? {}).flatMap(entriesOf),
     ]) {
+        if (entry.path[0] === "springs") continue;
         seen.set(
             entry.ref,
             (seen.get(entry.ref) ?? false) ||

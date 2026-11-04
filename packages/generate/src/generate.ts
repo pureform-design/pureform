@@ -494,7 +494,13 @@ const generateUnlocked = async <Options = Record<string, unknown>>(
         pruning && adapter.name === "css"
             ? narrowConfig(config, components, variants, pruning)
             : config,
-        Object.fromEntries(entries.map((e) => [e.name, e.shape.tokens])),
+        // Spring tokens lower to suffixed vars, which an override's plain key doesn't set.
+        Object.fromEntries(
+            entries.map((e) => [
+                e.name,
+                e.shape.tokens.filter((t) => !e.shape.springs?.includes(t)),
+            ]),
+        ),
         options.overridableTokens,
     );
     const hints: string[] = [];

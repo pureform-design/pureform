@@ -379,7 +379,12 @@ const generateTargetsUnlocked = async <Options = Record<string, unknown>>(
         files,
         changed,
         ok: options.check ? !changed : true,
-        hints: hint ? [hint] : [],
+        hints: [
+            ...new Set([
+                ...(hint ? [hint] : []),
+                ...targets.flatMap((target) => target.full.hints),
+            ]),
+        ],
         dependencies: loaded?.dependencies ?? [],
     };
 };
