@@ -5,7 +5,7 @@
 // read statically keeps every value; whatever might reach a component it can't name stops the
 // pruning (`keep: undefined` and a warning), so a pruned build never lacks a style it uses.
 
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { readdirSync, readFileSync, realpathSync, statSync } from "node:fs";
 import { isAbsolute, join, relative, resolve, sep } from "node:path";
 
 import * as anatomies from "@pureform/anatomy";
@@ -834,6 +834,7 @@ const listScripts = (
     skip: (path: string) => boolean,
     out: string[],
     pattern: RegExp = SCRIPT,
+    visited: Set<string> = new Set(),
 ): void => {
     let stats;
     try {
@@ -848,10 +849,14 @@ const listScripts = (
         return;
     }
     if (!stats.isDirectory()) return;
+    // A symlink back up the tree would otherwise be walked again and again.
+    const real = realpathSync(path);
+    if (visited.has(real)) return;
+    visited.add(real);
     for (const name of readdirSync(path).sort()) {
         const child = join(path, name);
         if (name.startsWith(".") || SKIPPED.has(name) || skip(child)) continue;
-        listScripts(child, skip, out, pattern);
+        listScripts(child, skip, out, pattern, visited);
     }
 };
 
@@ -935,11 +940,15 @@ export const scanTokenUse = (
     const files = new Set(scripts);
     const others: string[] = [];
     // Styles and markup can sit outside the script `include`, such as a root `index.html`.
-    listScripts(root, skip, others, STYLE_OR_MARKUP);
+    let unreadable: string | undefined;
+    try {
+        listScripts(root, skip, others, STYLE_OR_MARKUP);
+    } catch (error) {
+        unreadable = (error as { path?: string }).path ?? root;
+    }
     for (const file of others) files.add(file);
     const vars = new Set<string>();
     let runtimeTheme = false;
-    let unreadable: string | undefined;
     for (const file of files) {
         let source: string;
         try {

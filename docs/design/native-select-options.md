@@ -58,7 +58,8 @@ Rules:
 
 1. `label` stays a string. A `ReactNode` label can't be put in an `<option>` or a UIMenu, and
    typeahead and the form value always read it. The closed trigger reads `triggerLabel` when set
-   (device renderers only), otherwise `label`.
+   (device renderers only), otherwise `label`. With `multiple`, each selected item contributes its
+   `triggerLabel` if set, else its `label`, joined as the trigger does today.
 2. **Web:** only `disabled`, `title`, `lang`, `dir` and per-copy `slotProps`; `triggerLabel` is ignored, since a native `<select>` shows the
    option's own text. No icons or rich content: a
    browser `<option>` can't draw them. Anyone who needs rich options on web should use `Select`

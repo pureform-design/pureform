@@ -1,4 +1,10 @@
-import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
+import {
+    chmodSync,
+    mkdirSync,
+    mkdtempSync,
+    symlinkSync,
+    writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 
@@ -386,6 +392,34 @@ describe("scanTokenUse", () => {
         const outDir = join(root, ".pureform");
         const found = scanTokenUse({ root, outDir, include: ["src"] }, []);
         expect(found.vars).toContain("colors-brand");
+    });
+
+    it("walks a symlink back to the root once", () => {
+        const root = app({ "src/app.ts": `export {};`, "a.css": `a{}` });
+        symlinkSync(root, join(root, "loop1"));
+        symlinkSync(root, join(root, "loop2"));
+        const found = scanTokenUse(
+            { root, outDir: join(root, ".pureform"), include: ["src"] },
+            [],
+        );
+        expect(found.unreadable).toBeUndefined();
+    });
+
+    it("reports an unreadable folder instead of throwing", () => {
+        const root = app({ "src/app.ts": `export {};`, "locked/a.css": `a{}` });
+        chmodSync(join(root, "locked"), 0o000);
+        try {
+            const found = scanTokenUse(
+                { root, outDir: join(root, ".pureform"), include: ["src"] },
+                [],
+            );
+            // Skipped when the tests run as a user who can read anything.
+            if (found.unreadable) {
+                expect(found.unreadable).toContain("locked");
+            }
+        } finally {
+            chmodSync(join(root, "locked"), 0o755);
+        }
     });
 
     it("sees an app that uses runtime themes", () => {
