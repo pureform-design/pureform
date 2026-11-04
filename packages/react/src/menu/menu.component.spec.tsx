@@ -587,30 +587,33 @@ describe("Menu, submenus", () => {
                 animation.pause();
                 return animation;
             });
-        const moving = () =>
-            content()
-                .getAnimations({ subtree: true })
-                .map(
-                    (animation) =>
-                        (
-                            (animation.effect as KeyframeEffect)
-                                .target as HTMLElement
-                        ).dataset["pfPart"],
-                );
-        await interact(() => userEvent.click(items()[1]!));
-        expect(moving()).toContain("content");
-        // The header's label, which the pressed item's moves into.
-        const header = items()[0]!.querySelector(
-            `[data-testid="${ids.itemLabel}"]`,
-        )!;
-        expect(header.getAnimations()).toHaveLength(1);
-        await frames(30);
-        await interact(() => userEvent.click(items()[0]!));
-        const share = items()[1]!.querySelector(
-            `[data-testid="${ids.itemLabel}"]`,
-        )!;
-        expect(share.getAnimations()).toHaveLength(1);
-        holding.mockRestore();
+        try {
+            const moving = () =>
+                content()
+                    .getAnimations({ subtree: true })
+                    .map(
+                        (animation) =>
+                            (
+                                (animation.effect as KeyframeEffect)
+                                    .target as HTMLElement
+                            ).dataset["pfPart"],
+                    );
+            await interact(() => userEvent.click(items()[1]!));
+            expect(moving()).toContain("content");
+            // The header's label, which the pressed item's moves into.
+            const header = items()[0]!.querySelector(
+                `[data-testid="${ids.itemLabel}"]`,
+            )!;
+            expect(header.getAnimations()).toHaveLength(1);
+            await frames(30);
+            await interact(() => userEvent.click(items()[0]!));
+            const share = items()[1]!.querySelector(
+                `[data-testid="${ids.itemLabel}"]`,
+            )!;
+            expect(share.getAnimations()).toHaveLength(1);
+        } finally {
+            holding.mockRestore();
+        }
     });
 
     // The submenu as it opens: its content shown, or drilled into (the rows read the submenu's).
