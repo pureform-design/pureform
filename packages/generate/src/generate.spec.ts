@@ -347,6 +347,27 @@ describe("generate", () => {
     });
 
     describe("usage", () => {
+        it("reports what token pruning kept, for the CSS adapter only", async () => {
+            const root = tempRoot();
+            const usage = { components: ["button"], pruneTokens: true };
+            const css = await generate({
+                root,
+                config: fixtureConfig(),
+                target: { ...fakeAdapter(), name: "css" },
+                usage,
+            });
+            expect(css.tokenPruning?.tokens.kept).toBeLessThanOrEqual(
+                css.tokenPruning!.tokens.total,
+            );
+            const other = await generate({
+                root,
+                config: fixtureConfig(),
+                target: fakeAdapter(),
+                usage,
+            });
+            expect(other.tokenPruning).toBeUndefined();
+        });
+
         it("keeps the used components within the allow-list, and drops lazy names left out", async () => {
             const root = tempRoot();
             const adapter = fakeAdapter();

@@ -40,6 +40,9 @@ results and recordings.
 - **F2. Token, theme and @property pruning:** separate design; account for runtime token/theme
   references and dynamic usage (keyframe pruning is done in `narrowConfig`).
 
+Proposals with open decisions, no code yet: F1 in `docs/design/native-select-options.md`, F2 in
+`docs/design/token-pruning.md`.
+
 ## External verification and maintenance
 
 - **Full-gate timing failures (load, not reproduced alone):** under the parallel full workspace

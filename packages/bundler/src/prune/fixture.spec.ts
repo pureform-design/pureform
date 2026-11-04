@@ -15,6 +15,7 @@ import { build } from "vite";
 import { describe, expect, it } from "vitest";
 
 import { writeTree } from "../__fixtures__/app";
+import type { PruneOptions } from "../options";
 import { pureform } from "../plugin";
 
 const PACKAGES = resolve(__dirname, "../../..");
@@ -49,8 +50,11 @@ const fixture = (): string => {
     return root;
 };
 
-const built = async (root: string, prune: boolean) => {
-    const outDir = prune ? "pruned" : "full";
+const built = async (
+    root: string,
+    prune: boolean | PruneOptions,
+    outDir = prune ? "pruned" : "full",
+) => {
     await build({
         root,
         configFile: false,
@@ -131,6 +135,30 @@ describe("a pruned build", () => {
                 expect(pruned.css, unused).not.toContain(unused);
             }
             expect(pruned.css.length).toBeLessThan(full.css.length / 2);
+        },
+    );
+
+    it(
+        "drops tokens nothing reaches, and keeps the ones the app's own styles read",
+        { timeout: 120_000 },
+        async () => {
+            const root = fixture();
+            writeTree(root, {
+                "src/page.css": `.x { color: var(--colors-tertiary); }`,
+            });
+            const pruned = await built(root, true);
+            const lean = await built(
+                root,
+                { tokens: "safe", exclude: ["pruned", "full"] },
+                "lean",
+            );
+            expect(lean.css.length).toBeLessThan(pruned.css.length);
+            const dropped = [...pruned.css.matchAll(/(--[\w-]+):/g)]
+                .map((m) => m[1]!)
+                .filter((name) => !lean.css.includes(`${name}:`));
+            expect(dropped.length).toBeGreaterThan(0);
+            expect(dropped).not.toContain("--colors-tertiary-light");
+            expect(lean.css).toContain("--colors-tertiary-light:");
         },
     );
 });

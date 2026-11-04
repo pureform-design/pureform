@@ -5,7 +5,7 @@
 // read statically keeps every value; whatever might reach a component it can't name stops the
 // pruning (`keep: undefined` and a warning), so a pruned build never lacks a style it uses.
 
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { readdirSync, readFileSync, realpathSync, statSync } from "node:fs";
 import { isAbsolute, join, relative, resolve, sep } from "node:path";
 
 import * as anatomies from "@pureform/anatomy";
@@ -833,25 +833,36 @@ const listScripts = (
     path: string,
     skip: (path: string) => boolean,
     out: string[],
+    pattern: RegExp = SCRIPT,
+    visited: Set<string> = new Set(),
 ): void => {
     let stats;
     try {
         stats = statSync(path);
-    } catch {
-        return;
+    } catch (error) {
+        // A dangling or removed entry is nothing to read; anything else is a scan that
+        // can't be trusted to be complete.
+        if ((error as { code?: string }).code === "ENOENT") return;
+        throw error;
     }
     if (stats.isFile()) {
-        if (SCRIPT.test(path) && !TEST.test(path) && !path.endsWith(".d.ts")) {
+        if (pattern.test(path) && !TEST.test(path) && !path.endsWith(".d.ts")) {
             out.push(path);
         }
         return;
     }
     if (!stats.isDirectory()) return;
+    // A symlink back up the tree would otherwise be walked again and again: guard the
+    // ancestor chain only, so a folder reached by a second path is still read.
+    const real = realpathSync(path);
+    if (visited.has(real)) return;
+    visited.add(real);
     for (const name of readdirSync(path).sort()) {
         const child = join(path, name);
         if (name.startsWith(".") || SKIPPED.has(name) || skip(child)) continue;
-        listScripts(child, skip, out);
+        listScripts(child, skip, out, pattern, visited);
     }
+    visited.delete(real);
 };
 
 /** Scans an app for the components and variant values it uses. */
@@ -900,4 +911,67 @@ export const scanUsage = (options: ScanOptions): ScanResult => {
         };
     }
     return { usage: collector.usage(), warnings: [], files };
+};
+
+const STYLE_OR_MARKUP = /\.(?:css|scss|sass|less|html|vue|svelte|astro|mdx?)$/;
+const RUNTIME_THEME = /runtime-theme|themeScope\b|defineRuntimeTheme\b/;
+// A custom property name built at runtime: `--${name}`, `--spacing-${name}`, or `"--" + name`.
+const DYNAMIC_CUSTOM_PROPERTY = /--(?:[A-Za-z][\w-]*)?\$\{|["'`]--["'`]\s*\+/;
+
+/** What the app's own files say about tokens, for pruning them: the custom properties they
+ *  read (`var(--colors-brand)`, or `--colors-brand` in a Tailwind arbitrary value), and whether
+ *  they use runtime themes, whose tokens a build can't see. */
+export interface TokenUse {
+    /** Custom property names without the `--`. */
+    readonly vars: readonly string[];
+    /** Whether a file uses runtime themes. */
+    readonly runtimeTheme: boolean;
+    /** Whether a file reads a custom property whose name it builds at runtime. */
+    readonly dynamic: boolean;
+    /** A file the scan couldn't read, which keeps every token. */
+    readonly unreadable: string | undefined;
+}
+
+/** Reads the app's scripts, styles, and markup for the custom properties they use. */
+export const scanTokenUse = (
+    options: Pick<ScanOptions, "root" | "include" | "exclude" | "outDir">,
+    scripts: readonly string[],
+): TokenUse => {
+    const root = resolve(options.root);
+    const excluded = [
+        resolve(options.outDir),
+        ...(options.exclude ?? []).map((path) => resolve(root, path)),
+    ];
+    const skip = (path: string) =>
+        excluded.some(
+            (folder) => path === folder || path.startsWith(folder + sep),
+        );
+    const files = new Set(scripts);
+    const others: string[] = [];
+    // Styles and markup can sit outside the script `include`, such as a root `index.html`.
+    let unreadable: string | undefined;
+    try {
+        listScripts(root, skip, others, STYLE_OR_MARKUP);
+    } catch (error) {
+        unreadable = (error as { path?: string }).path ?? root;
+    }
+    for (const file of others) files.add(file);
+    const vars = new Set<string>();
+    let runtimeTheme = false;
+    let dynamic = false;
+    for (const file of files) {
+        let source: string;
+        try {
+            source = readFileSync(file, "utf8");
+        } catch {
+            unreadable ??= file;
+            continue;
+        }
+        if (RUNTIME_THEME.test(source)) runtimeTheme = true;
+        if (DYNAMIC_CUSTOM_PROPERTY.test(source)) dynamic = true;
+        for (const match of source.matchAll(/--([A-Za-z][\w-]*)/g)) {
+            vars.add(match[1]!);
+        }
+    }
+    return { vars: [...vars].sort(), runtimeTheme, dynamic, unreadable };
 };

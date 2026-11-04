@@ -4,7 +4,7 @@
 import type { GenerateResult, Usage } from "@pureform/generate";
 
 import type { PruneOptions } from "../options";
-import { scanUsage } from "./scan";
+import { scanTokenUse, scanUsage } from "./scan";
 
 export { scanUsage } from "./scan";
 export type { ScanOptions, ScanResult } from "./scan";
@@ -17,6 +17,11 @@ export interface Pruning {
     readonly warnings: readonly string[];
 }
 
+const scanOptions = (options: PruneOptions) => ({
+    ...(options.include && { include: options.include }),
+    ...(options.exclude && { exclude: options.exclude }),
+});
+
 /** Scans an app and applies the pruning options to what it found. */
 export const findUsage = (
     root: string,
@@ -28,8 +33,7 @@ export const findUsage = (
         scanned = scanUsage({
             root,
             outDir,
-            ...(options.include && { include: options.include }),
-            ...(options.exclude && { exclude: options.exclude }),
+            ...scanOptions(options),
         });
     } catch (error) {
         return {
@@ -53,15 +57,59 @@ export const findUsage = (
             ([name]) => !keep.has(name),
         ),
     );
+    const warnings: string[] = [];
+    let tokens: Pick<Usage, "pruneTokens" | "keepTokens" | "appVars"> = {};
+    if (options.tokens === "safe") {
+        const use = scanTokenUse(
+            { root, outDir, ...scanOptions(options) },
+            scanned.files,
+        );
+        if (use.runtimeTheme) {
+            warnings.push(
+                "pureform: token pruning is off, since the app uses runtime-theme, whose tokens a build can't see.",
+            );
+        } else if (use.unreadable) {
+            warnings.push(
+                `pureform: token pruning is off, since ${use.unreadable} couldn't be read.`,
+            );
+        } else if (use.dynamic) {
+            warnings.push(
+                "pureform: token pruning is off, since the app reads custom properties by names it builds at runtime, which the scan can't identify.",
+            );
+        } else {
+            tokens = {
+                pruneTokens: true,
+                appVars: use.vars,
+                ...(options.keepTokens && { keepTokens: options.keepTokens }),
+            };
+        }
+    }
     return {
         usage: {
             components: [
                 ...new Set([...scanned.usage.components, ...keep]),
             ].sort(),
             variants: options.variants === false ? {} : variants,
+            ...(options.themes && { themes: options.themes }),
+            ...tokens,
         },
-        warnings: [],
+        warnings,
     };
+};
+
+// What token pruning dropped, as a clause to append, or nothing when it dropped none.
+const dropped = ({ tokenPruning }: GenerateResult): string => {
+    if (!tokenPruning) return "";
+    const { tokens, themes } = tokenPruning;
+    const parts = [
+        ...(tokens.kept < tokens.total
+            ? [`${tokens.kept} of ${tokens.total} tokens`]
+            : []),
+        ...(themes.kept < themes.total
+            ? [`${themes.kept} of ${themes.total} themes`]
+            : []),
+    ];
+    return parts.length > 0 ? `; kept ${parts.join(", ")}` : "";
 };
 
 /** One line saying what a pruned build kept. */
@@ -71,5 +119,5 @@ export const describePruning = (result: GenerateResult): string => {
         names.length <= 8
             ? names.join(", ")
             : `${names.slice(0, 8).join(", ")}, …`;
-    return `pureform: pruned the generated registry to the ${names.length} component${names.length === 1 ? "" : "s"} the app uses${names.length > 0 ? ` (${shown})` : ""}, and the variant values it selects`;
+    return `pureform: pruned the generated registry to the ${names.length} component${names.length === 1 ? "" : "s"} the app uses${names.length > 0 ? ` (${shown})` : ""}, and the variant values it selects${dropped(result)}`;
 };

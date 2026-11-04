@@ -1,10 +1,16 @@
-import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
+import {
+    chmodSync,
+    mkdirSync,
+    mkdtempSync,
+    symlinkSync,
+    writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-import { scanUsage } from "./scan";
+import { scanTokenUse, scanUsage } from "./scan";
 
 const app = (files: Record<string, string>): string => {
     const root = mkdtempSync(join(tmpdir(), "pureform-scan-"));
@@ -350,5 +356,103 @@ describe("scanUsage", () => {
         const result = scan({ "src/app.tsx": source });
         expect(result.usage).toBeUndefined();
         expect(result.warnings.join("\n")).toContain(warning);
+    });
+});
+
+describe("scanTokenUse", () => {
+    const use = (files: Record<string, string>) => {
+        const root = app(files);
+        const outDir = join(root, ".pureform");
+        return scanTokenUse({ root, outDir }, [
+            ...scanUsage({ root, outDir }).files,
+        ]);
+    };
+
+    it("reads the custom properties scripts, styles, and markup use", () => {
+        const found = use({
+            "src/app.tsx": `export const a = { color: "var(--colors-brand)" };`,
+            "src/app.css": `.x { margin: var(--spacing-4); --local: 1; }`,
+            "index.html": `<div class="bg-[--colors-surface]"></div>`,
+        });
+        expect(found.vars).toEqual(
+            expect.arrayContaining([
+                "colors-brand",
+                "spacing-4",
+                "colors-surface",
+            ]),
+        );
+        expect(found.runtimeTheme).toBe(false);
+    });
+
+    it("reads styles and markup outside the script include", () => {
+        const root = app({
+            "src/app.ts": `export {};`,
+            "index.html": `<div style="color: var(--colors-brand)"></div>`,
+        });
+        const outDir = join(root, ".pureform");
+        const found = scanTokenUse({ root, outDir, include: ["src"] }, []);
+        expect(found.vars).toContain("colors-brand");
+    });
+
+    it("walks a symlink back to the root once", () => {
+        const root = app({ "src/app.ts": `export {};`, "a.css": `a{}` });
+        symlinkSync(root, join(root, "loop1"));
+        symlinkSync(root, join(root, "loop2"));
+        const found = scanTokenUse(
+            { root, outDir: join(root, ".pureform"), include: ["src"] },
+            [],
+        );
+        expect(found.unreadable).toBeUndefined();
+    });
+
+    it("still reads a folder a skipped path linked to first", () => {
+        const root = app({
+            "src/app.css": `a { color: var(--colors-brand); }`,
+        });
+        mkdirSync(join(root, "__tests__"));
+        symlinkSync(join(root, "src"), join(root, "__tests__/alias"));
+        const found = scanTokenUse(
+            { root, outDir: join(root, ".pureform") },
+            [],
+        );
+        expect(found.vars).toContain("colors-brand");
+    });
+
+    it("reports an unreadable folder instead of throwing", () => {
+        const root = app({ "src/app.ts": `export {};`, "locked/a.css": `a{}` });
+        chmodSync(join(root, "locked"), 0o000);
+        try {
+            const found = scanTokenUse(
+                { root, outDir: join(root, ".pureform"), include: ["src"] },
+                [],
+            );
+            // Skipped when the tests run as a user who can read anything.
+            if (found.unreadable) {
+                expect(found.unreadable).toContain("locked");
+            }
+        } finally {
+            chmodSync(join(root, "locked"), 0o755);
+        }
+    });
+
+    it("flags custom properties built at runtime", () => {
+        for (const source of [
+            "el.style.getPropertyValue(`--${name}`)",
+            "el.style.getPropertyValue(`--spacing-${name}`)",
+            `getComputedStyle(el).getPropertyValue("--" + name)`,
+        ]) {
+            expect(use({ "src/a.ts": source }).dynamic, source).toBe(true);
+        }
+        expect(
+            use({ "src/a.ts": `const x = "var(--colors-a)";` }).dynamic,
+        ).toBe(false);
+    });
+
+    it("sees an app that uses runtime themes", () => {
+        expect(
+            use({
+                "src/app.ts": `import { themeScope } from "@pureform/styling-web";`,
+            }).runtimeTheme,
+        ).toBe(true);
     });
 });

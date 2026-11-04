@@ -77,6 +77,16 @@ export interface PruneOptions {
     readonly keep?: readonly string[];
     /** Narrow each component's variant values too, not only the components. Default `true`. */
     readonly variants?: boolean;
+    /** The named themes the app selects, as `[data-theme="name"]` values the scan can't see:
+     *  the others are left out of the stylesheet. Default: every theme. */
+    readonly themes?: readonly string[];
+    /** Drop the tokens nothing the kept components reach: `"safe"`, or `"off"` (default). Custom
+     *  properties the app's own scripts, styles, and markup read (styles and markup anywhere under the root) are kept, and runtime themes
+     *  (`runtime-theme`) turn it off, since their tokens can't be seen at build time. */
+    readonly tokens?: "off" | "safe";
+    /** Tokens to keep with `tokens: "safe"`: globs such as `colors.*` or
+     *  `semanticTokens.surface.*`. */
+    readonly keepTokens?: readonly string[];
 }
 
 /** The options `generateTargets` gets from the plugin's, for a root: `pruned` writes the

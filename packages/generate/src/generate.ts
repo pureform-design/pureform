@@ -31,7 +31,12 @@ import {
 } from "./registry-index";
 import type { GeneratedEntry } from "./registry-index";
 import { componentShape } from "./shape";
-import { normalizeVariants } from "./usage";
+import {
+    countTokens,
+    narrowConfig,
+    normalizeVariants,
+    tokenPruning,
+} from "./usage";
 import type { Usage } from "./usage";
 import { checkVersions, findInstalled } from "./version-check";
 import { compareFiles, readGenerated, writeFiles } from "./write";
@@ -104,6 +109,12 @@ export interface GenerateResult {
     /** The declarations' contents, without the header, whether written or not. Empty in check
      *  mode when the adapter wasn't run. */
     readonly declarations: string;
+    /** What token and theme pruning kept, when it ran: token entries and named themes, kept of
+     *  total. Only for adapters that apply it (the CSS one). */
+    readonly tokenPruning?: {
+        readonly tokens: { readonly kept: number; readonly total: number };
+        readonly themes: { readonly kept: number; readonly total: number };
+    };
 }
 
 const toPosix = (path: string): string => path.split(sep).join("/");
@@ -349,6 +360,21 @@ const generateUnlocked = async <Options = Record<string, unknown>>(
         return found;
     };
     const variants = normalizeVariants(usage?.variants, components, shape);
+    const pruning = tokenPruning(usage);
+    // Only the CSS adapter narrows its stylesheet by it.
+    const prunedTokens =
+        pruning && adapter.name === "css"
+            ? (() => {
+                  const before = countTokens(config);
+                  const after = countTokens(
+                      narrowConfig(config, components, variants, pruning),
+                  );
+                  return {
+                      tokens: { kept: after.tokens, total: before.tokens },
+                      themes: { kept: after.themes, total: before.themes },
+                  };
+              })()
+            : undefined;
 
     const hash = hashOf({
         format: OUTPUT_FORMAT,
@@ -359,6 +385,7 @@ const generateUnlocked = async <Options = Record<string, unknown>>(
         lazy: [...lazy],
         // Only when it narrows anything, so an unpruned registry keeps its hash.
         ...(Object.keys(variants).length > 0 && { variants }),
+        ...(pruning && { pruning }),
         versions: Object.fromEntries(
             installed.map((entry) => [entry.name, entry.version]),
         ),
@@ -385,6 +412,7 @@ const generateUnlocked = async <Options = Record<string, unknown>>(
             components,
             platform: adapter.platform,
             declarations,
+            ...(prunedTokens && { tokenPruning: prunedTokens }),
         };
     };
 
@@ -413,6 +441,7 @@ const generateUnlocked = async <Options = Record<string, unknown>>(
         config,
         components,
         variants,
+        ...(pruning && { pruning }),
         options: adapterOptions,
         root,
         outDir,

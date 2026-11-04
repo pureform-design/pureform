@@ -361,3 +361,58 @@ describe("compileCss (pruned keyframes)", () => {
         ).toContain("overlayFadeIn");
     });
 });
+
+describe("compileCss (pruned tokens)", () => {
+    const config = pureform();
+    const declared = (css: string) =>
+        new Set([...css.matchAll(/^\s*(--[\w-]+):/gm)].map((m) => m[1]!));
+    // Every var a stylesheet reads: `var(--x)` or `var(--x, fallback)`.
+    const read = (css: string) =>
+        new Set([...css.matchAll(/var\((--[\w-]+)/g)].map((m) => m[1]!));
+    const SUBSETS = [
+        ["button"],
+        ["button", "linearProgress"],
+        ["menu", "button"],
+        ["fadeThrough"],
+        Object.keys(config.components),
+    ];
+
+    it.each(SUBSETS)("leaves no dangling var for %s", (...names) => {
+        const css = compileCss(
+            narrowConfig(config, names, {}, { pruneTokens: true }),
+        );
+        const have = declared(css);
+        // Vars an element sets on itself or a runtime does, not tokens.
+        const missing = [...read(css)].filter(
+            (name) =>
+                !have.has(name) &&
+                /^--(colors|spacing|radii|fontSizes|fonts|durations|easings|zIndex|springs)-/.test(
+                    name,
+                ),
+        );
+        expect(missing).toEqual([]);
+    });
+
+    it("emits fewer token vars than the full build, never more", () => {
+        const full = compileCss(narrowConfig(config, ["button"]));
+        const pruned = compileCss(
+            narrowConfig(config, ["button"], {}, { pruneTokens: true }),
+        );
+        expect(pruned.length).toBeLessThan(full.length);
+        expect([...declared(pruned)].every((n) => declared(full).has(n))).toBe(
+            true,
+        );
+    });
+
+    it("keeps tokens by keepTokens glob", () => {
+        const css = compileCss(
+            narrowConfig(
+                config,
+                ["button"],
+                {},
+                { pruneTokens: true, keepTokens: ["spacing.*"] },
+            ),
+        );
+        expect(css).toContain("--spacing-");
+    });
+});

@@ -200,3 +200,125 @@ describe("narrowConfig keyframes", () => {
         ]);
     });
 });
+
+describe("narrowConfig (tokens and themes)", () => {
+    const alias = (...path: string[]) => ({ type: "alias", path });
+    const lit = (value: string) => ({ type: "literal", value });
+    const base = {
+        tokens: {
+            colors: {
+                primary: lit("red"),
+                primaryContainer: lit("pink"),
+                base: lit("blue"),
+                unused: lit("black"),
+            },
+            fontSize: { body: lit("1rem"), huge: lit("4rem") },
+        },
+        semanticTokens: {
+            colors: { brand: alias("tokens", "colors", "base") },
+        },
+        durations: { fast: lit("100ms"), slow: lit("400ms") },
+        springs: { spatial: lit("spring") },
+        textStyles: {
+            body: { fontSize: alias("tokens", "fontSize", "body") },
+            display: { fontSize: alias("tokens", "fontSize", "huge") },
+        },
+        themes: {
+            teal: { tokens: { colors: { primary: lit("teal") } } },
+            rose: { tokens: { colors: { unused: lit("rose") } } },
+        },
+        components: {
+            button: {
+                kind: "component",
+                name: "button",
+                recipe: {
+                    base: {
+                        color: alias("semanticTokens", "colors", "brand"),
+                        background: alias("tokens", "colors", "primary"),
+                        textStyle: alias("textStyles", "body"),
+                        transition: alias("durations", "fast"),
+                    },
+                },
+            },
+            chip: {
+                kind: "component",
+                name: "chip",
+                recipe: {
+                    base: { color: alias("tokens", "colors", "unused") },
+                },
+            },
+        },
+    } as unknown as CoreConfig;
+    const prune = (
+        pruning: Parameters<typeof narrowConfig>[3],
+        components = ["button"],
+    ) => narrowConfig(base, components, {}, pruning);
+
+    it("keeps everything unless asked", () => {
+        expect(prune({}).tokens).toEqual(base.tokens);
+        expect(prune({}).themes).toEqual(base.themes);
+    });
+
+    it("keeps what kept components reach, through aliases and text styles", () => {
+        const pruned = prune({ pruneTokens: true });
+        expect(Object.keys(pruned.tokens["colors"]!).sort()).toEqual([
+            "base",
+            "primary",
+        ]);
+        expect(Object.keys(pruned.tokens["fontSize"]!)).toEqual(["body"]);
+        expect(Object.keys(pruned.textStyles!)).toEqual(["body"]);
+        expect(Object.keys(pruned.durations!)).toEqual(["fast"]);
+    });
+
+    it("never takes a token by its prefix", () => {
+        expect(
+            prune({ pruneTokens: true }).tokens["colors"],
+        ).not.toHaveProperty("primaryContainer");
+    });
+
+    it("keeps every spring", () => {
+        expect(Object.keys(prune({ pruneTokens: true }).springs!)).toEqual([
+            "spatial",
+        ]);
+    });
+
+    it("keeps what keepTokens names, by config path or var ref", () => {
+        const pruned = prune({
+            pruneTokens: true,
+            keepTokens: ["colors.primaryContainer", "durations.*"],
+        });
+        expect(pruned.tokens["colors"]).toHaveProperty("primaryContainer");
+        expect(Object.keys(pruned.durations!).sort()).toEqual(["fast", "slow"]);
+    });
+
+    it("keeps a token a raw var names", () => {
+        const withRaw = {
+            ...base,
+            componentBaseStyles: {
+                color: {
+                    type: "literal",
+                    value: "var(--colors-primary-container)",
+                },
+            },
+        } as unknown as CoreConfig;
+        const pruned = narrowConfig(
+            withRaw,
+            ["button"],
+            {},
+            { pruneTokens: true },
+        );
+        expect(pruned.tokens["colors"]).toHaveProperty("primaryContainer");
+    });
+
+    it("drops a theme's unreached tokens, and the themes the app doesn't select", () => {
+        const pruned = prune({ pruneTokens: true });
+        expect(pruned.themes!["rose"]).toEqual({ tokens: {} });
+        expect(pruned.themes!["teal"]!.tokens!["colors"]).toHaveProperty(
+            "primary",
+        );
+        expect(Object.keys(prune({ themes: ["teal"] }).themes!)).toEqual([
+            "teal",
+        ]);
+        expect(prune({ themes: [] }).themes).toEqual({});
+    });
+});

@@ -4,7 +4,7 @@
 
 import type { CoreConfig } from "@pureform/core/types";
 
-import type { VariantUsage } from "./usage";
+import type { TokenPruning, VariantUsage } from "./usage";
 
 /** Where the generated factories run: `web` modules export a `ClassFactory`, `native` modules a
  *  `StyleFactory`. */
@@ -55,6 +55,10 @@ export interface CodegenContext<Options = Record<string, unknown>> {
      *  config). A component or group left out keeps every value; empty or absent when nothing
      *  narrows. Factory modules don't change. */
     readonly variants?: VariantUsage;
+    /** The themes and tokens the app's usage lets a stylesheet leave out, when the bundler plugin
+     *  asked for it (`narrowConfig` takes it as its fourth argument). Absent when nothing is
+     *  pruned. */
+    readonly pruning?: TokenPruning;
     /** The adapter's own build options, as the bundler plugin or the CLI passed them (`prefix`,
      *  `classPrefix`, …). They're part of the header hash. */
     readonly options: Options;
