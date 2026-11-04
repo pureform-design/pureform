@@ -577,29 +577,43 @@ describe("Menu, submenus", () => {
         await interact(() => userEvent.click(byTestId(ids.trigger)));
         await frames();
         const content = () => contents()[0]!;
-        const moving = () =>
-            content()
-                .getAnimations({ subtree: true })
-                .map(
-                    (animation) =>
-                        (
-                            (animation.effect as KeyframeEffect)
-                                .target as HTMLElement
-                        ).dataset["pfPart"],
-                );
-        await interact(() => userEvent.click(items()[1]!));
-        expect(moving()).toContain("content");
-        // The header's label, which the pressed item's moves into.
-        const header = items()[0]!.querySelector(
-            `[data-testid="${ids.itemLabel}"]`,
-        )!;
-        expect(header.getAnimations()).toHaveLength(1);
-        await frames(30);
-        await interact(() => userEvent.click(items()[0]!));
-        const share = items()[1]!.querySelector(
-            `[data-testid="${ids.itemLabel}"]`,
-        )!;
-        expect(share.getAnimations()).toHaveLength(1);
+        // A user event can take seconds on a loaded machine, longer than a drill step's motion, so
+        // each animation holds where it starts until the test is done looking.
+        const animate = Element.prototype.animate;
+        const holding = vi
+            .spyOn(Element.prototype, "animate")
+            .mockImplementation(function (this: Element, ...args) {
+                const animation = animate.apply(this, args);
+                animation.pause();
+                return animation;
+            });
+        try {
+            const moving = () =>
+                content()
+                    .getAnimations({ subtree: true })
+                    .map(
+                        (animation) =>
+                            (
+                                (animation.effect as KeyframeEffect)
+                                    .target as HTMLElement
+                            ).dataset["pfPart"],
+                    );
+            await interact(() => userEvent.click(items()[1]!));
+            expect(moving()).toContain("content");
+            // The header's label, which the pressed item's moves into.
+            const header = items()[0]!.querySelector(
+                `[data-testid="${ids.itemLabel}"]`,
+            )!;
+            expect(header.getAnimations()).toHaveLength(1);
+            await frames(30);
+            await interact(() => userEvent.click(items()[0]!));
+            const share = items()[1]!.querySelector(
+                `[data-testid="${ids.itemLabel}"]`,
+            )!;
+            expect(share.getAnimations()).toHaveLength(1);
+        } finally {
+            holding.mockRestore();
+        }
     });
 
     // The submenu as it opens: its content shown, or drilled into (the rows read the submenu's).
