@@ -1,6 +1,7 @@
 // Token and theme pruning for `narrowConfig`: drops the named themes an app doesn't select, and
 // the tokens nothing a build keeps can reach. It errs toward keeping, as keyframe pruning does.
 
+import { isSpringToken, tokenValue } from "@pureform/core";
 import type { CoreConfig, ThemeOverride } from "@pureform/core/types";
 
 /** What a pruned build may drop besides components and variant values. */
@@ -103,7 +104,8 @@ const entriesOf = (parts: object): Entry[] => {
 };
 
 /** The var refs of a config's tokens (base and themes), each with whether it is a semantic token.
- *  Springs are left out: they lower to suffixed vars (`--springs-fast-duration`). */
+ *  Springs, and tokens holding one, are left out: they lower to suffixed vars
+ *  (`--springs-fast-duration`). */
 export const tokenRefs = (
     config: CoreConfig,
 ): { ref: string; semantic: boolean }[] => {
@@ -112,7 +114,17 @@ export const tokenRefs = (
         ...entriesOf(config),
         ...Object.values(config.themes ?? {}).flatMap(entriesOf),
     ]) {
-        if (entry.path[0] === "springs") continue;
+        if (
+            entry.path[0] === "springs" ||
+            isSpringToken(
+                tokenValue(entry.value as never) as Parameters<
+                    typeof isSpringToken
+                >[0],
+                { config },
+            )
+        ) {
+            continue;
+        }
         seen.set(
             entry.ref,
             (seen.get(entry.ref) ?? false) ||

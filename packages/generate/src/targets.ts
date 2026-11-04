@@ -382,7 +382,8 @@ const generateTargetsUnlocked = async <Options = Record<string, unknown>>(
         hints: [
             ...new Set([
                 ...(hint ? [hint] : []),
-                ...targets.flatMap((target) => target.full.hints),
+                // The declarations come from the default target, so its hints speak for them.
+                ...main.full.hints,
             ]),
         ],
         dependencies: loaded?.dependencies ?? [],

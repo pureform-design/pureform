@@ -5,7 +5,10 @@ import { overridableTokens } from "./overridable";
 
 const config = {
     tokens: { colors: { blue500: "#00f" }, spacing: { 4: "1rem" } },
-    semanticTokens: { colors: { primary: "{colors.blue500}" } },
+    semanticTokens: {
+        colors: { primary: "{colors.blue500}" },
+        motion: { fast: { type: "alias", path: ["springs", "fast"] } },
+    },
     springs: { fast: { type: "spring" } },
     themes: { teal: { semanticTokens: { colors: { accent: "#0aa" } } } },
 } as unknown as CoreConfig;
@@ -37,6 +40,7 @@ describe("overridableTokens", () => {
 
     it("leaves out spring tokens, which lower to suffixed vars", () => {
         expect(refs({ include: ["all"] })).not.toContain("springs.fast");
+        expect(refs({ include: ["all"] })).not.toContain("motion.fast");
     });
 
     it("names each token's category", () => {
